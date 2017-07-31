@@ -1,3 +1,9 @@
+version 0.003; 2017-07-21
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in META.{yml,json}, point to public bug tracker
+
 version 0.002; 2012-06-18
 
   * make test more forgiving regarding whitespace in

@@ -58,7 +58,16 @@ my $build = Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Perl4-CoreLibs\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Perl4-CoreLibs",
+			},
+		},
+	},
 	sign => 1,
 );
 $build->add_build_element("pl");

@@ -22,10 +22,12 @@ use JSON;
 use File::Spec;
 use Net::CIDR qw/cidr2range/;
 use Socket qw/inet_aton inet_ntoa/;
+use Memoize;
+memoize( 'read_ipinfo' );
 
 our $DEBUG = 0;
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 my ( $vol, $dir, $file ) = File::Spec->splitpath( __FILE__ );
 our $IPINFO_LOC_F = File::Spec->catpath( $vol, $dir, "inet_loc.csv" );
@@ -50,7 +52,7 @@ sub cidr_to_range {
 
 sub get_ipinfo {
   my ( $ip_list, %opt ) = @_;
-  $opt{i}               //= 0;
+  $opt{i}               ||= 0;
   $opt{return_arrayref} //= 1;
 
   my $i       = 0;
@@ -94,10 +96,10 @@ sub iterate_ipinfo {
 
   #deal with large ip_list file, ip_list is inet-sorted
   my ( $ip_list, %opt ) = @_;
-  $opt{i}               //= 0;
-  $opt{return_arrayref} //= 0;
-  $opt{ipinfo_file}  //= $IPINFO_LOC_F;
-  $opt{ipinfo_names} //= [qw/country area isp country_code area_code isp_code/];
+  $opt{i}               ||= 0;
+  $opt{return_arrayref} ||= 0;
+  $opt{ipinfo_file}  ||= $IPINFO_LOC_F;
+  $opt{ipinfo_names} ||= [qw/country area isp country_code area_code isp_code/];
 
   my $ip_info = read_ipinfo( $opt{ipinfo_file} );
   my $n       = $#$ip_info;
@@ -108,34 +110,39 @@ sub iterate_ipinfo {
   my $res = read_table(
     $ip_list,
     conv_sub => sub {
-      my ( $r ) = @_;
-      my ( $ip, $inet, $rr ) = calc_ip_inet( $r->[ $opt{i} ], \%opt );
+        my ( $r ) = @_;
+        my ( $ip, $inet, $rr ) = calc_ip_inet( $r->[ $opt{i} ], \%opt );
 
-      my $res_r;
+        return [ @$r, @{$rr}{ @{ $opt{ipinfo_names} } } ] if($rr);
 
-      my $rem_i = $i>$n ? 0 : $i;
+        #start from i=0
+        if($i>$n){
+            $i = 0;
+            ( $s, $e ) = @{$ip_info->[$i]}{qw/s e/};
+        }
 
-      if ( $rr ) {
-        $res_r = $rr;
-      } elsif ( $inet < $s or $i > $n ) {
-        $res_r = \%UNKNOWN;
-      } else {
+        #<- to nearby $i
+        while($inet<$s and $i>0){
+            $i = int($i/2);
+            ( $s, $e ) = @{$ip_info->[$i]}{qw/s e/};
+        }
+
+        #-> to nearby $i
         while ( $inet > $e and $i < $n ) {
-          $i++;
-          $ir = $ip_info->[$i];
-          ( $s, $e ) = @{$ir}{qw/s e/};
+            $i++;
+            $ir = $ip_info->[$i];
+            ( $s, $e ) = @{$ir}{qw/s e/};
         }
+
+        my $res_r;
         if ( $inet >= $s and $inet <= $e and $i <= $n ) {
-          $res_r = $ir;
-          print "$i : $ip, start $res_r->{s}, end $res_r->{e}, inet $inet\n" if ( $DEBUG );
-          $rem_i = $i;
+            $res_r = $ir;
+            print "$i : $ip, start $res_r->{s}, end $res_r->{e}, inet $inet\n" if ( $DEBUG );
+        }elsif ( $inet < $s or $i > $n ) {
+                $res_r = \%UNKNOWN;
         }
-      }
 
-      $i = $rem_i; #　last $i to found s,e
-
-
-      return [ @$r, @{$res_r}{ @{ $opt{ipinfo_names} } } ];
+        return [ @$r, @{$res_r}{ @{ $opt{ipinfo_names} } } ];
     },
     %opt,
   );

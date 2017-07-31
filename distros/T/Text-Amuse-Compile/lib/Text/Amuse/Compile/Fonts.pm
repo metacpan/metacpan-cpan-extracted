@@ -286,6 +286,21 @@ sub _default_font_list {
              type => 'serif',
             },
             {
+             name => 'Noto Serif',
+             desc => 'Noto Serif',
+             type => 'serif',
+            },
+            {
+             name => 'Gentium Book Basic',
+             desc => 'Gentium',
+             type => 'serif',
+            },
+            {
+             name => 'Cormorant Garamond',
+             desc => 'Garamond',
+             type => 'serif',
+            },
+            {
              name => 'CMU Sans Serif',
              desc => 'Computer Modern Sans Serif',
              type => 'sans',
@@ -306,11 +321,6 @@ sub _default_font_list {
              type => 'sans',
             },
             {
-             name => 'Linux Biolinum O',
-             desc => 'Linux Biolinum',
-             type => 'sans',
-            },
-            {
              name => 'DejaVu Sans',
              desc => 'DejaVu Sans',
              type => 'sans',
@@ -318,6 +328,11 @@ sub _default_font_list {
             {
              name => 'PT Sans',
              desc => 'PT Sans (cyrillic)',
+             type => 'sans',
+            },
+            {
+             name => 'Noto Sans',
+             desc => 'Noto Sans',
              type => 'sans',
             },
             {

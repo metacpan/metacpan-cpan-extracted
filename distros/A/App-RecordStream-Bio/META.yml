@@ -19,17 +19,20 @@ meta-spec:
 name: App-RecordStream-Bio
 no_index:
   directory:
+    - devel
     - eg
     - examples
+    - fatpack
     - inc
     - share
     - t
     - xt
 requires:
   App::RecordStream::Operation: v4.0.0
+  Bio::GFF3::LowLevel: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/MullinsLab/App-RecordStream-Bio/issues
   homepage: https://github.com/MullinsLab/App-RecordStream-Bio
   repository: https://github.com/MullinsLab/App-RecordStream-Bio.git
-version: '0.18'
+version: '0.23'

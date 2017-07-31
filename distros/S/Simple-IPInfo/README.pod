@@ -110,7 +110,7 @@ csv is in xt/ directory
 =head2 add_inet.pl
 
     $ add_inet.pl -f 02.ip_raw.csv -i 0 -d 02.ip_inet.csv
-    $ sort -t, -k3 -n 02.ip_inet.csv > 02.ip_inet.sort.csv
+    $ sort -t, -k3,3 -n 02.ip_inet.csv > 02.ip_inet.sort.csv
 
 =head2 add_ip_info.pl
 
@@ -155,6 +155,13 @@ src_file's inet is sorted by csvsort
 merge_inet.pl [src_inet_file1] [src_inet_file2] [dst_merge_file]
 
     $ merge_inet.pl city_inet.csv.sort.refine isp_inet.csv.sort.refine merge_city_isp_inet.csv
+
+=head2 get_ipinfo.pl
+
+get_ipinfo.pl [ip]
+
+    $ get_ipinfo.pl 202.38.64.10
+    202.38.64.10,3391504394,中国,安徽,教育,CN,34,EDU,4538
 
 =head1 XBIN
 

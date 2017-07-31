@@ -1,13 +1,13 @@
 package Lab::XPRESS::Sweep::Temperature;
-$Lab::XPRESS::Sweep::Temperature::VERSION = '3.553';
-
-use Lab::XPRESS::Sweep::Sweep;
+#ABSTRACT: Temperature sweep
+$Lab::XPRESS::Sweep::Temperature::VERSION = '3.554';
+use Lab::XPRESS::Sweep;
 use Statistics::Descriptive;
 use Time::HiRes qw/usleep/;
 use strict;
 use 5.010;
 
-our @ISA = ('Lab::XPRESS::Sweep::Sweep');
+our @ISA = ('Lab::XPRESS::Sweep');
 
 sub new {
     my $proto = shift;
@@ -396,13 +396,19 @@ sub convert_time {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::XPRESS::Sweep::Temperature - temperature sweep
+Lab::XPRESS::Sweep::Temperature - Temperature sweep
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -427,14 +433,13 @@ sub convert_time {
 
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Temperature class implements a module for temperature sweeps in the Lab::XPRESS::Sweep framework.
 
 .
 
 =head1 CONSTRUCTOR
-	
 
 	my $sweep_temperature = $hub->Sweep('Temperature',
 		{
@@ -442,7 +447,6 @@ The Lab::XPRESS::Sweep::Temperature class implements a module for temperature sw
 		points => [90,4],
 		mode => 'list'
 		});
-
 
 Instantiates a new temperature sweep
 
@@ -458,13 +462,13 @@ Supported instruments: Lab::Instrument::ITC
 .
 
 =head2 mode [string] (default = 'continuous' | 'step' | 'list')
-	
+
 continuous: perform a continuous temperature sweep. After the starting temperature has been stabalized by the temperature controller, the heater will be switched off in order to cool down to the final value. Measurements will be performed constantly at the time-interval defined in interval.
 
 step: measurements will be performed at discrete values between start and end points defined in parameter points, seperated by a step defined in parameter stepwidth
 
 list: measurements will be performed at a list of values defined in parameter points
-	
+
 .
 
 =head2 points [float array] (mandatory)
@@ -484,14 +488,12 @@ Array of values, with minimum length 1, that are approached in sequence to perfo
 
 .
 
-
-
 =head2 stepwidth [float array]
 
 This parameter is relevant only if mode = 'step' has been selected. 
 Stepwidth has to be an array of length '1' or greater. The values define the width for each step within the corresponding sweep sequence. 
 If the length of the defined sweep sequence devided by the stepwidth is not an integer number, the last step will be smaller in order to reach the defined points-value.
-	
+
 	points = [0, 90, 180]
 	stepwidth = [10, 25]
 	
@@ -504,7 +506,7 @@ If the length of the defined sweep sequence devided by the stepwidth is not an i
 can be used instead of 'stepwidth'. Attention: Use only the 'number_of_points' or the 'stepwidth' parameter. Using both will cause an Error!
 This parameter is relevant only if mode = 'step' has been selected. 
 Number_of_points has to be an array of length '1' or greater. The values defines the number of steps within the corresponding sweep sequence.
-	
+
 	points = [0, 90, 180]
 	number_of_points = [5, 2]
 	
@@ -517,7 +519,6 @@ Number_of_points has to be an array of length '1' or greater. The values defines
 interval in seconds for taking measurement points. Only relevant in mode 'continuous'.
 
 .
-
 
 =head2 id [string] (default = 'Temperature_sweep')
 
@@ -560,8 +561,6 @@ Setting C<setter_args => [@args]>, the C<set_T> method will be called as
 
  $instrument->set_T($setpoint, @args);
 
-
-
 =head1 CAVEATS/BUGS
 
 probably none
@@ -576,15 +575,17 @@ probably none
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-Christian Butschkow and Stefan Geißler
+  Copyright 2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Christian Butschkow
+            2015       Alois Dirnaichner
+            2016-2017  Andreas K. Huettel, Simon Reinhardt
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
 
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

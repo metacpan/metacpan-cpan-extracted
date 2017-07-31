@@ -36,22 +36,20 @@
 #define UTF32BOM    "\377\376\000\000"  /* FF FE 00 00 or +UFEFF */
 #define UTF32BOM_BE "\000\000\376\377"  /* 00 00 FE FF */
 
-/* strawberry 5.22 with USE_MINGW_ANSI_STDIO and USE_LONG_DOUBLE has now 
-   a proper inf/nan */
+/* mingw with USE_LONG_DOUBLE (and implied USE_MINGW_ANSI_STDIO) do use the
+   non-msvcrt inf/nan stringification in sprintf(). */
 #if defined(WIN32) && !defined(__USE_MINGW_ANSI_STDIO) && !defined(USE_LONG_DOUBLE)
-# if _MSC_VER > 1800
-#  define STR_INF "inf"
-#  define STR_INF2 "inf.0"
-#  define STR_NAN "nan"
-#  define STR_QNAN "nan(ind)"
-#  define HAVE_QNAN
-# else
-#  define STR_INF "1.#INF"
-#  define STR_INF2 "1.#INF.0"
-#  define STR_NAN "1.#IND"
-#  define STR_QNAN "1.#QNAN"
-#  define HAVE_QNAN
-# endif
+/* new ucrtd.dll runtime? We do not probe the runtime or variants in the Makefile.PL yet. */
+#define STR_INF "inf"
+#define STR_INF2 "inf.0"
+#define STR_NAN "nan"
+#define STR_QNAN "nan(ind)"
+/* old standard msvcrt.dll */
+#define STR_INF3 "1.#INF"
+#define STR_INF4 "1.#INF.0"
+#define STR_NAN2 "1.#IND"
+#define STR_QNAN2 "1.#QNAN"
+#define HAVE_QNAN
 #elif defined(sun) || defined(__sun)
 #define STR_INF "Infinity"
 #define STR_NAN "NaN"
@@ -235,11 +233,7 @@ mingw_modfl(long double x, long double *ip)
 
 #define SHORT_STRING_LEN 16384 // special-case strings of up to this size
 
-#if PERL_VERSION >= 8
 #define DECODE_WANTS_OCTETS(json) ((json)->flags & F_UTF8)
-#else
-#define DECODE_WANTS_OCTETS(json) (0)
-#endif
 
 #define SB do {
 #define SE } while (0)
@@ -1407,9 +1401,9 @@ encode_sv (pTHX_ enc_t *enc, SV *sv)
 # else
         if (UNLIKELY(isinf(nv) || isnan(nv)))
 # endif
-          {
-            goto is_inf_or_nan;
-          }
+        {
+          goto is_inf_or_nan;
+        }
       }
 #endif
 #ifdef USE_QUADMATH
@@ -1418,12 +1412,18 @@ encode_sv (pTHX_ enc_t *enc, SV *sv)
       (void)Gconvert (nv, NV_DIG, 0, enc->cur);
 #endif
 
+#ifdef STR_INF4
+      if (UNLIKELY(strEQc(enc->cur, STR_INF)
+                   || strEQc(enc->cur, STR_INF2)
+                   || strEQc(enc->cur, STR_INF3)
+                   || strEQc(enc->cur, STR_INF4)))
+#elif STR_INF2
+      if (UNLIKELY(strEQc(enc->cur, STR_INF)
+                   || strEQc(enc->cur, STR_INF2)))
+#else
       if (UNLIKELY(strEQc(enc->cur, STR_INF)))
-        inf_or_nan = 1;
-#ifdef STR_INF2
-      else if (UNLIKELY(strEQc(enc->cur, STR_INF2)))
-        inf_or_nan = 1;
 #endif
+        inf_or_nan = 1;
 #if defined(__hpux)
       else if (UNLIKELY(strEQc(enc->cur, STR_NEG_INF)))
         inf_or_nan = 2;
@@ -1432,23 +1432,43 @@ encode_sv (pTHX_ enc_t *enc, SV *sv)
 #endif
       else if
 #ifdef HAVE_QNAN
+# ifdef STR_QNAN2
+        (UNLIKELY(strEQc(enc->cur, STR_NAN)
+                  || strEQc(enc->cur, STR_QNAN)
+                  || strEQc(enc->cur, STR_NAN2)
+                  || strEQc(enc->cur, STR_QNAN2)))
+# else
         (UNLIKELY(strEQc(enc->cur, STR_NAN)
                   || strEQc(enc->cur, STR_QNAN)))
+# endif
 #else
         (UNLIKELY(strEQc(enc->cur, STR_NAN)))
 #endif
         inf_or_nan = 3;
       else if (*enc->cur == '-') {
+#ifdef STR_INF4
+        if (UNLIKELY(strEQc(enc->cur+1, STR_INF)
+                     || strEQc(enc->cur+1, STR_INF2)
+                     || strEQc(enc->cur+1, STR_INF3)
+                     || strEQc(enc->cur+1, STR_INF4)))
+#elif STR_INF2
+        if (UNLIKELY(strEQc(enc->cur+1, STR_INF)
+                   || strEQc(enc->cur+1, STR_INF2)))
+#else
         if (UNLIKELY(strEQc(enc->cur+1, STR_INF)))
-          inf_or_nan = 2;
-#ifdef STR_INF2
-        else if (UNLIKELY(strEQc(enc->cur+1, STR_INF2)))
-          inf_or_nan = 2;
 #endif
+          inf_or_nan = 2;
         else if
 #ifdef HAVE_QNAN
+# ifdef STR_QNAN2
+          (UNLIKELY(strEQc(enc->cur+1, STR_NAN)
+                    || strEQc(enc->cur+1, STR_QNAN)
+                    || strEQc(enc->cur+1, STR_NAN2)
+                    || strEQc(enc->cur+1, STR_QNAN2)))
+# else
           (UNLIKELY(strEQc(enc->cur+1, STR_NAN)
                     || strEQc(enc->cur+1, STR_QNAN)))
+# endif
 #else
           (UNLIKELY(strEQc(enc->cur+1, STR_NAN)))
 #endif
@@ -1477,7 +1497,8 @@ encode_sv (pTHX_ enc_t *enc, SV *sv)
             strncpy(enc->cur, "\"nan\"\0", 6);
         }
         else if (enc->json.infnan_mode != 2) {
-          croak ("invalid stringify_infnan mode %c. Must be 0, 1, 2 or 3", enc->json.infnan_mode);
+          croak ("invalid stringify_infnan mode %c. Must be 0, 1, 2 or 3",
+                 enc->json.infnan_mode);
         }
       }
       if (SvPOKp (sv) && !strEQ(enc->cur, SvPVX (sv))) {
@@ -2705,6 +2726,7 @@ decode_hv (pTHX_ dec_t *dec)
   HV *hv = newHV ();
   int allow_squote = dec->json.flags & F_ALLOW_SQUOTE;
   int allow_barekey = dec->json.flags & F_ALLOW_BAREKEY;
+  int relaxed = dec->json.flags & F_RELAXED;
   char endstr = '"';
 
   DEC_INC_DEPTH;
@@ -2786,6 +2808,10 @@ decode_hv (pTHX_ dec_t *dec)
                   if (UNLIKELY(p - key > I32_MAX))
                     ERR ("Hash key too large");
 #endif
+                  if (!relaxed && UNLIKELY(hv_exists (hv, key, len))) {
+                    ERR ("Duplicate keys not allowed");
+                  }
+
                   dec->cur = p + 1;
 
                   decode_ws (dec); if (*p != ':') EXPECT_CH (':');
@@ -2847,7 +2873,7 @@ decode_hv (pTHX_ dec_t *dec)
 
           /* the next line creates a mortal sv each time it's called. */
           /* might want to optimise this for common cases. */
-          if (LIKELY(he))
+          if (LIKELY((long)he))
             cb = hv_fetch_ent (dec->json.cb_sk_object, hv_iterkeysv (he), 0, 0);
 
           if (cb)
@@ -3185,14 +3211,12 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return)
     }
   }
 
-#if PERL_VERSION >= 8
   if (LIKELY(!converted)) {
     if (DECODE_WANTS_OCTETS (json))
       sv_utf8_downgrade (string, 0);
     else
       sv_utf8_upgrade (string);
   }
-#endif
 
   /* should basically be a NOP but needed for 5.6 with undef */
   if (!SvPOK(string))

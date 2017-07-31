@@ -1,6 +1,6 @@
-/* vim: ts=4:sw=4:ft=xs:fdm=marker: */
-/*
- * Copyright 2011 (C) Przemyslaw Iskra <sparky at pld-linux.org>
+/* vim: ts=4:sw=4:ft=xs:fdm=marker
+ *
+ * Copyright 2011-2015 (C) Przemyslaw Iskra <sparky at pld-linux.org>
  *
  * Loosely based on code by Cris Bailiff <c.bailiff+curl at devsecure.com>,
  * and subsequent fixes by other contributors.
@@ -47,6 +47,13 @@ static void
 perl_curl_multi_delete( pTHX_ perl_curl_multi_t *multi )
 /*{{{*/ {
 	perl_curl_multi_callback_code_t i;
+
+	if ( multi->handle ) {
+		curl_multi_setopt( multi->handle, CURLMOPT_SOCKETFUNCTION, NULL );
+#ifdef CURLMOPT_TIMERFUNCTION
+		curl_multi_setopt( multi->handle, CURLMOPT_TIMERFUNCTION, NULL );
+#endif
+	}
 
 	/* remove and mortalize all easy handles */
 	if ( multi->easies ) {
@@ -465,16 +472,81 @@ perform( multi )
 #if LIBCURL_VERSION_NUM >= 0x071C00
 
 int
-wait( multi, timeout )
+wait( multi, ... )
 	Net::Curl::Multi multi
-	long timeout
+	PROTOTYPE: $;$$
 	PREINIT:
+		int timeout = -1;
+		SV *extra_fds = NULL;
 		int remaining;
 		CURLMcode ret;
+		struct curl_waitfd *wait_for = NULL;
+		unsigned int extra_nfds = 0;
 	CODE:
 		CLEAR_ERRSV();
 
-		ret = curl_multi_wait( multi->handle, NULL, 0, timeout, &remaining );
+		if ( items > 1 )
+			timeout = SvIV( ST( items - 1 ) );
+		if ( items > 2 )
+			extra_fds = ST( 1 );
+
+		if ( extra_fds && SvOK( extra_fds ) )
+		{
+			int i;
+			AV *array;
+			if ( !SvROK( extra_fds ) || SvTYPE( SvRV( extra_fds ) ) != SVt_PVAV )
+				croak( "must be an arrayref" );
+			array = (AV *) SvRV( extra_fds );
+			extra_nfds = 1 + av_len( array );
+
+			Newxz( wait_for, extra_nfds, struct curl_waitfd );
+
+			for ( i = 0; i < extra_nfds; i++ )
+			{
+				HV *hash;
+				SV **tmp, **sv;
+				sv = av_fetch( array, i, 0 );
+				if ( !SvOK( *sv ) )
+					continue;
+				if ( !SvROK( *sv ) || SvTYPE( SvRV( *sv ) ) != SVt_PVHV )
+					croak( "must be a hashref" );
+				hash = (HV *) SvRV( *sv );
+
+				tmp = hv_fetchs( hash, "fd", 0 );
+				if ( tmp && *tmp && SvOK( *tmp ) )
+					wait_for[i].fd = SvIV( *tmp );
+
+				tmp = hv_fetchs( hash, "events", 0 );
+				if ( tmp && *tmp && SvOK( *tmp ) )
+					wait_for[i].events = SvIV( *tmp );
+
+				/* there is also revents which will be returned by curl */
+				tmp = hv_fetchs( hash, "revents", 0 );
+				if ( tmp && *tmp && SvOK( *tmp ) )
+					wait_for[i].revents = SvIV( *tmp );
+			}
+		}
+
+		ret = curl_multi_wait( multi->handle, wait_for, extra_nfds, timeout,
+			&remaining );
+
+		if ( wait_for )
+		{
+			int i;
+			AV *array = (AV *) SvRV( extra_fds );
+			for ( i = 0; i < extra_nfds; i++ )
+			{
+				HV *hash;
+				SV **sv;
+				short revents = wait_for[i].revents;
+				sv = av_fetch( array, i, 0 );
+				hash = (HV *) SvRV( *sv );
+
+				(void) hv_stores( hash, "revents", newSViv( revents ) );
+			}
+
+			Safefree( wait_for );
+		}
 
 		/* rethrow errors */
 		if ( SvTRUE( ERRSV ) )

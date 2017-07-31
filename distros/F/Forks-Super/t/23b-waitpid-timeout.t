@@ -101,7 +101,7 @@ ok($p == -1 || $p == 0, "pid->wait(0) returns -1 or 0");
 $t = Time::HiRes::time();
 $p = $pid->wait;
 $t = Time::HiRes::time() - $t;
-okl($t >= 1.75 && $t <= 5.15,
+okl($t >= 1.60 && $t <= 5.15,
    "pid->wait() waits for job to finish  ${t}s expected ~3s");     ### 21 ###
 ok($p == $pid, "subsequent waitpid long timeout returned pid");
 waitall;

@@ -1,25 +1,24 @@
 package Proc::tored::PidFile;
 # ABSTRACT: Manage a service using a pid file
-$Proc::tored::PidFile::VERSION = '0.17';
+$Proc::tored::PidFile::VERSION = '0.18';
 
 use warnings;
 use strict;
 use Moo;
 use Carp;
-use Fcntl qw(:flock :seek :DEFAULT);
 use Guard qw(guard);
 use Path::Tiny qw(path);
-use Time::HiRes qw(sleep);
 use Try::Tiny;
 use Types::Standard -types;
+use Proc::tored::LockFile;
 
-has file_path => (is => 'ro', isa => Str);
+has file_path => (is => 'ro', isa => Str, required => 1);
 
 has file => (is => 'lazy', isa => InstanceOf['Path::Tiny'], handles => ['touch']);
 sub _build_file { path(shift->file_path) }
 
-has write_lock_file => (is => 'lazy', isa => InstanceOf['Path::Tiny']);
-sub _build_write_lock_file { path(shift->file_path . '.lock') }
+has lockfile => (is => 'lazy', isa => InstanceOf['Proc::tored::LockFile']);
+sub _build_lockfile { Proc::tored::LockFile->new(file_path => shift->file_path . '.lock') }
 
 has mypid => (is => 'ro', isa => Int, default => sub { $$ }, init_arg => undef);
 
@@ -61,6 +60,7 @@ sub clear_file {
   my $self = shift;
   my $lock = $self->write_lock or return;
   return unless $self->is_running;
+  return unless $self->file->exists;
   $self->file->append({truncate => 1});
   try { $self->file->remove }
   catch { warn "error unlinking pid file: $_" }
@@ -80,29 +80,8 @@ sub lock {
 sub write_lock {
   my $self = shift;
   return unless $$ eq $self->mypid;
-
-  # Existing .lock file means another process came in ahead
-  my $lock = $self->write_lock_file;
-  return if $lock->exists;
-
-  my $locked = try {
-      $lock->filehandle({exclusive => 1}, '>');
-    }
-    catch {
-      # Rethrow if error was something other than the file already existing.
-      # Assume any 'sysopen' error matching 'File exists' is an indication
-      # of that.
-      die $_
-        unless $_->{op} eq 'sysopen' && $_->{err} =~ /File exists/i
-            || $lock->exists;
-    };
-
-  return unless $locked;
-
-  return guard {
-    try { $lock->remove }
-    catch { carp "unable to remove lock file: $_" }
-  };
+  return unless $self->lockfile;
+  return $self->lockfile->lock;
 }
 
 1;
@@ -119,7 +98,7 @@ Proc::tored::PidFile - Manage a service using a pid file
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -180,7 +159,7 @@ that will truncate and unlink the pid file if it goes out of scope.
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 

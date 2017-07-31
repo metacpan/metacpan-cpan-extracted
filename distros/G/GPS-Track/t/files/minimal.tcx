@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- expected TCX file as produced by GPSBabel -->
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+  <Courses>
+    <Course>
+      <Name>MinimalTest</Name>
+      <Track>
+        <Trackpoint>
+          <Time>2017-05-10T16:06:58Z</Time>
+          <Position>
+            <LatitudeDegrees>48.2256215</LatitudeDegrees>
+            <LongitudeDegrees>9.0323674</LongitudeDegrees>
+          </Position>
+          <AltitudeMeters>799.8</AltitudeMeters>
+          <HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
+            <Value>91</Value>
+          </HeartRateBpm>
+          <Cadence>95</Cadence>
+          <Extensions>
+            <TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2">
+              <Speed>3.382</Speed>
+            </TPX>
+          </Extensions>
+        </Trackpoint>
+      </Track>
+    </Course>
+  </Courses>
+</TrainingCenterDatabase>
+

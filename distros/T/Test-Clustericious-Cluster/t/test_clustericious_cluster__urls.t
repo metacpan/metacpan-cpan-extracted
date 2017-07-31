@@ -1,9 +1,5 @@
-use strict;
-use warnings;
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 use Test::Clustericious::Cluster;
-
-plan 3;
 
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok(qw( Foo Foo ));
@@ -31,6 +27,8 @@ is(
 );
 
 is $cluster->url, $cluster->urls->[1], 'url';
+
+done_testing;
 
 __DATA__
 

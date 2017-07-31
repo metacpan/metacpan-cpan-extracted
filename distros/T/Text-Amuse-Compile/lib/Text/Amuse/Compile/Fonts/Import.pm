@@ -77,9 +77,6 @@ sub try_list {
                mono  => [ map { $_->name } $fonts->mono_fonts ],
                sans  => [ map { $_->name } $fonts->sans_fonts ],
               );
-    push @{$all{serif}}, "Noto Serif";
-    push @{$all{sans}}, "Noto Sans";
-    push @{$all{mono}}, "Noto Mono";
     return \%all;
 }
 

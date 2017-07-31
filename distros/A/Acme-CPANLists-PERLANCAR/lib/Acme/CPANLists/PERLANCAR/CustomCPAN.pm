@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::CustomCPAN;
 
-our $DATE = '2017-07-01'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 our @Module_Lists = (
     {
@@ -99,7 +99,7 @@ Acme::CPANLists::PERLANCAR::CustomCPAN - Creating your own CPAN-like repository
 
 =head1 VERSION
 
-This document describes version 0.23 of Acme::CPANLists::PERLANCAR::CustomCPAN (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-01.
+This document describes version 0.25 of Acme::CPANLists::PERLANCAR::CustomCPAN (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-28.
 
 =head1 MODULE LISTS
 

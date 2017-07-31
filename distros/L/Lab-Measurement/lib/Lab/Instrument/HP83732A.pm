@@ -1,5 +1,6 @@
 package Lab::Instrument::HP83732A;
-$Lab::Instrument::HP83732A::VERSION = '3.553';
+#ABSTRACT: HP 83732A Series Synthesized Signal Generator
+$Lab::Instrument::HP83732A::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -115,6 +116,8 @@ sub disable_external_am {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -123,13 +126,9 @@ sub disable_external_am {
 
 Lab::Instrument::HP83732A - HP 83732A Series Synthesized Signal Generator
 
-=head1 SYNOPSIS
+=head1 VERSION
 
-=head1 DESCRIPTION
-
-=head1 CONSTRUCTOR
-
-=head1 METHODS
+version 3.554
 
 =head1 CAVEATS/BUGS
 
@@ -143,12 +142,18 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2005 Daniel Schröer (<schroeer@cpan.org>)
-            2011 Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Hermann Kraus
+            2013       Alois Dirnaichner, Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

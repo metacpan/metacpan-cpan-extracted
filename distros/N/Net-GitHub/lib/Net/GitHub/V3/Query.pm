@@ -20,6 +20,7 @@ use Moo::Role;
 # Authentication
 has 'login'  => ( is => 'rw', isa => Str, predicate => 'has_login' );
 has 'pass'  => ( is => 'rw', isa => Str, predicate => 'has_pass' );
+has 'otp'  => ( is => 'rw', isa => Str, predicate => 'has_otp' );
 has 'access_token' => ( is => 'rw', isa => Str, predicate => 'has_access_token' );
 
 # return raw unparsed JSON
@@ -50,6 +51,9 @@ has 'rate_limit_reset' => ( is => 'rw', isa => Str, default => 0 );
 has 'u'  => (is => 'rw', isa => Str);
 has 'repo' => (is => 'rw', isa => Str);
 
+# accept version
+has 'accept_version' => (is => 'rw', isa => Str, default => "v3");
+
 has 'is_main_module' => (is => 'ro', isa => Bool, default => 0);
 sub set_default_user_repo {
     my ($self, $user, $repo) = @_;
@@ -79,7 +83,7 @@ sub set_default_user_repo {
 sub args_to_pass {
     my $self = shift;
     my $ret;
-    foreach my $col ('login', 'pass', 'access_token', 'raw_string', 'raw_response', 'api_url', 'api_throttle', 'u', 'repo', 'next_url', 'last_url', 'first_url', 'prev_url', 'per_page', 'ua') {
+    foreach my $col ('login', 'pass', 'otp', 'access_token', 'raw_string', 'raw_response', 'api_url', 'api_throttle', 'u', 'repo', 'next_url', 'last_url', 'first_url', 'prev_url', 'per_page', 'ua') {
         my $v = $self->$col;
         $ret->{$col} = $v if defined $v;
     }
@@ -142,6 +146,9 @@ sub query {
     } elsif ($self->has_login and $self->has_pass) {
         my $auth_basic = $self->login . ':' . $self->pass;
         $ua->default_header('Authorization', 'Basic ' . encode_base64($auth_basic));
+        if ($self->has_otp) {
+            $ua->default_header('X-GitHub-OTP', $self->otp);
+        }
     }
 
     $url = $self->api_url . $url unless $url =~ /^https\:/;
@@ -165,6 +172,10 @@ sub query {
         $req->content($json);
     }
     $req->header( 'Content-Length' => length $req->content );
+
+    # if preview API, specify a custom media type to Accept header
+    # https://developer.github.com/v3/media/
+    $req->header( 'Accept' => sprintf("application/vnd.github.%s.param+json", $self->accept_version) );
 
     my $res = $self->_make_request($req);
 
@@ -307,6 +318,7 @@ sub __build_methods {
         my $args = $v->{args} || 0; # args for ->query
         my $check_status = $v->{check_status};
         my $is_u_repo = $v->{is_u_repo}; # need auto shift u/repo
+        my $preview_version = $v->{preview};
 
         no strict 'refs';
         no warnings 'once';
@@ -324,6 +336,9 @@ sub __build_methods {
             # make url, replace %s with real args
             my @uargs = splice(@_, 0, $n);
             my $u = sprintf($url, @uargs);
+
+            # if preview API, set preview version
+            $self->accept_version($preview_version) if $preview_version;
 
             # args for json data POST
             my @qargs = $args ? splice(@_, 0, $args) : ();

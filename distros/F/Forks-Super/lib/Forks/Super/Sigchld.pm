@@ -14,7 +14,7 @@ use warnings;
 our ($_SIGCHLD, $_SIGCHLD_CNT, $REAP) = (0,0,0);
 our (@CHLD_HANDLE_HISTORY, @SIGCHLD_CAUGHT) = (0);
 our $SIG_DEBUG = $ENV{SIG_DEBUG};
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 my %bastards;
 
 #

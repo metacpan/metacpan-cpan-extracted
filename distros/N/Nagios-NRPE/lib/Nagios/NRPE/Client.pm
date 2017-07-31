@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=pod
+
 =head1 NAME
 
 Nagios::NRPE::Client - A Nagios NRPE client
@@ -11,18 +13,19 @@ Nagios::NRPE::Client - A Nagios NRPE client
  my $client = Nagios::NRPE::Client->new( host => "localhost", check => 'check_cpu');
  my $response = $client->run();
  if(defined $response->{error}) {
-   print "ERROR: Couldn't run check ".$client->check()." because of: "$response->{reason}."\n";
+   print "ERROR: Couldn't run check " . $client->{check} . " because of: " . $response->{reason} . "\n";
  } else {
-   print $response->{status}."\n";
+   print $response->{buffer}."\n";
  }
 
 =head1 DESCRIPTION
 
-This Perl Module implements Version 2 of the NRPE-Protocol. With this module you can execute 
+This Perl Module implements Version 2 and 3 of the NRPE-Protocol. With this module you can execute 
+checks on a remote server.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Andreas Marschke <andreas.marschke@googlemail.com>.
+This software is copyright (c) 2017 by the authors (see AUTHORS file).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -31,7 +34,7 @@ the same terms as the Perl 5 programming language system itself.
 
 package Nagios::NRPE::Client;
 
-our $VERSION = '0.003';
+our $VERSION = '1.0.2';
 
 use 5.010_000;
 
@@ -41,14 +44,17 @@ use warnings;
 use Data::Dumper;
 use Carp;
 use IO::Socket;
-use IO::Socket::INET;
-use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_2
-			    NRPE_PACKET_QUERY
-			    MAX_PACKETBUFFER_LENGTH
-			    STATE_UNKNOWN
-			    STATE_CRITICAL
-			    STATE_WARNING
-			    STATE_OK);
+use IO::Socket::INET6;
+use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_3
+  NRPE_PACKET_VERSION_2
+  NRPE_PACKET_QUERY
+  MAX_PACKETBUFFER_LENGTH
+  STATE_UNKNOWN
+  STATE_CRITICAL
+  STATE_WARNING
+  STATE_OK);
+
+=pod
 
 =head1 SUBROUTINES
 
@@ -64,27 +70,27 @@ Constructor for the Nagios::NRPE::Client Object
 
 Takes a hash of options:
 
-=item host => <hostname or IP>
+ *  host => <hostname or IP>
 
 The hostname or IP on which the NRPE-Server is running
 
-=item port => <Portnumber>
+ * port => <Portnumber>
 
 The port number at which the NRPE-Server is listening
 
-=item timeout => <number in seconds>
+ * timeout => <number in seconds>
 
 Timeout for TCP/IP communication
 
-=item arglist => ["arg","uments"]
+ * arglist => ["arg","uments"]
 
 List of arguments attached to the check
 
-=item check => "check_command"
+ * check => "check_command"
 
 Command defined in the nrpe.cfg on the NRPE-Server
 
-=item ssl => 0,1
+ * ssl => 0,1
 
 Use or don't use SSL
 
@@ -93,16 +99,88 @@ Use or don't use SSL
 =cut
 
 sub new {
-  my ($class,%hash) = @_;
-  my $self = {};
-  $self->{host} = delete $hash{host} || "localhost";
-  $self->{port} = delete $hash{port} || 5666;
-  $self->{timeout} = delete $hash{timeout} || 30;
-  $self->{arglist} = delete $hash{arglist} || [];
-  $self->{check} = delete $hash{check} || "";
-  $self->{ssl} = delete  $hash{ssl} || 0;
-  bless $self,$class;
+    my ( $class, %hash ) = @_;
+    my $self = {};
+    $self->{arglist}  = delete $hash{arglist}  || [];
+    $self->{bindaddr} = delete $hash{bindaddr} || 0;
+    $self->{check}    = delete $hash{check}    || "";
+    $self->{host}     = delete $hash{host}     || "localhost";
+    $self->{ipv4}     = delete $hash{ipv4}     || 0;
+    $self->{ipv6}     = delete $hash{ipv6}     || 0;
+    $self->{port}     = delete $hash{port}     || 5666;
+    $self->{ssl}      = delete $hash{ssl}      || 0;
+    $self->{timeout}  = delete $hash{timeout}  || 30;
+    bless $self, $class;
 }
+
+=pod
+
+=over 2
+
+=item create_socket()
+
+Helper function that can create either an INET socket or a SSL socket
+
+=back
+
+=cut 
+
+sub create_socket {
+    my ($self) = @_;
+    my $reason;
+    my $socket;
+
+    my %socket_opts = (
+
+        # where to connect
+        PeerHost => $self->{host},
+        PeerPort => $self->{port},
+        Timeout  => $self->{timeout}
+    );
+    if ( $self->{bindaddr} ) {
+        $socket_opts{LocalAddr} = $self->{bindaddr};
+    }
+    if ( $self->{ipv4} ) {
+        $socket_opts{Domain} = AF_INET;
+    }
+    if ( $self->{ipv6} ) {
+        $socket_opts{Domain} = AF_INET6;
+    }
+    if ( $self->{ssl} ) {
+        eval {
+            # required for new IO::Socket::SSL versions
+            use IO::Socket::SSL;
+        };
+
+        $socket_opts{SSL_cipher_list} = 'ADH';
+        $socket_opts{SSL_verify_mode} = SSL_VERIFY_NONE;
+        $socket_opts{SSL_version}     = 'TLSv1';
+
+        $socket = IO::Socket::SSL->new(%socket_opts);
+        if ($SSL_ERROR) {
+            $reason = "$!,$SSL_ERROR";
+        }
+
+    }
+    else {
+        $socket_opts{Proto} = 'tcp';
+        $socket_opts{Type}  = SOCK_STREAM;
+        $socket             = IO::Socket::INET6->new(%socket_opts);
+        $reason             = $@;
+    }
+
+    if ( !$socket ) {
+        my %return;
+        $return{'error'}  = 1;
+        $return{'reason'} = $reason;
+        return ( \%return );
+    }
+
+    return $socket;
+
+}
+
+=pod
 
 =over 2
 
@@ -112,7 +190,19 @@ Runs the communication to the server and returns a hash of the form:
 
   my $response = $client->run();
 
-The output should be a hashref of this form:
+The output should be a hashref of this form for NRPE V3:
+
+  {
+    version => NRPE_VERSION,
+    type => RESPONSE_TYPE,
+    crc32 => CRC32_CHECKSUM,
+    code => RESPONSE_CODE,
+    alignment => PACKET_ALIGNMENT,
+    buffer_length => OUTPUT_LENGTH,
+    buffer => CHECK_OUTPUT
+  }
+  
+and this for for NRPE V2:
 
   {
     version => NRPE_VERSION,
@@ -127,44 +217,71 @@ The output should be a hashref of this form:
 =cut
 
 sub run {
-  my $self = shift;
-  my $check;
-  if (scalar @{$self->{arglist}} == 0) {
-    $check = $self->{check};
-  } else {
-    $check = join '!',$self->{check},@{$self->{arglist}};
-  }
+    my ($self) = @_;
+    my $check;
+    if ( scalar @{ $self->{arglist} } == 0 ) {
+        $check = $self->{check};
+    }
+    else {
+        $check = join '!', $self->{check}, @{ $self->{arglist} };
+    }
 
-  my $socket;
-  if($self->{ssl}) {
-    eval {
-        # required for new IO::Socket::SSL versions
-        require IO::Socket::SSL;
-        IO::Socket::SSL->import();
-        IO::Socket::SSL::set_ctx_defaults( SSL_verify_mode => 0 );
-    };
-    $socket = IO::Socket::SSL->new($self->{host}.':'.$self->{port})
-                    or die(IO::Socket::SSL::errstr());
-  } else {
-    $socket = IO::Socket::INET->new(
-                    PeerAddr => $self->{host},
-                    PeerPort => $self->{port},
-                    Proto    => 'tcp',
-                    Type     => SOCK_STREAM) or die "ERROR: $@ \n";
-  }
+    my $socket = $self->create_socket();
+    if ( ref $socket eq "REF" ) {
+        return ($socket);
+    }
+    my $packet = Nagios::NRPE::Packet->new();
+    my $response;
+    my $assembled = $packet->assemble(
+        type    => NRPE_PACKET_QUERY,
+        check   => $check,
+        version => NRPE_PACKET_VERSION_3
+    );
 
-  my $packet = Nagios::NRPE::Packet->new();
-  my $response;
-  print $socket $packet->assemble(type => NRPE_PACKET_QUERY,
-				  check => $check,
-				  version => NRPE_PACKET_VERSION_2 );
+    print $socket $assembled;
+    while (<$socket>) {
+        $response .= $_;
+    }
+    close($socket);
 
-  while (<$socket>) {
-    $response .= $_;
-  }
-  close($socket);
+    if ( !$response ) {
+        $socket = $self->create_socket();
+        if ( ref $socket eq "REF" ) {
+            return ($socket);
+        }
+        $packet    = Nagios::NRPE::Packet->new();
+        $response  = undef;
+        $assembled = $packet->assemble(
+            type    => NRPE_PACKET_QUERY,
+            check   => $check,
+            version => NRPE_PACKET_VERSION_2
+        );
 
-  return $packet->deassemble($response);
+        print $socket $assembled;
+        while (<$socket>) {
+            $response .= $_;
+        }
+        close($socket);
+
+        if ( !$response ) {
+            my %return;
+            $return{'error'}  = 1;
+            $return{'reason'} = "No output from remote host";
+            return ( \%return );
+        }
+    }
+    return $packet->deassemble($response);
 }
+
+=pod
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the authors (see AUTHORS file).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 
 1;

@@ -3,7 +3,8 @@ use warnings FATAL => 'all';
 
 use Test::More;
 use Test::Exception;
-use t::common qw( new_fh );
+use lib 't';
+use common qw( new_fh );
 
 # Need to have an explicit plan in order for the sub-testing to work right.
 #XXX Figure out how to use subtests for that.
@@ -73,7 +74,7 @@ print "ok ", ++\$t, " - and get at stuff in the database\n";
 __END_FH__
 
     # The exec below prevents END blocks from doing this.
-    (my $esc_dir = $t::common::dir) =~ s/(.)/sprintf "\\x{%x}", ord $1/egg;
+    (my $esc_dir = $common::dir) =~ s/(.)/sprintf "\\x{%x}", ord $1/egg;
     print $fh <<__END_FH_AGAIN__;
 use File::Path 'rmtree';
 rmtree "$esc_dir"; 

@@ -1,7 +1,7 @@
 package Log::ger::Output::String;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2017-07-30'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use strict;
 use warnings;
@@ -50,7 +50,7 @@ Log::ger::Output::String - Set output to a string
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

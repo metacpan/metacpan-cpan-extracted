@@ -1,5 +1,6 @@
 requires "Alien::Base" => "0";
 requires "base" => "0";
+requires "perl" => "5.01";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -10,13 +11,25 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
+  requires "Capture::Tiny" => "0";
   requires "Data::Dumper" => "0";
   requires "Test::More" => "0";
 };
 
 on 'configure' => sub {
   requires "Alien::Build" => "0.40";
+  requires "Alien::Build::Git" => "0.02";
   requires "Alien::Build::MM" => "0.40";
+  requires "Alien::Build::Plugin::Download::Git" => "0.02";
+  requires "Alien::Build::Plugin::Extract::Directory" => "0.65";
+  requires "Alien::Build::Plugin::Fetch::Git" => "0.02";
+  requires "Alien::Build::Plugin::Prefer::SortVersions" => "0.65";
+  requires "Alien::autoconf" => "0.03";
+  requires "Alien::automake" => "0.05";
+  requires "Alien::git" => "0.02";
+  requires "Alien::libtool" => "0.04";
+  requires "Alien::m4" => "0.11";
+  requires "Capture::Tiny" => "0.46";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
 

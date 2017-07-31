@@ -1,5 +1,8 @@
 Revision history for MooseX-Storage-IO-AmazonDynamoDB
 
+0.08  2017-07-24 19:57:48 UTC
+        - added force_type parameter.
+
 0.07  2017-07-19 20:12:23 UTC
         - MAJOR BREAKING CHANGE! Moved from Amazon::DynamoDB to Paws. Please read the "BREAKING CHANGES IN v0.07" POD section in the main module.
         - setup Docker development

@@ -1,10 +1,7 @@
 use strict;
 use warnings;
-BEGIN {
-  eval 'use Test::Clustericious::Log';
-  eval 'use File::HomeDir::Test'
-    unless $INC{'File/HomeDir/Test.pm'};
-}
+use Test::Clustericious::Cluster;
+use Test::Clustericious::Log;
 use Test::More tests => 2;
 use PlugAuth;
 

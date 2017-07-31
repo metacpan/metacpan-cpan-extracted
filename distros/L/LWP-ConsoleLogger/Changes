@@ -1,5 +1,9 @@
 Revision history for LWP-ConsoleLogger
 
+0.000036  2017-07-21 22:02:23Z
+    - Re-log the request headers when we get the response
+    - Don't skip Cookie and Set-Cookie when dumping headers
+
 0.000035  2017-03-01 14:38:00-05:00 America/Toronto
     - Adds LWP::ConsoleLogger::Everywhere (simbabque)
 

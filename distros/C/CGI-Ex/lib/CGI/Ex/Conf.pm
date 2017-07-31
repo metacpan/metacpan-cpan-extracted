@@ -7,7 +7,7 @@ CGI::Ex::Conf - Conf Reader/Writer for many different data format types
 =cut
 
 ###----------------------------------------------------------------###
-#  Copyright 2003-2015 - Paul Seamons                                #
+#  Copyright 2003-2017 - Paul Seamons                                #
 #  Distributed under the Perl Artistic License without warranty      #
 ###----------------------------------------------------------------###
 
@@ -29,7 +29,7 @@ use vars qw($VERSION
             );
 @EXPORT_OK = qw(conf_read conf_write in_cache);
 
-$VERSION = '2.44';
+$VERSION = '2.45';
 
 $DEFAULT_EXT = 'conf';
 
@@ -263,7 +263,7 @@ sub read_handler_json {
   CORE::read(IN, my $text, -s $file);
   close IN;
   require JSON;
-  my $decode = JSON->VERSION > 1.98 ? 'decode' : 'jsonToObj';
+  my $decode = JSON->can('decode') ? 'decode' : 'jsonToObj';
   return scalar JSON->new->$decode($text);
 }
 
@@ -547,13 +547,13 @@ sub write_handler_json {
   my $ref  = shift;
   require JSON;
   my $str;
-  if (JSON->VERSION > 1.98) {
+  if (JSON->can('encode')) {
       my $j = JSON->new;
       $j->canonical(1);
       $j->pretty;
       $str = $j->encode($ref);
   } else {
-      $str = JSON->new->objToJSon($ref, {pretty => 1, indent => 2});
+      $str = JSON->new->objToJson($ref, {pretty => 1, indent => 2});
   }
   local *OUT;
   open (OUT, ">$file") || die $!;

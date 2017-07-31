@@ -9,7 +9,7 @@ with 'PlugAuth::Role::Plugin';
 with 'PlugAuth::Role::Auth';
 
 # ABSTRACT: AuthenSimple plugin for PlugAuth
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub init
@@ -55,7 +55,7 @@ PlugAuth::Plugin::AuthenSimple - AuthenSimple plugin for PlugAuth
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

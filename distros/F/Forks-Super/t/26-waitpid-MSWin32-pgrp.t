@@ -34,22 +34,27 @@ SKIP: {
     my $job6 = fork { exec => [ $^X, "t/external-command.pl", "-e=2" ] };
     my $job7 = fork { cmd => [ $^X, "t/external-command.pl", "-e=3" ] };
 
+    # tests 5,6,8 fail sometimes
     my $pid5 = waitpid -$pgid, 0;
-    ok($pid5 == $job5 || $pid5 == $job6 || $pid5 == $job7,
-       'waitpid on parent pgid for cmd => ' . $pid5 );
+    ok($pid5 == $job5 || $pid5 == $job6 || $pid5 == $job7,   ### 5 ###
+       'waitpid on parent pgid for cmd => ' . $pid5 )
+        or diag "expected $job5 or $job6 or $job7";
 
     my $pid6 = waitpid -$pgid, 0;
-    ok(($pid6 == $job5 || $pid6 == $job6 || $pid6 == $job7)
+    ok(($pid6 == $job5 || $pid6 == $job6 || $pid6 == $job7)  ### 6 ###
        && $pid6 != $pid5,
-       'waitpid on parent pgid for cmd => ' . $pid6 );
+       'waitpid on parent pgid for cmd => ' . $pid6 )
+        or diag "expected $job5 or $job6 or $job7";
 
     my $pid7 = waitpid -1,0;
-    ok(($pid7 == $job5 || $pid7 == $job6 || $pid7 == $job7) 
+    ok(($pid7 == $job5 || $pid7 == $job6 || $pid7 == $job7)  ### 7 ###
        && $pid7 != $pid5 && $pid7 != $pid6,
-       'waitpid on parent pgid for cmd => ' . $pid7 );
+       'waitpid on parent pgid for cmd => ' . $pid7 )
+        or diag "expected $job5 or $job6 or $job7";
 
-    ok($job5->{pgid} == $pgid && $job6->{pgid} == $pgid,
-       "fork-to-cmd/fork-to-exec in MSWin32 keep pgid");
+    ok($job5->{pgid} == $pgid && $job6->{pgid} == $pgid,     ### 8 ###
+       "fork-to-cmd/fork-to-exec in MSWin32 keep pgid")
+        or diag "expected $job5->{pgid} or $job6->{pgid} to be $pgid";
 
     
 

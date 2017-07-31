@@ -1,11 +1,31 @@
+version 0.008; 2017-07-26
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * update op-munging code to the PERL_OP_PARENT-compatible style
+    (though none of it is actually used on Perls new enough to support
+    PERL_OP_PARENT)
+
+  * in tests, revise PERL_OP_PARENT reserve definitions to simpler form,
+    accommodating only Perl 5.21.11 or later
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.007; 2015-03-21
 
-  * update tests for Perl 5.21.2, where the op_sibling field has changed
-    meaning
+  * update tests for PERL_OP_PARENT builds of Perl 5.21.2 or later
 
 version 0.006; 2013-09-21
 
-  * bugfix: allow generated headers to work on API-compatible Perls 
+  * bugfix: allow generated headers to work on API-compatible Perls
     other than the specific version under which this module was installed
 
   * fix test for thread safety, which risked false negatives

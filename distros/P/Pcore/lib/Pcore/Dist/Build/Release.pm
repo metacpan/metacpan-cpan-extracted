@@ -189,7 +189,7 @@ sub run ($self) {
     {
         print 'Setting tags ... ';
 
-        my $res = $self->dist->scm->scm_set_tag( [ 'latest', $new_ver ], force => 1 );
+        my $res = $self->dist->scm->scm_set_tag( [ 'latest', $new_ver ], 1 );
 
         say $res && return if !$res;
 
@@ -209,30 +209,28 @@ sub run ($self) {
         }
     }
 
-    if ( $self->dist->build->docker ) {
+    if ( $self->dist->docker ) {
         require Pcore::API::DockerHub;
 
-        my $dockerhub_api = Pcore::API::DockerHub->new( { namespace => $self->dist->docker->{namespace} } );
-
-        my $dockerhub_repo = $dockerhub_api->get_repo( $self->dist->docker->{repo_name} );
+        my $dockerhub_api = Pcore::API::DockerHub->new;
 
       CREATE_DOCKERHUB_VERSION_TAG:
-        if ( !$self->dist->build->docker->create_build_tag( $dockerhub_repo, $new_ver ) ) {
+        if ( !$self->dist->build->docker->create_tag( $new_ver, $new_ver, $Pcore::API::DockerHub::DOCKERHUB_SOURCE_TYPE_TAG, '/' ) ) {
             goto CREATE_DOCKERHUB_VERSION_TAG if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
         }
 
       CREATE_DOCKERHUB_LATEST_TAG:
-        if ( !$self->dist->build->docker->create_build_tag( $dockerhub_repo, 'latest' ) ) {
+        if ( !$self->dist->build->docker->create_tag( 'latest', 'latest', $Pcore::API::DockerHub::DOCKERHUB_SOURCE_TYPE_TAG, '/' ) ) {
             goto CREATE_DOCKERHUB_LATEST_TAG if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
         }
 
       TRIGGER_BUILD_VERSION_TAG:
-        if ( !$self->dist->build->docker->trigger_build( $dockerhub_repo, $new_ver ) ) {
+        if ( !$self->dist->build->docker->trigger_build($new_ver) ) {
             goto TRIGGER_BUILD_VERSION_TAG if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
         }
 
       TRIGGER_BUILD_LATEST_TAG:
-        if ( !$self->dist->build->docker->trigger_build( $dockerhub_repo, 'latest' ) ) {
+        if ( !$self->dist->build->docker->trigger_build('latest') ) {
             goto TRIGGER_BUILD_LATEST_TAG if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
         }
     }
@@ -456,10 +454,10 @@ TXT
 ## |======+======================+================================================================================================================|
 ## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (26)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 143, 163, 220, 225,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
-## |      | 230, 235             |                                                                                                                |
+## |    2 | 143, 163, 218, 223,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |      | 228, 233             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 390                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 388                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

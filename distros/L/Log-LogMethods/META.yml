@@ -1,0 +1,39 @@
+---
+abstract: 'Writes your logging code for you!'
+author:
+  - 'Mike Shipper <AKALINUX@CPAN.ORG>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-LogMethods
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '1.68'
+  Carp: '1.42'
+  Data::Dumper: '2.167'
+  Data::Result: '1.0'
+  Exporter: '5.72'
+  IO::Scalar: '2.111'
+  Log::Dispatch::Handle: '2.65'
+  Log::Log4perl: '1.49'
+  Modern::Perl: '1.20170117'
+  Moo: '2.003002'
+  MooX::Types::MooseLike::Base: '0.29'
+  Ref::Util: '0.203'
+  Scalar::Util: '1.48'
+  Test::More: '1.302073'
+  Time::HiRes: '1.9741'
+  namespace::clean: '0.27'
+  overload: '1.28'
+version: '1.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

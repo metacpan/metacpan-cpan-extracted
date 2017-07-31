@@ -1,5 +1,3 @@
-#!/usr/bin/perl -w
-
 #
 # This is the RS232 Connection base class. It provides the interface definition for all
 # connections implementing access via a RS232 line with its typical properties
@@ -14,7 +12,8 @@
 # TODO: a lot, ...
 
 package Lab::Connection::RS232;
-$Lab::Connection::RS232::VERSION = '3.553';
+#ABSTRACT: RS232 Connection base class
+$Lab::Connection::RS232::VERSION = '3.554';
 use Lab::Connection;
 use strict;
 use Lab::Exception;
@@ -71,13 +70,22 @@ sub new {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Connection::RS232 - RS232 connection base class
+Lab::Connection::RS232 - RS232 Connection base class
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -96,6 +104,10 @@ Every inheriting class constructor should start as follows:
 
 C<Lab::Connection::RS232> is the base class for all connections providing a GPIB interface. 
 It is not usable on its own. It inherits from L<Lab::Connection>.
+
+=head1 NAME
+
+Lab::Connection::RS232 - RS232 connection base class
 
 =head1 CONSTRUCTOR
 
@@ -123,11 +135,9 @@ Takes a config hash, has to at least pass the key 'command' correctly to the und
 
 Takes a config hash, reads back a message from the device.
 
-
 =head3 Clear()
 
 Clears the instrument.
-
 
 =head2 config
 
@@ -158,6 +168,16 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 This library is free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.
 
-=cut
+=head1 COPYRIGHT AND LICENSE
 
-1;
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

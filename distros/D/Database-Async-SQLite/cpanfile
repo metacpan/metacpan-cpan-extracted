@@ -1,0 +1,3 @@
+requires 'parent', 0;
+requires 'ExtUtils::CppGuess', 0;
+

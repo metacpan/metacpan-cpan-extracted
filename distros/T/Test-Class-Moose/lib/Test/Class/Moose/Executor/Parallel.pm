@@ -4,7 +4,7 @@ package Test::Class::Moose::Executor::Parallel;
 
 use 5.10.0;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 use Moose 2.0000;
 use Carp;
@@ -208,7 +208,7 @@ Test::Class::Moose::Executor::Parallel - Execute tests in parallel (parallelized
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =for Pod::Coverage Tags Tests runtests
 

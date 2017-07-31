@@ -3,10 +3,9 @@ package Alien::Base::ModuleBuild::Cabinet;
 use strict;
 use warnings;
 
-our $VERSION = '0.040';
+our $VERSION = '0.042';
 
 use Sort::Versions;
-use List::MoreUtils qw/part/;
 
 sub new {
   my $class = shift;
@@ -28,15 +27,20 @@ sub add_files {
 sub sort_files {
   my $self = shift;
 
-  # split files which have versions and those which don't (sorted on filename)
-  my ($name, $version) = part { $_->has_version } @{ $self->{files} };
+  $self->{files} = [
+    sort { $b->has_version <=> $a->has_version || ($a->has_version ? versioncmp($b->version, $a->version) : versioncmp($b->filename, $a->filename)) }
+    @{ $self->{files} }
+  ];
 
-  # store the sorted lists of versioned, then non-versioned
-  my @sorted;
-  push @sorted, sort { versioncmp( $b->version,  $a->version  ) } @$version if $version;
-  push @sorted, sort { versioncmp( $b->filename, $a->filename ) } @$name    if $name;
-
-  $self->{files} = \@sorted;
+  ## split files which have versions and those which don't (sorted on filename)
+  #my ($name, $version) = part { $_->has_version } @{ $self->{files} };
+  #
+  ## store the sorted lists of versioned, then non-versioned
+  #my @sorted;
+  #push @sorted, sort { versioncmp( $b->version,  $a->version  ) } @$version if $version;
+  #push @sorted, sort { versioncmp( $b->filename, $a->filename ) } @$name    if $name;
+  #
+  #$self->{files} = \@sorted;
 
   return;
 }

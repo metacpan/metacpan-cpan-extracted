@@ -1,7 +1,6 @@
 package Lab::Connection::VICP;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: VICP ethernet protocol connection
-$Lab::Connection::VICP::VERSION = '3.553';
+$Lab::Connection::VICP::VERSION = '3.554';
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection::GPIB;
@@ -89,7 +88,7 @@ Lab::Connection::VICP - VICP ethernet protocol connection
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

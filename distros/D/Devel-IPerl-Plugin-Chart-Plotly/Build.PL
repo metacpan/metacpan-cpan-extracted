@@ -18,15 +18,15 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Devel-IPerl-Plugin-Chart-Plotly",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "mit",
   "module_name" => "Devel::IPerl::Plugin::Chart::Plotly",
   "recursive_test_files" => 1,
   "requires" => {
     "Chart::Plotly::Plot" => 0,
-    "Const::Fast" => 0,
     "Devel::IPerl::Display::HTML" => 0,
     "English" => 0,
+    "Module::Find" => 0,
     "Moo::Role" => 0,
     "Role::Tiny" => 0,
     "namespace::autoclean" => 0,

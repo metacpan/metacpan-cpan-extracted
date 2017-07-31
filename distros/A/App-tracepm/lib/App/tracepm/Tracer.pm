@@ -1,7 +1,7 @@
 package App::tracepm::Tracer;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-07-29'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 # saving CORE::GLOBAL::require doesn't work
 my $orig_require;
@@ -64,7 +64,7 @@ App::tracepm::Tracer - Trace module require to file
 
 =head1 VERSION
 
-This document describes version 0.20 of App::tracepm::Tracer (from Perl distribution App-tracepm), released on 2017-07-10.
+This document describes version 0.21 of App::tracepm::Tracer (from Perl distribution App-tracepm), released on 2017-07-29.
 
 =head1 HOMEPAGE
 
@@ -72,7 +72,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
+Source repository is at L<https://github.com/sharyanto/perl-App-tracepm>.
 
 =head1 BUGS
 

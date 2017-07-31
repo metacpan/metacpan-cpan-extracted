@@ -25,7 +25,11 @@ my $compile_ok = sub {
 		if($link_p) {
 			$builder->add_to_cleanup(
 				$cbuilder->exe_file($obj_file));
-			$cbuilder->link_executable(objects => $obj_file);
+			$cbuilder->link_executable(
+				objects => $obj_file,
+				extra_linker_flags =>
+					$builder->extra_linker_flags || [],
+			);
 		}
 		1;
 	};

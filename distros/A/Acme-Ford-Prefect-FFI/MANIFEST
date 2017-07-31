@@ -4,10 +4,10 @@ Build.PL
 Changes
 lib/Acme/Ford/Prefect/FFI.pm
 LICENSE
+maint/releaseprep
 MANIFEST			This list of files
 META.json
 META.yml
 README
 t/00_diag.t
-t/01_use.t
 t/answer.t

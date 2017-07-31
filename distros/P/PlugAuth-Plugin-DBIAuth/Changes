@@ -1,5 +1,8 @@
 Revision history for PlugAuth-Plugin-DBIAuth
 
+0.06      2017-07-22 22:22:18 -0400
+  - Removed dep on File::HomeDir
+
 0.05      2015-12-01 07:25:42 -0500
   - Silenced silly warnings due to crypt returning undef.
   - Moved repository to clustericious org on github

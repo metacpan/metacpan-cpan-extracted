@@ -12,6 +12,7 @@ dist.ini
 lib/Net/Fritz.pm
 lib/Net/Fritz/Action.pm
 lib/Net/Fritz/Box.pm
+lib/Net/Fritz/ConfigFile.pm
 lib/Net/Fritz/Data.pm
 lib/Net/Fritz/Device.pm
 lib/Net/Fritz/Error.pm
@@ -27,8 +28,10 @@ t/06.fritz-service.t
 t/07.fritz-device.t
 t/08.fritz-device-call.t
 t/09.fritz-box-call.t
+t/10.fritz-configfile.t
 t/60.connect-http.t
 t/61.connect-https.t
+t/80.pod-link-check.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-linkcheck.t

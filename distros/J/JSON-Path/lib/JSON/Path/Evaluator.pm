@@ -1,5 +1,5 @@
 package JSON::Path::Evaluator;
-$JSON::Path::Evaluator::VERSION = '0.400';
+$JSON::Path::Evaluator::VERSION = '0.411';
 use strict;
 use warnings;
 use 5.008;
@@ -418,6 +418,17 @@ sub _match_recursive {
 
     my @match;
 
+    # Fix for RT #122529.
+    #
+    # Consider the expression "$..foo..bar", evaluated with respect to the JSON "{"foo":{"bar":"baz"}}".
+    #
+    # The first term to be evaluated in the expression is "$..foo". If want_ref is passed to evaluate(),
+    # this will return a REF reference. In that case we must first dereference it to get the object that
+    # we will evaluate "..bar" with respect to.
+    if ( ref $obj eq 'REF' ) {
+        $obj = ${$obj};
+    }
+
     if ( _arraylike($obj) ) {
         if ( looks_like_number($index) && exists $obj->[$index] ) {
             push @match, $want_ref ? \( $obj->[$index] ) : $obj->[$index];
@@ -476,8 +487,8 @@ sub _process_pseudo_js {
         @lhs = map { $self->_evaluate( $_, [@token_stream] ) } values %{$object};
     }
     else {
-        for my $value (@{$object}) {
-            my ($got) = $self->_evaluate($value, [@token_stream]);
+        for my $value ( @{$object} ) {
+            my ($got) = $self->_evaluate( $value, [@token_stream] );
             push @lhs, $got;
         }
     }
@@ -632,7 +643,7 @@ JSON::Path::Evaluator - A module that recursively evaluates JSONPath expressions
 
 =head1 VERSION
 
-version 0.400
+version 0.411
 
 =head1 SYNOPSIS
 

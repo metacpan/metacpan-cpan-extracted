@@ -1,4 +1,7 @@
 Revision history for Perl module DBD::Neo4p
+0.1004 2017-07-21
+    - Updated test queries for Neo4j 3.2
+    - Simplify ping query
 0.0010 2015-04-25
     - Corrected user,pass handling
     - Works with Neo4j v2.2 basic auth

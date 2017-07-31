@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package JSON::Path;
-$JSON::Path::VERSION = '0.400';
+$JSON::Path::VERSION = '0.411';
 # VERSION
 
 use Exporter::Tiny ();
@@ -62,6 +62,14 @@ sub get {
 
 sub set {
     my ( $self, $object, $value, $limit ) = @_;
+
+    if ( !ref $object ) {
+        # warn if not called internally. If called internally (i.e. from value()) we will already have warned.
+        my @c = caller(0);
+        if ( $c[1] !~ /JSON\/Path\.pm$/ ) {
+            carp qq{Useless attempt to set a value on a non-reference};
+        }
+    }
     my $count = 0;
     my @refs = JSON::Path::Evaluator::evaluate_jsonpath( $object, "$self", want_ref => 1 );
     for my $ref (@refs) {
@@ -81,6 +89,12 @@ sub value : lvalue {
         },
         set => sub {
             my $value = shift;
+            # do some caller() magic to warn at the right place
+            if ( !ref $object ) {
+                my @c = caller(2);
+                my ( $filename, $line ) = @c[ 1, 2 ];
+                warn qq{Useless attempt to set a value on a non-reference at $filename line $line\n};
+            }
             $self->set( $object, $value, 1 );
         },
     );
@@ -124,7 +138,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 0.400
+version 0.411
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Run; # git description: 0.044-5-g4ef1978
+package Dist::Zilla::Plugin::Run; # git description: 0.045-5-gca670d9
 # ABSTRACT: Run external commands and code at specific phases of Dist::Zilla
 # KEYWORDS: plugin tool distribution build release run command shell execute
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 1;
 
@@ -21,7 +21,7 @@ Dist::Zilla::Plugin::Run - Run external commands and code at specific phases of 
 
 =head1 VERSION
 
-version 0.045
+version 0.046
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ Only run the given command if this is a release.
 
 Only run a given command if this isn't a release.
 
-=head2 eval (EXPERIMENTAL)
+=head2 eval
 
 Treats the input as a list of lines of Perl code; the code is evaluated at the
 specific L<Dist::Zilla> phase given by the plugin. The code is executed in its
@@ -143,11 +143,11 @@ for passing as arguments to the specified commands and eval strings
 
 =item *
 
-C<%a> the archive of the release (available to all C<*Release> phases)
+C<%a> the archive of the release (only available to all C<*Release> phases)
 
 =item *
 
-C<%d> the directory in which the distribution was built (or minted) (not in C<BeforeBuild>)
+C<%d> the directory in which the distribution was built (or minted) (not available in C<BeforeBuild>)
 
 =item *
 

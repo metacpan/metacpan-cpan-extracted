@@ -33,7 +33,16 @@ Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-String-Base\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=String-Base",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

@@ -21,6 +21,7 @@ The communication between check_nrpe and nrped is as follows:
 
 it uses the "packet" struct defined in "include/common.h"
 
+### NRPE v. 2
 ```
 typedef struct packet_struct{
 	int16_t   packet_version;
@@ -54,6 +55,48 @@ TCP Data looks like this:
 |-------------+---------+------+-------+------------+----------|
 ```
 
+### NRPE v. 3
+
+NRPE v. 3 works mostly like NRPE v. 2 but the length of the buffer is now of variable length. This means that the
+length of the packet buffer must now be sent as a field in the packet. An alignment field is also added and the 
+buffer is no longer padded, so a v. 3 packet can be both smaller and larger than a v. 2 packet.
+
+```
+typedef struct packet_struct{
+	int16_t   packet_version;
+	int16_t   packet_type;
+	u_int32_t crc32_value;
+	int16_t   result_code;
+	int16_t   alignment;
+	int32_t   buffer_length;
+	char      buffer[];
+        }packet;
+
+```
+Values in the struct can be explained as following for a sent query:
+
+```
+| size(in byte) | type       | name           | description                                     | Value         |
+|---------------+------------+----------------+-------------------------------------------------+---------------|
+| 2             | int16_t    | packet_version | uint16_t of host byte network order (hostshort) | 1/2/3         |
+| 2             | int16_t    | packet_type    | uint16_t query to the server                    | 1             |
+| 4             | u_int32_t  | crc32_value    | checksum of the packet(htonl)                   | <checksum>    |
+| 2             | int16_t    | result_code    | left empty on query                             | null          |
+| 2             | int16_t    | alignment      | alignment of the packet                         | 0             |
+| 4             | int32_t    | buffer_length  | length of the buffer                            | <length>      |
+| ?             | char[]     | buffer         | packet buffer terminated  with \x0              | "check_users" |
+```
+
+TCP Data looks like this:
+
+```
+|-------------+---------+------+-------+------------+-----------+--------------+----------|
+| BYTE        | 0     1 | 2  3 | 4   7 | 8        9 | 10     11 | 12        15 | 16     ? |
+|-------------+---------+------+-------+------------+-----------+--------------+----------|
+| DESCRIPTION | VERSION | TYPE | CRC32 | RESULTCODE | ALIGNMENT | BUFFERLENGTH | BUFFER   |
+|-------------+---------+------+-------+------------+-----------+--------------+----------|
+```
+
 # Client Side
 
 A short description of the workflow internal to check_nrpe:
@@ -74,8 +117,6 @@ _IF IT WAS COMPILED WITH SSL_
 
 _ENDIF_
  
- - randomize packet buffer data 
-   `(char *)&send_packet,sizeof(send_packet)`
  - build Packet
 
  - send packet

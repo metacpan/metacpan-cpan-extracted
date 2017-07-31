@@ -1,7 +1,7 @@
 package PlugAuth;
 
 # ABSTRACT: Pluggable authentication and authorization server.
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 use strict;
@@ -191,7 +191,7 @@ PlugAuth - Pluggable authentication and authorization server.
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 SYNOPSIS
 

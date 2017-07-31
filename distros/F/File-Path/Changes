@@ -1,5 +1,8 @@
 Revision history for Perl extension File::Path.
 
+2.15 2017-07-29
+    - Correct documentation error re possible arguments for rmtree().
+
 2.14 2017-06-07
     - When creating subdirectories for testing underneath
       File::Spec::Functions::tmpdir(), use randomly generated strings.

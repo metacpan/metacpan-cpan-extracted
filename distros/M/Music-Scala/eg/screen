@@ -5,14 +5,11 @@
 use strict;
 use warnings;
 use feature qw/say/;
-use Try::Tiny;
 
 use Music::Scala ();
 my $s = Music::Scala->new;
 
 for my $file ( glob('*.scl') ) {
-  try { say $file if $s->read_scala($file)->get_notes == 12 }
-  catch {
-    warn "could not parse '$file': $_\n";
-  };
+    eval { say $file if $s->read_scala($file)->get_notes == 12 };
+    warn "could not parse '$file': $@" if $@;
 }

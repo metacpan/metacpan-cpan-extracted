@@ -4,9 +4,9 @@ Memoize::Once - memoise expression on first execution
 
 =head1 SYNOPSIS
 
-	use Memoize::Once qw(once);
+    use Memoize::Once qw(once);
 
-	$value = once(expensive_computation());
+    $value = once(expensive_computation());
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ use strict;
 use Devel::CallChecker 0.003 ();
 use XSLoader;
 
-our $VERSION = "0.000";
+our $VERSION = "0.002";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(once);
@@ -88,7 +88,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

@@ -7,13 +7,19 @@ use Getopt::Long qw(GetOptions);
 use MIDI;
 use Music::RecRhythm;
 
+my $Default_Pad   = 0;
+my $Default_Patch = 0;
 my $Default_Pitch = 60;
-my @Pitches;
+my ( @Pads, @Patches, @Pitches );
+
+emit_help() unless @ARGV;
 
 GetOptions(
     'duration|d=s' => \my $Flag_Duration,
     'file|f=s'     => \my $Flag_MIDI_File,
     'help|h|?'     => \&emit_help,
+    'pads=s'       => \my $Flag_Pads,
+    'patches=s'    => \my $Flag_Patches,
     'pitches=s'    => \my $Flag_Pitches,
     'repeat|r=i'   => \my $Flag_Repeats,
     'silent=s'     => \my $Flag_Silent_Tracks,
@@ -27,10 +33,16 @@ for my $arg (@ARGV) {
     push @sets, Music::RecRhythm->new( set => [ integers_from($arg) ] );
     $sets[-2]->next( $sets[-1] ) if @sets > 1;
 }
-if ($Flag_Pitches) {
+if ($Flag_Pads) {
+    @Pads = integers_from($Flag_Pads);
+}
+if (defined $Flag_Patches) {
+    @Patches = integers_from($Flag_Patches);
+}
+if (defined $Flag_Pitches) {
     @Pitches = integers_from($Flag_Pitches);
 }
-if ($Flag_Silent_Tracks) {
+if (defined $Flag_Silent_Tracks) {
     for my $n ( integers_from($Flag_Silent_Tracks) ) {
         $sets[$n]->is_silent(1);
     }
@@ -45,7 +57,7 @@ warn sprintf "info: beatfactor=%d levels=%d\n",
   map { $sets[0]->$_ } qw/beatfactor levels/;
 
 my @MIDI_Tracks =
-  map { new_track_on_the_block() } 1 .. $sets[0]->audible_levels;
+  map { new_track_on_the_block($_) } 1 .. $sets[0]->audible_levels;
 my @Track_Durations;
 
 # though it may be more efficient to merely duplicate the MIDI events
@@ -82,10 +94,13 @@ Options include:
                   Default: 96. May need to be fiddled with depending on
                   the rhythm sets, etc.
   --file=f        Output file, otherwise 'out.midi' by default.
+  --pad=p,..      Leading silence for a given track. Defaults to no padding.
+  --patches=p,..  Patch to use for a given track.
   --pitches=p,..  What pitch to use in what recursion level. Default: 60.
   --repeat=r      How many times to repeat the recursion. Default: once.
   --silent=s,..   What sets to silence, where 0 indicates the first set
-                  listed on the command line, etc.
+                  listed on the command line, etc. (This will change the
+                  track numbering.)
   --tempo=t       MIDI tempo. Default 500000.
   --ticks=t       MIDI ticks. Deafult 384.
 
@@ -106,16 +121,21 @@ sub integers_from {
 }
 
 sub new_track_on_the_block {
+    my ($num) = @_;
+    my $chan  = $num - 1;
     my $track = MIDI::Track->new;
-    $track->new_event( 'set_tempo', 0, $Flag_Tempo );
-    $track->new_event( 'patch_change', 0, 0, 0 );
+    $track->new_event( 'set_tempo', $chan, $Flag_Tempo );
+    $track->new_event(
+        'patch_change', $Pads[$chan] // $Default_Pad,
+        $chan, $Patches[$chan] // $Default_Patch
+    );
     return $track;
 }
 
 sub play_note {
     my ( $track, $param ) = @_;
     $param->{chan} //= 0;
-    $param->{velo} //= 100;
+    $param->{velo} //= 90 + int( rand 3 + rand 3 + rand 3 );
     $track->new_event( 'note_on', 0, map { $param->{$_} } qw/chan pitch velo/ );
     $track->new_event( 'note_off', map( { $param->{$_} } qw/dur chan pitch/ ), 0 );
 }

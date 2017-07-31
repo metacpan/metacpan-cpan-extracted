@@ -16,6 +16,7 @@ App
 AskPullRequestQuestions
 ChangedFiles
 ChangedFilesFactory
+Cronin
 Dave
 Eilam
 Eilam's
@@ -27,6 +28,7 @@ GHE
 GHPT
 Greg
 Inc
+Kevin
 MAXMIND
 MAXMIND's
 Mark
@@ -41,7 +43,10 @@ OurMooseX
 Ourperl
 Parameterizable
 Parameterized
+Patrick
+PatrickCronin
 PayPal
+Phair
 Question
 Ragwitz
 Role
@@ -61,4 +66,6 @@ iff
 lib
 mark
 mfowler
+pcronin
+phair
 rafl

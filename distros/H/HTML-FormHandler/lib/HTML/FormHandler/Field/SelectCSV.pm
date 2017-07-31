@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::SelectCSV;
 # ABSTRACT: Multiple select field from CSV value
-$HTML::FormHandler::Field::SelectCSV::VERSION = '0.40067';
+$HTML::FormHandler::Field::SelectCSV::VERSION = '0.40068';
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -49,7 +49,7 @@ HTML::FormHandler::Field::SelectCSV - Multiple select field from CSV value
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

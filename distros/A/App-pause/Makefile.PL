@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long::Subcommand" => "0.09",
     "JSON::PP" => 0,
     "List::Util" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.019",
     "Log::ger::Output" => "0.005",
     "Log::ger::Output::Screen" => "0.004",
     "Log::ger::Util" => "0.008",
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.63",
+  "VERSION" => "0.64",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::PP" => 0,
   "List::Util" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.019",
   "Log::ger::Output" => "0.005",
   "Log::ger::Output::Screen" => "0.004",
   "Log::ger::Util" => "0.008",

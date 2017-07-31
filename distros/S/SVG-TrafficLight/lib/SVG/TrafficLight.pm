@@ -27,7 +27,7 @@ package SVG::TrafficLight;
 use Moose;
 use SVG;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.1.2';
 
 =head1 ATTRIBUTES AND METHODS
 
@@ -90,7 +90,7 @@ be set when creating the object;
 
     my $tl = SVG::TrafficLight->new({ padding => 100 });
 
-=cut 
+=cut
 
 has padding => (
   is         => 'ro',
@@ -245,7 +245,7 @@ sub _build_svg {
 This defines the colours used to draw the traffic lights. The value must be
 a reference to a hash. The hash must contain three keys - C<red>, C<amber>,
 and C<green>. The values are references to two-element arrays. The first
-element in each array is the colour used when the light is off and the 
+element in each array is the colour used when the light is off and the
 second is the colour used when the light is on.
 
 The values of the colours can be anything that is recognised as a colour in
@@ -282,7 +282,21 @@ three lights are on or off.
 
 The default sequence demonstates the full standard British traffic light
 sequence of green, amber, red, red and amber, green. This can be changed
-when creating the object.
+when creating the object. For example here is how to reproduct the green,
+amber, red, green sequence that is used in many countries.
+
+    my $tl = SVG::TrafficLight->new({
+      sequence => [
+        { red => 0, amber => 0, green => 1 },
+        { red => 0, amber => 1, green => 0 },
+        { red => 1, amber => 0, green => 0 },
+        { red => 0, amber => 0, green => 1 },
+      ],
+    });
+
+You don't need to reproduce sequences that are seen in the real world, The
+following code, for example, gives a sequence consisting of two steps - one
+where all lights are off followed by one where all lights are on.
 
     my $tl = SVG::TrafficLight->new({
       sequence => [
@@ -326,9 +340,44 @@ sub BUILD {
     my $light_set_x = ($i * ($self->light_width + $self->padding))
                       + $self->padding;
 
+    $self->draw_a_lightset_at($light_set_x, $self->padding,
+                              $self->sequence->[$i]);
+  }
+
+=head2 draw_a_lightset_at($x, $y, \%lights)
+
+Draws a set of three lights at a given position on the canvas.
+
+Takes three mandatory parameters:
+
+=over 4
+
+=item $x
+
+The x co-ordinate of the top-left corner of the light set.
+
+=item $y
+
+The  co-ordinate of the top left corner of the light set.
+
+=item \%lights
+
+A reference to a hash indicating which lights should be turned on or off.
+The keys in the has should be the names of the lights in the light set (red,
+amber and green) and the associated values should be a 1 (to indicate that the
+light is on) or a 0 (to indicate that the light is off).
+
+=back
+
+=cut
+
+  sub draw_a_lightset_at {
+    my $self = shift;
+    my ($x, $y, $lights) = @_;
+
     $self->rect(
-      x      => $light_set_x,
-      y      => $self->padding,
+      x      => $x,
+      y      => $y,
       width  => $self->light_width,
       height => $self->light_height,
       fill   => 'black',
@@ -338,11 +387,11 @@ sub BUILD {
 
     my $light = 0;
     for my $l (qw[red amber green]) {
-      my $fill = $self->colours->{$l}[$self->sequence->[$i]{$l}];
+      my $fill = $self->colours->{$l}[$lights->{$l}];
 
       $self->circle(
-        cx   => $light_set_x + $self->padding + $self->radius,
-        cy   => (2 * $self->padding) + $self->radius
+        cx   => $x + $self->padding + $self->radius,
+        cy   => $y + $self->padding + $self->radius
                 + $light * ($self->diameter + $self->padding),
         r    => $self->radius,
         fill => $fill,

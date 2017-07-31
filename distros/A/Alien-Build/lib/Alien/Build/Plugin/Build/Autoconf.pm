@@ -7,7 +7,7 @@ use constant _win => $^O eq 'MSWin32';
 use Path::Tiny ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 has with_pic       => 1;
@@ -29,6 +29,8 @@ sub init
   my $set_autoconf_prefix = sub {
     my($build) = @_;
     my $prefix = $build->install_prop->{prefix};
+    die "Prefix is not set.  Did you forget to run 'make alien_prefix'?"
+      unless $prefix;
     if(_win)
     {
       $prefix = Path::Tiny->new($prefix)->stringify;
@@ -62,6 +64,8 @@ sub init
 
       $set_autoconf_prefix->($build);
       my $prefix = $build->install_prop->{autoconf_prefix};
+      die "Prefix is not set.  Did you forget to run 'make alien_prefix'?"
+        unless $prefix;
       
       $intr->replace_helper(
         configure => sub {
@@ -128,7 +132,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -194,6 +198,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

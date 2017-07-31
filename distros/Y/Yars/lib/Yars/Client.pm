@@ -1,7 +1,7 @@
 package Yars::Client;
 
 # ABSTRACT: Yet Another RESTful-Archive Service Client
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ use Data::Dumper;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 use Number::Bytes::Human qw( format_bytes parse_bytes );
 use File::Temp qw( tempdir );
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 use YAML::XS;
 use Carp qw( carp );
 use JSON::MaybeXS qw( encode_json );
@@ -99,11 +99,18 @@ sub client {
     } : $self->SUPER::client;
 }
 
+sub _dist_data_dir
+{
+  my $dir = bsd_glob('~/.yars');
+  mkdir $dir unless -d $dir;
+  $dir;
+}
+
 sub bucket_map_cached {
     my($self, $new) = @_;
 
     state $fn = File::Spec->catfile(
-        File::HomeDir->my_dist_data('Yars', { create => 1 }),
+        _dist_data_dir,
         'bucket_map_cache.yml',
     );
 
@@ -555,7 +562,7 @@ Yars::Client - Yet Another RESTful-Archive Service Client
 
 =head1 VERSION
 
-version 1.28
+version 1.30
 
 =head1 SYNOPSIS
 

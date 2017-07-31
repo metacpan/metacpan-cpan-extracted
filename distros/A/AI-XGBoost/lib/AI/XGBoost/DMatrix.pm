@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.008';    # VERSION
 
 # ABSTRACT: XGBoost class for data
 
@@ -86,7 +86,7 @@ sub num_col {
 
 sub dims {
     my $self = shift();
-    return ( $self->rows(), $self->cols() );
+    return ( $self->num_row(), $self->num_col() );
 }
 
 sub DEMOLISH {
@@ -108,7 +108,7 @@ AI::XGBoost::DMatrix - XGBoost class for data
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -2,17 +2,17 @@ requires "DynaLoader" => "0";
 requires "perl" => "5.006";
 
 on 'build' => sub {
-  requires "Acme::Alien::DontPanic2" => "0.3200";
+  requires "Acme::Alien::DontPanic2" => "0.7500";
   requires "Module::Build" => "0.28";
 };
 
 on 'test' => sub {
-  requires "Test::More" => "0.94";
+  requires "Test2::V0" => "0.000060";
   requires "perl" => "5.006";
 };
 
 on 'configure' => sub {
-  requires "Acme::Alien::DontPanic2" => "0.3200";
+  requires "Acme::Alien::DontPanic2" => "0.7500";
   requires "Module::Build" => "0.28";
   requires "perl" => "5.006";
 };

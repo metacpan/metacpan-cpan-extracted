@@ -1,3 +1,14 @@
+version 0.011; 2017-07-25
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * in META.json, specify type of public repository
+
 version 0.010; 2013-09-21
 
   * bugfix: require bugfixed version of DateTime::TimeZone::SystemV to

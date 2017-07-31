@@ -1,5 +1,6 @@
 package Lab::Instrument::PD11042;
-$Lab::Instrument::PD11042::VERSION = '3.553';
+#ABSTRACT: Trinamic PD-110-42 low-cost 42mm stepper motor
+$Lab::Instrument::PD11042::VERSION = '3.554';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Lab::Instrument;
@@ -758,20 +759,26 @@ sub my_timestamp {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::PD11042 - 42mm stepper motor with integrated controller/driver
+Lab::Instrument::PD11042 - Trinamic PD-110-42 low-cost 42mm stepper motor
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
     use Lab::Instrument::PD11042;
     
     ...
-    
+
 =head1 DESCRIPTION
 
 The Lab::Instrument::PD11042 class implements an interface to the
@@ -800,18 +807,24 @@ None known so far. :)
 
 =item Lab::Instrument
 
-=item
+=item 
 <Lhttp://www.trinamic.com/index.php?option=com_content&view=article&id=243&
 Itemid=355>
 
-
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-  (c) 2011 Stefan Geissler
+  Copyright 2012       Andreas K. Huettel
+            2013       Andreas K. Huettel, Christian Butschkow
+            2014       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

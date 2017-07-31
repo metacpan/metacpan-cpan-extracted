@@ -67,10 +67,13 @@ sub new
 
    my $self = $class->SUPER::new( %args );
 
-   foreach my $req ( @{ $self->alien_requires || [] } ) {
-      my $missing = $self->do_requires( @$req );
-      die "OS unsupported - missing $missing\n" if defined $missing;
-   }
+   my $module = $self->pkgconfig_module;
+   my $version = $self->pkgconfig_version;
+
+   $use_bundled = 1 if
+      !$use_bundled and defined $self->do_requires_pkgconfig( $module, atleast_version => $version );
+
+   $self->configure_requires->{$_} ||= $more_configure_requires{$_} for keys %more_configure_requires;
 
    my @reqs = @{ $self->alien_requires || [] };
    while( @reqs ) {
@@ -81,21 +84,18 @@ sub new
       $self->configure_requires->{"ExtUtils::CChecker"} //= 0 if $name eq "header";
    }
 
-   $self->configure_requires->{$_} ||= $more_configure_requires{$_} for keys %more_configure_requires;
-
-   my $module = $self->pkgconfig_module;
-   my $version = $self->pkgconfig_version;
-
-   $use_bundled = 1 if
-      !$use_bundled and system( "pkg-config", $module, "--atleast-version", $version ) != 0;
-
    if( $use_bundled ) {
+      foreach my $req ( @{ $self->alien_requires || [] } ) {
+         my $missing = $self->do_requires( @$req );
+         die "OS unsupported - missing $missing\n" if defined $missing;
+      }
+
       die "OS unsupported - unable to find GNU make\n" unless defined &MAKE;
       die "OS unsupported - unable to find GNU libtool\n" unless defined &LIBTOOL;
       print "Building bundled source\n";
    }
    else {
-      print "Detected $module version >= $version from pkg-config\n";
+      print "Using $module version >= $version from pkg-config\n";
    }
 
    $self->notes( use_bundled => $use_bundled );

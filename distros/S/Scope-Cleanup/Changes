@@ -1,3 +1,27 @@
+version 0.003; 2017-07-28
+
+  * bugfix: run cleanup sub on a fresh stack, to avoid reallocating a
+    stack that core unwinding code was relying on not moving
+
+  * update to accommodate PERL_OP_PARENT builds of Perl 5.21.11 or later
+    (which is the default from Perl 5.25.1)
+
+  * mark the establish-cleanup ops as custom ops rather than disguising
+    them as rand ops
+
+  * test with the cleanup sub being a dynamically-generated closure
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * rename internal gen_*_op() function into a better style
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.002; 2012-02-04
 
   * don't preserve ghost context on Perl 5.13.7 and above, where the

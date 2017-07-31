@@ -1,15 +1,94 @@
-SYNOPSIS
+NAME
+    Complete::Man - Complete from list of available manpages
 
+VERSION
+    This document describes version 0.09 of Complete::Man (from Perl
+    distribution Complete-Man), released on 2017-07-29.
+
+SYNOPSIS
      use Complete::Man qw(complete_manpage complete_manpage_section);
-    
+
      my $res = complete_manpage(word => 'gre');
      # -> ['grep', 'grep-changelog', 'greynetic', 'greytiff']
-    
+
      # only from certain section
      $res = complete_manpage(word => 'gre', section => 1);
      # -> ['grep', 'grep-changelog', 'greytiff']
-    
+
      # complete section
      $res = complete_manpage_section(word => '3');
      # -> ['3', '3perl', '3pm', '3readline']
+
+FUNCTIONS
+  complete_manpage
+    Usage:
+
+     complete_manpage(%args) -> any
+
+    Complete from list of available manpages.
+
+    For each directory in "MANPATH" environment variable, search man section
+    directories and man files.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   section => *str*
+
+        Only search from specified section(s).
+
+        Can also be a comma-separated list to allow multiple sections.
+
+    *   use_mandb => *bool* (default: 1)
+
+    *   word* => *str*
+
+    Return value: (any)
+
+  complete_manpage_section
+    Usage:
+
+     complete_manpage_section(%args) -> any
+
+    Complete from list of available manpage sections.
+
+    If "MANSECT" is defined, will use that.
+
+    Otherwise, will collect section names by going through each directory in
+    "MANPATH" environment variable, searching man section directories and
+    man files.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Man>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Man>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Man>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

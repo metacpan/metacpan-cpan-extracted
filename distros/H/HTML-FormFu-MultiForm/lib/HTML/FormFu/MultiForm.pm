@@ -1,13 +1,18 @@
 package HTML::FormFu::MultiForm;
-{
-  $HTML::FormFu::MultiForm::VERSION = '1.00';
-}
+
+# ABSTRACT: Handle multi-page/stage forms with FormFu
+
+use strict;
+
+our $VERSION = '1.03'; # VERSION
+our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
+
+
 use Moose;
 use MooseX::Attribute::Chained;
 
 with
-    'HTML::FormFu::Role::FormAndElementMethods' =>
-    { -excludes => 'model_config' },
+    'HTML::FormFu::Role::FormAndElementMethods' => { -excludes => 'model_config' },
     'HTML::FormFu::Role::FormBlockAndFieldMethods',
     'HTML::FormFu::Role::NestedHashUtils',
     'HTML::FormFu::Role::Populate';
@@ -88,11 +93,12 @@ our @SHARED_WITH_FORMFU = (
 
 *loc = \&localize;
 
-for my $name ( qw(
+for my $name (
+    qw(
     persist_stash
     _file_fields
-    ) )
-{
+    )
+    ) {
     has $name => (
         is      => 'rw',
         default => sub { [] },
@@ -162,15 +168,13 @@ sub process {
     if ( defined $data ) {
         $current_form_num = $data->{current_form};
 
-        my $current_form
-            = $self->_load_current_form( $current_form_num, $data );
+        my $current_form = $self->_load_current_form( $current_form_num, $data );
 
         # are we on the last form?
         # are we complete?
 
         if ( ( $current_form_num == scalar @forms )
-            && $current_form->submitted_and_valid )
-        {
+            && $current_form->submitted_and_valid ) {
             $self->complete(1);
         }
 
@@ -241,7 +245,7 @@ sub _load_current_form {
     my $current_data = Clone::clone( $self->forms->[ $current_form_num - 1 ] );
 
     # merge constructor args
-    for my $key ( @SHARED_WITH_FORMFU ) {
+    for my $key (@SHARED_WITH_FORMFU) {
         my $value = $self->$key;
 
         if ( defined $value ) {
@@ -275,10 +279,11 @@ sub _load_current_form {
 
     # add hidden field
     if ( ( !defined $self->multiform_hidden_name ) && $current_form_num > 1 ) {
-        my $field = $current_form->element( {
-                type => 'Hidden',
+        my $field = $current_form->element(
+            {   type => 'Hidden',
                 name => $self->default_multiform_hidden_name,
-            } );
+            }
+        );
 
         $field->constraint( { type => 'Required', } );
     }
@@ -370,7 +375,7 @@ sub next_form {
     my $next_form = HTML::FormFu->new;
 
     # merge constructor args
-    for my $key ( @SHARED_WITH_FORMFU ) {
+    for my $key (@SHARED_WITH_FORMFU) {
         my $value = $self->$key;
 
         if ( defined $value ) {
@@ -403,10 +408,11 @@ sub next_form {
 
     # add hidden field
     if ( !defined $self->multiform_hidden_name ) {
-        my $field = $next_form->element( {
-                type => 'Hidden',
+        my $field = $next_form->element(
+            {   type => 'Hidden',
                 name => $self->default_multiform_hidden_name,
-            } );
+            }
+        );
 
         $field->constraint( { type => 'Required', } );
     }
@@ -526,8 +532,7 @@ sub _save_hidden_data {
     # store data in hidden field
     $data = $crypt->encrypt_hex($data);
 
-    my $hidden_field
-        = $next_form->get_field( { nested_name => $hidden_name, } );
+    my $hidden_field = $next_form->get_field( { nested_name => $hidden_name, } );
 
     $hidden_field->default($data);
 
@@ -576,21 +581,166 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-HTML::FormFu::MultiForm - Handle multi-page/stage forms
+HTML::FormFu::MultiForm - Handle multi-page/stage forms with FormFu
+
+=head1 VERSION
+
+version 1.03
 
 =head1 DESCRIPTION
 
 For now, see test files in L<Catalyst::Controller::HTML::FormFu> for examples.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Carl Franks, C<cfranks@cpan.org>
+=over 4
 
-=head1 LICENSE
+=item *
 
-This library is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Carl Franks <cpan@fireartist.com>
+
+=item *
+
+Nigel Metheringham <nigelm@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013-2017 by Carl Franks / Nigel Metheringham / Dean Hamstead.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc HTML::FormFu::MultiForm
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<http://metacpan.org/release/HTML-FormFu-MultiForm>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/HTML-FormFu-MultiForm>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-FormFu-MultiForm>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/HTML-FormFu-MultiForm>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/HTML-FormFu-MultiForm>
+
+=item *
+
+CPAN Forum
+
+The CPAN Forum is a web forum for discussing Perl modules.
+
+L<http://cpanforum.com/dist/HTML-FormFu-MultiForm>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/HTML-FormFu-MultiForm>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/H/HTML-FormFu-MultiForm>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=HTML-FormFu-MultiForm>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=HTML::FormFu::MultiForm>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-html-formfu-multiform at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=HTML-FormFu-MultiForm>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/FormFu/HTML-FormFu-MultiForm>
+
+  git clone https://github.com/FormFu/HTML-FormFu-MultiForm.git
+
+=head1 CONTRIBUTOR
+
+=for stopwords fireartist
+
+fireartist <fireartist@gmail.com>
 
 =cut

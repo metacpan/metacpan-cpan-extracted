@@ -38,6 +38,36 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            ExclusiveStartKey => {
+                username => 1000,
+            },
+            ExpressionAttributeValues => {
+                ':zip_code' => '01455',
+            },
+            FilterExpression => 'zip_code = :zip_code',
+            TableName => 'signups',
+            force_type => {
+                ':zip_code' => 'S',
+                username => 'S',
+            },
+        )
+    },
+    {
+        ExclusiveStartKey => {
+            username => { S => 1000 },
+        },
+        ExpressionAttributeValues => {
+            ':zip_code' => { S => '01455' },
+        },
+        FilterExpression => 'zip_code = :zip_code',
+        TableName => 'signups',
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output = Paws::DynamoDB::ScanOutput->new(
     Count => 2,
     Items => [

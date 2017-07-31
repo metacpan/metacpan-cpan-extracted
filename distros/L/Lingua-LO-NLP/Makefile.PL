@@ -22,6 +22,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         'Test::More' => 0,
         'Test::Fatal' => 0,
+        'Try::Tiny' => 0,
     },
     dist => {
         COMPRESS        => 'bzip2',

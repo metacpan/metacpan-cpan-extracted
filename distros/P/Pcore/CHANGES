@@ -1,3 +1,45 @@
+v0.46.0 2017-07-30T06:57:52Z
+ - dist issues api updated
+ - use Cpanel::JSON::XS instead of JSON::XS
+ - dist id fixed
+ - scm upstream_api -> hosting_api
+ - SCM API updated
+
+v0.45.6 2017-07-27T17:39:50Z
+ - docker ls command sort order updated
+ - undef val usage fixed
+
+v0.45.5 2017-07-27T11:20:50Z
+ - dist docker info renamed to status
+
+v0.45.4 2017-07-27T11:12:53Z
+ - dist release fixed
+
+v0.45.3 2017-07-27T11:08:21Z
+ - dist release fixed
+
+v0.45.2 2017-07-27T11:02:23Z
+ - dist release fixed
+
+v0.45.1 2017-07-27T10:57:56Z
+ - dist release fixed
+
+v0.45.0 2017-07-27T10:49:42Z
+ - read docker repo slug from config
+ - DBI quote composite id
+ - dist build docker command updated
+ - new dockerhub api
+ - SCM upstream API updated
+ - cpan meta info generator moved to scm upstream
+ - BitBucket API updated
+ - new pcore dist create options
+ - DockerHub api updated
+ - BitBucket API issues removed
+ - GitHub API updated
+ - dist wiki api updated
+ - dist release api updated
+ - use ca_file only under windows
+
 v0.44.0 2017-07-14T23:45:47Z
  - nssm removed
  - [l10n] do not add empty transaltions on read .po

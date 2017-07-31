@@ -4,17 +4,16 @@ XML::Easy - XML processing with a clean interface
 
 =head1 SYNOPSIS
 
-	use XML::Easy::NodeBasics qw(xml_element xml_e_attribute);
-	use XML::Easy::Text
-		qw(xml10_read_document xml10_write_document);
+    use XML::Easy::NodeBasics qw(xml_element xml_e_attribute);
+    use XML::Easy::Text qw(xml10_read_document xml10_write_document);
 
-	$element = xml_element("a", { href => "there" }, "there");
-	$element = xml10_read_document('<a href="there">there</a>');
+    $element = xml_element("a", { href => "there" }, "there");
+    $element = xml10_read_document('<a href="there">there</a>');
 
-	$href = xml_e_attribute($element, "href");
-	$text = xml10_write_document($element);
+    $href = xml_e_attribute($element, "href");
+    $text = xml10_write_document($element);
 
-	# see specific modules for many more functions
+    # see specific modules for many more functions
 
 =head1 DESCRIPTION
 
@@ -125,7 +124,7 @@ package XML::Easy;
 use warnings;
 use strict;
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

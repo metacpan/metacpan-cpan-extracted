@@ -18,14 +18,21 @@ if (@ARGV) { # PREFIX=~
 # not if the static library can be used in a shared lib on ELF.
 # i.e. if fPIC is used or not.
 # we really need a fallback, like Alien::PCRE2 or shipped sources.
-eval 'use Devel::CheckLib;' and
-  check_lib_or_exit(
-    lib => 'pcre2-8',
-    header => 'pcre2.h',
-    $prefix ? (
-      incpath => "$prefix/include",
-      libpath => "$prefix/lib"
-    ) : ());
+my @req = ();
+eval 'use Devel::CheckLib;';
+if ( !$@ && !check_lib(
+          lib => 'pcre2-8',
+          header => 'pcre2.h',
+          $prefix ? (
+              incpath => "$prefix/include",
+              libpath => "$prefix/lib"
+          ) : ()) )
+{
+    if (!$prefix) {
+        @req = ('Alien::PCRE2' => 0);
+        $prefix = $Config{sitearch}."/auto/share/dist/Alien-PCRE2";
+    }
+}
 
 # fixup darwin macports usr vs opt precedence. /usr/local/include vs /usr/local/lib
 my $ccflags = $Config{ccflags};
@@ -57,6 +64,7 @@ my %WriteMakefileArgs = (
   'ABSTRACT'     => 'PCRE2 regular expression engine with jit',
   'AUTHOR'       => 'Reini Urban <rurban@cpan.org>',
   'BUILD_REQUIRES' => {
+    @req,
     'Devel::CheckLib' => '1.00',
     'Data::Dumper' => '0',
     'Test::More'   => '0.88',
@@ -72,6 +80,7 @@ my %WriteMakefileArgs = (
      : ()),
   },
   'CONFIGURE_REQUIRES' => {
+    @req,
     'Devel::CheckLib'     => '1.00',
     'ExtUtils::MakeMaker' => '6.31'
   },

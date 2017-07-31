@@ -14,25 +14,25 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b1dc76bb84e636c3d4a32dc6676ae3259fa25aeb .appveyor.yml
-SHA1 bddff1b119b111563d9c812b92e28289c3ea450e .travis.yml
+SHA1 66ade5a767190219d6892f1e4d59fea22be138d8 .appveyor.yml
+SHA1 041783628ea621df1271501c341141be0c4cd0c2 .travis.yml
 SHA1 9a56f3b919dfc8fced3803e165a2e38de62646e5 COPYING
-SHA1 7eb2da232117269dbdd796c7eb869d7b143ea767 Changes
-SHA1 dddd524be72a6784fc85f96bd6f054bba0f3cd26 MANIFEST
-SHA1 1b54ffa91cf810f678afdece79df596f0e2c77ff META.json
-SHA1 5232306e51deaf16449d2336f1cce6a3163b3144 META.yml
-SHA1 7ddbf57c8a0b04ca11e50c1fcf534ec19b2a0806 Makefile.PL
-SHA1 5f9c081e4f784fbfccc7df27bf386da13f3b6301 README
-SHA1 faf7ee3dcf51ca9dee6c8ab4864632cfcf2aa0b8 XS.pm
-SHA1 de4fa143391188f9de660d068715fe134a1ba97c XS.xs
+SHA1 05e39fba1f3550cca1f9d6f15fb2fd472b133fa6 Changes
+SHA1 1cb5b409cb86b392753ca0ea2d6ba718f104b128 MANIFEST
+SHA1 0293f584ff61e62d9a5efea0bb74191a93eaae62 META.json
+SHA1 dc0b25e34b021a66f298791270c523c70812b347 META.yml
+SHA1 9f4e725e4e2fa7e255d1fce4314446c77da64035 Makefile.PL
+SHA1 ad85457cffa84dc07f9016b170f0ea7894a2b5eb README
+SHA1 9a3fda3cb684c8a4d482472640aa0e38de6e55a7 XS.pm
+SHA1 3022dd0522d14476779a21d7d9ad550bbea4a3a3 XS.xs
 SHA1 27b0bc7e0cd6fe90876fb3d285065c6a07cca028 XS/Boolean.pm
 SHA1 9e4b04d1af085e6959aaed51734475d350136392 bin/cpanel_json_xs
 SHA1 ea72bbe602baaabdd0004ef1d7e7cc3334b42bb4 eg/bench
 SHA1 6e5d2153e1931be4e416c8feef7f7dfcab0f91b4 ppport.h
 SHA1 f7101031fd3fde35fe2421a07ab6cee8a822c00c t/00_load.t
-SHA1 2e04c54c8e6bf0d8090bcbc17487238a98f5e0aa t/01_utf8.t
+SHA1 c8f0471da3ab4cab5e197a5362e24c0e2958f589 t/01_utf8.t
 SHA1 9cf542e0bf68c90749420c7d07d7be80e1860592 t/02_error.t
-SHA1 1dbcee8e27652d901af1c7f03a06a081e3b69092 t/03_types.t
+SHA1 7ceff3f6fafe1ca6c3bb1c6e3042178753966013 t/03_types.t
 SHA1 d876bdffc381f4f67ec90f9c331e3ec2138946e2 t/04_dwiw_encode.t
 SHA1 94b1130a9b760102e0a24ad518f1e7439ef9122c t/05_dwiw_decode.t
 SHA1 d8c75d0fc7061469eba29275eb366b593c156f7d t/06_pc_pretty.t
@@ -53,7 +53,7 @@ SHA1 01a0a0644343059c7185cb0b3b00b869d5211e1d t/113_overloaded_eq.t
 SHA1 8dece990d5b07df0ae1b6364caefced774cb587d t/114_decode_prefix.t
 SHA1 eb050780996f1e428c87bf6375415ca4c863cbb2 t/115_tie_ixhash.t
 SHA1 3477b0490b8666e451ac15df97f9f35d72c946b1 t/116_incr_parse_fixed.t
-SHA1 528c68984530cf1a3bdfbdb6c0792b23255552b9 t/117_numbers.t
+SHA1 5dc6d574882edd0d6c49ec3d5daeb8d9d4afc246 t/117_numbers.t
 SHA1 d1003d09b5da3609977362bcda64b2c593039a6b t/11_pc_expo.t
 SHA1 c0037e62cefc891df4bb84a110051963a60e9f8c t/12_blessed.t
 SHA1 4d553fd6b5e4486f087babff2946e0cb4b2c38fb t/13_limit.t
@@ -69,8 +69,9 @@ SHA1 1d9c81e5dfc27ff7f790354ce22af335cefe09c2 t/21_evans.t
 SHA1 3d155f37e687f929bd0cae767dc2dbf1993b73c9 t/22_comment_at_eof.t
 SHA1 1ffb0242c800720c565a9e148e184bfa9d54b1c4 t/23_array_ctx.t
 SHA1 2d2ccc7877250f80755a74acd0c3c2f21e606aae t/24_freeze_recursion.t
-SHA1 de63833eb7d922d21339a210680ebf84508b987a t/25_boolean.t
-SHA1 e69768ad5d6900497ab088e74473b3208e3a4bbd t/30_jsonspec.t
+SHA1 b1af7c633a8654de5180ae42289f8fe6d86263de t/25_boolean.t
+SHA1 b731e24e61fd24c19c7b2e636bf20b368fbc851e t/26_duplicate.t
+SHA1 7f4c74f3c46477c513a2baf07a60c94969d2e0e9 t/30_jsonspec.t
 SHA1 3705a4bc706627dde26e444f41342b88850cbe98 t/31_bom.t
 SHA1 ded6191143511074b0cfa5c7ff990e0cbaa11ff9 t/52_object.t
 SHA1 292cb103dae404294cb77c68e3f28a1239f603b9 t/53_readonly.t
@@ -78,12 +79,12 @@ SHA1 cf201da353d9930435463aee512fa7dccbad96df t/54_stringify.t
 SHA1 f08d2ec9499dc0d0e5ede5691c75b865f466b69c t/55_modifiable.t
 SHA1 7ad4a15bfdec5bbd757a48a4670f0275fb2ffd71 t/96_interop.t
 SHA1 1caf7492922f42dd78cf34b2de7bba5481f84fd8 t/96_interop_pp.t
-SHA1 711a469b7cf72b40bbe94ce65264d1c0a3f0a016 t/96_mojo.t
+SHA1 758322045b9e08bfd98122a662950eb86efb7180 t/96_mojo.t
 SHA1 3291c73ec3a19df551d0fff59695153616fc982a t/97_unshare_hek.t
 SHA1 1bf6336a76101f747b84c35cca38c4e8bacb9224 t/98_56only.t
 SHA1 e5e4ea9e68154f9adb4e5e19a86c96efb1704d02 t/99_binary.t
 SHA1 e6078e2fc5c375d45498494bb91487834601a189 t/_unicode_handling.pm
-SHA1 4fe1bc58fd22b56b331ef2050977bd488588919a t/appveyor-test.bat
+SHA1 ef62decbf1634f795ef03babe0b36ab9855f263b t/appveyor-test.bat
 SHA1 483157c2a683750b52011f4b6cc00fc3b4381d9a t/gh70-asan.t
 SHA1 413be8df242f37f68aa3841888174e545cba5b2f t/test_parsing/i_number_neg_int_huge_exp.json
 SHA1 fa1cc74fc07e84b1a18883a4f5e85472c41df793 t/test_parsing/i_number_pos_double_huge_exp.json
@@ -424,7 +425,7 @@ SHA1 4f9698c20ad9fd2c7c975e5426fc84d3aab0360f t/test_transform/string_with_escap
 SHA1 5cd847ba5ed5d1a90807dbf8891bf1690918cb5e t/z_kwalitee.t
 SHA1 6dfd7f5112f80b65e84916c780a0b1a71aad32dc t/z_leaktrace.t
 SHA1 e3259ac6c4bd7f3349cf6f2ff829827483bc749d t/z_meta.t
-SHA1 741e9e8bf600c7f7441794fe49ea8904cfd4bf58 t/z_perl_minimum_version.t
+SHA1 204e8376b847824292d6630be5b0ecfb54ad9a2b t/z_perl_minimum_version.t
 SHA1 d91cc1b39fcb1dbf23c11ebb5885cfaaeb2c3a50 t/z_pod-coverage.t
 SHA1 2eb526b1649c6306df677d7ae63433856b672476 t/z_pod-spell-mistakes.t
 SHA1 6e74cfbeb5080643d126b9d74f2f7e6dad26b013 t/z_pod-spelling.t
@@ -433,7 +434,7 @@ SHA1 3b92cafada1b683bbf03593d22eb40671e744bc7 t/zero-mojibake.t
 SHA1 e93c9b53438be114c25aa426742e24f4343057a7 typemap
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWQdMLAAKCRCabZJij/3J
-Qij9AJ0WBByTlFpF82C91mJ1SncHd6/k0wCeO6iIEafqRW21gWAF+GrNnPvvHYg=
-=wI+L
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWXscrQAKCRCabZJij/3J
+QuLWAJ9MygjIcjr3je/GWcbxuToLjGUADwCgi4KIy98+e+HNEpVgBKEy+pqXeec=
+=7QEI
 -----END PGP SIGNATURE-----

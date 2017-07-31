@@ -4,7 +4,7 @@ use warnings;
 use 5.012000;
 use utf8;
 use feature 'unicode_strings';
-use version 0.77; our $VERSION = version->declare('v0.2.0');
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 use Lingua::LO::NLP::Syllabify;
 use Lingua::LO::NLP::Analyze;
 use Lingua::LO::NLP::Romanize;
@@ -72,10 +72,13 @@ directly.
 
     new(option => value, ...)
 
-The object constructor currently does nothing; there are no options. However,
-it is likely that there will be in future versions, therefore it is highly
-recommended to call methods as object methods so your code won't break when I
-introduce them.
+=head3 Options
+
+=over 4
+
+=item * C<normalize>: passed to L</split_to_syllables> and L</analyze_syllable>.
+
+=back
 
 =cut
 sub new {
@@ -86,7 +89,7 @@ sub new {
 
 =head2 split_to_syllables
 
-    my @syllables = $object->split_to_syllables($text, %options );
+    my @syllables = $object->split_to_syllables( $text, %options );
 
 Split Lao text into its syllables using a regexp modelled after PHISSAMAY,
 DALALOY and DURRANI: I<Syllabification of Lao Script for Line Breaking>. Takes
@@ -96,13 +99,19 @@ Returns a list of syllables.
 
 =cut
 sub split_to_syllables {
-    shift;  # discard $self for now
-    return Lingua::LO::NLP::Syllabify->new(@_)->get_syllables;
+    my $self = shift;
+    my $text = shift;
+
+    return Lingua::LO::NLP::Syllabify->new(
+        $text,
+        normalize => $self->{normalize},
+        @_
+    )->get_syllables;
 }
 
 =head2 analyze_syllable
 
-    my $classified = $object->analyze_syllable($syllable, %options);
+    my $classified = $object->analyze_syllable( $syllable, %options );
 
 Returns a L<Lingua::LO::NLP::Analyze> object that allows you to query
 various syllable properties such as core consonant, tone mark, vowel length and
@@ -110,17 +119,21 @@ tone. See there for details.
 
 =cut
 sub analyze_syllable {
-    shift;  # discard $self for now
-    return Lingua::LO::NLP::Analyze->new(@_);
+    my $self = shift;
+    my $syllable = shift;
+    return Lingua::LO::NLP::Analyze->new(
+        $syllable,
+        normalize => $self->{normalize},
+        @_
+    );
 }
 
 =head2 romanize
 
-    $object->romanize($lao, %options);
+    $object->romanize( $lao, %options );
 
 Returns a romanized version of the text passed in as C<$lao>. See
-L<Lingua::LO::NLP::Romanize/new> for options. If you don't pass in I<any>
-options, the default is C<variant =E<gt> 'PCGN'>.
+L<Lingua::LO::NLP::Romanize/new> for options. The default C<variant> is 'PCGN'.
 
 =cut
 sub romanize {
@@ -140,7 +153,7 @@ Matthias Bethke, E<lt>matthias@towiski.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Matthias Bethke
+Copyright (C) 2016-2017 by Matthias Bethke
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.14.2 or, at your option,

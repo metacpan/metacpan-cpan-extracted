@@ -1,4 +1,7 @@
 AUTHORS
+bin/brat2relationlist.pl
+bin/brat2termlist.pl
+bin/bratStatistics.pl
 bin/concatBratFiles.pl
 Build.PL
 Change
@@ -22,4 +25,8 @@ t/2-printData.t
 t/3-loadFiles.t
 t/3-loadList.t
 t/4-concat.t
+t/5-getRelations.t
+t/5-getTerms.t
+t/pod-coverage.t
+t/pod.t
 TODO

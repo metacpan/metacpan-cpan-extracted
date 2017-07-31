@@ -3,17 +3,17 @@ abstract: 'AuthenSimple plugin for PlugAuth'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  File::HomeDir: '0.91'
   Params::Validate: '0'
   PlugAuth: '0.31'
-  Test::More: '0.94'
+  Test2::Plugin::FauxHomeDir: '0'
+  Test2::V0: '0.000060'
   YAML::XS: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,6 +26,7 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://github.com/clustericious/PlugAuth-Plugin-AuthenSimple/issues
-  homepage: http://perl.wdlabs.com/PlugAuth-Plugin-AuthenSimple
+  homepage: https://metacpan.org/pod/PlugAuth::Plugin::AuthenSimple
   repository: git://github.com/clustericious/PlugAuth-Plugin-AuthenSimple.git
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -130,10 +130,15 @@ my (@content_line, @filename_line);
     cmp_deeply(
         [ grep { /\[VerifyPhases\]/ } map { colorstrip($_) } @{ $tzil->log_messages } ],
         bag(
+            '[VerifyPhases] ---- this is the last before_build plugin ----',
             (map { "[VerifyPhases] $_ has already been calculated by end of file gathering phase" }
                 qw(name version abstract main_module license authors distmeta),
                 find_meta($tzil)->find_attribute_by_name('release_status') ? 'release_status' : ()),
+            '[VerifyPhases] ---- this is the last gather_files plugin ----',
+            '[VerifyPhases] ---- this is the last set_file_encodings plugin ----',
+            '[VerifyPhases] ---- this is the last prune_files plugin ----',
             "[VerifyPhases] file has been removed after file pruning phase: 'normal_file_0_moved' (content $verb by Naughty (Dist::Zilla::Plugin::Naughty line $content_line[0])" . (Dist::Zilla->VERSION < 5.023 ? '' : "; filename set by Naughty (Dist::Zilla::Plugin::Naughty line $filename_line[0])") . ")",
+            '[VerifyPhases] ---- this is the last munge_files plugin ----',
             "[VerifyPhases] file has been renamed after munging phase: 'normal_file_1_moved' (originally 'normal_file_1', content $verb by Naughty (Dist::Zilla::Plugin::Naughty line $content_line[1])" . (Dist::Zilla->VERSION < 5.023 ? '' : "; filename set by Naughty (Dist::Zilla::Plugin::Naughty line $filename_line[1])") . ")",
             "[VerifyPhases] file has been removed after file pruning phase: 'normal_file_2' (content $verb by Naughty (Dist::Zilla::Plugin::Naughty line $content_line[2]))",
             "[VerifyPhases] file has been added after file gathering phase: 'rogue_file_3' (content $verb by Naughty (Dist::Zilla::Plugin::Naughty line $content_line[3]))",
@@ -148,6 +153,7 @@ my (@content_line, @filename_line);
 \[VerifyPhases\]\s+\}
 /),
             re(qr/\[VerifyPhases\] distribution metadata has been altered after munging phase!.*Extra: \'x_ohhai\'/s),
+            '[VerifyPhases] ---- this is the last after_build plugin ----',
         ),
         'warnings are logged about our naughty plugin',
     );

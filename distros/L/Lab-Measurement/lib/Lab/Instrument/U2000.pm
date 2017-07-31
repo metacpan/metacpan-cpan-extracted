@@ -1,8 +1,6 @@
 package Lab::Instrument::U2000;
-$Lab::Instrument::U2000::VERSION = '3.553';
-#TODO: Error handling. Neither timeouts nor errors are handled correctly.
-# Error reporting from the kernel driver is bad.
-
+#ABSTRACT: Agilent U2000 series USB Power Sensor
+$Lab::Instrument::U2000::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 
@@ -239,6 +237,8 @@ sub get_error {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -246,6 +246,10 @@ sub get_error {
 =head1 NAME
 
 Lab::Instrument::U2000 - Agilent U2000 series USB Power Sensor
+
+=head1 VERSION
+
+version 3.554
 
 =head1 DESCRIPTION
 
@@ -273,17 +277,17 @@ Returns the instruments ID string.
 
 =head2 set_sample_rate
     $power->set_sample_rate(string);
-    
+
 Valid values are MIN, MAX, NORM, DOUBLE, FAST and 1-110 (rate in Hz).
 
 =head2 set_step_detect
     $power->set_step_detect(string);
-    
+
 Valid values are ON and OFF.
 
 =head2 set_frequency
     $power->set_frequency(string or number)
-    
+
 Sets frequency for internal frequency correction (in Hz).
 Valid values are DEF, MIN, MAX and 1kHz to 1000GHz.
 
@@ -293,18 +297,19 @@ Sometimes the sensor hangs for a short amount of time. Very seldom it
 completely stops working. This is probably either a bug in the firmware or
 in the kernel driver as not even a reset of the USB port reenable communication.
 
+Error handling needs to be improved. Neither timeouts nor errors are handled correctly.
+Error reporting from the kernel driver is bad.
 
-=head1 SEE ALSO
+=head1 COPYRIGHT AND LICENSE
 
-=over 4
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-=back
+  Copyright 2012       Hermann Kraus
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-=head1 AUTHOR/COPYRIGHT
 
-  Copyright 2012 Hermann Kraus
-
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

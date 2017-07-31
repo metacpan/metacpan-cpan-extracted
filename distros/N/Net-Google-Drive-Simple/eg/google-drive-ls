@@ -1,0 +1,41 @@
+#!/usr/local/bin/perl -w
+use strict;
+use lib 'lib';
+
+use Sysadm::Install qw(:all);
+use Net::Google::Drive::Simple;
+use Log::Log4perl qw(:easy);
+use File::Basename;
+use Getopt::Std;
+use Pod::Usage;
+
+Log::Log4perl->easy_init( { 
+    level => $DEBUG,
+    layout => "%d %F{1}:%L> %m%n"
+} );
+
+my $gd = Net::Google::Drive::Simple->new();
+
+my $gd_dir = "/top";
+
+INFO "Listing $gd_dir on Google Drive";
+
+my( $entries_gd, $parent ) = $gd->children( $gd_dir );
+
+for my $entry ( @$entries_gd ) {
+    if( $entry->kind() ne 'drive#file' ) {
+        DEBUG "Ignoring ", $entry->title();
+        next;
+    }
+
+    my $title = $entry->title();
+
+    my $labels = $entry->labels();
+
+    if( $labels->{ trashed } ) {
+        INFO "Ignoring trashed file $title", 
+        next;
+    }
+
+    print $entry->title(), "\n";
+}

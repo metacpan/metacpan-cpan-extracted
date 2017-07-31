@@ -6,7 +6,7 @@ use 5.010;
 use AE;
 use AnyEvent::Open3::Simple 0.76;
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 sub new
 {
@@ -167,7 +167,7 @@ Clustericious::Admin::RemoteHandler
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 AUTHOR
 

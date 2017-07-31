@@ -2,6 +2,7 @@ Changes
 lib/Async/Simple/Pool.pm
 lib/Async/Simple/Task.pm
 lib/Async/Simple/Task/Fork.pm
+lib/Async/Simple/Task/ForkTmpFile.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -11,8 +12,9 @@ t/02-pod-coverage.t
 t/03-pod.t
 t/04-task.t
 t/05-task-fork.t
-t/06-pool.t
-t/07-boilerplate.t
+t/06-task-forktmpfile.t
+t/07-pool.t
+t/08-boilerplate.t
 ignore.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

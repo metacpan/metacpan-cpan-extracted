@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,14 +15,14 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 23fe160a5180101b0c60d58b6348de332b8008b9 .gitignore
-SHA1 3b74ca7f199177440df3034cd3b3a0383f4420e8 Build.PL
-SHA1 e10194be1af32d55db1af5590aa5021f67b02304 Changes
+SHA1 7631199ef70df2ec207adc87132825d34e7160c2 Build.PL
+SHA1 a81a83d2e34ee5e85a8cdc152962e9724f306511 Changes
 SHA1 54793f1da593406ac164e4dd2ff190f3211c0062 MANIFEST
-SHA1 c07120ac77bfe367a3e3d1453b6b9aaf16ace15a META.json
-SHA1 3e44dfcaf2d1bc85e7f8ce226ea222d9e2621774 META.yml
+SHA1 240890b30827a235eba2c017c7bbcdceb31abfc2 META.json
+SHA1 4832e50df1f2b581ac97e832d15f4d6bd861e366 META.yml
 SHA1 bb0e036b5c11cb7e0e07f909776fb2b973e891cb README
-SHA1 6edfc340b684f26ff467ec4484d7c4c8d598abe8 lib/Params/Classify.pm
-SHA1 15ec6063f87686d5c172784f798e29b682baa411 lib/Params/Classify.xs
+SHA1 683529801ed37ce8ac6393836a492fa94137b6f2 lib/Params/Classify.pm
+SHA1 1cc33ea6793cd87043e868f98e7812610ccac8f5 lib/Params/Classify.xs
 SHA1 497c90b7b470f8c3a4594265c4a97376000fc2aa t/blessed.t
 SHA1 7217d9cfb3ff600005ea54634f3776da43b88e4a t/blessed_pp.t
 SHA1 e05666c5b2480ce441116ff26e55fa5bb07fb741 t/check.t
@@ -40,7 +40,7 @@ SHA1 97157325ac601fe786026cdc319f958c8ea785ae t/setup_pp.pl
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAllqrPEACgkQOV9mt2VyAVGl8ACeMsjblsdJApJyFh3uioNjhRA6
-xwcAn2Txm0djYIO4k8DV6Jf2c82T0tix
-=GrPy
+iEYEARECAAYFAll8oU0ACgkQOV9mt2VyAVHtqQCdHuuvfO8MFk+746FRVvgqXofR
+u5QAniv1tkNWSQJ/7tbXLX0eweqzmSbS
+=ni3G
 -----END PGP SIGNATURE-----

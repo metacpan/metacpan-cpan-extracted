@@ -87,3 +87,5 @@ Revision history for Perl extension SolarWinds.
   - batch added SWQL_bulk_ip_lookup
 1.21
   - make dist didn't like 1.2.. so we are on version 1.21
+1.22
+  - added SysName to result set for bulk ip lookups

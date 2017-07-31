@@ -3,12 +3,12 @@ use warnings;
 use Test::Clustericious::Cluster;
 use Test2::Bundle::More;
 
-plan 2;
-
 eval q{ use Net::hostent };
 is $@, '';
 
 is gethost('bar')->name, 'foo.example.com', 'gethost(bar).name = foo.example.com';
+
+done_testing;
 
 __DATA__
 

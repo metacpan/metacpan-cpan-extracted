@@ -1,7 +1,7 @@
 package App::manwrap::pm;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: man + Perl stuffs
@@ -18,7 +18,7 @@ App::manwrap::pm - man + Perl stuffs
 
 =head1 VERSION
 
-This document describes version 0.002 of App::manwrap::pm (from Perl distribution App-manwrap-pm), released on 2017-07-10.
+This document describes version 0.004 of App::manwrap::pm (from Perl distribution App-manwrap-pm), released on 2017-07-29.
 
 =head1 SYNOPSIS
 

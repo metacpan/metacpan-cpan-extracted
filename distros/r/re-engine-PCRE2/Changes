@@ -1,5 +1,13 @@
 Revision history for re::engine::PCRE2
 
+0.14 Tue Jul 25 11:25:04 CEST 2017 rurban
+
+    - Allocate match data in comp, not exec (Ævar Arnfjörð Bjarmason PR #18).
+      ~10% faster. now 50% faster than perl regex.
+    - Fallback to Alien:::PCRE2 if library not found
+    - Minor cleanups by ppisar
+    - 3 minor regressions, and one heap-buffer-overflow in the match data regression.
+
 0.13 Thu May 4 13:48:53 2017 +0200 rurban
 
     - Start handling multi-patterns (#26), like qr + $str + qr

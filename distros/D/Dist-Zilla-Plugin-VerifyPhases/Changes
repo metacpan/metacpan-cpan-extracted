@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-VerifyPhases
 
+0.016     2017-07-21 19:57:28Z
+          - debug logging is added at the end of each phase, to provide useful
+            diagnostics in 'dzil build --verbose' when trying to figure out
+            what the plugins are doing.
+
 0.015     2017-04-27 15:58:47Z
           - remove tracking of _share_dir_map -- it can be legitimately read
             in the filegathering phase

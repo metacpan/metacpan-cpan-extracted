@@ -4,7 +4,7 @@ use warnings;
 use 5.012000;
 use utf8;
 use feature 'unicode_strings';
-use version 0.77; our $VERSION = version->declare('v0.2.0');
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 use charnames qw/ :full lao /;
 use parent 'Exporter';
 
@@ -51,7 +51,7 @@ my $CONSONANTS = "\N{LAO LETTER KO}\N{LAO LETTER KHO SUNG}\N{LAO LETTER KHO TAM}
 "\N{LAO LETTER HO TAM}";
 
 my $VOWELS_COMBINING = "\N{LAO VOWEL SIGN MAI KAN}" .
-"\N{LAO VOWEL SIGN AM}\N{LAO VOWEL SIGN I}\N{LAO VOWEL SIGN II}" .
+"\N{LAO VOWEL SIGN I}\N{LAO VOWEL SIGN II}" .
 "\N{LAO VOWEL SIGN Y}\N{LAO VOWEL SIGN YY}\N{LAO VOWEL SIGN U}" .
 "\N{LAO VOWEL SIGN UU}\N{LAO VOWEL SIGN MAI KON}\N{LAO NIGGAHITA}";
 
@@ -112,6 +112,8 @@ my %regexp_fragments = (
     x9a10_3 => '(?: $x9 $x10_3)',
 );
 my $re1_all = '$x0_1 $x1? $x $x2?';
+## See naming explanation above
+## no critic(Bangs::ProhibitNumberedNames)
 my $re1_1   = '$x5? $x8? $x9a10_3?';
 my $re1_2   = '$x4_12 $x5? $x8? $x9a10_3?';
 my $re1_3   = '$x4_34 $x5? $x6_2 $x8? $x9a10_3?';
@@ -174,7 +176,7 @@ $re_basic =~ s/\n//gs;
 $re_basic =~ s/\s+/ /g; # keep it a bit more readable. could use s/\s+//g
 
 # Functional names for all the x-something groups from the original paper
-# Used for named catures.
+# Used for named captures.
 my %CAPTURE_NAMES = (
     'x'             => 'consonant',
     'x0_\d'         => 'vowel0',
@@ -291,7 +293,7 @@ sub get_sylre_basic {
 =head2 get_sylre_full
 
 In addition to the matching done by L<get_sylre_basic>, this one makes sure
-matches are either followed by another complete syllable, a blank, the end of
+matches are either followed by another complete syllable, a space, the end of
 string/line or some non-Lao character. This ensures correct matching of
 ambiguous syllable boundaries where the core consonant of a following syllable
 could also be an end consonant of the current one.
@@ -352,6 +354,8 @@ for speed!
 
 =cut
 
+## Modify-in-place for speed reasons
+## no critic(Subroutines::RequireFinalReturn)
 sub normalize_tone_marks {
     my $t = $_[0];
     $_[0] =~ s/([$CONSONANTS])([$TONE_MARKS])([$VOWELS_COMBINING])/$1$3$2/og;

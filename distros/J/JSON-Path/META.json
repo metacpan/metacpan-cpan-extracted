@@ -4,7 +4,7 @@
       "Kit Peters <kit.peters@broadbean.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "Exporter::Tiny" : "0",
             "JSON::MaybeXS" : "0",
             "LV" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.48",
             "Readonly" : "0",
             "Safe" : "0",
             "Scalar::Util" : "0",
@@ -69,19 +69,19 @@
    "provides" : {
       "JSON::Path" : {
          "file" : "lib/JSON/Path.pm",
-         "version" : "0.400"
+         "version" : "0.411"
       },
       "JSON::Path::Constants" : {
          "file" : "lib/JSON/Path/Constants.pm",
-         "version" : "0.400"
+         "version" : "0.411"
       },
       "JSON::Path::Evaluator" : {
          "file" : "lib/JSON/Path/Evaluator.pm",
-         "version" : "0.400"
+         "version" : "0.411"
       },
       "JSON::Path::Tokenizer" : {
          "file" : "lib/JSON/Path/Tokenizer.pm",
-         "version" : "0.400"
+         "version" : "0.411"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/popefelix/p5-json-path"
       }
    },
-   "version" : "0.400",
+   "version" : "0.411",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -3,6 +3,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
 #define PERL_DECIMAL_VERSION \
 	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
@@ -10,7 +14,8 @@
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
 #define Q_IOK_MAYBE_SPURIOUS (!PERL_VERSION_GE(5,7,1))
-#define Q_STRING_ZERO_FLOATS PERL_VERSION_GE(5,13,6)
+#define Q_STRING_ZERO_FLOATS \
+	(PERL_VERSION_GE(5,13,6) && !PERL_VERSION_GE(5,17,1))
 
 /*
  * The way an SV is interpreted for its numerical value varies between Perl
@@ -104,8 +109,8 @@ static SV *THX_numscl_val_cmp(pTHX_ SV *a, SV *b)
 {
 	bool aiok, biok;
 	int result;
-	aiok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(a) : !!SvIOK(a);
-	biok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(b) : !!SvIOK(b);
+	aiok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(a) : cBOOL(SvIOK(a));
+	biok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(b) : cBOOL(SvIOK(b));
 	if(aiok && biok) {
 		if(SvIOK_UV(a)) {
 			if(SvIOK_UV(b)) {
@@ -285,8 +290,8 @@ PREINIT:
 CODE:
 	a = string_2num(a);
 	b = string_2num(b);
-	aiok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(a) : !!SvIOK(a);
-	biok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(b) : !!SvIOK(b);
+	aiok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(a) : cBOOL(SvIOK(a));
+	biok = Q_IOK_MAYBE_SPURIOUS ? !SvNOK(b) : cBOOL(SvIOK(b));
 	anan = !aiok && SvNVX(a) != SvNVX(a);
 	bnan = !biok && SvNVX(b) != SvNVX(b);
 	if(anan || bnan) {

@@ -63,7 +63,7 @@
          "requires" : {
             "Archive::Tar" : "0",
             "Exporter" : "0",
-            "Test2::Compare::Custom" : "0.000060",
+            "Test2::Tools::URL" : "0",
             "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
             "Test::Alien::Build" : "0",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/plicease/Alien-Build-Git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

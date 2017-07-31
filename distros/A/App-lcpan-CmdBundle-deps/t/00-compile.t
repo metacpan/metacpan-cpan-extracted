@@ -6,10 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan/Cmd/deps_all.pm',
+    'App/lcpan/Cmd/deps_phases.pm',
+    'App/lcpan/Cmd/deps_rels.pm',
     'App/lcpan/CmdBundle/deps.pm'
 );
 

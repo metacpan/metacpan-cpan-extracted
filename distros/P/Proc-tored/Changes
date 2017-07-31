@@ -1,3 +1,11 @@
+0.18 2017-07-28
+- Lock file logic moved to Proc::tored::LockFile
+- Fixed warnings triggered when cleaning up lock/pid files whose parent
+  directory has been removed
+- Fixed bug permitting a newly started service to enter the paused state
+  another instance is already in the locked state, causing services to stack
+  while paused
+
 0.17 2017-03-18
 - Add newline to warning emitted when a signal is caught
 - Regularly touch the pid file while running
@@ -8,7 +16,8 @@
 
 0.15 2017-03-08
 - Fixed bug allowing a guard object to be held inappropriately
-- Fixed bug causing pid files to be overwritten/unlinked by forked child processes
+- Fixed bug causing pid files to be overwritten/unlinked by forked child
+  processes
 
 0.14 2017-03-08
 - Update to Auto::Mata 0.07

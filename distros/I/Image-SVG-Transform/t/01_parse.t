@@ -34,17 +34,17 @@ is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, { t
 lives_ok { $trans->extract_transforms('translate(4,8), scale(0.5)'); } 'parses translate and scale commands, comma sp b/w commands';
 is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, { type => 'scale', 'params' => [0.5], }, ], '... validate command data';
 
+lives_ok { $trans->extract_transforms('translate(4,8),scale(0.5)'); } 'parses translate and scale commands, comma b/w commands';
+is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, { type => 'scale', 'params' => [0.5], }, ], '... validate command data';
+
 lives_ok { $trans->extract_transforms('translate(4,8) , scale(0.5)'); } 'parses translate and scale commands, sp comma sp b/w commands';
 is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, { type => 'scale', 'params' => [0.5], }, ], '... validate command data';
 
-SKIP: {
-    skip 'Pending better parsing technology', 4;
-    lives_ok { $trans->extract_transforms('translate(4, 8)'); } 'parses translate and scale commands, comma sp b/w args';
-    is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, ], '... validate command data';
+lives_ok { $trans->extract_transforms('translate(4, 8)'); } 'parses translate and scale commands, comma sp b/w args';
+is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, ], '... validate command data';
 
-    lives_ok { $trans->extract_transforms('translate(4 , 8)'); } 'parses translate and scale commands, sp comma sp b/w args';
-    is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, ], '... validate command data';
-}
+lives_ok { $trans->extract_transforms('translate(4 , 8)'); } 'parses translate and scale commands, sp comma sp b/w args';
+is_deeply $trans->transforms(), [ { type => 'translate', params => [4,8], }, ], '... validate command data';
 
 lives_ok { $trans->extract_transforms('translate(4-7)'); } 'parses translate and scale commands, - b/w args';
 is_deeply $trans->transforms(), [ { type => 'translate', params => [4,-7], }, ], '... validate command data';
@@ -52,7 +52,7 @@ is_deeply $trans->transforms(), [ { type => 'translate', params => [4,-7], }, ],
 lives_ok { $trans->extract_transforms('translate(4+7)'); } 'parses translate and scale commands, + b/w args';
 is_deeply $trans->transforms(), [ { type => 'translate', params => [4,7], }, ], '... validate command data';
 
-lives_ok { $trans->extract_transforms('translate(4e1-7e-1)'); } 'parses translate and scale commands, + b/w args';
+lives_ok { $trans->extract_transforms('translate(4e1-7e-1)'); } 'parses translate and scale commands, - b/w exponential args';
 is_deeply $trans->transforms(), [ { type => 'translate', params => ['4e1','-7e-1'], }, ], '... validate command data';
 
 done_testing();

@@ -40,4 +40,14 @@ if ( defined $y ) {
     is( $y->is_silent, 1, 'silent on due to rebuild' );
 }
 
-plan tests => 13;
+# do next and prev linkages mostly kinda sorta work?
+my $uno = Music::RecRhythm->new( set => [ 1, 1 ], is_silent => 1 );
+my $dos = Music::RecRhythm->new( set => [ 2, 2, 2 ], is_silent => 0 );
+
+$uno->next($dos);
+
+is( $uno->next, $dos );
+is( $uno->prev, undef );
+is( $dos->prev, $uno );
+
+plan tests => 16;

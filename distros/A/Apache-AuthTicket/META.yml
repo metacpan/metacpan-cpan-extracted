@@ -4,26 +4,27 @@ author:
   - 'Michael Schout <mschout@cpan.org>'
 build_requires: {}
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Apache-AuthTicket
 requires:
-  Apache::Test: 1.35
-  CGI: 3.12
-  Class::Accessor::Fast: 0
-  DBI: 0
-  Digest::MD5: 0
-  MIME::Base64: 0
-  MRO::Compat: 0
-  ModPerl::VersionUtil: 0
-  SQL::Abstract: 0
-  Storable: 0
-  Test::More: 0
+  Apache::Test: '1.39'
+  CGI: '3.12'
+  Class::Accessor::Fast: '0'
+  DBI: '0'
+  Digest::MD5: '0'
+  MIME::Base64: '0'
+  MRO::Compat: '0'
+  ModPerl::VersionUtil: '0'
+  SQL::Abstract: '0'
+  Storable: '0'
+  Test::More: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthTicket
   homepage: http://search.cpan.org/dist/Apache-AuthTicket/
   repository: git://github.com/mschout/apache-authticket.git
-version: 0.93
+version: '0.94'
+x_serialization_backend: 'YAML::Tiny version 1.69'

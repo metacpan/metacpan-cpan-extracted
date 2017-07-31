@@ -196,7 +196,8 @@ use constant SWQL_bulk_ip_lookup=>q{SELECT
   n.StatCollection,
   n.Uri,
   n.DisplayName,
-  i.IPAddress as LookupIP
+  i.IPAddress as LookupIP,
+  n.SysName
   FROM 
     Orion.NodeIPAddresses i
     inner join Orion.Nodes n on n.ObjectSubType='SNMP' and i.NodeID=n.NodeID

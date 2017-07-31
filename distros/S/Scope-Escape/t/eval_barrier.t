@@ -14,6 +14,7 @@ $SIG{__DIE__} = sub {
 	$e =~ s/ at [^\n]*//;
 	die $e;
 };
+unshift @INC, "./t/lib";
 
 $cont = undef; @events = ();
 push @events, ["a0"];

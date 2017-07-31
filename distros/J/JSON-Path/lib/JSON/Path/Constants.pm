@@ -3,7 +3,7 @@ use warnings;
 use 5.008;
 
 package JSON::Path::Constants;
-$JSON::Path::Constants::VERSION = '0.400';
+$JSON::Path::Constants::VERSION = '0.411';
 # ABSTRACT: Constants used in the JSON::Path distribution
 
 # VERSION
@@ -87,7 +87,7 @@ JSON::Path::Constants - Constants used in the JSON::Path distribution
 
 =head1 VERSION
 
-version 0.400
+version 0.411
 
 =head1 AUTHOR
 

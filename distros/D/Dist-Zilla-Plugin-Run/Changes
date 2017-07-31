@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Run
 
+0.046     2017-07-24 02:08:24Z
+  - now logging a warning when using %d in [Run::BeforeBuild], or %a in a
+    non-release plugin, where these values are not yet defined
+
 0.045     2017-05-30 00:04:46Z
   - fix MSWin32 test failures where path separators do not come out as
     expected

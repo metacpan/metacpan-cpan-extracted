@@ -24,9 +24,9 @@ Nagios::NRPE::Daemon - A Nagios NRPE Daemon
      }
      my $buffer;
      if (scalar run(command => $commandlist->{$check}->{bin} . " " . $args,
- 		    verbose => 0,
-		    buffer => \$buffer,
-		    timeout => 20)) {
+                    verbose => 0,
+                    buffer => \$buffer,
+                    timeout => 20)) {
        return $buffer;
      }
    }
@@ -49,18 +49,11 @@ Nagios::NRPE::Daemon - A Nagios NRPE Daemon
 A simple daemon implementation with the capabillity to add your own callbacks 
 and hooks in case you want to build your own NRPE Server.
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2013 by Andreas Marschke <andreas.marschke@googlemail.com>.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
 
 package Nagios::NRPE::Daemon;
 
-our $VERSION = '0.003';
+our $VERSION = '1.0.2';
 
 use 5.010_000;
 
@@ -70,14 +63,19 @@ use warnings;
 use Data::Dumper;
 use Carp;
 use IO::Socket;
-use IO::Socket::INET;
-use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_2
-			    NRPE_PACKET_RESPONSE
-			    MAX_PACKETBUFFER_LENGTH
-			    STATE_UNKNOWN
-			    STATE_CRITICAL
-			    STATE_WARNING
-			    STATE_OK);
+use IO::Socket::INET6;
+use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_3
+  NRPE_PACKET_VERSION_2
+  NRPE_PACKET_RESPONSE
+  MAX_PACKETBUFFER_LENGTH
+  STATE_UNKNOWN
+  STATE_CRITICAL
+  STATE_WARNING
+  STATE_OK);
+
+=pod
+
+=head1 SUBROUTINES
 
 =over
 
@@ -85,27 +83,27 @@ use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_2
 
 Takes the following options as a hashref:
 
-=item listen:
+ * listen:
 
 Listen on this IP Address
 
-=item port:
+ * port:
 
 Port to listen on
 
-=item pid_dir
+ * pid_dir
 
 The pidfile for this daemon
 
-=item ssl
+ * ssl
 
 Use ssl (1|0)
 
-=item commandlist
+ * commandlist
 
 A hashref of the allowed commands on the daemon
 
-=item callback
+ * callback
 
 A sub executed everytime a check should be run. Giving the daemon full control what should happen.
 
@@ -121,9 +119,9 @@ A sub executed everytime a check should be run. Giving the daemon full control w
      }
      my $buffer;
      if (scalar run(command => $commandlist->{$check}->{bin} . " " . $args,
- 		    verbose => 0,
-		    buffer => \$buffer,
-		    timeout => 20)) {
+                    verbose => 0,
+                    buffer => \$buffer,
+                    timeout => 20)) {
        return $buffer;
      }
    }
@@ -135,22 +133,24 @@ A sub executed everytime a check should be run. Giving the daemon full control w
 =cut
 
 sub new {
-  my ($class,%hash) = @_;
-  my $self = {};
+    my ( $class, %hash ) = @_;
+    my $self = {};
 
-  $self->{listen} = delete $hash{listen} || "0.0.0.0";
-  $self->{port} = delete $hash{port} || "5666";
-  $self->{pid_dir} = delete $hash{pid_dir} || "/var/run";
-  $self->{ssl} = delete $hash{ssl} || 0;
-  $self->{commandlist} = delete $hash{commandlist} || {};
-  $self->{callback} = delete $hash{callback} || sub{};
+    $self->{listen}      = delete $hash{listen}      || "0.0.0.0";
+    $self->{port}        = delete $hash{port}        || "5666";
+    $self->{pid_dir}     = delete $hash{pid_dir}     || "/var/run";
+    $self->{ssl}         = delete $hash{ssl}         || 0;
+    $self->{commandlist} = delete $hash{commandlist} || {};
+    $self->{callback}    = delete $hash{callback}    || sub { };
 
-  bless $self,$class;
+    bless $self, $class;
 }
+
+=pod
 
 =over
 
-=item start
+=item start()
 
 Starts the server and enters the Loop listening for packets
 
@@ -158,36 +158,42 @@ Starts the server and enters the Loop listening for packets
 
 =cut
 
-sub start{
-  my $self = shift;
-  my $packet = Nagios::NRPE::Packet->new();
-  my $callback = $self->{callback};
-  my ($socket,$s);
+sub start {
+    my $self     = shift;
+    my $packet   = Nagios::NRPE::Packet->new();
+    my $callback = $self->{callback};
+    my ( $socket, $s );
 
-  $socket = $self->create_socket();
+    $socket = $self->create_socket();
 
-  while (1) {
-    while(($s = $socket->accept())) {
-      my $request;
-      $s->recv($request,1036);
-      my $unpacked_request = $packet->deassemble($request);
-      my $buffer = $unpacked_request->{buffer};
-      my ($command,@options) = split /!/,$buffer;
+    while (1) {
+        while ( ( $s = $socket->accept() ) ) {
+            my $request;
+            $s->recv( $request, 1036 );
+            my $unpacked_request = $packet->deassemble($request);
+            my $buffer           = $unpacked_request->{buffer};
+            my $version          = $unpacked_request->{packet_version};
+            my ( $command, @options ) = split /!/, $buffer;
 
-      my $return = $self->{callback}($self,$command,@options);
-      print $s $packet->assemble(version =>NRPE_PACKET_VERSION_2,
-				 type => NRPE_PACKET_RESPONSE,
-				 check => $return
-				);
+            my $return = $self->{callback}( $self, $command, @options );
+            eval {
+                print $s $packet->assemble(
+                    version => $version,
+                    type    => NRPE_PACKET_RESPONSE,
+                    check   => $return
+                );
+            };
 
-      close($s);
+            close($s);
+        }
     }
-  }
 }
+
+=pod
 
 =over
 
-=item commandlist
+=item commandlist()
 
 A hashref of elements that are valid commands.
 An example for it is:
@@ -202,13 +208,15 @@ C<args> can contain $ARG1$ elements like normal nrpe.cfg command elements.
 =cut
 
 sub commandlist {
-  my $self = shift;
-  return $self->{commandlist};
+    my $self = shift;
+    return $self->{commandlist};
 }
+
+=pod
 
 =over
 
-=item create_socket
+=item create_socket()
 
 A shorthand function returning either an encrypted or unencrypted socket
 depending on wether ssl is set to 1 or 0.
@@ -218,44 +226,48 @@ depending on wether ssl is set to 1 or 0.
 =cut
 
 sub create_socket {
-  my $self = shift;
-  my $socket;
+    my $self = shift;
+    my $socket;
 
-  if ($self->{ssl}) {
-    eval {
-      # required for new IO::Socket::SSL versions
-      require IO::Socket::SSL;
-      IO::Socket::SSL->import();
-      IO::Socket::SSL::set_ctx_defaults( SSL_verify_mode => 0 );
-    };
-    $socket = IO::Socket::SSL->new(
-      Listen => 5,
-      LocalAddr => $self->{host},
-      LocalPort => $self->{port},
-      Proto    => 'tcp',
-      Reuse    => 1,
-      SSL_verify_mode => 0x01,
-      Type     => SOCK_STREAM)
-      or die(IO::Socket::SSL::errstr());
-  } else {
-    $socket = IO::Socket::INET->new(
-      Listen => 5,
-      LocalAddr => $self->{host},
-      LocalPort => $self->{port},
-      Reuse    => 1,
-      Proto    => 'tcp',
-      Type     => SOCK_STREAM) or die "ERROR: $@ \n";
-  }
-  return $socket;
+    if ( $self->{ssl} ) {
+        eval {
+            # required for new IO::Socket::SSL versions
+            require IO::Socket::SSL;
+            IO::Socket::SSL->import();
+            IO::Socket::SSL::set_ctx_defaults( SSL_verify_mode => 0 );
+        };
+        $socket = IO::Socket::SSL->new(
+            Listen          => 5,
+            LocalAddr       => $self->{host},
+            LocalPort       => $self->{port},
+            Proto           => 'tcp',
+            Reuse           => 1,
+            SSL_verify_mode => 0x01,
+            Type            => SOCK_STREAM
+        ) or die( IO::Socket::SSL::errstr() );
+    }
+    else {
+        $socket = IO::Socket::INET6->new(
+            Listen    => 5,
+            LocalAddr => $self->{host},
+            LocalPort => $self->{port},
+            Reuse     => 1,
+            Proto     => 'tcp',
+            Type      => SOCK_STREAM
+        ) or die "ERROR: $@ \n";
+    }
+    return $socket;
 }
+
+=pod
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the authors (see AUTHORS file).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 1;
-
-
-
-
-
-
-
-
-
-

@@ -1,3 +1,18 @@
+version 0.004; 2017-07-30
+
+  * new "return_path" option to report pathnames
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * reformat module code with four-column indentation
+
+  * convert .cvsignore to .gitignore
+
 version 0.003; 2011-04-09
 
   * new "use_pod_dir" option for POD documentation in a subdirectory

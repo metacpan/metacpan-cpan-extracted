@@ -38,14 +38,16 @@ sub ee($@) {
 	$aa = shift;
 	push @events, [ "ee0", @_ ];
 	$@ = "wibble\n";
-	push @events, [ "ee1", do("t/from_eval_dofile_dd.pl"), "z", $@ ];
+	push @events, [ "ee1",
+		do("./t/lib/t/from_eval_dofile_dd.pl"),
+	"z", $@ ];
 	$@ = "wibble\n";
 	push @events, [ "ee2",
-		scalar(do("t/from_eval_dofile_dd.pl")),
+		scalar(do("./t/lib/t/from_eval_dofile_dd.pl")),
 	"z", $@ ];
 	$@ = "wibble\n";
 	push @events, [ "ee3",
-		do { do("t/from_eval_dofile_dd.pl"); "v" },
+		do { do("./t/lib/t/from_eval_dofile_dd.pl"); "v" },
 	"z", $@ ];
 	push @events, [ "ee4" ];
 	return "ee5";

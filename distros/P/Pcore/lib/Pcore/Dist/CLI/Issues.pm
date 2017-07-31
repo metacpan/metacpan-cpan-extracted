@@ -7,8 +7,13 @@ with qw[Pcore::Dist::CLI];
 sub CLI ($self) {
     return {
         abstract => 'view project issues',
-        opt      => {
-            active    => { desc  => 'issues with statuses "open", "resolved" or "closed"' },
+        help     => <<'TXT',
+issues --<ISSUE-STATUS> [--<ISSUE-STATUS> ...] - get issues, filtered by statuses;
+issues <ID> - print full issue #ID details;
+issues <ID> --<ISSUE-STATUS> - set new issue #ID status;
+TXT
+        opt => {
+            active    => { desc  => 'issues with statuses "open", "resolved"' },
             new       => { desc  => 'issues with status "new"' },
             open      => { desc  => 'issues with status "open"' },
             resolved  => { desc  => 'issues with status "resolved"' },
@@ -25,30 +30,39 @@ sub CLI ($self) {
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run( $opt, $arg );
+    my $dist = $self->get_dist;
 
-    return;
-}
+    if ( $dist->build->issues ) {
+        if ( defined $arg->{id} ) {
 
-sub run ( $self, $opt, $arg ) {
-    if ( $self->dist->build->issues ) {
-        my $issues = $self->dist->build->issues->get(
-            id => $arg->{id},
-            $opt->%*,
-        );
+            # set new issue status
+            if ( $opt->%* ) {
+                if ( $opt->%* > 1 ) {
+                    say q[Issue status is invalid];
 
-        if ( $arg->{id} && $opt->%* ) {
+                    exit 3;
+                }
 
-            # issue status changed, show only issue header, without content
-            if ($issues) {
-                $self->dist->build->issues->print_issues( $issues->{data}, 0 );
+                my $issue = $dist->build->issues->set_issue_status( $arg->{id}, ( keys $opt->%* )[0] );
+
+                # print issue without content
+                $dist->build->issues->print_issue( $issue->{data}, 0 );
             }
+
+            # print issue
             else {
-                say 'Error update issue status: ' . $issues;
+                my $issue = $dist->build->issues->get_issue( $arg->{id} );
+
+                # print issue with content
+                $dist->build->issues->print_issue( $issue->{data} );
             }
         }
+
+        # get issues
         else {
-            $self->dist->build->issues->print_issues( $issues->{data}, 1 );
+            my $issues = $dist->build->issues->search_issues($opt);
+
+            $dist->build->issues->print_issues( $issues->{data} );
         }
     }
     else {
@@ -59,16 +73,6 @@ sub run ( $self, $opt, $arg ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 35, 44, 51           | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

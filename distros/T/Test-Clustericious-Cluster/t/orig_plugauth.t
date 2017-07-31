@@ -8,7 +8,6 @@ BEGIN {
   skip_all 'test requires Clustericious 1.24'
     unless eval q{ use Clustericious 1.24; 1 };
 };
-plan 12;
 
 my $cluster = Test::Clustericious::Cluster->new;
 
@@ -38,6 +37,8 @@ $url->userinfo('optimus:matrix');
 $t->get_ok($url)
   ->status_is(200)
   ->content_is('secret');
+
+done_testing;
 
 __DATA__
 

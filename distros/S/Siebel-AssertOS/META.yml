@@ -3,27 +3,33 @@ abstract: 'verifies if the OS is supported by Siebel applications'
 author:
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Test::More: '0'
-  Test::Pod: '1.22'
-  Test::Pod::Coverage: '1.08'
+  perl: '5.008009'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
-license: open_source
+  perl: '5.008009'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Siebel-AssertOS
-no_index:
-  directory:
-    - t
-    - inc
-requires: {}
+provides:
+  Siebel::AssertOS:
+    file: lib/Siebel/AssertOS.pm
+    version: '0.9'
+  Siebel::AssertOS::Linux::Distribution:
+    file: lib/Siebel/AssertOS/Linux/Distribution.pm
+    version: '0.9'
+  Siebel::AssertOS::Validate:
+    file: lib/Siebel/AssertOS/Validate.pm
+    version: '0.9'
+requires:
+  Exporter: '0'
+  perl: '5.008009'
 resources:
   bugtracker: https://github.com/glasswalk3r/siebel-gnu-tools/issues
-  homepage: https://github.com/glasswalk3r/siebel-gnu-tools
-  license: http://www.gnu.org/licenses/gpl.txt
-  repository: https://github.com/glasswalk3r/siebel-gnu-tools
-version: '0.07'
+  repository: https://github.com/glasswalk3r/siebel-gnu-tools.git
+version: '0.9'
+x_serialization_backend: 'YAML::Tiny version 1.69'

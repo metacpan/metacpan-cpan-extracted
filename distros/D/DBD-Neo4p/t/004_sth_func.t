@@ -39,12 +39,13 @@ SKIP : {
   my $idx = ${$t->nix};
   my $q =<<OUTPUT;
    START x = node:$idx(name='I')
-   MATCH path =(x-[r]-friend)
-   RETURN friend, TYPE(r)
+   MATCH path =(x)-[r]-(friend)
+   RETURN friend, TYPE(r) 
+   ORDER BY r.hash
 OUTPUT
   my $q2 = <<INPUT;
    START x = node:$idx(name={Name})
-   CREATE UNIQUE x-[:pally]->y {name:'Fred'}
+   CREATE UNIQUE (x)-[:pally]->(y {name:'Fred'})
 INPUT
   
   ok my $sth = $dbh->prepare($q), 'prepare statment';
@@ -58,7 +59,7 @@ INPUT
 FRIEND => 0, qw/TYPE(R)/ => 1 }, 'NAME_uc_hash';
   ok my $row = $sth->fetchrow_hashref, 'fetchrow_hashref';
   is $row->{friend}->{name}, 'you', 'fetched row as hash 1';
-  is $row->{'TYPE(r)'}, 'bosom', 'fetched row as hash 2';
+  is $row->{'TYPE(r)'}, 'best', 'fetched row as hash 2';
   ok my $rows = $sth->fetchall_arrayref, 'fetchall_arrayref';
   is ref $rows, 'ARRAY', 'is arrayref';
   cmp_ok scalar @$rows, ">=", 2, 'got >= 2 rows';

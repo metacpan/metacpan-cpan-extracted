@@ -1,3 +1,16 @@
+0.88    - 28 Jul 2017, H.Merijn Brand
+    * Tested with perl-5.22 on Linux x64 with DS 9.1B
+    * Force sensible date format in tests
+    * Merge META works from other projects
+    * Note release date for Unicode 8.0.0 and 9.0.0
+    * Make HP-UX ld happy
+    * Fix unchanged rows test
+    * Only register the program once
+    * Activate $dbh only if connect () succeeds
+    * It's 2017
+    * We can/should ship from Linux now
+    * Extend the use of caching for Unify internals
+
 0.87    - 27 Mar 2015, H.Merijn Brand
     * primary_key to return correct info for composite keys
     * Move project to github

@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=pod
+
 =head1 NAME
 
 nrpe-server - A Nagios NRPE Server
@@ -41,96 +43,101 @@ use Nagios::NRPE::Daemon;
 use Nagios::NRPE::Packet;
 use threads;
 
-use constant {
-  NRPE_CONF_DIR => '/etc/nagios'
-};
-my($listen_cmd,$port_cmd,$config_cmd,$pid_cmd,$ssl_cmd);
+our $VERSION = '1.0.2';
 
-my $result = GetOptions (
-  "l|listen=s" =>\$listen_cmd,
-  "p|port=s"   => \$port_cmd,
-  "c|config=s" => \$config_cmd,
-  "P|pid=s"    => \$pid_cmd,
-  "s|ssl"      => \$ssl_cmd,
-  "h|help"     => sub { pod2usage(-exitval   => 0,
-				  -verbose   => 99,
-				  -noperldoc => 1) });
+use constant { NRPE_CONF_DIR => '/etc/nagios' };
+my ( $listen_cmd, $port_cmd, $config_cmd, $pid_cmd, $ssl_cmd );
 
-my($listen,
-   $port,
-   $log_facillity,
-   $pid,
-   $user,
-   $ssl,
-   $nrpe_group,
-   $allowed_hosts,
-   $debug,
-   $command_timeout,
-   $connection_timeout,
-   $commandlist);
+my $result = GetOptions(
+    "l|listen=s" => \$listen_cmd,
+    "p|port=s"   => \$port_cmd,
+    "c|config=s" => \$config_cmd,
+    "P|pid=s"    => \$pid_cmd,
+    "s|ssl"      => \$ssl_cmd,
+    "h|help"     => sub {
+        pod2usage(
+            -exitval   => 0,
+            -verbose   => 99,
+            -noperldoc => 1
+        );
+    }
+);
+
+my (
+    $listen,          $port,               $log_facillity,
+    $pid,             $user,               $ssl,
+    $nrpe_group,      $allowed_hosts,      $debug,
+    $command_timeout, $connection_timeout, $commandlist
+);
 
 my $config_hash;
 
-if (defined $config_cmd) {
-  $config_hash = Config::File::read_config_file($config_cmd) or die "ERROR: Can't open config. Reason: $!";
-} elsif ( -e NRPE_CONF_DIR."/nrpe.cfg" ) {
-  $config_hash = Config::File::read_config_file(NRPE_CONF_DIR."/nrpe.cfg") 
-    or die "ERROR: Can't open config. Reason: $!";
+if ( defined $config_cmd ) {
+    $config_hash = Config::File::read_config_file($config_cmd)
+      or die "ERROR: Can't open config. Reason: $!";
+}
+elsif ( -e NRPE_CONF_DIR . "/nrpe.cfg" ) {
+    $config_hash = Config::File::read_config_file( NRPE_CONF_DIR . "/nrpe.cfg" )
+      or die "ERROR: Can't open config. Reason: $!";
 }
 
 $commandlist = $config_hash->{command};
 
 $listen = $listen_cmd || $config_hash->{server_address} || "127.0.0.1";
-$port = $port_cmd || $config_hash->{server_port} || "5666";
+$port   = $port_cmd   || $config_hash->{server_port}    || "5666";
 $pid = $pid_cmd || $config_hash->{pid_file} || "/var/run/nagios/nrpe.pid";
 $ssl = 1 if defined $ssl_cmd;
-$allowed_hosts = $config_hash->{allowed_hosts} || "0.0.0.0";
-$command_timeout = $config_hash->{command_timeout} || "60";
+$allowed_hosts      = $config_hash->{allowed_hosts}      || "0.0.0.0";
+$command_timeout    = $config_hash->{command_timeout}    || "60";
 $connection_timeout = $config_hash->{connection_timeout} || 300;
 
-die "No Commands to execute given." if (not defined $commandlist);
+die "No Commands to execute given." if ( not defined $commandlist );
 
-foreach (keys %$commandlist) {
-  my @args = split /\ /,$commandlist->{$_};
-  my $hashref = {};
-  $hashref->{bin} = $args[0];
-  my $length = scalar @args;
-  my $argstr = "";
-  for (my $i = 1; $i < $length ; $i++) {
-    $argstr .= " ".$args[$i];
-  }
+foreach ( keys %$commandlist ) {
+    my @args = split /\ /, $commandlist->{$_};
+    my $hashref = {};
+    $hashref->{bin} = $args[0];
+    my $length = scalar @args;
+    my $argstr = "";
+    for ( my $i = 1 ; $i < $length ; $i++ ) {
+        $argstr .= " " . $args[$i];
+    }
 
-  $hashref->{args} = $argstr;
-  $commandlist->{$_} = $hashref;
+    $hashref->{args} = $argstr;
+    $commandlist->{$_} = $hashref;
 }
 
-my $daemon = Nagios::NRPE::Daemon->new(listen => $listen,
-				       port   => $port,
-				       pid_dir => $pid,
-				       ssl => $ssl,
-				       commandlist => $commandlist,
-				       callback => sub {
-					 my ($self,$check,@options) = @_;
-					 my $commandlist = $self->commandlist();
-					 if ($commandlist->{$check}) {
-					   my $args = $commandlist->{$check}->{args};
-					   my $i = 0;
-					   foreach (@options) {
-					     $i++;
-					     $args =~ "s/\$ARG$i\$/$_/";
-					   }
-					   my $buffer;
-					   if (scalar run(command => $commandlist->{$check}->{bin} . " " . $args,
-							  verbose => 0,
-							  buffer => \$buffer,
-							  timeout => 20)) {
-					     chomp $buffer;
-					     return $buffer;
-					   }
-					 }
-				       }
-				      );
+my $daemon = Nagios::NRPE::Daemon->new(
+    listen      => $listen,
+    port        => $port,
+    pid_dir     => $pid,
+    ssl         => $ssl,
+    commandlist => $commandlist,
+    callback    => sub {
+        my ( $self, $check, @options ) = @_;
+        my $commandlist = $self->commandlist();
+        if ( $commandlist->{$check} ) {
+            my $args = $commandlist->{$check}->{args};
+            my $i    = 0;
+            foreach (@options) {
+                $i++;
+                $args =~ "s/\$ARG$i\$/$_/";
+            }
+            my $buffer;
+            if (
+                scalar run(
+                    command => $commandlist->{$check}->{bin} . " " . $args,
+                    verbose => 0,
+                    buffer  => \$buffer,
+                    timeout => 20
+                )
+              )
+            {
+                chomp $buffer;
+                return $buffer;
+            }
+        }
+    }
+);
 
-
-threads->new($daemon->start());
-
+threads->new( $daemon->start() );

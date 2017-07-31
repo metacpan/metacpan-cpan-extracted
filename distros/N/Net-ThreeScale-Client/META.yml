@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/3scale/3scale_ws_api_for_perl/issues
   homepage: https://support.3scale.net/docs/deployment-options/code-libraries
   repository: git://github.com/3scale/3scale_ws_api_for_perl.git
-version: 2.1.6
+version: 2.1.7

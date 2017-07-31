@@ -38,6 +38,7 @@ Stall
 TensorFlow
 Testing
 Tom
+autotools
 bin
 gRPC
 lib

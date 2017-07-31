@@ -14,6 +14,7 @@ lib/App/JESP/Cmd/Command.pm
 lib/App/JESP/Cmd/Command/about.pm
 lib/App/JESP/Cmd/Command/deploy.pm
 lib/App/JESP/Cmd/Command/install.pm
+lib/App/JESP/Cmd/Command/status.pm
 lib/App/JESP/Cmd/CommandJESP.pm
 lib/App/JESP/Driver.pm
 lib/App/JESP/Driver/Pg.pm

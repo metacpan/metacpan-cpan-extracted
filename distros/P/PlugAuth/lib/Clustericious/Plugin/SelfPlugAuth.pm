@@ -7,7 +7,7 @@ use Mojo::ByteStream qw( b );
 use Mojo::Base 'Mojolicious::Plugin';
 
 # ABSTRACT: Self authentication for PlugAuth
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 sub register {
@@ -78,7 +78,7 @@ Clustericious::Plugin::SelfPlugAuth - Self authentication for PlugAuth
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 DESCRIPTION
 

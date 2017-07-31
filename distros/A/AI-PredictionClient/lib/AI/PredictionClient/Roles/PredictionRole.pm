@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Roles::PredictionRole;
-$AI::PredictionClient::Roles::PredictionRole::VERSION = '0.03';
+$AI::PredictionClient::Roles::PredictionRole::VERSION = '0.05';
 
 # ABSTRACT: Implements the Prediction service interface
 
@@ -130,7 +130,7 @@ AI::PredictionClient::Roles::PredictionRole - Implements the Prediction service 
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 AUTHOR
 

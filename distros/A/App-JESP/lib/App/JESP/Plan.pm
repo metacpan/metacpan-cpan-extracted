@@ -1,5 +1,5 @@
 package App::JESP::Plan;
-$App::JESP::Plan::VERSION = '0.008';
+$App::JESP::Plan::VERSION = '0.010';
 use Moose;
 use JSON;
 use File::Slurp;

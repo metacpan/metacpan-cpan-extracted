@@ -1,5 +1,6 @@
 CVS/
-^.git/
+^\.git/
+\B\.gitignore\b
 \.svn
 ^tgz/
 \.~$
@@ -14,7 +15,7 @@ CVS/
 ^blib/
 ^tmp/
 \.gz$
-.cvsignore
+\.cvsignore
 tmon\.out
 WrapEx.pm
 cover_db
@@ -31,3 +32,6 @@ coverage/
 \.tgz$
 \.tar\.gz$
 \.zip$
+\B\.perl-version$
+\bCGI-Ex-[0-9.]+/
+^\.travis\.yml$

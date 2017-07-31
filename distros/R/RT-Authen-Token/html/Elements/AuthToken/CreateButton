@@ -1,0 +1,25 @@
+<%ARGS>
+$Owner
+$ShowCreateForm => 0
+$CreateToken => 0
+</%ARGS>
+<%INIT>
+</%INIT>
+% if ($CreateToken) {
+  <&| /Widgets/TitleBox, title => loc("Create Auth Token") &>
+    <& /Elements/AuthToken/CreateResults, %ARGS &>
+  </&>
+% } elsif ($ShowCreateForm) {
+  <&| /Widgets/TitleBox, title => loc("Create Auth Token") &>
+    <& /Elements/AuthToken/CreateForm, Owner => $Owner &>
+  </&>
+% } else {
+<div class="authtoken-form-container">
+  <& /Elements/AuthToken/CreateForm, Owner => $Owner &>
+</div>
+<form method="GET">
+  <input type="hidden" name="ShowCreateForm" value="1">
+  <input type="hidden" name="id" value="<% $Owner %>">
+  <button type="submit" class="authtoken-create">Create Auth Token</button>
+</form>
+% }

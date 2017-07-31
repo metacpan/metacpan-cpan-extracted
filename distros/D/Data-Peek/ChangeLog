@@ -1,3 +1,8 @@
+0.47	- 2017-07-24, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * It's 2017
+    * Update ppport.h to Devel::PPPort-3.36
+    * Reserve stack space if required
+
 0.46	- 2016-05-12, H.Merijn Brand   <h.m.brand@xs4all.nl>
     * Skip nomemoize in old Perl::Tidy (RT#113433, Slaven)
     * Test with perl-5.24.0

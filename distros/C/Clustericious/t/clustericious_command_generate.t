@@ -1,12 +1,17 @@
 use strict;
 use warnings;
 use autodie;
+use Clustericious;
 use Test::Clustericious::Command;
 use Test::More;
 use File::Temp qw( tempdir );
 use Path::Class qw( dir );
 use File::chdir;
 use File::Which qw( which );
+
+$ENV{PERL_FILE_SHAREDIR_DIST} = 'Clustericious=' . Clustericious->_dist_dir;
+
+note "share directory = ", Clustericious->_dist_dir;
 
 requires undef, 2;
 mirror 'bin', 'bin';

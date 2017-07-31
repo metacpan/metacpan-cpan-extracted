@@ -1,5 +1,20 @@
 Revision history for Alien::JPCRE2.
 
+0.008000 2017-07-25
+
+    - Properly Require Test2::Suite & Test2::V0, Part 2 (Thanks Grinnz)
+    - Compatibility With Older Versions Of ExtUtils::MakeMaker (Thanks Grinnz)
+
+0.007000 2017-07-25
+
+    - Windows, Properly Require Alien::gmake & Alien::MSYS
+    - Properly Require Test2::Suite & Test2::V0
+    - Require Alien::PCRE2 v0.013 For Bug Fixes
+
+0.006000 2017-07-21
+
+    - Windows, Enable -DPCRE2_STATIC Macro To Fix Build Errors
+
 0.005000 2017-07-20
 
     - Disable C++11 Features, Support Older Compilers

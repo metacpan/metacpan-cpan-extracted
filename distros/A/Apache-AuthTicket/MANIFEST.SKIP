@@ -8,6 +8,8 @@
 ^t/TEST$
 ^t/db/
 ^dist\.ini$
+^t/httpd.loc
+^MYMETA
 
 # Apache::Test generated files
 ^t/conf/apache_test_config.pm$

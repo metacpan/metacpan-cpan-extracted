@@ -1,5 +1,22 @@
 Revision history for Module-CheckDep-Version
 
+0.08    2017-07-20
+        - no functional changes
+        - fix POD link to CPAN in DESCRIPTION
+        - name fix (again)
+
+0.07    2017-07-20
+        - no functional changes
+        - slightly modified POD in the script
+        - fixed NAME in POD
+
+0.06    2017-07-20
+        - no functional changes
+        - modified/clarified documentation, and added warnings about recklessly
+          bumping prereq version numbers, per RT#122522
+        - bump prereq of MetaCPAN::Client to 2.017000 (closes #1) (reported by
+          Slaven Rezic)
+
 0.05    2017-06-26
         - fix typo in a POD link in checkdev binary
         - fix typo in binary arg handling; was using 'ignore_all' as opposed to

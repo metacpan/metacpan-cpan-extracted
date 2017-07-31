@@ -10,11 +10,8 @@ use IO::File;
 use Test::More;
 use Cwd;
 
-BEGIN { plan tests => 5 }
+BEGIN { plan tests => 5*2 }
 BEGIN { require "./t/test_utils.pl"; }
-
-system("/bin/rm -rf test_dir/view1");
-system("/bin/rm -rf test_dir/tdir1");
 
 chdir "test_dir" or die;
 $ENV{CWD} = getcwd;
@@ -23,19 +20,26 @@ our $S4uu = "${PERL} ../../s4";
 
 my $cmd;
 
-##### Trapped
-like_cmd("${S4} co -r11 $REPO/views/trunk/view1 view1",
-	 qr/Checked out revision/);
+# need to run whole suite for both sparse and non-sparse checkouts
+foreach my $sparse ("", " --sparse") {
 
-like_cmd("${S4} merge $REPO/top/trunk/tdir1 view1 2>&1",
-	 qr/Error.*s4 merge not allowed/);
+    system("/bin/rm -rf view1");
+    system("/bin/rm -rf tdir1");
 
-like_cmd("cd view1 && ${S4uu} merge $REPO/top/trunk/tdir1 2>&1",
-	 qr/Error.*s4 merge not allowed/);
+    ##### Trapped
+    like_cmd("${S4} co$sparse -r11 $REPO/views/trunk/view1 view1",
+             qr/Checked out revision/);
 
-##### Pass-through
-like_cmd("${S4} co -r11 $REPO/top/trunk/tdir1",
-	 qr/Checked out revision/);
+    like_cmd("${S4} merge $REPO/top/trunk/tdir1 view1 2>&1",
+             qr/Error.*s4 merge not allowed/);
 
-like_cmd("${S4} merge -q $REPO/top/trunk/tdir1 tdir1",
-	 qr/^$/);
+    like_cmd("cd view1 && ${S4uu} merge $REPO/top/trunk/tdir1 2>&1",
+             qr/Error.*s4 merge not allowed/);
+
+    ##### Pass-through
+    like_cmd("${S4} co$sparse -r11 $REPO/top/trunk/tdir1",
+             qr/Checked out revision/);
+
+    like_cmd("${S4} merge -q $REPO/top/trunk/tdir1 tdir1",
+             qr/^$/);
+}

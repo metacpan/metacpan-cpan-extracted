@@ -10,6 +10,7 @@ use Term::ANSIColor ();
 use Sys::Hostname qw( hostname );
 use YAML::XS qw( Dump );
 use File::Basename qw( basename );
+use File::Glob qw( bsd_glob );
 use AE;
 use Clustericious::Admin::RemoteHandler;
 use Clustericious::Admin::Dump qw( perl_dump );
@@ -17,7 +18,7 @@ use File::chdir;
 use Path::Class ();
 
 # ABSTRACT: Parallel SSH client
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 sub _local_default ($$)
@@ -36,6 +37,13 @@ sub main
 # this hook is used for testing
 # see t/args.t subtest 'color'
 our $_stdout_is_terminal = sub { -t STDOUT };
+
+sub _rc
+{
+  my $dir = bsd_glob('~/.clad');
+  mkdir $dir unless $dir;
+  $dir;
+}
 
 sub new
 {
@@ -81,7 +89,7 @@ sub new
 
     'log'       => sub {
       $self->{log_dir} = Path::Class::Dir->new(
-        File::HomeDir->my_dist_data('Clustericious-Admin', { create => 1 } ), 
+        _rc(),
         'log', 
         sprintf("%08x.%s", time, $$)
       );
@@ -468,7 +476,7 @@ sub run_server
 sub run_purge
 {
   my $log_dir = Path::Class::Dir->new(
-    File::HomeDir->my_dist_data('Clustericious-Admin', { create => 1 } ),
+    _rc(),
     'log',
   );
   
@@ -535,7 +543,7 @@ App::clad - Parallel SSH client
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 

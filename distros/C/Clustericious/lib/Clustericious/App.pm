@@ -11,7 +11,8 @@ use Clustericious::Log;
 use Mojo::URL;
 use Scalar::Util qw( weaken );
 use Mojo::Base 'Mojolicious';
-use File::HomeDir ();
+use File::Glob qw( bsd_glob );
+use File::Path qw( mkpath );
 use Carp qw( croak carp );
 use Clustericious;
 use Clustericious::Controller;
@@ -20,7 +21,7 @@ use Clustericious::Commands;
 use Path::Class::Dir;
 
 # ABSTRACT: Clustericious app base class
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 has commands => sub {
@@ -96,28 +97,12 @@ sub init_logging {
 }
 
 
-sub dump_api
+sub _my_dist_data
 {
-  carp "Clustericious::App#dump_api is deprecated";
-  require Clustericious::Plugin::CommonRoutes;
-  Clustericious::Plugin::CommonRoutes->_dump_api(@_);
+  my $dir = bsd_glob '~/.local/share/Perl/dist/Clustericious';
+  mkpath $dir, 0, 0700;
+  $dir;
 }
-
-
-sub _dump_api_table_types
-{
-  carp "Clustericious::App#dump_api_table is deprecated";
-  require Clustericious::Plugin::CommonRoutes;
-  Clustericious::Plugin::CommonRoutes->_dump_api_table_types(@_);  
-}
-
-sub dump_api_table
-{
-  carp "Clustericious::App#dump_api_table is deprecated";
-  require Clustericious::Plugin::CommonRoutes;
-  Clustericious::Plugin::CommonRoutes->_dump_api_table($_[1]);
-}
-
 
 sub config
 {
@@ -140,7 +125,7 @@ sub config
         default => sub {
           my $url = Mojo::URL->new($config->{url});
           {
-            pid_file => File::Spec->catfile( File::HomeDir->my_dist_data("Clustericious", { create => 1 } ), 'hypnotoad-' . $url->port . '-' . $url->host . '.pid' ),
+            pid_file => File::Spec->catfile( _my_dist_data(), 'hypnotoad-' . $url->port . '-' . $url->host . '.pid' ),
             listen => [
               $url->to_string,
             ],
@@ -184,7 +169,7 @@ Clustericious::App - Clustericious app base class
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -220,22 +205,6 @@ and sets up logging for the client using log::log4perl.
  $app->init_logging;
 
 Initializing logging using ~/etc/log4perl.conf
-
-=head2 dump_api
-
- my @api = $app->dump_api;
-
-B<DEPRECATED>: will be removed on or after January 31, 2016.
-
-Dump out the API for this REST server.
-
-=head2 dump_api_table
-
- my $api = $app->dump_api_table( $table );
-
-B<DEPRECATED>: will be removed on or after January 31, 2016.
-
-Dump out the column information for the given table.
 
 =head2 config
 
@@ -274,6 +243,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

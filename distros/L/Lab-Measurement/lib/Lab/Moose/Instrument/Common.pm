@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::Common;
-$Lab::Moose::Instrument::Common::VERSION = '3.553';
+#ABSTRACT: Role for common commands declared mandatory by IEEE 488.2
+$Lab::Moose::Instrument::Common::VERSION = '3.554';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -13,63 +14,29 @@ use Carp;
 use namespace::autoclean;
 
 
-=head1 NAME
-
-Lab::Moose::Instrument::Common - Role for common commands declared mandatory by
-IEEE 488.2.
-
-=head1 METHODS
-
-=head2 cls
-
-Send I<*CLS> command.
-
-=cut
-
 sub cls {
     my ( $self, %args ) = validated_no_param_setter( \@_ );
     return $self->write( command => '*CLS', %args );
 }
 
-=head2 idn
-
-Return result of I<*IDN?> query.
-
-=cut
 
 sub idn {
     my ( $self, %args ) = validated_getter( \@_ );
     return $self->query( command => '*IDN?', %args );
 }
 
-=head2 opc
-
-Send I<*OPC> command.
-
-=cut
 
 sub opc {
     my ( $self, %args ) = validated_no_param_setter( \@_ );
     return $self->write( command => '*OPC', %args );
 }
 
-=head2 opc_query
-
-Return result of I<*OPC?> query.
-
-=cut
 
 sub opc_query {
     my ( $self, %args ) = validated_getter( \@_ );
     return $self->query( command => '*OPC?', %args );
 }
 
-=head2 opc_sync
-
-Perform C<opc_query> and croak if it does not return '1'. Make sure to provide
-a sufficient timeout.
-
-=cut
 
 sub opc_sync {
     my ( $self, %args ) = validated_getter( \@_ );
@@ -80,22 +47,12 @@ sub opc_sync {
     return $one;
 }
 
-=head2 RST
-
-Send I<*RST> command.
-
-=cut
 
 sub rst {
     my ( $self, %args ) = validated_no_param_setter( \@_ );
     return $self->write( command => '*RST', %args );
 }
 
-=head2 WAI
-
-Send I<*WAI> command.
-
-=cut
 
 sub wai {
     my ( $self, %args ) = validated_no_param_setter( \@_ );
@@ -103,3 +60,61 @@ sub wai {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::Common - Role for common commands declared mandatory by IEEE 488.2
+
+=head1 VERSION
+
+version 3.554
+
+=head1 METHODS
+
+=head2 cls
+
+Send I<*CLS> command.
+
+=head2 idn
+
+Return result of I<*IDN?> query.
+
+=head2 opc
+
+Send I<*OPC> command.
+
+=head2 opc_query
+
+Return result of I<*OPC?> query.
+
+=head2 opc_sync
+
+Perform C<opc_query> and croak if it does not return '1'. Make sure to provide
+a sufficient timeout.
+
+=head2 rst
+
+Send I<*RST> command.
+
+=head2 wai
+
+Send I<*WAI> command.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

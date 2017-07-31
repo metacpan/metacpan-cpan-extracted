@@ -1,4 +1,4 @@
-use File::HomeDir::Test;
+use Test2::Plugin::FauxHomeDir;
 use Test2::V0;
 use Test::Alien::Build;
 use Alien::Build::Plugin::Fetch::Cache;

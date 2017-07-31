@@ -4,13 +4,13 @@ Date::JD - conversion between flavours of Julian Date
 
 =head1 SYNOPSIS
 
-	use Date::JD qw(jd_to_mjd mjd_to_cjdnf cjdn_to_rd);
+    use Date::JD qw(jd_to_mjd mjd_to_cjdnf cjdn_to_rd);
 
-	$mjd = jd_to_mjd($jd);
-	($cjdn, $cjdf) = mjd_to_cjdnf($mjd, $tz);
-	$rd = cjdn_to_rd($cjdn, $cjdf);
+    $mjd = jd_to_mjd($jd);
+    ($cjdn, $cjdf) = mjd_to_cjdnf($mjd, $tz);
+    $rd = cjdn_to_rd($cjdn, $cjdf);
 
-	# and 509 other conversion functions
+    # and 509 other conversion functions
 
 =head1 DESCRIPTION
 
@@ -177,7 +177,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 use parent "Exporter";
 our @EXPORT_OK;
@@ -1352,7 +1352,6 @@ sub _ret_dnf($) {
 }
 
 sub _ret_dn($) {
-	my $dn = &_ret_dnn;
 	return wantarray ? &_ret_dnf : &_ret_dnn;
 }
 
@@ -1360,7 +1359,6 @@ foreach my $src (keys %jd_flavours) { foreach my $dst (keys %jd_flavours) {
 	my $ediff = $jd_flavours{$src}->{epoch_jd} -
 			$jd_flavours{$dst}->{epoch_jd};
 	my $ediffh = $ediff == int($ediff) ? 0 : 0.5;
-	my $ediffi = $ediff - $ediffh;
 	my $src_zone = !!$jd_flavours{$src}->{zone};
 	my $dst_zone = !!$jd_flavours{$dst}->{zone};
 	my($zp, $z1, $z2);
@@ -1430,7 +1428,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2010, 2011
+Copyright (C) 2006, 2007, 2009, 2010, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

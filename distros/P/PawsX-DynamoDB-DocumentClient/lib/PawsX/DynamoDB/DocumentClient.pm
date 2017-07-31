@@ -7,7 +7,7 @@ use Module::Runtime qw(require_module);
 use Scalar::Util qw(blessed);
 use Paws;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my ($class, %args) = @_;
@@ -173,6 +173,10 @@ For use cases where you need more extensive output data, every method supports a
   );
   # $output isa Paws::DynamoDB::GetItemOutput
 
+=head2 force_type
+
+All methods take in an optional force_type parameter, which gets passed to L<Net::Amazon::DynamoDB::Marshaler> for when you need to override its default typing. See the description of force_type in that module's documentation for more details.
+
 =head1 METHODS
 
 =head2 new
@@ -237,6 +241,32 @@ By default (return_paws_output not set), returns a hashref that looks like:
 
 unprocessed_keys can be fed back into a new call to batch_get(). See L<Paws::DynamoDB::BatchGetItemOutput> for more infomation.
 
+A note on using force_type with batch_get() - force_type should be a hashref of hashrefs, whose parent key is the table name, e.g.:
+
+  my $result = $dynamodb->batch_get(
+      RequestItems => {
+          users => {
+              Keys => [
+                  { username => 'jdoe' },
+                  { username => '2001' },
+              ],
+          },
+          zip_codes => {
+              Keys => [
+                  { zip_code => '03456' },
+              ],
+          },
+      },
+      force_type => {
+          users => {
+              username => 'S',
+          },
+          zip_codes => {
+              zip_code => 'S',
+          },
+      }
+  );
+
 =head2 batch_write
 
   my $result = $dynamodb->batch_write(
@@ -266,6 +296,8 @@ Puts or deletes multiple items in one or more tables by delegating to L<Paws::Dy
 The following arguments are marshalled: Items in PutRequests, Keys in DeleteRequests.
 
 By default (return_paws_output not set), returns a hashref of unprocessed items, in the same format as the RequestItems parameters. The unprocessed items are meant to be fed back into a new call to batch_write(). See L<Paws::DynamoDB::BatchWriteItemOutput> for more information.
+
+A note on using force_type with batch_write() - force_type should be a hashref of hashrefs, whose parent key is the table name, just like batch_get() above.
 
 =head2 delete
 

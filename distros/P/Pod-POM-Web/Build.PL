@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
       'List::Util'           => 0,
       'List::MoreUtils'      => 0,
       'Module::CoreList'     => 0,
+      'Module::Metadata'     => 0,
       'Time::HiRes'          => 0,
       'HTTP::Daemon'         => 0,
       'MIME::Types'          => 0,

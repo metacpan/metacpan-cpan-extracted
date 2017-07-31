@@ -18,7 +18,7 @@ regular expressions provided by libpcre2-8.
 This provides jit support and faster matching, but may fail in corner
 cases. See
 [pcre2compat](http://www.pcre.org/current/doc/html/pcre2compat.html).
-It is typically 40% faster than the core regex engine. See ["BENCHMARKS"](#benchmarks).
+It is typically 50% faster than the core regex engine. See ["BENCHMARKS"](#benchmarks).
 
 The goal is to pass the full core re testsuite, identify all
 problematic patterns and fall-back to the core re engine.  From the
@@ -357,11 +357,11 @@ E.g. hasbackslashc and framesize.
 
 Without PCRE2:
 
-    32.572s
+    34.327s
 
 With PCRE2:
 
-    19.596s - 40% faster
+    17.922s - 50% faster
 
 # FAILING TESTS
 

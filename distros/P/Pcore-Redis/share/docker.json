@@ -1,3 +1,4 @@
 {
-   "namespace" : "softvisio"
-}
+    "repo_namespace": "softvisio",
+    "repo_name": "pcore-redis"
+} 

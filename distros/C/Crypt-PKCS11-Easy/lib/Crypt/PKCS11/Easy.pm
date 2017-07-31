@@ -1,5 +1,5 @@
 package Crypt::PKCS11::Easy;
-$Crypt::PKCS11::Easy::VERSION = '0.162150';
+$Crypt::PKCS11::Easy::VERSION = '0.172091';
 # ABSTRACT: Wrapper around Crypt::PKCS11 to make using a HSM not suck
 
 use v5.16.3;    # CentOS7
@@ -16,6 +16,8 @@ use Moo;
 use namespace::clean;
 
 use experimental 'smartmatch';
+
+use constant MAX_CHUNK_SIZE => 1024;
 
 
 has module => (
@@ -661,12 +663,27 @@ sub sign {
         $args{mech}->set_mechanism($self->_default_mech->{sign});
     }
 
+    my $data_len = length $args{data};
+    $log->debug("Attempting to sign $data_len bytes of data");
+
     $self->_session->SignInit($args{mech}, $self->_key)
       or die "Failed to init signing: " . $self->_session->errstr;
 
-    my $sig = $self->_session->Sign($args{data})
-      or die "Failed to sign: " . $self->_session->errstr;
+    if ($data_len < MAX_CHUNK_SIZE) {
+        my $sig = $self->_session->Sign($args{data})
+          or die "Failed to sign: " . $self->_session->errstr;
+        return $sig;
+    }
 
+    # sign data in chunks
+    while (length $args{data}) {
+        my $chunk = substr $args{data}, 0, MAX_CHUNK_SIZE, q{};
+        $self->_session->SignUpdate($chunk)
+          or die "Failed to sign: " . $self->_session->errstr;
+    }
+
+    my $sig = $self->_session->SignFinal
+      or die "Failed to sign: " . $self->_session->errstr;
     return $sig;
 }
 
@@ -696,12 +713,27 @@ sub verify {
         $args{mech}->set_mechanism($self->_default_mech->{verify});
     }
 
+    my $data_len = length $args{data};
+    $log->debug("Attempting to verify $data_len bytes of data");
+
     $self->_session->VerifyInit($args{mech}, $self->_key)
       or die 'Failed to init verify ' . $self->_session->errstr;
 
-    my $v = $self->_session->Verify($args{data}, $args{sig});
+    if ($data_len < MAX_CHUNK_SIZE) {
+        my $v = $self->_session->Verify($args{data}, $args{sig});
+        $log->info($self->_session->errstr) unless $v;
+        return $v;
+    }
 
-    $log->info($self->_session->errstr) unless $v;
+    # verify data in chunks
+    while (length $args{data}) {
+        my $chunk = substr $args{data}, 0, MAX_CHUNK_SIZE, q{};
+        $self->_session->VerifyUpdate($chunk)
+          or die "Failed to verify: " . $self->_session->errstr;
+    }
+
+    my $v = $self->_session->VerifyFinal($args{sig})
+      or die "Failed to verify: " . $self->_session->errstr;
 
     return $v;
 }
@@ -820,7 +852,7 @@ Crypt::PKCS11::Easy - Wrapper around Crypt::PKCS11 to make using a HSM not suck
 
 =head1 VERSION
 
-version 0.162150
+version 0.172091
 
 =head1 SYNOPSIS
 
@@ -1117,7 +1149,7 @@ Ioan Rogers <ioan.rogers@sophos.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Sophos Ltd.
+This software is copyright (c) 2017 by Sophos Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

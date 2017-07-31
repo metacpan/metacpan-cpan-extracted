@@ -14,34 +14,33 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 f913f55b8c8e449460403860b54442d1473ed0fa Changes
+SHA1 5bf063f7c3b5d265ae9435d1c53d03f386a4e655 Changes
 SHA1 caddacafe099c9c8c7e615d34f33007397e33195 INSTALL
-SHA1 275383eac567137660ff0ae7fd02ee0ac280093e LICENSE
-SHA1 bb6495a3f31da5edb1225dc64832504616c491f9 MANIFEST
-SHA1 99dd425b8678635aa2f761578f688d96f080799f META.json
-SHA1 e5867958c400ed2e8608dda46b36ecad58ccffd9 META.yml
-SHA1 6a936141caa0a9da31e8a4f8af836c43981fdc6d Makefile.PL
+SHA1 74a39e57d27fb7e37c99d03ea23648b1cb90e9cc LICENSE
+SHA1 9291a099a97ebd9ac518dccaea2e8ad68ff131a4 MANIFEST
+SHA1 87db05838008a08e78d4158e9d9427830595f8a5 META.json
+SHA1 5b7a73e6292c1446bf305b8cbe9beaea6ec5e1fe META.yml
+SHA1 8b333631c8d9a19ef285816d09297cb2ba9abd8b Makefile.PL
 SHA1 97f8433158bffca81374cc36c17e4b51b71af6d2 README
-SHA1 539306d2b7a0f82becceddaa1968e1a90f2b9d4e README.mkdn
-SHA1 db107689e6495d786c80d6c67d521ae3d84fcfea cpanfile
-SHA1 e3a9b9bdc1a86ced0c7cd69bba7ef62d3063b933 doap.xml
-SHA1 a0d72c6931d5960c828cbb01a2cef595a444776a lib/Dancer2/Plugin/REST.pm
+SHA1 cd8591477f3aba79920a7cd7b38cbd1166c1934a README.mkdn
+SHA1 746f73b036aa1a4699c6d780e19dc38eb79f5533 cpanfile
+SHA1 07fe2afbe7f2b3b576c0a3fce624eef2a7586ed4 doap.xml
+SHA1 a71d216ab41f9b4a1c144aae58077428ae41bfcc lib/Dancer2/Plugin/REST.pm
 SHA1 6c6203d59c3188fcd2e07b5f44571941bc1fd55b t/00-compile.t
-SHA1 9d0a1350bab3bd4b5d3a8ce04938b31ff19116b2 t/00-report-prereqs.dd
+SHA1 442dda5b027cdfb1965a1186fae33c2d8ea6879c t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
-SHA1 b0425694eb9a68cb8e7876987239ffe7bb65efc2 t/02_prepare_serializer_for_format.t
+SHA1 2027b6ffbc740fd7f96f6d84da98d4e201211b87 t/02_prepare_serializer_for_format.t
 SHA1 0a8c2809bac263bb2d23eb9adc254ade3adc5d03 t/03_resource.t
 SHA1 ee83ba6ac37c73a5bbd7876ccad2bd6537266fda t/04_helpers.t
-SHA1 07c1552b0d53650bc22c693bbe5f89ce1c7da4cd t/04_plugin_settings.t
+SHA1 13f1aa25eca5364affa86f510787888a77c82400 t/04_plugin_settings.t
 SHA1 449ae0f1f11ca034f9ae7b4c149cbeca336d7ef3 t/05_named_captures.t
 SHA1 d2705253f5857c2aa924c98797d124308657098f t/06_tcp_server.t
+SHA1 5a59fb046dbea0a6bb4abe54ed8e87cd44e3b68a t/gh14-deserialized.t
 SHA1 56e82843de2534be42ebfb0e2e62742781499602 utils/list_helpers.pl
-SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAle/JlsACgkQ34Hwf+GwC4x7QACfcOCNQiQJfVeKucfbcktGYOVW
-A8UAoIh+PUXXXHtc5s1yvX9grsqJzSZQ
-=rg9l
+iEYEARECAAYFAllxQlcACgkQ34Hwf+GwC4xj9QCgrfzePeODTuE87FAegmIQjlid
+geoAoMxXka1m3mP9hZzjsZgtIdkRBDcM
+=O6TR
 -----END PGP SIGNATURE-----

@@ -34,7 +34,7 @@ use AI::XGBoost::CAPI::RAW;
 use FFI::Platypus;
 use Exception::Class ( 'XGBoostException' );
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.008';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
@@ -55,8 +55,8 @@ sub XGDMatrixCreateFromMat {
     # TODO Support PDL
     # TODO ¿Adapters?
     my $data_adapter = [ map { @$_ } @$data ];
-    my $ncols        = scalar @$data;
-    my $nrows        = scalar @{ $data->[0] };
+    my $nrows        = scalar @$data;
+    my $ncols        = scalar @{ $data->[0] };
     my $matrix       = 0;
     my $error = AI::XGBoost::CAPI::RAW::XGDMatrixCreateFromMat( $data_adapter, $nrows, $ncols, $missing, \$matrix );
     _CheckCall($error);
@@ -284,7 +284,7 @@ AI::XGBoost::CAPI - Perl wrapper for XGBoost C API https://github.com/dmlc/xgboo
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 

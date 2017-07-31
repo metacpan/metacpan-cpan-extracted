@@ -3,20 +3,32 @@ abstract: 'CGI utility suite - makes powerful application writing fun and easy'
 author:
   - 'Paul Seamons'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CGI-Ex
 no_index:
   directory:
     - t
     - inc
+    - t
+    - samples
 requires:
-  Template::Alloy: 1.016
-version: 2.44
+  CGI: '0'
+  File::Temp: '0'
+  Template::Alloy: '1.016'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/ljepson/CGI-Ex/issues
+  homepage: https://metacpan.org/module/CGI::Ex
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/ljepson/CGI-Ex.git
+version: '2.45'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

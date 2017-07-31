@@ -5,7 +5,7 @@ Lazy::Utils - Utility functions
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,8 @@ use warnings;
 use v5.10.1;
 use feature qw(switch);
 no if ($] >= 5.018), 'warnings' => 'experimental';
+require bytes;
+require utf8;
 use FindBin;
 use JSON;
 use Pod::Simple::Text;
@@ -43,7 +45,7 @@ use Pod::Simple::Text;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.21';
+	our $VERSION     = '1.22';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw(trim ltrim rtrim file_get_contents file_put_contents shellmeta system2 _system
 		bash_readline bashReadLine cmdargs commandArgs cmdArgs whereis whereisBin file_cache fileCache

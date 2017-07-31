@@ -1,5 +1,10 @@
 Revision history for Alien-libtermkey
 
+0.19    2017/07/29 12:53:00
+        [CHANGES]
+         * Don't bother with alien_requires tests if simply wrapping the
+           library provided by pkg-config (RT122634)
+
 0.18    2017/06/24 18:54:51
         [CHANGES]
          * Wrap libtermkey 0.20

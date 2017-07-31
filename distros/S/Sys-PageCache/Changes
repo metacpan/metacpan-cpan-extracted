@@ -1,5 +1,9 @@
 Revision history for Sys::PageCache
 
+0.05  2017-07-25
+    [IMPROVEMENTS]
+        - Pass tests on linux >= 4.8 [RT #122591]
+
 0.04  2017-06-20
     [IMPROVEMENTS]
         - Call mmap by chunk instead of whole file size #1

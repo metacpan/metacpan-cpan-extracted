@@ -4,10 +4,10 @@ requires "Role::Tiny" => "0";
 requires "perl" => "5.006";
 
 on 'test' => sub {
-  requires "File::HomeDir" => "0.91";
   requires "Params::Validate" => "0";
   requires "PlugAuth" => "0.31";
-  requires "Test::More" => "0.94";
+  requires "Test2::Plugin::FauxHomeDir" => "0";
+  requires "Test2::V0" => "0.000060";
   requires "YAML::XS" => "0";
   requires "perl" => "5.006";
 };
@@ -30,8 +30,4 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0";
   requires "Test::Strict" => "0";
   requires "YAML" => "0";
-};
-
-on 'develop' => sub {
-  recommends "YAML::XS" => "0";
 };

@@ -13,4 +13,5 @@ use 5.006;
 use strict; use warnings;
 use Test::Map::Tube;
 
+local $SIG{__WARN__} = sub {};
 not_ok_map(BadSample->new);

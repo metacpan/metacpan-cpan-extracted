@@ -1,5 +1,8 @@
 Revision history for Clustericious-Admin
 
+1.10      2017-07-22 22:34:12 -0400
+  - Remove dependency on File::HomeDir
+
 1.09      2017-03-14 10:59:11 -0400
   - Fix Test2 / Test::Exit order bug
 

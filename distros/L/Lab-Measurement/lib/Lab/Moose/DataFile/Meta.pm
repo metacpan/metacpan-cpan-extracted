@@ -1,5 +1,6 @@
 package Lab::Moose::DataFile::Meta;
-$Lab::Moose::DataFile::Meta::VERSION = '3.553';
+#ABSTRACT: YAML Metadata file
+$Lab::Moose::DataFile::Meta::VERSION = '3.554';
 use 5.010;
 use warnings;
 use strict;
@@ -78,9 +79,22 @@ sub log {
 
 __PACKAGE__->meta->make_immutable();
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Lab::Moose::DataFile::Meta - YAML Metadata file.
+Lab::Moose::DataFile::Meta - YAML Metadata file
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -100,6 +114,15 @@ Augment the file's contents. The new keys/items will be merged with the
 existing ones. Rewrites the file with the new contents.
 You may not mixup calls with hashref and arrayref arguments.
 
-=cut
+=head1 COPYRIGHT AND LICENSE
 
-1;
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

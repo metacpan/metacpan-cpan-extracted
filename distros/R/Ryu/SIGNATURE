@@ -14,15 +14,15 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 cb3d4a3d54b9245d62aec3ebc100c3fed9dfae05 Changes
+SHA1 d983c88c4a58e3f722425d396ecd1ea46a2c55bc Changes
 SHA1 1ee81e2d27e1d5040ba2fb9b6813400c8309cd50 INSTALL
 SHA1 8a4fdad1020dbfd5154c3f042385ce86e2eefea2 LICENSE
 SHA1 14ac17f2eb3aa3be9c7561d04ea08ba946ebb9dd MANIFEST
-SHA1 cd33009401a8a772a7bd5fd2cac5332b4881eb09 META.json
-SHA1 5d68e5ee0e9ca3ec5b0b04821d9b45376a8e7645 META.yml
-SHA1 fcfd913d84f63964b53e3617fc3c5f1a7fb7a2f5 Makefile.PL
-SHA1 dcf6e16595e24e79147c6ed29a4d3e32e5625664 README
-SHA1 4adfea493bdf06feeb68fb261c590b88c063272e cpanfile
+SHA1 d1392e5d69cf3b78a87e0cdbf317a14152c4d5bc META.json
+SHA1 663076935713557d0a63a35f1ea4cc94d069f0cf META.yml
+SHA1 29a3f169e4c3d7bc6ac0b480b2d3a471f48cd75c Makefile.PL
+SHA1 4ba8fb21ebd767b4be00223463c2bfb2d36256fc README
+SHA1 b62b6ff722819b9ba39cbeb788a3b7189868d523 cpanfile
 SHA1 f484ab9daa01b0249bc51afe97c9b34a19f9f672 dist.ini
 SHA1 d6bceaccce7a186b3c168202cb070ac3231e379f doc/classes.dot
 SHA1 4c9665bee573c6ab5576992a88c6ce8402314532 doc/protocol.md
@@ -31,18 +31,18 @@ SHA1 1aa5e553e5ae00d2b7caec85480d685f95ff5880 doc/transform.dot
 SHA1 4ae8ce0872faf9450a733224138f60a4d55e37ec doc/transform.png
 SHA1 ae42ce2042dde3fe3bc7f19720f6f4b7b8ca32a8 examples/count_lines.pl
 SHA1 70c5a330486221a0ace9bbc9d33f10e79b8402e0 examples/synopsis.pl
-SHA1 6821186cb7cbdc2aba274fff1cd690cd4962553f lib/Ryu.pm
-SHA1 28333e19a986a85eb4919d19fbb2777270d97aac lib/Ryu/Exception.pm
+SHA1 d1002f770347a68e97da727e769837149daa424b lib/Ryu.pm
+SHA1 b4605a105dcaaecaa6b19c13b5597ec4d71efc80 lib/Ryu/Exception.pm
 SHA1 4eef53496bcadcd472ce7e548b71325a4ac6408e lib/Ryu/Manual/ETL.pod
 SHA1 7481c9d28532550765d82ba3de48f65f68aeeb4b lib/Ryu/Manual/Protocol.pod
 SHA1 97b9e7f1727d65931b09807b05abb10bff7b10a9 lib/Ryu/Manual/Reactive.pod
-SHA1 302a6f9c93b14ffa050275a7597cd7fc25ac5e91 lib/Ryu/Node.pm
-SHA1 1fde48a8caca5d3bca5325258b629cc6f9e63c6f lib/Ryu/Observable.pm
-SHA1 d5737bfa4ee59baf2e03e3d678b39386b27f8c5f lib/Ryu/Sink.pm
-SHA1 a56307281009d9c0cc2e3f3c1de83031c348cc74 lib/Ryu/Source.pm
+SHA1 d44136f66138114c29064eaaa36f5ba04dec2cc4 lib/Ryu/Node.pm
+SHA1 c5d3375161bb5b6380cab6c784b6dcd2649a36fb lib/Ryu/Observable.pm
+SHA1 2088cd459251fe949d3caf0fc2147f7ab067d95f lib/Ryu/Sink.pm
+SHA1 2006c2e899495da3b7e9c537d099bc1fe9f03086 lib/Ryu/Source.pm
 SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
 SHA1 b98d9293e4fce8ff6cf843f65a7762f06b921d61 t/00-compile.t
-SHA1 64a05bc751691c0495cee2eee4f14ef00f99948e t/00-report-prereqs.dd
+SHA1 f1660b16c073612ce8fb0be794010b035aaafaa6 t/00-report-prereqs.dd
 SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
 SHA1 a53e977bc45bcb222f24f7eda01f4dd1c9b899aa t/chomp.t
 SHA1 ab5244038b62e1c579aa411fbf5474e4f7b13e60 t/combine_latest.t
@@ -54,7 +54,7 @@ SHA1 a8781aa3b97ac9b6d731efa4d6fbf1415cab3a18 t/every.t
 SHA1 964eef16f1e0f2a760e3fb944f0ce7d4164976f6 t/exception.t
 SHA1 c972c599c8f29d64fd754c3966f2fd16f63c09c1 t/extract_all.t
 SHA1 13b7b3bc93dcb60d599b263783974efa32943a7c t/flat_map.t
-SHA1 bd4efe6ca12a2189d16531aa25f5aa3dccacf20c t/map.t
+SHA1 bee151dab03b6f3c5ffff8950cbfb2cf4440c133 t/map.t
 SHA1 b6972df7db578094d238adeda0885017a7ece641 t/max.t
 SHA1 ed0cb3f9314920af0b6b4b828e5beb4ae5e2dcff t/mean.t
 SHA1 fb2c336f86d2d7428107e43b9b72e0412260b945 t/merge.t
@@ -79,17 +79,17 @@ SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJZYc4uAAoJEG2WkcbynxAlZX0P/30a0xZ8keDPDKbJI3JR6JEY
-zwmf9QnEr0bKAu1CZQ5Bmt9DEVSXprp6mXUmoyDZbHfZwCCHOinCc8r0PxemqJuQ
-GWF48zFC1daQcpUDUR2dt9TRFYkJAtgkmWJTyjPp6iOnXwBABS7aBeFF35oGtStL
-BhtIyOBgQe5aijsM0gDKoKBNIeAxjMaiNFCkjU8tWM1YqDsQP/6r/pCiLJ5BhyJo
-KnF0kPo7bOSv7kviRL9dZ2cVj3rQJy7XlqIxjh46h1jPkX/2JUpNeH6bGMfNXW4u
-nwF8Y7JVRP+GxhFlQWOyuP25iDF7Z71+HTWHEn+nbZP1M2/z786Alkov1xpmkNmD
-pyBjqMDzyzUI7YDAQmE0grOwPEKk+J+cI058mJe3CRlAg3l/i+Zf9ATnwz+jvLst
-E4rl5zBc8gKo0EVdESjiMDSl9vmSmWVaClxDSs1lhNSckmk54ZFDsYiH0vtCoVvH
-ir/C0fe6s1dyNPs6Ggd5LaVnIfnkCjFxFyyXmNmwu0kzkcg9HgouYgE2pazilDSQ
-3PdFZ5Faxqw7+ZikN+NFE8aPyW+vS84aOifmefWxt4YDUZkH6LlCmWV1/e6hat75
-CDzs3NORW3VVX7mPolhljeddf8EXbkWXs7txTiEKYwxv5/UBWsnPU5+ZutMqh7Od
-L9Aowfub+gEzTTzYknPQ
-=zu4K
+iQIcBAEBAgAGBQJZfJrqAAoJEG2WkcbynxAlX1YP+gL7c5NLTwD9hU0KHhsu3wWZ
+6Mfhl4PELWTkzy/an8lsttvV+4fvqEnGhGJ5AvaLw62ZfASgit6gjDrgkyB+2LiQ
+9EBXsBDrJkC79phqz5pG6GsA8WEbW/aO4E5CrCr6ZcILKoiS1zXEK5kl3XRTS8rG
+2vUPbxcWRWXLIVDsrtXddJ/CacN1XneFJ07xpYI2r2/w9mUQjQ15bGUGe5uTLETe
+44HiP8FbNL5Ak1YvOWODRAfPnLKeOFQX3o5vih3c27DiC+Fw3dxBuFqixfh5EFre
+lfHVJrRD2M4cqPHFoXaM01t7JfcTV92zAmYkUQHzeRHmeR17wgkZlouJwvqcDP2P
+suMk2gpHGtEfMCRt0+wPVpUePmJuw1VocZOGv4obinPv4EKLI6UmH+4dE+H40Ebg
+SL/uXwCoWNp2FzDHKIkhxNcHay3BrpDOvMAX518ARBwmqS7N0yoNek4XtacbsEqL
+p8PA34vO6T4AEitY6z+BUsvv+MO9zISop7qjKwsrOW3y7Wk7o79xYoi5uKJtLl/+
+zeQUO6GiyZtIanbOBITIKdOo7Qoe0sgdkyBhmoRGMUHAndFHHrI8hnGfWeRtKcuM
+RFA431mbakjZ6FrB9V2wlMalsp79Z86XYT/kebmKRv+h0MuH0ltYzULbUWQt5xyq
+d7plXuakuRtyzOr2ptUa
+=tXoW
 -----END PGP SIGNATURE-----

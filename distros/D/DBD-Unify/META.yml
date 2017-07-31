@@ -12,7 +12,7 @@ configure_requires:
   DBI::DBD: 0
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.141520
+generated_by: Author, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,16 +21,16 @@ name: DBD-Unify
 provides: 
   DBD::Unify: 
     file: lib/DBD/Unify.pm
-    version: '0.87'
+    version: '0.88'
   DBD::Unify::GetInfo: 
     file: lib/DBD/Unify/GetInfo.pm
-    version: '0.87'
+    version: '0.88'
   DBD::Unify::TypeInfo: 
     file: lib/DBD/Unify/TypeInfo.pm
-    version: '0.87'
+    version: '0.88'
 recommends: 
-  DBI: '1.633'
-  Test::More: '1.001014'
+  DBI: '1.636'
+  Test::More: '1.302086'
   perl: '5.020001'
 requires: 
   Carp: 0
@@ -42,4 +42,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-Unify
-version: '0.87'
+version: '0.88'

@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Test::More tests => 10;
 
 our $t = "abcdef";

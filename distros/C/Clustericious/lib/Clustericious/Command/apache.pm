@@ -7,7 +7,7 @@ use base 'Clustericious::Command';
 use File::Which qw( which );
 
 # ABSTRACT: Clustericious command to stat Apache
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 __PACKAGE__->attr(description => <<EOT);
@@ -44,7 +44,7 @@ Clustericious::Command::apache - Clustericious command to stat Apache
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 DESCRIPTION
 
@@ -79,7 +79,7 @@ Create a apache24-proxy.conf:
    - apache
  
  apache:
-   args: -f <%= $root %>/apache.<%= $port %>.conf -E <%= $root %>/apache.<%= $port %>.log
+   args: -f <%= $root %>/apache.<%= $port %>.conf -E <%= $root %>/apache.<%= $port %>.startup.log
    pid_file: <%= $root %>/apache.<%= $port %>.pid
    autogen:
      filename: <%= $root %>/apache.<%= $port %>.conf
@@ -97,9 +97,9 @@ Create a apache24-proxy.conf:
        ServerName <%= $host %>
        PidFile <%= $root %>/apache.<%= $port %>.pid
        
-       ErrorLog   <%= $root %>/apache.error.<%= $port %>.log
+       ErrorLog   <%= $root %>/apache.<%= $port %>.error.log
        LogFormat "%h %l %u %t \"%r\" %>s %b" common
-       CustomLog  <%= $root %>/apache.access.<%= $port %>.log common
+       CustomLog  <%= $root %>/apache.<%= $port %>.access.log common
        
        <Location />
          ProxyPreserveHost On
@@ -142,7 +142,7 @@ Create a apache24-cgi.conf:
  start_mode: apache
  
  apache:
-   args: -f <%= $root %>/apache.<%= $port %>.conf -E <%= $root %>/apache.startup.<%= $port %>.log
+   args: -f <%= $root %>/apache.<%= $port %>.conf -E <%= $root %>/apache.<%= $port %>.startup.log
    pid_file: <%= $root %>/apache.<%= $port %>.pid
    autogen:
      filename: <%= $root %>/apache.<%= $port %>.conf
@@ -160,9 +160,9 @@ Create a apache24-cgi.conf:
        ServerName <%= $host %>
        PidFile    <%= $root %>/apache.<%= $port %>.pid
        
-       ErrorLog   <%= $root %>/apache.error.<%= $port %>.log
+       ErrorLog   <%= $root %>/apache.<%= $port %>.error.log
        LogFormat "%h %l %u %t \"%r\" %>s %b" common
-       CustomLog  <%= $root %>/apache.access.<%= $port %>.log common
+       CustomLog  <%= $root %>/apache.<%= $port %>.access.log common
        
        PassEnv PERL5LIB
        PassEnv HOME
@@ -195,6 +195,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

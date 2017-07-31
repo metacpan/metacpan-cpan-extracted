@@ -11,7 +11,7 @@ use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 # External
 has 'argv'               => ( is => 'ro', default => q{} );
@@ -189,7 +189,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.61
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -246,9 +246,11 @@ as parameters. e.g. given
 
 then L<Code::TidyAll::Plugin::PerlCritic> would be constructed with parameters
 
-    select => 'lib/**/*.pm',
-    ignore = 'lib/UtterHack.pm',
-    argv = '-severity 3'
+    Code::TidyAll::Plugin::PerlCritic->new(
+        select => 'lib/**/*.pm',
+        ignore => 'lib/UtterHack.pm',
+        argv   => '-severity 3',
+    );
 
 The following attributes are part of this base class. Your subclass can declare
 others, of course.

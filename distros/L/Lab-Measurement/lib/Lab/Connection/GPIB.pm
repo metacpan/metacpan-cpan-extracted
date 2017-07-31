@@ -1,7 +1,6 @@
 package Lab::Connection::GPIB;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: GPIB Connection base class
-$Lab::Connection::GPIB::VERSION = '3.553';
+$Lab::Connection::GPIB::VERSION = '3.554';
 #
 # This is the GPIB Connection base class. It provides the interface definition for all
 # connections implementing the GPIB protocol.
@@ -118,7 +117,7 @@ Lab::Connection::GPIB - GPIB Connection base class
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

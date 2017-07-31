@@ -2,13 +2,13 @@ package CGI::Ex::Validate;
 
 ###---------------------###
 #  See the perldoc in CGI/Ex/Validate.pod
-#  Copyright 2003-2015 - Paul Seamons
+#  Copyright 2003-2017 - Paul Seamons
 #  Distributed under the Perl Artistic License without warranty
 
 use strict;
 use Carp qw(croak);
 
-our $VERSION  = '2.44';
+our $VERSION  = '2.45';
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;

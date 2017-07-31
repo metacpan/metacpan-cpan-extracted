@@ -9,7 +9,7 @@ use Yars::Client;
 use Path::Class qw( file dir );
 use Clustericious::Config;
 use File::Temp qw( tempdir );
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 use File::Path qw( remove_tree );
 use File::Copy qw( move );
 use YAML::XS qw( Dump );
@@ -26,14 +26,6 @@ subtest prep => sub {
   create_directory_ok 'foo4';
   $cluster->create_cluster_ok(qw( Yars Yars Yars Yars ));
   
-  #use YAML::XS;
-  #use File::HomeDir;
-  #use Path::Class qw( file );
-  #note "~ config template ~";
-  #note file(File::HomeDir->my_home, 'etc', 'Yars.conf')->slurp;
-  #note "~ config data ~";
-  #note YAML::XS::Dump(Clustericious::Config->new('Yars'));
-
   my $config = Clustericious::Config->new('Yars');
   is $config->url, $cluster->urls->[3], "primary is @{[ $cluster->urls->[3] ]}";
   is $config->failover_urls->[0], $cluster->urls->[2], "failover is @{[ $cluster->urls->[2] ]}";
@@ -61,9 +53,9 @@ subtest 'stashed on non-failover, non-primary' => sub {
   };
   
   # remove old
-  dir(File::HomeDir->my_home, 'foo2', 'bc')->rmtree(0,0);
+  dir(bsd_glob('~'), 'foo2', 'bc')->rmtree(0,0);
   # recreate as stashed file
-  my $dir = dir(File::HomeDir->my_home, qw( foo1 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 ));
+  my $dir = dir(bsd_glob('~'), qw( foo1 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 ));
   $dir->mkpath(0,0755);
   $dir->file('stuff')->spew(iomode => '>:raw', $data);
   
@@ -104,8 +96,8 @@ subtest 'bucket cache' => sub {
       $y->bucket_map_cached($bad_bucket_map);
       is $y->bucket_map_cached, $bad_bucket_map, 'preload with incorrect bucket map';
     
-      my $from = file(File::HomeDir->my_home, qw( foo2 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
-      my $to   = file(File::HomeDir->my_home, qw( foo4 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
+      my $from = file(bsd_glob('~'), qw( foo2 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
+      my $to   = file(bsd_glob('~'), qw( foo4 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
       note "move $from => $to";
       $to->parent->mkpath(0, 0700);
       move("$from", "$to") || die "copy $from => $to failed: $!";
@@ -133,8 +125,8 @@ subtest 'bucket cache' => sub {
       $y->upload('stuff', \"\x68\x65\x72\x65\x0a");
       is $y->bucket_map_cached, $good_bucket_map, 'preload with correct bucket map';
     
-      my $from = file(File::HomeDir->my_home, qw( foo2 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
-      my $to   = file(File::HomeDir->my_home, qw( foo4 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
+      my $from = file(bsd_glob('~'), qw( foo2 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
+      my $to   = file(bsd_glob('~'), qw( foo4 bc 98 d8 46 73 28 6c e1 44 7e ca 17 66 f2 85 04 stuff ));
       note "move $from => $to";
       $to->parent->mkpath(0, 0700);
       move("$from", "$to") || die "copy $from => $to failed: $!";

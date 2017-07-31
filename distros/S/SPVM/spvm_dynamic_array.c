@@ -10,7 +10,7 @@ SPVM_DYNAMIC_ARRAY* SPVM_DYNAMIC_ARRAY_new(int32_t capacity) {
   
   assert(capacity >= 0);
   
-  SPVM_DYNAMIC_ARRAY* array = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(1, sizeof(SPVM_DYNAMIC_ARRAY));
+  SPVM_DYNAMIC_ARRAY* array = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_DYNAMIC_ARRAY));
   array->length = 0;
   
   if (capacity == 0) {
@@ -20,7 +20,8 @@ SPVM_DYNAMIC_ARRAY* SPVM_DYNAMIC_ARRAY_new(int32_t capacity) {
     array->capacity = capacity;
   }
   
-  void** values = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(array->capacity, sizeof(void*));
+  int64_t values_byte_size = (int64_t)array->capacity * (int64_t)sizeof(void*);
+  void** values = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(values_byte_size);
   
   array->values = values;
   
@@ -37,11 +38,12 @@ void SPVM_DYNAMIC_ARRAY_maybe_extend(SPVM_DYNAMIC_ARRAY* array) {
   if (length >= capacity) {
     int32_t new_capacity = capacity * 2;
     
-    void** new_values = SPVM_UTIL_ALLOCATOR_safe_malloc_i32_zero(new_capacity, sizeof(void*));
+    int64_t new_values_byte_size = (int64_t)new_capacity * (int64_t)sizeof(void*);
+    void** new_values = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(new_values_byte_size);
     memcpy(new_values, array->values, capacity * sizeof(void*));
     free(array->values);
     array->values = new_values;
-
+    
     array->capacity = new_capacity;
   }
 }

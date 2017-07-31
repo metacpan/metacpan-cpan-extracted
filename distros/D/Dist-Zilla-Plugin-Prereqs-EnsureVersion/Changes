@@ -1,3 +1,8 @@
+0.04    2017-07-28 (PERLANCAR)
+
+	- Ignore prereqs with custom (/^x_/) phase & relationship.
+
+
 0.03    2017-07-07 (PERLANCAR)
 
 	- Switch from (ab)using InstallTool phase to using AfterBuild phase

@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Format;
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.553';
+#ABSTRACT: Format SCPI queries
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.554';
 use Moose::Role;
 use Lab::Moose::Instrument qw/setter_params getter_params validated_getter/;
 use Lab::Moose::Instrument::Cache;
@@ -52,3 +53,30 @@ sub format_border {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::SCPI::Format - Format SCPI queries
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

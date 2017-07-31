@@ -1,7 +1,6 @@
-#!/usr/bin/perl
-
 package Lab::Instrument::HP3458A;
-$Lab::Instrument::HP3458A::VERSION = '3.553';
+#ABSTRACT: Agilent 3458A Multimeter
+$Lab::Instrument::HP3458A::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Lab::Instrument::Multimeter;
@@ -503,6 +502,8 @@ sub get_value {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -510,6 +511,10 @@ sub get_value {
 =head1 NAME
 
 Lab::Instrument::HP3458A - Agilent 3458A Multimeter
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -537,7 +542,7 @@ Parameter: pl_freq
 
     $hp->pl_freq($new_freq);
     $npl_freq = $hp->pl_freq();
-	
+
 Get/set the power line frequency at your location (50 Hz for most countries, which is the default). This
 is the basis of the integration time setting (which is internally specified as a count of power
 line cycles, or PLCs). The integration time will be set incorrectly if this parameter is set incorrectly.
@@ -553,22 +558,21 @@ _head2 triggered_read
 
     @values = $hp->triggered_read();
     $value = $hp->triggered_read();
-	
+
 Trigger and read value(s) using the current device setup. This expects and digests a list of values in ASCII format,
 as set up by configure_voltage_dc().
 
 =head2 triggered_read_raw
 
     $result = $hp->triggered_read_raw( read_until_length => $length );
-	
+
 Trigger and read using the current device setup. This won't do any parsing and just return the answer from the device.
 If $read_until_length (integer) is specified, it will try to continuously read until it has gathered this amount of bytes.
-
 
 =head2 configure_voltage_dc
 
     $hp->configure_voltage_dc($range, $integration_time);
-	
+
 Configure range and integration time for the following DCV measurements.
 
 $range is a voltage or one of "AUTO", "MIN" or "MAX".
@@ -626,7 +630,6 @@ Clear the message displayed on the front panel.
     $hp->beep();
 
 Issue a single beep immediately.
-
 
 =head2 get_error
 
@@ -707,7 +710,6 @@ Takes a data blob with SINT values and decodes them into a numeric list. The use
 read from the device by default if omitted. Make sure the device still has the same settings as used to
 obtain $SINT_data, or iscale will be off which leads to invalid data decoding.
 
-
 =head1 CAVEATS/BUGS
 
 probably many
@@ -722,12 +724,19 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2009-2011 David Kalok, Andreas K. Hüttel
-            2011-2012 Andreas K. Hüttel, Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich
+            2013       Alois Dirnaichner, Andreas K. Huettel
+            2015       Alois Dirnaichner
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

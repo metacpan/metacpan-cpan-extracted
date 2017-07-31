@@ -1,13 +1,13 @@
 use warnings;
 use strict;
 
-use Test::More tests => 5*10 + 7;
+use Test::More tests => 6*10 + 8;
 
 my $test_input = "\x01\x02\x04\x08\x10\x20\x40\x80" .
 	"\x92\x07\x58\x97\x0c\x21\xd5\x82\xc8\xb8\xec\xe8\xb2\x85\x1e\x4c";
 my $f;
 
-open($f, "<:bitswap(0)", \$test_input);
+ok open($f, "<:bitswap(0)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x01\x02\x04\x08\x10\x20\x40\x80";
 is scalar(<$f>), "\x92\x07\x58\x97\x0c\x21\xd5\x82";
@@ -16,7 +16,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(1)", \$test_input);
+ok open($f, "<:bitswap(1)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x02\x01\x08\x04\x20\x10\x80\x40";
 is scalar(<$f>), "\x61\x0b\xa4\x6b\x0c\x12\xea\x41";
@@ -25,7 +25,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(2)", \$test_input);
+ok open($f, "<:bitswap(2)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x04\x08\x01\x02\x40\x80\x10\x20";
 is scalar(<$f>), "\x68\x0d\x52\x6d\x03\x84\x75\x28";
@@ -34,7 +34,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(4)", \$test_input);
+ok open($f, "<:bitswap(4)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x10\x20\x40\x80\x01\x02\x04\x08";
 is scalar(<$f>), "\x29\x70\x85\x79\xc0\x12\x5d\x28";
@@ -43,7 +43,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(7)", \$test_input);
+ok open($f, "<:bitswap(7)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x80\x40\x20\x10\x08\x04\x02\x01";
 is scalar(<$f>), "\x49\xe0\x1a\xe9\x30\x84\xab\x41";
@@ -52,7 +52,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(8)", \$test_input);
+ok open($f, "<:bitswap(8)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x02\x01\x08\x04\x20\x10\x80\x40";
 is scalar(<$f>), "\x07\x92\x97\x58\x21\x0c\x82\xd5";
@@ -61,7 +61,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(16)", \$test_input);
+ok open($f, "<:bitswap(16)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x04\x08\x01\x02\x40\x80\x10\x20";
 is scalar(<$f>), "\x58\x97\x92\x07\xd5\x82\x0c\x21";
@@ -70,7 +70,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(32)", \$test_input);
+ok open($f, "<:bitswap(32)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x10\x20\x40\x80\x01\x02\x04\x08";
 is scalar(<$f>), "\x0c\x21\xd5\x82\x92\x07\x58\x97";
@@ -79,7 +79,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(24)", \$test_input);
+ok open($f, "<:bitswap(24)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x08\x04\x02\x01\x80\x40\x20\x10";
 is scalar(<$f>), "\x97\x58\x07\x92\x82\xd5\x21\x0c";
@@ -88,7 +88,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(12)", \$test_input);
+ok open($f, "<:bitswap(12)", \$test_input);
 $/ = \8;
 is scalar(<$f>), "\x20\x10\x80\x40\x02\x01\x08\x04";
 is scalar(<$f>), "\x70\x29\x79\x85\x12\xc0\x28\x5d";
@@ -97,7 +97,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(36)", \$test_input);
+ok open($f, "<:bitswap(36)", \$test_input);
 $/ = \3;
 is scalar(<$f>), "\x01\x02\x04";
 $/ = \10;

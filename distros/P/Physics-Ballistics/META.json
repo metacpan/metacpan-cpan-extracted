@@ -1,0 +1,46 @@
+{
+   "abstract" : "Ballistics Formulae",
+   "author" : [
+      "TTKCIAR <ttk@ciar.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Physics-Ballistics",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.00",
+            "Math::Trig" : "1.03",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0.60",
+            "Test::Most" : "0.20"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ttkciar/perl-physics-ballistics",
+         "web" : "http://github.com/ttkciar/perl-physics-ballistics"
+      }
+   },
+   "version" : "1.03"
+}
+

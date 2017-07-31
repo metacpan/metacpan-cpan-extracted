@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "AppConfig" => 0,
     "Digest::MD5" => 0,
+    "File::Spec" => 0,
     "LWP::UserAgent" => "6.00",
     "Moo" => 0,
     "Moo::Role" => 0,
@@ -31,6 +32,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "App::PodLinkCheck" => 0,
+    "Capture::Tiny" => 0,
+    "File::Basename" => 0,
+    "File::Path" => 0,
     "HTTP::Response" => 0,
     "Test::DescribeMe" => 0,
     "Test::Exception" => 0,
@@ -39,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::TempDir::Tiny" => 0
   },
-  "VERSION" => "v0.0.8",
+  "VERSION" => "v0.0.9",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,8 +52,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::PodLinkCheck" => 0,
   "AppConfig" => 0,
+  "Capture::Tiny" => 0,
   "Digest::MD5" => 0,
+  "File::Basename" => 0,
+  "File::Path" => 0,
+  "File::Spec" => 0,
   "HTTP::Response" => 0,
   "LWP::UserAgent" => "6.00",
   "Moo" => 0,

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 
 use Moo;
 
@@ -19,6 +19,12 @@ extends 'Code::TidyAll::Plugin';
 #     \A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)    (with the m flag)
 # from the Jekyll source code here:
 # https://github.com/jekyll/jekyll/blob/c7d98cae2652b2df7ebd3c60b4f8c87950760e47/lib/jekyll/document.rb#L13
+# note - The 'm' modifier in ruby is essentially the same as 's' in Perl
+#        so we need to enable the 's' modifier not 'm'
+#      - Ruby essentially always treats '^' and '$' the way Perl does when the
+#        'm' modifier is enabled, so we need to turn that on too
+#      - We need to enable the 'x' modifier and space things out so that
+#        Perl treats '$\n' as '$' and '\n' and not the variable '$\' and 'n'
 my $YAML_REGEX = qr{
    \A
       # the starting ---, and anything up until...
@@ -26,7 +32,7 @@ my $YAML_REGEX = qr{
 
       # ...the first --- or ... on their own line
       ^ (?:---|\.\.\.) \s* $ \n?
-}mx;
+}msx;
 
 has encoding => (
     is => 'ro',
@@ -113,7 +119,7 @@ Code::TidyAll::Plugin::YAMLFrontMatter - TidyAll plugin for validating YAML Fron
 
 =head1 VERSION
 
-version 1.000000
+version 1.000001
 
 =head1 SYNOPSIS
 

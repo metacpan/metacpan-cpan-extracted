@@ -25,7 +25,7 @@ CatalystX::OAuth2::ActionRole::Token - A role for building token-building action
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 AUTHOR
 

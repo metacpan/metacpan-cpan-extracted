@@ -23,13 +23,9 @@ sub CLI ($self) {
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run($opt);
+    my $dist = $self->get_dist;
 
-    return;
-}
-
-sub run ( $self, $args ) {
-    exit 3 if !$self->dist->build->test( $args->%* );
+    exit 3 if !$dist->build->test( $opt->%* );
 
     return;
 }

@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::RS_SMB;
-$Lab::Moose::Instrument::RS_SMB::VERSION = '3.553';
+#ABSTRACT: Rohde & Schwarz SMB Signal Generator
+$Lab::Moose::Instrument::RS_SMB::VERSION = '3.554';
 use 5.010;
 
 use Moose;
@@ -26,39 +27,7 @@ sub BUILD {
     $self->cls();
 }
 
-=head1 NAME
 
-Lab::Moose::Instrument::RS_SMB - Rohde & Schwarz SMB Signal Generator
-
-=head1 SYNOPSIS
-
- # Set frequency to 2 GHz
- $smb->source_frequency(value => 2e9);
- 
- # Query output power (in Dbm)
- my $power = $smb->source_power_level_immediate_amplitude_query();
- 
-=cut
-
-=head1 METHODS
-
-Used roles:
-
-=over
-
-=item L<Lab::Moose::Instrument::SCPI::Source::Power>
-
-=back
-
-=head2 source_frequency_query
-
-=head2 source_frequency
-
-=head2 cached_source_frequency
-
-Query and set the RF output frequency.
-    
-=cut
 
 cache source_frequency => ( getter => 'source_frequency_query' );
 
@@ -79,3 +48,55 @@ sub source_frequency {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::RS_SMB - Rohde & Schwarz SMB Signal Generator
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ # Set frequency to 2 GHz
+ $smb->source_frequency(value => 2e9);
+ 
+ # Query output power (in Dbm)
+ my $power = $smb->source_power_level_immediate_amplitude_query();
+
+=head1 METHODS
+
+Used roles:
+
+=over
+
+=item L<Lab::Moose::Instrument::SCPI::Source::Power>
+
+=back
+
+=head2 source_frequency_query
+
+=head2 source_frequency
+
+=head2 cached_source_frequency
+
+Query and set the RF output frequency.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -18,23 +18,23 @@ if($ENV{RELEASE_TESTING}) {
 	}
 }
 
-my $build_requires = {
+my $test_requires = {
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
-	'Carp' => 0,
 };
 
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
-	$build_requires->{'Geo::Coder::Google::V3'} = 0.10;
-	$build_requires->{'Geo::Coder::OSM'} = 0;
-	$build_requires->{'Geo::Coder::CA'} = 0;
-	$build_requires->{'Geo::Coder::XYZ'} = 0.03;
-	$build_requires->{'Test::Number::Delta'} = 0;
-	$build_requires->{'Test::LWP::UserAgent'} = 0;
-	$build_requires->{'Test::Carp'} = 0;
-	$build_requires->{'LWP::UserAgent::Throttled'} = 0.04;
+	$test_requires->{'Geo::Coder::Google::V3'} = 0.10;
+	$test_requires->{'Geo::Coder::OSM'} = 0;
+	$test_requires->{'Geo::Coder::CA'} = 0;
+	$test_requires->{'Geo::Coder::US'} = 0;
+	$test_requires->{'Geo::Coder::XYZ'} = 0.06;
+	$test_requires->{'Test::Number::Delta'} = 0;
+	$test_requires->{'Test::LWP::UserAgent'} = 0;
+	$test_requires->{'Test::Carp'} = 0;
+	$test_requires->{'LWP::UserAgent::Throttled'} = 0.04;
 } else {
 	unlink('t/online.enabled');
 }
@@ -49,9 +49,10 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    BUILD_REQUIRES => $build_requires,
+    TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'LWP::Protocol::https' => 0,
+	'Carp' => 0,
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo::Coder::List-*' },

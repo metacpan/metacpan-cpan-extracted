@@ -1,6 +1,6 @@
 package Proc::tored;
 # ABSTRACT: Service management using a pid file and touch files
-$Proc::tored::VERSION = '0.17';
+$Proc::tored::VERSION = '0.18';
 use strict;
 use warnings;
 require Exporter;
@@ -59,7 +59,7 @@ Proc::tored - Service management using a pid file and touch files
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -315,7 +315,7 @@ L</run>.
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 

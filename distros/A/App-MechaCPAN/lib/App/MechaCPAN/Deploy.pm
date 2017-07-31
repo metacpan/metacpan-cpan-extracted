@@ -5,21 +5,103 @@ use warnings;
 use autodie;
 use Carp;
 use CPAN::Meta;
-use List::Util qw/reduce/;
-use App::MechaCPAN;
+use List::Util qw/first reduce/;
+use File::Temp qw/tempdir/;
+use App::MechaCPAN qw/:go/;
 
 our @args = (
   'skip-perl!',
   'update!',
 );
 
+sub munge_args
+{
+  my $class = shift;
+  my $opts  = shift;
+  my $file  = shift || '.';
+
+  if ( $file =~ git_re )
+  {
+    my ( $git_url, $branch ) = $file =~ git_extract_re;
+
+    if ( !eval { run(qw/git --version/); 1; } )
+    {
+      croak "Was given a git-looking URL, but could not run git";
+    }
+
+    my $remote      = 'origin';
+    my $needs_clone = 1;
+
+    # Determine if we're in a git directory
+    if ( -d '.git' || eval { run(qw/git rev-parse --git-dir/); 1 } )
+    {
+      my $remote_line = first {m/\t $git_url \s/xms} run(qw/git remote -v/);
+      if ($remote_line)
+      {
+        ($remote) = $remote_line =~ m/^ ([^\t]*) \t/xms;
+
+        success "Found git checkout of of $git_url";
+
+        $needs_clone = 0;
+      }
+      elsif ( -d '.git' )
+      {
+        # Only croak if there is a .git here which means we can't clone here
+        croak "Found git checkout but could not find remote URL $git_url";
+      }
+    }
+
+    if ($needs_clone)
+    {
+      info 'git-clone', "Cloning $git_url";
+
+      my $dir = tempdir(
+        TEMPLATE => File::Spec->tmpdir . '/mechacpan_XXXXXXXX',
+        CLEANUP  => 1
+      );
+
+      # We use a temp directory and --seperate-git-dir  since byt his point
+      # local exists because we're created it and started logging. These
+      # options, plus the git config below, allow us to clone a git repo
+      # without a clean current directory.
+      run qw/git clone/, '--separate-git-dir=.git', '-n', '-o', $remote,
+        $git_url, $dir;
+      run qw/git config --unset core.worktree/;
+      $branch //= 'master';
+      success 'git-clone', "Cloned $git_url";
+    }
+
+    if ($branch)
+    {
+      info 'git-branch', "Checking out $branch";
+      run qw/git checkout/, $branch;
+      run qw/git fetch/, $remote, $branch;
+      info 'git-branch', "Merging with remote branch $remote/$branch";
+      run qw/git merge --ff-only FETCH_HEAD/;
+      success 'git-branch', "Switched branch to $remote/$branch";
+    }
+
+    if ( !-f 'cpanfile' )
+    {
+      my @cpanfiles = glob '*/cpanfile';
+      if ( scalar @cpanfiles == 1 )
+      {
+        my $dir = $cpanfiles[0];
+        $dir =~ s[/cpanfile$][]xms;
+        chdir $dir;
+        $file = 'cpanfile';
+      }
+    }
+  }
+
+  return ($file);
+}
+
 sub go
 {
   my $class = shift;
   my $opts  = shift;
-  my $src   = shift || '.';
-
-  my $file = $src;
+  my $file  = shift || '.';
 
   if ( -d $file )
   {
@@ -50,6 +132,7 @@ sub go
   {
     my $snapshot_info = parse_snapshot("$file.snapshot");
     my %srcs;
+    my %reqs;
     foreach my $dist ( values %$snapshot_info )
     {
       my $src = $dist->{pathname};
@@ -58,9 +141,14 @@ sub go
         if ( exists $srcs{$provide} )
         {
           die
-              "Found dumplicate distributions ($src and $srcs{$provide}) that provides the same module ($provide)\n";
+            "Found dumplicate distributions ($src and $srcs{$provide}) that provides the same module ($provide)\n";
         }
         $srcs{$provide} = $src;
+      }
+
+      foreach my $req ( keys %{ $dist->{requirements} } )
+      {
+        $reqs{$req} = undef;
       }
     }
 
@@ -68,9 +156,11 @@ sub go
     {
       %srcs = ( %srcs, %{ $opts->{source} } );
     }
-    $opts->{source} = \%srcs;
-    $opts->{update} = 1;
+    $opts->{source}         = { %reqs, %srcs };
+    $opts->{update}         = 0;
     $opts->{'only-sources'} = 1;
+    $opts->{'smart-tests'}  = 1
+      if !defined $opts->{'smart-tests'};
   }
 
   my $result;
@@ -122,6 +212,15 @@ sub parse_cpanfile
     };
   }
 
+  foreach my $phase (qw/configure build test author/)
+  {
+    $methods->{ $phase . '_requires' } = sub
+    {
+      my ( $module, $ver ) = @_;
+      $result->{$phase}->{requires}->{$module} = $ver;
+    };
+  }
+
   open my $code_fh, '<', $file;
   my $code = do { local $/; <$code_fh> };
 
@@ -147,7 +246,7 @@ sub parse_cpanfile
   my $no_error = eval $sandbox;
 
   croak $@
-      unless $no_error;
+    unless $no_error;
 
   delete $result->{current};
 
@@ -217,6 +316,7 @@ App::MechaCPAN::Deploy - Mechanize the deployment of CPAN things.
   # Install perl and everything from the cpanfile into local/
   # If cpanfile.snapshot exists, it will be consulted exclusivly
   user@host:~$ mechacpan deploy
+  user@host:~$ mechacpan deploy git://git@example.com/MyApp.git
   user@host:~$ zhuli do the thing
 
 =head1 DESCRIPTION
@@ -225,13 +325,23 @@ App::MechaCPAN::Deploy - Mechanize the deployment of CPAN things.
 
   user@host:~$ mechacpan deploy
 
-The C<deploy> command is used for automating a deployment. It will install both L<perl> and all the modules specified from the C<cpanfile>.  If there is a C<cpanfile.snapshot> that was created by L<Carton>, C<deploy> will treat the modules listed in the snapshot file as the only modules available to install. If a module has a dependency not listed in the snapshot, the deployment will fail.
+The C<deploy> command is used for automating a deployment. It will install both L<perl> and all the modules specified from the C<cpanfile>.
+
+=head3 C<cpanfile.snapshot>
+
+If there is a C<cpanfile.snapshot> that was created by L<Carton>, C<deploy> will treat the modules listed in the snapshot file as the only modules available to install. If a module has a dependency not listed in the snapshot, the deployment will fail.
+
+The option C<smart-tests> is enabled by default when there is a C<cpanfile.snapshot> file. See L<App::MechaCPAN::Install/smart-tests> for more details.
 
 =head2 Methods
 
 =head3 go( \%opts, $cpanfile )
 
-This is the entry point into deployment. It will deploy perl and modules into the C<local> directory of the current directory. C<$cpanfile> is optional and does not have to provided. If it is provided, it needs to be either a path to a directory that contains a file named C<cpanfile> or the path to a file that can be used as a C<cpanfile>. The options available are listed below.
+This is the entry point into deployment. It will deploy perl and modules into the C<local> directory of the current directory. C<$cpanfile> is optional and does not have to provided. If it is provided, it needs to be either a path to a directory that contains a file named C<cpanfile> or the path to a file that can be used as a C<cpanfile>.
+
+C<$cpanfile> can also refer to a git repository. In this case, C<App:MechaCPAN::Deploy> will attempt to clone the repository if it's not already and checkout the branch specified branch if given. If there is a cpanfile in the checked out repository or inside a top-level directory, then that cpanfile and directory will be used.
+
+The options available are listed below.
 
 =head2 Arguments
 

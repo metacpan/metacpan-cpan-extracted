@@ -4,13 +4,13 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bit-Manip",
    "no_index" : {
@@ -47,5 +47,5 @@
          "web" : "https://github.com/stevieb9/bit-manip"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04"
 }

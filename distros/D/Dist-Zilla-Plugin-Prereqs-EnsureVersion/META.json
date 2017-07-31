@@ -59,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-Prereqs-EnsureVersion"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -147,14 +147,19 @@
             "version" : "6.009"
          },
          {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Author::PERLANCAR/ExecDir script",
+            "version" : "6.009"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.55"
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
             "name" : "@Author::PERLANCAR/Rinci::AbstractFromMeta",
-            "version" : "0.09"
+            "version" : "0.10"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodnameFromFilename",
@@ -338,7 +343,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.76"
+                        "version" : "0.77"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -372,9 +377,9 @@
             "version" : "6.009"
          },
          {
-            "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
-            "name" : "@Author::PERLANCAR/ReadmeFromPod",
-            "version" : "0.35"
+            "class" : "Dist::Zilla::Plugin::Pod2Readme",
+            "name" : "@Author::PERLANCAR/Pod2Readme",
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
@@ -425,9 +430,15 @@
             "version" : "0.03"
          },
          {
-            "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
-            "name" : "@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::StaticInstall",
+            "config" : {
+               "Dist::Zilla::Plugin::StaticInstall" : {
+                  "dry_run" : 0,
+                  "mode" : "on"
+               }
+            },
+            "name" : "@Author::PERLANCAR/StaticInstall",
+            "version" : "0.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest",
@@ -437,17 +448,22 @@
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANLists::Blacklist",
             "name" : "@Author::PERLANCAR/Acme::CPANLists::Blacklist",
-            "version" : "0.03"
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
             "name" : "@Author::PERLANCAR/Prereqs::EnsureVersion",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
             "name" : "@Author::PERLANCAR/Prereqs::CheckCircular",
-            "version" : "0.004"
+            "version" : "0.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
+            "name" : "@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple",
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -520,6 +536,7 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233",
+   "x_static_install" : 1
 }
 

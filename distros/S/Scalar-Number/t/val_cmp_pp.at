@@ -1,3 +1,7 @@
-do "t/setup_pp.pl" or die $@ || $!;
-do "t/val_cmp.at" or die $@ || $!;
+use warnings;
+use strict;
+
+do "./t/setup_pp.pl" or die $@ || $!;
+do "./t/val_cmp.at" or die $@ || $!;
+
 1;

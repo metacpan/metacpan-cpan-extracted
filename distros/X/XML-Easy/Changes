@@ -1,3 +1,24 @@
+version 0.011; 2017-07-25
+
+  * port to Perl 5.23.6, where applying a regexp to codepoints in the
+    upper half of the native unsigned integer range by default causes
+    a deprecation warning
+
+  * update tests for Perl 5.27.1, where codepoints in the upper half of
+    the native unsigned integer range are illegal
+
+  * extend tests to examine codepoints above the 32-bit range on 64-bit
+    Perl builds
+
+  * in test suite, avoid codepoint deprecation warnings from Perl 5.23.6
+    and above
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * limit the local muffling of "utf8"-category warnings to those Perl
+    versions that generate the unwanted warnings
+
 version 0.010; 2017-07-19
 
   * port to Perl 5.19.4, where the C type of array indices has changed

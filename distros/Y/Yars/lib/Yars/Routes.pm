@@ -1,7 +1,7 @@
 package Yars::Routes;
 
 # ABSTRACT: set up the routes for Yars.
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 
 use strict;
@@ -12,8 +12,7 @@ use File::Path qw/mkpath/;
 use File::Temp;
 use Clustericious::RouteBuilder;
 use if $^O ne 'MSWin32', 'Filesys::Df' => qw/df/;
-use List::Util qw/shuffle/;
-use List::MoreUtils qw/uniq/;
+use List::Util qw/ shuffle uniq /;
 use Digest::file qw/digest_file_hex/;
 use File::Basename qw/basename/;
 use JSON::MaybeXS qw( encode_json );
@@ -654,7 +653,7 @@ Yars::Routes - set up the routes for Yars.
 
 =head1 VERSION
 
-version 1.28
+version 1.30
 
 =head1 SYNOPSIS
 

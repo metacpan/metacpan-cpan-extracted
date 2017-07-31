@@ -1,5 +1,12 @@
 Revision history for Perl extension List-SomeUtils
 
+0.56     2017-07-22
+    - Make sure we depend on the latest LSU::XS if the system support XS.
+
+0.55     2017-07-22
+    - Fixed incorrect comments in doc examples for uniq().
+    - Added a new function, mode(), requested by Jerrad Pierce. GH #2.
+
 0.54     2017-06-01
     - Moved issue tracking to GitHub.
 

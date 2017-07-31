@@ -1,10 +1,10 @@
 requires "ExtUtils::CBuilder" => "0";
-requires "File::ShareDir" => "0";
+requires "File::ShareDir::Dist" => "0";
 requires "Module::Build" => "0";
 requires "perl" => "5.006";
 
 on 'test' => sub {
-  requires "Test2::Suite" => "0.000060";
+  requires "Test2::Bundle::Extended" => "0.000060";
   requires "Test::More" => "0.94";
   requires "perl" => "5.006";
 };

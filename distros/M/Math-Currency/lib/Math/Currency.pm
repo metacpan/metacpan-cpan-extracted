@@ -14,7 +14,7 @@
 #------------------------------------------------------------------------------
 
 package Math::Currency;
-$Math::Currency::VERSION = '0.51';
+$Math::Currency::VERSION = '0.52';
 # ABSTRACT: Exact Currency Math with Formatting and Rounding
 
 use strict;
@@ -471,7 +471,7 @@ Math::Currency - Exact Currency Math with Formatting and Rounding
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -938,11 +938,11 @@ perllocale
 
 =item *
 
-Math::BigFloat
+L<Math::BigFloat>
 
 =item *
 
-Math::BigInt
+L<Math::BigInt>
 
 =back
 

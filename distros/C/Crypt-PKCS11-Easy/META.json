@@ -4,7 +4,7 @@
       "Ioan Rogers <ioan.rogers@sophos.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,6 +40,7 @@
             "Try::Tiny" : "0",
             "Types::Path::Tiny" : "0",
             "Types::Standard" : "0",
+            "constant" : "0",
             "experimental" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.16.3",
@@ -78,9 +79,11 @@
          "web" : "https://github.com/sophos/Crypt-PKCS11-Easy"
       }
    },
-   "version" : "0.162150",
+   "version" : "0.172091",
    "x_contributors" : [
-      "Christopher Anthony <kozure@gmail.com>"
-   ]
+      "Christopher Anthony <kozure@gmail.com>",
+      "Ioan Rogers <ioan@dirtysoft.ca>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

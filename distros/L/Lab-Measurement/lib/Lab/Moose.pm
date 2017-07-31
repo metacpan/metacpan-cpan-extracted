@@ -1,7 +1,6 @@
 package Lab::Moose;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
-$Lab::Moose::VERSION = '3.553';
+$Lab::Moose::VERSION = '3.554';
 use warnings;
 use strict;
 use 5.010;
@@ -100,7 +99,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -168,6 +167,7 @@ Load Lab::Moose::DataFile::C<$type> and call it's C<new> method with C<%args>.
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

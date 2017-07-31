@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '0.30';
+$Test::Map::Tube::VERSION   = '0.31';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Interface to test Map::Tube features.
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
@@ -169,7 +169,8 @@ sub ok_map_routes($$;$) {
     my ($object, $routes, $message) = @_;
 
     $TEST->plan(tests => 1) unless $PLAN;
-    $TEST->is_num(_ok_map_routes($object, $routes), $TEST_BOOL, $message);
+    my ($response, $error) = _ok_map_routes($object, $routes);
+    $TEST->is_num($response, $TEST_BOOL, $message||$error);
 }
 
 #
@@ -295,7 +296,7 @@ sub _ok_map_routes {
         my ($description, $from, $to, $route) = split /\|/;
         my $got = $object->get_shortest_route($from, $to);
         my $expected = _expected_route($object, $route);
-        carp("Failed: $description") unless Compare($got, $expected);
+        return (0, "Failed: $description") unless Compare($got, $expected);
     }
 
     return 1;

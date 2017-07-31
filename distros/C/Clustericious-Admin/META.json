@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,8 +59,7 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "File::HomeDir" : "0.91",
-            "File::HomeDir::Test" : "0",
+            "Test2::Plugin::FauxHomeDir" : "0",
             "Test::Exit" : "0.11",
             "Test::More" : "0.94",
             "Test::Script" : "0",
@@ -81,7 +80,7 @@
          "web" : "https://github.com/clustericious/App-clad"
       }
    },
-   "version" : "1.09",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "1.10",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

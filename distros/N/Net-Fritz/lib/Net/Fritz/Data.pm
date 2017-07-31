@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Data;
 # ABSTRACT: wraps various response data
-$Net::Fritz::Data::VERSION = 'v0.0.8';
+$Net::Fritz::Data::VERSION = 'v0.0.9';
 
 use Scalar::Util qw(blessed);
 
@@ -64,7 +64,7 @@ Net::Fritz::Data - wraps various response data
 
 =head1 VERSION
 
-version v0.0.8
+version v0.0.9
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ services answers.
 
 This wrapper class is also used in some other methods that return
 things that need to be error-checkable, like
-L<Net::Fritz::Device/find_service_names>.
+L<find_service_names|Net::Fritz::Device/find_service_names(regexp)>.
 
 =head1 ATTRIBUTES (read-only)
 

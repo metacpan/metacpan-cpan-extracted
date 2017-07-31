@@ -1,3 +1,8 @@
+0.007   2017-07-28 (PERLANCAR)
+
+	- Add subcommands: deps-phases, deps-rels.
+
+
 0.006   2017-07-10 (PERLANCAR)
 
 	- No functional changes.

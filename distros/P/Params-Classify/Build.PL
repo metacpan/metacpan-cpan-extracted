@@ -30,8 +30,19 @@ Module::Build->subclass(code => q{
 	}
 	sub find_xs_files {
 		my($self) = @_;
-		return {} unless $self->have_c_compiler;
+		return {} unless $self->have_c_compiler &&
+			eval {
+				require ExtUtils::ParseXS;
+				ExtUtils::ParseXS->VERSION(3.30);
+				1;
+			};
 		return $self->SUPER::find_xs_files;
+	}
+	sub compile_xs {
+		my($self, $file, %args) = @_;
+		require ExtUtils::ParseXS;
+		ExtUtils::ParseXS->VERSION(3.30);
+		return $self->SUPER::compile_xs($file, %args);
 	}
 	sub compile_c {
 		my($self, $file, %args) = @_;
@@ -90,7 +101,6 @@ Module::Build->subclass(code => q{
 		"ExtUtils::CBuilder" => "0.15",
 	},
 	build_requires => {
-		"ExtUtils::ParseXS" => "2.2006",
 		"Module::Build" => 0,
 		"Test::More" => 0,
 		"perl" => "5.006001",
@@ -100,6 +110,7 @@ Module::Build->subclass(code => q{
 	build_recommends => {
 		"Devel::CallChecker" => "0.003",
 		"ExtUtils::CBuilder" => "0.15",
+		"ExtUtils::ParseXS" => "3.30",
 	},
 	requires => {
 		"Exporter" => 0,
@@ -116,6 +127,16 @@ Module::Build->subclass(code => q{
 	needs_compiler => 0,
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Params-Classify\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Params-Classify",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

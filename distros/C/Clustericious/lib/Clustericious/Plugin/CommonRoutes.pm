@@ -6,10 +6,10 @@ use 5.010;
 use Mojo::Base 'Mojolicious::Plugin';
 use File::Basename ();
 use Sys::Hostname ();
-use List::MoreUtils ();
+use List::Util qw/ uniq /;
 
 # ABSTRACT: Routes common to all clustericious applications
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 sub register
@@ -123,7 +123,7 @@ sub _dump_api {
       push @all, $class->_dump_api($app, $r->children);
     }
   }
-  return List::MoreUtils::uniq sort @all;
+  return uniq sort @all;
 }
 
 sub _dump_api_table_types
@@ -177,7 +177,7 @@ Clustericious::Plugin::CommonRoutes - Routes common to all clustericious applica
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -264,6 +264,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

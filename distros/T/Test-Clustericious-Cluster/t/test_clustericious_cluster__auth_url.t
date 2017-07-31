@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 use Test::Clustericious::Cluster;
 
 my $cluster = Test::Clustericious::Cluster->new;

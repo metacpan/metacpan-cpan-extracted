@@ -1,7 +1,6 @@
 package Lab::Bus::VICP;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: VICP bus
-$Lab::Bus::VICP::VERSION = '3.553';
+$Lab::Bus::VICP::VERSION = '3.554';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -677,7 +676,7 @@ Lab::Bus::VICP - VICP bus
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our
-$VERSION = 2.105;
+$VERSION = 2.106;
 
 =head1 NAME
 
@@ -53,7 +53,7 @@ sub _result_count_element_specs
 
 sub _result_count_pattern
   {
-  return qr'(\d+)[^0-9a-z]*(r.sultat|objet|annonce)s'i;
+  return qr'(\d+)\s+(?:résultat|objet|annonce)'i;
   } # _result_count_pattern
 
 

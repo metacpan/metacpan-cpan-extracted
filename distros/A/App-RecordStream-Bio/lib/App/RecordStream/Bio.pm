@@ -2,7 +2,7 @@ package App::RecordStream::Bio;
 
 use strict;
 use 5.010;
-our $VERSION = '0.18';
+our $VERSION = '0.23';
 
 # For informational purposes only in the fatpacked file, so it's OK to fail.
 # For now, classes are still under the App::RecordStream::Operation namespace
@@ -52,6 +52,8 @@ them via their command line wrappers within a larger record stream pipeline.
 =head1 TOOLS
 
 L<recs-fromfasta>
+
+L<recs-fromgff3>
 
 L<recs-fromsam>
 
@@ -103,7 +105,7 @@ Thomas Sibley E<lt>trsibley@uw.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2014- Mullins Lab, Department of Microbiology, University of Washington
+Copyright 2014-2017 Mullins Lab, Department of Microbiology, University of Washington
 
 =head1 LICENSE
 

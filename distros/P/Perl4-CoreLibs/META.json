@@ -1,0 +1,88 @@
+{
+   "abstract" : "libraries historically supplied with Perl 4",
+   "author" : [
+      "Brandon S. Allbery",
+      "John Bazik",
+      "Tom Christiansen <tchrist@convex.com>",
+      "Alexandr Ciornii (alexchorny at gmail.com)",
+      "Charles Collins",
+      "Joe Doupnik <JRD@CC.USU.EDU>",
+      "Marion Hakanson <hakanson@cse.ogi.edu>",
+      "Marc Horowitz <marc@mit.edu>",
+      "Waldemar Kebsch <kebsch.pad@nixpbe.UUCP>",
+      "Lee McLoughlin <lmjm@doc.ic.ac.uk>",
+      "<A.Macpherson@bnr.co.uk>",
+      "Dave Rolsky <autarch@urth.org>",
+      "Randal L. Schwartz <merlyn@stonehenge.com>",
+      "Aaron Sherman <asherman@fmrco.com>",
+      "David Sundstrom <sunds@asictest.sc.ti.com>",
+      "Wayne Thompson",
+      "Larry Wall <lwall@jpl-devvax.jpl.nasa.gov>",
+      "Ilya Zakharevich",
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl4-CoreLibs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "IO::Handle" : "0",
+            "Module::Build" : "0.26",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.26",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Getopt::Long" : "0",
+            "IPC::Open2" : "0",
+            "IPC::Open3" : "0",
+            "Socket" : "0",
+            "Text::ParseWords" : "3.25",
+            "Time::Local" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0",
+            "warnings::register" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl4::CoreLibs" : {
+         "file" : "lib/Perl4/CoreLibs.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Perl4-CoreLibs@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl4-CoreLibs"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

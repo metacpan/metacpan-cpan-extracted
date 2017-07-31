@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use MARC::Indexer;
+use MARC::Indexer::Config;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+sub usage;
+
+my ($config_file);
+GetOptions(
+    'c|config=s' => \$config_file,
+    'f|include-file' => sub { do $_[1] },
+) or usage;
+usage if !defined $config_file;
+
+my $config = MARC::Indexer::Config->new($config_file);
+my $indexer = MARC::Indexer->new(
+    %{ $config->parse },
+);
+
+$/ = "\x1d";
+while (defined(my $marc = <STDIN>)) {
+    my $recid = recid(\$marc);
+    my $index = $indexer->index(\$marc);
+    while (my ($key, $vals) = each %$index) {
+        print "$key $_\n" for @$vals;
+    }
+    print "\n";
+}
+
+sub recid {
+    my ($marcref) = @_;
+    pos($$marcref) = 24;
+    while ($$marcref =~ /\G(...)([0-9]{4})([0-9]{5})/gc) {
+        return substr($$marcref, substr($$marcref, 12, 5) + $3, $2 - 1) if $1 eq '001';
+    }
+}
+

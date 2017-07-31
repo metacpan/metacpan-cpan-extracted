@@ -21,13 +21,9 @@ sub CLI ($self) {
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run($opt);
+    my $dist = $self->get_dist;
 
-    return;
-}
-
-sub run ( $self, $opt ) {
-    if ( !$self->dist->par_cfg ) {
+    if ( !$dist->par_cfg ) {
         if ( P->term->prompt( qq[Create PAR profile?], [qw[yes no]], enter => 1 ) eq 'yes' ) {
             require Pcore::Util::File::Tree;
 
@@ -38,7 +34,7 @@ sub run ( $self, $opt ) {
 
             $files->render_tmpl( { main_script => 'main.pl' } );
 
-            $files->write_to( $self->dist->root );
+            $files->write_to( $dist->root );
 
             say q[PAR profile was created. You should edit "par.ini" manually.];
         }
@@ -46,10 +42,12 @@ sub run ( $self, $opt ) {
         return;
     }
     else {
-        $self->dist->build->par( $opt->%* );
+        $dist->build->par( $opt->%* );
 
         return;
     }
+
+    return;
 }
 
 1;
@@ -59,7 +57,7 @@ sub run ( $self, $opt ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 31                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 27                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

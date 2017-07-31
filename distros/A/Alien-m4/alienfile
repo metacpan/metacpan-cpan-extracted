@@ -31,11 +31,11 @@ probe sub {
     return 'system';
   }
   
-  if($^O eq 'MSWin32')
-  {
-    $build->runtime_prop->{my_use_msys} = 1;
-    return 'system';
-  }
+  #if($^O eq 'MSWin32')
+  #{
+  #  $build->runtime_prop->{my_use_msys} = 1;
+  #  return 'system';
+  #}
   
   return 'share';
 };
@@ -70,16 +70,16 @@ if($^O eq 'MSWin32')
 
     gather sub {
       my($build) = @_;
-      if($build->runtime_prop->{my_use_msys})
-      {
-        my $m4 = $build->runtime_prop->{command} = Path::Tiny->new(Alien::MSYS::msys_path())->child('m4.exe')->stringify;
-        my @stdout = `$m4 --version`;
-        $build->runtime_prop->{version} = 
-          defined $stdout[0] && $stdout[0] =~ /^m4/ && $stdout[0] =~ /([0-9\.]+)$/
-            ? $1
-            : 'unknown';
-        
-      }
+      #if($build->runtime_prop->{my_use_msys})
+      #{
+      #  my $m4 = $build->runtime_prop->{command} = Path::Tiny->new(Alien::MSYS::msys_path())->child('m4.exe')->stringify;
+      #  my @stdout = `$m4 --version`;
+      #  $build->runtime_prop->{version} = 
+      #    defined $stdout[0] && $stdout[0] =~ /^m4/ && $stdout[0] =~ /([0-9\.]+)$/
+      #      ? $1
+      #      : 'unknown';
+      #  
+      #}
     };
 
   };

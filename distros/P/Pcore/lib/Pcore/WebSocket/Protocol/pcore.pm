@@ -1,7 +1,7 @@
 package Pcore::WebSocket::Protocol::pcore;
 
 use Pcore -class, -result, -const;
-use JSON::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
+use Cpanel::JSON::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 use CBOR::XS qw[];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::WebSocket::Protocol::pcore::Request;
@@ -43,7 +43,7 @@ my $CBOR = do {
 };
 
 my $JSON = do {
-    my $json = JSON::XS->new;
+    my $json = Cpanel::JSON::XS->new;
 
     $json->utf8(1);
     $json->allow_nonref(1);    # allow scalars

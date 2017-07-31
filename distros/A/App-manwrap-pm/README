@@ -2,8 +2,8 @@ NAME
     App::manwrap::pm - man + Perl stuffs
 
 VERSION
-    This document describes version 0.002 of App::manwrap::pm (from Perl
-    distribution App-manwrap-pm), released on 2017-07-10.
+    This document describes version 0.004 of App::manwrap::pm (from Perl
+    distribution App-manwrap-pm), released on 2017-07-29.
 
 SYNOPSIS
     See manwrap-pm included in this distribution.

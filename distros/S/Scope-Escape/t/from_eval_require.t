@@ -15,6 +15,7 @@ $SIG{__DIE__} = sub {
 	$e =~ s/ at [^\n]*//;
 	die $e;
 };
+unshift @INC, "./t/lib";
 
 sub aa(@) {
 	push @events, [ "aa0", Scope::Escape::Continuation::wantarray($cont),

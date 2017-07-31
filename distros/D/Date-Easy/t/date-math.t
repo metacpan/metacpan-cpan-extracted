@@ -4,6 +4,7 @@ use Date::Easy;
 
 
 my $FMT = '%m/%d/%Y';
+my $CLASS = 'Date::Easy::Date';
 
 
 # simple math stuff first
@@ -12,11 +13,11 @@ my $d = date("2001-01-04");
 is $d->strftime($FMT), '01/04/2001', 'sanity check: base date';
 
 my $d2 = $d + 1;
-isa_ok $d2, 'Date::Easy::Date', 'object after addition';
+isa_ok $d2, $CLASS, 'object after addition' or diag('    isa ', ref $d2);
 is $d2->strftime($FMT), '01/05/2001', 'simple addition test';
 
 $d2 = $d - 1;
-isa_ok $d2, 'Date::Easy::Date', 'object after subtraction';
+isa_ok $d2, $CLASS, 'object after subtraction' or diag('    isa ', ref $d2);
 is $d2->strftime($FMT), '01/03/2001', 'simple subtraction test';
 
 
@@ -47,16 +48,45 @@ is $d2->second, 0, "time remains zero after crossing DST (sub, sec)";
 
 
 # type checks for things
-isa_ok $d  + 1, 'Date::Easy::Date', 'addition result';
-isa_ok $d2 - 5, 'Date::Easy::Date', 'subtraction result';
+isa_ok $d  + 1, $CLASS, 'addition result';
+isa_ok $d2 - 5, $CLASS, 'subtraction result';
 
 
 # adding months is, obviously harder
 
 $d2 = $d->add_months(2);
+isa_ok $d2, $CLASS, 'add_months result' or diag('    isa ', ref $d2);
 is $d2->strftime($FMT), '03/04/2001', 'month addition';
 $d2 = $d->add_months(-2);
 is $d2->strftime($FMT), '11/04/2000', 'month subtraction';
+
+
+# adding years is not quite as bad
+# just make sure we cross at least one leap year boundary
+
+$d2 = $d->add_years(12);
+isa_ok $d2, $CLASS, 'add_years result' or diag('    isa ', ref $d2);
+is $d2->strftime($FMT), '01/04/2013', 'year addition';
+$d2 = $d->add_years(-3);
+is $d2->strftime($FMT), '01/04/1998', 'year subtraction';
+
+
+# for adding and subtracting days and weeks,
+# we can just test against adding the equivalent integers
+# (since we've already established that that part works)
+for (0..120)					# just for consistency with the datetime tests, really
+{
+	is $d->add_days($_),    	$d + $_,		"adding $_ days works";
+	is $d->add_weeks($_),   	$d + $_ * 7,	"adding $_ weeks works";
+
+	is $d->subtract_days($_),	$d - $_,		"subtracting $_ days works";
+	is $d->subtract_weeks($_),	$d - $_ * 7,	"subtracting $_ weeks works";
+}
+
+# on the other hand, you *can't* add or subtract hours, minutes, or seconds
+# because that would break the contract of dates always having a time component of midnight
+throws_ok { $d->$_ } qr/cannot call $_ on a Date value/, "::Date properly disallows $_"
+		foreach map { ("add_$_", "subtract_$_") } qw< seconds minutes hours >;
 
 
 done_testing;

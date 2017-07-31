@@ -1,10 +1,12 @@
-#package main;
+#PODNAME: Lab::XPRESS::Utilities
+#ABSTRACT: Global utility functions for XPRESS
+
+#note: this is no "package"
 
 use Term::ReadKey;
 use Time::HiRes qw/usleep/, qw/time/;
 
-
-# collection of some usefull subroutines:
+# collection of some useful subroutines:
 
 sub my_sleep {
     my $sleeptime    = shift;
@@ -133,3 +135,32 @@ sub seconds2time {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::XPRESS::Utilities - Global utility functions for XPRESS
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Stefan Geissler
+            2013       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,4 +1,5 @@
 
+
 =encoding UTF-8
 
 =head1 NAME
@@ -7,10 +8,20 @@ IP::China - decide whether an internet address is from China
 
 =head1 SYNOPSIS
 
+    
+    use utf8;
     use IP::China 'chinese_ip';
     if (chinese_ip ('127.0.0.1')) {
         print '你好';
     }
+
+
+=head1 VERSION
+
+This documents IP::China version 20170704
+corresponding to git commit L<72e6c5fac49cb99a8f4052ecff15d513047c4453|https://github.com/benkasminbullock/chinese-ip/commit/72e6c5fac49cb99a8f4052ecff15d513047c4453> released on Sun Jul 30 15:30:33 2017 +0900. 
+
+This module incorporates the MaxMind GeoLite data of date 20170704 (YYYYMMDD).
 
 =head1 DESCRIPTION
 
@@ -31,9 +42,8 @@ is from China, and a false value (0) if the address is not from China.
 =head1 UPDATES
 
 The module will be periodically updated. Allocated addresses for China
-may change. The script to build updates is included in the git
-repository for this distribution. Please refer to F<Makefile.PL> for
-the git repository URL.
+may change. The script to build updates is included in L<the git
+repository|https://github.com/benkasminbullock/chinese-ip> for this distribution.
 
 The script also includes some errata for the MaxMind list.
 
@@ -73,7 +83,7 @@ Licence.
 =head2 DATA COPYRIGHT
 
 This product includes GeoLite data created by MaxMind, available from
-http://www.maxmind.com. The GeoLite databases are distributed under
+L<http://www.maxmind.com>. The GeoLite databases are distributed under
 the Creative Commons Attribution-ShareAlike 3.0 Unported License. The
 GeoLite data is in the file F<block-china-data.c> of the distribution.
 

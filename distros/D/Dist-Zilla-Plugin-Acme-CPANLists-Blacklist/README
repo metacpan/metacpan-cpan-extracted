@@ -1,30 +1,40 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Acme::CPANLists::Blacklist - Blacklist prereqs
+    using a CPANList module/author list
 
+VERSION
+    This document describes version 0.04 of
+    Dist::Zilla::Plugin::Acme::CPANLists::Blacklist (from Perl distribution
+    Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-28.
+
+SYNOPSIS
     In dist.ini:
 
      [Acme::CPANLists::Blacklist]
      module_list=PERLANCAR::Modules I'm avoiding
 
-    During build, if there is a prereq to a module listed in the above
-    list, the build process will be aborted.
+    During build, if there is a prereq to a module listed in the above list,
+    the build process will be aborted.
+
+    Currently prereqs with custom phase (/^x_/) or custom relationship are
+    ignored.
 
 DESCRIPTION
-
-    Acme::CPANLists::* modules contains various author lists and module
-    lists. With this plugin, you can specify a blacklist to modules in
-    those lists.
+    "Acme::CPANLists::*" modules contains various author lists and module
+    lists. With this plugin, you can specify a blacklist to modules in those
+    lists.
 
     If you specify a module list, e.g.:
 
      module_list=SomeNamespace::some name
 
-    then a module called Acme::CPANLists::SomeNamespace will be loaded, and
-    some name will be searched inside its @Module_Lists variable. If a list
-    with such name is found, then all modules listed in that list will be
-    added to the blacklist. (Otherwise, an error will be thrown if the list
-    is not found.)
+    then a module called "Acme::CPANLists::SomeNamespace" will be loaded,
+    and "some name" will be searched inside its @Module_Lists variable. If a
+    list with such name is found, then all modules listed in that list will
+    be added to the blacklist. (Otherwise, an error will be thrown if the
+    list is not found.)
 
-    To specify more lists, add more module_list= lines.
+    To specify more lists, add more "module_list=" lines.
 
     Later in the build, when a prereq is specified against one of the
     blacklisted modules, an error message will be thrown and the build
@@ -36,7 +46,7 @@ DESCRIPTION
      [Acme::CPANLists::Whitelist]
      module=Log::Any
 
-    To whitelist more modules, add more module= lines.
+    To whitelist more modules, add more "module=" lines.
 
     You can also specify an author list, e.g.:
 
@@ -53,9 +63,35 @@ DESCRIPTION
      [Acme::CPANLists::Whitelist]
      author=PERLANCAR
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Acme-CPANLists-Blacklist
+    >.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Acme-CPANLists-Blac
+    klist>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Acm
+    e-CPANLists-Blacklist>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Acme::CPANLists
 
-    Acme::CPANLists::* modules
+    "Acme::CPANLists::*" modules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

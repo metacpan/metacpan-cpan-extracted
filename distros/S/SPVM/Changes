@@ -1,3 +1,50 @@
+0.0234 2017-07-29
+  - rename malloc to new. you can also define new function for object initialization.
+    my $obj = new Foo;
+    my $obj = Foo::new(3);
+    package Foo {
+      sub new($var1 : int) {
+        
+        # ...
+        
+        return new Foo;
+      }
+    }
+  - object's fields are initialized by zero.
+    
+0.0233 2017-07-28
+  - support package template.
+  - support over 4G memory allocation
+0.0232 2017-07-26
+  - add len keyword to get array length
+    reason is that
+    foo(@$nums) looks like passing array itself, not array length.
+    you can use len keyword for readability.
+    foo(len $nums);
+  - Fix bug that error occur when near small base_object_max_byte_size_use_memory_pool is malloced
+0.0231 2017-07-25
+  - Fix clang compile error
+0.0230 2017-07-25
+  - Fix POSIX function import bug
+  - Package name must be start with upper case. Lowercase is reserved for core package.
+  - Add SPVM/stdout.pm as Perl module
+0.0229 2017-07-25
+  - support array initialization
+    my $nums = [1, 2, 3];
+  - fix memory breaking bug when object is assigned from freelist
+0.0228 2017-07-22
+  - fix enum constant bug
+  - support float enum
+  - support double enum
+0.0227 2017-07-21
+  - fix tests bug
+0.0226 2017-07-20
+  - fix float convertion bugs
+  - fix convert double to short bug
+  - fix floating number which don't have point(for example, 346638529e+38) parsing bug.
+  - rename std package to stdout
+  - fix enum default type. Correct type is int.
+  - fix enum { FOO = 1 } syntax. 
 0.0225 2017-07-19
   - add SPVM::Array::Byte::get_elements method
   - add SPVM::Array::Short::get_elements method
@@ -92,5 +139,5 @@
   - fix memset 0 bug
 0.02 2017-06-20
   - improve XS type convertion logic
-0.01 2017-06-17
+0.01 2017-06-17(DEVELOPMENT RELEASE
 	- Fisrt development release

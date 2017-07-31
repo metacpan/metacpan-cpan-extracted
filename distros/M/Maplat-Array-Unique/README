@@ -1,0 +1,32 @@
+Maplat-Array-Unique
+===================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+  use Maplat::Array::Unique;
+
+  my @myarray = qw[one two one three];
+
+  unique(\@myarray);
+
+  # @myarray now equals qw[one three two]
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Rene Schickbauer cavac@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

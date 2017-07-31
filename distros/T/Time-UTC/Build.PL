@@ -27,9 +27,9 @@ Module::Build->subclass(code => q{
 		"Carp" => 0,
 		"Digest::SHA1" => 0,
 		"Exporter" => 0,
-		"HTTP::Tiny" => "0.016",
 		"Math::BigRat" => "0.13",
-		"Net::FTP" => "1.21",
+		"Net::FTP::Tiny" => "0.001",
+		"Net::HTTP::Tiny" => "0.001",
 		"Time::Unix" => "1.02",
 		"constant" => 0,
 		"integer" => 0,
@@ -40,8 +40,17 @@ Module::Build->subclass(code => q{
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Time-UTC\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Time-UTC",
+			},
+		},
+	},
 	test_types => { author => ".at" },
-	create_makefile_pl => "passthrough",
 	sign => 1,
 )->create_build_script;
 

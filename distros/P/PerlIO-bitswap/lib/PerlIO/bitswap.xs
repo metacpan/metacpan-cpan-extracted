@@ -4,6 +4,10 @@
 #include "XSUB.h"
 #include "perliol.h"
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef PERL_UNUSED_ARG
 # define PERL_UNUSED_ARG(x) PERL_UNUSED_VAR(x)
 #endif /* !PERL_UNUSED_ARG */
@@ -161,9 +165,9 @@ static IV PerlIObitswap_popped(pTHX_ PerlIO *f)
 static SV *PerlIObitswap_getarg(pTHX_ PerlIO *f, CLONE_PARAMS *param, int flags)
 {
 	struct PerlIObitswap *bs = PerlIOSelf(f, struct PerlIObitswap);
+	U32 swaps = bs->octetswaps << 3;
 	PERL_UNUSED_ARG(param);
 	PERL_UNUSED_ARG(flags);
-	U32 swaps = bs->octetswaps << 3;
 	if(bs->bitswap_table) {
 		U8 s = bs->bitswap_table[1];
 		if(s & 0xf0) swaps |= 4;
@@ -346,7 +350,7 @@ static Off_t PerlIObitswap_tell(pTHX_ PerlIO *f)
 static IV PerlIObitswap_close(pTHX_ PerlIO *f)
 {
 	struct PerlIObitswap *bs = PerlIOSelf(f, struct PerlIObitswap);
-	bool eio = !!(bs->bufflags & BUFFLAG_WRITING);
+	bool eio = cBOOL(bs->bufflags & BUFFLAG_WRITING);
 	IV result = PerlIOBase_close(aTHX_ f);
 	if(result == 0 && eio) {
 		errno = EIO;

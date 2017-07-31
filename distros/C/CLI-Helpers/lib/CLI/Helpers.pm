@@ -1,26 +1,28 @@
 # ABSTRACT: Subroutines for making simple command line scripts
 package CLI::Helpers;
 
-our $VERSION = '1.2'; # VERSION
-
-our $_OPTIONS_PARSED;
-
 use strict;
 use warnings;
 
 use File::Basename;
 use Getopt::Long qw(:config pass_through);
 use IPC::Run3;
+use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Sys::Syslog qw(:standard);
 use Term::ANSIColor 2.01 qw(color colored colorstrip);
 use Term::ReadKey;
 use Term::ReadLine;
 use YAML;
 
+our $VERSION = '1.3'; # VERSION
+
+our $_OPTIONS_PARSED;
+
+
 { # Work-around for CPAN Smoke Test Failure
     # Details: http://perldoc.perl.org/5.8.9/Term/ReadLine.html#CAVEATS
-    open( my $FH, "/dev/tty" )
-        or eval 'sub Term::ReadLine::findConsole { ("&STDIN", "&STDERR") }';
+    open( my $FH, '<', "/dev/tty" )
+        or eval { sub Term::ReadLine::findConsole { ("&STDIN", "&STDERR") } };
     die $@ if $@;
     close $FH;
 } # End Work-around
@@ -142,7 +144,7 @@ sub colorize {
 
 
 sub output {
-    my $opts = ref $_[0] eq 'HASH' ? shift @_ : {};
+    my $opts = is_hashref($_[0]) ? shift @_ : {};
 
     # Return unless we have something to work with;
     return unless @_;
@@ -222,7 +224,7 @@ sub output {
 
 
 sub verbose {
-    my $opts = ref $_[0] eq 'HASH' ? shift @_ : {};
+    my $opts = is_hashref($_[0]) ? shift @_ : {};
     $opts->{level} = 1 unless exists $opts->{level};
     $opts->{syslog_level} = $opts->{level} > 1 ? 'debug' : 'info';
     my @msgs=@_;
@@ -235,7 +237,7 @@ sub verbose {
 
 
 sub debug {
-    my $opts = ref $_[0] eq 'HASH' ? shift @_ : {};
+    my $opts = is_hashref($_[0]) ? shift @_ : {};
     my @msgs=@_;
 
     # Smarter handling of debug output
@@ -261,7 +263,7 @@ sub debug_var {
         _caller_package => (caller)[0],     # Make sure this is set on entry
     };
     # Merge with options
-    if( ref $_[0] eq 'HASH' && defined $_[1] && ref $_[1] ) {
+    if( is_hashref($_[0]) && defined $_[1] && is_ref($_[1]) ) {
         my $ref = shift;
         foreach my $k (keys %{ $ref } ) {
             $opts->{$k} = $ref->{$k};
@@ -367,10 +369,10 @@ sub menu {
     $TERM ||= Term::ReadLine->new($0);
 
     # Determine how to handle this list
-    if( ref $opts eq 'ARRAY' ) {
+    if( is_arrayref($opts) ) {
         %desc = map { $_ => $_ } @{ $opts };
     }
-    elsif( ref $opts eq 'HASH' ) {
+    elsif( is_hashref($opts) ) {
         %desc = %{ $opts };
     }
     my $OUT = $TERM->OUT || \*STDOUT;
@@ -444,7 +446,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -749,7 +751,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Brad Lhotsky.
+This software is Copyright (c) 2017 by Brad Lhotsky.
 
 This is free software, licensed under:
 

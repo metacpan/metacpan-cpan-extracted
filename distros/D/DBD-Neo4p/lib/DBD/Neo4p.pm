@@ -8,7 +8,7 @@ require DBI;
 no warnings qw/once/;
 
 BEGIN {
- $DBD::Neo4p::VERSION = '0.1003';
+ $DBD::Neo4p::VERSION = '0.1004';
 }
 
 our $err = 0;               # holds error code   for DBI::err
@@ -210,7 +210,9 @@ sub rollback ($) {
 
 sub ping {
   my $dbh = shift;
-  my $sth = $dbh->prepare('START a=node(*) RETURN a LIMIT 1') or return 0;
+  my $s = ($dbh->neo_neo4j_version =~ /^3\.0/ ? 'match (a) return a limit 1' :
+	     'return 1');
+  my $sth = $dbh->prepare($s) or return 0;
   $sth->execute or return 0;
   $sth->finish;
   return 1;
@@ -229,11 +231,11 @@ sub neo_neo4j_version {
 
 sub table_info ($) {
     my($dbh) = @_;
-#-->> Change
+# -->> Change
     my ($raTables, $raName) = (undef, undef);
-#<<-- Change
+# <<-- Change
     return undef unless $raTables;
-#2. create DBD::Sponge driver
+# 2. create DBD::Sponge driver
     my $dbh2 = $dbh->{'_sponge_driver'};
     if (!$dbh2) {
         $dbh2 = $dbh->{'_sponge_driver'} = DBI->connect("DBI:Sponge:");
@@ -451,6 +453,8 @@ sub rows ($) {
 
 sub finish ($) {
   my ($sth) = @_;
+  $sth->{"${prefix}_query_obj"}->finish()
+    if (defined($sth->{"${prefix}_query_obj"}));
   $sth->{"${prefix}_query_obj"} = undef;
   $sth->STORE(Active => 0);
   $sth->SUPER::finish();

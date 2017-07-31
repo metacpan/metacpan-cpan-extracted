@@ -1,15 +1,13 @@
 use strict;
 use warnings;
+
 use Module::Runtime qw(use_module);
 use Test::More import => ['!pass'];
 use Data::Dumper;
 use HTTP::Request::Common;
 use Plack::Test;
 
-plan skip_all => "JSON is needed for this test"
-    unless use_module('JSON');
-plan skip_all => "YAML is needed for this test"
-    unless use_module('YAML');
+use Test::Requires qw/ JSON YAML /;
 
 my $data = { foo => 42 };
 my $json = JSON::encode_json($data);
@@ -55,15 +53,26 @@ my @tests = (
         response => $yaml,
     },
     {
+        path => '/foo.yaml',
+        content_type => qr'text/x-yaml',
+        response => $yaml,
+    },
+    {
         path => '/',
         content_type => qr'text/html',
         response => 'root',
     },
 );
 
-plan tests => scalar(@tests) * 2;
+plan tests => scalar @tests;
 
 for my $test ( @tests ) {
+    subtest $test->{content_type} => \&testcase, $test;
+}
+
+sub testcase {
+    my $test = shift;
+
     my $response = $plack_test->request( GET $test->{path} );
 
     like($response->header('Content-Type'),

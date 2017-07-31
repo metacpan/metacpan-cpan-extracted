@@ -1,5 +1,57 @@
 Revision history for Alien-Build
 
+0.75      2017-07-26 11:30:11 -0400
+  - Disable C++ Test::Alien test on production releases
+    C++ in Test::Alien is considered experimental and the
+    test has been intermitently causing a hard fail.
+    Until the issue is resolved the test will only run on
+    development releases
+
+0.74      2017-07-25 06:52:43 -0400
+  - Add alien_build_ok to Test::Alien::Build
+  - Enable Alien::Base::Dino compatibility in Test::Alien
+
+0.73      2017-07-24 07:19:49 -0400
+  - Fetch::FTP plugin will not attempt FTP transfer with non-FTP URLs
+  - Otherwise production release mostly identical with 0.72_01 release
+
+0.72_01   2017-07-22 07:36:35 -0400
+  - Marking C++ support in Test::Alien as EXPERIMENTAL
+    (it seems to be unreliable on MSWin32, possibly others)
+  - Fixed Extract::CommandLine probe of tar command to see if it
+    can handle tar.gz, tar.bz2, tar.xz (feature introduced in
+    0.69_01).
+  - Extract::CommandLine fallback on ptar if bsdtar or tar are
+    not available.
+  - Add Fetch::LocalDir plugin
+  - Add tmp flag for local files to avoid copies
+
+0.71_01   2017-07-21 15:07:32 -0400
+  - Improve Alien::Autotools support by updating ACLOCAL_PATH
+    when you requires 'Alien::Autotools';
+  - Add cbuilder_compile option to Test::Alien xs_ok function
+  - Add cbuilder_link option to Test::Alien xs_ok function
+  - Add cpp option to Test::Alien xs_ok function
+  - Add C++ option to Test::Alien xs_ok function
+
+0.70_01   2017-07-21 07:23:04 -0400
+  - (Alien::Build::MM) Fix race condition with parallel make (GH#24)
+
+0.69_01   2017-07-20 12:17:12 -0400
+  - Allow Alien::Build or Alien::Base as requires in alienfile.
+  - Fix warnings that sometimes come from Build::SearchDep plugin
+  - Extract::CommandLine tests to see if tar can handle tar.gz, tar.bz2, tar.xz
+    to avoid needing Alien::gzip, Alien::bzip2 or Alien::xz
+
+0.68_01   2017-07-19 08:54:58 -0400
+  - ALIEN_BUILD_PKG_CONFIG can be used to override the PkgConfig::Negotiate
+    logic.
+  - Extra diagnostics for PkgConfig::PP failure in gather stage
+
+0.67_01   2017-07-18 13:52:56 -0400
+  - Merged Alien-Base and Alien-Build.  For the old Test-Alien change log
+    see Changes.Alien-Base
+
 0.66      2017-07-17 02:46:11 -0400
   - Fix cmake helper.
 

@@ -1,7 +1,7 @@
 package App::EvalServerAdvanced;
 
 use strict;
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use App::EvalServerAdvanced::Sandbox;
 use IO::Async::Loop;
@@ -64,77 +64,80 @@ method init() {
         on_write_eof => sub {debug "write_eof"; $close_session->()},
 
         on_read => method ($buffref, $eof) {
-          my ($res, $message, $newbuf) = eval{decode_message($$buffref)};
-          debug sprintf("packet decode %d %d %d: %d", $res, length($message//''), length($newbuf//''), $eof);
+          my ($res, $message, $newbuf); 
+          do { # decode as many packets as we can
+            ($res, $message, $newbuf) = eval{decode_message($$buffref)};
+            debug sprintf("packet decode %d %d %d: %d", $res, length($message//''), length($newbuf//''), $eof);
 
-          # We had an error when decoding the incoming packets, tell them and close the connection.
-          if ($@) {
-            debug "Session error, decoding packet. $@";
-            my $message = encode_message(warning => {message => $@});
-            $stream->write($message);
-            $close_session->();
-            $stream->close_when_empty();
-          }
+            # We had an error when decoding the incoming packets, tell them and close the connection.
+            if ($@) {
+              debug "Session error, decoding packet. $@";
+              my $message = encode_message(warning => {message => $@});
+              $stream->write($message);
+              $close_session->();
+              $stream->close_when_empty();
+            }
 
-          if ($res) {
-            $$buffref = $newbuf;
+            if ($res) {
+              $$buffref = $newbuf;
 
-            if ($message->isa("App::EvalServerAdvanced::Protocol::Eval")) {
-              my $sequence = $message->sequence;
-              my $out_encoding = eval {$message->encoding} // "utf8";
-              try {  
-                my $prio = ($message->prio->has_pr_deadline ? "deadline" :
-                           ($message->prio->has_pr_batch    ? "batch" : "realtime"));
+              if ($message->isa("App::EvalServerAdvanced::Protocol::Eval")) {
+                my $sequence = $message->sequence;
+                my $out_encoding = eval {$message->encoding} // "utf8";
+                try {  
+                  my $prio = ($message->prio->has_pr_deadline ? "deadline" :
+                             ($message->prio->has_pr_batch    ? "batch" : "realtime"));
 
-                my $evalobj = {
-                  files => $message->{files},
-                  priority => $prio,
-                  language => $message->language,
-                };
+                  my $evalobj = {
+                    files => $message->{files},
+                    priority => $prio,
+                    language => $message->language,
+                  };
 
-                debug Dumper($evalobj);
+                  debug Dumper($evalobj);
 
-                if ($prio eq 'deadline') {
-                  $evalobj->{priority_deadline} = $message->prio->pr_deadline->milliseconds;  
-                };
+                  if ($prio eq 'deadline') {
+                    $evalobj->{priority_deadline} = $message->prio->pr_deadline->milliseconds;  
+                  };
 
-                my $job = $es_self->jobman->add_job($evalobj);
-                my $future = $job->{future};
-                debug "Got job and future";
+                  my $job = $es_self->jobman->add_job($evalobj);
+                  my $future = $job->{future};
+                  debug "Got job and future";
 
-                # Log the job for the session. Cancel any in progress with the same sequence.
-                if ($es_self->sessions->{$session_id}{jobs}{$sequence}) {
-                  my $job = $self->sessions->{$session_id}{jobs}{$sequence};
-                  
-                  $job->{future}->fail("Session ended") unless $job->{future}->is_ready;
-                  $job->{canceled} = 1; # Mark them as canceled
+                  # Log the job for the session. Cancel any in progress with the same sequence.
+                  if ($es_self->sessions->{$session_id}{jobs}{$sequence}) {
+                    my $job = $self->sessions->{$session_id}{jobs}{$sequence};
+                    
+                    $job->{future}->fail("Session ended") unless $job->{future}->is_ready;
+                    $job->{canceled} = 1; # Mark them as canceled
 
-                  delete $es_self->sessions->{$session_id}{jobs}{$sequence};
-                }
-                $es_self->sessions->{$session_id}{jobs}{$sequence} = $job;
-                
-                $future->on_ready(fun ($future) {
-                  my $output = eval {$future->get()};
-                  if ($@) {
-                    my $response = encode_message(warning => {message => "$@", sequence => $sequence, encoding => $out_encoding });
-                    $stream->write($response);
-                  } else {
-                    my $response = encode_message(response => {sequence => $sequence, contents => $output, encoding => $out_encoding});
-                    $stream->write($response);
+                    delete $es_self->sessions->{$session_id}{jobs}{$sequence};
                   }
+                  $es_self->sessions->{$session_id}{jobs}{$sequence} = $job;
+                  
+                  $future->on_ready(fun ($future) {
+                    my $output = eval {$future->get()};
+                    if ($@) {
+                      my $response = encode_message(warning => {message => "$@", sequence => $sequence, encoding => $out_encoding });
+                      $stream->write($response);
+                    } else {
+                      my $response = encode_message(response => {sequence => $sequence, contents => $output, encoding => $out_encoding});
+                      $stream->write($response);
+                    }
 
-                  delete $es_self->sessions->{$session_id}{jobs}{$sequence}; # get rid of the references, so we don't leak
-                });
-              } catch {
-                my $response = encode_message(warning => {message => "Something went wrong during decoding: $@", encoding => $out_encoding, sequence => $sequence});
+                    delete $es_self->sessions->{$session_id}{jobs}{$sequence}; # get rid of the references, so we don't leak
+                  });
+                } catch {
+                  my $response = encode_message(warning => {message => "Something went wrong during decoding: $@", encoding => $out_encoding, sequence => $sequence});
+                  $stream->write($response);
+                }
+              } else {
+                my $response = encode_message(warning => {message => "Got unhandled packet type, ". ref($message), encoding => "utf8"});
                 $stream->write($response);
               }
-            } else {
-              my $response = encode_message(warning => {message => "Got unhandled packet type, ". ref($message), encoding => "utf8"});
-              $stream->write($response);
             }
-          }
-
+          } while($res);
+          
           return 0;
         }
       );

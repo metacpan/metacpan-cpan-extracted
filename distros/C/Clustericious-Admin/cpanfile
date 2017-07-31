@@ -14,8 +14,7 @@ on 'build' => sub {
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
-  requires "File::HomeDir" => "0.91";
-  requires "File::HomeDir::Test" => "0";
+  requires "Test2::Plugin::FauxHomeDir" => "0";
   requires "Test::Exit" => "0.11";
   requires "Test::More" => "0.94";
   requires "Test::Script" => "0";

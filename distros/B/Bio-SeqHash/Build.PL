@@ -18,7 +18,7 @@ my %module_build_args = (
     "Yan Xueqing <yanxueqing621\@163.com>"
   ],
   "dist_name" => "Bio-SeqHash",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.1.3",
   "license" => "perl",
   "module_name" => "Bio::SeqHash",
   "recursive_test_files" => 1,

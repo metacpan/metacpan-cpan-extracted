@@ -13,14 +13,15 @@ use warnings;
 use Math::BigInt ();
 use Moo;
 use namespace::clean;
-use List::Util qw(sum0);
+use List::Util 1.26 qw(sum0);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 with 'MooX::Rebuild';
 
-has next => ( is => 'rw', );
+has _next => ( is => 'rw', );
+has prev => ( is => 'rw', weak_ref => 1 );
 
 has set => (
     is     => 'rw',
@@ -92,6 +93,17 @@ sub levels {
     return $count;
 }
 
+sub next {
+    my ( $self, $next ) = @_;
+    if ( defined $next ) {
+        $self->_next($next);
+        $next->prev($self);
+        return $self;
+    } else {
+        return $self->_next;
+    }
+}
+
 sub recurse {
     my ( $self, $callback, $extra ) = @_;
     my $bf = $self->beatfactor;
@@ -99,7 +111,8 @@ sub recurse {
 }
 
 sub _recurse {
-    my ( $rset, $callback, $extra, $totaltime, $level, $audible_level ) = @_;
+    my ( $rset, $callback, $extra, $totaltime, $level, $audible_level, @beats ) =
+      @_;
     my %param = ( level => $level, audible_level => $audible_level );
     for my $p (qw/next set/) {
         $param{$p} = $rset->$p;
@@ -112,11 +125,12 @@ sub _recurse {
         $param{index}    = $n;
         $param{duration} = int( $unittime * $param{beat} );
         if ( !$sil ) {
-            $callback->( $rset, \%param, $extra );
+            $callback->( $rset, \%param, $extra, @beats, $param{beat} );
         }
-        _recurse( $param{next}, $callback, $extra, $param{duration}, $level + 1,
-            $audible_level )
-          if defined $param{next};
+        if ( defined $param{next} ) {
+            _recurse( $param{next}, $callback, $extra, $param{duration}, $level + 1,
+                $audible_level, @beats, $param{beat} );
+        }
     }
 }
 
@@ -147,6 +161,7 @@ Music::RecRhythm - rhythms within rhythms within rhythms
   $one->is_silent(1);       # silent (but present)
 
   $one->next($two);         # link for recursion
+  $two->prev;               # now returns $one
 
   $one->recurse( sub { ... } );
 
@@ -189,6 +204,12 @@ C<Music::RecRhythm> object, any object that supports the necessary
 method calls could be used. Recursion will stop should this attribute be
 C<undef> (the default). Probably should not be changed in the middle of
 a B<recurse> call.
+
+Calls B<prev> in the given object to setup a bi-directional chain.
+
+=item B<prev>
+
+Previous object, if any. Will be automatically set by a B<next> call.
 
 =item B<set>
 
@@ -233,11 +254,30 @@ Iterates the beats of the B<set> and recurses through every B<next> for
 each beat, calling the I<coderef> unless B<is_silent> is true for the
 object. I<extra> gets passed along to the callback I<coderef>.
 
-The I<coderef> is passed three arguments. First, the C<Music::RecRhythm>
-object, second, a hash reference containing various parameters (listed
-below) and finally I<extra>, a scalar that can be whatever you want it
-to be (reference, object, whatever). The parameters, which are read-
-write (though probably should not be changed on the fly), include:
+See L</CALLBACK> for the arguments the callback sub will be passed.
+
+=item B<validate_set> I<set>
+
+Class method. Checks whether a B<set> really is a list of positive
+numbers (the C<int> truncation is done elsewhere). The empty set is not
+allowed. Used internally by the B<set> attribute.
+
+  Music::RecRhythm->validate_set("cat")      # 0
+  Music::RecRhythm->validate_set([qw/1 2/])  # 1
+
+=back
+
+=head1 CALLBACK
+
+The I<coderef> called during B<recurse> is passed four or more
+arguments. First, the C<Music::RecRhythm> object, second, a hash
+reference containing various parameters (listed below), third, I<extra>,
+a scalar that can be whatever you want it to be (reference, object,
+whatever) and fourth a list of the durations of the recursion stack
+where the last element of that list is the current C<$param{beat}>.
+
+The parameters passed as the second argument (which are read-write
+(though probably should not be changed on the fly)) include:
 
 =over 4
 
@@ -263,7 +303,7 @@ Index of the current beat in the I<set>, numbered from 0 on up.
 =item I<level>
 
 Level of recursion, C<0> for the first level, C<1> for the second, and
-so forth. The level numbers will have gaps if B<is_silent> is set, see
+so forth. The level numbers will have gaps if B<is_silent> is set. See
 I<audible_level> if that is a problem.
 
 =item I<next>
@@ -278,16 +318,8 @@ I<beat> is the current at index I<index>.
 
 =back
 
-=item B<validate_set> I<set>
-
-Class method. Checks whether a B<set> really is a list of positive
-numbers (the C<int> truncation is done elsewhere). The empty set is not
-allowed. Used internally by the B<set> attribute.
-
-  Music::RecRhythm->validate_set("cat")      # 0
-  Music::RecRhythm->validate_set([qw/1 2/])  # 1
-
-=back
+There are, again, example callbacks in the C<eg/> and C<t/>
+directory code.
 
 =head1 BUGS
 
@@ -324,6 +356,12 @@ detection somehow (or don't create loops via B<next> calls, sheesh!)).
 B<next> should be checked via C<isa> or somesuch to audit that passed
 objects are suitable to be used in B<beatfactor> and B<recurse>.
 
+=item *
+
+B<prev> is primitive and may have problems on object destruction; this
+is an unknown as my scripts that use this module exit the entire perl
+process when they are done.
+
 =back
 
 =head1 SEE ALSO
@@ -332,13 +370,18 @@ L<MIDI> or L<MIDI::Simple> may assist in the callback code to produce
 MIDI during the recursion. Consult the C<eg/> and C<t/> directories
 under this module's distribution for example code.
 
+L<Music::Voss> is a similar if different means of changing a rhythm
+over time.
+
+"The Geometry of Musical Rhythm" by Godfried T. Toussaint.
+
 =head1 AUTHOR
 
 thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Jeremy Mates
+Copyright (C) 2016-2017 by Jeremy Mates
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a copy

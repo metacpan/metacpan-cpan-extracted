@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::deps;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to dependencies
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::deps - More lcpan subcommands related to dependencies
 
 =head1 VERSION
 
-This document describes version 0.006 of App::lcpan::CmdBundle::deps (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-10.
+This document describes version 0.007 of App::lcpan::CmdBundle::deps (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-28.
 
 =head1 SYNOPSIS
 
@@ -27,6 +27,10 @@ This document describes version 0.006 of App::lcpan::CmdBundle::deps (from Perl 
 This bundle provides the following lcpan subcommands:
 
 =over
+
+=item * L<lcpan deps-rels|App::lcpan::Cmd::deps_rels>
+
+=item * L<lcpan deps-phases|App::lcpan::Cmd::deps_phases>
 
 =item * L<lcpan deps-all|App::lcpan::Cmd::deps_all>
 

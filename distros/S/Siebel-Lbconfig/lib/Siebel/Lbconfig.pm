@@ -13,20 +13,20 @@ use Cwd;
 use Siebel::Lbconfig::Daemon::Action::ListServers;
 use Siebel::Lbconfig::Daemon::Action::AOM;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 =pod
 
 =head1 NAME
 
-Siebel::Lbconfig - helper to generate optimied lbconfig file
+Siebel::Lbconfig - helper to generate an optimized F<lbconfig.txt> file
 
 =head1 DESCRIPTION
 
 The distribution Siebel-Lbconfig was created based on classes from L<Siebel::Srvrmgr>.
 
 The command line utility C<lbconfig> will connect to a Siebel Enterprise with C<srvrmgr> and generate a optimized
-lbconfig.txt file by search all active AOMs that take can take advantage of the native load balancer.
+F<lbconfig.txt> file by search all active AOMs that take can take advantage of the native load balancer.
 
 =cut
 
@@ -36,7 +36,7 @@ our @EXPORT_OK = qw(recover_info get_daemon create_files);
 
 =head2 create_daemon
 
-Creates a L<Siebel::Srvrmgr::Daemon> to connects to the Siebel Enterprise and retrieve the required information to create the lbconfig.txt.
+Creates a L<Siebel::Srvrmgr::Daemon> to connects to the Siebel Enterprise and retrieve the required information to create the F<lbconfig.txt>.
 
 It expects as parameters:
 
@@ -102,7 +102,7 @@ sub get_daemon {
 Expects as parameter the L<Siebel::Srvrmgr::Daemon::ActionStash> instance returned by C<create_daemon> and
 the Siebel Connection Broker TCP port.
 
-Returns a hash array reference with all the rows data of the lbconfig.txt.
+Returns a hash array reference with all the rows data of the F<lbconfig.txt>.
 
 =cut
 
@@ -161,14 +161,14 @@ sub recover_info {
 
 =head2 create_files
 
-Creates the lbconfig.txt and eapps*.cfg files.
+Creates the F<lbconfig.txt> and F<eapps*.cfg> files.
 
-Expects as parameters the directory where the eapps*.cfg file will be located. Those files will be used as templates, they will be copied to a new version of them,
-with the ConnectionString modified and all other content as is. The copied will have the C<.new> file "extension" attached to them.
+Expects as parameters the directory where the F<eapps*.cfg> file will be located. Those files will be used as templates, they will be copied to a new version of them,
+with the C<ConnectionString> modified and all other content as is. The copied will have the C<.new> file "extension" attached to them.
 
 Also, espects a data reference passed as the second parameter. The expected format is the same returned by the C<recover_info> sub.
 
-Returns nothing. The lbconfig.txt file will be located at the current directory.
+Returns nothing. The F<lbconfig.txt> file will be located at the current directory.
 
 =cut
 
@@ -232,7 +232,7 @@ sub create_files {
 
 The configuration file must have a INI format, which is supported by the L<Config::Tiny> module.
 
-Here is an example of the required parameters with a description:
+Here is an example of the required parameters:
 
     [GENERAL]
     gateway=foobar:1055
@@ -248,7 +248,7 @@ Beware that the commands executed by C<lbconfig> requires that the output has a 
 C<load_prefs> is not optional here, but a requirement!
 
 Also make sure to use C<type = light> because this distribution really doesn't need L<Siebel::Srvrmgr::Daemon::Heavy> and is
-intended to work on MS Windows.
+intended to work on MS Windows too.
 
 =head1 SEE ALSO
 

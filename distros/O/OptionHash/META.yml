@@ -1,0 +1,17 @@
+---
+abstract: 'Checking of option hashes'
+author:
+  - 'Joe Higton <draxil@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OptionHash
+requires:
+  Carp: '0'
+version: 0.2.0

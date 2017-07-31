@@ -1,3 +1,18 @@
+0.411     2017-07-27 15:38:42-05:00 America/Chicago
+
+    [ Bug Fixes ]
+    - multiple recursion (e.g. $..foo..bar) works properly.
+      Fixes RT #122529
+      Thomas Helsel ++
+
+    [ Other ]
+    - Warnings at the calling line when attempting to set on a non-object via set() or value() as an lvalue
+
+0.401     2017-07-20 09:24:14-05:00 America/Chicago
+
+    [ Other ]
+    Changes to build files only
+
 0.400     2017-07-17 17:44:44-05:00 America/Chicago
 
     [ Other ]

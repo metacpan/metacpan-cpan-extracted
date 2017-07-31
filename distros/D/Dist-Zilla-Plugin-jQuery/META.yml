@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,6 @@ meta-spec:
 name: Dist-Zilla-Plugin-jQuery
 requires:
   Dist::Zilla::Role::FileGatherer: '0'
-  File::HomeDir: '0.91'
   File::Temp: '0'
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
@@ -27,6 +26,7 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-jQuery/issues
-  homepage: http://perl.wdlabs.com/Dist-Zilla-Plugin-jQuery
+  homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::jQuery
   repository: git://github.com/plicease/Dist-Zilla-Plugin-jQuery.git
-version: '0.04'
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.70'

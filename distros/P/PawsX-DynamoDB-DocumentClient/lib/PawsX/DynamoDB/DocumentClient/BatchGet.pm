@@ -18,9 +18,13 @@ my $ASSERT_ARRAYREF = make_assert_arrayref($METHOD_NAME);
 sub transform_arguments {
     my $class = shift;
     my %args = @_;
+    my $force_type = delete $args{force_type} || {};
     return (
         %args,
-        RequestItems => _marshall_request_items($args{RequestItems}),
+        RequestItems => _marshall_request_items(
+            $args{RequestItems},
+            $force_type
+        ),
     );
 }
 
@@ -39,21 +43,28 @@ sub run_service_command {
 }
 
 sub _marshall_request_items {
-    my ($items) = @_;
+    my ($items, $force_type) = @_;
     $ASSERT_HASHREF->('RequestItems', $items);
-    return { map { $_ => _marshall_request_item($items->{$_}) } keys %$items };
+    return {
+        map { $_ => _marshall_request_item($items->{$_}, $force_type->{$_}) }
+        keys %$items
+    };
 }
 
 sub _marshall_request_item {
-    my ($item) = @_;
+    my ($item, $force_type) = @_;
     my $keys = $item->{Keys};
+    $force_type ||= {};
     die "$METHOD_NAME: RequestItems entry must have Keys" unless $keys;
     $ASSERT_ARRAYREF->('Keys', $keys);
     $ASSERT_HASHREF->('Keys entry', $_)
         for @$keys;
     return {
         %$item,
-        Keys => [ map { dynamodb_marshal($_) } @{$item->{Keys}} ],
+        Keys => [
+            map { dynamodb_marshal($_, force_type => $force_type) }
+            @{$item->{Keys}}
+        ],
     };
 }
 

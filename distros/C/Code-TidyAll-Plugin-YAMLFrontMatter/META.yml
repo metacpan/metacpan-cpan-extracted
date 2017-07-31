@@ -22,7 +22,7 @@ name: Code-TidyAll-Plugin-YAMLFrontMatter
 provides:
   Code::TidyAll::Plugin::YAMLFrontMatter:
     file: lib/Code/TidyAll/Plugin/YAMLFrontMatter.pm
-    version: '1.000000'
+    version: '1.000001'
 requires:
   Code::TidyAll::Plugin: '0'
   Encode: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/maxmind/Code-Tidyall-Plugin-YAMLFrontMatter/issues
   homepage: http://metacpan.org/release/Code-TidyAll-Plugin-YAMLFrontMAtter
   repository: git://github.com/maxmind/Code-Tidyall-Plugin-YAMLFrontMatter.git
-version: '1.000000'
+version: '1.000001'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -104,7 +104,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::VersionProvider
       name: '@MAXMIND/MAXMIND::VersionProvider'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@MAXMIND/Authority'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::Contributors
       name: '@MAXMIND/MAXMIND::Contributors'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -472,7 +472,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::WeaverConfig
       name: '@MAXMIND/MAXMIND::WeaverConfig'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -507,7 +507,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::License
       name: '@MAXMIND/MAXMIND::License'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@MAXMIND/CheckStrictVersion'
@@ -530,14 +530,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent
       name: '@MAXMIND/MAXMIND::CheckChangesHasContent'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -548,7 +548,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@MAXMIND/MAXMIND::TidyAll'
-      version: '0.80'
+      version: '0.81'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@MAXMIND/UploadToCPAN'
@@ -603,7 +603,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000000
+          tag: v1.000001
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -10,6 +10,10 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef PERL_UNUSED_VAR
 # define PERL_UNUSED_VAR(x) ((void)x)
 #endif /* !PERL_UNUSED_VAR */
@@ -22,48 +26,15 @@
 # define FPTR2DPTR(t,x) ((t)(UV)(x))
 #endif /* !FPTR2DPTR */
 
-#ifndef OpSIBLING
-# ifdef PERL_OP_PARENT
-#  define OpHAS_SIBLING(o) (!(o)->op_lastsib)
-#  define OpSIBLING(o) ((o)->op_lastsib ? (OP*)NULL : 0 + (o)->op_sibling)
-#  define OpSIBLING_set(o, sib) ((o)->op_sibling = (sib))
-# else /* !PERL_OP_PARENT */
-#  define OpHAS_SIBLING(o) (!!(o)->op_sibling)
-#  define OpSIBLING(o) (0 + (o)->op_sibling)
-#  define OpSIBLING_set(o, sib) ((o)->op_sibling = (sib))
-# endif /* !PERL_OP_PARENT */
-#endif /* !OpSIBLING */
-
 #ifndef OpMORESIB_set
-# if PERL_VERSION_GE(5,21,2)
-#  define OpMORESIB_set(o, sib) ((o)->op_lastsib = 0, (o)->op_sibling = (sib))
-# else /* <5.21.2 */
-#  define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
-# endif /* <5.21.2 */
+# define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+# define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+# define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
 #endif /* !OpMORESIB_set */
-
-#ifndef OpLASTSIB_set
-# ifdef PERL_OP_PARENT
-#  define OpLASTSIB_set(o, parent) \
-	((o)->op_lastsib = 1, (o)->op_sibling = (parent))
-# elif PERL_VERSION_GE(5,21,2)
-#  define OpLASTSIB_set(o, parent) ((o)->op_lastsib = 1, (o)->op_sibling = NULL)
-# else /* <5.21.2 */
-#  define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
-# endif /* <5.21.2 */
-#endif /* !OpLASTSIB_set */
-
-#ifndef OpMAYBESIB_set
-# ifdef PERL_OP_PARENT
-#  define OpMAYBESIB_set(o, sib, parent) \
-	((o)->op_sibling = ((o)->op_lastsib = !(sib)) ? (parent) : (sib))
-# elif PERL_VERSION_GE(5,21,2)
-#  define OpMAYBESIB_set(o, sib, parent) \
-	((o)->op_lastsib = !(sib), (o)->op_sibling = (sib))
-# else /* <5.21.2 */
-#  define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
-# endif /* <5.21.2 */
-#endif /* !OpMAYBESIB_set */
+#ifndef OpSIBLING
+# define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+# define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif /* !OpSIBLING */
 
 #ifndef op_contextualize
 # define op_contextualize(o, c) THX_op_contextualize(aTHX_ o, c)

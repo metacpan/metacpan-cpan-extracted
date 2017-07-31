@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::IsNoError;
 # ABSTRACT: a L<Moo::Role> discerning all other L<Net::Fritz> objects from a L<Net::Fritz::Error> object
-$Net::Fritz::IsNoError::VERSION = 'v0.0.8';
+$Net::Fritz::IsNoError::VERSION = 'v0.0.9';
 
 use Moo::Role;
 
@@ -31,7 +31,7 @@ Net::Fritz::IsNoError - a L<Moo::Role> discerning all other L<Net::Fritz> object
 
 =head1 VERSION
 
-version v0.0.8
+version v0.0.9
 
 =head1 SYNOPSIS
 

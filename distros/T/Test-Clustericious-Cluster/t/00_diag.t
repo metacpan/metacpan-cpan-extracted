@@ -1,7 +1,7 @@
-use strict;
-use warnings;
+use Test2::V0;
 use Config;
-use Test::More tests => 1;
+
+eval q{ require Test::More };
 
 # This .t file is generated.
 # make changes instead to dist.ini
@@ -14,13 +14,13 @@ $modules{$_} = $_ for qw(
   Clustericious
   EV
   ExtUtils::MakeMaker
-  File::HomeDir
   Mojolicious
   Path::Class
   PlugAuth
-  Test2
-  Test2::Suite
-  Test::More
+  Test2::API
+  Test2::Bundle::More
+  Test2::Plugin::FauxHomeDir
+  Test2::V0
 );
 
 
@@ -67,7 +67,7 @@ if(@keys > 0)
 
 diag sprintf $format, 'perl ', $];
 
-foreach my $module (@modules)
+foreach my $module (sort @modules)
 {
   if(eval qq{ require $module; 1 })
   {
@@ -89,3 +89,4 @@ if($post_diag)
 
 spacer;
 
+done_testing;

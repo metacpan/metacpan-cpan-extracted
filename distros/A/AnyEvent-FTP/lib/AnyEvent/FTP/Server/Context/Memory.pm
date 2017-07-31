@@ -6,12 +6,11 @@ use 5.010;
 use Moo;
 use Path::Class::File;
 use Path::Class::Dir;
-use List::MoreUtils qw( first_index );
 
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -40,6 +39,17 @@ has cwd => (
 );
 
 
+sub _first_index (&@)
+{
+  my $f = shift;
+  foreach my $i ( 0 .. $#_ )
+  {
+    local *_ = \$_[$i];
+    return $i if $f->();
+  }
+  return -1;
+}
+
 sub find
 {
   my($self, $path) = @_;
@@ -55,7 +65,7 @@ sub find
 
   while(1)
   {
-    my $i = first_index { $_ eq '..' } @list;
+    my $i = _first_index { $_ eq '..' } @list;
     last if $i == -1;
     if($i > 1)
     {
@@ -110,7 +120,7 @@ sub cmd_cwd
 
   while(1)
   {
-    my $i = first_index { $_ eq '..' } @list;
+    my $i = _first_index { $_ eq '..' } @list;
     last if $i == -1;
     if($i > 1)
     {
@@ -452,7 +462,7 @@ AnyEvent::FTP::Server::Context::Memory - FTP Server client context class with fu
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -559,7 +569,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

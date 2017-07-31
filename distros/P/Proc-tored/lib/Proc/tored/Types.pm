@@ -1,6 +1,6 @@
 package Proc::tored::Types;
 # ABSTRACT: Type constraints used by Proc::tored
-$Proc::tored::Types::VERSION = '0.17';
+$Proc::tored::Types::VERSION = '0.18';
 use strict;
 use warnings;
 use Types::Standard -types;
@@ -31,7 +31,7 @@ Proc::tored::Types - Type constraints used by Proc::tored
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 TYPES
 
@@ -49,7 +49,7 @@ An array ref of strings suitable for use in C<%SIG>, except on MSWin32 systems.
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 

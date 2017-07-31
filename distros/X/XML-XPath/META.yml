@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Parse and evaluate XPath statements.'
 author:
   - 'Matt Sergeant, AxKit.com Ltd'
 build_requires:
@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,78 +21,78 @@ no_index:
 provides:
   XML::XPath:
     file: lib/XML/XPath.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Boolean:
     file: lib/XML/XPath/Boolean.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Builder:
     file: lib/XML/XPath/Builder.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Expr:
     file: lib/XML/XPath/Expr.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Function:
     file: lib/XML/XPath/Function.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Literal:
     file: lib/XML/XPath/Literal.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::LocationPath:
     file: lib/XML/XPath/LocationPath.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node:
     file: lib/XML/XPath/Node.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::Attribute:
     file: lib/XML/XPath/Node/Attribute.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::AttributeImpl:
     file: lib/XML/XPath/Node/Attribute.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::Comment:
     file: lib/XML/XPath/Node/Comment.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::Element:
     file: lib/XML/XPath/Node/Element.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::Namespace:
     file: lib/XML/XPath/Node/Namespace.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::PI:
     file: lib/XML/XPath/Node/PI.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Node::Text:
     file: lib/XML/XPath/Node/Text.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::NodeSet:
     file: lib/XML/XPath/NodeSet.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Number:
     file: lib/XML/XPath/Number.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Parser:
     file: lib/XML/XPath/Parser.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::PerlSAX:
     file: lib/XML/XPath/PerlSAX.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Root:
     file: lib/XML/XPath/Root.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Step:
     file: lib/XML/XPath/Step.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::Variable:
     file: lib/XML/XPath/Variable.pm
-    version: '1.40'
+    version: '1.42'
   XML::XPath::XMLParser:
     file: lib/XML/XPath/XMLParser.pm
-    version: '1.40'
+    version: '1.42'
 requires:
   Scalar::Util: '1.45'
   XML::Parser: '2.23'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/XML-XPath.git
-version: '1.40'
+version: '1.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

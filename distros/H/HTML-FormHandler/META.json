@@ -4,13 +4,13 @@
       "FormHandler Contributors - see HTML::FormHandler"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTML-FormHandler",
    "prereqs" : {
@@ -31,6 +31,8 @@
          "requires" : {
             "Carp" : "0",
             "Class::Load" : "0.06",
+            "Crypt::Blowfish" : "0",
+            "Crypt::CBC" : "0",
             "Data::Clone" : "0",
             "DateTime" : "0",
             "DateTime::Format::Strptime" : "0",
@@ -42,6 +44,7 @@
             "JSON::MaybeXS" : "1.003003",
             "List::Util" : "1.33",
             "Locale::Maketext" : "1.09",
+            "MIME::Base64" : "0",
             "Moose" : "2.1403",
             "MooseX::Getopt" : "0.16",
             "MooseX::Types" : "0.20",
@@ -76,7 +79,7 @@
          "web" : "http://github.com/gshank/html-formhandler"
       }
    },
-   "version" : "0.40067",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 2.3404"
+   "version" : "0.40068",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

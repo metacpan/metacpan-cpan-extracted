@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::Exit;
-use File::HomeDir::Test;
+use Test2::Plugin::FauxHomeDir;
 use Test::Clustericious::Config;
 use Test::More;
 use App::clad;

@@ -3,16 +3,16 @@ package Module::Build::FFI;
 use strict;
 use warnings;
 use ExtUtils::CBuilder;
-use File::Glob       qw( bsd_glob );
-use File::Spec       ();
-use File::ShareDir   ();
-use File::Path       ();
-use Text::ParseWords ();
+use File::Glob           qw( bsd_glob );
+use File::Spec           ();
+use File::ShareDir::Dist qw( dist_share );
+use File::Path           ();
+use Text::ParseWords     ();
 use Config;
 use base qw( Module::Build );
 
 # ABSTRACT: Build Perl extensions in C with FFI
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.47'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_libtest_dir =>
@@ -101,7 +101,7 @@ sub _ffi_headers ($$)
 
 sub _share_dir
 {
-  File::ShareDir::dist_dir('Module-Build-FFI')
+  dist_share('Module-Build-FFI') or die "unable to find dist share directory";
 }
 
 sub _ffi_include_dirs ($$)
@@ -308,7 +308,7 @@ Module::Build::FFI - Build Perl extensions in C with FFI
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 

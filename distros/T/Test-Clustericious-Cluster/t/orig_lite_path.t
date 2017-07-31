@@ -11,8 +11,6 @@ BEGIN {
     };
 }
 
-plan 5;
-
 my $bin = create_directory_ok 'bin';
 
 do {
@@ -35,3 +33,4 @@ $t->get_ok($cluster->url)
   ->status_is(200)
   ->content_is('bar');
 
+done_testing;

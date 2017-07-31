@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "XML::Parser" => 0,
     "XML::Simple" => 0
   },
-  "VERSION" => "2.1.6",
+  "VERSION" => "2.1.7",
   "test" => {
     "TESTS" => "t/*.t"
   }

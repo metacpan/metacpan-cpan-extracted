@@ -1806,3 +1806,70 @@ CODE:
 }
 OUTPUT:
     RETVAL
+
+void
+mode (...)
+    PROTOTYPE: @
+    PPCODE:
+    {
+        int i;
+        unsigned int max = 0;
+        unsigned int c = 0;
+        unsigned int modality = 0;
+        SV **args = &PL_stack_base[ax];
+        HV *hv = newHV();
+        SV *tmp = sv_newmortal();
+        HE *he;
+
+        sv_2mortal(newRV_noinc((SV*)hv));
+        if (!items) {
+            if (GIMME_V == G_SCALAR) {
+                mPUSHi(0);
+                PUTBACK;
+                return;
+            }
+            else {
+                XSRETURN_EMPTY;
+            }
+        }
+
+        for (i = 0; i < items; i++) {
+            SvGETMAGIC(args[i]);
+
+            SvSetSV_nosteal(tmp, args[i]);
+            he = hv_fetch_ent(hv, tmp, 0, 0);
+
+            if (NULL == he) {
+                hv_store_ent(hv, tmp, newSViv(1), 0);
+            }
+            else {
+                SV *v = HeVAL(he);
+                IV how_many = SvIVX(v);
+                sv_setiv(v, ++how_many);
+            }
+        }
+
+        hv_iterinit(hv);
+        while (he = hv_iternext(hv)) {
+            c = SvIV(HeVAL(he));
+            if (c > max) {
+                max = c;
+            }
+        }
+
+        i = 0;
+        hv_iterinit(hv);
+        while (he = hv_iternext(hv)) {
+            if (SvIV(HeVAL(he)) == max) {
+                if (GIMME_V == G_SCALAR) {
+                    modality++;
+                } else {
+                    XPUSHs(HeSVKEY_force(he));
+                }
+            }
+        }
+
+        if  (GIMME_V == G_SCALAR) {
+            mXPUSHu(modality);
+        }
+    }

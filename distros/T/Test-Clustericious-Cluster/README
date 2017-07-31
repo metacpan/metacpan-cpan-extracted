@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.35
+    version 0.37
 
 SYNOPSIS
 
@@ -36,16 +36,16 @@ SYNOPSIS
 DESCRIPTION
 
     This module allows you to test an entire cluster of Clustericious
-    services (or just one or two). The only prerequisites are Mojolicious
-    and File::HomeDir, so you can mix and match Mojolicious,
+    services (or just one or two). The only prerequisites are Mojolicious,
+    and Test2::Plugin::FauxHomeDir so you can mix and match Mojolicious,
     Mojolicious::Lite and full Clustericious apps and test how they
     interact.
 
     If you are testing against Clustericious applications, it is important
     to either use this module as early as possible, or use
-    File::HomeDir::Test as the very first module in your test, as testing
-    Clustericious configurations depend on the testing home directory being
-    setup by File::HomeDir::Test.
+    Test2::Plugin::FauxHomeDir as the very first module in your test, as
+    testing Clustericious configurations depend on the testing home
+    directory being setup by Test2::Plugin::FauxHomeDir.
 
     In addition to passing Clustericious configurations into the
     create_cluster_ok method as describe below, you can include
@@ -124,12 +124,12 @@ DESCRIPTION
      use Test::Clustericious::Cluster;
      use Test2::Bundle::More;
      
-     plan 2;
-     
      eval q{ use Net::hostent };
      is $@, '';
      
      is gethost('bar')->name, 'foo.example.com', 'gethost(bar).name = foo.example.com';
+     
+     done_testing;
      
      __DATA__
      

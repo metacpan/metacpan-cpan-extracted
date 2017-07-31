@@ -1,0 +1,74 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::ConsistentVersion' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::HasVersion' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoSmartComments' => '0',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Spelling' => '0.12'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'List::Util' => '1.33',
+                                      'Moose' => '1.14',
+                                      'Moose::Exporter' => '0',
+                                      'Moose::Meta::TypeConstraint' => '0',
+                                      'Moose::Role' => '0',
+                                      'Moose::Util::MetaRole' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'MooseX::Meta::TypeConstraint::Mooish' => '0',
+                                      'MooseX::Role::Parameterized' => '0',
+                                      'MooseX::Types::Common::String' => '0',
+                                      'MooseX::Types::Moose' => '0',
+                                      'aliased' => '0',
+                                      'namespace::autoclean' => '0.24',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Moose::Util' => '0',
+                                   'MooseX::Types::Path::Class' => '0',
+                                   'Path::Class' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::Fatal' => '0',
+                                   'Test::Moose' => '0',
+                                   'Test::Moose::More' => '0.047',
+                                   'Test::More' => '0.94',
+                                   'Test::Requires' => '0',
+                                   'blib' => '1.01',
+                                   'constant' => '0',
+                                   'lib' => '0',
+                                   'perl' => '5.006'
+                                 },
+                   'suggests' => {
+                                   'MooseX::SemiAffordanceAccessor' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

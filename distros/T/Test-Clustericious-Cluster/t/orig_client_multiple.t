@@ -6,8 +6,6 @@ use Test2::Bundle::More;
 skip_all 'Test requires Clustericious 1.24'
   unless eval q{ use Clustericious 1.24; 1 };
 
-plan 4;
-
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok(qw( Foo Foo Foo ));
 
@@ -23,6 +21,8 @@ foreach my $index (0..2)
     is $client->welcome, 'willkommen', 'client.welcome';
   };
 }
+
+done_testing;
 
 __DATA__
 

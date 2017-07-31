@@ -4,9 +4,9 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
-  File::HomeDir: '0.91'
   HTTP::Date: '0'
   Module::Build: '0.28'
+  Test2::Plugin::FauxHomeDir: '0'
   Test::More: '0.94'
   URI::file: '0'
   perl: '5.010001'
@@ -16,7 +16,7 @@ configure_requires:
   Sort::Versions: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,5 +41,8 @@ resources:
   bugtracker: https://github.com/plicease/App-cpangitify/issues
   homepage: https://metacpan.org/pod/App::cpangitify
   repository: git://github.com/plicease/App-cpangitify.git
-version: '0.14'
+version: '0.16'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Mohammad S Anwar (MANWAR)'
 x_serialization_backend: 'YAML::Tiny version 1.70'

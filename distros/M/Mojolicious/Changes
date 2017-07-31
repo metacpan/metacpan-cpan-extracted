@@ -1,4 +1,10 @@
 
+7.37  2017-07-21
+  - Added slugify method to Mojo::ByteStream. (Grinnz)
+  - Added slugify function to Mojo::Util. (Grinnz)
+  - Fixed bugs in Mojo::IOLoop and Mojo::Reactor::Poll that would prevent a
+    reset from clearing events.
+
 7.36  2017-07-09
   - Fixed basename method in Mojo::File to work with relative paths. (jberger)
   - Fixed a bug where Mojo::Log could not correctly identify if it was deployed

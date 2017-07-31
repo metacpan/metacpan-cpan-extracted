@@ -56,6 +56,7 @@ sub sub_array {
         or diag $@;
     is $opt->cmd, 'cmd', 'The command cmd is found correctly';
     ok $opt->opt->can('processed'), 'Processed sub parameter is present';
+    is $opt->opt->processed(), 1, 'Get the processed parameter value';
 }
 
 sub sub_array_complex {

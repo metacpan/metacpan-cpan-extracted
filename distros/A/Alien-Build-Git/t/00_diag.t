@@ -24,7 +24,7 @@ $modules{$_} = $_ for qw(
   Path::Tiny
   PerlX::Maybe
   PerlX::Maybe::XS
-  Test2::Compare::Custom
+  Test2::Tools::URL
   Test2::V0
   Test::Alien
   Test::Alien::Build

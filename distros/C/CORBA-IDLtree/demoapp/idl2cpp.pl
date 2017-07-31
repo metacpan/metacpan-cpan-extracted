@@ -452,11 +452,11 @@ sub idl2cpp {
     } elsif ($type == CORBA::IDLtree::REMARK) {
         my @comment = @$name;
         if (scalar(@comment) == 1) {
-            dent("//" . $comment[0] . "\n\n");
+            dent("//" . $comment[0]->[2] . "\n\n");
         } else {
             dent "/*\n";
             foreach (@comment) {
-                dent "$_\n";
+                dent "$_->[2]\n";
             }
             dent " */\n\n";
         }
@@ -486,7 +486,7 @@ sub idl2cpp {
         emit(typeof($arg[0]) . " $name = ");
         emit join(' ', @{$arg[1]});
     } elsif ($type == CORBA::IDLtree::ENUM) {
-        emit "$name { ";
+        emit "enum $name { ";
         if ($#arg > 2) {
             $indentlevel += 5;
             emit "\n";
@@ -507,7 +507,7 @@ sub idl2cpp {
             emit " }";
         }
     } elsif ($type == CORBA::IDLtree::STRUCT) {
-        emit "$name {\n";
+        emit "struct $name {\n";
         $indentlevel++;
         my $had_case = 0;
         while (@arg) {

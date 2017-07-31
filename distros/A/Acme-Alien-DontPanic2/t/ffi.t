@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test2::Bundle::More;
+use Test2::V0;
 use Test::Alien 0.05;
 use Acme::Alien::DontPanic2;
 

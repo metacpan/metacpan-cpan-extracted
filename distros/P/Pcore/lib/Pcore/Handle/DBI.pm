@@ -7,7 +7,7 @@ use Pcore::Handle::DBI::STH;
 
 with qw[Pcore::Handle];
 
-requires qw[_get_schema_patch_table_query prepare quote quote_id];
+requires qw[_get_schema_patch_table_query prepare quote];
 
 has on_connect => ( is => 'ro', isa => Maybe [CodeRef] );
 
@@ -348,6 +348,27 @@ sub _apply_patch ( $self, $dbh, $cb ) {
     );
 
     return;
+}
+
+# QUOTE
+# https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html
+sub quote_id ( $self, $id ) {
+    if ( index( $id, q[.] ) != -1 ) {
+        my @id = split /[.]/sm, $id;
+
+        for my $s (@id) {
+            $s =~ s/"/""/smg;
+
+            $s = qq["$s"];
+        }
+
+        return join q[.], @id;
+    }
+    else {
+        $id =~ s/"/""/smg;
+
+        return qq["$id"];
+    }
 }
 
 1;

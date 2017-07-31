@@ -1,3 +1,9 @@
+0.26    2017-07-28 (PERLANCAR)
+
+	- [Bugfix] Avoid perl deference error when req is not yet
+	  defined/set.
+
+
 0.25    2017-07-03 (PERLANCAR)
 
 	- No functional changes.

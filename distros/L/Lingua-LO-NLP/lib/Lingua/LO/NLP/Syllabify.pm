@@ -4,7 +4,7 @@ use warnings;
 use 5.012000;
 use utf8;
 use feature 'unicode_strings';
-use version 0.77; our $VERSION = version->declare('v0.2.0');
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 use charnames qw/ :full lao /;
 use Carp;
 use Unicode::Normalize qw/ NFC /;

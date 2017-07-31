@@ -4,14 +4,14 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use POSIX qw/pause SIGKILL EXIT_FAILURE/;
+use POSIX qw<pause SIGKILL EXIT_FAILURE>;
 
 use IPC::MorseSignals::Emitter;
 use IPC::MorseSignals::Receiver;
 
-use base qw/Exporter/;
+use base qw<Exporter>;
 
-our @EXPORT_OK = qw/try bench init cleanup/;
+our @EXPORT_OK = qw<try bench init cleanup>;
 
 $Data::Dumper::Indent = 0;
 
@@ -93,7 +93,7 @@ sub try {
  my $speed = 2 ** 10;
  my $dump = Dumper($msg);
  1 while chomp $dump;
- $dump =~ s/\n\r/ /g; 
+ $dump =~ s/\n\r/ /g;
  $snd->reset;
  my $len = 0;
  while (($speed /= 2) >= 1) {

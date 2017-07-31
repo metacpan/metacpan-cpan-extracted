@@ -2,35 +2,58 @@ package Net::Amazon::DynamoDB::Marshaler;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.05';
 
 use parent qw(Exporter);
 our @EXPORT = qw(dynamodb_marshal dynamodb_unmarshal);
 
 use boolean qw(true false isBoolean);
-use Scalar::Util qw(looks_like_number blessed);
+use Scalar::Util qw(blessed);
+use Types::Standard qw(StrictNum);
 
 sub dynamodb_marshal {
-    my ($attrs) = @_;
-    die __PACKAGE__.'dynamodb_marshal(): argument must be a hashref' unless (
-        ref $attrs
-        && ref $attrs eq 'HASH'
-    );
-    return _marshal_hashref($attrs);
+    my ($attrs, %args) = @_;
+    my $force_type = $args{force_type} || {};
+    die __PACKAGE__.'::dynamodb_marshal(): argument must be a hashref'
+        unless (
+            ref $attrs
+            && ref $attrs eq 'HASH'
+        );
+    die __PACKAGE__.'::dynamodb_marshal(): force_type must be a hashref'
+        unless (
+            ref $force_type
+            && ref $force_type eq 'HASH'
+        );
+    return _marshal_hashref($attrs, $force_type);
 }
 
 sub dynamodb_unmarshal {
     my ($attrs) = @_;
-    die __PACKAGE__.'dynamodb_unmarshal(): argument must be a hashref' unless (
-        ref $attrs
-        && ref $attrs eq 'HASH'
-    );
+    die __PACKAGE__.'::dynamodb_unmarshal(): argument must be a hashref'
+        unless (
+            ref $attrs
+            && ref $attrs eq 'HASH'
+        );
     return _unmarshal_hashref($attrs);
 }
 
 sub _marshal_hashref {
-    my ($attrs) = @_;
-    return { map { $_ => _marshal_val($attrs->{$_}) } keys %$attrs };
+    my ($attrs, $force_type) = @_;
+    $force_type ||= {};
+    my %marshalled;
+    for my $key (keys %$attrs) {
+        my $val = $attrs->{$key};
+        my $new_val;
+        if (my $type = $force_type->{$key}) {
+            $new_val = _marshal_val_force_type($val, $type);
+        } else {
+            $new_val = _marshal_val($val);
+        }
+        if ($new_val) {
+            $marshalled{$key} = $new_val;
+        }
+    }
+    return \%marshalled;
 }
 
 sub _unmarshal_hashref {
@@ -52,6 +75,22 @@ sub _marshal_val {
     die "don't know how to marshal type of $type";
 }
 
+sub _marshal_val_force_type {
+    my ($val, $type) = @_;
+
+    if ($type eq 'N') {
+        return undef unless StrictNum->check($val);
+        return { N => $val };
+    }
+
+    if ($type eq 'S') {
+        return undef unless (defined $val && length($val));
+        return { S => "$val" };
+    }
+
+    die __PACKAGE__.'::dynamodb_marshal(): force_type only supports "S" and "N" types';
+}
+
 sub _unmarshal_attr_val {
     my ($attr_val) = @_;
     my ($type, $val) = %$attr_val;
@@ -71,7 +110,8 @@ sub _val_type {
     my ($val) = @_;
 
     return 'NULL' if ! defined $val;
-    return 'N' if !ref $val && looks_like_number($val);
+    return 'NULL' if $val eq '';
+    return 'N' if _is_number($val);
     return 'S' if !ref $val;
 
     return 'BOOL' if isBoolean($val);
@@ -93,6 +133,27 @@ sub _val_type {
 
     die __PACKAGE__.": unable to marshal value: $val";
 }
+
+sub _is_number {
+    my ($val) = @_;
+    return (
+        (!ref $val)
+        && StrictNum->check($val)
+        && (
+            $val == 0
+            || (
+                $val < '1E+126'
+                && $val > '1E-130'
+            )
+            || (
+                $val < '-1E-130'
+                && $val > '-1E+126'
+            )
+        )
+        && length($val) <= 38
+    );
+}
+
 
 1;
 __END__
@@ -142,19 +203,19 @@ NOTE: this module does not yet support Binary or Binary Set types. Pull requests
 
 =head1 CONVERSION RULES
 
-See <the AWS documentation|dynamoDb-marshaler|http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes> for more details on the various types supported by DynamoDB.
+See <the AWS documentation|http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes> for more details on the various types supported by DynamoDB.
 
-For a given Perl value, we use the following rules to pick the DynamoDB type (and vice-versa for un-marshaling):
+For a given Perl value, we use the following rules to pick the DynamoDB type:
 
 =over 4
 
 =item 1.
 
-If the value is undef, use Null ('NULL')
+If the value is undef or an empty string, use Null ('NULL').
 
 =item 2.
 
-If the value looks like a number, use Number ('N').
+If the value is a number (per StrictNum in L<Types::Standard>), and falls within the accepted range for a DynamoDB number, use Number ('N').
 
 =item 3.
 
@@ -174,13 +235,15 @@ If the value isa L<boolean>, use Boolean ('BOOL').
 
 =item 7.
 
-If the value isa L<Set::Object>, use either Number Set ('NS') or String Set ('SS'), depending on whether all members look like numbers or not. All members must be defined, non-reference values, or an error will be thrown.
+If the value isa L<Set::Object>, use either Number Set ('NS') or String Set ('SS'), depending on whether all members are numbers or not. All members must be defined, non-reference values, or an error will be thrown.
 
 =item 8.
 
 Any other value will throw an error.
 
 =back
+
+When doing the opposite - un-marshalling a hashref fetched from DynamoDB - the module applies the rules above in reverse. Please note that NULLs get unmarshalled as undefs, so an empty string will be re-written to undef if it goes through a marshal/unmarshal cycle. DynamoDB does not allow for a way to store empty strings as distinct from NULL.
 
 =head1 EXPORTS
 
@@ -190,7 +253,38 @@ By default, dynamodb_marshal and dynamodb_unmarshal are exported.
 
 Takes in a "normal" Perl hashref, transforms it into DynamoDB format.
 
-  my $attrs_marshalled = dynamodb_marshal($attrs);
+  my $attrs_marshalled = dynamodb_marshal($attrs[, force_type => {}]);
+
+=head3 force_type
+
+Sometimes you want to explicitly choose a type for an attribute, overridding the rules above. Most commonly this issue occurs for key attributes, as DynamoDB enforces consistent typing on these attributes that it doesn't enforce otherwise.
+
+For instance, you might have a table named 'users' whose partition key is a string named 'username'. If you have incoming data with a username of '1234', this module will tell DynamoDB to store that as a number, which will result in an error.
+
+Use force_type in that situation:
+
+  my $item = {
+      username => '1234',
+      ...
+  };
+
+  my $force_type = {
+      username => 'S',
+  };
+
+  my $item_dynamodb = dynamodb_marshal($item, force_type => $force_type);
+
+  # $item_dynamodb looks like:
+  # {
+  #   username => {
+  #     S => '1234',
+  #   },
+  #   ...
+  # };
+
+The module only supports 'S' and 'N' types for force_type. If you specify 'S', dynamodb_marshal will stringify the value, so make sure not to send arrays, etc. as values. If you specify 'N', dynamodb_marshal will set the value to undef if it's not a number.
+
+Undefs or empty string values for force_type attributes will be removed from the marshalled hashref. While this behavior might not seem intuitive at first, it's almost certainly what you want. For instance, if you have a global secondary index on a string attribute, and your item has an undef value for that attribute, you want to avoid sending that attribute (using NULL would be rejected by DynamoDB, and you can't send empty strings). If you have an undef value for a primary key string attribute, you have a bug in your application somewhere.
 
 =head2 dynamodb_unmarshal
 

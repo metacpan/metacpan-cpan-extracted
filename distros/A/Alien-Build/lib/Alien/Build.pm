@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -273,6 +273,10 @@ sub load_requires
     my $ver = $reqs->{$mod};
     eval qq{ use $mod @{[ $ver ? $ver : '' ]} () };
     die if $@;
+    
+    # allow for requires on Alien::Build or Alien::Base
+    next if $mod eq 'Alien::Build';
+    next if $mod eq 'Alien::Base';
 
     if($mod->can('bin_dir'))
     {
@@ -298,6 +302,13 @@ sub load_requires
         }
         push @{ $self->{aclocal_path} }, $path;
       }
+    }
+    
+    # sufficiently new Autotools have a aclocal_dir which will
+    # give us the directories we need.
+    if($mod eq 'Alien::Autotools' && $mod->can('aclocal_dir'))
+    {
+      push @{ $self->{aclocal_path} }, $mod->aclocal_dir;
     }
     
     if($mod->can('alien_helper'))
@@ -947,7 +958,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -1559,6 +1570,11 @@ If set to C<share> or C<system>, it will override the system detection logic.
 Perl source file which can override some global defaults for L<Alien::Build>,
 by, for example, setting preload and postload plugins.
 
+=item ALIEN_BUILD_PKG_CONFIG
+
+Override the logic in L<Alien::Build::Plugin::PkgConfig::Negotiate> which
+chooses the best C<pkg-config> plugin.
+
 =item ALIEN_BUILD_PRELOAD
 
 semicolon separated list of plugins to automatically load before parsing
@@ -1586,6 +1602,41 @@ be used by some Fetch plugins, if they support it.
 
 =back
 
+=head1 SUPPORT
+
+The intent of the C<Alien-Build> team is to support as best as possible 
+all Perls from 5.8.1 to the latest production version.  So long as they 
+are also supported by the Perl toolchain.
+
+Please feel encouraged to report issues that you encounter to the 
+project GitHub Issue tracker:
+
+=over 4
+
+=item L<https://github.com/Perl5-Alien/Alien-Build/issues>
+
+=back
+
+Better if you can fix the issue yourself, please feel encouraged to open 
+pull-request on the project GitHub:
+
+=over 4
+
+=item L<https://github.com/Perl5-Alien/Alien-Build/pulls>
+
+=back
+
+If you are confounded and have questions, join us on the C<#native> 
+channel on irc.perl.org.  The C<Alien-Build> developers frequent this 
+channel and can probably help point you in the right direction.  If you
+don't have an IRC client handy, you can use this web interface:
+
+=over 4
+
+=item L<https://chat.mibbit.com/?channel=%23native&server=irc.perl.org>
+
+=back
+
 =head1 SEE ALSO
 
 L<Alien::Build::Manual::AlienAuthor>,
@@ -1607,6 +1658,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

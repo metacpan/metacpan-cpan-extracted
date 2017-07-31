@@ -1,12 +1,11 @@
-use strict;
-use warnings;
-use Test::More tests => 1;
+use Test2::V0 -no_srand => 1;
 
 # please keep in alpha order
 my @mods = qw(
   Acme::Alien::DontPanic
   Acme::Ford::Prefect
   Acme::Ford::Prefect::FFI
+  Alien::Build
   Archive::Extract
   Capture::Tiny
   Cwd
@@ -20,15 +19,15 @@ my @mods = qw(
   Inline
   Inline::C
   Inline::CPP
-  List::MoreUtils
   Module::Build
+  Net::FTP
   Perl::OSType
   Shell::Config::Generate
   Shell::Guess
   Sort::Versions
   Test::Alien
-  Test::CChecker
-  Test::More
+  Test2::API
+  Test2::V0
   Text::ParseWords
   URI
   parent
@@ -44,3 +43,5 @@ foreach my $mod (@mods) {
   $version = 'undefined' unless defined $version;
   diag sprintf "%25s %s", $mod, $version;
 }
+
+done_testing;

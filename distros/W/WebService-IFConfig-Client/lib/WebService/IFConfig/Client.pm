@@ -1,13 +1,12 @@
 use strict;
 use warnings;
-use 5.10.0;
-use feature qw/switch/;
+use 5.12.0;
 
 use REST::Client;
 use JSON;
 
 use vars qw($VERSION);
-$VERSION = '0.004';
+$VERSION = '1.001';
 
 =head1 NAME
 
@@ -15,15 +14,19 @@ WebService::IFConfig::Client - Client for Martin Polden's https://ifconfig.co
 
 =head1 SYNOPSIS 
 
+    use strict;
+    use warnings;
+    use 5.12.0;
+
     use feature qw/say/;
     use WebService::IFConfig::Client;
     my $ifconfig = WebService::IFConfig::Client->new();
 
-    say $ifconfig->city;
-    say $ifconfig->country;
-    say $ifconfig->hostname;
-    say $ifconfig->ip;
-    say $ifconfig->ip_decimal;
+    say $ifconfig->get_city;
+    say $ifconfig->get_country;
+    say $ifconfig->get_hostname;
+    say $ifconfig->get_ip;
+    say $ifconfig->get_ip_decimal;
 
     # Time passes ...
     
@@ -40,6 +43,7 @@ To use a different server, pass C<'server' =E<gt> $my_server>.
 
 package WebService::IFConfig::Client;
 use Moose;
+use experimental qw/switch/;
 
 =head1 METHODS
 
@@ -121,7 +125,6 @@ Returns undef if no request has been made.
 sub get_status {
     my $self = shift;
     my $answer;
-    no warnings "experimental::smartmatch";
 
     given ( $self->get_raw_status ) {
         $answer = undef when 0;

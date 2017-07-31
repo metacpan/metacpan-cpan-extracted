@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.66.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,34 +14,33 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 1eb7c5cdcf9fd0c49af63fa42a57d4af0b8f4f66 .cvsignore
-SHA1 bde3c76c0460cd3ea60db8db98532d4f70db5e7e Build.PL
-SHA1 373a04b7b306994b1773c94741d96ddaf3713511 Changes
-SHA1 f207f7da5d66b089f894b70b45d8b984e2a68aa9 MANIFEST
-SHA1 9409974d0af4b89d751eba090f48ac9c7094ea4d META.yml
-SHA1 0f1b3b6269550b5135e10b3cae1b6b41d274b276 Makefile.PL
-SHA1 71d6d4850359ec175c6c6feb9830bb814a5286b5 README
-SHA1 b5c0b4101833065a1b5822cbdff0465330f52f80 lib/Scalar/.cvsignore
-SHA1 1daac5cc137b4f761ebdb77ac5ada01faa2e644f lib/Scalar/Number.pm
-SHA1 75d967c9649a9671f9048dcd25c9684891c9c3ac lib/Scalar/Number.xs
-SHA1 07c53564db36f8cdc104bc8acc6043734a5c6976 t/class.t
-SHA1 c8b108972eb882bb7d011afb9f026cd0bf47e0e8 t/class_pp.t
-SHA1 eb9934710616a5915c6333f0a4eedf79f996e47c t/id_cmp.t
-SHA1 df2471f508c93ea2a0f514dc55915dd4b7ad4f0d t/id_cmp_pp.t
-SHA1 a3f9a4aa77cbe3a54d7e3e70e7ace5ddd009ed7f t/num_forms.pl
-SHA1 2771c2e900726416e55414033f0a5b3a41e2ca5d t/part.t
-SHA1 4dd22cd59652f8d142c642fbe63538af7fb9f0b9 t/part_pp.t
+SHA1 fa19680481659af64081e59747c5f972f72b486f .gitignore
+SHA1 fc98c8e2d8d1c3225bc5b3819b00347229a4e31b Build.PL
+SHA1 f0e49805b81a763f1199cd691a2aee8742e67f84 Changes
+SHA1 2cdd3ac1c59c8594bca51be3aeeeb9fbe5b95267 MANIFEST
+SHA1 d7964d06f2b5adba1c731094aa4a90958f05a2f4 META.json
+SHA1 e52838e924f1412a386034a5e42f4e08d75a111c META.yml
+SHA1 ae6fbd184b87480c0ffa576e25eb3056b37887d0 README
+SHA1 9ce6e0327c813059746cd6c1e0864dc656130884 lib/Scalar/Number.pm
+SHA1 69392b38d119b84880eaf59f9794cce9b9efcc23 lib/Scalar/Number.xs
+SHA1 9b09bfb8337ed6ee58d71bbcbe9c5bdaca1e90cc t/class.t
+SHA1 136de494452cdb59ee1e94bb989fb58d8f466025 t/class_pp.t
+SHA1 22ddf7ced6eddee1055b53c5aeb874406a3924f7 t/id_cmp.t
+SHA1 c837d51051fd88837c89f6437ee35e78d123a240 t/id_cmp_pp.t
+SHA1 dbb94fb30b0cc82235e5f29501a8f8da4f015735 t/lib/t/NumForms.pm
+SHA1 4e76e22e6b18404f9eca3aa16761756bd4c8691d t/part.t
+SHA1 bbbdb3cb8e23620b36c624ac522f18e9cf466229 t/part_pp.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
-SHA1 3f447b1d0b8a6247c3a311087f8d66da1c3ca5db t/pod_cvg_pp.t
+SHA1 8b0ef0af30cd5064cf1b3d57c5fdbab11f8c567c t/pod_cvg_pp.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 4278252027f78436b54d4a8f7cd308c9642e189f t/setup_pp.pl
-SHA1 c2a4a8ada07c9d5cf31930d47158292cfe6f543b t/val_cmp.at
-SHA1 9eb602d316820b4779373e94992140dd5937f87e t/val_cmp_pp.at
+SHA1 58674d6b52b7f53c593cc8f8b13c5db609354a74 t/val_cmp.at
+SHA1 8eb781a88a69aa720801a07620a5fc36b66f9331 t/val_cmp_pp.at
 SHA1 006502a882473614f46463941e42004a9b1f6096 t/values.data
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAkzDS0gACgkQOV9mt2VyAVHv4gCgplM11o4cwq0Rwjf+QSZzl+XO
-8cIAoJT1g2B/Bs/5Is0rsIyZPtSQl3St
-=OMRA
+iEYEARECAAYFAll6pAoACgkQOV9mt2VyAVGbvgCgg98/dbSdXC4KhjE2Nq3/EF/h
+500An0EyBrVtSRISiB6lixRYR5U9PSe8
+=2Mpo
 -----END PGP SIGNATURE-----

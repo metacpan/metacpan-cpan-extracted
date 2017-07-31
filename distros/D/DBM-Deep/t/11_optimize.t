@@ -6,7 +6,8 @@ use Test::More;
 plan skip_all => "Skipping the optimize tests on Win32/cygwin for now."
     if ( $^O eq 'MSWin32' || $^O eq 'cygwin' );
 
-use t::common qw( new_fh );
+use lib 't';
+use common qw( new_fh );
 
 use_ok( 'DBM::Deep' );
 

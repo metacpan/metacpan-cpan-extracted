@@ -1,5 +1,10 @@
 Revision history for Math::Currency
 
+0.52  2017-07-29
+    - make SEE ALSO pod entries clickable
+    - don't include .travis.yml in the build
+    - make signature test a dzil author test
+
 0.51  2017-02-27
     - Add tests for legacy Math::BigInt bcmp() calling syntax
     - Update test for Ruble character changes in debian

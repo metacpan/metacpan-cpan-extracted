@@ -16,11 +16,10 @@ $modules{$_} = $_ for qw(
   Capture::Tiny
   Clustericious::Config
   EV
-  File::HomeDir
-  File::HomeDir::Test
   File::chdir
   Module::Build
   Path::Class
+  Test2::Plugin::FauxHomeDir
   Test::Exit
   Test::More
   Test::Script

@@ -1,0 +1,50 @@
+<%ARGS>
+$Owner
+</%ARGS>
+<%INIT>
+my $tokens = RT::AuthTokens->new($session{CurrentUser});
+$tokens->LimitOwner(VALUE => $Owner);
+</%INIT>
+<div class="authtoken-list" data-owner="<% $Owner %>">
+  <span class="loading"><img src="<%RT->Config->Get('WebPath')%>/static/images/loading.gif" alt="<%loc('Loading')%>" title="<%loc('Loading')%>" /></span>
+
+% if ($tokens->Count == 0) {
+  <em><&|/l&>No authentication tokens.</&></em>
+% } else {
+  <ul>
+% while (my $token = $tokens->Next) {
+    <li id="token-<% $token->Id %>">
+% if ($ARGS{ShowModifyForm} && $ARGS{Token} == $token->Id) {
+      <&| /Widgets/TitleBox, title => loc("Update Auth Token") &>
+% if ($ARGS{Update} || $ARGS{Revoke}) {
+        <& /Elements/AuthToken/ModifyResults, %ARGS, Token => $token->Id &>
+% } else {
+        <& /Elements/AuthToken/ModifyForm, %ARGS, TokenObj => $token &>
+% }
+      </&>
+% } else {
+      <span class="description"><% $token->Description %></span>
+      <span class="lastused">
+% my $used = $token->LastUsedObj;
+% if ($used->IsSet) {
+       <&|/l, $used->AgeAsString &>used [_1]</&>
+% } else {
+        <&|/l&>never used</&>
+% }
+      </span>
+
+      <div class="authtoken-form-container">
+        <& /Elements/AuthToken/ModifyForm, %ARGS, TokenObj => $token &>
+      </div>
+      <form method="GET" action="<%RT->Config->Get('WebPath')%><% $r->path_info %>#token-<% $token->Id %>">
+        <input type="hidden" name="ShowModifyForm" value="1">
+        <input type="hidden" name="id" value="<% $Owner %>">
+        <input type="hidden" name="Token" value="<% $token->Id %>">
+        <button type="submit" class="authtoken-modify">Edit</button>
+      </form>
+% }
+    </li>
+% }
+  </ul>
+% }
+</div>

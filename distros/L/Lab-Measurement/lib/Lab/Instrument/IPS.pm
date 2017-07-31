@@ -1,8 +1,11 @@
-# Please note: The Oxford IPS expects a \r after all commands, no matter which connection is used. For rs232 connection, additionally \n has to be added.
-# Hence termchar => \n. For Isobus connection, no additional termchar must be added. Hence IsoEnableTermChar => 0.
+# Please note: The Oxford IPS expects a \r after all commands, no matter 
+# which connection is used. For rs232 connection, additionally \n has to be added.
+# Hence termchar => \n. For Isobus connection, no additional termchar must be added. 
+# Hence IsoEnableTermChar => 0.
 
 package Lab::Instrument::IPS;
-$Lab::Instrument::IPS::VERSION = '3.553';
+#ABSTRACT: Oxford Instruments IPS Magnet Power Supply
+$Lab::Instrument::IPS::VERSION = '3.554';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 
@@ -955,13 +958,19 @@ sub sweep_to_level {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::Instrument::IPS - Oxford Instruments IPS Magnet Power Supply
+Lab::Instrument::IPS - Oxford Instruments IPS Magnet Power Supply
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -1082,15 +1091,11 @@ Wait until $seconds have been passed or if $seconds is not defined until the cur
 
 =back
 
- 
-
 =head2 active
 
 	$ips->active();
 
 Returns a value > 0 if magnet is currently sweeping and '0' if magnet is not sweeping.
-
- 
 
 =head1 CAVEATS/BUGS
 
@@ -1106,20 +1111,18 @@ probably many
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This is $Id: ILM.pm 613 2010-04-14 20:40:41Z schroeer $
+  Copyright 2012       Christian Butschkow, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014-2015  Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-Copyright 2010 Andreas K. Hüttel (L<http://www.akhuettel.de/>)
 
-modified 2011 by Stefan Geissler
-
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
-
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

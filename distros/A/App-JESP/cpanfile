@@ -15,6 +15,7 @@ requires 'Moose' , '>= 2.1801';
 requires 'SQL::Abstract', '>= 1.81';
 requires 'String::ShellQuote', '>= 1.04';
 
+test_requires 'Carp::Always', '>= 0.13';
 test_requires 'DBD::SQLite', '>= 1.50';
 test_requires 'Test::Most', '>= 0.34';
 test_requires 'Test::Pod::Coverage', '>= 1.08';

@@ -1,15 +1,16 @@
 package CGI::Ex::App;
 
 ###---------------------###
-#  Copyright 2004-2015 - Paul Seamons
+#  Copyright 2004-2017 - Paul Seamons
 #  Distributed under the Perl Artistic License without warranty
 
+use 5.006; #our
 use strict;
 BEGIN {
     eval { use Time::HiRes qw(time) };
     eval { use Scalar::Util };
 }
-our $VERSION = '2.44';
+our $VERSION = '2.45';
 
 sub croak { die sprintf "%s at %3\$s line %4\$s\n", $_[0], caller 1 }
 

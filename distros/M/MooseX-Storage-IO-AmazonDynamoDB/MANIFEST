@@ -13,6 +13,7 @@ docker-compose.yml
 lib/MooseX/Storage/IO/AmazonDynamoDB.pm
 t/author-pod-syntax.t
 t/basic.t
+t/live-force-type.t
 t/live.t
 t/local.t
 t/pre-v0.07.t

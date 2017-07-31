@@ -70,9 +70,18 @@ Module::Build->subclass(code => q{
 		"XSLoader" => 0,
 	},
 	needs_compiler => 0,
-	dynamic_config => 1,
+	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Scalar-String\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Scalar-String",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

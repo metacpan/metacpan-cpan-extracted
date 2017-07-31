@@ -9,8 +9,6 @@ use IO::Socket::INET;
 skip_all 'cannot turn off Mojo IPv6'
   if IO::Socket::INET->isa('IO::Socket::IP');
 
-plan 5;
-
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok(qw( MyApp MyApp MyApp ));
 my $t = $cluster->t;
@@ -124,6 +122,8 @@ subtest 'stop end server using relative url' => sub {
     ok $t->ua->server->app;
   };
 };
+
+done_testing;
 
 __DATA__
 

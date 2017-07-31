@@ -1,25 +1,8 @@
-
-=head1 NAME
-
-Lab::Instrument::Agilent34410A -- HP/Agilent/Keysight 34410A or 34411A digital
-multimeter
-
-=head1 SYNOPSIS
-
- use Lab::Instrument::Agilent34410A;
- my $multimeter = Lab::Instrument::Agilent34410A->new(%options);
-
- print $multimeter->get_value();
-
-=head1 DESCRIPTION
-
-The Lab::Instrument::Agilent34410A class implements an interface to the 34410A
-and 34411A digital multimeters by Agilent (now Keysight, formerly HP).
-
-=cut
-
 package Lab::Instrument::Agilent34410A;
-$Lab::Instrument::Agilent34410A::VERSION = '3.553';
+#ABSTRACT: HP/Agilent/Keysight 34410A or 34411A digital multimeter
+$Lab::Instrument::Agilent34410A::VERSION = '3.554';
+
+
 use warnings;
 use strict;
 use 5.010;
@@ -61,14 +44,6 @@ our %fields = (
 
 );
 
-=head1 METHODS
-
-=head2 new(%options)
-
-This method is described in L<Lab::Measurement::Tutorial> and
-L<Lab::Instrument>.
-
-=cut
 
 sub new {
     my $proto = shift;
@@ -82,13 +57,6 @@ sub new {
     return $self;
 }
 
-=head2 get_value()
-
-Perform data aquisition.
-
- my $value = $multimeter->get_value();
-
-=cut
 
 sub get_value {
     my ( $self, $tail ) = _init_getter(@_);
@@ -96,14 +64,6 @@ sub get_value {
     return $self->request( ":read?", $tail );
 }
 
-=head2 get_error()
-
- my ($err_num, $err_msg) = $agilent->get_error();
-
-Query the multimeter's error queue. Up to 20 errors can be stored in the
-queue. Errors are retrieved in first-in-first out (FIFO) order.
-
-=cut
 
 sub get_error {
     my $self = shift;
@@ -113,13 +73,6 @@ sub get_error {
     return ( $err_num, $err_msg );
 }
 
-=head2 reset()
-
- $agilent->reset();
-
-Reset the multimeter to its power-on configuration.
-
-=cut
 
 sub reset {    # basic
     my $self = shift;
@@ -127,12 +80,6 @@ sub reset {    # basic
     $self->reset_device_cache();
 }
 
-=head2 assert_function($keyword)
-
-Throw if the instrument is not in one of the operating modes given in
-C<$keyword>. See L<Lab::SCPI> for the keyword syntax.
-
-=cut
 
 # to be moved into Lab::Instrument::Multimeter??
 sub assert_function {
@@ -152,20 +99,6 @@ sub assert_function {
 my $valid_functions
     = 'current[:dc]|current:ac|voltage[:dc]|voltage[:ac]|resistance|fresistance';
 
-=head2 set_function($function)
-
-Set a new value for the measurement function of the Agilent34410A.
-
-C<$function> can be one of the measurement methods of the Agilent34410A.
-
-	"current:dc" --> DC current measurement 
-	"current:ac" --> AC current measurement 
-	"voltage:dc" --> DC voltage measurement 
-	"voltage:ac" --> AC voltage measurement 
-	"resistance" --> resistance measurement (2-wire)
-	"fresistance" --> resistance measurement (4-wire)
-
-=cut
 
 sub set_function {    # basic
     my $self = shift;
@@ -182,11 +115,6 @@ sub set_function {    # basic
 
 }
 
-=head2 get_function()
-
-Return the used measurement function.
-
-=cut
 
 sub get_function {
     my $self = shift;
@@ -203,15 +131,6 @@ sub get_function {
     # FIXME: throw here?
 }
 
-=head2 set_range($range)
-
-Set the range of the used measurement function to C<$range>.
-
-C<RANGE> is given in terms of amps, volts or ohms and can be C<-3...+3A | MIN | MAX | DEF | AUTO>, C<100mV...1000V | MIN | MAX | DEF | AUTO> or C<0...1e9 | MIN | MAX | DEF | AUTO>.	
-C<DEF> is default C<AUTO> activates the C<AUTORANGE-mode>.
-C<DEF> will be set, if no value is given.
-
-=cut
 
 sub _invalid_range {
     my $range = shift;
@@ -278,11 +197,6 @@ sub _init_getter {
     return ( $self, $tail );
 }
 
-=head2 get_range()
-
-Return the range of the used measurement function.
-
-=cut
 
 sub get_range {
     my ( $self, $tail ) = _init_getter(@_);
@@ -292,11 +206,6 @@ sub get_range {
     return $self->query( "$function:RANGE?", $tail );
 }
 
-=head2 get_autorange()
-
-Return non-zero, if autoranging is enabled.
-
-=cut
 
 sub get_autorange {
     my ( $self, $tail ) = _init_getter(@_);
@@ -307,34 +216,6 @@ sub get_autorange {
 
 my $valid_dc_functions = 'current[:dc]|voltage[:dc]|resistance|fresistance';
 
-=head2 set_nplc($nplc)
-
-Set a new value for the predefined C<NUMBER of POWER LINE CYCLES> for the
-used measurement function.
-
-The C<NUMBER of POWER LINE CYCLES> is actually something similar to an integration time for recording a single measurement value.
-The values for C<$nplc> can be any value between 0.006 ... 100 but internally the Agilent34410A selects the value closest to one of the following fixed values C< 0.006 | 0.02 | 0.06 | 0.2 | 1 | 2 | 10 | 100 | MIN | MAX | DEF >.
-
-Example: 
-Assuming C<$nplc> to be 10 and assuming a netfrequency of 50Hz this results in an integration time of 10*50Hz = 0.2 seconds for each measured value. 
-
-NOTE:
-1.) Only those integration times set to an integral number of power line cycles (1, 2, 10, or 100 PLCs) provide normal mode (line frequency noise) rejection.
-2.) Setting the integration time also sets the resolution for the measurement. The following table shows the relationship between integration time and resolution. 
-
-	Integration Time (power line cycles)		 Resolution
-	0.001 PLC  (34411A only)			30 ppm x Range
-	0.002 PLC  (34411A only)			15 ppm x Range
-	0.006 PLC					6.0 ppm x Range
-	0.02 PLC					3.0 ppm x Range
-	0.06 PLC					1.5 ppm x Range
-	0.2 PLC						0.7 ppm x Range
-	1 PLC (default)					0.3 ppm x Range
-	2 PLC						0.2 ppm x Range
-	10 PLC						0.1 ppm x Range
-	100 PLC 					0.03 ppm x Range
-
-=cut
 
 sub set_nplc {    # basic
     my $self = shift;
@@ -355,11 +236,6 @@ sub set_nplc {    # basic
     $self->write( "$function:NPLC $nplc", $tail );
 }
 
-=head2 get_nplc()
-
-Return the value of C<nplc> for the used measurement function.
-
-=cut
 
 sub get_nplc {
     my ( $self, $tail ) = _init_getter(@_);
@@ -369,18 +245,6 @@ sub get_nplc {
     return $self->query( "$function:NPLC?", $tail );
 }
 
-=head2 set_resolution($resolution)
-
-Set a new resolution for the used measurement function.
-
-Give the current value C<RANGE> of the current range,
-C<$resolution> is given in terms of C<$resolution * RANGE> or C<[MIN|MAX|DEF]>.
-C<$resolution=0.0001> means 4 1/2 digits for example.
-$resolution must be larger than 0.3e-6xRANGE.
-The best resolution is range = 100mV ==> resoltuion = 3e-8V
-C<DEF> will be set, if no value is given.
-
-=cut
 
 sub set_resolution {    # basic
     my $self = shift;
@@ -405,11 +269,6 @@ sub set_resolution {    # basic
 
 }
 
-=head2 get_resolution()
-
-Return the resolution of the used measurement function.
-
-=cut
 
 sub get_resolution {
     my ( $self, $tail ) = _init_getter(@_);
@@ -419,33 +278,6 @@ sub get_resolution {
     return $self->query( "$function:RES?", $tail );
 }
 
-=head2 set_tc($tc)
-
-Set a new value for the predefined C<INTEGRATION TIME> for the used measurement
-function.
-
-C<INTEGRATION TIME> $tc can be C< 1e-4 ... 1s | MIN | MAX | DEF>.
-
-NOTE: 
-1.) Only those integration times set to an integral number of power line cycles
-(1, 2, 10, or 100 PLCs) provide normal mode (line frequency noise) rejection. 
-2.) Setting the integration time also sets the resolution for the
-measurement. The following table shows the relationship between integration
-time and resolution.  
-
-	Integration Time (power line cycles)		 Resolution
-	0.001 PLC  (34411A only)			30 ppm x Range
-	0.002 PLC  (34411A only)			15 ppm x Range
-	0.006 PLC					6.0 ppm x Range
-	0.02 PLC					3.0 ppm x Range
-	0.06 PLC					1.5 ppm x Range
-	0.2 PLC						0.7 ppm x Range
-	1 PLC (default)					0.3 ppm x Range
-	2 PLC						0.2 ppm x Range
-	10 PLC						0.1 ppm x Range
-	100 PLC 					0.03 ppm x Range
-
-=cut
 
 sub set_tc {    # basic
     my $self = shift;
@@ -465,11 +297,6 @@ sub set_tc {    # basic
     $self->write( ":$function:APERTURE $tc; APERTURE:ENABLED 1", $tail );
 }
 
-=head2 get_tc()
-
-Return the C<INTEGRATION TIME> of the used measurement function.
-
-=cut
 
 sub get_tc {
     my ( $self, $tail ) = _init_getter(@_);
@@ -481,14 +308,6 @@ sub get_tc {
 
 my $valid_ac_functions = 'current:ac|voltage:ac';
 
-=head2 set_bw($bw)
-
-Set a new C<BANDWIDTH> for the used measurement function, which must be 
-C<VOLTAGE:AC> or C<CURRENT:AC>.
-
-C<$bw> can be C< 3 ... 200Hz | MIN | MAX | DEF>.
-
-=cut
 
 sub set_bw {    # basic
     my $self = shift;
@@ -507,12 +326,6 @@ sub set_bw {    # basic
     $self->write( "$function:BANDWIDTH $bw", $tail );
 }
 
-=head2 get_bw()
-
-Return the bandwidth of the used measurement function, which must be
-C<VOLTAGE:AC> or C<CURRENT:AC>.
-
-=cut
 
 sub get_bw {
     my ( $self, $tail ) = _init_getter(@_);
@@ -524,55 +337,6 @@ sub get_bw {
 
 # ----------------------------- TAKE DATA ---------------------------------------------------------
 
-=head2 config_measurement
-
-	old style:
-	$agilent->config_measurement($function, $number_of_points, <$time>, <$range>);
-	
-	new style:
-	$agilent->config_measurement({
-		'function' => $function, 
-		'nop' => $number_of_points,
-		'time' => <$time>, 
-		'range' => <$range>
-		});
-
-Preset the Agilent34410A for a TRIGGERED measurement.
-
-=over 4
-
-=item $function
-
-C<FUNCTION> can be one of the measurement methods of the Agilent34410A.
-
-	"current:dc" --> DC current measurement 
-	"current:ac" --> AC current measurement 
-	"voltage:dc" --> DC voltage measurement 
-	"voltage:ac" --> AC voltage measurement 
-	"resistance" --> resistance measurement (2-wire)
-	"fresistance" --> resistance measurement (4-wire)
-
-=item $number_of_points
-
-Preset the C<NUMBER OF POINTS> to be taken for one measurement trace.
-The single measured points will be stored in the internal memory of the Agilent34410A.
-For the Agilent34410A the internal memory is limited to 50.000 values.	
-	
-
-=item <$time>
-
-Preset the C<TIME> duration for one full trace. From C<TIME> the integration time value for each measurement point will be derived [TC = (TIME *50Hz)/NOP].
-Expected values are between 0.0001*NOP ... 1*NOP seconds.
-
-=item <$range>
-
-C<RANGE> is given in terms of amps, volts or ohms and can be C< -3...+3A | MIN | MAX | DEF | AUTO >, C< 100mV...1000V | MIN | MAX | DEF | AUTO > or C< 0...1e9 | MIN | MAX | DEF | AUTO >.	
-C<DEF> is default C<AUTO> activates the AUTORANGE-mode.
-C<DEF> will be set, if no value is given.
-
-=back
-
-=cut
 
 sub config_measurement {    # basic
     my $self = shift;
@@ -649,36 +413,12 @@ sub config_measurement {    # basic
 
 }
 
-=head2 trg()
-
- $agilent->trg();
-
-Sends a trigger signal via the C<GPIB-BUS> to start the predefined measurement.
-The LabVisa-script can immediatally be continued, e.g. to start another
-triggered measurement using a second Agilent34410A. 
-
-=cut
 
 sub trg {    # basic
     my $self = shift;
     $self->write("*TRG");
 }
 
-=head2 get_data($readings)
-
-reads all recorded values from the internal buffer and returnes them as an array of floatingpoint values.
-reading the buffer will start immediately. The LabVisa-script cannot be continued until all requested readings have been recieved.
-
-=over 4
-
-=item <$readings>
-
-C<readINGS> can be a number between 1 and 50.000 or 'ALL' to specifiy the number of values to be read from the buffer.
-If $readings is not defined, the default value "ALL" will be used.
-
-=back
-
-=cut
 
 sub get_data {    # basic
     my $self = shift;
@@ -738,22 +478,12 @@ sub get_data {    # basic
 
 }
 
-=head2 abort()
-
-Aborts current (triggered) measurement.
-
-=cut
 
 sub abort {    # basic
     my $self = shift;
     $self->write("ABOR");
 }
 
-=head2 wait()
-
-Wait until triggered measurement has been finished.
-
-=cut
 
 sub wait {     # basic
     my $self = shift;
@@ -767,12 +497,6 @@ sub wait {     # basic
 
 }
 
-=head2 active()
-
-Returns '1' if the current triggered measurement is still active and '0' if the current triggered measurement has allready been finished.
-
-
-=cut
 
 sub active {    # basic
     my $self = shift;
@@ -939,14 +663,6 @@ sub _set_sampledelay {    # internal
 
 # ------------------------------- DISPLAY and BEEPER --------------------------------------------
 
-=head2 display_text($text)
-	
-Display C<$text> on the front panel. The multimeter will display up to 12
-characters in a message; any additional characters are truncated.
-
-Without parameter, the displayed message is returned.
-
-=cut
 
 sub display_text {    # basic
     my $self = shift;
@@ -964,52 +680,25 @@ sub display_text {    # basic
     return $text;
 }
 
-=head2 display_on()
-
-Turn the front-panel display on.
-
-=cut
 
 sub display_on {    # basic
     my $self = shift;
     $self->write("DISPLAY ON");
 }
 
-=head2 display_off()
 
-Turn the front-panel display off.
-
-=cut
-
-=head2 display_off
-
-	$agilent->display_off();
-
-Turn the front-panel display off.
-
-=cut
 
 sub display_off {    # basic
     my $self = shift;
     $self->write("DISPLAY OFF");
 }
 
-=head2 display_clear()
-
-Clear the message displayed on the front panel.
-
-=cut
 
 sub display_clear {    # basic
     my $self = shift;
     $self->write("DISPLAY:TEXT:CLEAR");
 }
 
-=head2 beep()
-
-Issue a single beep immediately.
-
-=cut
 
 sub beep {             # basic
     my $self = shift;
@@ -1018,17 +707,314 @@ sub beep {             # basic
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::Agilent34410A - HP/Agilent/Keysight 34410A or 34411A digital multimeter
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use Lab::Instrument::Agilent34410A;
+ my $multimeter = Lab::Instrument::Agilent34410A->new(%options);
+
+ print $multimeter->get_value();
+
+=head1 DESCRIPTION
+
+The Lab::Instrument::Agilent34410A class implements an interface to the 34410A
+and 34411A digital multimeters by Agilent (now Keysight, formerly HP).
+
+=head1 METHODS
+
+=head2 new(%options)
+
+This method is described in L<Lab::Measurement::Tutorial> and
+L<Lab::Instrument>.
+
+=head2 get_value()
+
+Perform data aquisition.
+
+ my $value = $multimeter->get_value();
+
+=head2 get_error()
+
+ my ($err_num, $err_msg) = $agilent->get_error();
+
+Query the multimeter's error queue. Up to 20 errors can be stored in the
+queue. Errors are retrieved in first-in-first out (FIFO) order.
+
+=head2 reset()
+
+ $agilent->reset();
+
+Reset the multimeter to its power-on configuration.
+
+=head2 assert_function($keyword)
+
+Throw if the instrument is not in one of the operating modes given in
+C<$keyword>. See L<Lab::SCPI> for the keyword syntax.
+
+=head2 set_function($function)
+
+Set a new value for the measurement function of the Agilent34410A.
+
+C<$function> can be one of the measurement methods of the Agilent34410A.
+
+	"current:dc" --> DC current measurement 
+	"current:ac" --> AC current measurement 
+	"voltage:dc" --> DC voltage measurement 
+	"voltage:ac" --> AC voltage measurement 
+	"resistance" --> resistance measurement (2-wire)
+	"fresistance" --> resistance measurement (4-wire)
+
+=head2 get_function()
+
+Return the used measurement function.
+
+=head2 set_range($range)
+
+Set the range of the used measurement function to C<$range>.
+
+C<RANGE> is given in terms of amps, volts or ohms and can be C<-3...+3A | MIN | MAX | DEF | AUTO>, C<100mV...1000V | MIN | MAX | DEF | AUTO> or C<0...1e9 | MIN | MAX | DEF | AUTO>.	
+C<DEF> is default C<AUTO> activates the C<AUTORANGE-mode>.
+C<DEF> will be set, if no value is given.
+
+=head2 get_range()
+
+Return the range of the used measurement function.
+
+=head2 get_autorange()
+
+Return non-zero, if autoranging is enabled.
+
+=head2 set_nplc($nplc)
+
+Set a new value for the predefined C<NUMBER of POWER LINE CYCLES> for the
+used measurement function.
+
+The C<NUMBER of POWER LINE CYCLES> is actually something similar to an integration time for recording a single measurement value.
+The values for C<$nplc> can be any value between 0.006 ... 100 but internally the Agilent34410A selects the value closest to one of the following fixed values C< 0.006 | 0.02 | 0.06 | 0.2 | 1 | 2 | 10 | 100 | MIN | MAX | DEF >.
+
+Example: 
+Assuming C<$nplc> to be 10 and assuming a netfrequency of 50Hz this results in an integration time of 10*50Hz = 0.2 seconds for each measured value. 
+
+NOTE:
+1.) Only those integration times set to an integral number of power line cycles (1, 2, 10, or 100 PLCs) provide normal mode (line frequency noise) rejection.
+2.) Setting the integration time also sets the resolution for the measurement. The following table shows the relationship between integration time and resolution. 
+
+	Integration Time (power line cycles)		 Resolution
+	0.001 PLC  (34411A only)			30 ppm x Range
+	0.002 PLC  (34411A only)			15 ppm x Range
+	0.006 PLC					6.0 ppm x Range
+	0.02 PLC					3.0 ppm x Range
+	0.06 PLC					1.5 ppm x Range
+	0.2 PLC						0.7 ppm x Range
+	1 PLC (default)					0.3 ppm x Range
+	2 PLC						0.2 ppm x Range
+	10 PLC						0.1 ppm x Range
+	100 PLC 					0.03 ppm x Range
+
+=head2 get_nplc()
+
+Return the value of C<nplc> for the used measurement function.
+
+=head2 set_resolution($resolution)
+
+Set a new resolution for the used measurement function.
+
+Give the current value C<RANGE> of the current range,
+C<$resolution> is given in terms of C<$resolution * RANGE> or C<[MIN|MAX|DEF]>.
+C<$resolution=0.0001> means 4 1/2 digits for example.
+$resolution must be larger than 0.3e-6xRANGE.
+The best resolution is range = 100mV ==> resoltuion = 3e-8V
+C<DEF> will be set, if no value is given.
+
+=head2 get_resolution()
+
+Return the resolution of the used measurement function.
+
+=head2 set_tc($tc)
+
+Set a new value for the predefined C<INTEGRATION TIME> for the used measurement
+function.
+
+C<INTEGRATION TIME> $tc can be C< 1e-4 ... 1s | MIN | MAX | DEF>.
+
+NOTE: 
+1.) Only those integration times set to an integral number of power line cycles
+(1, 2, 10, or 100 PLCs) provide normal mode (line frequency noise) rejection. 
+2.) Setting the integration time also sets the resolution for the
+measurement. The following table shows the relationship between integration
+time and resolution.  
+
+	Integration Time (power line cycles)		 Resolution
+	0.001 PLC  (34411A only)			30 ppm x Range
+	0.002 PLC  (34411A only)			15 ppm x Range
+	0.006 PLC					6.0 ppm x Range
+	0.02 PLC					3.0 ppm x Range
+	0.06 PLC					1.5 ppm x Range
+	0.2 PLC						0.7 ppm x Range
+	1 PLC (default)					0.3 ppm x Range
+	2 PLC						0.2 ppm x Range
+	10 PLC						0.1 ppm x Range
+	100 PLC 					0.03 ppm x Range
+
+=head2 get_tc()
+
+Return the C<INTEGRATION TIME> of the used measurement function.
+
+=head2 set_bw($bw)
+
+Set a new C<BANDWIDTH> for the used measurement function, which must be 
+C<VOLTAGE:AC> or C<CURRENT:AC>.
+
+C<$bw> can be C< 3 ... 200Hz | MIN | MAX | DEF>.
+
+=head2 get_bw()
+
+Return the bandwidth of the used measurement function, which must be
+C<VOLTAGE:AC> or C<CURRENT:AC>.
+
+=head2 config_measurement
+
+	old style:
+	$agilent->config_measurement($function, $number_of_points, <$time>, <$range>);
+	
+	new style:
+	$agilent->config_measurement({
+		'function' => $function, 
+		'nop' => $number_of_points,
+		'time' => <$time>, 
+		'range' => <$range>
+		});
+
+Preset the Agilent34410A for a TRIGGERED measurement.
+
+=over 4
+
+=item $function
+
+C<FUNCTION> can be one of the measurement methods of the Agilent34410A.
+
+	"current:dc" --> DC current measurement 
+	"current:ac" --> AC current measurement 
+	"voltage:dc" --> DC voltage measurement 
+	"voltage:ac" --> AC voltage measurement 
+	"resistance" --> resistance measurement (2-wire)
+	"fresistance" --> resistance measurement (4-wire)
+
+=item $number_of_points
+
+Preset the C<NUMBER OF POINTS> to be taken for one measurement trace.
+The single measured points will be stored in the internal memory of the Agilent34410A.
+For the Agilent34410A the internal memory is limited to 50.000 values.	
+
+=item <$time>
+
+Preset the C<TIME> duration for one full trace. From C<TIME> the integration time value for each measurement point will be derived [TC = (TIME *50Hz)/NOP].
+Expected values are between 0.0001*NOP ... 1*NOP seconds.
+
+=item <$range>
+
+C<RANGE> is given in terms of amps, volts or ohms and can be C< -3...+3A | MIN | MAX | DEF | AUTO >, C< 100mV...1000V | MIN | MAX | DEF | AUTO > or C< 0...1e9 | MIN | MAX | DEF | AUTO >.	
+C<DEF> is default C<AUTO> activates the AUTORANGE-mode.
+C<DEF> will be set, if no value is given.
+
+=back
+
+=head2 trg()
+
+ $agilent->trg();
+
+Sends a trigger signal via the C<GPIB-BUS> to start the predefined measurement.
+The LabVisa-script can immediatally be continued, e.g. to start another
+triggered measurement using a second Agilent34410A. 
+
+=head2 get_data($readings)
+
+reads all recorded values from the internal buffer and returnes them as an array of floatingpoint values.
+reading the buffer will start immediately. The LabVisa-script cannot be continued until all requested readings have been recieved.
+
+=over 4
+
+=item <$readings>
+
+C<readINGS> can be a number between 1 and 50.000 or 'ALL' to specifiy the number of values to be read from the buffer.
+If $readings is not defined, the default value "ALL" will be used.
+
+=back
+
+=head2 abort()
+
+Aborts current (triggered) measurement.
+
+=head2 wait()
+
+Wait until triggered measurement has been finished.
+
+=head2 active()
+
+Returns '1' if the current triggered measurement is still active and '0' if the current triggered measurement has allready been finished.
+
+=head2 display_text($text)
+
+Display C<$text> on the front panel. The multimeter will display up to 12
+characters in a message; any additional characters are truncated.
+
+Without parameter, the displayed message is returned.
+
+=head2 display_on()
+
+Turn the front-panel display on.
+
+=head2 display_off()
+
+Turn the front-panel display off.
+
+=head2 display_off
+
+	$agilent->display_off();
+
+Turn the front-panel display off.
+
+=head2 display_clear()
+
+Clear the message displayed on the front panel.
+
+=head2 beep()
+
+Issue a single beep immediately.
+
 =head1 SEE ALSO
 
 =over 4
 
 =item L<Lab::Instrument>
 
-
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Stefan Geissler
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Andreas K. Huettel, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

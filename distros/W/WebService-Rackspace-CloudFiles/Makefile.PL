@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install;
 
 perl_version '5.008008';

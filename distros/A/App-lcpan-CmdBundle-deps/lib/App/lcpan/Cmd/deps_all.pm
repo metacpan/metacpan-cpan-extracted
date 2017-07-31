@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps_all;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -143,7 +143,7 @@ App::lcpan::Cmd::deps_all - List all dependencies
 
 =head1 VERSION
 
-This document describes version 0.006 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-10.
+This document describes version 0.007 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-28.
 
 =head1 DESCRIPTION
 

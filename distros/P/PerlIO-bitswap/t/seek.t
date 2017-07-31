@@ -1,14 +1,14 @@
 use warnings;
 use strict;
 
-use Test::More tests => 36;
+use Test::More tests => 40;
 
 my $test_input = "\x01\x02\x04\x08\x10\x20\x40\x80" .
 	"\x92\x07\x58\x97\x0c\x21\xd5\x82\xc8\xb8\xec\xe8\xb2\x85\x1e\x4c";
 my $out;
 my $f;
 
-open($f, "<:bitswap(4)", \$test_input);
+ok open($f, "<:bitswap(4)", \$test_input);
 $/ = \1;
 is scalar(<$f>), "\x10";
 is scalar(<$f>), "\x20";
@@ -21,7 +21,7 @@ ok seek($f, -19, 2);
 is scalar(<$f>), "\x02";
 $f = undef;
 
-open($f, "<:bitswap(24)", \$test_input);
+ok open($f, "<:bitswap(24)", \$test_input);
 $/ = \1;
 is scalar(<$f>), "\x08";
 is scalar(<$f>), "\x04";
@@ -45,7 +45,7 @@ is scalar(<$f>), "\xc8";
 $f = undef;
 
 $out = "";
-open($f, ">:bitswap(4)", \$out);
+ok open($f, ">:bitswap(4)", \$out);
 print $f "\x10\xaa\x40\xbb\x01\xcc\x04\x08";
 ok seek($f, 3, 0);
 print $f "\x80";
@@ -57,7 +57,7 @@ $f = undef;
 is $out, "\x01\x02\x04\x08\x10\x20\x40\x80";
 
 $out = "";
-open($f, ">:bitswap(24)", \$out);
+ok open($f, ">:bitswap(24)", \$out);
 print $f "\x08";
 print $f "\x04";
 print $f "\x02";

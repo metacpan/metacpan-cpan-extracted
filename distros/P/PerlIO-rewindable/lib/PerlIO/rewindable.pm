@@ -4,7 +4,7 @@ PerlIO::rewindable - I/O layer to allow rewinding of streams
 
 =head1 SYNOPSIS
 
-	binmode \*STDIN, ":rewindable";
+    binmode \*STDIN, ":rewindable";
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ package PerlIO::rewindable;
 use warnings;
 use strict;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -61,7 +61,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

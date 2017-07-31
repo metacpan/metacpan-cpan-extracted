@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use File::HomeDir::Test;
+use Test2::Plugin::FauxHomeDir;
 use Test::Clustericious::Cluster;
 use Test2::Bundle::More;
 
-plan 1;
-
 pass 'all good';
+
+done_testing;

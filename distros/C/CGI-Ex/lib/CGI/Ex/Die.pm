@@ -7,7 +7,7 @@ CGI::Ex::Die - A CGI::Carp::FatalsToBrowser type utility.
 =cut
 
 ###----------------------------------------------------------------###
-#  Copyright 2004-2015 - Paul Seamons                                #
+#  Copyright 2004-2017 - Paul Seamons                                #
 #  Distributed under the Perl Artistic License without warranty      #
 ###----------------------------------------------------------------###
 
@@ -23,7 +23,7 @@ use CGI::Ex;
 use CGI::Ex::Dump qw(debug ctrace dex_html);
 
 BEGIN {
-  $VERSION = '2.44';
+  $VERSION = '2.45';
   $SHOW_TRACE = 0      if ! defined $SHOW_TRACE;
   $IGNORE_EVAL = 0     if ! defined $IGNORE_EVAL;
   $EXTENDED_ERRORS = 1 if ! defined $EXTENDED_ERRORS;

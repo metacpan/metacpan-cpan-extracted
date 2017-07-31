@@ -1,9 +1,29 @@
+#DistZilla: +PodWeaver
+#PODNAME: Lab::Measurement::Developer::Write-A-Source-Driver
+#ABSTRACT: Implementing a current/voltage source driver
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Measurement::Developer::Write-A-Source-Driver - Implementing a current/voltage source driver
+
+=head1 VERSION
+
+version 3.554
+
 =head1 Implementing a current/voltage source driver
 
 This document is ment as a guideline to and a help with the implementation of drivers for current and voltage sources.
 Since the complexity of the C<Lab::Instrument> and C<Lab::Instrument::Source> classes increases, it becomes more and more cumbersome to carefully read
 the (sometimes outdated) class documentation to keep track of correct interfaces, i.e., required methods and return values, to provide 
 source device drivers.
+
+NOTE: This document hasn't been updated for a very long time and may in part be outdated.
 
 =head2 The config hash
 
@@ -46,7 +66,7 @@ At the moment when this documentation is written, an example for a correct confi
 	
 	device_cache_order => ['function','range'],
   );
-  
+
 Let me introduce the objects in this hash. C<connection_settings> is more or less self-explanatory and should be overwritten by the user anyway.
 
 =head2 The device_settings hash
@@ -80,7 +100,7 @@ The default for the getter should be to return the cached variable, i.e. the var
 If the option 
 
   from_device => 1
-  
+
 is given, the variable should be read from the device.
 
 =head3 The setter methods
@@ -89,14 +109,13 @@ should always set both on device and in the software cache.
 You can also use a 
 
   error_check=>1
-  
+
 in the C<$self->write> command, then a possible error which appears on the device will automatically be set.
 Read also the section on error checking.
 
 =head3 Default values
 
 Best is to use C<undef>.
-
 
 =head2 Methods that MUST be provided by the device class
 
@@ -120,7 +139,6 @@ A function C<get_status()>.
 The sub C<get_status> should read out the status byte of the device and create a hash with a descriptive flag and the state of the corresponding bit.
 The error bit should have the key B<"ERROR">.
 
-
 =head2 Methods that should be implemented
 
 It is convenient to implement the follwoing functions if possible:
@@ -129,7 +147,7 @@ It is convenient to implement the follwoing functions if possible:
 
 =item 1.
 A sub C<_sweep_to_level($target,$time)>.
- 
+
 =item 2.
 A sub C<get_error()>.
 
@@ -146,14 +164,14 @@ It should return C<$target>.
 should read out the device's error stack. It should return ONE error at once in a single array with 
 
   [$errorcode,$errormessage]
-  
+
 =head2 The error checking framework
 
 It is possible to wrap every C<write($cmd)> call by an error checking routine. This can be invoked by providing the option C<error_check>.
 For example:
 
   $self->write($cmd,'error_check' => 1)
-  
+
 After sending the command in C<$cmd> to the device, the framework will use C<get_status()> to read out the B<ERROR> status bit. If it is set, 
 C<get_error()> will be used to fetch the error from the device.
 
@@ -164,5 +182,15 @@ C<get_error()> will be used to fetch the error from the device.
 The advanced user should be given the possibility to do dirty workarounds when using the driver. To do this, he can provide options in the C<write()> call,
 that are interpreted on connection level. This should in general also be possible when using C<set_level> or any command that involves a C<write()> call.
 
-  
-  
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Alois Dirnaichner
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

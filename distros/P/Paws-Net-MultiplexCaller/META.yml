@@ -1,0 +1,24 @@
+---
+abstract: 'Control routing of services to Paws callers'
+author:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+build_requires:
+  Paws::Kinesis::MemoryCaller: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Paws-Net-MultiplexCaller
+requires:
+  Paws: '0'
+resources:
+  bugtracker: https://github.com/pplu/paws-net-multiplexcaller/issues/
+  repository: https://github.com/pplu/paws-net-multiplexcaller/
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

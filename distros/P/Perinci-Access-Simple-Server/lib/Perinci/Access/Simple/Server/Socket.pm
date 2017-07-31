@@ -1,7 +1,7 @@
 package Perinci::Access::Simple::Server::Socket;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 use 5.010001;
 use strict;
@@ -485,7 +485,7 @@ Perinci::Access::Simple::Server::Socket - Implement Riap::Simple server over soc
 
 =head1 VERSION
 
-This document describes version 0.25 of Perinci::Access::Simple::Server::Socket (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-03.
+This document describes version 0.26 of Perinci::Access::Simple::Server::Socket (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-28.
 
 =head1 SYNOPSIS
 
@@ -636,7 +636,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-Simple-Server>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Simple-Server>.
 
 =head1 BUGS
 

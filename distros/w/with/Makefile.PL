@@ -1,42 +1,57 @@
-use 5.009004;
+use 5.009_004;
 
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-my $BUILD_REQUIRES = {
- 'ExtUtils::MakeMaker' => 0,
- 'Test::More'          => 0,
-};
+my $dist = 'with';
 
-sub build_req {
- my $tometa = ' >> $(DISTVNAME)/META.yml;';
- my $build_req = 'echo "build_requires:" ' . $tometa;
- foreach my $mod ( sort { lc $a cmp lc $b } keys %$BUILD_REQUIRES ) {
-  my $ver = $BUILD_REQUIRES->{$mod};
-  $build_req .= sprintf 'echo "    %-30s %s" %s', "$mod:", $ver, $tometa;
- }
- return $build_req;
-}
+(my $name = $dist) =~ s{-}{::}g;
+
+(my $file = $dist) =~ s{-}{/}g;
+$file = "lib/$file.pm";
+
+my %PREREQ_PM = (
+ 'Carp'                 => 0,
+ 'Filter::Util::Call'   => 0,
+ 'Scalar::Util'         => 0,
+ 'Sub::Prototype::Util' => '0.08',
+ 'Text::Balanced'       => 0,
+);
+
+my %META = (
+ configure_requires => {
+  'ExtUtils::MakeMaker' => 0,
+ },
+ build_requires => {
+  'ExtUtils::MakeMaker' => 0,
+  'Test::More'          => 0,
+  %PREREQ_PM,
+ },
+ dynamic_config => 0,
+ resources => {
+  bugtracker => "http://rt.cpan.org/Dist/Display.html?Name=$dist",
+  homepage   => "http://search.cpan.org/dist/$dist/",
+  license    => 'http://dev.perl.org/licenses/',
+  repository => "http://git.profvince.com/?p=perl%2Fmodules%2F$dist.git",
+ },
+);
 
 WriteMakefile(
-    NAME          => 'with',
-    AUTHOR        => 'Vincent Pit <perl@profvince.com>',
-    LICENSE       => 'perl',
-    VERSION_FROM  => 'lib/with.pm',
-    ABSTRACT_FROM => 'lib/with.pm',
-    PL_FILES      => {},
-    PREREQ_PM     => {
-        'Carp'                 => 0,
-        'Filter::Util::Call'   => 0,
-        'Scalar::Util'         => 0,
-        'Sub::Prototype::Util' => 0.08,
-        'Text::Balanced'       => 0,
-    },
-    dist          => { 
-        PREOP                => 'pod2text lib/with.pm > $(DISTVNAME)/README; '
-                                . build_req,
-        COMPRESS             => 'gzip -9f', SUFFIX => 'gz'
-    },
-    clean         => { FILES => 'with-* *.gcov *.gcda *.gcno cover_db' },
+ NAME             => $name,
+ AUTHOR           => 'Vincent Pit <perl@profvince.com>',
+ LICENSE          => 'perl',
+ VERSION_FROM     => $file,
+ ABSTRACT_FROM    => $file,
+ PL_FILES         => {},
+ PREREQ_PM        => \%PREREQ_PM,
+ MIN_PERL_VERSION => '5.009004',
+ META_MERGE       => \%META,
+ dist             => {
+  PREOP    => "pod2text -u $file > \$(DISTVNAME)/README",
+  COMPRESS => 'gzip -9f', SUFFIX => 'gz'
+ },
+ clean            => {
+  FILES => "$dist-* *.gcov *.gcda *.gcno cover_db Debian_CPANTS.txt"
+ },
 );

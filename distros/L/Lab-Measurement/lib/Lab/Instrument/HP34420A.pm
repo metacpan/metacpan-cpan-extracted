@@ -1,7 +1,6 @@
-#!/usr/bin/perl
-
 package Lab::Instrument::HP34420A;
-$Lab::Instrument::HP34420A::VERSION = '3.553';
+#ABSTRACT: HP/Agilent 34420A digital multimeter
+$Lab::Instrument::HP34420A::VERSION = '3.554';
 use strict;
 use Scalar::Util qw(weaken);
 use Lab::Instrument;
@@ -436,6 +435,8 @@ sub scroll_message {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -443,6 +444,10 @@ sub scroll_message {
 =head1 NAME
 
 Lab::Instrument::HP34420A - HP/Agilent 34420A digital multimeter
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -454,7 +459,6 @@ Lab::Instrument::HP34420A - HP/Agilent 34420A digital multimeter
 		gpib_address => 14,
 	),
   }
-
 
 =head1 DESCRIPTION
 
@@ -496,13 +500,12 @@ one of the values 0.1, 1, 10, 100 and 1000V.
 
 $integration_time is the integration time in seconds. This implicitly sets the provided resolution.
 
-
 =head2 pl_freq
 Parameter: pl_freq
 
 	$hp->pl_freq($new_freq);
 	$npl_freq = $hp->pl_freq();
-	
+
 Get/set the power line frequency at your location (50 Hz for most countries, which is the default). This
 is the basis of the integration time setting (which is internally specified as a count of power
 line cycles, or PLCs). The integration time will be set incorrectly if this parameter is set incorrectly.
@@ -522,7 +525,6 @@ Inherited from L<Lab::Instrument::Multimeter>
     $Agi->set_display_state($state);
 
 Turn the front-panel display on ($state = "ON") or off ($state = "OFF").
-
 
 =head2 get_resistance
 
@@ -577,7 +579,7 @@ at 6 1/2 digits. The resolution parameter only affects the front-panel display.
 =head2 configure_voltage_dc_trigger
 
 	$device->configure_voltage_dc_trigger($intt, $range, $count, $delay, $resolution)
-	
+
 Configure the multimeter for a triggered reading. 
 
 =over 4
@@ -607,13 +609,13 @@ The resolution for the measurement. If given, this overwrites the C<$intt> param
 =head2 trigger_read
 
 	$data = $device->trigger_read()
-	
+
 Sends a trigger signal and fetches the value(s) from the multimeter.
 
 =head2 trigger
 
 	$device->trigger()
-	
+
 Sends a trigger signal to the device.
 
 =head2 fetch
@@ -657,12 +659,21 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2004-2006 Daniel Schröer (<schroeer@cpan.org>), 2009-2010 Daniela Taubert, 
-            2011 Florian Olbrich, Andreas Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Florian Olbrich
+            2013       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

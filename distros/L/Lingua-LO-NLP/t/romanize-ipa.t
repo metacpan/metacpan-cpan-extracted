@@ -1,16 +1,16 @@
 #!/usr/bin/perl
-BEGIN { use lib -d 't' ? "t/lib" : "lib"; }
 use strict;
 use warnings;
 use utf8;
 use feature 'unicode_strings';
 use charnames qw/ :full lao /;
 use open qw/ :encoding(UTF-8) :std /;
+BEGIN { use lib -d 't' ? "t/lib" : "lib"; }
 use Test::More;
 use Lingua::LO::NLP::Romanize;
 
 my @tests = (
-    'ເຄື່ອງກໍາເນີດໄຟຟ້າ' => ['kʰɯ̄ːəŋ kám nɤ́ːt fáj fâː', 'kʰɯːəŋ kam nɤːt faj faː'],
+    'ເຄື່ອງກໍາເນີດໄຟຟ້າ' => ['kʰɯ̄ːəŋ kám nɤ̂ːt fáj fâː', 'kʰɯːəŋ kam nɤːt faj faː'],
     'ສະບາຍດີ'    => ['sá bàːj dìː', 'sa baːj diː'],
     'ດີໆ'        => ['dìː-dìː', 'diː-diː'],
     'ເລື້ອຍໆ'     => ['lɯ̂ːəi-lɯ̂ːəi', 'lɯːəi-lɯːəi' ],

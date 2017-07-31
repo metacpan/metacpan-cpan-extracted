@@ -1,6 +1,6 @@
-
 package Lab::Instrument::TRMC2;
-$Lab::Instrument::TRMC2::VERSION = '3.553';
+#ABSTRACT: ABB TRMC2 temperature controller
+$Lab::Instrument::TRMC2::VERSION = '3.554';
 use strict;
 use warnings;
 use Lab::Instrument;
@@ -405,6 +405,8 @@ sub MakeFrenchComma {
     return $value;
 }
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -412,6 +414,10 @@ sub MakeFrenchComma {
 =head1 NAME
 
 Lab::Instrument::TRMC2 - ABB TRMC2 temperature controller
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -421,7 +427,6 @@ Lab::Instrument::TRMC2 - ABB TRMC2 temperature controller
 
 The Lab::Instrument::ILM class implements an interface to the ABB TRMC2 temperature 
 controller. The driver works, but documentation is lacking.
-
 
 =head1 CONSTRUCTOR
 
@@ -439,11 +444,18 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2010 David Kalok and Andreas K. Hüttel (L<http://www.akhuettel.de/>)
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel
+            2013       Alois Dirnaichner
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

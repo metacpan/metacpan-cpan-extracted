@@ -58,6 +58,16 @@ sub test_main : Tests {
     );
 
     $self->tidyall(
+        source => "---\none: line\n---\nThis should work",
+        desc   => 'one line is okay'
+    );
+
+    $self->tidyall(
+        source => "---\none: line\ntwo: lines\n---\nThis should work",
+        desc   => 'two lines are okay'
+    );
+
+    $self->tidyall(
         source => 'fish',
         expect_error =>
             qr/dummy[.]md' does not start with valid YAML Front Matter/,

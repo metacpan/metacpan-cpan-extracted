@@ -4,9 +4,9 @@ XML::Easy::Syntax - excruciatingly correct XML syntax
 
 =head1 SYNOPSIS
 
-	use XML::Easy::Syntax qw($xml10_name_rx);
-	if($name =~ /\A$xml10_name_rx\z/o) { ...
-	# and many other regular expressions
+    use XML::Easy::Syntax qw($xml10_name_rx);
+    if($name =~ /\A$xml10_name_rx\z/o) { ...
+    # and many other regular expressions
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ package XML::Easy::Syntax;
 use warnings;
 use strict;
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

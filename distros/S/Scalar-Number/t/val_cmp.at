@@ -1,9 +1,13 @@
+use warnings;
+use strict;
+
+BEGIN { unshift @INC, "./t/lib"; }
 use Data::Float 0.008 qw(have_nan have_infinite significand_bits);
 use Data::Integer 0.001 qw(natint_bits);
 use Test::More;
+use t::NumForms qw(zpat zero_forms natint_forms float_forms);
 
-do "t/num_forms.pl" or die $@ || $!;
-my @zeroes = ( natint_forms("0"), float_forms("+0"), float_forms("-0") );
+my @zeroes = zero_forms();
 my @values = ( have_nan ? [ float_forms("nan") ] : [] );
 open(TEST_VALS, "<", "t/values.data") or die "t/values.data: $!";
 while(1) {

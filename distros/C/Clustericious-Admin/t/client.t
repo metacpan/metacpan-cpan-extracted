@@ -3,7 +3,6 @@ use warnings;
 use Test::Clustericious::Config;
 use Test::More tests => 14;
 use App::clad;
-use File::HomeDir;
 use Path::Class qw( dir file );
 use Clustericious::Config;
 use Capture::Tiny qw( capture );

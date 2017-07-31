@@ -168,9 +168,16 @@ cmp_deeply(
 cmp_deeply(
     [ grep { /^\[Run::[^]]+\]/ } @{ $tzil->log_messages } ],
     [
+        '[Run::BeforeBuild] attempting to use %d in before_build',
+        '[Run::BeforeBuild] attempting to use %a in a non-Release plugin',
         re(qr/^\Q[Run::BeforeBuild] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('before_build \E/),
+
+        '[Run::AfterBuild] attempting to use %a in a non-Release plugin',
         re(qr/^\Q[Run::AfterBuild] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('after_build \E/),
+
+        '[Run::BeforeArchive] attempting to use %a in a non-Release plugin',
         re(qr/^\Q[Run::BeforeArchive] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('before_archive \E/),
+
         re(qr/^\Q[Run::BeforeRelease] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('before_release \E/),
         re(qr/^\Q[Run::Release] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('release \E/),
         re(qr/^\Q[Run::AfterRelease] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('after_release \E/),

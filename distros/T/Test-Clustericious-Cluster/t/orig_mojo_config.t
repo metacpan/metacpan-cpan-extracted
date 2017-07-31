@@ -3,8 +3,6 @@ use warnings;
 use Test::Clustericious::Cluster;
 use Test2::Bundle::More;
 
-plan 10;
-
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok(['Foo' => { arg1 => 'one', arg2 => 'two' }]);
 
@@ -22,6 +20,8 @@ $t->get_ok("$url/foo")
 $t->get_ok("$url/bar")
   ->status_is(200)
   ->content_is('two');
+
+done_testing;
 
 __DATA__
 

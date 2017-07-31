@@ -20,6 +20,6 @@ t/04_helpers.t
 t/04_plugin_settings.t
 t/05_named_captures.t
 t/06_tcp_server.t
+t/gh14-deserialized.t
 utils/list_helpers.pl
-xt/release/pause-permissions.t
 xt/release/unused-vars.t

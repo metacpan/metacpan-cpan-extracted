@@ -14,7 +14,7 @@ use base qw(DynaLoader);
 use strict;
 use vars qw($VERSION $Debug);
 
-$VERSION = '3.426';
+$VERSION = '3.430';
 
 #$Debug sets the default value for debug.  You're better off with the object method though.
 
@@ -58,6 +58,7 @@ sub new {
 		use_vars => 1,
 		use_unreadback => 1,   # Backward compatibility
 		use_protected => 1,   # Backward compatibility
+		use_pinselects => 0,   # Backward compatibility
 		use_std => undef,	# Undef = silent
 		#use_cb_{callback-name} => 0/1
 		#
@@ -72,6 +73,7 @@ sub new {
 		$self->{_sigparser},
 		$self->{use_unreadback},
 		$self->{use_protected},
+		$self->{use_pinselects},  # Undocumented as for use in SigParser only
 		);
 
     $self->{use_cb_contassign} = $self->{use_vars} if !exists $self->{use_cb_contassign};

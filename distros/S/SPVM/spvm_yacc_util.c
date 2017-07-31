@@ -12,6 +12,7 @@
 #include "spvm_constant.h"
 #include "spvm_var.h"
 #include "spvm_op.h"
+#include "spvm_type.h"
 
 void SPVM_yyerror_format(SPVM_COMPILER* compiler, const char* message_template, ...) {
   
@@ -93,7 +94,7 @@ void SPVM_yyerror(SPVM_COMPILER* compiler, const char* message)
       ptr++;
     }
     
-    char* token = (char*) SPVM_UTIL_ALLOCATOR_safe_malloc_i32(length + 1, sizeof(char));
+    char* token = (char*) SPVM_UTIL_ALLOCATOR_safe_malloc_zero(length + 1);
     memcpy(token, compiler->befbufptr + empty_count, length);
     token[length] = '\0';
     
@@ -118,21 +119,27 @@ void SPVM_yyprint (FILE *file, int type, YYSTYPE yylval) {
     case CONSTANT: {
       SPVM_CONSTANT* constant = yylval.opval->uv.constant;
       
-      switch(constant->code) {
-        case SPVM_CONSTANT_C_CODE_INT:
-          fprintf(file, "int %" PRId64, constant->uv.long_value);
+      switch(constant->type->id) {
+        case SPVM_TYPE_C_ID_BYTE:
+          fprintf(file, "int %" PRId8, constant->value.byte_value);
           break;
-        case SPVM_CONSTANT_C_CODE_LONG:
-          fprintf(file, "long %" PRId64, constant->uv.long_value);
+        case SPVM_TYPE_C_ID_SHORT:
+          fprintf(file, "int %" PRId16, constant->value.short_value);
           break;
-        case SPVM_CONSTANT_C_CODE_FLOAT:
-          fprintf(file, "float %f", constant->uv.float_value);
+        case SPVM_TYPE_C_ID_INT:
+          fprintf(file, "int %" PRId32, constant->value.int_value);
           break;
-        case SPVM_CONSTANT_C_CODE_DOUBLE:
-          fprintf(file, "double %f", constant->uv.double_value);
+        case SPVM_TYPE_C_ID_LONG:
+          fprintf(file, "long %" PRId64, constant->value.long_value);
           break;
-        case SPVM_CONSTANT_C_CODE_STRING:
-          fprintf(file, "string %s", constant->uv.string_value);
+        case SPVM_TYPE_C_ID_FLOAT:
+          fprintf(file, "float %f", constant->value.float_value);
+          break;
+        case SPVM_TYPE_C_ID_DOUBLE:
+          fprintf(file, "double %f", constant->value.double_value);
+          break;
+        case SPVM_TYPE_C_ID_STRING:
+          fprintf(file, "string %s", constant->value.string_value);
           break;
       }
     }

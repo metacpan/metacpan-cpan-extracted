@@ -1,5 +1,6 @@
 requires "Carp" => "0";
 requires "Exporter" => "0";
+requires "List::Util" => "0";
 requires "Module::Implementation" => "0";
 requires "perl" => "5.006";
 requires "strict" => "0";
@@ -9,6 +10,8 @@ requires "warnings" => "0";
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
+  requires "Scalar::Util" => "0";
+  requires "Storable" => "0";
   requires "Test::Builder::Module" => "0";
   requires "Test::LeakTrace" => "0";
   requires "Test::More" => "0.96";

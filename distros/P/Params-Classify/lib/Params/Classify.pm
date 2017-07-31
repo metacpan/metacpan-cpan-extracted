@@ -4,49 +4,48 @@ Params::Classify - argument type classification
 
 =head1 SYNOPSIS
 
-	use Params::Classify qw(
-		scalar_class
-		is_undef check_undef
-		is_string check_string
-		is_number check_number
-		is_glob check_glob
-		is_regexp check_regexp
-		is_ref check_ref ref_type
-		is_blessed check_blessed blessed_class
-		is_strictly_blessed check_strictly_blessed
-		is_able check_able
-	);
+    use Params::Classify qw(
+	scalar_class
+	is_undef check_undef
+	is_string check_string
+	is_number check_number
+	is_glob check_glob
+	is_regexp check_regexp
+	is_ref check_ref ref_type
+	is_blessed check_blessed blessed_class
+	is_strictly_blessed check_strictly_blessed
+	is_able check_able);
 
-	$c = scalar_class($arg);
+    $c = scalar_class($arg);
 
-	if(is_undef($arg)) {
-	check_undef($arg);
+    if(is_undef($arg)) {
+    check_undef($arg);
 
-	if(is_string($arg)) {
-	check_string($arg);
-	if(is_number($arg)) {
-	check_number($arg);
+    if(is_string($arg)) {
+    check_string($arg);
+    if(is_number($arg)) {
+    check_number($arg);
 
-	if(is_glob($arg)) {
-	check_glob($arg);
-	if(is_regexp($arg)) {
-	check_regexp($arg);
+    if(is_glob($arg)) {
+    check_glob($arg);
+    if(is_regexp($arg)) {
+    check_regexp($arg);
 
-	if(is_ref($arg)) {
-	check_ref($arg);
-	$t = ref_type($arg);
-	if(is_ref($arg, "HASH")) {
-	check_ref($arg, "HASH");
+    if(is_ref($arg)) {
+    check_ref($arg);
+    $t = ref_type($arg);
+    if(is_ref($arg, "HASH")) {
+    check_ref($arg, "HASH");
 
-	if(is_blessed($arg)) {
-	check_blessed($arg);
-	if(is_blessed($arg, "IO::Handle")) {
-	check_blessed($arg, "IO::Handle");
-	$c = blessed_class($arg);
-	if(is_strictly_blessed($arg, "IO::Pipe::End")) {
-	check_strictly_blessed($arg, "IO::Pipe::End");
-	if(is_able($arg, ["print", "flush"])) {
-	check_able($arg, ["print", "flush"]);
+    if(is_blessed($arg)) {
+    check_blessed($arg);
+    if(is_blessed($arg, "IO::Handle")) {
+    check_blessed($arg, "IO::Handle");
+    $c = blessed_class($arg);
+    if(is_strictly_blessed($arg, "IO::Pipe::End")) {
+    check_strictly_blessed($arg, "IO::Pipe::End");
+    if(is_able($arg, ["print", "flush"])) {
+    check_able($arg, ["print", "flush"]);
 
 =head1 DESCRIPTION
 
@@ -78,7 +77,7 @@ package Params::Classify;
 use warnings;
 use strict;
 
-our $VERSION = "0.014";
+our $VERSION = "0.015";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

@@ -1,5 +1,15 @@
 Revision history for Dist::Zilla::PluginBundle::MSCHOUT
 
+0.32  2017-07-29
+    - add MinimumPerl plugin
+    - enable Dist::Zilla::PluginBundle::PluginRemover plugin
+    - make signature test an AUTHOR test and use Test::Signature
+    - use Moose attibutes for options
+    - enable ::PluginBundle::Config::Slicer role so plugin options can be
+      easily set
+    - enable InsertCopyright plugin
+    - enable Prereqs::AuthorDeps plugin
+
 0.31  2016-08-30
     - Configure Git::Push to also push build/releases if it exists on origin
     - signature test: skip generated files

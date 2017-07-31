@@ -22,7 +22,9 @@ lib/AI/XGBoost/DMatrix.pm
 misc/using_capi.c
 t/00-load.t
 t/10-cast_arguments.t
+t/20-dmatrix.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t
+weaver.ini

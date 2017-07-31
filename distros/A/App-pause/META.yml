@@ -22,7 +22,7 @@ requires:
   Getopt::Long::Subcommand: '0.09'
   JSON::PP: '0'
   List::Util: '0'
-  Log::ger: '0.011'
+  Log::ger: '0.019'
   Log::ger::Output: '0.005'
   Log::ger::Output::Screen: '0.004'
   Log::ger::Util: '0.008'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause
   homepage: https://metacpan.org/release/App-pause
   repository: git://github.com/perlancar/perl-App-pause.git
-version: '0.63'
+version: '0.64'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

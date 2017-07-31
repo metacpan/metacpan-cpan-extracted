@@ -1,3 +1,18 @@
+1.0.2 2017-07-27
+ - Fix manifest.
+
+1.0.1 2017-07-27
+ - Add support for NRPE V3 and IPv6.
+
+1.0.0 2016-09-12
+ - Sort options alphabetically
+
+0.004 2016-06-01
+ - Fix SSL incompatibility with recent NRPE Server implementations
+
+0.003 2014-04-16
+ - Fix Pod errors
+
 0.002 2014-04-15
  - Fix kwalitee errors
  - Build.PL add Test::Podcoverage to build requirements

@@ -33,12 +33,18 @@ the constant C<APACHE2_4> which is needed for the test suite.
 
 =item *
 
-Your module must inherit from C<Apache2_4::AuthCookie> instead of C<Apache2::AuthCookie>
+You must not call authcookie's authorize() method.  Authorization is done using
+AuthzProvider's under Apache 2.4 and these work very different from previous
+apache versions.  If you are simply doing simple things such as
+C<Require user ...> or C<Require valid-user> in your C<httpd.conf>, then you
+likely do not need an authorization provider at all.  Apache 2.4 handles these
+for you in C<mod_authz_user.c>.
 
 =item *
 
-You must change every method that was called as a C<PerlAuthzHandler> under
-previous versions to return one of the following values:
+Related to previous item, you must change every method that was called as a
+C<PerlAuthzHandler> under previous versions to return one of the following
+values:
 
 =over 4
 
@@ -75,7 +81,9 @@ return granted or denied.
 
 =item *
 
-Remove all C<PerlAuthzHandler> entries.  C<PerlAuthzHandler> does not exist in Apache 2.4.
+Remove all C<PerlAuthzHandler> entries.  C<PerlAuthzHandler> is not necessary
+in Apache 2.4.  If you are doing custom authoriaztion, you need to convert
+these to C<PerlAddAuthzProvider> entries:
 
 =item *
 
@@ -85,11 +93,7 @@ one.
 
 If your C<Require> directives are simply C<valid-user> or C<user ...> then you
 do not need to do this.  Apache already provides an authz provider that handles
-C<user> and C<valid-user> requirements for you in C<mod_authz_user>.
-
-C<AuthCookie> does provide a C<authz_handler> for these requirements for
-backwards compatibility with previous versions, but the one provided by Apache
-is preferred.
+C<user> and C<valid-user> requirements for you in C<mod_authz_user.c>.
 
 =item *
 
@@ -101,7 +105,7 @@ Each one implements a specific requirement. E.g.:
 
  PerlAddAuthzProvider species My::AuthCookieHandler->authz_species
 
-Will be called to handle a 
+Will be called to handle a
 
  Require species klingon
 
@@ -110,7 +114,8 @@ Directive.
 It is important to know that Authz Providers are called B<twice> for
 a request.  First, the authz provider is called before authentication has been
 processed to check for anonymous access.  In this method call, C<< $r->user >>
-is not set.  You are expected to return one of:
+is not set (to allow for your handler to allow annonymous access).  You are
+expected to return one of:
 
 =over 4
 
@@ -128,8 +133,9 @@ provider)
 
 =item AUTHZ_DENIED_NO_USER
 
-Authentication is processed, C<< $r->user >> will be set with the current
-username and your authz provider will be called again.
+This should be returned if C<< $r->user >> is not set and you do not wish to
+allow anonymous access.  Authentication will be processed, C<< $r->user >> will
+be set with the current username and your authz provider will be called again.
 
 =back
 
@@ -233,7 +239,7 @@ Continue processing siblings.
 You need to use a C<PerlAddAuthzProvider> and write an appropriate handler as
 described above instead.  Note that you do not need a C<PerlAddAuthzProvider>
 for C<user> or C<valid-user> requirements.  Apache already handles those
-internally.
+internally via C<mod_authz_user.c>
 
 =item ${auth_name}Satisfy
 
@@ -259,6 +265,7 @@ then C<HTTP_UNAUTHORIZED> is returned.  In previous versions of Apache,
 C<HTTP_FORBIDDEN> was returned.  You can get the old behaviour if you want it
 with:
 
+    # in httpd.conf
     AuthzSendForbiddenOnFailure On
 
 =back
@@ -276,6 +283,20 @@ authorization of anonymous access. You are expected to return
 C<Apache2::Const::AUTHZ_DENIED_NO_USER> IF C<< $r->user >> has not yet been set
 if you want authentication to proceed.  Your authz handler will be called a
 second time after the user has been authenticated.
+
+=item *
+
+I get an error like C<Can't locate object method "requires" via package Apache2::RequestRec ...>
+
+This is because you called C<AuthCookie>'s C<authorize()> method, which is illegal under Apache 2.4.  This could either be because your C<AuthCookie> subclass explicitly called C<authorize()>, or (more likely) because your C<httpd.conf> contains a line like:
+
+ PerlAuthzHandler My::AuthCookie->authorize
+
+You should remove lines from C<httpd.conf> that call C<authorize>, and your
+subclass should not be calling authorize().
+
+If you need to do custom autorization, you need to write an authz provider
+instead.
 
 =item *
 

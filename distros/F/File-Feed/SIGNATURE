@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3006e855b44ccc9a032597c8e12ae1ce3648b66a INSTALL
+SHA1 af9545a64675c806dce98685e3ef972d9bbd7eae LICENSE
+SHA1 2ed119ece18ec92ca18fffd7049335694a9e2526 MANIFEST
+SHA1 e9644de28197bd3c34d0fb7de2a5b557b2507b73 META.json
+SHA1 0845214307bff04c1d1c583ad39e993655a48e19 META.yml
+SHA1 747ba9bbfcdf842fe753c8799b92177c0ebf84e3 Makefile.PL
+SHA1 ff7d4c1c509d5f5858bdfc78983e406441b3a6cd README.md
+SHA1 0c862fb26e72e019ae7fce0263bbe97833ad622e dist.ini
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 example/@idle
+SHA1 a065879662bcdf6c8ac2da9ea5bd3e88a9bba218 example/dropoff/ls.txt
+SHA1 becd39c9173c5d0b8f8d0cd3593299c101c499e9 example/feed.kv
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 example/files.kv
+SHA1 2ea3fb7920a3559795bfe72da4be9587023d7b9d lib/File/Feed.pm
+SHA1 ee834eecf4c4c6596468cfa8a16278632bc91117 lib/File/Feed/Channel.pm
+SHA1 157395b4c012bbb48956ac9df1b18d31a3fd7deb lib/File/Feed/Context.pm
+SHA1 a5c8d53b82f03d041323a80dfe94e2c6d0025d56 lib/File/Feed/File.pm
+SHA1 c113dffd990746b7cb10511227cdb4545d964454 lib/File/Feed/Sink.pm
+SHA1 6e6727bbf8743847dcf8cb8df3f05cefb69d0eb7 lib/File/Feed/Sink/kit.pm
+SHA1 8c9dec12cb9279d2518ea4f52a9959cb33b7ee14 lib/File/Feed/Source.pm
+SHA1 645fe519a4b3dc8e62dd651e9d86a17ed6179fab lib/File/Feed/Source/file.pm
+SHA1 0171fd45b423207bedb08e4f6c9b81f35984c661 lib/File/Feed/Source/ftp.pm
+SHA1 75d478c9281aa850277cb93061c35b8fe650fa36 lib/File/Feed/Util.pm
+SHA1 1b9c417c953497c4b2d502152708fb0e1be5ddff script/ffeed
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAll2XKAACgkQ9IHYOgPo3G366wCgsdSqafJmK2d2GmLMYPPlzuAQ
+xXYAoKHGMuPURcvGtwMhEIpe23+mip7E
+=Feno
+-----END PGP SIGNATURE-----

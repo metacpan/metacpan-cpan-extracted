@@ -16,6 +16,7 @@ my @files = (
     't/04-plugin-order.t',
     't/05-duplicate-files.t',
     't/06-skip-distmeta.t',
+    't/07-no-releasers.t',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',

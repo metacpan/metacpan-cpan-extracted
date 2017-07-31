@@ -9,6 +9,9 @@ do { my $x = {
                       'requires' => {
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::Encoding' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs' => '0',
+                                      'Dist::Zilla::Plugin::ReleaseStatus::FromVersion' => '0',
+                                      'Dist::Zilla::Plugin::RemovePrereqs' => '0',
                                       'Dist::Zilla::PluginBundle::DAGOLDEN' => '0.072',
                                       'File::Spec' => '0',
                                       'File::Temp' => '0',
@@ -30,6 +33,9 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                      'IO::Uncompress::Gunzip' => '0'
+                                    },
                       'requires' => {
                                       'CPAN::DistnameInfo' => '0',
                                       'CPAN::Meta::YAML' => '0',
@@ -42,7 +48,6 @@ do { my $x = {
                                       'File::Temp' => '0.19',
                                       'File::stat' => '0',
                                       'HTTP::Tiny' => '0',
-                                      'IO::Uncompress::Gunzip' => '0',
                                       'Module::Load' => '0',
                                       'Search::Dict' => '1.07',
                                       'Tie::Handle::SkipHeader' => '0',

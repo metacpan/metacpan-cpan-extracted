@@ -1,12 +1,12 @@
 use warnings;
 use strict;
 
-use Test::More tests => 31*3;
+use Test::More tests => 33*3;
 
 my $test_input = "\x01\x02\x04\x08\x10\x20\x40\x80";
 my $f;
 
-open($f, "<:bitswap(0)", \$test_input);
+ok open($f, "<:bitswap(0)", \$test_input);
 $/ = \1;
 is scalar(<$f>), "\x01";
 is scalar(<$f>), "\x02";
@@ -20,7 +20,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(0)", \$test_input);
+ok open($f, "<:bitswap(0)", \$test_input);
 $/ = \1;
 ok !eof($f);
 is scalar(<$f>), "\x01";
@@ -45,7 +45,7 @@ is scalar(<$f>), undef;
 ok eof($f);
 $f = undef;
 
-open($f, "<:bitswap(4)", \$test_input);
+ok open($f, "<:bitswap(4)", \$test_input);
 $/ = \1;
 is scalar(<$f>), "\x10";
 is scalar(<$f>), "\x20";
@@ -59,7 +59,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(4)", \$test_input);
+ok open($f, "<:bitswap(4)", \$test_input);
 $/ = \1;
 ok !eof($f);
 is scalar(<$f>), "\x10";
@@ -84,7 +84,7 @@ is scalar(<$f>), undef;
 ok eof($f);
 $f = undef;
 
-open($f, "<:bitswap(8)", \$test_input);
+ok open($f, "<:bitswap(8)", \$test_input);
 $/ = \1;
 is scalar(<$f>), "\x02";
 is scalar(<$f>), "\x01";
@@ -98,7 +98,7 @@ is scalar(<$f>), undef;
 is scalar(<$f>), undef;
 $f = undef;
 
-open($f, "<:bitswap(8)", \$test_input);
+ok open($f, "<:bitswap(8)", \$test_input);
 $/ = \1;
 ok !eof($f);
 is scalar(<$f>), "\x02";

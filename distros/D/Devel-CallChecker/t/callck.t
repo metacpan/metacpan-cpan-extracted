@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Test::More tests => 79;
 use t::LoadXS ();
 use t::WriteHeader ();

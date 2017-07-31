@@ -10,11 +10,11 @@ FSM::Basic -  Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ The HASH is easily using a JSON file
 
 my $fsm = FSM::Basic->new( \%states, 'accept' );
 
-Create the FSM with the HASH ref as first paramter 
+Create the FSM with the HASH ref as first paramter
 and the initial state as second parameter
 
 The HASH is like this:
@@ -96,39 +96,80 @@ The keys are the states name.
 
 =over 2
 
-=item executable code ( "do" for perl code, "exec" for system code, and a specific "cat" just reading the file content provided in parameter).
+=item executable code:
 
-=item "matching" to define the state when the input match the "expect" value
 
-=item "final" to return a flag 
+"do" for perl code
 
-=item "not_matching" the state if the input is not matching the "expect" value (if missing stay in the same state)
 
-=item "repeat" a number of trial before the state goes to "not_matching0"
+"exec" for system code, and 2 specific commands:
 
-=item "not_matching0" the state when the number of failled matching number is reached
+=over 4
 
-=item "not_matching_info_last" info returned as second value when the  failled matching number is reached
+=item *
+"cat" just reading the file content provided in parameter).
 
-=item "output" the info  returned as second value
+=item *
+"catRAND" chose randomly one of the files provided in parameter space separated
+
+=item *
+"catSEQ" read sequentialy the next files provided in parameter space separated
+        if "catSEQ_idx" is defined, that file is used to keep the state. Otherwise , the state file is named used
+        all the files name from "catSEQ" concatenated with a final '.tate'. All spaces are replaced by an underscore
+
+=back
+
+=item
+
+"matching" to define the state when the input match the "expect" value
+
+
+=item
+
+"final" to return a flag
+
+
+=item
+
+"not_matching" the state if the input is not matching the "expect" value (if missing stay in the same state)
+
+
+=item
+
+"repeat" a number of trial before the state goes to "not_matching0"
+
+
+=item
+
+"not_matching0" the state when the number of failled matching number is reached
+
+
+=item
+
+"not_matching_info_last" info returned as second value when the  failled matching number is reached
+
+
+=item
+
+"output" the info  returned as second value
+
 
 =back
 
 It is perfectly possible to add extra tag not used by FSM::Basic for generic purpose.
 Check examples/fake_bash_ssh1.*
 Take a look at timout and timer usage
-In this example if destination IP from the SSH connection is available, the file IP.json is used as definition 
+In this example if destination IP from the SSH connection is available, the file IP.json is used as definition
 (with fallback to fake_bash1.pl)
 
 =cut
 
-sub new
-{
-    my ( $class, $l, $s ) = @_;
+sub new {
+    my ($class, $l, $s) = @_;
     my $self;
-    $self->{ states_list } = $l;
-    $self->{ state }       = $s;
-    bless( $self, $class );
+    $self->{states_list} = $l;
+    $self->{state}       = $s;
+    bless($self, $class);
     return $self;
 }
 
@@ -142,137 +183,153 @@ Run the FSM with the input and return the expected output and an extra flag
 
 =cut
 
-sub run
-{
-    my ( $self, $in ) = @_;
+sub run {
+    my ($self, $in) = @_;
 
     my $output = '';
-    if ( exists $self->{ states_list } )
-    {
-        if (   exists $self->{ states_list }{ $self->{ state } }
-            && exists $self->{ states_list }{ $self->{ state } }{ repeat }
-            && $self->{ states_list }{ $self->{ state } }{ repeat } <= 0 )
+    if (exists $self->{states_list}) {
+        if (   exists $self->{states_list}{ $self->{state} }
+            && exists $self->{states_list}{ $self->{state} }{repeat}
+            && $self->{states_list}{ $self->{state} }{repeat} <= 0)
         {
-            $self->{ previous_state } = $self->{ state };
-            $self->{ state } = $self->{ states_list }{ $self->{ state } }{ expect }{ not_matching0 } // $self->{ states_list }{ $self->{ state } }{ not_matching0 };
-            if ( exists $self->{ states_list }{ $self->{ previous_state } }{ not_matching_info_last } )
-            {
-                $output = $self->{ states_list }{ $self->{ previous_state } }{ not_matching_info_last };
+            $self->{previous_state} = $self->{state};
+            $self->{state} = $self->{states_list}{ $self->{state} }{expect}{not_matching0} // $self->{states_list}{ $self->{state} }{not_matching0};
+            if (exists $self->{states_list}{ $self->{previous_state} }{not_matching_info_last}) {
+                $output = $self->{states_list}{ $self->{previous_state} }{not_matching_info_last};
             }
-            $output .= $self->{ states_list }{ $self->{ state } }{ output } // '';
-            return ( $self->{ states_list }{ $self->{ state } }{ final } // 0, $output );
+            $output .= $self->{states_list}{ $self->{state} }{output} // '';
+            return ($self->{states_list}{ $self->{state} }{final} // 0, $output);
         }
-        if ( exists $self->{ states_list }{ $self->{ state } }{ expect } )
-        {
-            if ( exists $self->{ states_list }{ $self->{ state } }{ info } )
-            {
-                $output = $self->{ states_list }{ $self->{ state } }{ info } . $output;
+        if (exists $self->{states_list}{ $self->{state} }{expect}) {
+            if (exists $self->{states_list}{ $self->{state} }{info}) {
+                $output =
+                  $self->{states_list}{ $self->{state} }{info} . $output;
             }
-            if ( exists $self->{ states_list }{ $self->{ state } }{ info_once } )
-            {
-                $output = delete( $self->{ states_list }{ $self->{ state } }{ info_once } ) . $output;
+            if (exists $self->{states_list}{ $self->{state} }{info_once}) {
+                $output = delete($self->{states_list}{ $self->{state} }{info_once}) . $output;
             }
             my $state;
-            if (   exists $self->{ previous_output }
+            if (   exists $self->{previous_output}
                 && $in eq ''
-                && $self->{ previous_output } =~ /\[(.+)\]/ )
+                && $self->{previous_output} =~ /\[(.+)\]/)
             {
                 $in = $1;
             }
-            if ( exists $self->{ states_list }{ $self->{ state } }{ expect }{ $in } )
-            {
-                $state = $self->{ states_list }{ $self->{ state } }{ expect }{ $in };
-            }
-            else
-            {
-                foreach my $key ( keys %{ $self->{ states_list }{ $self->{ state } }{ expect } } )
-                {
-                    if ( $in =~ /$key/ )
-                    {
-                        $state = $self->{ states_list }{ $self->{ state } }{ expect }{ $key };
+            if (exists $self->{states_list}{ $self->{state} }{expect}{$in}) {
+                $state = $self->{states_list}{ $self->{state} }{expect}{$in};
+            } else {
+                foreach my $key (keys %{ $self->{states_list}{ $self->{state} }{expect} }) {
+                    if ($in =~ /$key/) {
+                        $state =
+                          $self->{states_list}{ $self->{state} }{expect}{$key};
                     }
                 }
             }
-            if ( ref $state eq 'HASH' )
-            {
-                $self->{ previous_state }  = $self->{ state };
-                $self->{ previous_output } = $state->{ output } // $self->{ states_list }{ $self->{ state } }{ output } // '';
-                $self->{ state }           = $state->{ matching } // $self->{ state };
-                $output .= $state->{ output } // $self->{ states_list }{ $self->{ state } }{ output } // '';
-                if ( exists $state->{ cmd } )
-                {
-                    my $cmd_state = delete $state->{ cmd };
+            if (ref $state eq 'HASH') {
+                $self->{previous_state}  = $self->{state};
+                $self->{previous_output} = $state->{output} // $self->{states_list}{ $self->{state} }{output} // '';
+                $self->{state}           = $state->{matching} // $self->{state};
+                $output .= $state->{output} // $self->{states_list}{ $self->{state} }{output} // '';
+                if (exists $state->{cmd}) {
+                    my $cmd_state = delete $state->{cmd};
                     $cmd_state =~ s/\$in/$in/g;
-                    push( @{ $self->{ cmd_stack } }, $cmd_state );
+                    push(@{ $self->{cmd_stack} }, $cmd_state);
                 }
-                if ( exists $state->{ cmd_exec } )
-                {
-                    my $cmd_exec = join ' ', @{ $self->{ cmd_stack } };
+                if (exists $state->{cmd_exec}) {
+                    my $cmd_exec = join ' ', @{ $self->{cmd_stack} };
                     my $string = `$cmd_exec`;
-                    $output =  eval (print $string) . $output;
-                    $self->{ cmd_exec } = [];
+                    $output = sprintf("%s", $string) . $output;
+                    $self->{cmd_exec} = [];
                 }
-                if ( exists $state->{ exec } )
-                {
-                    my $old_exec = $state->{ exec };
-                    $state->{ exec } =~ s/__IN__/$in/g;
-                    my $string =`$state->{exec}`;
-                    $output =  eval (print $string) . $output;
-                    $state->{ exec } = $old_exec;
+                if (exists $state->{exec}) {
+                    my $old_exec = $state->{exec};
+                    $state->{exec} =~ s/__IN__/$in/g;
+                    my $string = `$state->{exec}`;
+                    $output = sprintf("%s", $string) . $output;
+                    $state->{exec} = $old_exec;
                 }
-                if ( exists $state->{ do } )
-                {
-                    my $old_do = $state->{ do };
-                    $state->{ do } =~ s/__IN__/$in/g;
-                    $output = ( eval $state->{ do } ) . $output;
-                    $state->{ do } = $old_do;
+                if (exists $state->{do}) {
+                    my $old_do = $state->{do};
+                    $state->{do} =~ s/__IN__/$in/g;
+                    $output = (eval $state->{do}) . $output;
+                    $state->{do} = $old_do;
                 }
-                if ( exists $state->{ cat } )
-                {
-                    my $old_cat = $state->{ cat };
-                    $state->{ cat } =~ s/__IN__/$in/g;
-                    my $string = do { local ( @ARGV, $/ ) =  $state->{ cat }; <> }; 
-                    $output =  eval (print $string) . $output;
-                    $state->{ cat } = $old_cat;
+                if (exists $state->{cat}) {
+                    my $old_cat = $state->{cat};
+                    $state->{cat} =~ s/__IN__/$in/g;
+                    my $string = do { local (@ARGV, $/) = $state->{cat}; <> };
+                    $output = sprintf("%s", $string) . $output;
+                    $state->{cat} = $old_cat;
                 }
+                if (exists $state->{catRAND}) {
+                    my $old_cat = $state->{catRAND};
+                    $state->{catRAND} =~ s/__IN__/$in/g;
+                    my @files  = split /\s+/, $state->{catRAND};
+                    my $file   = $files[ rand @files ];
+                    my $string = do { local (@ARGV, $/) = $file; <> };
+                    $output = sprintf("%s", $string) . $output;
+                    $state->{catRAND} = $old_cat;
+                }
+                if (exists $state->{catSEQ}) {
+                    my $old_cat =$state->{catSEQ};
+                    my $state_file;
+                    if (exists $state->{catSEQ_idx}) {
+                    $state_file= $state->{catSEQ_idx}
+                    }else{
+                    $state_file = $old_cat . '.state';
+                    $state_file =~ s/\s/_/g;
+
+                     }
+                    $state->{catSEQ} =~ s/__IN__/$in/g;
+                    my @files = split /\s+/, $state->{catSEQ};
+                    tie my $nbr => 'FSM::Basic::Modulo', scalar @files, 0;
+                        if (-f $state_file) {
+                            $nbr = do {
+                                local (@ARGV, $/) = $state_file;
+                                <>;
+                            };
+                        }
+                    my $file = $files[ $nbr++ ];
+                    my $string = do { local (@ARGV, $/) = $file; <> };
+                    $output = sprintf("%s", $string) . $output;
+                    $state->{catSEQ} = $old_cat;
+                    write_file($state_file, $nbr);
+                }
+            } else {
+                $self->{previous_state} = $self->{state};
+                $self->{state} = $self->{states_list}{ $self->{state} }{not_matching} // $self->{state};
+                $self->{states_list}{ $self->{state} }{repeat}--
+                  if exists $self->{states_list}{ $self->{state} }{repeat};
+                $output .= $self->{states_list}{ $self->{state} }{output} // '';
+                if (exists $self->{states_list}{ $self->{state} }{not_matching_info}) {
+                    $output = $self->{states_list}{ $self->{state} }{not_matching_info} . "\n" . $output;
+                }
+                return ($self->{states_list}{ $self->{state} }{$in}{final} // $self->{states_list}{ $self->{state} }{final} // 0, $output);
             }
-            else
-            {
-                $self->{ previous_state } = $self->{ state };
-                $self->{ state } = $self->{ states_list }{ $self->{ state } }{ not_matching } // $self->{ state };
-                $self->{ states_list }{ $self->{ state } }{ repeat }-- if exists $self->{ states_list }{ $self->{ state } }{ repeat };
-                $output .= $self->{ states_list }{ $self->{ state } }{ output } // '';
-                if ( exists $self->{ states_list }{ $self->{ state } }{ not_matching_info } )
-                {
-                    $output = $self->{ states_list }{ $self->{ state } }{ not_matching_info } . "\n" . $output;
-                }
-                return ( $self->{ states_list }{ $self->{ state } }{ $in }{ final } // $self->{ states_list }{ $self->{ state } }{ final } // 0, $output );
-            }
-            return ( $self->{ states_list }{ $self->{ state } }{ $in }{ final } // $self->{ states_list }{ $self->{ state } }{ final } // 0, $output );
+            return ($self->{states_list}{ $self->{state} }{$in}{final} // $self->{states_list}{ $self->{state} }{final} // 0, $output);
         }
     }
 }
 
-sub set
-{
-    my ( $self, $in ) = @_;
-    $self->{ previous_state }  = $self->{ state };
-    $self->{ previous_output } = $self->{ states_list }{ $self->{ state } }{ output } // '';
-    $self->{ state }           = $in
-      if exists $self->{ states_list }{ $in };
+sub set {
+    my ($self, $in) = @_;
+    $self->{previous_state}  = $self->{state};
+    $self->{previous_output} = $self->{states_list}{ $self->{state} }{output} // '';
+    $self->{state}           = $in if exists $self->{states_list}{$in};
 }
 
-#sub edit
-#{
-#    my ( $self, $in ) = @_;
-#
-#    return $self;
-#}
-#
-#sub crawl_states
-#{
-#    my ( $self, $in ) = @_;
-#}
+sub write_file {
+    my ($file, $content) = @_;
+    open my $fh, ">$file" or die "Error opening file for write $file: $!\n";
+    print $fh $content;
+    close $fh or die "Error closing file $file: $!\n";
+}
+
+package FSM::Basic::Modulo;
+sub TIESCALAR { bless [ $_[2] || 0, $_[1] ] => $_[0] }
+sub FETCH { ${ $_[0] }[0] }
+sub STORE { ${ $_[0] }[0] = $_[1] % ${ $_[0] }[1] }
+1;
 
 =head1 EXAMPLE
 
@@ -282,7 +339,7 @@ sub set
     use FSM::Basic;
     use JSON;
     use Term::ReadLine;
-    
+
         my %states = (
         'accept' => {
             'expect' => {
@@ -298,7 +355,7 @@ sub set
             'output' => 'Password: ',
             'repeat' => 2
         },
-    
+
         'close'  => {'final' => 1},
         'prompt' => {
             'expect' => {
@@ -307,11 +364,21 @@ sub set
                     'matching' => 'close',
                     'final'    => 0
                 },
-                'meminfo'     => {'do' => 'do { local( @ARGV, $/ ) = "/proc/meminfo" ; <> }'},
-                'h(elp)?|\\?' => {
+                "read"         => {'cat' => 'file.txt'},
+                "read_random"  => {'catRAND' => 'file1.txt file2.txt file3.txt'},
+                "read_seq"     => {'catSEQ' => 'file1.txt file2.txt file3.txt', 'catSEQ_idx' => 'catSEQ_status'},
+                'meminfo'      => {'do' => 'do { local( @ARGV, $/ ) = "/proc/meminfo" ; <> }'},
+                'mem'          => {
+				   'do' => "my ( $tot,$avail) = (split /\n/ ,do { local( @ARGV, $/ ) = \"/proc/meminfo\" ; <> })[0,2];$tot =~ s/\\D*//g; $avail =~ s/\\D*//g; sprintf \"%0.2f%%\\n\",(100*($tot-$avail)/$tot);"
+			          },
+                'h(elp)?|\\?'  => {
                     'output' => 'exit
+    read
+    read_random
+    read_seq
     meminfo
     mem_usage
+    mem
     User> '
                 },
                 'mem_usage' => {'do' => 'my ( $tot,$avail) = (split /\\n/ ,do { local( @ARGV, $/ ) = "/proc/meminfo" ; <> })[0,2];$tot =~ s/\\D*//g; $avail =~ s/\\D*//g; sprintf "%0.2f%%\\n",(100*($tot-$avail)/$tot); '},
@@ -329,7 +396,7 @@ sub set
     $term->using_history();
     $term->read_history( $history_file );
     $term->clear_signals();
-    
+
     my $fsm = FSM::Basic->new( \%states, 'accept' );
     my $out = "Password> ";
     while ( defined( $line = $term->readline( $out ) ) )
@@ -338,7 +405,7 @@ sub set
         $term->write_history( $history_file );
         last if $final;
     }
-    
+
     print $out if $final;
 
 

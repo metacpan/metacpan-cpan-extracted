@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SPVM",
    "no_index" : {
@@ -35,6 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.0225",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.0234",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

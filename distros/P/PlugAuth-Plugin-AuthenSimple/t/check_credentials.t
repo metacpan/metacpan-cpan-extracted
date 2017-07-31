@@ -1,10 +1,8 @@
-use strict;
-use warnings;
-use File::HomeDir::Test;
-use File::HomeDir;
+use Test2::Plugin::FauxHomeDir;
+use Test2::V0;
 use File::Spec;
-use Test::More tests => 7;
 use YAML::XS ();
+use File::Glob qw( bsd_glob );
 use PlugAuth;
 
 delete $ENV{HARNESS_ACTIVE};
@@ -13,7 +11,7 @@ $ENV{LOG_LEVEL} = "ERROR";
 my $x = 0;
 my $y = 0;
 
-my $home = File::HomeDir->my_home;
+my $home = bsd_glob('~');
 mkdir(File::Spec->catdir($home, 'etc'));
 YAML::XS::DumpFile(File::Spec->catfile($home, 'etc', 'PlugAuth.conf'), {
   plugins => { 
@@ -34,6 +32,8 @@ is $app->auth->check_credentials('invalid', 'bogus'), 0, 'user = invalid pass = 
 
 is $x, 1, "x = 1";
 is $y, 2, "y = 2";
+
+done_testing;
 
 package Authen::Simple::Test1;
 

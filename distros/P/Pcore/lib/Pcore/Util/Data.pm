@@ -56,7 +56,7 @@ sub encode_data ( $type, $data, @ ) {
         token              => undef,               # attach informational token
         compress_threshold => 100,                 # min data length in bytes to perform compression, only if compress = 1
         cipher             => $DATA_CIPHER_DES,    # cipher to use
-        json               => undef,               # HashRef with additional params for JSON::XS
+        json               => undef,               # HashRef with additional params for Cpanel::JSON::XS
         splice @_, 2,
     );
 
@@ -261,7 +261,7 @@ sub decode_data ( $type, @ ) {
         cipher       => $DATA_CIPHER_DES,
         encode       => undef,              # 0, 1 = 'hex', 'hex', 'b64'
         perl_ns      => undef,              # for PERL only, namespace for data evaluation
-        json         => undef,              # HashRef with additional params for JSON::XS
+        json         => undef,              # HashRef with additional params for Cpanel::JSON::XS
         return_token => 0,                  # return token
         splice( @_, 2 ),
         type => $type,
@@ -462,9 +462,9 @@ sub _get_json_obj {
         @_,
     );
 
-    state $init = !!require JSON::XS;
+    state $init = !!require Cpanel::JSON::XS;
 
-    my $json = JSON::XS->new;
+    my $json = Cpanel::JSON::XS->new;
 
     for ( keys %args ) {
         $json->$_( $args{$_} );

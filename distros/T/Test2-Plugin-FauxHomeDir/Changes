@@ -1,0 +1,8 @@
+Revision history for Test2-Plugin-FauxHomeDir
+
+0.02      2017-07-23 08:59:06 -0400
+  - warn via either note or diag (depending on if the test fails) if
+    File::HomeDir::Test has been loaded.
+
+0.01      2017-07-22 21:58:35 -0400
+  - initial version

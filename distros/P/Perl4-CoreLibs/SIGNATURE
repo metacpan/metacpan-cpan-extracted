@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.63.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,14 +14,14 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 d09f62f9c109895ad15fb3b482fa2afb6e72e28a .cvsignore
-SHA1 c17292b79988132359a655218bd18bd660ad356b Build.PL
-SHA1 1cb57b7c251d6aad288277d1539fa05810204623 Changes
-SHA1 f5ef5f44a756a2d10cfa09b416c89dfa8ac1f85c MANIFEST
-SHA1 652b5406b0dc9f757766c5c15fe1ee62b984f343 META.yml
-SHA1 a2f826a75b3f104b7fc1a1a901a61822b1a88cc7 Makefile.PL
-SHA1 19046d8d05805fb0aeca9c07c7d6ccffe5f86e5a README
-SHA1 eabbd94c1fbb3915fb1206c6ffcf61ccfd55e29e lib/Perl4/CoreLibs.pm
+SHA1 b62e2957b124b85389dc7c6006674bdd6ad71d80 .gitignore
+SHA1 6c4f1a89b50e415af9d5f1f52fe35378aa81e453 Build.PL
+SHA1 5381ffa20c2adfcceb6177f443c2fbdd9351e89f Changes
+SHA1 490c4e56b47b0412e92446963876eec6a26a0fc9 MANIFEST
+SHA1 45c93214eaf890d277fe2d121ea79fd5d4bda868 META.json
+SHA1 aa5c914ef1a1260f17e57cd58d7104231d7089be META.yml
+SHA1 e4b5e2d752168d5be5b89e64934019299c8ceedb README
+SHA1 b3a813a4e87c2f39c133247db86772749f20994d lib/Perl4/CoreLibs.pm
 SHA1 d34f3092d7fa015b1d79da59ba2ef6d1750c3235 lib/abbrev.pl
 SHA1 e7baaba3c82cb56da45e12cf10e020df80403b89 lib/assert.pl
 SHA1 e471939828ca3bcddc12e4642be4a2caffedf9f1 lib/bigfloat.pl
@@ -69,9 +69,9 @@ SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 089234273a73f10e3bf39d636f7dbd21fb413060 t/shellwords.t
 SHA1 4a3269c9d997504a12fc561088eff53d4cc61600 t/timelocal.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk2C2OoACgkQOV9mt2VyAVFJ8gCgmlsCNfMygy2orNNrIXAguv8S
-+pkAn0Cj1SPZad9RXFBgWd/2nxo1ezgI
-=gOYW
+iEYEARECAAYFAll9f8kACgkQOV9mt2VyAVEtEACeOlwYTBGd2JKvxj1cfMboCpEM
+uGYAnjeq6pKvrRbvc27fWSMj/BkfP3Iq
+=FOYv
 -----END PGP SIGNATURE-----

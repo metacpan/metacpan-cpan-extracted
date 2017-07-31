@@ -4,13 +4,13 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DateTime-TimeZone-SystemV",
    "prereqs" : {
@@ -46,17 +46,23 @@
    "provides" : {
       "DateTime::TimeZone::SystemV" : {
          "file" : "lib/DateTime/TimeZone/SystemV.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-DateTime-TimeZone-SystemV@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-TimeZone-SystemV"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "git://git.fysh.org/zefram/DateTime-TimeZone-SystemV.git"
       }
    },
-   "version" : "0.009"
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

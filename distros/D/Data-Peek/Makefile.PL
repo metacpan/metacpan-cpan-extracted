@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2008-2016 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2008-2017 H.Merijn Brand
 
 require 5.008; # <- also see postamble at the bottom for META.yml
 use strict;
@@ -97,6 +97,7 @@ sub postamble
 	'	pod-spell-check --aspell --ispell',
 	'',
 	'checkmeta:	spellcheck',
+	'	perl sandbox/genPPPort_h.pl',
 	'	perl sandbox/genMETA.pl -c',
 	'',
 	'fixmeta:	distmeta',

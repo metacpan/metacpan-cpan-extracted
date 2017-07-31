@@ -169,8 +169,8 @@ to overcome this ambiguity";
                   if ( $spj->{python_version} && $spj->{python_version} eq '3' ) {
                     $pip_command = 'pip3'
                   }
-                  print "cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"\n";
-                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
+                  #print "cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"\n";
+                  #execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
                 }            
 
             }
@@ -373,7 +373,7 @@ to overcome this ambiguity";
       };
 
     }
-    my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=local/lib/perl5:\$PERL5LIB && export PYTHONPATH=python-lib:\$PYTHONPATH && ";
+    my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=local/lib/perl5:\$PERL5LIB && export PYTHONPATH=\$PWD/python-lib:\$PYTHONPATH && ";
 
     if ($spj->{plugin_type} eq 'outthentic'){
       $cmd.="  strun --root ./ --task '[plg] $pid'";

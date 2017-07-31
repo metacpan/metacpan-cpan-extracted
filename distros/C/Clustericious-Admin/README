@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.09
+    version 1.10
 
 SYNOPSIS
 
@@ -93,8 +93,7 @@ OPTIONS
 
     --log
 
-      Same as --log-dir, but the location is chosen by
-      File::HomeDir#my_dist_data (using Clustericious-Admin as the dist).
+      Same as --log-dir, but the location is ~/clad/log.
 
     --purge
 

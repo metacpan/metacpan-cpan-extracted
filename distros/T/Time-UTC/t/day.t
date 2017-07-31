@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 1 + 3 + 16*39 + 6;
+use Test::More tests => 1 + 3 + 16*41 + 6;
 
 BEGIN {
 	use_ok "Time::UTC", qw(
@@ -36,7 +36,7 @@ like $@, qr/\Aday [0-9]+ precedes the start of UTC /;
 eval { utc_check_instant($seg->start_utc_day - 1, br(0)); };
 like $@, qr/\Aday [0-9]+ precedes the start of UTC /;
 
-for(my $n = 39; $n--; $seg = $seg->next) {
+for(my $n = 41; $n--; $seg = $seg->next) {
 	match utc_day_leap_seconds($seg->start_utc_day), br(0);
 	match utc_day_seconds($seg->start_utc_day), br(86400);
 	eval { utc_check_instant($seg->start_utc_day, -$epsilon); };

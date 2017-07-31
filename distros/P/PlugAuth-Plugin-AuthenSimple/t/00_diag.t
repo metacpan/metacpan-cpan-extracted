@@ -1,25 +1,30 @@
-use strict;
-use warnings;
+use Test2::V0;
 use Config;
-use Test::More tests => 1;
-BEGIN {
-  my @modules;
-  eval q{
-    require FindBin;
-    require File::Spec;
-    1;
-  } || die $@;
-  do {
-    my $fh;
-    if(open($fh, '<', File::Spec->catfile($FindBin::Bin, '00_diag.pre.txt')))
-    {
-      @modules = <$fh>;
-      close $fh;
-      chomp @modules;
-    }
-  };
-  eval qq{ require $_ } for @modules;
-};
+
+eval q{ require Test::More };
+
+# This .t file is generated.
+# make changes instead to dist.ini
+
+my %modules;
+my $post_diag;
+
+$modules{$_} = $_ for qw(
+  Authen::Simple
+  Clustericious
+  ExtUtils::MakeMaker
+  Mojolicious
+  Params::Validate
+  PlugAuth
+  Role::Tiny
+  Test2::Plugin::FauxHomeDir
+  Test2::V0
+  YAML::XS
+);
+
+
+
+my @modules = sort keys %modules;
 
 sub spacer ()
 {
@@ -29,15 +34,6 @@ sub spacer ()
 }
 
 pass 'okay';
-
-my @modules;
-do {
-  my $fh;
-  open($fh, '<', File::Spec->catfile($FindBin::Bin, '00_diag.txt'));
-  @modules = <$fh>;
-  close $fh;
-  chomp @modules;
-};
 
 my $max = 1;
 $max = $_ > $max ? $_ : $max for map { length $_ } @modules;
@@ -68,12 +64,9 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $^V;
+diag sprintf $format, 'perl ', $];
 
-require(File::Spec->catfile($FindBin::Bin, '00_diag.pl'))
-  if -e File::Spec->catfile($FindBin::Bin, '00_diag.pl');
-
-foreach my $module (@modules)
+foreach my $module (sort @modules)
 {
   if(eval qq{ require $module; 1 })
   {
@@ -87,5 +80,12 @@ foreach my $module (@modules)
   }
 }
 
+if($post_diag)
+{
+  spacer;
+  $post_diag->();
+}
+
 spacer;
 
+done_testing;

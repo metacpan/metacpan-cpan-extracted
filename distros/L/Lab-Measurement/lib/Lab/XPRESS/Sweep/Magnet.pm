@@ -1,11 +1,11 @@
 package Lab::XPRESS::Sweep::Magnet;
-$Lab::XPRESS::Sweep::Magnet::VERSION = '3.553';
-
-use Lab::XPRESS::Sweep::Sweep;
+#ABSTRACT: Magnetic field sweep
+$Lab::XPRESS::Sweep::Magnet::VERSION = '3.554';
+use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
 
-our @ISA = ('Lab::XPRESS::Sweep::Sweep');
+our @ISA = ('Lab::XPRESS::Sweep');
 
 sub new {
     my $proto                  = shift;
@@ -148,13 +148,19 @@ sub exit {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::XPRESS::Sweep::Magnet - magnetic field sweep
+Lab::XPRESS::Sweep::Magnet - Magnetic field sweep
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -182,14 +188,13 @@ sub exit {
 
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Magnet class implements a module for magnetic field Sweeps in the Lab::XPRESS::Sweep framework.
 
 .
 
 =head1 CONSTRUCTOR
-	
 
 	my $sweep_magnet = $hub->Sweep('Magnet',
 		{
@@ -215,13 +220,13 @@ Allowed instruments: Lab::Instrument::IPS, Lab::Instrument::IPSWeiss1, Lab::Inst
 .
 
 =head2 mode [string] (default = 'continuous' | 'step' | 'list')
-	
+
 continuous: perform a continuous magnetic field sweep. Measurements will be performed constantly at the time-interval defined in interval.
 
 step: measurements will be performed at discrete values of the magnetic field between start and end points defined in parameter points, seperated by the magnetic field values defined in parameter stepwidth
 
 list: measurements will be performed at a list of magnetic field values defined in parameter points
-	
+
 .
 
 =head2 points [float array] (mandatory)
@@ -253,7 +258,6 @@ The first value defines the rate to approach the starting point.
 The following values define the rates to approach the magnetic field values defined by the points-array.
 If the number of values in the rates-array is less than the length of the points-array, the last defined rate will be used for the remaining sweep sections.
 
-	
 	points => [-5, -1, 1, 5],
 	rates => [1, 0.5, 0.2]
 	
@@ -264,11 +268,10 @@ If the number of values in the rates-array is less than the length of the points
 
 .
 
-
 =head2 duration [float array] (mandatory if not defined rate)
 
 can be used instead of 'rate'. Attention: Use only the 'duration' or the 'rate' parameter. Using both will cause an Error!
-	
+
 The first value defines the duration to approach the starting point. 
 The second value defines the duration to approach the magnetic field value defined by the second value of the points-array.
 ...
@@ -281,7 +284,7 @@ If the number of values in the duration-array is less than the length of the poi
 This parameter is relevant only if mode = 'step' has been selected. 
 Stepwidth has to be an array of length '1' or greater. The values define the width for each step within the corresponding sweep sequence. 
 If the length of the defined sweep sequence devided by the stepwidth is not an integer number, the last step will be smaller in order to reach the defined points-value.
-	
+
 	points = [0, 0.5, 3]
 	stepwidth = [0.2, 0.5]
 	
@@ -294,7 +297,7 @@ If the length of the defined sweep sequence devided by the stepwidth is not an i
 can be used instead of 'stepwidth'. Attention: Use only the 'number_of_points' or the 'stepwidth' parameter. Using both will cause an Error!
 This parameter is relevant only if mode = 'step' has been selected. 
 Number_of_points has to be an array of length '1' or greater. The values defines the number of steps within the corresponding sweep sequence.
-	
+
 	points = [0, 0.5, 3]
 	number_of_points = [5, 2]
 	
@@ -313,45 +316,31 @@ interval in seconds for taking measurement points. Only relevant in mode 'contin
 0 : no backsweep (default)
 1 : a backsweep will be performed
 2 : no backsweep performed automatically, but sweep sequence will be reverted every second time the sweep is started (relevant eg. if sweep operates as a slave. This way the sweep sequence is reverted at every second step of the master)
-	
-.
 
 =head2 id [string] (default = 'Magnet_sweep')
 
 Just an ID.
 
-.
-
 =head2 filename_extention [string] (default = 'B=')
 
 Defines a postfix, that will be appended to the filenames if necessary.
 
-.
-
 =head2 delay_before_loop [int] (default = 0)
 
 defines the time in seconds to wait after the starting point has been reached.
-
-.
 
 =head2 delay_in_loop [int] (default = 0)
 
 This parameter is relevant only if mode = 'step' or 'list' has been selected. 
 Defines the time in seconds to wait after the value for the next step has been reached.
 
-.
-
 =head2 delay_after_loop [int] (default = 0)
 
 Defines the time in seconds to wait after the sweep has been finished. This delay will be executed before an optional backsweep or optional repetitions of the sweep.
 
-.
-
 =head1 CAVEATS/BUGS
 
 probably none
-
-.
 
 =head1 SEE ALSO
 
@@ -361,15 +350,17 @@ probably none
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-Christian Butschkow and Stefan Geißler
+  Copyright 2012       Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
 
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

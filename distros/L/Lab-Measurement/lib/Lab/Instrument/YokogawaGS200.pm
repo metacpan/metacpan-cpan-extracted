@@ -1,5 +1,6 @@
 package Lab::Instrument::YokogawaGS200;
-$Lab::Instrument::YokogawaGS200::VERSION = '3.553';
+#ABSTRACT: Yokogawa GS200 DC source
+$Lab::Instrument::YokogawaGS200::VERSION = '3.554';
 use strict;
 use warnings;
 use 5.010;
@@ -534,6 +535,8 @@ sub get_error {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -541,6 +544,10 @@ sub get_error {
 =head1 NAME
 
 Lab::Instrument::YokogawaGS200 - Yokogawa GS200 DC source
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -586,9 +593,9 @@ you might also want to have gate protect from the start (the default values are 
 
 		max_sweep_time=>3600,
 		min_sweep_time=>0.1,
-	
+
 Additinally there is support to set parameters for the device "on init":		
-	
+
 		function			=> undef, # 'VOLT' - voltage, 'CURR' - current
 		range			=> undef,
 		level			=> undef,
@@ -601,7 +608,7 @@ If those values are not specified, they are read from the device.
 =head2 sweep_to_level
 
 	$src->sweep_to_level($lvl,$time)
-	
+
 Sweep to the level $lvl in $time seconds.
 
 =head2 set_voltage
@@ -635,19 +642,19 @@ Returns the currently set $current. The value is read from the driver cache by d
 to read directly from the device.
 
 =head2 set_level
-	
+
 	$src->set_level($lvl)
-	
+
 Sets the level $lvl in the current operation mode.
 
 =head2 get_level
 
 	$lvl = $src->get_level()
-	
+
 Returns the currently set level. Use 
 
 	device_cache => 1
-	
+
 to enforce a reading directly from the device. 
 
 =head2 set_range($range)
@@ -667,7 +674,6 @@ to enforce a reading directly from the device.
     
     Please use the format on the left for the range command.
 
-
 =head2 program_run($program)
 
 Runs a program stored on the YokogawaGS200. If no prgram name is given, the currently loaded program is executed.
@@ -679,7 +685,6 @@ Pauses the currently running program.
 =head2 program_continue
 
 Continues the paused program.
-
 
 =head2 set_function($function)
 
@@ -708,18 +713,13 @@ Sets the output switch to on and returns the new value of the output status.
 Sets the output switch to off. The instrument outputs no voltage
 or current then, no matter what voltage you set. Returns the new value of the output status.
 
-
 =head2 get_error()
 
 Queries the error code from the device. This is a very useful thing to do when you are working remote and the source is not responding.
 
-
 =head2 get_output()
 
-
 =head2 get_range()
-
-
 
 =head1 CAVEATS
 
@@ -728,7 +728,6 @@ probably many
 =head1 SEE ALSO
 
 =over 4
-
 
 =item * Lab::Instrument
 
@@ -740,13 +739,23 @@ The YokogawaGP200 class is a Source (L<Lab::Instrument::Source>)
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- (c) 2004-2006 Daniel Schröer
- (c) 2007-2010 Daniel Schröer, Daniela Taubert, Andreas K. Hüttel, and others
- (c) 2011 Florian Olbrich, Andreas K. Hüttel
- (c) 2012-2013 Alois Dirnaichner, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, David Kalok, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich
+            2013       Andreas K. Huettel, Christian Butschkow
+            2014       Alois Dirnaichner, Christian Butschkow
+            2015       Alois Dirnaichner
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

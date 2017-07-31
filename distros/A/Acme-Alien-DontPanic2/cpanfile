@@ -2,32 +2,27 @@ requires "Alien::Base" => "0.038";
 requires "perl" => "5.006";
 
 on 'build' => sub {
-  requires "Alien::Build" => "0.32";
-  requires "Alien::Build::MB" => "0.02";
+  requires "Alien::Build" => "0.75";
+  requires "Alien::Build::MB" => "0.03";
   requires "Module::Build" => "0.28";
 };
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
   requires "ExtUtils::CBuilder" => "0";
-  requires "File::Spec" => "0";
-  requires "Test2::Suite" => "0.000060";
+  requires "Test2::V0" => "0.000060";
   requires "Test::Alien" => "0.05";
-  requires "Test::More" => "0.94";
-  requires "Text::ParseWords" => "0";
   requires "perl" => "5.006";
 };
 
 on 'configure' => sub {
   requires "Alien::Build" => "0.32";
-  requires "Alien::Build::MB" => "0.01";
-  requires "IPC::Cmd" => "0";
+  requires "Alien::Build::MB" => "0.02";
   requires "Module::Build" => "0.28";
   requires "perl" => "5.006";
 };
 
 on 'develop' => sub {
-  requires "File::Spec" => "0";
   requires "FindBin" => "0";
   requires "Test::CPAN::Changes" => "0";
   requires "Test::EOL" => "0";

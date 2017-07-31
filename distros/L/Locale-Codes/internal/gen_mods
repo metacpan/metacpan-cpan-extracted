@@ -224,6 +224,11 @@ qualified with the package name:
 
 =over 4
 
+=item B<${parent}::${typelab}::show_errors(FLAG)>
+
+By default, invalid input will produce empty results, but no errors.  By
+passing in a non-zero value of FLAG, errors will be produced.
+
 =item B<${parent}::${typelab}::rename_${type}(CODE ,NEW_NAME [,CODESET])>
 
 See B<rename_code> in L<Locale::Codes>
@@ -303,8 +308,9 @@ use Locale::Codes::Constants;
 push(\@EXPORT,\@Locale::Codes::Constants::CONSTANTS_${TYPE});
 
 our \$obj = new Locale::Codes('$type');
+\$obj->show_errors(0);
 
-sub _show_errors {
+sub show_errors {
    my(\$val) = \@_;
    \$obj->show_errors(\$val);
 }

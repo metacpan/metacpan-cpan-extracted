@@ -1,0 +1,26 @@
+#! /usr/bin/perl -w
+
+my $VERSION = 1.02;
+
+use blib;
+
+# Restrictions on Loop-variable Names
+#
+# Due to a bug in most versions of Text::Balanced,
+# loop-variable names that look like Perl operators,
+# including $m, $a, $s, $y, $tr, $qq, $qw, $qr, $qx
+# and possibly others, cause syntax errors.
+
+# are these restrictions fixed ?
+
+use Shell::POSIX::Select ;
+
+select $m (@ARGV) { print "$m\n"; }
+select $a (@ARGV) { print "$a\n"; }
+select $s (@ARGV) { print "$s\n"; }
+select $y (@ARGV) { print "$y\n"; }
+select $tr (@ARGV) { print "$tr\n"; }
+select $qq (@ARGV) { print "$qq\n"; }
+select $qw (@ARGV) { print "$qw\n"; }
+select $qr (@ARGV) { print "$qr\n"; }
+select $qx (@ARGV) { print "$qx\n"; }

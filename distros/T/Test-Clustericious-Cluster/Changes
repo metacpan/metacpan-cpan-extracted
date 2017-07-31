@@ -1,5 +1,11 @@
 Revision history for Test-Clustericious-Cluster
 
+0.37      2017-07-22 23:42:49 -0400
+  - Remove dependency on File::HomeDir
+
+0.36_01   2017-07-14 11:10:19 -0400
+  - Migrate to using Test2::V0
+
 0.35      2017-04-27 08:37:00 -0400
   - Bump Clustericious tests to requrie 1.24 for Mojolicious 7.31 compat
 

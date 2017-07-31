@@ -1,6 +1,15 @@
 use alienfile;
 
-our $VERSION = 0.008_000;
+our $VERSION = 0.014_000;
+
+use English qw(-no_match_vars);  # for $OSNAME
+
+# DEV NOTE: Windows OS, required macro to avoid build errors
+my $configure_cxxflags = '';
+if ($OSNAME eq 'MSWin32') {
+    $configure_cxxflags = 'CXXFLAGS="%CXXFLAGS% -DPCRE2_STATIC"';
+}
+#print {*STDERR} "\n\n", q{<<< DEBUG >>> in alienfile, have $configure_cxxflags = '}, $configure_cxxflags, q{'}, "\n\n";
 
 plugin 'Probe::CBuilder' => (
   aliens => [ 'Alien::PCRE2' ],
@@ -22,8 +31,8 @@ share {
         public_l => 1,
     );
     build [
-#        '%{configure}' . ' --enable-cpp11 --enable-test',  # DEV NOTE: disable C++11 features to support older compilers
-        '%{configure}' . ' --disable-cpp11 --enable-test', 
+#        '%{configure} --enable-cpp11 --enable-test ' . $configure_cxxflags,  # DEV NOTE: disable C++11 features to support older compilers
+        '%{configure} --disable-cpp11 --enable-test ' . $configure_cxxflags,
         '%{gmake}',
         '%{gmake} check',
         '%{gmake} install',

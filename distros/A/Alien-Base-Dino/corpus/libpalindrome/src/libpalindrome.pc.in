@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libpalindrome
+Description: A toy autohell library that can check for palindromes
+Version: @VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lpalindrome

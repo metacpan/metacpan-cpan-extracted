@@ -1,8 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
-
+use Test2::V0 -no_srand => 1;
 use Alien::Base::ModuleBuild;
 use File::chdir;
 use File::Temp ();

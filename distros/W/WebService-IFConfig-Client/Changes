@@ -1,3 +1,22 @@
+1.001 2017.07.26
+* Markdown cleanup from markdownlint https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint
+* Documentation bugs
+
+1.000 2017.07.26
+* Bump version for release
+
+0.008 2017.07.22
+* documentation out of date
+
+0.007 2017.07.22
+* experimental was not in requirements list
+
+0.006 2017.07.22
+* Change to 5.12.0 as minimum version
+
+0.005 2017.07.20
+* Change to using use experimental. See http://blogs.perl.org/users/mike_b/2013/06/a-little-nicer-way-to-use-smartmatch-on-perl-518.html
+
 0.004 2017.07.20
 * Add a Changes file as recommended by https://cpants.cpanauthors.org/kwalitee/has_changelog
 

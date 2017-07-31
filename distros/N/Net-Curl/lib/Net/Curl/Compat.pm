@@ -69,7 +69,7 @@ VERSION
 # Dirty hack so Test::ConsistentVersion passes
 sub VERSION {
 	return (caller)[0] eq 'Test::ConsistentVersion'
-		? 0.37
+		? 0.38
 		: $VERSION;
 }
 
@@ -94,7 +94,7 @@ unshift @INC, sub {
 
 =head1 COPYRIGHT
 
-Copyright (c) 2011 Przemyslaw Iskra <sparky at pld-linux.org>.
+Copyright (c) 2011-2015 Przemyslaw Iskra <sparky at pld-linux.org>.
 
 You may opt to use, copy, modify, merge, publish, distribute and/or sell
 copies of the Software, and permit persons to whom the Software is furnished

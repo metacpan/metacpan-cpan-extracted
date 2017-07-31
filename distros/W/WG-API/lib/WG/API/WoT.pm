@@ -2,9 +2,7 @@ package WG::API::WoT;
 
 use Moo;
 
-with 'WG::API::WoT::Account';
-with 'WG::API::WoT::Ratings';
-with 'WG::API::WoT::Tanks';
+with 'WG::API::Base';
 
 =head1 NAME
 
@@ -12,12 +10,13 @@ WG::API::WoT - Modules to work with Wargaming.net Public API for World of Tanks
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.5';
 
+use constant api_uri => 'api.worldoftanks.ru/wot';
 
 =head1 SYNOPSIS
 
@@ -25,9 +24,9 @@ Wargaming.net Public API is a set of API methods that provide access to Wargamin
 
 This module provide access to WG Public API
 
-    use WG::API::WoT;
+    use WG::API;
 
-    my $wot = WG::API::WoT->new( application_id => 'demo' );
+    my $wot = WG::API->new( application_id => 'demo' )->wot();
     ...
     my $player = $wot->account_info( account_id => '1' );
 
@@ -45,15 +44,6 @@ Params:
  - languare
  - api_uri
 
-=cut
-
-has api_uri => (
-    is      => 'ro',
-    default => sub{ 'api.worldoftanks.ru/wot' },
-);
-
-with 'WG::API::Base';
-
 =head1 METHODS
 
 =head2 Account
@@ -62,23 +52,58 @@ with 'WG::API::Base';
 
 Method returns partial list of players. The list is filtered by initial characters of user name and sorted alphabetically
 
+=cut
+
+sub account_list {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/list', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
+        @_ );
+}
+
 =head3 B<account_info( [ %params ] )>
 
 Method returns player details.
+
+=cut
+
+sub account_info {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/info', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
+        ['account_id'], @_ );
+}
 
 =head3 B<account_tanks( [ %params ] )>
 
 Method returns details on player's vehicles.
 
+=cut
+
+sub account_tanks {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/tanks', [ 'language', 'fields', 'access_token', 'account_id', 'tank_id' ],
+        ['account_id'], @_ );
+}
+
 =head3 B<account_achievements( [ %params ] )>
 
 Method returns players' achievement details.
 
-Achievement properties define the achievements field values (ref. L<WG::API::WoT::Achievements> ):
+Achievement properties define the achievements field values:
 
     1-4 for Mastery Badges and Stage Achievements (type: "class");
     maximum value of Achievement series (type: "series");
     number of achievements earned from sections: Battle Hero, Epic Achievements, Group Achievements, Special Achievements, etc. (type: "repeatable, single, custom").
+
+=cut
+
+sub account_achievements {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/achievements', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
+}
 
 =head2 Player ratings
 
@@ -86,21 +111,74 @@ Achievement properties define the achievements field values (ref. L<WG::API::WoT
 
 Method returns dictionary of rating periods and ratings details.
 
+=cut
+
+sub ratings_types {
+    my $self = shift;
+
+    return $self->_request( 'get', 'ratings/types', [ 'language', 'fields', 'battle_type' ], undef, @_ );
+}
+
 =head3 B<ratings_dates( [ %params ] )>
 
 Method returns dates with available rating data.
+
+=cut
+
+sub ratings_dates {
+    my $self = shift;
+
+    return $self->_request( 'get', 'ratings/dates', [ 'language', 'fields', 'battle_type', 'type', 'account_id' ],
+        ['type'], @_ );
+}
 
 =head3 B<ratings_accounts( [ %params ] )>
 
 Method returns player ratings by specified IDs.
 
+=cut
+
+sub ratings_accounts {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'ratings/accounts',
+        [ 'language', 'fields', 'battle_type', 'type', 'date', 'account_id' ],
+        [ 'type',     'account_id' ], @_
+    );
+}
+
 =head3 B<ratings_neighbors( [ %params ] )>
 
 Method returns list of adjacent positions in specified rating.
 
+=cut
+
+sub ratings_neighbors {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'ratings/neighbors',
+        [ 'language', 'fields',     'battle_type', 'type', 'date', 'account_id', 'rank_field', 'limit' ],
+        [ 'type',     'account_id', 'rank_field' ], @_
+    );
+}
+
 =head3 B<ratings_top( [ %params ] )>
 
 Method returns the list of top players by specified parameter.
+
+=cut
+
+sub ratings_top {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'ratings/top',
+        [ 'language', 'fields', 'battle_type', 'type', 'date', 'rank_field', 'limit', 'page_no' ],
+        [ 'type',     'rank_field' ], @_
+    );
+}
 
 =head2 Player's vehicles
 
@@ -108,15 +186,35 @@ Method returns the list of top players by specified parameter.
 
 Method returns overall statistics, Tank Company statistics, and clan statistics per each vehicle for each user.
 
+=cut
+
+sub tanks_stats {
+    my $self = shift;
+
+    return $self->_request( 'get', 'tanks/stats',
+        [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage' ],
+        ['account_id'], @_ );
+}
+
 =head3 B<tanks_achievements( [ %params ] )>
 
 Method returns list of achievements on all vehicles.
 
-Achievement properties define the achievements field values (ref. L<WG::API::WoT::Achievements> ):
+Achievement properties define the achievements field values:
 
     1-4 for Mastery Badges and Stage Achievements (type: "class");
     maximum value of Achievement series (type: "series");
     number of achievements earned from sections: Battle Hero, Epic Achievements, Group Achievements, Special Achievements, etc. (type: "repeatable, single, custom").
+
+=cut
+
+sub tanks_achievements {
+    my $self = shift;
+
+    return $self->_request( 'get', 'tanks/achievements',
+        [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage' ],
+        ['account_id'], @_ );
+}
 
 =head1 BUGS
 
@@ -161,7 +259,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -206,4 +304,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API::WoT
+1;    # End of WG::API::WoT

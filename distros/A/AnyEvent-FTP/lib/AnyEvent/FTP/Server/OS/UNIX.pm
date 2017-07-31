@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: UNIX implementations for AnyEvent::FTP
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub BUILDARGS
@@ -84,7 +84,7 @@ AnyEvent::FTP::Server::OS::UNIX - UNIX implementations for AnyEvent::FTP
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

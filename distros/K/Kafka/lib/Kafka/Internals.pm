@@ -6,7 +6,7 @@ Kafka::Internals - Constants and functions used internally.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Internals> version 1.05 .
+This documentation refers to C<Kafka::Internals> version 1.06 .
 
 =cut
 
@@ -18,7 +18,7 @@ use warnings;
 
 
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Exporter qw(
     import
@@ -29,6 +29,7 @@ our @EXPORT_OK = qw(
     $APIKEY_FETCH
     $APIKEY_OFFSET
     $APIKEY_METADATA
+    $APIKEY_FINDCOORDINATOR
     $APIKEY_APIVERSIONS
     $APIKEY_OFFSETCOMMIT
     $APIKEY_OFFSETFETCH
@@ -135,6 +136,13 @@ The numeric code that the ApiKey in the request take for the C<OffsetFetchReques
 
 =cut
 const our $APIKEY_OFFSETFETCH                   => 9;
+
+=head3 C<$APIKEY_FINDCOORDINATOR>
+
+The numeric code that the C<ApiKey> in the request take for the C<FindCoordinator> request type.
+
+=cut
+const our $APIKEY_FINDCOORDINATOR               => 10;
 
 =head3 C<$APIKEY_APIVERSIONS>
 

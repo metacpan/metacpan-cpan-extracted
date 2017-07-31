@@ -1,0 +1,9 @@
+0.02 2017-07-25
+ - bubble up exceptions from implementations correctly
+ - make caller created with pawsx-fakeimplementation-instance first class Paws callers. 
+   Before, you would have to pass through a first-class Paws caller (like 
+   Paws::Net::MultiplexCaller), that wasn't verifying that what it multiplexes to
+   is itself a valid Paws caller.
+
+0.01 2017-07-24
+ - First version released to an unsuspecting world

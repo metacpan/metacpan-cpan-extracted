@@ -4,7 +4,7 @@ use strict;
 use vars qw($PLACEHOLDER);
 use Benchmark qw(cmpthese timethese);
 use CGI::Ex::Conf;
-use POSIX qw(tmpnam);
+use File::Temp ();
 
 $PLACEHOLDER = chr(186).'~'.chr(186);
 
@@ -75,8 +75,8 @@ my $conf = eval $str;
 my %TESTS = ();
 
 ### do perl
-my $dir = tmpnam;
-mkdir $dir, 0755;
+my $dir = File::Temp->newdir();
+chmod 0755, $dir;
 my $tmpnam = "$dir/bench";
 my $file = $tmpnam. '.pl';
 $TESTS{pl} = sub {
@@ -95,7 +95,7 @@ $files{g_conf} = $file2;
 
 ### load in the rest of the tests that we support
 if (eval {require JSON}) {
-  my $_file = tmpnam(). '.json';
+  my $_file = $tmpnam. '.json';
   $TESTS{json} = sub {
     $cob->write_ref($file, $str);
   };
@@ -169,7 +169,6 @@ cmpthese timethese ($n, \%TESTS);
 
 ### comment out this line to inspect files
 unlink $_ foreach values %files;
-rmdir $dir;
 
 ###----------------------------------------------------------------###
 

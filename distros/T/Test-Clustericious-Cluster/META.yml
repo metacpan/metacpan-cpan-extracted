@@ -4,14 +4,14 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Path::Class: '0.26'
-  Test2::Suite: '0.000060'
-  Test::More: '0.94'
+  Test2::Bundle::More: '0.000060'
+  Test2::V0: '0.000060'
   perl: '5.010001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +21,13 @@ recommends:
   EV: '0'
   PlugAuth: '0.30'
 requires:
-  File::HomeDir: '0.91'
   Mojolicious: '6.00'
-  Test2: '1.302015'
+  Test2::API: '1.302015'
+  Test2::Plugin::FauxHomeDir: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/clustericious/Test-Clustericious-Cluster/issues
   homepage: https://metacpan.org/pod/Test::Clustericious::Cluster
   repository: git://github.com/clustericious/Test-Clustericious-Cluster.git
-version: '0.35'
+version: '0.37'
 x_serialization_backend: 'YAML::Tiny version 1.70'

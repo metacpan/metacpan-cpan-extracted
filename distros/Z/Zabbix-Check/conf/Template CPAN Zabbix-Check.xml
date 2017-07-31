@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.0</version>
-    <date>2016-12-28T11:03:46Z</date>
+    <date>2017-07-23T17:41:12Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -18,6 +18,9 @@
                 </group>
             </groups>
             <applications>
+                <application>
+                    <name>CPAN Zabbix-Check</name>
+                </application>
                 <application>
                     <name>Disk</name>
                 </application>
@@ -38,6 +41,49 @@
                 </application>
             </applications>
             <items>
+                <item>
+                    <name>CPAN Zabbix-Check installed</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>cpan.zabbix.check.installed</key>
+                    <delay>60</delay>
+                    <history>7</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units/>
+                    <delta>0</delta>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>CPAN Zabbix-Check</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                </item>
                 <item>
                     <name>RabbitMQ installed</name>
                     <type>0</type>
@@ -462,7 +508,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>General</name>
+                            <name>CPAN Zabbix-Check</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -500,7 +546,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>1</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
@@ -814,24 +860,34 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].last()} &gt; 90</expression>
-                            <name>Disk {#DEVNAME} I/O Util too high(&gt;90%)</name>
+                            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].min(1m)} &gt; 90</expression>
+                            <name>Disk {#DEVNAME} I/O Util too high(&gt;90%) for 1m</name>
                             <url/>
                             <status>0</status>
                             <priority>1</priority>
                             <description/>
                             <type>0</type>
-                            <dependencies/>
+                            <dependencies>
+                                <dependency>
+                                    <name>Disk {#DEVNAME} I/O Util too high(&gt;90%) for 5m</name>
+                                    <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].min(5m)} &gt; 90</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].min(1m)} &gt; 90</expression>
-                            <name>Disk {#DEVNAME} I/O Util too high(&gt;90%) for 1m</name>
+                            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].min(5m)} &gt; 90</expression>
+                            <name>Disk {#DEVNAME} I/O Util too high(&gt;90%) for 5m</name>
                             <url/>
                             <status>0</status>
                             <priority>2</priority>
                             <description/>
                             <type>0</type>
-                            <dependencies/>
+                            <dependencies>
+                                <dependency>
+                                    <name>Disk {#DEVNAME} I/O Util too high(&gt;90%) for 15m</name>
+                                    <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].min(15m)} &gt; 90</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{CPAN Zabbix-Check:cpan.zabbix.check.disk.ioutil[{#DEVNAME}].min(15m)} &gt; 90</expression>
@@ -998,7 +1054,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>cpan.zabbix.check.rabbitmq.queue_discovery</key>
-                    <delay>600</delay>
+                    <delay>300</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
@@ -1022,7 +1078,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>1</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
@@ -1032,7 +1088,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.rabbitmq.queue_status[{#VHOST},{#QUEUE},ready]</key>
-                            <delay>600</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1076,7 +1132,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.rabbitmq.queue_status[{#VHOST},{#QUEUE},total]</key>
-                            <delay>600</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1120,7 +1176,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.rabbitmq.queue_status[{#VHOST},{#QUEUE},unacked]</key>
-                            <delay>600</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1159,7 +1215,64 @@
                         </item_prototype>
                     </item_prototypes>
                     <trigger_prototypes/>
-                    <graph_prototypes/>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>RabbitMQ queue {#VHOST} {#QUEUE}</name>
+                            <width>900</width>
+                            <height>200</height>
+                            <yaxismin>0.0000</yaxismin>
+                            <yaxismax>100.0000</yaxismax>
+                            <show_work_period>1</show_work_period>
+                            <show_triggers>1</show_triggers>
+                            <type>0</type>
+                            <show_legend>1</show_legend>
+                            <show_3d>0</show_3d>
+                            <percent_left>0.0000</percent_left>
+                            <percent_right>0.0000</percent_right>
+                            <ymin_type_1>1</ymin_type_1>
+                            <ymax_type_1>0</ymax_type_1>
+                            <ymin_item_1>0</ymin_item_1>
+                            <ymax_item_1>0</ymax_item_1>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>0</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>F63100</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>CPAN Zabbix-Check</host>
+                                        <key>cpan.zabbix.check.rabbitmq.queue_status[{#VHOST},{#QUEUE},total]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>1A7C11</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>CPAN Zabbix-Check</host>
+                                        <key>cpan.zabbix.check.rabbitmq.queue_status[{#VHOST},{#QUEUE},ready]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>2774A4</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>CPAN Zabbix-Check</host>
+                                        <key>cpan.zabbix.check.rabbitmq.queue_status[{#VHOST},{#QUEUE},unacked]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
                     <host_prototypes/>
                 </discovery_rule>
                 <discovery_rule>
@@ -1168,7 +1281,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>cpan.zabbix.check.rabbitmq.vhost_discovery</key>
-                    <delay>600</delay>
+                    <delay>300</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
@@ -1192,7 +1305,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>1</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes/>
                     <trigger_prototypes/>
@@ -1205,7 +1318,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>cpan.zabbix.check.supervisor.worker_discovery</key>
-                    <delay>600</delay>
+                    <delay>300</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
@@ -1229,7 +1342,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>1</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
@@ -1286,7 +1399,12 @@
                             <priority>2</priority>
                             <description/>
                             <type>0</type>
-                            <dependencies/>
+                            <dependencies>
+                                <dependency>
+                                    <name>Supervisor worker {#NAME} not running for 5m</name>
+                                    <expression>{CPAN Zabbix-Check:cpan.zabbix.check.supervisor.worker_status[{#NAME}].iregexp(^RUNNING, 5m)} = 0</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{CPAN Zabbix-Check:cpan.zabbix.check.supervisor.worker_status[{#NAME}].iregexp(^RUNNING, 5m)} = 0</expression>
@@ -1308,7 +1426,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>cpan.zabbix.check.systemd.service_discovery</key>
-                    <delay>600</delay>
+                    <delay>300</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
@@ -1332,7 +1450,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>1</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
@@ -1342,7 +1460,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.systemd.service_active[{#NAME}]</key>
-                            <delay>60</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1386,7 +1504,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.systemd.service_availability_1h[{#NAME}]</key>
-                            <delay>60</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1430,7 +1548,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.systemd.service_availability_24h[{#NAME}]</key>
-                            <delay>60</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1474,7 +1592,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>cpan.zabbix.check.systemd.service_status[{#NAME}]</key>
-                            <delay>60</delay>
+                            <delay>300</delay>
                             <history>7</history>
                             <trends>0</trends>
                             <status>0</status>
@@ -1514,11 +1632,11 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.systemd.service_availability_1h[{#NAME}].last()} &lt; {CPAN Zabbix-Check:cpan.zabbix.check.systemd.service_availability_24h[{#NAME}].last()}</expression>
+                            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.systemd.service_availability_1h[{#NAME}].last()}+20 &lt; {CPAN Zabbix-Check:cpan.zabbix.check.systemd.service_availability_24h[{#NAME}].last()}</expression>
                             <name>Systemd service {#NAME} availability low</name>
                             <url/>
                             <status>0</status>
-                            <priority>2</priority>
+                            <priority>1</priority>
                             <description/>
                             <type>0</type>
                             <dependencies/>
@@ -1528,7 +1646,7 @@
                             <name>Systemd service {#NAME} failed</name>
                             <url/>
                             <status>0</status>
-                            <priority>3</priority>
+                            <priority>2</priority>
                             <description/>
                             <type>0</type>
                             <dependencies/>
@@ -1608,7 +1726,7 @@
                 </macro>
                 <macro>
                     <macro>{$ZC_VERSION}</macro>
-                    <value>1.10</value>
+                    <value>1.11</value>
                 </macro>
             </macros>
             <templates/>
@@ -1617,7 +1735,17 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.version.last()} &lt; 1.09</expression>
+            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.installed.last()} = 0</expression>
+            <name>CPAN Zabbix-Check not installed</name>
+            <url/>
+            <status>0</status>
+            <priority>1</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.version.last()} &lt; 1.10</expression>
             <name>CPAN Zabbix-Check version not up to date</name>
             <url/>
             <status>0</status>
@@ -1671,7 +1799,9 @@ or&#13;
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.time.zone.iregexp(^\{$ZC_TIME_ZONE}$)} = 0</expression>
+            <expression>{CPAN Zabbix-Check:cpan.zabbix.check.installed.last()} &lt;&gt; 0&#13;
+and&#13;
+{CPAN Zabbix-Check:cpan.zabbix.check.time.zone.iregexp(^\{$ZC_TIME_ZONE}$)} = 0</expression>
             <name>Time zone wrong</name>
             <url/>
             <status>0</status>

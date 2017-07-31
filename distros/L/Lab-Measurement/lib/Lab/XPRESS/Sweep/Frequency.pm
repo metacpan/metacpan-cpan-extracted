@@ -1,11 +1,11 @@
 package Lab::XPRESS::Sweep::Frequency;
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.553';
-
-use Lab::XPRESS::Sweep::Sweep;
+#ABSTRACT: Frequency sweep
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.554';
+use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
 
-our @ISA = ('Lab::XPRESS::Sweep::Sweep');
+our @ISA = ('Lab::XPRESS::Sweep');
 
 sub new {
     my $proto                  = shift;
@@ -84,13 +84,19 @@ sub exit {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::XPRESS::Sweep::Frequency - Frequency-Sweep
+Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -112,20 +118,18 @@ sub exit {
 		mode => 'step',		
 		backsweep => 0 
 		});
-		
-.
 
+.
 
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Frequency class implements a module for frequncy sweeps in the Lab::XPRESS::Sweep framework.
 
 .
 
 =head1 CONSTRUCTOR
-	
 
 		my $sweep_voltage = $hub->Sweep('Frequency',
 		{
@@ -150,18 +154,17 @@ Allowed instruments: Lab::Instrument::SignalRecovery726x
 .
 
 =head2 mode [string] (default = 'step' | 'list')
-	
+
 step: measurements will be performed at discrete values of the frequency between start and end points defined in parameter points, seperated by steps defined in parameter stepwidth
 
 list: measurements will be performed at a list frequencies defined in parameter points
-	
+
 .
 
 =head2 points [float array] (mandatory)
 
 array of values (in Hz) that defines the characteristic points of the sweep.
 First value is appraoched before measurement begins. 
-
 
 Case mode => 'step' :
 Same as in 'continuous' but frequency will be swept in stop and go mode. 
@@ -171,14 +174,12 @@ Array of values, with minimum length 1, that are approached in sequence to perfo
 
 .
 
-
-
 =head2 stepwidth [float array]
 
 This parameter is relevant only if mode = 'step' has been selected. 
 Stepwidth has to be an array of length '1' or greater. The values define the width for each step within the corresponding sweep sequence. 
 If the length of the defined sweep sequence devided by the stepwidth is not an integer number, the last step will be smaller in order to reach the defined points-value.
-	
+
 	points = [100, 3000, 300]
 	stepwidth = [500, 1000]
 	
@@ -191,12 +192,11 @@ If the length of the defined sweep sequence devided by the stepwidth is not an i
 can be used instead of 'stepwidth'. Attention: Use only the 'number_of_points' or the 'stepwidth' parameter. Using both will cause an Error!
 This parameter is relevant only if mode = 'step' has been selected. 
 Number_of_points has to be an array of length '1' or greater. The values defines the number of steps within the corresponding sweep sequence.
-	
+
 	points = [100, 3000, 300]
 	number_of_points = [10, 2]
 	
 	==> steps: 100, 390, 680, 970, 1260, 1550, 1840, 2130, 2420, 2710, 3000, 1650, 300
-
 
 .
 
@@ -205,7 +205,7 @@ Number_of_points has to be an array of length '1' or greater. The values defines
 0 : no backsweep (default)
 1 : a backsweep will be performed
 2 : no backsweep performed automatically, but sweep sequence will be reverted every second time the sweep is started (relevant eg. if sweep operates as a slave. This way the sweep sequence is reverted at every second step of the master)
-	
+
 .
 
 =head2 id [string] (default = 'Frequency_Sweep')
@@ -253,15 +253,17 @@ probably none
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-Christian Butschkow and Stefan Geißler
+  Copyright 2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
 
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

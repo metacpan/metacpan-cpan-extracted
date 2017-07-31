@@ -21,7 +21,7 @@ use CPAN::ReleaseHistory;
 use HTTP::Tiny;
 
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 our $ua  = HTTP::Tiny->new;
@@ -285,7 +285,7 @@ App::cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 DESCRIPTION
 
@@ -297,7 +297,11 @@ L<cpangitify>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Mohammad S Anwar (MANWAR)
 
 =head1 COPYRIGHT AND LICENSE
 

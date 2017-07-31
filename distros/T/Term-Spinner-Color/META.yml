@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Term::Spinner::Color:
     file: lib/Term/Spinner/Color.pm
-    version: '0.02'
+    version: '0.03'
 recommends:
   Term::ANSIScreen: '0'
 requires:
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/SwellJoe/perl-Term-Spinner-Color/issues
   homepage: https://github.com/SwellJoe/perl-Term-Spinner-Color
   repository: https://github.com/SwellJoe/perl-Term-Spinner-Color.git
-version: '0.02'
+version: '0.03'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -83,7 +83,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
+          Module::Metadata: '1.000033'
           version: '0.004'
       name: '@Starter/MetaProvides::Package'
       version: '2.004003'
@@ -125,7 +125,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Starter/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -177,7 +177,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
-      version: '3.000'
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::PerlTidy
+      name: PerlTidy
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta

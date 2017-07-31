@@ -1,3 +1,7 @@
+2.1.7 -
+
+* Fix a bug in which error messages aren't returned.
+
 2.1.6 -
 
 * Fix bug in transaction reporting introduced by HTTP::Tiny change.

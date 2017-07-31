@@ -1,6 +1,6 @@
-requires "File::HomeDir" => "0.91";
 requires "Mojolicious" => "6.00";
-requires "Test2" => "1.302015";
+requires "Test2::API" => "1.302015";
+requires "Test2::Plugin::FauxHomeDir" => "0";
 requires "perl" => "5.010001";
 recommends "EV" => "0";
 recommends "PlugAuth" => "0.30";
@@ -9,8 +9,8 @@ suggests "PlugAuth" => "0.30";
 
 on 'test' => sub {
   requires "Path::Class" => "0.26";
-  requires "Test2::Suite" => "0.000060";
-  requires "Test::More" => "0.94";
+  requires "Test2::Bundle::More" => "0.000060";
+  requires "Test2::V0" => "0.000060";
   requires "perl" => "5.010001";
 };
 

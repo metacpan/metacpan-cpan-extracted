@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.24
+    version 1.26
 
 SYNOPSIS
 
@@ -105,6 +105,8 @@ AUTHOR
     Contributors:
 
     Curt Tilmes
+
+    Yanick Champoux
 
 COPYRIGHT AND LICENSE
 

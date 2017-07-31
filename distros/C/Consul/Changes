@@ -1,3 +1,6 @@
+0.021     2017-07-21 17:54:30+10:00 Australia/Melbourne
+- Support setting and getting null values in the KV store
+
 0.020     2016-12-20 20:59:28+11:00 Australia/Melbourne
 - Support hash-to-object coercion in check_register and
   service_register.

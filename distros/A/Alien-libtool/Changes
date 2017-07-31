@@ -1,5 +1,12 @@
 Revision history for Alien-libtool
 
+0.06      2017-07-28 11:23:18 -0400
+  - Support for running out of blib directory
+
+0.05      2017-07-28 10:16:40 -0400
+  - Fixed hiccup where Alien:::MSYS was added as a
+    test prereq on non-Windows platforms
+
 0.04      2017-07-07 03:03:34 -0400
   - Fixes for OpenBSD.
 

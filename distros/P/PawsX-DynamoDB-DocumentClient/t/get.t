@@ -32,6 +32,27 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            Key => {
+                username => '1234',
+            },
+            TableName => 'users',
+            force_type => {
+                username => 'S',
+            },
+        )
+    },
+    {
+        Key => {
+            username => { S => '1234' },
+        },
+        TableName => 'users',
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output = Paws::DynamoDB::GetItemOutput->new(
     Item => make_attr_map({
         user_id => { S => '002da0b1-5607-44bd-9658-250e46d23db4' },

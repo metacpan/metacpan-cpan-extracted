@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 our $SYNC_PARTNER_GONE = 3.0;
 
 sub new {
@@ -196,7 +196,7 @@ Forks::Super::Sync - portable interprocess synchronization object
 
 =head1 VERSION
 
-0.90
+0.91
 
 =head1 SYNOPSIS
 

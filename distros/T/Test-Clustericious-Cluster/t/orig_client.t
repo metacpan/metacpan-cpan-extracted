@@ -12,18 +12,17 @@ BEGIN {
 }
 use Clustericious::Client;
 use Test::Clustericious::Config;
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 
 skip_all 'test requires Clustericious::Client 1.01'
   unless Clustericious::Client->can('_mojo_user_agent_factory');
-plan 4;
 
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok('MyApp');
 
 note "etc/MyApp.conf:";
 note "  $_" for do {
-  open my $fh, '<', "@{[ File::HomeDir->my_home ]}/etc/MyApp.conf";
+  open my $fh, '<', "@{[ bsd_glob '~' ]}/etc/MyApp.conf";
   <$fh>;
 };
 
@@ -35,6 +34,8 @@ isa_ok $client, 'MyApp::Client';
 
 is $client->welcome, 'welcome', 'welcome returns welcome';
 is $client->version->[0], '1.00', 'version = 1.00';
+
+done_testing;
 
 __DATA__
 

@@ -16,7 +16,7 @@ my @msgs = (
  { hlagh => 1, HLAGH => 2 },
  { lol => [ 'bleh', undef, 4684324 ] },
 );
-$msgs[7]->{wut} = { dong => [ 0 .. 9 ], recurse => $msgs[7] };
+$msgs[7]->{wut} = { derp => [ 0 .. 9 ], recurse => $msgs[7] };
 my $i = 0;
 
 my $deuce = IPC::MorseSignals::Emitter->new(speed => 1024);

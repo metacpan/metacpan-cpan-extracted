@@ -4,7 +4,7 @@ package DBD::Unify::GetInfo;
 # DBI::DBD::Metadata::write_getinfo_pm v2.008696.
 # And manually reformatted into readable style
 
-our $VERSION = $DBD::Unify::VERSION;
+our $VERSION = "0.88";
 
 use strict;
 use warnings;
@@ -43,19 +43,16 @@ my @Keywords = qw(
     XLOCK
     );
 
-sub sql_keywords
-{
+sub sql_keywords {
     return join ",", @Keywords;
     } # sql_keywords
 
-sub sql_data_source_name
-{
+sub sql_data_source_name {
     my $dbh = shift;
     return "dbi:$sql_driver:" . $dbh->{Name};
     } # sql_data_source_name
 
-sub sql_user_name
-{
+sub sql_user_name {
     my $dbh = shift;
     # CURRENT_USER is a non-standard attribute, probably undef
     # Username is a standard DBI attribute

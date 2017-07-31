@@ -5,8 +5,8 @@ author:
 build_requires:
   File::chdir: '0'
   PlugAuth::Lite: '0'
-  Test2::Suite: '0.000060'
-  Test::Clustericious::Cluster: '0.35'
+  Test2::Bundle::Extended: '0.000060'
+  Test::Clustericious::Cluster: '0.37'
   Test::More: '0.94'
   Test::Script: '1.10'
   Test::Warn: '0'
@@ -16,7 +16,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   perl: '5.010001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,13 +38,12 @@ requires:
   Data::Rmap: '0'
   DateTime::Format::DateParse: '0'
   DateTime::Format::ISO8601: '0'
-  File::HomeDir: '0.91'
   File::ReadBackwards: '0'
-  File::ShareDir: '0'
+  File::ShareDir::Dist: '0'
   File::Which: '0'
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
-  List::MoreUtils: '0'
+  List::Util: '1.45'
   Log::Log4perl: '0'
   Log::Log4perl::Appender::TAP: '0.02'
   MojoX::Log::Log4perl: '0'
@@ -54,6 +53,7 @@ requires:
   Sub::Exporter: '0'
   Sub::Identify: '0.05'
   Term::Prompt: '0'
+  Test2::Plugin::FauxHomeDir: '0'
   YAML::XS: '0'
   autodie: '0'
   perl: '5.010001'
@@ -61,5 +61,10 @@ resources:
   bugtracker: https://github.com/clustericious/Clustericious/issues
   homepage: https://metacpan.org/pod/Clustericious
   repository: git://github.com/clustericious/Clustericious.git
-version: '1.24'
+version: '1.26'
+x_contributors:
+  - 'Brian Duggan'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Curt Tilmes'
+  - 'Yanick Champoux'
 x_serialization_backend: 'YAML::Tiny version 1.70'

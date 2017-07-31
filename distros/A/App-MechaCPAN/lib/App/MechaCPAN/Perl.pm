@@ -21,7 +21,7 @@ sub go
   my $src   = shift;
   my @argv  = shift;
 
-  if ($^O eq 'MSWin32')
+  if ( $^O eq 'MSWin32' )
   {
     info 'Cannot build perl on Win32';
     return 0;
@@ -94,7 +94,7 @@ sub go
     push @config, '-Dusethreads';
   }
 
-  if ($opts->{devel} )
+  if ( $opts->{devel} )
   {
     push @config, '-Dusedevel';
   }

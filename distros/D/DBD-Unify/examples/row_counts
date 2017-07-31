@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
-sub usage
-{
+our $VERSION = "1.01 - 20160901";
+
+sub usage {
     my $err = shift and select STDERR;
     print "usage: vol [-1] [-a] [-e] [-s schema] [tbl]\n";
     exit $err;

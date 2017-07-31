@@ -1,0 +1,67 @@
+{
+   "abstract" : "Setup a faux home directory for tests",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Plugin-FauxHomeDir",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test2::API" : "1.302015",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Test2-Plugin-FauxHomeDir/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Test2::Plugin::FauxHomeDir",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Test2-Plugin-FauxHomeDir.git",
+         "web" : "https://github.com/plicease/Test2-Plugin-FauxHomeDir"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

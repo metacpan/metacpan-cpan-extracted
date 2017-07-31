@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use App::JenkinsCli;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
@@ -33,29 +33,52 @@ sub main {
                 },
             },
             sub_command => {
-                ls      => [],
+                ls      => [
+                    'long|l',
+                    'recipient|R=s',
+                    'regexp|r',
+                ],
                 list    => [
                     'long|l',
                     'recipient|R=s',
+                    'regexp|r',
                     'verbose|v+',
                 ],
-                start   => [],
+                start   => [
+                    'force|f!',
+                ],
                 delete  => [],
                 status  => [],
-                conf    => [],
+                conf    => [
+                    'regexp|r',
+                ],
                 config  => [
                     'out|o=s',
+                    'recipient|R=s',
+                    'regexp|r',
                 ],
                 queue   => [],
-                enable  => [],
-                disable => [],
-                change  => [
+                enable  => [
+                    'recipient|R=s',
+                    'regexp|r',
                     'test|T!',
+                ],
+                disable => [
+                    'recipient|R=s',
+                    'regexp|r',
+                    'test|T!',
+                ],
+                change  => [
+                    'recipient|R=s',
+                    'regexp|r',
+                    'test|T!',
+                    'verbose|v+',
                 ],
                 create => [],
                 watch  => [
                     'long|l',
                     'recipient|R=s',
+                    'regexp|r',
                     'sleep|s=i',
                     'verbose|v+',
                 ],
@@ -73,12 +96,6 @@ sub main {
             'username|U=s',
             'password|P=s',
             'colors|c=s%',
-            'force|f!',
-            'long|l',
-            'out|o=s',
-            'regexp|r',
-            'recipient|R=s',
-            'sleep|s=i',
             'test|T!',
             'verbose|v+',
         ],
@@ -94,7 +111,7 @@ sub main {
         opt      => $options,
     );
 
-    return $jenkins->$cmd(@ARGV) || 0;
+    return $jenkins->$cmd(@{ $opt->files }) || 0;
 }
 
 sub _error {
@@ -112,7 +129,7 @@ jenkins-cli - Operate Jenkins from the command line
 
 =head1 VERSION
 
-This documentation refers to jenkins-cli version 0.009
+This documentation refers to jenkins-cli version 0.010
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use SPVM 'TestCase'; my $use_test_line = __LINE__;
-use SPVM 'std'; my $use_std_line = __LINE__;
+use SPVM 'stdout'; my $use_std_line = __LINE__;
 
 use POSIX ();
 
@@ -25,12 +25,93 @@ my $INT_MAX = 2147483647;
 my $INT_MIN = -2147483648;
 my $LONG_MAX = 9223372036854775807;
 my $LONG_MIN = -9223372036854775808;
-my $FLOAT_MAX = POSIX::FLT_MAX;
-my $FLOAT_MIN = POSIX::FLT_MIN;
-my $DOUBLE_MAX = POSIX::DBL_MAX;
-my $DOUBLE_MIN = POSIX::DBL_MIN;
+my $FLOAT_MAX = POSIX::FLT_MAX();
+my $FLOAT_MIN = POSIX::FLT_MIN();
+my $DOUBLE_MAX = POSIX::DBL_MAX();
+my $DOUBLE_MIN = POSIX::DBL_MIN();
 
-# Convert type - widning convertion
+use SPVM::stdout;
+
+# Lookup switch
+{
+  ok(SPVM::TestCase::lookup_switch());
+}
+
+# Table switch
+{
+  ok(SPVM::TestCase::table_switch());
+}
+
+{
+  ok(SPVM::TestCase::my_var_initialized_zero());
+}
+
+{
+  ok(SPVM::TestCase::object_field_initialized_zero());
+}
+
+{
+  ok(SPVM::TestCase::new_near_small_base_object_max_byte_size_use_memory_pool());
+}
+
+# Get object from freelist
+{
+  ok(SPVM::TestCase::get_object_from_freelist());
+}
+
+is_deeply(
+  \@SPVM::PACKAGE_INFOS,
+  [
+    {name => 'TestCase', file => $file, line => $use_test_line},
+    {name => 'stdout', file => $file, line => $use_std_line}
+  ]
+);
+
+# Get object from freelist
+{
+  ok(SPVM::TestCase::get_object_from_freelist());
+}
+
+# Array initialization
+{
+  ok(SPVM::TestCase::array_int());
+}
+
+# Enumeration
+{
+  ok(SPVM::TestCase::enum_int());
+  ok(SPVM::TestCase::enum_long());
+  ok(SPVM::TestCase::enum_float());
+  ok(SPVM::TestCase::enum_double());
+}
+
+# Convert type - floating point narrowing convertion
+{
+  ok(SPVM::TestCase::convert_float_to_byte());
+  ok(SPVM::TestCase::convert_float_to_short());
+  ok(SPVM::TestCase::convert_float_to_int());
+  ok(SPVM::TestCase::convert_float_to_long());
+  ok(SPVM::TestCase::convert_double_to_byte());
+  ok(SPVM::TestCase::convert_double_to_short());
+  ok(SPVM::TestCase::convert_double_to_int());
+  ok(SPVM::TestCase::convert_double_to_long());
+  ok(SPVM::TestCase::convert_double_to_float());
+}
+
+# Convert type - floating point widening convertion
+{
+  ok(SPVM::TestCase::convert_byte_to_float());
+  ok(SPVM::TestCase::convert_short_to_float());
+  ok(SPVM::TestCase::convert_int_to_float());
+  ok(SPVM::TestCase::convert_long_to_float());
+  ok(SPVM::TestCase::convert_byte_to_double());
+  ok(SPVM::TestCase::convert_short_to_double());
+  ok(SPVM::TestCase::convert_int_to_double());
+  ok(SPVM::TestCase::convert_long_to_double());
+  ok(SPVM::TestCase::convert_float_to_double());
+}
+
+# Convert type - integral number widning convertion
 {
   ok(SPVM::TestCase::convert_byte_to_short_plus());
   ok(SPVM::TestCase::convert_byte_to_short_minus());
@@ -54,7 +135,7 @@ my $DOUBLE_MIN = POSIX::DBL_MIN;
   ok(SPVM::TestCase::convert_byte_to_byte());
 }
 
-# Convert type - integral narrowing convertion
+# Convert type - integral number narrowing convertion
 {
   ok(SPVM::TestCase::convert_long_to_int());
   ok(SPVM::TestCase::convert_long_to_short());
@@ -98,14 +179,6 @@ my $DOUBLE_MIN = POSIX::DBL_MIN;
   }
   
 }
-
-is_deeply(
-  \@SPVM::PACKAGE_INFOS,
-  [
-    {name => 'TestCase', file => $file, line => $use_test_line},
-    {name => 'std', file => $file, line => $use_std_line}
-  ]
-);
 
 # call_sub return array
 {
@@ -305,11 +378,19 @@ is_deeply(
     my $array = SPVM::new_double_array([0.5, 0.5, 1.0]);
     is(SPVM::TestCase::call_sub_double_array($array), 2.0);
   }
+
+  # call_sub
+  {
+    ok(SPVM::TestCase::call_sub_args_byte(0, $BYTE_MAX, $BYTE_MIN));
+    ok(SPVM::TestCase::call_sub_args_short(0, $SHORT_MAX, $SHORT_MIN));
+    ok(SPVM::TestCase::call_sub_args_int(0, $INT_MAX, $INT_MIN));
+    ok(SPVM::TestCase::call_sub_args_long(0, $LONG_MAX, $LONG_MIN));
+  }
 }
 
 # SPVM::Array
 {
-  my $data_nums = SPVM::Array::Int->malloc(3);
+  my $data_nums = SPVM::Array::Int->new(3);
   $data_nums->set_elements([1, 2, 3]);
 }
 
@@ -375,12 +456,6 @@ is_deeply(
   is(SPVM::TestCase::load_constant_double_0(), 0.0);
   is(SPVM::TestCase::load_constant_double_1(), 1.0);
   is(SPVM::TestCase::load_constant_double_0_5(), 0.5);
-}
-
-# call_sub
-{
-  ok(SPVM::TestCase::call_sub_args_int(1, 2147483647, -2147483647, 0));
-  ok(SPVM::TestCase::call_sub_args_long(1, 9223372036854775807, -9223372036854775808, 0));
 }
 
 # If
@@ -577,8 +652,8 @@ is_deeply(
 {
   # int array and get length
   {
-    my $len = SPVM::TestCase::array_malloc_int_array_and_get_length();
-    is($len, 3);
+    ok(SPVM::TestCase::get_array_length_at());
+    ok(SPVM::TestCase::get_array_length_len());
   }
 
   # array - set and get array element, first element

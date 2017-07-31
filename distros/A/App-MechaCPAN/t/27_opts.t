@@ -49,5 +49,16 @@ my $dir = cwd;
   is( $ran_configure, 0, "Didn't try and install $dist when told not to upgrade" );
 }
 
+# --smart-tests
+{
+  my $depdist = "$FindBin::Bin/../test_dists/FailWDeps/FailWDeps-1.0.tar.gz";
+  isnt( App::MechaCPAN::main( 'install', $depdist ), 0, "Fail as expected: $depdist" );
+
+  isnt( App::MechaCPAN::main( '--smart-tests', 'install', $depdist ), 0, "Smart tests ran the tests: $dist" );
+  is( App::MechaCPAN::main( '--smart-tests', 'install', $dist, $depdist), 0, "Smart tests didn't run the tests: $dist" );
+
+  is( cwd, $dir, 'Returned to whence it started' );
+}
+
 chdir $pwd;
 done_testing;

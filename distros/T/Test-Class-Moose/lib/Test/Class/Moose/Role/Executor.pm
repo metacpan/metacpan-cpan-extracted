@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::Executor;
 
 use 5.10.0;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -24,9 +24,9 @@ use Test::Class::Moose::Util qw( context_do );
 use Try::Tiny;
 
 has 'test_configuration' => (
-    is  => 'ro',
-    isa => 'Test::Class::Moose::Config',
-
+    is       => 'ro',
+    isa      => 'Test::Class::Moose::Config',
+    required => 1,
 );
 
 has 'test_report' => (
@@ -532,7 +532,7 @@ Test::Class::Moose::Role::Executor - Common code for Runner classes
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =for Pod::Coverage runtests test_classes
 

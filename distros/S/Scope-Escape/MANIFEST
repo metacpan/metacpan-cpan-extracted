@@ -1,12 +1,10 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
-lib/Scope/.cvsignore
 lib/Scope/Escape.pm
 lib/Scope/Escape.xs
 lib/Scope/Escape/Continuation.pod
@@ -16,12 +14,10 @@ t/cross_stacks.t
 t/cxinc.t
 t/die.t
 t/eval_barrier.t
-t/eval_barrier_req.pl
 t/extent.t
 t/from_block.t
 t/from_eval_block.t
 t/from_eval_dofile.t
-t/from_eval_dofile_dd.pl
 t/from_eval_require.t
 t/from_eval_string.t
 t/from_format.t
@@ -33,6 +29,8 @@ t/from_loop_while.t
 t/from_null.t
 t/from_sub.t
 t/leximport.t
+t/lib/t/eval_barrier_req.pl
+t/lib/t/from_eval_dofile_dd.pl
 t/multi.t
 t/object.t
 t/op_as_function.t
@@ -41,4 +39,5 @@ t/pod_cvg.t
 t/pod_syn.t
 t/repackage.t
 t/retval_life.t
+t/version_synch.t
 SIGNATURE    Added here by Module::Build

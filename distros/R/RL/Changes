@@ -1,5 +1,8 @@
 Revision history for RL
 
+0.06 Fri Jul 21 10:46:57 CDT 2017
+    - Do not buffer output
+
 0.05 Thu Jul 13 17:25:35 CDT 2017
     - Don't add newline after reading EOF
 

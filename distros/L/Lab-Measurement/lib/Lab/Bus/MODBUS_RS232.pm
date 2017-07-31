@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
-
+package Lab::Bus::MODBUS_RS232;
+#ABSTRACT: RS232/RS485 MODBUS RTU protocol bus
+$Lab::Bus::MODBUS_RS232::VERSION = '3.554';
 #
 # MODBUS bus driver.
 # The MODBUS standard defines a protocol to access the memory of connected devices,
@@ -11,8 +12,6 @@
 
 use strict;
 
-package Lab::Bus::MODBUS_RS232;
-$Lab::Bus::MODBUS_RS232::VERSION = '3.553';
 use Lab::Bus::RS232;
 use Carp;
 use Data::Dumper;
@@ -374,6 +373,8 @@ sub _MB_CRC
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -381,6 +382,10 @@ sub _MB_CRC
 =head1 NAME
 
 Lab::Bus::MODBUS_RS232 - RS232/RS485 MODBUS RTU protocol bus
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -393,7 +398,6 @@ Lab::Bus::MODBUS_RS232 - RS232/RS485 MODBUS RTU protocol bus
 
 C<COM1> is the Windows notation, C</dev/ttyUSB1> the Linux equivalent. Use as needed.
 
-
 =head1 DESCRIPTION
 
 This is an interface package for Lab::Measurement to communicate via RS232/RS485 with a 
@@ -405,7 +409,6 @@ Refer to your device for the correct port configuration.
 
 As of yet, this driver does NOT fully implement all MODBUS RTU functions. Only the function
 codes 3 and 6 are provided.
-
 
 =head1 CONSTRUCTOR
 
@@ -427,7 +430,6 @@ slave_address (0xFF)
 mem_address ( 0xFFFF, Address of first word )
 mem_count ( 0xFFFF, Count of words to read )
 
-
 =head2 connectionWrite
 
 Send data to instrument. Arguments: 
@@ -441,7 +443,6 @@ Currently only 0x06 is implemented.
  mem_address ( 0xFFFF, Address of word )
  
  Value ( 0xFFFF, value to write to mem_address )
-
 
 =head1 CAVEATS/BUGS
 
@@ -463,11 +464,16 @@ This is a prototype...
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- (c) Florian Olbrich 2010
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011-2012  Andreas K. Huettel, Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -4,18 +4,17 @@ Scope::Escape - reified escape continuations
 
 =head1 SYNOPSIS
 
-	use Scope::Escape qw(current_escape_function);
+    use Scope::Escape qw(current_escape_function);
 
-	$escape = current_escape_function;
-	...
-	$escape->($result);
+    $escape = current_escape_function;
+    ...
+    $escape->($result);
 
-	use Scope::Escape::Continuation
-		qw(current_escape_continuation);
+    use Scope::Escape::Continuation qw(current_escape_continuation);
 
-	$escape = current_escape_continuation;
-	...
-	$escape->go($result);
+    $escape = current_escape_continuation;
+    ...
+    $escape->go($result);
 
 =head1 DESCRIPTION
 
@@ -196,7 +195,8 @@ is the use of an escape continuation, that continuation itself remains
 valid during unwinding, until its target is unwound at the completion of
 the control transfer.  Thus cleanup code executed during unwinding can
 itself perform non-local control transfers, provided that its target is
-at least as low as the target of the current unwinding.
+at least as low as the target of the current unwinding, except on some
+Perl versions suffering from a core bug (see L</BUGS> below).
 
 If multiple continuations appear to target the same stack frame, such
 as the frame established by a subroutine call, they are always actually
@@ -228,7 +228,9 @@ package Scope::Escape;
 use warnings;
 use strict;
 
-our $VERSION = "0.004";
+use Devel::CallChecker 0.003 ();
+
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(current_escape_function current_escape_continuation);
@@ -238,7 +240,7 @@ XSLoader::load(__PACKAGE__, $VERSION);
 
 {
 	package Scope::Escape::Continuation;
-	our $VERSION = "0.004";
+	our $VERSION = "0.005";
 }
 
 =head1 OPERATORS
@@ -277,6 +279,21 @@ prefer L</current_escape_function>.
 
 =back
 
+=head1 BUGS
+
+Continuations can't currently be generated correctly in code embedded
+in a regexp via C</(?{...})/>.
+
+Perl versions 5.19.4 up to 5.21.11 suffer bug [perl #124156], which
+prevents non-local control transfers initiated during unwinding from
+working properly.  The problem mainly affects code that uses either C<die>
+or an escape continuation from within a cleanup subroutine established
+by L<Scope::Cleanup>.  It strikes when the cleanup executes as part of
+unwinding for another non-local control transfer.  The effect is usually
+that the Perl process crashes.  There is no way for this module to work
+around the problem; this kind of convoluted control transfer just can't
+be used on those Perl versions.  Perl 5.22.0 fixed the bug.
+
 =head1 SEE ALSO
 
 L<Scope::Cleanup>,
@@ -290,7 +307,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

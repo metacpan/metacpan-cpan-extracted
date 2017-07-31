@@ -8,6 +8,7 @@ use Encode;
 use JSON;
 use HTTP::Request;
 use LWP::UserAgent;
+use LWP::Protocol::https;
 use URI;
 
 =head1 NAME
@@ -16,11 +17,11 @@ Geo::Coder::XYZ - Provides a geocoding functionality using https://geocode.xyz
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -86,6 +87,9 @@ sub geocode {
 	}
 
 	my $uri = URI->new("https://$self->{host}/some_location/");
+	if($location =~ /(.+),\s*England$/i) {
+		$location = "$1, United Kingdom";	# geocode.xyz gets confused between England and New England
+	}
 	$location =~ s/\s/+/g;
 	my %query_parameters = ('locate' => $location, 'json' => 1, 'moreinfo' => 1);
 	$uri->query_form(%query_parameters);
@@ -119,11 +123,12 @@ Accessor method to get and set UserAgent object used internally. You
 can call I<env_proxy> for example, to get the proxy information from
 environment variables:
 
-  $geocoder->ua()->env_proxy(1);
+    $geocoder->ua()->env_proxy(1);
 
 You can also set your own User-Agent object:
 
-  $geocoder->ua(LWP::UserAgent::Throttled->new());
+    use LWP::UserAgent::Throttled;
+    $geocoder->ua(LWP::UserAgent::Throttled->new());
 
 =cut
 

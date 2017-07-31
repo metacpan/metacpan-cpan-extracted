@@ -1,0 +1,9 @@
+# Sample feed
+@feed foo
+
+@source file:dropoff
+move 1
+filter glob:*.txt
+
+@sink kit:pickup/%(datetime).kit
+

@@ -1,13 +1,13 @@
 package Map::Tube::Exception;
 $Map::Tube::Exception::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::VERSION = '3.12';
+$Map::Tube::Exception::VERSION = '3.13';
 =head1 NAME
 
 Map::Tube::Exception - Base exception package as Moo Role for Map::Tube::* family.
 
 =head1 VERSION
 
-version 3.12
+version 3.13
 
 =cut
 
@@ -72,6 +72,7 @@ Map::Tube and it's Map::Tube::* family. It has been re-structured in the process
     |     123     | Invalid line color.                                         |
     |     124     | Missing Map Data.                                           |
     |     125     | Found unsupported map data format.                          |
+    |     126     | Malformed Map Data.                                         |
     +-------------+-------------------------------------------------------------+
 
 =head1 AUTHOR

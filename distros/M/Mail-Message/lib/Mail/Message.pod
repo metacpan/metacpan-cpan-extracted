@@ -20,6 +20,8 @@ Mail::Message - general message object
    is a Mail::Reporter
 
  Mail::Message is extended by
+   Mail::Box::Message
+   Mail::Message::Dummy
    Mail::Message::Part
    Mail::Message::Replace::MailInternet
 
@@ -53,7 +55,7 @@ Mail::Message - general message object
 A C<Mail::Message> object is a container for MIME-encoded message information,
 as defined by RFC2822.  Everything what is not specificly related to storing
 the messages in mailboxes (folders) is implemented in this class.  Methods
-which are related to folders is implemented in the Mail::Box::Message
+which are related to folders is implemented in the L<Mail::Box::Message|Mail::Box::Message>
 extension.
 
 The main methods are L<get()|Mail::Message/"The header">, to get information from a message header
@@ -85,12 +87,12 @@ copied with the message, but the delete and modified flags are not.
  
 BE WARNED: the clone of any kind of message (or a message part)
 will B<always> be a C<Mail::Message> object.  For example, a
-Mail::Box::Message's clone is detached from the folder of its original.
-When you use Mail::Box subroutine addMessage with the cloned message at hand,
+L<Mail::Box::Message|Mail::Box::Message>'s clone is detached from the folder of its original.
+When you use L<Mail::Box::addMessage()|Mail::Box/"The folder"> with the cloned message at hand,
 then the clone will automatically be coerced into the right message type
 to be added.
 
-See also Mail::Box::Message subroutine copyTo and Mail::Box::Message subroutine moveTo.
+See also L<Mail::Box::Message::copyTo()|Mail::Box::Message/"The message"> and L<Mail::Box::Message::moveTo()|Mail::Box::Message/"The message">.
 
  -Option      --Default
   shallow       <false>
@@ -108,7 +110,7 @@ one of both shallow clones change the flags, that will update the header
 and thereby be visible in both.
 
 There are situations where a shallow clone can be used safely.  For instance,
-when Mail::Box::Message subroutine moveTo is used and you are sure that the
+when L<Mail::Box::Message::moveTo()|Mail::Box::Message/"The message"> is used and you are sure that the
 original message cannot get undeleted after the move.
 
 =item shallow_body => BOOLEAN
@@ -173,7 +175,7 @@ Default type of head to be created for L<readHead()|Mail::Message/"Internals">.
 
 =item labels => ARRAY|HASH
 
-Initial values of the labels.  In case of Mail::Box::Message's, this
+Initial values of the labels.  In case of L<Mail::Box::Message|Mail::Box::Message>'s, this
 shall reflect the state the message is in.  For newly constructed
 L<Mail::Message|Mail::Message>'s, this may be anything you want, because L<coerce()|Mail::Message/"Internals">
 will take care of the folder specifics once the message is added to one.
@@ -306,7 +308,7 @@ example:
 Dummy messages are used to fill holes in linked-list and such, where only
 a message-id is known, but not the place of the header of body data.
 
-This method is also available for Mail::Message::Dummy objects,
+This method is also available for L<Mail::Message::Dummy|Mail::Message::Dummy> objects,
 where this will return C<true>.  On any extension of C<Mail::Message>,
 this will return C<false>.
 
@@ -348,13 +350,13 @@ example:
 =item $obj-E<gt>B<send>( [$mailer], %options )
 
 Transmit the message to anything outside this Perl program.  $mailer
-is a Mail::Transport::Send object.  When the $mailer is not specified, one
+is a L<Mail::Transport::Send|Mail::Transport::Send> object.  When the $mailer is not specified, one
 will be created, and kept as default for the next messages as well.
 
 The %options are mailer specific, and a mixture of what is usable for
 the creation of the mailer object and the sending itself.  Therefore, see
-for possible options Mail::Transport::Send subroutine new and
-Mail::Transport::Send subroutine send.
+for possible options L<Mail::Transport::Send::new()|Mail::Transport::Send/"METHODS"> and
+L<Mail::Transport::Send::send()|Mail::Transport::Send/"Sending mail">.
 
 example: 
 
@@ -365,7 +367,7 @@ is short (but little less flexibile) for
  my $mailer = Mail::Transport::SMTP->new(@smtpopts);
  $mailer->send($message, @sendopts);
 
-See examples/send.pl in the distribution of Mail::Box.
+See examples/send.pl in the distribution of L<Mail::Box|Mail::Box>.
 
 example: 
 
@@ -826,7 +828,7 @@ called to ensure that the correct message type is stored.
 The coerced message is returned on success, otherwise C<undef>.  The
 coerced message may be a reblessed version of the original message
 or a new object.  In case the message has to be specialized, for
-instance from a general Mail::Message into a Mail::Box::Mbox::Message,
+instance from a general Mail::Message into a L<Mail::Box::Mbox::Message|Mail::Box::Mbox::Message>,
 no copy is needed.  However, to coerce a L<Mail::Internet|Mail::Internet> object into
 a Mail::Message, a lot of copying and converting will take place.
 
@@ -835,7 +837,7 @@ are of type
 
 =over 4
 
-=item * Any type of Mail::Box::Message
+=item * Any type of L<Mail::Box::Message|Mail::Box::Message>
 
 =item * MIME::Entity objects, using L<Mail::Message::Convert::MimeEntity|Mail::Message::Convert::MimeEntity>
 
@@ -1010,7 +1012,7 @@ variable which contains the reference.  Normal garbage collection will
 call C<DESTROY()> when possible.
 
 This method is only provided to hide differences with messages which are
-located in folders: their Mail::Box::Message subroutine destruct works quite
+located in folders: their L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup"> works quite
 differently.
 
 example: of Mail::Message destruct
@@ -1087,7 +1089,7 @@ you can better take a look at L<Mail::Message::Construct::Rebuild|Mail::Message:
 =head2 Message class implementation
 
 The class structure of messages is very close to that of folders.  For
-instance, a Mail::Box::File::Message relates to a Mail::Box::File
+instance, a L<Mail::Box::File::Message|Mail::Box::File::Message> relates to a L<Mail::Box::File|Mail::Box::File>
 folder.
 
 As extra level of inheritance, it has a L<Mail::Message|Mail::Message>, which
@@ -1118,14 +1120,14 @@ The message types are:
                           |
                     Mail::Reporter (general base class)
 
-By far most folder features are implemented in Mail::Box, so
+By far most folder features are implemented in L<Mail::Box|Mail::Box>, so
 available to all folder types.  Sometimes, features which appear
 in only some of the folder types are simulated for folders that miss
 them, like sub-folder support for MBOX.
 
 Two strange other message types are defined:
-the Mail::Message::Dummy, which fills holes in
-Mail::Box::Thread::Node lists, and a Mail::Box::Message::Destructed,
+the L<Mail::Message::Dummy|Mail::Message::Dummy>, which fills holes in
+L<Mail::Box::Thread::Node|Mail::Box::Thread::Node> lists, and a L<Mail::Box::Message::Destructed|Mail::Box::Message::Destructed>,
 this is an on purpose demolished message to reduce memory consumption.
 
 =head2 Labels
@@ -1173,7 +1175,7 @@ a meaning in user applications.
 =item * flagged
 
 Messages can be I<flagged> for some purpose, for instance as result of
-a search for spam in a folder.  The Mail::Box subroutine messages method
+a search for spam in a folder.  The L<Mail::Box::messages()|Mail::Box/"The messages"> method
 can be used to collect all these flagged messages from the folder.
 
 Probably it is more useful to use an understandable name (like C<spam>)
@@ -1272,7 +1274,7 @@ explicitly using the C<via> options.
 You may wish to construct a message to be stored in a some kind
 of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
-Mail::Box subroutine addMessage process, the message will get L<coerce()|Mail::Message/"Internals">-d
+L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
 
 =item Error: Package $package does not implement $method.
@@ -1289,13 +1291,13 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.000,
-built on February 02, 2017.
+This module is part of Mail-Message distribution version 3.001,
+built on July 26, 2017.
 
 Do not forget to read
-L</Mail::Box-Overview>,
-L</Mail::Box-Cookbook>, and
-L</Mail::Box-Index>.
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
 Examples are included in the Mail-Box distribution, directories 'examples'
 and 'scripts'.
 
@@ -1303,15 +1305,15 @@ Browseable manuals, papers, and other released material van be found
 at  Website: F<http://perl.overmeer.net/mailbox/>
 
 The central modules (in separate distributions) in the MailBox suite are:
-L</Mail::Message>,
-L</Mail::Box>,
-L</Mail::Box::IMAP4>,
-L</Mail::Box::POP3>,
-L</Mail::Box::Parser::C>,
-L</Mail::Box::Dbx> (unpublished),
-L</Mail::Transport>,
-L</Object::Realize::Later>, and
-L</User::Identity>.
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
 
 Please post questions or ideas to the author F<markov@cpan.org>.
 
@@ -1321,5 +1323,5 @@ Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

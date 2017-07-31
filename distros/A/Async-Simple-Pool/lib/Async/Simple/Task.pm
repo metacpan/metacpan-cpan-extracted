@@ -101,7 +101,7 @@ use Modern::Perl;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 
 =head1 Attributes

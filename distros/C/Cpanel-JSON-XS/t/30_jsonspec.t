@@ -14,7 +14,7 @@ my $relaxed = Cpanel::JSON::XS->new->utf8->allow_nonref->relaxed;
 #  i_string_unicode_*_nonchar  ["\uDBFF\uDFFE"] (add warning as in core)
 #  i_string_not_in_unicode_range  Code point 0x13FFFF is not Unicode UTF8_DISALLOW_SUPER
 #  y_string_utf16, y_string_utf16be, y_string_utf32, y_string_utf32be fixed with 3.0222
-my %todo = {};
+my %todo;
 $todo{'y_string_nonCharacterInUTF-8_U+FFFF'}++ if $] < 5.013;
 $todo{'n_string_UTF8_surrogate_U+D800'}++      if $] >= 5.012;
 if ($] < 5.008) {
@@ -54,6 +54,8 @@ my %i_parseerr = map{$_ => 1}
       i_string_UTF-16_invalid_surrogate
       i_string_UTF-8_invalid_sequence
       i_string_not_in_unicode_range
+      y_object_duplicated_key
+      y_object_duplicated_key_and_value
    );
 # should parse and return undef:
 my %i_empty    = map{$_ => 1}
@@ -166,7 +168,11 @@ for my $f (<t/test_parsing/*.json>) {
     close $fh;
   }
   my ($base) = ($f =~ m|test_parsing/(.*)\.json|);
-  if ($base =~ /^y_/) {
+  # This is arguably a specification bug. it should error on default
+  if ($base =~ /y_object_duplicated_key/) {
+    n_error($s, $base);
+  }
+  elsif ($base =~ /^y_/) {
     y_pass($s, $base);
   }
   elsif ($base =~ /^n_/) {

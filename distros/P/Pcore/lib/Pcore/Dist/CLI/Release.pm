@@ -8,21 +8,20 @@ sub CLI ($self) {
     return {
         abstract => 'release distribution',
         opt      => {
-            major  => { short => 'M', desc => 'increment major version' },
-            minor  => { desc  => 'increment minor version', },
-            bugfix => { desc  => 'increment bugfix version', },
+            major => {
+                short => 'M',
+                desc  => 'increment major version',
+            },
+            minor  => { desc => 'increment minor version', },
+            bugfix => { desc => 'increment bugfix version', },
         },
     };
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run($opt);
+    my $dist = $self->get_dist;
 
-    return;
-}
-
-sub run ( $self, $opt ) {
-    exit 3 if !$self->dist->build->release( $opt->%* );
+    exit 3 if !$dist->build->release( $opt->%* );
 
     return;
 }

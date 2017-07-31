@@ -1,7 +1,6 @@
 package Lab::Bus::VISA;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: National Instruments VISA bus
-$Lab::Bus::VISA::VERSION = '3.553';
+$Lab::Bus::VISA::VERSION = '3.554';
 use strict;
 use Lab::VISA;
 use Scalar::Util qw(weaken);
@@ -380,7 +379,7 @@ Lab::Bus::VISA - National Instruments VISA bus
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -487,6 +486,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
             2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich, Stefan Geissler
             2013       Andreas K. Huettel, Christian Butschkow
             2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

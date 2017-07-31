@@ -2,7 +2,7 @@ NAME
     Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 VERSION
-    This document describes version 0.48 of Finance::Bank::ID::BCA (from
+    This document describes version 0.49 of Finance::Bank::ID::BCA (from
     Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
 
 SYNOPSIS

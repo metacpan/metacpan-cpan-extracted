@@ -1,7 +1,7 @@
 package Finance::Bank::ID::BCA;
 
 our $DATE = '2017-07-20'; # DATE
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 use 5.010001;
 use Moo;
@@ -444,7 +444,7 @@ Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.48 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
+This document describes version 0.49 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
 
 =head1 SYNOPSIS
 

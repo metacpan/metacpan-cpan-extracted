@@ -3,8 +3,9 @@ use alienfile;
 probe sub { 'share' };
 
 share {
-  requires 'Alien::m4' => '0.11';
+  requires 'Alien::m4'   => '0.11';
   requires 'Alien::MSYS' => '0.08' if $^O eq 'MSWin32';
+  requires 'Path::Tiny'  => 0;
 
   meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
 
@@ -14,5 +15,79 @@ share {
     version => qr/([0-9\.]+)/,
   );
   plugin Extract => 'tar.gz',
+  
   plugin 'Build::Autoconf' => ();
+  
+  meta->before_hook(
+    gather_share => sub {
+      my($build) = @_;
+      my $bin = Path::Tiny->new('bin');
+
+      # patch executables
+      foreach my $exe ($bin->children)
+      {
+        my($shebang, @lines) = $exe->lines;
+        if($shebang =~ /^#!.*perl/)
+        {
+          @lines = (
+            "BEGIN {\n",
+            "  use strict;\n",
+            "  use warnings;\n",
+            "  use File::Spec;\n",
+            "  my(\$v,\$d) = File::Spec->splitpath(File::Spec->rel2abs(__FILE__));\n",
+            "  my \@d = File::Spec->splitdir(\$d);\n",
+            "  pop \@d for 1..2;\n",
+            "  my \$dist_dir = File::Spec->catpath(\$v,File::Spec->catdir(\@d), '');\n",
+            "  \$ENV{AUTOM4TE}            ||= File::Spec->catfile(\$dist_dir, 'bin/autom4te');\n",
+            "  \$ENV{autom4te_perllibdir} ||= File::Spec->catdir(\$dist_dir, 'share/autoconf');\n",
+            "  \$ENV{AC_MACRODIR}         ||= File::Spec->catdir(\$dist_dir, 'share/autoconf');\n",
+            "  \$ENV{AUTOCONF}            ||= File::Spec->catfile(\$dist_dir, 'bin/autoconf');\n",
+            "  \$ENV{AUTOHEADER}          ||= File::Spec->catfile(\$dist_dir, 'bin/autoheader');\n",
+            "  \$ENV{AUTOM4TE_CFG}        ||= File::Spec->catfile(\$dist_dir, 'share/autoconf/autom4te.blib.cfg')\n",
+            "    if \$d[-5] eq 'lib' && \$d[-6] eq 'blib'\n",
+            "}\n",
+            @lines
+          );
+          $exe->spew($shebang, @lines);
+          $exe->chmod("0755");
+        }
+        elsif($shebang =~ /^#!.*sh/)
+        {
+          @lines = (
+            ": \${AUTOM4TE=`alien_autoconf_root`'/bin/autom4te'}\n",
+            @lines
+          );
+          $exe->spew($shebang, @lines);
+          $exe->chmod("0755");
+        }
+      }
+      
+      # patch autom4te config
+      {
+        my $orig = Path::Tiny->new('share/autoconf/autom4te.cfg');
+        my $new  = Path::Tiny->new('share/autoconf/autom4te.blib.cfg');
+        my $stage = Path::Tiny->new($build->install_prop->{stage})->child('share/autoconf')->stringify;
+        $orig->copy($new);
+        $new->edit_lines(sub {
+          s/--prepend-include '(.*)'/--prepend-include '$stage'/;
+        });
+      }
+      
+      # script to compute path to autoconf root
+      {
+        my $exe = Path::Tiny->new('bin/alien_autoconf_root');
+        my $perl = $ENV{PERL} || '/usr/bin/perl';
+        $exe->spew(
+          "#!$perl\n",
+          "use File::Spec;\n",
+          "my(\$v,\$d) = File::Spec->splitpath(File::Spec->rel2abs(__FILE__));\n",
+          "my \@d = File::Spec->splitdir(\$d);\n",
+          "pop \@d for 1..2;\n",
+          "my \$dist_dir = File::Spec->catpath(\$v,File::Spec->catdir(\@d), '');\n",
+          "print \$dist_dir\n",
+        );
+        $exe->chmod('0700');
+      }
+    },
+  );
 };

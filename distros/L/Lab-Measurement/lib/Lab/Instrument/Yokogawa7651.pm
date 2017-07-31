@@ -1,5 +1,6 @@
 package Lab::Instrument::Yokogawa7651;
-$Lab::Instrument::Yokogawa7651::VERSION = '3.553';
+#ABSTRACT: Yokogawa 7651 DC source
+$Lab::Instrument::Yokogawa7651::VERSION = '3.554';
 use warnings;
 use strict;
 use Time::HiRes qw/usleep/;
@@ -773,6 +774,8 @@ sub autorange() {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -780,6 +783,10 @@ sub autorange() {
 =head1 NAME
 
 Lab::Instrument::Yokogawa7651 - Yokogawa 7651 DC source
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -829,17 +836,15 @@ you might also want to have gate protect from the start (the default values are 
 If you want to use the sweep function without using gate protect, you should specify
 
 		stepsize=>0.01
-	
+
 Additinally there is support to set parameters for the device "on init":		
-	
+
 		function			=> Voltage, # specify "Voltage" or "Current" mode, string is case insensitive
 		range			=> undef,
 		level			=> undef,
 		output					=> undef,
 
 If those values are not specified, the current device configuration is left unaltered.
-
-
 
 =head1 METHODS
 
@@ -874,25 +879,25 @@ Returns the currently set $current. The value is read from the driver cache by d
 to read directly from the device.
 
 =head2 set_level
-	
+
 	$src->set_level($lvl)
-	
+
 Sets the level $lvl in the current operation mode.
 
 =head2 get_level
 
 	$lvl = $src->get_level()
-	
+
 Returns the currently set level. Use 
 
 	device_cache => 1
-	
+
 to enforce a reading directly from the device. 
 
 =head2 sweep_to_level
 
 	$src->sweep_to_level($lvl,$time)
-	
+
 Sweep to the level $lvl in $time seconds.
 
 =head2 set_range
@@ -917,7 +922,6 @@ Returns the new output state;
 =head2 get_output
 
 Returns the status of the output switch (0 or 1).
-
 
 =head2 set_voltage_limit($limit)
 
@@ -945,7 +949,6 @@ The value for each key is either 0 or 1, indicating the status of the instrument
 The stability (24h) is the value at 23 +- 1°C. The stability (90days),
 accuracy (90days) and accuracy (1year) are values at 23 +- 5°C.
 The temperature coefficient is the value at 5 to 18°C and 28 to 40°C.
-
 
  Range  Maximum     Resolution  Stability 24h   Stability 90d   
         Output                  +-(% of setting +-(% of setting  
@@ -981,7 +984,6 @@ The temperature coefficient is the value at 5 to 18°C and 28 to 40°C.
  1V      +-120mA less than 2mOhm     15µVp-p     60µVp-p
  10V     +-120mA less than 2mOhm     50µVp-p     100µVp-p
  30V     +-120mA less than 2mOhm     150µVp-p    200µVp-p
-
 
 Common mode rejection:
 120dB or more (DC, 50/60Hz). (However, it is 100dB or more in the
@@ -1036,12 +1038,23 @@ The Yokogawa7651 class is a Source (L<Lab::Instrument::Source>)
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- (c) 2004-2006 Daniel Schröer
- (c) 2007-2010 Daniel Schröer, Daniela Taubert, Andreas K. Hüttel, and others
- (c) 2011 Florian Olbrich, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Alexei Iankilevitch, Alois Dirnaichner, Christian Butschkow
+            2015       Andreas K. Huettel, Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

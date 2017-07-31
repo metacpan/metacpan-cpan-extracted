@@ -43,14 +43,17 @@ int fetch(int addr, char * dev, char * wbuf1, char * wbuf2, int res){
         exit(1);
     }
 
-    // AND with 10000000 and wait for bit 15 of the config register to go true
+    // AND with 10000000 and wait for bit 15 of the config register to go false`
     // This bit stores the "conversion complete" indicator
 
     while ((read_buf[0] & 0x80) == 0){
         read(i2c_file, read_buf, 2);
     }
 
-    write_buf[0] = 0; // set to conversion register
+    // 0: conversion register
+    // 1: configuration register
+
+    write_buf[0] = 0;
     write(i2c_file, write_buf, 1);
 
     read(i2c_file, read_buf, 2);
@@ -60,7 +63,7 @@ int fetch(int addr, char * dev, char * wbuf1, char * wbuf2, int res){
     if (res == 12){
         conversion = conversion >> 4;
     }
-   
+    
     close(i2c_file);
 
     return conversion;

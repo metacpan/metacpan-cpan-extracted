@@ -4,8 +4,6 @@ use 5.006001;
 use strict;
 use warnings;
 
-use English qw(-no_match_vars);
-
 use PPI::Document;
 
 use Perl::Critic::Annotation;
@@ -13,7 +11,7 @@ use Perl::Critic::TestUtils qw(bundled_policy_names);
 
 use Test::More;
 
-our $VERSION = '1.128';
+our $VERSION = '1.130';
 
 Perl::Critic::TestUtils::assert_version( $VERSION );
 Perl::Critic::TestUtils::block_perlcriticrc();

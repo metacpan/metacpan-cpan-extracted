@@ -1,19 +1,346 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line
+    arguments (@ARGV)
 
+VERSION
+    This document describes version 0.82 of Perinci::Sub::GetArgs::Argv
+    (from Perl distribution Perinci-Sub-GetArgs-Argv), released on
+    2017-07-22.
+
+SYNOPSIS
      use Perinci::Sub::GetArgs::Argv;
-    
+
      my $res = get_args_from_argv(argv=>\@ARGV, meta=>$meta, ...);
 
 DESCRIPTION
+    This module provides "get_args_from_argv()", which parses command line
+    arguments (@ARGV) into subroutine arguments (%args). This module is used
+    by Perinci::CmdLine. For explanation on how command-line options are
+    processed, see Perinci::CmdLine's documentation.
 
-    This module provides get_args_from_argv(), which parses command line
-    arguments (@ARGV) into subroutine arguments (%args). This module is
-    used by Perinci::CmdLine. For explanation on how command-line options
-    are processed, see Perinci::CmdLine's documentation.
+FUNCTIONS
+  gen_getopt_long_spec_from_meta
+    Usage:
+
+     gen_getopt_long_spec_from_meta(%args) -> [status, msg, result, meta]
+
+    Generate Getopt::Long spec from Rinci function metadata.
+
+    This routine will produce a Getopt::Long specification from Rinci
+    function metadata, as well as some more data structure in the result
+    metadata to help producing a command-line help/usage message.
+
+    Function arguments will be mapped to command-line options with the same
+    name, with non-alphanumeric characters changed to "-" ("-" is preferred
+    over "_" because it lets user avoid pressing Shift on popular
+    keyboards). For example: "file_size" becomes "file-size",
+    "file_size.max" becomes "file-size-max". If function argument option
+    name clashes with command-line option or another existing option, it
+    will be renamed to "NAME-arg" (or "NAME-arg2" and so on). For example:
+    "help" will become "help-arg" (if "common_opts" contains "help", that
+    is).
+
+    Each command-line alias ("cmdline_aliases" property) in the argument
+    specification will also be added as command-line option, except if it
+    clashes with an existing option, in which case this function will warn
+    and skip adding the alias. For more information about "cmdline_aliases",
+    see "Rinci::function".
+
+    For arguments with type of "bool", Getopt::Long will by default also
+    automatically recognize "--noNAME" or "--no-NAME" in addition to
+    "--name". So this function will also check those names for clashes.
+
+    For arguments with type array of simple scalar, "--NAME" can be
+    specified more than once to append to the array.
+
+    If "per_arg_json" setting is active, and argument's schema is not a
+    "required simple scalar" (e.g. an array, or a nullable string), then
+    "--NAME-json" will also be added to let users input undef (through
+    "--NAME-json null") or a non-scalar value (e.g. "--NAME-json
+    '[1,2,3]'"). If this name conflicts with another existing option, a
+    warning will be displayed and the option will not be added.
+
+    If "per_arg_yaml" setting is active, and argument's schema is not a
+    "required simple scalar" (e.g. an array, or a nullable string), then
+    "--NAME-yaml" will also be added to let users input undef (through
+    "--NAME-yaml '~'") or a non-scalar value (e.g. "--NAME-yaml '[foo,
+    bar]'"). If this name conflicts with another existing option, a warning
+    will be displayed and the option will not be added. YAML can express a
+    larger set of values, e.g. binary data, circular references, etc.
+
+    Will produce a hash (Getopt::Long spec), with "func.specmeta",
+    "func.opts", "func.common_opts", "func.func_opts" that contain extra
+    information ("func.specmeta" is a hash of getopt spec name and a hash of
+    extra information while "func.*opts" lists all used option names).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args => *hash*
+
+        Reference to hash which will store the result.
+
+    *   common_opts => *hash*
+
+        Common options.
+
+        A hash where the values are hashes containing these keys: "getopt"
+        (Getopt::Long option specification), "handler" (Getopt::Long
+        handler). Will be passed to "get_args_from_argv()". Example:
+
+         {
+             help => {
+                 getopt  => 'help|h|?',
+                 handler => sub { ... },
+                 summary => 'Display help and exit',
+             },
+             version => {
+                 getopt  => 'version|v',
+                 handler => sub { ... },
+                 summary => 'Display version and exit',
+             },
+         }
+
+    *   ignore_converted_code => *bool* (default: 0)
+
+        Whether to ignore coderefs converted to string.
+
+        Across network through JSON encoding, coderef in metadata (e.g. in
+        "cmdline_aliases" property) usually gets converted to string "CODE".
+        In some cases, like for tab completion, this is pretty harmless so
+        you can turn this option on. For example, in the case of
+        "cmdline_aliases", the effect is just that command-line aliases code
+        are not getting executed, but this is usually okay.
+
+    *   meta* => *hash*
+
+        Rinci function metadata.
+
+    *   meta_is_normalized => *bool*
+
+    *   per_arg_json => *bool* (default: 0)
+
+        Whether to add --NAME-json for non-simple arguments.
+
+        Will also interpret command-line arguments as JSON if assigned to
+        function arguments, if arguments' schema is not simple scalar.
+
+    *   per_arg_yaml => *bool* (default: 0)
+
+        Whether to add --NAME-yaml for non-simple arguments.
+
+        Will also interpret command-line arguments as YAML if assigned to
+        function arguments, if arguments' schema is not simple scalar.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_args_from_argv
+    Usage:
+
+     get_args_from_argv(%args) -> [status, msg, result, meta]
+
+    Get subroutine arguments (%args) from command-line arguments (@ARGV).
+
+    Using information in Rinci function metadata's "args" property, parse
+    command line arguments @argv into hash %args, suitable for passing into
+    subroutines.
+
+    Currently uses Getopt::Long's "GetOptions" to do the parsing.
+
+    As with GetOptions, this function modifies its "argv" argument, so you
+    might want to copy the original "argv" first (or pass a copy instead) if
+    you want to preserve the original.
+
+    See also: gen_getopt_long_spec_from_meta() which is the routine that
+    generates the specification.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_extra_elems => *bool* (default: 0)
+
+        Allow extra/unassigned elements in argv.
+
+        If set to 1, then if there are array elements unassigned to one of
+        the arguments, instead of generating an error, this function will
+        just ignore them.
+
+        This option will be passed to Perinci::Sub::GetArgs::Array's
+        allow_extra_elems.
+
+    *   args => *hash*
+
+        Specify input args, with some arguments preset.
+
+    *   argv => *array[str]*
+
+        If not specified, defaults to @ARGV
+
+    *   common_opts => *hash*
+
+        Common options.
+
+        A hash where the values are hashes containing these keys: "getopt"
+        (Getopt::Long option specification), "handler" (Getopt::Long
+        handler). Will be passed to "get_args_from_argv()". Example:
+
+         {
+             help => {
+                 getopt  => 'help|h|?',
+                 handler => sub { ... },
+                 summary => 'Display help and exit',
+             },
+             version => {
+                 getopt  => 'version|v',
+                 handler => sub { ... },
+                 summary => 'Display version and exit',
+             },
+         }
+
+    *   ggls_res => *array*
+
+        Full result from gen_getopt_long_spec_from_meta().
+
+        If you already call "gen_getopt_long_spec_from_meta()", you can pass
+        the *full* enveloped result here, to avoid calculating twice.
+
+    *   ignore_converted_code => *bool* (default: 0)
+
+        Whether to ignore coderefs converted to string.
+
+        Across network through JSON encoding, coderef in metadata (e.g. in
+        "cmdline_aliases" property) usually gets converted to string "CODE".
+        In some cases, like for tab completion, this is harmless so you can
+        turn this option on.
+
+    *   meta* => *hash*
+
+    *   meta_is_normalized => *bool* (default: 0)
+
+        Can be set to 1 if your metadata is normalized, to avoid duplicate
+        effort.
+
+    *   on_missing_required_args => *code*
+
+        Execute code when there is missing required args.
+
+        This can be used to give a chance to supply argument value from
+        other sources if not specified by command-line options.
+        Perinci::CmdLine, for example, uses this hook to supply value from
+        STDIN or file contents (if argument has "cmdline_src" specification
+        key set).
+
+        This hook will be called for each missing argument. It will be
+        supplied hash arguments: (arg => $the_missing_argument_name, args =>
+        $the_resulting_args_so_far, spec => $the_arg_spec).
+
+        The hook can return true if it succeeds in making the missing
+        situation resolved. In this case, this function will not report the
+        argument as missing.
+
+    *   per_arg_json => *bool* (default: 0)
+
+        Whether to recognize --ARGNAME-json.
+
+        This is useful for example if you want to specify a value which is
+        not expressible from the command-line, like 'undef'.
+
+         % script.pl --name-json 'null'
+
+        But every other string will need to be quoted:
+
+         % script.pl --name-json '"foo"'
+
+        See also: per_arg_yaml. You should enable just one instead of
+        turning on both.
+
+    *   per_arg_yaml => *bool* (default: 0)
+
+        Whether to recognize --ARGNAME-yaml.
+
+        This is useful for example if you want to specify a value which is
+        not expressible from the command-line, like 'undef'.
+
+         % script.pl --name-yaml '~'
+
+        See also: per_arg_json. You should enable just one instead of
+        turning on both.
+
+    *   strict => *bool* (default: 1)
+
+        Strict mode.
+
+        If set to 0, will still return parsed argv even if there are parsing
+        errors (reported by Getopt::Long). If set to 1 (the default), will
+        die upon error.
+
+        Normally you would want to use strict mode, for more error checking.
+        Setting off strict is used by, for example, Perinci::Sub::Complete
+        during completion where the command-line might still be incomplete.
+
+        Should probably be named "ignore_errors". :-)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    Error codes:
+
+    *   400 - Error in Getopt::Long option specification, e.g. in
+        common_opts.
+
+    *   500 - failure in GetOptions, meaning argv is not valid according to
+        metadata specification (only if 'strict' mode is enabled).
+
+    *   501 - coderef in cmdline_aliases got converted into a string,
+        probably because the metadata was transported (e.g. through
+        Riap::HTTP/Riap::Simple).
 
 FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-GetArgs-Argv>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Perinci-Sub-GetArgs-Argv>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-GetArgs-A
+    rgv>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Perinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,5 +1,6 @@
 package Lab::Instrument::RSSMB100A;
-$Lab::Instrument::RSSMB100A::VERSION = '3.553';
+#ABSTRACT: Rohde & Schwarz SMB100A signal generator
+$Lab::Instrument::RSSMB100A::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -150,13 +151,19 @@ sub disable_internal_pulsemod {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::RSSMB100A - Rohde & Schwarz SMB100A Signal Generator
+Lab::Instrument::RSSMB100A - Rohde & Schwarz SMB100A signal generator
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -178,13 +185,19 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2005 Daniel Schröer (<schroeer@cpan.org>)
-            2011 Andreas K. Hüttel
-            2014 Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Hermann Kraus
+            2013       Alois Dirnaichner, Andreas K. Huettel
+            2014       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

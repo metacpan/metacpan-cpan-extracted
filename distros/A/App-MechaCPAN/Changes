@@ -1,5 +1,16 @@
 Revision history for App-MechaCPAN
 
+0.20  2017-07-21 22:28:41 EDT
+  - Improve the speed and reliability of installing a module. Much of this
+    releases work went into this, which in turn makes deploy more dependable
+  - Add --smart-tests as an alternative to --skip-tests
+  - Reduce the number of calls to metacpan for finding modules
+  - Improve the error handling and reporting
+  - Handle more variations of CPAN modules
+  - Don't stop processing modules after the first error
+  - Accept git repositories as a parameter to deploy to checkout and deploy
+    from
+
 0.19  2017-04-27 23:39:40 EDT
   - Delete PERL_USE_UNSAFE_INC before running other module's tests (GH#5)
   - Increase the default timeout to 60s

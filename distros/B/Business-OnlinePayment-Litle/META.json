@@ -79,7 +79,7 @@
          "web" : "https://github.com/Jayceh/Business--OnlinePayment--Litle"
       }
    },
-   "version" : "0.956",
+   "version" : "0.957",
    "x_contributors" : [
       "Daina Pettit <dpettit@bluehost.com>",
       "David Bartle <captindave@gmail.com>",
@@ -87,6 +87,6 @@
       "Jason (Jayce^) Hall <jayce@lug-nut.com>",
       "Jason Terry <oaxlin@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

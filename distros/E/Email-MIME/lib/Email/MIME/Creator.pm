@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Email::MIME::Creator;
 # ABSTRACT: obsolete do-nothing library
-$Email::MIME::Creator::VERSION = '1.940';
+$Email::MIME::Creator::VERSION = '1.945';
 use parent q[Email::Simple::Creator];
 use Email::MIME;
 use Encode ();
@@ -44,7 +44,7 @@ Email::MIME::Creator - obsolete do-nothing library
 
 =head1 VERSION
 
-version 1.940
+version 1.945
 
 =head1 SYNOPSIS
 

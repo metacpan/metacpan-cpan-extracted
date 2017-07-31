@@ -1,14 +1,14 @@
 package App::pause;
 
-our $DATE = '2017-07-10'; # DATE
+our $DATE = '2017-07-24'; # DATE
 our $DIST = 'App-pause'; # DIST
-our $VERSION = '0.63'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 our %cli_attrs = do {
     my $p = '/WWW/PAUSE/Simple/';
 
     (
-        summary => 'A CLI for PAUSE',
+        script_summary => 'A CLI for PAUSE',
         url => '/WWW/PAUSE/Simple/',
         subcommands => {
             upload       => { url => "${p}upload_files" },
@@ -44,7 +44,7 @@ App::pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.63 of App::pause (from Perl distribution App-pause), released on 2017-07-10.
+This document describes version 0.64 of App::pause (from Perl distribution App-pause), released on 2017-07-24.
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 8*39 + 10;
+use Test::More tests => 8*41 + 10;
 
 BEGIN { use_ok "Time::UTC", qw(utc_start_segment); }
 
@@ -19,7 +19,7 @@ sub match($$) {
 
 my $seg = utc_start_segment();
 
-for(my $n = 39; $n--; $seg = $seg->next) {
+for(my $n = 41; $n--; $seg = $seg->next) {
 	match $seg->length_in_tai_seconds,
 		$seg->end_tai_instant - $seg->start_tai_instant;
 	match $seg->last_utc_day + 1, $seg->end_utc_day;

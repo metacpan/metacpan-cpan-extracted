@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.000';
+my $VERSION = '3.001';
 
 my @optional =
 ( 
@@ -41,15 +41,15 @@ REASON
 
 my %prereq =
  ( Date::Format   => 0
- , Date::Parse    => 0.0
+ , Date::Parse    => 0
  , Encode         => 2.26
  , File::Spec     => 0.7
- , IO::Scalar     => 0.0
+ , IO::Scalar     => 0
  , Mail::Address  => 2.17
- , MIME::Base64   => 0.0
+ , MIME::Base64   => 0
  , MIME::Types    => 1.004
  , Scalar::Util   => 1.13
- , Sys::Hostname  => 0.0
+ , Sys::Hostname  => 0
  , Test::More     => 0.47
  , Time::Zone     => 0
  , URI            => 1.23
@@ -161,8 +161,8 @@ sub MY::postamble { <<'__POSTAMBLE' }
 RAWDIR          = ../public_html/mail-message/raw
 DISTDIR         = ../public_html/mail-message/source
 
-LICENSE         = artistic
-EXTENDS			= ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC
+LICENSE         = perl
+EXTENDS			= ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC:../MailBox4:../MailTransport
 
 # for POD
 FIRST_YEAR      = 2001

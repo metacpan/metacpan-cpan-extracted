@@ -2,8 +2,7 @@ package WG::API::WoWs;
 
 use Moo;
 
-with 'WG::API::WoWs::Account';
-with 'WG::API::WoWs::Warships';
+with 'WG::API::Base';
 
 =head1 NAME
 
@@ -11,11 +10,13 @@ WG::API::WoWs - Moduled for work with Wargaming.net Public API for Worlf of Wars
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.5';
+
+use constant api_uri => 'api.worldofwarships.ru/wows';
 
 =head1 SYNOPSIS
 
@@ -23,9 +24,9 @@ Wargaming.net Public API is a set of API methods that provide access to Wargamin
 
 This module provide access to WG Public API
 
-    use WG::API::WoWs;
+    use WG::API;
 
-    my $wows = WG::API::WoWs->new( application_id => 'demo' );
+    my $wows = WG::API->new( application_id => 'demo' )->wows();
     ...
     my $player = $wows->account_info( account_id => '1' );
 
@@ -41,15 +42,6 @@ Params:
  - languare
  - api_uri
 
-=cut
-
-has api_uri => (
-    is      => 'ro',
-    default => sub{ 'api.worldofwarships.ru/wows' },
-);
-
-with 'WG::API::Base';
-
 =head1 METHODS
 
 =head2 Account
@@ -58,19 +50,55 @@ with 'WG::API::Base';
 
 Method returns partial list of players. The list is filtered by initial characters of user name and sorted alphabetically.
 
+=cut
+
+sub account_list {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/list', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
+        @_ );
+}
+
 =head3 B<account_info( [ %params ] )>
 
 Method returns player details. Players may hide their game profiles, use field hidden_profile for determination.
 
+=cut
+
+sub account_info {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/info', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
+        ['account_id'], @_ );
+}
+
 =head3 B<account_achievements( [ %params ] )>
 
 Method returns information about players' achievements. Accounts with hidden game profiles are excluded from response. Hidden profiles are listed in the field meta.hidden.
+
+=cut
+
+sub account_achievements {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/achievements', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
+}
 
 =head2 Warships
 
 =head3 B<ships_stats( [ %params ] )>
 
 Method returns general statistics for each ship of a player. Accounts with hidden game profiles are excluded from response. Hidden profiles are listed in the field meta.hidden.
+
+=cut
+
+sub ships_stats {
+    my $self = shift;
+
+    return $self->_request( 'get', 'ships/stats',
+        [ 'language', 'fields', 'access_token', 'extra', 'account_id', 'ship_id', 'in_garage' ],
+        ['account_id'], @_ );
+}
 
 =head1 BUGS
 
@@ -115,7 +143,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -160,5 +188,5 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API::WoWs
+1;    # End of WG::API::WoWs
 

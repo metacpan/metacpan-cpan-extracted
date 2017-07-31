@@ -47,7 +47,6 @@ Module::Build->subclass(code => q{
 	}
 })->new(
 	module_name => "Memoize::Once",
-	dist_version => "0.000",
 	license => "perl",
 	configure_requires => {
 		"Module::Build" => 0,
@@ -76,7 +75,16 @@ Module::Build->subclass(code => q{
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Memoize-Once\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Memoize-Once",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

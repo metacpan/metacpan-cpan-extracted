@@ -137,5 +137,5 @@ BUGS
     width.
 
     I have no idea how to write tests for this, so there's only a
-    placeholder test.
+    placeholder test, and several examples in the examples directory.
 

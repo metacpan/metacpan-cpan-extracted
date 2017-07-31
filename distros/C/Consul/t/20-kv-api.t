@@ -39,8 +39,13 @@ ok $r, "key was updated";
 lives_ok { $r = $kv->put(baz => 3) } "KV put succeeded";
 ok $r, "key was updated";
 
+lives_ok { $r = $kv->put(quux => undef) } "KV put null value succeeds";
+ok $r, "key was updated";
+lives_ok { $r = $kv->get("quux") } "KV get succeeded";
+ok !defined($r->value), "returned key is null";
+
 lives_ok { $r = $kv->keys("") } "KV keys succeeded";
-is_deeply [sort @$r], [sort qw(foo bar baz)], "return KV keys are correct";
+is_deeply [sort @$r], [sort qw(foo bar baz quux)], "return KV keys are correct";
 
 lives_ok { $r = $kv->put("foo" => 1) } "KV put succeeded";
 ok $r, "key was updated";

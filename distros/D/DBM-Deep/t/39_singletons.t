@@ -3,7 +3,8 @@ use warnings FATAL => 'all';
 
 use Test::More;
 use Test::Deep;
-use t::common qw( new_dbm new_fh );
+use lib 't';
+use common qw( new_dbm new_fh );
 
 sub is_undef {
  ok(!defined $_[0] || ref $_[0] eq 'DBM::Deep::Null', $_[1])

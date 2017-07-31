@@ -9,8 +9,8 @@ unless ( $ENV{RELEASE_TESTING} ) {
 }
 
 my $min_tcm = 0.9;
-eval "use Test::CheckManifest $min_tcm";
-plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
+## no critic(Lax::ProhibitStringyEval::ExceptForRequire, BuiltinFunctions::ProhibitStringyEval)
+eval "use Test::CheckManifest $min_tcm; 1" // plan skip_all => "Test::CheckManifest $min_tcm required";
 
 ok_manifest({
         exclude => [ qw# /.git /.gitignore /local /cover_db /release # ],

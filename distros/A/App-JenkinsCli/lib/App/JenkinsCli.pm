@@ -17,7 +17,7 @@ use File::ShareDir qw/dist_dir/;
 use Path::Tiny;
 use DateTime;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 has [qw/base_url api_key api_pass test/] => (
     is => 'rw',
@@ -242,7 +242,7 @@ sub enable {
     my ($self, $query) = @_;
 
     my $xsl = path(dist_dir('App-JenkinsCli'), 'enable.xsl');
-    $self->_xslt_actions($self->opt, $query, $xsl);
+    $self->_xslt_actions($query, $xsl);
 
     return;
 }
@@ -251,7 +251,7 @@ sub disable {
     my ($self, $query) = @_;
 
     my $xsl = path(dist_dir('App-JenkinsCli'), 'disable.xsl');
-    $self->_xslt_actions($self->opt, $query, $xsl);
+    $self->_xslt_actions($query, $xsl);
 
     return;
 }
@@ -259,7 +259,7 @@ sub disable {
 sub change {
     my ($self, $query, $xsl) = @_;
 
-    $self->_xslt_actions($self->opt, $query, $xsl);
+    $self->_xslt_actions($query, $xsl);
 
     return;
 }
@@ -312,7 +312,7 @@ sub _action {
 
     if ( ! $data || $@ ) {
         my $err = $@ ? ": $@" : '';
-        die "No data found! (can't talk to Jenkins Server?)$err\n";
+        confess "No data found! (can't talk to Jenkins Server? depth = $depth)$err";
     }
 
     my $re = $self->opt->regexp ? qr/$query/ : qr/\A\Q$query\E\Z/;
@@ -432,7 +432,7 @@ App::JenkinsCli - Command line tool for interacting with Jenkins
 
 =head1 VERSION
 
-This documentation refers to App::JenkinsCli version 0.009
+This documentation refers to App::JenkinsCli version 0.010
 
 =head1 SYNOPSIS
 

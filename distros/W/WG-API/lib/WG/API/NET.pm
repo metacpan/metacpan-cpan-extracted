@@ -1,9 +1,8 @@
 package WG::API::NET;
 
 use Moo;
-with 'WG::API::NET::Clans';
-with 'WG::API::NET::Accounts';
-with 'WG::API::NET::Servers';
+
+with 'WG::API::Base';
 
 =head1 NAME
 
@@ -11,11 +10,13 @@ WG::API::NET - Modules to work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.5';
+
+use constant api_uri => 'api.worldoftanks.ru/wgn';
 
 =head1 SYNOPSIS
 
@@ -23,11 +24,11 @@ Wargaming.net Public API is a set of API methods that provide access to Wargamin
 
 This module provide access to WG Public API
 
-    use WG::API::NET;
+    use WG::API;
 
-    my $wot = WG::API::NET->new( application_id => 'demo' );
+    my $net = WG::API->new( application_id => 'demo' )->net();
     ...
-    my $player = $wot->account_info( account_id => '1' );
+    my $player = $net->account_info( account_id => '1' );
 
 
 
@@ -41,52 +42,166 @@ Params:
 
  - application_id *
  - languare
- - api_uri
 
 =head1 METHODS
 
 =head2 Accounts
 
-=head3 B<accounts_list( [ %params ] )>
+=over 1
+
+=item B<accounts_list>
 
 Method returns partial list of players. The list is filtered by initial characters of user name and sorted alphabetically.
 
-=head3 B<account_info( [ %account_id ] )>
+=over 2
 
-Method returns Wargaming account details.
+=item I<required fields:>
 
-=head2 Clans
+    search - Player name search string. Parameter "type" defines minimum length and type of search. Using the exact search type, you can enter several names, separated with commas. Maximum length: 24.
 
-=head3 B<clans_list( [ %params ] )>
-
-Method searches through clans and sorts them in a specified order.
-
-=head3 B<clans_info( [ %params ] )>
-
-Method returns detailed clan information.
-
-=head3 B<clans_membersinfo( [ %params ] )>
-
-Method returns clan member info and short info on the clan.
-
-=head3 B<clans_glossary( [ %params ] )>
-
-Method returns information on clan entities.
-
-=head2 Servers
-
-=head3 B<servers_info( [ %params ] )>
-
-Method returns the number of online players on the servers.
+=back
 
 =cut
 
-has api_uri => (
-    is  => 'ro',
-    default => sub{ 'api.worldoftanks.ru/wgn' },
-);
+sub accounts_list {
+    my $self = shift;
 
-with 'WG::API::Base';
+    return $self->_request( 'get', 'account/list', [ 'fields', 'game', 'type', 'search', 'limit' ], ['search'], @_ );
+}
+
+=item B<account_info>
+
+Method returns Wargaming account details.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=back
+
+=cut
+
+sub account_info {
+    my ( $self, %params ) = @_;
+
+    return $self->_request( 'get', 'account/info', [ 'fields', 'access_token', 'account_id' ], ['account_id'],
+        %params );
+}
+
+=head2 Clans
+
+=over 1
+
+=item B<clans_list>
+
+Method searches through clans and sorts them in a specified order.
+
+=cut
+
+sub clans_list {
+    my $self = shift;
+
+    return $self->_request( 'get', 'clans/list',
+        [ 'language', 'fields', 'search', 'orded_by', 'limit', 'page_no', 'game' ],
+        undef, @_ );
+}
+
+=item B<clans_info>
+
+Method returns detailed clan information.
+
+=over 2
+
+=item I<required fields:>
+
+    clan_id - Clan ID. Max limit is 100.
+
+=back
+
+=cut
+
+sub clans_info {
+    my $self = shift;
+
+    return $self->_request( 'get', 'clans/info', [ 'language', 'fields', 'access_token', 'clan_id' ], ['clan_id'], @_ );
+}
+
+=item B<clans_membersinfo>
+
+Method returns clan member info and short info on the clan. Information is available for World of Tanks and World of Warplanes clans.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=cut
+
+sub clans_membersinfo {
+    my $self = shift;
+
+    return $self->_request( 'get', 'clans/membersinfo', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
+}
+
+=item B<clans_glossary>
+
+Method returns information on clan entities in World of Tanks and World of Warplanes.
+
+=cut
+
+sub clans_glossary {
+    my $self = shift;
+
+    return $self->_request( 'get', 'clans/glossary', [ 'language', 'fields', 'game' ], undef, @_ );
+}
+
+=item B<clans_messageboard>
+
+Method returns messages of clan message board.
+
+=over 2
+
+=item I<required fields:>
+
+    access_token - Access token for the private data of a user's account; can be received via the authorization method; valid within a stated time period
+
+=back
+
+=back
+
+=cut
+
+sub clans_messageboard {
+    my $self = shift;
+
+    return $self->_request( 'get', 'clans/mesageboard', [ 'language', 'fields', 'access_token' ], ['access_token'],
+        @_ );
+}
+
+=head2 Servers
+
+=over 1
+
+=item B<servers_info>
+
+Method returns the number of online players on the servers.
+
+=back
+
+=cut
+
+sub servers_info {
+    my ( $self, %params ) = @_;
+
+    return $self->_request( 'get', 'servers/info', [ 'language', 'fields', 'game' ], undef, %params );
+}
 
 =head1 BUGS
 
@@ -131,7 +246,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -176,5 +291,5 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API::NET
+1;    # End of WG::API::NET
 

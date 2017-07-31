@@ -9,6 +9,7 @@ Makefile.PL
 README
 SIGNATURE
 lib/Log/Dispatch/FileRotate.pm
+t/author-lockfile-race-condition.t
 t/author-pod-syntax.t
 t/author-signature.t
 t/basic.t

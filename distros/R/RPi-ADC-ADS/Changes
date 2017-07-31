@@ -1,5 +1,14 @@
 Revision history for Perl extension RPi::ADC::ADS
 
+1.02    2017-07-20
+        - if in single-ended mode, we now return 0 for all fetch methods, as
+          sometimes a single-ended check can result in a negative number
+        - small fixes in comments in XS file
+        - POD corrections, specifically in bits(), amongst others
+        - added check for FreeBSD and bail if we're on that platform, as it
+          doesn't include the I2C linux header file. This was causing CPAN
+          Testers failures on that platform
+
 1.01    2017-01-11
         - removed _lsb() and _msb() as they were no longer needed or referenced
         - slight POD corrections

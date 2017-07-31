@@ -16,8 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "AI::PredictionClient::Alien::TensorFlowServingProtos" : "0.03",
-            "Alien::Google::GRPC" : "0.03",
+            "AI::PredictionClient::Alien::TensorFlowServingProtos" : "0.05",
+            "Alien::Google::GRPC" : "0.06",
             "ExtUtils::MakeMaker" : "0",
             "Inline" : "0",
             "Inline::CPP" : "0",
@@ -56,6 +56,44 @@
          }
       }
    },
+   "provides" : {
+      "AI::PredictionClient" : {
+         "file" : "lib/AI/PredictionClient.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::CPP::PredictionGrpcCpp" : {
+         "file" : "lib/AI/PredictionClient/CPP/PredictionGrpcCpp.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::Classes::SimpleTensor" : {
+         "file" : "lib/AI/PredictionClient/Classes/SimpleTensor.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::InceptionClient" : {
+         "file" : "lib/AI/PredictionClient/InceptionClient.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::Predict" : {
+         "file" : "lib/AI/PredictionClient/Predict.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::Roles::PredictRole" : {
+         "file" : "lib/AI/PredictionClient/Roles/PredictRole.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::Roles::PredictionRole" : {
+         "file" : "lib/AI/PredictionClient/Roles/PredictionRole.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::Testing::Camel" : {
+         "file" : "lib/AI/PredictionClient/Testing/Camel.pm",
+         "version" : "0.05"
+      },
+      "AI::PredictionClient::Testing::PredictionLoopback" : {
+         "file" : "lib/AI/PredictionClient/Testing/PredictionLoopback.pm",
+         "version" : "0.05"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://github.com/mountaintom/AI-PredictionClient",
@@ -65,7 +103,7 @@
          "web" : "https://github.com/mountaintom/AI-PredictionClient"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

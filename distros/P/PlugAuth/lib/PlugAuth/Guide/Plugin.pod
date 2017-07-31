@@ -14,7 +14,7 @@ PlugAuth::Guide::Plugin - Guide for writing PlugAuth plugins.
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 DESCRIPTION
 
@@ -211,14 +211,14 @@ Here is a basic test for this plugin:
 
  use strict;
  use warnings;
- use File::HomeDir::Test;
- use File::HomeDir;
+ use Test2::Plugin::FauxHomeDir;
  use Test::More tests => 3;
  use Test::Mojo;
  use YAML::XS qw( DumpFile );
+ use File::Glob qw( bsd_glob );
  
- mkdir File::HomeDir->my_home . '/etc';
- DumpFile( File::HomeDir->my_home . '/etc/PlugAuth.conf', {
+ mkdir bsd_glob('~/etc');
+ DumpFile( bsd_glob('~/etc/PlugAuth.conf'), {
    plugins => [
      { 'PlugAuth::Plugin::ExampleRoute' => {} },
    ],
@@ -230,7 +230,7 @@ Here is a basic test for this plugin:
    ->status_is(200)
    ->content_is('hello world!');
 
-We use L<File::HomeDir::Test> to create a temporary home directory for the test.  This
+We use L<Test2::Plugin::FauxHomeDir> to create a temporary home directory for the test.  This
 means that no production configurations will be used by mistake.  Next we create a
 configuration for the test using L<YAML::XS>'s C<DumpFile> function.  Finally we use
 L<Test::Mojo> to make an HTTP GET on /hello and check the status value and content

@@ -1,0 +1,227 @@
+NAME
+    App::perlmv::u - Rename files using Perl code, with undo/redo
+
+VERSION
+    This document describes version 0.001 of App::perlmv::u (from Perl
+    distribution App-perlmv-u), released on 2017-07-28.
+
+DESCRIPTION
+    See included script perlmv-u.
+
+FUNCTIONS
+  clear_history
+    Usage:
+
+     clear_history() -> [status, msg, result, meta]
+
+    Clear undo history.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  history
+    Usage:
+
+     history() -> [status, msg, result, meta]
+
+    Show undo history.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  move_multiple
+    Usage:
+
+     move_multiple(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    This function supports dry-run operation. This function is idempotent
+    (repeated invocations with same arguments has the same effect as single
+    invocation). This function supports transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file_pairs* => *array[array]*
+
+        Pairs of [source, target].
+
+        Both "source" and "target" must be absolute paths.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  perlmv
+    Usage:
+
+     perlmv(%args) -> [status, msg, result, meta]
+
+    Rename files using Perl code, with undo/redo.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   d => *bool*
+
+        Alias for --dry-run.
+
+    *   eval* => *str*
+
+        Perl code to rename file.
+
+        Your Perl code will receive the original filename in $_ and is
+        expected to modify it. If it is unmodified, the last expression is
+        used as the new filename. If it is also the same as the original
+        filename, the file is not renamed.
+
+    *   files* => *array[pathname]*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  redo
+    Usage:
+
+     redo() -> [status, msg, result, meta]
+
+    Redo last undone action.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  undo
+    Usage:
+
+     undo() -> [status, msg, result, meta]
+
+    Undo last action.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-perlmv-u>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-perlmv-u>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-u>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::perlmv
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

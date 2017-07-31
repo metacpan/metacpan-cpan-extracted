@@ -4,23 +4,21 @@ use Alien::autoconf;
 use Alien::automake;
 use Env qw( @PATH );
 
-skip_all 'hard coded perl paths.  fun.';
-
 unshift @PATH, Alien::autoconf->bin_dir;
 
 alien_ok 'Alien::automake';
 
-my @cmd = ('automake', '--version');
+my $wrapper = sub { [@_] };
 
 if($^O eq 'MSWin32')
 {
   require Alien::MSYS;
   push @PATH, Alien::MSYS::msys_path();
-  @cmd = ('sh', -c => 'automake --version');
+  $wrapper = sub { [ 'sh', -c => "@_" ] };
 }
 
-run_ok(\@cmd)
+run_ok($wrapper->($_, '--version'))
   ->success
-  ->note;
+  ->note for qw( automake aclocal );
 
 done_testing;

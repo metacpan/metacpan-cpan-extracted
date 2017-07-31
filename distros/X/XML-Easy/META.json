@@ -22,6 +22,7 @@
             "Params::Classify" : "0",
             "Scalar::Util" : "0",
             "Test::More" : "0",
+            "if" : "0",
             "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
@@ -44,6 +45,7 @@
          "requires" : {
             "Exporter" : "0",
             "Params::Classify" : "0",
+            "if" : "0",
             "parent" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -54,31 +56,31 @@
    "provides" : {
       "XML::Easy" : {
          "file" : "lib/XML/Easy.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "XML::Easy::Classify" : {
          "file" : "lib/XML/Easy/Classify.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "XML::Easy::Content" : {
          "file" : "lib/XML/Easy/Content.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "XML::Easy::Element" : {
          "file" : "lib/XML/Easy/Element.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "XML::Easy::NodeBasics" : {
          "file" : "lib/XML/Easy/NodeBasics.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "XML::Easy::Syntax" : {
          "file" : "lib/XML/Easy/Syntax.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "XML::Easy::Text" : {
          "file" : "lib/XML/Easy/Text.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -91,6 +93,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

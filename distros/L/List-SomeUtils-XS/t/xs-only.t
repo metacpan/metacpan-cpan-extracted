@@ -5,12 +5,13 @@ use Test::More 0.96;
 use Test::Warnings 0.006;
 
 BEGIN {
-    eval 'require List::SomeUtils';
+    eval 'use List::SomeUtils 0.56';
     if ($@) {
-        plan skip_all =>
-            'These tests require that List::SomeUtils already be installed';
+        plan skip_all => 'These tests require that List::SomeUtils 0.56 already be installed';
     }
+}
 
+BEGIN {
     $^W++;
     $ENV{LIST_SOMEUTILS_IMPLEMENTATION} = 'XS';
 }

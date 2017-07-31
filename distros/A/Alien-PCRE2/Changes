@@ -1,5 +1,10 @@
 Revision history for Alien::PCRE2.
 
+0.013000 2017-07-22
+
+    - Windows, Properly Require Alien::Build & Alien::MSYS & Alien::gmake
+    - Require Test2::Suite v0.000072 For Test2::V0
+
 0.012000 2017-07-18
 
     - Windows, Skip pcre-config Tests If sh Bourne Shell Not Found, Part 2

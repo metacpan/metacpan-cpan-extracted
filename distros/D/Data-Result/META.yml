@@ -1,0 +1,30 @@
+---
+abstract: 'Handling true and false in a better way!'
+author:
+  - 'Mike Shipper <AKALINUX@CPAN.ORG>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Result
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.42'
+  Data::Dumper: '2.167'
+  Modern::Perl: '1.20170117'
+  Moo: '2.003002'
+  MooX::Types::MooseLike::Base: '0.29'
+  Test::More: '1.302073'
+  namespace::clean: '0.27'
+  overload: '1.28'
+version: '1.0001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

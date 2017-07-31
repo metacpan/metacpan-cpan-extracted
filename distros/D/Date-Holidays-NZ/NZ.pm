@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use vars qw($VERSION @EXPORT @EXPORT_OK);
-$VERSION = '1.02';
+$VERSION = '1.04';
 @EXPORT = qw(is_nz_holiday nz_holidays nz_regional_day nz_holiday_date);
 @EXPORT_OK = qw(%HOLIDAYS $NATIONAL_HOLIDAYS %regions
 		nz_region_code nz_region_name %holiday_cache);
@@ -25,12 +25,6 @@ my $AD = "Anniversary Day";
 
 our %HOLIDAYS
     = (
-       # holidays that everyone gets, unless they fall on a weekend,
-       # in which case you only get them "if you would normally have
-       # worked on that day (of the week)
-       "Waitangi Day" => "0206",
-       "ANZAC Day" => "0425",
-
        # holidays which are fixed, but unless you would "normally have
        # worked on that day", then they are moved to the next working
        # day
@@ -38,6 +32,8 @@ our %HOLIDAYS
        "Day after New Years Day" => '0102+',
        "Christmas Day" => "1225+",
        "Boxing Day" => '1226+',
+       "Waitangi Day" => "0206+",
+       "ANZAC Day" => "0425+",
 
        # other nationwide holidays
        "Easter Monday" => "Easter + 1day",
@@ -81,6 +77,12 @@ our %HOLIDAYS
        "Dominion Day" => "4th Monday in September",
        "Christchurch Show Day" => "1st Tuesday in November + 10d",
       );
+
+our %CHANGESET_2014 = (
+       # Pre-mondayisation dates for Waitangi and ANZAC days
+       "Waitangi Day" => "0206",
+       "ANZAC Day" => "0425",
+    );
 
 our $NATIONAL_HOLIDAYS =
     $SET->new( "Waitangi Day",
@@ -262,12 +264,18 @@ sub interpret_date {
 sub nz_stat_holidays {
     my $year = shift;
 
+    # merge the old definitions of Waitangi day and ANZAC day if year is pre-mondayisation
+    my %holidays = %HOLIDAYS;
+    if ( $year < 2014 ){
+        %holidays = ( %holidays, %CHANGESET_2014 );
+    }
+
     # build the relative dates
     my (%h, @tentative);
     foreach my $holiday ($NATIONAL_HOLIDAYS->members) {
 
-	my $when = interpret_date($year, $HOLIDAYS{$holiday}||die)
-	    or die "couldn't interpret $year, $HOLIDAYS{$holiday}";
+	my $when = interpret_date($year, $holidays{$holiday}||die)
+	    or die "couldn't interpret $year, $holidays{$holiday}";
 
 	if ( $when =~ s/\+// ) {
 	    push @tentative, $when;
@@ -488,7 +496,7 @@ Valid holiday names are:
   New Years Day
   Queens Birthday
   Waitangi Day
-  
+
   Auckland Anniversary Day
   Chatham Islands Anniversary Day
   Christchurch Show Day
@@ -528,13 +536,18 @@ the "normal" day for a holiday, rather than the day listed on the
 official government site, for a couple of regional days which did not
 match the general rule for when they were due.
 
-Note that district councils are free to alter the holidays schedule at
-any time.  Also, strictly speaking, it is the Pope that decides the
-date of Easter, upon which Easter Friday and Monday are based.
+In 1.03 was a fix to correct for the newly Monday-ised ANZAC and
+Waitangi days, which came into force on 1 January 2014, but had no
+effect until 25 April 2015. Pre-2014 instances of these holidays are
+unaffected and will continue to match their original dates.
 
-I'm not entirely sure on which Anniversary Day the following NZ
-regions observe, so if it matters for you, please check that it is
-correct and let me know if I need to fix anything:
+Note that district councils are free to alter the holidays schedule at
+any time.  Also, strictly speaking, it is the Pope who decides the date
+of Easter, upon which Easter Friday and Monday are based.
+
+I'm not entirely sure on which Anniversary Day the following NZ regions
+observe, so if it matters for you, please check that it is correct and
+let me know if I need to fix anything:
 
 =over
 
@@ -548,7 +561,7 @@ BOP (assumed Auckland)
 
 =item *
 
-Gisbourne (assumed Hawkes' Bay)
+Gisborne (assumed Hawkes' Bay)
 
 =item *
 
@@ -570,15 +583,15 @@ holidays or even time there is only a loosely observed phenomenon.
 
 Exports the four listed functions in this manual page by default.
 
-You may also import various internal variables and methods used by
-this module if you like.  Log a ticket if you want any of them to be
-added to the documentation.
+You may also import various internal variables and methods used by this
+module if you like.  Log a ticket if you want any of them to be added to
+the documentation.
 
 =head1 BUGS
 
 This module does not support Te Reo Māori.  If you would be interested
-in translating the holiday names, region names or manual page to
-Māori, please contact the author.
+in translating the holiday names, region names or manual page to Māori,
+please contact the author.
 
 Please report issues via CPAN RT:
 
@@ -602,6 +615,10 @@ Copyright (c) 2004 Lars Thegler. All rights reserved.
 some modifications
 
 Copyright (c) 2005, 2008, Sam Vilain. All rights reserved.
+
+further modifications
+
+Copyright (c) 2015, Haydn Newport. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

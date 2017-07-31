@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,16 +15,15 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 50a33bc9a88c69555e5489fce1af57d941ace9bb .gitignore
-SHA1 c5cc3c6ffb73c8e2dc96d1cad626133c7f7de8a7 Build.PL
-SHA1 696008a4f1d5e42a283bf129d2ba25602ee071c1 Changes
-SHA1 67ac44de0d0552292d9ca9c62e19874b942d7949 MANIFEST
-SHA1 b4392452a8ff00af034193accf2a518f7af5dc37 META.json
-SHA1 f6ab5c6c3f3dfeaa1b1d23edd89376784a3d98b4 META.yml
-SHA1 2157ae40589595d6cc1585fd7279b25bcf8f5852 Makefile.PL
-SHA1 3b1448faa08a1bea405521366d0dce485231211c README
-SHA1 70d7426d561078d23ce1c5f75308e05b217ffc79 lib/Time/UTC/Now.pm
-SHA1 f25273e0d9e0613e7ff0861a8f533c583c33e8b5 lib/Time/UTC/Now.xs
-SHA1 bdffe0ee03b13173ff9615c2d4f6008d8f4f3cab lib/Time/UTC/features.probe
+SHA1 d3a94575bee648344bdd123d1409b553da858b99 Build.PL
+SHA1 54c08412cc49a9ffd0d443e0b170ee65b08ba2bb Changes
+SHA1 dbe47f4e74ee3a266b41a40115486daefa4fa3b4 MANIFEST
+SHA1 e4fc508754e0c64470fc12fca0d7d42cb6c3982b META.json
+SHA1 25c42e310b7a8cbabb9cfa74fc4e47a603992750 META.yml
+SHA1 de878cb702f8aa4a27af7d9ee7210724315faeb6 README
+SHA1 bdd6d8ec8b862bdff0cfdc94fc716079e0d92538 lib/Time/UTC/Now.pm
+SHA1 12b43c2ef6b03c6987f41bbf722704c17e52f9a9 lib/Time/UTC/Now.xs
+SHA1 f5f46e1f896fdb2856126095a2ece9db88dea79d lib/Time/UTC/features.probe
 SHA1 8fdbf9499577b02901b7199b7bacfc228cbaa934 t/cjdn.t
 SHA1 cb353ef1f99464fde1f41fabc856773f58473ff0 t/mjdn.t
 SHA1 3b45a4f835ac46476fe9082a62999f701753bb24 t/now.t
@@ -32,9 +31,9 @@ SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 23fe797b660d5ad9c3961cff748cfc43a3cc9d0e t/threads.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk89XikACgkQOV9mt2VyAVFGogCfXnE3xzFRwJMuyVpO1D1dzvwY
-DKQAn3/U2yVAeH3vhFNuTPuoZ7TO8QNd
-=fpgt
+iEYEARECAAYFAll8wdkACgkQOV9mt2VyAVFgAgCaAwVYhloFI1gZyHzeJTM91iUe
+0E0An1VFcGriAJf0imD4awgvMkhkYWu9
+=DSX9
 -----END PGP SIGNATURE-----

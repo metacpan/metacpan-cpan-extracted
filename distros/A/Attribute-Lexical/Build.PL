@@ -22,7 +22,7 @@ Module::Build->new(
 	},
 	requires => {
 		"Carp" => 0,
-		"Lexical::SealRequireHints" => "0.005",
+		"Lexical::SealRequireHints" => "0.008",
 		"Params::Classify" => 0,
 		"constant" => 0,
 		"if" => 0,
@@ -32,7 +32,16 @@ Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Attribute-Lexical\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Attribute-Lexical",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

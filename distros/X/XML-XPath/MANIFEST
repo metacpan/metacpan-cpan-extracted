@@ -79,6 +79,7 @@ t/47position.t
 t/48translate.t
 t/49literal.t
 t/50xmlxpathparsercache.t
+t/51elementname.t
 t/rdf.t
 t/remove.t
 t/insert.t

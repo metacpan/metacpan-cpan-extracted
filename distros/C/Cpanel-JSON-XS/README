@@ -123,7 +123,8 @@ DESCRIPTION
     - interop for true/false overloading. JSON::XS, JSON::PP and Mojo::JSON
     representations for booleans are accepted and JSON::XS accepts
     Cpanel::JSON::XS booleans [#13, #37] Fixed overloading of booleans.
-    Cpanel::JSON::XS::true stringifies now to true, not 1.
+    Cpanel::JSON::XS::true stringifies again to "1", not "true", analog to
+    all other JSON modules.
 
     - native boolean mapping of yes and no to true and false, as in
     YAML::XS. In perl "!0" is yes, "!1" is no. The JSON value true maps to
@@ -166,12 +167,13 @@ DESCRIPTION
 
     - extended testsuite, passes all http://seriot.ch/parsing_json.html
     tests. In fact it is the only know JSON decoder which does so, while
-    being the fastest.
+    also being the fastest.
 
     - support many more options and methods from JSON::PP: stringify_infnan,
     allow_unknown, allow_stringify, allow_barekey, encode_stringify,
     allow_bignum, allow_singlequote, sort_by (partially), escape_slash,
-    convert_blessed, ... optional decode_json(, allow_nonref) arg
+    convert_blessed, ... optional decode_json(, allow_nonref) arg. relaxed
+    implements allow_dupkeys.
 
     - support all 5 unicode BOM's: UTF-8, UTF-16LE, UTF-16BE, UTF-32LE,
     UTF-32BE, encoding internally to UTF-8.
@@ -540,6 +542,13 @@ OBJECT-ORIENTED INTERFACE
             quotes. See the "allow_barekey" option.
 
                 { foo:"bar" }
+
+        *   duplicate keys
+
+            With relaxed decoding of duplicate keys does not error and are
+            silently accepted. See <http://seriot.ch/parsing_json.php#24>:
+            RFC 7159 section 4: "The names within an object should be
+            unique."
 
     $json = $json->canonical ([$enable])
     $enabled = $json->get_canonical
@@ -1301,7 +1310,7 @@ MAPPING
         respectively. You can also use "\1" and "\0" or "!0" and "!1"
         directly if you want.
 
-           encode_json [Cpanel::JSON::XS::true, Cpanel::JSON::XS::true]      # yields [false,true]
+           encode_json [Cpanel::JSON::XS::true, Cpanel::JSON::XS::true] # yields [false,true]
            encode_json [!1, !0]      # yields [false,true]
 
     blessed objects
@@ -1983,7 +1992,7 @@ SEE ALSO
 AUTHOR
     Marc Lehmann <schmorp@schmorp.de>, http://home.schmorp.de/
 
-    Reini Urban <rurban@cpan.org>, http://cpanel.net/
+    Reini Urban <rurban@cpan.org>
 
 MAINTAINER
     Reini Urban <rurban@cpan.org>

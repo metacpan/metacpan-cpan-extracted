@@ -1,11 +1,53 @@
 package Pcore::Dist::Build::Issues;
 
-use Pcore -class;
-use Pcore::Util::Scalar qw[blessed];
+use Pcore -class, -const, -ansi;
 
 has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
 
-has api => ( is => 'lazy', isa => InstanceOf ['Pcore::API::Bitbucket'], init_arg => undef );
+const our $PRIORITY_ID => {
+    trivial  => 1,
+    minor    => 2,
+    major    => 3,
+    critical => 4,
+    blocker  => 5,
+};
+
+const our $PRIORITY_COLOR => {
+    trivial  => $WHITE,
+    minor    => $BLACK . $ON_WHITE,
+    major    => $BLACK . $ON_YELLOW,
+    critical => $WHITE . $ON_RED,
+    blocker  => $BOLD . $WHITE . $ON_RED,
+};
+
+const our $KIND => {
+    bug         => [ 'bug',  $WHITE . $ON_RED ],
+    enhancement => [ 'enh',  $WHITE ],
+    proposal    => [ 'prop', $WHITE ],
+    task        => [ 'task', $WHITE ],
+};
+
+const our $STATUS_ID => {
+    new       => 1,
+    open      => 2,
+    resolved  => 3,
+    closed    => 4,
+    'on hold' => 5,
+    invalid   => 6,
+    duplicate => 7,
+    wontfix   => 8,
+};
+
+const our $STATUS_COLOR => {
+    new       => $BLACK . $ON_WHITE,
+    open      => $BLACK . $ON_WHITE,
+    resolved  => $WHITE . $ON_RED,
+    closed    => $BLACK . $ON_GREEN,
+    'on hold' => $WHITE . $ON_BLUE,
+    invalid   => $WHITE . $ON_BLUE,
+    duplicate => $WHITE . $ON_BLUE,
+    wontfix   => $WHITE . $ON_BLUE,
+};
 
 around new => sub ( $orig, $self, $args ) {
     my $scm = $args->{dist}->scm;
@@ -15,92 +57,24 @@ around new => sub ( $orig, $self, $args ) {
     return $self->$orig($args);
 };
 
-sub _build_api ($self) {
-    state $init = !!require Pcore::API::Bitbucket;
+sub search_issues ( $self, $filters ) {
+    my $upstream = $self->{dist}->scm->upstream;
 
-    my $scm_upstream = $self->dist->scm->upstream;
+    my $api = $upstream->get_hosting_api;
 
-    return Pcore::API::Bitbucket->new(
-        {   namespace => $scm_upstream->namespace,
-            repo_name => $scm_upstream->repo_name,
-        }
-    );
-}
+    my $status;
 
-sub get ( $self, @ ) {
-    my $blocking_cv = AE::cv;
-
-    my %args = (
-        id        => undef,
-        active    => undef,
-        new       => undef,
-        open      => undef,
-        resolved  => undef,
-        closed    => undef,
-        hold      => undef,
-        invalid   => undef,
-        duplicate => undef,
-        wontfix   => undef,
-        splice @_, 1,
-    );
-
-    my $status = {};
-
-    $status->@{qw[open resolved closed]} = () if $args{active};
-
-    $status->{new} = undef if $args{new};
-
-    $status->{open} = undef if $args{open};
-
-    $status->{resolved} = undef if $args{resolved};
-
-    $status->{closed} = undef if $args{closed};
-
-    $status->{'on hold'} = undef if $args{hold};
-
-    $status->{invalid} = undef if $args{invalid};
-
-    $status->{duplicate} = undef if $args{duplicate};
-
-    $status->{wontfix} = undef if $args{wontfix};
-
-    # default
-    $status->@{qw[open resolved closed]} = () if !$args{id} && !$status->%*;
-
-    my @status = keys $status->%*;
-
-    if ( $args{id} && @status ) {
-
-        # impossible to set multiple statuses
-        croak q[Can't set multiply issue statuses] if @status > 1;
-
-        $self->api->set_issue_status(
-            $args{id},
-            $status[0],
-            sub ($res) {
-                $blocking_cv->($res);
-
-                return;
-            }
-        );
+    if ( !$filters->%* || $filters->{active} ) {
+        $status = [ 'open', 'resolved' ];
     }
     else {
-        if ( $args{id} ) {
-            $self->api->get_issue( $args{id}, $blocking_cv );
-        }
-        else {
-            $self->api->get_issues(
-                status    => \@status,
-                milestone => $args{milestone},
-                $blocking_cv
-            );
-        }
+        $status = [ keys $filters->%* ];
     }
 
-    return $blocking_cv->recv;
+    return $api->get_issues( $upstream->{repo_id}, status => $status, );
 }
 
-sub print_issues ( $self, $issues, $content = 1 ) {
+sub print_issues ( $self, $issues ) {
     if ( !$issues ) {
         say 'No issues';
     }
@@ -125,35 +99,76 @@ sub print_issues ( $self, $issues, $content = 1 ) {
 
         print $tbl->render_header;
 
-        if ( blessed $issues ) {
-            my $issue = $issues;
-
-            print $tbl->render_row( [ $issue->{local_id}, $issue->status_color, $issue->priority_color, $issue->kind_color, $issue->{title} ] );
-
-            print $tbl->finish;
-
-            say $LF, $issue->{content} || 'No content' if $content;
+        for my $issue ( sort { $STATUS_ID->{ $a->{status} } <=> $STATUS_ID->{ $b->{status} } or $PRIORITY_ID->{ $b->{priority} } <=> $PRIORITY_ID->{ $a->{priority} } or $b->{utc_last_updated} cmp $a->{utc_last_updated} } values $issues->%* ) {
+            print $tbl->render_row(
+                [   $issue->{local_id},    #
+                    $STATUS_COLOR->{ $issue->{status} } . " $issue->{status} " . $RESET,
+                    $PRIORITY_COLOR->{ $issue->{priority} } . " $issue->{priority} " . $RESET,
+                    $KIND->{ $issue->{metadata}->{kind} }->[1] . " $KIND->{ $issue->{metadata}->{kind} }->[0] " . $RESET,
+                    $issue->{title}
+                ]
+            );
         }
-        else {
-            for my $issue ( sort { $a->status_id <=> $b->status_id or $b->priority_id <=> $a->priority_id or $b->utc_last_updated_ts <=> $a->utc_last_updated_ts } $issues->@* ) {
-                print $tbl->render_row( [ $issue->{local_id}, $issue->status_color, $issue->priority_color, $issue->kind_color, $issue->{title} ] );
-            }
 
-            print $tbl->finish;
+        print $tbl->finish;
 
-            say 'max. 50 first issues shown';
-        }
+        say 'max. 50 first issues shown';
     }
 
     return;
 }
 
-sub create_version ( $self, $ver, $cb ) {
-    return $self->api->create_version( $ver, $cb );
+sub get_issue ( $self, $id ) {
+    my $upstream = $self->{dist}->scm->upstream;
+
+    my $api = $upstream->get_hosting_api;
+
+    return $api->get_issue( $upstream->{repo_id}, $id );
 }
 
-sub create_milestone ( $self, $milestone, $cb ) {
-    return $self->api->create_milestone( $milestone, $cb );
+sub print_issue ( $self, $issue, $print_content = 1 ) {
+    my $tbl = P->text->table(
+        style => 'pcore',
+        width => 120,
+        cols  => [
+            id => {
+                width => 6,
+                align => 1,
+            },
+            status   => { width => 15, },
+            priority => { width => 15, },
+            kind     => {
+                width => 10,
+                align => 0,
+            },
+            title => { title_align => -1, },
+        ],
+    );
+
+    print $tbl->render_header;
+
+    print $tbl->render_row(
+        [   $issue->{local_id},    #
+            $STATUS_COLOR->{ $issue->{status} } . " $issue->{status} " . $RESET,
+            $PRIORITY_COLOR->{ $issue->{priority} } . " $issue->{priority} " . $RESET,
+            $KIND->{ $issue->{metadata}->{kind} }->[1] . " $KIND->{ $issue->{metadata}->{kind} }->[0] " . $RESET,
+            $issue->{title}
+        ]
+    );
+
+    print $tbl->finish;
+
+    say $LF, $issue->{content} || 'No content' if $print_content;
+
+    return;
+}
+
+sub set_issue_status ( $self, $id, $status ) {
+    my $upstream = $self->{dist}->scm->upstream;
+
+    my $api = $upstream->get_hosting_api;
+
+    return $api->update_issue( $upstream->{repo_id}, $id, { status => $status } );
 }
 
 1;
@@ -163,7 +178,7 @@ sub create_milestone ( $self, $milestone, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 138                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 102                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

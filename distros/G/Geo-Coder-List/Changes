@@ -1,7 +1,10 @@
 Revision history for Geo-Coder-List
 
+0.13	Tue Jul 25 11:40:19 EDT 2017
+	Address RT#122441
+
 0.12	Tue May 30 13:31:44 EDT 2017
-	Bump minimum version of G:C:XYZ - RT121919
+	Bump minimum version of G:C:XYZ - RT#121919
 	Stash array values
 	When a geocoder errors, Carp the location
 

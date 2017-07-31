@@ -1,7 +1,6 @@
-#!/usr/bin/perl
-
 package Lab::Instrument::HP34401A;
-$Lab::Instrument::HP34401A::VERSION = '3.553';
+#ABSTRACT: HP/Agilent 34401A digital multimeter
+$Lab::Instrument::HP34401A::VERSION = '3.554';
 use strict;
 use Scalar::Util qw(weaken);
 use Lab::Instrument;
@@ -442,6 +441,8 @@ sub scroll_message {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -449,6 +450,10 @@ sub scroll_message {
 =head1 NAME
 
 Lab::Instrument::HP34401A - HP/Agilent 34401A digital multimeter
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -460,7 +465,6 @@ Lab::Instrument::HP34401A - HP/Agilent 34401A digital multimeter
 		gpib_address => 14,
 	),
   }
-
 
 =head1 DESCRIPTION
 
@@ -508,7 +512,7 @@ $resolution sets the resolution of the measurment. If set, $integration_time is 
 =head2 configure_voltage_dc_trigger
 
 	$hp->configure_voltage_dc_trigger($range, $integration_time, $count, $delay, $resolution)
-	
+
 Configures the device for successive triggered reading events. Does not initiate the trigger facility.
 Reading can then be performed calling triggered_read().
 The first three parameters are just passed to configure_voltage_dc.
@@ -520,7 +524,7 @@ $delay is the delay in seconds between these readings.
 =head2 triggered_read
 
 	@data = $hp->triggered_read();
-	
+
 Sends a trigger pulse and fetches the values from the instrument buffer once the reading is finished.
 
 =head2 read_trig()
@@ -537,7 +541,6 @@ Initializes the trigger facility. The device is then in the state "waiting for t
 
 Inherited from L<Lab::Instrument::Multimeter>. Performs a single reading in the current configuration.
 
-
 =head2 get_voltage_dc
 
     $datum=$Agi->get_voltage_dc($range,$resolution);
@@ -551,7 +554,6 @@ and resolution.
 
 Preset and make a ac voltage measurement with the specified range
 and resolution.
-
 
 =head2 get_current_dc
 
@@ -587,13 +589,12 @@ Returns a status string from the device.
 
 Returns the error string from the device.
 
-
 =head2 pl_freq
 Parameter: pl_freq
 
 	$hp->pl_freq($new_freq);
 	$npl_freq = $hp->pl_freq();
-	
+
 Get/set the power line frequency at your location (50 Hz for most countries, which is the default). This
 is the basis of the integration time setting (which is internally specified as a count of power
 line cycles, or PLCs). The integration time will be set incorrectly if this parameter is set incorrectly.
@@ -654,7 +655,7 @@ at 6 1/2 digits. The resolution parameter only affects the front-panel display.
 =head2 configure_voltage_dc_trigger
 
 	$device->trigger_mode($intt, $range, $count, $delay, $resolution)
-	
+
 Configure the multimeter for a triggered reading. 
 
 =over 4
@@ -684,13 +685,13 @@ The resolution for the measurement. If given, this overwrites the C<$intt> param
 =head2 trigger_read
 
 	$data = $device->trigger_read()
-	
+
 Sends a trigger signal and fetches the value(s) from the multimeter.
 
 =head2 trigger
 
 	$device->trigger()
-	
+
 Sends a trigger signal to the device.
 
 =head2 fetch
@@ -702,7 +703,7 @@ Fetches the data which is currently in the output buffer of the device.
 =head2 scroll_message
 
     $Agi->scroll_message($message);
-  
+
 Scrolls the message C<$message> on the display of the HP.
 
 =head2 beep
@@ -740,13 +741,21 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2004-2006 Daniel Schröer (<schroeer@cpan.org>), 2009-2010 Daniela Taubert, 
-            2011 Florian Olbrich, Andreas Hüttel
-            2012 Alois Dirnaichner
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Florian Olbrich
+            2013       Alois Dirnaichner, Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

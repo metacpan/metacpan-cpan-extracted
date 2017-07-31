@@ -1,7 +1,7 @@
 package PlugAuth::Routes;
 
 # ABSTRACT: routes for plugauth
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 # There may be external authentication for these routes, i.e. using
@@ -11,10 +11,9 @@ use strict;
 use warnings;
 use Log::Log4perl qw/:easy/;
 use Mojo::ByteStream qw/b/;
-use List::MoreUtils qw/mesh/;
 use Clustericious::RouteBuilder;
 use Clustericious::Config;
-use List::MoreUtils qw( uniq );
+use List::Util qw( uniq );
 
 
 get '/'      => sub { shift->welcome } => 'index';
@@ -385,7 +384,7 @@ PlugAuth::Routes - routes for plugauth
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 DESCRIPTION
 

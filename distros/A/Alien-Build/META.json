@@ -1,7 +1,8 @@
 {
    "abstract" : "Build external dependencies for use in CPAN",
    "author" : [
-      "Graham Ollis <plicease@cpan.org>"
+      "Graham Ollis <plicease@cpan.org>",
+      "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
@@ -45,11 +46,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0.036",
             "Capture::Tiny" : "0.17",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::ParseXS" : "3.21",
             "FFI::CheckLib" : "0.11",
+            "File::ShareDir" : "0",
             "File::Which" : "1.10",
             "File::chdir" : "0",
             "JSON::PP" : "0",
@@ -83,12 +84,26 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.66",
+   "version" : "0.75",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
       "Roy Storey",
-      "Ilya Pavlov"
+      "Ilya Pavlov",
+      "David Mertens (run4flat)",
+      "Mark Nunberg (mordy, mnunberg)",
+      "Christian Walde (Mithaldu)",
+      "Brian Wightman (MidLifeXis)",
+      "Zaki Mughal (zmughal)",
+      "mohawk2",
+      "Vikas N Kumar (vikasnkumar)",
+      "Flavio Poletti (polettix)",
+      "Salvador Fandi\u00f1o (salva)",
+      "Gianni Ceccarelli (dakkar)",
+      "Pavel Shaydo (zwon, trinitum)",
+      "Kang-min Liu (\u5289\u5eb7\u6c11, gugod)",
+      "Nicholas Shipp (nshp)",
+      "Juan Juli\u00e1n Merelo Guerv\u00f3s (JJ)"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }

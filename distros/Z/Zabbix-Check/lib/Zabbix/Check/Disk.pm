@@ -5,51 +5,18 @@ Zabbix::Check::Disk - Zabbix check for disk
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 
 Zabbix check for disk
 
-	UserParameter=cpan.zabbix.check.disk.discovery,/usr/bin/perl -MZabbix::Check::Disk -e_discovery
-	UserParameter=cpan.zabbix.check.disk.bps[*],/usr/bin/perl -MZabbix::Check::Disk -e_bps -- $1 $2
-	UserParameter=cpan.zabbix.check.disk.iops[*],/usr/bin/perl -MZabbix::Check::Disk -e_iops -- $1 $2
-	UserParameter=cpan.zabbix.check.disk.ioutil[*],/usr/bin/perl -MZabbix::Check::Disk -e_ioutil -- $1
-
-=head3 discovery
-
-discovers disks
-
-=head3 bps $1 $2
-
-gets disk I/O traffic in bytes per second
-
-$1: I<device name, eg: sda, sdb1, dm-3, ...>
-
-$2: I<type: read|write|total>
-
-=head3 iops $1 $2
-
-gets disk I/O transaction speed in transactions per second
-
-$1: I<device name, eg: sda, sdb1, dm-3, ...>
-
-$2: I<type: read|write|total>
-
-=head3 ioutil $1 $2
-
-gets disk I/O utilization in percentage
-
-$1: I<device name, eg: sda, sdb1, dm-3, ...>
-
 =cut
 use strict;
 use warnings;
-no warnings qw(qw utf8);
-use v5.14;
-use utf8;
-use File::Slurp;
+use v5.10.1;
 use JSON;
+use Lazy::Utils;
 
 use Zabbix::Check;
 
@@ -57,13 +24,9 @@ use Zabbix::Check;
 BEGIN
 {
 	require Exporter;
-	# set the version for version checking
-	our $VERSION     = '1.10';
-	# Inherit from Exporter to export functions and variables
+	our $VERSION     = '1.11';
 	our @ISA         = qw(Exporter);
-	# Functions and variables which are exported by default
 	our @EXPORT      = qw(_discovery _bps _iops _ioutil);
-	# Functions and variables which can be optionally exported
 	our @EXPORT_OK   = qw();
 }
 
@@ -73,8 +36,8 @@ sub disks
 	my $result = {};
 	for my $blockpath (glob("/sys/dev/block/*"))
 	{
-		next unless -f "$blockpath/uevent";
-		my $uevent = read_file("$blockpath/uevent", { err_mode => "quiet" });
+		my $uevent = file_get_contents("$blockpath/uevent");
+		next unless defined($uevent);
 		my ($major) = $uevent =~ /^\QMAJOR=\E(.*)/m;
 		my ($minor) = $uevent =~ /^\QMINOR=\E(.*)/m;
 		my ($devname) = $uevent =~ /^\QDEVNAME=\E(.*)/m;
@@ -87,23 +50,25 @@ sub disks
 			devpath => $devpath,
 			major => $major,
 			minor => $minor,
-			size => (-f "$blockpath/size" and $_ = read_file("$blockpath/size", { err_mode => "quiet" }))? int(s/^\s+|\s+$//gr)*512: undef,
-			removable => (-f "$blockpath/removable" and $_ = read_file("$blockpath/removable", { err_mode => "quiet" }))? s/^\s+|\s+$//gr: undef,
-			partition => (-f "$blockpath/partition" and $_ = read_file("$blockpath/partition", { err_mode => "quiet" }))? s/^\s+|\s+$//gr: undef,
+			size => defined($_ = file_get_contents("$blockpath/size"))? trim($_)*512: undef,
+			removable => defined($_ = file_get_contents("$blockpath/removable"))? trim($_): undef,
+			partition => defined($_ = file_get_contents("$blockpath/partition"))? trim($_): undef,
 			dmname => undef,
 			dmpath => undef,
 		};
-		if (-f "$blockpath/dm/name" and my $dmname = read_file("$blockpath/dm/name", { err_mode => "quiet" }))
+		if (defined(my $dmname = file_get_contents("$blockpath/dm/name")))
 		{
-			chomp $dmname;
+			$dmname = trim($dmname);
 			$disk->{dmname} = $dmname;
 			$disk->{dmpath} = "/dev/mapper/$dmname";
 		}
-		my $dmpath = $disk->{dmpath}? $disk->{dmpath}: "";
-		for my $mount (grep(/^(\Q$disk->{devpath}\E|\Q$dmpath\E)\s+/, (-f "/proc/mounts")? read_file("/proc/mounts", { err_mode => "quiet" }): ()))
+		my $dmpath = defined($disk->{dmpath})? $disk->{dmpath}: "";
+		for my $mount (grep(/^(\Q$disk->{devpath}\E|\Q$dmpath\E)\s+/, defined($_ = file_get_contents("/proc/mounts"))? split("\n", $_): ()))
 		{
-			chomp $mount;
-			my ($devpath, $mountpoint, $fstype) = $mount =~ /^(\S+)\s+(\S+)\s+(\S+)\s+/;
+			$mount = trim($mount);
+			my ($mountname, $mountpoint, $fstype) = $mount =~ /^(\S+)\s+(\S+)\s+(\S+)\s+/;
+			next unless $mountname =~ /^\Q$disk->{devpath}\E|\Q$dmpath\E$/;
+			$disk->{mountpoint} = $mountpoint;
 			$disk->{fstype} = $fstype;
 		}
 		$result->{$devname} = $disk;
@@ -118,10 +83,8 @@ sub stats
 	for my $devname (keys %$disks)
 	{
 		my $disk = $disks->{$devname};
-		next unless -f "$disk->{blockpath}/stat";
-		my $statLine = read_file("$disk->{blockpath}/stat", { err_mode => "quiet" });
-		next unless $statLine;
-		chomp $statLine;
+		my $stat_line = defined($_ = file_get_contents("$disk->{blockpath}/stat"))? trim($_): "";
+		next unless $stat_line;
 		my $stat = { 'epoch' => time() };
 		(
 			$stat->{readIOs},
@@ -135,78 +98,80 @@ sub stats
 			$stat->{inFlight},
 			$stat->{IOTicks},
 			$stat->{totalWaits},
-		) = $statLine =~ /^\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/;
+		) = $stat_line =~ /^\s*(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/;
 		$result->{$devname} = $stat;
 	}
 	return $result;
 }
 
-sub analyzeStats
+sub analyze_stats
 {
 	my $now = time();
 	my $stats;
-	my $oldStats;
-	my $tmpPrefix = "/tmp/".(caller(0))[3] =~ s/\Q::\E/-/gr.",stats,";
-	for my $tmpPath (sort {$b cmp $a} glob("$tmpPrefix*"))
+	my $old_stats;
+	my $tmp_prefix = (caller(0))[3];
+	$tmp_prefix =~ s/\Q::\E/-/g;
+	$tmp_prefix = "/tmp/".$tmp_prefix.".";
+	for my $tmp_path (sort {$b cmp $a} glob("$tmp_prefix*"))
 	{
-		if (my ($epoch, $pid) = $tmpPath =~ /^\Q$tmpPrefix\E(\d*)\.(\d*)/)
+		if (my ($epoch, $pid) = $tmp_path =~ /^\Q$tmp_prefix\E(\d*)\.(\d*)/)
 		{
 			if ($now-$epoch < 1*60)
 			{
 				if (not $stats)
 				{
-					my $tmp = read_file($tmpPath, { err_mode => "quiet" });
+					my $tmp = file_get_contents($tmp_path);
 					eval { $stats = from_json($tmp) } if $tmp;
 				}
 				next;
 			}
-			if (not $oldStats)
+			if (not $old_stats)
 			{
-				my $tmp = read_file($tmpPath, { err_mode => "quiet" });
-				eval { $oldStats = from_json($tmp) } if $tmp;
+				my $tmp = file_get_contents($tmp_path);
+				eval { $old_stats = from_json($tmp) } if $tmp;
 				next unless not $tmp or $@;
 			}
 			next unless $now-$epoch > 2*60;
 		}
-		unlink($tmpPath);
+		unlink($tmp_path);
 	}
 	unless ($stats)
 	{
 		$stats = stats();
 		my $tmp;
 		eval { $tmp = to_json($stats, {pretty => 1}) };
-		write_file("$tmpPrefix$now.$$", { err_mode => "quiet" }, $tmp) if $tmp;
+		file_put_contents("$tmp_prefix$now.$$", $tmp) if $tmp;
 	}
-	return unless $oldStats;
+	return unless $old_stats;
 	my $result = {};
 	for my $devname (keys %$stats)
 	{
 		my $stat = $stats->{$devname};
-		my $oldStat = $oldStats->{$devname};
-		next unless defined $oldStat;
-		my $diff = $stat->{epoch} - $oldStat->{epoch};
+		my $old_stat = $old_stats->{$devname};
+		next unless defined $old_stat;
+		my $diff = $stat->{epoch} - $old_stat->{epoch};
 		next unless $diff;
 		$result->{$devname} = {};
 
 		my $sector;
 		my $io;
 
-		$sector = $stat->{readSectors} - $oldStat->{readSectors};
-		$io = $stat->{readIOs} - $oldStat->{readIOs};
+		$sector = $stat->{readSectors} - $old_stat->{readSectors};
+		$io = $stat->{readIOs} - $old_stat->{readIOs};
 		$result->{$devname}->{bps_read} = 512*$sector/$diff;
 		$result->{$devname}->{iops_read} = $io/$diff;
 
-		$sector = $stat->{writeSectors} - $oldStat->{writeSectors};
-		$io = $stat->{writeIOs} - $oldStat->{writeIOs};
+		$sector = $stat->{writeSectors} - $old_stat->{writeSectors};
+		$io = $stat->{writeIOs} - $old_stat->{writeIOs};
 		$result->{$devname}->{bps_write} = 512*$sector/$diff;
 		$result->{$devname}->{iops_write} = $io/$diff;
 
-		$sector = $stat->{readSectors} - $oldStat->{readSectors} + $stat->{writeSectors} - $oldStat->{writeSectors};
-		$io = $stat->{readIOs} - $oldStat->{readIOs} + $stat->{writeIOs} - $oldStat->{writeIOs};
+		$sector = $stat->{readSectors} - $old_stat->{readSectors} + $stat->{writeSectors} - $old_stat->{writeSectors};
+		$io = $stat->{readIOs} - $old_stat->{readIOs} + $stat->{writeIOs} - $old_stat->{writeIOs};
 		$result->{$devname}->{bps_total} = 512*$sector/$diff;
 		$result->{$devname}->{iops_total} = $io/$diff;
 
-		$result->{$devname}->{ioutil} = 100*($stat->{IOTicks} - $oldStat->{IOTicks})/(1000*$diff);
+		$result->{$devname}->{ioutil} = 100*($stat->{IOTicks} - $old_stat->{IOTicks})/(1000*$diff);
 	}
 	return $result;
 }
@@ -219,18 +184,19 @@ sub _discovery
 	for my $devname (keys %$disks)
 	{
 		my $disk = $disks->{$devname};
+		next if $devname =~/^loop\d*$/i or $devname =~ /^ram\d*$/i;
 		next if not $removable and $disk->{removable};
 		push @items, $disk;
 	}
-	return printDiscovery(@items);
+	return print_discovery(@items);
 }
 
 sub _bps
 {
-	my ($devname, $type) = map(zbxDecode($_), @ARGV);
-	return unless $devname and $type and $type =~ /^read|write|total$/;
+	my ($devname, $type) = map(zbx_decode($_), @ARGV);
+	return "" unless defined($devname) and $type and $type =~ /^read|write|total$/;
 	my $result = 0;
-	my $analyzed = analyzeStats();
+	my $analyzed = analyze_stats();
 	my $status = $analyzed->{$devname} if $analyzed;
 	$result = sprintf("%.2f", $status->{"bps_$type"}) if $status;
 	print $result;
@@ -239,10 +205,10 @@ sub _bps
 
 sub _iops
 {
-	my ($devname, $type) = map(zbxDecode($_), @ARGV);
-	return unless $devname and $type and $type =~ /^read|write|total$/;
+	my ($devname, $type) = map(zbx_decode($_), @ARGV);
+	return "" unless defined($devname) and $type and $type =~ /^read|write|total$/;
 	my $result = 0;
-	my $analyzed = analyzeStats();
+	my $analyzed = analyze_stats();
 	my $status = $analyzed->{$devname} if $analyzed;
 	$result = sprintf("%.2f", $status->{"iops_$type"}) if $status;
 	print $result;
@@ -251,10 +217,10 @@ sub _iops
 
 sub _ioutil
 {
-	my ($devname) = map(zbxDecode($_), @ARGV);
-	return unless $devname;
+	my ($devname) = map(zbx_decode($_), @ARGV);
+	return "" unless defined($devname);
 	my $result = 0;
-	my $analyzed = analyzeStats();
+	my $analyzed = analyze_stats();
 	my $status = $analyzed->{$devname} if $analyzed;
 	$result = sprintf("%.2f", $status->{"ioutil"}) if $status;
 	print $result;
@@ -272,11 +238,11 @@ B<CPAN> L<https://metacpan.org/release/Zabbix-Check>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016  Orkun Karaduman <orkunkaraduman@gmail.com>
+Copyright (C) 2017  Orkun Karaduman <orkunkaraduman@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,8 +1,12 @@
 Revision history for FSM-Basic
 
+0.10  Tue Jul 21 09:43:07 UTC 2017
+         add executable tag 'catRAND' and 'catSEQ'
+         fix output from 'cat' 'exec' and 'cmd_'exec'
+
 0.09   Tue May 30 17:05:41 2017 +0200
          add executable tag 'cat' because it is often used
-         
+
 0.08   Wed Apr 26 21:39:04 2017 +0200
          tidy perldoc
 

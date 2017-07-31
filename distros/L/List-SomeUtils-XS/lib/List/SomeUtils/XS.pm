@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.53';
+our $VERSION = '0.55';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -14,22 +14,49 @@ require List::SomeUtils::PP;
 # This list is copied from List::SomeUtils itself and should be updated
 # when subs are added.
 my @subs = qw(
-    any all none notall
-    true false
-    firstidx lastidx
-    insert_after insert_after_string
-    apply indexes
-    after after_incl before before_incl
-    firstval lastval
-    each_array each_arrayref
-    pairwise natatime
-    mesh uniq
-    minmax part
+    after
+    after_incl
+    all
+    all_u
+    any
+    any_u
+    apply
+    before
+    before_incl
     bsearch
-    sort_by nsort_by
-    one any_u all_u none_u notall_u one_u
-    firstres onlyidx onlyval onlyres lastres
-    singleton bsearchidx
+    bsearchidx
+    each_array
+    each_arrayref
+    false
+    firstidx
+    firstres
+    firstval
+    indexes
+    insert_after
+    insert_after_string
+    lastidx
+    lastres
+    lastval
+    mesh
+    minmax
+    mode
+    natatime
+    none
+    none_u
+    notall
+    notall_u
+    nsort_by
+    one
+    one_u
+    onlyidx
+    onlyres
+    onlyval
+    pairwise
+    part
+    singleton
+    sort_by
+    true
+    uniq
 );
 
 for my $sub (@subs) {
@@ -55,7 +82,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 DESCRIPTION
 

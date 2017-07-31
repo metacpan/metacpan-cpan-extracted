@@ -1,5 +1,18 @@
 Revision history for App-RecordStream-Bio
 
+0.23  2017-07-21 10:30:24 PDT
+    - Fixing the release process, no functional changes!
+
+0.22  2017-07-21 10:25:50 PDT
+    - Testing release process, no functional changes (but hey, version numbers
+      are cheap!)
+
+0.20  2017-07-21 10:08:10 PDT
+    - Better fatpacking of the standalone bio.pm download
+
+0.19  2017-07-20 13:33:09 PDT
+    - New command fromgff3 for parsing GFF3 annotation files
+
 0.18  2016-07-06 12:17:07 PDT
     - Point folks looking for fastq input/output to recs-fastq
 

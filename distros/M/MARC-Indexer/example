@@ -1,0 +1,123 @@
+# Index term config example
+
+docid id;
+
+defaults {
+    repeat;
+    noparse;
+    nostem;
+    nodefault;
+    nonorm;
+    noprefix;
+}
+
+term id "Bib ID" {
+    norepeat;
+    source 001;
+    match /^[0-9]+$/;
+    prefix Q;
+}
+
+term rtyp "Record type" {
+    source L/06;
+    norepeat;
+    norm [lowercase, blank2hash];
+    prefix XRT;
+}
+
+term mform "Material form" {
+    source 006/0;
+    norm [lowercase, blank2hash];
+    prefix XMF;
+}
+
+term mtyp "Material type" {
+    source 007/0-1;
+    default "--";
+    norm [lowercase, blank2hash];
+    prefix XMT;
+}
+
+term sig "Record signature" {
+    derived;
+    permute [rtyp, mtyp];
+    prefix XRS;
+}
+
+term rdacontent "RDA content type" {
+    source 336$b;
+    norm [trim, lowercase];
+    prefix X6R;
+}
+
+term rdamedia "RDA media type" {
+    source 337$b;
+    norm [trim, lowercase];
+    prefix X7R;
+}
+
+term rdacarrier "RDA carrier type" {
+    source 338$b;
+    norm [trim, lowercase];
+    prefix X8R;
+}
+
+term title "Title" {
+    source 245$abfgknps;
+    norm [lowercase, trim, nfc];
+    parse;
+    stem english;
+    prefix [S, ""];
+}
+
+term descrip "Physical description" {
+    source 300$abcefg;
+    norm [lowercase, trim];
+    parse;
+    stem english;
+    prefix [XDE, ""];
+}
+
+term gmd "General material designation" {
+    source 245$h;
+    norm [lowercase, alpha, trim];
+    parse;
+    stem english;
+    prefix [XGM, ""];
+}
+
+term inst "Holding institution" {
+    source 9ho$i;
+    prefix XHI;
+}
+
+term loc "Location" {
+    source 9ho$l;
+    prefix XHL;
+}
+
+term group "Record load institution" {
+    source 9bl$g;
+    prefix XBG;
+}
+
+term proj "Record load project" {
+    source 9bl$p;
+    prefix XBP;
+}
+
+term update "Record load update" {
+    source 9bl$u;
+    prefix XBU;
+}
+
+term batch "Record load batch" {
+    source 9bl$b;
+    prefix XBB;
+}
+
+term job "Record load job" {
+    source 9bl$j;
+    prefix XBJ;
+}
+

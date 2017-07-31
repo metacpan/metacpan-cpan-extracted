@@ -17,7 +17,12 @@ my $arg_transformer = make_arg_transformer(
 sub transform_arguments {
     my $class = shift;
     my %args = @_;
-    return map { $_ => $arg_transformer->($_, $args{$_}) } keys %args;
+    my $force_type = delete $args{force_type};
+    return map
+        {
+            $_ => $arg_transformer->($_, $args{$_}, $force_type)
+        }
+        keys %args;
 }
 
 sub transform_output {

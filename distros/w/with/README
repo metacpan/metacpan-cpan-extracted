@@ -2,7 +2,13 @@ NAME
     with - Lexically call methods with a default object.
 
 VERSION
-    Version 0.02
+    Version 0.03
+
+WARNING
+    This module was an early experiment which turned out to be completely
+    unpractical. Therefore its use is officially deprecated. Please don't
+    use it, and don't hesitate to contact me if you want to reuse the
+    namespace.
 
 SYNOPSIS
         package Deuce;
@@ -10,6 +16,7 @@ SYNOPSIS
         sub new { my $class = shift; bless { id = > shift }, $class }
 
         sub hlagh { my $self = shift; print "Deuce::hlagh $self->{id}\n" }
+
 
         package Pants;
 
@@ -25,7 +32,7 @@ SYNOPSIS
          use with \$deuce;
          hlagh;        # Deuce::hlagh 1
          Pants::hlagh; # Pants::hlagh
- 
+
          {
           use with \Deuce->new(2);
           hlagh;       # Deuce::hlagh 2
@@ -73,7 +80,7 @@ IGNORED KEYWORDS
     A call will never be dispatched to a method whose name is one of :
 
         my our local sub do eval goto return
-        if else elsif unless given when or and 
+        if else elsif unless given when or and
         while until for foreach next redo last continue
         eq ne lt gt le ge cmp
         map grep system exec sort print say
@@ -112,8 +119,7 @@ DEPENDENCIES
 AUTHOR
     Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
 
-    You can contact me by mail or on #perl @ FreeNode (vincent or
-    Prof_Vince).
+    You can contact me by mail or on "irc.perl.org" (vincent).
 
 BUGS
     Please report any bugs or feature requests to "bug-with at rt.cpan.org",
@@ -133,7 +139,7 @@ ACKNOWLEDGEMENTS
     order to add hints support and more placeholder patterns.
 
 COPYRIGHT & LICENSE
-    Copyright 2008 Vincent Pit, all rights reserved.
+    Copyright 2008,2017 Vincent Pit, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

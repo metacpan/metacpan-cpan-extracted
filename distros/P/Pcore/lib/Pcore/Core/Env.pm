@@ -278,7 +278,7 @@ sub scan_deps ($self) {
     eval { Int->('error') };
 
     # eval common modules
-    require JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
+    require Cpanel::JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
 
     return;
 }
@@ -294,7 +294,7 @@ sub DEMOLISH ( $self, $global ) {
 
             local $/;
 
-            my $deps = JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->decode(<$fh>);
+            my $deps = Cpanel::JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->decode(<$fh>);
 
             $index->@{ $deps->@* } = ();
         }
@@ -357,7 +357,7 @@ sub DEMOLISH ( $self, $global ) {
 
             seek $fh, 0, SEEK_SET or die;
 
-            print {$fh} JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->encode( [ sort keys $index->%* ] );
+            print {$fh} Cpanel::JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->encode( [ sort keys $index->%* ] );
         }
 
         close $fh or die;

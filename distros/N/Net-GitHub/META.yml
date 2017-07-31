@@ -36,8 +36,9 @@ resources:
   bugtracker: https://github.com/fayland/perl-net-github/issues
   homepage: https://github.com/fayland/perl-net-github
   repository: https://github.com/fayland/perl-net-github.git
-version: '0.87'
+version: '0.89'
 x_contributors:
+  - 'Alan Berndt <alan@eatabrick.org>'
   - 'Alex Muntada <alexm@alexm.org>'
   - 'Alex Vandiver <alex@chmrr.net>'
   - 'brian d foy <brian.d.foy@gmail.com>'
@@ -53,6 +54,7 @@ x_contributors:
   - 'Finn Smith <finn@timeghost.net>'
   - 'franck cuny <franck@lumberjaph.net>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'Grant McLean <grant@catalyst.net.nz>'
   - 'hiroraba <xornelius0313@gmail.com>'
   - 'Hristo Dragolov <hdragolov@gmail.com>'
   - 'Ioan Rogers <ioanr@cpan.org>'
@@ -67,6 +69,7 @@ x_contributors:
   - 'Kirk Kimmel <kimmel.k.programmer@gmail.com>'
   - 'Leigh Hart <lhart@broadsoft.com>'
   - 'Lubomir Rintel <lkundrak@v3.sk>'
+  - 'Makoto Sasaki <wanigoya@gmail.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
   - 'mikegrb <mgreb@linode.com>'
   - 'mschilli <github@perlmeister.com>'

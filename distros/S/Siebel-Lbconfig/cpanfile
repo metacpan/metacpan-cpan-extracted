@@ -1,0 +1,38 @@
+requires "Carp" => "0";
+requires "Config::IniFiles" => "2.88";
+requires "Cwd" => "0";
+requires "Exporter" => "0";
+requires "File::Spec" => "0";
+requires "Moose" => "2.0401";
+requires "Scalar::Util" => "0";
+requires "Set::Tiny" => "0.03";
+requires "Siebel::Srvrmgr::Daemon::Action" => "0";
+requires "Siebel::Srvrmgr::Daemon::ActionStash" => "0.27";
+requires "Siebel::Srvrmgr::Daemon::Command" => "0.27";
+requires "Siebel::Srvrmgr::Daemon::Light" => "0.27";
+requires "Siebel::Srvrmgr::Util::IniDaemon" => "0.27";
+requires "namespace::autoclean" => "0.13";
+requires "perl" => "5.014004";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Digest::MD5" => "0";
+  requires "Siebel::Srvrmgr::Daemon::ActionFactory" => "0.27";
+  requires "Siebel::Srvrmgr::ListParser" => "0.27";
+  requires "Test::More" => "0";
+  requires "perl" => "5.014004";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.014004";
+};
+
+on 'develop' => sub {
+  requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::Kwalitee" => "1.21";
+  requires "Test::More" => "0.88";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Pod::Coverage" => "1.08";
+};

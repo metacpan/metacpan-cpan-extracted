@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,46 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 7f11842f1b2ded0e3d3126c435aa234c77993647 Changes
-SHA1 7b6e849fc65ffd16e73ead4c4218ed266fcba36a Curl.xs
-SHA1 92d451baa620bc6e13838017f5f5d5011535027c Curl_Easy.xsh
-SHA1 1768e269e467241534c66fc0fb4c182fadc647c6 Curl_Easy_callbacks.c
-SHA1 e0766c39827c70f193a211078067ba07e4263a87 Curl_Easy_setopt.c
-SHA1 44377258664ac091df6d716d08b120be5b9839e5 Curl_Form.xsh
-SHA1 b798df0c460badf025d3aad0945eda71502aea5e Curl_Multi.xsh
-SHA1 c997b990a8f62a360d8ab4fcc58868edf2b5a38e Curl_Share.xsh
+SHA1 d19c53570e8f126f441d5a449cce8fe3bdbf8bd0 Changes
+SHA1 39881f72c1bbdc29c2f3ff49c276a568dc2cd788 Curl.xs
+SHA1 8aee52860821705f3df845c1aab87a02de3ea56f Curl_Easy.xsh
+SHA1 9fc4e5d53a8d79b161ae230c8f9bf35524ee4357 Curl_Easy_callbacks.c
+SHA1 5ad8fa0ea366048d6bcfc6bb693f637be1a137bf Curl_Easy_setopt.c
+SHA1 22e695ed5394239a5bd7af1211eeb24d165cfe20 Curl_Form.xsh
+SHA1 554bad24658db890d1bdf276707eaceda61fc33d Curl_Multi.xsh
+SHA1 c9f922e44042a44951bd00ec6f65ddf3da085189 Curl_Share.xsh
 SHA1 94cbea5b3fb940e25cd4535d1c81bfd7d51dac3c LICENSE
-SHA1 82dd3dd1209b0f93cdd4809ab074cda40d24dd5a MANIFEST
-SHA1 1eb19d5ff88359c31e8765d1e87a456a81726b4e MANIFEST.SKIP
-SHA1 1104b54a8036464ff941adb4c0fd991562032074 META.json
-SHA1 e0f863dd4aee56c20f938f2eea45121365cd0365 META.yml
-SHA1 61d11ea8514494812cada090ad563869856c0001 Makefile.PL
-SHA1 e0521c2d216c85f1379e2e4c8b4887a0e2dce4b4 README
+SHA1 b129e50a730f8f3e9e4e547aa2350dcbbe201770 MANIFEST
+SHA1 fe9829c2f37402c8e201d3a0ae881c71ef8fa198 MANIFEST.SKIP
+SHA1 4ecc8334e4b6d74472e1ab5b13b04e3a558c477c META.json
+SHA1 9abeae7bef1ea9b348caac7b54966764dac3c9c9 META.yml
+SHA1 4618ff50b1759cde83fc5bb26f9a880d62b34ecc Makefile.PL
+SHA1 1d3edad0566388d7716d7c7e3e3e2f1cf96b9163 README
 SHA1 e400ec90c587f215f739142efaea4e898fee2860 examples/01-curl-transport.pl
 SHA1 8a186c6f71f6e3a727e110bea0558bca6d7ce886 examples/02-multi-simple.pl
 SHA1 b29db3349dca4b2f7ab5669ceab505643516ef48 examples/03-multi-event.pl
 SHA1 8a62bb893894876fd334c7dbd47ee9c895ed6c57 examples/04-share-threads.pl
 SHA1 513e95c81d810b39c13278be22c9f45ffb92e980 examples/05-irssi-downloader.pl
-SHA1 943f46de730ed59fb2ff3c4e29707dcaea3f4171 inc/Compat.pm
+SHA1 3f23c044a5e005eb8482ed7babb42ab18b994cd3 inc/Compat.pm
 SHA1 a35a0062fb86bb30bbbbd1b7db35d830e3fa11b5 inc/Compat/WWW/Curl.pm
 SHA1 e3b60977a4d7721b0ce96bee1b3cebf1bb5594e7 inc/Compat/WWW/Curl/Easy.pm
 SHA1 34949d7d32cfbae05110b0d23ce60a01475a3447 inc/Compat/WWW/Curl/Form.pm
 SHA1 5c17a56bf0c59a248e12b4e43b45a4ba85812637 inc/Compat/WWW/Curl/Multi.pm
 SHA1 b683b9c3c979c2ebb5ce26d00141b7e6f712ee67 inc/Compat/WWW/Curl/Share.pm
-SHA1 c145c4023e4f8a015b0110476aedd8deccac81e2 inc/Test/HTTP/Server.pm
+SHA1 c3089d52614a6eb54bc533d6c544fddd43b5cec3 inc/Test/HTTP/Server.pm
 SHA1 a6f7f0e3d86e2f3afdfbde417822fb379c064402 inc/Test/UnConstant.pm
-SHA1 16911e4d05afc532860c42131123663278214a44 inc/symbols-in-versions
-SHA1 1271f27c1bde7db770339d41dee82b32be2e6e36 lib/Net/Curl.pm
-SHA1 085f148e73b93100e43c4aa05610fda98aa6b326 lib/Net/Curl/Compat.pm
-SHA1 ed2b8a9735f5311a51b2a3adc0c76bba85542950 lib/Net/Curl/Easy.pm
-SHA1 cf98295b33daa716d054d467727c648c0acfccda lib/Net/Curl/Form.pm
-SHA1 de4a477bc753200e03b4acbf62b10f53e6037e0c lib/Net/Curl/Multi.pm
-SHA1 e5de1f9c6823cee8005c57f03b678d4ddb7d3f8c lib/Net/Curl/Share.pm
+SHA1 b8bd327bbc38f4d08996a1606c50ba45b2631edb inc/symbols-in-versions
+SHA1 e0c8e11bee56447fb735160d75f783266cf4bc3b lib/Net/Curl.pm
+SHA1 151a3ba3b1c745fa523d044a8b5a99f873a6ad0f lib/Net/Curl/Compat.pm
+SHA1 affa95e687de63c96e5b3bde7c539752de4eceea lib/Net/Curl/Easy.pm
+SHA1 f212e632b89e0f24131535615f798822597f9482 lib/Net/Curl/Form.pm
+SHA1 1be3e803f14221e44b9a6c579481d084495ea17b lib/Net/Curl/Multi.pm
+SHA1 6c3a7f4deb6c2ea293e9f026f2692d2d39e8b3f0 lib/Net/Curl/Share.pm
 SHA1 1aba3b48885111b18ff04a61fbd935d433b0fe76 lib/Net/Curl/examples.pod
 SHA1 10ee021520d7eeacc4f5d150169e848965e14484 t/00-info.t
-SHA1 b18bde711dae86f2639c3baf80b99ac826237ef6 t/01-constants.t
+SHA1 4da7f41ef39a9fa073601ed4eff1d12feb7f76fd t/01-constants.t
 SHA1 283cdb21915eec7eb5db4d4c847a62634cb3ee1e t/02-methods.t
 SHA1 455acd3e338758d55aa8568fd55d5de51949aeb9 t/03-cookies.t
 SHA1 0d8c720e1cbfd5435728cc4debd4b18be36a0140 t/40-callback-opensocket.t
@@ -62,9 +62,10 @@ SHA1 e45fd5d25b370dd2046dc85600b260371d45a905 t/53-crash-destroy-with-callbacks-
 SHA1 ebc394ec4976961f44fb3b56553be3d1dac1e2d2 t/54-crash-getinfo-slist.t
 SHA1 61aeac7a252232b6d1d9652df6dcab3c83f958c0 t/55-crash-reset.t
 SHA1 f6ee222b402b4547039b3a1eca84163596038e6a t/60-multi-wait.t
-SHA1 d675cdc6a0311b507b9fd4bc19a95a04e20019cf t/70-escape-unescape.t
-SHA1 79d428efbf3b0815adc0c16d3202f6e4df361b9d t/96-leak.t
-SHA1 3bc7d6c66856a43e316fa7c3df42261985204be7 t/99-symbols.t
+SHA1 785874be7f0f8af832974b336eb28f8f252b5fe7 t/61-multi-wait-other.t
+SHA1 8c7f77276d25462777c47f3eb9b6324b2e2c3a7e t/70-escape-unescape.t
+SHA1 c29d11704649e3c68535ef61c09000c46c08389e t/96-leak.t
+SHA1 1179b37e88d0f41db0d7f64a3bedc33c1f1a46af t/99-symbols.t
 SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
 SHA1 2c4604765042c0039769fe609a03c625416e4859 t/compat-00constants.t
 SHA1 95344cec0992e8bb068568596ecc89e09366e400 t/compat-01basic.t
@@ -98,7 +99,7 @@ SHA1 643940a5f77687bc5aa80956badeacb84f8a9c34 t/old-18twinhandles.t
 SHA1 af208771859129d4d969230bb068b5ce81812ea3 t/old-19multi.t
 SHA1 e84e2646755e4cb34da503891f4d1b11b959e0e5 t/old-20undefined_subs.t
 SHA1 44887247bd82d8e032558ad0a225a1698da5b7d8 t/old-21write-to-scalar.t
-SHA1 c435208e36f0e54953014cbe0884b35020ef88db t/old-22sendrecv.t
+SHA1 7790ee055079fe2a7af2c7e3899fe6656eee0677 t/old-22sendrecv.t
 SHA1 4efaedd1235b3c8b93e49802a0b1cb8e25f40040 t/old-23socket-action.t
 SHA1 525ee0d951e66e31378c0be2347f1133331015de t/old-24-multi-refcount.t
 SHA1 ca7ba61d165418ae0fb37f07698d8719e7db24c7 t/old-25xrefinfo.t
@@ -117,13 +118,13 @@ SHA1 b3350d3d17bb2fa4e23075ec8d786505cc565539 t/release-test-version.t
 SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
 SHA1 7b0e013f379f67f219c78779f68dba82bf7e91c9 typemap
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJUzfJvAAoJEDlxU7ZVUpmiAnoH/2zKeNEXHkNt78qH9iM7yIUO
-h3PhJXcMslGESVMmg1vnx8iZOPt9y4Xe9LNhw/j25z7iOeiwHaI0ghV88flr9R1S
-1QyQPrVFVbxQAuLKcvWd9tKL723z4vaIymuX7GBj0mVN+fsIirmYzJxd9SBgJIHM
-Pd8I0PBzKhWsfLYpCPJSlv4PwdW4sZr3jYZT8Q+rz1g8HhbC90MMd2kB0T2P+DMb
-ShrOCtI1dUT4nVDFtrQFG0xVAEFXygrkILNgzggdeOtaPWj2i5HkvGNKmtvwWWN3
-/CI6qd5/1pXgpS0vVQBd17hThbDbLyQrTFlbz5BJuZHID2B6CmqMwPBEBeGKU04=
-=/yRb
+iQEzBAEBCAAdFiEEK428BioOyOagl43QOXFTtlVSmaIFAll4TVIACgkQOXFTtlVS
+maJJywgAlSTTlCYdF92GpkH4udF6ohM7dQP13rLMY5nj6g17hR94mFpp9Q/AH96U
+2WaftQdlr5U0/OxPFA9Qz395MlLvIqLbwCPd9F6OTN8HavM9xw241eWDmQDtGw1I
+mDAAEK3csfa0L3otVHNfhD8xdtb3kMWRbDs/sorHBO9LMxlzWlSUsJydNh5uU5J8
+x5Qw9b3Oww+IJtQM3vcY+sjoO9BoDqYLEQPCPHlYXsPcy5Ug4Uz2pmhp7p0GoQMw
+TtuznZeHnK7iVQXdEQ0NGEpskhyvdlNfVZ9btCF/edxAHIFNrFkEex7f5FU6jpMg
+ZSCC5wOIqQoB5wFHUlUysGGPUvl+Zg==
+=fWA2
 -----END PGP SIGNATURE-----

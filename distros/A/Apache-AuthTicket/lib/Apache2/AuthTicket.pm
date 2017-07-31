@@ -1,8 +1,5 @@
 package Apache2::AuthTicket;
-BEGIN {
-  $Apache2::AuthTicket::VERSION = '0.93';
-}
-
+$Apache2::AuthTicket::VERSION = '0.94';
 # ABSTRACT: Cookie Based Access and Authorization Module
 
 use strict;
@@ -34,7 +31,7 @@ sub apache_const {
 
 1;
 
-
+__END__
 
 =pod
 
@@ -44,7 +41,7 @@ Apache2::AuthTicket - Cookie Based Access and Authorization Module
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -516,7 +513,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

@@ -13,7 +13,7 @@ use Perinci::Access::Simple::Server::Pipe;
 subtest "v1.1" => sub {
     my $pa  = Perinci::Access::Simple::Client->new;
     my $res = $pa->request(
-        call => "riap+pipe:$^X"."//"."bin%2Fperi-pipe"."//".
+        call => "riap+pipe:$^X"."//"."script%2Fperi-pipe"."//".
             "Perinci/Examples/sum",
         {args=>{array=>[1,2,3,4,5]}});
 

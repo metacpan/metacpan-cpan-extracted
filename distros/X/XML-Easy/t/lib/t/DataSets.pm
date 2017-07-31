@@ -71,8 +71,8 @@ my @interesting_value = (
 	undef,
 	"",
 	"abc",
-	do { no warnings "utf8"; "\x{d800}" },
-	do { no warnings "utf8"; "\x{ffffffff}" },
+	do { no if "$]" < 5.013009, qw(warnings utf8); "\x{d800}" },
+	do { no if "$]" < 5.013009, qw(warnings utf8); "\x{7fffffff}" },
 	*STDOUT,
 	\"",
 	[],
@@ -143,7 +143,10 @@ sub foreach_no_string_or_array_or_content_object_or_element($) {
 sub foreach_hex_char($@) {
 	my $do = shift(@_);
 	foreach(@_) {
-		no warnings "utf8";
+		no warnings "portable";
+		no if "$]" < 5.013009, qw(warnings utf8);
+		no if "$]" >= 5.023006 && "$]" < 5.027001,
+			qw(warnings deprecated);
 		my $c = chr(hex($_));
 		die "chr/ord failure" unless sprintf("%x", ord($c)) eq $_;
 		$do->($c);
@@ -161,16 +164,23 @@ sub foreach_yes_char($) {
 	);
 }
 
-*COUNT_ch_no_char = memoise sub { 3 + 2 + 2 + 2 + 2 + 4 };
+my @hex_no_char = qw(
+	0 1 8
+	b c
+	e 1f
+	d800 dfff
+	fffe ffff
+	110000 7fffffff
+);
+push @hex_no_char, "7fffffffffffffff" if ((~0 >> 31) >> 31) >= 3;
+if("$]" < 5.027001) {
+	push @hex_no_char, ((~0 >> 31) >> 31) >= 3 ?
+		qw(8000000000000000 ffffffffffffffff) :
+		qw(80000000 ffffffff);
+}
+*COUNT_ch_no_char = memoise sub { scalar @hex_no_char };
 sub foreach_ch_no_char($) {
-	foreach_hex_char $_[0], qw(
-		0 1 8
-		b c
-		e 1f
-		d800 dfff
-		fffe ffff
-		110000 7fffffff 80000000 ffffffff
-	);
+	foreach_hex_char $_[0], @hex_no_char;
 }
 
 *COUNT_yes_namestartchar = memoise sub { 1 + 2 + 3 + 1 + 1 };

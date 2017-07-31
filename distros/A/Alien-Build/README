@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.66
+    version 0.75
 
 SYNOPSIS
 
@@ -579,6 +579,11 @@ ENVIRONMENT
       Perl source file which can override some global defaults for
       Alien::Build, by, for example, setting preload and postload plugins.
 
+    ALIEN_BUILD_PKG_CONFIG
+
+      Override the logic in Alien::Build::Plugin::PkgConfig::Negotiate
+      which chooses the best pkg-config plugin.
+
     ALIEN_BUILD_PRELOAD
 
       semicolon separated list of plugins to automatically load before
@@ -607,6 +612,29 @@ ENVIRONMENT
       proxy variables may be used by some Fetch plugins, if they support
       it.
 
+SUPPORT
+
+    The intent of the Alien-Build team is to support as best as possible
+    all Perls from 5.8.1 to the latest production version. So long as they
+    are also supported by the Perl toolchain.
+
+    Please feel encouraged to report issues that you encounter to the
+    project GitHub Issue tracker:
+
+    https://github.com/Perl5-Alien/Alien-Build/issues
+
+    Better if you can fix the issue yourself, please feel encouraged to
+    open pull-request on the project GitHub:
+
+    https://github.com/Perl5-Alien/Alien-Build/pulls
+
+    If you are confounded and have questions, join us on the #native
+    channel on irc.perl.org. The Alien-Build developers frequent this
+    channel and can probably help point you in the right direction. If you
+    don't have an IRC client handy, you can use this web interface:
+
+    https://chat.mibbit.com/?channel=%23native&server=irc.perl.org
+
 SEE ALSO
 
     Alien::Build::Manual::AlienAuthor, Alien::Build::Manual::AlienUser,
@@ -626,6 +654,34 @@ AUTHOR
     Roy Storey
 
     Ilya Pavlov
+
+    David Mertens (run4flat)
+
+    Mark Nunberg (mordy, mnunberg)
+
+    Christian Walde (Mithaldu)
+
+    Brian Wightman (MidLifeXis)
+
+    Zaki Mughal (zmughal)
+
+    mohawk2
+
+    Vikas N Kumar (vikasnkumar)
+
+    Flavio Poletti (polettix)
+
+    Salvador Fandiño (salva)
+
+    Gianni Ceccarelli (dakkar)
+
+    Pavel Shaydo (zwon, trinitum)
+
+    Kang-min Liu (劉康民, gugod)
+
+    Nicholas Shipp (nshp)
+
+    Juan Julián Merelo Guervós (JJ)
 
 COPYRIGHT AND LICENSE
 

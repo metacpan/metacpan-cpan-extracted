@@ -160,6 +160,21 @@ Usage:
 
     $this->install();
 
+## status
+
+Returns the list of [App::JESP::Patch](https://metacpan.org/pod/App::JESP::Patch) with their application Datetime if this is known.
+This will ALSO return the orphans (patches that are recorded as applied but not in the plan).
+
+Usage:
+
+    my $status = $this->status();
+
+    $status is like:
+       {
+          plan_patches => [ list of App::JESP::Patch ],
+          plan_orphans => [ list of orphan patch IDs ]
+       };
+
 ## deploy
 
 Deploys the unapplied patches from the plan in the database and record

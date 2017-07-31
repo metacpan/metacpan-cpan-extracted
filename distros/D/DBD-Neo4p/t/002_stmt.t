@@ -38,7 +38,7 @@ SKIP : {
   my $idx = ${$t->nix};
   my $q =<<CYPHER;
    START x = node:$idx(name= { startName })
-   MATCH path =(x-[r]-friend)
+   MATCH path =(x)-[r]-(friend)
    WHERE friend.name = { name }
    RETURN TYPE(r)
 CYPHER

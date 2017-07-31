@@ -1,0 +1,10 @@
+Revision history for perl distribution Mojo-GoogleAnalytics
+
+0.02 2017-07-26T13:24:12+0200
+ - Fix $err is not a hash ref
+ - Add view_id() attribute
+ - Add get_report() method
+
+0.01 2017-07-24T13:39:40+0200
+ - Created Mojo::GoogleAnalytics
+ - Created Mojo::GoogleAnalytics::Report

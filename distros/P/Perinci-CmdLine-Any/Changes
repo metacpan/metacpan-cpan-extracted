@@ -1,4 +1,12 @@
-Revision history for Perinci-CmdLine-Any
+0.14    2017-07-22 (PERLANCAR)
+
+        - [optimize] Reduce startup overhad by avoiding use of strict/warnings
+          pragmas in built version.
+
+	- [test] Add test.
+
+        - [dist] Bump prereq versions Perinci::CmdLine::{Lite,Classic} to 1.76.
+
 
 0.13    2016-07-20 (PERLANCAR)
 

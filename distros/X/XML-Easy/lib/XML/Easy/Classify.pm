@@ -4,36 +4,35 @@ XML::Easy::Classify - classification of XML-related items
 
 =head1 SYNOPSIS
 
-	use XML::Easy::Classify qw(
-		is_xml_name check_xml_name
-		is_xml_encname check_xml_encname
-		is_xml_chardata check_xml_chardata
-		is_xml_attributes check_xml_attributes
-		is_xml_content_object check_xml_content_object
-		is_xml_content_twine check_xml_content_twine
-		is_xml_content check_xml_content
-		is_xml_element check_xml_element
-	);
+    use XML::Easy::Classify qw(
+	is_xml_name check_xml_name
+	is_xml_encname check_xml_encname
+	is_xml_chardata check_xml_chardata
+	is_xml_attributes check_xml_attributes
+	is_xml_content_object check_xml_content_object
+	is_xml_content_twine check_xml_content_twine
+	is_xml_content check_xml_content
+	is_xml_element check_xml_element);
 
-	if(is_xml_name($arg)) { ...
-	check_xml_name($arg);
-	if(is_xml_encname($arg)) { ...
-	check_xml_encname($arg);
-	if(is_xml_chardata($arg)) { ...
-	check_xml_chardata($arg);
+    if(is_xml_name($arg)) { ...
+    check_xml_name($arg);
+    if(is_xml_encname($arg)) { ...
+    check_xml_encname($arg);
+    if(is_xml_chardata($arg)) { ...
+    check_xml_chardata($arg);
 
-	if(is_xml_attributes($arg)) { ...
-	check_xml_attributes($arg);
+    if(is_xml_attributes($arg)) { ...
+    check_xml_attributes($arg);
 
-	if(is_xml_content_object($arg)) { ...
-	check_xml_content_object($arg);
-	if(is_xml_content_twine($arg)) { ...
-	check_xml_content_twine($arg);
-	if(is_xml_content($arg)) { ...
-	check_xml_content($arg);
+    if(is_xml_content_object($arg)) { ...
+    check_xml_content_object($arg);
+    if(is_xml_content_twine($arg)) { ...
+    check_xml_content_twine($arg);
+    if(is_xml_content($arg)) { ...
+    check_xml_content($arg);
 
-	if(is_xml_element($arg)) { ...
-	check_xml_element($arg);
+    if(is_xml_element($arg)) { ...
+    check_xml_element($arg);
 
 =head1 DESCRIPTION
 
@@ -59,7 +58,7 @@ use Params::Classify 0.000 qw(is_string is_ref is_strictly_blessed);
 use XML::Easy::Syntax 0.000
 	qw($xml10_char_rx $xml10_name_rx $xml10_encname_rx);
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -101,13 +100,15 @@ and other things in XML.)
 =cut
 
 sub is_xml_name($) {
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	return is_string($_[0]) && $_[0] =~ /\A$xml10_name_rx\z/o;
 }
 
 sub check_xml_name($) {
 	_throw_data_error("name isn't a string") unless is_string($_[0]);
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	_throw_data_error("illegal name")
 		unless $_[0] =~ /\A$xml10_name_rx\z/o;
 }
@@ -122,14 +123,16 @@ encoding name syntax.
 =cut
 
 sub is_xml_encname($) {
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	return is_string($_[0]) && $_[0] =~ /\A$xml10_encname_rx\z/o;
 }
 
 sub check_xml_encname($) {
 	_throw_data_error("encoding name isn't a string")
 		unless is_string($_[0]);
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	_throw_data_error("illegal encoding name")
 		unless $_[0] =~ /\A$xml10_encname_rx\z/o;
 }
@@ -146,14 +149,16 @@ the value of an element attribute.
 =cut
 
 sub is_xml_chardata($) {
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	return is_string($_[0]) && $_[0] =~ /\A$xml10_char_rx*\z/o;
 }
 
 sub check_xml_chardata($) {
 	_throw_data_error("character data isn't a string")
 		unless is_string($_[0]);
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	_throw_data_error("character data contains illegal character")
 		unless $_[0] =~ /\A$xml10_char_rx*\z/o;
 }
@@ -183,7 +188,9 @@ sub check_xml_attributes($) {
 	_throw_data_error("attribute hash isn't a hash")
 		unless is_ref($_[0], "HASH");
 	foreach(sort keys %{$_[0]}) {
-		no warnings "utf8";
+		no if "$]" < 5.017002, qw(warnings utf8);
+		no if "$]" >= 5.023006 && "$]" < 5.027001,
+			qw(warnings deprecated);
 		_throw_data_error("illegal attribute name")
 			unless /\A$xml10_name_rx\z/o;
 		check_xml_chardata($_[0]->{$_});

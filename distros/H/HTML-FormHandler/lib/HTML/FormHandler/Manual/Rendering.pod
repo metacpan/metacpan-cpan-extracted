@@ -13,7 +13,7 @@ HTML::FormHandler::Manual::Rendering - how to render with FormHandler
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 SYNOPSIS
 
@@ -540,6 +540,12 @@ The 'first_fset' block will render like this:
         <div>
     </fieldset>
 
+You can also provide a method to 'build' the block's render list
+
+   has_block 'first_fset' => ( tag => 'fieldset, label => 'Two Fields',
+       build_render_list_method => \&build_render_list_first_fset );
+   sub build_render_list_first_fset { ['foo', 'bar'] }
+
 In order to actually get this block to be used when you render with
 C<< $form->render >>, you need to supply a 'render_list' on the form
 level:
@@ -774,7 +780,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

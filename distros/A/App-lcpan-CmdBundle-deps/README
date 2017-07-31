@@ -3,13 +3,17 @@ NAME
     dependencies
 
 VERSION
-    This document describes version 0.006 of App::lcpan::CmdBundle::deps
+    This document describes version 0.007 of App::lcpan::CmdBundle::deps
     (from Perl distribution App-lcpan-CmdBundle-deps), released on
-    2017-07-10.
+    2017-07-28.
 
 SYNOPSIS
 DESCRIPTION
     This bundle provides the following lcpan subcommands:
+
+    *   lcpan deps-rels
+
+    *   lcpan deps-phases
 
     *   lcpan deps-all
 

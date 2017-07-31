@@ -3,13 +3,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-List/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-List)
 
-# Geo::Coder::List
+# NAME
 
-Call many geocoders
+Geo::Coder::List - Call many geocoders
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -52,6 +52,13 @@ and OpenStreetMap for other places:
 
 Runs geocode on all of the loaded drivers.
 See [Geo::Coder::GooglePlaces::V3](https://metacpan.org/pod/Geo::Coder::GooglePlaces::V3) for an explanation
+
+The name of the geocoder that gave the result is put into the geocode element of the
+return value, if the value was retrieved from the cache the value will be undefined.
+
+    if(defined($location->{'geocoder'})) {
+        print 'Location information retrieved using ', $location->{'geocoder'}, "\n";
+    }
 
 ## ua
 

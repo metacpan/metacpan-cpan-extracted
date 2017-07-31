@@ -1,6 +1,6 @@
 package Task::Calendar;
 
-$Task::Calendar::VERSION   = '0.30';
+$Task::Calendar::VERSION   = '0.31';
 $Task::Calendar::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Task::Calendar - Bundles Calendar::* packages.
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,11 @@ L<https://github.com/manwar/Task-Calendar>
 
 =item L<Calendar::Gregorian>
 
+=item L<Calendar::Hebrew>
+
 =item L<Calendar::Hijri>
+
+=item L<Calendar::Julian>
 
 =item L<Calendar::Persian>
 

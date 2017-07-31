@@ -1837,7 +1837,7 @@ a?\R	a\n	y	$&	a\n
 
 # check we have the right utf8ness as we switch back and forth between
 # patterns
-^(\x{100}|a)(??{ qr/.?\xF7/d})	a_\xF7	y	-	-
+^(\x{100}|a)(??{ qr/.?\xF7/d})	a_\xF7	yp	-	-
 
 # [perl #118375]
 /(a|(bc)){0,0}?xyz/	xyz	y	$&	xyz
@@ -1989,8 +1989,8 @@ AB\s+\x{100}	AB \x{100}X	y	-	-
 /[ ^ a b ]/xx	a	n	-	-
 /[ ^ a b ]/xx	b	n	-	-
 /[ ^ a b ]/xx	A	y	$&	A
-/(?x:[a b])/xx	\N{SPACE}	yS	$&	 	# Note a space char here
+/(?x:[a b])/xx	\N{SPACE}	ySp	$&	 	# Note a space char here
 /(?xx:[a b])/x	\N{SPACE}	np	-	-
-/(?x)[a b]/xx	\N{SPACE}	yS	$&	 	# Note a space char here
+/(?x)[a b]/xx	\N{SPACE}	ySp	$&	 	# Note a space char here
 /(?xx)[a b]/x	\N{SPACE}	np	-	-
 /(?-x:[a b])/xx	\N{SPACE}	yS	$&	 	# Note a space char here

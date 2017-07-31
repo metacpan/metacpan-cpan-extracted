@@ -4,27 +4,27 @@ Date::Darian::Mars - the Darian calendar for Mars
 
 =head1 SYNOPSIS
 
-	use Date::Darian::Mars qw(present_y);
+    use Date::Darian::Mars qw(present_y);
 
-	print present_y($y);
+    print present_y($y);
 
-	use Date::Darian::Mars
-		qw(month_days cmsdn_to_ymd ymd_to_cmsdn present_ymd);
+    use Date::Darian::Mars qw(
+	month_days cmsdn_to_ymd ymd_to_cmsdn present_ymd);
 
-	$md = month_days(209, 23);
-	($y, $m, $d) = cmsdn_to_ymd(546236);
-	$cmsdn = ymd_to_cmsdn(209, 23, 18);
-	print present_ymd(546236);
-	print present_ymd(209, 23, 18);
+    $md = month_days(209, 23);
+    ($y, $m, $d) = cmsdn_to_ymd(546236);
+    $cmsdn = ymd_to_cmsdn(209, 23, 18);
+    print present_ymd(546236);
+    print present_ymd(209, 23, 18);
 
-	use Date::Darian::Mars
-		qw(year_days cmsdn_to_yd yd_to_cmsdn present_yd);
+    use Date::Darian::Mars qw(
+	year_days cmsdn_to_yd yd_to_cmsdn present_yd);
 
-	$yd = year_days(209);
-	($y, $d) = cmsdn_to_yd(546236);
-	$cmsdn = yd_to_cmsdn(209, 631);
-	print present_yd(546236);
-	print present_yd(209, 631);
+    $yd = year_days(209);
+    ($y, $d) = cmsdn_to_yd(546236);
+    $cmsdn = yd_to_cmsdn(209, 631);
+    print present_yd(546236);
+    print present_yd(209, 631);
 
 =head1 DESCRIPTION
 
@@ -98,7 +98,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -402,7 +402,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007, 2009, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2007, 2009, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

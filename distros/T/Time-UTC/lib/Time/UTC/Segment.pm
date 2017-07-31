@@ -4,29 +4,29 @@ Time::UTC::Segment - segments of UTC definition
 
 =head1 SYNOPSIS
 
-	use Time::UTC::Segment;
+    use Time::UTC::Segment;
 
-	$seg = Time::UTC::Segment->start;
+    $seg = Time::UTC::Segment->start;
 
-	$tai = $seg->start_tai_instant;
-	$tai = $seg->end_tai_instant;
-	$len = $seg->length_in_tai_seconds;
+    $tai = $seg->start_tai_instant;
+    $tai = $seg->end_tai_instant;
+    $len = $seg->length_in_tai_seconds;
 
-	$day = $seg->start_utc_day;
-	$day = $seg->last_utc_day;
-	$day = $seg->end_utc_day;
+    $day = $seg->start_utc_day;
+    $day = $seg->last_utc_day;
+    $day = $seg->end_utc_day;
 
-	$len = $seg->utc_second_length;
-	$secs = $seg->leap_utc_seconds;
+    $len = $seg->utc_second_length;
+    $secs = $seg->leap_utc_seconds;
 
-	$secs = $seg->last_day_utc_seconds;
-	$secs = $seg->length_in_utc_seconds;
+    $secs = $seg->last_day_utc_seconds;
+    $secs = $seg->length_in_utc_seconds;
 
-	$seg = $seg->prev;
-	$seg = $seg->next;
+    $seg = $seg->prev;
+    $seg = $seg->next;
 
-	if($seg->complete_p) { ...
-	$seg->when_complete(\&do_stuff);
+    if($seg->complete_p) { ...
+    $seg->when_complete(\&do_stuff);
 
 =head1 DESCRIPTION
 
@@ -58,12 +58,10 @@ use strict;
 
 use Carp qw(croak);
 use Digest::SHA1 qw(sha1_hex);
-use HTTP::Tiny 0.016 ();
 use Math::BigRat 0.13;
-use Net::FTP 1.21 ();
 use Time::Unix 1.02 ();
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 @Time::UTC::Segment::Complete::ISA = qw(Time::UTC::Segment);
 @Time::UTC::Segment::Incomplete::ISA = qw(Time::UTC::Segment);
@@ -223,6 +221,8 @@ sub _add_data_from_tai_utc_dat($$) {
 use constant _UNIX_EPOCH_MJD => Math::BigRat->new(40586);
 
 sub _download_tai_utc_dat() {
+	require Net::HTTP::Tiny;
+	Net::HTTP::Tiny->VERSION(0.001);
 	# Annoyingly, TAI-UTC data is not published with any
 	# indicator of the extent of its future validity.
 	# The IERS never says "there will be no leap second
@@ -234,15 +234,12 @@ sub _download_tai_utc_dat() {
 	# For this reason we only do a direct get from USNO;
 	# we do not use proxies which might serve old data.
 	my $unix_time = Time::Unix::time();
-	my $httpresp = HTTP::Tiny->new->get(
-			"http://maia.usno.navy.mil/ser7/tai-utc.dat");
-	unless($httpresp->{status} == 200) {
-		die "failed to download tai-utc.dat: ".
-			"@{[$httpresp->{status}]} @{[$httpresp->{reason}]}\n";
-	}
 	use integer;
 	my $now_mjd = $unix_time/86400 + _UNIX_EPOCH_MJD;
-	_add_data_from_tai_utc_dat($httpresp->{content}, $now_mjd + 7*7);
+	_add_data_from_tai_utc_dat(
+		Net::HTTP::Tiny::http_get(
+			"http://maia.usno.navy.mil/ser7/tai-utc.dat"),
+		$now_mjd + 7*7);
 }
 
 use constant _NTP_EPOCH_MJD => Math::BigRat->new(15020);
@@ -256,33 +253,18 @@ sub _ntp_second_to_tai_day($) {
 use constant _BIGRAT_ONE => Math::BigRat->new(1);
 
 sub _download_leap_seconds_list() {
-	my $ftp = Net::FTP->new("utcnist2.colorado.edu")
-		or die "failed to download leap-seconds.list: FTP error: $@\n";
-	$ftp->login("anonymous","-anonymous\@")
-		or die "failed to download leap-seconds.list: FTP error: ".
-			$ftp->message;
-	$ftp->binary
-		or die "failed to download leap-seconds.list: FTP error: ".
-			$ftp->message;
-	$ftp->cwd("pub")
-		or die "failed to download leap-seconds.list: FTP error: ".
-			$ftp->message;
-	my $ftpd = $ftp->retr("leap-seconds.list")
-		or die "failed to download leap-seconds.list: FTP error: ".
-			$ftp->message;
-	my $list = "";
-	while(1) {
-		my $n = $ftpd->sysread($list, 4096, length($list));
-		defined $n or die "failed to download leap-seconds.list: $!\n";
-		last if $n == 0;
-	}
-	$ftpd->close
-		or die "failed to download leap-seconds.list: FTP error: ".
-			$ftp->message;
+	require Net::FTP::Tiny;
+	Net::FTP::Tiny->VERSION(0.001);
+	my $list = Net::FTP::Tiny::ftp_get(
+			"ftp://utcnist2.colorado.edu/pub/leap-seconds.list");
 	die "malformed leap-seconds.list" unless $list =~ /\n\z/;
-	$list =~ /^\#h([ \t0-9a-fA-F]+)$/m
+	$list =~ /^\#h[\ \t]*
+			([0-9a-fA-F]{1,8}(?:[\ \t]+[0-9a-fA-F]{1,8}){4})
+			[\ \t]*$/xm
 		or die "no hash in leap-seconds.list";
-	(my $hash = $1) =~ tr/A-F \t/a-f/d;
+	(my $hash = $1) =~ tr/A-F/a-f/;
+	$hash =~ s/([0-9a-f]+)/("0" x (8 - length($1))).$1/eg;
+	$hash =~ tr/ \t//d;
 	my $data_to_hash = "";
 	while($list =~ /^(?:\#[\$\@])?[ \t]*([0-9][^\#\n]*)[#\n]/mg) {
 		$data_to_hash .= $1;
@@ -602,25 +584,25 @@ sub Time::UTC::Segment::Incomplete::when_complete {
 
 The following relations hold for all segments:
 
-	$seg->length_in_tai_seconds ==
-		$seg->end_tai_instant - $seg->start_tai_instant
+    $seg->length_in_tai_seconds ==
+	$seg->end_tai_instant - $seg->start_tai_instant
 
-	$seg->last_utc_day + 1 == $seg->end_utc_day
+    $seg->last_utc_day + 1 == $seg->end_utc_day
 
-	$seg->last_day_utc_seconds == 86400 + $seg->leap_utc_seconds
+    $seg->last_day_utc_seconds == 86400 + $seg->leap_utc_seconds
 
-	$seg->length_in_utc_seconds ==
-		86400 * ($seg->last_utc_day - $seg->start_utc_day) +
-			$seg->last_day_utc_seconds
+    $seg->length_in_utc_seconds ==
+	86400 * ($seg->last_utc_day - $seg->start_utc_day) +
+	    $seg->last_day_utc_seconds
 
-	$seg->length_in_tai_seconds ==
-		$seg->length_in_utc_seconds * $seg->utc_second_length
+    $seg->length_in_tai_seconds ==
+	$seg->length_in_utc_seconds * $seg->utc_second_length
 
-	$seg->next->prev == $seg
+    $seg->next->prev == $seg
 
-	$seg->end_tai_instant == $seg->next->start_tai_instant
+    $seg->end_tai_instant == $seg->next->start_tai_instant
 
-	$seg->end_utc_day == $seg->next->start_utc_day
+    $seg->end_utc_day == $seg->next->start_utc_day
 
 =head1 SEE ALSO
 
@@ -632,7 +614,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, 2006, 2007, 2009, 2010, 2012
+Copyright (C) 2005, 2006, 2007, 2009, 2010, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
@@ -684,4 +666,6 @@ __DATA__
 2006 JAN  1 =JD 2453736.5  TAI-UTC=  33.0       S + (MJD - 41317.) X 0.0      S
 2009 JAN  1 =JD 2454832.5  TAI-UTC=  34.0       S + (MJD - 41317.) X 0.0      S
 2012 JUL  1 =JD 2456109.5  TAI-UTC=  35.0       S + (MJD - 41317.) X 0.0      S
-2013 JAN  1 =JD 2456293.5  unknown
+2015 JUL  1 =JD 2457204.5  TAI-UTC=  36.0       S + (MJD - 41317.) X 0.0      S
+2017 JAN  1 =JD 2457754.5  TAI-UTC=  37.0       S + (MJD - 41317.) X 0.0      S
+2018 JUL  1 =JD 2458300.5  unknown

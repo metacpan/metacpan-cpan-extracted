@@ -20,12 +20,16 @@ use Exporter qw/import/;
 
 BEGIN
 {
-  our @EXPORT_OK
-    = qw/url_re info success dest_dir inflate_archive run restart_script/;
+  our @EXPORT_OK = qw/
+    url_re git_re git_extract_re
+    logmsg info success error
+    dest_dir inflate_archive
+    run restart_script
+    /;
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -120,10 +124,10 @@ sub main
   local $VERBOSE = $options->{verbose} // $VERBOSE;
   local $QUIET   = $options->{quiet}   // $QUIET;
 
-  my $dest_dir = &dest_dir;
-  my $cmd      = ucfirst lc shift @argv;
-  my $pkg      = join( '::', __PACKAGE__, $cmd );
-  my $action   = eval { $pkg->can('go') };
+  my $cmd    = ucfirst lc shift @argv;
+  my $pkg    = join( '::', __PACKAGE__, $cmd );
+  my $action = eval { $pkg->can('go') };
+  my $munge  = eval { $pkg->can('munge_args') };
 
   if ( !defined $action )
   {
@@ -140,6 +144,12 @@ sub main
 
   $options->{is_restarted_process} = $is_restarted_process;
 
+  if ( defined $munge )
+  {
+    @argv = $pkg->$munge( $options, @argv );
+  }
+
+  my $dest_dir = &dest_dir;
   if ( !-d $dest_dir )
   {
     mkdir $dest_dir;
@@ -162,7 +172,7 @@ sub main
 
   if ( !defined $ret )
   {
-    warn $@;
+    error($@);
     return -1;
   }
 
@@ -174,9 +184,57 @@ sub url_re
   state $url_re = qr[
     ^
     (?: ftp | http | https | file )
-    :
+    : //
   ]xmsi;
   return $url_re;
+}
+
+sub git_re
+{
+  state $git_re = qr[
+    ^ (?: git | ssh ) :
+    |
+    [.]git (?: @|$ )
+  ]xmsi;
+  return $git_re;
+}
+
+sub git_extract_re
+{
+  state $re = qr[
+    ^
+    (                   # git url capture
+      .* ://
+      (?: \w*@)?      # Might have an @ for user@url
+      .*?               # Capture the rest
+    )
+    (?:                 # git commit id capture
+      @
+      ([^@]*)           # Evertyhing after @ is a commit_id
+    )?
+    $
+  ]xmsi;
+
+  return $re;
+}
+
+sub logmsg
+{
+  my @lines = @_;
+
+  return
+    unless defined $LOGFH;
+
+  foreach my $line (@lines)
+  {
+    if ( $line !~ m/\n$/xms )
+    {
+      $line .= "\n";
+    }
+    print $LOGFH $line;
+  }
+
+  return;
 }
 
 sub info
@@ -207,6 +265,20 @@ sub success
   status( $key, 'GREEN', $line );
 }
 
+sub error
+{
+  my $key  = shift;
+  my $line = shift;
+
+  if ( !defined $line )
+  {
+    $line = $key;
+    undef $key;
+  }
+
+  status( $key, 'RED', $line );
+}
+
 my $RESET = Term::ANSIColor::color('RESET');
 my $BOLD  = Term::ANSIColor::color('BOLD');
 
@@ -225,6 +297,8 @@ sub _show_line
 
   if ( !defined $key )
   {
+    # Scroll Up 1 line
+    print STDERR "\n";
     $idx = -1;
   }
 
@@ -254,8 +328,9 @@ sub _show_line
   # \e[.E  - Move down from the current line, back to the end of the list
   print STDERR "\e[${idx}F";
   print STDERR "\e[K";
-  print STDERR "$color$line$RESET";
-  print STDERR "\e[${idx}E";
+  print STDERR "$color$line$RESET\n";
+  print STDERR "\e[" . ( $idx - 1 ) . "E"
+    if $idx > 1;
 
   return;
 }
@@ -272,6 +347,8 @@ sub status
     $color = 'RESET';
   }
 
+  logmsg($line);
+
   return
     if $QUIET;
 
@@ -280,7 +357,7 @@ sub status
   state @last_key;
 
   # Undo the last line that is bold
-  if ( @last_key && !$VERBOSE )
+  if ( @last_key && !$VERBOSE && $last_key[0] ne $key )
   {
     _show_line(@last_key);
   }
@@ -345,7 +422,7 @@ sub inflate_archive
 
   my $dir = tempdir(
     TEMPLATE => File::Spec->tmpdir . '/mechacpan_XXXXXXXX',
-    CLEANUP  => 1
+    CLEANUP  => 1,
   );
   my $orig = cwd;
 
@@ -414,12 +491,14 @@ sub run
   }
 
   # If the output is asked for (non-void context), don't show it anywhere
+  #<<<
   if ($wantoutput)
   {
-    open $dest_out_fh, ">", \$out;
-    open $dest_err_fh, ">", \$err;
+    undef $dest_out_fh; open $dest_out_fh, ">", \$out;
+    undef $dest_err_fh; open $dest_err_fh, ">", \$err;
     undef $print_output;
   }
+  #>>>
 
   my ( $output, $output_chld ) = _genio;
   my ( $error,  $error_chld )  = _genio;

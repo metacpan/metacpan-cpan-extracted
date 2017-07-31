@@ -18,7 +18,7 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.911';
+our $VERSION = '0.912';
 
 use constant WIN32 => $^O eq 'MSWin32';
 
@@ -202,6 +202,8 @@ sub cmd_version {
 
 sub cmd_exec {
     my ($self, @argv) = @_;
+    warn "WARN: exec subcommand is deprecated.\n"
+        ."WARN: Please use `perl -I\$PWD/local/lib/perl5 ...` or `env PERL5LIB=\$PWD/local/lib/perl5 perl ...`.\n";
     my $local_lib = $self->maybe_abs($self->{local_lib});
     if (-d "$local_lib/lib/perl5") {
         $ENV{PERL5LIB} = "$local_lib/lib/perl5"

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  development:
+    build: .
+    volumes:
+      - .:/opt/Net-Amazon-DynamoDB-Marshaler
+      - $HOME/.gitconfig:/home/app/.gitconfig
+      - $HOME/.ssh/id_rsa:/home/app/.ssh/id_rsa
+    env_file: .env

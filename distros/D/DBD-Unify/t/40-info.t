@@ -24,6 +24,7 @@ ok (exists $tbl{"SYS.ACCESSIBLE_TABLES"}, "base table existance");
 
 my ($catalog, $schema, $table, $type, $rw);
 ok (1, "-- table_info ()");
+is ($dbh->uni_clear_cache (), undef, "Clear SYS cache");
 my $sth; # $dbh->table_info () returns a handle to be fetched
 ok ($sth = $dbh->table_info (), "table_info ()");
 ok ($sth->bind_columns (\($catalog, $schema, $table, $type, $rw)), "bind");

@@ -3,40 +3,42 @@ abstract: 'determine current time in UTC correctly'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Data::Dumper: 0
-  ExtUtils::CBuilder: 0.15
-  IO::File: 0
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Data::Dumper: '0'
+  ExtUtils::CBuilder: '0.15'
+  IO::File: '0'
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Time-UTC-Now
 provides:
   Time::UTC::Now:
     file: lib/Time/UTC/Now.pm
-    version: 0.010
+    version: '0.011'
 requires:
-  Exporter: 0
-  Math::BigRat: 0.13
-  Time::Unix: 1.02
-  XSLoader: 0
-  constant: 0
-  parent: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Exporter: '0'
+  Math::BigRat: '0.13'
+  Time::Unix: '1.02'
+  XSLoader: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Time-UTC-Now
   license: http://dev.perl.org/licenses/
-version: 0.010
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

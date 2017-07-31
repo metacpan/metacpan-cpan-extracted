@@ -1,14 +1,8 @@
 use strict;
 use warnings;
 
-eval {
-    require Storable;
-    print "1..3\n";
-};
-if ($@) {
-    print "1..0 # skipped: Needs the Storable module installed\n";
-    exit;
-}
+use Test::Needs 'Storable';
+print "1..3\n";
 
 system($^X, "-Iblib/lib", "t/storable-test.pl", "store");
 system($^X, "-Iblib/lib", "t/storable-test.pl", "retrieve");

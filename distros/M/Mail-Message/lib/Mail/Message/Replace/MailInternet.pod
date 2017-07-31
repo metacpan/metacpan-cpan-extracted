@@ -421,7 +421,7 @@ STDOUT.  This calls L<Mail::Message::print()|Mail::Message/"The message">.
 =item $obj-E<gt>B<send>($type, %options)
 
 Send via Mail Transfer Agents (MUA).  These will be handled by various
-Mail::Transport::Send extensions.  The C<test> $type is not supported.
+L<Mail::Transport::Send|Mail::Transport::Send> extensions.  The C<test> $type is not supported.
 
 =item $obj-E<gt>B<size>()
 
@@ -474,7 +474,7 @@ Delete the fields with the specified $name.  The deleted fields are
 returned.
 
 BE WARNED: if no $name is specified, the C<delete> is interpreted as
-the deletion of the message in a folder, so Mail::Box::Message subroutine delete
+the deletion of the message in a folder, so L<Mail::Box::Message::delete()|Mail::Message/"Flags">
 will be called.  This may have no negative effect at all...
 
 Calls L<Mail::Message::Replace::MailHeader::delete()|Mail::Message::Replace::MailHeader/"Access to the header">
@@ -619,7 +619,7 @@ L<Mail::Message::Body::stripSignature()|Mail::Message::Body::Construct/"Construc
 =item $obj-E<gt>B<smtpsend>(%options)
 
 This method is calling L<Mail::Message::send()|Mail::Message/"The message"> via C<smtp>, which is
-implemented in Mail::Transport::SMTP.  The implementation is
+implemented in L<Mail::Transport::SMTP|Mail::Transport::SMTP>.  The implementation is
 slightly different, so this method is not 100% compliant.
 
  -Option  --Default
@@ -706,7 +706,7 @@ Extends L<"The whole message as text" in Mail::Message|Mail::Message/"The whole 
 =item $obj-E<gt>B<as_mbox_string>()
 
 Returns the whole message as one string, which can be included in an
-MBOX folder (while not using Mail::Box::Mbox).  Lines in the body
+MBOX folder (while not using L<Mail::Box::Mbox|Mail::Box::Mbox>).  Lines in the body
 which start with C<From > are escaped with an E<gt>.
 
 =item $obj-E<gt>B<file>()
@@ -915,7 +915,7 @@ If a forward message is created, a destination address must be specified.
 You may wish to construct a message to be stored in a some kind
 of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
-Mail::Box subroutine addMessage process, the message will get L<coerce()|Mail::Message::Replace::MailInternet/"Internals">-d
+L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message::Replace::MailInternet/"Internals">-d
 into the right message type, adding storage information and the like.
 
 =item Error: Package $package does not implement $method.
@@ -930,13 +930,13 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.000,
-built on February 02, 2017.
+This module is part of Mail-Message distribution version 3.001,
+built on July 26, 2017.
 
 Do not forget to read
-L</Mail::Box-Overview>,
-L</Mail::Box-Cookbook>, and
-L</Mail::Box-Index>.
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
 Examples are included in the Mail-Box distribution, directories 'examples'
 and 'scripts'.
 
@@ -944,15 +944,15 @@ Browseable manuals, papers, and other released material van be found
 at  Website: F<http://perl.overmeer.net/mailbox/>
 
 The central modules (in separate distributions) in the MailBox suite are:
-L</Mail::Message>,
-L</Mail::Box>,
-L</Mail::Box::IMAP4>,
-L</Mail::Box::POP3>,
-L</Mail::Box::Parser::C>,
-L</Mail::Box::Dbx> (unpublished),
-L</Mail::Transport>,
-L</Object::Realize::Later>, and
-L</User::Identity>.
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
 
 Please post questions or ideas to the author F<markov@cpan.org>.
 
@@ -962,5 +962,5 @@ Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -16,7 +16,7 @@ has abstract => sub {
 has [qw(auto_migrate parent search_path)];
 has database_class  => 'Mojo::Pg::Database';
 has dsn             => 'dbi:Pg:';
-has max_connections => 5;
+has max_connections => 1;
 has migrations      => sub {
   my $migrations = Mojo::Pg::Migrations->new(pg => shift);
   weaken $migrations->{pg};
@@ -38,7 +38,7 @@ has pubsub => sub {
   return $pubsub;
 };
 
-our $VERSION = '4.0';
+our $VERSION = '4.01';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -368,7 +368,7 @@ Data source name, defaults to C<dbi:Pg:>.
   $pg     = $pg->max_connections(3);
 
 Maximum number of idle database handles to cache for future use, defaults to
-C<5>.
+C<1>.
 
 =head2 migrations
 

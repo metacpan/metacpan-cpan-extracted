@@ -1,5 +1,10 @@
 use ExtUtils::MakeMaker;
 
+if ($^O =~ 'freebsd'){
+    print "Can't run on $^O\n";
+    exit;
+}
+
 WriteMakefile(
     NAME              => 'RPi::ADC::ADS',
     VERSION_FROM      => 'lib/RPi/ADC/ADS.pm',
@@ -22,6 +27,7 @@ WriteMakefile(
             },
         },
     },
+    LICENSE => 'perl_5',
     PREREQ_PM         => {
     },
 #    CCFLAGS => => '-Wno-unused-result',

@@ -23,7 +23,8 @@ BEGIN {
 
 plan tests => 351;
 
-use t::common qw( new_fh );
+use lib 't';
+use common qw( new_fh );
 use File::Spec;
 use Test::Deep;
 

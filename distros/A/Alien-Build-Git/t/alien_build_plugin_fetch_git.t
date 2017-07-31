@@ -5,7 +5,7 @@ use lib 't/lib';
 use Repo;
 use Capture::Tiny qw( capture_merged );
 use Path::Tiny qw( path );
-use Test2::Compare::Custom;
+use Test2::Tools::URL;
 
 my $build = alienfile_ok q{
   use alienfile;
@@ -77,26 +77,35 @@ subtest 'fetch without tag' => sub {
       field list => array {
         item hash {
           field filename => '0.01';
-          field url      => $url_check;
+          field url      => url {
+            url_component scheme   => 'file';
+            url_component host     => 'localhost';
+            url_component path     => $example1;
+            url_component fragment => '0.01';
+          };
         };
         item hash {
           field filename => '0.02';
-          field url      => $url_check;
+          field url      => url {
+            url_component scheme   => 'file';
+            url_component host     => 'localhost';
+            url_component path     => $example1;
+            url_component fragment => '0.02';
+          };
         };
         item hash {
           field filename => '0.03';
-          field url      => $url_check;
+          field url      => url {
+            url_component scheme   => 'file';
+            url_component host     => 'localhost';
+            url_component path     => $example1;
+            url_component fragment => '0.03';
+          };
         };
         end;
       };
     },
   );
-  
-  is(
-    [map { $_->fragment } map { URI->new($_->{url}) } @{ $ret->{list} || [] }],
-    [qw( 0.01 0.02 0.03 )],
-  );
-
 };
 
 done_testing

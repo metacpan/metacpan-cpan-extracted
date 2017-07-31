@@ -60,23 +60,29 @@ my %wm = (
 
     LINKTYPE      =>   "dynamic",
     INC           =>   "-I$UNITOP -I$UNITOP/include -I\$(DBI_INSTARCH_DIR)",
-    OBJECT        =>   "Unify\$(OBJ_EXT) dbdimp\$(OBJ_EXT)",
+    OBJECT        => ( join " " =>
+			"Unify\$(OBJ_EXT)",
+			"dbdimp\$(OBJ_EXT)",
+			$ULIBS,
+			$ULDOPTS, {
+			    hpux	=> "",
+			    aix		=> "-lm",
+			    dec_osf	=> "-lxnet",
+			    }->{$^O} || ""),
 
     depend        => { "dbdimp\$(OBJ_EXT)" => "dbdimp.c Unify.h",
 		       "Unify\$(OBJ_EXT)"  => "Unify.h",
 		       },
 
-    dynamic_lib   => { OTHERLDFLAGS => " $ULIBS \$(COMPOBJS) " .
-					    "-L$UNIFY " .(
-					    { hpux	=> "",
-					      aix	=> "-lm",
-					      dec_osf	=> "-lxnet",
-					      }->{$^O}||"") . $ULDOPTS,
+    dynamic_lib   => { OTHERLDFLAGS => join " " => "",
+			"-L$UNIFY",
+			"\$(COMPOBJS)",
 		       },
     macro         => { EPP    => "$UNITOP/bin/EPP",
 		       EPPOPT => "",
 		       CC     => ($^O eq "aix" ? "env UPPNAME='cc -E' " : "")
 		       			. "$UNITOP/bin/ucc",
+		       TARFLAGS       => "--format=ustar -c -v -f",
 		       SELINUXENABLED => "/usr/sbin/selinuxenabled",
 		       },
     );
@@ -85,6 +91,22 @@ $eummv > 6.30				and $wm{LICENSE} = "perl";
 $Config{myarchname} eq "ia64-hpux"	and delete $wm{macro}{CC};
 
 my $rv = WriteMakefile (%wm);
+
+# perlcriticrc uses Config::Tiny, which does not support nesting
+if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
+    open my $fh, ">", ".perlcriticrc";
+    print $fh do {
+	local (@ARGV, $/) = ("$ENV{HOME}/.perlcriticrc"); <> };
+    print $fh join "\n" => "",
+	"[-Documentation::RequireLinkedURLs]\n", # L<DBI|http://...] requires 5.12
+	"[-Modules::ProhibitMultiplePackages]\n",
+	"[-Modules::RequireExplicitPackage]\n",			# use 5.8.0
+	"[-Subroutines::ProhibitBuiltinHomonyms]\n",		# connect
+	"[-Subroutines::ProtectPrivateSubs]\n",
+	"[-ValuesAndExpressions::ProhibitVersionStrings]\n",	# use 5.8.0
+	"";
+    close $fh;
+    }
 
 if ($rv && <ulib/*.s[lo] >) {
     open my $mf, "<Makefile" or die "Cannot read Makefile: $!\n";
@@ -96,8 +118,7 @@ if ($rv && <ulib/*.s[lo] >) {
     close $mf;
     }
 
-sub CheckUnify
-{
+sub CheckUnify {
     unless (exists $ENV{UNIFY}) {
 	print STDERR
 	    "\$UNIFY not set.  This probably means that you either do not have\n",
@@ -173,8 +194,8 @@ sub CheckUnify
 		    (my $sl = "lib$a") =~ s/\.a$/.$dlext/o;
 		    $sl =~ s/^liblib/lib/;
 		    -f $sl and next;	# Already done;
-		    mkdir "_a_SL" or die "Cannot create temp dir for conversion: $!";
-		    chdir "_a_SL" or die "Cannot chdir to temp dir: $!";
+		    mkdir "_a_SL", 0775 or die "Cannot create temp dir for conversion: $!";
+		    chdir "_a_SL", 0775 or die "Cannot chdir to temp dir: $!";
 		    print STDERR "  Converting $a ...\n";
 		    system "ar x ../$a";
 		    system "ld -b +s -o ../$sl *.o";
@@ -203,8 +224,7 @@ sub CheckUnify
 
     # --- Check development environment
 
-    sub Check ($)
-    {
+    sub Check {
 	my $f = shift;
 	-r "$UNITOP/$f" && -s _ && (-x _ || $f !~ m/^bin/) and return;
 	die "I can't find $f\n".
@@ -232,8 +252,8 @@ sub CheckUnify
 
 package MY;
 
-sub postamble
-{
+sub postamble {
+    my @pc = -f ".perlcriticrc" ? ("\tperlcritic -1 Unify.pm") : ();
     join "\n" =>
 	DBI::DBD::dbd_postamble (),
 	'',
@@ -265,6 +285,7 @@ sub postamble
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	@pc,
 	'',
 	'linkext::',
 	'	if [ -x $(SELINUXENABLED) ] && $(SELINUXENABLED); then chcon -t textrel_shlib_t $(INST_ARCHLIB)/auto/$(FULLEXT)/$(DLBASE).so; fi',
@@ -274,8 +295,7 @@ sub postamble
 	'';
     } # postamble
 
-sub libscan
-{
+sub libscan {
     my ($self, $path) = @_;
     ($path =~ m/\~$/) ? undef : $path;
     } # libscan

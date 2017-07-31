@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000007';
+our $VERSION = '1.000008';
 
 use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
 use App::GHPT::WorkSubmitter::AskPullRequestQuestions;
@@ -131,6 +131,7 @@ sub run ($self) {
 sub _append_question_answers ( $self, $text ) {
     my $qa_markdown = App::GHPT::WorkSubmitter::AskPullRequestQuestions->new(
         merge_to_branch_name => 'origin/' . $self->base,
+        question_namespaces  => $self->_question_namespaces,
     )->ask_questions;
     return $text unless defined $qa_markdown and length $qa_markdown;
     return join "\n\n",

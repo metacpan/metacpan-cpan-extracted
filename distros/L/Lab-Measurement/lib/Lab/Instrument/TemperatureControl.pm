@@ -1,6 +1,6 @@
-
 package Lab::Instrument::TemperatureControl;
-$Lab::Instrument::TemperatureControl::VERSION = '3.553';
+#ABSTRACT: Generic temperature control instrument base class
+$Lab::Instrument::TemperatureControl::VERSION = '3.554';
 use strict;
 
 our @ISA = ('Lab::Instrument');
@@ -59,13 +59,33 @@ sub _get_temperature() {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Instrument::TemperatureControl - base class for temperature control instruments
+Lab::Instrument::TemperatureControl - Generic temperature control instrument base class
 
-  (c) 2011 Andreas K. Hüttel
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2009       Andreas K. Huettel
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -6,7 +6,7 @@ use warnings;
 use Test::More tests => 1;
 
 BEGIN {
-	use_ok( 'with' );
+ use_ok( 'with' );
 }
 
 diag( "Testing with $with::VERSION, Perl $], $^X" );

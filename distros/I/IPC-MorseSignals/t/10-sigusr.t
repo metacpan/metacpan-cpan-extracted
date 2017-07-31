@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 4;
 
-use POSIX qw/SIGUSR1 SIGUSR2/;
+use POSIX qw<SIGUSR1 SIGUSR2>;
 
 my ($a, $b) = (0, 0);
 

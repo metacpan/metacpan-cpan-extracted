@@ -24,4 +24,4 @@ die "Can't generate script: $res->[0] - $res->[1]"
 
 my $content = $res->[2] . "\n\n" . read_text("$Bin/../devdata/pause.pod");
 
-write_text("$Bin/../bin/pause", $content);
+write_text("$Bin/../script/pause", $content);

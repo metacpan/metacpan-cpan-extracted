@@ -45,6 +45,8 @@ use Test::More;
      # lsb == msb
 
     $ok = eval { bit_get($d, 8, 8); 1; };
-    is $ok, 1, "lsb == msb dies ok";
+    is $ok, 1, "lsb == msb does not die";
+
+    is bit_get($d, 7, 7), 1, "msb can equal lsb (issue #2)";
 }
 done_testing();

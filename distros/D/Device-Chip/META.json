@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -32,22 +32,22 @@
    "provides" : {
       "Device::Chip" : {
          "file" : "lib/Device/Chip.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Device::Chip::Adapter" : {
          "file" : "lib/Device/Chip/Adapter.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Device::Chip::Base::RegisteredI2C" : {
          "file" : "lib/Device/Chip/Base/RegisteredI2C.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Device::Chip::Ex::GPIOTickitUI" : {
          "file" : "lib/Device/Chip/Ex/GPIOTickitUI.pm"
       },
       "Test::Device::Chip::Adapter" : {
          "file" : "lib/Test/Device/Chip/Adapter.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

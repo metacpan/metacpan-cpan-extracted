@@ -8,7 +8,7 @@ ok(push @CORBA::IDLtree::include_path, "t");
    # For future tests that use include files.
 
 my $symroot;
-$CORBA::IDLtree::support_module_reopening = 1;
+$CORBA::IDLtree::long_double_supported = 1;
 ok($symroot = CORBA::IDLtree::Parse_File "t/orbit-everything.idl");
 ok(CORBA::IDLtree::Dump_Symbols $symroot);
 ok($symroot = CORBA::IDLtree::Parse_File "t/reopened_module.idl");

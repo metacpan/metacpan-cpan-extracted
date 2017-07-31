@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.66.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,24 +14,23 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 90be75c934cb6c2e5a48d2442c14dbe2e6abaf16 .cvsignore
-SHA1 32779d1882014031a5b197ac5b5c45bc8c255bc4 Build.PL
-SHA1 c4bd5b2a58f82aae179338069db33e99359bad52 Changes
-SHA1 e26cc984acc177f221ff8a9f2c8d666a42625c5a MANIFEST
-SHA1 44e4cb2c3baf9df1adf10a32f3e5ae8de548b91e META.json
-SHA1 8de0648e2768245006563666f3a6e184a0425f55 META.yml
-SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
-SHA1 29fafc13a97eeafe87e192c42342f8fc83f6f0d1 README
-SHA1 c2af1070591c8f054e89778afd7aed2586f2fb90 lib/Date/Darian/Mars.pm
+SHA1 edd22c9556e6b0dcac9d15784d92f7404259de7a .gitignore
+SHA1 48e08ad187610c2191af4abc8de4042485828dd5 Build.PL
+SHA1 8dbc08c9fb1c5d80ac22d03e920a82e73a39ac27 Changes
+SHA1 69080b9cb2249156dc1e3673eb105823b3bb1c0c MANIFEST
+SHA1 84d3a761a4c705a6fc464545965ff8f5221a9a97 META.json
+SHA1 a6cc581432bad2d56b080bdb484f60beabdde72c META.yml
+SHA1 bdf09338bfc3877d9c3f27d2e297c341e4195d75 README
+SHA1 e4f53f7d0e94bd75c15d9ef76c7c555829d37288 lib/Date/Darian/Mars.pm
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 a99514af715c7cd6139e8ac2aa2ad75400260ca4 t/y.t
 SHA1 e1928af9f51f5fd749b5407f46034a0c888caae0 t/yd.t
 SHA1 fc003b00a78e489da38d8c9a47fb0198e58da29b t/ymd.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk2gfMUACgkQOV9mt2VyAVHrqACfYCT9Lgf+PqlUMeVLqhfO621b
-o54AoKMxKLGYJq489h3uL2f2BDO8pKvf
-=Z/o+
+iEUEARECAAYFAll7afYACgkQOV9mt2VyAVGRZgCXfp91DCtcxuoY2Lb6QECoLlkT
+EQCfZik+GNU3iN+TYCqztrpzaNNrEic=
+=HGd3
 -----END PGP SIGNATURE-----

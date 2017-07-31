@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.66.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,31 +14,27 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 2e316e3644dcdb78c4d7235eda193a5e495de6b7 .cvsignore
-SHA1 700666988c988a9f1ef2258c07fdff853304dce6 Build.PL
-SHA1 beab60906b294529d48f38e58e77f24061b5afe5 Changes
-SHA1 3ea06ab671afdb9caba144b68ca5cd8f14f6d1f2 MANIFEST
-SHA1 d5669a96dc9957d610bf756a5dd7febda0577d25 META.json
-SHA1 06603c6701391cf761aa6ee4c442c0fecc636ecf META.yml
-SHA1 53380dfd209add8663abe51f6ee717b92e03c861 Makefile.PL
-SHA1 96c32044be56ef5fb86408975a9b2743c6548365 README
-SHA1 da97efc18cd78eb50b0eb2f58aad47b6ed399e8c lib/Scope/.cvsignore
-SHA1 330d986f8b90d763f4e9f1f86946b9e2c2431371 lib/Scope/Escape.pm
-SHA1 1957b47e9bb8cad659dcc11d6c99fac68e721eae lib/Scope/Escape.xs
-SHA1 ef33fc3a354df784778da424be13bccabaab23be lib/Scope/Escape/Continuation.pod
+SHA1 24d07521071d5c1882abf437a0df7ed086ad753a .gitignore
+SHA1 48aff4925bf03e59f056a0e3becb8bf91cabb83e Build.PL
+SHA1 bfff74c82f7ba1695af83cc4615af7b6fc74c804 Changes
+SHA1 93b088d079c11545f1fe4cb0447c481399067ede MANIFEST
+SHA1 c37d1c600df37901f5e48f607622d6894f8d9be8 META.json
+SHA1 c084c6ffde3aecb5fcc6df387df7c7e66b019401 META.yml
+SHA1 9b8e2ea2e34e668520b19664ffe3fe9d49cb18ae README
+SHA1 0ab97ad7cc080d5575e317f7d6607f88e254830a lib/Scope/Escape.pm
+SHA1 2528bf306ecad04569866fe534d0c867bf95eced lib/Scope/Escape.xs
+SHA1 997b3d13aae463420405338c72186d32b3cfe401 lib/Scope/Escape/Continuation.pod
 SHA1 e0075d9fa9530701d2f6a0ba72b5c9a9bc97e948 t/catcher_escape.t
 SHA1 1a457848ed1023c7458188e190810d7a23ab2090 t/catcher_eval.t
 SHA1 d53d8b9994c1d727499c6079aa3a112649a09aa6 t/cross_stacks.t
 SHA1 8b290ca64392952e05f9a0942b16e3a3efcf0854 t/cxinc.t
-SHA1 a29b6f587ff2eac2cad759711f5c820502761ec0 t/die.t
-SHA1 9b224d251b97b9737f62d4be16087c2eb7e98ad9 t/eval_barrier.t
-SHA1 2d74cdfe25c3d9fa12c2c23fab63ae0f5d81e028 t/eval_barrier_req.pl
+SHA1 0cf3ee1947f26b8cc6df6480616a775f57f0f8ce t/die.t
+SHA1 aec3b3e9a57538b31390e9468169328830167be7 t/eval_barrier.t
 SHA1 355061fedfe57511686f1d00794adf1d47dfa0ac t/extent.t
 SHA1 3c90b6591182ebed259090aac82b49d460ccbb0b t/from_block.t
 SHA1 5b781b3ade9fc28bbdb7973c7434647b4a55f1d5 t/from_eval_block.t
-SHA1 8da7aaba0e2423f9458445017290bfd730a2afdf t/from_eval_dofile.t
-SHA1 96caffc77055709358105727f56ca46e02c89fbf t/from_eval_dofile_dd.pl
-SHA1 877d669ae06e7040f55185c19e6003ac51793deb t/from_eval_require.t
+SHA1 d5b77dc8d4f79e37a2d09e8105b0ae12bd2a7314 t/from_eval_dofile.t
+SHA1 45ff6fb006a52c16d610a6e4b17bc327718b3d90 t/from_eval_require.t
 SHA1 0b5e2e873843edf8974f840eecf29548792063e6 t/from_eval_string.t
 SHA1 def8997dd6da3e51f539f7beed6001101828984a t/from_format.t
 SHA1 bd66965f6cf42a64d8df6e4762d3eb60885a1501 t/from_loop_foreach.t
@@ -49,18 +45,21 @@ SHA1 b1405dc840ef50fdedde9d4abac03c9f64f3f511 t/from_loop_while.t
 SHA1 bf2f0283144b16a780cc3bbd6aa0ff11956f1f43 t/from_null.t
 SHA1 fa62e470a92f349e70d6022460a0800b95157d59 t/from_sub.t
 SHA1 e362565876d4a901d5194ed7d7542dff64bfe8ec t/leximport.t
-SHA1 8075ef2e7b1ca7d7dff423c559079e2dbdae55af t/multi.t
+SHA1 2d74cdfe25c3d9fa12c2c23fab63ae0f5d81e028 t/lib/t/eval_barrier_req.pl
+SHA1 96caffc77055709358105727f56ca46e02c89fbf t/lib/t/from_eval_dofile_dd.pl
+SHA1 d024354ee7b6596a292c3035dad869104bbe46af t/multi.t
 SHA1 e75c9529fd53e7ce1dd3e4ebd234614d91f06df2 t/object.t
 SHA1 b65c8128a67d4d1885128e6fcc039b05dd4ea12c t/op_as_function.t
-SHA1 7778806eb20abc15ff0cb95fa267f5a58390b66c t/peep.t
+SHA1 be464742086fefbaea6f3ec8f4fbbb8c9fc825c7 t/peep.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 fa6eadc8c57b7073fef349f5fd1cf535888679e7 t/repackage.t
 SHA1 d48402ca8507cc085d4498d5aaa778e740350727 t/retval_life.t
+SHA1 574568a4a8ce5e0de38fddeb366941b4dfc317fb t/version_synch.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk24JFgACgkQOV9mt2VyAVHxsQCdEWW2lHVsiiw8S18sLYHlQ7Uv
-WZUAnjmuBs6JHqi2or85mpMmtWxieNVB
-=47mi
+iEYEARECAAYFAll7PfIACgkQOV9mt2VyAVECNACdGC7Huo8IFJ2k3NMWSsWLIIKr
+wxkAn1kMzMAYkH+n6MYEln5Rsi53MO/1
+=FVNN
 -----END PGP SIGNATURE-----

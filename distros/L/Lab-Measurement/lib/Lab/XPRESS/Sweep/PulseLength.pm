@@ -1,12 +1,11 @@
 package Lab::XPRESS::Sweep::PulseLength;
-#Dist::Zilla: +PodWeaver
-# ABSTRACT: Pulse length sweep
-$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.553';
-use Lab::XPRESS::Sweep::Sweep;
+#ABSTRACT: Pulse length sweep
+$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.554';
+use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
 
-our @ISA = ('Lab::XPRESS::Sweep::Sweep');
+our @ISA = ('Lab::XPRESS::Sweep');
 
 sub new {
     my $proto                  = shift;
@@ -93,7 +92,7 @@ Lab::XPRESS::Sweep::PulseLength - Pulse length sweep
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -120,7 +119,7 @@ version 3.553
 
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Frequency class implements a module for frequncy sweeps in the Lab::XPRESS::Sweep framework.
 

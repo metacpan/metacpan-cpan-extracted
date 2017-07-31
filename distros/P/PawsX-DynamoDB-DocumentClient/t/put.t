@@ -42,6 +42,29 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            Item => {
+                username => '1234',
+                rank     => 2,
+            },
+            TableName => 'users',
+            force_type => {
+                username => 'S',
+            },
+        )
+    },
+    {
+        Item => {
+            username => { S => '1234' },
+            rank     => { N => '2' },
+        },
+        TableName => 'users',
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output = Paws::DynamoDB::PutItemOutput->new();
 is(
     $class->transform_output($test_output),

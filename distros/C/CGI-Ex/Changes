@@ -1,10 +1,24 @@
+2.45
+    2017-07-23
+        * Lost commits from 2.43 have been restored in this version
+        * Allow HTML5 input types to be filled
+        * Fix bug that prevents bounce_on_logout from deleting the auth cookie
+        * Silence warning about CGI::param in list context
+        * Fix tests on perl 5.26.0 (thanks to Petr Písař)
+        * Smarter feature detection for JSON module (thanks to Petr Písař)
+        * Declare perl version required
+        * Add CGI.pm to pre-reqs
+        * Upgrade Makefile.PL
+        * No longer indexing 'samples' directory
+        * Updated the copyright year to 2017
+
 2.44
-    2015-10-7
+    2015-10-07
         * Restoring the version number in several modules
         * Updated the copyright year to 2015
 
 2.43
-    2015-10-1
+    2015-10-01
         * Fixing POD errors
         * Restoring the README that got lost in 2.42
 

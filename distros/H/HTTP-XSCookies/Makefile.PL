@@ -13,6 +13,7 @@ WriteMakefile(
     TEST_REQUIRES  => {
         'Test::More'            => 0,
         'Data::Dumper'          => 0,
+        'Date::Parse'           => 0,
     },
     AUTHOR         => [
         'Gonzalo Diethelm (gonzus@cpan.org)',
@@ -41,7 +42,13 @@ sub cflags {
     my @cflags = split /\n/, $cflags;
 
     $self->{CCFLAGS} .= ' -Wall';                # Flag all warnings
-    $self->{CCFLAGS} .= ' -std=c89';             # Compile according to C89 standard
+
+    # solaris refuses to compile unless we are using C99
+    if ($^O eq 'solaris') {
+        $self->{CCFLAGS} .= ' -std=c99';
+    } else {
+        $self->{CCFLAGS} .= ' -std=c89';
+    }
 
     # Need this define for localtime_r(), except on FreeBSD
     if ($^O ne 'freebsd') {

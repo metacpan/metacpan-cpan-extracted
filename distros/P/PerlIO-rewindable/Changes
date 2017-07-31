@@ -1,3 +1,14 @@
+version 0.002; 2017-07-28
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * convert .cvsignore to .gitignore
+
 version 0.001; 2011-07-11
 
   * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation

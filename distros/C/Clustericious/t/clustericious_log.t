@@ -3,7 +3,6 @@ use warnings;
 use Test::Clustericious::Log import => ':all', diag => 'NONE', note => 'ALL';
 use Clustericious::Log -init_logging => "Froodle";
 use Test::More tests => 5;
-use File::HomeDir;
 use YAML::XS ();
 
 TRACE "trace";
@@ -12,9 +11,6 @@ INFO  "info";
 WARN  "warn";
 ERROR "error";
 FATAL "fatal";
-
-note "File::HomeDir::Test=$INC{'File/HomeDir/Test.pm'}";
-note "homedir: @{[ File::HomeDir->my_home ]}";
 
 cmp_ok log_events, '>', 0, 'log_events';
 

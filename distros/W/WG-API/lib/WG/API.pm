@@ -1,14 +1,7 @@
 package WG::API;
 
-use 5.014;
+use Modern::Perl '2015';
 use Moo;
-use LWP::UserAgent;
-
-use WG::API::NET;
-use WG::API::WoT;
-use WG::API::WoWs;
-use WG::API::WoWp;
-use WG::API::Auth;
 
 =encoding utf8
 
@@ -18,11 +11,11 @@ WG::API - Module for work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.5';
 
 =head1 SYNOPSIS
 
@@ -49,13 +42,15 @@ Rerquired application id: L<https://developers.wargaming.net/documentation/guide
 =cut 
 
 has application_id => (
-    is  => 'ro',
+    is      => 'ro',
     require => 1,
 );
 
+=head1 METHODS
+
 =over 1
 
-=item I<wot>
+=item B<wot>
 
 Returns a WoT instance
 
@@ -66,15 +61,17 @@ Returns a WoT instance
 sub wot {
     my $self = shift;
 
+    require WG::API::WoT;
+
     return WG::API::WoT->new(
-        application_id  => $self->application_id,
-        @_
+        application_id => $self->application_id,
+        @_,
     );
 }
 
 =over 1
 
-=item I<wowp>
+=item B<wowp>
 
 Returns A WoWp instance
 
@@ -85,15 +82,17 @@ Returns A WoWp instance
 sub wowp {
     my $self = shift;
 
+    require WG::API::WoWp;
+
     return WG::API::WoWp->new(
         application_id => $self->application_id,
-        @_
+        @_,
     );
 }
 
 =over 1
 
-=item I<wows>
+=item B<wows>
 
 Returns a WoWs instance
 
@@ -104,15 +103,17 @@ Returns a WoWs instance
 sub wows {
     my $self = shift;
 
+    require WG::API::WoWs;
+
     return WG::API::WoWs->new(
-        application_id  => $self->application_id,
-        @_
+        application_id => $self->application_id,
+        @_,
     );
 }
 
 =over 1
 
-=item I<net>
+=item B<net>
 
 Returns a NET instance
 
@@ -123,15 +124,17 @@ Returns a NET instance
 sub net {
     my $self = shift;
 
+    require WG::API::NET;
+
     return WG::API::NET->new(
-        application_id  => $self->application_id,
-        @_
+        application_id => $self->application_id,
+        @_,
     );
 }
 
 =over 1
 
-=item I<auth>
+=item B<auth>
 
 Return a Auth instance
 
@@ -141,9 +144,12 @@ Return a Auth instance
 
 sub auth {
     my $self = shift;
+
+    require WG::API::Auth;
+
     return WG::API::Auth->new(
         application_id => $self->application_id,
-        @_
+        @_,
     );
 }
 
@@ -190,7 +196,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -235,4 +241,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API
+1;    # End of WG::API

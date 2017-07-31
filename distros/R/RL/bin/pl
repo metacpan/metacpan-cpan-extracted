@@ -4,6 +4,7 @@ use RL;
 use Data::Dumper;
 use Getopt::Long;
 
+$| = 1;
 $SIG{"__WARN__"} = \&warner;
 
 GetOptions(

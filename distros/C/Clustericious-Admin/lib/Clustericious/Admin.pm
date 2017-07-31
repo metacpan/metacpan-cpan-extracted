@@ -6,7 +6,7 @@ use App::clad;
 use Carp ();
 
 # ABSTRACT: Parallel SSH client
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 
@@ -71,7 +71,7 @@ Clustericious::Admin - Parallel SSH client
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 

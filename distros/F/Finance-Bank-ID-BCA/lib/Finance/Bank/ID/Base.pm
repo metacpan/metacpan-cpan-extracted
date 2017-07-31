@@ -1,7 +1,7 @@
 package Finance::Bank::ID::Base;
 
 our $DATE = '2017-07-20'; # DATE
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 use 5.010;
 use Moo;
@@ -273,7 +273,7 @@ Finance::Bank::ID::Base - Base class for Finance::Bank::ID::BCA etc
 
 =head1 VERSION
 
-This document describes version 0.48 of Finance::Bank::ID::Base (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
+This document describes version 0.49 of Finance::Bank::ID::Base (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
 
 =head1 SYNOPSIS
 

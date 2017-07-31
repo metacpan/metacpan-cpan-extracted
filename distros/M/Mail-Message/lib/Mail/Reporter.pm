@@ -7,7 +7,7 @@ use warnings;
 
 package Mail::Reporter;
 use vars '$VERSION';
-$VERSION = '3.000';
+$VERSION = '3.001';
 
 
 use Carp;
@@ -25,7 +25,7 @@ for(my $l = 1; $l < @levelname; $l++)
 sub new(@)
 {   my $class = shift;
 #confess "Parameter list has odd length: @_" if @_ % 2;
-    (bless {}, $class)->init({@_});
+    (bless {MR_log => 1, MR_trace => 1}, $class)->init({@_});
 }
 
 my($default_log, $default_trace, $trace_callback);
@@ -115,6 +115,8 @@ sub log(;$@)
         my $text    = join '', @_;
         $trace_callback->($thing, $level, $text)
             if $prio >= $thing->{MR_trace};
+use Carp;
+$thing->{MR_trace} or confess;
 
         push @{$thing->{MR_report}[$prio]}, $text
             if $prio >= $thing->{MR_log};

@@ -1,5 +1,6 @@
 package Lab::Instrument::ITC;
-$Lab::Instrument::ITC::VERSION = '3.553';
+#ABSTRACT: Oxford Instruments ITC Intelligent Temperature Control
+$Lab::Instrument::ITC::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Lab::MultiChannelInstrument;
@@ -441,13 +442,19 @@ sub get_heateroutput {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::Instrument::ITC - Oxford Instruments ITC Intelligent Temperature Control
+Lab::Instrument::ITC - Oxford Instruments ITC Intelligent Temperature Control
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -591,19 +598,17 @@ probably many
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This is $Id: ITC503.pm 618 2010-04-15 10:16:04Z huettel $
+  Copyright 2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Christian Butschkow
+            2016       Christian Butschkow, Simon Reinhardt
+            2017       Andreas K. Huettel
 
-Copyright 2010 David Kalok and Andreas K. Hüttel (L<http://www.akhuettel.de/>)
 
-Modified 2011 by Stefan Geissler
-
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
-
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

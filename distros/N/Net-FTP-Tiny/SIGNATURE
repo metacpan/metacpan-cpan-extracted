@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,27 +15,26 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 1836a9c8f56463104259bddeb5578b84106ce509 .gitignore
-SHA1 b4564824e091f1aeb67603b9d2fb74674d2435bd Build.PL
-SHA1 5db48e2cb31938efa0910c43729de8b93d398234 Changes
-SHA1 ee2a6e0e6d6511e3e0a53f2d0615d48baa183a72 MANIFEST
-SHA1 04790b8b3660b7ec9977503f4ae1f62cde9ef791 META.json
-SHA1 adde71331cae8bf3a63e784b32660a2035180115 META.yml
-SHA1 9158dcbbdf50934018f9e0a56b2ee96b0bdc037f Makefile.PL
-SHA1 f849d5b5b59a9007b5770b093ae876441793a4a2 README
-SHA1 62af8dc867afc71c4d8e808958a489c50c654fc2 lib/Net/FTP/Tiny.pm
+SHA1 3b919fa85d10eb3bb44a99d3eaf66ebb835e7af3 Build.PL
+SHA1 4f7a079877cb769cbcf8d1af81e738c3fa2a9166 Changes
+SHA1 81c4255956621a88815e879dc75c2fe26cc38fa0 MANIFEST
+SHA1 c205b71b88df6f4a6ac04bc1dabb513e3086f672 META.json
+SHA1 6879bef6e66f133ee664129a8073a9c003c2f763 META.yml
+SHA1 dc97e2ad967249295785ea348b3f823818756a2f README
+SHA1 46a9acef42ec577ed9746304b089d054fb4c75dd lib/Net/FTP/Tiny.pm
 SHA1 1251f4db7dfa35ece0025b4b8cb32c9f13dade64 t/dependency.t
 SHA1 c45fd2506f5311376485f34157fabbf68de50f24 t/get_cpan.at
 SHA1 39bc50959d14911338187c3fe9ca7beeadb6b54d t/get_cpan_noip.at
-SHA1 951c81b538d0654c442e6d0b29569404e67659a3 t/parse_ftp_url.t
+SHA1 1f34b64193fff73414a4e45691caeabfbd9dc146 t/parse_ftp_url.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 86da39c9cd43c353f9218a9f8ba8703df15de09c t/setup_noip.pl
 SHA1 1de2cb22e40e13c960506b4d8de312bbc6fdae28 t/upgraded.t
 SHA1 74f1ba5786e068c7f5f07206cf1a22e459e405ba t/use.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk9o3fIACgkQOV9mt2VyAVHZHQCfdfKEK/22XrxN3GPBpNF+a/oA
-tc0An2h06HrfYJ08WHXnKcPjAct69t01
-=okmP
+iEYEARECAAYFAll5aqoACgkQOV9mt2VyAVHvcgCfcRG8BRtqzUmm98rLqUVcYGyN
+/TAAnjeyiJmQHCuAHN/530M8c+b6obxW
+=q8dG
 -----END PGP SIGNATURE-----

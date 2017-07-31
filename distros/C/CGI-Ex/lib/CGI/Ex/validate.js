@@ -1,4 +1,4 @@
-// Copyright 2003-2015 - Paul Seamons - ver 2.44
+// Copyright 2003-2017 - Paul Seamons - ver 2.45
 // Distributed under the Perl Artistic License without warranty
 // See perldoc CGI::Ex::Validate for usage
 

@@ -4,11 +4,11 @@ Scope::Cleanup - reliably run code upon exit of dynamic scope
 
 =head1 SYNOPSIS
 
-	use Scope::Cleanup qw(establish_cleanup);
+    use Scope::Cleanup qw(establish_cleanup);
 
-	establish_cleanup sub { ... };
-	establish_cleanup \&do_cleanup;
-	establish_cleanup $cleanup_code_ref;
+    establish_cleanup sub { ... };
+    establish_cleanup \&do_cleanup;
+    establish_cleanup $cleanup_code_ref;
 
 =head1 DESCRIPTION
 
@@ -136,7 +136,7 @@ use strict;
 
 use Devel::CallChecker 0.003 ();
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(establish_cleanup);
@@ -173,7 +173,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2012, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

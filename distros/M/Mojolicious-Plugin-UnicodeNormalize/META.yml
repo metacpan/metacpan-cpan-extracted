@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +22,10 @@ name: Mojolicious-Plugin-UnicodeNormalize
 requires:
   Carp: '0'
   Mojo::Base: '0'
-  Mojolicious: '6.41'
+  Mojolicious: '7.0'
   Unicode::Normalize: '0'
 resources:
   homepage: https://github.com/chromatic/Mojolicious-Plugin-UnicodeNormalize
   repository: https://github.com/chromatic/Mojolicious-Plugin-UnicodeNormalize.git
-version: '1.20160509'
+version: '1.20170726'
+x_serialization_backend: 'YAML::Tiny version 1.70'

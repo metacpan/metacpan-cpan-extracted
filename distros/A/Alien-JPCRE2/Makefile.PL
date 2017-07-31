@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.042_000;
+our $VERSION = 0.050_000;
 
 use ExtUtils::MakeMaker;
 use Alien::Build::MM;
@@ -10,21 +10,21 @@ use Alien::Build::MM;
 BEGIN { 
     use Config;
     use English qw(-no_match_vars);  # for $OSNAME
-
-    # remove previous Alien build directory, ensure only one build process to be found by t/02_make_check.t
-    use File::Path qw(remove_tree);
-    my $removed_count = remove_tree('_alien');
-print {*STDERR} q{<<< DEBUG >>> in Makefile.PL, after calling remove_tree('_alien'), have $removed_count = }, $removed_count, "\n\n";
 }
 
-# fix read-only blib/lib in MS Windows
+# MS Windows OS, fix read-only blib/lib directory & enable GNU configure/make
+my $configure_requires_windows = {};
 if ( $OSNAME eq 'MSWin32' ) {
     push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
+    $configure_requires_windows = {
+        'Alien::MSYS'  => '0.08',
+        'Alien::gmake' => '0.20',
+    };
 }
 
 my $abmm = Alien::Build::MM->new;
 
-WriteMakefile($abmm->mm_args(
+my %WriteMakefile_args = $abmm->mm_args(
     NAME         => 'Alien::JPCRE2',
     DISTNAME     => 'Alien-JPCRE2',
     ABSTRACT     => 'Find Or Download/Build/Install libjpcre2 In JPCRE2',
@@ -37,10 +37,13 @@ WriteMakefile($abmm->mm_args(
     CONFIGURE_REQUIRES => {
         # DEV NOTE, CORRELATION #ap001: must install IO::Socket::SSL & Alien::Build from Makefile.PL (which becomes META.json, for CPAN) & .travis.yml & appveyor.yml 
         'IO::Socket::SSL'       => '2.043',
-        'Alien::Build'          => '0.61',  # provides Alien::Build::MM
-        'Alien::Build::MM'      => '0.61',
-        'Alien::PCRE2'          => '0.012',  # DEV NOTE, CORRELATION #aj00: NEED ANSWER, DOES THIS WORK VIA cpanm???
-        'File::Find::Rule'      => '0.34',  # used to find config.status file in t/02_make_check.t
+        'Alien::Build'          => '0.66',  # provides Alien::Build::MM
+        'Alien::PCRE2'          => '0.013',
+        %{$configure_requires_windows}
+    },
+
+    TEST_REQUIRES => {
+        'Test2::Suite'          => '0.000072',  # provides Test2::V0
     },
 
     META_MERGE => {
@@ -66,7 +69,19 @@ WriteMakefile($abmm->mm_args(
 #            x_wiki        => "https://NONE",
         },
     },
-));
+);
+
+unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
+    my $test_requires = delete $WriteMakefile_args{TEST_REQUIRES};
+    my $build_requires = delete $WriteMakefile_args{BUILD_REQUIRES};
+    $WriteMakefile_args{PREREQ_PM}{$_} = $test_requires->{$_} for keys %$test_requires;
+    $WriteMakefile_args{PREREQ_PM}{$_} = $build_requires->{$_} for keys %$build_requires;
+}
+
+delete $WriteMakefile_args{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
+
+WriteMakefile(%WriteMakefile_args);
 
 
 package MY;

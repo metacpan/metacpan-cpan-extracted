@@ -1,5 +1,5 @@
 package Log::Dispatch::FileRotate;
-$Log::Dispatch::FileRotate::VERSION = '1.27';
+$Log::Dispatch::FileRotate::VERSION = '1.29';
 # ABSTRACT: Log to Files that Archive/Rotate Themselves
 
 require 5.005;
@@ -13,6 +13,7 @@ use Log::Dispatch::File;   # We are a wrapper around Log::Dispatch::File
 
 use Date::Manip;  # For time based recurring rotations
 use File::Spec;   # For file-names
+use Fcntl ':flock'; # import LOCK_* constants
 
 use Params::Validate qw(validate SCALAR BOOLEAN);
 Params::Validate::validation_options( allow_extra => 1 );
@@ -63,7 +64,7 @@ sub new
 
 	my $lockfile = File::Spec->catpath($vol, $dir, ".".$f.".LCK");
 	warn "Lock file is $lockfile\n" if $self->{'debug'};
-	$self->{'lf'} = $lockfile;
+	$self->{lf} = $lockfile;
 
 	# Have we been called with a time based rotation pattern then setup
 	# timebased stuff. TZ is important and must match current TZ or all
@@ -203,17 +204,16 @@ sub log_message
 	# Prime our time based data outside the critical code area
 	my ($in_time_mode,$time_to_rotate) = $self->time_to_rotate();
 
-	# Handle critical code for logging. No changes if someone else is in
-	if( !$self->lfhlock_test() )
-	{
-		warn "$$ waiting on lock\n" if $self->{debug};
-		unless($self->lfhlock())
-		{
-			warn "$$ Log::Dispatch::FileRotate failed to get lock: ", $self->{_lfhlock_test_err}, ". Not logging.\n";
-			return;
-		}
-		warn "$$ got lock after wait\n" if $self->{debug};
+	# Handle critical code for logging. No changes if someone else is in.  We
+	# lock a lockfile, not the actual log filehandle because locking doesn't
+	# work properly if the logfile was opened in a parent process for example.
+	my $lfh;
+	unless ($lfh = flopen($self->{lf})) {
+		warn "$$ Log::Dispatch::FileRotate failed to get lock: $!. Not logging.\n";
+		return;
 	}
+
+	warn "$$ got lock\n" if $self->{debug};
 
 	my $have_to_rotate = 0;
 	my $size   = (stat($fh))[7];   # Stat the handle to get real size
@@ -282,7 +282,8 @@ sub log_message
 	}
 
 	$self->logit($p{message});
-	$self->lfhunlock();
+
+	safe_flock($lfh, LOCK_UN);
 }
 
 sub DESTROY
@@ -293,10 +294,6 @@ sub DESTROY
     {
 		delete $self->{LDF};  # Should get rid of current LDF
     }
-
-	# Clean up locks
-	close $self->{lfh} if $self->{lfh};
- 	unlink $self->{lf} if $self->{lf} && -f $self->{lf};
 }
 
 sub logit
@@ -581,15 +578,12 @@ sub _get_next_occurance
 	return( shift(@{$self->{'dates'}{$pat}}) );
 }
 
-
 # Lock and unlock routines. For when we need to write a message.
-use Fcntl ':flock'; # import LOCK_* constants
-
 sub lock 
 {
 	my $self = shift;
 
-	flock($self->{LDF}->{fh},LOCK_EX);
+	safe_flock($self->{LDF}->{fh},LOCK_EX);
 
 	# Make sure we are at the EOF
 	seek($self->{LDF}->{fh}, 0, 2);
@@ -601,67 +595,76 @@ sub lock
 sub unlock 
 {
 	my $self = shift;
-	flock($self->{LDF}->{fh},LOCK_UN);
+	safe_flock($self->{LDF}->{fh},LOCK_UN);
 	warn localtime() . " $$ unLocked\n" if $self->{debug};
 }
 
-# Lock and unlock routines. For when we need to roll the logs.
-#
-# Note: On May 1, Dan Waldheim's good news was:
-# I discovered something interesting about forked processes and locking.
-# If the parent "open"s the filehandle and then forks, exclusive locks
-# don't work properly between the parent and children.  Anyone can grab a
-# lock while someone else thinks they have it.  To work properly the
-# "open" has to be done within each process.
-#
-# Thanks Dan
-sub lfhlock_test 
-{
-	my $self = shift;
+# Inspired by BSD's flopen(), returns filehandle on success
+sub flopen {
+	my $path = shift;
 
-	if (open(LFH, ">>$self->{lf}"))
-	{
-		$self->{lfh} = *LFH;
-		if (flock($self->{lfh}, LOCK_EX | LOCK_NB))
-		{
-			warn "$$ got lock on Lock File ".$self->{lfh}."\n" if $self->{debug};
-			return 1;
+	my $flags = LOCK_EX;
+
+	my $fh;
+
+	while (1) {
+		unless (open $fh, '>>', $path) {
+			return;
 		}
-	}
-	else
-	{
-		$self->{_lfhlock_test_err} = "couldn't lock $self->{lf}: $!";
-		$self->{lfh} = 0;
-		warn "$$ couldn't get lock on Lock File\n" if $self->{debug};
-		return 0;
+
+		unless (safe_flock($fh, $flags)) {
+			return;
+		}
+
+		my @path_stat = stat $path;
+
+		unless (@path_stat) {
+			# file disappeared fron under our feet
+			close $fh;
+			next;
+		}
+
+		my @fh_stat = stat $fh;
+		unless (@fh_stat) {
+			# This should never happen
+			return;
+		}
+
+		unless ($^O =~ /^MSWin/) {
+			# stat on a filehandle and path return different "dev" and "rdev"
+			# fields on windows
+			if ($path_stat[0] != $fh_stat[0]) {
+				# file was changed under our feet. try again;
+				close $fh;
+				next;
+			}
+		}
+
+		# check that device and inode are the same for the path and fh
+		if ($path_stat[1] != $fh_stat[1])
+		{
+			# file was changed under our feet. try again;
+			close $fh;
+			next;
+		}
+
+		return $fh;
 	}
 }
 
-sub lfhlock
-{
-	my $self = shift;
+sub safe_flock {
+	my ($fh, $flags) = @_;
 
-	if (!$self->{lfh})
-	{
-		if (!open(LFH, ">>$self->{lf}"))
-		{
+	while (1) {
+		unless (flock $fh, $flags) {
+			# retry if we were interrupted or we are in non-blocking and the file is locked
+			next if $!{EAGAIN} or $!{EWOULDBLOCK};
+
 			return 0;
 		}
-		$self->{lfh} = *LFH;
-	}
-
-	flock($self->{lfh},LOCK_EX);
-}
-
-sub lfhunlock 
-{
-	my $self = shift;
-
-	if($self->{lfh})
-	{
-		flock($self->{lfh},LOCK_UN);
-		close $self->{lfh};
-		$self->{lfh} = 0;
+		else {
+			return 1;
+		}
 	}
 }
 
@@ -669,8 +672,6 @@ sub debug
 {
 	$_[0]->{'debug'} = $_[1];
 }
-
-__END__
 
 =pod
 
@@ -680,7 +681,7 @@ Log::Dispatch::FileRotate - Log to Files that Archive/Rotate Themselves
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 
@@ -963,3 +964,8 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+
+# vim: noet

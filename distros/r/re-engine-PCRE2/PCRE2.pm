@@ -1,5 +1,5 @@
 package re::engine::PCRE2;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -53,7 +53,7 @@ regular expressions provided by libpcre2-8.
 This provides jit support and faster matching, but may fail in corner
 cases. See
 L<pcre2compat|http://www.pcre.org/current/doc/html/pcre2compat.html>.
-It is typically 40% faster than the core regex engine. See L</BENCHMARKS>.
+It is typically 50% faster than the core regex engine. See L</BENCHMARKS>.
 
 The goal is to pass the full core re testsuite, identify all
 problematic patterns and fall-back to the core re engine.  From the
@@ -401,11 +401,11 @@ with unicode support builtin. (C<--enable-unicode>).
 
 Without PCRE2:
 
-    32.572s
+    34.327s
 
 With PCRE2:
 
-    19.596s - 40% faster
+    17.922s - 50% faster
 
 =head1 FAILING TESTS
 

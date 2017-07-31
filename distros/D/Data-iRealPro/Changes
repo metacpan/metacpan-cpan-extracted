@@ -1,5 +1,9 @@
 Revision history for Data-iRealPro
 
+1.08	2017-07-22
+
+	Remove App::Packager. It is now on CPAN.
+
 1.08	2017-05-22
 
 	Fix problem with text input where space separated chords did

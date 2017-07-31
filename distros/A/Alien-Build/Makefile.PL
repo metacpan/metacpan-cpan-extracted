@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Build external dependencies for use in CPAN",
-  "AUTHOR" => "Graham Ollis <plicease\@cpan.org>",
+  "AUTHOR" => "Graham Ollis <plicease\@cpan.org>, Joel Berger <joel.a.berger\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Which" => 0
@@ -25,6 +25,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Alien::Build",
   "PM" => {
+    "lib/Alien/Base.pm" => "\$(INST_LIB)/Alien/Base.pm",
+    "lib/Alien/Base/Authoring.pod" => "\$(INST_LIB)/Alien/Base/Authoring.pod",
+    "lib/Alien/Base/FAQ.pod" => "\$(INST_LIB)/Alien/Base/FAQ.pod",
     "lib/Alien/Base/Wrapper.pm" => "\$(INST_LIB)/Alien/Base/Wrapper.pm",
     "lib/Alien/Build.pm" => "\$(INST_LIB)/Alien/Build.pm",
     "lib/Alien/Build/CommandSequence.pm" => "\$(INST_LIB)/Alien/Build/CommandSequence.pm",
@@ -63,6 +66,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Fetch/HTTPTiny.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/HTTPTiny.pm",
     "lib/Alien/Build/Plugin/Fetch/LWP.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/LWP.pm",
     "lib/Alien/Build/Plugin/Fetch/Local.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/Local.pm",
+    "lib/Alien/Build/Plugin/Fetch/LocalDir.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/LocalDir.pm",
     "lib/Alien/Build/Plugin/Fetch/NetFTP.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/NetFTP.pm",
     "lib/Alien/Build/Plugin/Gather/IsolateDynamic.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Gather/IsolateDynamic.pm",
     "lib/Alien/Build/Plugin/PkgConfig/CommandLine.pm" => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/CommandLine.pm",
@@ -80,17 +84,18 @@ my %WriteMakefileArgs = (
     "lib/Test/Alien.pm" => "\$(INST_LIB)/Test/Alien.pm",
     "lib/Test/Alien/Build.pm" => "\$(INST_LIB)/Test/Alien/Build.pm",
     "lib/Test/Alien/CanCompile.pm" => "\$(INST_LIB)/Test/Alien/CanCompile.pm",
+    "lib/Test/Alien/CanCompileCpp.pm" => "\$(INST_LIB)/Test/Alien/CanCompileCpp.pm",
     "lib/Test/Alien/CanPlatypus.pm" => "\$(INST_LIB)/Test/Alien/CanPlatypus.pm",
     "lib/Test/Alien/Run.pm" => "\$(INST_LIB)/Test/Alien/Run.pm",
     "lib/Test/Alien/Synthetic.pm" => "\$(INST_LIB)/Test/Alien/Synthetic.pm",
     "lib/alienfile.pm" => "\$(INST_LIB)/alienfile.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Base" => "0.036",
     "Capture::Tiny" => "0.17",
     "ExtUtils::CBuilder" => 0,
     "ExtUtils::ParseXS" => "3.21",
     "FFI::CheckLib" => "0.11",
+    "File::ShareDir" => 0,
     "File::Which" => "1.10",
     "File::chdir" => 0,
     "JSON::PP" => 0,
@@ -105,7 +110,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "0.66",
+  "VERSION" => "0.75",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -113,11 +118,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::Base" => "0.036",
   "Capture::Tiny" => "0.17",
   "ExtUtils::CBuilder" => 0,
   "ExtUtils::ParseXS" => "3.21",
   "FFI::CheckLib" => "0.11",
+  "File::ShareDir" => 0,
   "File::Which" => "1.10",
   "File::chdir" => 0,
   "JSON::PP" => 0,
@@ -134,6 +139,18 @@ my %FallbackPrereqs = (
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 if (!do { require File::Which; ($ENV{PKG_CONFIG} && File::Which::which($ENV{PKG_CONFIG})) || File::Which::which('pkgconf') || File::Which::which('pkg-config') }) {
 requires('PkgConfig' => '0.14026' ); # for static cflags support
+}
+
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+if (do { use Config; $^O eq 'solaris' && $Config{ptrsize} == 8 }) {
+requires('PkgConfig' => '0.14026' ); # for using the wrong libraries support
+}
+
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+if (!$ENV{ALIEN_BASE_NO_ABMB}) {
+requires('Alien::Base::ModuleBuild' => '0.040');
 }
 
 

@@ -22,7 +22,7 @@ requires:
   Data::Dmp: '0.21'
   Data::Rmap: '0'
   DateTime: '0'
-  Log::ger: '0.015'
+  Log::ger: '0.019'
   Moo: '0'
   String::Indent: '0'
   WWW::Mechanize: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Bank-ID-BCA
   homepage: https://metacpan.org/release/Finance-Bank-ID-BCA
   repository: git://github.com/perlancar/perl-Finance-Bank-ID-BCA.git
-version: '0.48'
+version: '0.49'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

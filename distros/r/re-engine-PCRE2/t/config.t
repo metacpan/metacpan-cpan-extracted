@@ -7,7 +7,7 @@ my $qr = qr/(a(b?))/;
 if ($] < 5.013 && $qr->_alloptions() == 4294967295) {
   plan skip_all => "methods return -1";
 } else {
-  plan tests => 37;
+  plan tests => 39;
 }
 my %m =
   (
@@ -91,3 +91,10 @@ $s = re::engine::PCRE2::config("UNICODE_VERSION");
 like($s, qr/^\d/, "config UNICODE_VERSION \"$s\"");
 $s = re::engine::PCRE2::config("VERSION");
 like($s, qr/^10\.*/, "config VERSION \"$s\"");
+
+{ use bytes;
+  my $q = qr/[a-z]/;
+  my $tbl = $q->firstbitmap;
+  is(length $tbl, 32, 'firstbitmap table');
+  is(join(" ",unpack("C*", $tbl)), '0 0 0 0 0 0 0 0 0 0 0 0 254 255 255 7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0');
+}

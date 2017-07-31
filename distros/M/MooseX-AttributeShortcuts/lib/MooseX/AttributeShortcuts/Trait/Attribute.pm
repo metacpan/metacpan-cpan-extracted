@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.032';
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.034';
 # ABSTRACT: Shortcuts attribute trait proper
 
 use namespace::autoclean;
@@ -159,6 +159,27 @@ sub _mxas_process_options {
     return;
 }
 
+# The following two methods are here both to help ensure compatibility with
+# MooseX::SemiAffordanceAccessor and to enable other packages to modify our
+# behaviour.
+
+sub _mxas_writer_name {
+    my ($class, $name) = @_;
+
+    return $class->canonical_writer_prefix . $name
+        unless $class->meta->does_role('MooseX::SemiAffordanceAccessor::Role::Attribute');
+
+    # ok, if we're here then we need to follow that role's scheme
+    return $name =~ /^_/ ? "_set$name" : "set_$name";
+};
+
+sub _mxas_private_writer_name {
+    my ($class, $name) = @_;
+
+    $name = $class->_mxas_writer_name($name);
+    return $name =~ /^_/ ? $name : "_$name";
+}
+
 # handle: is => 'rwp'
 sub _mxas_is_rwp {
     my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
@@ -166,7 +187,7 @@ sub _mxas_is_rwp {
     return unless $_opt->('is') eq 'rwp';
 
     $options->{is}     = 'ro';
-    $options->{writer} = $class->canonical_writer_prefix . $name;
+    $options->{writer} = $class->_mxas_private_writer_name($name);
 
     return;
 }
@@ -347,7 +368,7 @@ MooseX::AttributeShortcuts::Trait::Attribute - Shortcuts attribute trait proper
 
 =head1 VERSION
 
-This document describes version 0.032 of MooseX::AttributeShortcuts::Trait::Attribute - released June 13, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.034 of MooseX::AttributeShortcuts::Trait::Attribute - released July 25, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

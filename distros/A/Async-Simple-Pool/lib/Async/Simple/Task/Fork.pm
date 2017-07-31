@@ -116,7 +116,13 @@ use namespace::autoclean;
 use Data::Serializer;
 use Time::HiRes qw/ alarm sleep /;
 
-our $VERSION = '0.08';
+
+if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
+    die 'Your OS does not support threads... Use Async::Simple::Task::ForkTmpFile instead.';
+};
+
+
+our $VERSION = '0.12';
 
 
 extends 'Async::Simple::Task';
@@ -285,7 +291,6 @@ sub fork_child {
 
     # child
     unless ( $pid ) {
-
         close $parent_reader;
         close $parent_writer;
 
@@ -344,6 +349,9 @@ sub get {
         # Alarm caught but something readed, will continue
         undef $@;
     };
+
+    return unless defined $data;
+    return unless $data eq "-\n";
 
     # Read useful data without any timeouts
     # or die, if parent/child has closed connection

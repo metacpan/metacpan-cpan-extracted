@@ -1,5 +1,6 @@
 package Lab::Instrument::Lakeshore224;
-$Lab::Instrument::Lakeshore224::VERSION = '3.553';
+#ABSTRACT: Lake Shore 224 temperature monitor
+$Lab::Instrument::Lakeshore224::VERSION = '3.554';
 use strict;
 
 use Lab::Instrument;
@@ -300,3 +301,31 @@ sub get_value {
 # points => 2,		  #Specifies how many data points the filtering function uses. Valid range= 2 to 64
 # window => 10,		  #Specifies what percent of full scale reading limits the filtering fuction. Valid range = 1 to 10 %
 # });
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::Lakeshore224 - Lake Shore 224 temperature monitor
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2015       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

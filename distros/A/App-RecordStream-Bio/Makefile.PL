@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "App::RecordStream::Bio",
   "PREREQ_PM" => {
-    "App::RecordStream::Operation" => "4.0.0"
+    "App::RecordStream::Operation" => "4.0.0",
+    "Bio::GFF3::LowLevel" => 0
   },
   "TEST_REQUIRES" => {
     "App::RecordStream::Test::OperationHelper" => "4.0.0",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "JSON" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "App::RecordStream::Operation" => "4.0.0",
   "App::RecordStream::Test::OperationHelper" => "4.0.0",
   "App::RecordStream::Test::Tester" => "4.0.0",
+  "Bio::GFF3::LowLevel" => 0,
   "File::Temp" => 0,
   "JSON" => 0,
   "Test::More" => "0.88"

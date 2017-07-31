@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,35 +14,34 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 025f8128cefb18907254472a403eb9189c6ce83d Changes
+SHA1 83a317d5e1ae3444508c469250d6ec2b823f654c Changes
 SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
 SHA1 e3a2df616166117646cf4937f6603294b132bfc0 MANIFEST
-SHA1 ab163dede298427d04edce99684b453da854d4e1 META.json
-SHA1 3eb40b8a806a1700f757b06dfe5be756cb1d36a9 META.yml
-SHA1 facfa0dbc3789f76202f02f2a748bfce10a54532 Makefile.PL
-SHA1 14cd8d5d9184caef7c268c85582579679f23858b README
+SHA1 07e4f2974814b6344b4e7751a3db0a745d75cb91 META.json
+SHA1 59319c4501a17217eb4115f82b6426346a97ca83 META.yml
+SHA1 1b31be88cb4fffc1090ebe999bc6db9e1fd8f63c Makefile.PL
+SHA1 a2c6745458502b19c159b713871481ccff59efde README
 SHA1 4fea85261b7e39faad02530ac8433724d811da0d carlos_super.scl
 SHA1 107cca4f2aa050b35d31ffb23e4bd057023a4311 eg/README
-SHA1 238659bce59669bf18a6ff62b883accc2d7839da eg/fitness
-SHA1 083d1291fb9ea30be91f9fcbabff0ad1d89456d1 eg/screen
-SHA1 13b9d0594dc332bd227b730dd55f6df301e2e09e eg/screen-octaves
-SHA1 321983200fc0cbb311388cf34932aa00675e2f25 eg/show-major-third-ratios
+SHA1 0c94f18a1bdc6a487d051c43f31ca6f006ad56da eg/fitness
+SHA1 8ed328e75ebb899893a1111d320577f6e2769d3c eg/screen
+SHA1 9d8e441c6994ab7fdda06b5bb184e539f3e12474 eg/screen-octaves
+SHA1 778818739cc4ac52dba61361d7ef07103aae778b eg/show-major-third-ratios
 SHA1 f7bc1a4d7a75f98f28146b31841a9589e0aea0ee equal.scl
 SHA1 d1354148078743d67bb476ba7cc1007e3f48524a groenewald_bach.scl
-SHA1 79b1af04764d9aab9c03c2515bf449168b02469e lib/Music/Scala.pm
+SHA1 bef3e9f90663fc2b6582efb06348a77c37fd919f lib/Music/Scala.pm
 SHA1 cf35a78faeb46fb71d2b8590e37c1ffe6444bf2b slen_pel16.scl
-SHA1 fabe3b563d5361a72afaeab9a1087a71db5c4d14 t/Music-Scala.t
+SHA1 08e4da9a4f673fec331799bde7c0b06481128e89 t/Music-Scala.t
 SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
 SHA1 989fc8791e6904e136b85373ae94832c8912c415 valid-pitch-lines.scl
 SHA1 a36e78e383253bdde3a9f462d3cc2ab31004179a xylophone2.scl
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJX4AcuAAoJEKSYBH5dablg3XAIAJoqafkKzhZ16K7mNCGtbQ5f
-9MR9pLe+MEexVFsWMuLP5Go5uG5RnO/wq/Fk06eJn9sqcAliHm7cjFEO09NuBbkp
-RTeobj/+sA9FhMRPi+yGbYSsmU/Y8eW0PA5vXQ3MVO8wLrf3W9bxVicsxL3rCE3N
-fH6mdUv5hwuGPIB1SyVEYbebsNcsskeC53iCcb9s787DnIkzBJb1lxwnmrWNtM05
-kZU5rWoeJVdH1F7EdAIdV8550cWuqNr6jlmcTDGCc4WHyqgm5W/WO7SLSsDfwqwL
-6DaPexrPOzOFR35KPzSbPglTFQ9d44fkrU+QeLBUCNk+1/sXOK3DBVAbeh/9O/M=
-=UPl/
+iQEcBAEBAgAGBQJZcgcEAAoJEKSYBH5dablgyDcH/A5J3DnoZ5Hf0WoimJ3HTDw3
+qpbgjo4c7bhs7jUpox6jvswmjC/VoTX2UBJbfHDeqFq8nYZNs5jb8ARhpSF+I0FN
+wtBC53sA2O35eK5T6pMhcub7+ZJzJu3KZAD6PDBnlEI16OIIAYXKsGYDJq+kOhj8
+38clNOzIMIoxn3KVuN0SQUfZaKDttLMC3jc2We2Gd0K4JkKdkcsZOr3+70Ss4ETG
+NUnfsFgDoQCq/+BRYyzCakFoHvT0Ps0Q4EVXkBdsFg+oX6inW9YI3gEBsxB5MK1t
+NpkX46hwDD+2/xeXHXaF4giWhlWULDhwn7A7cS298szAGxBN4pRc7w9apdNx+Rc=
+=rHtC
 -----END PGP SIGNATURE-----

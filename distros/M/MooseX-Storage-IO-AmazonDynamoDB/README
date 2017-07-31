@@ -23,6 +23,7 @@ SYNOPSIS
       with Storage(io => [ 'AmazonDynamoDB' => {
           table_name => 'my_docs',
           key_attr   => 'doc_id',
+          force_type => { doc_id => 'S' },
       }]);
     
       has 'doc_id'  => (is => 'ro', isa => 'Str', required => 1);
@@ -139,6 +140,16 @@ PARAMETERS
     your class (see below for method description). If you want to use a
     different name for this method (e.g., because it conflicts with an
     existing method), you can change it via this parameter.
+
+  force_type
+
+    Gets passed to Net::Amazon::DynamoDB::Marshaler when converting our
+    packed data to DynamoDB format.
+
+    It is highly recommended that you set the types for any attributes that
+    are part of a key (either key_attr, or an attribute that's part of an
+    index). Read up on force_type in Net::Amazon::DynamoDB::Marshaler for
+    more details.
 
   document_client_attribute_name
 

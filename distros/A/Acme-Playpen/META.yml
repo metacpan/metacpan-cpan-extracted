@@ -20,8 +20,9 @@ no_index:
   package:
     - Acme::Playpen::NonIndexedPackage
 requires:
+  Acme::Playpen::Utilities: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '2.03'
+version: '2.05'
 x_serialization_backend: 'YAML::Tiny version 1.62'

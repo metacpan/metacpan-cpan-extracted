@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::VNASweep;
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.553';
+#ABSTRACT: Role for network analyzer sweeps
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.554';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
@@ -71,68 +72,7 @@ sub _get_data_columns {
     return cat( $freq_array, @data_columns );
 }
 
-=head1 NAME
 
-Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps.
-
-=head1 METHODS
-
-=head2 sparam_sweep
-
- my $data = $vna->sparam_sweep(timeout => 10, average => 10, precision => 'double');
-
-Perform a single sweep, and return the resulting data as a 2D PDL. The first
-dimension runs over the sweep points. E.g. if only the S11 parameter is
-measured, the resulting PDL has dimensions N x 3:
-
- [
-  [freq1, freq2, freq3, ..., freqN],
-  [Re(S11)_1, Re(S11)_2, ..., Re(S11)_N],
-  [Im(S11)_1, Im(S11)_2, ..., Im(S11)_N],
- ]
- 
-This method accepts a hash with the following options:
-
-=over
-
-=item B<timeout>
-
-timeout for the sweep operation. If this is not given, use the connection's
-default timeout.
-
-=item B<average>
-
-Setting this to C<$N>, the method will perform C<$N> sweeps and the
-returned data will consist of the average values.
-
-=item B<precision>
-
-floating point type. Has to be 'single' or 'double'. Defaults to 'single'.
-
-=back
-
-=cut
-
-=head1 REQUIRED METHODS
-
-The following methods are required for role consumption.
-
-=head2 sparam_catalog
-
- my $array_ref = $vna->sparam_catalog();
-
-Return an arrayref of available S-parameter names. Example result:
-C<['Re(s11)', 'Im(s11)', 'Re(s21)', 'Im(s21)']>.
-
-=head2 sparam_sweep_data
-
- my $binary_string = $vna->sparam_sweep_data(timeout => $timeout)
-
-Return binary SCPI data block of S-parameter values. This string contains
-the C<sparam_catalog> values of each frequency point. The floats must be in
-native byte order. 
-
-=cut
 
 sub sparam_sweep {
     my ( $self, %args ) = validated_hash(
@@ -186,6 +126,78 @@ sub sparam_sweep {
     return $self->_get_data_columns( $catalog, $freq_array, $points_ref );
 }
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps
+
+=head1 VERSION
+
+version 3.554
+
+=head1 METHODS
+
+=head2 sparam_sweep
+
+ my $data = $vna->sparam_sweep(timeout => 10, average => 10, precision => 'double');
+
+Perform a single sweep, and return the resulting data as a 2D PDL. The first
+dimension runs over the sweep points. E.g. if only the S11 parameter is
+measured, the resulting PDL has dimensions N x 3:
+
+ [
+  [freq1, freq2, freq3, ..., freqN],
+  [Re(S11)_1, Re(S11)_2, ..., Re(S11)_N],
+  [Im(S11)_1, Im(S11)_2, ..., Im(S11)_N],
+ ]
+
+This method accepts a hash with the following options:
+
+=over
+
+=item B<timeout>
+
+timeout for the sweep operation. If this is not given, use the connection's
+default timeout.
+
+=item B<average>
+
+Setting this to C<$N>, the method will perform C<$N> sweeps and the
+returned data will consist of the average values.
+
+=item B<precision>
+
+floating point type. Has to be 'single' or 'double'. Defaults to 'single'.
+
+=back
+
+=head1 REQUIRED METHODS
+
+The following methods are required for role consumption.
+
+=head2 sparam_catalog
+
+ my $array_ref = $vna->sparam_catalog();
+
+Return an arrayref of available S-parameter names. Example result:
+C<['Re(s11)', 'Im(s11)', 'Re(s21)', 'Im(s21)']>.
+
+=head2 sparam_sweep_data
+
+ my $binary_string = $vna->sparam_sweep_data(timeout => $timeout)
+
+Return binary SCPI data block of S-parameter values. This string contains
+the C<sparam_catalog> values of each frequency point. The floats must be in
+native byte order. 
+
 =head1 CONSUMED ROLES
 
 =over
@@ -198,9 +210,13 @@ sub sparam_sweep {
 
 =item L<Lab::Moose::Instrument::SCPI::Sense::Average>
 
+=item L<Lab::Moose::Instrument::SCPI::Sense::Bandwidth>
+
 =item L<Lab::Moose::Instrument::SCPI::Sense::Frequency>
 
 =item L<Lab::Moose::Instrument::SCPI::Sense::Sweep>
+
+=item L<Lab::Moose::Instrument::SCPI::Source::Power>
 
 =item L<Lab::Moose::Instrument::SCPI::Initiate>
 
@@ -208,6 +224,15 @@ sub sparam_sweep {
 
 =back
 
-=cut
+=head1 COPYRIGHT AND LICENSE
 
-1;
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

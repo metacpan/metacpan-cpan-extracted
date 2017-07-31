@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,26 +15,25 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 a349b7ce0f4affbe722258ad69a41852bf34306a .gitignore
-SHA1 17f71b30c2e357456b8e75003f06e3f36bd360d7 Build.PL
-SHA1 b4b726780f8af84bf440237325f3fda19c9d2a19 Changes
-SHA1 e74fe40e8100c8cae03d471e49be4d4be67f2c1f MANIFEST
-SHA1 3ad1f1056359ccef08f913f5b9d2424aa2b12cfc META.json
-SHA1 3f0433c8998aa6fe99e44ed4a30226e08fca4a01 META.yml
-SHA1 ac10abef4842e562f11f09847244c1a1b1bcca06 Makefile.PL
-SHA1 2fd0cb56d38d7c889b359c3a69fa7b6e6f8f07f6 README
-SHA1 b7183c11e320479b6d0a8759f21617cfdfed154d lib/String/Base.pm
-SHA1 a43355832d9fe88230cc72d8e270c25c090cd5e5 lib/String/Base.xs
+SHA1 e0c0beb97b8dafe603946c836b1866bf08c800b2 Build.PL
+SHA1 beb1d3b64ec3fbf6db76aef2b216f5b4aa2a28bb Changes
+SHA1 830d7f2a31b031227f7fa7d06988729b1069ca97 MANIFEST
+SHA1 ec9104528aed065fdc4eec458a8a4655c08d80bb META.json
+SHA1 6d04e8a648ba5de77c0e57b2eff1223af8652272 META.yml
+SHA1 015f6691051173f51039d5714b2382d923ec0253 README
+SHA1 1cbaf536d4d53a200bf5747a2c1aefe34268c1bd lib/String/Base.pm
+SHA1 8f8530987d571759735d01ca089f93cfdacfd266 lib/String/Base.xs
 SHA1 307e9f981eb0e2694cb43e975a132cfcf98987d8 t/index.t
+SHA1 eeac0d4ce1d64f8468f30aaa7df2d2583eb12c8c t/lib/t/scope_0.pm
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 d433dd01e76808c7c501f941b0769775cdea7ace t/pos.t
-SHA1 058969c00979827f634ce83822504863c6a13bde t/scope.t
-SHA1 eeac0d4ce1d64f8468f30aaa7df2d2583eb12c8c t/scope_0.pm
+SHA1 6de8546e2a5e4d085c45255b237db2a9214fd29f t/scope.t
 SHA1 232c8bf9885c6d604b2925a9a52dcaf25bb197e9 t/substr.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk8pZ00ACgkQOV9mt2VyAVEFVwCeKQMd4MvLzHwmIfFg5S5Ze3oV
-zioAnAyNCv70BUZaV48/axr2rvGEozJf
-=65ZY
+iEYEARECAAYFAll8XU8ACgkQOV9mt2VyAVH8CACfc/ASXJcIqLyaTEOBm5JqARIY
+xe0An3kqHxOPXiHOt3k458hcfrx7hfFo
+=fA36
 -----END PGP SIGNATURE-----

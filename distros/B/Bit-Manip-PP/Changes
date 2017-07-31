@@ -1,5 +1,11 @@
 Revision history for Bit-Manip-PP
 
+1.07    2017-07-24
+        - added bit_tog() as an alias to bit_toggle()
+        - changed lsb >= msb in _check_lsb(), we now allow equal which can be
+          used to select an individual bit
+        - added tests for the reference feature
+
 1.06    2017-03-28
         - no functional or doc changes
         - missed doing an s/x/y/g for the Appveyor update in 1.05

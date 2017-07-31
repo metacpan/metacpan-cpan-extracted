@@ -1,5 +1,5 @@
 package App::JESP::Driver;
-$App::JESP::Driver::VERSION = '0.008';
+$App::JESP::Driver::VERSION = '0.010';
 use Moose;
 
 =head1 NAME

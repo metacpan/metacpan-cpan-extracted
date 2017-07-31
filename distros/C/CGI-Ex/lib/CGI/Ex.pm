@@ -7,24 +7,25 @@ CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 =cut
 
 ###----------------------------------------------------------------###
-#  Copyright 2003-2015 - Paul Seamons                                #
+#  Copyright 2003-2017 - Paul Seamons                                #
 #  Distributed under the Perl Artistic License without warranty      #
 ###----------------------------------------------------------------###
 
 ### See perldoc at bottom
 
+use 5.006;
 use strict;
-use vars qw($VERSION
-            $PREFERRED_CGI_MODULE
-            $PREFERRED_CGI_REQUIRED
-            $AUTOLOAD
-            $DEBUG_LOCATION_BOUNCE
-            @EXPORT @EXPORT_OK
-            );
+our ($VERSION,
+     $PREFERRED_CGI_MODULE,
+     $PREFERRED_CGI_REQUIRED,
+     $AUTOLOAD,
+     $DEBUG_LOCATION_BOUNCE,
+     @EXPORT, @EXPORT_OK
+     );
 use base qw(Exporter);
 
 BEGIN {
-    $VERSION               = '2.44';
+    $VERSION               = '2.45';
     $PREFERRED_CGI_MODULE  ||= 'CGI';
     @EXPORT = ();
     @EXPORT_OK = qw(get_form
@@ -127,6 +128,8 @@ sub get_form {
     ### get the info out of the object
     my $obj  = shift || $self->object;
     my %hash = ();
+    ### this particular use of $cgi->param in list context is safe
+    local $CGI::LIST_CONTEXT_WARN = 0;
     foreach my $key ($obj->param) {
         my @val = $obj->param($key);
         $hash{$key} = ($#val <= 0) ? $val[0] : \@val;

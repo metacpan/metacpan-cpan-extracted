@@ -1,4 +1,4 @@
-/*  Copyright (c) 2008-2016 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2008-2017 H.Merijn Brand.  All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
  */
@@ -70,7 +70,9 @@ DPeek (...)
   PROTOTYPE: ;$
   PPCODE:
     I32 gimme = GIMME_V;
-    ST (0) = _DPeek (aTHX_ items, ST (0));
+    SV *sv    = items ? ST (0) : DEFSV;
+    if (items == 0) EXTEND (SP, 1);
+    ST (0) = _DPeek (aTHX_ items, sv);
     if (gimme == G_VOID) warn ("%s\n", SvPVX (ST (0)));
     XSRETURN (1);
     /* XS DPeek */
@@ -86,6 +88,7 @@ DDisplay (...)
 	pv_pretty (dsp, SvPVX (sv), SvCUR (sv), 0,
 	    NULL, NULL,
 	    (PERL_PV_PRETTY_DUMP | PERL_PV_ESCAPE_UNI_DETECT));
+    if (items == 0) EXTEND (SP, 1);
     ST (0) = dsp;
     if (gimme == G_VOID) warn ("%s\n", SvPVX (ST (0)));
     XSRETURN (1);
@@ -134,6 +137,7 @@ DDual (sv, ...)
     if (items > 1 && SvGMAGICAL (sv) && SvTRUE (ST (1)))
 	mg_get (sv);
 
+    EXTEND (SP, 5);
     if (SvPOK (sv) || SvPOKp (sv)) {
 	SV *xv = newSVpv (SvPVX (sv), 0);
 	if (SvUTF8 (sv)) SvUTF8_on (xv);
@@ -176,6 +180,7 @@ DGrow (sv, size)
     if (!SvPOK (sv))
 	sv_setpvn (sv, "", 0);
     SvGROW (sv, size);
+    EXTEND (SP, 1);
     mPUSHi (SvLEN (sv));
     /* XS DGrow */
 

@@ -116,7 +116,10 @@ while(1) {
 	chomp $correct;
 	$correct = $correct =~ /\A[:'A-Za-z ]+\z/ ?
 		[ "error", "$correct\n" ] :
-		[ "ok", do { no warnings "utf8"; eval($correct) } ];
+		[ "ok", do {
+				no if "$]" < 5.013009, qw(warnings utf8);
+				eval($correct);
+			} ];
 	ok deep_match(try_read($prod, upgraded($input)), $correct);
 	ok deep_match(try_read($prod, downgraded($input)), $correct);
 }

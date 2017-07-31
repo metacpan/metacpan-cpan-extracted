@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::ParseXS" : "2.2006",
             "Module::Build" : "0",
             "Test::More" : "0",
             "perl" : "5.006001",
@@ -50,15 +49,19 @@
    "provides" : {
       "Params::Classify" : {
          "file" : "lib/Params/Classify.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Params-Classify@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Classify"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

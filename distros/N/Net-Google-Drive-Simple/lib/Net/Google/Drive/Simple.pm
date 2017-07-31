@@ -18,7 +18,7 @@ use Data::Dumper;
 use File::MMagic;
 use OAuth::Cmdline::GoogleDrive;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 ###########################################
 sub new {
@@ -251,6 +251,105 @@ sub file_upload {
 }
 
 ###########################################
+sub file_mvdir {
+###########################################
+    my( $self, $path, $target_folder ) = @_;
+
+    my $url;
+
+    if( !defined $path or !defined $target_folder ) {
+        LOGDIE "Missing parameter";
+    }
+
+    # Determine the file's parent in the path
+    my( $file_id, $folder_id ) = $self->path_resolve( $path );
+
+    if( !defined $file_id ) {
+        LOGDIE "Cannot find source file: $path";
+    }
+
+    my( $target_folder_id ) = $self->path_resolve( $target_folder );
+
+    if( !defined $target_folder_id ) {
+        LOGDIE "Cannot find destination path: $target_folder";
+    }
+
+    print "file_id=$file_id\n";
+    print "folder_id=$folder_id\n";
+    print "target_folder_id=$target_folder_id\n";
+
+      # Delete it from the current parent
+    $url = URI->new( $self->{ api_file_url } .
+        "/$folder_id/children/$file_id" );
+    if( !$self->http_delete( $url ) ) {
+        LOGDIE "Failed to remove $path from parent folder.";
+    }
+
+      # Add a new parent
+    $url = URI->new( $self->{ api_file_url } .
+        "/$target_folder_id/children" );
+    if( !$self->http_json( $url, { id => $file_id } ) ) {
+        LOGDIE "Failed to insert $path into $target_folder.";
+    }
+    
+    return 1;
+}
+
+###########################################
+sub path_resolve {
+###########################################
+    my( $self, $path, $search_opts ) = @_;
+
+    $search_opts = {} if !defined $search_opts;
+
+    my @parts = split '/', $path;
+    my @ids   = ();
+    my $parent = $parts[0] = "root";
+    DEBUG "Parent: $parent";
+
+    my $folder_id = shift @parts;
+    push @ids, $folder_id;
+
+    PART: for my $part ( @parts ) {
+
+        DEBUG "Looking up part $part (folder_id=$folder_id)";
+
+        my $children = $self->children_by_folder_id( $folder_id,
+          { maxResults    => 100, # path resolution maxResults is different
+          },
+          { %$search_opts, title => $part },
+        );
+
+        if( ! defined $children ) {
+            return undef;
+        }
+
+        for my $child ( @$children ) {
+            DEBUG "Found child ", $child->title();
+            if( $child->title() eq $part ) {
+                $folder_id = $child->id();
+                unshift @ids, $folder_id;
+                $parent = $folder_id;
+                DEBUG "Parent: $parent";
+                next PART;
+            }
+        }
+
+        my $msg = "Child $part not found";
+        $self->error( $msg );
+        ERROR $msg;
+        return undef;
+    }
+
+    if( @ids == 1 ) {
+          # parent of root is root
+        return( @ids, @ids );
+    }
+
+    return( @ids );
+}
+
+###########################################
 sub file_delete {
 ###########################################
     my( $self, $file_id ) = @_;
@@ -261,8 +360,20 @@ sub file_delete {
 
     $url = URI->new( $self->{ api_file_url } . "/$file_id" );
 
+    if( $self->http_delete( $url ) ) {
+        return $file_id;
+    }
+
+    return undef;
+}
+
+###########################################
+sub http_delete {
+###########################################
+    my( $self, $url ) = @_;
+
     my $req = &HTTP::Request::Common::DELETE(
-        $url->as_string,
+        $url,
         $self->{ oauth }->authorization_headers(),
     );
 
@@ -275,7 +386,7 @@ sub file_delete {
         return undef;
     }
 
-    return $file_id;
+    return 1;
 }
 
 ###########################################
@@ -349,39 +460,9 @@ sub children {
         $search_opts = {};
     }
 
-    my @parts = split '/', $path;
-    my $parent = $parts[0] = "root";
-    DEBUG "Parent: $parent";
+    my( $folder_id, $parent ) = $self->path_resolve( $path, $search_opts );
 
-    my $folder_id = shift @parts;
-
-    PART: for my $part ( @parts ) {
-
-        DEBUG "Looking up part $part (folder_id=$folder_id)";
-
-        my $children = $self->children_by_folder_id( $folder_id,
-          { maxResults    => 100, # path resolution maxResults is different
-          },
-          { %$search_opts, title => $part },
-        );
-
-        if( ! defined $children ) {
-            return undef;
-        }
-
-        for my $child ( @$children ) {
-            DEBUG "Found child ", $child->title();
-            if( $child->title() eq $part ) {
-                $folder_id = $child->id();
-                $parent = $folder_id;
-                DEBUG "Parent: $parent";
-                next PART;
-            }
-        }
-
-        my $msg = "Child $part not found";
-        $self->error( $msg );
-        ERROR $msg;
+    if( !defined $folder_id ) {
         return undef;
     }
 
@@ -821,6 +902,12 @@ empty search:
 =item C<$gd-E<gt>file_delete( file_id )>
 
 Delete the file with the specified ID from Google Drive.
+
+=item C<$gd-E<gt>drive_mvdir( "/gdrive/path/to/file", "/path/to/new/folder" )>
+
+Move an existing file to a new folder. Removes the file's "parent" 
+setting (pointing to the old folder) and then adds the new folder as a 
+new parent.
 
 =back
 

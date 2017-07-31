@@ -1,8 +1,6 @@
-#$Id: IPSWeissDillFridge.pm 2012-11-10 Geissler/Butschkow $
-
 package Lab::Instrument::IPSWeissDillFridge;
-$Lab::Instrument::IPSWeissDillFridge::VERSION = '3.553';
-
+#ABSTRACT: Derived IPS instrument for the AG Weiss dilution refrigerator
+$Lab::Instrument::IPSWeissDillFridge::VERSION = '3.554';
 use strict;
 use Lab::Instrument::IPS;
 our @ISA = ('Lab::Instrument::IPS');
@@ -64,4 +62,38 @@ sub check_magnet {
     }
 }
 
+
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::IPSWeissDillFridge - Derived IPS instrument for the AG Weiss dilution refrigerator
+
+=head1 VERSION
+
+version 3.554
+
+=head1 TO DO
+
+Move this module to a separate distribution with files specific for the
+Regensburg labs.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Christian Butschkow
+            2013       Andreas K. Huettel, Christian Butschkow
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

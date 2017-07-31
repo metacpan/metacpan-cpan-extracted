@@ -9,9 +9,23 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef newSVpvs
 # define newSVpvs(s) newSVpvn(""s"", (sizeof(""s"")-1))
 #endif /* !newSVpvs */
+
+#ifndef OpMORESIB_set
+# define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+# define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+# define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+#endif /* !OpMORESIB_set */
+#ifndef OpSIBLING
+# define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+# define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif /* !OpSIBLING */
 
 #define QPFX xAd8NP3gxZglovQRL5Hn_
 #define QPFXS STRINGIFY(QPFX)
@@ -113,16 +127,17 @@ static OP *THX_entersub_extract_args(pTHX_ OP *entersubop)
 	OP *pushop, *aop, *bop, *cop;
 	if(!(entersubop->op_flags & OPf_KIDS)) return NULL;
 	pushop = cUNOPx(entersubop)->op_first;
-	if(!pushop->op_sibling) {
+	if(!OpHAS_SIBLING(pushop)) {
 		if(!(pushop->op_flags & OPf_KIDS)) return NULL;
 		pushop = cUNOPx(pushop)->op_first;
-		if(!pushop->op_sibling) return NULL;
+		if(!OpHAS_SIBLING(pushop)) return NULL;
 	}
-	for(bop = pushop; (cop = bop->op_sibling)->op_sibling; bop = cop) ;
+	for(bop = pushop; (cop = OpSIBLING(bop), OpHAS_SIBLING(cop));
+			bop = cop) ;
 	if(bop == pushop) return NULL;
-	aop = pushop->op_sibling;
-	pushop->op_sibling = cop;
-	bop->op_sibling = NULL;
+	aop = OpSIBLING(pushop);
+	OpMORESIB_set(pushop, cop);
+	OpLASTSIB_set(bop, NULL);
 	return aop;
 }
 
@@ -134,21 +149,21 @@ static void THX_entersub_inject_args(pTHX_ OP *entersubop, OP *aop)
 	if(!(entersubop->op_flags & OPf_KIDS)) {
 		abort:
 		while(aop) {
-			bop = aop->op_sibling;
+			bop = OpSIBLING(aop);
 			op_free(aop);
 			aop = bop;
 		}
 		return;
 	}
 	pushop = cUNOPx(entersubop)->op_first;
-	if(!pushop->op_sibling) {
+	if(!OpHAS_SIBLING(pushop)) {
 		if(!(pushop->op_flags & OPf_KIDS)) goto abort;
 		pushop = cUNOPx(pushop)->op_first;
-		if(!pushop->op_sibling) goto abort;
+		if(!OpHAS_SIBLING(pushop)) goto abort;
 	}
-	for(bop = aop; (cop = bop->op_sibling); bop = cop) ;
-	bop->op_sibling = pushop->op_sibling;
-	pushop->op_sibling = aop;
+	for(bop = aop; (cop = OpSIBLING(bop)); bop = cop) ;
+	OpMORESIB_set(bop, OpSIBLING(pushop));
+	OpMORESIB_set(pushop, aop);
 }
 
 # define ck_entersub_args_stalk(eo, so) THX_ck_entersub_args_stalk(aTHX_ eo, so)
@@ -338,29 +353,30 @@ static MGVTBL mgvtbl_checkcall;
 typedef OP *(*Perl_call_checker)(pTHX_ OP *, GV *, SV *);
 
 # define Perl_cv_get_call_checker QPFXD(gcc0)
-# define cv_get_call_checker(cv, ckfun_p, ckobj_p) \
-	Perl_cv_get_call_checker(aTHX_ cv, ckfun_p, ckobj_p)
+# define cv_get_call_checker(cv, THX_ckfun_p, ckobj_p) \
+	Perl_cv_get_call_checker(aTHX_ cv, THX_ckfun_p, ckobj_p)
 MY_EXPORT_CALLCONV void QPFXD(gcc0)(pTHX_ CV *cv,
-	Perl_call_checker *ckfun_p, SV **ckobj_p)
+	Perl_call_checker *THX_ckfun_p, SV **ckobj_p)
 {
 	MAGIC *callmg = SvMAGICAL((SV*)cv) ?
 		mg_findext((SV*)cv, PERL_MAGIC_ext, &mgvtbl_checkcall) : NULL;
 	if(callmg) {
-		*ckfun_p = DPTR2FPTR(Perl_call_checker, callmg->mg_ptr);
+		*THX_ckfun_p = DPTR2FPTR(Perl_call_checker, callmg->mg_ptr);
 		*ckobj_p = callmg->mg_obj;
 	} else {
-		*ckfun_p = Perl_ck_entersub_args_proto_or_list;
+		*THX_ckfun_p = Perl_ck_entersub_args_proto_or_list;
 		*ckobj_p = (SV*)cv;
 	}
 }
 
 # define Perl_cv_set_call_checker QPFXD(scc0)
-# define cv_set_call_checker(cv, ckfun, ckobj) \
-	Perl_cv_set_call_checker(aTHX_ cv, ckfun, ckobj)
+# define cv_set_call_checker(cv, THX_ckfun, ckobj) \
+	Perl_cv_set_call_checker(aTHX_ cv, THX_ckfun, ckobj)
 MY_EXPORT_CALLCONV void QPFXD(scc0)(pTHX_ CV *cv,
-	Perl_call_checker ckfun, SV *ckobj)
+	Perl_call_checker THX_ckfun, SV *ckobj)
 {
-	if(ckfun == Perl_ck_entersub_args_proto_or_list && ckobj == (SV*)cv) {
+	if(THX_ckfun == Perl_ck_entersub_args_proto_or_list &&
+			ckobj == (SV*)cv) {
 		if(SvMAGICAL((SV*)cv))
 			sv_unmagicext((SV*)cv, PERL_MAGIC_ext,
 				&mgvtbl_checkcall);
@@ -374,7 +390,7 @@ MY_EXPORT_CALLCONV void QPFXD(scc0)(pTHX_ CV *cv,
 			SvREFCNT_dec(callmg->mg_obj);
 			callmg->mg_flags &= ~MGf_REFCOUNTED;
 		}
-		callmg->mg_ptr = FPTR2DPTR(char *, ckfun);
+		callmg->mg_ptr = FPTR2DPTR(char *, THX_ckfun);
 		callmg->mg_obj = ckobj;
 		if(ckobj != (SV*)cv) {
 			SvREFCNT_inc(ckobj);
@@ -383,23 +399,24 @@ MY_EXPORT_CALLCONV void QPFXD(scc0)(pTHX_ CV *cv,
 	}
 }
 
-static OP *(*nxck_entersub)(pTHX_ OP *);
-static OP *myck_entersub(pTHX_ OP *entersubop)
+static OP *(*THX_nxck_entersub)(pTHX_ OP *);
+
+static OP *THX_myck_entersub(pTHX_ OP *entersubop)
 {
 	OP *aop, *cvop;
 	CV *cv;
 	GV *namegv;
-	Perl_call_checker ckfun;
+	Perl_call_checker THX_ckfun;
 	SV *ckobj;
 	aop = cUNOPx(entersubop)->op_first;
-	if(!aop->op_sibling) aop = cUNOPx(aop)->op_first;
-	aop = aop->op_sibling;
-	for(cvop = aop; cvop->op_sibling; cvop = cvop->op_sibling) ;
+	if(!OpHAS_SIBLING(aop)) aop = cUNOPx(aop)->op_first;
+	aop = OpSIBLING(aop);
+	for(cvop = aop; OpHAS_SIBLING(cvop); cvop = OpSIBLING(cvop)) ;
 	if(!(cv = rv2cv_op_cv(cvop, 0)))
-		return nxck_entersub(aTHX_ entersubop);
-	cv_get_call_checker(cv, &ckfun, &ckobj);
-	if(ckfun == Perl_ck_entersub_args_proto_or_list && ckobj == (SV*)cv)
-		return nxck_entersub(aTHX_ entersubop);
+		return THX_nxck_entersub(aTHX_ entersubop);
+	cv_get_call_checker(cv, &THX_ckfun, &ckobj);
+	if(THX_ckfun == Perl_ck_entersub_args_proto_or_list && ckobj == (SV*)cv)
+		return THX_nxck_entersub(aTHX_ entersubop);
 	namegv = (GV*)rv2cv_op_cv(cvop,
 			RV2CVOPCV_MARK_EARLY|RV2CVOPCV_RETURN_NAME_GV);
 	entersubop->op_private |= OPpENTERSUB_HASTARG;
@@ -407,7 +424,7 @@ static OP *myck_entersub(pTHX_ OP *entersubop)
 	if(PERLDB_SUB && PL_curstash != PL_debstash)
 		entersubop->op_private |= OPpENTERSUB_DB;
 	op_null(cvop);
-	return ckfun(aTHX_ entersubop, namegv, ckobj);
+	return THX_ckfun(aTHX_ entersubop, namegv, ckobj);
 }
 
 # define Q_PROVIDE_CV_SET_CALL_CHECKER 1
@@ -420,7 +437,7 @@ PROTOTYPES: DISABLE
 
 BOOT:
 #if Q_PROVIDE_CV_SET_CALL_CHECKER
-	wrap_op_checker(OP_ENTERSUB, myck_entersub, &nxck_entersub);
+	wrap_op_checker(OP_ENTERSUB, THX_myck_entersub, &THX_nxck_entersub);
 #endif /* Q_PROVIDE_CV_SET_CALL_CHECKER */
 
 SV *

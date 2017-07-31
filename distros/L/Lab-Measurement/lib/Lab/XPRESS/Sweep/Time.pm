@@ -1,14 +1,14 @@
 package Lab::XPRESS::Sweep::Time;
-$Lab::XPRESS::Sweep::Time::VERSION = '3.553';
-
-use Lab::XPRESS::Sweep::Sweep;
+#ABSTRACT: Simple time-controlled repeater
+$Lab::XPRESS::Sweep::Time::VERSION = '3.554';
+use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use Statistics::Descriptive;
 use Carp;
 use strict;
 use 5.010;
 
-our @ISA = ('Lab::XPRESS::Sweep::Sweep');
+our @ISA = ('Lab::XPRESS::Sweep');
 
 sub new {
     my $proto = shift;
@@ -157,13 +157,19 @@ sub halt {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::XPRESS::Sweep::Time - simple time controlled repeater
+Lab::XPRESS::Sweep::Time - Simple time-controlled repeater
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -174,18 +180,13 @@ sub halt {
 		duration => 5
 		});
 
-.
-
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Time class implements a simple time controlled repeater module in the Lab::XPRESS::Sweep framework.
 
-.
-
 =head1 CONSTRUCTOR
-	
 
 	my $time_sweep = Sweep('Time',
 		{
@@ -195,7 +196,7 @@ The Lab::XPRESS::Sweep::Time class implements a simple time controlled repeater 
 
 Instantiates a new Time-Sweep with a duration of 5 seconds and a Measurement interval of 5 seconds.
 To operate in the stabilization mode make an instant like the following:
-	
+
 	my $time_sweep = Sweep('Time',
 		{
 		stabilize => 1,		
@@ -207,43 +208,28 @@ To operate in the stabilization mode make an instant like the following:
 		interval => 0.5
 		});
 
-.
-
 =head1 PARAMETERS
 
-
-
 =head2 duration [float] (default = 1)
-	
+
 duration for the time controlled repeater. Default value is 1, negative values indicate a infinit number of repetitions.
 In stabilization mode, the duration gives the maximum duration which is waited before the sweep gets interrupted even though the stabilization criterion hasn't been reached yet.
 
-.
-
 =head2 interval [float] (default = 1)
-	
-interval in seconds for taking measurement points.
 
-.
+interval in seconds for taking measurement points.
 
 =head2 id [string] (default = 'Repeater')
 
 Just an ID.
 
-.
-
-
 =head2 delay_before_loop [float] (default = 0)
 
 defines the time in seconds to wait after the starting point has been reached.
 
-.
-
-
 =head2 delay_after_loop [float] (default = 0)
 
 Defines the time in seconds to wait after the sweep has been finished. This delay will be executed before an optional backsweep or optional repetitions of the sweep.
-
 
 =head2 stabilize [int] (default = 0)
 
@@ -265,13 +251,10 @@ See 'stabilize'.
 =head2 stabilize_observation_time [float] (default = 3*60)
 
 See 'stabilize'.
-.
 
 =head1 CAVEATS/BUGS
 
 probably none
-
-.
 
 =head1 SEE ALSO
 
@@ -281,16 +264,18 @@ probably none
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-Christian Butschkow and Stefan Geißler
+  Copyright 2012       Stefan Geissler
+            2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2015       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
 
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

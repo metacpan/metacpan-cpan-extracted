@@ -1,0 +1,15 @@
+Build.PL
+lib/Biblio/SIF.pm
+lib/Biblio/SIF/Patron.pm
+MANIFEST			This list of files
+README.md
+scripts/psif2yaml
+scripts/psifbrowse
+scripts/psifcount
+scripts/psifdiag
+scripts/psifgrep
+scripts/psifnorm
+scripts/psifpick
+scripts/psifprint
+scripts/psifpurge
+META.yml

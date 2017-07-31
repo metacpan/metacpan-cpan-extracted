@@ -30,9 +30,11 @@ Curtis
 DEPRECATIONS
 DROLSKY
 DROLSKY's
+Daignault
 Dave
 Denny
 Deprecated
+Desmond
 Doug
 Etheridge
 Executor
@@ -114,6 +116,7 @@ metadata
 munge
 munges
 namespace
+nawglan
 neil
 ok
 olaf

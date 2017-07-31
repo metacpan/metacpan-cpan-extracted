@@ -1,7 +1,7 @@
 package Log::ger::Output::Null;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2017-07-30'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 sub get_hooks {
     return {
@@ -29,7 +29,7 @@ Log::ger::Output::Null - Null output
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package HTML::FormHandler::I18N::bg_bg;
 # ABSTRACT: Bulgarian message file
-$HTML::FormHandler::I18N::bg_bg::VERSION = '0.40067';
+$HTML::FormHandler::I18N::bg_bg::VERSION = '0.40068';
 use strict;
 use warnings;
 use utf8;
@@ -110,7 +110,7 @@ HTML::FormHandler::I18N::bg_bg - Bulgarian message file
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 NAME
 
@@ -133,7 +133,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

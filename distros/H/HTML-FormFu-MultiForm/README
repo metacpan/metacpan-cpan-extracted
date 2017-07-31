@@ -1,13 +1,135 @@
+NAME
 
+    HTML::FormFu::MultiForm - Handle multi-page/stage forms with FormFu
 
-This archive contains the distribution HTML-FormFu-MultiForm,
-version 1.00:
+VERSION
 
-  Handle multi-page/stage forms
+    version 1.03
 
-This software is copyright (c) 2013 by Carl Franks.
+DESCRIPTION
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+    For now, see test files in Catalyst::Controller::HTML::FormFu for
+    examples.
 
+AUTHORS
+
+      * Carl Franks <cpan@fireartist.com>
+
+      * Nigel Metheringham <nigelm@cpan.org>
+
+      * Dean Hamstead <dean@bytefoundry.com.au>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013-2017 by Carl Franks / Nigel
+    Metheringham / Dean Hamstead.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc HTML::FormFu::MultiForm
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/HTML-FormFu-MultiForm
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/HTML-FormFu-MultiForm
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-FormFu-MultiForm
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/HTML-FormFu-MultiForm
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/HTML-FormFu-MultiForm
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/HTML-FormFu-MultiForm
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/HTML-FormFu-MultiForm
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/H/HTML-FormFu-MultiForm
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=HTML-FormFu-MultiForm
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=HTML::FormFu::MultiForm
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-html-formfu-multiform at rt.cpan.org, or through the web interface
+    at
+    https://rt.cpan.org/Public/Bug/Report.html?Queue=HTML-FormFu-MultiForm.
+    You will be automatically notified of any progress on the request by
+    the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/FormFu/HTML-FormFu-MultiForm
+
+      git clone https://github.com/FormFu/HTML-FormFu-MultiForm.git
+
+CONTRIBUTOR
+
+    fireartist <fireartist@gmail.com>
 

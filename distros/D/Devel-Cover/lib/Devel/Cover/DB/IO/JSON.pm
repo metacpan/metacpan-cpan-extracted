@@ -13,7 +13,7 @@ use warnings;
 use Fcntl ":flock";
 use JSON::MaybeXS ();
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 sub new {
     my $class = shift;
@@ -42,6 +42,7 @@ sub write {
     my $self = shift;
     my ($data, $file) = @_;
 
+    unlink $file;
     open my $fh, ">", $file or die "Can't open $file: $!\n";
     flock $fh, LOCK_EX      or die "Can't lock $file: $!\n";
     print $fh ${$self}->encode($data);
@@ -59,7 +60,7 @@ Devel::Cover::DB::IO::JSON - JSON based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

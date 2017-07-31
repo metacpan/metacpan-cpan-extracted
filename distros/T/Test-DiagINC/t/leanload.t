@@ -20,7 +20,7 @@ BEGIN {
     @::initial_INC = keys %INC;
 
     unless ( $] < 5.008 ) {
-        @::B_inc = split /\0/, `$^X -Mt::lib::B_laced_INC_dump`;
+        @::B_inc = split /\0/, `$^X t/lib/B_laced_INC_dump.pl`;
     }
 }
 

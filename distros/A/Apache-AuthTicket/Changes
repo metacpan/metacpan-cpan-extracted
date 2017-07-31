@@ -1,3 +1,11 @@
+0.94  2017-07-28
+  - *** Add support for Apache 2.4 ***
+    NOTE: configuration changes WILL be required.  See README.apache-2.4.pod
+    for details.
+  - use Test::Signature for the signature test
+  - make signature test an AUTHOR test.
+  - bump minimum Apache::Test version to v1.39
+
 0.93  2011-06-06
     fixed logout set Location header (broken in 0.92)
     added ticket object to _ticket_idle_timeout() args

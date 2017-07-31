@@ -4,7 +4,6 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/DateTime/TimeZone/Tzfile.pm
 t/Davis.tz

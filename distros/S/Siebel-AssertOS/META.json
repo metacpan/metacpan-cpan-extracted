@@ -3,38 +3,55 @@
    "author" : [
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "open_source"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Siebel-AssertOS",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0",
-            "Test::Pod" : "1.22",
-            "Test::Pod::Coverage" : "1.08"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Pod::Coverage" : "0"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "Siebel::AssertOS" : {
+         "file" : "lib/Siebel/AssertOS.pm",
+         "version" : "0.9"
+      },
+      "Siebel::AssertOS::Linux::Distribution" : {
+         "file" : "lib/Siebel/AssertOS/Linux/Distribution.pm",
+         "version" : "0.9"
+      },
+      "Siebel::AssertOS::Validate" : {
+         "file" : "lib/Siebel/AssertOS/Validate.pm",
+         "version" : "0.9"
       }
    },
    "release_status" : "stable",
@@ -42,13 +59,13 @@
       "bugtracker" : {
          "web" : "https://github.com/glasswalk3r/siebel-gnu-tools/issues"
       },
-      "homepage" : "https://github.com/glasswalk3r/siebel-gnu-tools",
-      "license" : [
-         "http://www.gnu.org/licenses/gpl.txt"
-      ],
       "repository" : {
-         "url" : "https://github.com/glasswalk3r/siebel-gnu-tools"
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/siebel-gnu-tools.git",
+         "web" : "https://github.com/glasswalk3r/siebel-gnu-tools"
       }
    },
-   "version" : "0.07"
+   "version" : "0.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
+

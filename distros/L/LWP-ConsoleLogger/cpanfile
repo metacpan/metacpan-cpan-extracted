@@ -29,6 +29,8 @@ recommends "HTML::FormatText::Lynx" => "23";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "File::Spec" => "0";
   requires "HTML::FormatText::WithLinks" => "0";
   requires "HTTP::Request" => "0";
   requires "Log::Dispatch::Array" => "0";
@@ -48,20 +50,21 @@ on 'test' => sub {
   requires "perl" => "5.013010";
 };
 
+on 'test' => sub {
+  recommends "CPAN::Meta" => "2.120900";
+};
+
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "perl" => "5.006";
 };
 
-on 'configure' => sub {
-  suggests "JSON::PP" => "2.27300";
-};
-
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Pod::Wordlist" => "0";
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::Code::TidyAll" => "0.50";
-  requires "Test::More" => "0.88";
+  requires "Test::More" => "0.96";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Spelling" => "0.12";
 };

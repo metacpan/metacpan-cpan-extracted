@@ -2,7 +2,7 @@ package Import::Export;
 
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our %EX;
 
@@ -16,11 +16,11 @@ our %EXTYPE = (
 
 sub import {
 	my ($pkg) = shift;
-	return unless my @export = @_;	
-	
+	return unless my @export = @_;
+
 	%EX = %{"${pkg}::EX"} or Carp::croak('define your %EX export hash');
 
-	my $caller = caller();		
+	my $caller = caller();
 	export($pkg, $caller, @export);
 }
 
@@ -29,10 +29,10 @@ sub export {
 	while (my $ex = shift) {
 		my $type;
 		if ( ! $EX{$ex} ) {
-		 	my @export = grep { 
+		 	my @export = grep {
 				grep { $_ =~ m{\Q$ex\E} } @{ $EX{$_} }
 			} keys %EX;
-			scalar @export 
+			scalar @export
 				? return export($pkg, $caller, (@export, @_))
 				: Carp::croak "$ex is not exported";
 		}
@@ -40,7 +40,7 @@ sub export {
 		$type = ($ex =~ s/^(\W)//) ? $1 : "&";
 		$pkg->can($type) and next;
 
-		my $exporting = $EXTYPE{$type} or Carp::croak("Cant export symbol $ex");		
+		my $exporting = $EXTYPE{$type} or Carp::croak("Cant export symbol $ex");
 		*{"${caller}::${ex}"} = $exporting->($pkg, $ex);
 	}
 }
@@ -57,7 +57,7 @@ Import::Export - Exporting
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -65,20 +65,20 @@ Version 0.03
 
 Quick summary of what the module does.
 
-    package One;
+	package One;
 
-    use base 'Import::Export';
+	use base 'Import::Export';
 
-    our %EX = (
+	our %EX = (
 		one => [qw/all/],
-    	two => [qw/all another/]
+		two => [qw/all another/]
 	);
-    
-    sub one { 'Echo' }
 
-    package One::Two;
+	sub one { 'Echo' }
 
-    use One qw/all/;
+	package One::Two;
+
+	use One qw/all/;
 
 	.....
 

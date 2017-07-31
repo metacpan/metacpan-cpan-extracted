@@ -1,5 +1,8 @@
 Revision history for PawsX-DynamoDB-DocumentClient
 
+0.05  2017-07-21 18:49:42 UTC
+        - add ability to pass force_type to Net::Amazon::DynamoDB::Marshaler
+
 0.04  2017-07-19 20:05:51 UTC
         - re-release due to git issues with 0.03 release
 

@@ -6,7 +6,7 @@ use Capture::Tiny qw( capture );
 use Path::Class qw( file );
 use File::Temp qw( tempdir );
 use Clustericious::Admin::Dump qw( perl_dump );
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 use File::Spec;
 
 my @perls = ($^X);
@@ -22,7 +22,7 @@ eval '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . q{
   
   push @perls, 
     grep { -x $_ }
-    map { File::Spec->catfile(File::HomeDir->my_home, qw( perl5 perlbrew perls), $_, 'bin', 'perl') } 
+    map { File::Spec->catfile(bsd_glob('~/perl5/perlbrew/perls'), $_, 'bin', 'perl') } 
     map { s/^\s*//; $_ } 
     grep !/\@/, 
     grep !/^\*/, 

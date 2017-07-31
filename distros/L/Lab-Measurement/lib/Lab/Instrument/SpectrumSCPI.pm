@@ -1,5 +1,6 @@
 package Lab::Instrument::SpectrumSCPI;
-$Lab::Instrument::SpectrumSCPI::VERSION = '3.553';
+#ABSTRACT: Generic spectrum analyzer with SCPI command set
+$Lab::Instrument::SpectrumSCPI::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 
@@ -168,13 +169,19 @@ sub get_error {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::SpectrumSCPI - Spectrum Analyzer with SCPI command set
+Lab::Instrument::SpectrumSCPI - Generic spectrum analyzer with SCPI command set
+
+=head1 VERSION
+
+version 3.554
 
 =head1 DESCRIPTION
 
@@ -205,17 +212,16 @@ Returns the instruments ID string.
 
 none known so far :)
 
-=head1 SEE ALSO
+=head1 COPYRIGHT AND LICENSE
 
-=over 4
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-=back
+  Copyright 2012       Hermann Kraus
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-=head1 AUTHOR/COPYRIGHT
 
-  Copyright 2012 Hermann Kraus
-
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

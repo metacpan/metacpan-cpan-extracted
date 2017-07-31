@@ -26,7 +26,7 @@ use constant {
 
 BEGIN {
 	@ISA         = qw(Exporter);
-	$VERSION     = "2.1.6";
+	$VERSION     = "2.1.7";
 	@EXPORT_OK   = qw();
 	%EXPORT_TAGS = (
 		'all' => \@EXPORT_OK,
@@ -70,11 +70,10 @@ sub _authorize_given_url{
     my $response = $self->{HTTPTiny}->get($url);
     $self->_debug( "start> got response : ", $response->{content} );
 
-    if (!$response->{success}){
-        return $self->_wrap_error($response);
-    }
-    # HTTP 409 = Conflict
-    if ($response->{status} == 409){
+    # Valid HTTP response codes in which we should still have XML that may
+    # be parsed.
+    # https://support.3scale.net/docs/3scale-apis-activedocs
+    if (!$response->{success} && ($response->{status} !~ /^403|404|409$/)) {
         return $self->_wrap_error($response);
     }
 

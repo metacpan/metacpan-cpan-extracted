@@ -1,7 +1,7 @@
 package App::tracepm;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-07-29'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,11 +29,15 @@ our $tablespec = {
 $SPEC{tracepm} = {
     v => 1.1,
     summary => 'Trace dependencies of your Perl script',
+    args_rels => {
+        req_one => [qw/script module eval/],
+    },
     args => {
         script => {
-            summary => 'Path to script file (script to be packed)',
+            summary => 'Path to script file',
             schema => ['str*'],
             pos => 0,
+            cmdline_aliases => {s=>{}},
             tags => ['category:input'],
         },
         eval => {
@@ -42,6 +46,13 @@ $SPEC{tracepm} = {
             cmdline_aliases => {e=>{}},
             tags => ['category:input'],
         },
+        module => {
+            summary => "--module MOD is equivalent to --script 'use MOD'",
+            schema  => 'str*',
+            cmdline_aliases => {m=>{}},
+            tags => ['category:input'],
+        },
+
         method => {
             summary => 'Tracing method to use',
             schema => ['str*',
@@ -164,6 +175,7 @@ _
         detail => {
             summary => 'Whether to return records instead of just module names',
             schema => ['bool' => default=>0],
+            cmdline_aliases => {l=>{}},
             tags => ['category:field-selection'],
         },
         core => {
@@ -187,12 +199,21 @@ sub tracepm {
 
     my %args = @_;
 
-    my $script = $args{script};
-    unless (defined $script) {
-        my $eval = $args{eval};
-        defined($eval) or die "Please specify input script or --eval (-e)\n";
+    my $script;
+    {
+        if (defined $args{script}) {
+            $script = $args{script};
+            last;
+        }
         my ($fh, $filename) = File::Temp::tempfile();
-        print $fh $eval;
+        if (defined $args{module}) {
+            print $fh "use $args{module};\n";
+        } elsif (defined $args{eval}) {
+            print $fh $args{eval};
+        } else {
+            die "Please specify input via one of ".
+                "--script (-s), --module (-m), or --eval (-e)\n";
+        }
         $script = $filename;
     }
 
@@ -415,6 +436,10 @@ sub tracepm {
 
     } # if method
 
+    if (defined $args{module}) {
+        @res = grep { $_->{module} ne $args{module} } @res;
+    }
+
     unless ($args{detail}) {
         @res = map {$_->{module}} @res;
     }
@@ -439,7 +464,7 @@ App::tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.20 of App::tracepm (from Perl distribution App-tracepm), released on 2017-07-10.
+This document describes version 0.21 of App::tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
 
 =head1 SYNOPSIS
 
@@ -521,6 +546,10 @@ faster.
 
 =back
 
+=item * B<module> => I<str>
+
+--module MOD is equivalent to --script 'use MOD'.
+
 =item * B<multiple_runs> => I<array[hash]>
 
 Parameter to run script multiple times.
@@ -561,7 +590,7 @@ When recursing, exclude XS modules.
 
 =item * B<script> => I<str>
 
-Path to script file (script to be packed).
+Path to script file.
 
 =item * B<trap_script_output> => I<bool>
 
@@ -598,7 +627,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
+Source repository is at L<https://github.com/sharyanto/perl-App-tracepm>.
 
 =head1 BUGS
 

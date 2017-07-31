@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use 5.010;
 use Alien::Build::Plugin;
-use File::HomeDir 1.00;
 use URI 1.71;
 use Path::Tiny 0.100 ();
 use Sereal 3.015 qw( encode_sereal decode_sereal );
 use Digest::MD5;
+use File::Glob qw( bsd_glob );
 
 # ABSTRACT: Alien::Build plugin to cache files downloaded from the internet
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub _local_file
@@ -19,8 +19,7 @@ sub _local_file
   my($uri) = @_;
 
   Path::Tiny
-    ->new(File::HomeDir->my_home)
-    ->child('.alienbuild/plugin_fetch_cache')
+    ->new(bsd_glob '~/.alienbuild/plugin_fetch_cache')
     ->child($uri->scheme)
     ->child($uri->host)
     ->child($uri->path)
@@ -68,8 +67,7 @@ sub init
             close $fh;
           }
           
-          my $data = Path::Tiny->new(File::HomeDir->my_home)
-                     ->child('.alienbuild/plugin_fetch_cache/payload')
+          my $data = Path::Tiny->new(bsd_glob '~/.alienbuild/plugin_fetch_cache/payload')
                      ->child($md5->hexdigest)
                      ->child($res->{filename});
           $data->parent->mkpath;
@@ -145,7 +143,7 @@ Alien::Build::Plugin::Fetch::Cache - Alien::Build plugin to cache files download
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Test::Class::Moose::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 use Test2::API qw( context );
 
@@ -57,7 +57,7 @@ Test::Class::Moose::Util - Internal utilities
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =for Pod::Coverage context_do
 

@@ -26,4 +26,4 @@ requires:
   Time::HiRes: 0
   URI::Escape: 0
   perl: 5.006
-version: 0.046
+version: 0.047

@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+timeline - Program to draw an SVG timeline diagram from events defined in a file
+
+=head1 SYNOPSIS
+
+    $ timeline list_of_events.txt > timeline.svg
+
+=head1 DESCRIPTION
+
+A program to produce SVG timeline diagrams from events defined in a file.
+
+This program reads data from a file given on the command line and writes an
+SVG document to C<STDOUT>.
+
+=head2 Input Data
+
+The program reads input data from a tab-separated file. Each line in the file
+represents a single event in the timeline - which will be represented by a
+coloured rectangle in the diagram.
+
+Each line in  the file requires three columns of data: a text string (to be
+used as the label for the event), a start year and an end year. There can
+also be an optional fourth column which is a colour for the background of
+the rectangle representing the event. This colour can be a colour name (e.g.
+C<red>) or an RGB string as recognised by SVG (e.g. C<rgb(255,0,0)>).
+
+An example input file might be:
+
+    World War I	1914	1918
+    World War II	1939	1945
+
+Or, with colours included:
+
+    World War I	1914	1918	red
+    World War II	1939	1940	blue
+
+=head2 Command Line Options
+
+The program takes three command line options. This are all options.
+
+=over 4
+
+=item years_per_grid
+
+The number of years between grid lines in the output. The default value
+is ten, which gives a line every decade.
+
+=item width
+
+This will be inserted as the C<width> attribute of the top-level SVG
+element in the output. The default is C<100%>.
+
+=item height
+
+This will be inserted as the C<height> attribute of the top-level SVG
+element in the output. The default is C<100%>.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use 5.010;
+
+use List::Util qw[min max];
+use Getopt::Long;
+use SVG::Timeline;
+
+my %opts;
+
+GetOptions(
+  \%opts,
+  'years_per_grid=i',
+  'width=s',
+  'height=s',
+);
+
+my $timeline = SVG::Timeline->new(%opts);
+
+my @events;
+while (<>) {
+  chomp;
+  my %rec;
+  @rec{qw[text start end colour]} = split /\t/;
+  $timeline->add_event(\%rec);
+}
+
+say $timeline->draw;
+
+=head1 AUTHOR
+
+Dave Cross <dave@perlhacks.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2017, Magnum Solutions Ltd. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

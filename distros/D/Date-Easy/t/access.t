@@ -24,12 +24,26 @@ is $dt->second,        6,   "second accessor is correct for datetime";
 is $dt->epoch,    $epoch,    "epoch accessor is correct for datetime";
 is $dt->time_zone, $zone, "timezone accessor is correct for datetime";
 
+# simple split test
+eq_or_diff [$dt->split], [2001, 2, 3, 4, 5, 6], "can split datetime into component pieces";
+
 # try every day of the week, to insure we're getting the proper range
 # start with the first Monday in 2000 (Jan 3rd)
 for (1..7)
 {
 	$dt = Date::Easy::Datetime->new(2000, 1, $_ + 2, 0, 0, 0);
 	is $dt->day_of_week, $_, "dow accessor is correct for datetime on " . $dt->strftime('%a');
+}
+
+# day of year: just test every day for two years (one leap year, one non-leap year)
+# starting with: 1 Jan 2015
+my $start = Date::Easy::Datetime->new(2015, 1, 1, 0, 0, 0);
+my $DAYS = 60 * 60 * 24;
+my @expected = (1..365, 1..366);
+foreach (0..$#expected)
+{
+	$dt = $start + $_ * $DAYS;
+	is $dt->day_of_year, $expected[$_], "day of year correct for $dt";
 }
 
 # make sure we try the full range of quarters as well
@@ -66,13 +80,26 @@ is $d->hour,           0,     "hour accessor is correct for date";
 is $d->minute,         0,   "minute accessor is correct for date";
 is $d->second,         0,   "second accessor is correct for date";
 is $d->epoch,     $epoch,    "epoch accessor is correct for date";
-is $dt->time_zone, 'UTC', "timezone accessor is correct for datetime";
+is $d->time_zone,  'UTC', "timezone accessor is correct for date"
+	or diag "Time::Piece is v$Time::Piece::VERSION (must be at least 1.30)";
+
+# simple split test
+eq_or_diff [$d->split], [2001, 2, 3], "can split date into component pieces";
 
 # just like datetimes (see above)
 for (1..7)
 {
 	$d = Date::Easy::Date->new(2000, 1, $_ + 2);
 	is $d->day_of_week, $_, "dow accessor is correct for date on " . $d->strftime('%a');
+}
+
+# just like datetimes (see above)
+$start = Date::Easy::Date->new(2015, 1, 1);
+@expected = (1..365, 1..366);
+foreach (0..$#expected)
+{
+	$d = $start + $_;
+	is $d->day_of_year, $expected[$_], "day of year correct for $d";
 }
 
 # just like datetimes (see above)

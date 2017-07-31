@@ -1,7 +1,7 @@
 package Log::ger::For::Class;
 
-our $DATE = '2017-06-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-30'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -123,7 +123,7 @@ Log::ger::For::Class - Add logging to class
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::For::Class (from Perl distribution Log-ger-For-Class), released on 2017-06-19.
+This document describes version 0.002 of Log::ger::For::Class (from Perl distribution Log-ger-For-Class), released on 2017-07-30.
 
 =head1 SYNOPSIS
 

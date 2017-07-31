@@ -28,10 +28,12 @@ PerlSetVar ProtectedLoginScript          /login-screen
   <IfDefine APACHE2>
     AuthType Apache2::AuthTicket
     PerlAuthenHandler Apache2::AuthTicket->authenticate
-    PerlAuthzHandler  Apache2::AuthTicket->authorize
+    <IfDefine !APACHE2_4>
+      PerlAuthzHandler  Apache2::AuthTicket->authorize
+    </IfDefine>
   </IfDefine>
   AuthName Protected
-  require valid-user
+  Require valid-user
 </Location>
 
 <Location /login-screen>
@@ -43,6 +45,9 @@ PerlSetVar ProtectedLoginScript          /login-screen
   <IfDefine APACHE2>
     AuthType Apache2::AuthTicket
     PerlResponseHandler Apache2::AuthTicket->login_screen
+  </IfDefine>
+  <IfDefine APACHE2_4>
+    Require all granted
   </IfDefine>
   AuthName Protected
 </Location>
@@ -57,6 +62,9 @@ PerlSetVar ProtectedLoginScript          /login-screen
     AuthType Apache2::AuthTicket
     PerlResponseHandler Apache2::AuthTicket->login
   </IfDefine>
+  <IfDefine APACHE2_4>
+    Require all granted
+  </IfDefine>
   AuthName Protected
 </Location>
 
@@ -69,6 +77,9 @@ PerlSetVar ProtectedLoginScript          /login-screen
   <IfDefine APACHE2>
     AuthType Apache2::AuthTicket
     PerlResponseHandler Apache2::AuthTicket->logout
+  </IfDefine>
+  <IfDefine APACHE2_4>
+    Require all granted
   </IfDefine>
   AuthName Protected
 </Location>
@@ -100,10 +111,12 @@ PerlSetVar ProtectedLoginScript          /login-screen
   <IfDefine APACHE2>
     AuthType Apache2::AuthTicket
     PerlAuthenHandler Apache2::AuthTicket->authenticate
-    PerlAuthzHandler  Apache2::AuthTicket->authorize
+    <IfDefine !APACHE2_4>
+      PerlAuthzHandler  Apache2::AuthTicket->authorize
+    </IfDefine>
   </IfDefine>
   AuthName Sec
-  require  valid-user
+  Require  valid-user
 </Location>
 
 <Location /secure/login-screen>
@@ -115,6 +128,9 @@ PerlSetVar ProtectedLoginScript          /login-screen
   <IfDefine APACHE2>
     AuthType Apache2::AuthTicket
     PerlResponseHandler Apache2::AuthTicket->login_screen
+  </IfDefine>
+  <IfDefine APACHE2_4>
+    Require all granted
   </IfDefine>
   AuthName Sec
 </Location>
@@ -129,6 +145,9 @@ PerlSetVar ProtectedLoginScript          /login-screen
     AuthType Apache2::AuthTicket
     PerlResponseHandler Apache2::AuthTicket->login
   </IfDefine>
+  <IfDefine APACHE2_4>
+    Require all granted
+  </IfDefine>
   AuthName Sec
 </Location>
 
@@ -141,6 +160,9 @@ PerlSetVar ProtectedLoginScript          /login-screen
   <IfDefine APACHE2>
     AuthType Apache2::AuthTicket
     PerlResponseHandler Apache2::AuthTicket->logout
+  </IfDefine>
+  <IfDefine APACHE2_4>
+    Require all granted
   </IfDefine>
   AuthName Sec
 </Location>

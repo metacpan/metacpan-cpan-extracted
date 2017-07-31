@@ -17,7 +17,7 @@ use SVN::S4;
 use SVN::S4::Debug qw (DEBUG is_debug);
 use SVN::S4::Path;
 
-our $VERSION = '1.064';
+our $VERSION = '1.066';
 our $Info = 1;
 
 
@@ -136,8 +136,9 @@ sub checkout {
     my $self = shift;
     my %params = (#url=>,
                   #path=>,
-		  #revision=>,
-		  #fallback_cmd=>,
+                  #revision=>,
+                  #fallback_cmd=>,
+                  #sparse=>,
                   @_);
     if (!$params{fallback_cmd}) {  # used when called from within S4.
 	die "s4: %Error: s4 checkout needs url,path,revision"
@@ -187,8 +188,9 @@ sub checkout {
     # (or we'd have to repair the root, which confuses svn.)
     DEBUG "s4: Checkout the top view directory into $params{path}\n" if $self->debug;
     my @cmd_nonrecursive = (split(/\s+/,$self->{svn_binary}), "checkout", "--revision", $rev,
-			    #"--non-recursive",
-			    $params{url}, $params{path});
+			    ($params{sparse}
+			     ? ("--depth", "immediates", $params{url}, $params{path})
+			     : ($params{url}, $params{path})));
     push @cmd_nonrecursive, "--quiet" if $self->quiet;
     DEBUG "\t",join(' ',@cmd_nonrecursive),"\n" if $self->debug;
     local $! = undef;
@@ -205,7 +207,17 @@ sub checkout {
     }
     DEBUG "Parse the viewspec file $viewspec\n" if $self->debug;
     $self->parse_viewspec (filename=>$viewspec, revision=>$rev);
+    if ($params{sparse}) {
+        $self->populate_non_switched_dirs ("", %params);
+    }
     $self->apply_viewspec (path=>$params{path});
+    if ($params{sparse}) {
+        #DEBUG "s4: Updating top view directory $params{path} to infinite depth\n" if $self->debug;
+        my $cmd = "$self->{svn_binary} update --set-depth infinity $params{path}";
+        $cmd .= ' --quiet' if $self->quiet;
+        $self->run($cmd);
+        $self->set_dirs_depth_infinity ("", %params);
+    }
     $self->save_viewspec_state (path=>$params{path});
 }
 

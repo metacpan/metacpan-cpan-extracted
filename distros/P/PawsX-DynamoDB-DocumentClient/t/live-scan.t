@@ -24,9 +24,14 @@ sub do_scans {
         $elapsed_warned = 1;
     }
 
+    my $force_type = {
+        user_id => 'S',
+    };
+
     my %attr_values;
     for (my $i = 0; $i < @$user_ids; $i++) {
         $attr_values{":user_id${i}"} = $user_ids->[$i];
+        $force_type->{":user_id${i}"} = 'S';
     }
 
     my $filter = join(
@@ -40,6 +45,7 @@ sub do_scans {
         FilterExpression => $filter,
         Limit => 2,
         maybe ExclusiveStartKey => $last_evaluated_key,
+        force_type => $force_type,
     );
 
     my $results = $dynamodb->scan(%scan_params);

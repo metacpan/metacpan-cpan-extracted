@@ -1,0 +1,9 @@
+Revision history for Params-Check-Item
+
+0.02    2017-07-24    [Samuel Steffl]
+  Fixed README/pod from checkType to checkClass
+
+0.01    2017-07-23    [Samuel Steffl]
+  Initial Version
+
+

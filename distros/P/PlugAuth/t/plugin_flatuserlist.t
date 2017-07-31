@@ -3,7 +3,7 @@ use warnings;
 use autodie;
 use Test::Clustericious::Cluster;
 use Test::More tests => 19;
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 use File::Spec;
 
 my $cluster = Test::Clustericious::Cluster->new;
@@ -41,7 +41,7 @@ $t->get_ok(url $url, "/user")
     ], 'full sorted user list');
 
 do {
-  open(my $fh, '>>', File::Spec->catfile(File::HomeDir->my_home, qw( var data ), 'user_list'));
+  open(my $fh, '>>', bsd_glob('~/var/data/user_list'));
   print $fh "optimus";
   close $fh;
   # fake it that the mtime is older for test
@@ -55,7 +55,7 @@ $t->get_ok(url $url, "/user")
     ], 'full sorted user list');
 
 do {
-  open(my $fh, '>', File::Spec->catfile(File::HomeDir->my_home, qw( var data ), 'user_list'));
+  open(my $fh, '>', bsd_glob('~/var/data/user_list'));
   print $fh "one";
   close $fh;
   # fake it that the mtime is older for test

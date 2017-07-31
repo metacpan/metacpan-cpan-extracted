@@ -1,5 +1,14 @@
 Revision history for PlugAuth
 
+0.38      2017-07-26 04:31:05 -0400
+  - Remove dependency on List::MoreUtils
+
+0.37      2017-07-23 17:12:25 -0400
+  - Require Clustericious 1.24 for recent Mojolicious compat
+
+0.36      2017-07-22 21:59:57 -0400
+  - Remove dependency on File::HomeDir
+
 0.35      2016-11-28 14:31:26 -0500
   - Remove dependency on Log::Log4perl::CommandLine
 

@@ -4,7 +4,7 @@
       "Graham Ollis <perl@wdlabs.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,9 +21,6 @@
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -43,7 +40,6 @@
       "runtime" : {
          "requires" : {
             "Dist::Zilla::Role::FileGatherer" : "0",
-            "File::HomeDir" : "0.91",
             "File::Temp" : "0",
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
@@ -65,13 +61,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/Dist-Zilla-Plugin-jQuery/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Dist-Zilla-Plugin-jQuery",
+      "homepage" : "https://metacpan.org/pod/Dist::Zilla::Plugin::jQuery",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/Dist-Zilla-Plugin-jQuery.git",
          "web" : "https://github.com/plicease/Dist-Zilla-Plugin-jQuery"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

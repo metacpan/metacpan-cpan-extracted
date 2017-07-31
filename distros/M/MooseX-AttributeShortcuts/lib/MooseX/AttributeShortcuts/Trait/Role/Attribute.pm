@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Role::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Role::Attribute::VERSION = '0.032';
+$MooseX::AttributeShortcuts::Trait::Role::Attribute::VERSION = '0.034';
 # ABSTRACT: Role attribute trait to create builder method
 
 use MooseX::Role::Parameterized;
@@ -85,7 +85,7 @@ MooseX::AttributeShortcuts::Trait::Role::Attribute - Role attribute trait to cre
 
 =head1 VERSION
 
-This document describes version 0.032 of MooseX::AttributeShortcuts::Trait::Role::Attribute - released June 13, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.034 of MooseX::AttributeShortcuts::Trait::Role::Attribute - released July 25, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

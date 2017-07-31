@@ -6,6 +6,7 @@ build_requires:
   HTTP::Server::Simple: '0'
   HTTP::Server::Simple::CGI: '0'
   Test::More: '0'
+  feature: '0'
   parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -20,10 +21,10 @@ requires:
   JSON: '0'
   Moose: '0'
   REST::Client: '0'
-  feature: '0'
-  perl: v5.10.0
+  experimental: '0.016'
+  perl: v5.12.0
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.004'
+version: '1.001'
 x_serialization_backend: 'YAML::Tiny version 1.70'

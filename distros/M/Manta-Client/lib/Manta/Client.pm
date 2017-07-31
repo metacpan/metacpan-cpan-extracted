@@ -102,3 +102,55 @@ sub ls {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Manta::Client - a Manta client implementation in Perl
+
+=head1 SYNOPSIS
+
+  my $manta = Manta::Client->new(user => $username,
+    url => "https://us-east.manta.joyent.com",
+    key_file => "/root/.ssh/id_rsa");
+  my $object = $manta->get("/$username/stor/file.txt");
+  $manta->put(path => "/$username/stor/file.txt",
+    content => $content,
+    "content-type" => "text/plain");
+  $manta->rm("$username/stor/file.txt");
+  $manta->mkdir("/$username/stor/new_directory");
+  my $files = $manta->ls("$username/stor");
+
+=head1 DESCRIPTION
+
+Manta::Client communicates with some of the API endpoints defined at L<https://apidocs.joyent.com/manta/>.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+This is the constructor method. It requires a hash argument containing three elements: C<user> - the Manta username; C<url> - the URL of the Manta API endpoint; and C<key_file> - the path to an SSH private key file
+
+=head2 get
+
+Gets an object. It requires a single argument, the Manta path of the object to retrieve. It returns the contents of the object, or undef on failure.
+
+=head2 put
+
+Put an object. It requires a hash argument containing: C<path> - destination Manta path; C<content> - contents of the object to be uploaded; and C<content-type> (optional) - the MIME type of the object (defaults to application/octet-stream)
+
+It returns true on success and false on failure.
+
+=head2 rm
+
+Destroy an object. It requires a single argument, the Manta path of the object to destroy. It returns true on success and false on failure.
+
+=head2 mkdir
+
+Create a directory. It requires a single argument, the Manta path of the directory to create. It returns true on success and false on failure.
+
+=head2 ls
+
+List contents of a directory. It requires a single argument, the Manta path of the directory to list. It returns a hashref (keying on the object path) of hashrefs (or undef on failure). Each hashref has the following keys: C<type> - the MIME type; C<mtime> - the modification time in YYYY-mm-ddTHH:MM:ss.sssZ format; C<size> - size of the object in bytes; and C<etag> - UUID of the object
+

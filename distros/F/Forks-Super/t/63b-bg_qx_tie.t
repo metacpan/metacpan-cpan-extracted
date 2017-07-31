@@ -171,6 +171,6 @@ ok(@tests == 2, "list bg_qx interrupted output had "
 if (@tests>2) {
   print STDERR "output was:\n", @tests, "\n";
 }
-ok($t >= 5.5 && $t < 10.05,
+ok($t >= 5.15 && $t < 10.05,
 	"list bg_qx took ${t}s expected ~6-7s");             ### 32 ###
 

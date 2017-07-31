@@ -8,11 +8,11 @@ use Module::Build;
 my $build = Module::Build->new(
   module_name => 'Nagios::NRPE',
   license => 'perl',
-  dist_author => 'Andreas Marschke <andreas.marschke@googlemail.com>',
+  dist_author => ['Andreas Marschke', 'Sven Nierlein', 'Franz Skale', 'Johan Carlquist <jocar@su.se>', 'Christian Biamont <cbeam@su.se>', 'Micke Nordin <mikael.nordin@su.se>'],
   meta_merge => {
     resources => {
-      homepage => 'http://github.com/andreas-marschke/nagios-nrpe',
-      repository => 'git://github.com/andreas-marschke/nagios-nrpe.git'
+      homepage => 'http://github.com/stockholmuniversity/nagios-nrpe',
+      repository => 'git://github.com/stockholmuniversity/nagios-nrpe.git'
      },
     no_index => {
       directory => [qw/t xt/],
@@ -29,8 +29,9 @@ my $build = Module::Build->new(
     "perl" => "5.010_000",
     "Convert::Binary::C" => 0,
     "constant" => 0,
+    "Digest::CRC" => 0,
     "IO::Socket" => 0,
-    "IO::Socket::INET" => 0
+    "IO::Socket::INET6" => 0
   },
   dynamic_config => 0,
   recursive_test_files => 1,

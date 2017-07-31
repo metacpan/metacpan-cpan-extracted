@@ -3,6 +3,7 @@ abstract: 'Just Enough SQL Patches'
 author:
   - 'Jerome Eteve <jerome.eteve@gmail.com>'
 build_requires:
+  Carp::Always: '0.13'
   DBD::SQLite: '1.50'
   Test::Most: '0.34'
   Test::Pod::Coverage: '1.08'
@@ -32,4 +33,4 @@ requires:
 resources:
   homepage: https://github.com/jeteve/App-JESP
   repository: https://github.com/jeteve/App-JESP.git
-version: '0.008'
+version: '0.010'

@@ -1,6 +1,10 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
-0.050 2016-07-10
+0.051 2017-07-27
+
+  - Indexing for version 17.05 & up
+
+0.050 2017-07-10
 
   - Framework code lost on linking (thks Tomas Cohen Arazi)
 

@@ -20,7 +20,7 @@ use Devel::Cover::Dumper;
 # For comprehensive debug logging.
 use constant DEBUG => 0;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 our $AUTOLOAD;
 
 sub new {
@@ -233,6 +233,7 @@ sub write {
     unless (mkdir $dir) {
         confess "Can't mkdir $dir: $!" unless -d $dir;
     }
+    chmod 0777, $dir if $self->{loose_perms};
     for my $file (sort keys %{$self->{f}}) {
         $self->{f}{$file}{file} = $file;
         my $digest = $self->{f}{$file}{digest};
@@ -349,7 +350,7 @@ Devel::Cover::DB::Structure - Internal: abstract structure of a source file
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

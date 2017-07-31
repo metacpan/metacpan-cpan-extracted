@@ -1,5 +1,15 @@
 Revision history for CPAN-Common-Index
 
+0.010     2017-07-26 10:36:48-04:00 America/New_York
+
+    - No changes from 0.009
+
+0.009     2017-06-08 14:03:34-04:00 America/New_York (TRIAL RELEASE)
+
+    [CHANGED]
+
+    - Make IO::Uncompress::Gunzip optional for fat-pack-ability.
+
 0.007     2017-05-11 13:07:37-04:00 America/New_York
 
     [CHANGED]

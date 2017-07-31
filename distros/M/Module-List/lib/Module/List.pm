@@ -4,12 +4,11 @@ Module::List - module `directory' listing
 
 =head1 SYNOPSIS
 
-	use Module::List qw(list_modules);
+    use Module::List qw(list_modules);
 
-	$id_modules = list_modules("Data::ID::",
-			{ list_modules => 1});
-	$prefixes = list_modules("",
-			{ list_prefixes => 1, recurse => 1 });
+    $id_modules = list_modules("Data::ID::", { list_modules => 1});
+    $prefixes = list_modules("",
+		    { list_prefixes => 1, recurse => 1 });
 
 =head1 DESCRIPTION
 
@@ -30,7 +29,7 @@ use Carp qw(croak);
 use File::Spec;
 use IO::Dir 1.03;
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(list_modules);
@@ -105,84 +104,156 @@ named "C<pod>".  (Any POD files in such a subdirectory will therefore be
 visible under two module names, one treating the "C<pod>" subdirectory
 level as part of the module name.)
 
+=item return_path
+
+Truth value, default false.  If false, only the existence of requested
+items is reported.  If true, the pathnames of the files in which they
+exist are reported.
+
 =back
 
 Note that the default behaviour, if an empty options hash is supplied, is
 to return nothing.  You I<must> specify what kind of information you want.
 
 The function returns a reference to a hash, the keys of which are the
-names of interest.  The value associated with each of these keys is undef.
+names of interest.  By default, the value associated with each of these
+keys is undef.  If additional information about each item was requested,
+the value for each item is a reference to a hash, containing some subset
+of these items:
+
+=over
+
+=item module_path
+
+Pathname of the module of this name.  Specifically, this identifies
+the file that would be read in order to load the module.  This may be
+a C<.pmc> file if one is available.  Absent if there is no module.
+
+=item pod_path
+
+Pathname of the POD document of this name.  Absent if there is no
+discrete POD document.  (POD in a module file doesn't constitute a
+discrete POD document.)
+
+=item prefix_paths
+
+Reference to an array of the pathnames of the directories referenced
+by this prefix.  The directories are listed in the order corresponding
+to @INC.  Absent if this is not a prefix.
+
+=back
 
 =cut
 
 sub list_modules($$) {
-	my($prefix, $options) = @_;
-	my $trivial_syntax = $options->{trivial_syntax};
-	my($root_leaf_rx, $root_notleaf_rx);
-	my($notroot_leaf_rx, $notroot_notleaf_rx);
-	if($trivial_syntax) {
-		$root_leaf_rx = $notroot_leaf_rx = qr#:?(?:[^/:]+:)*[^/:]+:?#;
-		$root_notleaf_rx = $notroot_notleaf_rx =
-			qr#:?(?:[^/:]+:)*[^/:]+#;
-	} else {
-		$root_leaf_rx = $root_notleaf_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
-		$notroot_leaf_rx = $notroot_notleaf_rx = qr/[0-9a-zA-Z_]+/;
-	}
-	croak "bad module name prefix `$prefix'"
-		unless $prefix =~ /\A(?:${root_notleaf_rx}::
-					 (?:${notroot_notleaf_rx}::)*)?\z/x &&
-			 $prefix !~ /(?:\A|[^:]::)\.\.?::/;
-	my $list_modules = $options->{list_modules};
-	my $list_prefixes = $options->{list_prefixes};
-	my $list_pod = $options->{list_pod};
-	my $use_pod_dir = $options->{use_pod_dir};
-	return {} unless $list_modules || $list_prefixes || $list_pod;
-	my $recurse = $options->{recurse};
-	my @prefixes = ($prefix);
-	my %seen_prefixes;
-	my %results;
-	while(@prefixes) {
-		my $prefix = pop(@prefixes);
-		my @dir_suffix = split(/::/, $prefix);
-		my $module_rx =
-			$prefix eq "" ? $root_leaf_rx : $notroot_leaf_rx;
-		my $pm_rx = qr/\A($module_rx)\.pmc?\z/;
-		my $pod_rx = qr/\A($module_rx)\.pod\z/;
-		my $dir_rx =
-			$prefix eq "" ? $root_notleaf_rx : $notroot_notleaf_rx;
-		$dir_rx = qr/\A$dir_rx\z/;
-		foreach my $incdir (@INC) {
-			my $dir = File::Spec->catdir($incdir, @dir_suffix);
-			my $dh = IO::Dir->new($dir) or next;
-			while(defined(my $entry = $dh->read)) {
-				if(($list_modules && $entry =~ $pm_rx) ||
-						($list_pod &&
-							$entry =~ $pod_rx)) {
-					$results{$prefix.$1} = undef;
-				} elsif(($list_prefixes || $recurse) &&
-						File::Spec
-							->no_upwards($entry) &&
-						$entry =~ $dir_rx &&
-						-d File::Spec->catdir($dir,
-							$entry)) {
-					my $newpfx = $prefix.$entry."::";
-					next if exists $seen_prefixes{$newpfx};
-					$results{$newpfx} = undef
-						if $list_prefixes;
-					push @prefixes, $newpfx if $recurse;
-				}
+    my($prefix, $options) = @_;
+    my $trivial_syntax = $options->{trivial_syntax};
+    my($root_leaf_rx, $root_notleaf_rx);
+    my($notroot_leaf_rx, $notroot_notleaf_rx);
+    if($trivial_syntax) {
+	$root_leaf_rx = $notroot_leaf_rx = qr#:?(?:[^/:]+:)*[^/:]+:?#;
+	$root_notleaf_rx = $notroot_notleaf_rx = qr#:?(?:[^/:]+:)*[^/:]+#;
+    } else {
+	$root_leaf_rx = $root_notleaf_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
+	$notroot_leaf_rx = $notroot_notleaf_rx = qr/[0-9a-zA-Z_]+/;
+    }
+    croak "bad module name prefix `$prefix'"
+	unless $prefix =~ /\A(?:${root_notleaf_rx}::
+				 (?:${notroot_notleaf_rx}::)*)?\z/x &&
+		 $prefix !~ /(?:\A|[^:]::)\.\.?::/;
+    my $list_modules = $options->{list_modules};
+    my $list_prefixes = $options->{list_prefixes};
+    my $list_pod = $options->{list_pod};
+    my $use_pod_dir = $options->{use_pod_dir};
+    return {} unless $list_modules || $list_prefixes || $list_pod;
+    my $recurse = $options->{recurse};
+    my $return_path = $options->{return_path};
+    my @prefixes = ($prefix);
+    my %seen_prefixes;
+    my %results;
+    while(@prefixes) {
+	my $prefix = pop(@prefixes);
+	my @dir_suffix = split(/::/, $prefix);
+	my $module_rx = $prefix eq "" ? $root_leaf_rx : $notroot_leaf_rx;
+	my $pmc_rx = qr/\A($module_rx)\.pmc\z/;
+	my $pm_rx = qr/\A($module_rx)\.pm\z/;
+	my $pod_rx = qr/\A($module_rx)\.pod\z/;
+	my $dir_rx = $prefix eq "" ? $root_notleaf_rx : $notroot_notleaf_rx;
+	$dir_rx = qr/\A$dir_rx\z/;
+	foreach my $incdir (@INC) {
+	    my $dir = File::Spec->catdir($incdir, @dir_suffix);
+	    my $dh = IO::Dir->new($dir) or next;
+	    my @entries = $dh->read;
+	    $dh->close;
+	    if($list_modules) {
+		foreach my $pmish_rx ($pmc_rx, $pm_rx) {
+		    foreach my $entry (@entries) {
+			if($entry =~ $pmish_rx) {
+			    my $name = $prefix.$1;
+			    if($return_path) {
+				my $path = File::Spec->catfile($dir, $entry);
+				$results{$name} ||= {};
+				$results{$name}->{module_path} = $path
+				    unless
+					exists($results{$name}->{module_path});
+			    } else {
+				$results{$name} = undef;
+			    }
 			}
-			next unless $list_pod && $use_pod_dir;
-			$dir = File::Spec->catdir($dir, "pod");
-			$dh = IO::Dir->new($dir) or next;
-			while(defined(my $entry = $dh->read)) {
-				if($entry =~ $pod_rx) {
-					$results{$prefix.$1} = undef;
-				}
-			}
+		    }
 		}
+	    }
+	    if($list_pod) {
+		my @poddirs = [ $dir, \@entries ];
+		if($use_pod_dir) {
+		    my $pdir = File::Spec->catdir($dir, "pod");
+		    my $pdh = IO::Dir->new($pdir);
+		    if($pdh) {
+			push @poddirs, [ $pdir, [$pdh->read] ];
+			$pdh->close;
+		    }
+		}
+		foreach(@poddirs) {
+		    my($dir, $entries) = @$_;
+		    foreach my $entry (@$entries) {
+			if($entry =~ $pod_rx) {
+			    my $name = $prefix.$1;
+			    if($return_path) {
+				my $path = File::Spec->catfile($dir, $entry);
+				$results{$name} ||= {};
+				$results{$name}->{pod_path} = $path
+				    unless exists($results{$name}->{pod_path});
+			    } else {
+				$results{$name} = undef;
+			    }
+			}
+		    }
+		}
+	    }
+	    if($list_prefixes || $recurse) {
+		foreach my $entry (@entries) {
+		    if(File::Spec->no_upwards($entry) && $entry =~ $dir_rx &&
+			    -d File::Spec->catdir($dir, $entry)) {
+			my $newpfx = $prefix.$entry."::";
+			if($recurse && !exists($seen_prefixes{$newpfx})) {
+			    push @prefixes, $newpfx;
+			    $seen_prefixes{$newpfx} = undef;
+			}
+			if($list_prefixes) {
+			    if($return_path) {
+				$results{$newpfx} ||= { prefix_paths => [] };
+				push @{$results{$newpfx}->{prefix_paths}},
+				    File::Spec->catfile($dir, $entry);
+			    } else {
+				$results{$newpfx} = undef;
+			    }
+			}
+		    }
+		}
+	    }
 	}
-	return \%results;
+    }
+    return \%results;
 }
 
 =back
@@ -197,7 +268,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2006, 2009, 2011
+Copyright (C) 2004, 2006, 2009, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

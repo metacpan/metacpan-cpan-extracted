@@ -4,7 +4,7 @@ package DBD::Unify::TypeInfo;
 # DBI::DBD::Metadata::write_typeinfo_pm v2.008696.
 # And manually reformatted into readable style
 
-our $VERSION = $DBD::Unify::VERSION;
+our $VERSION = "0.88";
 
 use strict;
 use warnings;
@@ -116,16 +116,14 @@ my %uni_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
 $uni_types{CHARACTER} = $uni_types{CHAR};
 $uni_types{DOUBLE}    = $uni_types{"DOUBLE PRECISION"};
 
-sub odbc_type
-{
+sub odbc_type {
     my $t = shift;
     defined $t or return 0;
     $t = $odbc_types{uc $t} || $t;
     return $t;
     } # uni_type
 
-sub uni_type
-{
+sub uni_type {
     my $t = shift;
     defined $t or return 0;
     $t = $uni_types{uc $t} || $t;

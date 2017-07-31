@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Biblio::SIF::Patron;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my $term;
+
+my $num_total = 0;
+
+GetOptions(
+    't|terminator=s' => \$term,
+    'z' => sub { $term = "\x00\n" },
+    'Z' => sub { $term = "\x0a\x00\x0a" },
+    '0' => sub { $term = "\x00" },
+    'n' => sub { $term = "\n" },
+    'crlf' => sub { $term = "\x0d\x0a" },
+);
+
+$term = "\x00\x0a" unless defined $term;
+
+my $iter = Biblio::SIF::Patron->iterator(
+    @ARGV ? shift @ARGV : \*STDIN,
+    'terminator' => $term,
+);
+while (defined (my $patron = $iter->())) {
+    $num_total++;
+}
+
+print $num_total, "\n";

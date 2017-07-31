@@ -25,7 +25,7 @@ subtest 'call() returns error when discovery fails' => sub {
 subtest 'call() returns error when Device::call() fails' => sub {
     # given
     my $box = new_ok( 'Net::Fritz::Box' );
-    $box->_ua->map('http://fritz.box:49000/tr64desc.xml', get_fake_device_response());
+    $box->_ua->map('https://fritz.box:49443/tr64desc.xml', get_fake_device_response());
 
     # when
     my $error = $box->call('unknown service', 'unknown action');
@@ -52,7 +52,7 @@ subtest 'call() delegates to Device::call()' => sub {
 subtest 'discovered Device gets cached after call()' => sub {
     # given
     my $box = new_ok( 'Net::Fritz::Box' );
-    $box->_ua->map('http://fritz.box:49000/tr64desc.xml', get_fake_device_response());
+    $box->_ua->map('https://fritz.box:49443/tr64desc.xml', get_fake_device_response());
 
     # when
     $box->call('unknown service', 'unknown action');

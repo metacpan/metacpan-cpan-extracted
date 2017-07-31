@@ -1,11 +1,9 @@
-use strict;
-use warnings;
 use Test::Clustericious::Cluster;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 
-plan skip_all => 'test requires Mojolicious::Plugin::MountPSGI'
+skip_all 'test requires Mojolicious::Plugin::MountPSGI'
   unless eval q{ use Mojolicious::Plugin::MountPSGI (); 1 };
-plan skip_all => 'test requires Plack::Builder'
+skip_all 'test requires Plack::Builder'
   unless eval q{ use Plack::Builder (); 1 };
 
 my $cluster = Test::Clustericious::Cluster->new;
@@ -31,8 +29,8 @@ __DATA__
 
 use strict;
 use warnings;
-use Test::More;
 use Plack::Builder;
+use Test2::V0 -no_srand => 1;
 
 my $app = sub {
   my $env = shift;

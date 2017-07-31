@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use warnings;
 use strict;
 use Getopt::Std;
@@ -6,7 +6,7 @@ use Siebel::Lbconfig qw(recover_info get_daemon create_files);
 use File::HomeDir 1.00;
 use File::Spec;
 
-our $VERSION = '0.002'; # VERSION
+# VERSION
 
 $| = 1;
 

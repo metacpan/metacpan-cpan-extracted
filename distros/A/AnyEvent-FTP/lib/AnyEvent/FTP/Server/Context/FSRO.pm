@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Server::Context::FSRW';
 
 # ABSTRACT: FTP Server client context class with read-only access
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub cmd_stor
@@ -40,7 +40,7 @@ AnyEvent::FTP::Server::Context::FSRO - FTP Server client context class with read
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,8 @@ use warnings;
 
 my ($pid, $p_in, $p_out);
 BEGIN {
-    delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
+    delete @ENV{qw( BOOLFMT DATEFMT )};
+    #delete @ENV{qw( LC_ALL LANG )};
     $ENV{DATEFMT} = "MM/DD/YY";
 
     pipe ($p_in, $p_out);
@@ -440,7 +441,7 @@ ok ($sth = $dbh->prepare ("select xl, xc from xx where xs = ?"), "sel prepare");
 ok ($sth->execute (1), "execute 1");
 is ($sth->state, "", "state method");
 ok ($ref = $sth->fetchrow_arrayref, "fetchrow_arrayref");
-is ($sth->state, "01U00", "state method");
+like ($sth->state, qr{^(?:01U00|)$}, "state method");
 is ("@$ref", "1001, 1", "fr_ar values");
 ok ($sth->finish, "finish");
 waitpid $pid, 0;

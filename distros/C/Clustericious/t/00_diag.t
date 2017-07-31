@@ -18,9 +18,8 @@ $modules{$_} = $_ for qw(
   DateTime::Format::ISO8601
   EV
   ExtUtils::MakeMaker
-  File::HomeDir
   File::ReadBackwards
-  File::ShareDir
+  File::ShareDir::Dist
   File::ShareDir::Install
   File::Which
   File::chdir
@@ -28,7 +27,7 @@ $modules{$_} = $_ for qw(
   JSON::MaybeXS
   JSON::PP
   JSON::XS
-  List::MoreUtils
+  List::Util
   Log::Log4perl
   Log::Log4perl::Appender::TAP
   MojoX::Log::Log4perl
@@ -40,7 +39,8 @@ $modules{$_} = $_ for qw(
   Sub::Exporter
   Sub::Identify
   Term::Prompt
-  Test2::Suite
+  Test2::Bundle::Extended
+  Test2::Plugin::FauxHomeDir
   Test::Clustericious::Cluster
   Test::More
   Test::Script

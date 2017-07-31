@@ -4,7 +4,7 @@
       "celogeek <me@celogeek.com>",
       "Jens Rehsack <rehsack@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -59,7 +59,8 @@
             "Path::Class" : "0.32",
             "Pod::Usage" : "0",
             "Text::LineFold" : "0",
-            "perl" : "v5.8.1"
+            "perl" : "v5.8.1",
+            "strictures" : "2"
          }
       },
       "test" : {
@@ -97,6 +98,6 @@
          "web" : "https://github.com/celogeek/MooX-Options"
       }
    },
-   "version" : "4.100",
+   "version" : "4.101",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

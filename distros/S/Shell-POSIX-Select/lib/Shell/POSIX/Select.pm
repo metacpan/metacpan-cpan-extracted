@@ -1,6 +1,6 @@
 package Shell::POSIX::Select;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Tim Maher, tim@teachmeperl.com, yumpy@cpan.org
 # Fri May  2 10:29:25 PDT 2003
@@ -51,12 +51,11 @@ use strict;
 # no strict 'refs';	# no problem now
 
 use File::Spec::Functions 0.7;
-# some bugs in F::S or its relatives, that can cause compilation errors here
-use Filter::Simple;
+use Filter::Simple 0.84;
 
 # Damian's been fixing bugs as I report them, so best to have recent version
 # This is the oldest version that I know works pretty well
-use Text::Balanced 1.89 qw(extract_variable extract_bracketed);
+use Text::Balanced 1.97 qw(extract_variable extract_bracketed);
 
 # I've done most testing with this as yet unrelased version
 # use Text::Balanced 1.90 qw(extract_variable extract_bracketed);
@@ -121,12 +120,12 @@ $LOGGING and log_files();	# open logfiles, depending on DEBUG setting
 
 $DEBUG >2 and warn "Import_called initially set to: $_import_called\n";
 
-FILTER_ONLY code => \&filter, all => sub {
+FILTER_ONLY code_no_comments => \&filter, all => sub {
 	$LOGGING and print SOURCE;
 };
 
 $DEBUG >2 and warn "Import_called set to: $_import_called\n";
-$DEBUG >2 and warn "testmode is $Shell::POSIX::Select::_testmode";
+$DEBUG >2 and $Shell::POSIX::Select::_testmode and warn "testmode is $Shell::POSIX::Select::_testmode";
 
 use re 'eval';
 
@@ -215,7 +214,7 @@ my $RE_kw_and_decl = qr^
 				$DEBUG > 1 and show_subs("****** LOOKING FOR LOOP ****** #$loopnum\n","");
 				$loopnum > 5 and warn "$subname: Might be stuck in loop\n";
 				$loopnum > 10 and die "$subname: Probably was stuck in loop\n";
-				$DEBUG > 3 and warn "pos is currently: ", pos(), "\n";
+				$DEBUG > 3 and pos() and warn "pos is currently: ", pos(), "\n";
 				pos()=0;
 				/\S/ or $LOGGING and
 					print LOG "\$_ is all white space or else empty\n";
@@ -433,7 +432,7 @@ FILTER_EXIT:
 		}
 	}
 
-	$loopnum > 1 and $Shell::POSIX::Select::filter_output=$_;
+	$loopnum > 0 and $Shell::POSIX::Select::filter_output=$_;
 		$LOGGING and print USERPROG $_;	# $_ unset 2nd call; label starts below
 		$DEBUG_FILT > 2 and _WARN "Leaving $subname on call #$::_FILTER_CALLS\n";
 	}	# end sub filter
@@ -1330,8 +1329,8 @@ END { # END block
 				die;
 			}
 			defined $Shell::POSIX::Select::filter_output and
-				print SOURCE $Shell::POSIX::Select::filter_output or 
-				die "$PKG-END(): Failed to write to '$cdump', $!\n";
+				(print SOURCE $Shell::POSIX::Select::filter_output or 
+				die "$PKG-END(): Failed to write to '$cdump', $!\n");
 #			system "ls -li $cdump $sdump";
 	}
 
@@ -1888,7 +1887,7 @@ allows me to select the man-page of interest from a menu.
 
  # Extract man-page names from the TOC portion of the output of "perldoc perl"
  select $manpage ( sort ( `perldoc perl` =~ /^\s+(perl\w+)\s/mg) ) {
-     system "perldoc '$manpage'" ;
+     system "perldoc $manpage" ;
  }
 
 B<Screen>
@@ -2213,78 +2212,6 @@ the line numbers of the source code that gets dumped to the
 F</tmp/SELECT_source> file.  Of course, if everything works correctly,
 you'll have little reason to look at the source. 8-}
 
-=head2 Comments can Interfere with Filtering
-
-Because of the way Filter::Simple works,
-ostensibly "commented-out" C<select> loops like the following
-can actually break your program:
-
- # select (@ARGV)
- # { ; }
- select (@ARGV) { ; }
-
-A future version of Filter::Simple
-(or more precisely Text::Balanced, on which on which it depends)
-may correct this problem.
-
-In any case, there's an easy workaround for the commented-out select
-loop problem; just
-change I<se>lect into I<es>lect when you comment it out, and there'll
-be no problem.
-
-For other problems involving troublesome text within comments, see 
-L<"Failure to Identify select Loops">.
-
-=head2 Failure to Identify C<select> Loops
-
-When a properly formed C<select> loop appears in certain contexts,
-such as before a line containing certain patterns of dollar signs
-or quotes,
-it will not be properly identified and translated into standard Perl.
-
-=begin comment
-
-The following is such an example:
-
-    use Shell::POSIX::Select;
-    select (@names) { print ; }
-    # $X$
-
-=end comment
-
-The failure of the filtering routine to rewrite the loop causes the
-compiler to issue the following fatal error when it sees the
-B<{> following the B<(LIST)>:
-	
-syntax error at I<filename> line I<X>, near ") {"
-
-This of course prevents the program from running.
-
-The problem is either a bug in Filter::Simple, or one of the modules on
-which it depends.
-Until this is resolved, you may be able to 
-handle such cases by explicitly turning filtering off before the offending
-code is encountered, using the B<no> directive:
-
-    use Shell::POSIX::Select;     # filtering ON
-    select (@names) { print ; }
-
-    no Shell::POSIX::Select;      # filtering OFF
-    # $X$
-
-=head2 Restrictions on Loop-variable Names
-
-Due to a bug in most versions of Text::Balanced,
-loop-variable names that look like Perl operators,
-including C<$m>, C<$a>, C<$s>, C<$y>, C<$tr>,
-C<$qq>, C<$qw>, C<$qr>, and C<$qx>, and possibly others,
-cause syntax errors.
-Newer
-versions of that module
-(unreleased at the time of this writing)
-have corrected this problem, 
-so download the latest version if you must use such names.
-
 =head2 Please Report Bugs!
 
 This is a non-trivial program, that does some fairly complex parsing
@@ -2400,7 +2327,7 @@ B<perldoc -f select>, which has nothing to do with this module
 
 =head1 VERSION
 
- This document describes version 0.05.
+This document describes version 0.07.
 
 =head1 LICENSE
 

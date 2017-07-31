@@ -1,0 +1,13 @@
+#! /usr/bin/perl -w
+
+my $VERSION = 1.02;
+
+use blib;
+
+use Shell::POSIX::Select qw($Heading);
+
+BEGIN { @ARGV or @ARGV=qw(A B C)  ; }
+# select $var[2] ( ) { print "$var[2]\n" }
+
+$Heading='MENU CITY';
+select $var (@ARGV) { print "$var\n"; }

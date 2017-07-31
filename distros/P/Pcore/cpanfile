@@ -92,7 +92,7 @@ requires 'Sub::Util';
 
 # Pcore::Util::Data
 requires 'YAML::XS';
-requires 'JSON::XS';
+requires 'Cpanel::JSON::XS';
 requires 'CBOR::XS';
 requires 'XML::Hash::XS';
 requires 'Crypt::CBC';

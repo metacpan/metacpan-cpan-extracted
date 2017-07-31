@@ -1,3 +1,8 @@
+0.020   2017-07-30 (PERLANCAR)
+
+	- [ux] Enable $Data::Dmp::OPT_REMOVE_PRAGMAS.
+
+
 0.019   2017-07-14 (PERLANCAR)
 
 	- [Bugfix] Forgot to create preconstructed default null-loggers for
@@ -138,22 +143,22 @@
 	- [doc] Update module name Log::ger::LogAny -> Log::ger::Output::LogAny.
 
 
-0.002    2017-06-21 (PERLANCAR)
+0.002   2017-06-21 (PERLANCAR)
 
-         - [Incompatible change] Reorganize internals & fix a couple of doc
-           typos.
+        - [Incompatible change] Reorganize internals & fix a couple of doc
+          typos.
 
-         - Add outputs: Null, String (mainly for testing).
+        - Add outputs: Null, String (mainly for testing).
 
-         - Formatter: format undef as '<undef>' like in Log::Any.
+        - Formatter: format undef as '<undef>' like in Log::Any.
 
-         - Screen output: Add hooks for
-           Progress::Any::Output::TermProgressBarColor, like in
-           Log::Any::Adapter::Screen.
+        - Screen output: Add hooks for
+          Progress::Any::Output::TermProgressBarColor, like in
+          Log::Any::Adapter::Screen.
 
-         - Add some tests.
+        - Add some tests.
 
 
-0.001    2017-06-19 (PERLANCAR)
+0.001   2017-06-19 (PERLANCAR)
 
-         - First release.
+        - First release.

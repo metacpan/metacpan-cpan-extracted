@@ -1,0 +1,68 @@
+#!/m1/shared/perl/5.8.8_Oracle10/bin/perl -w
+
+eval 'exec /m1/shared/perl/5.8.8_Oracle10/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use Biblio::SIF::Patron;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my $term;
+my @conditions;
+
+GetOptions(
+    't|terminator=s' => \$term,
+    'z' => sub { $term = "\x00\n" },
+    'Z' => sub { $term = "\x0a\x00\x0a" },
+    '0' => sub { $term = "\x00" },
+    'n' => sub { $term = "\n" },
+    'crlf' => sub { $term = "\x0d\x0a" },
+);
+
+exit usage() unless @ARGV;
+my $code = compile_criteria(shift @ARGV);
+
+my $iter = Biblio::SIF::Patron->iterator(
+    @ARGV ? shift @ARGV : \*STDIN,
+    'terminator' => $term,
+);
+{
+    local $_;
+    while (defined ($_ = $iter->())) {
+        print if $code->();
+    }
+}
+
+sub compile_criteria {
+    my ($criteria) = @_;
+    if ($criteria =~ /^(\w+)=(.+)/) {
+        my ($method, $val) = ($1, $2);
+        push @code, sub {
+            $_->$method eq $val;
+        };
+    }
+    elsif ($criteria =~ /^(\w+)!=(.+)/) {
+        my ($method, $val) = ($1, $2);
+        push @code, sub {
+            $_->$method ne $val;
+        };
+    }
+    elsif ($criteria =~ /^(\w+)~(.+)/) {
+        my ($method, $pattern) = ($1, $2);
+        push @code, sub {
+            $_->$method =~ /$pattern/o;
+        };
+    }
+    elsif ($criteria =~ /^(\w+)!~(.+)/) {
+        my ($method, $pattern) = ($1, $2);
+        push @code, sub {
+            $_->$method !~ /$pattern/o;
+        };
+    }
+    return sub {
+        foreach my $f (@code) {
+            return unless $f->();
+        }
+        return 1;
+    };
+}

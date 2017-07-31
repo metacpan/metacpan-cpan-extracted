@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Device;
 # ABSTRACT: represents a TR064 device
-$Net::Fritz::Device::VERSION = 'v0.0.8';
+$Net::Fritz::Device::VERSION = 'v0.0.9';
 
 use Net::Fritz::Data;
 use Net::Fritz::Error;
@@ -242,7 +242,7 @@ Net::Fritz::Device - represents a TR064 device
 
 =head1 VERSION
 
-version v0.0.8
+version v0.0.9
 
 =head1 SYNOPSIS
 
@@ -304,25 +304,25 @@ XML:
 
 =over 4
 
-=item deviceType
+=item * deviceType
 
-=item friendlyName
+=item * friendlyName
 
-=item manufacturer
+=item * manufacturer
 
-=item manufacturerURL
+=item * manufacturerURL
 
-=item modelDescription
+=item * modelDescription
 
-=item modelName
+=item * modelName
 
-=item modelNumber
+=item * modelNumber
 
-=item modelURL
+=item * modelURL
 
-=item UDN
+=item * UDN
 
-=item presentationURL
+=item * presentationURL
 
 =back
 
@@ -393,14 +393,15 @@ first.
 
 If no matching device is found, a L<Net::Fritz::Error> is returned.
 
-=head2 call(I<service_name> I<action_name [I<parameter> => I<value>] [...])
+=head2 call(I<service_name> I<action_name> [I<argument_hash>])
 
 Directly calls the L<Net::Fritz::Action> named I<action_name> of the
 L<Net::Fritz::Service> matching the regular expression I<service_name>.
 
 This is a convenience method that internally calls
-L<find_service()|/find_service(regexp)> followed by L<Net::Fritz::Service/call> -
-see those methods for further details.
+L<find_service()|/find_service(regexp)> followed by
+L<Net::Fritz::Service::call|Net::Fritz::Service/call(action_name
+[argument_hash])> - see those methods for further details.
 
 The intermediate L<Net::Fritz::Service> is cached, so that further
 calls to the same I<service_name> only need to do one instead of two

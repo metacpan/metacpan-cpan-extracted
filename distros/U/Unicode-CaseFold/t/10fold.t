@@ -122,7 +122,7 @@ table_test(@test_table);
 
 SKIP: {
   skip "Unicode version <5.1", 4 unless $^V ge v5.10.1;
-  
+
   my @test_table = (
     [ 'TSCHÜẞ', 'tschüß', 'Tschüß', 'TSCHÜẞ', 'tschüß', 'Tschüß', 'TSCHÜẞ', 'tschüß', 'tschüss', 'tschüss',  ],
     [ 'WEIẞ', 'weiß', 'Weiß', 'WEIẞ', 'weiß', 'Weiß', 'WEIẞ', 'weiß', 'weıss', 'weiss',  ],

@@ -2,12 +2,12 @@
 # run with perl -d:DProf $0
 
 use CGI::Ex::Conf qw(conf_read conf_write);
-use POSIX qw(tmpnam);
+use File::Temp ();
 use Data::Dumper qw(Dumper);
 
 #my $cob = CGI::Ex::Conf->new;
-my $tmp = tmpnam .".sto";
-END { unlink $tmp };
+my $tmp_obj = File::Temp->new(SUFFIX => ".sto");
+my $tmp = $tmp_obj->filename;
 
 my $conf = {
     one   => 1,

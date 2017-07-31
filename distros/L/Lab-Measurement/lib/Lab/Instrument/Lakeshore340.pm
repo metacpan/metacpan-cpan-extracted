@@ -1,5 +1,6 @@
 package Lab::Instrument::Lakeshore340;
-$Lab::Instrument::Lakeshore340::VERSION = '3.553';
+#ABSTRACT: Lakeshore 340 temperature controller
+$Lab::Instrument::Lakeshore340::VERSION = '3.554';
 use warnings;
 use strict;
 use 5.010;
@@ -937,9 +938,19 @@ sub factory_reset {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Lab::Instrument::Lakeshore340 - Lakeshore 340 Temperature controller
+Lab::Instrument::Lakeshore340 - Lakeshore 340 temperature controller
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -978,7 +989,6 @@ If not defined the default channel 'A' will be selected.
 
 =back
 
-
 =head2 get_R
 
 	$t = $lake->get_R(<$channel>);
@@ -993,7 +1003,6 @@ CHANNEL is an optinal parameter to select the sensor channel (A/B/C/D) for the m
 If not defined the default channel 'A' will be selected.
 
 =back
-
 
 =head2 set_T
 
@@ -1074,7 +1083,6 @@ The INTEGRAL term looks at error over time to build the integral contribution to
 
 The DERIVATIVE term acts aon the change in error with time to make its contribution to the output. Values: 0 ... 200.
 
-
 =back
 
 .
@@ -1145,16 +1153,16 @@ probably many
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This is $Id: Lakeshore336.pm 650 2010-04-22 19:09:27Z schroeer $
+  Copyright 2013-2014  Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
 
-Modified 2011 by Stefan Geissler
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

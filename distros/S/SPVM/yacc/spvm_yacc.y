@@ -11,9 +11,10 @@
   #include "spvm_op.h"
   #include "spvm_dumper.h"
   #include "spvm_constant.h"
+  #include "spvm_type.h"
 %}
 
-%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE MALLOC
+%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW
 %token <opval> LAST NEXT NAME VAR CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF DIE
 %token <opval> SWITCH CASE DEFAULT VOID EVAL EXCEPTION_VAR
 
@@ -205,7 +206,7 @@ enumeration_value
       SPVM_OP_insert_child(compiler, op_enumeration_value, op_enumeration_value->last, $1);
       $$ = op_enumeration_value;
     }
-  | NAME ASSIGN CONSTANT
+  | NAME ASSIGN term
     {
       SPVM_OP* op_enumeration_value = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ENUMERATION_VALUE, $1->file, $1->line);
       SPVM_OP_insert_child(compiler, op_enumeration_value, op_enumeration_value->last, $1);
@@ -357,6 +358,14 @@ sub
      {
        $$ = SPVM_OP_build_sub(compiler, $1, $2, $4, $7, $8, NULL);
      }
+ | SUB NEW '(' opt_args ')' ':' opt_descriptors type_or_void block
+     {
+       $$ = SPVM_OP_build_sub(compiler, $1, $2, $4, $7, $8, $9);
+     }
+ | SUB NEW '(' opt_args ')' ':' opt_descriptors type_or_void ';'
+     {
+       $$ = SPVM_OP_build_sub(compiler, $1, $2, $4, $7, $8, NULL);
+     }
 enumeration
   : ENUM enumeration_block
     {
@@ -393,15 +402,15 @@ expression
     }
   | call_field ASSIGN term
     {
-      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
   | array_elem ASSIGN term
     {
-      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
   | EXCEPTION_VAR ASSIGN term
     {
-      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
 
 opt_terms
@@ -467,13 +476,13 @@ term
   | my_var
 
 new_object
-  : MALLOC type_name
+  : NEW type_name
     {
-      $$ = SPVM_OP_build_malloc_object(compiler, $1, $2);
+      $$ = SPVM_OP_build_new_object(compiler, $1, $2);
     }
-  | MALLOC type_array_with_length
+  | NEW type_array_with_length
     {
-      $$ = SPVM_OP_build_malloc_object(compiler, $1, $2);
+      $$ = SPVM_OP_build_new_object(compiler, $1, $2);
     }
 
 convert_type
@@ -505,15 +514,15 @@ unop
   | '-' term %prec UMINUS
     {
       if ($2->code == SPVM_OP_C_CODE_CONSTANT) {
-        SPVM_CONSTANT* constant = $2->uv.constant;
-        if (constant->code == SPVM_CONSTANT_C_CODE_INT || constant->code == SPVM_CONSTANT_C_CODE_LONG) {
-          constant->sign = 1;
-          $$ = $2;
+        SPVM_OP* op_constant = $2;
+        SPVM_CONSTANT* constant = op_constant->uv.constant;
+        if (constant->sign) {
+          constant->sign = 0;
         }
         else {
-          SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEGATE, $1->file, $1->line);
-          $$ = SPVM_OP_build_unop(compiler, op, $2);
+          constant->sign = 1;
         }
+        $$ = op_constant;
       }
       else {
         SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEGATE, $1->file, $1->line);
@@ -546,7 +555,7 @@ unop
     }
   | NOT term
     {
-      $$ = SPVM_OP_build_unop(compiler, $1, $2);
+      $$ = SPVM_OP_build_not(compiler, $1, $2);
     }
 
 binop
@@ -592,13 +601,17 @@ binop
     {
       $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
     }
+  | my_var ASSIGN '[' opt_terms ']'
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $4);
+    }
   | my_var ASSIGN term
     {
-      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
   | VAR ASSIGN term
     {
-      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
   | '(' term ')'
     {
@@ -606,11 +619,11 @@ binop
     }
   | term OR term
     {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_or(compiler, $2, $1, $3);
     }
   | term AND term
     {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_and(compiler, $2, $1, $3);
     }
 
 array_elem
@@ -650,7 +663,7 @@ call_sub
       SPVM_OP* op_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
       $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_terms);
     }
-
+    
 opt_args
   :	/* Empty */
     {
@@ -729,7 +742,6 @@ type
   : type_name
   | type_array
 
-
 type_name
   : NAME
     {
@@ -760,6 +772,7 @@ type_or_void
   : type
   | VOID
 
+
 field_name : NAME
 sub_name : NAME
 package_name : NAME
@@ -771,4 +784,3 @@ eval_block
     }
 
 %%
-

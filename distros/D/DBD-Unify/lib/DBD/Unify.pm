@@ -1,16 +1,16 @@
-#   Copyright (c) 1999-2015 H.Merijn Brand
+#   Copyright (c) 1999-2017 H.Merijn Brand
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
 
-require 5.006;
+use 5.8.4;
 
 use strict;
 use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.87";
+our $VERSION = "0.88";
 
 =head1 NAME
 
@@ -89,14 +89,12 @@ use vars qw(@ISA);
 @ISA = qw(DynaLoader);
 bootstrap DBD::Unify $VERSION;
 
-use vars qw($err $errstr $state $drh);
-$err    = 0;		# holds error code   for DBI::err
-$errstr = "";		# holds error string for DBI::errstr
-$state  = "";		# holds SQL state    for DBI::state
-$drh    = undef;	# holds driver handle once initialized
+our $err    = 0;	# holds error code   for DBI::err
+our $errstr = "";	# holds error string for DBI::errstr
+our $state  = "";	# holds SQL state    for DBI::state
+our $drh    = undef;	# holds driver handle once initialized
 
-sub driver
-{
+sub driver {
     return $drh if $drh;
     my ($class, $attr) = @_;
 
@@ -123,21 +121,20 @@ package DBD::Unify::dr;
 
 $DBD::Unify::dr::imp_data_size = 0;
 
-sub connect
-{
-    my ($drh, $dbname, $user, $auth) = @_;
+sub connect {
+    my ($dr_h, $dbname, $user, $auth) = @_;
 
     unless ($ENV{UNIFY} && -d $ENV{UNIFY} && -x _) {
-	$drh->{Warn} and
+	$dr_h->{Warn} and
 	    Carp::croak "\$UNIFY not set or invalid. UNIFY may fail\n";
 	}
     # More checks here if wanted ...
 
-    $user = "" unless defined $user;
-    $auth = "" unless defined $auth;
+    defined $user or $user = "";
+    defined $auth or $auth = "";
 
     # create a 'blank' dbh
-    my $dbh = DBI::_new_dbh ($drh, {
+    my $dbh = DBI::_new_dbh ($dr_h, {
 	Name          => $dbname,
 	USER          => $user,
 	CURRENT_USER  => $user,
@@ -155,11 +152,10 @@ sub connect
     $dbh;
     } # connect
 
-sub data_sources
-{
-    my ($drh) = @_;
-    $drh->{Warn} and
-	Carp::carp "\$drh->data_sources () not defined for Unify\n";
+sub data_sources {
+    my ($dr_h) = @_;
+    $dr_h->{Warn} and
+	Carp::carp "\$dr_h->data_sources () not defined for Unify\n";
     "";
     } # data_sources
 
@@ -171,8 +167,7 @@ package DBD::Unify::db;
 
 $DBD::Unify::db::imp_data_size = 0;
 
-sub parse_trace_flag
-{
+sub parse_trace_flag {
     my ($dbh, $name) = @_;
   # print STDERR "# Flags: $name\n";
     return 0x7FFFFF00 if $name eq "DBD";	# $h->trace ("DBD"); -- ALL
@@ -183,15 +178,13 @@ sub parse_trace_flag
     return $dbh->SUPER::parse_trace_flag ($name);
     } # parse_trace_flag
 
-sub type_info_all
-{
+sub type_info_all {
     my ($dbh) = @_;
     require DBD::Unify::TypeInfo;
     return [ @$DBD::Unify::TypeInfo::type_info_all ];
     } # type_info_all
 
-sub get_info
-{
+sub get_info {
     my ($dbh, $info_type) = @_;
     require  DBD::Unify::GetInfo;
     my $v = $DBD::Unify::GetInfo::info{int $info_type};
@@ -199,9 +192,8 @@ sub get_info
     return $v;
     } # get_info
 
-sub private_attribute_info
-{
-    return { 
+sub private_attribute_info {
+    return {
 	dbd_verbose	=> undef,
 
 	uni_verbose	=> undef,
@@ -209,15 +201,13 @@ sub private_attribute_info
 	};
     } # private_attribute_info
 
-sub ping
-{
+sub ping {
     my $dbh = shift;
     $dbh->prepare ("select USER_NAME from SYS.DATABASE_USERS") or return 0;
     return 1;
     } # ping
 
-sub prepare
-{
+sub prepare {
     my ($dbh, $statement, @attribs) = @_;
 
     # Strip comments
@@ -240,14 +230,12 @@ sub prepare
     $sth;
     } # prepare
 
-sub _is_or_like
-{
+sub _is_or_like {
     my ($fld, $val) = @_;
     $val =~ m/[_%]/ ? "$fld like '$val'" : "$fld = '$val'";
     } # _is_or_like
 
-sub table_info
-{
+sub table_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $type, $attr);
     ref $_[0] or ($catalog, $schema, $table, $type) = splice @_, 0, 4;
@@ -281,8 +269,141 @@ sub table_info
     $sth;
     } # table_info
 
-sub column_info
-{
+{   my (%cache, @links, $pki);
+
+    sub _sys_clear_cache {
+	%cache = ();
+	@links = ();
+	$pki   = undef;
+	} # _sys_clear_cache
+    *DBI::db::uni_clear_cache = \&_sys_clear_cache;
+
+    sub _set_info_cache {
+	my $dbh = shift;
+
+	keys %cache and return;
+
+	my $sth = $dbh->prepare (join " " =>
+	    "select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH,",
+		   "DATA_SCALE, DISPLAY_LENGTH, DISPLAY_SCALE, NULLABLE,",
+		   "RDNLY, PRIMRY, UNIQ, LOGGED, ORDERED",
+	    "from   SYS.ACCESSIBLE_COLUMNS") or return;
+	$sth->{ChopBlanks} = 1;
+	$sth->execute or return;
+	my %sac;
+	my @fld = @{$sth->{NAME_lc}};
+	$sth->bind_columns (\@sac{@fld});
+	while ($sth->fetch) {
+	    $cache{$sac{ownr} || ""}
+		  {$sac{table_name}}
+		  {$sac{column_name}} = [ @sac{@fld} ];
+	    }
+	} # _set_info_cache
+
+    sub _set_link_cache {
+	my $dbh = shift;
+
+	@links and return;
+
+	my $sth = $dbh->prepare (join " " =>
+	    "select INDEX_NAME,",
+		   "REFERENCED_OWNER,  REFERENCED_TABLE,  REFERENCED_COLUMN,",
+		   "REFERENCING_OWNER, REFERENCING_TABLE, REFERENCING_COLUMN,",
+		   "REFERENCING_COLUMN_ORD",
+	    "from   SYS.LINK_INDEXES");
+	$sth or return;
+	$sth->{ChopBlanks} = 1;
+	$sth->execute or return;
+	my %sli;
+	my @fld = @{$sth->{NAME_lc}};
+	$sth->bind_columns (\@sli{@fld});
+	while ($sth->fetch) {
+	    push @links, { %sli };
+	    }
+	} # _set_link_cache
+
+    sub _sys_column_info {
+	my ($dbh, $sch, $tbl, $col) = @_;
+
+	_set_info_cache ($dbh);
+
+	my @ci;
+	foreach my $s (sort keys %cache) {
+	    $sch and lc $sch ne lc $s and next;
+	    foreach my $t (sort keys %{$cache{$s}}) {
+		$tbl and lc $tbl ne lc $t and next;
+		foreach my $c (sort keys %{$cache{$s}{$t}}) {
+		    $col and lc $col ne lc $c and next;
+		    push @ci, $cache{$s}{$t}{$c};
+		    }
+		}
+	    }
+	@ci;
+	}
+
+    sub _sys_link_info {
+	my $dbh = shift;
+	my ($Pcatalog, $Pschema, $Ptable,
+	    $Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
+
+	_set_link_cache ($dbh);
+
+	my @fki;
+	for (@links) {
+	    $Pschema and lc $_->{referenced_owner}  ne lc $Pschema and next;
+	    $Ptable  and lc $_->{referenced_table}  ne lc $Ptable  and next;
+	    $Fschema and lc $_->{referencing_owner} ne lc $Fschema and next;
+	    $Ftable  and lc $_->{referencing_table} ne lc $Ftable  and next;
+
+	    push @fki, [
+		undef, @{$_}{qw( referenced_owner  referenced_table  referenced_column  )},
+		undef, @{$_}{qw( referencing_owner referencing_table referencing_column )},
+		$_->{referencing_column_ord} + 1,
+		undef, undef,
+		$_->{index_name}, undef,
+		undef, undef,
+		];
+	    }
+	@fki;
+	} # _sys_link_info
+
+    sub _sys_primary_keys {
+	my $dbh = shift;
+	unless ($pki) {
+	    _set_info_cache ($dbh);
+
+	    # Note that PRIMRY is *only* set for tables with *ONE* key field
+	    # for composite keys this doesn't work :(
+	    foreach my $s (sort keys %cache) {
+		foreach my $t (sort keys %{$cache{$s}}) {
+		    foreach my $c (sort keys %{$cache{$s}{$t}}) {
+			$cache{$s}{$t}{$c}[-4] eq "Y" or next;
+			push @{$pki->{key}{$s}{$t}}, $c;
+			}
+		    }
+		}
+
+	    # For tables with a combined key, we need to analyse the automatic
+	    # added HASH_INDEX for those tables
+	    if (my $hth = $dbh->prepare (join " " =>
+		    "select   OWNR, TABLE_NAME, COLUMN_NAME, COLUMN_ORD",
+		    "from     SYS.HASH_INDEXES_G",
+		    "where    UNIQUE_SPEC = 'Y'",
+		    "order by OWNR, TABLE_NAME, COLUMN_ORD")) {
+		$hth->{ChopBlanks} = 1;
+		$hth->execute or return;
+		$hth->bind_columns (\my ($sch, $tbl, $fld, $ord));
+		while ($hth->fetch) {
+		    #warn "$ord $sch.$tbl.$fld\n";
+		    push @{$pki->{key}{$sch}{$tbl}}, $fld;
+		    }
+		}
+	    }
+	$pki;
+	} # _sys_primary_keys
+    }
+
+sub column_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $column);
     ref $_[0] or ($catalog, $schema, $table, $column) = splice @_, 0, 4;
@@ -291,21 +412,11 @@ sub column_info
 	    Carp::carp "Unify does not support catalogs in column_info\n";
 	return;
 	}
-    my @where;
-    $schema and push @where, "OWNR        like '$schema'";
-    $table  and push @where, "TABLE_NAME  like '$table'";
-    $column and push @where, "COLUMN_NAME like '$column'";
-    local $" = " and ";
-    my $where = @where ? " where @where" : "";
-    my $sth = $dbh->prepare (
-	"select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_SCALE, DISPLAY_LENGTH, DISPLAY_SCALE, NULLABLE, RDNLY, PRIMRY, UNIQ, LOGGED, ORDERED ".
-	"from   SYS.ACCESSIBLE_COLUMNS ".
-	$where);
-    $sth or return;
-    $sth->execute;
+    my @ci = _sys_column_info ($dbh, $schema, $table, $column) or return;
     my @fki;
     require DBD::Unify::TypeInfo;
-    while (my @sli = $sth->fetchrow_array) {
+    for (@ci) {
+	my @sli = @$_;
 	my $uni_type_name = $sli[3];
 	   $uni_type_name =~ s/^CHARACTER$/CHAR/;
 	   $uni_type_name =~ s/^DOUBLE$/DOUBLE PRECISION/;
@@ -342,8 +453,6 @@ sub column_info
 	    @sli[6,7,9..13],
 	    ];
 	}
-    $sth->finish;
-    $sth = undef;
 
     my @col_name = qw(
 	TABLE_CAT TABLE_SCHEM TABLE_NAME
@@ -364,20 +473,17 @@ sub column_info
 	uni_uniq uni_logged uni_ordered
 	);
     DBI->connect ("dbi:Sponge:", "", "", {
-	RaiseError       => $sth->{RaiseError},
-	PrintError       => $sth->{PrintError},
+	RaiseError       => $dbh->{RaiseError},
+	PrintError       => $dbh->{PrintError},
 	ChopBlanks       => 1,
-	FetchHashKeyName => $sth->{FetchHashKeyName} || "NAME",
-	})->prepare ("select column_info $where", {
+	FetchHashKeyName => $dbh->{FetchHashKeyName} || "NAME",
+	})->prepare ("select column_info", {
 	    rows => \@fki,
 	    NAME => \@col_name,
 	    });
     } # column_info
 
-my $info_cache;
-
-sub primary_key
-{
+sub primary_key {
     my $dbh = shift;
     my ($catalog, $schema, $table) = @_;
     if ($catalog) {
@@ -394,52 +500,20 @@ sub primary_key
 	};
     @key and return @key;
 
-    unless ($info_cache) {
-	# Note that PRIMRY is *only* set for tables with *ONE* key field
-	# for composite keys this doesn't work :(
-	my $sth = $dbh->prepare (
-	    "select COLUMN_NAME, OWNR, TABLE_NAME ".
-	    "from   SYS.ACCESSIBLE_COLUMNS ".
-	    "where  PRIMRY = 'Y'") or return;
-	$sth->{ChopBlanks} = 1;
-	$sth->execute or return;
+    my $pki_cache = _sys_primary_keys ($dbh);
+    $pki_cache && $pki_cache->{key} or return;
 
-	$sth->bind_columns (\my ($fld, $sch, $tbl));
-	while ($sth->fetch) {
-	    #warn "* $sch.$tbl.$fld\n";
-	    push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
-	    }
-
-	# For tables with a combined key, we need to analyse the automatic
-	# added HASH_INDEX for those tables
-	if (my $hth = $dbh->prepare (
-		"select   OWNR, TABLE_NAME, COLUMN_NAME, COLUMN_ORD ".
-		"from     SYS.HASH_INDEXES_G ".
-		"where    UNIQUE_SPEC = 'Y' ".
-		"order by OWNR, TABLE_NAME, COLUMN_ORD")) {
-	    $hth->{ChopBlanks} = 1;
-	    $hth->execute or return;
-	    $hth->bind_columns (\my ($sch, $tbl, $fld, $ord));
-	    while ($hth->fetch) {
-		#warn "$ord $sch.$tbl.$fld\n";
-		push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
-		}
-	    }
-	}
-    $info_cache && $info_cache->{key} or return;
-
-    foreach my $sch (sort keys %{$info_cache->{key}}) {
+    foreach my $sch (sort keys %{$pki_cache->{key}}) {
 	defined $schema && lc $sch ne lc $schema and next;
-	foreach my $tbl (sort keys %{$info_cache->{key}{$sch}}) {
+	foreach my $tbl (sort keys %{$pki_cache->{key}{$sch}}) {
 	    defined $table && lc $tbl ne lc $table and next;
-	    push @key, @{$info_cache->{key}{$sch}{$tbl}};
+	    push @key, @{$pki_cache->{key}{$sch}{$tbl}};
 	    }
 	}
     return @key;
     } # primary_key
 
-sub quote_identifier
-{
+sub quote_identifier {
     my ($dbh, @arg) = map { defined $_ && $_ ne "" ? $_ : undef } @_;
     return $dbh->SUPER::quote_identifier (@arg);
     } # quote_identifier
@@ -448,41 +522,14 @@ sub quote_identifier
 #            $pk_catalog, $pk_schema, $pk_table,
 #            $fk_catalog, $fk_schema, $fk_table,
 #            \%attr);
-sub foreign_key_info
-{
+sub foreign_key_info {
     my $dbh = shift;
     my ($Pcatalog, $Pschema, $Ptable,
 	$Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
 
-    my @where;
-    $Pschema and push @where, "REFERENCED_OWNER  = '$Pschema'";
-    $Ptable  and push @where, "REFERENCED_TABLE  = '$Ptable'";
-    $Fschema and push @where, "REFERENCING_OWNER = '$Fschema'";
-    $Ftable  and push @where, "REFERENCING_TABLE = '$Ftable'";
-
-    my $where = @where ? "where " . join " and " => @where : "";
-    my $sth = $dbh->prepare (join "\n",
-	"select INDEX_NAME, ",
-	"       REFERENCED_OWNER,  REFERENCED_TABLE,  REFERENCED_COLUMN,",
-	"       REFERENCING_OWNER, REFERENCING_TABLE, REFERENCING_COLUMN,",
-	"       REFERENCING_COLUMN_ORD",
-	"from   SYS.LINK_INDEXES",
-	$where);
-    $sth or return;
-    $sth->{ChopBlanks} = 1;
-    $sth->execute or return;
-    my @fki;
-    while (my @sli = $sth->fetchrow_array) {
-	push @fki, [
-	    undef, @sli[1..3],
-	    undef, @sli[4..6], $sli[7] + 1,
-	    undef, undef,
-	    $sli[0], undef,
-	    undef, undef
-	    ];
-	}
-    $sth->finish;
-    undef $sth;
+    my @fki = _sys_link_info ($dbh,
+	    $Pcatalog, $Pschema, $Ptable,
+	    $Fcatalog, $Fschema, $Ftable, $attr);
 
     my @col_name = qw(
 	UK_TABLE_CAT UK_TABLE_SCHEM UK_TABLE_NAME UK_COLUMN_NAME
@@ -493,11 +540,11 @@ sub foreign_key_info
 	FK_NAME UK_NAME
 	DEFERABILITY UNIQUE_OR_PRIMARY );
     DBI->connect ("dbi:Sponge:", "", "", {
-	RaiseError       => $sth->{RaiseError},
-	PrintError       => $sth->{PrintError},
+	RaiseError       => $dbh->{RaiseError},
+	PrintError       => $dbh->{PrintError},
 	ChopBlanks       => 1,
-	FetchHashKeyName => $sth->{FetchHashKeyName} || "NAME",
-	})->prepare ("select link_info $where", {
+	FetchHashKeyName => $dbh->{FetchHashKeyName} || "NAME",
+	})->prepare ("select link_info", {
 	    rows => \@fki,
 	    NAME => \@col_name,
 	    });
@@ -505,8 +552,7 @@ sub foreign_key_info
 
 # type = "R" ? references me : references
 # This is to be converted to foreign_key_info
-sub link_info
-{
+sub link_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $type, $attr);
     ref $_[0] or ($catalog, $schema, $table, $type) = splice @_, 0, 4;
@@ -549,9 +595,8 @@ sub link_info
 
 package DBD::Unify::st;
 
-sub private_attribute_info
-{
-    return { 
+sub private_attribute_info {
+    return {
 	uni_type	=> undef,
 	};
     } # private_attribute_info
@@ -559,6 +604,7 @@ sub private_attribute_info
 1;
 
 ####### End ###################################################################
+__END__
 
 =head1 DESCRIPTION
 
@@ -719,7 +765,7 @@ Just here for DBI. No use in telling the end-user what to do with it :)
 =item data_sources
 
 There is no way for Unify to tell what data sources might be available.
-There is no central files (like /etc/oratab for Oracle) that lists all
+There is no central files (like F</etc/oratab> for Oracle) that lists all
 available sources, so this method will always return an empty list.
 
 =item quote_identifier
@@ -745,6 +791,8 @@ alias C<uni_verbose>) level. See "trace" below.
 =item link_info ($;$$$$)
 
 =item primary_key ($$$)
+
+=item uni_clear_cache ()
 
 Note that these five get their info by accessing the C<SYS> schema which
 is relatively extremely slow. e.g. Getting all the primary keys might well
@@ -792,6 +840,12 @@ types C<currency> and C<huge integer>.
   smallint            SMALLINT          5    2 NUMERIC (4)
   text                TEXT             -1   -9 TEXT
   time                TIME             10   -7 TIME
+
+Currently the driver tries to cache information about the schema as it
+is required. When there are fields added, removed, or altered, references
+are added or removed or primary keys or unique hashes are added or removed
+it is wise to call C<< $dbh->uni_clear_cache >> to ensure that the info
+on next inquiries will be up to date.
 
 =item ping
 
@@ -913,7 +967,7 @@ No messages (yet) set to level 8 and up.
 
 =back
 
-=item int  dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
+=item int  dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value, IV sql_type, SV *attribs, int is_inout, IV maxlen)
 
 =item SV  *dbd_db_FETCH_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
 
@@ -927,7 +981,7 @@ No messages (yet) set to level 8 and up.
 
 =item int  dbd_db_do (SV *dbh, char *statement)
 
-=item int  dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
+=item int  dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pwd)
 
 =item int  dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh)
 
@@ -943,7 +997,7 @@ No messages (yet) set to level 8 and up.
 
 =item int  dbd_st_STORE_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)
 
-=item int  dbd_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field,
+=item int  dbd_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field, long offset, long len, SV *destrv, long destoffset)
 
 =item void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 
@@ -1006,7 +1060,7 @@ documentation (DBD-Oracle is probably the most complete), the
 comp.lang.perl.modules newsgroup and the dbi-users mailing list
 (mailto:dbi-users-help@perl.org)
 
-=head1 AUTHORS
+=head1 AUTHOR
 
 DBI/DBD was developed by Tim Bunce, who also developed the DBD::Oracle.
 
@@ -1016,7 +1070,7 @@ Todd Zervas has given a lot of feedback and patches.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2015 H.Merijn Brand
+Copyright (C) 1999-2017 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

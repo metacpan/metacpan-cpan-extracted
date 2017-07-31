@@ -8,10 +8,10 @@
 
 use strict;
 use Test::More tests => 8;
-use POSIX qw(tmpnam);
+use File::Temp ();
 
-my $file = tmpnam;
-END { unlink $file };
+my $fileobject = File::Temp->new;
+my $file = $fileobject->filename;
 
 use_ok('CGI::Ex::Conf');
 

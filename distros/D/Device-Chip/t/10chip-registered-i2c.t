@@ -8,14 +8,14 @@ use Test::Device::Chip::Adapter;
 
 use Device::Chip::Base::RegisteredI2C;
 
+my $adapter = Test::Device::Chip::Adapter->new;
+
 {
    package TestChip;
    use base qw( Device::Chip::Base::RegisteredI2C );
 }
 
-my $adapter = Test::Device::Chip::Adapter->new;
-
-my $chip = Device::Chip::Base::RegisteredI2C->new;
+my $chip = TestChip->new;
 $chip->mount( $adapter )->get;
 
 # write
@@ -92,6 +92,49 @@ $chip->mount( $adapter )->get;
    $chip->cached_write_reg( 3, "\x41" )->get;
 
    $adapter->check_and_clear( '->cached_write_reg writes a new value' );
+}
+
+# wide data
+{
+   {
+      package TestChipWide;
+      use base qw( Device::Chip::Base::RegisteredI2C );
+      use constant REG_DATA_SIZE => 16;
+   }
+
+   my $chip = TestChipWide->new;
+   $chip->mount( $adapter )->get;
+
+   {
+      $adapter->expect_write( pack( "C a*", 0x10, "ab" ) );
+
+      $chip->write_reg( 0x10, "ab" )->get;
+
+      $adapter->check_and_clear( '->write_reg for 16 bit data' );
+   }
+
+   {
+      $adapter->expect_write_then_read( pack( "C", 0x11 ), 2 )
+         ->returns( "cd" );
+
+      is( $chip->read_reg( 0x11, 1 )->get, "cd",
+         '->read_reg returns value for 16 bit data' );
+
+      $adapter->check_and_clear( '->read_reg for 16 bit data' );
+   }
+
+   {
+      $adapter->expect_write( pack( "C a*", 0x12, "ef" ) );
+      # no expect read
+      # no expect write again
+
+      $chip->cached_write_reg( 0x12, "ef" )->get;
+      is( $chip->cached_read_reg( 0x12, 1 )->get, "ef",
+         '->cached_read_reg returns value for 16 bit data' );
+      $chip->cached_write_reg( 0x12, "ef" )->get;
+
+      $adapter->check_and_clear( '->cached write and read for 16 bit data' );
+   }
 }
 
 done_testing;

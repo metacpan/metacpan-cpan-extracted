@@ -1,5 +1,5 @@
 package Proc::tored::Machine;
-$Proc::tored::Machine::VERSION = '0.17';
+$Proc::tored::Machine::VERSION = '0.18';
 use strict;
 use warnings;
 use Moo;
@@ -35,16 +35,15 @@ my $Proctor = declare 'Proctor', as Dict[
   finish  => Bool,       # true when last callback returned false
 ];
 
-my $Stopped    = declare 'Stopped',    as $Proctor,  where { $_->{stopped}->is_set || $_->{quit} };
-my $Paused     = declare 'Paused',     as ~$Stopped, where { $_->{paused}->is_set };
+my $Stopped    = declare 'Stopped',    as  $Proctor, where { $_->{stopped}->is_set || $_->{quit} };
 my $NotStopped = declare 'NotStopped', as ~$Stopped;
+my $Unlocked   = declare 'Unlocked',   as  $NotStopped, where { !$_->{lock} };
+my $Locked     = declare 'Locked',     as  $NotStopped, where { $_->{lock} };
+my $Started    = declare 'Started',    as  $Locked, where { $_->{started} };
+my $Paused     = declare 'Paused',     as  $Started, where { $_->{paused}->is_set };
 my $NotPaused  = declare 'NotPaused',  as ~$Paused;
-my $Nominal    = declare 'Nominal',    as $NotStopped & $NotPaused;
-my $Unlocked   = declare 'Unlocked',   as $Nominal,  where { !$_->{lock} };
-my $Locked     = declare 'Locked',     as $Nominal,  where { $_->{lock} };
-my $Started    = declare 'Started',    as $Locked,   where { $_->{started} };
-my $Running    = declare 'Running',    as $Started,  where { !$_->{finish} };
-my $Finished   = declare 'Finished',   as $Started,  where { $_->{finish} };
+my $Running    = declare 'Running',    as  $NotPaused & $Started, where { !$_->{finish} };
+my $Finished   = declare 'Finished',   as  $Started, where { $_->{finish} };
 
 sub pause_sleep {
   my ($acc, $time) = @_;
@@ -169,11 +168,11 @@ Proc::tored::Machine
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 

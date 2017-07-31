@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::RecordReader;
 #ABSTRACT: Koha biblio/authority records reader
-$Koha::Contrib::Tamil::RecordReader::VERSION = '0.050';
+$Koha::Contrib::Tamil::RecordReader::VERSION = '0.051';
 use Moose;
 
 with 'MooseX::RW::Reader';
@@ -64,6 +64,10 @@ has allrecords => ( is => 'rw', isa => 'Bool', default => 1 );
 # Mark as done an entry is Zebra queue
 has sth_queue_done => ( is => 'rw' );
 
+# SQL statement to get marcxml record
+has sth_biblio => ( is => 'rw' );
+has sth_biblio_del => ( is => 'rw' );
+
 # Items tag
 has itemtag => ( is => 'rw' );
 
@@ -93,6 +97,20 @@ sub BUILD {
         $self->normalizer($normalizer);
         # Necessary for as_xml method
         MARC::File::XML->default_record_format( C4::Context->preference('marcflavour') );
+    }
+
+    # Since version 17.05 marcxml biblio record is stored in biblio_metadata table.
+    if ( $version =~ /^([0-9]{2})/ && $1 >= 17 ) {
+        $self->sth_biblio( $dbh->prepare(
+            "SELECT metadata FROM biblio_metadata WHERE biblionumber=? " ) );
+        $self->sth_biblio_del( $dbh->prepare(
+            "SELECT metadata FROM deletedbiblio_metadata WHERE biblionumber=? " ) );
+    }
+    else {
+        $self->sth_biblio( $dbh->prepare(
+            "SELECT marcxml FROM biblioitems WHERE biblionumber=? " ) );
+        $self->sth_biblio_del( $dbh->prepare(
+            "SELECT marcxml FROM deletedbiblioitems WHERE biblionumber=? " ) );
     }
 
     my $operation = $self->select =~ /update/i
@@ -151,19 +169,13 @@ sub read {
 
 
 sub get_biblio_xml {
-    my ( $self, $id ) = @_;
-    my $sth = $self->koha->dbh->prepare(
-        "SELECT marcxml FROM biblioitems WHERE biblionumber=? ");
-    $sth->execute( $id );
-    my ($marcxml) = $sth->fetchrow;
+    my ($self, $id) = @_;
 
-    # If biblio isn't found in biblioitems, it is searched in
-    # deletedbilioitems. Usefull for delete Zebra requests
+    $self->sth_biblio->execute( $id );
+    my ($marcxml) = $self->sth_biblio->fetchrow;
     unless ( $marcxml ) {
-        $sth = $self->koha->dbh->prepare(
-            "SELECT marcxml FROM deletedbiblioitems WHERE biblionumber=? ");
-        $sth->execute( $id );
-        ($marcxml) = $sth->fetchrow;
+        $self->sth_biblio_del->execute( $id );
+        ($marcxml) = $self->sth_biblio_del->fetchrow;
     }
 
     # Items extraction if Koha v3.4 and above
@@ -200,16 +212,11 @@ sub get_biblio_xml {
 sub get_biblio_marc {
     my ( $self, $id ) = @_;
 
-    my $sth = $self->koha->dbh->prepare(
-        "SELECT marcxml FROM biblioitems WHERE biblionumber=? ");
-    $sth->execute( $id );
-    my ($marcxml) = $sth->fetchrow;
-
+    $self->sth_biblio->execute( $id );
+    my ($marcxml) = $self->sth_biblio->fetchrow;
     unless ( $marcxml ) {
-        $sth = $self->koha->dbh->prepare(
-            "SELECT marcxml FROM deletedbiblioitems WHERE biblionumber=? ");
-        $sth->execute( $id );
-        ($marcxml) = $sth->fetchrow;
+        $self->sth_biblio_del->execute( $id );
+        ($marcxml) = $self->sth_biblio_del->fetchrow;
     }
 
     $marcxml =~ s/[^\x09\x0A\x0D\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//g;
@@ -284,7 +291,7 @@ Koha::Contrib::Tamil::RecordReader - Koha biblio/authority records reader
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 SYNOPSYS
 

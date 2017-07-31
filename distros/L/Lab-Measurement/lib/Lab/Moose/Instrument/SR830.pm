@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.553';
+#ABSTRACT: Stanford Research SR830 Lock-In Amplifier
+$Lab::Moose::Instrument::SR830::VERSION = '3.554';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw/enum/;
@@ -24,48 +25,6 @@ sub BUILD {
     $self->cls();
 }
 
-=encoding utf8
-
-=head1 NAME
-
-Lab::Moose::Instrument::SR830 -  Stanford Research SR830 Lock-In Amplifier
-
-=head1 SYNOPSIS
-
- use Lab::Moose;
-
- # Constructor
- my $lia = instrument(type => 'SR830', %connection_options);
- 
- # Set reference frequency to 10 kHz
- $lia->set_freq(value => 10000);
-
- # Set time constant to 10 sec
- $lia->set_tc(value => 10);
-
- # Set sensitivity to 10 mV
- $lia->set_sens(value => 0.001);
- 
- # Get X and Y values
- my $xy = $lia->get_xy();
- say "X: ", $xy->{x};
- say "Y: ", $xy->{y};
-
-=head1 METHODS
-
-=head2 get_freq
-
- my $freq = $lia->get_freq();
-
-Query frequency of the reference oscillator.
-
-=head2 set_freq
-
- $lia->set_freq(value => $freq);
-
-Set frequency of the reference oscillator.
-
-=cut
 
 cache freq => ( getter => 'get_freq' );
 
@@ -84,19 +43,6 @@ sub set_freq {
     $self->cached_freq($value);
 }
 
-=head2 get_amplitude
-
- my $ampl = $lia->get_amplitude();
-
-Query amplitude of the sine output.
-
-=head2 set_amplitude
-
- $lia->set_amplitude(value => $ampl);
-
-Set amplitude of the sine output.
-
-=cut
 
 cache amplitude => ( getter => 'get_amplitude' );
 
@@ -117,20 +63,6 @@ sub set_amplitude {
 
 cache phase => ( getter => 'get_phase' );
 
-=head2 get_phase
-
- my $phase = $lia->get_phase();
-
-Get reference phase shift (in degree). Result is between -180 and 180.
-
-=head2 set_phase
-
- $lia->set_phase(value => $phase);
-
-Set reference phase shift. The C<$phase> parameter has to be between -360 and
-729.99.
-
-=cut
 
 sub get_phase {
     my ( $self, %args ) = validated_getter( \@_ );
@@ -150,27 +82,6 @@ sub set_phase {
     $self->cached_phase($value);
 }
 
-=head2 get_xy
-
- my $xy = $lia->get_xy();
- my $x = $xy->{x};
- my $y = $xy->{y};
-
-Query the X and Y values.
-
-=head2 get_rphi
-
- my $rphi = $lia->get_rphi();
- my $r = $rphi->{r};
- my $phi = $rphi->{phi};
-
-Query R and the angle (in degree).
-
-=head2 get_xyrphi
-
-Get x, y, R and the angle all in one call.
-
-=cut
 
 cache xy => ( getter => 'get_xy' );
 
@@ -204,22 +115,6 @@ sub get_xyrphi {
 
 cache tc => ( getter => 'get_tc' );
 
-=head2 get_tc
-
- my $tc = $lia->get_tc();
-
-Query the time constant.
-
-=head2 set_tc
-
- # Set tc to 30μs
- $lia->set_tc(value => 30e-6);
-
-Set the time constant. The value is rounded to the nearest valid
-value. Rounding is performed in logscale. Croak if the the value is out of
-range.
-
-=cut
 
 sub _int_to_tc {
     my $self = shift;
@@ -271,43 +166,6 @@ sub set_tc {
     $self->cached_tc( $self->_int_to_tc($int_tc) );
 }
 
-=head2 get_filter_slope
-
- my $filter_slope = $lia->get_filter_slope();
-
-Query the low pass filter slope (dB/oct). Possible return values:
-
-=over
-
-=item * 6
-
-=item * 12
-
-=item * 18
-
-=item * 24
-
-=back
-
-=head2 set_filter_slope
-
- $lia->set_filter_slope(value => 18);
-
-Set the low pass filter slope (dB/oct). Allowed values:
-
-=over
-
-=item * 6
-
-=item * 12
-
-=item * 18
-
-=item * 24
-
-=back
-
-=cut
 
 cache filter_slope => ( getter => 'get_filter_slope' );
 
@@ -331,21 +189,6 @@ sub set_filter_slope {
     $self->cached_filter_slope($value);
 }
 
-=head2 get_sens
-
- my $sens = $lia->get_sens();
-
-Get sensitivity (in Volt).
-
-=head2 set_sens
-
- $lia->set_sens(value => $sens);
-
-Set sensitivity (in Volt).
-
-Same rounding as for C<set_tc>.
-
-=cut
 
 sub _int_to_sens {
     my $self = shift;
@@ -410,43 +253,6 @@ sub set_sens {
     $self->cached_sens( $self->_int_to_sens($int_sens) );
 }
 
-=head2 get_input
-
- my $input = $lia->get_input();
-
-Query the input configuration. Possible return values:
-
-=over
-
-=item * A
-
-=item * AB
-
-=item * I1M
-
-=item * I100M
-
-=back
-
-=head2 set_input
-
- $lia->set_input(value => 'AB');
-
-Set input configuration. Allowed values:
-
-=over
-
-=item * A
-
-=item * AB
-
-=item * I1M
-
-=item * I100M
-
-=back
-
-=cut
 
 cache input => ( getter => 'get_input' );
 
@@ -470,38 +276,6 @@ sub set_input {
     $self->cached_input($value);
 }
 
-=head2 get_ground
-
- my $ground = $lia->get_ground();
-
-Query the input shield grounding. Possible return values:
-
-=over
-
-=item * GROUND
-
-=item * FLOAT
-
-=back
-
-=head2 set_ground
-
- $lia->set_ground(value => 'GROUND');
-
- # or:
- $lia->set_ground(value => 'FLOAT');
-
-Set the input shield grounding. Allowed values:
-
-=over
-
-=item * GROUND
-
-=item * FLOAT
-
-=back
-
-=cut
 
 cache ground => ( getter => 'get_ground' );
 
@@ -523,38 +297,6 @@ sub set_ground {
     $self->cached_ground($value);
 }
 
-=head2 get_coupling
-
- my $coupling = $lia->get_coupling();
-
-Query the input coupling. Possible return values:
-
-=over
-
-=item * AC
-
-=item * DC
-
-=back
-
-=head2 set_coupling
-
- $lia->set_coupling(value => 'AC');
-
- # or:
- $lia->set_coupling(value => 'DC');
-
-Set the input coupling. Allowed values:
-
-=over
-
-=item * AC
-
-=item * DC
-
-=back
-
-=cut
 
 cache coupling => ( getter => 'get_coupling' );
 
@@ -576,43 +318,6 @@ sub set_coupling {
     $self->cached_coupling($value);
 }
 
-=head2 get_line_notch_filters
-
- my $filters = $lia->get_line_notch_filters();
-
-Query the line notch filter configuration. Possible return values:
-
-=over
-
-=item * OUT
-
-=item * LINE
-
-=item * 2xLINE
-
-=item * BOTH
-
-=back
-
-=head2 set_line_notch_filters
-
- $lia->set_line_notch_filters(value => 'BOTH');
-
-Set the line notch filter configuration. Allowed values:
-
-=over
-
-=item * OUT
-
-=item * LINE
-
-=item * 2xLINE
-
-=item * BOTH
-
-=back
-
-=cut
 
 cache line_notch_filters => ( getter => 'get_line_notch_filters' );
 
@@ -636,28 +341,6 @@ sub set_line_notch_filters {
     $self->cached_line_notch_filters($value);
 }
 
-=head2 calculate_settling_time
-
- my $settling_time = $lia->calculate_settling_time(settling => '99');
-
-Calculate settling time independent of current time constant and filter slope.
-See "Principles of lock-in detection and the state of the art" white paper by
-Zurich Instruments. The C<settling> parameter is given in percent. Allowed
-values:
-
-=over
-
-=item * '63.2'
-
-=item * '90'
-
-=item * '99'
-
-=item * '99.9'
-
-=back
-
-=cut
 
 sub calculate_settling_time {
     my $self = shift;
@@ -702,6 +385,325 @@ sub calculate_settling_time {
     return $multiplier * $tc;
 }
 
+
+__PACKAGE__->meta()->make_immutable();
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use Lab::Moose;
+
+ # Constructor
+ my $lia = instrument(type => 'SR830', %connection_options);
+ 
+ # Set reference frequency to 10 kHz
+ $lia->set_freq(value => 10000);
+
+ # Set time constant to 10 sec
+ $lia->set_tc(value => 10);
+
+ # Set sensitivity to 10 mV
+ $lia->set_sens(value => 0.001);
+ 
+ # Get X and Y values
+ my $xy = $lia->get_xy();
+ say "X: ", $xy->{x};
+ say "Y: ", $xy->{y};
+
+=head1 METHODS
+
+=head2 get_freq
+
+ my $freq = $lia->get_freq();
+
+Query frequency of the reference oscillator.
+
+=head2 set_freq
+
+ $lia->set_freq(value => $freq);
+
+Set frequency of the reference oscillator.
+
+=head2 get_amplitude
+
+ my $ampl = $lia->get_amplitude();
+
+Query amplitude of the sine output.
+
+=head2 set_amplitude
+
+ $lia->set_amplitude(value => $ampl);
+
+Set amplitude of the sine output.
+
+=head2 get_phase
+
+ my $phase = $lia->get_phase();
+
+Get reference phase shift (in degree). Result is between -180 and 180.
+
+=head2 set_phase
+
+ $lia->set_phase(value => $phase);
+
+Set reference phase shift. The C<$phase> parameter has to be between -360 and
+729.99.
+
+=head2 get_xy
+
+ my $xy = $lia->get_xy();
+ my $x = $xy->{x};
+ my $y = $xy->{y};
+
+Query the X and Y values.
+
+=head2 get_rphi
+
+ my $rphi = $lia->get_rphi();
+ my $r = $rphi->{r};
+ my $phi = $rphi->{phi};
+
+Query R and the angle (in degree).
+
+=head2 get_xyrphi
+
+Get x, y, R and the angle all in one call.
+
+=head2 get_tc
+
+ my $tc = $lia->get_tc();
+
+Query the time constant.
+
+=head2 set_tc
+
+ # Set tc to 30μs
+ $lia->set_tc(value => 30e-6);
+
+Set the time constant. The value is rounded to the nearest valid
+value. Rounding is performed in logscale. Croak if the the value is out of
+range.
+
+=head2 get_filter_slope
+
+ my $filter_slope = $lia->get_filter_slope();
+
+Query the low pass filter slope (dB/oct). Possible return values:
+
+=over
+
+=item * 6
+
+=item * 12
+
+=item * 18
+
+=item * 24
+
+=back
+
+=head2 set_filter_slope
+
+ $lia->set_filter_slope(value => 18);
+
+Set the low pass filter slope (dB/oct). Allowed values:
+
+=over
+
+=item * 6
+
+=item * 12
+
+=item * 18
+
+=item * 24
+
+=back
+
+=head2 get_sens
+
+ my $sens = $lia->get_sens();
+
+Get sensitivity (in Volt).
+
+=head2 set_sens
+
+ $lia->set_sens(value => $sens);
+
+Set sensitivity (in Volt).
+
+Same rounding as for C<set_tc>.
+
+=head2 get_input
+
+ my $input = $lia->get_input();
+
+Query the input configuration. Possible return values:
+
+=over
+
+=item * A
+
+=item * AB
+
+=item * I1M
+
+=item * I100M
+
+=back
+
+=head2 set_input
+
+ $lia->set_input(value => 'AB');
+
+Set input configuration. Allowed values:
+
+=over
+
+=item * A
+
+=item * AB
+
+=item * I1M
+
+=item * I100M
+
+=back
+
+=head2 get_ground
+
+ my $ground = $lia->get_ground();
+
+Query the input shield grounding. Possible return values:
+
+=over
+
+=item * GROUND
+
+=item * FLOAT
+
+=back
+
+=head2 set_ground
+
+ $lia->set_ground(value => 'GROUND');
+
+ # or:
+ $lia->set_ground(value => 'FLOAT');
+
+Set the input shield grounding. Allowed values:
+
+=over
+
+=item * GROUND
+
+=item * FLOAT
+
+=back
+
+=head2 get_coupling
+
+ my $coupling = $lia->get_coupling();
+
+Query the input coupling. Possible return values:
+
+=over
+
+=item * AC
+
+=item * DC
+
+=back
+
+=head2 set_coupling
+
+ $lia->set_coupling(value => 'AC');
+
+ # or:
+ $lia->set_coupling(value => 'DC');
+
+Set the input coupling. Allowed values:
+
+=over
+
+=item * AC
+
+=item * DC
+
+=back
+
+=head2 get_line_notch_filters
+
+ my $filters = $lia->get_line_notch_filters();
+
+Query the line notch filter configuration. Possible return values:
+
+=over
+
+=item * OUT
+
+=item * LINE
+
+=item * 2xLINE
+
+=item * BOTH
+
+=back
+
+=head2 set_line_notch_filters
+
+ $lia->set_line_notch_filters(value => 'BOTH');
+
+Set the line notch filter configuration. Allowed values:
+
+=over
+
+=item * OUT
+
+=item * LINE
+
+=item * 2xLINE
+
+=item * BOTH
+
+=back
+
+=head2 calculate_settling_time
+
+ my $settling_time = $lia->calculate_settling_time(settling => '99');
+
+Calculate settling time independent of current time constant and filter slope.
+See "Principles of lock-in detection and the state of the art" white paper by
+Zurich Instruments. The C<settling> parameter is given in percent. Allowed
+values:
+
+=over
+
+=item * '63.2'
+
+=item * '90'
+
+=item * '99'
+
+=item * '99.9'
+
+=back
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -712,8 +714,15 @@ This driver consumes the following roles:
 
 =back
 
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-
-__PACKAGE__->meta()->make_immutable();
-
-1;

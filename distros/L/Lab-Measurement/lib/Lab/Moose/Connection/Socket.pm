@@ -1,5 +1,6 @@
 package Lab::Moose::Connection::Socket;
-$Lab::Moose::Connection::Socket::VERSION = '3.553';
+#ABSTRACT: Transfer IEEE 488.2 / SCPI messages over TCP
+$Lab::Moose::Connection::Socket::VERSION = '3.554';
 use 5.010;
 
 use Moose;
@@ -144,10 +145,19 @@ __PACKAGE__->meta->make_immutable();
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Lab::Moose::Connection::Socket - Transfer IEEE 488.2 / SCPI messages over TCP
-socket.
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -169,5 +179,14 @@ It supports both newline terminated messages of arbitrary length and definite
 length block data, which is needed to transfer binary data from e.g. spectrum
 analyzers, oscilloscopes and VNAs (IEEE 488.2 Sec. 8.7.9).
 
-=cut
+=head1 COPYRIGHT AND LICENSE
 
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

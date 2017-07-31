@@ -4,11 +4,12 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Joel A. Berger <joel.a.berger@gmail.com>'
 build_requires:
-  Test::More: '0.94'
+  Test2::Require::Module: '0.000071'
+  Test2::V0: '0.000071'
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,31 +23,31 @@ no_index:
 provides:
   Alien::Base::ModuleBuild:
     file: lib/Alien/Base/ModuleBuild.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::Cabinet:
     file: lib/Alien/Base/ModuleBuild/Cabinet.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::File:
     file: lib/Alien/Base/ModuleBuild/File.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::Repository:
     file: lib/Alien/Base/ModuleBuild/Repository.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::Repository::FTP:
     file: lib/Alien/Base/ModuleBuild/Repository/FTP.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::Repository::HTTP:
     file: lib/Alien/Base/ModuleBuild/Repository/HTTP.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::Repository::Local:
     file: lib/Alien/Base/ModuleBuild/Repository/Local.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::ModuleBuild::Utils:
     file: lib/Alien/Base/ModuleBuild/Utils.pm
-    version: '0.040'
+    version: '0.042'
   Alien::Base::PkgConfig:
     file: lib/Alien/Base/PkgConfig.pm
-    version: '0.040'
+    version: '0.042'
 recommends:
   HTML::LinkExtor: '0'
 requires:
@@ -56,7 +57,7 @@ requires:
   File::chdir: '0.1005'
   HTTP::Tiny: '0.044'
   JSON::PP: '0'
-  List::MoreUtils: '0'
+  List::Util: '1.45'
   Module::Build: '0.36'
   Shell::Config::Generate: '0'
   Shell::Guess: '0'
@@ -71,5 +72,5 @@ resources:
   bugtracker: http://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/Perl5-Alien/Alien-Base-ModuleBuild
-version: '0.040'
+version: '0.042'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

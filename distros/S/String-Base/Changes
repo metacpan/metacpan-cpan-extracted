@@ -1,3 +1,39 @@
+version 0.003; 2017-07-29
+
+  * bugfix: properly maintain op_last when munging ops
+
+version 0.002; 2017-07-27
+
+  * bugfix: chain correct op checker for index/rindex ops when not
+    modifying them
+
+  * update to accommodate PERL_OP_PARENT builds of Perl 5.21.11 or later
+    (which is the default from Perl 5.25.1)
+
+  * be more conservative about maintaining op tree structure
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * register custom ops on Perl 5.13.7+
+
+  * use cleaner wrap_op_checker() API to control op checking
+
+  * elide custom null ops at peep time on Perl 5.19.10+
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * build custom op structures from scratch
+
+  * rename internal gen_*_op() functions into a better style
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.001; 2012-02-01
 
   * bugfix: properly avoid duff constant folding with pos() code on Perl

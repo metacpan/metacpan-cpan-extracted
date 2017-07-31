@@ -6,7 +6,7 @@ Kafka::Exceptions - Perl Kafka API exception definitions.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Exceptions> version 1.05 .
+This documentation refers to C<Kafka::Exceptions> version 1.06 .
 
 =cut
 
@@ -20,7 +20,7 @@ use warnings;
 
 our $DEBUG = 0;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Exporter qw(
     import
@@ -64,10 +64,7 @@ use Kafka::Internals qw(
     format_message
 );
 
-if( Kafka::Internals::debug_level( __PACKAGE__ ) ) {
-    Kafka::Exception->Trace(1); # include stack traces
-}
-
+Kafka::Exception->Trace(1); # include stack traces
 
 
 =head1 SYNOPSIS

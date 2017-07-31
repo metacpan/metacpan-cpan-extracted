@@ -1,5 +1,5 @@
 package App::JESP::Patch;
-$App::JESP::Patch::VERSION = '0.008';
+$App::JESP::Patch::VERSION = '0.010';
 use Moose;
 
 use File::Spec;
@@ -17,6 +17,9 @@ has 'file' => ( is => 'ro', isa => 'Str' );
 has 'sql' => ( is => 'ro', isa => 'Maybe[Str]' , lazy_build => 1 );
 
 has 'file_data' => ( is => 'ro' , lazy_build => 1 );
+
+#Transient properties:
+has 'applied_datetime' => ( is => 'rw', isa => 'Str', required => 0 );
 
 sub _build_file_data{
     my ($self) = @_;

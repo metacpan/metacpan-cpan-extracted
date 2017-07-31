@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "spvm_memory_pool.h"
 #include "spvm_util_allocator.h"
@@ -8,7 +10,7 @@
 
 SPVM_MEMORY_POOL* SPVM_MEMORY_POOL_new(int32_t page_byte_size) {
   
-  SPVM_MEMORY_POOL* memory_pool = (SPVM_MEMORY_POOL*) SPVM_UTIL_ALLOCATOR_safe_malloc_i32(1, sizeof(SPVM_MEMORY_POOL));
+  SPVM_MEMORY_POOL* memory_pool = (SPVM_MEMORY_POOL*) SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_MEMORY_POOL));
   
   if (page_byte_size == 0) {
     memory_pool->page_byte_size = 0xFFFF;
@@ -17,9 +19,10 @@ SPVM_MEMORY_POOL* SPVM_MEMORY_POOL_new(int32_t page_byte_size) {
     memory_pool->page_byte_size = page_byte_size;
   }
   
-  int8_t* page = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(memory_pool->page_byte_size, sizeof(int8_t));
+  char* page = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(memory_pool->page_byte_size);
   memory_pool->pages_length = 1;
-  memory_pool->pages = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(memory_pool->pages_length, sizeof(int8_t*));
+  int64_t memory_pool_pages_byte_size = (int64_t)memory_pool->pages_length * (int64_t)sizeof(char*);
+  memory_pool->pages = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(memory_pool_pages_byte_size);
   memory_pool->pages[0] = page;
   
   memory_pool->current_page = 0;
@@ -31,7 +34,11 @@ SPVM_MEMORY_POOL* SPVM_MEMORY_POOL_new(int32_t page_byte_size) {
 void* SPVM_MEMORY_POOL_alloc(SPVM_MEMORY_POOL* memory_pool, int32_t byte_size) {
   
   assert(byte_size > 0);
-  assert(byte_size <= memory_pool->page_byte_size);
+  
+  if (byte_size > memory_pool->page_byte_size) {
+    fprintf(stderr, "Very lerge memory byte size is specified(SPVM_MEMORY_POOL_alloc)\n");
+    abort();
+  }
   
   // Adjust alignment
   int32_t aligned_byte_size = (byte_size - 1) + ((int32_t)sizeof(SPVM_VALUE) - ((byte_size - 1) % (int32_t)sizeof(SPVM_VALUE)));
@@ -45,15 +52,16 @@ void* SPVM_MEMORY_POOL_alloc(SPVM_MEMORY_POOL* memory_pool, int32_t byte_size) {
     if (memory_pool->current_page == memory_pool->pages_length) {
       int32_t new_memory_pool_pages_length = memory_pool->pages_length * 2;
       
-      uint8_t** new_pages = SPVM_UTIL_ALLOCATOR_safe_malloc_i32_zero(new_memory_pool_pages_length, sizeof(uint8_t*));
-      memcpy(new_pages, memory_pool->pages, memory_pool->pages_length * sizeof(uint8_t*));
+      int64_t new_pages_byte_size = (int64_t)new_memory_pool_pages_length * (int64_t)sizeof(char*);
+      char** new_pages = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(new_pages_byte_size);
+      memcpy(new_pages, memory_pool->pages, memory_pool->pages_length * sizeof(char*));
       free(memory_pool->pages);
       memory_pool->pages = new_pages;
       
       {
         int32_t i;
         for (i = memory_pool->pages_length; i < new_memory_pool_pages_length; i++) {
-          memory_pool->pages[i] = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(memory_pool->page_byte_size, sizeof(uint8_t));
+          memory_pool->pages[i] = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(memory_pool->page_byte_size);
         }
       }
       
@@ -62,7 +70,7 @@ void* SPVM_MEMORY_POOL_alloc(SPVM_MEMORY_POOL* memory_pool, int32_t byte_size) {
   }
   
   // Allocated address
-  int8_t* alloc_address = memory_pool->pages[memory_pool->current_page] + memory_pool->current_offset;
+  char* alloc_address = memory_pool->pages[memory_pool->current_page] + memory_pool->current_offset;
   
   memory_pool->current_offset += aligned_byte_size;
   

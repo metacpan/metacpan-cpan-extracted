@@ -5,7 +5,7 @@ use namespace::autoclean;
 use 5.010;
 use Path::Class qw( file dir );
 use YAML qw( LoadFile DumpFile );
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 
 with 'Dist::Zilla::Role::TestRunner';
 
@@ -28,7 +28,7 @@ sub test
     my $new = $dir->file('lib.pl');
     symlink $old, $new;
     
-    $old = file( File::HomeDir->my_home, 'etc', 'localhost.yml');
+    $old = file( bsd_glob '~/etc/localhost/yml');
     $new = $dir->file('config.yml');
     
     my $config = LoadFile($old);
@@ -38,7 +38,7 @@ sub test
   
   my @remotes;
   
-  foreach my $remote_config (grep { $_->basename =~ /\.yml$/ } dir(File::HomeDir->my_home, 'etc')->children)
+  foreach my $remote_config (grep { $_->basename =~ /\.yml$/ } dir(bsd_glob '~/etc')->children)
   {
     next if $remote_config->basename eq 'localhost.yml';
     #$self->zilla->log($remote_config->basename);

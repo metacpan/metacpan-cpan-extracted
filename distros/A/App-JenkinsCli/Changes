@@ -1,5 +1,13 @@
 Revision history for App-jenkins-cli
 
+0.010   2017-07-30
+        Updating for release of version 0.010
+        Fixing paramaters passed to _xslt_actions (Ivan Wills)
+        Fixing sub-command required parameters (Ivan Wills)
+        Updated minimum required version (Ivan Wills)
+        Fixed issue with @ARGV and switched to $opt->files instead (Ivan Wills)
+        Fixing arguments for subcommands (Ivan Wills)
+
 0.009   2017-07-17
         Updating for release of version 0.009
         Fixing up not processing sub-commands properly (Ivan Wills)

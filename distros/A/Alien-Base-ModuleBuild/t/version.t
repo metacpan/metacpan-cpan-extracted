@@ -1,9 +1,6 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Alien::Base::PkgConfig;
-use_ok('Alien::Base::ModuleBuild');
+use Alien::Base::ModuleBuild;
 
 my $pkg_config = Alien::Base::PkgConfig->pkg_config_command;
 

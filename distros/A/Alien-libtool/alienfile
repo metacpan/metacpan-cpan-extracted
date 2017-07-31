@@ -5,6 +5,9 @@ probe sub { 'share' };
 share {
   requires 'Alien::MSYS' => '0.08' if $^O eq 'MSWin32';
   requires 'Alien::m4' => '0.11';
+  requires 'Path::Tiny' => 0;
+
+  meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
 
   if($^O eq 'openbsd')
   {
@@ -19,4 +22,39 @@ share {
   );
   plugin Extract => 'tar.gz',
   plugin 'Build::Autoconf' => ();
+  
+  patch sub {
+    my($libtoolize) = Path::Tiny->new('libtoolize.in');
+    $libtoolize->edit_lines(sub {
+      s{['"]\@prefix\@['"]}{\`alien_libtool_root\`}g;
+      s{\@datadir\@}{\$prefix/share}g;
+      s{\@pkgauxdir\@}{\$prefix/share/libtool/build-aux}g;
+      s{\@pkgdatadir\@}{\$prefix/share/libtool}g;
+      s{\@aclocaldir\@}{\$prefix/share/aclocal}g;
+    });
+    foreach my $man (map { Path::Tiny->new($_) } qw( doc/libtool.1 doc/libtoolize.1 ))
+    {
+      $man->touch;
+    }
+  };
+  
+  meta->after_hook(
+    gather_share => sub {
+      my($build) = @_;
+      {
+        my $exe = Path::Tiny->new('bin/alien_libtool_root');
+        my $perl = $ENV{PERL} || '/usr/bin/perl';
+        $exe->spew(
+          "#!$perl\n",
+          "use File::Spec;\n",
+          "my(\$v,\$d) = File::Spec->splitpath(File::Spec->rel2abs(__FILE__));\n",
+          "my \@d = File::Spec->splitdir(\$d);\n",
+          "pop \@d for 1..2;\n",
+          "my \$dist_dir = File::Spec->catpath(\$v,File::Spec->catdir(\@d), '');\n",
+          "print \$dist_dir\n",
+        );
+        $exe->chmod('0700');
+      }
+    },
+  );
 };

@@ -1,10 +1,20 @@
+v1.0.0
+	* BUGFIX: LAO VOWEL SIGN AM was "normalized" to the wrong character
+		order when used after a tone mark.
+	* BUGFIX: completely reworked the seriously broken tone rules.
+		Despite each Lao material using its own, slightly different
+		scheme, this should come close to reality now. This entails a
+		set of tones that is slightly different from v0.2.0
+	* IMPROVEMENT: Lingua::LO::NLP now accepts constructor options (one,
+	  actually) to use as defaults for other methods.
+
 v0.2.0
-	* BUGFIX: add missing complex vowels ເ◌ີຍ and ເ◌ິຍ
+	* BUGFIX: add missing diphthongs ເ◌ີຍ and ເ◌ິຍ
 	* BUGFIX: Lingua::LO::NLP::Romanize::hyphen did not allow
 		to turn off hyphenation with an undef value as that
-		makes it act as a read a accessor. Now you can
+		makes it act as a read accessor. Now you can
 		pass an explicit 0.
-	* IMPROVEMENT: split ວ => ʋ/w depending on position
+	* IMPROVEMENT: split ວ => ʋ/w depending on position in IPA
 	* IMPROVEMENT: small documentation enhancements
 
 v0.1.1	2016-12-04

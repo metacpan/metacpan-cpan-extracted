@@ -1,0 +1,25 @@
+<& /Admin/Elements/Header, Title => loc("[_1]'s authentication tokens",$UserObj->Name)  &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<div class="auth-tokens">
+<p><&|/l&>Authentication tokens allow other applications to use your user account without having to share your password, while allowing you to revoke access on an application-specific basis. Changing your password <em>does not</em> invalidate your auth tokens; you must revoke them here.</&></p>
+<br>
+
+<& /Elements/AuthToken/CreateButton, %ARGS, Owner => $UserObj->Id &>
+<& /Elements/AuthToken/List, %ARGS, Owner => $UserObj->Id &>
+</div>
+
+<%ARGS>
+$id => undef
+</%ARGS>
+<%INIT>
+my @results;
+
+my $UserObj = RT::User->new( $session{'CurrentUser'} );
+$UserObj->Load( $id );
+unless ( $UserObj->id ) {
+    Abort( loc("Couldn't load user #[_1]", $id) );
+}
+$id = $ARGS{'id'} = $UserObj->id;
+</%INIT>

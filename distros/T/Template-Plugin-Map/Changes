@@ -1,5 +1,9 @@
 Revision history for Template::Plugin::Map
 
+0.03  2017-07-29
+    - add signature author test
+    - new release that includes META.json
+
 0.02  2014-04-01
     - remove Module::Signature requirement
 

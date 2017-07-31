@@ -17,6 +17,7 @@ t/01_sanity.t
 t/02_cmds.t
 t/03_run.t
 t/04_opts.t
+t/05_re.t
 t/11_perl.t
 t/12_perl__get_targz.t
 t/21_install.t
@@ -25,6 +26,7 @@ t/23_install_array.t
 t/24_simple_source.t
 t/25_depend_source.t
 t/26_avoid_reinstall.t
+t/26_keep_processing.t
 t/26_subseq_prereq.t
 t/27_opts.t
 t/31_cpanfile.t
@@ -50,6 +52,11 @@ test_dists/FailTests/cpanfile
 test_dists/FailTests/dist.ini
 test_dists/FailTests/lib/FailTests.pm
 test_dists/FailTests/t/basic.t
+test_dists/FailWDeps/FailWDeps-1.0.tar.gz
+test_dists/FailWDeps/cpanfile
+test_dists/FailWDeps/dist.ini
+test_dists/FailWDeps/lib/FailWDeps.pm
+test_dists/FailWDeps/t/basic.t
 test_dists/FakePerl-5.12.0.tar.gz
 test_dists/FakePerl/Configure
 test_dists/MBDeps/MBDeps-1.0.tar.gz

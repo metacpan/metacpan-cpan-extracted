@@ -1,5 +1,12 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.93 2017-07-29
+
+ - Updated default font list
+
+ - Added option --coverpage-only-if-toc to restore the conditional
+   nocoverpage
+
 0.92 2017-06-06
 
  - Replace enumerate package with enumitem (more flexible)

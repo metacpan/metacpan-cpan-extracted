@@ -1,3 +1,26 @@
+version 0.009; 2017-07-27
+
+  * bugfix: avoid spuriously falling back from leap-seconds.list to
+    tai-utc.dat on the grounds of hash mismatch, by accepting the hash
+    being stated in the file with leading zeroes omitted from each
+    dotriacontet
+
+  * use Net::HTTP::Tiny and Net::FTP::Tiny instead of HTTP::Tiny and
+    Net::FTP
+
+  * load network modules lazily
+
+  * update built-in data to 2018-07-01
+
+  * test that all modules have matching version numbers
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
 version 0.008; 2012-02-05
 
   * download leap-seconds.list from more reliable server

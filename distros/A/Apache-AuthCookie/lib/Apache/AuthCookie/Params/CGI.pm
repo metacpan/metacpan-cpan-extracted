@@ -1,5 +1,5 @@
 package Apache::AuthCookie::Params::CGI;
-$Apache::AuthCookie::Params::CGI::VERSION = '3.26';
+$Apache::AuthCookie::Params::CGI::VERSION = '3.27';
 # ABSTRACT: Internal CGI Params Subclass
 
 use strict;
@@ -180,7 +180,7 @@ Apache::AuthCookie::Params::CGI - Internal CGI Params Subclass
 
 =head1 VERSION
 
-version 3.26
+version 3.27
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ version 3.26
 
 =head1 DESCRIPTION
 
-This is a pure perl implmentation of HTTP/CGI parameter processing for Apache::AuthCookie.
+This is a pure perl implementation of HTTP/CGI parameter processing for Apache::AuthCookie.
 
 =head1 METHODS
 
@@ -229,7 +229,7 @@ Set the given CGI field value to the given values.  Existing values will be repl
 
 =head2 params(): Hash::MultiValue
 
-Get the underlying CGI paramters.  This is a merged version of
+Get the underlying CGI parameters.  This is a merged version of
 L<query_params()> and L<body_params()>.
 
 =head2 query_params(): Hash::MultiValue

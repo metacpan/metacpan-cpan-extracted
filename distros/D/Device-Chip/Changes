@@ -1,5 +1,14 @@
 Revision history for Device-Chip
 
+0.10    2017/07/27 17:31:30
+        [CHANGES]
+         * Allow Device::Chip::Base::RegisteredI2C to work on data sizes
+           larger than 8 bits
+
+        [BUGFIXES]
+         * Fixes for recent Test::Builder::Tester output format changes
+           (RT114210)
+
 0.09    2016/10/02 20:57:15
         [CHANGES]
          * Defined a ->sleep method on adapters

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-BEGIN { eval q{ use File::HomeDir::Test } }
+use Test2::Plugin::FauxHomeDir;
 use Test2::Bundle::More;
 BEGIN { skip_all 'borked' }
 BEGIN {
@@ -8,8 +8,6 @@ BEGIN {
     unless eval q{ use Clustericious 1.24; 1};
 }
 use Test::PlugAuth;
-
-plan 5;
 
 my $auth = Test::PlugAuth->new(auth => sub {
   my($user, $pass) = @_;
@@ -48,3 +46,4 @@ $t->get_ok("http://baduser:badpass\@localhost:$port/private")
 $t->get_ok("http://gooduser:goodpass\@localhost:$port/private")
   ->status_is(200);
 
+done_testing;

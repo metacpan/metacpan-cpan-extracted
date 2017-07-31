@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/tracepm/tracepm
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# and generated automatically using Perinci::CmdLine::Gen version 0.47
 
-our $DATE = '2017-07-10'; # DATE
+our $DATE = '2017-07-29'; # DATE
 our $DIST = 'App-tracepm'; # DIST
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.20 of tracepm (from Perl distribution App-tracepm), released on 2017-07-10.
+This document describes version 0.21 of tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,7 @@ Do not read environment for default options.
 
 =over
 
-=item B<--detail>
+=item B<--detail>, B<-l>
 
 Whether to return records instead of just module names.
 
@@ -254,9 +254,13 @@ Filter only modules that are XS modules.
 
 Specify script from command-line instead.
 
-=item B<--script>=I<s>
+=item B<--module>=I<s>, B<-m>
 
-Path to script file (script to be packed).
+--module MOD is equivalent to --script 'use MOD'.
+
+=item B<--script>=I<s>, B<-s>
+
+Path to script file.
 
 =back
 
@@ -372,6 +376,7 @@ List of available configuration parameters:
  eval (see --eval)
  format (see --format)
  method (see --method)
+ module (see --module)
  multiple_runs (see --multiple-runs)
  naked_res (see --naked-res)
  perl_version (see --perl-version)
@@ -404,7 +409,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
+Source repository is at L<https://github.com/sharyanto/perl-App-tracepm>.
 
 =head1 BUGS
 

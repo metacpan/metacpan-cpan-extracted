@@ -1,3 +1,25 @@
+version 0.003; 2017-07-27
+
+  * avoid declaration-after-statement in C code (not valid in C90)
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in t/partial.t, muffle "unable to close filehandle" warnings that are
+    (correctly) generated from Perl 5.21.6 onwards
+
+  * in test suite, check success of open() operations
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * use cBOOL() where appropriate
+
+  * remove some stray commented-out code from t/partial.t
+
+  * convert .cvsignore to .gitignore
+
 version 0.002; 2011-07-12
 
   * restore portability to Perl versions preceding 5.8.8, which was

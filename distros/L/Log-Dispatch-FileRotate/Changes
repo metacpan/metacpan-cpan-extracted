@@ -1,5 +1,21 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.29 Fri Jul 28 2017
+    - Fix deadlock on Windows due to the fact that stat() on a filehandle vs a
+      path doesn't return the same device field on Windows.
+
+1.28 Thu Jul 27 2017
+    *** Multiple fixes to locking code:
+    - flock() can be interrupted by a syscall. work around by using a
+      safe_flock() wrapper that retries if errno is EAGAIN (and also
+      EWOULDBLOCK).
+    - handle several possible race conditions between open() and flock().
+    - DESTROY() was unlinking the lockfile (.logfile.LCK).  This was the cause
+      of a race condition where multiple processes could enter the critical
+      seciton at the same time.  Avoided by leaving .LCK files in place.
+      Probably fixes #77075 (Thanks Emanuele Tomasi).
+    - add author test for DESTROY lockfile race condition.
+
 1.27 Thu Jul 06 2017
     - add "check_both" configuration option which allows the use of both time and
       size based rotation at the same time.  If either conditions require a

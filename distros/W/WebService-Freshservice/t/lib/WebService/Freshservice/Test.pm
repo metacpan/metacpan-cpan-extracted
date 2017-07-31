@@ -42,6 +42,13 @@ method test_with_auth($test, $number_tests) {
 
 method test_with_dancer($test, $number_tests) {
   SKIP: {
+    if ($^O eq 'MSWin32') {
+      eval {  
+        require Win32::Process;
+        require Win32;
+      };
+      skip 'These tests are for cached testing and require Win32::Process on Windows.', $number_tests if ($@);
+    }
     eval {  
       require Dancer2;
       require Storable;
@@ -51,10 +58,21 @@ method test_with_dancer($test, $number_tests) {
     skip 'These tests are for cached testing and require Dancer2, Storable + Scalar::Util.', $number_tests if ($@);
     skip 'Dancer2 >= 0.200000 required for these tests.', $number_tests unless $Dancer2::VERSION >= 0.200000;
 
-    my $pid = fork();
+    my ($win32_processobj, $pid);
+    if ($^O eq 'MSWin32') {
+        Win32::Process::Create($win32_processobj,
+            "$^X",
+            "$^X t/bin/cached_api.pl",
+            0,
+            32 + 134217728, #NORMAL_PRIORITY_CLASS + CREATE_NO_WINDOW
+            ".") || die $^E;
+        $pid = $win32_processobj->GetProcessID();
+    } else {
+        $pid = fork();
 
-    if (!$pid) {
-      exec($^X,"t/bin/cached_api.pl");
+        if (!$pid) {
+          exec($^X,"t/bin/cached_api.pl");
+        }
     }
 
     # Allow some time for the instance to spawn. TODO: Make this smarter

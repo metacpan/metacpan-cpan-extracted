@@ -23,30 +23,30 @@ sub user_testing {
   };
   
   subtest 'Get Method' => sub {
-    my $get = $api->get_api( "/itil/requesters/1234.json" );
+    my $get = $api->get_api( "itil/requesters/1234.json" );
     is( $get->{user}{name}, "Test", "'get_api' returns data" );
     dies_ok { $api->get_api("invalid") } "'get_api' dies when JSON not received";
-    dies_ok { $api->get_api("unknown") } "'get_api' dies when success is not received";
+    dies_ok { $api->get_api("error") } "'get_api' dies when success is not received";
   };
    
   subtest 'Post Method' => sub {
     my $user->{user}{name} = "Test";
-    my $post = $api->post_api( "/itil/requesters.json", $user );
+    my $post = $api->post_api( "itil/requesters.json", $user );
     is( $post->{user}{name}, "Test", "'post_api' returns data" );
     throws_ok { $api->post_api("invalid", { content => "test" } ) } qr/Failed to parse json/,"'post_api' dies when JSON not received";
-    throws_ok { $api->post_api("unknown", { content => "test" }) } qr/API failed - error: /, "'post_api' dies when success is not received";
+    throws_ok { $api->post_api("error", { content => "test" }) } qr/API failed - error: /, "'post_api' dies when success is not received";
   };
    
   subtest 'Put Method' => sub {
     my $user->{user}{name} = "Elite";
-    is( $api->put_api( "/itil/requesters/1337.json", $user ), 1, "'put_api' returns 1 on success" );
-    my $get = $api->get_api( "/itil/requesters/1337.json" );
+    is( $api->put_api( "itil/requesters/1337.json", $user ), 1, "'put_api' returns 1 on success" );
+    my $get = $api->get_api( "itil/requesters/1337.json" );
     is( $get->{user}{name}, "Elite", "'put_api' updates data" );
     throws_ok { $api->put_api("error", { content => "test" }) } qr/API failed - error: /, "'put_api' dies when success is not received";
   };
 
   subtest 'Delete Method' => sub {
-    is( $api->delete_api( "/itil/requesters/1337.json" ), 1, "'delete_api' returns 1 on success" );
+    is( $api->delete_api( "itil/requesters/1337.json" ), 1, "'delete_api' returns 1 on success" );
     throws_ok { $api->delete_api("error") } qr/API failed - error: /, "'delete_api' dies when success is not received";
   };
 

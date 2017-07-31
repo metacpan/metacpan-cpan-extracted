@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Predict;
-$AI::PredictionClient::Predict::VERSION = '0.03';
+$AI::PredictionClient::Predict::VERSION = '0.05';
 
 # ABSTRACT: The Predict service client
 
@@ -22,7 +22,7 @@ AI::PredictionClient::Predict - The Predict service client
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,15 +15,14 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 a363e9572aff750da41cfe38a5ce668ba2113fef .gitignore
-SHA1 f8c9073147104c7323faeeb16a59f642aeea8095 Build.PL
-SHA1 6c96972fc554d1bbdefe835a114349565584028d Changes
-SHA1 9589d7c7e99618a1869a8957d9379a532b74d51d MANIFEST
-SHA1 9aa641ffdc20488e28a2f8d6fb6f05b1ed97c373 META.json
-SHA1 e028964fec8d74c22685ead8d46a4357688407a6 META.yml
-SHA1 94823f40b300188c2e44ea2197ce43b3ae315d91 Makefile.PL
-SHA1 7738aa4e6381b06daad24a89b1126a559682affa README
-SHA1 db95101c80f4c0bfcbf9b1605a60ee72b39b1d18 lib/Sub/Metadata.pm
-SHA1 f76343511f79f2349d56cf52771ed4c5d8876f07 lib/Sub/Metadata.xs
+SHA1 9d98681571bcb8da83a678abcf5db94f1c985fee Build.PL
+SHA1 7d1d01a8e876144ca1a4160d2b6e72c3e9a76bd1 Changes
+SHA1 4ec857f74a0cfbe558169bc267723687624f61db MANIFEST
+SHA1 6902d6ea6d1d029858e80dd4cebdf34e8f9c009e META.json
+SHA1 80465a98d30d3980b46b5643e18d4b81f024fc99 META.yml
+SHA1 ca38af7422ccb4c3586ae4151673b97cc76e00c6 README
+SHA1 055930c705fde1ad91bf86852646b1ae3186a01f lib/Sub/Metadata.pm
+SHA1 df5ab2effb613079eb781bf2447ad4c721817521 lib/Sub/Metadata.xs
 SHA1 fb8828eb65f31e2cea4b93e64e934368841d1239 t/body_type.t
 SHA1 e4f5614b53c92ebb7eb9b71411dc80c43919e9be t/closure_role.t
 SHA1 16ad8a65858efb86a8deb1b414098c3594f7df31 t/is_constant.t
@@ -36,9 +35,9 @@ SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 c49108c62487dcec8835e3f01c6facc73060c33f t/prototype.t
 SHA1 bacd114f195b72d05b4b35350efd5bd2aa704c46 typemap
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAlUMuZUACgkQOV9mt2VyAVE2qwCfZ/8p92G+lyRIe+yzbgdgzb7l
-/a0An1UU/V1zZJBDGtke5CkSCTPzZ9JO
-=f/6H
+iEYEARECAAYFAll3BrgACgkQOV9mt2VyAVHJ9QCgpKjyA5GDd4M9cJeJG7lRNKLX
+gMwAoKpfHkv+IoLlVtcl1mTV4vr0ggWn
+=Cwh5
 -----END PGP SIGNATURE-----

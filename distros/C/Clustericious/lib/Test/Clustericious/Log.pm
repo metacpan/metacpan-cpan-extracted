@@ -3,8 +3,8 @@ package Test::Clustericious::Log;
 use strict;
 use warnings;
 use 5.010001;
-use if !$INC{'File/HomeDir/Test.pm'}, 'File::HomeDir::Test';
-use File::HomeDir;
+use Test2::Plugin::FauxHomeDir;
+use File::Glob qw( bsd_glob );
 use Test::Builder::Module;
 use Clustericious::Log ();
 use Carp qw( carp );
@@ -15,7 +15,7 @@ our @EXPORT = qw( log_events log_context log_like log_unlike );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
 # ABSTRACT: Clustericious logging in tests.
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 sub log_events
@@ -161,7 +161,7 @@ sub import
     return;
   }
 
-  my $home = File::HomeDir->my_home;
+  my $home = bsd_glob('~');
   mkdir "$home/etc" unless -d "$home/etc";
   mkdir "$home/log" unless -d "$home/log";
 
@@ -262,7 +262,7 @@ sub import
 END
 {
   my $tb = Test::Builder::Module->builder;
-  my $home = File::HomeDir->my_home;
+  my $home = bsd_glob('~');
   
   unless($tb->is_passing)
   {
@@ -330,7 +330,7 @@ Test::Clustericious::Log - Clustericious logging in tests.
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -444,6 +444,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

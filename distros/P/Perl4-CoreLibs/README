@@ -4,13 +4,12 @@ Perl4::CoreLibs - libraries historically supplied with Perl 4
 
 DESCRIPTION
 
-This is a collection of ".pl" files that have historically been bundled
-with the Perl core but are planned not to be so distributed with
-core version 5.15 or later.  Relying on their presence in the core
+This is a collection of ".pl" files that were bundled with the Perl
+core until core version 5.15.1.  Relying on their presence in the core
 distribution is deprecated; they should be acquired from this CPAN
-distribution instead.  From core version 5.13, until their removal,
-it is planned that the core versions of these libraries will emit a
-warning when loaded.  The CPAN version will not emit such a warning.
+distribution instead.  From core version 5.13.3 until their removal, the
+core versions of these libraries emit a deprecation warning when loaded.
+The CPAN version does not emit such a warning.
 
 The entire Perl 4 approach to libraries was largely superseded in Perl
 5.000 by the system of module namespaces and ".pm" files.  Most of the
@@ -54,7 +53,7 @@ COPYRIGHT
 
 Copyright (C) 1987-2009 Larry Wall et al
 
-Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 LICENSE
 

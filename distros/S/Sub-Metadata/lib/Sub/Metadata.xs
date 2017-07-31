@@ -9,12 +9,16 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef CvISXSUB
-# define CvISXSUB(cv) !!CvXSUB(cv)
+# define CvISXSUB(cv) (cBOOL(CvXSUB(cv)))
 #endif /* !CvISXSUB */
 
 #ifndef CvCONST
-# define CvCONST(cv) (!!cv_const_sv(cv))
+# define CvCONST(cv) (cBOOL(cv_const_sv(cv)))
 #endif /* !CvCONST */
 
 #ifndef CvSTASH_set
@@ -78,7 +82,7 @@ bool
 sub_is_lvalue(CV *sub)
 PROTOTYPE: $
 CODE:
-	RETVAL = !!CvLVALUE(sub);
+	RETVAL = cBOOL(CvLVALUE(sub));
 OUTPUT:
 	RETVAL
 
@@ -86,7 +90,7 @@ bool
 sub_is_constant(CV *sub)
 PROTOTYPE: $
 CODE:
-	RETVAL = !!CvCONST(sub);
+	RETVAL = cBOOL(CvCONST(sub));
 OUTPUT:
 	RETVAL
 
@@ -94,7 +98,7 @@ bool
 sub_is_method(CV *sub)
 PROTOTYPE: $
 CODE:
-	RETVAL = !!CvMETHOD(sub);
+	RETVAL = cBOOL(CvMETHOD(sub));
 OUTPUT:
 	RETVAL
 

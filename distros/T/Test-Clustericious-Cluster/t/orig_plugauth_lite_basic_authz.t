@@ -4,8 +4,6 @@ use Test2::Bundle::More;
 use Test::Mojo;
 use Mojolicious::Lite;
 
-plan 8;
-
 plugin 'plug_auth_lite', {
   auth => sub {
     my($user, $pass) = @_;
@@ -35,3 +33,5 @@ $t->get_ok('/authz/user/galvatron/open/matrix')
   ->status_is(403)
   ->content_is('not ok');
 
+
+done_testing;

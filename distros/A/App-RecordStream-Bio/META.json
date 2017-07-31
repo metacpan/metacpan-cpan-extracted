@@ -15,8 +15,10 @@
    "name" : "App-RecordStream-Bio",
    "no_index" : {
       "directory" : [
+         "devel",
          "eg",
          "examples",
+         "fatpack",
          "inc",
          "share",
          "t",
@@ -39,6 +41,7 @@
       "runtime" : {
          "requires" : {
             "App::RecordStream::Operation" : "v4.0.0",
+            "Bio::GFF3::LowLevel" : "0",
             "perl" : "5.010"
          }
       },
@@ -64,6 +67,6 @@
          "web" : "https://github.com/MullinsLab/App-RecordStream-Bio"
       }
    },
-   "version" : "0.18"
+   "version" : "0.23"
 }
 

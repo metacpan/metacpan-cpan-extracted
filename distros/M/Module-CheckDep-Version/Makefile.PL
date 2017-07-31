@@ -32,7 +32,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'MetaCPAN::Client'  => 0,
+        'MetaCPAN::Client'  => 2.010700,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Module-CheckDep-Version-*' },

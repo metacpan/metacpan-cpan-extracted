@@ -1,0 +1,137 @@
+#!/m1/shared/bin/perl
+
+use strict;
+use warnings;
+
+use Biblio::SIF::Patron;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+# Per the docs, "[t]he total maximum record length is 5318 or 5319."
+use constant MAXBUF => 6000;
+
+sub usage;
+sub fatal;
+
+my $buf = '';
+my @problems;
+my %problem;
+my $ok = 0;
+my $n = 0;
+
+my %test = (
+    'E01' => [ sub { $_->last_name      =~ /\S/ }, 'last name is blank'         ],
+    'E02' => [ sub { $_->first_name     =~ /\S/ }, 'first name is blank'        ],
+    'E03' => [ sub { $_->institution_id =~ /\S/ }, 'institution ID is blank'    ],
+    'W04' => [ sub { $_->barcode1       =~ /\S/ }, 'barcode 1 is blank'         ],
+    'W05' => [ sub { $_->group1         =~ /\S/ }, 'patron group 1 is blank'    ],
+);
+my %term2str;
+
+my ($verbose, $quiet, $summarize, $warnings_are_errors, %skip);
+GetOptions(
+    'v' => \$verbose,
+    'q' => \$quiet,
+    's' => \$summarize,
+    'w' => \$warnings_are_errors,
+    'x=s' => sub {
+        my ($opt, $t) = @_;
+        usage if !$test{$t};
+        $skip{$t} = 1;
+    },
+    'l' => sub {
+        print STDERR "Possible warnings and errors:\n";
+        printf STDERR "  %s %s\n", $_, $test{$_}[1] for sort keys %test;
+        exit 0;
+    },
+) or usage;
+
+if (@ARGV && !open STDIN, '<', $ARGV[0]) {
+    fatal "open: $ARGV[0]\n";
+    exit 2;
+}
+
+my %nterm;
+my ($wtotal, $etotal) = (0, 0);
+while (1) {
+    while ($buf =~ s/\G([^\x00\x0a\x0d]+)([\x00\x0a\x0d]+)//) {
+        $n++;
+        my ($pstr, $term) = ($1, $2);
+        $nterm{$term}++;
+        my $p = Biblio::SIF::Patron->new(\$pstr);
+        my @res;
+        my ($e, $w) = (0, 0);
+        foreach my $t (sort keys %test) {
+            next if $skip{$t};
+            my ($test, $label) = @{ $test{$t} };
+            local $_ = $p;
+            next if $test->();
+            $e += ($t =~ /^E/ ? 1 : 0);
+            $w += ($t =~ /^W/ ? 1 : 0);
+            push @res, sprintf('%s %s', $t, $label);
+            $problem{$t}++;
+        }
+        $etotal += $e;
+        $wtotal += $w;
+        if (@res) {
+            push @problems, [$n, @res];
+            $ok++ if !$e && !$warnings_are_errors;
+        }
+        else {
+            $ok++;
+        }
+    }
+    my $nread = sysread STDIN, $buf, MAXBUF, length $buf;
+    die "Can't read: $!" if !defined $nread;
+    last if $nread == 0 && $buf eq '';
+}
+die "Malformed record at end" if $buf ne '';
+foreach (@problems) {
+    my ($recnum, @p) = @$_;
+    if ($verbose) {
+        printf STDERR "%8d %s\n", $recnum, $_ for @p;
+    }
+    elsif (!$quiet) {
+        printf STDERR "record $recnum invalid\n";
+    }
+}
+if ($summarize) {
+    print STDERR "results:\n";
+    printf STDERR "%8d records\n", $n;
+    printf STDERR "%8d warnings\n", $wtotal;
+    printf STDERR "%8d errors\n", $etotal;
+    print STDERR "record terminators:\n";
+    foreach (sort keys %nterm) {
+        printf STDERR "%8d %s\n", $nterm{$_}, term2str($_);
+    }
+    if (@problems) {
+        print STDERR "problems:\n";
+        foreach my $t (sort keys %test) {
+            my ($test, $label) = @{ $test{$t} };
+            printf STDERR "%8d %s %s\n", $problem{$t}, $t, $label if $problem{$t};
+        }
+    }
+}
+exit 2 if $etotal || $wtotal && $warnings_are_errors;
+exit 0;
+
+sub term2str {
+    my $str = shift;
+    return $term2str{$str} if defined $term2str{$str};
+    local $_ = $str;
+    s/\x0a/\\n/g;
+    s/\x0d/\\r/g;
+    s/\x00/\\0/g;
+    return $term2str{$str} = $_;
+}
+
+sub usage {
+    print STDERR "usage: psifdiag [-wqvsl] [FILE]\n";
+    exit 1;
+}
+
+sub fatal {
+    print STDERR "psifdiag: $_\n" for @_;
+    exit 2;
+}
+

@@ -11,7 +11,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 sub _build_cmd {'masontidy'}
 
@@ -40,7 +40,7 @@ Code::TidyAll::Plugin::MasonTidy - Use masontidy with tidyall
 
 =head1 VERSION
 
-version 0.61
+version 0.63
 
 =head1 SYNOPSIS
 

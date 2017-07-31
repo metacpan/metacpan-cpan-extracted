@@ -9,8 +9,8 @@
 #
 package MooseX::AttributeShortcuts;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.031-7-gfd91be8
-$MooseX::AttributeShortcuts::VERSION = '0.032';
+# git description: 0.033-3-g90bb675
+$MooseX::AttributeShortcuts::VERSION = '0.034';
 
 # ABSTRACT: Shorthand for common attribute options
 
@@ -119,7 +119,7 @@ MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =head1 VERSION
 
-This document describes version 0.032 of MooseX::AttributeShortcuts - released June 13, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.034 of MooseX::AttributeShortcuts - released July 25, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 SYNOPSIS
 
@@ -150,15 +150,6 @@ This document describes version 0.032 of MooseX::AttributeShortcuts - released J
     # extending? Use the "Shortcuts" trait alias
     extends 'Some::OtherClass';
     has '+bar' => (traits => [Shortcuts], builder => 1, ...);
-
-    # or...
-    package Some::Other::Class;
-
-    use Moose;
-    use MooseX::AttributeShortcuts -writer_prefix => '_';
-
-    # same as: is => 'ro', writer => '_foo'
-    has foo => (is => 'rwp');
 
 =head1 DESCRIPTION
 
@@ -213,8 +204,8 @@ metaclasses.
 
 If you're extending a class and trying to extend its attributes as well,
 you'll find out that the trait is only applied to attributes defined locally
-in the class.  This package exports a trait shortcut function "Shortcuts" that
-will help you apply this to the extended attribute:
+in the class.  This package exports a trait shortcut function C<Shortcuts>
+that will help you apply this to the extended attribute:
 
     has '+something' => (traits => [Shortcuts], ...);
 
@@ -224,7 +215,7 @@ Unless specified here, all options defined by L<Moose::Meta::Attribute> and
 L<Class::MOP::Attribute> remain unchanged.
 
 Want to see additional options?  Ask, or better yet, fork on GitHub and send
-a pull request. If the shortcuts you're asking for already exist in L<Moo> or
+a pull request.  If the shortcuts you're asking for already exist in L<Moo> or
 L<Mouse> or elsewhere, please note that as it will carry significant weight.
 
 For the following, C<$name> should be read as the attribute name; and the
@@ -488,6 +479,47 @@ coderefs that will coerce a given type to our type.
         ],
     );
 
+=head1 INTERACTIONS WITH OTHER ATTRIBUTE TRAITS
+
+Sometimes attribute traits interact in surprising ways.  This trait is well
+behaved; if you have discovered any interactions with other traits (good, bad,
+indifferent, etc), please
+L<report this|https://github.com/RsrchBoy/moosex-attributeshortcuts/issues/new>
+so that it can be worked around, fixed, or documented, as appropriate.
+
+=head2 MooseX::SemiAffordanceAccessor
+
+L<MooseX::SemiAffordanceAccessor> changes how the C<< is => 'rw' >> and
+C<< accessor => ... >> attribute options work.  If our trait detects that an
+attribute has had the
+L<MooseX::SemiAffordanceAccessor attribute trait|MooseX::SemiAffordanceAccessor::Role::Attribute>
+applied, then we change our behaviour to conform to its expectations:
+
+=over 4
+
+=item *
+
+C<< is => 'rwp' >>
+
+This:
+
+    has  foo => (is => 'rwp');
+    has _bar => (is => 'rwp');
+
+...is now effectively equivalent to:
+
+    has foo  => (is => 'ro', writer => '_set_foo');
+    has _bar => (is => 'ro', writer => '_set_bar')
+
+=item *
+
+C<-writer_prefix> is ignored
+
+...as MooseX::SemiAffordanceAccessor has its own specific ideas as to how
+writers should look.
+
+=back
+
 =head1 SEE ALSO
 
 Please see those modules/websites for more information related to this module.
@@ -496,11 +528,15 @@ Please see those modules/websites for more information related to this module.
 
 =item *
 
+L<Moo|Moo>
+
+=item *
+
 L<MooseX::Types|MooseX::Types>
 
 =item *
 
-L<Moo|Moo>
+L<MooseX::SemiAffordanceAccessor|MooseX::SemiAffordanceAccessor>
 
 =back
 

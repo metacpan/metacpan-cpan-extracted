@@ -1,6 +1,9 @@
 ######################################################################
 Revision history for Perl extension Net::Google::Drive::Simple
 
+0.13 (2017/07/27)
+    (ms) Added file_mvdir() to move files between folders.
+
 0.12 (2015/01/26)
     (ms) [rt.cpan.org #100789] http_loop() now returns a HTTP::Response 
          object even in the error case, to allow for the is_error() 

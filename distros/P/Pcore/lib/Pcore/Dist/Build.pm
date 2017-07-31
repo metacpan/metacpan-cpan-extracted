@@ -27,10 +27,10 @@ sub _build_docker ($self) {
     return Pcore::Dist::Build::Docker->new( { dist => $self->dist } );
 }
 
-sub create ( $self, @args ) {
+sub create ( $self, $args ) {
     state $init = !!require Pcore::Dist::Build::Create;
 
-    return Pcore::Dist::Build::Create->new( { @args, build => $self } )->run;    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    return Pcore::Dist::Build::Create->new($args)->run;
 }
 
 sub setup ($self) {

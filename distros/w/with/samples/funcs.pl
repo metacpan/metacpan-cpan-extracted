@@ -14,7 +14,7 @@ my %dup;
       grep { eval { () = prototype "CORE::$_"; 1 } }
        grep !$dup{$_}++, @f;
 my $c = 10;
-my $base = "my \@core = qw/";
+my $base = "my \@core = qw<";
 my $out = $base;
 my $l = length $base;
 my $first = 1;
@@ -34,5 +34,5 @@ for (@f) {
   redo;
  }
 }
-$out .= "/;\n";
+$out .= ">;\n";
 print $out;

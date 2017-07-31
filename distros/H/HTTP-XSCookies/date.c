@@ -4,10 +4,6 @@
 #include <time.h>
 #include "date.h"
 
-#if defined(_WIN32) || defined(_WIN64)
-#define gmtime_r(x, y) gmtime_s(y, x)
-#endif
-
 /* length of a string like "Sun, 08-Jan-2006 13:56:17 GMT"]" */
 #define DATE_FORMAT_LEN 29
 
@@ -155,7 +151,18 @@ Buffer* date_format(double date, Buffer* format)
 
     time_t t = (time_t) date;
     struct tm gmt;
+
+#if defined(_WIN32) || defined(_WIN64)
+    /* Damn you Windows... */
+    struct tm* p = gmtime(&t);
+    if (p) {
+        gmt = *p;
+    } else {
+        memset(&gmt, 0, sizeof(gmt));
+    }
+#else
     gmtime_r(&t, &gmt);
+#endif
 
     buffer_ensure_unused(format, DATE_FORMAT_LEN);
     sprintf(format->data,

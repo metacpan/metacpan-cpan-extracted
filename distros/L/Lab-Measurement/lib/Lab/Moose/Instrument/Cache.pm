@@ -1,71 +1,7 @@
-
-=head1 NAME
-
-Lab::Moose::Instrument::Cache - Role for device cache functionality in
-Moose::Instrument drivers.
-
-=head1 SYNOPSIS
-
-in your driver:
-
- use Lab::Moose::Instrument::Cache;
-
- cache 'foobar' => (getter => 'get_foobar');
-
- sub get_foobar {
-     my $self = shift;
-     
-     return $self->cached_foobar(
-         $self->query(command => ...));
- }
-
- sub set_foobar {
-     my ($self, $value) = @_;
-     $self->write(command => ...);
-     $self->cached_foobar($value);
- }
-
-=head1 DESCRIPTION
-
-This package exports a new Moose keyword: B<cache>.
-
-Calling C<< cache key => (getter => $getter, isa => $type) >> will generate a
-L<Moose attribute|Moose::Manual::Attributes> 'cached_key' with the following
-properties: 
-
- is => 'rw',
- isa => $type,
- predicate => 'has_cached_key',
- clearer => 'clear_cached_key',
- builder => 'cached_key_builder',
- lazy => 1,
- init_arg => undef
-
-The C<isa> argument is optional.
-
-The builder method comes into play if a cache entry is in the cleared state. If
-the getter is called in this situation, the builder
-method will be used to generate the value.
-The default builder method just calls the configured C<$getter> method.
-
-
-If you need to call the getter with specific arguments, override the
-builder method.
-For example, the C<format_data_query> of the L<Lab::Moose::Instrument::RS_ZVM>
-needs a timeout of 3s. This is done by putting the following into the
-driver:
-
- sub cached_format_data_builder {
-     my $self = shift;
-     return $self->format_data_query( timeout => 3 );
- }
-
-
-
-=cut
-
 package Lab::Moose::Instrument::Cache;
-$Lab::Moose::Instrument::Cache::VERSION = '3.553';
+#ABSTRACT: Role for device cache functionality in Moose::Instrument drivers
+$Lab::Moose::Instrument::Cache::VERSION = '3.554';
+
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -129,3 +65,85 @@ sub cache {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::Cache - Role for device cache functionality in Moose::Instrument drivers
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+in your driver:
+
+ use Lab::Moose::Instrument::Cache;
+
+ cache 'foobar' => (getter => 'get_foobar');
+
+ sub get_foobar {
+     my $self = shift;
+     
+     return $self->cached_foobar(
+         $self->query(command => ...));
+ }
+
+ sub set_foobar {
+     my ($self, $value) = @_;
+     $self->write(command => ...);
+     $self->cached_foobar($value);
+ }
+
+=head1 DESCRIPTION
+
+This package exports a new Moose keyword: B<cache>.
+
+Calling C<< cache key => (getter => $getter, isa => $type) >> will generate a
+L<Moose attribute|Moose::Manual::Attributes> 'cached_key' with the following
+properties: 
+
+ is => 'rw',
+ isa => $type,
+ predicate => 'has_cached_key',
+ clearer => 'clear_cached_key',
+ builder => 'cached_key_builder',
+ lazy => 1,
+ init_arg => undef
+
+The C<isa> argument is optional.
+
+The builder method comes into play if a cache entry is in the cleared state. If
+the getter is called in this situation, the builder
+method will be used to generate the value.
+The default builder method just calls the configured C<$getter> method.
+
+If you need to call the getter with specific arguments, override the
+builder method.
+For example, the C<format_data_query> of the L<Lab::Moose::Instrument::RS_ZVM>
+needs a timeout of 3s. This is done by putting the following into the
+driver:
+
+ sub cached_format_data_builder {
+     my $self = shift;
+     return $self->format_data_query( timeout => 3 );
+ }
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

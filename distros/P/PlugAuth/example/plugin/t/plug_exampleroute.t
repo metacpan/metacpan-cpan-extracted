@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-use File::HomeDir::Test;
-use File::HomeDir;
+use Test2::Plugin::FauxHomeDir;
 use Test::More tests => 3;
 use Test::Mojo;
 use YAML::XS qw( DumpFile );
+use File::Glob qw( bsd_glob );
 
-mkdir File::HomeDir->my_home . '/etc';
-DumpFile( File::HomeDir->my_home . '/etc/PlugAuth.conf', {
+mkdir bsd_glob('~/etc');
+DumpFile( bsd_glob('~/etc/PlugAuth.conf'), {
   plugins => [
     { 'PlugAuth::Plugin::ExampleRoute' => {} },
   ],

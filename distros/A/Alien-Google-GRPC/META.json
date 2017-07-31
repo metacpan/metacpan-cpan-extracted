@@ -24,7 +24,18 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "0.40",
+            "Alien::Build::Git" : "0.02",
             "Alien::Build::MM" : "0.40",
+            "Alien::Build::Plugin::Download::Git" : "0.02",
+            "Alien::Build::Plugin::Extract::Directory" : "0.65",
+            "Alien::Build::Plugin::Fetch::Git" : "0.02",
+            "Alien::Build::Plugin::Prefer::SortVersions" : "0.65",
+            "Alien::autoconf" : "0.03",
+            "Alien::automake" : "0.05",
+            "Alien::git" : "0.02",
+            "Alien::libtool" : "0.04",
+            "Alien::m4" : "0.11",
+            "Capture::Tiny" : "0.46",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -37,15 +48,23 @@
          "requires" : {
             "Alien::Base" : "0",
             "base" : "0",
+            "perl" : "5.01",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Data::Dumper" : "0",
             "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Alien::Google::GRPC" : {
+         "file" : "lib/Alien/Google/GRPC.pm",
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -57,7 +76,7 @@
          "web" : "https://github.com/mountaintom/Alien-Google-GRPC"
       }
    },
-   "version" : "0.03",
+   "version" : "0.07",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

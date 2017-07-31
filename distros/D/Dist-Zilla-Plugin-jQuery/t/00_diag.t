@@ -12,7 +12,6 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Dist::Zilla::Role::FileGatherer
   ExtUtils::MakeMaker
-  File::HomeDir
   File::Temp
   Moose
   Moose::Util::TypeConstraints

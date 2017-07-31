@@ -32,6 +32,7 @@
          "requires" : {
             "AppConfig" : "0",
             "Digest::MD5" : "0",
+            "File::Spec" : "0",
             "LWP::UserAgent" : "6.00",
             "Moo" : "0",
             "Moo::Role" : "0",
@@ -47,6 +48,10 @@
       },
       "test" : {
          "requires" : {
+            "App::PodLinkCheck" : "0",
+            "Capture::Tiny" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
             "HTTP::Response" : "0",
             "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
@@ -61,35 +66,39 @@
    "provides" : {
       "Net::Fritz" : {
          "file" : "lib/Net/Fritz.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Net::Fritz::Action" : {
          "file" : "lib/Net/Fritz/Action.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Net::Fritz::Box" : {
          "file" : "lib/Net/Fritz/Box.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
+      },
+      "Net::Fritz::ConfigFile" : {
+         "file" : "lib/Net/Fritz/ConfigFile.pm",
+         "version" : "v0.0.9"
       },
       "Net::Fritz::Data" : {
          "file" : "lib/Net/Fritz/Data.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Net::Fritz::Device" : {
          "file" : "lib/Net/Fritz/Device.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Net::Fritz::Error" : {
          "file" : "lib/Net/Fritz/Error.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Net::Fritz::IsNoError" : {
          "file" : "lib/Net/Fritz/IsNoError.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "Net::Fritz::Service" : {
          "file" : "lib/Net/Fritz/Service.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       }
    },
    "release_status" : "stable",
@@ -103,7 +112,7 @@
          "web" : "https://github.com/mmitch/fritz"
       }
    },
-   "version" : "v0.0.8",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

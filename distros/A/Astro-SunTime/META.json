@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "A functional module for calculating sunrise/sunset times",
    "author" : [
-      "unknown"
+      "Rob Fugina <robf@fugina.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "gpl_3"
    ],
@@ -13,30 +13,30 @@
       "version" : "2"
    },
    "name" : "Astro-SunTime",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test" : "0",
-            "Time::ParseDate" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
          "requires" : {
             "POSIX" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0",
+            "Time::ParseDate" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::SunTime" : {
+         "file" : "lib/Astro/SunTime.pm",
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
-   "version" : 0.05
+   "version" : "0.06"
 }

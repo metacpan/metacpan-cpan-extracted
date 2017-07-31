@@ -1,5 +1,22 @@
 Revision history for Alien-automake
 
+0.09      2017-07-29 10:22:05 -0400
+  - Require autoconf 0.05 for blib fixes
+
+0.08      2017-07-28 11:38:43 -0400
+  - Fix undef warning
+  - Production version otherwise identical to 0.06_02
+    (repair bad 0.07 release)
+
+0.07      2017-07-28 11:34:16 -0400
+  - Production version identical to 0.06_01
+
+0.06_02   2017-07-27 21:46:20 -0400
+  - Support running out of a blib on Strawberry Perl
+
+0.06_01   2017-07-27 10:36:28 -0400
+  - Support running out of a blib
+
 0.05      2017-07-08 09:55:42 -0400
   Production version identical to 0.04_02
 

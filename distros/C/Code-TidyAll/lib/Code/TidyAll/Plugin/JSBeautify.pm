@@ -4,13 +4,14 @@ use strict;
 use warnings;
 
 use IPC::Run3 qw(run3);
+use Text::ParseWords qw(shellwords);
 use Try::Tiny;
 
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 sub _build_cmd {'js-beautify'}
 
@@ -18,10 +19,9 @@ sub transform_file {
     my ( $self, $file ) = @_;
 
     try {
-        my $cmd = join( ' ', $self->cmd, $self->argv, $file );
-
+        my @cmd = ( $self->cmd, shellwords( $self->argv ), $file );
         my $output;
-        my $exit = run3( $cmd, \undef, \$output, \$output );
+        my $exit = run3( \@cmd, \undef, \$output, \$output );
         die "exited with $?\n" if $?;
         $file->spew($output);
     }
@@ -49,7 +49,7 @@ Code::TidyAll::Plugin::JSBeautify - Use js-beautify with tidyall
 
 =head1 VERSION
 
-version 0.61
+version 0.63
 
 =head1 SYNOPSIS
 

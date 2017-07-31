@@ -5,7 +5,8 @@ use Test::More;
 
 use_ok( 'DBM::Deep' );
 
-use t::common qw( new_dbm );
+use lib 't';
+use common qw( new_dbm );
 
 # RT #77746
 my $dbm_factory = new_dbm();

@@ -4,40 +4,37 @@ XML::Easy::NodeBasics - basic manipulation of XML data nodes
 
 =head1 SYNOPSIS
 
-	use XML::Easy::NodeBasics qw(xml_content_object xml_element);
+    use XML::Easy::NodeBasics qw(xml_content_object xml_element);
 
-	$content = xml_content_object("this", "&", "that");
-	$content = xml_content_object(@sublems);
+    $content = xml_content_object("this", "&", "that");
+    $content = xml_content_object(@sublems);
 
-	$element = xml_element("a", { href => "there" }, "there");
-	$element = xml_element("div", @subelems);
+    $element = xml_element("a", { href => "there" }, "there");
+    $element = xml_element("div", @subelems);
 
-	use XML::Easy::NodeBasics
-		qw(xml_c_content_object xml_c_content_twine);
+    use XML::Easy::NodeBasics qw(
+	xml_c_content_object xml_c_content_twine);
 
-	$content = xml_c_content_object($content);
-	$twine = xml_c_content_twine($content);
+    $content = xml_c_content_object($content);
+    $twine = xml_c_content_twine($content);
 
-	use XML::Easy::NodeBasics qw(
-		xml_e_type_name
-		xml_e_attributes xml_e_attribute
-		xml_e_content_object
-	);
+    use XML::Easy::NodeBasics qw(
+	xml_e_type_name
+	xml_e_attributes xml_e_attribute
+	xml_e_content_object);
 
-	$type_name = xml_e_type_name($element);
-	$attributes = xml_e_attributes($element);
-	$href = xml_e_attribute($element, "href");
-	$content = xml_e_content_object($element);
+    $type_name = xml_e_type_name($element);
+    $attributes = xml_e_attributes($element);
+    $href = xml_e_attribute($element, "href");
+    $content = xml_e_content_object($element);
 
-	use XML::Easy::NodeBasics qw(
-		xml_c_equal xml_e_equal
-		xml_c_unequal xml_e_unequal
-	);
+    use XML::Easy::NodeBasics qw(
+	xml_c_equal xml_e_equal xml_c_unequal xml_e_unequal);
 
-	if(xml_c_equal($content0, $content1)) { ...
-	if(xml_e_equal($element0, $element1)) { ...
-	if(xml_c_unequal($content0, $content1)) { ...
-	if(xml_e_unequal($element0, $element1)) { ...
+    if(xml_c_equal($content0, $content1)) { ...
+    if(xml_e_equal($element0, $element1)) { ...
+    if(xml_c_unequal($content0, $content1)) { ...
+    if(xml_e_unequal($element0, $element1)) { ...
 
 =head1 DESCRIPTION
 
@@ -104,7 +101,7 @@ BEGIN {
 	}
 }
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

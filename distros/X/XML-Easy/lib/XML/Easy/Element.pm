@@ -4,15 +4,15 @@ XML::Easy::Element - abstract form of XML element
 
 =head1 SYNOPSIS
 
-	use XML::Easy::Element;
+    use XML::Easy::Element;
 
-	$element = XML::Easy::Element->new("a",
-			{ href => "#there" }, $content);
+    $element = XML::Easy::Element->new("a", { href => "#there" },
+		$content);
 
-	$type_name = $element->type_name;
-	$attributes = $element->attributes;
-	$href = $element->attribute("href");
-	$content = $element->content_object;
+    $type_name = $element->type_name;
+    $attributes = $element->attributes;
+    $href = $element->attribute("href");
+    $content = $element->content_object;
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ use strict;
 
 use XML::Easy::Content 0.007 ();
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 eval { local $SIG{__DIE__};
 	require XSLoader;
@@ -125,7 +125,9 @@ sub new {
 	_throw_data_error("element type name isn't a string")
 		unless is_string($type_name);
 	{
-		no warnings "utf8";
+		no if "$]" < 5.017002, qw(warnings utf8);
+		no if "$]" >= 5.023006 && "$]" < 5.027001,
+			qw(warnings deprecated);
 		_throw_data_error("illegal element type name")
 			unless $type_name =~ /\A$xml10_name_rx\z/o;
 	}
@@ -188,7 +190,9 @@ sub attribute {
 	_throw_data_error("attribute name isn't a string")
 		unless is_string($_[1]);
 	{
-		no warnings "utf8";
+		no if "$]" < 5.017002, qw(warnings utf8);
+		no if "$]" >= 5.023006 && "$]" < 5.027001,
+			qw(warnings deprecated);
 		_throw_data_error("illegal attribute name")
 			unless $_[1] =~ /\A$xml10_name_rx\z/o;
 	}

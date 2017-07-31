@@ -1,13 +1,13 @@
 package Lab::XPRESS::Sweep::Voltage;
-$Lab::XPRESS::Sweep::Voltage::VERSION = '3.553';
-
-use Lab::XPRESS::Sweep::Sweep;
+#ABSTRACT: Voltage sweep
+$Lab::XPRESS::Sweep::Voltage::VERSION = '3.554';
+use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use warnings;
 use strict;
 use 5.010;
 use Carp;
-our @ISA = ('Lab::XPRESS::Sweep::Sweep');
+our @ISA = ('Lab::XPRESS::Sweep');
 
 sub new {
     my $proto                  = shift;
@@ -152,13 +152,19 @@ sub exit {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-	Lab::XPRESS::Sweep::Voltage - voltage sweep
+Lab::XPRESS::Sweep::Voltage - Voltage sweep
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -181,20 +187,14 @@ sub exit {
 		interval => 1,
 		backsweep => 1 
 		});
-		
-.
-
 
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Voltage class implements a module for voltage Sweeps in the Lab::XPRESS::Sweep framework.
 
-.
-
 =head1 CONSTRUCTOR
-	
 
 	my $sweep_voltage = $hub->Sweep('Voltage',
 		{
@@ -208,8 +208,6 @@ The Lab::XPRESS::Sweep::Voltage class implements a module for voltage Sweeps in 
 
 Instantiates a new voltage-sweep.
 
-.
-
 =head1 PARAMETERS
 
 =head2 instrument [Lab::Instrument] (mandatory)
@@ -217,17 +215,13 @@ Instantiates a new voltage-sweep.
 Instrument, conducting the sweep. Must be of type Lab:Instrument. 
 Allowed instruments: Lab::Instrument::Yokogawa7651
 
-.
-
 =head2 mode [string] (default = 'continuous' | 'step' | 'list')
-	
+
 continuous: perform a continuous voltage sweep. Measurements will be performed constantly at the time-interval defined in interval.
 
 step: measurements will be performed at discrete values of the applied voltage between start and end points defined in parameter points, seperated by voltage steps defined in parameter stepwidth
 
 list: measurements will be performed at a list voltage values defined in parameter points
-	
-.
 
 =head2 points [float array] (mandatory)
 
@@ -248,8 +242,6 @@ Same as in 'continuous' but voltage will be swept in stop and go mode. I.e. volt
 Case mode => 'list' :
 Array of voltages, with minimum length 1, that are approached in sequence to perform a measurment.
 
-.
-
 =head2 rate [float array] (mandatory if not defined duration)
 
 array of rates, at which the voltage is swept (V / sec).
@@ -258,7 +250,6 @@ The first value defines the rate to approach the starting point.
 The following values define the rates to approach the voltages defined by the points-array.
 If the number of values in the rates-array is less than the length of the points-array, the last defined rate will be used for the remaining sweep sections.
 
-	
 	points => [-5, -1, 1, 5],
 	rates => [1, 0.005, 0.02]
 	
@@ -267,58 +258,46 @@ If the number of values in the rates-array is less than the length of the points
 	rate to approach 1 V   : 0.02 V/sec 
 	rate to approach 5 V   : 0.02 V/sec (last defined rate)
 
-.
-
-
 =head2 duration [float array] (mandatory if not defined rate)
 
 can be used instead of 'rate'. Attention: Use only the 'duration' or the 'rate' parameter. Using both will cause an Error!
-	
+
 The first value defines the duration to approach the starting point. 
 The second value defines the duration to approach the voltage value defined by the second value of the points-array.
 ...
 If the number of values in the duration-array is less than the length of the points-array, last defined duration will be used for the remaining sweep sections.
-
-.
 
 =head2 stepwidth [float array]
 
 This parameter is relevant only if mode = 'step' has been selected. 
 Stepwidth has to be an array of length '1' or greater. The values define the width for each step within the corresponding sweep sequence. 
 If the length of the defined sweep sequence devided by the stepwidth is not an integer number, the last step will be smaller in order to reach the defined points-value.
-	
+
 	points = [0, 0.5, 3]
 	stepwidth = [0.2, 0.5]
 	
 	==> steps: 0, 0.2, 0.4, 0.5, 1.0, 1.5, 2.0, 2.5, 3
-
-.
 
 =head2 number_of_points [int array]
 
 can be used instead of 'stepwidth'. Attention: Use only the 'number_of_points' or the 'stepwidth' parameter. Using both will cause an Error!
 This parameter is relevant only if mode = 'step' has been selected. 
 Number_of_points has to be an array of length '1' or greater. The values defines the number of steps within the corresponding sweep sequence.
-	
+
 	points = [0, 0.5, 3]
 	number_of_points = [5, 2]
 	
 	==> steps: 0, 0.1, 0.2, 0.3, 0.4, 0.5, 1.75, 3
-.
 
 =head2 interval [float] (default = 1)
 
 interval in seconds for taking measurement points. Only relevant in mode 'continuous'.
-
-.
 
 =head2 backsweep [int] (default = 0 | 1 | 2)
 
 0 : no backsweep (default)
 1 : a backsweep will be performed
 2 : no backsweep performed automatically, but sweep sequence will be reverted every second time the sweep is started (relevant eg. if sweep operates as a slave. This way the sweep sequence is reverted at every second step of the master)
-	
-.
 
 =head2 jump [int] (default = 0 | 1 )
 
@@ -326,46 +305,31 @@ can be used to switch off the sweeping between adjacent points in step or list m
 
 0 : a sweep is performed between adjacent steps (default)
 1 : the voltage is set without sweeping, given that gateprotect does not trigger a sweep.
-	
-.
-
 
 =head2 id [string] (default = 'Voltage_sweep')
 
 Just an ID.
 
-.
-
 =head2 filename_extention [string] (default = 'V=')
 
 Defines a postfix, that will be appended to the filenames if necessary.
 
-.
-
 =head2 delay_before_loop [int] (default = 0)
 
 defines the time in seconds to wait after the starting point has been reached.
-
-.
 
 =head2 delay_in_loop [int] (default = 0)
 
 This parameter is relevant only if mode = 'step' or 'list' has been selected. 
 Defines the time in seconds to wait after the value for the next step has been reached.
 
-.
-
 =head2 delay_after_loop [int] (default = 0)
 
 Defines the time in seconds to wait after the sweep has been finished. This delay will be executed before an optional backsweep or optional repetitions of the sweep.
 
-.
-
 =head1 CAVEATS/BUGS
 
 probably none
-
-.
 
 =head1 SEE ALSO
 
@@ -375,15 +339,19 @@ probably none
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-Christian Butschkow and Stefan Geißler
+  Copyright 2012       Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Alois Dirnaichner, Andreas K. Huettel
+            2015       Alois Dirnaichner
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
 
-.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

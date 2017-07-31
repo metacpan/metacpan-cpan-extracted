@@ -7,7 +7,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( _read_win32_reg_dump );
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 # perl -MYAML= -MConfig::INI::Reader::Multiline -MFile::BOM -E 'use autodie; open $fh, "<:via(File::BOM)", "foo.reg"; <$fh>; say Dump(Config::INI::Reader::Multiline->read_handle($fh))'
@@ -82,7 +82,7 @@ Alien::Build::Util::Win32::RegistryDump - Private utility functions for Alien::B
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 DESCRIPTION
 
@@ -109,6 +109,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

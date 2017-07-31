@@ -8,7 +8,7 @@ use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Net::FTP plugin for fetching files
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 has '+url' => '';
@@ -37,6 +37,9 @@ sub init
     $url ||= $self->url;
     
     $url = URI->new($url);
+
+    die "Fetch::NetFTP does not support @{[ $url->scheme ]}"
+      unless $url->scheme eq 'ftp';
     
     $build->log("trying passive mode FTP first") if $self->passive;
     my $ftp = _ftp_connect($url, $self->passive);
@@ -129,8 +132,6 @@ sub _ftp_connect {
   my $url = shift;
   my $is_passive = shift || 0;
 
-  Alien::Build->log("is_passive = $is_passive");
-  
   my $ftp = Net::FTP->new(
     $url->host, Port =>$url->port, Passive =>$is_passive,
   ) or die "error fetching $url: $@";
@@ -157,7 +158,7 @@ Alien::Build::Plugin::Fetch::NetFTP - Net::FTP plugin for fetching files
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -204,6 +205,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

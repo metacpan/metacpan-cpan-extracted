@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Acme::CPANLists::Whitelist;
 
-our $DATE = '2017-07-06'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ Dist::Zilla::Plugin::Acme::CPANLists::Whitelist - Specify whitelist
 
 =head1 VERSION
 
-This document describes version 0.03 of Dist::Zilla::Plugin::Acme::CPANLists::Whitelist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-06.
+This document describes version 0.04 of Dist::Zilla::Plugin::Acme::CPANLists::Whitelist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-28.
 
 =head1 SYNOPSIS
 

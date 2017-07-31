@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-use File::HomeDir::Test;
-use File::HomeDir;
+use Test2::Plugin::FauxHomeDir;
+use File::Glob qw( bsd_glob );
 use Test::More tests => 14;
 use App::cpangitify;
 use Capture::Tiny qw( capture_merged );
@@ -17,7 +17,7 @@ $App::cpangitify::_run_cb = sub {
   note "+ git @command";
 };
 
-my $home = dir( File::HomeDir->my_home );
+my $home = dir( bsd_glob '~' );
 
 note "home = $home";
 

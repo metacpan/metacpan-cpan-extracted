@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Box;
 # ABSTRACT: main configuration and entry point for L<Net::Fritz> distribution
-$Net::Fritz::Box::VERSION = 'v0.0.8';
+$Net::Fritz::Box::VERSION = 'v0.0.9';
 
 # We need LWP::UserAgent 6.00 because of ssl_opts.  We could work with
 # an older version as seen in https://github.com/rhuss/jmx4perl/issues/28
@@ -20,13 +20,14 @@ use AppConfig;
 
 use Net::Fritz::Error;
 use Net::Fritz::Device;
+use Net::Fritz::ConfigFile;
 
 use Moo;
 
 with 'Net::Fritz::IsNoError';
 
 
-has upnp_url      => ( is => 'ro', default => 'http://fritz.box:49000' );
+has upnp_url      => ( is => 'ro', default => 'https://fritz.box:49443' );
 
 
 has trdesc_path   => ( is => 'ro', default => '/tr64desc.xml' );
@@ -46,34 +47,16 @@ sub BUILDARGS {
 
     if (exists $args{configfile}) {
 
-	# expand empty filename to default ~/.fritzrc
-	if (! $args{configfile}) {
-	    my $default_configfile = "$ENV{HOME}/.fritzrc";
-	    return \%args unless -e $default_configfile; # skip if ~/.fritzrc does not exist
-	    $args{configfile} = $default_configfile;
-	}
-
-	# expand ~ to $HOME
-	$args{configfile} =~ s/^~/$ENV{HOME}/;
-
-	# configure AppConfig
-	my $config = AppConfig->new();
-	$config->define('upnp_url=s');
-	$config->define('trdesc_path=s');
-	$config->define('username=s');
-	$config->define('password=s');
-
-	# read configfile
-	$config->file($args{configfile});
+	my $config = Net::Fritz::ConfigFile->new( $args{configfile} );
 
 	# get configuration variables
-	my %config_vars = $config->varlist('^');
+	my %config_vars = %{$config->configuration};
 
-	# remove all missing configuration variables
-	delete $config_vars{$_} foreach grep {!defined $config_vars{$_}} keys %config_vars;
-
-	# merge both hashes; %args wins for duplicate keys
-	return { %config_vars, %args };
+	# merge both hashes: %args wins over %config_vars for duplicate keys
+	%args = ( %config_vars, %args );
+	
+	# always update 'configfile' from $config (might be expanded or auto-selected)
+	$args{'configfile'} = $config->configfile;
     }
 
     return \%args;
@@ -182,15 +165,15 @@ Net::Fritz::Box - main configuration and entry point for L<Net::Fritz> distribut
 
 =head1 VERSION
 
-version v0.0.8
+version v0.0.9
 
 =head1 SYNOPSIS
 
     my $fritz = Net::Fritz::Box->new();
     $fritz->dump();
 
-    my $fritz_ssl = Net::Fritz::Box->new(
-        upnp_url => 'https://fritz.box:49000'
+    my $fritz_nossl = Net::Fritz::Box->new(
+        upnp_url => 'http://fritz.box:49000'
     );
 
     my $fritz_auth = Net::Fritz::Box->new(
@@ -207,7 +190,7 @@ L<Net::Fritz::Device>s.
 
 =head2 upnp_url
 
-Default value: C<http://fritz.box:49000>
+Default value: C<https://fritz.box:49443>
 
 Base URL for all operations.  This must point to your device. The
 default value expects a standard Fritz!Box installation with working
@@ -221,7 +204,9 @@ C<192.168.179.1> or C<169.254.1.1>, these adresses seem to be
 hardcoded for "emergency use" after a misconfiguration.
 
 An address starting with C<https://> enables secure communication over
-SSL, but see L<Net::Fritz/SSL> for bugs and limitations.
+SSL.  To disable SSL, use an address starting with C<http://>.  The
+port will be different; the Fritz!Box default for unsecured access is
+C<http://fritz.box:49000>
 
 =head2 trdesc_path
 
@@ -248,30 +233,13 @@ Default value: none
 
 Sets a configuration file to read the configuration from.
 
-A C<~> at the beginning of the filename will be expanded to
-C<$ENV{HOME}>.
-
-If the filename expands to C<false> (C<0>, C<''> or the like), the
-default filename of C<~/.fritzrc> will be used if it exists.
-
-The file format is simply C<key = value> (for more details see
-L<AppConfig>) per line with the following keys available:
-
-=over
-
-=item L</upnp_url>
-
-=item L</trdesc_path>
-
-=item L</username>
-
-=item L</password>
-
-=back
+For a description of the file format as well as default configfile
+locations that are automatically searched, see
+L<Net::Fritz::ConfigFile>.
 
 If an attribute is both defined by the configuration file and given as
-a parameter to L</new>, the parameter is taken and the value from the
-configuration file is ignored.
+a parameter to L</new>, the parameter overwrites the value from the
+configuration file.
 
 This attribute is available since C<v0.0.8>.
 
@@ -292,13 +260,15 @@ values:
 
 =over
 
-=item L</upnp_url>
+=item * L</configfile>
 
-=item L</trdesc_path>
+=item * L</upnp_url>
 
-=item L</username>
+=item * L</trdesc_path>
 
-=item L</password>
+=item * L</username>
+
+=item * L</password>
 
 =back
 
@@ -307,13 +277,15 @@ values:
 Tries to discover the TR064 device at the current L</upnp_url>.
 Returns a L<Net::Fritz::Device> on success.  Accepts no parameters.
 
-=head2 call(I<service_name> I<action_name [I<parameter> => I<value>] [...])
+=head2 call(I<service_name> I<action_name> [I<argument_hash>])
 
 Directly calls the L<Net::Fritz::Action> named I<action_name> of the
 L<Net::Fritz::Service> matching the regular expression I<service_name>.
 
 This is a convenience method that internally calls L</discover>
-followed by L<Net::Fritz::Device/call> - see those methods for further
+followed by
+L<Net::Fritz::Device::call|Net::Fritz::Device/call(service_name
+action_name [argument_hash])> - see those methods for further
 details.
 
 The intermediate L<Net::Fritz::Device> is cached, so that further

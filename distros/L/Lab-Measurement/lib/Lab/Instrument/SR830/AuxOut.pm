@@ -1,66 +1,7 @@
-
-=head1 NAME
-
-Lab::Instrument::SR830::AuxOut -- Aux Outputs of the Stanford
-Research SR830 Lock-In Amplifier.
-
-=head1 SYNOPSIS
-
- use Lab::Instrument::SR830::AuxOut
- my $output = Lab::Instrument::SR830::AuxOut->new(%options, channel => 1);
-
-=head1 DESCRIPTION
-
-This class provides access to the four DC outputs of the SR830. You have to
-provide a C<channel> (1..4) parameter in the constructor. 
-
-B<To use multiple virtual instruments, which use the same physical device, you have to share the connection between the virtual instruments:>
-
- use Lab::Measurement;
-
- # Create the shared connection. 
- my $connection = Connection('LinuxGPIB', {gpib_address => 8});
- 
- # Create two outputs.
- my $gate = Instrument('SR830::AuxOut', {connection => $connection,
-					channel => 1,
-					gate_protect => 0});
- my $bias = Instrument('SR830::AuxOut', {connection => $connection,
-					channel => 2,
-					gate_protect => 0});
-
-You can now use C<$gate> and C<$bias> to build XPRESS L<Voltage
-Sweeps|Lab::XPRESS::Sweep::Voltage>. The SR830 does not have hardware support
-for continuous voltage sweeps. Thus, the C<mode> parameter of the sweep must be
-set to C<'step'> or C<'list'> and the C<jump> parameter must be set to
-C<1>. Example sweep configuration:
-
- my $gate_sweep = Sweep('Voltage',
- 		       {
- 			       mode => 'step',
- 			       instrument => $gate,
- 			       points => [-0.1,0.1],
- 			       stepwidth => [0.001],
- 			       jump => 1,
- 			       rate => [0.001],
- 			       
- 		       });
- 
- my $bias_sweep = Sweep('Voltage',
- 		       {
- 			       mode => 'step',
- 			       instrument => $bias,
- 			       points => [-0.1,0.1],
- 			       stepwidth => [0.001],
- 			       rate => [0.001],
- 			       jump => 1,
- 		       });
- 
- 
-=cut
-
 package Lab::Instrument::SR830::AuxOut;
-$Lab::Instrument::SR830::AuxOut::VERSION = '3.553';
+#ABSTRACT: Aux Outputs of the Stanford Research SR830 Lock-In Amplifier
+$Lab::Instrument::SR830::AuxOut::VERSION = '3.554';
+
 use warnings;
 use strict;
 use 5.010;
@@ -131,14 +72,6 @@ sub empty_buffer {
     }
 }
 
-=head1 Methods
-
-=head2 _set_level($voltage)
-
-Set the output voltage. Will throw an exception, if the absolute value of
-C<$voltage> is bigger than 10.5 V. 
-
-=cut
 
 sub _set_level {
     my $self = shift;
@@ -157,11 +90,6 @@ sub _set_level {
     return $value;
 }
 
-=head2 set_voltage($voltage)
-
-Equivalent to C<_set_level>.
-
-=cut
 
 sub set_voltage {
     my $self = shift;
@@ -170,15 +98,6 @@ sub set_voltage {
     return $self->set_level( $voltage, $tail );
 }
 
-=head2 set_level($voltage)
-
-See L<Lab::Instrument::Source>.
-
-=head2 get_level()
-
-Query the current output voltage.
-
-=cut
 
 sub get_level {
     my $self = shift;
@@ -192,3 +111,101 @@ sub active {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::SR830::AuxOut - Aux Outputs of the Stanford Research SR830 Lock-In Amplifier
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use Lab::Instrument::SR830::AuxOut
+ my $output = Lab::Instrument::SR830::AuxOut->new(%options, channel => 1);
+
+=head1 DESCRIPTION
+
+This class provides access to the four DC outputs of the SR830. You have to
+provide a C<channel> (1..4) parameter in the constructor. 
+
+B<To use multiple virtual instruments, which use the same physical device, you have to share the connection between the virtual instruments:>
+
+ use Lab::Measurement;
+
+ # Create the shared connection. 
+ my $connection = Connection('LinuxGPIB', {gpib_address => 8});
+ 
+ # Create two outputs.
+ my $gate = Instrument('SR830::AuxOut', {connection => $connection,
+					channel => 1,
+					gate_protect => 0});
+ my $bias = Instrument('SR830::AuxOut', {connection => $connection,
+					channel => 2,
+					gate_protect => 0});
+
+You can now use C<$gate> and C<$bias> to build XPRESS L<Voltage
+Sweeps|Lab::XPRESS::Sweep::Voltage>. The SR830 does not have hardware support
+for continuous voltage sweeps. Thus, the C<mode> parameter of the sweep must be
+set to C<'step'> or C<'list'> and the C<jump> parameter must be set to
+C<1>. Example sweep configuration:
+
+ my $gate_sweep = Sweep('Voltage',
+ 		       {
+ 			       mode => 'step',
+ 			       instrument => $gate,
+ 			       points => [-0.1,0.1],
+ 			       stepwidth => [0.001],
+ 			       jump => 1,
+ 			       rate => [0.001],
+ 			       
+ 		       });
+ 
+ my $bias_sweep = Sweep('Voltage',
+ 		       {
+ 			       mode => 'step',
+ 			       instrument => $bias,
+ 			       points => [-0.1,0.1],
+ 			       stepwidth => [0.001],
+ 			       rate => [0.001],
+ 			       jump => 1,
+ 		       });
+
+=head1 Methods
+
+=head2 _set_level($voltage)
+
+Set the output voltage. Will throw an exception, if the absolute value of
+C<$voltage> is bigger than 10.5 V. 
+
+=head2 set_voltage($voltage)
+
+Equivalent to C<_set_level>.
+
+=head2 set_level($voltage)
+
+See L<Lab::Instrument::Source>.
+
+=head2 get_level()
+
+Query the current output voltage.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

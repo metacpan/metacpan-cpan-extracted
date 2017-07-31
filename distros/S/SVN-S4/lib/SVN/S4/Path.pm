@@ -9,7 +9,7 @@ use strict;
 
 use SVN::S4::Debug qw (DEBUG is_debug);
 
-our $VERSION = '1.064';
+our $VERSION = '1.066';
 
 ######################################################################
 

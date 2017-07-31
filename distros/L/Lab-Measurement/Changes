@@ -4,6 +4,16 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.554 2017-07-25
+
+  * Complete the PodWeaver conversion
+  * Move Lab::XPRESS::Sweep::Sweep to Lab::XPRESS::Sweep
+  * Documentation fixes and improvements
+  * Start with OI Mercury magnet control support
+  * Separate documentation build system into its own distro and repo
+  * Adapt normal Perl directory structure
+  * Clear executable bits of pm files in git
+
 3.553 2017-07-03
 
   * More PodWeaver conversion of documentation

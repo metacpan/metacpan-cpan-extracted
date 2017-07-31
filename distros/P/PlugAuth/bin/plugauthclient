@@ -2,7 +2,7 @@
 
 # PODNAME: plugauthclient
 # ABSTRACT: Plug auth command line client
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 use strict;
@@ -36,7 +36,7 @@ plugauthclient - Plug auth command line client
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 SYNOPSIS
 

@@ -4,25 +4,23 @@ XML::Easy::Text - XML parsing and serialisation
 
 =head1 SYNOPSIS
 
-	use XML::Easy::Text qw(
-		xml10_read_content_object xml10_read_element
-		xml10_read_document xml10_read_extparsedent_object
-	);
+    use XML::Easy::Text qw(
+	xml10_read_content_object xml10_read_element
+	xml10_read_document xml10_read_extparsedent_object);
 
-	$content = xml10_read_content_object($text);
-	$element = xml10_read_element($text);
-	$element = xml10_read_document($text);
-	$content = xml10_read_extparsedent_object($text);
+    $content = xml10_read_content_object($text);
+    $element = xml10_read_element($text);
+    $element = xml10_read_document($text);
+    $content = xml10_read_extparsedent_object($text);
 
-	use XML::Easy::Text qw(
-		xml10_write_content xml10_write_element
-		xml10_write_document xml10_write_extparsedent
-	);
+    use XML::Easy::Text qw(
+	xml10_write_content xml10_write_element
+	xml10_write_document xml10_write_extparsedent);
 
-	$text = xml10_write_content($content);
-	$text = xml10_write_element($element);
-	$text = xml10_write_document($element, "UTF-8");
-	$text = xml10_write_extparsedent($content, "UTF-8");
+    $text = xml10_write_content($content);
+    $text = xml10_write_element($element);
+    $text = xml10_write_document($element, "UTF-8");
+    $text = xml10_write_extparsedent($content, "UTF-8");
 
 =head1 DESCRIPTION
 
@@ -60,7 +58,7 @@ use strict;
 use XML::Easy::Content 0.007 ();
 use XML::Easy::Element 0.007 ();
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -170,7 +168,7 @@ sub _parse_reference($) {
 		my $v = $1;
 		_throw_wfc_error("invalid character in character reference")
 			unless $v =~ /\A0*(.{1,6})\z/s;
-		no warnings "utf8";
+		no if "$]" < 5.017002, qw(warnings utf8);
 		my $c = chr(hex($v));
 		_throw_wfc_error("invalid character in character reference")
 			unless $c =~ /\A$xml10_char_rx\z/o;
@@ -179,7 +177,7 @@ sub _parse_reference($) {
 		my $v = $1;
 		_throw_wfc_error("invalid character in character reference")
 			unless $v =~ /\A0*(.{1,7})\z/s;
-		no warnings "utf8";
+		no if "$]" < 5.017002, qw(warnings utf8);
 		my $c = chr($v);
 		_throw_wfc_error("invalid character in character reference")
 			unless $c =~ /\A$xml10_char_rx\z/o;
@@ -455,7 +453,8 @@ sub _serialise_chardata($$) {
 	my($rtext, $str) = @_;
 	_throw_data_error("character data isn't a string")
 		unless is_string($str);
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	while($str !~ /\G\z/gc) {
 		# Note perl bug: in some versions of perl, including 5.8.8
 		# and 5.10.0, the "+" in the plain-character regexp acts
@@ -519,7 +518,8 @@ sub _serialise_attvalue($$) {
 	my($rtext, $str) = @_;
 	_throw_data_error("character data isn't a string")
 		unless is_string($str);
-	no warnings "utf8";
+	no if "$]" < 5.017002, qw(warnings utf8);
+	no if "$]" >= 5.023006 && "$]" < 5.027001, qw(warnings deprecated);
 	while($str !~ /\G\z/gc) {
 		# Note perl bug: in some versions of perl, including 5.8.8
 		# and 5.10.0, the "+" in the plain-character regexp acts
@@ -556,7 +556,9 @@ sub _serialise_element($$) {
 	_throw_data_error("element type name isn't a string")
 		unless is_string($type_name);
 	{
-		no warnings "utf8";
+		no if "$]" < 5.017002, qw(warnings utf8);
+		no if "$]" >= 5.023006 && "$]" < 5.027001,
+			qw(warnings deprecated);
 		_throw_data_error("illegal element type name")
 			unless $type_name =~ /\A$xml10_name_rx\z/o;
 	}
@@ -566,7 +568,9 @@ sub _serialise_element($$) {
 		unless is_ref($attributes, "HASH");
 	foreach(sort keys %$attributes) {
 		{
-			no warnings "utf8";
+			no if "$]" < 5.017002, qw(warnings utf8);
+			no if "$]" >= 5.023006 && "$]" < 5.027001,
+				qw(warnings deprecated);
 			_throw_data_error("illegal attribute name")
 				unless /\A$xml10_name_rx\z/o;
 		}
@@ -635,7 +639,9 @@ sub xml10_write_document($;$) {
 		_throw_data_error("encoding name isn't a string")
 			unless is_string($encname);
 		{
-			no warnings "utf8";
+			no if "$]" < 5.017002, qw(warnings utf8);
+			no if "$]" >= 5.023006 && "$]" < 5.027001,
+				qw(warnings deprecated);
 			_throw_data_error("illegal encoding name")
 				unless $encname =~ /\A$xml10_encname_rx\z/;
 		}
@@ -667,7 +673,9 @@ sub xml10_write_extparsedent($;$) {
 		_throw_data_error("encoding name isn't a string")
 			unless is_string($encname);
 		{
-			no warnings "utf8";
+			no if "$]" < 5.017002, qw(warnings utf8);
+			no if "$]" >= 5.023006 && "$]" < 5.027001,
+				qw(warnings deprecated);
 			_throw_data_error("illegal encoding name")
 				unless $encname =~ /\A$xml10_encname_rx\z/;
 		}

@@ -1,8 +1,6 @@
-use strict;
-use warnings;
+use Test2::V0;
 use Acme::Alien::DontPanic2 ();
 use ExtUtils::CBuilder;
-use Test::More tests => 3;
 use File::Spec;
 use Capture::Tiny qw( capture_merged );
 
@@ -61,3 +59,5 @@ my($link_output, $lib) = capture_merged {
 $ok = ok defined $lib && -r $lib, "linked $lib";
 
 $ok ? note $link_output : diag $link_output;
+
+done_testing;

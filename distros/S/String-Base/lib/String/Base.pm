@@ -4,9 +4,9 @@ String::Base - string index offseting
 
 =head1 SYNOPSIS
 
-	use String::Base +1;
+    use String::Base +1;
 
-	no String::Base;
+    no String::Base;
 
 =head1 DESCRIPTION
 
@@ -114,7 +114,7 @@ use Lexical::SealRequireHints 0.006;
 use warnings;
 use strict;
 
-our $VERSION = "0.001";
+our $VERSION = "0.003";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -166,7 +166,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2011, 2012, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

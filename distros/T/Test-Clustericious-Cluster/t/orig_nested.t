@@ -4,8 +4,6 @@ eval q{ use Test::Clustericious::Log };
 use Test::Clustericious::Cluster;
 use Test2::Bundle::More;
 
-plan 7;
-
 my $cluster = Test::Clustericious::Cluster->new;
 
 $cluster->create_cluster_ok(
@@ -24,6 +22,8 @@ $t->get_ok("$urls[0]/end_of_road")
 $t->get_ok("$urls[0]/redirect1")
   ->status_is(200)
   ->content_is('([now, light our darkest hour])');
+
+done_testing;
 
 __DATA__
 

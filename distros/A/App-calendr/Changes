@@ -1,5 +1,15 @@
 Revision history for App::calendr
 
+0.18  Sat Jul 29 08:40:00 2017
+      - Renamed option '--julian' to '--jday', just to make sure
+        it doesn't confuse user with the calendar name 'Julian'.
+
+0.17  Sun Jul 23 10:50:00 2017
+      - Added support for Julian Calendar.
+
+0.16  Sun Jul 23 03:20:00 2017
+      - Added support for Hebrew Calendar.
+
 0.15  Sat Apr 08 18:50:00 2017
       - Updated copyright year information in the pod document.
 

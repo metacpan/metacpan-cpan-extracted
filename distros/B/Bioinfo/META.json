@@ -1,0 +1,66 @@
+{
+   "abstract" : "my perl module and CLIs for Biology",
+   "author" : [
+      "Yan Xueqing <yanxueqing621@163.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bioinfo",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "FindBin" : "0",
+            "IO::All" : "0",
+            "List::Util" : "0",
+            "Modern::Perl" : "0",
+            "Moo" : "0",
+            "MooX::Cmd" : "0",
+            "MooX::Options" : "0",
+            "Moose" : "0",
+            "Parallel::ForkManager" : "0",
+            "lib" : "0",
+            "namespace::autoclean" : "0",
+            "namespace::clean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

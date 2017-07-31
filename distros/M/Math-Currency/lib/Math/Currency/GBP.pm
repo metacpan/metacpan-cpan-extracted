@@ -1,5 +1,5 @@
 package Math::Currency::GBP;
-$Math::Currency::GBP::VERSION = '0.51';
+$Math::Currency::GBP::VERSION = '0.52';
 # ABSTRACT: GBP Currency Module for Math::Currency
 
 use strict;
@@ -21,7 +21,7 @@ Math::Currency::GBP - GBP Currency Module for Math::Currency
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SOURCE
 

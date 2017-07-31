@@ -14524,7 +14524,7 @@ language:
       gib: Gibanawa
       gic: Gail
       gid: Gidar
-      gie: GaÉogbo
+      gie: Gabogbo
       gig: Goaria
       gih: Githabul
       gil: Gilbertese
@@ -26400,6 +26400,9 @@ language:
       gabi-gabi: 
         - gbw
         - Gabi-Gabi
+      gabogbo: 
+        - gie
+        - Gabogbo
       gabri: 
         - gab
         - Gabri
@@ -26619,9 +26622,6 @@ language:
       gazi: 
         - gzi
         - Gazi
-      gaéogbo: 
-        - ~
-        - GaÉogbo
       gbagyi: 
         - gbr
         - Gbagyi

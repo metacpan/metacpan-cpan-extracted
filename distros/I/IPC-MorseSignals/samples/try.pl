@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-use POSIX qw/pause EXIT_SUCCESS EXIT_FAILURE/;
+use POSIX qw<pause EXIT_SUCCESS EXIT_FAILURE>;
 
-use lib qw{blib/lib};
+use lib qw<blib/lib>;
 
 use IPC::MorseSignals::Emitter;
 use IPC::MorseSignals::Receiver;

@@ -1,11 +1,12 @@
 package Lingua::Word::Parser;
+our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Parse a word into known and unknown parts
+# ABSTRACT: Parse a word into scored known and unknown parts
 
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.0804';
 
 use Bit::Vector;
 use DBI;
@@ -17,6 +18,7 @@ memoize('_does_not_overlap');
 memoize('power');
 memoize('_reconstruct');
 memoize('_grouping');
+memoize('score');
 memoize('score_parts');
 memoize('_rle');
 memoize('_or_together');
@@ -200,26 +202,55 @@ sub power {
 
 sub score {
     my $self = shift;
-    my ( $open_sparator, $close_separator ) = @_;
+    my ( $open_separator, $close_separator ) = @_;
 
-    my $parts = $self->score_parts( $open_sparator, $close_separator );
+    my $parts = $self->score_parts( $open_separator, $close_separator );
 
     for my $mask ( keys %$parts ) {
+        my $familiarity = sprintf "%.2f chunks / %.2f chars", @{ $self->_familiarity($mask) };
+
         for my $element ( @{ $parts->{$mask} } ) {
-            my $key  = "$element->{score}{knowns}:$element->{score}{unknowns} chunks / $element->{score}{knownc}:$element->{score}{unknownc} chars";
-            my $val  = join ', ', @{ $element->{partition} };
+            my $score = sprintf "%d:%d chunks / %d:%d chars",
+                $element->{score}{knowns}, $element->{score}{unknowns},
+                $element->{score}{knownc}, $element->{score}{unknownc};
+
+            my $part = join ', ', @{ $element->{partition} };
+
             my $defn = join ', ', @{ $element->{definition} };
-            push @{ $self->{score}{$mask} }, { score => $key, partition => $val, definition => $defn };
+
+            push @{ $self->{score}{$mask} }, {
+                score       => $score,
+                familiarity => $familiarity,
+                partition   => $part,
+                definition  => $defn,
+            };
         }
     }
 
     return $self->{score};
 }
 
+sub _familiarity {
+    my ( $self, $mask ) = @_;
+
+    my @chunks = grep { $_ ne "" } split /(0+)/, $mask;
+
+    # Figure out how many chars are only 1s and
+    # Figure out how many chunks are made up of 1s:
+    my $char_1s = 0;
+    my $chunk_1s = 0;
+    for my $chunk (@chunks) {
+        $char_1s  += $chunk =~ /0/ ? 0 : length($chunk);
+        $chunk_1s += $chunk =~ /0/ ? 0 : 1;
+    }
+
+    return [ $chunk_1s / @chunks, $char_1s / length($mask) ];
+}
+
 
 sub score_parts {
     my $self = shift;
-    my ( $open_sparator, $close_separator, $line_terminator ) = @_;
+    my ( $open_separator, $close_separator, $line_terminator ) = @_;
 
     $line_terminator = '' unless defined $line_terminator;
 
@@ -248,7 +279,7 @@ sub score_parts {
             $count{unknownc} += $unknownc;
         }
 
-        my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_sparator, $close_separator );
+        my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_separator, $close_separator );
 
         my $defn = [];
         for my $i ( @$m )
@@ -259,8 +290,12 @@ sub score_parts {
             }
         }
 
-        push @{ $self->{score_parts}{$together} },
-            { score => \%count, partition => $s, definition => $defn };
+        push @{ $self->{score_parts}{$together} }, {
+            score       => \%count,
+            partition   => $s,
+            definition  => $defn,
+            familiarity => $self->_familiarity($together),
+        };
     }
 
     return $self->{score_parts};
@@ -378,59 +413,55 @@ __END__
 
 =head1 NAME
 
-Lingua::Word::Parser - Parse a word into known and unknown parts
+Lingua::Word::Parser - Parse a word into scored known and unknown parts
 
 =head1 VERSION
 
-version 0.07
+version 0.0804
 
 =head1 SYNOPSIS
 
  use Lingua::Word::Parser;
- my $p = Lingua::Word::Parser->new(
-    word => 'abioticaly',
-    file => 'eg/lexicon.dat',
- );
 
- # Or with a database source:
- $p = Lingua::Word::Parser->new(
+ # With a database source:
+ my $p = Lingua::Word::Parser->new(
     word   => 'abioticaly',
     dbname => 'fragments',
     dbuser => 'akbar',
     dbpass => 's3kr1+',
  );
 
+ # With a file source:
+ $p = Lingua::Word::Parser->new(
+    word => 'abioticaly',
+    file => 'eg/lexicon.dat',
+ );
+
  my $known  = $p->knowns;
  my $combos = $p->power;
- my $parts  = $p->score_parts;
+ my $score  = $p->score;    # Stringified output
+ #my $score  = $p->score_parts; # "Raw" output
 
  # The best guess is the last sorted scored set:
- print Dumper $scored->{ [ sort keys %$scored ]->[-1] };
+ print Dumper $score->{ [ sort keys %$score ]->[-1] };
 
 =head1 DESCRIPTION
 
 A C<Lingua::Word::Parser> breaks a word into known affixes.
 
-A (word-part => regular-expression) lexicon file must have lines of
-the form:
+A word-part lexicon file must have "regular-expression definition"
+lines of the form:
 
  a(?=\w)        opposite
  ab(?=\w)       away
  (?<=\w)o(?=\w) combining
  (?<=\w)tic     possessing
 
-Please see the included F<eg/lexicon.dat> file.
+Please see the included F<eg/lexicon.dat> example file.
 
-A database lexicon must have records of the form:
-
-         affix     definition
-  -----------------------------
-         a(?=\w)   opposite
-         ab(?=\w)  away
-  (?<=\w)o(?=\w)   combining
-  (?<=\w)tic       possessing
-
-Please see the included F<eg/word_part.sql> file.
+A database lexicon must have records as above, but with the column
+names, B<affix> and B<definition>.  Please see the included
+F<eg/word_part.sql> example file.
 
 =head1 METHODS
 
@@ -465,27 +496,34 @@ all masks.
 =head2 score()
 
   $score = $p->score();
-  $score = $p->score( $open_sparator, $close_separator);
+  $score = $p->score( $open_separator, $close_separator);
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks or parts or "spans of adjacent characters" B<as a collection of strings>.
+chunks, word familiarity, partitions and definitions.
 
-If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
+This method sets the B<score> member to a list of hashrefs with keys:
+
+  partition
+  definition
+  score
+  familiarity
+
+If not given, the B<$open_separator> and B<$close_separator> are '<' and '>' by
 default.
 
 =head2 score_parts()
 
   $score_parts = $p->score_parts();
-  $score_parts = $p->score_parts( $open_sparator, $close_separator );
-  $score_parts = $p->score_parts( $open_sparator, $close_separator, $line_terminator );
+  $score_parts = $p->score_parts( $open_separator, $close_separator );
+  $score_parts = $p->score_parts( $open_separator, $close_separator, $line_terminator );
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks (spans of adjacent characters).
+chunks, word familiarity, partitions and definitions.
 
-If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
+If not given, the B<$open_separator> and B<$close_separator> are '<' and '>' by
 default.
 
-The line terminator can be any string, like a newline (C<\n> or an HTML
+The B<$line_terminator> can be any string, like a newline (C<\n> or an HTML
 line-break), but is the empty string (C<''>) by default.
 
 =head1 SEE ALSO
@@ -496,13 +534,15 @@ L<http://en.wikipedia.org/wiki/Affix> is the tip of the iceberg...
 
 L<https://github.com/ology/Word-Part> a friendly L<Dancer> user interface.
 
+The F<t/*> and F<eg/*> files in this distribution!
+
 =head1 AUTHOR
 
 Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2015 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,6 @@
 package Lab::Instrument::MG369xB;
-$Lab::Instrument::MG369xB::VERSION = '3.553';
+#ABSTRACT: Anritsu MG369xB series signal generator
+$Lab::Instrument::MG369xB::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -169,28 +170,24 @@ sub sweep_next_step {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::MG369xB - MG369xB Series Signal Generator
+Lab::Instrument::MG369xB - Anritsu MG369xB series signal generator
 
-IMPORTANT: Only works for B series devices. MG369xA use SCPI commands and are 
-supported by HP83732A driver.
+=head1 VERSION
 
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-=head1 CONSTRUCTOR
-
-=head1 METHODS
+version 3.554
 
 =head1 CAVEATS/BUGS
 
-probably many
+IMPORTANT: Only works for B series devices. MG369xA use SCPI commands and are 
+supported by HP83732A driver.
 
 =head1 SEE ALSO
 
@@ -200,11 +197,17 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2012 Hermann Kraus
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+  Copyright 2012       Hermann Kraus
+            2013-2014  Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

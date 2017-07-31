@@ -12,7 +12,7 @@ require 5.6.1;
 use strict;
 use warnings;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 our $LVERSION =
     do { local $SIG{__WARN__} = sub {}; eval '$VERSION' || "0.001" };  # for dev
 
@@ -419,7 +419,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -436,11 +436,11 @@ available by using the report option.
 
 The following reports are currently available:
 
- text        - detailed textual summary
- html        - detailed HTML reports
+ html        - detailed HTML reports  (default)
  html_basic  - detailed HTML reports with syntax highlighting
- compilation - output in a format similar to Perl
- json        - output in a JSON
+ text        - detailed textual summary
+ compilation - output in a format similar to Perl errors
+ json        - output in a JSON format
  vim         - show coverage information in vim gutter
 
 =head1 OPTIONS
@@ -482,13 +482,14 @@ The following command line options are supported:
 
 =head1 REPORT FORMATS
 
-Tool accepts -report option:
+The following C<-report> options are available in the core module.  Other
+reports may be available if they've been installed from external packages.
 
 =over 4
 
 =item html|html_minimal (default)
 
-HTML reporting. Percentage thresholds are color-coded and configurable
+HTML reporting. Percentage thresholds are colour-coded and configurable
 via -report_c0 <integer>, -report_c1 <integer> and -report_c2 <integer>.:
 
     0%      75%      90%      100%
@@ -508,9 +509,18 @@ Plain text reporting.
 
 =item compilation
 
-Like text but hacked to give a minimal output in a format similar
-to that output by Perl itself so that it's easier to step through
-the untested locations with Emacs compilation mode.
+A textual report in a format similar to that output by Perl itself such that
+the report may be used by your editor or other reporting tools to show where
+coverage is missing.
+
+=item json
+
+A report in JSON format.
+
+=item vim
+
+A report suitable for use with the vim editor to show coverage data in the sign
+column.
 
 =back
 

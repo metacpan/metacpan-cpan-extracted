@@ -131,7 +131,7 @@ Catalyst::Authentication::Credential::OAuth2 - Authenticate against OAuth2 serve
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 SYNOPSIS
 

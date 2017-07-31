@@ -1,5 +1,8 @@
 Revision history for Perl extension Email::MIME::RFC2047
 
+0.96  2017-07-27
+        - Readd main .pm file (GH issue #3).
+
 0.95  2016-05-14
         - Fix distribution abstract.
         - Documentation fixes.

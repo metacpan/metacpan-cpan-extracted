@@ -4,39 +4,6 @@ use strict;
 use Bit::Manip::PP qw(:all);
 use Test::More;
 
-{
-    # refs
-
-    my $d;
-
-    $d = 7;
-
-    bit_clr(\$d, 0, 1, 0b1);
-    is bit_bin($d), '110', "7, 0, 1 ref ok";
-
-    bit_clr(\$d, 1, 1, 0b1);
-    is bit_bin($d), '100', "7, 1, 1 ref ok";
-
-    bit_clr(\$d, 2, 1, 0b1);
-    is bit_bin($d), '0', "7, 2, 1 ref ok";
-
-    $d = 65535;
-
-    my @ret = qw (
-        65534 65532 65528 65520 65504 65472
-        65408 65280 65024 64512 63488 61440
-        57344 49152 32768 0
-        );
-
-    my $c = 0;
-
-    for (0 .. 15) {
-        bit_clr(\$d, $_, 1, 0b1);
-        is $d, $ret[$c], "65535, $_, 1 ref ok";
-        $c++;
-    }
-}
-
 is bin(bit_clr(7, 0, 1)), '110', "7, 0 ok";
 is bin(bit_clr(7, 1, 1)), '101', "7, 1 ok";
 is bin(bit_clr(7, 2, 1)), '11', "7, 2 ok";
@@ -67,6 +34,13 @@ is bin(bit_clr(255, 3, 1)), '11110111', "255, 3, 1 ok";
 is bin(bit_clr(255, 3, 2)), '11100111', "255, 3, 2 ok";
 is bin(bit_clr(255, 3, 3)), '11000111', "255, 3, 3 ok";
 is bin(bit_clr(255, 7, 1)), '1111111', "255, 7, 1 ok";
+
+# as scalar ref
+
+my $test_data_ref = 255;
+
+bit_clr(\$test_data_ref, 7, 1);
+is bin($test_data_ref), '1111111', "255, 7, 1 ok as scalar ref";
 
 sub bin {
     return sprintf "%b", $_[0];

@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Field::Role::HTMLAttributes;
 # ABSTRACT: apply HTML attributes
-$HTML::FormHandler::Widget::Field::Role::HTMLAttributes::VERSION = '0.40067';
+$HTML::FormHandler::Widget::Field::Role::HTMLAttributes::VERSION = '0.40068';
 
 use Moose::Role;
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -25,7 +25,7 @@ HTML::FormHandler::Widget::Field::Role::HTMLAttributes - apply HTML attributes
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

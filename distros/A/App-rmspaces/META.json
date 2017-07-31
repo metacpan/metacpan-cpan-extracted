@@ -33,8 +33,9 @@
       "runtime" : {
          "requires" : {
             "File::Copy" : "0",
+            "File::Spec" : "0",
             "Getopt::Long" : "0",
-            "Pod::Usage" : "0",
+            "Pod::Usage" : "1.33",
             "perl" : "5.008004",
             "strict" : "0",
             "warnings" : "0"
@@ -55,6 +56,6 @@
          "web" : "https://github.com/athos-ribeiro/rmspaces"
       }
    },
-   "version" : 0.4,
+   "version" : 0.5,
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

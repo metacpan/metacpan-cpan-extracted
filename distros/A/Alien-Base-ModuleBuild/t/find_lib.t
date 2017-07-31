@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Alien::Base::ModuleBuild;
 use File::chdir;
 
@@ -29,7 +26,7 @@ $builder->config( ext_lib => '.a' );
 subtest 'Find from file structure' => sub {
   local $expected->{lib_files} = [sort qw/mylib onlypostdot onlypredot otherlib prepostdot/];
   my $paths = $builder->alien_find_lib_paths($dir);
-  is_deeply( $paths, $expected, "found paths from extensions only" ); 
+  is( $paths, $expected, "found paths from extensions only" ); 
 
   my $pc = $builder->alien_generate_manual_pkgconfig($dir);
   isa_ok($pc, 'Alien::Base::PkgConfig');
@@ -49,7 +46,7 @@ subtest 'Find from file structure' => sub {
 subtest 'Find using alien_provides_libs' => sub {
   $builder->alien_provides_libs('-lmylib');
   my $paths = $builder->alien_find_lib_paths($dir);
-  is_deeply( $paths, $expected, "found paths from provides" ); 
+  is( $paths, $expected, "found paths from provides" ); 
 
   my $pc = $builder->alien_generate_manual_pkgconfig($dir);
   isa_ok($pc, 'Alien::Base::PkgConfig');
@@ -77,7 +74,7 @@ subtest 'Find with static libs only' => sub {
   local $expected->{lib_files} = [sort qw/mylib otherlib/];
 
   my $paths = $builder->alien_find_lib_paths($dir);
-  is_deeply( $paths, $expected, "found paths from extensions only" );
+  is( $paths, $expected, "found paths from extensions only" );
 
 
   my $pc = $builder->alien_generate_manual_pkgconfig($dir);
@@ -105,7 +102,7 @@ subtest 'Find with static libs and dynamic dir' => sub {
   local $expected->{lib_files} = [sort qw/mylib otherlib/];
 
   my $paths = $builder->alien_find_lib_paths($dir);
-  is_deeply( $paths, $expected, "found paths from extensions only" );
+  is( $paths, $expected, "found paths from extensions only" );
   
   my $pc = $builder->alien_generate_manual_pkgconfig($dir);
   isa_ok($pc, 'Alien::Base::PkgConfig');

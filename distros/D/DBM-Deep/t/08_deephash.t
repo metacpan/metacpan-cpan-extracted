@@ -6,7 +6,8 @@ use Test::More;
 plan skip_all => "You must set \$ENV{LONG_TESTS} to run the long tests"
     unless $ENV{LONG_TESTS};
 
-use t::common qw( new_dbm );
+use lib 't';
+use common qw( new_dbm );
 
 diag "This test can take up to several minutes to run. Please be patient.";
 

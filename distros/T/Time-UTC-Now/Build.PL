@@ -18,7 +18,7 @@ Module::Build->subclass(code => q{
 			unless($self->up_to_date($probe_file, $feat_file)) {
 				require IO::File;
 				require Data::Dumper;
-				my $probe = do($probe_file) or
+				my $probe = do("./$probe_file") or
 					die $@ || "can't read $probe_file: $!";
 				my $feat_defs = $probe->($self);
 				$self->add_to_cleanup($feat_file);
@@ -29,7 +29,7 @@ Module::Build->subclass(code => q{
 							$feat_defs))
 					or die "can't write $feat_file: $!";
 			}
-			my $feat_defs = do($feat_file) or
+			my $feat_defs = do("./$feat_file") or
 				die $@ || "can't read $feat_file: $!";
 			$args{defines} =
 				{ %{$args{defines} || {}}, %$feat_defs };
@@ -72,7 +72,16 @@ Module::Build->subclass(code => q{
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Time-UTC-Now\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Time-UTC-Now",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

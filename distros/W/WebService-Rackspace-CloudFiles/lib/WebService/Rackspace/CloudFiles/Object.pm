@@ -80,6 +80,18 @@ sub _url {
     return $url;
 }
 
+# get the CDN management url for this object (for edge purge)
+sub _management_url {
+    my ($self) = @_;
+    my $url
+        = $self->cloudfiles->cdn_management_url . "/"
+        . $self->container->name . '/'
+        . $self->name;
+    utf8::downgrade($url);
+    return $url;
+}
+
+
 sub _cdn_url {
     my($self,$ssl) = @_;
     $ssl ||= 0;
@@ -182,7 +194,7 @@ sub delete {
 
 sub purge_cdn {
     my ($self, @emails) = @_;
-    my $request = HTTP::Request->new( 'DELETE', $self->_url,
+    my $request = HTTP::Request->new( 'DELETE', $self->_management_url,
         [ 'X-Auth-Token' => $self->cloudfiles->token,
           'X-Purge-Email' => join ', ', @emails] );
     my $response = $self->cloudfiles->_request($request);

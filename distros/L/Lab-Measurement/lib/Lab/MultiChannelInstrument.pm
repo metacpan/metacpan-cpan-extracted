@@ -1,7 +1,6 @@
 package Lab::MultiChannelInstrument;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Multi-channel instrument base class
-$Lab::MultiChannelInstrument::VERSION = '3.553';
+$Lab::MultiChannelInstrument::VERSION = '3.554';
 use strict;
 use Lab::Generic;
 use List::MoreUtils qw{ any };
@@ -320,7 +319,7 @@ Lab::MultiChannelInstrument - Multi-channel instrument base class
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -330,6 +329,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
             2014       Andreas K. Huettel, Christian Butschkow
             2015       Andreas K. Huettel
             2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

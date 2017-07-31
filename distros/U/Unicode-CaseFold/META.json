@@ -1,0 +1,77 @@
+{
+   "abstract" : "Unicode case-folding for case-insensitive lookups.",
+   "author" : [
+      "Andrew Rodland <arodland@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Unicode-CaseFold",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "XSLoader" : "0"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "1.11",
+            "Unicode::UCD" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Unicode-CaseFold@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Unicode-CaseFold"
+      },
+      "homepage" : "http://metacpan.org/release/Unicode-CaseFold",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/arodland/Unicode-CaseFold.git",
+         "web" : "http://github.com/arodland/Unicode-CaseFold"
+      }
+   },
+   "version" : "1.01",
+   "x_authority" : "cpan:ARODLAND",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

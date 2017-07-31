@@ -1,6 +1,19 @@
 Revision history for Bit-Manip
 
-1.03    2017-02-01
+1.04    2017-07-23
+        - replaced all calls to pow() with bit shift operations instead,
+          breaking reliance on stdint.h (closes #10)
+        - renamed bit_toggle() to bit_tog(), left an alias for backward
+          compatibility purposes (closes #8)
+        - add the parameter lists to the functions in POD (closes #9)
+        - changed to the older way of using Exporter (closes #7)
+        - added note in DESCRIPTION that we also have a pure Perl version
+          (closes #6)
+        - verified $msb can equal $lsb in bit_get(), and added tests to ensure
+          it (closes #2)
+        - added tests to ensure bit_tog() does the right thing
+
+1.03    2017-02-09
         - added bit_clr() (per PerlMonks discussion), clears selected bits
         - changed $bits param name to $nbits in code and POD as it makes it less
           ambiguous as to what we mean by the arg

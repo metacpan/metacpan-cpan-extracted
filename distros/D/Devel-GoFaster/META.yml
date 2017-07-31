@@ -14,7 +14,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,14 +23,17 @@ name: Devel-GoFaster
 provides:
   Devel::GoFaster:
     file: lib/Devel/GoFaster.pm
+    version: '0.001'
 recommends:
   XSLoader: '0'
 requires:
   Carp: '0'
-  Lexical::SealRequireHints: '0.006'
+  Lexical::SealRequireHints: '0.008'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-GoFaster
   license: http://dev.perl.org/licenses/
-version: '0.000'
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

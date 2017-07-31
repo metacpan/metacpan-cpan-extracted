@@ -1,15 +1,12 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
-lib/Math/.cvsignore
 lib/Math/Decimal.pm
 lib/Math/Decimal.xs
-t/NumForms.pm
 t/add.t
 t/add_pp.t
 t/canon.t
@@ -20,6 +17,7 @@ t/cmp.t
 t/cmp_pp.t
 t/error.t
 t/error_pp.t
+t/lib/t/NumForms.pm
 t/mul.t
 t/mul_pp.t
 t/pod_cvg.t

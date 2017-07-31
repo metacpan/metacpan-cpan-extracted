@@ -8,6 +8,8 @@ Makefile.PL
 README
 dist.ini
 lib/App/lcpan/Cmd/deps_all.pm
+lib/App/lcpan/Cmd/deps_phases.pm
+lib/App/lcpan/Cmd/deps_rels.pm
 lib/App/lcpan/CmdBundle/deps.pm
 t/00-compile.t
 t/author-pod-coverage.t

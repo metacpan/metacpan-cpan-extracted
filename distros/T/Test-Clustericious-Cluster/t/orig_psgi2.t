@@ -1,11 +1,8 @@
-use strict;
-use warnings;
+use Test2::V0 -no_srand => 1;
 use Test::Clustericious::Cluster;
-use Test::More;
 
-plan skip_all => 'test requires Mojolicious::Plugin::MountPSGI'
+skip_all 'test requires Mojolicious::Plugin::MountPSGI'
   unless eval q{ use Mojolicious::Plugin::MountPSGI (); 1 };
-plan tests => 4;
 
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok('myapp.psgi');
@@ -16,6 +13,8 @@ my $url = $cluster->url;
 $t->get_ok("$url/foo")
   ->status_is(200)
   ->content_is('Hello World!');
+
+done_testing;
 
 __DATA__
 

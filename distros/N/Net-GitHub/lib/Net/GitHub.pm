@@ -2,7 +2,7 @@ package Net::GitHub;
 
 use Net::GitHub::V3;
 
-our $VERSION = '0.87';
+our $VERSION = '0.89';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 sub new {
@@ -24,6 +24,15 @@ Net::GitHub - Perl Interface for github.com
 
     my $github = Net::GitHub->new(  # Net::GitHub::V3
         login => 'fayland', pass => 'secret'
+    );
+
+    # If you use two factor authentication you can pass in the OTP. Do
+    # note that OTPs expire quickly and you will need to generate an oauth
+    # token to do anything non-trivial.
+    my $github = Net::GitHub->new(
+        login =>   'fayland',
+        pass =>    'secret',
+        otp =>     '123456',
     );
 
     # Pass api_url for GitHub Enterprise installations. Do not include a

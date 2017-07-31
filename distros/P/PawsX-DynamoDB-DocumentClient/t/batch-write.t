@@ -113,6 +113,69 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            RequestItems => {
+                'users' => [
+                    {
+                        PutRequest => {
+                            Item => { username => '1234', rank => 1 },
+                        },
+                    },
+                    {
+                        DeleteRequest => {
+                            Key => { username => '1235' },
+                        },
+                    },
+                ],
+                'zip_codes' => [
+                    {
+                        PutRequest => {
+                            Item => { zip_code => '01234' },
+                        },
+                    },
+                ],
+            },
+            force_type => {
+                users => {
+                    username => 'S',
+                },
+                zip_codes => {
+                    zip_code => 'S',
+                },
+            },
+        ),
+    },
+    {
+        RequestItems => {
+            'users' => [
+                {
+                    PutRequest => {
+                        Item => {
+                            username => { S => '1234' },
+                            rank => { N => 1 },
+                        },
+                    },
+                },
+                {
+                    DeleteRequest => {
+                        Key => { username => { S => '1235' } },
+                    },
+                },
+            ],
+            'zip_codes' => [
+                {
+                    PutRequest => {
+                        Item => { zip_code => { S => '01234' } },
+                    },
+                },
+            ],
+        },
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output = BatchWriteItemOutput->new(
     UnprocessedItems => BatchWriteItemRequestMap->new(
         Map => {

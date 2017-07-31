@@ -4,60 +4,65 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Decimal",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : 0,
-            "Params::Classify" : 0,
-            "Test::More" : 0,
+            "Module::Build" : "0",
+            "Params::Classify" : "0",
+            "Test::More" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : 0,
+            "Module::Build" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "recommends" : {
-            "XSLoader" : 0
+            "XSLoader" : "0"
          },
          "requires" : {
-            "Carp" : 0,
-            "Exporter" : 0,
-            "Params::Classify" : 0,
-            "parent" : 0,
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Params::Classify" : "0",
+            "parent" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Math::Decimal" : {
          "file" : "lib/Math/Decimal.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Math-Decimal@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Decimal"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

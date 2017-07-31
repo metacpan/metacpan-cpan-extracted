@@ -1,0 +1,62 @@
+{
+   "abstract" : "A dependency injector container for Moose",
+   "author" : [
+      "Lo\u00efc Prieto <loic.prieto@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooseX-DIC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "Pod::Markdown" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Slurp" : "0",
+            "Moose" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "Throwable" : "0",
+            "Try::Tiny" : "0",
+            "aliased" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/loic-prieto/moosex-dic/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/loic-prieto/moosex-dic",
+         "web" : "https://github.com/loic-prieto/moosex-dic"
+      }
+   },
+   "version" : "0.1.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

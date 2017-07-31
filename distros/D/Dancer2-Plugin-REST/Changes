@@ -1,5 +1,12 @@
 Revision history for Dancer2-Plugin-REST
 
+1.02 2017-07-20
+  [ BUG FIXES ]
+    - Updated plugin for newest Dancer2. (GH#14)
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 198 insertions(+), 79 deletions(-)
+
 1.01 2016-08-25
   - use the HTTP codes from Dancer2::Core::HTTP
   - add numerical status_XXX helpers.

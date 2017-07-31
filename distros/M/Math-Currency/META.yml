@@ -3,15 +3,16 @@ abstract: 'Exact Currency Math with Formatting and Rounding'
 author:
   - 'Michael Schout <mschout@cpan.org>'
 build_requires:
-  Socket: '0'
   Test::More: '0.94'
   Test::More::UTF8: '0'
   lib: '0'
+  perl: '5.008'
   vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,6 +27,7 @@ requires:
   Test::More: '0.94'
   base: '0'
   overload: '0'
+  perl: '5.008'
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -33,4 +35,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Math-Currency
   homepage: http://search.cpan.org/dist/Math-Currency/
   repository: git://github.com/mschout/perl-math-currency.git
-version: '0.51'
+version: '0.52'
+x_serialization_backend: 'YAML::Tiny version 1.69'

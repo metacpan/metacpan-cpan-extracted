@@ -12,7 +12,7 @@ require 5.8.0;  # My patches to B::Concise didn't get released till 5.8.0.
 use strict;
 use warnings;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 use Devel::Cover::Dumper;
 
@@ -84,7 +84,7 @@ Devel::Cover::Op - B::Concise with coverage data
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,10 +49,9 @@
          },
          "requires" : {
             "AnyEvent" : "0",
-            "File::Share" : "0",
+            "File::ShareDir::Dist" : "0",
             "File::Which" : "0",
             "File::chdir" : "0",
-            "List::MoreUtils" : "0",
             "Moo" : "2.0",
             "Path::Class" : "0.26",
             "PerlIO::eol" : "0",
@@ -62,7 +61,6 @@
       },
       "test" : {
          "requires" : {
-            "File::HomeDir" : "0.91",
             "perl" : "5.010001"
          }
       }
@@ -79,7 +77,7 @@
          "web" : "https://github.com/plicease/AnyEvent-FTP"
       }
    },
-   "version" : "0.10",
+   "version" : "0.14",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Ryo Okamoto",

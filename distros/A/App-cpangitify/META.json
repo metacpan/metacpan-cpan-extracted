@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -65,8 +65,8 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "File::HomeDir" : "0.91",
             "HTTP::Date" : "0",
+            "Test2::Plugin::FauxHomeDir" : "0",
             "Test::More" : "0.94",
             "URI::file" : "0",
             "perl" : "5.010001"
@@ -85,7 +85,11 @@
          "web" : "https://github.com/plicease/App-cpangitify"
       }
    },
-   "version" : "0.14",
+   "version" : "0.16",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Mohammad S Anwar (MANWAR)"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

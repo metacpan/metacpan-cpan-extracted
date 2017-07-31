@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -157,7 +157,14 @@ sub second		{ shift->{impl}->sec }
 sub epoch		{ shift->{impl}->epoch }
 sub time_zone	{ shift->{impl}->strftime('%Z') }
 sub day_of_week	{ shift->{impl}->day_of_week || 7 }						# change Sunday from 0 to 7
+sub day_of_year	{ shift->{impl}->yday + 1 }								# change from 0-based to 1-based
 sub quarter		{ int(shift->{impl}->_mon / 3) + 1 }					# calc quarter from (zero-based) month
+
+sub split
+{
+	my $impl = shift->{impl};
+	( $impl->year, $impl->mon, $impl->mday, $impl->hour, $impl->min, $impl->sec )
+}
 
 
 # FORMATTERS
@@ -177,11 +184,6 @@ sub iso8601		{ shift->{impl}->datetime }
 *iso = \&iso8601;
 
 
-# MATH METHODS
-
-sub add_months	{ shift->{impl}->add_months(@_) }
-
-
 ########################
 # OVERLOADED OPERATORS #
 ########################
@@ -198,7 +200,42 @@ sub _op_convert
 sub _result_convert
 {
 	my $func = shift;
-	return Date::Easy::Datetime->new( scalar $func->(@_) );
+	return ref($_[0])->new( scalar $func->(_op_convert($_[0]), _op_convert($_[1]), $_[2]) );
+}
+
+sub _add_seconds		{ _result_convert( \&Time::Piece::add      => @_ ) }
+sub _subtract_seconds	{ _result_convert( \&Time::Piece::subtract => @_ ) }
+# subclasses can override these to change what units an integer represents
+sub _add_integer		{ $_[0]->add_seconds($_[1])      }
+sub _subtract_integer	{ $_[0]->subtract_seconds($_[1]) }
+
+sub _dispatch_add
+{
+	if ( blessed $_[1] && $_[1]->isa('Date::Easy::Units') )
+	{
+		$_[1]->_add_to($_[0]);
+	}
+	else
+	{
+		# this should DTRT for whichever class we are
+		$_[0]->_add_integer($_[1]);
+	}
+}
+
+sub _dispatch_subtract
+{
+	if ( blessed $_[1] && $_[1]->isa('Date::Easy::Units') )
+	{
+		# this shouldn't be possible ...
+		die("should have called overloaded - for ::Units") if $_[2];
+		# as the name implies, this method assumes reversed operands
+		$_[1]->_subtract_from($_[0]);
+	}
+	else
+	{
+		# this should DTRT for whichever class we are
+		$_[0]->_subtract_integer($_[1]);
+	}
 }
 
 use overload
@@ -206,9 +243,28 @@ use overload
 	'<=>'	=>	sub { Time::Piece::compare    (_op_convert($_[0]), _op_convert($_[1]), $_[2]) },
 	'cmp'	=>	sub { Time::Piece::str_compare(_op_convert($_[0]), _op_convert($_[1]), $_[2]) },
 
-	'+'		=>	sub { _result_convert( \&Time::Piece::add      => (_op_convert($_[0]), _op_convert($_[1]), $_[2]) ) },
-	'-'		=>	sub { _result_convert( \&Time::Piece::subtract => (_op_convert($_[0]), _op_convert($_[1]), $_[2]) ) },
+	'+'		=>	\&_dispatch_add,
+	'-'		=>	\&_dispatch_subtract,
 ;
+
+
+# MATH METHODS
+
+sub add_seconds			{ shift->_add_seconds      (@_) }
+sub add_minutes			{ shift->_add_seconds      ($_[0] * 60)            }
+sub add_hours			{ shift->_add_seconds      ($_[0] * 60 * 60)       }
+sub add_days			{ shift->_add_seconds      ($_[0] * 60 * 60 * 24)  }
+sub add_weeks			{ shift->add_days          ($_[0] * 7)             }
+sub add_months			{ ref($_[0])->new( shift->{impl}->add_months(@_) ) }
+sub add_years			{ ref($_[0])->new( shift->{impl}->add_years (@_) ) }
+
+sub subtract_seconds	{ shift->_subtract_seconds (@_) }
+sub subtract_minutes	{ shift->_subtract_seconds ($_[0] * 60)            }
+sub subtract_hours		{ shift->_subtract_seconds ($_[0] * 60 * 60)       }
+sub subtract_days		{ shift->_subtract_seconds ($_[0] * 60 * 60 * 24)  }
+sub subtract_weeks		{ shift->subtract_days     ($_[0] * 7)             }
+sub subtract_months		{ shift->add_months($_[0] * -1)                    }
+sub subtract_years		{ shift->add_years ($_[0] * -1)                    }
 
 
 
@@ -229,7 +285,7 @@ Date::Easy::Datetime - easy datetime class
 
 =head1 VERSION
 
-This document describes version 0.03 of Date::Easy::Datetime.
+This document describes version 0.04 of Date::Easy::Datetime.
 
 =head1 SYNOPSIS
 
@@ -457,6 +513,11 @@ Same as C<strftime('%Z')>.
 
 Returns the day of the week from 1 (Monday) to 7 (Sunday).
 
+=head3 day_of_year
+
+Returns the day of the year from 1 (January 1st) to either 365 (December 31st) for a non-leap year,
+or 366 for a leap year.
+
 =head3 quarter
 
 Returns the quarter of the year, based on the month (1 - 4).
@@ -472,6 +533,13 @@ Calls L<Time::Piece>'s C<datetime>, which produces an ISO 8601 formatted datetim
 =head3 iso
 
 Alias for L</iso8601>, in case you can never remember the exact digits (like me).
+
+=head3 split
+
+Returns a list consisting of the year, month, day, hours, minutes, and seconds, in that order, in
+the same ranges as returned by the L</Accessors>.  Doesn't return anything useful in scalar context,
+so don't do that.  Calling C<split> in scalar context may eventually be changed to throw a warning
+or fatal error.
 
 =head3 as($conv_spec)
 
@@ -495,13 +563,6 @@ Date::Easy::Datetime is stored internally as a Time::Piece object, this is a tri
 
 =back
 
-=head3 add_months($num)
-
-Calls L<Time::Piece>'s C<add_months> to add a given number of months and return a new datetime
-object.  The original datetime is not modified.  Supply a negative number to subtract months.  See
-the L<Time::Piece> docs for full details, especially as regards what happens when you try to add
-months to dates at the ends of months.
-
 =head2 Overloaded Operators
 
 =head3 Addition
@@ -513,6 +574,57 @@ datetime object.  The original datetime is not modified.
 
 You can subtract an integer value from a datetime object.  It subtracts that number of seconds and
 returns a new datetime object.  The original datetime is not modified.
+
+=head2 Math Methods
+
+=head3 add_seconds($num)
+
+Same as adding C<$num> directly to the datetime.
+
+=head3 add_minutes($num)
+
+Same as adding C<$num * 60> directly to the datetime.
+
+=head3 add_hours($num)
+
+Same as adding C<$num * 60 * 60> directly to the datetime.
+
+=head3 add_days($num)
+
+Same as adding C<$num * 60 * 60 * 24> directly to the datetime.
+
+=head3 add_weeks($num)
+
+Same as calling C<add_days($num * 7)> on the datetime.
+
+=head3 add_months($num)
+
+Calls L<Time::Piece>'s C<add_months> to add a given number of months and return a new datetime
+object.  The original datetime is not modified.  See the L<Time::Piece> docs for full details,
+especially as regards what happens when you try to add months to dates at the ends of months.
+
+=head3 add_years($num)
+
+Calls L<Time::Piece>'s C<add_years> to add a given number of years and return a new datetime object.
+The original datetime is not modified.  See the L<Time::Piece> docs for full details.  (Though the
+Time::Piece documentation isn't clear on this point, adding a year to Feb 29th of a leap years acts
+correspondingly to adding a month to Jan 29th of a non-leap year.)
+
+=head3 subtract_seconds($num)
+
+=head3 subtract_minutes($num)
+
+=head3 subtract_hours($num)
+
+=head3 subtract_days($num)
+
+=head3 subtract_weeks($num)
+
+=head3 subtract_months($num)
+
+=head3 subtract_years($num)
+
+The same as calling the equivalent C<add_> method, but with C<-$num>.
 
 =head1 BUGS, CAVEATS and NOTES
 
@@ -564,17 +676,27 @@ If the DST flag (i.e. the condition of either being on daylight savings or not) 
 Hopefully this means hitting this bug will be rare.  An upstream bug L<has been
 filed|https://github.com/muir/Time-modules/issues/8>.
 
+There is a bug in L<Date::Parse> which causes the supplied century of a 4-digit year to be ignored
+when it is outside the sliding window that L<Time::Local> uses to guess the century for a 2-digit
+year.  This simple code demonstrates the problem:
+
+    say datetime("1/1/1965") # Thu Jan  1 00:00:00 2065
+
+Any year which is 50 years or more in the past will have this behavior.  There is an outstanding
+L<upstream bug|https://rt.cpan.org/Public/Bug/Display.html?id=105031> for this issue.  Note that
+dates don't have this problem; only datetimes.
+
 If your local timezone contains leap seconds, you will likely get funky results with UTC datetimes,
 such as this being true:
 
-	$dt->second != $dt->strftime("%S")
+    $dt->second != $dt->strftime("%S")
 
 in all cases except, of course, datetimes from before the first leap second was added (i.e. prior to
 30-Jun-1972 23:59:60).  Weirdly, this isn't a problem with local datetimes.  An upstream bug L<has
 been filed|https://github.com/rjbs/Time-Piece/issues/23>, although there is still some ongoing
 discussion about whether this is a bug or not, and whether it's fixable even if it is.
 
-See also the "Limitations" section in C<Date::Easy>.
+See also L<Date::Easy/"Limitations">.
 
 =head1 AUTHOR
 

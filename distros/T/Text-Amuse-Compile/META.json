@@ -55,5 +55,5 @@
       "x_IRC" : "irc://chat.freenode.net/#amusewiki",
       "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
    },
-   "version" : "0.92"
+   "version" : "0.93"
 }

@@ -33,6 +33,8 @@ TOOLS
 
     recs-fromfasta
 
+    recs-fromgff3
+
     recs-fromsam
 
     recs-tofasta
@@ -84,8 +86,8 @@ AUTHOR
 
 COPYRIGHT
 
-    Copyright 2014- Mullins Lab, Department of Microbiology, University of
-    Washington
+    Copyright 2014-2017 Mullins Lab, Department of Microbiology, University
+    of Washington
 
 LICENSE
 

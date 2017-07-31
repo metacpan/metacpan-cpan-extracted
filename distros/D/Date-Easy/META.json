@@ -4,13 +4,13 @@
       "Buddy Burden <barefootcoder@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Date-Easy",
    "prereqs" : {
@@ -61,15 +61,19 @@
    "provides" : {
       "Date::Easy" : {
          "file" : "lib/Date/Easy.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Date::Easy::Date" : {
          "file" : "lib/Date/Easy/Date.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Date::Easy::Datetime" : {
          "file" : "lib/Date/Easy/Datetime.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "Date::Easy::Units" : {
+         "file" : "lib/Date/Easy/Units.pm",
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -84,6 +88,7 @@
          "web" : "https://github.com/barefootcoder/date-easy"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

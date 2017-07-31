@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::ARODLAND;
 # ABSTRACT: Use L<Dist::Zilla> like ARODLAND does
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 use 5.10.0;
 use Moose;
@@ -165,7 +165,7 @@ sub bundle_config {
     [
       CopyFilesFromBuild => {
         copy => [
-          ($install_plugin eq 'modulebuild_optionalxs' or $install_plugin eq 'mbtiny'
+          (($install_plugin eq 'modulebuild_optionalxs' or $install_plugin eq 'mbtiny')
             ? ('Build.PL')
             : ()
           ),
@@ -248,7 +248,7 @@ Dist::Zilla::PluginBundle::ARODLAND - Use L<Dist::Zilla> like ARODLAND does
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

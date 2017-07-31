@@ -15,6 +15,8 @@ is_deeply [sub{
 
 sub pathological { 1 while 1 }
 
+sub re_eval { qr/(?{})/ }
+
 my $x;
 
 $x = "XxYxZ";

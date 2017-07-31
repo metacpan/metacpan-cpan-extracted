@@ -9,7 +9,7 @@ use AnyEvent::Socket qw( tcp_server tcp_connect );
 use AnyEvent::Handle;
 
 # ABSTRACT: Interface for PASV, PORT and REST commands
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 has data => (
@@ -161,7 +161,7 @@ AnyEvent::FTP::Server::Role::TransferPrep - Interface for PASV, PORT and REST co
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -222,7 +222,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

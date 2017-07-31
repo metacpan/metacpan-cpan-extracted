@@ -67,7 +67,6 @@ void SPVM_RUNTIME_API_push_retval_object(SPVM_API* api, SPVM_BASE_OBJECT* value)
 int64_t SPVM_RUNTIME_API_calcurate_base_object_byte_size(SPVM_API* api, SPVM_BASE_OBJECT* base_object);
 SPVM_ARRAY* SPVM_RUNTIME_API_create_array_byte(SPVM_API* api, int32_t length);
 SPVM_ARRAY* SPVM_RUNTIME_API_create_array_byte_from_pv(SPVM_API* api, const char* pv);
-int32_t SPVM_RUNTIME_API_get_array_value_size(SPVM_API* api, int32_t type);
 SPVM_VALUE* SPVM_RUNTIME_API_get_fields(SPVM_API* api, SPVM_OBJECT* object);
 int32_t SPVM_RUNTIME_API_get_fields_length(SPVM_API* api, SPVM_OBJECT* object);
 int32_t SPVM_RUNTIME_API_dump_field_names(SPVM_API* api, SPVM_OBJECT* object);
@@ -76,15 +75,15 @@ int32_t SPVM_RUNTIME_API_get_ref_count(SPVM_API* api, SPVM_BASE_OBJECT* base_obj
 int32_t SPVM_RUNTIME_API_get_sub_id(SPVM_API* api, const char* name);
 int32_t SPVM_RUNTIME_API_get_package_id(SPVM_API* api, const char* name);
 
-SPVM_OBJECT* SPVM_RUNTIME_API_malloc_object_noinc(SPVM_API* api, int32_t package_id);
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object_noinc(SPVM_API* api, int32_t package_id);
 
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_byte_array_noinc(SPVM_API* api, int32_t length);
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_short_array_noinc(SPVM_API* api, int32_t length);
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_int_array_noinc(SPVM_API* api, int32_t length);
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_long_array_noinc(SPVM_API* api, int32_t length);
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_float_array_noinc(SPVM_API* api, int32_t length);
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_double_array_noinc(SPVM_API* api, int32_t length);
-SPVM_ARRAY* SPVM_RUNTIME_API_malloc_object_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_byte_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_short_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_int_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_long_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_float_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_double_array_noinc(SPVM_API* api, int32_t length);
+SPVM_ARRAY* SPVM_RUNTIME_API_new_object_array_noinc(SPVM_API* api, int32_t length);
 
 // Exception
 void SPVM_RUNTIME_API_set_exception(SPVM_API* api, SPVM_ARRAY* exception);

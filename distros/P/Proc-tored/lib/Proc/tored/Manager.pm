@@ -1,13 +1,12 @@
 package Proc::tored::Manager;
 # ABSTRACT: OO interface to creating a proctored service
-$Proc::tored::Manager::VERSION = '0.17';
+$Proc::tored::Manager::VERSION = '0.18';
 
 use strict;
 use warnings;
 use Moo;
 use Carp;
 use Fcntl qw(:flock :seek :DEFAULT);
-use Guard qw(guard);
 use Path::Tiny qw(path);
 use Time::HiRes qw(sleep);
 use Try::Tiny;
@@ -102,7 +101,7 @@ Proc::tored::Manager - OO interface to creating a proctored service
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -235,7 +234,7 @@ secondary condition that decides whether to stop running.
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 

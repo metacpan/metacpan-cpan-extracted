@@ -5,21 +5,20 @@ NAME
 
 SYNOPSIS
 
-        use Bit::Manip::PP qw(:all);
+        use Bit::Manip qw(:all);
     
         my $b;    # bit string
         $b = 128; # 10000000
     
-        $b = bit_toggle($b, 4); # 10010000
-        $b = bit_toggle($b, 4); # 10000000
+        # toggle a bit off and on
     
-        bit_toggle(\$b, 4); # same as above, but with a reference
+        $b = bit_tog($b, 4); # 10010000
+        $b = bit_tog($b, 4); # 10000000
     
-        $b = bit_off($b, 7);    # 0 
-        $b = bit_on($b, 7);     # 10000000 
+        # turn a bit off, then back on
     
-        bit_off(\$b, 7);
-        bit_on(\$b, 7);
+        $b = bit_off($b, 7);    # 0
+        $b = bit_on($b, 7);     # 10000000
     
         # get the value of a range of bits...
         # in this case, we'll print the value of bits 4-3
@@ -32,10 +31,9 @@ SYNOPSIS
         # let's set bits 4-2 to binary 101
     
         $b = 0b10000000;
+        my $num_bits = 3; # 0b101 in the call is 3 bits
     
-        $b = bit_set($b, 2, 3, 0b101); # 10010100
-    
-        bit_set(\$b, 2, 3, 0b101); # reference
+        $b = bit_set($b, 2, $num_bits, 0b101); # 10010100
     
         # clear some bits
     
@@ -45,8 +43,6 @@ SYNOPSIS
         $lsb = 3;
     
         $b = bit_clr($b, $lsb, $num_bits); # 11000111
-    
-        bit_clr(\$b, $lsb, $num_bits); # reference
     
         # helpers
     
@@ -71,14 +67,13 @@ DESCRIPTION
 
 EXPORT_OK
 
-    Use the :all tag (eg: use Bit::Manip::PP qw(:all);) to import the
-    following functions into your namespace, or pick and choose
-    individually:
+    Use the :all tag (eg: use Bit::Manip qw(:all);) to import the following
+    functions into your namespace, or pick and choose individually:
 
-        bit_get 
+        bit_get
         bit_set
         bit_clr
-        bit_toggle
+        bit_tog
         bit_on
         bit_off
         bit_bin
@@ -87,7 +82,7 @@ EXPORT_OK
 
 FUNCTIONS
 
- bit_get
+ bit_get($data, $msb, $lsb)
 
     Retrieves the value of specified bits within a bit string.
 
@@ -111,11 +106,12 @@ FUNCTIONS
     of bits to collect the value for (starting at 0 from the right). A
     value of 0 means return the value from $msb through to the very end of
     the bit string. A value of 1 will capture from $msb through to bit 1
-    (second from right). This value must be equal to or lower than $msb.
+    (second from right). If $msb is equal to $lsb, we'll return just that
+    bit.
 
     Return: Integer, the modified $data param.
 
- bit_set
+ bit_set($data, $lsb, $nbits, $value)
 
     Allows you to set a value for specific bits in your bit string.
 
@@ -124,9 +120,6 @@ FUNCTIONS
         $data
 
     Mandatory: Integer, the bit string you want to manipulate bits in.
-    Optionally, send in a reference to the scalar, and we'll work directly
-    on it instead of passing by value and getting the updated value
-    returned.
 
         $lsb
 
@@ -134,18 +127,18 @@ FUNCTIONS
     range you want to manipulate. For example, if you wanted to set a new
     value for bits 7-5, you'd send in 5.
 
-        $bits
+        $nbits
 
-    Mandatory: Integer, the number of bits you plan on setting. This is so
-    that any leading zeros are honoured.
+    Mandatory: Integer, the number of bits you're sending in. We need this
+    param in the event your leading bit is a zero. For example, if you're
+    sending in 0b111 or 0b001, this param would be 3.
 
         $value
 
     Mandatory: Integer, the value that you want to change the specified
     bits to. Easiest if you send in a binary string (eg: 0b1011 in Perl).
 
-    Return: Integer, the modified $data param if <C$data> is passed in by
-    value, or 0 if passed in by reference.
+    Return: Integer, the modified $data param.
 
     Example:
 
@@ -166,7 +159,7 @@ FUNCTIONS
         my $x = bit_set($data, 4, 3, 0b111); # (0x07, or 7)
         printf("%b\n", $x); # prints 11110000
 
- bit_clr
+ bit_clr($data, $lsb, $nbits)
 
     Clear (unset to 0) specific bits in the bit string.
 
@@ -175,9 +168,6 @@ FUNCTIONS
         $data
 
     Mandatory: Integer, the bit string you want to manipulate bits in.
-    Optionally, send in a reference to the scalar, and we'll work directly
-    on it instead of passing by value and getting the updated value
-    returned.
 
         $lsb
 
@@ -191,10 +181,15 @@ FUNCTIONS
     starting from the $lsb bit, and clearing the number of bits to the
     left.
 
-    Return: Integer, the modified $data param if <C$data> is passed in by
-    value, or 0 if passed in by reference.
+    Returns the modified bit string.
 
- bit_toggle
+ bit_toggle($data, $bit)
+
+    See "bit_tog".
+
+ bit_tog($data, $bit)
+
+    AKA: bit_toggle().
 
     Toggles a single bit. If it's 0 it'll toggle to 1 and vice-versa.
 
@@ -203,78 +198,51 @@ FUNCTIONS
         $data
 
     Mandatory: Integer, the number/bit string to toggle a bit in.
-    Optionally, send in a reference to the scalar, and we'll work directly
-    on it instead of passing by value and getting the updated value
-    returned.
 
         $bit
 
     Mandatory: Integer, the bit number counting from the right-most (LSB)
     bit starting from 0.
 
-    Return: Integer, the modified $data param if <C$data> is passed in by
-    value, or 0 if passed in by reference.
+    Return: Integer, the modified $data param.
 
- bit_on
+ bit_on($data, $bit)
 
-    Sets a single bit (sets to 1), regardless of its current state.
+    Sets a single bit (sets to 1), regardless of its current state. This is
+    just a short form of setting a single bit with bit_set.
 
     Parameters:
 
         $data
 
     Mandatory: Integer, the number/bit string to toggle a bit in.
-    Optionally, send in a reference to the scalar, and we'll work directly
-    on it instead of passing by value and getting the updated value
-    returned.
 
         $bit
 
     Mandatory: Integer, the bit number counting from the right-most (LSB)
     bit starting from 0.
 
-    Return: Integer, the modified $data param if <C$data> is passed in by
-    value, or 0 if passed in by reference.
+    Return: Integer, the modified $data param.
 
- bit_off
+ bit_off($data, $bit)
 
-    Unsets a single bit (sets to 0), regardless of its current state.
+    Unsets a single bit (sets to 0), regardless of its current state. This
+    is just a short form of clearing a single bit with bit_set.
 
     Parameters:
 
         $data
 
     Mandatory: Integer, the number/bit string to toggle a bit in.
-    Optionally, send in a reference to the scalar, and we'll work directly
-    on it instead of passing by value and getting the updated value
-    returned.
 
         $bit
 
     Mandatory: Integer, the bit number counting from the right-most (LSB)
     bit starting from 0.
 
-    Return: Integer, the modified $data param if <C$data> is passed in by
-    value, or 0 if passed in by reference.
+    Return: Integer, the modified $data param.
 
- bit_mask
-
-    Generates a bit mask for the specific bits you specify.
-
-    Parameters:
-
-        $bits
-
-    Mandatory: Integer, the number of bits to get the mask for.
-
-        $lsb
-
-    Mandatory: Integer, the LSB at which you plan on implementing your
-    change.
-
-    Return: Integer, the bit mask ready to be applied.
-
- bit_bin
+ bit_bin($data)
 
     Returns the binary representation of a number as a string of ones and
     zeroes.
@@ -285,7 +253,7 @@ FUNCTIONS
 
     Mandatory: Integer, the number you want to convert.
 
- bit_count
+ bit_count($num, $set)
 
     Returns either the total count of bits in a number, or just the number
     of set bits (if the $set, parameter is sent in and is true).
@@ -307,6 +275,23 @@ FUNCTIONS
 
     Return: Integer, the number of bits that make up the number if $set is
     0, and the number of set bits (1's) if $set is true.
+
+ bit_mask($nbits, $lsb)
+
+    Generates a bit mask for the specific bits you specify.
+
+    Parameters:
+
+        $nbits
+
+    Mandatory: Integer, the number of bits to get the mask for.
+
+        $lsb
+
+    Mandatory: Integer, the LSB at which you plan on implementing your
+    change.
+
+    Return: Integer, the bit mask ready to be applied.
 
 AUTHOR
 

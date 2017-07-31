@@ -8,16 +8,17 @@ package Device::Chip::INA219;
 use strict;
 use warnings;
 use 5.010;
-use base qw( Device::Chip );
+use base qw( Device::Chip::Base::RegisteredI2C );
+Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
+
+use constant REG_DATA_SIZE => 16;
 
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 use Data::Bitfield qw( bitfield boolfield enumfield );
-
-use constant PROTOCOL => "I2C";
 
 =encoding UTF-8
 
@@ -76,23 +77,6 @@ L<Future> instances.
 
 =cut
 
-sub read_register
-{
-   my $self = shift;
-   my ( $reg ) = @_;
-
-   $self->protocol->write_then_read( chr $reg, 2 )
-      ->transform( done => sub { unpack "s>", $_[0] } );
-}
-
-sub write_register
-{
-   my $self = shift;
-   my ( $reg, $value ) = @_;
-
-   $self->protocol->write( chr( $reg ) . pack 's>', $value );
-}
-
 use constant {
    REG_CONFIG  => 0x00, # R/W
    REG_VSHUNT  => 0x01, # R
@@ -126,19 +110,10 @@ sub read_config
 {
    my $self = shift;
 
-   $self->read_register( REG_CONFIG )->then( sub {
-      my ( $data ) = @_;
-      Future->done( $self->{config} = { unpack_CONFIG( $data ) } );
+   $self->cached_read_reg( REG_CONFIG, 1 )->then( sub {
+      my ( $bytes ) = @_;
+      Future->done( $self->{config} = { unpack_CONFIG( unpack "S>", $bytes ) } );
    });
-}
-
-sub _config
-{
-   my $self = shift;
-
-   defined $self->{config}
-      ? Future->done( $self->{config} )
-      : $self->read_config->then( sub { Future->done( $self->{config} ) } );
 }
 
 =head2 change_config
@@ -154,11 +129,12 @@ sub change_config
    my $self = shift;
    my %changes = @_;
 
-   $self->_config->then( sub {
+   ( defined $self->{config} ? Future->done( $self->{config} ) :
+         $self->read_config )->then( sub {
       my %config = ( %{ $_[0] }, %changes );
 
       undef $self->{config}; # invalidate the cache
-      $self->write_register( REG_CONFIG, pack_CONFIG( %config ) );
+      $self->write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %config ) );
    });
 }
 
@@ -174,8 +150,8 @@ sub read_shunt_voltage
 {
    my $self = shift;
 
-   $self->read_register( REG_VSHUNT )->then( sub {
-      my ( $vraw ) = @_;
+   $self->read_reg( REG_VSHUNT, 1 )->then( sub {
+      my ( $vraw ) = unpack "s>", $_[0];
 
       # Each $vraw graduation is 10uV
       Future->done( $vraw * 10 );
@@ -198,8 +174,8 @@ sub read_bus_voltage
 {
    my $self = shift;
 
-   $self->read_register( REG_VBUS )->then( sub {
-      my ( $value ) = @_;
+   $self->read_reg( REG_VBUS, 1 )->then( sub {
+      my ( $value ) = unpack "s>", $_[0];
       my $ovf  = ( $value & 1<<0 );
       my $cnvr = ( $value & 1<<1 );
       my $vraw = $value >> 3;

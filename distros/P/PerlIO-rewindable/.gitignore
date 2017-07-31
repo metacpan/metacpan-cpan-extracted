@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/PerlIO-rewindable-*
+/lib/PerlIO/rewindable.c
+/lib/PerlIO/rewindable.o

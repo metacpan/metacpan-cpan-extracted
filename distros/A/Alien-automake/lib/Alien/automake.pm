@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find automake
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::automake - Build or find automake
 
 =head1 VERSION
 
-version 0.05
+version 0.09
 
 =head1 SYNOPSIS
 

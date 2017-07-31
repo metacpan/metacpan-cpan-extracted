@@ -1,11 +1,10 @@
 #!perl
-use Test::More tests => 15;
+use Test::More tests => 12;
 use warnings;
 use strict;
 
 use Test::Mock::Simple;
 use Test::Mock::LWP::Dispatch;
-use Test::TempDir::Tiny;
 use HTTP::Response;
 
 BEGIN { use_ok('Net::Fritz::Box') };
@@ -20,12 +19,12 @@ subtest 'check new()' => sub {
     my $box = new_ok( 'Net::Fritz::Box' );
 
     # then
-    is( $box->error,       '',                       'Net::Fritz::Box->error'       );
-    is( $box->upnp_url,    'http://fritz.box:49000', 'Net::Fritz::Box->upnp_url'    );
-    is( $box->trdesc_path, '/tr64desc.xml',          'Net::Fritz::Box->trdesc_path' );
-    is( $box->username,    undef,                    'Net::Fritz::Box->username'    );
-    is( $box->password,    undef,                    'Net::Fritz::Box->password'    );
-    is( $box->configfile,  undef,                    'Net::Fritz::Box->configfile'  );
+    is( $box->error,       '',                        'Net::Fritz::Box->error'       );
+    is( $box->upnp_url,    'https://fritz.box:49443', 'Net::Fritz::Box->upnp_url'    );
+    is( $box->trdesc_path, '/tr64desc.xml',           'Net::Fritz::Box->trdesc_path' );
+    is( $box->username,    undef,                     'Net::Fritz::Box->username'    );
+    is( $box->password,    undef,                     'Net::Fritz::Box->password'    );
+    is( $box->configfile,  undef,                     'Net::Fritz::Box->configfile'  );
 };
 
 subtest 'check new() with parameters' => sub {
@@ -76,12 +75,12 @@ subtest 'empty configfile does not overwrite defaults' => sub {
 	);
 
     # then
-    is( $box->error,       '',                       'Net::Fritz::Box->error'       );
-    is( $box->upnp_url,    'http://fritz.box:49000', 'Net::Fritz::Box->upnp_url'    );
-    is( $box->trdesc_path, '/tr64desc.xml',          'Net::Fritz::Box->trdesc_path' );
-    is( $box->username,    undef,                    'Net::Fritz::Box->username'    );
-    is( $box->password,    undef,                    'Net::Fritz::Box->password'    );
-    is( $box->configfile,  't/empty.file',           'Net::Fritz::Box->configfile'  );
+    is( $box->error,       '',                        'Net::Fritz::Box->error'       );
+    is( $box->upnp_url,    'https://fritz.box:49443', 'Net::Fritz::Box->upnp_url'    );
+    is( $box->trdesc_path, '/tr64desc.xml',           'Net::Fritz::Box->trdesc_path' );
+    is( $box->username,    undef,                     'Net::Fritz::Box->username'    );
+    is( $box->password,    undef,                     'Net::Fritz::Box->password'    );
+    is( $box->configfile,  't/empty.file',            'Net::Fritz::Box->configfile'  );
 };
 
 subtest 'new() parameters overwrite configfile values' => sub {
@@ -106,69 +105,6 @@ subtest 'new() parameters overwrite configfile values' => sub {
     is( $box->configfile,  't/config.file', 'Net::Fritz::Box->configfile'  );
 };
 
-subtest '~ is expanded in configfile name' => sub {
-    # given
-    my $file_to_read;
-    my $mock = Test::Mock::Simple->new(module => 'AppConfig');
-    $mock->add(file => sub { shift; $file_to_read = shift; });
-
-    # when
-    my $box = new_ok( 'Net::Fritz::Box',
-		      [ configfile  => '~/.fritzrc'
-		      ]
-	);
-
-    # then
-    is( $box->error,      '',                    'Net::Fritz::Box->error' );
-    is( $box->configfile, "$ENV{HOME}/.fritzrc", 'Net::Fritz::Box->configfile' );
-    is( $file_to_read,    "$ENV{HOME}/.fritzrc", 'filename passed to AppConfig->file()' );
-};
-
-subtest 'use ~/.fritzrc as default configfile if filename is not set' => sub {
-    # given
-    my $file_to_read;
-    my $mock = Test::Mock::Simple->new(module => 'AppConfig');
-    $mock->add(file => sub { shift; $file_to_read = shift; });
-
-    # ensure that ~/.fritzrc exists
-    $ENV{HOME} = tempdir();
-    open EMPTYFILE, '>', "$ENV{HOME}/.fritzrc" or die $!;
-    close EMPTYFILE or die $!;    
-
-    # when
-    my $box = new_ok( 'Net::Fritz::Box',
-		      [ configfile  => 0
-		      ]
-	);
-
-    # then
-    is( $box->error,      '',                    'Net::Fritz::Box->error' );
-    is( $box->configfile, "$ENV{HOME}/.fritzrc", 'Net::Fritz::Box->configfile' );
-    is( $file_to_read,    "$ENV{HOME}/.fritzrc", 'filename passed to AppConfig->file()' );
-};
-
-subtest 'missing default configfile is skipped and throws no error' => sub {
-    # given
-    my $file_to_read;
-    my $mock = Test::Mock::Simple->new(module => 'AppConfig');
-    $mock->add(file => sub { shift; $file_to_read = shift; });
-
-    # set $HOME to empty temporary directory
-    # to be sure that no ~/.fritzrc exists
-    $ENV{HOME} = tempdir();
-    
-    # when
-    my $box = new_ok( 'Net::Fritz::Box',
-		      [ configfile  => 0
-		      ]
-	);
-
-    # then
-    is( $box->error,      '',    'Net::Fritz::Box->error' );
-    is( $box->configfile, 0,     'Net::Fritz::Box->configfile' );
-    is( $file_to_read,    undef, 'no filename passed to AppConfig->file()' );
-};
-
 subtest 'check discover() without Fritz!Box present' => sub {
     # given
     my $box = new_ok( 'Net::Fritz::Box' );
@@ -183,7 +119,7 @@ subtest 'check discover() without Fritz!Box present' => sub {
 subtest 'check discover() with mocked Fritz!Box' => sub {
     # given
     my $box = new_ok( 'Net::Fritz::Box' );
-    $box->_ua->map('http://fritz.box:49000/tr64desc.xml', get_fake_device_response());
+    $box->_ua->map('https://fritz.box:49443/tr64desc.xml', get_fake_device_response());
 
     # when
     my $discovery = $box->discover();

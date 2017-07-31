@@ -4,7 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.54';
+use List::Util qw( max );
+
+our $VERSION = '0.56';
 
 sub any (&@)
 {
@@ -543,6 +545,13 @@ sub nsort_by(&@)
       map { [ $_, scalar( $code->() ) ] } @list;
 }
 
+sub mode (@) {
+    my %v;
+    $v{$_}++ for @_;
+    my $max = max( values %v );
+    return grep { $v{$_} == $max } keys %v;
+}
+
 1;
 
 # ABSTRACT: Pure Perl implementation for List::SomeUtils
@@ -559,7 +568,7 @@ List::SomeUtils::PP - Pure Perl implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 DESCRIPTION
 

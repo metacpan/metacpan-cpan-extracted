@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.64.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,22 +12,31 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 26755664a478fe97bfc5cc1c42d870e93230ee67 Changes
-SHA1 24680eb2a8fe871c0f35e23caa5b528f4101a21b LICENSE
-SHA1 8e997fd210b14cdc2d77dc974412472d6eb80704 MANIFEST
-SHA1 c752e71bb4da519610158cee6ccb03876fdd3168 META.json
-SHA1 e1dee80021875b212c4aaeaf7c440ac3abe4add5 META.yml
-SHA1 cec3bcab91587c70ba27377617887959c680918c Makefile.PL
+SHA1 d655369a706435f6f648eff4053e67ce7bf61dcb Changes
+SHA1 9f4a0eba8702ab8f6130f49109778a044a1c6337 LICENSE
+SHA1 673863b4f0231c01710e14473908a892b35504d5 MANIFEST
+SHA1 54d1e5a45503d87d9cb456da593aa29a49b67c6c META.json
+SHA1 35f2d1e3df22f805597d9ecd3da22d077c1b36d1 META.yml
+SHA1 d90997de1cd11146c11a4d5deea828018bed6dd0 Makefile.PL
 SHA1 62e534a7cb20870539866eb017240b9e0ecbe404 README.md
-SHA1 0bf2c0471418d385e8312ec0fc72237b105fdd95 dist.ini
-SHA1 b8ea3c33cfe636b7602675053842297a7af0b35e lib/Plack/Middleware/XForwardedFor.pm
-SHA1 3bca04e5f471ede7f7c182f260873eaba5d50a7c t/basic.t
+SHA1 212185f0653f208fb8432f653d54cf1f2751df91 dist.ini
+SHA1 08825c8bb45f5631f968ff6dde33d510c663e84d lib/Plack/Middleware/XForwardedFor.pm
+SHA1 698739d2184172b8862af89a7b95dc27717d8471 t/basic.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (Darwin)
 
-iEYEARECAAYFAkzPWHUACgkQR0BL4gbYw3T+BQCdG4xrJrCXDv103nVbG3DgmPms
-5mMAnjOd40kFrWQgd5o44FuNRRlahZrl
-=1Yzc
+iQIcBAEBCAAGBQJZdfiaAAoJEF0awSLzqjNN1hEP+wfWee3K/+Xc7xR2Ua5UTFTl
+vDb+1yI4iaubaOOZvnIu4XqDNFSwl2ZGTF295tUTbPpKdljBMB/WmK8++txk+cY7
+DahjlsQHmRgnmDgNqGa83eJiGpV82YGg8TkyI+iNDnrtPx0WIwE09Jg379f7IajR
+uJWJgnBSbu4tr7xa8E5TZ9VRhxlWLiD5n5CH1BuAI8JoBXYumcAM/dod4+Huih9y
+g0ErrbQBOtIKQXb/ChHaz+SghUMnp4CPfjNAc7qOVqE3AddGrbXzI1WaHezb+ugC
+ekRMht54V4c7j6zdwYfB9i97aKRdo/jUq0O64XNsVTU4qdpHWzn1We/meISWL7xS
+NdY8UbOoOwq27PLovFWpWCq2I+jiaeSWvwdyEXGQHUb0jAnKzW1+D+mhp4QBozUm
+kuHhZIQpMVO8gfGXEX63MY61wAfwxFApBPFoiHIA98J5C2lIOeQQ3U4ra/5uOwCb
+hAgw0czdjA3x7cRjC9TLHZQOuhWeTKUqo62GCguo6JQuiF2Ik6oa2bx3l4KqChcl
+7RjZMNoe9krj+P+X2x9GktCG2lBGsZ72Cx3bDwYgYLg8BhoxwoXGoOMQZELj9p56
+ze5e/mYOwS0DLRXmogRfd4eMUASTMt+DcZdq7AMgj8+pZew4r1odRO2IhLOY8Kki
+Q/KJ7lu6fuSKeuERuYIp
+=wh2Z
 -----END PGP SIGNATURE-----

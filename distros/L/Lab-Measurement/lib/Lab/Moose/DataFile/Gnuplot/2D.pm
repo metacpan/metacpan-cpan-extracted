@@ -1,5 +1,6 @@
 package Lab::Moose::DataFile::Gnuplot::2D;
-$Lab::Moose::DataFile::Gnuplot::2D::VERSION = '3.553';
+#ABSTRACT: 2D data file with live plotting support
+$Lab::Moose::DataFile::Gnuplot::2D::VERSION = '3.554';
 use 5.010;
 use warnings;
 use strict;
@@ -15,47 +16,8 @@ use Lab::Moose::DataFile::Read 'read_2d_gnuplot_format';
 use List::Util 'any';
 use namespace::autoclean;
 
-
 extends 'Lab::Moose::DataFile::Gnuplot';
 
-=head1 NAME
-
-Lab::Moose::DataFile::Gnuplot::2D - 2D data file with live plotting support.
-
-=head1 SYNOPSIS
-
- use Lab::Moose;
-
- my $folder = datafolder();
- 
- my $file = datafile(
-     type => 'Gnuplot::2D',
-     folder => $folder,
-     filename => 'gnuplot-file.dat',
-     columns => [qw/time voltage temp/]
-     );
-
-  $file->add_plot(
-     x => 'time',
-     y => 'voltage',
-     curve_options => {with => 'points'},
-     hard_copy => 'gnuplot-file-T-V.png',
-  );
-   
-  $file->add_plot(
-      x => 'time',
-      y => 'temp',
-      hard_copy => 'gnuplot-file-T-Temp.png',
-  );
-
- $file->log(time => 1, voltage => 2, temp => 3);
-
-=head1 DESCRIPTION
-
-This submodule of L<Lab::Moose::DataFile::Gnuplot> provides live plotting of 2D
-data with gnuplot. It requires L<PDL::Graphics::Gnuplot> installed.
-
-=cut
 
 # Refresh plots.
 after [qw/log log_block/] => sub {
@@ -79,69 +41,6 @@ has plots => (
     init_arg => undef
 );
 
-=head1 METHODS
-
-This module inherits all methods of L<Lab::Moose::DataFile::Gnuplot>.
-
-=head2 add_plot
-
- $file->add_plot(
-     x => 'x-column',
-     y => 'y-column',
-     plot_options => {grid => 1, xlabel => 'voltage', ylabel => 'current'},
-     curve_options => {with => 'points'},
-     hard_copy => 'myplot.png',
-     hard_copy_terminal => 'svg',
- );
-
-Add a new live plot to the datafile. Options:
-
-=over
-
-=item * x (mandatory)
-
-Name of the column which is used for the x-axis.
-
-=item * y (mandatory)
-
-Name of the column which is used for the y-axis.
-
-=item * terminal
-
-gnuplot terminal. Default is qt.
-
-=item * terminal_options
-
-HashRef of terminal options. For the qt and x11 terminals, this defaults to
-C<< {persist => 1, raise => 0} >>.
-
-=item * plot_options
-
-HashRef of plotting options (See L<PDL::Graphics::Gnuplot> for the complete
-list).
-
-=item * curve_options
-
-HashRef of curve options (See L<PDL::Graphics::Gnuplot> for the complete
-list).
-
-=item * handle
-
-Set this to a string, if you need to refresh the plot manually with the
-C<refresh_plots> option. Multiple plots can share the same handle string.
-
-=item * hard_copy        
-
-Create a copy of the plot in the data folder.
-
-=item * hard_copy_terminal
-
-Terminal for hard_copy option. Use png terminal by default. The 'output'
-terminal option must be supported.
-
-=back
-
-=cut
 
 sub add_plot {
     my ( $self, %args ) = validated_hash(
@@ -236,16 +135,6 @@ sub _refresh_plot {
     );
 }
 
-=head2 refresh_plots
-
- $file->refresh_plots(handle => $handle);
- $file->refresh_plots();
-
-Call C<refresh_plot> for each plot with hanle C<$handle>.
-
-If the C<handle> argument is not given, refresh all plots.
-
-=cut
 
 sub refresh_plots {
     my $self = shift;
@@ -283,3 +172,134 @@ sub refresh_plots {
 __PACKAGE__->meta->make_immutable();
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::DataFile::Gnuplot::2D - 2D data file with live plotting support
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use Lab::Moose;
+
+ my $folder = datafolder();
+ 
+ my $file = datafile(
+     type => 'Gnuplot::2D',
+     folder => $folder,
+     filename => 'gnuplot-file.dat',
+     columns => [qw/time voltage temp/]
+     );
+
+  $file->add_plot(
+     x => 'time',
+     y => 'voltage',
+     curve_options => {with => 'points'},
+     hard_copy => 'gnuplot-file-T-V.png',
+  );
+   
+  $file->add_plot(
+      x => 'time',
+      y => 'temp',
+      hard_copy => 'gnuplot-file-T-Temp.png',
+  );
+
+ $file->log(time => 1, voltage => 2, temp => 3);
+
+=head1 DESCRIPTION
+
+This submodule of L<Lab::Moose::DataFile::Gnuplot> provides live plotting of 2D
+data with gnuplot. It requires L<PDL::Graphics::Gnuplot> installed.
+
+=head1 METHODS
+
+This module inherits all methods of L<Lab::Moose::DataFile::Gnuplot>.
+
+=head2 add_plot
+
+ $file->add_plot(
+     x => 'x-column',
+     y => 'y-column',
+     plot_options => {grid => 1, xlabel => 'voltage', ylabel => 'current'},
+     curve_options => {with => 'points'},
+     hard_copy => 'myplot.png',
+     hard_copy_terminal => 'svg',
+ );
+
+Add a new live plot to the datafile. Options:
+
+=over
+
+=item * x (mandatory)
+
+Name of the column which is used for the x-axis.
+
+=item * y (mandatory)
+
+Name of the column which is used for the y-axis.
+
+=item * terminal
+
+gnuplot terminal. Default is qt.
+
+=item * terminal_options
+
+HashRef of terminal options. For the qt and x11 terminals, this defaults to
+C<< {persist => 1, raise => 0} >>.
+
+=item * plot_options
+
+HashRef of plotting options (See L<PDL::Graphics::Gnuplot> for the complete
+list).
+
+=item * curve_options
+
+HashRef of curve options (See L<PDL::Graphics::Gnuplot> for the complete
+list).
+
+=item * handle
+
+Set this to a string, if you need to refresh the plot manually with the
+C<refresh_plots> option. Multiple plots can share the same handle string.
+
+=item * hard_copy        
+
+Create a copy of the plot in the data folder.
+
+=item * hard_copy_terminal
+
+Terminal for hard_copy option. Use png terminal by default. The 'output'
+terminal option must be supported.
+
+=back
+
+=head2 refresh_plots
+
+ $file->refresh_plots(handle => $handle);
+ $file->refresh_plots();
+
+Call C<refresh_plot> for each plot with hanle C<$handle>.
+
+If the C<handle> argument is not given, refresh all plots.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

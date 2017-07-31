@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Prereqs::EnsureVersion;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,7 +34,9 @@ sub after_build {
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
 
     for my $phase (sort keys %$prereqs_hash) {
+        next if $phase =~ /^x_/;
         for my $rel (sort keys %{$prereqs_hash->{$phase}}) {
+            next if $rel =~ /^x_/;
             my $versions = $prereqs_hash->{$phase}{$rel};
             for my $mod (sort keys %$versions) {
                 my $ver = $versions->{$mod};
@@ -66,7 +68,7 @@ Dist::Zilla::Plugin::Prereqs::EnsureVersion - Make sure that prereqs have minimu
 
 =head1 VERSION
 
-This document describes version 0.03 of Dist::Zilla::Plugin::Prereqs::EnsureVersion (from Perl distribution Dist-Zilla-Plugin-Prereqs-EnsureVersion), released on 2017-07-07.
+This document describes version 0.04 of Dist::Zilla::Plugin::Prereqs::EnsureVersion (from Perl distribution Dist-Zilla-Plugin-Prereqs-EnsureVersion), released on 2017-07-28.
 
 =head1 SYNOPSIS
 
@@ -86,6 +88,8 @@ F<~/pmversions.ini> containing list of modules and their mininum versions. Then,
 the plugin will check all prereqs against this list. If minimum version is not
 met (e.g. the prereq says 0 or a smaller version) then the build will be
 aborted.
+
+Currently, prereqs with custom (/^x_/) phase or relationship are ignored.
 
 Ideas for future version: ability to blacklist certain versions, specify version
 ranges, e.g.:

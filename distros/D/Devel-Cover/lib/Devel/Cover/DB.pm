@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -103,6 +103,7 @@ sub write {
     unless (mkdir $self->{db}) {
         croak "Can't mkdir $self->{db}: $!\n" unless -d $self->{db};
     }
+    chmod 0777, $self->{db} if $self->{loose_perms};
     $self->validate_db;
 
     my $db = { runs => $self->{runs} };
@@ -892,7 +893,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

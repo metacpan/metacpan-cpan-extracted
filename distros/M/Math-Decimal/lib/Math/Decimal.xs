@@ -9,9 +9,20 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
 #ifndef newSVpvs
 # define newSVpvs(string) newSVpvn(""string"", sizeof(string)-1)
 #endif /* !newSVpvs */
+
+#if PERL_VERSION_GE(5,7,3)
+# define PERL_UNUSED_THX() NOOP
+#else /* <5.7.3 */
+# define PERL_UNUSED_THX() ((void)(aTHX+0))
+#endif /* <5.7.3 */
 
 /* parameter classification */
 
@@ -166,6 +177,7 @@ static int THX_canonical_get_expt(pTHX_ struct decimal *a)
 {
 	char *p, *q;
 	int val;
+	PERL_UNUSED_THX();
 	if(a->frac_start != a->frac_end) croak("not an integer");
 	p = a->int_start;
 	q = a->int_end;

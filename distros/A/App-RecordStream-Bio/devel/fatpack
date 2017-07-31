@@ -1,16 +1,71 @@
 #!/bin/bash
-version=${1:-`git describe --tags HEAD`}
+set -e -o pipefail
 
-mkdir -p fatpack
-rm -rf fatpack/lib
-cp -rv lib fatpack
-pushd fatpack
+main() {
+    local version=${1:-`git describe --tags HEAD`}
 
-echo "Stripping Perl libs"
-find lib -type f -name '*.pm' \
-    | xargs perlstrip --size --cache
+    echo "# Cleaning up previous fatpack/"
+    mkdir -p fatpack
+    rm -rf fatpack/lib fatpack/fatlib fatpack/trace
 
-echo Fatpacking into bio.pm
-fatpack file <(echo 'use App::RecordStream::Bio; 1;') > bio.pm
 
-popd
+    echo
+    echo "# Copying our own libs for packing"
+    cp -rv lib fatpack
+
+
+    echo
+    echo "# Tracing modules"
+    cpanfile-dump --no-configure --no-build --no-test --no-recommends --no-suggests \
+        | grep -vF perl \
+        | grep -vF App::RecordStream::Operation \
+        | xargs printf "use %s;\n" \
+        | fatpack trace --to=fatpack/trace >/dev/null 2>&1
+
+
+    pushd fatpack >/dev/null
+
+        echo
+        echo "# Copying non-core deps into fatlib"
+        filter-modules < trace \
+            | xargs fatpack packlists-for \
+            | xargs fatpack tree
+
+
+        echo
+        echo "# Stripping Perl libs"
+        find fatlib lib -type f -name '*.pm' \
+            | xargs perlstrip --size --cache
+
+
+        echo
+        echo "# Fatpacking into bio.pm"
+        fatpack file <(stub-script "$version") > bio.pm
+
+    popd >/dev/null
+}
+
+filter-modules() {
+    perl -Mutf8 -CSAD -MModule::CoreList -nE '
+        chomp;
+        my $mod = s</><::>rg =~ s/\.pm$//r;
+
+        # TODO: does not account for modules which are removed from core after
+        # 5.8.1...  though that is fairly rare.
+        #   -trs, 21 July 2017
+        next if $Module::CoreList::version{5.008001}{$mod};
+
+        warn "→ $mod\n";
+        say;
+    ' "$@"
+}
+
+stub-script() {
+    echo "use App::RecordStream::Bio;"
+    if [[ -n "$1" ]]; then
+        printf '$App::RecordStream::Bio::VERSION = q[%s];\n' "$1"
+    fi
+    echo "1;"
+}
+
+main "$@"

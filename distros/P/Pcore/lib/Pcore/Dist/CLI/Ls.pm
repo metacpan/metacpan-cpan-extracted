@@ -97,10 +97,6 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     return;
 }
 
-sub run ( $self ) {
-    return;
-}
-
 1;
 __END__
 =pod
@@ -109,7 +105,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Dist::CLI::Ls - list installed ditributions
+Pcore::Dist::CLI::Ls - list installed distributions
 
 =head1 SYNOPSIS
 

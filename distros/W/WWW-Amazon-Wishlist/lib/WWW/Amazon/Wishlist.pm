@@ -1,7 +1,12 @@
 
 package WWW::Amazon::Wishlist;
 
+use warnings;
 use strict;
+
+our
+$VERSION = 2.018;
+
 use vars qw( @ISA @EXPORT @EXPORT_OK );
 
 use Carp;
@@ -26,9 +31,6 @@ require Exporter;
         UK
         COM
 );
-
-our
-$VERSION = 2.016;
 
 =pod
 
@@ -154,15 +156,17 @@ sub get_list {
   # Note to self ... should we UC the id? Nahhhh. Not yet.
   # fairly self explanatory
   my $domain = ($uk) ? "co.uk" : "com";
+  my $sBase = qq'http://www.amazon.$domain';
   # set up some variables
   my $iPage = 1;
   my @items;
+  my $url;
   # and awaaaaaaaaaaaaay we go ....
  INFINITE:
   while (1)
     {
-    my $url = $uk ? "https://www.amazon.co.uk/gp/registry/wishlist/ref=cm_wl_search_1?page=$iPage&cid=$id" :
-    "http://www.amazon.com/gp/registry/wishlist/$id/?page=$iPage";
+    $url ||= $uk ? "$sBase/gp/registry/wishlist/ref=cm_wl_search_1?page=$iPage&cid=$id" :
+    "$sBase/gp/registry/wishlist/$id";
     # This is a typical complete .com URL as of 2008-12:
     # http://www.amazon.com/gp/registry/wishlist/2O4B95NPM1W3L
     DEBUG_HTML && warn " DDD fetching wishlist for $id, page $iPage...\n";
@@ -182,15 +186,15 @@ sub get_list {
     if (9 < $test)
       {
       eval "use File::Slurp";
-      write_file(qq'Pages/fetched-$domain.html', $content);
+      my $sFname = qq'Pages/fetched-$domain.html';
+      write_file($sFname, $content);
+      warn " DDD wrote HTML to $sFname\n";
       exit 88;
       } # if
     my $iLen = length($content);
     # warn " DDD fetched $iLen bytes.\n";
 
-    # UPDATED 2014-11.  Both USA and UK sites use the same page
-    # format, therefore we always pass COM to the _extract() method:
-    my $result = _extract(COM, $content, $test);
+    my $result = _extract($uk, $content, $test);
     # print Dumper($result);
     # exit 88;
     if (! defined $result)
@@ -227,40 +231,15 @@ sub get_list {
       push @items, $item;
       DEBUG_HTML && warn " DDD added one item to \@items\n";
       } # foreach ITEM
-    my $sURLNext = $result->{next};
-    my $iNext = 0;
-    if (! defined $sURLNext)
-      {
-      # DEBUG_NEXT && warn " DDD no 'next' URL, content===$content===\n";
-      # exit 88;
-      # Use brute force to find it:
-      if ($content =~ m!([;&]page=\d+)">\s*(<[^>]+>)?\s*Next!)
-        {
-        DEBUG_NEXT && warn " DDD found next URL with brute force\n";
-        $sURLNext = $1;
-        } # if
-      } # if
-    # Paranoia:
-    if ( ! defined $sURLNext)
+    # Assumes an absolute path without hostname:
+    if ( ! defined $result->{next})
       {
       DEBUG_NEXT && warn " WWW did not find next url\n";
       DEBUG_NEXT && write_file(qq'Pages/no-next.html', $content);
       last INFINITE;
       } # if
-    if ($sURLNext !~ m/[;&]page=(\d+)/)
-      {
-      DEBUG_NEXT && warn " WWW next url =$sURLNext= does not contain page#\n";
-      last INFINITE;
-      } # if
-    $iNext = $1;
-    # More paranoia:
-    if ($iNext <= $iPage)
-      {
-      DEBUG_NEXT && warn " WWW next url page=$iNext is not greater than current page=$iPage\n";
-      last INFINITE;
-      } # if
-    # ...and update:
-    $iPage = $iNext;
+    $url = $sBase . $result->{next};
+    $iPage++;
     } # while INFINITE
   return @items;
   } # get_list
@@ -340,14 +319,13 @@ sub _extract {
   $oTree->parse($s);
   $oTree->eof;
   my $sTag = q/div/;
-  my $sClass = q/a-text-left a-fixed-left-grid-col a-col-right/;
-  my @aoSPAN = $iUK ? $oTree->look_down(_tag => $sTag,
-                                        class => 'a-text-left a-fixed-left-grid-col a-col-right',
-                                        # class => 'lineItemGroup',
-                                       )
-                    : $oTree->look_down(_tag => $sTag,
-                                        class => $sClass,
-                                       );
+  my $sClass = q/a-fixed-left-grid a-spacing-none/;
+  $sClass = q/a-text-left a-fixed-left-grid-col a-col-right/ if $iUK;
+  # $sClass = q/a-fixed-left-grid   a-spacing-large/ if $iUK;
+
+  my @aoSPAN = $oTree->look_down(_tag => $sTag,
+				 class => $sClass,
+      );
   my $iCountSPAN = scalar(@aoSPAN);
   DEBUG_HTML && warn " DDD _extract() found $iCountSPAN $sTag tags of class '$sClass'\n";
  SPAN_TAG:
@@ -394,7 +372,7 @@ sub _extract {
           ||
           ($sURL =~ m!/gp/product/(.+?)/ref!)
           ||
-          ($sURL =~ m!/dp/(.+?)/ref!)
+          ($sURL =~ m!/dp/(.+?)/(_encoding|ref)!)
          )
         {
         # It's a match!
@@ -417,6 +395,7 @@ sub _extract {
                                   class => 'itemWrapper',
                                  )
                 : $oSPAN;
+    $oParent = $oSPAN;
     if (! ref $oParent)
       {
       DEBUG_HTML && warn " WWW did not find ancestor TBODY\n";
@@ -568,12 +547,15 @@ sub _extract {
     } # foreach SPAN_TAG
   # Look for the next-page link:
   my @aoA = $oTree->look_down(_tag => 'a',
-                              sub
-                                {
-                                return 0 if (length($_[0]->attr('href')) < 5);
-                                my $s = $_[0]->as_text || q{};
+			      role => 'link',
+                              sub {
+                                return 0 if (length($_[0]->attr('href')) < 55);
+                                # my $s = $_[0]->as_text || q{};
                                 # DEBUG_NEXT && warn " DDD _extract():   try next <A> ==$s==\n";
-                                $s =~ m/\A\s*NEXT/i;
+                                # $s =~ m/\A\s*(NEXT|SEE\s+MORE)\s*\z/i;
+				my $s = $_[0]->attr('class');
+				DEBUG_NEXT && warn " DDD _extract():   try next <A> ==$s==\n";
+				$s =~ m/wl-see-more/
                                 },
                              );
   my $iCountA = scalar(@aoA);
@@ -593,7 +575,7 @@ sub _extract {
 
 sub _match_priority {
   my $s = shift || return;
-  if ($s =~ m'.+PRIORITY:?\s*(\w+?)(\s|\z)'i)
+  if ($s =~ m'PRIORITY:?\s*(\w+?)(\s|\z)'i)
     {
     return lc $1;
     } # if

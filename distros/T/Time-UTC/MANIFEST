@@ -4,7 +4,6 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Time/UTC.pm
 lib/Time/UTC/Segment.pm
@@ -20,6 +19,7 @@ t/pod_syn.t
 t/seg_of.t
 t/segments.t
 t/start.t
+t/version_synch.t
 t/when_comp.t
 t/ymd.t
 t/ymdhms.t

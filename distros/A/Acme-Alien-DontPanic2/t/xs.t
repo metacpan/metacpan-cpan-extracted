@@ -1,10 +1,6 @@
-use strict;
-use warnings;
-use Test2::Bundle::More;
+use Test2::V0;
 use Test::Alien 0.05;
 use Acme::Alien::DontPanic2;
-
-plan 3;
 
 alien_ok 'Acme::Alien::DontPanic2';
 
@@ -13,6 +9,8 @@ xs_ok do { local $/; <DATA> }, with_subtest {
   plan 1;
   is $module->answer, 42, 'answer is 42';
 };
+
+done_testing;
 
 __DATA__
 

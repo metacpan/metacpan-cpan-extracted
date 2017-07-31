@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise;
+use Data::Dumper;
 use Lingua::Word::Parser;
 
 my $p = Lingua::Word::Parser->new(
-  file => 'eg/lexicon.dat',
   word => shift || 'abioticaly',
+  file => 'eg/lexicon.dat',
 );
 #warn Dumper $p->{lex};
 
@@ -17,6 +17,7 @@ my ($known, $masks) = $p->knowns;
 #warn Dumper $masks;
 my $combos = $p->power;
 #warn Dumper $combos;
-my $score = $p->score('[', ']', '</br>');
+my $score = $p->score;    # Stringified output
+#my $score = $p->score_parts; # "Raw" output
 #warn Dumper $score;
 warn Dumper $score->{ [ sort keys %$score ]->[-1] };

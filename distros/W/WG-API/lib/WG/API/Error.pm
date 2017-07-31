@@ -1,7 +1,6 @@
 package WG::API::Error;
 
 use Moo;
-use 5.014;
 
 =head1 NAME
 
@@ -9,12 +8,11 @@ WG::API::Error - module for work with API error
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
-
+our $VERSION = 'v0.8.5';
 
 =head1 SYNOPSIS
 
@@ -50,7 +48,7 @@ Error code.
 =cut
 
 has code => (
-    is  => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
@@ -65,7 +63,7 @@ Error message.
 =cut
 
 has message => (
-    is  => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
@@ -80,7 +78,7 @@ Error field.
 =cut
 
 has field => (
-    is  => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
@@ -95,7 +93,7 @@ Error value.
 =cut
 
 has value => (
-    is  => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
@@ -109,9 +107,7 @@ RAW data from invalid response
 
 =cut
 
-has raw => (
-    is  => 'ro',
-);
+has raw => ( is => 'ro', );
 
 =head1 BUGS
 
@@ -156,7 +152,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -201,4 +197,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API::Error
+1;    # End of WG::API::Error

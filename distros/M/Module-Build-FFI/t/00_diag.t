@@ -12,10 +12,10 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   ExtUtils::CBuilder
   ExtUtils::MakeMaker
-  File::ShareDir
+  File::ShareDir::Dist
   File::ShareDir::Install
   Module::Build
-  Test2::Suite
+  Test2::Bundle::Extended
   Test::More
 );
 

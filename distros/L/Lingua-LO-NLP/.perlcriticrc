@@ -1,0 +1,18 @@
+severity = harsh
+verbose = %f:%l:%c:%m [%p]\n
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[-CodeLayout::ProhibitHashBarewords]
+[-RegularExpressions::RequireExtendedFormatting]
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+[-Subroutines::RequireArgUnpacking]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]

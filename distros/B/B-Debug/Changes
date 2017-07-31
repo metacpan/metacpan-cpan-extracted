@@ -1,5 +1,10 @@
 -*- change-log -*-
 
+1.25 2017-07-26 rurban
+	* add 5.27.1c support: B::class instead of class keyword.
+        * add cperl OP->rettype, UNOP_AUX.
+        * deprecate in core.
+
 1.24 2016-12-11 rurban
 	* add 5.25.6 support: split optimization
 

@@ -1,7 +1,6 @@
-#2012-10-12 Geissler / Butschkow
-
 package Lab::Instrument::TCD;
-$Lab::Instrument::TCD::VERSION = '3.553';
+#ABSTRACT: Temperature control for our Oxford Instruments TLM dilution fridge
+$Lab::Instrument::TCD::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 
@@ -202,11 +201,19 @@ sub set_heatercontrol {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-	Lab::Instrument::TDC - Temperature Control Interface for our Oxford Dilution Fridge
+Lab::Instrument::TCD - Temperature control for our Oxford Instruments TLM dilution fridge
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -215,8 +222,6 @@ sub set_heatercontrol {
 
 	use Lab::Instrument::TCD;
 	my $tcd=new Lab::Instrument::TCD($rs232,$addr);
-
-.
 
 =head1 DESCRIPTION
 
@@ -228,8 +233,6 @@ The Lab::Instrument::ITC class implements an interface to our Oxford Dilution Fr
 
 Instantiates a new object attached to the RS232 port.
 
-.
-
 =head1 METHODS
 
 =head2 get_T
@@ -237,8 +240,6 @@ Instantiates a new object attached to the RS232 port.
 	$temperature=$tcd->get_T();
 
 Returns the current temperature of the mixing chamber.
-
-.
 
 =head2 set_T
 
@@ -254,21 +255,15 @@ TEMPERATURE can be between 0 ... 1 K.
 
 =back
 
-.
-
 =head2 set_heateroff
 
 	$temperature=$tcd->set_heateroff();
 
 Switch OFF the heater for the mixing chamber
 
-.
-
 =head1 CAVEATS/BUGS
 
 probably many
-
-.
 
 =head1 SEE ALSO
 
@@ -278,11 +273,16 @@ probably many
 
 =back
 
-.
+=head1 COPYRIGHT AND LICENSE
 
-=head1 AUTHOR/COPYRIGHT
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-2011 Stefan Geissler
-.
+  Copyright 2013       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

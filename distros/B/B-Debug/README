@@ -1,34 +1,42 @@
-B::Debug - Walk Perl syntax tree, printing debug info about ops
-	   A simple list version of B::Terse, i.e. B::Concise
+NAME
+    B::Debug - Walk Perl syntax tree, printing debug info about ops
 
 SYNOPSIS
             perl -MO=Debug foo.pl
             perl -MO=Debug,-exec foo.pl
 
-With option -exec, walks tree in execute order, otherwise in basic
-order.
+DESCRIPTION
+    See ext/B/README and the newer B::Concise.
 
-Copyright (c) 1996, 1997 Malcolm Beattie
-Copyright (c) 2008, 2010, 2013, 2014 Reini Urban
+OPTIONS
+    With option -exec, walks tree in execute order, otherwise in basic
+    order.
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of either:
+AUTHOR
+    Malcolm Beattie, "retired" Reini Urban "rurban@cpan.org"
 
-	a) the GNU General Public License as published by the Free
-	Software Foundation; either version 1, or (at your option) any
-	later version, or
+LICENSE
+    Copyright (c) 1996, 1997 Malcolm Beattie Copyright (c) 2008, 2010, 2013,
+    2014 Reini Urban
 
-	b) the "Artistic License" which comes with this kit.
+            This program is free software; you can redistribute it and/or modify
+            it under the terms of either:
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
-    the GNU General Public License or the Artistic License for more details.
+            a) the GNU General Public License as published by the Free
+            Software Foundation; either version 1, or (at your option) any
+            later version, or
 
-    You should have received a copy of the Artistic License with this kit,
-    in the file named "Artistic".  If not, you can get one from the Perl
-    distribution. You should also have received a copy of the GNU General
-    Public License, in the file named "Copying". If not, you can get one
-    from the Perl distribution or else write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+            b) the "Artistic License" which comes with this kit.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+        the GNU General Public License or the Artistic License for more details.
+
+        You should have received a copy of the Artistic License with this kit,
+        in the file named "Artistic".  If not, you can get one from the Perl
+        distribution. You should also have received a copy of the GNU General
+        Public License, in the file named "Copying". If not, you can get one
+        from the Perl distribution or else write to the Free Software Foundation,
+        Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 

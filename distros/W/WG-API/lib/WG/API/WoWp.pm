@@ -2,8 +2,7 @@ package WG::API::WoWp;
 
 use Moo;
 
-with 'WG::API::WoWp::Account';
-with 'WG::API::WoWp::Ratings';
+with 'WG::API::Base';
 
 =head1 NAME
 
@@ -11,11 +10,13 @@ WG::API::WoWp - Modules to work with Wargaming.net Public API for World of Warpl
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.5';
+
+use constant api_uri => 'api.worldofwarplanes.ru/wowp';
 
 =head1 SYNOPSIS
 
@@ -23,9 +24,9 @@ Wargaming.net Public API is a set of API methods that provide access to Wargamin
 
 This module provide access to WG Public API
 
-    use WG::API::WoWp;
+    use WG::API;
 
-    my $wowp = WG::API::WoWp->new( application_id => 'demo' );
+    my $wowp = WG::API->new( application_id => 'demo' )->wowp();
     ...
     my $player = $wowp->account_info( account_id => '1' );
 
@@ -42,15 +43,6 @@ Params:
  - languare
  - api_uri
 
-=cut
-
-has api_uri => (
-    is  => 'ro',
-    default => sub{ 'api.worldofwarplanes.ru/wowp' },
-);
-
-with 'WG::API::Base';
-
 =head1 METHODS
 
 =head2 Accounts
@@ -61,17 +53,38 @@ Method returns partial list of players. The list is filtered by initial characte
 
 =cut 
 
+sub account_list {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/list', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
+        @_ );
+}
+
 =head3 B<account_info( [ %params ] )>
 
 Method returns player details.
 
 =cut 
 
+sub account_info {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/info', [ 'language', 'fields', 'access_token', 'account_id' ],
+        ['account_id'], @_ );
+}
+
 =head3 B<account_planes( [ %params ] )>
 
 Method returns details on player's aircrafts.
 
 =cut 
+
+sub account_planes {
+    my $self = shift;
+
+    return $self->_request( 'get', 'account/planes', [ 'language', 'fields', 'access_token', 'account_id' ],
+        ['account_id'], @_ );
+}
 
 =head2 Ratings
 
@@ -81,11 +94,27 @@ Method returns dictionary of rating periods and ratings details.
 
 =cut
 
+sub ratings_types {
+    my $self = shift;
+
+    return $self->_request( 'get', 'ratings/types', [ 'language', 'fields' ], undef, @_ );
+}
+
 =head3 B<ratings_accounts( [ %params ] )>
 
 Method returns player ratings by specified IDs.
 
 =cut
+
+sub ratings_accounts {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'ratings/accounts',
+        [ 'language', 'fields', 'type', 'date', 'account_id' ],
+        [ 'type',     'account_id' ], @_
+    );
+}
 
 =head3 B<ratings_neighbors( [ %params ] )>
 
@@ -93,17 +122,43 @@ Method returns list of adjacent positions in specified rating.
 
 =cut
 
+sub ratings_neighbors {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'ratings/neighbors',
+        [ 'language', 'fields',     'type', 'date', 'account_id', 'rank_field', 'limit' ],
+        [ 'type',     'account_id', 'rank_field' ], @_
+    );
+}
+
 =head3 B<ratings_top( [ %params ] )>
 
 Method returns the list of top players by specified parameter.
 
 =cut
 
+sub ratings_top {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'ratings/top',
+        [ 'language', 'fields', 'type', 'date', 'rank_field', 'limit' ],
+        [ 'type',     'rank_field' ], @_
+    );
+}
+
 =head3 B<ratings_dates( [ %params ] )>
 
 Method returns dates with available rating data.
 
 =cut
+
+sub ratings_dates {
+    my $self = shift;
+
+    return $self->_request( 'get', 'ratings/dates', [ 'language', 'fields', 'type', 'account_id' ], ['type'], @_ );
+}
 
 =head1 BUGS
 
@@ -148,7 +203,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -193,5 +248,5 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API::WoWp
+1;    # End of WG::API::WoWp
 

@@ -7,7 +7,7 @@ use strict;
 
 package Mail::Message;
 use vars '$VERSION';
-$VERSION = '3.000';
+$VERSION = '3.001';
 
 
 use Mail::Message::Head::Complete  ();
@@ -66,12 +66,12 @@ sub build(@)
         }
         elsif($key eq 'attach')
         {   foreach my $c (reftype $value eq 'ARRAY' ? @$value : $value)
-	    {   defined $c or next;
+            {   defined $c or next;
                 push @data, ref $c && $c->isa('Mail::Message')
 		          ? Mail::Message::Body::Nested->new(nested => $c)
-			  : $c;
+                  : $c;
             }
-	}
+        }
         elsif($key =~
            m/^content\-(type|transfer\-encoding|disposition|description|id)$/i )
         {   my $k     = lc $1;
@@ -88,7 +88,7 @@ sub build(@)
         {   $class->log(WARNING => "Skipped unknown key $key in build");
         }
 
-        push @parts, grep {defined $_} @data if @data;
+        push @parts, grep defined, @data;
     }
 
     my $body

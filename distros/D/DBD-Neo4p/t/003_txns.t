@@ -39,24 +39,24 @@ SKIP : {
   my $idx = ${$t->nix};
   my $q =<<CYPHER;
    START x = node:$idx(name='he')
-   MATCH x-[:pally]->u
+   MATCH (x)-[:pally]->(u)
    DELETE u
 CYPHER
   my $w =<<CYPHER2;
    START x = node:$idx(name='he')
-   CREATE UNIQUE x-[r:pally]->u
+   CREATE UNIQUE (x)-[r:pally]->(u)
    RETURN u, r
 CYPHER2
   my $v =<<CYPHER3;
    START x = node:$idx(name='he')
-   MATCH x-[r:pally]->u
+   MATCH (x)-[r:pally]->(u)
    SET u.name = 'Screlb'
    SET u.uuid = '925bd263_e369_4fc0_8e33_ea50d616358b'
    RETURN u
 CYPHER3
   my $find =<<FIND;
    START x = node:$idx(name='he')
-   MATCH x-[:pally]->u
+   MATCH (x)-[:pally]->(u)
    RETURN u
 FIND
   ok $dbh->{AutoCommit}, "AutoCommit defaults to set";

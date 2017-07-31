@@ -4,16 +4,14 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(fa2hs);
 
-our $VERSION = '0.1.0'; # VERSION: 
+our $VERSION = '0.1.3'; # VERSION: 
 # ABSTRACT: get one or more sequences from a FASTA file quickly.
 
 
 sub new {
   my $class = shift;
-  my $self = {
-    @_
-  };
-  $self->{file} || die `pod2text $0`;
+  my $self =  ref $_[0] ? $_[0] : {@_};
+  $self->{file} || die `file parameter is not exist`;
   bless $self, $class;
 }
 
@@ -84,7 +82,7 @@ Bio::SeqHash - get one or more sequences from a FASTA file quickly.
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -104,10 +102,10 @@ version 0.1.0
 
 =head1 DESCRIPTION
 
-  Currently, there do have some modules that can operate the FASTA file such as Bio::SeqIO, 
-  But it only provide some basic operation to obtain the information about sequence. In my daily work,
-  I still have to write some repetitive code. So this module is write to perform a deeper wrapper for operating FASTA file
-  Notice: this module is not suitable for the FASTA file that is extremble big.
+Currently, there do have some modules that can operate the FASTA file such as Bio::SeqIO, 
+But it only provide some basic operation to obtain the information about sequence. In my daily work,
+I still have to write some repetitive code. So this module is write to perform a deeper wrapper for operating FASTA file
+Notice: this module is not suitable for the FASTA file that is extremble big.
 
 =head1 METHODS
 

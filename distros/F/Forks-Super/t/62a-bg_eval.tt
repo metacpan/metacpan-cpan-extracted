@@ -83,7 +83,7 @@ $t = Time::HiRes::time();
 my %others = %$x;
 my $t2 = Time::HiRes::time();
 ($t,$t0) = ($t2-$t,$t2-$t0);
-okl($t0 >= 1.95 && $t <= 5.04,           ### 25 ### was 5.04 obs 8.54
+okl($t0 >= 1.55 && $t <= 5.04,           ### 25 ### was 5.04 obs 8.54
     "listref bg_eval took ${t0}s ${t}s expected ~2s");
 ok(scalar(keys %others) > 0, "listref bg_eval");
 $x = [ "a", "v", "rst" ];
@@ -113,7 +113,7 @@ ok($w == 14 + 1 + 2, "bg_eval start callback");
 ok($x == 19, "scalar bg_eval with lots of options");
 $t1 = Time::HiRes::time();
 ($t,$t0) = ($t1-$t,$t1-$t0);
-okl($t0 > 7.60 && $t < 13.5,  ### 34 ### was 9.6 obs 9.99,10.35,11.37,13.20,7.69
+okl($t0 > 7.50 && $t < 13.5,  ### 34 ### was 9.6 obs 10.35,11.37,13.20,7.55
    "bg_eval with delay took ${t}s ${t0}s, expected ~8s");
 ok($w == 14 + 1 + 2 + 5, "bg_eval finish callback");
 

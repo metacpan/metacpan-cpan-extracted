@@ -14,7 +14,7 @@ use Fcntl ":flock";
 use Sereal::Decoder;
 use Sereal::Encoder;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 my $Decoder;
 my $Encoder;
@@ -47,6 +47,7 @@ sub write {
     my ($data, $file) = @_;
 
     $Encoder ||= Sereal::Encoder->new({});
+    unlink $file;
     open my $fh, ">", $file or die "Can't open $file: $!\n";
     flock $fh, LOCK_EX      or die "Can't lock $file: $!\n";
     print $fh $Encoder->encode($data);
@@ -64,7 +65,7 @@ Devel::Cover::DB::IO::Sereal - Sereal based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

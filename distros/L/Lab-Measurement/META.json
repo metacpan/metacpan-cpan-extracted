@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lab-Measurement",
    "prereqs" : {
@@ -126,7 +126,7 @@
          "web" : "https://github.com/lab-measurement/lab-measurement"
       }
    },
-   "version" : "3.553",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "3.554",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

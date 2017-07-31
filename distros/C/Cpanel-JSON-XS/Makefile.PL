@@ -29,7 +29,7 @@ WriteMakefile(
   LICENSE      => 'perl',
   ($] >= 5.005 ?
    (ABSTRACT_FROM  => 'XS.pm',
-    AUTHOR         => 'Reini Urban <rurban@cpanel.net>',
+    AUTHOR         => 'Reini Urban <rurban@cpan.org>',
     # ORIGINAL_AUTHOR => 'Marc Lehmann <schmorp@schmorp.de>'
    ) : ()),
   ($ExtUtils::MakeMaker::VERSION gt '6.46'
@@ -67,7 +67,6 @@ WriteMakefile(
         bugtracker  => 'https://github.com/rurban/Cpanel-JSON-XS/issues',
         # Note: https://rt.cpan.org/Public/Dist/Display.html?Queue=Cpanel-JSON-XS is also observed
         repository  => 'https://github.com/rurban/Cpanel-JSON-XS',
-        homepage    => 'http://software.schmorp.de/pkg/JSON-XS.html',
       },
     }
    ) : ()),

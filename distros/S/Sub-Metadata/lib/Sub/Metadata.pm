@@ -4,29 +4,28 @@ Sub::Metadata - read and write subroutine metadata
 
 =head1 SYNOPSIS
 
-	use Sub::Metadata qw(
-		sub_body_type
-		sub_closure_role
-		sub_is_lvalue
-		sub_is_constant
-		sub_is_method mutate_sub_is_method
-		sub_is_debuggable mutate_sub_is_debuggable
-		sub_prototype mutate_sub_prototype
-		sub_package mutate_sub_package
-	);
+    use Sub::Metadata qw(
+	sub_body_type
+	sub_closure_role
+	sub_is_lvalue
+	sub_is_constant
+	sub_is_method mutate_sub_is_method
+	sub_is_debuggable mutate_sub_is_debuggable
+	sub_prototype mutate_sub_prototype
+	sub_package mutate_sub_package);
 
-	$type = sub_body_type($sub);
-	$type = sub_closure_role($sub);
-	if(sub_is_lvalue($sub)) { ...
-	if(sub_is_constant($sub)) { ...
-	if(sub_is_method($sub)) { ...
-	mutate_sub_is_method($sub, 1);
-	if(sub_is_debuggable($sub)) { ...
-	mutate_sub_is_debuggable($sub, 0);
-	$proto = sub_prototype($sub);
-	mutate_sub_prototype($sub, $proto);
-	$pkg = sub_package($sub);
-	mutate_sub_package($sub, $pkg);
+    $type = sub_body_type($sub);
+    $type = sub_closure_role($sub);
+    if(sub_is_lvalue($sub)) { ...
+    if(sub_is_constant($sub)) { ...
+    if(sub_is_method($sub)) { ...
+    mutate_sub_is_method($sub, 1);
+    if(sub_is_debuggable($sub)) { ...
+    mutate_sub_is_debuggable($sub, 0);
+    $proto = sub_prototype($sub);
+    mutate_sub_prototype($sub, $proto);
+    $pkg = sub_package($sub);
+    mutate_sub_package($sub, $pkg);
 
 =head1 DESCRIPTION
 
@@ -41,7 +40,7 @@ package Sub::Metadata;
 use warnings;
 use strict;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -207,7 +206,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011, 2013, 2015
+Copyright (C) 2009, 2010, 2011, 2013, 2015, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

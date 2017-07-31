@@ -1,5 +1,5 @@
 package Email::MIME::RFC2047::Parser;
-$Email::MIME::RFC2047::Parser::VERSION = '0.95';
+$Email::MIME::RFC2047::Parser::VERSION = '0.96';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Email::MIME::RFC2047::Parser - Base class for parsers
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ Nick Wellnhofer <wellnhofer@aevum.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Nick Wellnhofer.
+This software is copyright (c) 2017 by Nick Wellnhofer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

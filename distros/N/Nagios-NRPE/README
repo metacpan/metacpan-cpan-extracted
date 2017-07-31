@@ -28,15 +28,18 @@ To read it use perldoc like this:
 
 In the case of problems or appreciation please visit these URLs
 
-*   [RT, CPAN's request tracker](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Nagios-NRPE) # NOT YET
+*   [Github issues](https://github.com/stockholmuniversity/nagios-nrpe/issues) 
 
 *   [CPAN Ratings](http://cpanratings.perl.org/d/Nagios-NRPE)
 
 *   [Search CPAN](http://search.cpan.org/dist/Nagios-NRPE)
 
-*   [Github repository](https://github.com/andreas-marschke/nagios-nrpe/)
+*   [Github repository](https://github.com/stockholmuniversity/nagios-nrpe/)
 
 COPYRIGHT AND LICENSE
 ---------------------
 
+This software is copyright (c) 2017 by the authors (see AUTHORS file).
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

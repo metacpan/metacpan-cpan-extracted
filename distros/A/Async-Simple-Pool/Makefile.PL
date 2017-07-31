@@ -3,9 +3,9 @@ use 5.14.0;
 use Modern::Perl;
 use ExtUtils::MakeMaker;
 
-if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
-    die 'OS unsupported';
-};
+#if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
+#    die 'OS unsupported';
+#};
 
 WriteMakefile(
     NAME             => 'Async::Simple::Pool',
@@ -45,16 +45,20 @@ WriteMakefile(
     META_ADD => {
         provides => {
             'Async::Simple::Pool' => {
-                'version' => '0.08',
+                'version' => '0.12',
                 'file'    => 'lib/Async/Simple/Pool.pm'
             },
             'Async::Simple::Task::Fork' => {
                 'file'    => 'lib/Async/Simple/Task/Fork.pm',
-                'version' => '0.08'
+                'version' => '0.12'
+            },
+            'Async::Simple::Task::ForkTmpFile' => {
+                'file'    => 'lib/Async/Simple/Task/ForkTmpFile.pm',
+                'version' => '0.12'
             },
             'Async::Simple::Task' => {
                 'file'    => 'lib/Async/Simple/Task.pm',
-                'version' => '0.08'
+                'version' => '0.12'
             }
         }
     },

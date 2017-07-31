@@ -120,6 +120,10 @@ The optional L<Text::Amuse::Compile::Fonts::Selected> object.
 
 Boolean (default to true) which triggers the epub font embedding.
 
+=item coverpage_only_if_toc
+
+Boolean (default to false). Activates the conditional article output.
+
 =back
 
 =cut
@@ -145,6 +149,7 @@ has file_header => (is => 'lazy', isa => Object);
 has cover => (is => 'lazy', isa => Str);
 has coverwidth => (is => 'lazy', isa => Str);
 has nocoverpage => (is => 'lazy', isa => Bool);
+has coverpage_only_if_toc => (is => 'ro', isa => Bool, default => sub { 0 });
 has nofinalpage => (is => 'lazy', isa => Bool);
 has notoc => (is => 'lazy', isa => Bool);
 has fonts => (is => 'ro', isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
@@ -1147,16 +1152,15 @@ sub _prepare_tex_tokens {
         $parsed{fontsize} = $fonts->size;
     }
 
-    # no cover page
-    # here we used to have a conditional ->wants_toc, removed.
-    # Instead, the template should say \let\chapter\section or
-    # \let\chapter\part
 
-        if ($self->nocoverpage) {
+    # no cover page if header or compiler says so, or
+    # if coverpage_only_if_toc is set and doc doesn't have a toc.
+    if ($self->nocoverpage or
+        ($self->coverpage_only_if_toc && !$doc->wants_toc)) {
             $parsed{nocoverpage} = 1;
             $parsed{class} = 'scrartcl';
             delete $parsed{opening}; # not needed for article.
-        }
+    }
 
 
     unless ($parsed{notoc}) {

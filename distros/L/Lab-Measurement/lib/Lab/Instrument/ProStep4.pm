@@ -1,5 +1,6 @@
 package Lab::Instrument::ProStep4;
-$Lab::Instrument::ProStep4::VERSION = '3.553';
+#ABSTRACT: ProStep4 step motor
+$Lab::Instrument::ProStep4::VERSION = '3.554';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Lab::Instrument;
@@ -582,3 +583,32 @@ sub my_timestamp {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::ProStep4 - ProStep4 step motor
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2013       Christian Butschkow, Stefan Geissler
+            2014-2015  Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -80,6 +80,7 @@
             "Compress::Zlib" : "0",
             "Const::Fast" : "0",
             "Convert::Ascii85" : "0",
+            "Cpanel::JSON::XS" : "0",
             "Crypt::Argon2" : "0",
             "Crypt::CBC" : "0",
             "Crypt::DES" : "0",
@@ -101,7 +102,6 @@
             "Import::Into" : "0",
             "Inline" : "0",
             "Inline::C" : "0",
-            "JSON::XS" : "0",
             "List::AllUtils" : "0",
             "List::Util::XS" : "0",
             "MIME::Base64" : "0",
@@ -158,6 +158,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.44.0",
+   "version" : "v0.46.0",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

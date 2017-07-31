@@ -7,7 +7,7 @@ use App::cpangitify;
 
 # PODNAME: cpangitify
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 exit App::cpangitify->main(@ARGV);
@@ -24,7 +24,7 @@ cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ If the distribution you are migrating changed names during its history,
 simply specify each name it had on the command line.  Be sure to specify
 the current name first (this will be used when creating a directory name
 for the repository).  For example L<Mojolicious::Plugin::TtRenderer> was
-once called L<MojoX::Renderer::TT>, so you would get both names in the
+once called C<MojoX::Renderer::TT>, so you would get both names in the
 history like this:
 
  % cpangitify Mojolicious::Plugin::TtRenderer MojoX::Renderer::TT
@@ -153,7 +153,11 @@ or two distributions here and there.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Mohammad S Anwar (MANWAR)
 
 =head1 COPYRIGHT AND LICENSE
 

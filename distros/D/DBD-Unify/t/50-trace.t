@@ -20,8 +20,7 @@ $dbh or BAIL_OUT ("Unable to connect to Unify ($DBI::errstr)\n");
 my $tracefile = "trace.log";
 my $trace;
 
-sub stoptrace
-{
+sub stoptrace {
     $dbh->trace (0);
 
     $trace = "";
@@ -105,8 +104,7 @@ my %dbdv2 = (
     "5.6"	=> $patv2[3],
     );
 
-sub testtrace
-{
+sub testtrace {
     my $dbdv = shift;
     ok (1, "-- $dbdv: table_info ()");
 

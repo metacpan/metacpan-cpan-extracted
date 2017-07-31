@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   File::chdir: '0'
+  Test2::Plugin::FauxHomeDir: '0'
   Test2::V0: '0.000060'
   Test::Alien::Build: '0'
   Test::Script: '0'
@@ -22,7 +23,6 @@ name: Alien-Build-Plugin-Fetch-Cache
 requires:
   Alien::Build: '0.57'
   Digest::MD5: '0'
-  File::HomeDir: '1.00'
   Number::Bytes::Human: '0'
   Path::Tiny: '0.100'
   Sereal: '3.015'
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::Cache
   repository: git://github.com/plicease/Alien-Build-Plugin-Fetch-Cache.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

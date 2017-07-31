@@ -3,8 +3,8 @@ use strict;
 use warnings;
 package Email::MIME;
 # ABSTRACT: easy MIME message handling
-$Email::MIME::VERSION = '1.940';
-use Email::Simple 2.206; # header_raw
+$Email::MIME::VERSION = '1.945';
+use Email::Simple 2.212; # nth header value
 use parent qw(Email::Simple);
 
 use Carp ();
@@ -61,7 +61,11 @@ use Scalar::Util qw(reftype weaken);
 #pod   );
 #pod
 #pod   my $email = Email::MIME->create(
-#pod       header_str => [ From => 'casey@geeknest.com' ],
+#pod       header_str => [
+#pod           From => 'casey@geeknest.com',
+#pod           To => [ 'user1@host.com', 'Name <user2@host.com>' ],
+#pod           Cc => Email::Address::XS->new("Display Name \N{U+1F600}", 'user@example.com'),
+#pod       ],
 #pod       parts      => [ @parts ],
 #pod   );
 #pod
@@ -119,7 +123,15 @@ my $NO_ENCODE_RE = qr/
 /ix;
 
 sub new {
-  my $self = shift->SUPER::new(@_);
+  my ($class, $text, $arg, @rest) = @_;
+  $arg ||= {};
+
+  my $encode_check = exists $arg->{encode_check}
+                   ? delete $arg->{encode_check}
+                   : Encode::FB_CROAK;
+
+  my $self = shift->SUPER::new($text, $arg, @rest);
+  $self->encode_check_set($encode_check);
   $self->{ct} = parse_content_type($self->content_type);
   $self->parts;
   return $self;
@@ -141,9 +153,22 @@ sub new {
 #pod
 #pod This method creates a new MIME part. The C<header_str> parameter is a list of
 #pod headers pairs to include in the message. The value for each pair is expected to
-#pod be a text string that will be MIME-encoded as needed.  A similar C<header>
-#pod parameter can be provided in addition to or instead of C<header_str>.  Its
-#pod values will be used verbatim.
+#pod be a text string that will be MIME-encoded as needed.  Alternatively it can be
+#pod an object with C<as_mime_string> method which implements conversion of that
+#pod object to MIME-encoded string.  That object method is called with two named
+#pod input parameters: C<charset> and C<header_name_length>.  It should return
+#pod MIME-encoded representation of the object.  As of 2017-07-25, the
+#pod header-value-as-object code is very young, and may yet change.
+#pod
+#pod In case header name is registered in C<%Email::MIME::Header::header_to_class_map>
+#pod hash then registered class is used for conversion from Unicode string to 8bit
+#pod MIME encoding.  Value can be either string or array reference to strings.
+#pod Object is constructed via method C<from_string> with string value (or values
+#pod in case of array reference) and converted to MIME-encoded string via
+#pod C<as_mime_string> method.
+#pod
+#pod A similar C<header> parameter can be provided in addition to or instead of
+#pod C<header_str>.  Its values will be used verbatim.
 #pod
 #pod C<attributes> is a hash of MIME attributes to assign to the part, and may
 #pod override portions of the header set in the C<header> parameter.
@@ -222,7 +247,13 @@ sub create {
     $CREATOR->_add_to_header(\$header, 'Content-Type' => 'text/plain',);
   }
 
-  my $email = $class->new($header);
+  my %pass_on;
+
+  if (exists $args{encode_check}) {
+    $pass_on{encode_check} = $args{encode_check};
+  }
+
+  my $email = $class->new($header, \%pass_on);
 
   for my $key (keys %attrs) {
     $email->content_type_attribute_set($key => $attrs{$key});
@@ -247,7 +278,7 @@ sub create {
     Carp::confess("body_str was given, but no encoding is defined")
       unless $attrs{encoding};
 
-    my $body_octets = Encode::encode($attrs{charset}, $args{body_str}, 1);
+    my $body_octets = Encode::encode($attrs{charset}, $args{body_str}, $email->encode_check);
     $email->body_set($body_octets);
   }
 
@@ -342,7 +373,7 @@ sub body_str {
     Carp::confess("can't get body as a string for " . $self->content_type);
   }
 
-  my $str = Encode::decode($encoding, $self->body, 1);
+  my $str = Encode::decode($encoding, $self->body, $self->encode_check);
   return $str;
 }
 
@@ -448,6 +479,11 @@ sub header_str_pairs {
   $self->header_obj->header_str_pairs(@_);
 }
 
+sub header_as_obj {
+  my $self = shift;
+  $self->header_obj->header_as_obj(@_);
+}
+
 #pod =method content_type_set
 #pod
 #pod   $email->content_type_set( 'text/html' );
@@ -542,6 +578,42 @@ sub content_type_attribute_set {
   $self->_compose_content_type($ct_header);
 }
 
+#pod =method encode_check
+#pod
+#pod =method encode_check-set
+#pod
+#pod   $email->encode_check;
+#pod   $email->encode_check_set(0);
+#pod   $email->encode_check_set(Encode::FB_DEFAULT);
+#pod
+#pod Gets/sets the current C<encode_check> setting (default: I<FB_CROAK>).
+#pod This is the parameter passed to L<Encode/"decode"> and L<Encode/"encode">
+#pod when C<body_str()>, C<body_str_set()>, and C<create()> are called.
+#pod
+#pod With the default setting, Email::MIME may crash if the claimed charset
+#pod of a body does not match its contents (for example - utf8 data in a
+#pod text/plain; charset=us-ascii message).
+#pod
+#pod With an C<encode_check> of 0, the unrecognized bytes will instead be
+#pod replaced with the C<REPLACEMENT CHARACTER> (U+0FFFD), and may end up
+#pod as either that or question marks (?).
+#pod
+#pod See L<Encode/"Handling Malformed Data"> for more information.
+#pod
+#pod =cut
+
+sub encode_check {
+  my ($self) = @_;
+
+  return $self->{encode_check};
+}
+
+sub encode_check_set {
+  my ($self, $val) = @_;
+
+  return $self->{encode_check} = $val;
+}
+
 #pod =method encoding_set
 #pod
 #pod   $email->encoding_set( 'base64' );
@@ -623,7 +695,7 @@ sub body_str_set {
   Carp::confess("body_str was given, but no charset is defined")
     unless my $charset = $ct->{attributes}{charset};
 
-  my $body_octets = Encode::encode($charset, $body_str, 1);
+  my $body_octets = Encode::encode($charset, $body_str, $self->encode_check);
   $self->body_set($body_octets);
 }
 
@@ -866,7 +938,7 @@ Email::MIME - easy MIME message handling
 
 =head1 VERSION
 
-version 1.940
+version 1.945
 
 =head1 SYNOPSIS
 
@@ -911,7 +983,11 @@ by all means keep reading.
   );
 
   my $email = Email::MIME->create(
-      header_str => [ From => 'casey@geeknest.com' ],
+      header_str => [
+          From => 'casey@geeknest.com',
+          To => [ 'user1@host.com', 'Name <user2@host.com>' ],
+          Cc => Email::Address::XS->new("Display Name \N{U+1F600}", 'user@example.com'),
+      ],
       parts      => [ @parts ],
   );
 
@@ -975,9 +1051,22 @@ very long. Added to that, you have:
 
 This method creates a new MIME part. The C<header_str> parameter is a list of
 headers pairs to include in the message. The value for each pair is expected to
-be a text string that will be MIME-encoded as needed.  A similar C<header>
-parameter can be provided in addition to or instead of C<header_str>.  Its
-values will be used verbatim.
+be a text string that will be MIME-encoded as needed.  Alternatively it can be
+an object with C<as_mime_string> method which implements conversion of that
+object to MIME-encoded string.  That object method is called with two named
+input parameters: C<charset> and C<header_name_length>.  It should return
+MIME-encoded representation of the object.  As of 2017-07-25, the
+header-value-as-object code is very young, and may yet change.
+
+In case header name is registered in C<%Email::MIME::Header::header_to_class_map>
+hash then registered class is used for conversion from Unicode string to 8bit
+MIME encoding.  Value can be either string or array reference to strings.
+Object is constructed via method C<from_string> with string value (or values
+in case of array reference) and converted to MIME-encoded string via
+C<as_mime_string> method.
+
+A similar C<header> parameter can be provided in addition to or instead of
+C<header_str>.  Its values will be used verbatim.
 
 C<attributes> is a hash of MIME attributes to assign to the part, and may
 override portions of the header set in the C<header> parameter.
@@ -1024,6 +1113,28 @@ will remain intact.
 These four methods modify common C<Content-Type> attributes. If set to
 C<undef>, the attribute is removed. All other C<Content-Type> header
 information is preserved when modifying an attribute.
+
+=head2 encode_check
+
+=head2 encode_check-set
+
+  $email->encode_check;
+  $email->encode_check_set(0);
+  $email->encode_check_set(Encode::FB_DEFAULT);
+
+Gets/sets the current C<encode_check> setting (default: I<FB_CROAK>).
+This is the parameter passed to L<Encode/"decode"> and L<Encode/"encode">
+when C<body_str()>, C<body_str_set()>, and C<create()> are called.
+
+With the default setting, Email::MIME may crash if the claimed charset
+of a body does not match its contents (for example - utf8 data in a
+text/plain; charset=us-ascii message).
+
+With an C<encode_check> of 0, the unrecognized bytes will instead be
+replaced with the C<REPLACEMENT CHARACTER> (U+0FFFD), and may end up
+as either that or question marks (?).
+
+See L<Encode/"Handling Malformed Data"> for more information.
 
 =head2 encoding_set
 
@@ -1124,6 +1235,9 @@ This behaves like C<header_raw_set>, but expects Unicode (character) strings as
 the values to set, rather than pre-encoded byte strings.  It will encode them
 as MIME encoded-words if they contain any control or 8-bit characters.
 
+Alternatively, values can be objects with C<as_mime_string> method.  Same as in
+method C<create>.
+
 =head2 header_str_pairs
 
   my @pairs = $email->header_str_pairs;
@@ -1131,6 +1245,23 @@ as MIME encoded-words if they contain any control or 8-bit characters.
 This method behaves like C<header_raw_pairs>, returning a list of field
 name/value pairs, but the values have been decoded to character strings, when
 possible.
+
+=head2 header_as_obj
+
+  my $first_obj = $email->header_as_obj($field);
+  my $nth_obj   = $email->header_as_obj($field, $index);
+  my @all_objs  = $email->header_as_obj($field);
+
+  my $nth_obj_of_class  = $email->header_as_obj($field, $index, $class);
+  my @all_objs_of_class = $email->header_as_obj($field, undef, $class);
+
+This method returns an object representation of the header value.  It instances
+new object via method C<from_mime_string> of specified class.  Input argument
+for that class method is list of the raw MIME-encoded values.  If class argument
+is not specified then class name is taken from the hash
+C<%Email::MIME::Header::header_to_class_map> via key field.  Use class method
+C<< Email::MIME::Header->set_class_for_header($class, $field) >> for adding new
+mapping.
 
 =head2 parts
 
@@ -1332,6 +1463,9 @@ __END__
 #pod the values to set, rather than pre-encoded byte strings.  It will encode them
 #pod as MIME encoded-words if they contain any control or 8-bit characters.
 #pod
+#pod Alternatively, values can be objects with C<as_mime_string> method.  Same as in
+#pod method C<create>.
+#pod
 #pod =method header_str_pairs
 #pod
 #pod   my @pairs = $email->header_str_pairs;
@@ -1339,6 +1473,23 @@ __END__
 #pod This method behaves like C<header_raw_pairs>, returning a list of field
 #pod name/value pairs, but the values have been decoded to character strings, when
 #pod possible.
+#pod
+#pod =method header_as_obj
+#pod
+#pod   my $first_obj = $email->header_as_obj($field);
+#pod   my $nth_obj   = $email->header_as_obj($field, $index);
+#pod   my @all_objs  = $email->header_as_obj($field);
+#pod
+#pod   my $nth_obj_of_class  = $email->header_as_obj($field, $index, $class);
+#pod   my @all_objs_of_class = $email->header_as_obj($field, undef, $class);
+#pod
+#pod This method returns an object representation of the header value.  It instances
+#pod new object via method C<from_mime_string> of specified class.  Input argument
+#pod for that class method is list of the raw MIME-encoded values.  If class argument
+#pod is not specified then class name is taken from the hash
+#pod C<%Email::MIME::Header::header_to_class_map> via key field.  Use class method
+#pod C<< Email::MIME::Header->set_class_for_header($class, $field) >> for adding new
+#pod mapping.
 #pod
 #pod =method parts
 #pod

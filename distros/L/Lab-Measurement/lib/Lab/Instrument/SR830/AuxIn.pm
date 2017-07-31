@@ -1,49 +1,7 @@
-
-=head1 NAME
-
-Lab::Instrument::SR830::AuxIn -- Aux Inputs of the Stanford
-Research SR830 Lock-In Amplifier.
-
-=head1 SYNOPSIS
-
- use Lab::Instrument::SR830::AuxIn
- my $multimeter = Lab::Instrument::SR830::AuxIn->new(%options, channel => 1);
-
- print $multimeter->get_value();
-
-=head1 DESCRIPTION
-
-This class provides access to the four DC inputs of the SR830. You have to
-provide a C<channel> (1..4) parameter in the constructor. 
-
-B<To use multiple virtual instruments, which use the same physical device, you have to share the connection between the virtual instruments:>
-
- use Lab::Measurement;
-
- # Create the shared connection.
- my $connection = Connection('LinuxGPIB', {gpib_address => 8});
- 
- # Array of instrument objects. Each element belongs to one of the four
- # channels. 
- my @inputs;
- 
- for my $channel (1..4) {
- 	$inputs[$channel] = Instrument('SR830::AuxIn', {
- 		connection => $connection,
- 		channel => $channel,
- 				 });
- }
- 
- for my $channel (1..4) {
- 	say "channel $channel: ", $inputs[$channel]->get_value();
- }
-
-
-
-=cut
-
 package Lab::Instrument::SR830::AuxIn;
-$Lab::Instrument::SR830::AuxIn::VERSION = '3.553';
+#ABSTRACT: Aux Inputs of the Stanford Research SR830 Lock-In Amplifier
+$Lab::Instrument::SR830::AuxIn::VERSION = '3.554';
+
 use warnings;
 use strict;
 use 5.010;
@@ -90,13 +48,6 @@ sub empty_buffer {
     }
 }
 
-=head1 Methods
-
-=head2 get_value()
-
-Return the input voltage.
-
-=cut
 
 sub get_value {
     my $self = shift;
@@ -106,3 +57,70 @@ sub get_value {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::SR830::AuxIn - Aux Inputs of the Stanford Research SR830 Lock-In Amplifier
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use Lab::Instrument::SR830::AuxIn
+ my $multimeter = Lab::Instrument::SR830::AuxIn->new(%options, channel => 1);
+
+ print $multimeter->get_value();
+
+=head1 DESCRIPTION
+
+This class provides access to the four DC inputs of the SR830. You have to
+provide a C<channel> (1..4) parameter in the constructor. 
+
+B<To use multiple virtual instruments, which use the same physical device, you have to share the connection between the virtual instruments:>
+
+ use Lab::Measurement;
+
+ # Create the shared connection.
+ my $connection = Connection('LinuxGPIB', {gpib_address => 8});
+ 
+ # Array of instrument objects. Each element belongs to one of the four
+ # channels. 
+ my @inputs;
+ 
+ for my $channel (1..4) {
+ 	$inputs[$channel] = Instrument('SR830::AuxIn', {
+ 		connection => $connection,
+ 		channel => $channel,
+ 				 });
+ }
+ 
+ for my $channel (1..4) {
+ 	say "channel $channel: ", $inputs[$channel]->get_value();
+ }
+
+=head1 Methods
+
+=head2 get_value()
+
+Return the input voltage.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

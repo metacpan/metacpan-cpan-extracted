@@ -1,12 +1,15 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Data::Float 0.008
 	qw(have_signed_zero have_nan have_infinite significand_bits);
 use Data::Integer 0.001 qw(natint_bits);
 use Test::More;
+use t::NumForms qw(zpat zero_forms natint_forms float_forms);
 
-do "t/num_forms.pl" or die $@ || $!;
+my @all_zeroes = zero_forms();
+
 my @tests;
 push @tests, [ 0, 1, [ float_forms("nan") ] ] if have_nan;
 open(TEST_VALS, "<", "t/values.data") or die "t/values.data: $!";
@@ -41,17 +44,20 @@ while(1) {
 
 my $nforms = 0;
 $nforms += @{$_->[2]} foreach @tests;
-plan tests => 1 + 6 + 2*$nforms;
+plan tests => 1 + 3*@all_zeroes + 2*$nforms;
 
 use_ok "Scalar::Number", qw(sclnum_is_natint sclnum_is_float);
 
-foreach my $func (\&sclnum_is_natint, \&sclnum_is_float) {
-	foreach my $ozero (0, +0.0, -0.0) {
-		my $nzero = $ozero;
-		my $tzero = $ozero;
-		$func->($tzero);
-		is zpat($tzero), zpat($nzero);
-	}
+foreach my $ozero (@all_zeroes) {
+	my $izero = $ozero;
+	my $fzero = $ozero;
+	my $isi = sclnum_is_natint($izero);
+	my $isf = sclnum_is_float($fzero);
+	ok $isi || $isf;
+	my $nzero = $ozero;
+	my $pat = zpat($nzero);
+	is zpat($izero), $pat;
+	is zpat($fzero), $pat;
 }
 
 foreach(@tests) {

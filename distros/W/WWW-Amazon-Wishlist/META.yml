@@ -4,12 +4,13 @@ author:
   - "Simon Wistow\r"
 build_requires:
   ExtUtils::MakeMaker: 6.36
+  File::Slurp: 0
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,4 +29,4 @@ requires:
   LWP::UserAgent: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 2.016
+version: 2.018

@@ -9,11 +9,17 @@ IPC::MorseSignals - Communicate between processes with Morse signals.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
+
+=head1 WARNING
+
+Due to the POSIX signals specification (which I wasn't aware of at the time I wrote this module), this module is by nature completely unreliable and will never work properly.
+It is therefore B<deprecated>.
+Please don't use it (if you were actually crazy enough to use it).
 
 =head1 SYNOPSIS
 
@@ -36,13 +42,18 @@ our $VERSION = '0.16';
 
 =head1 DESCRIPTION
 
-This module implements a rare form of IPC by sending Morse-like signals through C<SIGUSR1> and C<SIGUSR2>. Both of those signals are used, so you won't be able to keep them for something else when you use this module.
+This module implements a rare form of IPC by sending Morse-like signals through C<SIGUSR1> and C<SIGUSR2>.
+Both of those signals are used, so you won't be able to keep them for something else when you use this module.
 
 =over 4
 
-=item L<IPC::MorseSignals::Emitter> is a base class for emitters ;
+=item *
 
-=item L<IPC::MorseSignals::Receiver> is a base class for receivers.
+L<IPC::MorseSignals::Emitter> is a base class for emitters ;
+
+=item *
+
+L<IPC::MorseSignals::Receiver> is a base class for receivers.
 
 =back
 
@@ -77,7 +88,8 @@ You can contact me by mail or on C<irc.perl.org> (vincent).
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-ipc-morsesignals at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-MorseSignals>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-ipc-morsesignals at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-MorseSignals>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -91,7 +103,7 @@ Thanks for the inspiration, mofino ! I hope this module will fill all your IPC n
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007,2008,2013 Vincent Pit, all rights reserved.
+Copyright 2007,2008,2013,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

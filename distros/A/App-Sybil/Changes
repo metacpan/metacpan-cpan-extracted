@@ -1,0 +1,10 @@
+Revision history for App-Sybil
+
+0.3  2017-07-23 19:25:14 PDT
+ * Better authentication workflow
+
+0.2  2017-07-21 17:07:30 PDT
+ * Fix metadata issues
+
+0.1  2017-07-21 16:59:27 PDT
+        - Initial release

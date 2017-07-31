@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e07b0b2b0cc12ffb0cd33d7b775dde0c64783919 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 c25fc03a77bc0d5ed1cd0cd2e0e63d11b0ac0585 Changes
+SHA1 bc8848dc173934b30fdd1377f815a1f3f9dbdd70 INSTALL
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 937b2248da74a30c18bcb4595c213446180b5c8c MANIFEST
+SHA1 d407795fb2b02d6df542a2a2769113b820cc6b5b META.json
+SHA1 48888bcf851b251b284517a1e52f37891fc739f8 META.yml
+SHA1 1aea867d977398b5b2c67838c95841d1c3b6f24d Makefile.PL
+SHA1 0b4a74fd6e0e8ea62db1c906ed726ebb58b5fbe5 README
+SHA1 fe89f6d822b50110f21e22ab700e3935652edb07 dist.ini
+SHA1 bbfe1cb729bb28076e2867eb93929360a28a0b0e doap.ttl
+SHA1 15093c9afbbf60faee67874880ac0b55642b1f5d lib/JavaScript/Any.pm
+SHA1 a53729d2e65efccd87778008b27892193efe88c8 lib/JavaScript/Any/Context.pm
+SHA1 66ae65e38ef612cef27c91949e09c7567edc0ad5 lib/JavaScript/Any/Context/Duktape.pm
+SHA1 3e65a07e313d249e679a80ec19a433b78c210a09 lib/JavaScript/Any/Context/JE.pm
+SHA1 4a1e969decdcc7ceeb17b87f126695bd3b67df05 lib/JavaScript/Any/Context/V8.pm
+SHA1 1285c829f025560ad72c5aa024d11212d0e784cc t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAllyAogACgkQzr+BKGoqfTk/XwCfSHioJf7izBz1Zjx1NfVKuBy/
+DakAoIMedMzuEK6Df4NgxqI7KwKhs+PQ
+=xNRe
+-----END PGP SIGNATURE-----

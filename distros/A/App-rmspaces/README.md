@@ -1,7 +1,7 @@
 ## rmspaces
 
 This is a simple script to remove those anoying, lame, awful spaces from file
-names. Just add it to your PATH and run `rmspaces FILENAME`.
+names. Just run `rmspaces FILENAME`.
 
 Note that it could also be used to change multiple file names by using the
 --target and the --separator arguments. For example, if you have
@@ -21,9 +21,21 @@ $ ls
 ```
 
 Check `rmspaces --help` for more information or check the docstrings in the
-code.
+source code.
 
-## License
+### Installing
+
+You can either install rmspaces from CPAN, available under
+[App-rmspaces](http://search.cpan.org/~athos/) or install it through sources by
+running
+
+```
+perl Makefile.PL
+make
+make install
+```
+
+### License
 
 Copyright 2017 Athos Ribeiro <athoscr@fedoraproject.org>
 

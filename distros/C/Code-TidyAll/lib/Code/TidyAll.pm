@@ -8,13 +8,13 @@ use Code::TidyAll::CacheModel;
 use Code::TidyAll::Config::INI::Reader;
 use Code::TidyAll::Plugin;
 use Code::TidyAll::Result;
-use Code::TidyAll::Util qw(can_load);
 use Data::Dumper;
 use Date::Format;
 use Digest::SHA qw(sha1_hex);
 use File::Find qw(find);
 use File::Zglob;
 use List::SomeUtils qw(uniq);
+use Module::Runtime qw( use_module );
 use Path::Tiny qw(path);
 use Scalar::Util qw(blessed);
 use Specio 0.30;
@@ -28,7 +28,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -139,6 +139,12 @@ has 'verbose' => (
     default => 0,
 );
 
+has 'inc' => (
+    is  => 'ro',
+    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+    default => sub { [] },
+);
+
 # Internal
 has 'backup_dir' => (
     is       => 'lazy',
@@ -242,6 +248,8 @@ sub BUILD {
         $self->backup_dir->mkpath( { mode => 0775 } );
         $self->_purge_backups_periodically();
     }
+
+    @INC = ( @{ $self->inc }, @INC );
 }
 
 sub new_from_conf_file {
@@ -262,7 +270,8 @@ sub new_from_conf_file {
     # Initialize with alternate class if given
     #
     if ( my $tidyall_class = delete( $params{tidyall_class} ) ) {
-        die qq{cannot load '$tidyall_class'} unless can_load($tidyall_class);
+        local @INC = ( @{ $conf_params->{inc} }, @INC ) if $conf_params->{inc};
+        use_module($tidyall_class) or die qq{cannot load '$tidyall_class'};
         $class = $tidyall_class;
     }
 
@@ -354,7 +363,7 @@ sub _load_plugin {
         : "Code::TidyAll::Plugin::$plugin_fname"
     );
     try {
-        can_load($plugin_class) || die 'not found';
+        use_module($plugin_class) || die 'not found';
     }
     catch {
         die qq{could not load plugin class '$plugin_class': $_};
@@ -794,7 +803,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.61
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -881,6 +890,13 @@ actually written back to the file.
 
 A boolean indicating if we should skip cleaning temporary files or not.
 Defaults to false.
+
+=item inc
+
+An arrayref of directories to prepend to C<@INC>. This can be set via the
+command-line as C<-I>, but you can also set it in a config file.
+
+This affects both loading and running plugins.
 
 =item data_dir
 

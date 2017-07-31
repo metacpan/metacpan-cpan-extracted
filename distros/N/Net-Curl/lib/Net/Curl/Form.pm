@@ -5,7 +5,7 @@ use warnings;
 use Net::Curl ();
 use Exporter 'import';
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 our @EXPORT_OK = grep { /^CURL/x } keys %{Net::Curl::Form::};
 our %EXPORT_TAGS = ( constants => \@EXPORT_OK );
@@ -255,7 +255,7 @@ L<curl_formadd(3)>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2011 Przemyslaw Iskra <sparky at pld-linux.org>.
+Copyright (c) 2011-2015 Przemyslaw Iskra <sparky at pld-linux.org>.
 
 You may opt to use, copy, modify, merge, publish, distribute and/or sell
 copies of the Software, and permit persons to whom the Software is furnished

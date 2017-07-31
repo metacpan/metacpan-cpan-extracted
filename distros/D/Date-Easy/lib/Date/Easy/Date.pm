@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -71,7 +71,7 @@ sub _strptime
 	# some validation, then returns epoch seconds by calling timegm (from Time::Local) on it.  I
 	# don't _want_ to call str2time because I'm just going to take the epoch seconds and turn them
 	# back into pieces, so it's inefficicent.  But more importantly I _can't_ call str2time because
-	# it convertes to UTC, and I want the pieces as they are relative to whatever timezone the
+	# it converts to UTC, and I want the pieces as they are relative to whatever timezone the
 	# parsed date has.
 	#
 	# On the other hand, the problem with calling strptime directly is that str2time is doing two
@@ -197,26 +197,32 @@ sub _mkdate
 }
 
 
+############################
+# OVERRIDDEN FROM DATETIME #
+############################
+
+
+sub split
+{
+	my $impl = shift->{impl};
+	( $impl->year, $impl->mon, $impl->mday )
+}
+
+
 # override addition and subtraction
 # numbers added to a ::Date are days
 
-use overload
-		'+' => \&_add,
-		'-' => \&_subtract;
+sub _add_integer		{ $_[0]->add_days($_[1])      }
+sub _subtract_integer	{ $_[0]->subtract_days($_[1]) }
 
-sub _add
-{
-	my ($self, $rhs) = @_;
 
-	return $self->_mkdate($self->epoch + 86_400 * $rhs);
-}
-
-sub _subtract
-{
-	my ($self, $rhs) = @_;
-
-	return $self->_mkdate($self->epoch - 86_400 * $rhs);
-}
+# These are illegal to call.
+sub add_seconds { die("cannot call add_seconds on a Date value") }
+sub add_minutes { die("cannot call add_minutes on a Date value") }
+sub add_hours { die("cannot call add_hours on a Date value") }
+sub subtract_seconds { die("cannot call subtract_seconds on a Date value") }
+sub subtract_minutes { die("cannot call subtract_minutes on a Date value") }
+sub subtract_hours { die("cannot call subtract_hours on a Date value") }
 
 
 
@@ -237,7 +243,7 @@ Date::Easy::Date - easy date class
 
 =head1 VERSION
 
-This document describes version 0.03 of Date::Easy::Date.
+This document describes version 0.04 of Date::Easy::Date.
 
 =head1 SYNOPSIS
 
@@ -355,6 +361,34 @@ C<hour>, C<minute>, and C<second> will always return 0 for a date object, and C<
 always return 'UTC'.  Likewise, C<is_local> always returns false and C<is_utc> (and its alias
 C<is_gmt>) always return true.
 
+=head2 Overridden Methods
+
+A few methods inherited from L<Date::Easy::Datetime> return different results in
+C<Date::Easy::Date>.
+
+=head3 split
+
+Returns a list consisting of the year, month, and day, in that order, in the same ranges as returned
+by the L<Date::Easy::Datetime/Accessors>.  This differs from datetime's C<split> in that the final
+three elements (hours, minutes, and seconds) are omitted, since they're always zero.  Doesn't return
+anything useful in scalar context, so don't do that.  Calling C<split> in scalar context may
+eventually be changed to throw a warning or fatal error.
+
+=head3 add_seconds
+
+=head3 add_minutes
+
+=head3 add_hours
+
+=head3 subtract_seconds
+
+=head3 subtract_minutes
+
+=head3 subtract_hours
+
+These methods throw exceptions if you call them for a date value, because they would adjust the time
+portion, and the time portion of a date value must always be midnight.
+
 =head2 Other Methods
 
 All other methods are also inherited from L<Date::Easy::Datetime>, so refer to those docs.
@@ -379,7 +413,16 @@ via C<date>.  That range is 26-Apr-1970 17:46:40 to 2-Dec-1970 15:33:19.
 
 Any timezone portion specified in a string passed to C<date> is completely ignored.
 
-See also the "Limitations" section in C<Date::Easy>.
+Because dates I<don't> have the same bug with 4-digit years that are 50+ years old that datetimes
+do, they have a different bug instead.  If you pass a 2-digit year to `date` and it gets handled by
+L<Date::Parse>, it will always come back in the 20th century:
+
+    say date("2/1/17"); # Thu Feb  1 00:00:00 1917
+
+Avoiding this is simple: always use 4-digit dates (which is a good habit to get into anyway).  Given
+the choice between the two bugs, this was considered the lesser of two weevils.
+
+See also L<Date::Easy/"Limitations">.
 
 =head1 AUTHOR
 

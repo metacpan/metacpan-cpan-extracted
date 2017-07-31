@@ -4,15 +4,15 @@ Scope::Escape::Continuation - reified escape continuation
 
 =head1 SYNOPSIS
 
-	$escape->go($result);
-	if($escape->wantarray) { ...
-	if($escape->is_accessible) { ...
+    $escape->go($result);
+    if($escape->wantarray) { ...
+    if($escape->is_accessible) { ...
 
-	if($escape->may_be_valid) { ...
-	$escape->invalidate;
+    if($escape->may_be_valid) { ...
+    $escape->invalidate;
 
-	$escape = $escape->as_function;
-	$escape = $escape->as_continuation;
+    $escape = $escape->as_function;
+    $escape = $escape->as_continuation;
 
 =head1 DESCRIPTION
 
@@ -160,7 +160,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

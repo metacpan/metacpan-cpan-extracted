@@ -34,11 +34,12 @@ my %WriteMakefileArgs = (
     "String::ShellQuote" => "1.04"
   },
   "TEST_REQUIRES" => {
+    "Carp::Always" => "0.13",
     "DBD::SQLite" => "1.50",
     "Test::Most" => "0.34",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::Cmd" => "0.331",
+  "Carp::Always" => "0.13",
   "DBD::SQLite" => "1.50",
   "DBI" => "1.636",
   "DBIx::Simple" => "1.35",

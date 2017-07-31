@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 21;
 use File::Temp;
 use File::Copy qw/copy/;
 use File::Spec::Functions qw/catfile catdir/;
@@ -62,6 +62,18 @@ $c->compile($target);
 $texbody = read_file($tex);
 
 like($texbody, qr/\{scrartcl\}/, "Passing nocoverpage as extra changes the class");
+like($texbody, qr/\\let\\chapter\\section/);
+
+
+# check new main option
+{
+    $c = Text::Amuse::Compile->new(tex => 1, coverpage_only_if_toc => 1);
+    $c->compile($target);
+    $texbody = read_file($tex);
+    like($texbody, qr/\{scrartcl\}/, "coverpage_only_if_toc to compiler changes the class");
+    like($texbody, qr/\\let\\chapter\\section/);
+}
+
 
 $muse =<<'MUSE';
 #title Test
@@ -121,3 +133,14 @@ $c = Text::Amuse::Compile->new(tex => 1, extra => { cover => '',
 $c->compile($target);
 $texbody = read_file($tex);
 unlike $texbody, qr/(mytest|prova).png/;
+
+# check new main option
+{
+    $c = Text::Amuse::Compile->new(tex => 1, coverpage_only_if_toc => 1);
+    $c->compile($target);
+    $texbody = read_file($tex);
+    unlike($texbody, qr/\{scrartcl\}/, "coverpage_only_if_toc to compiler changes the class");
+    unlike($texbody, qr/\\let\\chapter\\section/);
+    like($texbody, qr/\{scrbook\}/);
+    like($texbody, qr/prova\.png/);
+}

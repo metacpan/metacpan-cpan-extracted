@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,34 +15,34 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 8bfe067cb42b893a3844485cc94c000a27bda47e .gitignore
-SHA1 8e5f53dd328d3a571b0fb0a50155061a3b1c17ae Build.PL
-SHA1 c1808ce5adf0a6cd9f02da49616bfef49ad0f495 Changes
-SHA1 e4a13219730a75bb374d128d10f0516d4aa3a00b MANIFEST
-SHA1 eb224107e1760404233a164e3bda19bf52b387bd META.json
-SHA1 68e2feff2bc138dbe5315abee804e72271aee6eb META.yml
-SHA1 2157ae40589595d6cc1585fd7279b25bcf8f5852 Makefile.PL
-SHA1 df592a5bfbcfbfcd068efd490be21bed046d7526 README
-SHA1 95427b885d5fd94c7fca088214f51a860608e48e lib/Time/UTC.pm
-SHA1 b7f7131f00b1c15eafcd4ade26ae8d86ad7bfa83 lib/Time/UTC/Segment.pm
+SHA1 e1c699ed21c003e0cf5f4c8f23e352a4afcb3054 Build.PL
+SHA1 25088b63cba1414834a8c6e45d0c2ada98e9829b Changes
+SHA1 75f16388216f445115a203c1633295e69618e079 MANIFEST
+SHA1 94bb82046b91b1b0983772110fb2c413a0868e26 META.json
+SHA1 f6cc9a0aa1e872dc6193a44d0bc64972e2502b35 META.yml
+SHA1 985b7baf96e7a0d2642422fe9f7fe1265940e6bc README
+SHA1 520129275c4c5430a1a19628d3b9a9e4d5a0916c lib/Time/UTC.pm
+SHA1 a4fbc34726941b821854ba06b4661d0c5ee1e45d lib/Time/UTC/Segment.pm
 SHA1 1b89476221f02aa902cc5fa30bf977d8b55bbef1 t/builtin.t
 SHA1 d0e85e57034489396dc9e305b2a140d3034ec22c t/cjdn.t
-SHA1 757a26a05f6367663b65bfc518f6a0abfde3cf59 t/day.t
+SHA1 19e937dda2c686be35e95ca1c2c79b90634d549d t/day.t
 SHA1 90f442eded7b8a5f35c4d9bef6b5aebcc0fae602 t/dl_lslist.at
 SHA1 af574bfe22333b68c8e5121342add9c5ebcbe729 t/dl_taiutcdat.at
 SHA1 49514d3a2e87f2041572cf9e854ac1f5da1c3c75 t/hms.t
 SHA1 2ad1a4e25eabcb572912d31688f239acbef85d4f t/mjdn.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
-SHA1 6a2fb8883ccbeb58e81433b1d0be04fb184a07ec t/seg_of.t
-SHA1 030058cd362cf50c36d72d53b1d3f5c9edb8e59f t/segments.t
+SHA1 f6884a8e7e0501f1bc75d574bb0496a2b4def575 t/seg_of.t
+SHA1 986b68cff592e5face6af8fa3488e3ea8559231a t/segments.t
 SHA1 aa384924c90cc7480b5be1eebd4ca68d3d6fc65d t/start.t
-SHA1 de0e3df85bce675f9418e78a87ae17111df515f5 t/when_comp.t
+SHA1 87a213dec99640b2a03455c6fc86fd8fa39db7aa t/version_synch.t
+SHA1 87730c2cff5f2301b91fdc949a6c1ba9cbc34b88 t/when_comp.t
 SHA1 ab85bdc01855bdddb6bf6999c27960e46cdb2358 t/ymd.t
 SHA1 409b2c7b06b11041eac60a1079d8a08052050035 t/ymdhms.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk8uk4wACgkQOV9mt2VyAVGcmwCgmZaS+0JdgvWrsCSo+gnHo4ee
-3wkAnRQkZXed050DrxHbxyeH5ZZYoHw2
-=jgmB
+iEYEARECAAYFAll5uqUACgkQOV9mt2VyAVHzPwCePjnemqVgV2rcvtVttCxFAzx9
+r40AoKKaS4tfi1a1H5CUp1TYN4R+jNs7
+=QR3a
 -----END PGP SIGNATURE-----

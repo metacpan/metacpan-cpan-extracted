@@ -9,7 +9,7 @@ use File::Basename;
 use Getopt::Std;
 use Pod::Usage;
 
-getopts("hvn", \my %opts);
+getopts("hvnc", \my %opts);
 pod2usage() if $opts{h};
 
 my( $local_dir, $gd_dir ) = @ARGV;
@@ -20,6 +20,10 @@ if( ! defined $gd_dir ) {
 
 if( ! -d $local_dir ) {
     pod2usage( "$local_dir not a directory" );
+}
+
+if( $opts{ c } ) {
+    $opts{ v } = 1;
 }
 
 my $log_level = $INFO;
@@ -90,6 +94,11 @@ for my $entry ( @$entries_gd ) {
     } else {
         INFO "Remote only: $title";
     }
+}
+
+if( $opts{ c } ) {
+    print "No updates in check mode\n";
+    exit 0;
 }
 
 for my $file ( sort keys %files_local ) {

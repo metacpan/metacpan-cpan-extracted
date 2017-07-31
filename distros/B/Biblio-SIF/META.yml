@@ -1,0 +1,29 @@
+---
+name: Biblio-SIF
+version: 0.01
+author:
+  - 'Paul Hoffman <paul@flo.org>'
+abstract: Voyager ILS SIF file operations
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Package::Constants: 0
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+provides:
+  Biblio::SIF:
+    file: lib/Biblio/SIF.pm
+    version: 0.01
+  Biblio::SIF::Patron:
+    file: lib/Biblio/SIF/Patron.pm
+  Biblio::SIF::Patron::Address:
+    file: lib/Biblio/SIF/Patron.pm
+  Biblio::SIF::Patron::Barcode:
+    file: lib/Biblio/SIF/Patron.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

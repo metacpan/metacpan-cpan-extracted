@@ -1,5 +1,6 @@
 package Lab::Instrument::OI_Triton;
-$Lab::Instrument::OI_Triton::VERSION = '3.553';
+#ABSTRACT: Oxford Instruments Triton dilution refrigerator control
+$Lab::Instrument::OI_Triton::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Carp;
@@ -183,13 +184,19 @@ sub get_value {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::OI_Triton - Oxford Instruments Triton DR Control
+Lab::Instrument::OI_Triton - Oxford Instruments Triton dilution refrigerator control
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -226,11 +233,17 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2014 Andreas K. Hüttel (L<http://www.akhuettel.de/>)
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2014       
+            2015       Andreas K. Huettel
+            2016       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

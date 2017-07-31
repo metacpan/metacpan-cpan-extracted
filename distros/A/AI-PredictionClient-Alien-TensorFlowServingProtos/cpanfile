@@ -1,5 +1,4 @@
 requires "Alien::Base" => "0";
-requires "Alien::Google::GRPC" => "0";
 requires "base" => "0";
 requires "perl" => "5.01";
 requires "strict" => "0";
@@ -18,7 +17,7 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Alien::Build" => "0.40";
   requires "Alien::Build::MM" => "0.40";
-  requires "Alien::Google::GRPC" => "0.03";
+  requires "Alien::Google::GRPC" => "0.06";
   requires "Archive::Extract" => "0";
   requires "Env" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";

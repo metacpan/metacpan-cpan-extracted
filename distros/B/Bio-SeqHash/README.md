@@ -4,7 +4,7 @@ Bio::SeqHash - get one or more sequences from a FASTA file quickly.
 
 # VERSION
 
-version 0.1.0
+version 0.1.3
 
 # SYNOPSIS
 
@@ -24,10 +24,10 @@ version 0.1.0
 
 # DESCRIPTION
 
-    Currently, there do have some modules that can operate the FASTA file such as Bio::SeqIO, 
-    But it only provide some basic operation to obtain the information about sequence. In my daily work,
-    I still have to write some repetitive code. So this module is write to perform a deeper wrapper for operating FASTA file
-    Notice: this module is not suitable for the FASTA file that is extremble big.
+Currently, there do have some modules that can operate the FASTA file such as Bio::SeqIO, 
+But it only provide some basic operation to obtain the information about sequence. In my daily work,
+I still have to write some repetitive code. So this module is write to perform a deeper wrapper for operating FASTA file
+Notice: this module is not suitable for the FASTA file that is extremble big.
 
 # METHODS
 

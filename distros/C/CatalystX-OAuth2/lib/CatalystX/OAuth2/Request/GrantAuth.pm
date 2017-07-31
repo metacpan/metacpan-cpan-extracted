@@ -93,7 +93,7 @@ CatalystX::OAuth2::Request::GrantAuth - A catalyst request extension for approvi
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 AUTHOR
 

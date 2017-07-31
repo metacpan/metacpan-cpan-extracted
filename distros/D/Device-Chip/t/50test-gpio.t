@@ -12,7 +12,7 @@ my $adapter = Test::Device::Chip::Adapter->new;
 my $gpio = $adapter->make_protocol( 'GPIO' )->get;
 
 {
-   test_out( '    # Subtest: ->write_gpios' );
+   test_out( qr/\s*# Subtest: ->write_gpios\n/ );
    test_out( '    ok 1 - write_gpios' );
    test_out( '    1..1' );
    test_out( 'ok 1 - ->write_gpios' );
@@ -26,7 +26,7 @@ my $gpio = $adapter->make_protocol( 'GPIO' )->get;
 
 {
    test_out( 'ok 1 - ->read_gpios returns values' );
-   test_out( '    # Subtest: ->read_gpios' );
+   test_out( qr/\s*# Subtest: ->read_gpios\n/ );
    test_out( '    ok 1 - read_gpios' );
    test_out( '    1..1' );
    test_out( 'ok 2 - ->read_gpios' );

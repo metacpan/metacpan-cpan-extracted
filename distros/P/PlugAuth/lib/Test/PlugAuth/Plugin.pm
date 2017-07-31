@@ -2,20 +2,11 @@ package Test::PlugAuth::Plugin;
 
 use strict;
 use warnings;
+use Test2::Plugin::FauxHomeDir;
 
 # ABSTRACT: Private package for Test::PlugAUth::Plugin::* modules
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
-
-BEGIN {
-  $ENV{LOG_LEVEL} = "ERROR";
-
-  unless($INC{'File/HomeDir/Test.pm'}) 
-  {
-    require File::HomeDir::Test;
-    File::HomeDir::Test->import;
-  }
-}
 
 1;
 
@@ -31,7 +22,7 @@ Test::PlugAuth::Plugin - Private package for Test::PlugAUth::Plugin::* modules
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 SEE ALSO
 

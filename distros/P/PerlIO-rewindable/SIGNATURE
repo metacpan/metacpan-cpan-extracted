@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,24 +14,22 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b882bcdebca488107fc2650098e0fcec2e82c62f .cvsignore
-SHA1 ab249c3f1eba8bb5c1238c8b0c212c0123076a54 Build.PL
-SHA1 ecacc677b76eefd665c9a7eb665c78bbf9e31743 Changes
-SHA1 cb13afcb947a13f5d89dd29c9fa0c58714c55c49 MANIFEST
-SHA1 cf92ec4310379136f98a3c0f2c3bef84c4f89e1f META.json
-SHA1 834ef63eea781f995d04d98242c4de3d2c7ed5e0 META.yml
-SHA1 ac10abef4842e562f11f09847244c1a1b1bcca06 Makefile.PL
-SHA1 57b5656d656658b249acc68949b97c44f319591e README
-SHA1 c58bf6064f38ec571e1634791d29e76a43128c04 lib/PerlIO/.cvsignore
-SHA1 a052449515825321a8e1c334d2b0d121d7ede92f lib/PerlIO/rewindable.pm
+SHA1 80a882b12064c108cc0e5cc0147a3e8b457efc2b .gitignore
+SHA1 88a8b8c24f84fcb9203fd24c9f94fe078f89520e Build.PL
+SHA1 e28c7c54b84f67a6d00a7fdc3889278f2a93e3a9 Changes
+SHA1 97481a7b32b9c4a9d1c7c70a22be7b7a3da65e66 MANIFEST
+SHA1 50b6cddaa6d7871fc10cb874f741d4063e11ac1b META.json
+SHA1 82bed8c133c4bc8a324ad225b606c230828c0bf7 META.yml
+SHA1 6185ee26760e95e87eb1e21c102442b4dfe4d173 README
+SHA1 12db5e11fa563e8d69a2eba2a65c6b7a56fc9ef7 lib/PerlIO/rewindable.pm
 SHA1 729d234b1a42e104c68344e13965a7c9efb3fd26 lib/PerlIO/rewindable.xs
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 4dc1bb11c63e291108bf63a4085bc42dad25e42d t/rewind.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk4bS0gACgkQOV9mt2VyAVGRRACffTKVjY0YSdosp6nrNj/GRxnv
-4VMAnRWyySLlIEPMRiLPpmjelNNc5ndZ
-=pbFa
+iEYEARECAAYFAll6s20ACgkQOV9mt2VyAVHb+ACcDArXhnM45B5OZLKqCWXsllOb
+MW0AnjisZ3FkEQ3C61wFWyBu9U1kzLKD
+=Wpus
 -----END PGP SIGNATURE-----

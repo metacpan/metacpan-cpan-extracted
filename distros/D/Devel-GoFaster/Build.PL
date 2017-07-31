@@ -35,7 +35,6 @@ Module::Build->subclass(code => q{
 	}
 })->new(
 	module_name => "Devel::GoFaster",
-	dist_version => "0.000",
 	license => "perl",
 	configure_requires => {
 		"Module::Build" => 0,
@@ -58,7 +57,7 @@ Module::Build->subclass(code => q{
 	},
 	requires => {
 		"Carp" => 0,
-		"Lexical::SealRequireHints" => "0.006",
+		"Lexical::SealRequireHints" => "0.008",
 		"perl" => "5.006",
 		"strict" => 0,
 		"warnings" => 0,
@@ -69,7 +68,16 @@ Module::Build->subclass(code => q{
 	needs_compiler => 0,
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Devel-GoFaster\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Devel-GoFaster",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

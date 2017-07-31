@@ -1,0 +1,43 @@
+{
+   "abstract" : "Determine New Zealand public holidays",
+   "author" : [
+      "Sam Vilain (samv@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Holidays-NZ",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Manip" : "0",
+            "Set::Object" : "1.09"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

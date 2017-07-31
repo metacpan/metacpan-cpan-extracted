@@ -11,7 +11,7 @@ use JSON::MaybeXS qw( encode_json );
 use Clustericious::Config;
 
 # ABSTRACT: Helpers for clustericious config files.
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 our @mergeStack;
@@ -57,8 +57,8 @@ sub get_password
 
 sub home (;$)
 {
-  require File::HomeDir;
-  $_[0] ? File::HomeDir->users_home($_[0]) : File::HomeDir->my_home;
+  require File::Glob;
+  $_[0] ? File::Glob::bsd_glob("~$_[0]") : File::Glob::bsd_glob('~');
 }
 
 
@@ -177,7 +177,7 @@ Clustericious::Config::Helpers - Helpers for clustericious config files.
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -291,6 +291,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

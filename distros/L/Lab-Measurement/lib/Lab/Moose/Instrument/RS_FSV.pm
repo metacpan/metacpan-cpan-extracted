@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::RS_FSV;
-$Lab::Moose::Instrument::RS_FSV::VERSION = '3.553';
+#ABSTRACT: Rohde & Schwarz FSV Signal and Spectrum Analyzer
+$Lab::Moose::Instrument::RS_FSV::VERSION = '3.554';
 use 5.010;
 
 use PDL::Core qw/pdl cat/;
@@ -35,54 +36,7 @@ sub BUILD {
     $self->cls();
 }
 
-=head1 NAME
 
-Lab::Moose::Instrument::RS_FSV - Rohde & Schwarz FSV Signal and Spectrum
-Analyzer
-
-=head1 SYNOPSIS
-
- my $data = $fsv->get_spectrum(timeout => 10);
-
-=cut
-
-=head1 METHODS
-
-This driver implements the following high-level method:
-
-=head2 get_spectrum
-
- $data = $fsv->get_spectrum(timeout => 10, trace => 2, precision => 'double');
-
-Perform a single sweep and return the resulting spectrum as a 2D PDL:
-
- [
-  [freq1,  freq2,  freq3,  ...,  freqN],
-  [power1, power2, power3, ..., powerN],
- ]
-
-I.e. the first dimension runs over the sweep points.
-
-This method accepts a hash with the following options:
-
-=over
-
-=item B<timeout>
-
-timeout for the sweep operation. If this is not given, use the connection's
-default timeout.
-
-=item B<trace>
-
-number of the trace (1..6). Defaults to 1.
-
-=item B<precision>
-
-floating point type. Has to be 'single' or 'double'. Defaults to 'single'.
-
-=back
-
-=cut
 
 sub get_spectrum {
     my ( $self, %args ) = validated_hash(
@@ -129,6 +83,63 @@ sub get_spectrum {
 
 }
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::RS_FSV - Rohde & Schwarz FSV Signal and Spectrum Analyzer
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ my $data = $fsv->get_spectrum(timeout => 10);
+
+=head1 METHODS
+
+This driver implements the following high-level method:
+
+=head2 get_spectrum
+
+ $data = $fsv->get_spectrum(timeout => 10, trace => 2, precision => 'double');
+
+Perform a single sweep and return the resulting spectrum as a 2D PDL:
+
+ [
+  [freq1,  freq2,  freq3,  ...,  freqN],
+  [power1, power2, power3, ..., powerN],
+ ]
+
+I.e. the first dimension runs over the sweep points.
+
+This method accepts a hash with the following options:
+
+=over
+
+=item B<timeout>
+
+timeout for the sweep operation. If this is not given, use the connection's
+default timeout.
+
+=item B<trace>
+
+number of the trace (1..6). Defaults to 1.
+
+=item B<precision>
+
+floating point type. Has to be 'single' or 'double'. Defaults to 'single'.
+
+=back
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -151,6 +162,15 @@ This driver consumes the following roles:
 
 =back
 
-=cut
+=head1 COPYRIGHT AND LICENSE
 
-1;
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

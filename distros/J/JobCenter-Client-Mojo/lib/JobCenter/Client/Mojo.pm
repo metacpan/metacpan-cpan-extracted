@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.24'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -267,6 +267,43 @@ sub call_nb {
 	});
 }
 
+sub find_jobs {
+	my ($self, $filter) = @_;
+	croak('no filter?') unless $filter;
+
+	#print 'filter: ', Dumper($filter);
+	$filter = encode_json($filter) if ref $filter eq 'HASH';
+	
+	my ($done, $err, $jobs);
+	Mojo::IOLoop->delay->steps(
+	sub {
+		my $d = shift;
+		# fixme: check results?
+		$self->conn->call('find_jobs', { filter => $filter }, $d->begin(0));
+	},
+	sub {
+		#say 'find_jobs call returned: ', Dumper(\@_);
+		my ($d, $e, $r) = @_;
+		if ($e) {
+			$self->log->debug("find_jobs got error $e");
+			$err = $e;
+			$done++;
+			return;
+		}
+		$jobs = $r;
+		$done++;
+	})->catch(sub {
+		my ($d, $err) = @_;
+		$self->log->debug("something went wrong with get_job_status: $err");
+		$done++;
+	});
+
+	Mojo::IOLoop->singleton->reactor->one_tick while !$done;
+
+	return $err, @$jobs if ref $jobs eq 'ARRAY';
+	return $err;
+}
+
 sub get_job_status {
 	my ($self, $job_id) = @_;
 	croak('no job_id?') unless $job_id;
@@ -372,7 +409,8 @@ sub announce {
 		$self->conn->call('announce', {
 				 workername => $workername,
 				 actionname => $actionname,
-				 slots => $slots
+				 slots => $slots,
+				 (($args{filter}) ? (filter => $args{filter}) : ()),
 			}, $d->begin(0));
 	},
 	sub {
@@ -711,6 +749,16 @@ message.  If the job has not finished executing then both $job_id and
 $result will be undefined.  Otherwise the $result will contain the result of
 the job.  (Which may be a JobCenter error object)
 
+=head2 find_jobs
+
+($err, @jobs) = $client->find_jobs({'foo'=>'bar'});
+
+Finds all currently running jobs with arguments matching the filter
+expression.  The expression is evaluated in PostgreSQL using the @> for
+jsonb objects, basically this means that you can only do equality tests for
+one or more top-level keys.  If @jobs is empty $err might contain an error
+message.
+
 =head2 ping
 
 $status = $client->ping($timeout);
@@ -786,6 +834,16 @@ returns an error object or throws an error.  Called with the same arguments
 as the original callback.
 
 (optional, only valid for mode 'subproc')
+
+=item - filter: only process a subset of the action
+
+The filter expression allows a worker to specify that it can only do the
+actionname for a certain subset of arguments.  For example, for a "mkdir"
+action the filter expression {'host' => 'example.com'} would mean that this
+worker can only do mkdir on host example.com. Filter expressions are limited
+to simple equality tests on one or more keys, and only those keys that are
+allowed in the action definition. Filtering can be allowed, be mandatory or
+be forbidden per action.
 
 =back
 

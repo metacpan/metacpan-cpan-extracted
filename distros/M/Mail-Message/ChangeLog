@@ -5,6 +5,16 @@ Limitations to be fixed:
  - when lines are over 997 chars, then the transfer-encoding should
    automatically change from 'none' into 'quoted-printable' or 'base64'
 
+version 3.001: Wed 26 Jul 14:22:22 CEST 2017
+
+	Fixes:
+	- license accidentally changed to 'artistic', back to 'perl'
+	  rt.cpan.org#120319 [Jitka Plesnikova]
+	- have some log-level on object already during init.
+
+	Improvements:
+	- new option ::Body::new(filename)
+
 version 3.000: Thu  2 Feb 15:39:10 CET 2017
 
 	Changes:

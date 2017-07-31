@@ -1,4 +1,8 @@
-Revision history for Dist-Zilla-Plugin-Acme-CPANLists
+0.03    2017-07-28 (PERLANCAR)
+
+	- Add modules mentioned in module lists as prereqs
+	  (phase=x_mentions, rel=x_mentions).
+
 
 0.02    2016-02-21 (PERLANCAR)
 

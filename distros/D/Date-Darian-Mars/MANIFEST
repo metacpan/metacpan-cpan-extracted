@@ -1,10 +1,9 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Date/Darian/Mars.pm
 t/pod_cvg.t

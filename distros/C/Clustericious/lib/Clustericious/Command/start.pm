@@ -3,7 +3,6 @@ package Clustericious::Command::start;
 use strict;
 use warnings;
 use Clustericious::Log;
-use List::MoreUtils qw( mesh );
 use File::Path qw( mkpath );
 use File::Basename qw( dirname );
 use Clustericious::App;
@@ -14,7 +13,7 @@ use Carp ();
 use Env qw( @PERL5LIB );
 
 # ABSTRACT: Clustericious command to start a Clustericious application
-our $VERSION = '1.24'; # VERSION 
+our $VERSION = '1.26'; # VERSION 
 
 
 has description => <<EOT;
@@ -74,15 +73,7 @@ sub run {
     }
     elsif(%conf)
     {
-      Carp::carp("arguments specified withouth 'args' option is deprecated and will be removed on or after February 29, 2016");
-      # THIS IS RETARDED AND SHOULD BE DEPRECATED
-      # if it starts with a dash, leave it alone, else add two dashes
-      my %args = mesh
-        @{ [ map {/^-/ ? "$_" : "--$_"} keys %conf ] },
-        @{ [ values %conf                          ] };
-
-      # squash "null"s (for boolean arguments)
-      @args = grep { $_ ne 'null' } %args;
+      die "arguments specified withouth 'args' option\n";
     }
 
     DEBUG "Sending args for $mode : @args";
@@ -105,7 +96,7 @@ Clustericious::Command::start - Clustericious command to start a Clustericious a
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -160,6 +151,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

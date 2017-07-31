@@ -8,7 +8,7 @@ use open qw(:utf8 :std);
 
 use Brat::Handler::File;
 
-our $VERSION='0.1';
+our $VERSION='0.11';
 
 sub new {
 
@@ -127,8 +127,11 @@ sub loadList {
 sub loadFile {
     my ($self, $file) = @_;
     
-    my $ann = Brat::Handler::File->new($file);
-    return($ann);
+    if (($file =~ /\.ann$/) || ($file =~ /\.txt$/)) {
+	my $ann = Brat::Handler::File->new($file);
+	return($ann);
+    }
+    return(undef);
 }
 
 sub concat {
@@ -245,6 +248,224 @@ sub _copyRelationsWithOffsetShift {
     
 }
 
+sub printTermList {
+    my ($self, $filename, $addmode) = @_;
+    my $id;
+
+    my $fh;
+    if ($filename eq "-") {
+	$fh = \*STDOUT;
+    } else {
+	
+	if (defined $addmode) {
+	    open $fh, ">>:utf8", $filename or die "no such file " . $filename . "\n";
+	} else {
+	    open $fh, ">:utf8", $filename or die "no such file " . $filename . "\n";
+	}
+    }
+    print $fh $self->getTermList;
+
+    if ($filename ne "-") {
+	close $fh;
+    }
+}
+
+sub getTermList {
+    my ($self) = @_;
+    my $termlistStr = "";
+    my $bratFile;
+    my %termList;
+    my $term;
+
+    foreach $bratFile (@{$self->_bratAnnotations}) {
+	foreach $term (@{$bratFile->getTerms}) {
+	    if (!exists $termList{$term->{'str'}}) {
+		$termList{lc($term->{'str'})} = {'str' => $term->{'str'}, 'lmstr' => undef, 'type' => {$term->{'type'} => 1}};
+	    } else {
+		$termList{lc($term->{'str'})}->{'type'}->{$term->{'type'}}++;
+	    }
+	}
+    }
+    foreach $term (keys %termList) {
+	$termlistStr .= $termList{$term}->{'str'} . " :  : " . join(';', keys%{$termList{$term}->{'type'}}) . " :\n";
+    # foreach $id (keys %{$self->_terms}) {
+    # 	$termlistStr .= $self->_getTermFromId($id)->{'str'} . " : : " . $self->_getTermFromId($id)->{'type'} . " :\n";
+    }
+    return($termlistStr);
+}
+
+sub getRelationList {
+    my ($self) = @_;
+    my $relation;
+    my $relationListStr = "";
+    my %relationList;
+    my $bratFile;
+    my $key;
+
+    foreach $bratFile (@{$self->_bratAnnotations}) {
+	foreach $relation (@{$bratFile->getRelations}) {
+	    $key = lc($relation->{'str1'} . '_' . $relation->{'str2'} . '_' . $relation->{'type'});
+	    if (!exists $relationList{$key}) {
+		$relationList{$key} = [$relation->{'str1'}, $relation->{'str2'}, $relation->{'type'}];
+	    }
+	}
+    }
+    
+    foreach $key (keys %relationList) {
+	$relationListStr .= join(' : ', @{$relationList{$key}}) . "\n";
+    }
+    return($relationListStr);
+}
+
+sub printRelationList {
+    my ($self, $filename, $addmode) = @_;
+    my $id;
+
+    my $fh;
+    if ($filename eq "-") {
+	$fh = \*STDOUT;
+    } else {
+	
+	if (defined $addmode) {
+	    open $fh, ">>:utf8", $filename or die "no such file " . $filename . "\n";
+	} else {
+	    open $fh, ">:utf8", $filename or die "no such file " . $filename . "\n";
+	}
+    }
+    print $fh $self->getRelationList;
+
+    if ($filename ne "-") {
+	close $fh;
+    }
+}
+
+sub getStats {
+    my ($self) = @_;
+
+    my $stats = "";
+    my $nbFiles;
+    my $bratFile;
+    my $nbTerms = 0;
+    my $nbRels = 0;
+    my $sumTextSize = 0;
+    my $minTextSize = 0;
+    my $maxTextSize = 0;
+    my $minTerms = 0;
+    my $maxTerms = 0;
+    my $minRels = 0;
+    my $maxRels = 0;
+
+    # my %Terms;
+    # my %Relations;
+    my %termTypes;
+    my %relationTypes;
+    my %tmp;
+    my $k;
+
+    $nbFiles = scalar(@{$self->_bratAnnotations});
+    if ($nbFiles > 0) {
+	$minTextSize = $self->_bratAnnotations->[0]->_textSize;
+	$minTerms = scalar(keys(%{$self->_bratAnnotations->[0]->_terms}));
+	$minRels = scalar(keys(%{$self->_bratAnnotations->[0]->_relations}));
+    }
+    
+    foreach $bratFile (@{$self->_bratAnnotations}) {
+	$sumTextSize += $bratFile->_textSize;
+	if ($minTextSize > $bratFile->_textSize) {
+	    $minTextSize = $bratFile->_textSize
+	}
+	if ($maxTextSize < $bratFile->_textSize) {
+	    $maxTextSize = $bratFile->_textSize
+	}
+	$nbTerms += scalar(keys(%{$bratFile->_terms}));
+	if ($minTerms > scalar(keys(%{$bratFile->_terms}))) {
+	    $minTerms = scalar(keys(%{$bratFile->_terms}));
+	}
+	if ($maxTerms < scalar(keys(%{$bratFile->_terms}))) {
+	    $maxTerms = scalar(keys(%{$bratFile->_terms}));
+	}
+	$nbRels += scalar(keys(%{$bratFile->_relations}));
+	if ($minRels > scalar(keys(%{$bratFile->_relations}))) {
+	    $minRels = scalar(keys(%{$bratFile->_relations}));
+	}
+	if ($maxRels < scalar(keys(%{$bratFile->_relations}))) {
+	    $maxRels = scalar(keys(%{$bratFile->_relations}));
+	}
+	%tmp = $bratFile->getTermTypes;
+	foreach $k (keys %tmp) {
+	    $termTypes{$k}+=$tmp{$k};
+	}
+	%tmp = $bratFile->getRelationTypes;
+	foreach $k (keys %tmp) {
+	    $relationTypes{$k}+=$tmp{$k};
+	}
+	# map {$relationTypes{$_}++;} $bratFile->getRelationTypes;
+    }
+    
+    $stats .= "Number of documents: $nbFiles\n";
+    $stats .= "Text Size sum: $sumTextSize\n";
+    $stats .= "Number of Terms: $nbTerms\n";
+    $stats .= "Number of Relations: $nbRels\n";
+    $stats .= "\n";
+    $stats .= "Minimal Text Size: $minTextSize\n";
+    $stats .= "Maximal Text Size: $maxTextSize\n";
+    $stats .= "Average of Text Size: " . ($sumTextSize/$nbFiles) . "\n";
+    $stats .= "\n";
+    $stats .= "Minimal number of Terms: $minTerms\n";
+    $stats .= "Maximal number of Terms: $maxTerms\n";
+    $stats .= "Average number of Terms: " . ($nbTerms/$nbFiles) . "\n";
+    $stats .= "\n";
+    $stats .= "Minimal number of Relations: $minRels\n";
+    $stats .= "Maximal number of Relations: $maxRels\n";
+    $stats .= "Average number of Relations: " . ($nbRels/$nbFiles) . "\n";
+    $stats .= "\n";
+    $stats .= "Term types:" . "\n";
+    foreach $k (sort keys %termTypes) {
+	$stats .= "\t$k: " . $termTypes{$k} . "\n";
+    }
+    $stats .= "\n";
+    $stats .= "Relation types:" . "\n";
+    foreach $k (sort keys %relationTypes) {
+	$stats .= "\t$k: " . $relationTypes{$k} . "\n";
+    }
+    
+    # $stats .= "" . "\n";
+    # $stats .= "" . "\n";
+    # $stats .= "" . "\n";
+    # $stats .= "" . "\n";
+    # $stats .= "" . "\n";
+
+
+    return($stats);
+}
+
+sub printStats {
+    my ($self, $filename, $addmode) = @_;
+
+    my $id;
+    my %terms;
+    my %termTypes;
+    my %relations;
+    my %relationTypes;
+
+    my $fh;
+    if ($filename eq "-") {
+	$fh = \*STDOUT;
+    } else {
+	if (defined $addmode) {
+	    open $fh, ">>:utf8", $filename or die "no such file " . $filename . "\n";
+	} else {
+	    open $fh, ">:utf8", $filename or die "no such file " . $filename . "\n";
+	}
+    }
+
+    print $fh $self->getStats;
+
+    if ($filename ne "-") {
+	close $fh;
+    }
+}
+
 
 1;
 
@@ -303,6 +524,57 @@ The methods loads annotation file specified in C<$file>.
     $bratHandler->concat();
 
 The methods concatenates annotation files indicated in the field C<inputFiles>.
+
+=head2 getTermList()
+
+    $bratHandler->getTermList();
+
+The method returns a string containing the list of entities of the
+loaded files, in the C<Alvis::TermTagger> format.
+
+=head2 getStats()
+
+    $bratHandler->getStats();
+
+The method returns a string containing the statistics for all the
+loaded file.
+
+
+=head2 printTermList()
+
+    $bratHandler->printTermList($filename, $mode);
+
+The method prints a entity list in the C<Alvis::TermTagger> format, in
+the file C<$filename>. If the file is C<->, statistics are printed on
+the standard output.
+
+
+
+=head2 getRelationList()
+
+    $bratHandler->getRelationList();
+
+The method returns a string containing the relations between two
+entities with the type of the relation. Separator is C< : >.
+
+=head2 printRelationList()
+
+    $bratHandler->printRelationList($filename, $mode);
+
+The method prints relations between two entities with the type of the
+relation in the file C<$filename>. Separator is C< : >. If the file is
+C<->, statistics are printed on the standard output.
+
+
+=head2 printStats()
+
+    $bratHandler->printStats($filename, $mode);
+
+The method prints the statistics of all the loaded files in the file
+C<$filename>. If the file is C<->, statistics are printed on the
+standard output.
+
+
 
 =head1 SEE ALSO
 

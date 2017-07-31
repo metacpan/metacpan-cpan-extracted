@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,15 +15,14 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 a542cde965012858a623deaa1bea7c96b36ffd65 .gitignore
-SHA1 4914242a5bce810256b7cd1677bb63530baa3051 Build.PL
-SHA1 1bc7e27121571f5f4007422dd6c9e912a6aabbf4 Changes
-SHA1 8b999bca6e8a2a0b5554077344d8241c8cf7937d MANIFEST
-SHA1 218d64658432d8f6a776acc77c01f3b61a51d2a0 META.json
-SHA1 cbaf841f4d33b47e0e9509bf01f8101e7af0fabc META.yml
-SHA1 01014dbee096cf5abd3f05069cefa9c907a4aea1 Makefile.PL
-SHA1 9cd1862f13808fe2b8c2e7e02547fe570d9bff1d README
-SHA1 d1efb9307bf397f044e494f502f0f0067de54302 lib/Devel/GoFaster.pm
-SHA1 bde2341eb5bb93b637f0eaca3ec033b60d6adf5a lib/Devel/GoFaster.xs
+SHA1 3d146d07b3b7746fa603af50bad982dafefd0457 Build.PL
+SHA1 54b024e62e02b23240d999510717dc064de5cbfc Changes
+SHA1 ff19b04bd42be6901e20fa4459471d37d0520270 MANIFEST
+SHA1 1e6a4b3ada8ff0b236fa959b66d8cb9d96d36163 META.json
+SHA1 e45c95ac8a6fbd2722d60ee6260509d6a5bc1981 META.yml
+SHA1 075e6e6d3c1d176a56dcef4ab9847e9b7d1f4f21 README
+SHA1 f8189caefbd635753548f9dbf1d52e629535c234 lib/Devel/GoFaster.pm
+SHA1 3cd26685408f248e6a241a2cf511550a04ba1ce9 lib/Devel/GoFaster.xs
 SHA1 2ae91dcfc7b92e61fe9da733e91cb0fe126358ec t/endless_loop.t
 SHA1 86bd1d1e6943a55d1cf36d63cc64f13c300026f2 t/padsv_from_shift.t
 SHA1 30f78abe014e2deb5218e4e1b2429dda8d87a947 t/padsv_from_shift_dor_smalliv.t
@@ -32,9 +31,9 @@ SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 0823b93706b32cde6838496c56ffa054ba6c973a t/shift_defav.t
 SHA1 c1eaa321dbbaafacac9c6cb50f2dc25f22c2e92c t/xs_disabled.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAlT5QnEACgkQOV9mt2VyAVHOuwCeMAcLzLJXdD0PGhMukbD4T/2D
-BekAni3xVI1KJAYO4lZjeGQbIP+1qNIc
-=Vc4a
+iEYEARECAAYFAll9iG8ACgkQOV9mt2VyAVHUlgCfZakv8r2p6ikOroG8v8OtRWjS
+b58AnReRBXnQ59QcuEPre/TJ08iSBylw
+=macc
 -----END PGP SIGNATURE-----

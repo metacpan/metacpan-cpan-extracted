@@ -1,5 +1,4 @@
 package Webinject;
-
 #    Copyright 2010-2012 Sven Nierlein (nierlein@cpan.org)
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
 #
@@ -32,8 +31,10 @@ use XML::Parser;                # for web services verification (you may comment
 use Error qw(:try);             # for web services verification (you may comment this out if aren't doing XML verifications for web services)
 use Data::Dumper;               # dump hashes for debugging
 use File::Temp qw/ tempfile /;  # create temp files
+use File::Basename;
+use File::Spec;
 
-our $VERSION = '1.92';
+our $VERSION = '1.94';
 
 =head1 NAME
 
@@ -70,7 +71,7 @@ possible values are 'standard', 'nagios', 'nagios2', 'mrtg' or 'external:'
 
 =item nooutput
 
-suppress all output to STDOUT, create only logilfes
+suppress all output to STDOUT, create only logfiles
 
 =item break_on_errors
 
@@ -137,6 +138,18 @@ Defaults to 'lines'
 =item gnuplot
 
 Defines the path to your gnuplot binary.
+
+=item postbodybasedir
+
+Path to a directory from which all relative test case postbody directives
+are based.  
+
+When test cases include a "postbody" directive with a "file=>..." 
+value, and that value is a relative location, Webinject will prepend this 
+directory path.
+
+If not supplied, the directory containing the current test case file is 
+prepended to any relative "file=>" values.
 
 =back
 
@@ -209,6 +222,12 @@ sub engine {
     for my $currentcasefile ( @{ $self->{'casefilelist'} } ) {
         #print "\n$currentcasefile\n\n";
 
+        my $configpostbodybasedir = $self->{'config'}->{'postbodybasedir'};
+        my $currentcasefilebasedir = (defined($configpostbodybasedir) ? File::Spec->canonpath($configpostbodybasedir) : undef)
+                                  // File::Spec->rel2abs(dirname($currentcasefile))
+                                  // File::Spec->rel2abs(dirname($0))
+                                  // File::Spec->rel2abs(dirname(__FILE__));
+        
         my $resultfile = {
             'name'  => $currentcasefile,
             'cases' => [],
@@ -261,7 +280,7 @@ sub engine {
                 }
 
                 # create testcase
-                my $case = { 'id' => $testnum };
+                my $case = { 'id' => $testnum, 'testdir' => $currentcasefilebasedir };
 
                 # populate variables with values from testcase file, do substitutions, and revert converted values back
                 for my $key (keys %{$xmltestcases->{'case'}->{$testnum}}) {
@@ -373,11 +392,14 @@ sub _run_test_case {
             if(lc $case->{method} eq "get") {
                 ($latency,$request,$response) = $self->_httpget($useragent, $case);
             }
+            elsif(lc $case->{method} eq "delete") {
+                ($latency,$request,$response) = $self->_httpdelete($useragent, $case);
+            }
             elsif(lc $case->{method} eq "post") {
                 ($latency,$request,$response) = $self->_httppost($useragent, $case);
             }
             else {
-                $self->_usage('ERROR: bad HTTP Request Method Type, you must use "get" or "post"');
+                $self->_usage('ERROR: bad HTTP Request Method Type, you must use "get", "delete" or "post"');
             }
         }
         else {
@@ -696,6 +718,7 @@ sub _set_defaults {
         'proxy'                     => '',
         'timeout'                   => 180,
         'tmpfiles'                  => [],
+        'postbodybasedir'           => undef
     };
     $self->{'exit_codes'}         = {
         'UNKNOWN'  => 3,
@@ -952,6 +975,18 @@ sub _httpget {
 }
 
 ################################################################################
+# send http request and read response
+sub _httpdelete {
+    my $self      = shift;
+    my $useragent = shift;
+    my $case      = shift;
+
+    $self->_out("DELETE Request: ".$case->{url}."\n");
+    my $request = new HTTP::Request( 'DELETE', $case->{url} );
+    return $self->_http_defaults($request, $useragent, $case);
+}
+
+################################################################################
 # post request based on specified encoding
 sub _httppost {
     my $self        = shift;
@@ -1012,7 +1047,13 @@ sub _httppost_xml {
 
     # read the xml file specified in the testcase
     $case->{postbody} =~ m~file=>(.*)~imx;
-    open( my $xmlbody, "<", $1 ) or $self->_usage("ERROR: Failed to open text/xml file ".$1.": ".$!);    # open file handle
+    my $postbodyfile = $1;
+    if (!(File::Spec->file_name_is_absolute($postbodyfile)) && length $case->{'testdir'}) {
+        $postbodyfile = File::Spec->rel2abs($postbodyfile, $case->{'testdir'});
+    }
+    open( my $xmlbody, "<", $postbodyfile ) 
+      or $self->_usage("ERROR: Failed to open text/xml file $1 (resolved to $postbodyfile): $!");    # open file handle
+      
     my @xmlbody = <$xmlbody>;    # read the file into an array
     close($xmlbody);
 
@@ -1359,11 +1400,22 @@ sub _read_config_xml {
           or $self->_usage("ERROR: Failed to open ".$config_file." file: ".$!);
         $self->{'config'}->{'exists'} = 1;   # flag we are going to use a config file
     }
-    # if config.xml exists, read it
+    # if config.xml exists in current working directory, read it
     elsif( -e "config.xml" ) {
         open( $config, '<', "config.xml" )
           or $self->_usage("ERROR: Failed to open config.xml file: ".$!);
         $self->{'config'}->{'exists'} = 1; # flag we are going to use a config file
+    }
+    else {
+        # if config.xml exists in same location as binary, read it
+        my $scriptdir = File::Spec->rel2abs(dirname($0))
+                     // File::Spec->rel2abs(dirname(__FILE__));
+        my $confpath  = File::Spec->rel2abs('config.xml', $scriptdir);
+        if ( -e $confpath ) {
+            open( $config, '<', $confpath )
+              or $self->_usage("ERROR: Failed to open config.xml file: ".$!);
+            $self->{'config'}->{'exists'} = 1; # flag we are going to use a config file
+        }
     }
 
     if( $self->{'config'}->{'exists'} ) {    #if we have a config file, use it
@@ -1394,7 +1446,7 @@ sub _read_config_xml {
         for my $key (
             qw/realserverip baseurl baseurl1 baseurl2 gnuplot proxy timeout output_dir
             globaltimeout globalhttplog standaloneplot max_redirect
-            break_on_errors useragent/
+            break_on_errors useragent postbodybasedir/
           )
         {
 

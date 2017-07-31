@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,25 +12,35 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 d7caf4e76ff65397ad00a326ab4344975c067ef3 Changes
-SHA1 2beb45dc06997750da3736c02e3f8305bfc286c3 LICENSE
-SHA1 e57ae62a69dde68d4c312ceaa52cc6a8fefb7296 MANIFEST
-SHA1 377150ced6e6074667a91257a1e770016565bc44 META.yml
-SHA1 6485042fe7f0633321fccdcba11d4f14ea8e189a Makefile.PL
-SHA1 b6a0d0057cefa9a485368277465f3da04b9493b6 README
-SHA1 6ff0866442373b1bd4fef18ad98be31d08764521 dist.ini
-SHA1 a198584b682fa34aca4e0e76cd9083f7fab99600 lib/Template/Plugin/Map.pm
-SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
-SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 b54a37d0aa4ee70dafdf8a9189ac7e676e94e066 Changes
+SHA1 233c87227ff01497365d7d7e9d6a05790f7bec2d LICENSE
+SHA1 0ef01cfb97fbd02e9f1daaac00aead3d97081528 MANIFEST
+SHA1 dfc3b2e64d8af9154ac417d7082892803722040a MANIFEST.SKIP
+SHA1 356228a4163841521bd4f98b9b6d54b14977a401 META.json
+SHA1 7d365af93728b6828c4bb0ab0eb2a7a07247c42e META.yml
+SHA1 a4f1eb67936c958c7263d839cdb094d87bd8c4e7 Makefile.PL
+SHA1 54520a21c5ff9c9f80af2d46c549eaca2f69fdda README
+SHA1 0076943f98daddc38b231ae3dc23e2cadba7c3ac lib/Template/Plugin/Map.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 c985a5f343adfd44c02ddf90efa70d3601d1c34b t/author-signature.t
 SHA1 15832ddabe3acf27ddaaf0b8b19141eeca8fba51 t/smoke.t
-SHA1 dc5577d84d6015589321fed7ab730d17a80d4410 weaver.ini
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
-Comment: GPGTools - http://gpgtools.org
+Version: GnuPG v2
 
-iEYEARECAAYFAlM7AysACgkQ+CqvSzp9LOxVrACgio1NI9AioijIwTsGTjqE8Q6T
-SBcAoIV5ON7KvqB7NdYOz3NFxBFMunKe
-=mgR0
+iQIVAwUBWXzgbqQl27WkM10aAQjnBg/7BPA2ozcMYU4Xd23hEk79c7enNdGcyQxJ
+56RKNf5qqeoF032L9e/lgTQOpPl8HN5plSu6eJremZLc/visukG4rAd2UP55TyDD
+yU18WITIvvtgAPGo8/ZDPLbFY14FtNXPOpShGocEnWUKBj+2Styw/dyAaMq9ow/0
+9K26DQwvtBFQEyLhtufhzM+vT9BuUUe108M0jxp8FuteaLJiG0QVkh6rmobh7g2Z
+XPD/O/YnfUJs+NOhFJfQc3mzgfyIXJK3+HE5ajncu2RFO3q0We2OhtGPfuCXe8Z4
+0Umg8eL3S03/lkWTrNCkxEw52JKN0pIo/I1k1xFY1WL/cjCab1EbzGYaSGZTgRIN
+VWyHbeShe/eAdqMu4yAJRU+uJ4DvS99XDAqrAuBs+cCutKvx2AfROO1ZMLjY04RU
+J7m0GDRpHiO4iRECd4Pez79KWr6uXLJeJOc+Zov9QPfa0FcEzuYLvZ6+DNCq08UT
+EKuqFPIcEqPwGj3ob8NuTfkOdVqj5b+KcG5qCZhkJDv8hO2rMSaIjvvSUIqMeJPc
+0V1ZRR6P0WFlDz7Wgg2o3Gj9DMK0V0JhAwW/goH4uMDoAAFpCIsuHJuct0DnOILm
+I5GD2hZeChCfV8v8u5ZGF5faLHoykBej2CzsdkUkWVGbyTM4hilJjq1lPm0eyD7F
+QSPhaCozFZM=
+=ufCB
 -----END PGP SIGNATURE-----

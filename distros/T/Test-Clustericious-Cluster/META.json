@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,9 +43,9 @@
             "PlugAuth" : "0.30"
          },
          "requires" : {
-            "File::HomeDir" : "0.91",
             "Mojolicious" : "6.00",
-            "Test2" : "1.302015",
+            "Test2::API" : "1.302015",
+            "Test2::Plugin::FauxHomeDir" : "0",
             "perl" : "5.010001"
          },
          "suggests" : {
@@ -59,8 +59,8 @@
          },
          "requires" : {
             "Path::Class" : "0.26",
-            "Test2::Suite" : "0.000060",
-            "Test::More" : "0.94",
+            "Test2::Bundle::More" : "0.000060",
+            "Test2::V0" : "0.000060",
             "perl" : "5.010001"
          }
       }
@@ -77,7 +77,7 @@
          "web" : "https://github.com/clustericious/Test-Clustericious-Cluster"
       }
    },
-   "version" : "0.35",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

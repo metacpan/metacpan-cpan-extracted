@@ -2,7 +2,7 @@
 
 # PODNAME: yarsclient
 # ABSTRACT: Upload, download, and delete files to Yars.
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 use strict;
 use warnings;
@@ -33,7 +33,7 @@ yarsclient - Upload, download, and delete files to Yars.
 
 =head1 VERSION
 
-version 1.28
+version 1.30
 
 =head1 SYNOPSIS
 

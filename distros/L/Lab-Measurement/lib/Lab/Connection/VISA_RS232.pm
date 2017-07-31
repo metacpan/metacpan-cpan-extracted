@@ -1,7 +1,6 @@
 package Lab::Connection::VISA_RS232;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: RS232-type connection which uses NI VISA (L<Lab::VISA>) as backend
-$Lab::Connection::VISA_RS232::VERSION = '3.553';
+$Lab::Connection::VISA_RS232::VERSION = '3.554';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -173,7 +172,7 @@ Lab::Connection::VISA_RS232 - RS232-type connection which uses NI VISA (L<Lab::V
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

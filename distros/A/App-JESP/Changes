@@ -1,9 +1,35 @@
 ==================================================
-Changes from 2016-02-22 00:00:00 +0000 to present.
+Changes from 2016-07-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.008 at 2017-02-21 10:13:32 +0000
+version 0.010 at 2017-07-20 15:49:22 +0000
+------------------------------------------
+
+  Change: e4cd5ea4b4db2f8e4cf5936b41bb5b4f83fa95af
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-07-20 16:47:47 +0000
+
+    Added status command 
+
+  Change: bda4b3bd235eba25982fbc374e07a3bde776a7c3
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-07-20 15:43:53 +0000
+
+    Quote patches option 
+
+------------------------------------------
+version 0.009 at 2017-07-20 11:28:11 +0000
+------------------------------------------
+
+  Change: 7e57055e8deeaab3e01d13009bde3eb42a7da30c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-07-20 12:28:11 +0000
+
+    Carp::Always resistent 
+
+------------------------------------------
+version 0.008 at 2017-02-21 10:00:12 +0000
 ------------------------------------------
 
   Change: ccc9b9348eddd8c8e7d372c1dfde1525cfbba799

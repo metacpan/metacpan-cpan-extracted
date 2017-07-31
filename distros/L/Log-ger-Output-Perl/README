@@ -1,0 +1,88 @@
+NAME
+    Log::ger::Output::Perl - Log to Perl's standard facility (warn, die,
+    etc)
+
+VERSION
+    This document describes version 0.001 of Log::ger::Output::Perl (from
+    Perl distribution Log-ger-Output-Perl), released on 2017-07-24.
+
+SYNOPSIS
+     use Log::ger::Output Perl => (
+         action => { # optional
+             trace => '',
+             debug => '',
+             info  => '',
+             warn  => 'warn',
+             error => 'warn',
+             fatal => 'die',
+         },
+     );
+
+DESCRIPTION
+    This output passes message to Perl's standard facility of reporting
+    error: "warn()", "die()", or one of Carp's "carp()", "cluck()",
+    "croak()", and "confess()".
+
+CONFIGURATION
+  action => hash
+    A mapping of Log::ger error level name and action. Unmentioned levels
+    mean to ignore log for that level. Action can be one of:
+
+    *   '' (empty string)
+
+        Ignore the log message.
+
+    *   warn
+
+        Pass message to Perl's "warn()".
+
+    *   die
+
+        Pass message to Perl's "die()".
+
+    *   carp
+
+        Pass message to Carp's "carp()".
+
+    *   cluck
+
+        Pass message to Carp's "cluck()".
+
+    *   croak
+
+        Pass message to Carp's "croak()".
+
+    *   confess
+
+        Pass message to Carp's "confess()".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Output-Perl>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Output-Perl>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-Perl>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Modelled after Log::Dispatch::Perl.
+
+    Log::Dispatch::Plugin::Perl which actually replaces the log statements
+    with warn(), die(), etc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

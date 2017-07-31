@@ -9,6 +9,7 @@ build_requires:
   Params::Classify: '0'
   Scalar::Util: '0'
   Test::More: '0'
+  if: '0'
   perl: '5.008'
   strict: '0'
   utf8: '0'
@@ -28,31 +29,32 @@ name: XML-Easy
 provides:
   XML::Easy:
     file: lib/XML/Easy.pm
-    version: '0.010'
+    version: '0.011'
   XML::Easy::Classify:
     file: lib/XML/Easy/Classify.pm
-    version: '0.010'
+    version: '0.011'
   XML::Easy::Content:
     file: lib/XML/Easy/Content.pm
-    version: '0.010'
+    version: '0.011'
   XML::Easy::Element:
     file: lib/XML/Easy/Element.pm
-    version: '0.010'
+    version: '0.011'
   XML::Easy::NodeBasics:
     file: lib/XML/Easy/NodeBasics.pm
-    version: '0.010'
+    version: '0.011'
   XML::Easy::Syntax:
     file: lib/XML/Easy/Syntax.pm
-    version: '0.010'
+    version: '0.011'
   XML::Easy::Text:
     file: lib/XML/Easy/Text.pm
-    version: '0.010'
+    version: '0.011'
 recommends:
   Internals: '0'
   XSLoader: '0'
 requires:
   Exporter: '0'
   Params::Classify: '0'
+  if: '0'
   parent: '0'
   perl: '5.008'
   strict: '0'
@@ -60,5 +62,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Easy
   license: http://dev.perl.org/licenses/
-version: '0.010'
+version: '0.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

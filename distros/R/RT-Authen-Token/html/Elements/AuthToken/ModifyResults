@@ -1,0 +1,30 @@
+<%ARGS>
+$Token
+$Description => ''
+$Update => 0
+$Revoke => 0
+</%ARGS>
+<%INIT>
+my $TokenObj = RT::AuthToken->new($session{CurrentUser});
+$TokenObj->Load($Token);
+my ($error, $ok, $msg);
+
+if ($Update) {
+    if (!length($Description)) {
+        $error = loc("Description cannot be blank.");
+    }
+
+    if ($Description ne $TokenObj->Description) {
+        ($ok, $msg) = $TokenObj->SetDescription($Description);
+        $error = $msg if !$ok;
+    }
+}
+elsif ($Revoke) {
+    ($ok, $msg) = $TokenObj->Delete;
+}
+</%INIT>
+% if ($error || !$msg) {
+<& /Elements/AuthToken/ModifyForm, TokenObj => $TokenObj, Error => $error, Description => $Description, id => $ARGS{id} &>
+% } else {
+<% $msg %>
+% }

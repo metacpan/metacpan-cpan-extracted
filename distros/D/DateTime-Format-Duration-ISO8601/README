@@ -1,26 +1,73 @@
-SYNOPSIS
+NAME
+    DateTime::Format::Duration::ISO8601 - Format DateTime::Duration object
+    as ISO8601 duration string
 
+VERSION
+    This document describes version 0.004 of
+    DateTime::Format::Duration::ISO8601 (from Perl distribution
+    DateTime-Format-Duration-ISO8601), released on 2017-07-20.
+
+SYNOPSIS
      use DateTime::Format::Duration::ISO8601;
-    
-     my $d = DateTime::Format::Duration::ISO8601->new;
-     say $d->format_duration(
+
+     my $format = DateTime::Format::Duration::ISO8601->new;
+     say $format->format_duration(
          DateTime::Duration->new(years=>3, months=>5, seconds=>10),
      ); # => P3Y5MT10S
 
+     my $d = $format->parse_duration('P1Y1M1DT1H1M1S');
+     say $d->in_units('minutes'); # => 61
+
 DESCRIPTION
+    This module formats and parses ISO 8601 durations to and from
+    DateTime::Duration instances.
+
+    ISO 8601 intervals are not supported.
 
 METHODS
+  new(%args) => "DateTime::Duration::Format::ISO8601"
+   Arguments
+    *   on_error ("CODE", optional)
 
- new
+        Subroutine reference that will receive an error message if parsing
+        fails.
 
- format_duration($dur_obj) => str
+        The default implementation simply "die"s with the message.
+
+        Set to "undef" to disable error dispatching.
+
+  format_duration ("DateTime::Duration") => "string"
+  parse_duration ("string") => "DateTime::Duration"
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTime-Format-Duration-ISO8601>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTime-Format-Duration-ISO8601>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Durat
+    ion-ISO8601>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     DateTime::Format::ISO8601 to format DateTime object into ISO8601
     date/time string. At the time of this writing, there is no support to
     format DateTime::Duration object, hence this module.
 
     DateTime::Format::Duration to format DateTime::Duration object using
     strftime-style formatting.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

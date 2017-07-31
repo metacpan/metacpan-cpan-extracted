@@ -4,47 +4,46 @@ Math::Decimal - arithmetic in decimal
 
 =head1 SYNOPSIS
 
-	use Math::Decimal qw($dec_number_rx);
+    use Math::Decimal qw($dec_number_rx);
 
-	if($arg =~ /\A$dec_number_rx\z/o) { ...
-	# and other regular expressions
+    if($arg =~ /\A$dec_number_rx\z/o) { ...
+    # and other regular expressions
 
-	use Math::Decimal qw(is_dec_number check_dec_number);
+    use Math::Decimal qw(is_dec_number check_dec_number);
 
-	if(is_dec_number($arg)) { ...
-	check_dec_number($arg);
+    if(is_dec_number($arg)) { ...
+    check_dec_number($arg);
 
-	use Math::Decimal qw(dec_canonise);
+    use Math::Decimal qw(dec_canonise);
 
-	$r = dec_canonise($a);
+    $r = dec_canonise($a);
 
-	use Math::Decimal qw(
-		dec_sgn dec_abs
-		dec_cmp dec_min dec_max
-		dec_neg dec_add dec_sub
-		dec_pow10 dec_mul_pow10
-		dec_mul
-		dec_rndiv_and_rem dec_rndiv
-		dec_round_and_rem dec_round
-		dec_rem
-	);
+    use Math::Decimal qw(
+	dec_sgn dec_abs
+	dec_cmp dec_min dec_max
+	dec_neg dec_add dec_sub
+	dec_pow10 dec_mul_pow10
+	dec_mul
+	dec_rndiv_and_rem dec_rndiv
+	dec_round_and_rem dec_round
+	dec_rem);
 
-	$v = dec_sgn($a);
-	$v = dec_abs($a);
-	@v = sort { dec_cmp($a, $b) } @a;
-	$v = dec_min($a, $b);
-	$v = dec_max($a, $b);
-	$v = dec_neg($a);
-	$v = dec_add($a, $b);
-	$v = dec_sub($a, $b);
-	$v = dec_pow10($a);
-	$v = dec_mul_pow10($a, $b);
-	$v = dec_mul($a, $b);
-	($q, $r) = dec_rndiv_and_rem("NEAR_EVN", $a, $b);
-	$q = dec_rndiv("NEAR_EVN", $a, $b);
-	($v, $r) = dec_round_and_rem("NEAR_EVN", $a, $b);
-	$v = dec_round("NEAR_EVN", $a, $b);
-	$r = dec_rem("NEAR_EVN", $a, $b);
+    $v = dec_sgn($a);
+    $v = dec_abs($a);
+    @v = sort { dec_cmp($a, $b) } @a;
+    $v = dec_min($a, $b);
+    $v = dec_max($a, $b);
+    $v = dec_neg($a);
+    $v = dec_add($a, $b);
+    $v = dec_sub($a, $b);
+    $v = dec_pow10($a);
+    $v = dec_mul_pow10($a, $b);
+    $v = dec_mul($a, $b);
+    ($q, $r) = dec_rndiv_and_rem("NEAR_EVN", $a, $b);
+    $q = dec_rndiv("NEAR_EVN", $a, $b);
+    ($v, $r) = dec_round_and_rem("NEAR_EVN", $a, $b);
+    $v = dec_round("NEAR_EVN", $a, $b);
+    $r = dec_rem("NEAR_EVN", $a, $b);
 
 =head1 DESCRIPTION
 
@@ -171,7 +170,7 @@ use strict;
 use Carp qw(croak);
 use Params::Classify 0.000 qw(is_string);
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -817,7 +816,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2009, 2010, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

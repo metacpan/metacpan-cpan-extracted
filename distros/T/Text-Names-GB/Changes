@@ -1,0 +1,9 @@
+Revision history for Text-Names-GB
+
+0.02	Thu Jul 20 10:49:00 EDT 2017
+	Added support for Kai
+	Added dependency on Text::Names
+	Added support for CI sites
+
+0.01	Thu Jul 20 09:55:08 EDT 2017
+	Initial Draft

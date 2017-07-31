@@ -1,6 +1,6 @@
 package App::calendr::Option;
 
-$App::calendr::Option::VERSION   = '0.15';
+$App::calendr::Option::VERSION   = '0.18';
 $App::calendr::Option::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::calendr::Option - Option as Moo Role for App::calendr.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.18
 
 =cut
 
@@ -22,14 +22,14 @@ use namespace::clean;
 use Types::Standard -all;
 use MooX::Options;
 
-has calendars    => (is => 'rw');
-option month     => (is => 'ro', isa => Str, format => 's', doc => 'Month number/name e.g. 1,2,3... or January,February...');
-option year      => (is => 'ro', isa => Int, format => 'i', doc => 'Year number (3/4 digits)');
-option gregorian => (is => 'ro', isa => Str, format => 's', doc => 'Gregorian date (YYYY-MM-DD)');
-option julian    => (is => 'ro', isa => Str, format => 'i', doc => 'Julian date');
-option name      => (is => 'ro', isa => Str, format => 's', doc => "Calendar name e.g. Bahai,Gregorian,Hijri,Persian,Saka.\n\tDefault is Gregorian.");
-option 'as_svg'  => (is => 'ro', doc => 'Generate calendar in SVG format');
-option 'list_month_names' => (is => 'ro', doc => 'List calendar month names');
+has calendars     => (is => 'rw');
+option month      => (is => 'ro', isa => Str, format => 's', doc => 'Month number/name e.g. 1,2,3... or January,February...');
+option year       => (is => 'ro', isa => Int, format => 'i', doc => 'Year number (3/4 digits)');
+option gregorian  => (is => 'ro', isa => Str, format => 's', doc => 'Gregorian date (YYYY-MM-DD)');
+option jday       => (is => 'ro', isa => Str, format => 'i', doc => 'Julian day');
+option name       => (is => 'ro', isa => Str, format => 's', doc => "Calendar name e.g. Bahai,Gregorian,Hebrew,Hijri,Julian,Persian,Saka.\n\tDefault is Gregorian.");
+option as_svg     => (is => 'ro', doc => 'Generate calendar in SVG format');
+option list_month_names => (is => 'ro', doc => 'List calendar month names');
 
 =head1 DESCRIPTION
 

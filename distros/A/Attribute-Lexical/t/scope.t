@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Test::More tests => 50;
 
 BEGIN { $^H |= 0x20000 if "$]" < 5.008; }

@@ -7,7 +7,6 @@ BEGIN {
   skip_all 'test requires Clustericious 1.24'
     unless eval q{ use Clustericious 1.24; 1};
 }
-plan 14;
 
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok(qw( MyApp1 MyApp2 ));
@@ -31,6 +30,8 @@ $t->get_ok('/')
   ->content_is('myapp2');
 
 pass '14th test';
+
+done_testing;
 
 __DATA__
 

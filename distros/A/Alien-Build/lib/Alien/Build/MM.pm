@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 sub new
@@ -139,7 +139,7 @@ sub mm_postamble
 
   # set verson
   $postamble .= "alien_version : _alien/mm/version\n\n" .
-                "_alien/mm/version :\n" .
+                "_alien/mm/version : _alien/mm/prefix\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e version \$(VERSION)\n\n";
 
   # download
@@ -304,7 +304,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -409,6 +409,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -89,4 +89,10 @@ sub option_process {
 
     ($value, $used) = $three->process('', 'T', 'test', []);
     is $value, 'test', '--short again sets value to test';
+
+    $three->{type} = 'Other';
+    eval { $three->process('', 'T', 'O', []) };
+    $error = $@;
+    ok $error, 'Get an error';
+    like $error, qr/^Unknown type 'Other'\n/, 'Error on unknown types';
 }

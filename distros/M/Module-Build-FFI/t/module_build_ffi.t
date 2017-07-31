@@ -14,10 +14,9 @@ subtest 'ffi_dlext' => sub {
 
 subtest 'share_dir' => sub {
 
-  my $dir = eval { Module::Build::FFI->_share_dir };
-  
-  skip_all 'test only with blib and actual install'
-    if $@;
+  note "inc=$_" for @INC;
+
+  my $dir = Module::Build::FFI->_share_dir;
   
   ok -d $dir, "dir exists";
   note "dir = $dir";

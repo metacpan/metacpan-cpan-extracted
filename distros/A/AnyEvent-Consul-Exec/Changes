@@ -1,0 +1,6 @@
+Revision history for AnyEvent-Consul-Exec
+
+0.002     2017-07-29 16:20:54+10:00 Australia/Melbourne
+- Add the 'wait' option
+
+0.001     2017-07-25 01:23:46+10:00 Australia/Melbourne

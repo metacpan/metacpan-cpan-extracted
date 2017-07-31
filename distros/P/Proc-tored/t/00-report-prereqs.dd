@@ -22,7 +22,8 @@ do { my $x = {
                                       'Time::HiRes' => '0',
                                       'Try::Tiny' => '0',
                                       'Type::Tiny' => '0',
-                                      'Types::Standard' => '0'
+                                      'Types::Standard' => '0',
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {
@@ -30,6 +31,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Devel::Cover' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Path::Tiny' => '0.097',

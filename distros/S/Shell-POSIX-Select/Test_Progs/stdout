@@ -1,0 +1,10 @@
+#! /usr/bin/perl -w
+
+my $VERSION = 1.02;
+
+use blib;
+
+use Shell::POSIX::Select;
+
+print STDOUT "STDOUT\n";
+

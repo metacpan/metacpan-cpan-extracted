@@ -10,7 +10,7 @@ package Devel::Cover;
 use strict;
 use warnings;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 our $LVERSION;
 BEGIN { $LVERSION = do { no warnings; eval '$VERSION' || "0.001" } }  # for dev
 
@@ -57,6 +57,7 @@ my $Merge          = 1;                  # Merge databases.
 my $Summary        = 1;                  # Output coverage summary.
 my $Subs_only      = 0;                  # Coverage only for sub bodies.
 my $Self_cover_run = 0;                  # Covering Devel::Cover now.
+my $Loose_perms    = 0;                  # Use loose permissions in the cover DB
 
 my @Ignore;                              # Packages to ignore.
 my @Inc;                                 # Original @INC to ignore.
@@ -330,7 +331,10 @@ sub import {
 
     my $class = shift;
 
-    my @o = (@_, split ",", $ENV{DEVEL_COVER_OPTIONS} || "");
+    # Die tainting.
+    # Anyone using this module can do worse things than messing with tainting.
+    my $options = ($ENV{DEVEL_COVER_OPTIONS} || "") =~ /(.*)/ ? $1 : "";
+    my @o = (@_, split ",", $options);
     defined or $_ = "" for @o;
     # print STDERR __PACKAGE__, ": Parsing options from [@o]\n";
 
@@ -344,6 +348,7 @@ sub import {
         /^-silent/      && do { $Silent      = shift @o; next };
         /^-dir/         && do { $Dir         = shift @o; next };
         /^-db/          && do { $DB          = shift @o; next };
+        /^-loose_perms/ && do { $Loose_perms = shift @o; next };
         /^-merge/       && do { $Merge       = shift @o; next };
         /^-summary/     && do { $Summary     = shift @o; next };
         /^-blib/        && do { $blib        = shift @o; next };
@@ -380,10 +385,7 @@ sub import {
     }
 
     if (defined $Dir) {
-        # Die tainting.
-        # Anyone using this module can do worse things than messing with
-        # tainting.
-        $Dir = $1 if $Dir =~ /(.*)/;
+        $Dir = $1 if $Dir =~ /(.*)/;  # Die tainting.
         chdir $Dir or die __PACKAGE__ . ": Can't chdir $Dir: $!\n";
     } else {
         $Dir = $1 if Cwd::getcwd() =~ /(.*)/;
@@ -392,6 +394,7 @@ sub import {
     unless (mkdir $DB) {
         die "Can't mkdir $DB: $!" unless -d $DB;
     }
+    chmod 0777, $DB if $Loose_perms;
     $DB = $1 if abs_path($DB) =~ /(.*)/;
     Devel::Cover::DB->delete($DB) unless $Merge;
 
@@ -427,13 +430,14 @@ sub import {
 sub populate_run {
     my $self = shift;
 
-    $Run{OS}   = $^O;
-    $Run{perl} = $] < 5.010 ? join ".", map ord, split //, $^V
-                            : sprintf "%vd", $^V;
-    $Run{dir}  = $Dir;
-    $Run{run}  = $0;
+    $Run{OS}      = $^O;
+    $Run{perl}    = $] < 5.010 ? join ".", map ord, split //, $^V
+                               : sprintf "%vd", $^V;
+    $Run{dir}     = $Dir;
+    $Run{run}     = $0;
+    $Run{name}    = $Dir;
+    $Run{version} = "unknown";
 
-    my $version;
     my $mymeta = "$Dir/MYMETA.json";
     if (-e $mymeta) {
         eval {
@@ -442,9 +446,14 @@ sub populate_run {
             my $json = $io->read($mymeta);
             $Run{$_} = $json->{$_} for qw( name version abstract );
         }
-    } elsif ($Dir =~ m|.*/([^/]+?)(\d+\.\d+)(?:-\w{6})$|) {
-        $Run{name}    = $1;
-        $Run{version} = $2;
+    } elsif ($Dir =~ m|.*/([^/]+)$|) {
+        my $filename = $1;
+        eval {
+            require CPAN::DistnameInfo;
+            my $dinfo     = CPAN::DistnameInfo->new($filename);
+            $Run{name}    = $dinfo->dist;
+            $Run{version} = $dinfo->version;
+        }
     }
 
     $Run{start} = get_elapsed() / 1e6;
@@ -755,7 +764,10 @@ sub _report {
     chdir $Dir or die __PACKAGE__ . ": Can't chdir $Dir: $!\n";
 
     $Run{collected} = \@collected;
-    $Structure      = Devel::Cover::DB::Structure->new(base => $DB);
+    $Structure      = Devel::Cover::DB::Structure->new(
+        base        => $DB,
+        loose_perms => $Loose_perms,
+    );
     $Structure->read_all;
     $Structure->add_criteria(@collected);
     # print STDERR "Start structure: ", Dumper $Structure;
@@ -806,15 +818,17 @@ sub _report {
 
     my $run = time . ".$$." . sprintf "%05d", rand 2 ** 16;
     my $cover = Devel::Cover::DB->new(
-        base      => $DB,
-        runs      => { $run => \%Run },
-        structure => $Structure,
+        base        => $DB,
+        runs        => { $run => \%Run },
+        structure   => $Structure,
+        loose_perms => $Loose_perms,
     );
 
     my $dbrun = "$DB/runs";
     unless (mkdir $dbrun) {
         die "Can't mkdir $dbrun $!" unless -d $dbrun;
     }
+    chmod 0777, $dbrun if $Loose_perms;
     $dbrun .= "/$run";
 
     print OUT __PACKAGE__, ": Writing coverage database to $dbrun\n"
@@ -1273,7 +1287,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -1454,6 +1468,9 @@ In this example, Devel::Cover will be operating in silent mode.
  +ignore RE          - Append to REs of files to ignore.
  -inc path           - Set prefixes of files to include (default @INC).
  +inc path           - Append to prefixes of files to include.
+ -loose_perms val    - Use loose permissions on all files and directories in
+                       the coverage db so that code changing EUID can still
+                       write coverage information (default off).
  -merge val          - Merge databases, for multiple test benches (default on).
  -select RE          - Set REs of files to select (default none).
  +select RE          - Append to REs of files to select.

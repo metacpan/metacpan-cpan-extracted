@@ -1,7 +1,7 @@
 requires 'perl', '5.008005';
 
 requires 'Module::Runtime';
-requires 'Net::Amazon::DynamoDB::Marshaler';
+requires 'Net::Amazon::DynamoDB::Marshaler', '0.05';
 requires 'Paws';
 requires 'PerlX::Maybe';
 requires 'Scalar::Util';

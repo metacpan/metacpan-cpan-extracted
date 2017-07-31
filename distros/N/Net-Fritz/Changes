@@ -1,10 +1,22 @@
 Revision history for perl distribution Net::Fritz
 
+v0.0.9 2017-07-20
+
+ - Use SSL communication by default.  If this makes any problems,
+   please let me know so I can revert the change in the next version
+   (or better yet: fix the bug).
+   In case of problems, call Net::Fritz::Box->new with
+   upnp_url => 'http://fritz.box:49000' to revert to the old behaviour.
+ - Net::Fritz::Box->new( configfile => 0) will now check multiple
+   locations for the default configuration file, see
+   Net::Fritz::ConfigFile for details
+ - various documentation fixes
+
 v0.0.8 2017-07-08
 
  - Net::Fritz::Box::new() can parse a configuration file where you can
    store the username and password to log into your FRITZ!Box
-  - new convenience methods that reduce boilerplate code:
+ - new convenience methods that reduce boilerplate code:
    - Net::Fritz::Box::call()
    - Net::Fritz::Device::call()
  - various documentation fixes

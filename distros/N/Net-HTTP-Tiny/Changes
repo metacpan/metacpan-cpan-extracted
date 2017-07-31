@@ -1,3 +1,19 @@
+version 0.002; 2017-07-27
+
+  * declare correct version for Test::More dependency
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * change author test websites to ones that are still on HTTP
+
+  * update author tests to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
 version 0.001; 2012-03-20
 
   * bugfix: correct parsing of URLs with IPv4 address literals (both as

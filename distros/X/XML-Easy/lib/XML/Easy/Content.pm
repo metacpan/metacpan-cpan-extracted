@@ -4,15 +4,15 @@ XML::Easy::Content - abstract form of XML content
 
 =head1 SYNOPSIS
 
-	use XML::Easy::Content;
+    use XML::Easy::Content;
 
-	$content = XML::Easy::Content->new([
-		"foo",
-		$subelement,
-		"bar",
-	]);
+    $content = XML::Easy::Content->new([
+		    "foo",
+		    $subelement,
+		    "bar",
+		]);
 
-	$twine = $content->twine;
+    $twine = $content->twine;
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ package XML::Easy::Content;
 use warnings;
 use strict;
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 eval { local $SIG{__DIE__};
 	require XSLoader;

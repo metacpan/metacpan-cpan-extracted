@@ -1,5 +1,9 @@
 Revision history for Unicode-CaseFold
 
+Version 1.01: 2017-07-25
+  * Fix a deprecation warning about toFOLD_utf8 in 5.26 (this should also
+    prevent trouble when the current version is removed in 5.30).
+
 Version 1.00: 2014-05-05
   * Fix a documentation bug
   * Bump version to reflect maturity of the module

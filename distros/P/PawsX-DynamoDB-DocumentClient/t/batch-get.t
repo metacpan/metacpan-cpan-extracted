@@ -19,40 +19,44 @@ is_deeply(
     {
         $class->transform_arguments(
             RequestItems => {
-                'foo' => {
-                    ConsistentRead => 1,
-                    ProjectionExpression => 'foo_id, foo_name',
+                users => {
                     Keys => [
-                        { foo_id => 'abcde' },
-                        { foo_id => 'fghijk' },
+                        { username => 'jdoe' },
+                        { username => '2001' },
                     ],
                 },
-                'bar' => {
+                zip_codes => {
                     Keys => [
-                        { bar_id => 12345 },
+                        { zip_code => '03456' },
                     ],
+                },
+            },
+            force_type => {
+                users => {
+                    username => 'S',
+                },
+                zip_codes => {
+                    zip_code => 'S',
                 },
             },
         )
     },
     {
         RequestItems => {
-            'foo' => {
-                ConsistentRead => 1,
-                ProjectionExpression => 'foo_id, foo_name',
+            users => {
                 Keys => [
-                    { foo_id => { S => 'abcde' } },
-                    { foo_id => { S => 'fghijk' } },
+                    { username => { S => 'jdoe' } },
+                    { username => { S => '2001' } },
                 ],
             },
-            'bar' => {
+            zip_codes => {
                 Keys => [
-                    { bar_id => { N => 12345 } },
+                    { zip_code => { S => '03456' } },
                 ],
             },
         },
     },
-    'transform_arguments() marshalls correct args',
+    'transform_arguments() handles force_type',
 );
 
 my $test_output = Paws::DynamoDB::BatchGetItemOutput->new(

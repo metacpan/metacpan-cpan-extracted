@@ -1,7 +1,6 @@
 package MooX::Options::Descriptive;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 2;
 
 =head1 NAME
 
@@ -13,7 +12,7 @@ This class will override the usage_class method, to customize the output of the 
 
 =cut
 
-our $VERSION = "4.100";
+our $VERSION = "4.101";
 
 use Getopt::Long 2.43;
 use Getopt::Long::Descriptive 0.099;

@@ -1,23 +1,9 @@
-
 package Lab::Instrument::MagnetSupply;
-$Lab::Instrument::MagnetSupply::VERSION = '3.553';
+#ABSTRACT: Base class for superconducting magnet power supply instruments
+$Lab::Instrument::MagnetSupply::VERSION = '3.554';
 use Lab::Measurement::KeyboardHandling qw(labkey_soft_check);
 use strict;
 
-# about the coding and calling conventions
-#
-# convention is, all control of magnet power supplies is done via current values,
-# never via field values. (we dont know where exactly the sample is anyway!)
-#
-# if a field constant can be obtained from the instrument, it will be read out
-# and used by default.
-# if not, it has to be set on initialization, otherwise the program aborts if
-# it needs it
-#
-# persistent mode is not handled yet, i.e. the heater is left completely untouched
-#
-# all values are given in si base units, i.e. AMPS, TESLA, SECONDS, and their
-# derivatives. I.e., a sweep rate is given in AMPS/SECOND.
 
 our @ISA = ('Lab::Instrument');
 
@@ -41,6 +27,7 @@ our %fields = (
     # Config hash passed to subchannel objects or $self->configure()
     default_device_settings => {},
 );
+
 
 sub new {
     my $proto = shift;
@@ -87,21 +74,22 @@ sub get_fieldconstant {
     }
 }
 
-# converts the argument in AMPS to TESLA
+
 sub ItoB {
     my $self    = shift;
     my $current = shift;
     return ( $self->get_fieldconstant() * $current );
 }
 
-# converts the argument in TESLA to AMPS
+
 sub BtoI {
     my $self  = shift;
     my $field = shift;
     return ( $field / $self->get_fieldconstant() );
 }
 
-# field in TESLA
+
+
 sub set_field {
     my $self    = shift;
     my $field   = shift;
@@ -112,8 +100,8 @@ sub set_field {
     return $field;
 }
 
-# current in AMPS
-# any value can be supplied, zero transition is handled automatically
+
+
 sub set_current {
     my $self          = shift;
     my $targetcurrent = shift;
@@ -161,6 +149,9 @@ sub set_current {
         die "fixme: not programmed yet\n";
     }
 }
+
+
+
 
 sub start_sweep_to_field {
     my $self  = shift;
@@ -305,14 +296,75 @@ sub _get_fieldconstant {
 
 1;
 
-=encoding utf8
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Instrument::MagnetSupply - base class for magnet power supply instruments
+Lab::Instrument::MagnetSupply - Base class for superconducting magnet power supply instruments
 
-  (c) 2010 David Borowsky, Andreas K. Hüttel
-      2011 Andreas K. Hüttel
+=head1 VERSION
+
+version 3.554
+
+=head1 Coding and calling conventions
+
+All control of magnet power supplies is done via current values,
+never via field values. (We dont know where exactly the sample is anyway!)
+
+If a field constant can be obtained from the instrument, it will be read out
+and used by default.
+If not, it has to be set on initialization, otherwise the program aborts as 
+soon as it needs to convert something.
+
+Persistent mode is not handled yet, i.e. the heater is left completely untouched.
+
+All values are given in SI base units, i.e. amperes, tesla, seconds, and their
+derivatives. I.e., a sweep rate is given in amperes per second.
+
+=head1 Device settings 
+
+=head1 Functions
+
+=head2 get_fieldconstant
+
+Returns the magnet field constant in Tesla per Ampere.
+
+=head2 ItoB
+
+Converts the argument in Amperes to Tesla.
+
+=head2 BtoI
+
+Converts the argument in Tesla to Amperes.
+
+=head2 set_field
+
+Takes one parameter, the target field in Tesla. Ramps the magnet to that value
+and stops there. Positive and negative values can be supplied; the polarity
+change is handled automatically.
+
+=head2 set_current
+
+Takes one parameter, the target current in Ampere. Ramps the magnet to that value
+and stops there. Positive and negative values can be supplied; the polarity
+change is handled automatically.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Andreas K. Huettel
+            2013       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -4,36 +4,35 @@ Date::ISO8601 - the three ISO 8601 numerical calendars
 
 =head1 SYNOPSIS
 
-	use Date::ISO8601 qw(present_y);
+    use Date::ISO8601 qw(present_y);
 
-	print present_y($y);
+    print present_y($y);
 
-	use Date::ISO8601
-		qw(month_days cjdn_to_ymd ymd_to_cjdn present_ymd);
+    use Date::ISO8601 qw(
+	month_days cjdn_to_ymd ymd_to_cjdn present_ymd);
 
-	$md = month_days(2000, 2);
-	($y, $m, $d) = cjdn_to_ymd(2406029);
-	$cjdn = ymd_to_cjdn(1875, 5, 20);
-	print present_ymd(2406029);
-	print present_ymd(1875, 5, 20);
+    $md = month_days(2000, 2);
+    ($y, $m, $d) = cjdn_to_ymd(2406029);
+    $cjdn = ymd_to_cjdn(1875, 5, 20);
+    print present_ymd(2406029);
+    print present_ymd(1875, 5, 20);
 
-	use Date::ISO8601
-		qw(year_days cjdn_to_yd yd_to_cjdn present_yd);
+    use Date::ISO8601 qw(year_days cjdn_to_yd yd_to_cjdn present_yd);
 
-	$yd = year_days(2000);
-	($y, $d) = cjdn_to_yd(2406029);
-	$cjdn = yd_to_cjdn(1875, 140);
-	print present_yd(2406029);
-	print present_yd(1875, 140);
+    $yd = year_days(2000);
+    ($y, $d) = cjdn_to_yd(2406029);
+    $cjdn = yd_to_cjdn(1875, 140);
+    print present_yd(2406029);
+    print present_yd(1875, 140);
 
-	use Date::ISO8601
-		qw(year_weeks cjdn_to_ywd ywd_to_cjdn present_ywd);
+    use Date::ISO8601 qw(
+	year_weeks cjdn_to_ywd ywd_to_cjdn present_ywd);
 
-	$yw = year_weeks(2000);
-	($y, $w, $d) = cjdn_to_ywd(2406029);
-	$cjdn = ywd_to_cjdn(1875, 20, 4);
-	print present_ywd(2406029);
-	print present_ywd(1875, 20, 4);
+    $yw = year_weeks(2000);
+    ($y, $w, $d) = cjdn_to_ywd(2406029);
+    $cjdn = ywd_to_cjdn(1875, 20, 4);
+    print present_ywd(2406029);
+    print present_ywd(1875, 20, 4);
 
 =head1 DESCRIPTION
 
@@ -98,7 +97,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -543,7 +542,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2011
+Copyright (C) 2006, 2007, 2009, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

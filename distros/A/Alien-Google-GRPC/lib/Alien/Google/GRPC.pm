@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::Google::GRPC;
-$Alien::Google::GRPC::VERSION = '0.03';
+$Alien::Google::GRPC::VERSION = '0.07';
 use base qw( Alien::Base );
 
 =head1 NAME
@@ -83,25 +83,36 @@ If a build is needed, it can be lengthy. A half hour or more to compile is not u
 
 The following dependencies need to be installed in order for gRPC to build.
 
- $ [sudo] apt-get install build-essential autoconf libtool
- $ [sudo] apt-get install automake curl
+ $ [sudo] apt-get install build-essential
+ $ [sudo] apt-get install curl
  $ [sudo] apt-get install git
 
 The install information that this module is based on is available here:
 https://github.com/grpc/grpc/blob/master/INSTALL.md
-However, I made some changes so protofbuf would install
-in a non-system location. 
 
 At this time only Linux builds are supported.
 
 =cut
 
+=head1 AUTHOR
+
+Tom Stall <stall@cpan.org>
+
+=cut
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom Stall.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 
 =head1 SEE ALSO
 
 L<Alien>, L<Alien::Base>, L<Alien::Build::Manual::AlienUser>
 
 =cut
-
 
 1;

@@ -3,8 +3,7 @@ package Yars::Tools;
 use strict;
 use warnings;
 use Clustericious::Config;
-use List::Util qw/shuffle/;
-use List::MoreUtils qw/uniq/;
+use List::Util qw/ shuffle uniq /;
 use Hash::MoreUtils qw/safe_reverse/;
 use Clustericious::Log;
 use File::Find::Rule;
@@ -16,14 +15,14 @@ use JSON::MaybeXS ();
 # TODO: rm dep on stat
 use File::stat qw/stat/;
 use Mojo::ByteStream qw/b/;
-use File::HomeDir;
 use File::Spec;
 use Mojo::UserAgent;
 use File::Spec;
 use Yars::Util qw( format_tx_error );
+use File::Glob qw( bsd_glob );
 
 # ABSTRACT: various utility functions dealing with servers, hosts, etc
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 
 sub new
@@ -81,7 +80,7 @@ sub refresh_config {
         }
     }
   }
-  my $default_dir = $self->{default_dir} = File::HomeDir->my_home . "/var/run/yars";
+  my $default_dir = $self->{default_dir} = bsd_glob("~/var/run/yars");
   
   my $state_file = $self->{state_file} = $config->state_file(default => "$default_dir/state.txt");
   -e $state_file or do {
@@ -435,7 +434,7 @@ Yars::Tools - various utility functions dealing with servers, hosts, etc
 
 =head1 VERSION
 
-version 1.28
+version 1.30
 
 =head1 DESCRIPTION
 

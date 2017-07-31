@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+#
+# This is an internal use only script for smoke testing this dist against
+# various perlbrew installations.
+#
+
+# fail fast and hard
+set -eo pipefail
+
+# make sure perlbrew is initialized
+. $HOME/perl5/perlbrew/etc/bashrc
+
+die() {
+    echo $@
+    exit 1
+}
+
+check_perlbrew() {
+    if [ -z "$PERLBREW_ROOT" ] || [ -z "$PERLBREW_PERL" ]; then
+        die "perlbrew does not seem to be initialized"
+    fi
+
+    if [ ! -d $PERLBREW_ROOT/perls/$PERLBREW_PERL ]; then
+        die "$PERLBREW_PERL does not seem to be a valid perl installation"
+    fi
+
+    if [ ! -d $PERLBREW_ROOT/perls/$PERLBREW_PERL/.git ]; then
+        die "perlbrew installation $PERLBREW_PERL is not a git repository"
+    fi
+}
+
+perlbrew_reset() {
+    (
+        cd $PERLBREW_ROOT/perls/$PERLBREW_PERL
+        git clean -fdx
+        git checkout .
+    )
+}
+
+install_cpan_deps() {
+    PERL_VERSION=$(perl -e 'print $]')
+
+    if [ ! -z "$CPAN_MINVERSION" ]; then
+        cpanm -q --notest \
+            Test::More@0.94 \
+            URI@1.30 \
+            LWP::UserAgent@2.033 \
+            Apache::Test@1.39 \
+            Class::Load@0.03
+    else
+        cpanm -q --notest --skip-satisfied --installdeps .
+
+        # install optional modules so that tests run
+        cpanm -q --notest --skip-satisfied DBD::SQLite URI~1.30 LWP::UserAgent~2.033
+
+        # modern Test::More+ApacheTest and 5.8.9 do not play nicely together.
+        # force downgrade to 0.94 if necessary
+        if [ $PERL_VERSION = "5.008009" ] || [ $PERL_VERSION = "5.010001" ]; then
+            cpanm -q --notest Test::More@0.94
+        fi
+    fi
+
+    # if author testing is set, install author testing deps
+    if [ ! -z "$AUTHOR_TESTING" ]; then
+        cpanm -q --notest Test::Pod
+    fi
+
+    # if signature testing is on, install Module::Signature
+    if [ ! -z "$TEST_SIGNATURE" ]; then
+        cpanm -q --notest Test::Signature
+    fi
+}
+
+smoke_perl() {
+    local variant=$1
+
+    # remove any stale core files
+    rm -f t/core.*
+
+    [ -f Makefile ] && make distclean
+
+    perlbrew use $variant
+
+    check_perlbrew
+
+    if [ -z "$NO_RESET" ]; then
+        perlbrew_reset
+    fi
+
+    install_cpan_deps
+
+    perl Makefile.PL && make test
+}
+
+perlbrew list | grep apache | sed -e 's/*//' | while read variant
+do
+    echo "=====> TESTING AGAINST PERLBREW INSTALL: $variant <====="
+
+    smoke_perl $variant
+
+    echo ""
+done

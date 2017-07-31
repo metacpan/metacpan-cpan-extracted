@@ -4,7 +4,7 @@ List::SomeUtils - Provide the stuff missing in List::Util
 
 # VERSION
 
-version 0.54
+version 0.56
 
 # SYNOPSIS
 
@@ -33,15 +33,15 @@ couldn't be compiled on this machine.
 # WHY DOES THIS MODULE EXIST?
 
 You might wonder why this module exists when we already have
-[List::MoreUtils](https://metacpan.org/pod/List::MoreUtils). In fact, this module is the same code as is found in LMU
-with no significant changes. However, the LMU distribution depends on several
-modules for configuration (to run the Makefile.PL) that some folks in the Perl
-community don't think are appropriate for a module high upstream in the CPAN
-river.
+[List::MoreUtils](https://metacpan.org/pod/List::MoreUtils). In fact, this module is (nearly) the same code as is found
+in LMU with no significant changes. However, the LMU distribution depends on
+several modules for configuration (to run the Makefile.PL) that some folks in
+the Perl community don't think are appropriate for a module high upstream in
+the CPAN river.
 
 I (Dave Rolsky) don't have a strong opinion on this, but I _do_ like the
 functions provided by LMU, and I'm tired of getting patches and PRs to remove
-it from my code.
+LMU from my code.
 
 This distribution exists to let me use the functionality I like without having
 to get into tiring arguments about issues I don't really care about.
@@ -265,9 +265,9 @@ scalar context, returns the number of unique elements in LIST.
     my $x = uniq 1, 1, 2, 2, 3, 5, 3, 4; # returns 5
     # returns "Mike", "Michael", "Richard", "Rick"
     my @n = distinct "Mike", "Michael", "Richard", "Rick", "Michael", "Rick"
-    # returns '', 'S1', A5' and complains about "Use of uninitialized value"
+    # returns '', undef, 'S1', A5'
     my @s = distinct '', undef, 'S1', 'A5'
-    # returns undef, 'S1', A5' and complains about "Use of uninitialized value"
+    # returns '', undef, 'S1', A5'
     my @w = uniq undef, '', 'S1', 'A5'
 
 `distinct` is an alias for `uniq`.
@@ -580,6 +580,19 @@ However, the Perl implementation of it has some overhead simply due to the fact
 that there are more lines of Perl code involved. Therefore, LIST needs to be
 fairly big in order for `minmax` to win over a naive implementation. This
 limitation does not apply to the XS version.
+
+### mode LIST
+
+Calculates the most common items in the list and returns them as a list. This
+is effectively done by string comparisons, so references will be
+stringified. If they implement string overloading, this will be used.
+
+If more than one item appears the same number of times in the list, all such
+items will be returned. For example, the mode of a unique list is the list
+itself.
+
+This function **always** returns a list. That means that in scalar context you
+get a count indicating the number of modes in the list.
 
 # MAINTENANCE
 

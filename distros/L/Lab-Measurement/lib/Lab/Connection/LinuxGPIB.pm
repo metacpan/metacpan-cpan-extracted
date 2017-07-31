@@ -1,7 +1,6 @@
 package Lab::Connection::LinuxGPIB;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: LinuxGPIB connection
-$Lab::Connection::LinuxGPIB::VERSION = '3.553';
+$Lab::Connection::LinuxGPIB::VERSION = '3.554';
 #
 # GPIB Connection class for Lab::Bus::LinuxGPIB
 #
@@ -100,7 +99,7 @@ Lab::Connection::LinuxGPIB - LinuxGPIB connection
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

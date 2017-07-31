@@ -3,11 +3,11 @@ use warnings;
 use autodie;
 use 5.010;
 use File::Spec;
-use File::HomeDir;
 use Path::Class qw( dir );
 use File::Spec;
 use FindBin ();
 use YAML qw( LoadFile );
+use File::Glob qw( bsd_glob );
 
 my @services = do {
   open my $fh, '<', '/etc/services';
@@ -23,19 +23,19 @@ my @client_tests = map { $_->stringify } grep { $_->basename =~ /^client_.*\.t$/
 
 foreach my $service (@services)
 {
-  local $ENV{AEF_CONFIG} = File::Spec->catfile(File::HomeDir->my_home, '.ftptest', 'localhost.yml');
+  local $ENV{AEF_CONFIG} = File::Spec->catfile(bsd_glob '~/.ftptest/localhost.yml');
   local $ENV{AEF_PORT} = $service;
   say "[$service]";
   system 'prove', '-l', '-j', 3, @client_tests;
 }
 
 my @list = do {
-  my $dir = File::Spec->catdir(File::HomeDir->my_home, '.ftptest');
+  my $dir = File::Spec->catdir(bsd_glob '~/.ftptest');
   my $dh;
   opendir DIR, $dir;
   my @list = readdir DIR;
   closedir DIR;
-  map { File::Spec->catfile(File::HomeDir->my_home, '.ftptest', $_) } grep !/^localhost\.yml$/, grep !/^\./, @list;
+  map { File::Spec->catfile(bsd_glob('~/.ftptest'), $_) } grep !/^localhost\.yml$/, grep !/^\./, @list;
 };
 
 foreach my $config (@list)

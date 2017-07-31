@@ -1,10 +1,10 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.017';
+$ExtUtils::HasCompiler::VERSION = '0.021';
 use strict;
 use warnings;
 
 use base 'Exporter';
-our @EXPORT_OK = qw/can_compile_loadable_object/;
+our @EXPORT_OK = qw/can_compile_loadable_object can_compile_static_library can_compile_extension/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 use Config;
@@ -75,23 +75,14 @@ sub can_compile_loadable_object {
 
 	my ($source_handle, $source_name) = tempfile('TESTXXXX', DIR => $tempdir, SUFFIX => '.c', UNLINK => 1);
 	my $basename = basename($source_name, '.c');
-
-	my $shortname = '_Loadable' . $counter++;
-	my $package = "ExtUtils::HasCompiler::$shortname";
-	printf $source_handle $loadable_object_format, $basename, $package or do { carp "Couldn't write to $source_name: $!"; return };
-	close $source_handle or do { carp "Couldn't close $source_name: $!"; return };
-
 	my $abs_basename = catfile($tempdir, $basename);
-	my $object_file = $abs_basename . $config->get('_o');
-	my $loadable_object = $abs_basename . '.' . $config->get('dlext');
-	my $incdir = catdir($config->get('archlibexp'), 'CORE');
 
-	my ($cc, $ccflags, $optimize, $cccdlflags, $ld, $ldflags, $lddlflags, $libperl, $perllibs) = map { $config->get($_) } qw/cc ccflags optimize cccdlflags ld ldflags lddlflags libperl perllibs/;
+	my ($cc, $ccflags, $optimize, $cccdlflags, $ld, $ldflags, $lddlflags, $libperl, $perllibs, $archlibexp, $_o, $dlext) = map { $config->get($_) } qw/cc ccflags optimize cccdlflags ld ldflags lddlflags libperl perllibs archlibexp _o dlext/;
 
-	if ($prelinking{$^O}) {
-		require ExtUtils::Mksymlists;
-		ExtUtils::Mksymlists::Mksymlists(NAME => $basename, FILE => $abs_basename, IMPORTS => {});
-	}
+	my $incdir = catdir($archlibexp, 'CORE');
+	my $object_file = $abs_basename.$_o;
+	my $loadable_object = "$abs_basename.$dlext";
+
 	my @commands;
 	if ($^O eq 'MSWin32' && $cc =~ /^cl/) {
 		push @commands, qq{$cc $ccflags $cccdlflags $optimize /I "$incdir" /c $source_name /Fo$object_file};
@@ -127,6 +118,16 @@ sub can_compile_loadable_object {
 		push @commands, qq{$ld $object_file -o $loadable_object $lddlflags @extra};
 	}
 
+	if ($prelinking{$^O}) {
+		require ExtUtils::Mksymlists;
+		ExtUtils::Mksymlists::Mksymlists(NAME => $basename, FILE => $abs_basename, IMPORTS => {});
+	}
+
+	my $shortname = '_Loadable' . $counter++;
+	my $package = "ExtUtils::HasCompiler::$shortname";
+	printf $source_handle $loadable_object_format, $basename, $package or do { carp "Couldn't write to $source_name: $!"; return };
+	close $source_handle or do { carp "Couldn't close $source_name: $!"; return };
+
 	for my $command (@commands) {
 		print $output "$command\n" if not $args{quiet};
 		system $command and do { carp "Couldn't execute $command: $!"; return };
@@ -152,6 +153,54 @@ sub can_compile_loadable_object {
 	}
 }
 
+my %static_unsupported_on = map { $_ => 1 } qw/VMS aix MSWin32 cygwin/;
+sub can_compile_static_library {
+	my %args = @_;
+
+	my $output = $args{output} || \*STDOUT;
+
+	my $config = $args{config} || 'ExtUtils::HasCompiler::Config';
+	return if $config->get('useshrplib') eq 'true';
+
+	my ($source_handle, $source_name) = tempfile('TESTXXXX', DIR => $tempdir, SUFFIX => '.c', UNLINK => 1);
+	my $basename = basename($source_name, '.c');
+	my $abs_basename = catfile($tempdir, $basename);
+
+	my ($cc, $ccflags, $optimize, $ar, $full_ar, $ranlib, $archlibexp, $_o, $lib_ext) = map { $config->get($_) } qw/cc ccflags optimize ar full_ar ranlib archlibexp _o lib_ext/;
+	my $incdir = catdir($archlibexp, 'CORE');
+	my $object_file = "$abs_basename$_o";
+	my $static_library = $abs_basename.$lib_ext;
+
+	my @commands;
+	if ($static_unsupported_on{$^O}) {
+		return;
+	}
+	else {
+		my $my_ar = length $full_ar ? $full_ar : $ar;
+		push @commands, qq{$cc $ccflags $optimize "-I$incdir" -c $source_name -o $object_file};
+		push @commands, qq{$my_ar cr $static_library $object_file};
+		push @commands, qq{$ranlib $static_library} if $ranlib ne ':';
+	}
+
+	my $shortname = '_Loadable' . $counter++;
+	my $package = "ExtUtils::HasCompiler::$shortname";
+	printf $source_handle $loadable_object_format, $basename, $package or do { carp "Couldn't write to $source_name: $!"; return };
+	close $source_handle or do { carp "Couldn't close $source_name: $!"; return };
+
+	for my $command (@commands) {
+		print $output "$command\n" if not $args{quiet};
+		system $command and do { carp "Couldn't execute $command: $!"; return };
+	}
+	return 1;
+}
+
+sub can_compile_extension {
+	my %args = @_;
+	$args{config} ||= 'ExtUtils::HasCompiler::Config';
+	my $linktype = $args{linktype} || ($args{config}->get('usedl') ? 'dynamic' : 'static');
+	return $linktype eq 'static' ? can_compile_static_library(%args) : can_compile_loadable_object(%args);
+}
+
 sub ExtUtils::HasCompiler::Config::get {
 	my (undef, $key) = @_;
 	return $ENV{uc $key} || $Config{$key};
@@ -173,7 +222,17 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.017
+version 0.021
+
+=head1 SYNOPSIS
+
+ use ExtUtils::HasCompiler 'can_compile_extension';
+ if (can_compile_extension()) {
+   ...
+ }
+ else {
+   ...
+ }
 
 =head1 DESCRIPTION
 
@@ -200,6 +259,34 @@ An L<ExtUtils::Config|ExtUtils::Config> (compatible) object for configuration.
 =item * skip_load
 
 This causes can_compile_loadable_object to not try to load the generated object. This defaults to true on a cross-compiling perl.
+
+=back
+
+=head2 can_compile_static_library(%opts)
+
+This checks if the system can compile and link a perl static library. It does not check it it can compile a new perl with it. It may take the following options:
+
+=over 4
+
+=item * quiet
+
+Do not output the executed compilation commands.
+
+=item * config
+
+An L<ExtUtils::Config|ExtUtils::Config> (compatible) object for configuration.
+
+=back
+
+=head2 can_compile_extension(%opts)
+
+This will call either C<can_compile_loadable_object>, or C<can_compile_static_library>, depending on which is the default on your configuration. In addition to the arguments listed above, it can take one more optional argument:
+
+=over 4
+
+=item * linktype
+
+This will force the linktype to be either static or dynamic. Dynamic compilation on a static perl won't work, but static libraries can be viable on a dynamic perl.
 
 =back
 

@@ -1,64 +1,7 @@
-
-=head1 NAME
-
-Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>.
-
-=head1 SYNOPSIS
-
- use PDL;
- use Lab::Moose::Plot;
-
- # use default terminal 'qt'
- my $plot = Lab::Moose::Plot->new();
-
- # simple 2-D plot
- my $x = sequence(10);
- my $y = 2 * $x;
-
- $plot->plot(
-     plot_options => {title => 'linear function'},
-     curve_options => {legend => '2 * x'},
-     data => [$x, $y]
- );
-
- # pm3d plot
- my $z = sin(rvals(300, 300) / 10);
- my $x = xvals($z);
- my $y = yvals($z);
-
- $plot->splot(
-     plot_options => {
-         title => 'a pm3d plot',
-	 pm3d => 1,
-	 view => 'map',
-	 surface => 0,
-         palette => "model RGB defined ( 0 'red', 1 'yellow', 2 'white' )",
-     },
-     data => [$x, $y, $z],
- );
-
- 
- # use a different terminal with default plot options
-
- my $plot = Lab::Moose::Plot(
-     terminal => 'svg',
-     terminal_options => {output => 'file.svg', enhanced => 0},
-     plot_options => {pm3d => 1, view => 'map', surface => 0}
- );
-
-=head1 DESCRIPTION
-
-This is a small wrapper around L<PDL::Graphics::Gnuplot> with the aim to make
-it accessible with our hash-based calling convention.
-
-See the documentation of L<PDL::Graphics::Gnuplot> for the allowed values of
-terminal-, plot- and curve-options.
-
-
-=cut
-
 package Lab::Moose::Plot;
-$Lab::Moose::Plot::VERSION = '3.553';
+#ABSTRACT: Frontend to L<PDL::Graphics::Gnuplot>
+$Lab::Moose::Plot::VERSION = '3.554';
+
 use warnings;
 use strict;
 use 5.010;
@@ -128,23 +71,6 @@ sub build_curve_options {
     return {};
 }
 
-=head1 METHODS
-
-=head2 new
-
- my $plot = Lab::Moose::Plot->new(
-     terminal => $terminal,
-     terminal_options => \%terminal_options,
-     plot_options => \%plot_options,
-     curve_options => \%curve_options,
- );
-
-Construct a new plotting backend. All arguments are optional. The default for
-C<terminal> is 'qt'. For the 'qt' and 'x11' terminals, C<terminal_options>
-defaults to C<< {persist => 1, raise => 0 } >>. The default for
-C<plot_options> and C<curve_options> is the empty hash.
-
-=cut
 
 sub BUILD {
     my $self  = shift;
@@ -190,6 +116,106 @@ sub _plot {
     $gpwin->$plot_function( $plot_options, %{$curve_options}, @{$data} );
 }
 
+
+my $meta = __PACKAGE__->meta();
+
+for my $func (qw/plot splot replot/) {
+    $meta->add_method(
+        $func => sub {
+            my $self = shift;
+            my ( $plot_options, $curve_options, $data )
+                = $self->_parse_options(@_);
+
+            $self->_plot( $plot_options, $curve_options, $data, $func );
+        }
+    );
+}
+
+__PACKAGE__->meta->make_immutable();
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use Lab::Moose::Plot;
+
+ # use default terminal 'qt'
+ my $plot = Lab::Moose::Plot->new();
+
+ # simple 2-D plot
+ my $x = sequence(10);
+ my $y = 2 * $x;
+
+ $plot->plot(
+     plot_options => {title => 'linear function'},
+     curve_options => {legend => '2 * x'},
+     data => [$x, $y]
+ );
+
+ # pm3d plot
+ my $z = sin(rvals(300, 300) / 10);
+ my $x = xvals($z);
+ my $y = yvals($z);
+
+ $plot->splot(
+     plot_options => {
+         title => 'a pm3d plot',
+	 pm3d => 1,
+	 view => 'map',
+	 surface => 0,
+         palette => "model RGB defined ( 0 'red', 1 'yellow', 2 'white' )",
+     },
+     data => [$x, $y, $z],
+ );
+
+ 
+ # use a different terminal with default plot options
+
+ my $plot = Lab::Moose::Plot(
+     terminal => 'svg',
+     terminal_options => {output => 'file.svg', enhanced => 0},
+     plot_options => {pm3d => 1, view => 'map', surface => 0}
+ );
+
+=head1 DESCRIPTION
+
+This is a small wrapper around L<PDL::Graphics::Gnuplot> with the aim to make
+it accessible with our hash-based calling convention.
+
+See the documentation of L<PDL::Graphics::Gnuplot> for the allowed values of
+terminal-, plot- and curve-options.
+
+=head1 METHODS
+
+=head2 new
+
+ my $plot = Lab::Moose::Plot->new(
+     terminal => $terminal,
+     terminal_options => \%terminal_options,
+     plot_options => \%plot_options,
+     curve_options => \%curve_options,
+ );
+
+Construct a new plotting backend. All arguments are optional. The default for
+C<terminal> is 'qt'. For the 'qt' and 'x11' terminals, C<terminal_options>
+defaults to C<< {persist => 1, raise => 0 } >>. The default for
+C<plot_options> and C<curve_options> is the empty hash.
+
 =head2 plot
 
  $plot->plot(
@@ -209,22 +235,15 @@ of elements in the array depends on the used plotting style.
 splot and replot call L<PDL::Graphics::Gnuplot>'s splot and replot functions.
 Otherwise they behave like plot.
 
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-
-my $meta = __PACKAGE__->meta();
-
-for my $func (qw/plot splot replot/) {
-    $meta->add_method(
-        $func => sub {
-            my $self = shift;
-            my ( $plot_options, $curve_options, $data )
-                = $self->_parse_options(@_);
-
-            $self->_plot( $plot_options, $curve_options, $data, $func );
-        }
-    );
-}
-
-__PACKAGE__->meta->make_immutable();
-
-1;

@@ -4,7 +4,7 @@ Lazy::Utils - Utility functions
 
 # VERSION
 
-version 1.21
+version 1.22
 
 # SYNOPSIS
 

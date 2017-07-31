@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Alien::TensorFlowServingProtos;
-$AI::PredictionClient::Alien::TensorFlowServingProtos::VERSION = '0.03';
+$AI::PredictionClient::Alien::TensorFlowServingProtos::VERSION = '0.05';
 use base qw( Alien::Base );
 
 =head1 NAME
@@ -64,10 +64,11 @@ for use by other modules.
 =head1  DEPENDENCIES
 
 This module is dependent on gRPC. This module will use the cpan module Alien::Google::GRPC to 
-either use an existing gRPC installed on your system or if not found, the Alien::Google::GRPC
+either use an existing gRPC installation on your system or if not found, the Alien::Google::GRPC
 module will download and build a private copy.
 
-Additional, the following dependencies need to be installed in order for this module to build.
+The system dependencies needed for this module to build are most often already installed. 
+If not, the following dependencies need to be installed.
 
  $ [sudo] apt-get install build-essential make g++
 
@@ -79,16 +80,29 @@ At this time only Linux builds are supported.
 
 =head2 CPAN Testers Note
 
-It is normal for this module to fail the CPAN Testers' tests. 
+This module may fail CPAN Testers' tests. 
 The build support tools needed by this module and especially the 
-Alien::Google::GRPC module are not normally installed on the 
-CPAN Testers' machines.
+Alien::Google::GRPC module are normally installed on the 
+CPAN Testers' machines, but not always.
+
+The system build tools dependencies have been reduced, so hopefully 
+a large number of machines will build without manually installing 
+system dependencies.
 
 =cut
 
 =head1 AUTHOR
 
 Tom Stall stall@cpan.org
+
+=cut
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom Stall.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 

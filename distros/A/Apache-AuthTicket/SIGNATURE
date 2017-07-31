@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,51 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 f611edbb32d8af3d400f3cf3d89cd052e220affe Changes
-SHA1 118121e197d10e867dcaa5d10e4cfe89cec69912 LICENSE
-SHA1 7920e166dc4ce13aa84165f53ccc6829e0dba29f MANIFEST
-SHA1 ab560e33a2c26fe0f8dcda7e9fd89acec8a0438f MANIFEST.SKIP
-SHA1 414bbbd0f8761cc46515fd44660c4505200a5367 META.yml
+SHA1 5a800d421ea18f4c3ed2e4850caa0e58f46ddab3 Changes
+SHA1 8b0409db336db384681d95935887a3812231b63a LICENSE
+SHA1 4b26d6494de9419470265df86913f944ddb41ba4 MANIFEST
+SHA1 d42eb8b02250efc798a0723cd12d59e2c7cd388c MANIFEST.SKIP
+SHA1 421ec73f102939040a90a3881e5d4302e4ee0050 META.json
+SHA1 ca0f01b792e2f52390d531fd20c67b3712da717c META.yml
 SHA1 a742a2e3a2adc9937d21c0051577fedf16fb8290 Makefile.PL
 SHA1 9d23f7efe7217d113889cdb3dc84b9d473069e1f README
+SHA1 9029d10c37ad361e0582c4f88e44d1a9602c0458 README.apache-2.4.pod
 SHA1 2ba7c70bf5de1d9faa51f6c9377af729f4dcb3ce TODO
-SHA1 dfd8ad0a149af7fb2443043534c7abf800cb2d5f lib/Apache/AuthTicket.pm
-SHA1 0519451704dfd7b614edbf2079ea7be8e874c6bd lib/Apache/AuthTicket/Base.pm
-SHA1 ebcb2c868938a883b36442052c6ccd79f5b11004 lib/Apache2/AuthTicket.pm
+SHA1 d1e695706bce96eb8b23c4f022e9819d9dae2ea1 lib/Apache/AuthTicket.pm
+SHA1 b06bfd3a9979902eb53cf923e2c6c8bb9a0a8ab8 lib/Apache/AuthTicket/Base.pm
+SHA1 1b5e3e88012610655b52c94f97fd40432998662c lib/Apache2/AuthTicket.pm
 SHA1 5c582e555b7a769a5426c9594986503204db047c sample/apache.conf
 SHA1 43aa0abcaeb4b81a674bf4fe1e86283f11a1fa2b sample/apache2.conf
 SHA1 bfed0aca630ec73296e56764a3f8f0e95976e2a4 sample/mysql.sql
 SHA1 9b9c1209bcb8dab96718617324684794cc000e2a sample/pgsql.sql
+SHA1 cf09a993ef33cb3f9c7d00245a3ea81c3f5799f2 scripts/perlbrew-smoke
 SHA1 a0fa4c757db0157b9b19260dd492b329444b35aa t/01-sqlite.t
 SHA1 adcfc1165110741fad1398210055ba6692debfba t/TEST.PL
 SHA1 3facbcb313bdca60feb6b5edf06bc059b82ae8b7 t/auth.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 ca3a7959764fddc5878ec251796e7a38344e75fc t/author-signature.t
 SHA1 65d04bd627b5270ba1709e733b86747d59c59ab2 t/compile.t
-SHA1 d2a13c2cce7bf1bf29bec26bed0b836139eb6aed t/conf/extra.conf.in
+SHA1 a2ba1b9741224d5d328290176152fe300cf26ed3 t/conf/extra.conf.in
 SHA1 e16df4b6fc7e10c12a255ede916772030d4a3059 t/conf/mp1-startup.pl
 SHA1 9a4bd966b763f5f332fb867028b559359f7b6bb0 t/htdocs/protected/index.html
 SHA1 9a4bd966b763f5f332fb867028b559359f7b6bb0 t/htdocs/secure/protected/index.html
 SHA1 5aeb51048d562cf81ac4150e256865a49a41f982 t/lib/My/Util.pm
-SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
-SHA1 61cea839dd94aaaeb301ccac9b83cde4c5c91b42 t/signature.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+Version: GnuPG v2
 
-iEYEARECAAYFAk3s+/kACgkQ+CqvSzp9LOyMzQCgtwxxJ1mTr3j97HEUyWfL5CuJ
-TloAn3AsIqo26DaT5UQntIhdn7cmeeBZ
-=cXol
+iQIVAwUBWXupXqQl27WkM10aAQiRXw/9Gx8+ct9VSsSn1hnjMP2efUlXMrdZbZ6C
+8zz7LMMJHGTzNmKrkJHLWFLAUbZqY2K0VPHaCBMhG6lLuGZLiWAHocI+NC0meTOt
+O5mqESDFJo/EGzVRu3HHbOO1xp5pQP5y2O0cixylZ5HlyNnmRPA9pIeovICxSmCM
+fL4wH5LZ+dHngcFP9VJKt/V0pQeHzfWT+/K3DfXIJoaWTM4lE5SomSnlZLTaHSnA
+sH9BB5vrqkajrIhep+UfEdvwuwaNLZGLDfxPuNtAU1idvEDPpvLYo21fOTWDs26h
+vz0ipZHvWsvkF63CitJ12CCw/02GK1HHcRe75/MmfK45xQQbGT9wASCNYIY2gs4a
+jXVlS+PItmEOEVDrEMXJtsyHIjrokez6zTjQxawlWhC9Bbb/0imCNYA8BzVQLScD
+jb817WdWSnq9q2+xeK3b14jF+N+NQDWJyKEY9CznCTW75UYJFpRQQY4LN6Etnp8f
+35/HfBQrn3I4ic28Waeu32M30x3q7a+fb/3ufWt4ZT8amGZIHsOIb0frw6rSCgIe
+aEyx9rrjmyKzGybYFI3b1wjnlVfoSOAuIFNvuDonVqbGu0JomQVmbkQRUJydmgDZ
+P9ixfdR+xzdUOUyxgUVF4zFg0fcrSOpwEM7R3ZeSW+nG5Eo2MEIXt7EeXjSV1rnA
+XhiwJdve+Kc=
+=C8u+
 -----END PGP SIGNATURE-----

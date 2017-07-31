@@ -1,7 +1,7 @@
 package PlugAuth::Plugin::FlatAuthz;
 
 # ABSTRACT: Authorization using flat files for PlugAuth
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 use strict;
@@ -12,7 +12,7 @@ use Text::Glob qw( match_glob );
 use Clone qw( clone );
 use Role::Tiny::With;
 use File::Touch;
-use List::MoreUtils qw( uniq );
+use List::Util qw( uniq );
 
 with 'PlugAuth::Role::Plugin';
 with 'PlugAuth::Role::Authz';
@@ -553,7 +553,7 @@ PlugAuth::Plugin::FlatAuthz - Authorization using flat files for PlugAuth
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 SYNOPSIS
 

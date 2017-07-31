@@ -9,12 +9,15 @@ use Carp qw( croak );
 use File::Temp qw( tempdir );
 use Test2::API qw( context );
 use Capture::Tiny qw( capture_merged );
+use Alien::Build::Util qw( _mirror );
 
-our @EXPORT = qw( alienfile alienfile_ok );
+our @EXPORT = qw( alienfile alienfile_ok alien_build_ok );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
+
+my $build;
 
 sub alienfile
 {
@@ -62,7 +65,7 @@ sub alienfile
 
   require Alien::Build;
   
-  my $build;
+  undef $build;
   my $out = capture_merged {
     $build = Alien::Build->load($args{filename}, root => $args{root});
     $build->set_stage($args{stage});
@@ -92,6 +95,86 @@ sub alienfile_ok
 }
 
 
+my $count = 1;
+
+sub alien_build_ok
+{
+  my $opt = defined $_[0] && ref($_[0]) eq 'HASH'
+    ? shift : { class => 'Alien::Base' };
+
+  my($name) = @_;
+
+  $name ||= 'alien builds okay';
+  my $ok;
+  my @diag;
+  my @note;
+  my $alien;
+  
+  if($build)
+  {
+    my($out,$error) = capture_merged {
+      eval {
+        $build->load_requires('configure');
+        $build->load_requires($build->install_type);
+        $build->download;
+        $build->build;
+      };
+      $@;
+    };
+    if($error)
+    {
+      $ok = 0;
+      push @diag, $out if defined $out;
+      push @diag, "build threw exception: $error";
+    }
+    else
+    {
+      $ok = 1;
+      
+      push @note, $out if defined $out;
+      
+      require Alien::Base;
+      
+      my $prefix = $build->runtime_prop->{prefix};
+      my $stage  = $build->install_prop->{stage};
+      my %prop   = %{ $build->runtime_prop };
+      
+      $prop{distdir} = $prefix;
+      
+      _mirror $stage, $prefix;
+      
+      my $dist_dir = sub {
+        $prefix;
+      };
+      
+      my $runtime_prop = sub {
+        \%prop;
+      };
+      
+      $alien = sprintf 'Test::Alien::Build::Faux%04d', $count++;
+      {
+        no strict 'refs';
+        @{ "${alien}::ISA" }          = $opt->{class};
+        *{ "${alien}::dist_dir" }     = $dist_dir;
+        *{ "${alien}::runtime_prop" } = $runtime_prop;
+      }
+    }
+  }
+  else
+  {
+    $ok = 0;
+    push @diag, 'no alienfile';
+  }
+  
+  my $ctx = context();
+  $ctx->ok($ok, $name);
+  $ctx->diag($_) for @diag;
+  $ctx->note($_) for @note;
+  $ctx->release;
+  
+  $alien;
+}
+
 delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE );
 $ENV{ALIEN_BUILD_RC} = '-';
 
@@ -109,7 +192,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -126,6 +209,8 @@ version 0.66
      ...
    );
  };
+ 
+ alien_build_ok 'builds okay.';
  
  done_testing;
 
@@ -195,6 +280,28 @@ The install prefix for the build.
 Same as C<alienfile> above, except that it runs as a test, and will not throw an exception
 on failure (it will return undef instead).
 
+=head2 alien_build_ok
+
+ my $alien = alien_build_ok;
+ my $alien = alien_build_ok $name;
+ my $alien = alien_build_ok { class => $class };
+ my $alien = alien_build_ok { class => $class }, $name;
+
+Runs the download and build stages.  Passes if the build succeeds.  Returns an instance
+of L<Alien::Base> which can be passed into C<alien_ok> from L<Test::Alien>.  Returns
+C<undef> if the test fails.
+
+Options
+
+=over 4
+
+=item class
+
+The base class to use for your alien.  This is L<Alien::Base> by default.  Should
+be a subclass of L<Alien::Base>, or at least adhere to its API.
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -220,6 +327,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

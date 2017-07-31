@@ -1,5 +1,5 @@
 package Consul::API::Session;
-$Consul::API::Session::VERSION = '0.020';
+$Consul::API::Session::VERSION = '0.021';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -73,7 +73,7 @@ sub renew {
 }
 
 package Consul::API::Session::Session;
-$Consul::API::Session::Session::VERSION = '0.020';
+$Consul::API::Session::Session::VERSION = '0.021';
 use Moo;
 use Types::Standard qw(Str Enum ArrayRef Num Int);
 

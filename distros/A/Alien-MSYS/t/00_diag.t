@@ -11,7 +11,6 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Archive::Zip
-  File::HomeDir
   File::ShareDir
   HTTP::Tiny
   Module::Build

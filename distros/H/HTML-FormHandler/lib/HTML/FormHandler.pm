@@ -1,6 +1,6 @@
 package HTML::FormHandler;
 # ABSTRACT: HTML forms using Moose
-$HTML::FormHandler::VERSION = '0.40067';
+$HTML::FormHandler::VERSION = '0.40068';
 use Moose;
 extends 'HTML::FormHandler::Base'; # to make some methods overridable by roles
 with 'HTML::FormHandler::Model', 'HTML::FormHandler::Fields',
@@ -817,7 +817,7 @@ HTML::FormHandler - HTML forms using Moose
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 SYNOPSIS
 
@@ -1685,7 +1685,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

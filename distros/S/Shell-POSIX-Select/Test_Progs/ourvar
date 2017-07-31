@@ -1,5 +1,9 @@
 #! /usr/bin/perl -w
 
+my $VERSION = 1.02;
+
+use blib;
+
 use Shell::POSIX::Select;
 
 select our $var (1) { print "$var\n"; }

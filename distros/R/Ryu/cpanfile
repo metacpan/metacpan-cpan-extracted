@@ -2,7 +2,6 @@ requires 'parent', 0;
 requires 'curry', '>= 1.001';
 requires 'indirect', 0;
 requires 'Future', '>= 0.35';
-requires 'Mixin::Event::Dispatch', '>= 2.000';
 requires 'Scalar::Util', '>= 1.47';
 requires 'Ref::Util', '>= 0.111';
 requires 'List::UtilsBy', '>= 0.10';

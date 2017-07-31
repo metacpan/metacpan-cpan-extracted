@@ -1,74 +1,61 @@
 #!/usr/bin/env perl
 #
 # Determine how well the ratios in arbitrary Scala scale files fit to
-# those from a given Scala scale file. (One use: to see how well overtone-
-# based ratio sequences fit other extant scale systems, and what the
-# worst of these fits is, to find scale systems least similar to the
-# overtone series.)
+# those from a given Scala scale file. Lower numbers are a better fit;
+# where there are unequal number of intervals in the scale files, the
+# closest interval to the interval under consideration will be used.
 #
-# For example, checking against a 53-note overtone-based scale:
+# For example, this checks the scala scale directory from
+# http://www.huygens-fokker.org/docs/scales.zip
+# against a 53-note overtone-based scale for the worst fits:
 #
-#   perl fitness --ref=sparschuh_53in13lim.scl \
+#   perl fitness sparschuh_53in13lim.scl \
 #     | grep '1200$' | sort -nr | sed 22q
 #
-# Finds that the worst fits include various gamelan temperaments--this
-# comes as no surprise to me, as they have their own scale systems
-# independent of the Western tradition. Reverse some fortunes in
-# history, and would gamelan scholars then be asking questions about
-# curious Western systems and how poorly they fit the justifications
-# for the gamelan theory?
-#
-# For an even worse fit, use a 10-note overtone-based scale. This gets
-# back to the question of where one gets off the overtone-go-round
-# before Gotterdamerung--a 53-note scale will better match other scales,
-# simply because it has four to 10 times the resolution of 12 to 5 note
-# overtone scales:
-#
-#   perl fitness --ref=harmf9.scl   | grep '1200$' | sort -nr | sed 22q
-#   perl fitness --ref=malcolms.scl | grep '1200$' | sort -nr | sed 22q
-#
-# Malcolm's Monochord and Riley's Albion scale (also proposed by
-# Hindemith in "Unterweisung im Tonsatz") shows some 800+ octave-ending
-# scales that have a >= 25 cent mean delta! Such scales do not match the
-# overtone series, so one again we find things overtones cannot explain.
+# The worst fits are various gamelan temperaments; these have their own
+# scale systems independent of Western tradition. Fiddle with the
+# fortunes of history, and gamelan scholars might instead ask why
+# Western scale systems so poorly fit gamelan theories.
 
 use strict;
 use warnings;
 use feature qw/say/;
 
-use Getopt::Long qw/GetOptions/;
-use List::Util qw/min sum/;
+use File::Spec ();
+use List::Util 1.26.1 qw/min sum0/;
 use Music::Scala ();
 
-GetOptions( 'ref=s' => \my $reference_scala )
-  or die "Usage: $0 --ref=foo.scl\n";
+my $reference_scala = shift or die "Usage: $0 reference.scl [scala-dir]\n";
+my $dir = shift || '.';
 
 my $s = Music::Scala->new( file => $reference_scala );
 
 my @ref_cents = $s->get_cents;
 
-FILE: for my $file ( grep { $_ ne $reference_scala } glob('*.scl') ) {
-  my @cents        = $s->read_scala($file)->get_cents;
-  my $note_count   = @cents;
-  my $ratio_ultima = sprintf "%.0f", $cents[-1];
+FILE: for my $file ( glob(File::Spec->catfile( $dir, '*.scl' ))) {
+    my @cents        = $s->read_scala($file)->get_cents;
+    my $note_count   = @cents;
+    my $ratio_ultima = sprintf "%.0f", $cents[-1];
 
-  my @fits;
-  my $prev_c = 0;
-  for my $c (@cents) {
-    # some scales have negative cents--skip these, want ascending-
-    # only scales (nor subharmonic or whatever scales that repeat)
-    next FILE if $c < 0 or $c <= $prev_c;
+    my @fits;
+    my $prev_c = 0;
+    for my $c (@cents) {
+        # some scales have negative cents--skip these, want ascending-
+        # only scales (nor subharmonic or whatever scales that repeat)
+        next FILE if $c < 0 or $c <= $prev_c;
 
-    #push @fits, min map { my $delta = ( $c - $_ )**2; $delta } @ref_cents;
-    push @fits, min map { my $delta = abs( $c - $_ ); $delta } @ref_cents;
+        # TODO figure out the square-vs-absolute value thing in stats
+        # one of these years
+        #push @fits, min map { ( $c - $_ )**2 } @ref_cents;
+        push @fits, min map { abs( $c - $_ ) } @ref_cents;
 
-    $prev_c = $c;
-  }
+        $prev_c = $c;
+    }
 
-  my $sum = sum @fits;
+    my $sum = sum0 @fits;
 
-  # Mean delta (might also look at deeper stats, see which has the worst
-  # outliers, histogram things up, etc.)
-  say sprintf( "%.2f", $sum / @fits ),
-    " $file notes $note_count ur $ratio_ultima";
+    # Mean delta (might also look at deeper stats, see which has the
+    # worst outliers, histogram things up, etc.)
+    say sprintf( "%.2f", $sum / @fits ),
+      " $file notes $note_count ur $ratio_ultima";
 }

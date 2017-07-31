@@ -1,0 +1,46 @@
+{
+   "abstract" : "Manage PG replication standbys",
+   "author" : [
+      "Chris Travers <chris.travers@adjust.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PGObject-Util-Replication-Standby",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "PGObject::Util::Replication::SMO" : "0",
+            "URI" : "1",
+            "URI::QueryParam" : "1",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

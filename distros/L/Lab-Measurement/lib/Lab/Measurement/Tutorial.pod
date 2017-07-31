@@ -1,3 +1,9 @@
+#DistZilla: +PodWeaver
+#PODNAME: Lab::Measurement::Tutorial
+#ABSTRACT: Tutorial on using the Lab::Measurement package stack
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -5,6 +11,10 @@
 =head1 NAME
 
 Lab::Measurement::Tutorial - Tutorial on using the Lab::Measurement package stack
+
+=head1 VERSION
+
+version 3.554
 
 =head1 Introduction
 
@@ -85,7 +95,6 @@ similar.
 RS232 is the abbreviation for the serial port that used to be built into each
 PC. It provides a point-to-point connection to one instrument.
 
-
 =head1 Architecture
 
 A schematic view of the various software layers between your perl
@@ -126,7 +135,6 @@ The highest abstraction layer is provided by the L<Lab::Measurement> class,
 which contains methods for data and metadata handling, plotting and rudimentary
 keyboard control.
 
-
 =head1 Using the Lab::Instrument class
 
 The L<Lab::Instrument> class can do for us the routine work of connecting to
@@ -166,7 +174,6 @@ up. Lab::Instrument does it for us. Now that's already quite nice, eh?
 
 By only using L<Lab::Instrument> you should already be able to do about
 everything that can be done with the instruments in your lab.
-
 
 =head1 Using Lab::Instrument::xxx virtual instruments
 
@@ -254,7 +261,7 @@ Here the gate_protect mechanism limits the step size of the voltage source to
 implemented automatically within the C<set_voltage($goto)> command; after we
 have set the parameters in the initialization phase, we do not have to take
 care of it anymore.
-  
+
 =head1 Using the high-level Lab::Measurement and related classes
 
 With the tools introduced so far you should be able to easily write short
@@ -289,7 +296,7 @@ different axes. Read on!
 
 =head2 The concept of sweeps
 
-The L<Sweep|Lab::XPRESS::Sweep::Sweep> classes provide a high-level interface for measurement
+The L<Sweep|Lab::XPRESS::Sweep> classes provide a high-level interface for measurement
 automation. The following script explains the basic use of sweeps. This
 example shows a two-dimensional L<Voltage Sweep|Lab::XPRESS::Sweep::Voltage>: The I<master sweep> controls
 the gate voltage. For each value of the gate voltage we perform a 
@@ -423,7 +430,6 @@ multimeter and logs to a DataFile object.
   #-------- 8. And GO! -----------------------
   
   $frame->start();
-  
 
 For full details, see the documentation of the various sweep
 classes.
@@ -455,9 +461,18 @@ To be done
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2006 Daniel Schröer, 
-           2012 Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2006       Daniel Schroeer
+            2010       Daniel Schroeer
+            2011-2012  Andreas K. Huettel
+            2016       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

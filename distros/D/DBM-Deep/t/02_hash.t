@@ -3,7 +3,8 @@ use warnings FATAL => 'all';
 
 use Test::More;
 use Test::Exception;
-use t::common qw( new_dbm );
+use lib 't';
+use common qw( new_dbm );
 use Scalar::Util qw( reftype );
 
 use_ok( 'DBM::Deep' );

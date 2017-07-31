@@ -1,8 +1,19 @@
-=encoding utf8
+#PODNAME: Lab::Moose::Developer
+#ABSTRACT: Lab::Moose developer tutorial
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Moose::Developer - Developer tutorial.
+Lab::Moose::Developer - Lab::Moose developer tutorial
+
+=head1 VERSION
+
+version 3.554
 
 =head2 Writing drivers
 
@@ -153,7 +164,7 @@ user to pass additional options, like a timeout, to the underlying connection:
 
  return $self->cached_amplitude(
          $self->query( command => 'SLVL?', %args ) );
- 
+
 We read the amplitude from the instrument and store it's value into the cache.
 Don't forget the C<%args> argument to C<query>!
 
@@ -228,7 +239,6 @@ this:
  $lia->rst();
  done_testing();
 
-
 First thing, we need to run the test with the I<real> instrument, to create the
 connection log file F<t/Moose/Instrument/SR830.yml>:
 
@@ -245,7 +255,6 @@ Now with the connection log in place, you can run the test without the real
 instrument connected:
 
 C<< $ prove -lv t/Moose/Instrument/SR830.t >>
-
 
 If C<set_get_test> is not enough for you, take a look at the other test
 routines in F<t/Lab/Test.pm> which offer
@@ -274,4 +283,14 @@ TODO
 
 TODO
 
-=head2 
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

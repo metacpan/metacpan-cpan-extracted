@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use MARC::Matcher;
+use MARC::Loop qw(marcparse marcfield marcbuild TAG VALREF SUBS SUB_ID SUB_VALREF);
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my ($use_average, $score_field, $match_field);
+my %norm = ('lc' => sub { lc }, 'uc' => sub { uc }, 'trim' => \&trim);
+
+my @matchpoints;
+
+GetOptions(
+    'm|matchpoint=s'  => sub { push @matchpoints, { parse_matchpoint($_[1]) } },
+    'A|use-average'   => \$use_average,
+    'S|score-field=s' => \$score_field,
+    'M|match-field=s' => \$match_field,
+) or usage();
+
+my $matcher = MARC::Matcher->new(
+    'matchpoints' => \@matchpoints,
+    'normalizers' => \%norm,
+);
+
+$/ = "\x1d";
+my $n = 0;
+
+my @scored;
+my $tmarc = <STDIN>;
+$matcher->target(\$tmarc);
+while (defined (my $cmarc = <STDIN>)) {
+    my ($cldr, $cflds) = marcparse(\$cmarc);
+    my ($score, @breakdown) = $matcher->match($cldr, $cflds);
+    # TODO: Add in an optional quality score here?
+    push @$cflds, marcfield($score_field, ' ', ' ',
+        'a' => 'score',
+        's' => sprintf('%0.1f', $score),
+    ) if defined $score_field;
+    if (defined $match_field) {
+        foreach my $b (@breakdown) {
+            my ($m, $r) = @$b{qw(matchpoint results)};
+            my ($w, $k, $t, $c) = @$m{qw(weight key target candidate)};
+            my ($tk, $ck) = map { $_->{'key'} } ($t, $c);
+            foreach (@$r) {
+                my ($tv, $cv, $d, $s) = @$_{qw(target candidate raw_distance score)};
+                push @$cflds, marcfield($match_field, ' ', ' ',
+                    'a' => 'match',
+                    's' => sprintf('%0.1f', $s),
+                    'k' => $k,
+                    'w' => $w,
+                    'd' => sprintf('%0.3f', $d),
+                    't' => $tk, 'v' => $tv,
+                    'c' => $ck, 'v' => $cv,
+                );
+            }
+        }
+    }
+    push @scored, [ $score, marcbuild($cldr, $cflds) ];
+}
+my @ranked = sort { $b->[0] <=> $a->[0] } @scored;
+print $tmarc;
+print $_->[1] for @ranked;
+
+# --- Functions
+
+sub parse_matchpoint {
+    my ($str) = @_;
+    $str =~ s/\s+//g;  # Trim whitespace
+    my ($comparands, $scoring) = split /=/, $str, 2;
+    $comparands =~ /^([^:~]+)([:~]?)(.*)$/ or die;
+    my ($t, $op, $c) = ($1, $2, $3);
+    $c = $t if !length $c;
+    my $exact = ($op ne '~');
+    my %scoring = parse_scoring($scoring);
+    my %match = (
+        'target'    => { parse_comparand($t) },
+        'candidate' => { parse_comparand($c) },
+        %scoring,
+        'exact' => $exact,
+        'key' => $comparands,
+    );
+    return %match;
+}
+
+sub parse_comparand {
+    local $_ = shift;
+    s{
+        ^
+        (?:
+            ([0-9A-Za-z]{3})    # 010
+            ([a-z0-9]*)         # 245abcd
+            |
+            L/(\d+)             # L/06
+                (?: -(\d+) )?   # L/06-07
+        )
+    }{}x or die;
+    my ($tag, $subs, $lbegin, $lend) = ($1, $2, $3, $4);
+    my $key;
+    my %comparand;
+    if (defined $tag) {
+        $key = $comparand{'field'} = $tag;
+        if (length $subs) {
+            $key .= $subs;
+            die if $tag lt '010';
+            $comparand{'subfields'} = $subs;
+        }
+    }
+    elsif (defined $lend) {
+        $lend < 24 or die;
+        $lend >= $lbegin or die;
+        $key = "L/$lbegin-$lend";
+        $comparand{'field'} = 'leader';
+        $comparand{'leader'} = [ $lbegin, $lend - $lbegin + 1 ];
+    }
+    else {
+        $key = "L/$lbegin";
+        $comparand{'field'} = 'leader';
+        $comparand{'leader'} = [ $lbegin, 1 ];
+    }
+    $comparand{'key'} = $key;
+    if (s/\[([^\[\]]+)\]//) {
+        # 020[*]  | 020         -> Every 020 field
+        # 020[1]  | 020[first]  -> Only the first one
+        # 020[2]                -> First two
+        # 020[-1] | 020[last]   -> Only the last one
+        # 020[-2]               -> Last two
+        die if defined $lbegin;
+        my $i = lc $1;
+        $i = -1 if $i eq 'last';
+        $i =  1 if $i eq 'first';
+        $comparand{'index'} = $i if $i ne '*';
+    }
+    if (s/{([^{}]+)}//) {
+        # Normalization(s)
+        my $n = lc $1;
+        $comparand{'normalize'} = [ map { lc $_ } split(/,/, $n) ];
+    }
+    return %comparand;
+}
+
+sub parse_scoring {
+    local $_ = shift;
+    my %scoring;
+    $scoring{'exact'} = 1 if s/^=//;
+    s/^~//;  # Optional fuzziness op, e.g., "245a=~100"
+    /^([0-9]+)(.*)$/ or die;
+    $scoring{'weight'} = $1;
+    $scoring{'flag'} = { map { $_ => 1 } split //, $2 };
+    return %scoring;
+}
+
+sub trim {
+    my ($str) = @_;
+    $str =~ s/^\s+|\s+$//g;
+    return $str;
+}
+
+sub read_config {
+}
+

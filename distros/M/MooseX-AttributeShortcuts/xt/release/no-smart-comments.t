@@ -23,6 +23,7 @@ no_smart_comments_in("lib/MooseX/AttributeShortcuts/Trait/Attribute.pm");
 no_smart_comments_in("lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm");
 no_smart_comments_in("lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm");
 no_smart_comments_in("t/00-compile.t");
+no_smart_comments_in("t/00-report-prereqs.dd");
 no_smart_comments_in("t/00-report-prereqs.t");
 no_smart_comments_in("t/02-parameterized.t");
 no_smart_comments_in("t/03-lazy.t");
@@ -49,6 +50,7 @@ no_smart_comments_in("t/metaclasses.t");
 no_smart_comments_in("t/old/01-basic.t");
 no_smart_comments_in("t/old/04-clearer-and-predicate.t");
 no_smart_comments_in("t/old/07-trigger.t");
+no_smart_comments_in("t/others/semiaffordanceaccessor.t");
 no_smart_comments_in("t/predicate.t");
 no_smart_comments_in("t/trigger.t");
 

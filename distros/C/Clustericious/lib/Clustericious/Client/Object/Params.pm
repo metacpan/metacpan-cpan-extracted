@@ -5,7 +5,7 @@ use warnings;
 use base 'Clustericious::Client::Object';
 
 # ABSTRACT: object parameters
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 sub new
@@ -30,7 +30,7 @@ Clustericious::Client::Object::Params - object parameters
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

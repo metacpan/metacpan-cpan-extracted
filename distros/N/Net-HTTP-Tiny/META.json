@@ -4,31 +4,31 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-HTTP-Tiny",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : 0,
-            "Test::More" : 0,
+            "Module::Build" : "0",
+            "Test::More" : "0.41",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : 0,
+            "Module::Build" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -37,27 +37,32 @@
             "IO::Socket::IP" : "0.08"
          },
          "requires" : {
-            "Carp" : 0,
-            "Exporter" : 0,
+            "Carp" : "0",
+            "Exporter" : "0",
             "IO::Socket::INET" : "1.24",
             "perl" : "5.006",
-            "strict" : 0,
-            "utf8" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Net::HTTP::Tiny" : {
          "file" : "lib/Net/HTTP/Tiny.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-HTTP-Tiny@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-HTTP-Tiny"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.001"
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

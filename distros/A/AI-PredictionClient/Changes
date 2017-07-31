@@ -4,4 +4,7 @@
   - Fix dependencies found by CPAN testers. Documentation maintenance
 0.03 2017-07-16
   - Bump up dependencies' version requirements
-
+0.04 2017-07-21
+  - Bump up dependencies. Documentation maintenance.
+0.05 2017-07-23
+  - Bump up dependencies.

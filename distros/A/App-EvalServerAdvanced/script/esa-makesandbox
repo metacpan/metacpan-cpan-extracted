@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use File::ShareDir qw/module_dir/;
 use Path::Tiny;

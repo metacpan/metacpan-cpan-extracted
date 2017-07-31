@@ -1,5 +1,9 @@
 Revision history for Perl script csvgrep
 
+0.06 2017-07-20 NEILB
+    - Added a --match-column / -mc option, which says that the pattern
+      should only be applied to a specific column, rather than the whole line.
+
 0.05 2017-06-22 NEILB
     - The count of lines had an off-by-one error, as it was including
       the header line. Thanks to Scott Baker for catching this.

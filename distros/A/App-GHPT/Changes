@@ -1,3 +1,7 @@
+1.000008 2017-07-21
+
+- Fixed call to instantiate AskPullRequestQuestions object.
+
 1.000007 2017-07-04
 
 - I should pull before releasing. :(

@@ -8,7 +8,7 @@ use utf8;
 use Test::More tests => 5;
 
 use lib 't/lib';
-use IPC::MorseSignals::TestSuite qw/try init cleanup/;
+use IPC::MorseSignals::TestSuite qw<try init cleanup>;
 
 *IPC::MorseSignals::TestSuite::diag = *Test::More::diag;
 
@@ -22,7 +22,7 @@ sub test {
  ok($res, $desc . ' (' . $len . ' bits @ ' . $speed . ' bauds)');
 }
 
-my @msgs = qw/€éèë 月語 x tata たTÂ/;
+my @msgs = qw<€éèë 月語 x tata たTÂ>;
 
 init 6;
 

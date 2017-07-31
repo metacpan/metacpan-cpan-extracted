@@ -21,7 +21,7 @@ sub run ($self) {
 
     my $upstream = $scm->upstream;
 
-    my $base_url = q[/] . $upstream->namespace . q[/] . $upstream->repo_name . q[/wiki/];
+    my $base_url = qq[/$upstream->{repo_id}/wiki/];
 
     P->file->rmtree( $wiki_path . 'POD/' );
 
@@ -97,20 +97,20 @@ MD
     say keys( $toc->%* ) + 1 . ' wiki page(s) were generated';
 
     print 'Add/remove wiki changes ... ';
-    $scm->scm_addremove or die;
-    say 'done';
+    my $add_res = $scm->scm_addremove;
+    say $add_res;
 
     if ( !$scm->scm_is_commited->{data} ) {
         print 'Committing wiki ... ';
-        $scm->scm_commit('automatically updated') or die;
-        say 'done';
+        my $commit_res = $scm->scm_commit('automatically updated');
+        say $commit_res;
 
       PUSH_WIKI:
         print 'Pushing wiki ... ';
 
         my $res = $scm->scm_push;
 
-        say $res->reason;
+        say $res;
 
         if ( !$res ) {
             goto PUSH_WIKI if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';

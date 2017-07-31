@@ -4,8 +4,6 @@ use Test2::Bundle::More;
 use Test::Mojo;
 use Mojolicious::Lite;
 
-plan 10;
-
 plugin 'plug_auth_lite', auth => sub { 1 }, url => "/foo/bar/baz";
 
 my $t = Test::Mojo->new;
@@ -28,3 +26,4 @@ $t->get_ok($url->path('/foo/bar/baz/auth'))
   ->status_is(200)
   ->content_is('ok', 'auth succeeded');
 
+done_testing;

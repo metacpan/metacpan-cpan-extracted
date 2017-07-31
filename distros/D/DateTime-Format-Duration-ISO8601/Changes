@@ -1,4 +1,13 @@
-Revision history for DateTime-Format-Duration-ISO8601
+0.004   2017-07-20 (PERLANCAR)
+
+	- [Bugfix] Avoid mixing PnYnMnDTnHnMnS and PnW styles according to ISO
+          8601 (Thanks Rudolf Leermakers).
+
+
+0.003   2017-07-20 (PERLANCAR)
+
+	- Add support for duration parsing (thanks Rudolf Leermakers).
+
 
 0.002   2016-06-29 (PERLANCAR)
 

@@ -1,71 +1,23 @@
 package Siebel::AssertOS;
 use warnings;
 use strict;
-use Siebel::AssertOS::Linux::Distribution qw(distribution_name);
+use Siebel::AssertOS::Validate qw(os_is);
 
-our $VERSION = "0.07";
+our $VERSION = '0.9'; # VERSION
 
 sub import {
-
     shift;
     die_if_os_isnt();
 }
 
 sub die_if_os_isnt {
-
     my $os = shift || $^O;
-
     os_is($os) ? 1 : die_unsupported($os);
-
 }
 
 sub die_unsupported {
-
     my $os = shift;
     die "The operation system $os is not supported";
-
-}
-
-sub os_is {
-
-    my $os = shift;
-
-    if ( $os eq 'linux' ) {
-
-        # supported Linux distribuitions
-        my %distros =
-          ( redhat => 1, suse => 1, 'oracle enterprise linux' => 1 );
-
-        my $distro = distribution_name();
-
-        if ( exists( $distros{$distro} ) ) {
-
-            return 1;
-
-        }
-        else {
-
-            warn "The Linux distribution '$distro' is not supported";
-            return 0;
-
-        }
-
-    }
-
-    return 1 if ( $os eq 'MSWin32' );
-    return 1 if ( $os eq 'aix' );
-    return 1 if ( $os eq 'solaris' );
-    if ( $os eq 'hpux' ) {
-
-        return 1;
-
-    }
-    else {
-
-        return 0;
-
-    }
-
 }
 
 1;
@@ -95,15 +47,15 @@ Regarding supported Linux distributions, this module will also validate if the c
 
 =head2 EXPORT
 
-None, but the functions below can be used by calling them with the complete package name (Siebel::AssertOS::<function>).
+None, but the functions below can be used by calling them with the complete package name (C<Siebel::AssertOS::FUNCTION>).
 
 =head3 die_if_os_isnt
 
-Expects an optional string parameter with the operational system name. If not given, it will assume $^O as default.
+Expects an optional string parameter with the operational system name. If not given, it will assume C<$^O> as default.
 
 It will execute C<os_is> with the operational system name, calling C<die_unsuported> if the return value from C<os_is> is false.
 
-Beware that the given parameter must follow the same provided by $^O, including case and format.
+Beware that the given parameter must follow the same provided by C<$^O>, including case and format.
 C<die_if_os_isnt> is called by default when the module is imported to another package.
 
 =head3 die_unsupported
@@ -116,7 +68,7 @@ Will execute C<die> with a message telling that the parameter is not supported.
 
 Expects a string as parameter, being the string the OS name.
 
-Returns true or false depending on the give value. The string is restricted by those return by $^O special variable.
+Returns true or false depending on the give value. The string is restricted by those return by C<$^O> special variable.
 
 =head1 SEE ALSO
 

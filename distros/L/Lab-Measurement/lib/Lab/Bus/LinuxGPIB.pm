@@ -1,7 +1,6 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus::LinuxGPIB;
-$Lab::Bus::LinuxGPIB::VERSION = '3.553';
+#ABSTRACT: LinuxGPIB bus
+$Lab::Bus::LinuxGPIB::VERSION = '3.554';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -476,6 +475,11 @@ sub _search_twin {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -483,6 +487,10 @@ sub _search_twin {
 =head1 NAME
 
 Lab::Bus::LinuxGPIB - LinuxGPIB bus
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -510,7 +518,6 @@ be automagically reused.
 In GPIB, instantiating two bus with identical parameter "gpib_board" will logically lead to the reuse of the first one.
 To override this, use the parameter "ignore_twins" at your own risk.
 
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -522,7 +529,6 @@ To override this, use the parameter "ignore_twins" at your own risk.
 Return blessed $self, with @_ accessible through $self->config().
 
 C<gpib_board>: Index of board to use. Can be omitted, 0 is the default.
-
 
 =head1 Thrown Exceptions
 
@@ -558,13 +564,11 @@ See C<Lab::Instrument::Read()>.
 
 TODO: this is probably not correct anymore
 
-
 =head2 connection_write
 
   $GPIB->connection_write( $InstrumentHandle, { Cmd => $Command } );
 
 Sends $Command to the instrument specified by the handle.
-
 
 =head2 connection_read
 
@@ -602,11 +606,11 @@ Few. Also, not a lot to be done here.
 
 =over 4
 
-=item 
+=item
 
 L<Lab::Bus>
 
-=item 
+=item
 
 L<Lab::Bus::MODBUS>
 
@@ -616,17 +620,17 @@ and many more...
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer <schroeer@cpan.org>, 
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and David Kalok,
-           2010      Matthias Völker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich, Hermann Kraus, Stefan Geissler
+            2016       Charles Lane, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

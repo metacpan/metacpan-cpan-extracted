@@ -1,5 +1,7 @@
 #! perl -w
 
+use strict;
+use warnings;
 use Test::Most;
 use App::JESP;
 
@@ -17,7 +19,16 @@ throws_ok(sub{ $jesp->deploy() } , qr/ERROR querying meta/ );
 
 # Time to install
 $jesp->install();
-is( $jesp->deploy(), 4, "Ok applied 3 patches");
+ my $status = $jesp->status();
+is( scalar( @{$status->{plan_patches}} ) , 4, "Ok 4 patches in plan");
+is( $jesp->deploy(), 4, "Ok applied 4 patches");
+
+$status = $jesp->status();
+is( scalar( @{$status->{plan_patches}} ) , 4, "Ok 4 patches in plan");
+map{ ok( $_->applied_datetime() )  } @{$status->{plan_patches}};
+is( scalar( @{$status->{plan_orphans}} ) , 0 , "Ok 0 orphans");
+
+
 is( $jesp->deploy(), 0, "Ok applied 0 patches on the second call");
 
 # After this is installed, we should be able to use and query the
@@ -54,6 +65,14 @@ is( $jesp->deploy({ force => 1, logonly => 1  }) , 4 , "Ok 4  patches forced app
         my $hashes = $jesp->dbix_simple()->select( 'customer' , [ 'cust_id', 'cust_addr' ] )->hashes();
         is( $hashes->[0]->{cust_addr} , 'Rue de la pierre en bois' , "The trigger did work!" );
     }
+}
+
+{
+    # Create some orphans and check we have the right amount of orphans.
+    shift @{$jesp->plan()->patches()};
+    my $status = $jesp->status();
+    is( scalar( @{$status->{plan_patches}} ) , 3, "Ok 3 patches in plan");
+    is( scalar( @{$status->{plan_orphans}} ) , 1 , "Ok 1 orphan");
 }
 
 done_testing();

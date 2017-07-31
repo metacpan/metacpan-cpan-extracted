@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use open qw(:utf8 :std);
 
-our $VERSION='0.1';
+our $VERSION='0.11';
 
 sub new {
 
@@ -272,8 +272,7 @@ sub loadBratFile {
 	@ends = ();
 
 	($id, $info, $str) = split /\t/, $line;
-	# warn "$id\n";
-	if ($id =~ /^T(?<numid>\d+)/) {
+	if ($id =~ /^TS?(?<numid>[\d]+)/) {
 	    $numId = $+{numid};
 #	    ($type, $start, $end) = split / /, $info;
 #	    warn "info: $info\n";
@@ -356,6 +355,28 @@ sub printStats {
     }
 }
 
+sub getTermTypes {
+    my ($self) = @_;
+
+    my $id;
+    my %termTypes;
+    foreach $id (keys %{$self->_terms}) {
+	$termTypes{$self->_getTermFromId($id)->{'type'}}++;
+    }
+    return(%termTypes);
+}
+
+sub getRelationTypes {
+    my ($self) = @_;
+
+    my $id;
+    my %relationTypes;
+    foreach $id (keys %{$self->_relations}) {
+	$relationTypes{$self->_getRelationFromId($id)->{'type'}}++;
+    }
+    return(%relationTypes);
+}
+
 sub getStats {
     my ($self) = @_;
 
@@ -428,6 +449,16 @@ sub getTermList {
 }
 
 
+sub getTerms {
+    my ($self) = @_;
+    my $id;
+    my @terms;
+
+    foreach $id (keys %{$self->_terms}) {
+	push @terms, {"str" => $self->_getTermFromId($id)->{'str'}, "lmstr" => undef, "type" => $self->_getTermFromId($id)->{'type'}};
+    }
+    return(\@terms);
+}
 
 sub printRelationList {
     my ($self, $filename, $addmode) = @_;
@@ -458,6 +489,23 @@ sub getRelationList {
     }
     return($relationList);
 }
+
+
+sub getRelations {
+    my ($self, $addmode) = @_;
+    my $id;
+    my $relationList = "";
+    my @relations;
+    
+    foreach $id (keys %{$self->_relations}) {
+	push @relations, {'str1' => $self->_getTermFromId($self->_getRelationFromId($id)->{'arg1'})->{'str'}, 
+			  'str2' => $self->_getTermFromId($self->_getRelationFromId($id)->{'arg2'})->{'str'},
+			  'type' => $self->_getRelationFromId($id)->{'type'}};
+	# $relationList .= $self->_getTermFromId($self->_getRelationFromId($id)->{'arg1'})->{'str'} . " : " . $self->_getTermFromId($self->_getRelationFromId($id)->{'arg2'})->{'str'} . " : " . $self->_getRelationFromId($id)->{'type'} . "\n";
+    }
+    return(\@relations);
+}
+
 
 sub getAnnotationList {
     my ($self) = @_;
@@ -634,6 +682,12 @@ The method prints a entity list in the C<Alvis::TermTagger> format.
 The method returns a string containing the list of entities in the
 C<Alvis::TermTagger> format.
 
+=head2 getTerms()
+
+    $bratFile->getTerms();
+
+The method returns an array containing the list of entities with their type.
+
 =head2 printRelationList()
 
     $bratFile->printRelationList($filename, $mode);
@@ -641,14 +695,34 @@ C<Alvis::TermTagger> format.
 The method prints relations between two entities with the type of the
 relation. Separator is C< : >.
 
-
-
 =head2 getRelationList()
 
     $bratFile->getRelationList();
 
 The method returns a string containing the relations between two
 entities with the type of the relation. Separator is C< : >.
+
+=head2 getRelations()
+
+    $bratFile->getRelations();
+
+The method returns an array containing the relations between two
+entities with the type of the relation.
+
+=head2 getRelationTypes()
+
+    $bratFile->getRelationTypes();
+
+The method returns the reference to an hashtable containing the
+relations between two entities for each relation type. The relation
+types are the hash keys.
+
+=head2 getTermTypes()
+
+    $bratFile->getTermTypes();
+
+The method returns the reference to an hashtable containing the
+terms for each term type. The term types are the hash keys.
 
 =head2 getAnnotationList()
 

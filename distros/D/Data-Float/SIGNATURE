@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,14 +15,13 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 67ab6441ac84593b05be87ec425194d069a51a4f .gitignore
-SHA1 22c0b8256338e7f077f6311527c006ca9acfc75b Build.PL
-SHA1 ca759dce347033b09e9ae85304e9afa352f97e6b Changes
-SHA1 739118525532c8ff18c2f9ec7a929501d610088a MANIFEST
-SHA1 c842f45a8761f35bb77ce7cff3e1bde66826d4c2 META.json
-SHA1 83ade225100dc05a2d06033c44cd317609f97efb META.yml
-SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
-SHA1 6f2a34c998a573556ecc84049f01bc1deb30d860 README
-SHA1 f3398878f29a6e567c17b98caa25ffa15c857033 lib/Data/Float.pm
+SHA1 51038d8df8e8a4aa29c0b5462db2a554079dd1d4 Build.PL
+SHA1 083de6c6b8b9b82eabc05f87708086791c66d14a Changes
+SHA1 efa3ba002e530881eb04ceb66df34f8d5151e6ee MANIFEST
+SHA1 3d9fb5d89a73d9dd7dd9ce83e05d6b9f58e8b274 META.json
+SHA1 093974afafda5e5df08e79ecdf9f553c7d8864d5 META.yml
+SHA1 0e70e74666ed9702cbce0899ed0a2e759c532b0c README
+SHA1 7d2f83d9e82cc04b8f03716373f6e4f963da5079 lib/Data/Float.pm
 SHA1 1108747d9aec62d4eadd34403fa59f1c54df153f t/class.t
 SHA1 eba7f4eeb285767f6546eebdca9cd07011b4dd51 t/const.t
 SHA1 a4ee7a6b431b6e5ee3872ff2dba90663c28148d7 t/copysign.t
@@ -34,9 +33,9 @@ SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 3369ba662006149c6e5a089e6f2a440367f6df64 t/pow2.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk8tRHMACgkQOV9mt2VyAVHh0QCfTJyr4UoKGJNnpJBYoNRMt0st
-0DsAniDJ01nBya7tjOZrcDPqJ9zv5ynU
-=rIt7
+iEYEARECAAYFAll85HQACgkQOV9mt2VyAVG57wCfWtVZY5fr+Sm2iKataje2u6s8
+HsIAoJaNsFJB2s+xS3UlCJdqvXRe103v
+=fbmx
 -----END PGP SIGNATURE-----

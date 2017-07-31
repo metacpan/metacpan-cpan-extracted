@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Field::Checkbox;
 # ABSTRACT: HTML attributes field role
-$HTML::FormHandler::Widget::Field::Checkbox::VERSION = '0.40067';
+$HTML::FormHandler::Widget::Field::Checkbox::VERSION = '0.40068';
 use Moose::Role;
 use namespace::autoclean;
 use HTML::FormHandler::Render::Util ('process_attrs');
@@ -43,7 +43,7 @@ HTML::FormHandler::Widget::Field::Checkbox - HTML attributes field role
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

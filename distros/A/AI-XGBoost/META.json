@@ -68,7 +68,10 @@
          "web" : "https://github.com/pablrod/p5-AI-XGBoost"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
+   "x_contributors" : [
+      "Ruben <me@ruben.tech>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

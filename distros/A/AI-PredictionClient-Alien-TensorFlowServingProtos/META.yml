@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Alien::Build: '0.40'
   Alien::Build::MM: '0.40'
-  Alien::Google::GRPC: '0.03'
+  Alien::Google::GRPC: '0.06'
   Archive::Extract: '0'
   Env: '0'
   ExtUtils::MakeMaker: '6.52'
@@ -23,9 +23,12 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: AI-PredictionClient-Alien-TensorFlowServingProtos
+provides:
+  AI::PredictionClient::Alien::TensorFlowServingProtos:
+    file: lib/AI/PredictionClient/Alien/TensorFlowServingProtos.pm
+    version: '0.05'
 requires:
   Alien::Base: '0'
-  Alien::Google::GRPC: '0'
   base: '0'
   perl: '5.01'
   strict: '0'
@@ -33,5 +36,5 @@ requires:
 resources:
   homepage: https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos
   repository: https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

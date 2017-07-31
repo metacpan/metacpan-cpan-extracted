@@ -4,7 +4,7 @@ use warnings;
 
 use parent 'NativeCall';
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.008';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
@@ -92,7 +92,7 @@ AI::XGBoost::CAPI::RAW - Perl wrapper for XGBoost C API https://github.com/dmlc/
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 

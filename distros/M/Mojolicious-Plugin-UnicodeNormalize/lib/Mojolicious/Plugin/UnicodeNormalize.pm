@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::UnicodeNormalize;
-$Mojolicious::Plugin::UnicodeNormalize::VERSION = '1.20160509';
-use Mojolicious 6.41;
+$Mojolicious::Plugin::UnicodeNormalize::VERSION = '1.20170726';
+use Mojolicious 7.0;
 use Mojo::Base 'Mojolicious::Plugin';
 use Unicode::Normalize ();
 
@@ -16,8 +16,7 @@ sub register {
     }
 
     my $sub = sub {
-        my $c      = shift;
-        my $params = $c->req->params;
+        my $params = $_[0]->req->params;
         my $pairs  = [
             map { ref( $_ ) ? $_ : $normalizer->( $_ ) } @{ $params->pairs }
         ];
@@ -90,8 +89,7 @@ Unless you know why you might use an alternate form, use the default of NFC.
 
 =head1 AUTHOR
 
-chromatic E<lt>chromatic@cpan.orgE<gt>, sponsored by Blender Recipe Reviews
-(L<https://blenderrecipereviews.com/>).
+chromatic E<lt>chromatic@cpan.orgE<gt>.
 
 =head1 SEE ALSO
 
@@ -100,4 +98,5 @@ L<Mojolicious>, L<Unicode::Normalize>
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify it under
-the terms of the Artistic License, version 2 (the same terms as Perl itself).
+the terms of the Artistic License, version 2 (the same terms as Perl 5.26
+itself).

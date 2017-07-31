@@ -28,7 +28,11 @@ sub new {
 
         endrow   => $params->{endrow},
 
-        endtime  => $params->{endtime},
+        starttime => $params->{starttime}, # server's default is 0
+
+        endtime  => $params->{endtime}, # server's default is Long.MAX_VALUE
+
+        maxversions => $params->{maxversions}, # server's default is 1
 
         prefix   => $params->{prefix},
 
@@ -111,6 +115,9 @@ sub get_next_batch {
         my $rows = $self->_scan_raw({
             table      => $self->{table},
             startrow   => $self->{startrow}, # <- inclusive
+            starttime  => $self->{starttime},
+            endtime    => $self->{endtime},
+            maxversions=> $self->{maxversions},
             limit      => $limit,
         });
         $self->{last_batch_time} = time - $self->{_last_batch_time_start};
@@ -160,6 +167,9 @@ sub get_next_batch {
             table     => $table,
             startrow  => $last_key_from_previous_batch,
             exclude_startrow_from_result => 1,
+            starttime  => $self->{starttime},
+            endtime    => $self->{endtime},
+            maxversions=> $self->{maxversions},
             limit     => $limit,
         });
 
@@ -229,8 +239,6 @@ sub _scan_raw {
     my $hbase = $self->{hbase};
     $hbase->{last_error} = undef;
 
-    $params->{endtime} = $self->{endtime};
-
     my $scan_uri = _build_scan_uri($params);
 
     my $rows = $hbase->_get_tiny($scan_uri);
@@ -256,12 +264,12 @@ sub _build_scan_uri {
     # optional
     my $startrow    = $params->{startrow}    || "";
     my $endrow      = $params->{endrow}      || "";
-    my $endtime     = $params->{endtime}     || "";
+    my $starttime   = $params->{starttime}; # server's default is 0
+    my $endtime     = $params->{endtime}; # server's default is Long.MAX_VALUE
+    my $maxversions = $params->{maxversions}; # server's default is 1
 
     # not supported yet:
     my $columns     = $params->{columns}     || "";
-    my $starttime   = $params->{starttime}   || "";
-    my $maxversions = $params->{maxversions} || "";
 
     # option to do scans with exclusion of first row. Usefull when
     # scanning for the next batch based on the last key from previous
@@ -285,7 +293,9 @@ sub _build_scan_uri {
         . "&limit="     . $limit
     ;
 
-    $uri .= "&endtime=" . $endtime if $endtime;
+    $uri .= "&starttime=" . $starttime if defined $starttime;
+    $uri .= "&endtime=" . $endtime if defined $endtime;
+    $uri .= "&maxversions=" . $maxversions if defined $maxversions;
 
     return $uri;
 }

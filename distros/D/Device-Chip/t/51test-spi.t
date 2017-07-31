@@ -14,7 +14,7 @@ my $spi = $adapter->make_protocol( 'SPI' )->get;
 ok( defined $spi, 'defined $spi' );
 
 {
-   test_out( '    # Subtest: ->write' );
+   test_out( qr/\s*# Subtest: ->write\n/ );
    test_out( '    ok 1 - write' );
    test_out( '    1..1' );
    test_out( 'ok 1 - ->write' );
@@ -28,7 +28,7 @@ ok( defined $spi, 'defined $spi' );
 
 {
    test_out( 'ok 1 - ->readwrite return' );
-   test_out( '    # Subtest: ->readwrite' );
+   test_out( qr/\s*# Subtest: ->readwrite\n/ );
    test_out( '    ok 1 - readwrite' );
    test_out( '    1..1' );
    test_out( 'ok 2 - ->readwrite' );

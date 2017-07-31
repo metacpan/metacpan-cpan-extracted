@@ -38,6 +38,27 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            Key => {
+                username => '1234',
+            },
+            TableName => 'users',
+            force_type => {
+                username => 'S',
+            },
+        )
+    },
+    {
+        Key => {
+            username => { S => '1234' },
+        },
+        TableName => 'users',
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output = Paws::DynamoDB::DeleteItemOutput->new();
 is(
     $class->transform_output($test_output),

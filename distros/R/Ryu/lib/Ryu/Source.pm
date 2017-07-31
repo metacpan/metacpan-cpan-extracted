@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 =head1 NAME
 
@@ -449,7 +449,14 @@ sub map : method {
         return if $src->is_ready;
         shift->on_ready($src->completed);
     });
-    $self->each_while_source(sub { $src->emit(scalar $_->$code) }, $src);
+    $self->each_while_source(sub {
+        $src->emit(blessed($_)
+            ? (scalar $_->$code)
+            : !ref($code)
+            ? $_->{$code}
+            : scalar $_->$code
+        )
+    }, $src);
 }
 
 =head2 flat_map

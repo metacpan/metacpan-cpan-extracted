@@ -13,10 +13,10 @@ my $re_full = "(?^ux: $re_short (?= \\P{Lao} | \\s | \$ | $re_short ) )";
 sub is_re {
     my ($is, $should, $message) = @_;
     # fix up for Perl < 5.14
-    if($^V lt v5.14) {
+    if($^V < 5.014_000) {
         s/\(\?\S+?://g for $is, $should;   # makes malformed RE, but never mind
     }
-    is($is, $should, $message);
+    return is($is, $should, $message);
 }
 
 my $re_is = Lingua::LO::NLP::Data::get_sylre_basic;

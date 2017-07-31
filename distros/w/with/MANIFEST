@@ -1,8 +1,11 @@
 Changes
 MANIFEST
+META.json
+META.yml
 Makefile.PL
 README
 lib/with.pm
+samples/bench.pl
 samples/funcs.pl
 samples/with.pl
 t/00-load.t
@@ -11,10 +14,4 @@ t/11-skip.t
 t/12-keywords.t
 t/13-scope.t
 t/14-defer.t
-t/90-boilerplate.t
-t/91-pod.t
-t/92-pod-coverage.t
-t/95-portability-files.t
-t/99-kwalitee.t
 t/lib/with/TestClass.pm
-META.yml                                 Module meta-data (added by MakeMaker)

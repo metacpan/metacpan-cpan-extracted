@@ -4,7 +4,7 @@ use strict;
 use YAML qw(LoadFile Load);
 use IO::File;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -580,20 +580,21 @@ sub _parse_edi
 
                        my $structure = $spec->{structure}{lc($section)};
 
-                       # START THE LOOPING
-                       if ($loop_def{$type} and not $IN_LOOP)
-                       {
-                           $IN_LOOP = $type;
-                           $LOOP_SECTION = $section;
-                           %LOOP_SEGMENTS = map { $_ => 1 } @{ $loop_def{$type} || [] };
-                       }
-
                        # END THE LOOPING
                        if ($IN_LOOP and not $LOOP_SEGMENTS{$type})
                        {
                            %LOOP_SEGMENTS = ();
                            $LOOP_SECTION = undef;
                            $IN_LOOP = undef;
+                       }
+
+                       # START THE LOOPING
+                       if ($loop_def{$type} and not $IN_LOOP)
+                       {
+                           $IN_LOOP = $type;
+                           $LOOP_SECTION = $section;
+                           %LOOP_SEGMENTS = map { $_ => 1 } @{ $loop_def{$type} || [] };
+
                        }
 
                        if ($IN_LOOP)

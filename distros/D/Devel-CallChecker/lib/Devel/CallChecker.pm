@@ -4,22 +4,22 @@ Devel::CallChecker - custom op checking attached to subroutines
 
 =head1 SYNOPSIS
 
-	# to generate header prior to XS compilation
+    # to generate header prior to XS compilation
 
-	perl -MDevel::CallChecker=callchecker0_h \
-		-e 'print callchecker0_h' > callchecker0.h
+    perl -MDevel::CallChecker=callchecker0_h \
+	-e 'print callchecker0_h' > callchecker0.h
 
-	# in Perl part of module
+    # in Perl part of module
 
-	use Devel::CallChecker;
+    use Devel::CallChecker;
 
-	/* in XS */
+    /* in XS */
 
-	#include "callchecker0.h"
+    #include "callchecker0.h"
 
-	cv_get_call_checker(cv, &ckfun, &ckobj);
-	static OP *my_ckfun(pTHX_ OP *o, GV *namegv, SV *ckobj);
-	cv_set_call_checker(cv, my_ckfun, ckobj);
+    cv_get_call_checker(cv, &ckfun, &ckobj);
+    static OP *my_ckfun(pTHX_ OP *o, GV *namegv, SV *ckobj);
+    cv_set_call_checker(cv, my_ckfun, ckobj);
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ package Devel::CallChecker;
 use warnings;
 use strict;
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(callchecker0_h callchecker_linkable);
@@ -138,7 +138,7 @@ referencing GV.  The resulting C<GV*> is cast to C<CV*> to be returned.
 A null pointer is returned as usual if there is no statically-determinable
 subroutine.
 
-	CV *rv2cv_op_cv(OP *cvop, U32 flags)
+    CV *rv2cv_op_cv(OP *cvop, U32 flags)
 
 =item cv_get_call_checker
 
@@ -166,8 +166,8 @@ and the SV parameter is I<cv> itself.  This implements standard
 prototype processing.  It can be changed, for a particular subroutine,
 by L</cv_set_call_checker>.
 
-	void cv_get_call_checker(CV *cv,
-		Perl_call_checker *ckfun_p, SV **ckobj_p)
+    void cv_get_call_checker(CV *cv, Perl_call_checker *ckfun_p,
+	    SV **ckobj_p)
 
 =item cv_set_call_checker
 
@@ -192,8 +192,8 @@ such as to a call to a different subroutine or to a method call.
 The current setting for a particular CV can be retrieved by
 L</cv_get_call_checker>.
 
-	void cv_set_call_checker(CV *cv, Perl_call_checker ckfun,
-		SV *ckobj)
+    void cv_set_call_checker(CV *cv, Perl_call_checker ckfun,
+	    SV *ckobj)
 
 =item ck_entersub_args_list
 
@@ -204,7 +204,7 @@ with C<&>, or a method call, or a call through a subroutine reference,
 or any other call where the callee can't be identified at compile time,
 or a call where the callee has no prototype.
 
-	OP *ck_entersub_args_list(OP *entersubop)
+    OP *ck_entersub_args_list(OP *entersubop)
 
 =item ck_entersub_args_proto
 
@@ -230,8 +230,8 @@ exception at the top level of parsing which covers all the compilation
 errors that occurred.  In the error message, the callee is referred to
 by the name defined by the I<namegv> parameter.
 
-	OP *ck_entersub_args_proto(OP *entersubop, GV *namegv,
-		SV *protosv)
+    OP *ck_entersub_args_proto(OP *entersubop, GV *namegv,
+	    SV *protosv)
 
 =item ck_entersub_args_proto_or_list
 
@@ -256,8 +256,8 @@ exception at the top level of parsing which covers all the compilation
 errors that occurred.  In the error message, the callee is referred to
 by the name defined by the I<namegv> parameter.
 
-	OP *ck_entersub_args_proto_or_list(OP *entersubop,
-		GV *namegv, SV *protosv)
+    OP *ck_entersub_args_proto_or_list(OP *entersubop, GV *namegv,
+	    SV *protosv)
 
 =back
 
@@ -273,7 +273,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011, 2012, 2013, 2015
+Copyright (C) 2011, 2012, 2013, 2015, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

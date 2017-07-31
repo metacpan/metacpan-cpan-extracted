@@ -2,7 +2,7 @@
 
 # PODNAME: plugauthpasswd
 # ABSTRACT: Change your PlugAuth password
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 use strict;
@@ -55,7 +55,7 @@ plugauthpasswd - Change your PlugAuth password
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 SYNOPSIS
 

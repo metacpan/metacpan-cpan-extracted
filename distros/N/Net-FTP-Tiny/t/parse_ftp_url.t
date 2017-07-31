@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 185;
+use Test::More 0.41 tests => 185;
 
 use Net::FTP::Tiny ();
 

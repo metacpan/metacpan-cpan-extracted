@@ -32,12 +32,22 @@ Module::Build->new(
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
 	meta_merge => {
+		"meta-spec" => { version => "2" },
 		resources => {
-			repository => "git://git.fysh.org/zefram/".
-				"DateTime-TimeZone-SystemV.git",
+			bugtracker => {
+				mailto => "bug-DateTime-TimeZone-SystemV".
+					"\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=".
+					"DateTime-TimeZone-SystemV",
+			},
+			repository => {
+				type => "git",
+				url => "git://git.fysh.org/zefram/".
+					"DateTime-TimeZone-SystemV.git",
+			},
 		},
 	},
-	create_makefile_pl => "passthrough",
 	sign => 1,
 )->create_build_script;
 

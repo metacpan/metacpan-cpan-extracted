@@ -4,29 +4,56 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 use Exporter qw( import );
 
 use Module::Implementation;
 
 my @subs = qw(
-    any all none notall
-    true false
-    firstidx lastidx
-    insert_after insert_after_string
-    apply indexes
-    after after_incl before before_incl
-    firstval lastval
-    each_array each_arrayref
-    pairwise natatime
-    mesh uniq
-    minmax part
+    after
+    after_incl
+    all
+    all_u
+    any
+    any_u
+    apply
+    before
+    before_incl
     bsearch
-    sort_by nsort_by
-    one any_u all_u none_u notall_u one_u
-    firstres onlyidx onlyval onlyres lastres
-    singleton bsearchidx
+    bsearchidx
+    each_array
+    each_arrayref
+    false
+    firstidx
+    firstres
+    firstval
+    indexes
+    insert_after
+    insert_after_string
+    lastidx
+    lastres
+    lastval
+    mesh
+    minmax
+    mode
+    natatime
+    none
+    none_u
+    notall
+    notall_u
+    nsort_by
+    one
+    one_u
+    onlyidx
+    onlyres
+    onlyval
+    pairwise
+    part
+    singleton
+    sort_by
+    true
+    uniq
 );
 
 my %aliases = (
@@ -83,7 +110,7 @@ List::SomeUtils - Provide the stuff missing in List::Util
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -112,15 +139,15 @@ couldn't be compiled on this machine.
 =head1 WHY DOES THIS MODULE EXIST?
 
 You might wonder why this module exists when we already have
-L<List::MoreUtils>. In fact, this module is the same code as is found in LMU
-with no significant changes. However, the LMU distribution depends on several
-modules for configuration (to run the Makefile.PL) that some folks in the Perl
-community don't think are appropriate for a module high upstream in the CPAN
-river.
+L<List::MoreUtils>. In fact, this module is (nearly) the same code as is found
+in LMU with no significant changes. However, the LMU distribution depends on
+several modules for configuration (to run the Makefile.PL) that some folks in
+the Perl community don't think are appropriate for a module high upstream in
+the CPAN river.
 
 I (Dave Rolsky) don't have a strong opinion on this, but I I<do> like the
 functions provided by LMU, and I'm tired of getting patches and PRs to remove
-it from my code.
+LMU from my code.
 
 This distribution exists to let me use the functionality I like without having
 to get into tiring arguments about issues I don't really care about.
@@ -353,9 +380,9 @@ scalar context, returns the number of unique elements in LIST.
   my $x = uniq 1, 1, 2, 2, 3, 5, 3, 4; # returns 5
   # returns "Mike", "Michael", "Richard", "Rick"
   my @n = distinct "Mike", "Michael", "Richard", "Rick", "Michael", "Rick"
-  # returns '', 'S1', A5' and complains about "Use of uninitialized value"
+  # returns '', undef, 'S1', A5'
   my @s = distinct '', undef, 'S1', 'A5'
-  # returns undef, 'S1', A5' and complains about "Use of uninitialized value"
+  # returns '', undef, 'S1', A5'
   my @w = uniq undef, '', 'S1', 'A5'
 
 C<distinct> is an alias for C<uniq>.
@@ -668,6 +695,19 @@ However, the Perl implementation of it has some overhead simply due to the fact
 that there are more lines of Perl code involved. Therefore, LIST needs to be
 fairly big in order for C<minmax> to win over a naive implementation. This
 limitation does not apply to the XS version.
+
+=head3 mode LIST
+
+Calculates the most common items in the list and returns them as a list. This
+is effectively done by string comparisons, so references will be
+stringified. If they implement string overloading, this will be used.
+
+If more than one item appears the same number of times in the list, all such
+items will be returned. For example, the mode of a unique list is the list
+itself.
+
+This function B<always> returns a list. That means that in scalar context you
+get a count indicating the number of modes in the list.
 
 =head1 MAINTENANCE
 

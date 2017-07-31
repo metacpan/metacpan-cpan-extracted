@@ -4,24 +4,24 @@ DateTime::TimeZone::Tzfile - tzfile (zoneinfo) timezone files
 
 =head1 SYNOPSIS
 
-	use DateTime::TimeZone::Tzfile;
+    use DateTime::TimeZone::Tzfile;
 
-	$tz = DateTime::TimeZone::Tzfile->new(
-		name => "local timezone",
-		filename => "/etc/localtime");
-	$tz = DateTime::TimeZone::Tzfile->new("/etc/localtime");
+    $tz = DateTime::TimeZone::Tzfile->new(
+	    name => "local timezone",
+	    filename => "/etc/localtime");
+    $tz = DateTime::TimeZone::Tzfile->new("/etc/localtime");
 
-	if($tz->is_floating) { ...
-	if($tz->is_utc) { ...
-	if($tz->is_olson) { ...
-	$category = $tz->category;
-	$tz_string = $tz->name;
+    if($tz->is_floating) { ...
+    if($tz->is_utc) { ...
+    if($tz->is_olson) { ...
+    $category = $tz->category;
+    $tz_string = $tz->name;
 
-	if($tz->has_dst_changes) { ...
-	if($tz->is_dst_for_datetime($dt)) { ...
-	$offset = $tz->offset_for_datetime($dt);
-	$abbrev = $tz->short_name_for_datetime($dt);
-	$offset = $tz->offset_for_local_datetime($dt);
+    if($tz->has_dst_changes) { ...
+    if($tz->is_dst_for_datetime($dt)) { ...
+    $offset = $tz->offset_for_datetime($dt);
+    $abbrev = $tz->short_name_for_datetime($dt);
+    $offset = $tz->offset_for_local_datetime($dt);
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ use IO::File 1.13;
 use IO::Handle 1.08;
 use Params::Classify 0.000 qw(is_undef is_string is_ref);
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 my $rdn_epoch_cjdn = 1721425;
 
@@ -581,7 +581,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007, 2009, 2010, 2011, 2012, 2013
+Copyright (C) 2007, 2009, 2010, 2011, 2012, 2013, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

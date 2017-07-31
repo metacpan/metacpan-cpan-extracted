@@ -3,38 +3,40 @@ abstract: 'minimal FTP client'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  Test::More: '0.41'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-FTP-Tiny
 provides:
   Net::FTP::Tiny:
     file: lib/Net/FTP/Tiny.pm
-    version: 0.001
+    version: '0.002'
 recommends:
-  IO::Socket::IP: 0.08
+  IO::Socket::IP: '0.08'
 requires:
-  Carp: 0
-  Exporter: 0
-  IO::Socket::INET: 1.24
-  Socket: 1.72
-  perl: 5.006
-  strict: 0
-  utf8: 0
-  warnings: 0
+  Carp: '0'
+  Exporter: '0'
+  IO::Socket::INET: '1.24'
+  Socket: '1.72'
+  perl: '5.006'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Tiny
   license: http://dev.perl.org/licenses/
-version: 0.001
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

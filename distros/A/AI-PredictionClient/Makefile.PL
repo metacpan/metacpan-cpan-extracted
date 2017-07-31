@@ -15,8 +15,8 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "A Perl Prediction client for Google TensorFlow Serving.",
   "AUTHOR" => "Tom Stall <stall\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "AI::PredictionClient::Alien::TensorFlowServingProtos" => "0.03",
-    "Alien::Google::GRPC" => "0.03",
+    "AI::PredictionClient::Alien::TensorFlowServingProtos" => "0.05",
+    "Alien::Google::GRPC" => "0.06",
     "ExtUtils::MakeMaker" => 0,
     "Inline" => 0,
     "Inline::CPP" => 0,
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }

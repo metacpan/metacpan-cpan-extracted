@@ -61,10 +61,3 @@ sub get_response {
 }
 
 
-sub has_perlfunc {
-
-
-  
-
-
-}

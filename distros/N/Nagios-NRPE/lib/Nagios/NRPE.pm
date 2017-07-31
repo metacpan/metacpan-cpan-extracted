@@ -22,13 +22,12 @@ Nagios::NRPE - A Nagios NRPE implementation in pure perl
  use IO::Socket;
  use IO::Socket::INET;
  # Import necessary constants into Namespace
- use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_2
-		             NRPE_PACKET_QUERY
-		             MAX_PACKETBUFFER_LENGTH
-		             STATE_UNKNOWN
-		             STATE_CRITICAL
-		             STATE_WARNING
-		             STATE_OK);
+ use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_3
+                             NRPE_PACKET_QUERY
+                             STATE_UNKNOWN
+                             STATE_CRITICAL
+                             STATE_WARNING
+                             STATE_OK);
 
  my $packet = Nagios::NRPE::Packet->new();
 
@@ -40,7 +39,7 @@ Nagios::NRPE - A Nagios NRPE implementation in pure perl
 
  print $socket $packet->assemble(type => QUERY_PACKET,
                               buffer => "check_load 1 2 3",
-                              version => NRPE_PACKET_VERSION_2 );
+                              version => NRPE_PACKET_VERSION_3 );
 
  my $data = <$socket>
  my $response = $packet->deassemble($data);
@@ -54,7 +53,7 @@ the submodules please read Nagios::NRPE::Client or Nagios::NRPE::Packet or Nagio
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Andreas Marschke <andreas.marschke@googlemail.com>.
+This software is copyright (c) 2017 by the authors (see AUTHORS file).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -66,8 +65,6 @@ package Nagios::NRPE;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '1.0.2';
 
 1;
-
-

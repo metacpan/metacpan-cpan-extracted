@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use File::HomeDir::Test;
+use Test2::Plugin::FauxHomeDir;
 use Test::More;
 
 BEGIN {

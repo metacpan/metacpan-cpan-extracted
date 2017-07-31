@@ -30,7 +30,22 @@ sub test_undef() {
     );
 }
 
-# If the value looks like a number, use Number ('N').
+# If the value is an empty string, use Null ('NULL')
+sub test_empty_string() {
+    my $item = {
+        user_id => '',
+    };
+    my $item_dynamodb = {
+        user_id => { NULL => '1' },
+    };
+    cmp_deeply(
+        dynamodb_marshal($item),
+        $item_dynamodb,
+        'empty string marshalled to NULL',
+    );
+}
+
+# If the value is a number, use Number ('N').
 sub test_number() {
     my $item = {
         user_id => '1234',
@@ -49,6 +64,62 @@ sub test_number() {
         dynamodb_unmarshal($item_dynamodb),
         $item,
         q|N's unmarshalled to numbers|,
+    );
+}
+
+# If it's a number, but is too large/precise for DynamoDB, use String('S').
+sub test_out_of_range_number() {
+    my $item = {
+        ok_large            => '1E+125',
+        ok_small            => '1E-129',
+        ok_small_negative   => '-1E-129',
+        ok_large_negative   => '-1E+125',
+        ok_precise          => 1x38,
+        too_large           => '1E+126',
+        too_small           => '1E-130',
+        too_small_negative  => '-1E-130',
+        too_large_negative  => '-1E+126',
+        too_precise         => 1x39,
+        too_precise2        => '1.'.(1x38),
+    };
+    cmp_deeply(
+        dynamodb_marshal($item),
+        {
+            ok_large => {
+                N => '1E+125',
+            },
+            ok_small => {
+                N => '1E-129',
+            },
+            ok_small_negative => {
+                N => '-1E-129',
+            },
+            ok_large_negative => {
+                N => '-1E+125',
+            },
+            ok_precise => {
+                N => 1x38,
+            },
+            too_large => {
+                S => '1E+126',
+            },
+            too_small => {
+                S => '1E-130',
+            },
+            too_small_negative => {
+                S => '-1E-130',
+            },
+            too_large_negative => {
+                S => '-1E+126',
+            },
+            too_precise => {
+                S => 1x39,
+            },
+            too_precise2 => {
+                S => '1.'.(1x38),
+            },
+        },
+        'out-of-bounds numbers marshalled to S',
     );
 }
 
@@ -154,8 +225,8 @@ sub test_boolean() {
     );
 }
 
-# If the value isa Set::Object, use Number Set ('NS') if all members look
-# like numbers.
+# If the value isa Set::Object, use Number Set ('NS') if all members are
+# numbers.
 sub test_number_set() {
     my $item = {
         scores => Set::Object->new(5, 7, 25, 32.4),
@@ -191,8 +262,8 @@ sub test_number_set() {
     );
 }
 
-# If the value isa Set::Object, use String Set ('SS') if one member does not
-# look like a number.
+# If the value isa Set::Object, use String Set ('SS') if one member is not
+# a number.
 sub test_string_set() {
     my $item = {
         tags => Set::Object->new(54, 'clothing', 'female'),
@@ -369,8 +440,98 @@ sub test_complex() {
     );
 }
 
+sub test_force_type_string() {
+    my $item = {
+        username => '1234',
+        email_address => 'john@example.com',
+        age => 24,
+        family => undef,
+        nickname => '',
+        category => ['main'],
+    };
+    cmp_deeply(
+        dynamodb_marshal($item),
+        {
+            username      => { N => '1234' },
+            email_address => { S => 'john@example.com' },
+            age           => { N => 24 },
+            family        => { NULL => 1 },
+            nickname      => { NULL => 1 },
+            category      => { L => [ { S => 'main' } ] },
+        },
+        'attribute marshalled to derived types with no force_type',
+    );
+    my $force_type = {
+        username => 'S',
+        family   => 'S',
+        category => 'S',
+        nickname => 'S',
+    };
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => $force_type),
+        {
+            username      => { S => '1234' },
+            email_address => { S => 'john@example.com' },
+            age           => { N => 24 },
+            category      => { S => re('^ARRAY') },
+        },
+        'attributes marshalled to S via force_type, undefs dropped',
+    );
+}
+
+sub test_force_type_number() {
+    my $item = {
+        user_id  => '1234',
+        rank     => undef,
+        age      => 'twenty-five',
+        category => ['main'],
+    };
+    cmp_deeply(
+        dynamodb_marshal($item),
+        {
+            user_id  => { N => '1234' },
+            rank     => { NULL => 1 },
+            age      => { S => 'twenty-five' },
+            category => { L => [ { S => 'main' } ] },
+        },
+        'attribute marshalled to derived types with no force_type',
+    );
+    my $force_type = {
+        user_id  => 'N',
+        rank     => 'N',
+        age      => 'N',
+        category => 'N',
+    };
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => $force_type),
+        {
+            user_id  => { N => '1234' },
+        },
+        'attributes marshalled to N via force_type, undefs dropped',
+    );
+}
+
+sub test_force_type_other() {
+    like(
+        exception {
+            dynamodb_marshal(
+                {
+                    colors => [qw(red yellow green)],
+                },
+                force_type => {
+                    colors => 'L',
+                },
+            );
+        },
+        qr/force_type only supports "S" and "N" types/,
+        'Error thrown on bad force_type value',
+    );
+}
+
 test_undef();
+test_empty_string();
 test_number();
+test_out_of_range_number();
 test_scalar();
 test_list();
 test_map();
@@ -380,5 +541,8 @@ test_string_set();
 test_set_error();
 test_other();
 test_complex();
+test_force_type_string();
+test_force_type_number();
+test_force_type_other();
 
 done_testing;

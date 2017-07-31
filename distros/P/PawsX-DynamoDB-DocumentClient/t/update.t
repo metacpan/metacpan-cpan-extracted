@@ -38,6 +38,36 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            TabelName => 'users',
+            ExpressionAttributeValues => {
+                ':zip_code' => '01234',
+            },
+            Key => {
+                username => '1234',
+            },
+            UpdateExpression => 'SET zip_code = :zip_code',
+            force_type => {
+                username => 'S',
+                ':zip_code' => 'S',
+            },
+        )
+    },
+    {
+        TabelName => 'users',
+        ExpressionAttributeValues => {
+            ':zip_code' => { S => '01234' },
+        },
+        Key => {
+            username => { S => '1234' },
+        },
+        UpdateExpression => 'SET zip_code = :zip_code',
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output = Paws::DynamoDB::UpdateItemOutput->new();
 is(
     $class->transform_output($test_output),

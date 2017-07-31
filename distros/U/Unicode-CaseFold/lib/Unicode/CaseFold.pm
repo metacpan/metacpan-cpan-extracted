@@ -3,7 +3,7 @@ package Unicode::CaseFold;
 # ABSTRACT: Unicode case-folding for case-insensitive lookups.
 
 BEGIN {
-  our $VERSION = '1.00'; # VERSION
+  our $VERSION = '1.01'; # VERSION
 }
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
@@ -66,13 +66,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Unicode::CaseFold - Unicode case-folding for case-insensitive lookups.
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -156,7 +158,7 @@ not available. In this case, C<fc> will perform a simple case-folding instead
 of a full case-folding. Although relatively few characters are affected,
 strings case-folded using simple folding might not compare equal to the
 corresponding strings case-folded with full folding, which may cause
-compatibility issues. 
+compatibility issues.
 
 Furthermore, when simple folding is in use, some strings
 that would have case-folded to the same value when using full folding will
@@ -207,7 +209,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Andrew Rodland.
+This software is copyright (c) 2017 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '1.76'; # VERSION
+our $DATE = '2017-07-22'; # DATE
+our $VERSION = '1.77'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -315,8 +315,26 @@ sub hook_after_get_meta {
         my $default_dry_run = $metao->default_dry_run // $self->default_dry_run;
         $r->{dry_run} = 1 if $default_dry_run;
         $r->{dry_run} = ($ENV{DRY_RUN} ? 1:0) if defined $ENV{DRY_RUN};
+        require Perinci::Sub::GetArgs::Argv;
+        # note: we cannot cache this to $r->{_ggls_res} because we produce this
+        # without dry-run
+        my $ggls_res = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
+            meta               => $r->{meta},
+            meta_is_normalized => 1,
+            args               => $r->{args},
+            common_opts        => $self->common_opts,
+            per_arg_json       => $self->{per_arg_json},
+            per_arg_yaml       => $self->{per_arg_yaml},
+        );
+        my $meta_uses_opt_n = 0;
+        {
+            last unless $ggls_res->[0] == 200;
+            my $opts = $ggls_res->[3]{'func.opts'};
+            if (grep { $_ eq '-n' } @$opts) { $meta_uses_opt_n = 1 }
+        }
+        my $optname = 'dry-run' . ($meta_uses_opt_n ? '' : '|n');
         $self->common_opts->{dry_run} = {
-            getopt  => $default_dry_run ? 'dry-run!' : 'dry-run',
+            getopt  => $default_dry_run ? "$optname!" : $optname,
             summary => $default_dry_run ?
                 "Disable simulation mode (also via DRY_RUN=0)" :
                 "Run in simulation mode (also via DRY_RUN=1)",
@@ -325,7 +343,6 @@ sub hook_after_get_meta {
                 if ($val) {
                     log_debug("[pericmd] Dry-run mode is activated");
                     $r->{dry_run} = 1;
-                    #$ENV{VERBOSE} = 1;
                 } else {
                     log_debug("[pericmd] Dry-run mode is deactivated");
                     $r->{dry_run} = 0;
@@ -482,7 +499,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.76 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-14.
+This document describes version 1.77 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-22.
 
 =head1 SYNOPSIS
 

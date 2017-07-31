@@ -1,0 +1,400 @@
+#!perl
+
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Perinci::CmdLine::Any;
+
+my $cmd = Perinci::CmdLine::Any->new(
+    url => '/App/perlmv/u/',
+    subcommands => {
+        mv            => {url => '/App/perlmv/u/perlmv'},
+        undo          => {url => '/App/perlmv/u/undo'},
+        redo          => {url => '/App/perlmv/u/redo'},
+        history       => {url => '/App/perlmv/u/history'},
+        clear_history => {url => '/App/perlmv/u/clear_history'},
+    },
+    default_subcommand => 'mv',
+    log => 1,
+);
+$cmd->common_opts->{undo} = {
+    summary => 'Shortcut for --cmd=undo',
+    getopt => 'undo',
+    handler => sub {
+        my ($go, $val, $r) = @_;
+        $r->{subcommand_name} = 'undo';
+        $r->{subcommand_name_from} = '--cmd'; # XXX not exactly accurate
+        $r->{skip_parse_subcommand_argv} = 1;
+    },
+};
+$cmd->common_opts->{redo} = {
+    summary => 'Shortcut for --cmd=redo',
+    getopt => 'redo',
+    handler => sub {
+        my ($go, $val, $r) = @_;
+        $r->{subcommand_name} = 'redo';
+        $r->{subcommand_name_from} = '--cmd'; # XXX not exactly accurate
+        $r->{skip_parse_subcommand_argv} = 1;
+    },
+};
+$cmd->common_opts->{history} = {
+    summary => 'Shortcut for --cmd=history',
+    getopt => 'history',
+    handler => sub {
+        my ($go, $val, $r) = @_;
+        $r->{subcommand_name} = 'history';
+        $r->{subcommand_name_from} = '--cmd'; # XXX not exactly accurate
+        $r->{skip_parse_subcommand_argv} = 1;
+    },
+};
+$cmd->common_opts->{clear_history} = {
+    summary => 'Shortcut for --cmd=clear_history',
+    getopt => 'clear-history',
+    handler => sub {
+        my ($go, $val, $r) = @_;
+        $r->{subcommand_name} = 'clear_history';
+        $r->{subcommand_name_from} = '--cmd'; # XXX not exactly accurate
+        $r->{skip_parse_subcommand_argv} = 1;
+    },
+};
+$cmd->run;
+
+1;
+# ABSTRACT: Rename files using Perl code, with undo/redo
+# PODNAME: perlmv-u
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perlmv-u - Rename files using Perl code, with undo/redo
+
+=head1 VERSION
+
+This document describes version 0.001 of perlmv-u (from Perl distribution App-perlmv-u), released on 2017-07-28.
+
+=head1 SYNOPSIS
+
+ # rename some files, but in simulation mode, not really rename the files
+ % perlmv-u --dry-run -e '/(\d+)/; sprintf "file%03d.txt", $1' file*txt
+ % perlmv-u -n        -e '/(\d+)/; sprintf "file%03d.txt", $1' file*txt
+
+ # rename some files, for real
+ % perlmv-u           -e '/(\d+)/; sprintf "file%03d.txt", $1' file*txt
+
+ # oops, made a mistake. undo last action.
+ % perlmv-u --undo
+
+ # redo last action
+ % permv-u --redo
+
+ # show history
+ % perlmv-u --history
+
+ # forget history; past actions can no longer be undone/redone
+ % perlmv-u --clear-history
+
+=head1 DESCRIPTION
+
+B<EARLY RELEASE, EXPERIMENTAL.>
+
+This utility is a reimplementation of L<perlmv> with undo feature. Currently
+unimplemented: scriptlets, mv/cp/symlink/link mode, test compile (-c),
+--parents, etc.
+
+=head1 SUBCOMMANDS
+
+=head2 B<clear_history>
+
+Clear undo history.
+
+=head2 B<history>
+
+Show undo history.
+
+=head2 B<mv>
+
+Rename files using Perl code, with undo/redo.
+
+=head2 B<redo>
+
+Redo last undone action.
+
+=head2 B<undo>
+
+Undo last action.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--clear-history>
+
+Shortcut for --cmd=clear_history.
+
+=item B<--cmd>=I<s>
+
+Select subcommand.
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--dry-run>, B<-n>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--history>
+
+Shortcut for --cmd=history.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--redo>
+
+Shortcut for --cmd=redo.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--undo>
+
+Shortcut for --cmd=undo.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand mv
+
+=over
+
+=item B<--eval>=I<s>*, B<-e>
+
+Perl code to rename file.
+
+Your Perl code will receive the original filename in `$_` and is expected to
+modify it. If it is unmodified, the last expression is used as the new filename.
+If it is also the same as the original filename, the file is not renamed.
+
+
+=item B<--file>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+=item B<-d>
+
+Alias for --dry-run.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C perlmv-u perlmv-u
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete perlmv-u 'p/*/`perlmv-u`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/perlmv-u.conf>, F<~/perlmv-u.conf>, or F</etc/perlmv-u.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand clear_history
+
+
+=head2 Configuration for subcommand history
+
+
+=head2 Configuration for subcommand mv
+
+ d (see -d)
+ eval (see --eval)
+ files (see --file)
+
+=head2 Configuration for subcommand redo
+
+
+=head2 Configuration for subcommand undo
+
+=head1 ENVIRONMENT
+
+=head2 PERLMV_U_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/perlmv-u.conf>
+
+F<~/perlmv-u.conf>
+
+F</etc/perlmv-u.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv-u>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-perlmv-u>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-u>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<perlmv> from L<App::perlmv>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

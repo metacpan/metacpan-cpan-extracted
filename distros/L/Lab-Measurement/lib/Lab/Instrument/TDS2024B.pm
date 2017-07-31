@@ -1,5 +1,6 @@
 package Lab::Instrument::TDS2024B;
-$Lab::Instrument::TDS2024B::VERSION = '3.553';
+#ABSTRACT: Tektronix TDS2024B digital oscilloscope
+$Lab::Instrument::TDS2024B::VERSION = '3.554';
 use 5.006;
 use strict;
 use warnings;
@@ -10,17 +11,6 @@ use English;
 use Time::HiRes qw(sleep);
 use Clone 'clone';
 use Data::Dumper;
-
-=head1 NAME
-
-Lab::Instrument::TDS2024B - Control Tektronix TDS2024B
-digital oscilloscope, via USBtmc. 
-
-=head1 VERSION
-
-Version 3.530
-
-=cut
 
 our $DEBUG   = 0;
 our @ISA     = ("Lab::Instrument");
@@ -365,77 +355,6 @@ our %fields  = (
     },
 );
 
-=head1 SYNOPSIS
-
-=over 4
-
-    use Lab::Instrument::TDS2024B;
-
-    my $s = new Lab::Instrument::TDS2024B (
-        usb_serial => 'C12345',
-        # usb_vendor and usb_product set automatically        
-    );
-   
-    $s->set_channel(3);
-    $s->set_scale(scale=>'20mV/div');
-    $s->set_display_persist(persist=>'5s');
-    $s->set_acquire_average(32);
-    $s->set_acquire_state(state=>'RUN');
-
-=back
-
-Many of the 'quantities' passed to the code can use scientific
-notation, order of magnitude suffixes ('u', 'm', etc) and unit
-suffixes. The routines can be called using positional parameters
-(check the documentation for order), or with keyword parameters. 
-
-There are a few 'big' routines that let you set many parameters
-in one call, use keyword parameters for those. 
-
-In general, keywords passed TO these routines are case-independent,
-with only the first few characters being significant. So, in the
-example above: state=>'Run', state=>'running', both work. In cases
-where the keywords distinguish an "on/off" situation (RUN vs STOP 
-for acquistion, for example) you can use a Boolean quantity, and
-again, the Boolean values are flexible:
-
-=over
-
-TRUE = 't' or 'y' or 'on' or number!=0
-
-FALSE = 'f' or 'n' or 'off' or number ==0
-
-(only the first part of these is checked, case independent)
-
-=back
-
-The oscilloscope input 'channels' are CH1..CH4, but 
-there are also MATH, REFA..REFD that can be displayed
-or manipulated.  To perform operations on a channel, one
-should first $s->set_channel($chan);  Channel can be
-specified as 1..4 for the input channels, and it will
-be translated to 'CH1..CH4'.
-
-
-The state of the TDS2024B scope is cached only when the
-front-panel is in a 'locked' state, so that it cannot be
-changed by users fiddling with knobs.  
-
-
-
-=head1 GENERAL/SYSTEM ROUTINES
-
-=head2 new
-
-my $s = new Lab::Instrument::TDS2024B(
-         usb_serial => '...',
-);
-
-serial only needed if multiple TDS2024B scopes are attached, it
-defaults to '*', which selects the first TDS2024B found.  See
-Lab::Bus::USBtmc.pm documentation for more information.
-
-=cut
 
 sub new {
     my $proto = shift;
@@ -819,13 +738,6 @@ sub _parseNRf {
 
 }
 
-=head2 reset
-
-$s->reset()
-
-Reset the oscilloscope (*RST)
-
-=cut
 
 sub reset {
     my $self = shift;
@@ -967,13 +879,6 @@ sub _debug {
     }
 }
 
-=head2 get_error
-
-($code,$message) = $s->get_error();
-
-Fetch an error from the device error queue
-
-=cut
 
 sub get_error {
     my $self = shift;
@@ -999,46 +904,6 @@ sub get_error {
     #    (:EVMSG 110, "command head")
 }
 
-=head2 get_status
-
-$status = $s->get_status(['statusbit']);
-
-Fetches the scope status, and returns either the requested
-status bit (if a 'statusbit' is supplied) or a reference to
-a hash of status information. Reading the status register
-causes it to be cleared.  A status bit 'ERROR' is combined
-from the other error bits.
-
-Example: $s->get_status('OPC');
-
-Example: $s->get_status()->{'DDE'};
-
-
-Status bit names:
-
-=over 
-
-B<PON>: Power on
-
-B<URQ>: User Request (not used)
-
-B<CME>: Command Error
-
-B<EXE>: Execution Error
-
-B<DDE>: Device Error
-
-B<QYE>: Query Error
-
-B<RQC>: Request Control (not used)
-
-B<OPC>: Operation Complete
-
-B<ERROR>: CME or EXE or DDE or QYE
-
-=back
-
-=cut
 
 our $sbits = [qw(OPC RQC QYE DDE EXE CME URQ PON)];
 
@@ -1059,27 +924,6 @@ sub get_status {
     return $s;
 }
 
-=head2 wait_done
-
-$s->wait_done([$time[,$deltaT]);
-
-$s->wait_done(timeout => $time, checkinterval=>$deltaT);
-
-Wait for "operation complete". If the $time optional argument
-is given, it is the (max) number of seconds to wait for completion
-before returning, otherwise a timeout of 10 seconds is used.
-$time can be a simple number of seconds, or a text string with
-magnitude and unit suffix. (Ex: $time = "200ms"). If $time="INF"
-then this routine will run indefinitely until completion (or some
-I/O error). 
-
-If $deltaT is given, checks are performed in intervals of $deltaT
-seconds (again, number or text), except when $deltaT is less than $time.
-$deltaT defaults to 500ms. 
-
-Returns 1 if completed, 0 if timed out. 
-
-=cut
 
 sub wait_done {
     my $self = shift;
@@ -1130,13 +974,6 @@ sub wait_done {
     }
 }
 
-=head2 test_busy
-
-$busy = $s->test_busy();
-
-Returns 1 if busy (waiting for trigger, etc), 0 if not busy.
-
-=cut
 
 sub test_busy {
     my $self = shift;
@@ -1144,13 +981,6 @@ sub test_busy {
     return 0;
 }
 
-=head2 get_id
-
-$s->get_id()
-
-Fetch the *IDN? string from device
-
-=cut
 
 sub get_id {
     my $self = shift;
@@ -1167,14 +997,6 @@ sub get_id {
     return $self->{device_cache}->{ID};
 }
 
-=head2 get_header
-
-$header = $s->get_header();
-
-Fetch whether headers are included
-with query response; returns 0 or 1.
-
-=cut
 
 sub get_header {
     my $self = shift;
@@ -1203,15 +1025,6 @@ sub get_header {
     return $self->{device_cache}->{HEADER};
 }
 
-=head2 save
-
-$s->save($n);
-
-$s->save(setup=>$n);
-
-Save the scope setup to a nonvolatile internal memory $n = 1..10
-
-=cut
 
 sub save {
     my $self = shift;
@@ -1227,15 +1040,6 @@ sub save {
     $self->_debug();
 }
 
-=head2 recall
-
-$s->recall($n);
-
-$s->recall(setup=>$n);
-
-Recall scope setup from internal memory location $n = 1..10
-
-=cut      
 
 sub recall {
     my $self = shift;
@@ -1250,15 +1054,6 @@ sub recall {
     $self->_debug();
 }
 
-=head2 set_header
-
-$s->set_header($boolean);
-$s->set_header(header=>$boolean);
-
-Turns on or off headers in query replies; Boolean
-values described above.
-
-=cut
 
 sub set_header {
     my $self = shift;
@@ -1285,15 +1080,6 @@ sub set_header {
     $self->_debug();
 }
 
-=head2 get_verbose
-
-$verb = $s->get_verbose();
-
-Fetch boolean indicating whether query responses
-(headers, if enabled, and response keywords)
-are returned in 'long form'
-
-=cut
 
 sub get_verbose {
     my $self = shift;
@@ -1321,20 +1107,6 @@ sub get_verbose {
     return $self->{device_cache}->{VERBOSE};
 }
 
-=head2 set_verbose
-
-$s->set_verbose($bool);
-$s->set_verbose(verbose=>$bool);
-
-Sets the 'verbose' mode for replies, with
-the longer form of command headers (if enabled) and
-keyword values. Note that
-when using the get_* routines, the replies are
-processed before being returned as 'long' values, 
-so this routine only affects the communication
-between the scope and this code. 
-
-=cut
 
 sub set_verbose {
     my $self = shift;
@@ -1360,17 +1132,6 @@ sub set_verbose {
     $self->_debug();
 }
 
-=head2 get_locked
-
-$locked = $s->get_locked()
-
-Get whether user front-panel controls
-are locked. Returns 1 (all controls locked)
-or 0 (no controls locked). Caching for most
-quantities is turned off when the controls
-are unlocked. 
-
-=cut
 
 sub get_locked {
     my $self = shift;
@@ -1400,19 +1161,6 @@ sub get_locked {
     return $self->{device_cache}->{LOCKED};
 }
 
-=head2 set_locked
-
-$s->set_locked($bool);
-$s->set_locked(locked=>$bool);
-
-Lock or unlock front panel controls; 
-
-NOTE: locking the front panel
-enables the device_cache, and reinitializes cached values (other
-than the special ones that are not alterable from the front
-panel)
-
-=cut
 
 sub set_locked {
     my $self = shift;
@@ -1465,18 +1213,6 @@ sub _ClearCache {
     }
 }
 
-=head2 get_setup
-
-$setup = get_setup();
-
-Get a long GPIB string that has the scope setup information
-
-Note that the scope I am testing with generates a 
-"300, Device-specific error; no alternate chosen"
-error when triggering on "AC LINE". Might be a firmware
-bug, so filtering it out. 
-
-=cut
 
 # these give the mappings between SCPI codes and cache entries
 
@@ -1656,20 +1392,6 @@ sub get_setup {
     return $r;
 }
 
-=head2 set_setup
-
-$s->set_setup($setup);
-
-$s->set_setup(setup=>$setup);
-
-Send configuration to scope. The '$setup' string is
-of the form returned from get_setup(), but can be
-any valid command string for the scope.  The setup
-string is processed into separate commands, and
-transmitted sequentially, to avoid communications
-timeouts.
-
-=cut
 
 sub set_setup {
     my $self = shift;
@@ -1687,16 +1409,6 @@ sub set_setup {
     }
 }
 
-=head1 ACQUIRE ROUTINES
-
-
-=head2 get_acquire_mode
-
-$acqmode = $s->get_acquire_mode();
-
-Fetches acquisition mode: SAMple,PEAKdetect,AVErage
-
-=cut
 
 sub get_acquire_mode {
     my $self  = shift;
@@ -1710,14 +1422,6 @@ sub get_acquire_mode {
     return $amode;
 }
 
-=head2 set_acquire_mode
-
-$s->set_acquire_mode($mode);
-$s->set_acquire_mode(mode=>$mode);
-
-Sets the acquire mode: SAMple, PEAKdetect or AVErage
-
-=cut
 
 sub set_acquire_mode {
     my $self = shift;
@@ -1741,14 +1445,6 @@ sub set_acquire_mode {
     $self->_debug();
 }
 
-=head2 get_acquire_numacq
-
-$numacq = $s->get_acquire_numacq();
-
-Fetch the number of acquisitions that have happened
-since starting acquisition.
-
-=cut 
 
 sub get_acquire_numacq {
     my $self = shift;
@@ -1757,13 +1453,6 @@ sub get_acquire_numacq {
     return $self->_parseReply($ans);
 }
 
-=head2 get_acquire_numavg
-
-$numavg = $s->get_acquire_numavg();
-
-Fetch the number of waveforms specified for averaging
-
-=cut
 
 sub get_acquire_numavg {
     my $self = shift;
@@ -1772,15 +1461,6 @@ sub get_acquire_numavg {
     return $self->_parseReply($ans);
 }
 
-=head2 set_acquire_numavg
-
-$s->set_acquire_numavg($n);
-$s->set_acquire_numavg(average=>$n);
-
-Set the number of waveforms to average
-valid values are 4, 16, 64 and 128
-
-=cut
 
 sub set_acquire_numavg {
     my $self = shift;
@@ -1799,14 +1479,6 @@ sub set_acquire_numavg {
     }
 }
 
-=head2 get_acquire_state
-
-$state = $s->get_acquire_state()
-
-Fetch the acquisition state: STOP (stopped) or RUN (running)
-NOTE: to check if acq is complete: wait_done()
-
-=cut
 
 sub get_acquire_state {
     my $self = shift;
@@ -1818,15 +1490,6 @@ sub get_acquire_state {
     return 'STOP';
 }
 
-=head2 set_acquire_state
-
-$s->set_acquire_state($state);
-$s->set_acquire_state(state=>$state);
-
-$state =  'RUN' (or boolean 'true') starts acquisition
-          'STOP' (or boolean 'false')  stops acquisition
-
-=cut
 
 # note: do not cache, since "single-shot ACQ" can change value asynchronously
 
@@ -1848,14 +1511,6 @@ sub set_acquire_state {
     $self->_debug();
 }
 
-=head2 get_acquire_stopafter
-
-$mode = $s->get_acquire_stopafter();
-
-Fetch whether acquisition is in "RUNSop" mode (run until stopped)
-or "SEQuence" mode 
-
-=cut
 
 sub get_acquire_stopafter {
     my $self = shift;
@@ -1866,15 +1521,6 @@ sub get_acquire_stopafter {
     return $ans;
 }
 
-=head2 set_acquire_stopafter
-
-$s->set_acquire_stopafter($mode);
-$s->set_acquire_stopafter(mode=>$mode);
-
-Sets stopafter mode: RUNStop : run until stopped, 
-or SEQuence: stop after some defined sequence (single trigger, pattern, etc)
-
-=cut
 
 sub set_acquire_stopafter {
     my $self = shift;
@@ -1895,14 +1541,6 @@ sub set_acquire_stopafter {
     $self->_debug();
 }
 
-=head2 get_acquire
-
-%hashref = $s->get_acquire();
-
-Get the "acquire" information in a hash; this is a combined
-"get_acquire_*" with the keywords that can be use for set_acquire()
-
-=cut
 
 sub get_acquire {
     my $self   = shift;
@@ -1917,18 +1555,6 @@ sub get_acquire {
     return $h;
 }
 
-=head2 set_acquire
-
-$s->set_acquire(state=>$state, # RUN|STOP  (or boolean)
-                mode=>$mode,   # SAM|PEAK|AVE
-                stopafter=>$stopa # STOPAfter|SEQ
-                average=>$navg);
-$s->set_acquire($hashref);       # from get_acquire
-$s->set_acquire($state,$mode,$stopa,$navg);
-
-Sets acquisition parameters
-
-=cut
 
 sub set_acquire {
     my $self = shift;
@@ -1939,14 +1565,6 @@ sub set_acquire {
     $self->set_acquire_state($tail)     if exists $tail->{state};
 }
 
-=head2 get_autorange_state
-
-$arstate = $s->get_autorange_state()
-
-Fetch the autorange state, boolean, indicating
-whether the scope is autoranging
-
-=cut
 
 sub get_autorange_state {
     my $self = shift;
@@ -1955,14 +1573,6 @@ sub get_autorange_state {
     return $self->_parseReply($ars);
 }
 
-=head2 set_autorange_state
-
-$s->set_autorange_state(state=>$bool);
-$s->set_autorange_state($bool);
-
-Set autoranging on or off.
-
-=cut
 
 sub set_autorange_state {
     my $self = shift;
@@ -1983,14 +1593,6 @@ sub set_autorange_state {
     $self->_debug();
 }
 
-=head2 get_autorange_settings
-
-$arset  = $s->get_autorange_settings()
-
-Fetch the autorange settings, returns
-value (HORizontal|VERTical|BOTH)
-
-=cut
 
 sub get_autorange_settings {
     my $self = shift;
@@ -2005,15 +1607,6 @@ sub get_autorange_settings {
     return $ars;
 }
 
-=head2 set_autorange_settings
-
-$s->set_autorange_settings(set=>$arset);
-
-$s->set_autorange_settings($arset);
-
-Set what is subject to autoranging: $arset = HORizontal, VERTical, BOTH
-
-=cut
 
 sub set_autorange_settings {
     my $self = shift;
@@ -2036,14 +1629,6 @@ sub set_autorange_settings {
     $self->_debug();
 }
 
-=head2 do_autorange
-
-$s->do_autorange();
-
-Causes scope to adjust horiz/vert, like pressing 'autoset' button
-This command may take some time to complete.
-
-=cut    
 
 sub do_autorange {
     my $self = shift;
@@ -2051,14 +1636,6 @@ sub do_autorange {
     $self->_debug();
 }
 
-=head2 get_autorange_signal
-
-$sig = $s->get_autorange_signal()
-
-returns the type of signal found by the most recent autoset, or NON
-if the autoset menu is not displayed.
-
-=cut
 
 sub get_autorange_signal {
     my $self = shift;
@@ -2072,14 +1649,6 @@ sub get_autorange_signal {
     return $sig;
 }
 
-=head2 get_autorange_view
-
-$view = $s->get_autoset_view();
-
-Fetch the menu display; view can be one of (depending on scope options):
-MULTICY SINGLECY FFT RISING FALLING FIELD ODD EVEN LINE LINEN DCLI DEF NONE
-
-=cut
 
 sub get_autorange_view {
     my $self = shift;
@@ -2102,16 +1671,6 @@ sub get_autorange_view {
     return $r;
 }
 
-=head2 set_autorange_view
-
-$s->set_autoset_view($view)
-
-$s->set_autoset_view(view=>$view)
-
-Set the menu display; view can be one of (depending on scope options):
-MULTICY SINGLECY FFT RISING FALLING FIELD ODD EVEN LINE LINEN DCLI DEF NONE
-
-=cut
 
 sub set_autorange_view {
     my $self = shift;
@@ -2170,13 +1729,6 @@ sub set_autorange_view {
     carp("error in set_autorange_view: $c,'$m'");
 }
 
-=head2 get_autorange
-
-%hashref = $s->get_autorange();
-
-get autorange settings as a hash
-
-=cut
 
 sub get_autorange {
     my $self = shift;
@@ -2190,34 +1742,12 @@ sub get_autorange {
     return $h;
 }
 
-=head1 CHANNEL ROUTINES
-
-=head2 get_channel
-
-$chan = $s->get_channel();
-
-Get the current channel selected for operations 1..4
-
-=cut
 
 sub get_channel {
     my $self = shift;
     return $self->{channel};
 }
 
-=head2 set_channel
-
-$s->set_channel(channel=>$chan);
-$s->set_channel($chan);
-
-sets the channel number (1..4)  for operations
-with the set_chan_XXX and get_chan_YYY methods
-on oscilloscope channels
-
-Channel can be specified as an integer 1..4, or Ch1, Ch2, etc.,
-or 'MATH'.
-
-=cut
 
 sub set_channel {
     my $self = shift;
@@ -2255,22 +1785,6 @@ sub set_channel {
     $self->{channel} = $ch;
 }
 
-=head2 set_visible
-
-$s->set_visible([$chan,[$vis]]);
-
-$s->set_visible(channel=>$chan [, visible=>$vis]);
-
-Set/reset channel visiblity.
-
-If no channel is given, the current channel (set by set_channel ) is used.
-Otherwise $chan = CH1..4, REFA..D, MATH
-
-If $vis is not specified, it defaults to "make channel visible". 
-
-To make turn off display of a channel, use $vis=(boolean false).
-
-=cut
 
 sub set_visible {
     my $self = shift;
@@ -2329,17 +1843,6 @@ sub set_visible {
     $cache->{select} = $vis if defined $cache;
 }
 
-=head2 get_visible
-
-$vis = $s->get_visible($chan);
-
-$vis = $s->get_visible(channel=>$chan);
-
-Fetch boolean value for whether the channel (CH1..4, REFA..D, MATH) is
-being displayed. If channel is not specified, the current channel
-(from 'set_channel()') is used. 
-
-=cut
 
 sub get_visible {
     my $self = shift;
@@ -2392,14 +1895,6 @@ sub get_visible {
     return $r;
 }
 
-=head2 get_chan_bwlimit
-
-$bwlim = $s->get_chan_bwlimit()
-
-Fetch whether the channel has bandwidth limited to 20MHz
-(boolean)
-
-=cut
 
 sub get_chan_bwlimit {
     my $self = shift;
@@ -2412,13 +1907,6 @@ sub get_chan_bwlimit {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_bwlimit
-
-$s->set_chan_bwlimit(limit=>'on')
-
-Turns on or off bandwith limiting (limit = boolean, true = 'limit')
-
-=cut
 
 sub set_chan_bwlimit {
     my $self = shift;
@@ -2442,13 +1930,6 @@ sub set_chan_bwlimit {
     $self->_debug();
 }
 
-=head2 get_chan_coupling
-
-$coupling = $s->get_chan_coupling()
-
-Fetch the channel coupling (AC/DC/GND).
-
-=cut
 
 sub get_chan_coupling {
     my $self = shift;
@@ -2460,13 +1941,6 @@ sub get_chan_coupling {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_coupling
-
-$s->set_coupling(coupling => $coupling); 
-
-Set the coupling to AC|DC|GND for an input channel
-
-=cut
 
 sub set_chan_coupling {
     my $self = shift;
@@ -2479,15 +1953,6 @@ sub set_chan_coupling {
     $self->_debug();
 }
 
-=head2 get_chan_current_probe
-
-$iprobe = $s->get_chan_current_probe();
-
-Get the probe scale factor. This does not mean that a
-current probe is in use, just what 'probe scale factor'
-would be applied if current probe use is selected. 
-
-=cut
 
 sub get_chan_current_probe {
     my $self = shift;
@@ -2499,14 +1964,6 @@ sub get_chan_current_probe {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_current_probe
-
-$self->set_chan_current_probe(factor=>$x);
-
-Set the current probe scale factor. Valid values
-are 0.2, 1, 2, 5, 10, 50, 100, 1000
-
-=cut
 
 sub set_chan_current_probe {
     my $self = shift;
@@ -2537,13 +1994,6 @@ sub set_chan_current_probe {
     $self->_debug();
 }
 
-=head2 get_chan_invert
-
-$inv = $s->get_chan_invert();
-
-fetch whether the channel is 'inverted' -> boolean
-
-=cut
 
 sub get_chan_invert {
     my $self = shift;
@@ -2559,13 +2009,6 @@ sub get_chan_invert {
     return $r;
 }
 
-=head2 set_chan_invert
-
-$s->set_chan_invert(invert=>$inv);
-
-sets a channel to 'invert' mode if $inv is true, $inv=boolean
-
-=cut
 
 sub set_chan_invert {
     my $self = shift;
@@ -2589,15 +2032,6 @@ sub set_chan_invert {
     $self->_debug();
 }
 
-=head2 get_chan_position
-
-$p = $s->get_chan_position();
-
-get the vertical position of "zero volts" for a channel
-The value is the number of graticule divisions from the
-center.
-
-=cut
 
 sub get_chan_position {
     my $self = shift;
@@ -2609,16 +2043,6 @@ sub get_chan_position {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_position
-
-$s->set_chan_position(position=> -24)
-
-Sets the trace 'zero' position, in graticule divisions
-from the center of the display.
-Note that the limits depend on the vertical scale,
-+/- 50V for >= 500mV/div, +/- 2V for < 500mV/div
-
-=cut
 
 sub set_chan_position {
     my $self = shift;
@@ -2649,13 +2073,6 @@ sub set_chan_position {
     $self->_debug();
 }
 
-=head2 get_chan_probe
-
-$probe = $s->get_chan_probe();
-
-Fetch the voltage probe attenuation. 
-
-=cut
 
 sub get_chan_probe {
     my $self = shift;
@@ -2667,14 +2084,6 @@ sub get_chan_probe {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_probe
-
-$self->set_chan_probe(factor=>X);
-
-Set the voltage probe scale factor. Valid values
-are 1, 10, 20, 50, 100, 500, 1000
-
-=cut
 
 sub set_chan_probe {
     my $self = shift;
@@ -2705,14 +2114,6 @@ sub set_chan_probe {
     $self->_debug();
 }
 
-=head2 get_chan_scale
-
-$scale = $s->get_chan_scale();
-
-Fetch the vertical scale for a channel, in V/div
-(or A/div when used with a current probe)
-
-=cut
 
 sub get_chan_scale {
     my $self = shift;
@@ -2724,15 +2125,6 @@ sub get_chan_scale {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_scale
-
-$self->set_chan_scale(scale=>$scale);
-
-Set the vertical scale for a channel, in V/div or
-A/div.  X can be a number, or a string with suffixes and units
-Ex: '2.0V/div' '100m'.  
-
-=cut
 
 sub set_chan_scale {
     my $self = shift;
@@ -2781,14 +2173,6 @@ sub set_chan_scale {
     $self->_debug();
 }
 
-=head2 get_chan_yunit
-
-$scale = $s->get_chan_yunit();
-
-Fetch the units for the vertical scale of a channel,
-returns either "V" or "A" 
-
-=cut
 
 sub get_chan_yunit {
     my $self = shift;
@@ -2800,13 +2184,6 @@ sub get_chan_yunit {
     return $self->_parseReply($r);
 }
 
-=head2 set_chan_yunit
-
-$self->set_chan_yunit(unit=>X);
-
-Set the vertical scale units to either 'V' or 'A'
-
-=cut
 
 sub set_chan_yunit {
     my $self = shift;
@@ -2830,29 +2207,6 @@ sub set_chan_yunit {
     $self->_debug();
 }
 
-=head2 get_chan_setup
-
-$hashref = $s->get_chan_setup([channel=>$chan])
-
-Fetches channel settings and returns them as a 
-hashref:
-=over 2
-=item    channel => channel selected (otherwise default from set_channel)
-=item    probe => probefactor,
-=item    postion => screen vertical position, in divisions
-=item    scale => screen vertical scale, V/div or A/div
-=item    coupling =>  (AC|DC|GND)
-=item    bandwidth => (ON|OFF)
-=item    yunit => (V|A)
-=item    invert => ON|OFF
-=item    probe => probe attentuation (for yunit=V)
-=item    currentprobe => current probe factor (for yunit=A)
-=back
-
-The hash is set up so that it can be passed to 
-$s->set_channel($hashref) 
-
-=cut
 
 sub get_chan_setup {
     my $self = shift;
@@ -2877,17 +2231,6 @@ sub get_chan_setup {
     return $h;
 }
 
-=head2 set_chan_setup
-
-$s->set_channel([channel=>1],scale=>...)
-
-Can pass the hash returned from "get_chan_setup" to 
-set a an oscilloscope channel to the desired state.
-
-TODO: check current/voltage probe selection,
-adjust order of calls to avoid settings conflicts
-
-=cut
 
 sub set_chan_setup {
     my $self = shift;
@@ -2915,28 +2258,6 @@ sub set_chan_setup {
 
 }
 
-=head1 CURSOR CONTROLS
-
-The cursors can either be 'horizontal bars' (HBARS), attached to
-a particular trace, measuring amplitude; or 'vertical bars' (VBARS)
-that are measuring horizontally (time or frequency).  
-
-Since these names can be confusing, you can also use 'X' to select VBARS and 
-'Y' to select HBARS, since that gives a more natural indication of what
-you are measuring. 
-
-=head2 get_cursor_type
-
-$cursor = $s->get_cursor_type([$opt]);
-
-$cursor = $s->get_cursor_type([option=>$opt]);
-
-
-Fetch cursor type: (OFF|HBARS|VBARS) default
-
-cursor type returned as: (OFF|X|Y) if $opt = 'xy';
-
-=cut
 
 sub get_cursor_type {
     my $self = shift;
@@ -2957,15 +2278,6 @@ sub get_cursor_type {
     return $r;
 }
 
-=head2 set_cursor_type
-
-$s->set_cursor_type($type);
-
-$s->set_cursor_type(type=>$type)
-
-$type = OFF|HBAr|Y|VBAr|X  
-
-=cut
 
 sub set_cursor_type {
     my $self = shift;
@@ -2998,14 +2310,6 @@ sub set_cursor_type {
     $self->_debug();
 }
 
-=head2 get_cursor_xunits
-
-$units = $s->get_cursor_xunits()
-
-gets the x (horizontal) units for the cursors (VBAR type),
-returns either SECONDS or HERTZ.
-
-=cut
 
 sub get_cursor_xunits {
     my $self = shift;
@@ -3021,17 +2325,6 @@ sub get_cursor_xunits {
     return $r;
 }
 
-=head2 get_cursor_yunits
-
-$self->get_cursor_yunits();
-
-Fetch the units used for the cursor y positions (HBARS, or the 
-waveform vertical position with VBARS).
-
-The units returned can be: VOLTS, DIVISIONS, DECIBELS UNKNOWN AMPS 
-VOLTSSQUARED AMPSSQUARED VOLTSAMPS.
-
-=cut
 
 sub get_cursor_yunits {
     my $self = shift;
@@ -3049,14 +2342,6 @@ sub get_cursor_yunits {
     return $r;
 }
 
-=head2 get_cursor_source
-
-$src = $s->get_cursor_source();
-
-Fetch the source waveform being used with the cursors, determines
-the units of the cursor for horizontal bar (HBAR, Y) cursors. 
-
-=cut
 
 sub get_cursor_source {
     my $self = shift;
@@ -3065,13 +2350,6 @@ sub get_cursor_source {
     return $self->_parseReply($r);
 }
 
-=head2 set_cursor_source
-
-$s->set_cursor_sourch($chan);
-
-$s->set_cursor_source(channel => $chan);
-
-=cut
 
 sub set_cursor_source {
     my $self = shift;
@@ -3095,17 +2373,6 @@ sub set_cursor_source {
     $self->_debug();
 }
 
-=head2 set_cursor_xunits
-
-$s->set_cursor_xunits($units);
-
-$s->set_cursor_xunits(unit=>$units);
-
-Set the units used for VBAR (x) cursor, for VBAR the possible
-units are (SEConds|s) or (HERtz|Hz). HBAR cursor units
-cannot be changed. 
-
-=cut
 
 sub set_cursor_xunits {
     my $self = shift;
@@ -3127,13 +2394,6 @@ sub set_cursor_xunits {
     $self->_debug();
 }
 
-=head2 get_cursor_dx
-
-$delt = $s->get_cursor_dx();
-
-Fetch the difference between x (VBAR) cursor positions.
-
-=cut
 
 sub get_cursor_dx {
     my $self = shift;
@@ -3145,13 +2405,6 @@ sub get_cursor_dx {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_dy
-
-$delt = $s->get_cursor_dy();
-
-Fetch the difference between y (HBAR) cursor positions.
-
-=cut
 
 sub get_cursor_dy {
     my $self = shift;
@@ -3163,14 +2416,6 @@ sub get_cursor_dy {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_x1
-
-$pos = $s->get_cursor_x1();
-
-Fetch the x position of cursor 1 (VBAR), typically in
-units of seconds. 
-
-=cut
 
 sub get_cursor_x1 {
     my $self = shift;
@@ -3180,14 +2425,6 @@ sub get_cursor_x1 {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_x2
-
-$pos = $s->get_cursor_x2();
-
-Fetch the x position of cursor 2 (VBAR), typically in
-units of seconds. 
-
-=cut
 
 sub get_cursor_x2 {
     my $self = shift;
@@ -3197,14 +2434,6 @@ sub get_cursor_x2 {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_y1
-
-$pos = $s->get_cursor_y1();
-
-Fetch the y position of cursor 1 (HBAR), typically in
-units of volts, but possibly other units 
-
-=cut
 
 sub get_cursor_y1 {
     my $self = shift;
@@ -3215,14 +2444,6 @@ sub get_cursor_y1 {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_y2
-
-$pos = $s->get_cursor_y2();
-
-Fetch the y position of cursor 2 (HBAR), typically in
-units of volts, but possibly other units. 
-
-=cut
 
 sub get_cursor_y2 {
     my $self = shift;
@@ -3233,15 +2454,6 @@ sub get_cursor_y2 {
     return $self->_parseReply($r);
 }
 
-=head2 set_cursor_x1
-
-$s->set_cursor_x1($location);
-
-$s->set_cursor_x1(position => $location);
-
-set cursor 1 x location (VBAR type cursor)
-
-=cut
 
 sub set_cursor_x1 {
     my $self = shift;
@@ -3249,15 +2461,6 @@ sub set_cursor_x1 {
     $self->_set_cursor( 'VBA', 1, $ipos );
 }
 
-=head2 set_cursor_x2
-
-$s->set_cursor_x2($location);
-
-$s->set_cursor_x2(position => $location);
-
-set cursor 2 x location (VBAR type cursor)
-
-=cut
 
 sub set_cursor_x2 {
     my $self = shift;
@@ -3265,15 +2468,6 @@ sub set_cursor_x2 {
     $self->_set_cursor( 'VBA', 2, $ipos );
 }
 
-=head2 set_cursor_y1
-
-$s->set_cursor_y1($location);
-
-$s->set_cursor_y1(position => $location);
-
-set cursor 1 y position (HBAR type)
-
-=cut
 
 sub set_cursor_y1 {
     my $self = shift;
@@ -3281,15 +2475,6 @@ sub set_cursor_y1 {
     $self->_set_cursor( 'HBA', 1, $ipos );
 }
 
-=head2 set_cursor_y2
-
-$s->set_cursor_y2($location);
-
-$s->set_cursor_y2(position => $location);
-
-set cursor 2 y position (HBAR type)
-
-=cut
 
 sub set_cursor_y2 {
     my $self = shift;
@@ -3348,15 +2533,6 @@ sub _set_cursor {
     $self->_debug();
 }
 
-=head2 get_cursor_v1
-
-$vcursor = $s->get_cursor_v1();
-
-If using HBAR (y) cursors, get the vertical position of cursors;
-if using VBAR (x) cursors, get the waveform voltage (or other vertical unit)
-at the cursor1 position.
-
-=cut
 
 sub get_cursor_v1 {
     my $self = shift;
@@ -3366,15 +2542,6 @@ sub get_cursor_v1 {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_v2
-
-$vcursor = $s->get_cursor_v2();
-
-If using HBAR (y) cursors, get the vertical position of cursors;
-if using VBAR (x) cursors, get the waveform voltage (or other vertical unit)
-at the cursor2 position.
-
-=cut
 
 sub get_cursor_v2 {
     my $self = shift;
@@ -3384,14 +2551,6 @@ sub get_cursor_v2 {
     return $self->_parseReply($r);
 }
 
-=head2 get_cursor_dv
-
-$dv = $s->get_cursor_dv();
-
-Get the vertical distance between the cursors (dy if HBAR cursors,
-dv2-dv1 if VBAR cursors)
-
-=cut
 
 sub get_cursor_dv {
     my $self = shift;
@@ -3400,12 +2559,6 @@ sub get_cursor_dv {
     return $self->_parseReply($r);
 }
 
-=head2 $hashref = $s->get_cursor()
-
-Fetches cursor information and returns it in a hash,
-in a form that can be used with set_cursor()
-
-=cut
 
 sub get_cursor {
     my $self   = shift;
@@ -3429,15 +2582,6 @@ sub get_cursor {
     return $h;
 }
 
-=head2 set_cursor
-
-$s->set_cursor( type=>$type,
-               x1 => $x1, x2 => $x2, ...);
-
-sets cursor information. If used with a hash from get_cursor, the
-entries that cannot be used to set the cursors are ignored
-
-=cut
 
 sub set_cursor {
     my $self = shift;
@@ -3452,16 +2596,6 @@ sub set_cursor {
     $self->set_cursor_y2($tail)     if exists( $tail->{y2} );
 }
 
-=head1 DISPLAY CONTROLS    
-
-	
-=head2 get_display_contrast
-
-$cont = $s->get_display_contrast()
-
-Fetches the display contrast:  1 .. 100
-
-=cut
 
 sub get_display_contrast {
     my $self = shift;
@@ -3470,14 +2604,6 @@ sub get_display_contrast {
     return $self->_parseReply($r);
 }
 
-=head2 set_display_contrast
-
-$s->set_display_contrast($cont)
-
-(alternate set_display_contrast(contrast => number) )
-Set the display contrast, percent 1..100
-
-=cut
 
 sub set_display_contrast {
     my $self = shift;
@@ -3492,13 +2618,6 @@ sub set_display_contrast {
     $self->_debug();
 }
 
-=head2 get_display_format
-
-$form = $s->get_display_format()
-
-Fetch the display format: YT or XY
-
-=cut
 
 sub get_display_format {
     my $self = shift;
@@ -3507,16 +2626,6 @@ sub get_display_format {
     return $f;
 }
 
-=head2 set_display_format
-
-$s->set_display_format($format);
-
-$s->set_display_format(format => $format);
-
-Where $format = XY or YT.
-
-
-=cut
 
 sub set_display_format {
     my $self = shift;
@@ -3530,14 +2639,6 @@ sub set_display_format {
     }
 }
 
-=head2 get_display_persist
-
-$pers = $s->get_display_persist()
-
-Fetch the display persistance, values 1,2,5,INF,OFF
-Numbers are in seconds.
-
-=cut
 
 sub get_display_persist {
     my $self = shift;
@@ -3549,15 +2650,6 @@ sub get_display_persist {
     return $r;
 }
 
-=head2 set_display_persist
-
-$s->set_display_persist($pers);
-
-$s->set_display_persist(persist=>$pers);
-
-Sets display persistence. $pers = 1,2,5 seconds, INF, or OFF
-
-=cut
 
 sub set_display_persist {
     my $self = shift;
@@ -3582,13 +2674,6 @@ sub set_display_persist {
     $self->_debug();
 }
 
-=head2 get_display_style
-
-$style = $s->get_display_style()
-
-Fetch the display style = 'DOTS' or 'VECTORS'
-
-=cut
 
 sub get_display_style {
     my $self = shift;
@@ -3599,16 +2684,6 @@ sub get_display_style {
     return $r;
 }
 
-=head2 set_display_style
-
-$s->set_display_style($style)l\;
-
-$s->set_display_style(style=>$style);
-
-
-Sets the display style: $style is DOTs or VECtors
-
-=cut
 
 sub set_display_style {
     my $self = shift;
@@ -3618,14 +2693,6 @@ sub set_display_style {
     $self->_debug();
 }
 
-=head2 get_display
-
-$hashref = $s->get_display();
-
-Fetch display settings (contrast, format, etc) in a
-hash, that can be used with "set_display".
-
-=cut
 
 sub get_display {
     my $self   = shift;
@@ -3638,13 +2705,6 @@ sub get_display {
     return $h;
 }
 
-=head2 set_display
-
-$s->set_display(contrast=>$contrast, ...)
-
-Set the display characteristics
-
-=cut
 
 sub set_display {
     my $self = shift;
@@ -3655,17 +2715,6 @@ sub set_display {
     $self->set_display_style($tail)    if exists $tail->{style};
 }
 
-=head1 FILESYSTEM ROUTINES
-
-=head2 get_cwd
-
-$s->get_cwd();
-
-Gets the current working directory on any USB flash drive
-plugged into the oscilloscope, or a null string ( '' ) if 
-no drive is plugged in.
-
-=cut
 
 sub get_cwd {
     my $self = shift;
@@ -3674,21 +2723,6 @@ sub get_cwd {
     return $self->_parseReply($r);
 }
 
-=head2 set_cwd
-
-$s->set_cwd($cwd);
-
-$s->set_cwd(cwd => $cwd);
-
-Set the current working directory on the flash drive.
-The flash drive is on the "A:" drive, and the cwd uses
-"DOS" type syntax.  For compatibility, forward slashes
-are translated to backslashes. 
-
-It would be a good idea to check for errors after
-this call.
-
-=cut
 
 sub set_cwd {
     my $self = shift;
@@ -3700,20 +2734,6 @@ sub set_cwd {
     $self->_debug();
 }
 
-=head2 delete
-
-$self->delete($file);
-
-$self->delete(file => $file);
-
-Delete a file from the USB filesystem; use DOS format, and
-note that the USB filesystem is on "A:\topdir\subdir..."
-
-For ease of use, this routine translates forward slashes
-to backslashes.  It would be a good idea to check for errors
-after calling this routine. 
-
-=cut
 
 sub delete {
     my $self = shift;
@@ -3725,14 +2745,6 @@ sub delete {
     $self->_debug();
 }
 
-=head2 get_dir
-
-@files = $s->get_dir();
-
-Get a list of filenames in the current (USB flash drive)
-directory. 
-
-=cut
 
 sub get_dir {
     my $self = shift;
@@ -3778,13 +2790,6 @@ sub _parseStrings {
     return (@results);
 }
 
-=head2 get_freespace
-
-$bytes = $s->get_freespace();
-
-Get the amount of freespace on the USB flash.
-
-=cut
 
 sub get_freespace {
     my $self = shift;
@@ -3793,20 +2798,6 @@ sub get_freespace {
     return $self->parseReply($r);
 }
 
-=head2 mkdir
-
-$s->mkdir($dirname);
-
-$s->mkdir(directory=>$dirname);
-
-Create a directory on the flash drive, uses MSDOS
-file syntax, only on the A: drive.
-
-Forward slashes are translated to backslashes for compatibility.
-
-It is a good idea to check for errors after calling this routine.
-
-=cut
 
 sub mkdir {
     my $self = shift;
@@ -3818,20 +2809,6 @@ sub mkdir {
     $self->_debug();
 }
 
-=head2 rename
-
-$s->rename($old,$new);
-
-$s->rename(old=>$old, new=>$new);
-
-Rename $old filepath to $new filepath. Note that these are in
-MSDOS file syntax, all on the "A:" drive. 
-
-Forward slashes are translated to backslashes.
-
-It is a good idea to check for errors after calling this routine.
-
-=cut
 
 sub rename {
     my $self = shift;
@@ -3844,20 +2821,6 @@ sub rename {
     $self->_debug();
 }
 
-=head2 rmdir
-
-$s->rmdir($dir);
-
-$s->rmdir(directory=>$rmdir);
-
-Removes a directory from the USB flash drive. The directory
-name is in MSDOS syntax; forward slashes are translated to 
-backslashes. 
-
-A directory must be empty before deletion; it is a good idea
-to check for errors after calling this routien.
-
-=cut
 
 sub rmdir {
     my $self = shift;
@@ -3868,23 +2831,6 @@ sub rmdir {
     $self->_debug();
 }
 
-=head1 HARDCOPY ROUTINES
-
-=head2 get_hardcopy_format
-
-$format = $s->get_hardcopy_format();
-
-Fetch the hardcopy format, returns one of:
-
-=over 4
-
- BMP BUBBLEJET DESKJET DPU3445 DPU411 DPU412 EPSC60 EPSC80 
-
- EPSIMAGE EPSON INTERLEAF JPEG LASERJET PCX RLE THINK TIFF
-
-=back
-
-=cut
 
 sub get_hardcopy_format {
     my $self = shift;
@@ -3904,23 +2850,6 @@ sub get_hardcopy_format {
     );
 }
 
-=head2 set_hardcopy_format
-
-$s->set_hardcopy_format($format);
-
-$s->set_hardcopy_format(format => $format);
-
-Set the 'hardcopy' format, used for screen captures:
-
-=over 4
-
- BMP BUBBLEJET DESKJET DPU3445 DPU411 DPU412 EPSC60 EPSC80 
-
- EPSIMAGE EPSON INTERLEAF JPEG LASERJET PCX RLE THINK TIFF
-
-=back
-
-=cut
 
 sub set_hardcopy_format {
     my $self = shift;
@@ -3989,13 +2918,6 @@ sub set_hardcopy_format {
     $self->_debug();
 }
 
-=head2 get_hardcopy_layout
-
-$layout = $s->get_hardcopy_layout();
-
-Fetch the hardcopy layout: PORTRAIT or LANDSCAPE
-
-=cut
 
 sub get_hardcopy_layout {
     my $self = shift;
@@ -4005,15 +2927,6 @@ sub get_hardcopy_layout {
     return _bloat( $r, { PORTR => 'PORTRAIT', LAN => 'LANDSCAPE' } );
 }
 
-=head2 set_hardcopy_layout
-
-$s->set_hardcopy_layout($layout);
-
-$s->set_hardcopy_layout(layout => $layout);
-
-Set the hardcopy layout: LANdscpe or PORTRait.
-
-=cut
 
 sub set_hardcopy_layout {
     my $self = shift;
@@ -4035,14 +2948,6 @@ sub set_hardcopy_layout {
     $self->_debug();
 }
 
-=head2 get_hardcopy_port
-
-$port = $s->get_hardcopy_port();
-
-Fetch the port used for hardcopy printing; for the TDS2024B, this
-should aways return 'USB'.
-
-=cut
 
 sub get_hardcopy_port {
     my $self = shift;
@@ -4051,16 +2956,6 @@ sub get_hardcopy_port {
     return $self->_parseReply($r);
 }
 
-=head2 set_hardcopy_port
-
-$s->set_hardcopy_port($port);
-
-$s->set_hardcopy_port(port => $port);
-
-Set the hardcopy port; for the TDS2024B, this should always be USB.
-Included for compatibility with other scopes.
-
-=cut
 
 sub set_hardcopy_port {
     my $self = shift;
@@ -4075,14 +2970,6 @@ sub set_hardcopy_port {
     $self->_debug();
 }
 
-=head2 get_hardcopy
-
-$hashref = get_hardcopy();
-
-Fetch hardcopy parameters (format, layout, port; although
-port is always 'USB') and return in a hashref.
-
-=cut
 
 sub get_hardcopy {
     my $self = shift;
@@ -4094,14 +2981,6 @@ sub get_hardcopy {
     return $h;
 }
 
-=head2 set_hardcopy
-
-$s->set_hardcopy(format=>$format, layout=>$layout, port=>$port);
-
-Set hardcopy parameters; this can use a hashref returned from
-get_hardcopy();
-
-=cut
 
 sub set_hardcopy {
     my $self = shift;
@@ -4111,25 +2990,6 @@ sub set_hardcopy {
     $self->set_hardcopy_port($tail)   if exists $tail->{port};
 }
 
-=head2 get_image
-
-$img = $s->get_image();
-
-$img = $s->get_image($filename[, $force]);
-
-$img = $s->get_image(file=>$filename, force=>$force,
-                 timeout=>$timeout, read_length=>$rlength,
-                   [hardcopy options]);
-
-Fetch a screen-capture image of the scope, using the the current
-hardcopy options (format, layout).  If the filename is specified, write
-to that filename (in addition to returning the image data); error
-if the file already exists, unless $force is true. 
-
-timeout (in seconds) and read_length (in bytes) are only passed with
-the "hash" form of the call. 
-
-=cut
 
 sub get_image {
     my $self = shift;
@@ -4196,19 +3056,6 @@ sub get_image {
     return $r;
 }
 
-=head1 HORIZONTAL CONTROL ROUTINES
-
-=head2 get_horiz_view
-
-$view = $s->get_horiz_view();
-
-Fetch the horizontal view: MAIN, WINDOW, ZONE
-
-WINDOW is a selection of the MAIN view; ZONE is
-the same as MAIN, but with vertical bar cursors
-to show the range displayed in WINDOW view.
-
-=cut    
 
 sub get_horiz_view {
     my $self = shift;
@@ -4218,15 +3065,6 @@ sub get_horiz_view {
     return _bloat( $r, { MAI => 'MAIN' } );
 }
 
-=head2 set_horiz_view
-
-$s->set_horiz_view($view);
-
-$s->set_horiz_view(view=>$view);
-
-Set the horizontal view to MAIn, WINDOW, or ZONE.
-
-=cut
 
 sub set_horiz_view {
     my $self = shift;
@@ -4237,15 +3075,6 @@ sub set_horiz_view {
     $self->_debug();
 }
 
-=head2 get_horiz_position
-
-$pos = $s->get_horiz_position();
-
-Fetch the horizontal position of the main view, in seconds; this
-is the difference between the trigger point and the horizontal 
-center of the screen. 
-
-=cut
 
 sub get_horiz_position {
     my $self = shift;
@@ -4255,17 +3084,6 @@ sub get_horiz_position {
     return $self->_parseReply($r);
 }
 
-=head2 set_horiz_position
-
-$s->set_horiz_position($t);
-
-$s->set_horiz_position(time => $t);
-
-Set the horizontal position, in seconds, for the main view.
-Positive time values puts the trigger point to the left of the
-center of the screen.
-
-=cut
 
 sub set_horiz_position {
     my $self = shift;
@@ -4282,14 +3100,6 @@ sub set_horiz_position {
     $self->_debug();
 }
 
-=head2 get_delay_position
-
-$time = $s->get_delay_position();
-
-Fetch the delay time for the WINDOW view. Time is relative to the
-center of the screen.
-
-=cut
 
 sub get_delay_position {
     my $self = shift;
@@ -4299,16 +3109,6 @@ sub get_delay_position {
     return $r;
 }
 
-=head2 set_delay_position
-
-$s->set_delay_position($time);
-
-$s->set_delay_position(delaytime=>$time);
-
-Set the postion of the WINDOW view horizontally. $time is in
-seconds, relative to the center of the screen.
-
-=cut
 
 sub set_delay_position {
     my $self = shift;
@@ -4323,13 +3123,6 @@ sub set_delay_position {
     $self->_debug();
 }
 
-=head2 get_horiz_scale
-
-$secdiv = $s->get_horiz_scale();
-
-Fetch the scale (in seconds/division) for the 'main' view.
-
-=cut
 
 sub get_horiz_scale {
     my $self = shift;
@@ -4339,16 +3132,6 @@ sub get_horiz_scale {
     return $r;
 }
 
-=head2 set_horiz_scale
-
-$s->set_horiz_scale($secdiv);
-
-$s->set_horiz_scale(scale=>$secdiv);
-
-Set the horizontal scale, main window, to $secdiv
-seconds/division.
-
-=cut
 
 sub set_horiz_scale {
     my $self = shift;
@@ -4372,13 +3155,6 @@ sub set_horiz_scale {
     $self->_debug();
 }
 
-=head2 get_delay_scale
-
-$secdiv = $s->get_delay_scale();
-
-Fetch the scale (in seconds/division) for the 'window' view.
-
-=cut
 
 sub get_delay_scale {
     my $self = shift;
@@ -4388,16 +3164,6 @@ sub get_delay_scale {
     return $r;
 }
 
-=head2 set_del_scale
-
-$s->set_del_scale($secdiv);
-
-$s->set_del_scale(delayscale=>$secdiv);
-
-Set the horizontal scale, window view, to $secdiv
-seconds/division.
-
-=cut
 
 sub set_del_scale {
     my $self = shift;
@@ -4421,29 +3187,11 @@ sub set_del_scale {
     $self->_debug();
 }
 
-=head2 get_recordlength
-
-$samples = $s->get_recordlength();
-
-Returns record length, in number of samples. For the TDS200B,
-this is always 2500, so a constant is returned. 
-
-=cut
 
 sub get_recordlength {
     return 2500;
 }
 
-=head2 get_horizontal
-
-$hashref = $s->get_horizontal();
-
-Fetch a hashref, with entries that describe the horizontal setup, and
-can be passesd to set_horizontal
-
-keys: view, time, delaytime, scale, delayscale, recordlength
-
-=cut
 
 sub get_horizontal {
     my $self = shift;
@@ -4461,13 +3209,6 @@ sub get_horizontal {
     return $h;
 }
 
-=head2 set_horizontal
-
-$s->set_horizontal(time=>..., scale=>...);
-
-Set the horizontal characteristics. See get_horizontal()
-
-=cut
 
 sub set_horizontal {
     my $self = shift;
@@ -4480,15 +3221,6 @@ sub set_horizontal {
     $self->set_delay_scale($tail)    if exists $tail->{delayscale};
 }
 
-=head1 MATH/FFT ROUTINES
-
-=head2 get_math_definition
-
-$string = $s->get_math_definition();
-
-Fetch the definition used for the MATH waveform
-
-=cut
 
 sub get_math_definition {
     my $self = shift;
@@ -4511,42 +3243,6 @@ sub get_math_definition {
     return $r;
 }
 
-=head2 set_math_definition
-
-$s->set_math_definition($string);
-
-$s->set_math_definition(math => $string);
-
-Define the 'MATH' waveform; the input is sufficiently complex that
-the user should check for errors after calling this routine.
-
-Choices:
-
-=over 
-
-    CH1+CH2
-
-    CH3+CH4
-
-    CH1-CH2
-
-    CH2-CH1
-
-    CH3-CH4
-
-    CH4-CH3 
-
-    CH1*CH2
-
-    CH3*CH4
-
-    FFT (CHx[, <window>])
-
-=back
-
-<window> is HANning, FLATtop, or RECTangular.
-
-=cut
 
 sub set_math_definition {
     my $self = shift;
@@ -4577,15 +3273,6 @@ sub set_math_definition {
     $self->_debug();
 }
 
-=head2 get_math_position
-
-
-$y => $s->get_math_position();
-
-Fetch the MATH trace vertical position, in divisions
-from the center of the screen. 
-
-=cut
 
 sub get_math_position {
     my $self = shift;
@@ -4595,16 +3282,6 @@ sub get_math_position {
     return _parseNRf($r);
 }
 
-=head2 set_math_position
-
-$s->set_math_position($y);
-
-$s->set_math_postition(position=>$y);
-
-Set the MATH trace veritical position, in divisions from the center
-of the screen.
-
-=cut
 
 sub set_math_position {
     my $self = shift;
@@ -4621,14 +3298,6 @@ sub set_math_position {
     $self->_debug();
 }
 
-=head2 get_fft_xposition
-
-$pos = $s->get_fft_xposition();
-
-Fetch FFT horizontal position, a percentage of the total FFT 
-length, relative to the center of the screen.
-
-=cut
 
 sub get_fft_xposition {
     my $self = shift;
@@ -4637,16 +3306,6 @@ sub get_fft_xposition {
     return $self->_parseReply($r);
 }
 
-=head2 set_fft_xposition
-
-$s->set_fft_xposition($percent);
-
-$s->set_fft_xposition(fft_xposition=>$percent);
-
-Set the horizontal position of the FFT trace; the "percent"
-of the trace is placed at the center of the screen.
-
-=cut
 
 sub set_fft_xposition {
     my $self = shift;
@@ -4665,14 +3324,6 @@ sub set_fft_xposition {
     $self->_debug();
 }
 
-=head2 get_fft_xscale
-
-$scale = $s->get_fft_xscale();
-
-Fetch the horizontal zoom factor for FFT display,
-possible values are 1,2,5 and 10.
-
-=cut
 
 sub get_fft_xscale {
     my $self = shift;
@@ -4681,15 +3332,6 @@ sub get_fft_xscale {
     return $self->_parseReply($r);
 }
 
-=head2 set_fft_xscale
-
-$s->set_fft_xscale($zoom);
-
-$s->set_fft_xscale(fft_xscale => $zoom);
-
-Set the FFT horizontal scale zoom factor: 1,2,5, or 10.
-
-=cut
 
 sub set_fft_xscale {
     my $self = shift;
@@ -4723,14 +3365,6 @@ sub set_fft_xscale {
     $self->_debug();
 }
 
-=head2 get_fft_position
-
-$divs = $s->get_fft_position();
-
-Fetch the y position of the FFT display, in division from the
-screen center.
-
-=cut
 
 sub get_fft_position {
     my $self = shift;
@@ -4739,16 +3373,6 @@ sub get_fft_position {
     return _parseReply($r);
 }
 
-=head2 set_fft_position
-
-$s->set_fft_position($divs);
-
-$s->set_fft_position(fft_position=>$divs);
-
-Set the FFT trace y position, in screen divisions relative to the
-screen center. 
-
-=cut
 
 sub set_fft_position {
     my $self = shift;
@@ -4764,13 +3388,6 @@ sub set_fft_position {
     $self->_debug();
 }
 
-=head2 get_fft_scale
-
-$zoom = $s->get_fft_scale();
-
-Fetch the FFT vertical zoom factor, returns one of 0.5, 1, 2, 5, 10
-
-=cut
 
 sub get_fft_scale {
     my $self = shift;
@@ -4779,16 +3396,6 @@ sub get_fft_scale {
     return _parseReply($r);
 }
 
-=head2 set_fft_scale
-
-$s->set_fft_scale($zoom);
-
-$s->set_fft_yscale(fft_scale => $zoom);
-
-Set the fft vertical zoom factor, valid values are 
-0.5, 1, 2, 5, 10
-
-=cut
 
 sub set_fft_scale {
     my $self = shift;
@@ -4826,37 +3433,6 @@ sub set_fft_scale {
     $self->_debug();
 }
 
-=head1 MEASUREMENT ROUTINES
-
-The TDS2024B manual suggests using the 'IMMediate' measurements;
-when measurements 1..5 are used, it results in an on-screen display
-of the measurement results, because the on-screen display is update
-(at most) every 500ms. It would be a good idea to check for errors
-after calling get_measurement_value, because errors can result if
-the waveform is out of range.  Also note that when the MATH trace
-is in FFT mode, 'normal' measurement is not possible. 
-
-The 'IMMediate' measurements cannot be accessed from the scope
-front panel, so will be cached even if the scope is in an 'unlocked'
-state. (see set_locked) 
-
-
-=head2 get_measurement_type
-
-$type = $s->get_measurement_type($n);
-
-$type = $s->get_measurement_type(measurement=>$n);
-
-Fetch the measurement type for measurement $n = 'IMMediate' or 1..5
-$n defaults to 'IMMediate'
-
-returns one of:
- FREQuency | MEAN | PERIod |
-PHAse | PK2pk | CRMs | MINImum | MAXImum | RISe | FALL |
-PWIdth | NWIdth | NONE 
-
-
-=cut
 
 # do our own cache handling, doesn't fit the normal scheme
 
@@ -4916,23 +3492,6 @@ sub get_measurement_type {
     return $r;
 }
 
-=head2 set_measurement_type
-
-$s->set_measurement_type($n,$type);
-
-$s->set_measurement_type(measurement=>$n, type=>$type);
-
-$s->set_measurement_type($type);     (defaults to $n = 'IMMediate')
-
-
-
-Set the measurement type, for measurement $n= 'IMMediate', 1..5
-
-The type is one of:  FREQuency | MEAN | PERIod |
-PHAse | PK2pk | CRMs | MINImum | MAXImum | RISe | FALL | PWIdth | NWIdth 
-or NONE (only for $n=1..5).
-
-=cut
 
 sub set_measurement_type {
     my $self = shift;
@@ -4978,18 +3537,6 @@ sub set_measurement_type {
     $self->get_measurement_type( measurement => $n );
 }
 
-=head2 get_measurement_units
-
-$units = $s->get_measurement_units($n);
-
-$units = $s->get_measurement_units(measurement=>$n);
-
-Fetch the measurement units for measurement $n (IMMediate, 1..5)
-result:  V, A, S, Hz, VA, AA, VV
-
-If $n is missing or undefined, uses IMMediate. 
-
-=cut
 
 sub get_measurement_units {
     my $self = shift;
@@ -5027,19 +3574,6 @@ sub get_measurement_units {
     return $r;
 }
 
-=head2 get_measurement_source
-
-$wfm = $s->get_measurement_source($n);
-
-$wfm = $s->get_measurement_source(measurement=>$n);
-
-
-Fetch the source waveform for measurements: CH1..CH4 or MATH
-for measurement $n = IMMediate, 1..5
-
-If $n is undefined or missing, IMMediate is used. 
-
-=cut
 
 sub get_measurement_source {
     my $self = shift;
@@ -5080,16 +3614,6 @@ sub get_measurement_source {
     return $r;
 }
 
-=head2 set_measurement_source
-
-$s->set_measurement_source($n,$wfm);
-
-$s->set_measurement_source(measurement=>$n, measurement_source => $wfm);
-
-Set the measurement source, CH1..CH4 or MATH for measurement 
-$n = IMMediate, 1..5.  If $n is undefined or missing uses IMMediate. 
-
-=cut
 
 sub set_measurement_source {
     my $self = shift;
@@ -5126,18 +3650,6 @@ sub set_measurement_source {
     $self->{device_cache}->{"meas_source_$n"} = $wfm;
 }
 
-=head2 get_measurement_value
-
-$val = $s->get_measurement_value($n);
-
-$val = $s->get_measurement_value(measurement=>$n);
-
-
-Fetch  measurement value, measurement $n = IMMediate, 1..5
-If $n is missing or undefined, use IMMediate. 
-
-
-=cut
 
 sub get_measurement_value {
     my $self = shift;
@@ -5179,17 +3691,6 @@ sub get_measurement_value {
     return _parseNRf($r);
 }
 
-=head1 TRIGGER ROUTINES
-
-
-=head2 trigger
-
-$s->trigger();
-
-Force a trigger, equivalent to pushing the "FORCE TRIGGE" button on
-front panel
-
-=cut
 
 sub trigger {
     my $self = shift;
@@ -5197,15 +3698,6 @@ sub trigger {
     $self->_debug();
 }
 
-=head2 get_trig_coupling
-
-$coupling = $s->get_trig_coupling();
-
-returns $coupling = AC|DC|HFREJ|LFREJ|NOISEREJ
-
-(only applies to 'EDGE' trigger)
-
-=cut
 
 sub get_trig_coupling {
     my $self = shift;
@@ -5218,16 +3710,6 @@ sub get_trig_coupling {
     );
 }
 
-=head2 set_trig_coupling
-
-$s->set_trig_coupling($coupling);
-
-$s->set_trig_coupling(coupling=>$coupling);
-
-Set trigger coupling, $coupling = AC|DC|HFRej|LFRej|NOISErej
-Only applies to EDGE trigger
-
-=cut
 
 sub set_trig_coupling {
     my $self = shift;
@@ -5239,14 +3721,6 @@ sub set_trig_coupling {
     $self->_debug();
 }
 
-=head2 get_trig_slope
-
-$sl = $s->get_trig_slope();
-
-Fetch the trigger slope, FALL or RISE
-only applies to EDGE trigger.
-
-=cut
 
 sub get_trig_slope {
     my $self = shift;
@@ -5257,17 +3731,6 @@ sub get_trig_slope {
     return $r;
 }
 
-=head2 set_trig_slope
-
-$s->set_trig_slope($sl);
-
-$s->set_trig_slope(slope=>$sl);
-
-Set the trigger slope: RISE|UP|POS|+  or FALL|DOWN|NEG|-
-
-Only applies to EDGE trigger
-
-=cut
 
 sub set_trig_slope {
     my $self = shift;
@@ -5290,20 +3753,6 @@ sub set_trig_slope {
     $self->_debug();
 }
 
-=head2 get_trig_source
-
-$ch = $s->get_trig_source([$trigtype]);
-
-$ch = $s->get_trig_source([type=>$trigtype]);
-
-Fetch the trigger source, returns one of CH1..4, EXT, EXT5,  LINE
-
-(EXT5 is 'external source, attenuated by a factor of 5')
-
-Trigger type is the "currently selected" trigger type, unless
-specified with the type parameter.
-
-=cut
 
 sub get_trig_source {
     my $self = shift;
@@ -5335,17 +3784,6 @@ sub get_trig_source {
     return $r;
 }
 
-=head2 set_trig_source
-
-$s->set_trig_source($ch);
-
-$s->set_trig_source(source=>$ch[, type=>$type]);
-
-Set the trigger source to one of CH1..4, EXT, EXT5, LINE (or 'AC LINE') 
-for the current trigger type, unless type=>$type is specified.
-
-
-=cut
 
 sub set_trig_source {
     my $self = shift;
@@ -5380,15 +3818,6 @@ sub set_trig_source {
         = _bloat( $type, { PUL => 'PULSE', VID => 'VIDEO' } );
 }
 
-=head2 get_trig_frequency
-
-$f = $s->get_trig_frequency();
-
-Fetch the trigger frequency in Hz. This function is not for use when
-in 'video' trigger type. If the frequcency is less than 10Hz, 1Hz
-is returned.
-
-=cut
 
 sub get_trig_frequency {
     my $self = shift;
@@ -5412,13 +3841,6 @@ sub get_trig_frequency {
     return $r;
 }
 
-=head2 get_trig_holdoff
-
-$hold = $s->get_trig_holdoff();
-
-Fetch the trigger holdoff, in seconds
-
-=cut
 
 sub get_trig_holdoff {
     my $self = shift;
@@ -5427,19 +3849,6 @@ sub get_trig_holdoff {
     return $self->_parseReply($r);
 }
 
-=head2 set_trig_holdoff
-
-$s->set_trig_holdoff($time);
-
-$s->set_trig_holdoff(holdoff=>$time);
-
-Set the trigger holdoff. If $time is a number it is
-taken to be in seconds; text can be passed with the
-usual order-of-magnitude and unit suffixes. 
-
-holdoff can range from 500ns to 10s
-
-=cut
 
 sub set_trig_holdoff {
     my $self = shift;
@@ -5464,13 +3873,6 @@ sub set_trig_holdoff {
     $self->_debug();
 }
 
-=head2 get_trig_level
-
-$lev = $s->get_trig_level();
-
-Fetch the trigger level, in volts
-
-=cut
 
 sub get_trig_level {
     my $self = shift;
@@ -5479,17 +3881,6 @@ sub get_trig_level {
     return _parseReply($r);
 }
 
-=head2 set_trig_level
-
-$s->set_trig_level($lev);
-
-$s->set_trig_level(level => $lev);
-
-Set the trigger level, in volts.  The usual magnitude/suffix 
-rules apply. This routine has no effect when the trigger ssource 
-is set to 'AC LINE'
-
-=cut
 
 sub set_trig_level {
     my $self = shift;
@@ -5508,13 +3899,6 @@ sub set_trig_level {
     $self->_debug();
 }
 
-=head2 get_trig_mode
-
-$mode = $s->get_trig_mode();
-
-Fetch the trigger mode: AUTO or NORMAL
-
-=cut
 
 sub get_trig_mode {
     my $self = shift;
@@ -5525,15 +3909,6 @@ sub get_trig_mode {
     return $r;
 }
 
-=head2 set_trig_mode
-
-$s->set_trig_mode($mode);
-
-$s->set_trig_mode(mode=>$mode);
-
-Set the trigger mode: AUTO or NORMAL
-
-=cut
 
 sub set_trig_mode {
     my $self = shift;
@@ -5544,13 +3919,6 @@ sub set_trig_mode {
     $self->_debug();
 }
 
-=head2 get_trig_type
-
-$type = $s->get_trig_type();
-
-Fetch the trigger type, returns EDGE or PULSE or VIDEO.
-
-=cut
 
 sub get_trig_type {
     my $self = shift;
@@ -5560,15 +3928,6 @@ sub get_trig_type {
     return _bloat( $r, { PUL => 'PULSE', VID => 'VIDEO' } );
 }
 
-=head2 set_trig_type
-
-$s->set_trig_type($type);
-
-$s->set_trig_type(type=>$type);
-
-Set trigger type to EDGE, PULse or VIDeo. 
-
-=cut
 
 sub set_trig_type {
     my $self = shift;
@@ -5580,13 +3939,6 @@ sub set_trig_type {
     $self->_debug();
 }
 
-=head2 get_trig_pulse_width
-
-$wid = $s->get_trig_pulse_width();
-
-Fetch trigger pulse width for PULSE trigger type
-
-=cut
 
 sub get_trig_pulse_width {
     my $self = shift;
@@ -5596,16 +3948,6 @@ sub get_trig_pulse_width {
     return $self->_parseReply($r);
 }
 
-=head2 set_trig_pulse_width
-
-$s->set_trig_pulse_width($wid);
-
-$s->set_trig_pulse_width(width=>$wid);
-
-Set the pulse width for PULSE type triggers, in seconds. Valid
-range is from 33ns to 10s.
-
-=cut
 
 sub set_trig_pulse_width {
     my $self = shift;
@@ -5624,14 +3966,6 @@ sub set_trig_pulse_width {
     $self->_debug();
 }
 
-=head2 get_trig_pulse_polarity
-
-$pol = $s->get_trig_pulse_polarity();
-
-Fetch the polarity for the PULSE type trigger,
-returns POSITIVE or NEGATIVE
-
-=cut
 
 sub get_trig_pulse_polarity {
     my $self = shift;
@@ -5641,17 +3975,6 @@ sub get_trig_pulse_polarity {
     return _bloat( $r, { POS => 'POSITIVE', NEG => 'NEGATIVE' } );
 }
 
-=head2 set_trig_pulse_polarity
-
-$s->set_trig_pulse_polarity($pol);
-
-$s->set_trig_pulse_polarity(pulse_polarity=>$pol);
-
-Set the polarity for PULSE type trigger.  
-
-$pol can be (Postive|P|+) or (Negative|N|M|-)
-
-=cut
 
 sub set_trig_pulse_polarity {
     my $self = shift;
@@ -5673,29 +3996,6 @@ sub set_trig_pulse_polarity {
     $self->_debug();
 }
 
-=head2 get_trig_pulse_when
-
-$when = $s->get_trig_pulse_when();
-
-Fetch the "when" condition for pulse triggering, possible
-values are 
-
-=over 4
-
-EQUAL: triggers on trailing edge of specified width)
-
-NOTEQUAL: triggers on trailing edge of pulse shorter than specified
-width, or if pulse continues longer than specified width.
-
-INSIDE: triggers on the trailing edge of pulses that are less than
-the specified width.
-
-OUTSIDE: triggers when a pulse continues longer than the specified
-width
-
-=back
-
-=cut 
 
 sub get_trig_pulse_when {
     my $self = shift;
@@ -5710,30 +4010,6 @@ sub get_trig_pulse_when {
     );
 }
 
-=head2 set_trig_pulse_when
-
-$s->set_trig_pulse_when($when);
-
-$s->set_trig_pulse_when(pulse_when=>$when);
-
-Set the PULSE type trigger to trigger on the specified 
-condition, relative to the pulse width.
-
-=over 4
-
-EQ|EQUAL|= : trigger on trailing edge of pulse equal to 'width'.
-
-NOTE|NOTEQUAL|NE|!=|<>: trigger on trailing edge of pulse that is shorter than specified width, or when the pulse exceeds the specified width.
-
-IN|INSIDE|LT|< : trigger on trailing edge when less than specified width
-
-OUT|OUTSIDE|GT|> : trigger when pulse width exceeds specified width.
-
-The pulse width for this trigger is set by set_trig_pulse_width();
-
-=back
-
-=cut
 
 sub set_trig_pulse_when {
     my $self = shift;
@@ -5761,14 +4037,6 @@ sub set_trig_pulse_when {
     $self->_debug();
 }
 
-=head2 get_trig_vid_line
-
-$line = $s->get_trig_vid_line();
-
-Get the video line number for triggering when
-SYNC is set to LINENUM.
-
-=cut
 
 sub get_trig_vid_line {
     my $self = shift;
@@ -5777,16 +4045,6 @@ sub get_trig_vid_line {
     return $self->_parseReply($r);
 }
 
-=head2 set_trig_vid_line
-
-$s->set_trig_vid_line($line);
-
-$s->set_trig_vid_line(vid_line => $line);
-
-Set the video line number for triggering with video
-trigger, when SYNC is set to LINENUM.
-
-=cut
 
 sub set_trig_vid_line {
     my $self = shift;
@@ -5810,13 +4068,6 @@ sub set_trig_vid_line {
     $self->_debug();
 }
 
-=head2 get_trig_vid_polarity
-
-$pol = $s->get_trig_vid_polarity();
-
-Fetch the video trigger polarity: NORMAL or INVERTED
-
-=cut
 
 sub get_trig_vid_polarity {
     my $self = shift;
@@ -5826,15 +4077,6 @@ sub get_trig_vid_polarity {
     return _bloat( $r, { NORM => 'NORMAL', INV => 'INVERTED' } );
 }
 
-=head2 set_trig_vid_polarity
-
-$s->set_trig_vid_polarity($pol);
-
-$s->set_trig_vid_polarity(vid_polarity=>$pol);
-
-Set the video trigger polarity: NORMal|-SYNC or INVerted|+SYNC
-
-=cut
 
 sub set_trig_vid_polarity {
     my $self = shift;
@@ -5856,14 +4098,6 @@ sub set_trig_vid_polarity {
     $self->_debug();
 }
 
-=head2 get_trig_vid_standard
-
-$std = $s->get_trig_vid_standard();
-
-Fetch the video standard used for video-type triggering;
-returns NTSC or PAL (PAL = PAL or SECAM).
-
-=cut
 
 sub get_trig_vid_standard {
     my $self = shift;
@@ -5874,16 +4108,6 @@ sub get_trig_vid_standard {
     return $r;
 }
 
-=head2 set_trig_vid_standard
-
-$s->set_trig_vid_standard($std);
-
-$s->set_trig_vid_standard(vid_standard=>$std);
-
-Set the video standard used for video triggering. 
-$std = NTSC, PAL, SECAM  (SECAM selects PAL triggering).
-
-=cut
 
 sub set_trig_vid_standard {
     my $self = shift;
@@ -5905,14 +4129,6 @@ sub set_trig_vid_standard {
     $self->_debug();
 }
 
-=head2 get_trig_vid_sync
-
-$sync = $s->get_trig_vid_sync();
-
-Fetcht the syncronization used for video trigger, possible
-values are FIELD, LINE, ODD, EVEN and LINENUM.
-
-=cut
 
 sub get_trig_vid_sync {
     my $self = shift;
@@ -5923,16 +4139,6 @@ sub get_trig_vid_sync {
     return $r;
 }
 
-=head2 set_trig_vid_sync
-
-$s->set_trig_vid_sync($sync);
-
-$s->set_trig_vid_sync(vid_sync => $sync);
-
-Set the synchronization used for video triggering; possible values
-are FIELD, LINE, ODD, EVEN, and LINENum.
-
-=cut
 
 sub set_trig_vid_sync {
     my $self = shift;
@@ -5943,30 +4149,6 @@ sub set_trig_vid_sync {
     $self->_debug();
 }
 
-=head2 get_trig_state
-
-$state = $s->get_trig_state();
-
-Fetch the trigger state (warning: this is not a good way to determine
-if acquisition is completed).  Possible values are:
-
-=over 4
-
-ARMED: aquiring pretrigger information, triggers ignored
-
-READY: ready to accept a trigger
-
-TRIGGER: trigger has been accepted, scope is processing postrigger information.
-
-AUTO: in auto mode, acquiring even without a trigger.
-
-SAVE: acquisition stopped, or all channels off.
-
-SCAN: scope is in scan mode 
-
-=back
-
-=cut
 
 sub get_trig_state {
     my $self = shift;
@@ -5975,18 +4157,6 @@ sub get_trig_state {
     $r = $self->_parseReply($r);
 }
 
-=head1 WAVEFORM ROUTINES
-
-=head2 get_data_width
-
-$nbytes = $s->get_data_width();
-
-Fetch the number of bytes transferred per waveform sample, returns 1 or 2. 
-
-Note that only the MSB is used, unless the waveform is averaged or a 
-MATH waveform. 
-
-=cut
 
 sub get_data_width {
     my $self = shift;
@@ -5995,18 +4165,6 @@ sub get_data_width {
     return $self->_parseReply($r);
 }
 
-=head2 set_data_width
-
-$s->set_data_width($nbytes);
-
-$s->set_data_width(nbytes=>$nbytes);
-
-Set the number of bytes per waveform sample, either 1 or 2. 
-
-Note that only the MSB is used for waveforms that are not the
-result of averaging or MATH operations.
-
-=cut
 
 sub set_data_width {
     my $self = shift;
@@ -6028,42 +4186,6 @@ sub set_data_width {
     $self->_debug();
 }
 
-=head2 get_data_encoding
-
-$enc = $s->get_data_encoding();
-
-Fetch the encoding that is used to transfer waveform
-data from the scope. 
-
-returns one of 
-
-=over 4
-
-ASCII: numbers returned as ascii signed  integers, comma separated
-
-RIBINARY: signed integer binary, MSB transferred first (if width=2)
-
-RPBINARY: unsigned integer binary, MSB first
-
-SRIBINARY: signed integer binary, LSB first
-
-SRPBINARY: unsigned integer binary, LSB first
-
-=back
-
-RIBINARY is the fastest transfer mode, particularly with width=1,
-as is used for simple waveform traces, with values ranging from
--128..127 with 0 corresponding to the center of the screen. 
-
-(width = 2 data range -32768 .. 32767 with center = 0) 
-
-For unsigned data, width=1, range is 0..255 with 127 at center,
-width=2 range is 0..65535.
-
-In all cases the "lower limit" is one division below the bottom of the
-screen, and the "upper limit" is one division above the top of the screen.
-
-=cut
 
 sub get_data_encoding {
     my $self = shift;
@@ -6078,16 +4200,6 @@ sub get_data_encoding {
     );
 }
 
-=head2 set_data_encoding
-
-$s->set_data_encoding($enc);
-
-$s->set_data_encoding(encoding=>$enc);
-
-Set the waveform transfer encoding, see get_waveform_encoding for
-possible values and their meanings.
-
-=cut
 
 sub set_data_encoding {
     my $self = shift;
@@ -6098,14 +4210,6 @@ sub set_data_encoding {
     $self->_debug();
 }
 
-=head2 get_data_start
-
-$i = $s->get_data_start();
-
-Fetch the index of the first waveform sample 
-for transfers $i = 1..2500
-
-=cut
 
 sub get_data_start {
     my $self = shift;
@@ -6114,16 +4218,6 @@ sub get_data_start {
     return $self->_parseReply($r);
 }
 
-=head2 set_data_start
-
-$s->set_data_start($i);
-
-$s->set_data_start(start=>$i);
-
-Set the index of the first waveform sample
-for transfers, $i = 1..2500.
-
-=cut
 
 sub set_data_start {
     my $self = shift;
@@ -6148,14 +4242,6 @@ sub set_data_start {
     $self->_debug();
 }
 
-=head2 get_data_stop
-
-$i = $s->get_data_stop();
-
-Fetch the index of the last waveform sample 
-for transfers $i = 1..2500
-
-=cut
 
 sub get_data_stop {
     my $self = shift;
@@ -6164,16 +4250,6 @@ sub get_data_stop {
     return $self->_parseReply($r);
 }
 
-=head2 set_data_stop
-
-$s->set_data_stop($i);
-
-$s->set_data_stop(stop=>$i);
-
-Set the index of the lat waveform sample
-for transfers, $i = 1..2500.
-
-=cut
 
 sub set_data_stop {
     my $self = shift;
@@ -6198,14 +4274,6 @@ sub set_data_stop {
     $self->_debug();
 }
 
-=head2 get_data_destination
-
-$dst = $s->get_data_destination();
-
-Fetch the destination (REFA..REFD) for data transfered
-TO the scope. 
-
-=cut
 
 sub get_data_destination {
     my $self = shift;
@@ -6214,16 +4282,6 @@ sub get_data_destination {
     return $self->_parseReply($r);
 }
 
-=head2 set_data_destination
-
-$s->set_data_destination($dst);
-
-$s->set_data_destination(destination=>$dst);
-
-Set the destination ($dst = REFA..REFD) for waveforms
-transferred to the scope. 
-
-=cut
 
 sub set_data_destination {
     my $self = shift;
@@ -6242,14 +4300,6 @@ sub set_data_destination {
     $self->_debug();
 }
 
-=head2 set_data_init
-
-$s->set_data_init();
-
-initialize all data parameters (source, destination, encoding, etc)
-to factory defaults
-
-=cut
 
 sub set_data_init {
     my $self = shift;
@@ -6257,15 +4307,6 @@ sub set_data_init {
     $self->_debug();
 }
 
-=head2 get_data_source
-
-$src = $s->get_data_source();
-
-Fetch the source of waveforms transferred FROM the scope.
-
-Possible values are CH1..CH4, MATH, or REFA..REFD.
-
-=cut
 
 sub get_data_source {
     my $self = shift;
@@ -6274,16 +4315,6 @@ sub get_data_source {
     return $self->_parseReply($r);
 }
 
-=head2 set_data_source
-
-$s->set_data_source($src);
-
-$s->set_data_source(source => $src);
-
-Set the source of waveforms transferred from the scope. Possible
-values are CH1..CH4, MATH, or REFA..REFD. 
-
-=cut
 
 sub set_data_source {
     my $self = shift;
@@ -6308,15 +4339,6 @@ sub set_data_source {
     $self->_debug();
 }
 
-=head2 get_data
-
-  $h = $s->get_data();
-
-return a hash reference with data transfer information
-such as width, encoding, source, etc, suitable for use with
-the  set_data($h) routine
-
-=cut
 
 sub get_data {
     my $self   = shift;
@@ -6332,14 +4354,6 @@ sub get_data {
     return $h;
 }
 
-=head2 set_data
-
-$s->set_data(width=>$w, start=>$istart, ... );
-
-set data transfer characteristics, call with a hash
-or hashref similar to what one gets from get_data()
-
-=cut
 
 sub set_data {
     my $self = shift;
@@ -6353,38 +4367,6 @@ sub set_data {
     $self->set_data_destinatin($tail) if exists $tail->{destination};
 }
 
-=head2 get_waveform
-
-$hashref = $s->get_waveform();
-
-$hashref = $s->get_waveform( waveform=>$wfm,
-                             start=>$startbin, stop=>$stopbin,
-                             ...data parameters...);
-
-Fetch waveform from specified channel; if parameters are not
-set, use the current setup from the scope (see get_data_source) 
-The value of $wfm can be CH1..4, MATH, or REFA..D.
-
-returns $hashref = { v=>[voltages], t=>[times], various x,y parameters };
-
-Note that voltages and times are indexed starting at '1', or at the
-'data_start' index  (see set_data_start())  
-    $hashref->{v}->[1]  ...first voltage sample, default
-
-    Alternately:
-    $s->set_data_start(33);
-    ...
-    $hashref->{v}->[33]  ... first voltage sample
-
-    The hashref contains keys DAT:STAR and DAT:STOP for start and stop
-    sample numbers. 
-
-If you are going to alter the data in $hashref->{v}->[], make
-sure to delete($hashref->{rawdata}) before the waveform is transmitted
-to the scope, this will case the rawdata to be regenerated from 
-the $hashref->{v}->[] entries.
-
-=cut
 
 sub get_waveform {
     my $self = shift;
@@ -6521,48 +4503,6 @@ sub _unquote {
     return $str;
 }
 
-=head2 create_waveform
-
-$hwfd = $s->create_waveform();
-
-$hwfd = $s->create_waveform($t0,$t1[,$n[,\&vfunc]]);
-
-$hwfd = $s->create_waveform(tstart=>$t0, tstop=>$t1[, nbins=$n][, vfunc=\&vfunc]);
-
-returns a hashref with an array of time values (useful for creating
-a waveform) starting at $t0 and ending at $t1 with $n bins. Please
-note that the TDS2024B can use $n=2500 at most, although this routine
-will work for larger values of $n.  If $n is not specified $n=2500 for 
-a simple waveform, and $n=1250 for an 'envelope' waveform. 
-
-$t0 and $t1 can be numbers, in seconds, or text with suffixes: $t1='33ms'
-
-The bin numbers start with '1', matching the scope behavior: $hwfd->{t}->[1] = $t0 ... $hwfd->{t}->[$n] = $t1
-
-If a "vfunc" is given, it is called with the time values:
-
-    $v = vfunc($t);  # $t in seconds   
-
-If vfunc returns an array of two voltages, it is taken as "min,max" values
-for an 'ENVELOPE' style waveform:
-
-   ($vmin,$vmax) = vfunc($t);
-
-In either case, the result is 
-analyzed to produce a 'rawdata' entry with 8 bit waveform data, 
-filling in the parameters needed for
-transmitting the waveform to the scope. 
- 
-If you do not provide a reference to a "vfunc" function, you will
-have to create and fill in an array: $hwfd->{v}->[$n] = voltage($n)
-If you do not specify the $t0 and $t1 times, then you will also
-have to create and fill in the $hwfd->{t}->[$n] = time($n) array.
-
-To make use of an "envelope" waveform, fill in $hwfd->{vmin}->[$n]
-and $hwfd->{vmax}->[$n].
-
-
-=cut
 
 sub create_waveform {
     my $self = shift;
@@ -6674,29 +4614,6 @@ sub create_waveform {
     return $hwfd;
 }
 
-=head2 put_waveform
-
-$s->put_waveform($hwfm);
-
-$s->put_waveform(waveform=>$hwfm, 
-    [destination=>$dst, position=>$ypos, scale=>$yscale] )
-
-Store waveform to one of the REFA..REFD traces. If not set explicitly
-in the call arguments, uses the location set in the scope (see 
-get_data_destination).
-
-The vertical position of the trace is set with $ypos = divisions from
-the screen center, and the vertical scale with $yscale = V/div. 
-
-If  $hwfm->{rawdata} exists, it will be transmitted to the scope
-unchanged. Otherwise the $hwfm->{rawdata} entry will be regenerated
-from the $hwfm->{v}->[]  (or $hwfm->{vmin|vmax}->[]) array(s).  
-
-The error/consistency checking is certainly not complete, so 
-doing something 'tricky' with the $hwfm hash may give unexpected
-results.
-
-=cut
 
 sub put_waveform {
     my $self = shift;
@@ -6986,18 +4903,6 @@ sub put_waveform {
     $self->_debug();
 }
 
-=head2 print_waveform
-
-$s->print_waveform($hwfm [,$IOhandle]);
-
-$s->print_waveform(waveform=>$hwfm [,output=>$iohandle]);
-
-print information from the waveform stored in a
-hasref $hwfm, taken from get_waveform();
-
-This is mostly for diagnostic purposes.
-
-=cut
 
 sub print_waveform {
     my $self = shift;
@@ -7069,13 +4974,1907 @@ sub print_waveform {
 
 }
 
-=head1 AUTHOR
+1;    # End of Lab::Instrument::TDS2024B
 
-Chuck Lane, C<< <lane at duphy4.physics.drexel.edu> >>
+__END__
 
-This code is publically available under the same terms
-as Perl. 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::TDS2024B - Tektronix TDS2024B digital oscilloscope
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+=over 4
+
+    use Lab::Instrument::TDS2024B;
+
+    my $s = new Lab::Instrument::TDS2024B (
+        usb_serial => 'C12345',
+        # usb_vendor and usb_product set automatically        
+    );
+   
+    $s->set_channel(3);
+    $s->set_scale(scale=>'20mV/div');
+    $s->set_display_persist(persist=>'5s');
+    $s->set_acquire_average(32);
+    $s->set_acquire_state(state=>'RUN');
+
+=back
+
+Many of the 'quantities' passed to the code can use scientific
+notation, order of magnitude suffixes ('u', 'm', etc) and unit
+suffixes. The routines can be called using positional parameters
+(check the documentation for order), or with keyword parameters. 
+
+There are a few 'big' routines that let you set many parameters
+in one call, use keyword parameters for those. 
+
+In general, keywords passed TO these routines are case-independent,
+with only the first few characters being significant. So, in the
+example above: state=>'Run', state=>'running', both work. In cases
+where the keywords distinguish an "on/off" situation (RUN vs STOP 
+for acquistion, for example) you can use a Boolean quantity, and
+again, the Boolean values are flexible:
+
+=over
+
+TRUE = 't' or 'y' or 'on' or number!=0
+
+FALSE = 'f' or 'n' or 'off' or number ==0
+
+(only the first part of these is checked, case independent)
+
+=back
+
+The oscilloscope input 'channels' are CH1..CH4, but 
+there are also MATH, REFA..REFD that can be displayed
+or manipulated.  To perform operations on a channel, one
+should first $s->set_channel($chan);  Channel can be
+specified as 1..4 for the input channels, and it will
+be translated to 'CH1..CH4'.
+
+The state of the TDS2024B scope is cached only when the
+front-panel is in a 'locked' state, so that it cannot be
+changed by users fiddling with knobs.  
+
+=head1 GENERAL/SYSTEM ROUTINES
+
+=head2 new
+
+my $s = new Lab::Instrument::TDS2024B(
+         usb_serial => '...',
+);
+
+serial only needed if multiple TDS2024B scopes are attached, it
+defaults to '*', which selects the first TDS2024B found.  See
+Lab::Bus::USBtmc.pm documentation for more information.
+
+=head2 reset
+
+$s->reset()
+
+Reset the oscilloscope (*RST)
+
+=head2 get_error
+
+($code,$message) = $s->get_error();
+
+Fetch an error from the device error queue
+
+=head2 get_status
+
+$status = $s->get_status(['statusbit']);
+
+Fetches the scope status, and returns either the requested
+status bit (if a 'statusbit' is supplied) or a reference to
+a hash of status information. Reading the status register
+causes it to be cleared.  A status bit 'ERROR' is combined
+from the other error bits.
+
+Example: $s->get_status('OPC');
+
+Example: $s->get_status()->{'DDE'};
+
+Status bit names:
+
+=over
+
+B<PON>: Power on
+
+B<URQ>: User Request (not used)
+
+B<CME>: Command Error
+
+B<EXE>: Execution Error
+
+B<DDE>: Device Error
+
+B<QYE>: Query Error
+
+B<RQC>: Request Control (not used)
+
+B<OPC>: Operation Complete
+
+B<ERROR>: CME or EXE or DDE or QYE
+
+=back
+
+=head2 wait_done
+
+$s->wait_done([$time[,$deltaT]);
+
+$s->wait_done(timeout => $time, checkinterval=>$deltaT);
+
+Wait for "operation complete". If the $time optional argument
+is given, it is the (max) number of seconds to wait for completion
+before returning, otherwise a timeout of 10 seconds is used.
+$time can be a simple number of seconds, or a text string with
+magnitude and unit suffix. (Ex: $time = "200ms"). If $time="INF"
+then this routine will run indefinitely until completion (or some
+I/O error). 
+
+If $deltaT is given, checks are performed in intervals of $deltaT
+seconds (again, number or text), except when $deltaT is less than $time.
+$deltaT defaults to 500ms. 
+
+Returns 1 if completed, 0 if timed out. 
+
+=head2 test_busy
+
+$busy = $s->test_busy();
+
+Returns 1 if busy (waiting for trigger, etc), 0 if not busy.
+
+=head2 get_id
+
+$s->get_id()
+
+Fetch the *IDN? string from device
+
+=head2 get_header
+
+$header = $s->get_header();
+
+Fetch whether headers are included
+with query response; returns 0 or 1.
+
+=head2 save
+
+$s->save($n);
+
+$s->save(setup=>$n);
+
+Save the scope setup to a nonvolatile internal memory $n = 1..10
+
+=head2 recall
+
+$s->recall($n);
+
+$s->recall(setup=>$n);
+
+Recall scope setup from internal memory location $n = 1..10
+
+=head2 set_header
+
+$s->set_header($boolean);
+$s->set_header(header=>$boolean);
+
+Turns on or off headers in query replies; Boolean
+values described above.
+
+=head2 get_verbose
+
+$verb = $s->get_verbose();
+
+Fetch boolean indicating whether query responses
+(headers, if enabled, and response keywords)
+are returned in 'long form'
+
+=head2 set_verbose
+
+$s->set_verbose($bool);
+$s->set_verbose(verbose=>$bool);
+
+Sets the 'verbose' mode for replies, with
+the longer form of command headers (if enabled) and
+keyword values. Note that
+when using the get_* routines, the replies are
+processed before being returned as 'long' values, 
+so this routine only affects the communication
+between the scope and this code. 
+
+=head2 get_locked
+
+$locked = $s->get_locked()
+
+Get whether user front-panel controls
+are locked. Returns 1 (all controls locked)
+or 0 (no controls locked). Caching for most
+quantities is turned off when the controls
+are unlocked. 
+
+=head2 set_locked
+
+$s->set_locked($bool);
+$s->set_locked(locked=>$bool);
+
+Lock or unlock front panel controls; 
+
+NOTE: locking the front panel
+enables the device_cache, and reinitializes cached values (other
+than the special ones that are not alterable from the front
+panel)
+
+=head2 get_setup
+
+$setup = get_setup();
+
+Get a long GPIB string that has the scope setup information
+
+Note that the scope I am testing with generates a 
+"300, Device-specific error; no alternate chosen"
+error when triggering on "AC LINE". Might be a firmware
+bug, so filtering it out. 
+
+=head2 set_setup
+
+$s->set_setup($setup);
+
+$s->set_setup(setup=>$setup);
+
+Send configuration to scope. The '$setup' string is
+of the form returned from get_setup(), but can be
+any valid command string for the scope.  The setup
+string is processed into separate commands, and
+transmitted sequentially, to avoid communications
+timeouts.
+
+=head1 ACQUIRE ROUTINES
+
+=head2 get_acquire_mode
+
+$acqmode = $s->get_acquire_mode();
+
+Fetches acquisition mode: SAMple,PEAKdetect,AVErage
+
+=head2 set_acquire_mode
+
+$s->set_acquire_mode($mode);
+$s->set_acquire_mode(mode=>$mode);
+
+Sets the acquire mode: SAMple, PEAKdetect or AVErage
+
+=head2 get_acquire_numacq
+
+$numacq = $s->get_acquire_numacq();
+
+Fetch the number of acquisitions that have happened
+since starting acquisition.
+
+=head2 get_acquire_numavg
+
+$numavg = $s->get_acquire_numavg();
+
+Fetch the number of waveforms specified for averaging
+
+=head2 set_acquire_numavg
+
+$s->set_acquire_numavg($n);
+$s->set_acquire_numavg(average=>$n);
+
+Set the number of waveforms to average
+valid values are 4, 16, 64 and 128
+
+=head2 get_acquire_state
+
+$state = $s->get_acquire_state()
+
+Fetch the acquisition state: STOP (stopped) or RUN (running)
+NOTE: to check if acq is complete: wait_done()
+
+=head2 set_acquire_state
+
+$s->set_acquire_state($state);
+$s->set_acquire_state(state=>$state);
+
+$state =  'RUN' (or boolean 'true') starts acquisition
+          'STOP' (or boolean 'false')  stops acquisition
+
+=head2 get_acquire_stopafter
+
+$mode = $s->get_acquire_stopafter();
+
+Fetch whether acquisition is in "RUNSop" mode (run until stopped)
+or "SEQuence" mode 
+
+=head2 set_acquire_stopafter
+
+$s->set_acquire_stopafter($mode);
+$s->set_acquire_stopafter(mode=>$mode);
+
+Sets stopafter mode: RUNStop : run until stopped, 
+or SEQuence: stop after some defined sequence (single trigger, pattern, etc)
+
+=head2 get_acquire
+
+%hashref = $s->get_acquire();
+
+Get the "acquire" information in a hash; this is a combined
+"get_acquire_*" with the keywords that can be use for set_acquire()
+
+=head2 set_acquire
+
+$s->set_acquire(state=>$state, # RUN|STOP  (or boolean)
+                mode=>$mode,   # SAM|PEAK|AVE
+                stopafter=>$stopa # STOPAfter|SEQ
+                average=>$navg);
+$s->set_acquire($hashref);       # from get_acquire
+$s->set_acquire($state,$mode,$stopa,$navg);
+
+Sets acquisition parameters
+
+=head2 get_autorange_state
+
+$arstate = $s->get_autorange_state()
+
+Fetch the autorange state, boolean, indicating
+whether the scope is autoranging
+
+=head2 set_autorange_state
+
+$s->set_autorange_state(state=>$bool);
+$s->set_autorange_state($bool);
+
+Set autoranging on or off.
+
+=head2 get_autorange_settings
+
+$arset  = $s->get_autorange_settings()
+
+Fetch the autorange settings, returns
+value (HORizontal|VERTical|BOTH)
+
+=head2 set_autorange_settings
+
+$s->set_autorange_settings(set=>$arset);
+
+$s->set_autorange_settings($arset);
+
+Set what is subject to autoranging: $arset = HORizontal, VERTical, BOTH
+
+=head2 do_autorange
+
+$s->do_autorange();
+
+Causes scope to adjust horiz/vert, like pressing 'autoset' button
+This command may take some time to complete.
+
+=head2 get_autorange_signal
+
+$sig = $s->get_autorange_signal()
+
+returns the type of signal found by the most recent autoset, or NON
+if the autoset menu is not displayed.
+
+=head2 get_autorange_view
+
+$view = $s->get_autoset_view();
+
+Fetch the menu display; view can be one of (depending on scope options):
+MULTICY SINGLECY FFT RISING FALLING FIELD ODD EVEN LINE LINEN DCLI DEF NONE
+
+=head2 set_autorange_view
+
+$s->set_autoset_view($view)
+
+$s->set_autoset_view(view=>$view)
+
+Set the menu display; view can be one of (depending on scope options):
+MULTICY SINGLECY FFT RISING FALLING FIELD ODD EVEN LINE LINEN DCLI DEF NONE
+
+=head2 get_autorange
+
+%hashref = $s->get_autorange();
+
+get autorange settings as a hash
+
+=head1 CHANNEL ROUTINES
+
+=head2 get_channel
+
+$chan = $s->get_channel();
+
+Get the current channel selected for operations 1..4
+
+=head2 set_channel
+
+$s->set_channel(channel=>$chan);
+$s->set_channel($chan);
+
+sets the channel number (1..4)  for operations
+with the set_chan_XXX and get_chan_YYY methods
+on oscilloscope channels
+
+Channel can be specified as an integer 1..4, or Ch1, Ch2, etc.,
+or 'MATH'.
+
+=head2 set_visible
+
+$s->set_visible([$chan,[$vis]]);
+
+$s->set_visible(channel=>$chan [, visible=>$vis]);
+
+Set/reset channel visiblity.
+
+If no channel is given, the current channel (set by set_channel ) is used.
+Otherwise $chan = CH1..4, REFA..D, MATH
+
+If $vis is not specified, it defaults to "make channel visible". 
+
+To make turn off display of a channel, use $vis=(boolean false).
+
+=head2 get_visible
+
+$vis = $s->get_visible($chan);
+
+$vis = $s->get_visible(channel=>$chan);
+
+Fetch boolean value for whether the channel (CH1..4, REFA..D, MATH) is
+being displayed. If channel is not specified, the current channel
+(from 'set_channel()') is used. 
+
+=head2 get_chan_bwlimit
+
+$bwlim = $s->get_chan_bwlimit()
+
+Fetch whether the channel has bandwidth limited to 20MHz
+(boolean)
+
+=head2 set_chan_bwlimit
+
+$s->set_chan_bwlimit(limit=>'on')
+
+Turns on or off bandwith limiting (limit = boolean, true = 'limit')
+
+=head2 get_chan_coupling
+
+$coupling = $s->get_chan_coupling()
+
+Fetch the channel coupling (AC/DC/GND).
+
+=head2 set_chan_coupling
+
+$s->set_coupling(coupling => $coupling); 
+
+Set the coupling to AC|DC|GND for an input channel
+
+=head2 get_chan_current_probe
+
+$iprobe = $s->get_chan_current_probe();
+
+Get the probe scale factor. This does not mean that a
+current probe is in use, just what 'probe scale factor'
+would be applied if current probe use is selected. 
+
+=head2 set_chan_current_probe
+
+$self->set_chan_current_probe(factor=>$x);
+
+Set the current probe scale factor. Valid values
+are 0.2, 1, 2, 5, 10, 50, 100, 1000
+
+=head2 get_chan_invert
+
+$inv = $s->get_chan_invert();
+
+fetch whether the channel is 'inverted' -> boolean
+
+=head2 set_chan_invert
+
+$s->set_chan_invert(invert=>$inv);
+
+sets a channel to 'invert' mode if $inv is true, $inv=boolean
+
+=head2 get_chan_position
+
+$p = $s->get_chan_position();
+
+get the vertical position of "zero volts" for a channel
+The value is the number of graticule divisions from the
+center.
+
+=head2 set_chan_position
+
+$s->set_chan_position(position=> -24)
+
+Sets the trace 'zero' position, in graticule divisions
+from the center of the display.
+Note that the limits depend on the vertical scale,
++/- 50V for >= 500mV/div, +/- 2V for < 500mV/div
+
+=head2 get_chan_probe
+
+$probe = $s->get_chan_probe();
+
+Fetch the voltage probe attenuation. 
+
+=head2 set_chan_probe
+
+$self->set_chan_probe(factor=>X);
+
+Set the voltage probe scale factor. Valid values
+are 1, 10, 20, 50, 100, 500, 1000
+
+=head2 get_chan_scale
+
+$scale = $s->get_chan_scale();
+
+Fetch the vertical scale for a channel, in V/div
+(or A/div when used with a current probe)
+
+=head2 set_chan_scale
+
+$self->set_chan_scale(scale=>$scale);
+
+Set the vertical scale for a channel, in V/div or
+A/div.  X can be a number, or a string with suffixes and units
+Ex: '2.0V/div' '100m'.  
+
+=head2 get_chan_yunit
+
+$scale = $s->get_chan_yunit();
+
+Fetch the units for the vertical scale of a channel,
+returns either "V" or "A" 
+
+=head2 set_chan_yunit
+
+$self->set_chan_yunit(unit=>X);
+
+Set the vertical scale units to either 'V' or 'A'
+
+=head2 get_chan_setup
+
+$hashref = $s->get_chan_setup([channel=>$chan])
+
+Fetches channel settings and returns them as a 
+hashref:
+=over 2
+=item    channel => channel selected (otherwise default from set_channel)
+=item    probe => probefactor,
+=item    postion => screen vertical position, in divisions
+=item    scale => screen vertical scale, V/div or A/div
+=item    coupling =>  (AC|DC|GND)
+=item    bandwidth => (ON|OFF)
+=item    yunit => (V|A)
+=item    invert => ON|OFF
+=item    probe => probe attentuation (for yunit=V)
+=item    currentprobe => current probe factor (for yunit=A)
+=back
+
+The hash is set up so that it can be passed to 
+$s->set_channel($hashref) 
+
+=head2 set_chan_setup
+
+$s->set_channel([channel=>1],scale=>...)
+
+Can pass the hash returned from "get_chan_setup" to 
+set a an oscilloscope channel to the desired state.
+
+TODO: check current/voltage probe selection,
+adjust order of calls to avoid settings conflicts
+
+=head1 CURSOR CONTROLS
+
+The cursors can either be 'horizontal bars' (HBARS), attached to
+a particular trace, measuring amplitude; or 'vertical bars' (VBARS)
+that are measuring horizontally (time or frequency).  
+
+Since these names can be confusing, you can also use 'X' to select VBARS and 
+'Y' to select HBARS, since that gives a more natural indication of what
+you are measuring. 
+
+=head2 get_cursor_type
+
+$cursor = $s->get_cursor_type([$opt]);
+
+$cursor = $s->get_cursor_type([option=>$opt]);
+
+Fetch cursor type: (OFF|HBARS|VBARS) default
+
+cursor type returned as: (OFF|X|Y) if $opt = 'xy';
+
+=head2 set_cursor_type
+
+$s->set_cursor_type($type);
+
+$s->set_cursor_type(type=>$type)
+
+$type = OFF|HBAr|Y|VBAr|X  
+
+=head2 get_cursor_xunits
+
+$units = $s->get_cursor_xunits()
+
+gets the x (horizontal) units for the cursors (VBAR type),
+returns either SECONDS or HERTZ.
+
+=head2 get_cursor_yunits
+
+$self->get_cursor_yunits();
+
+Fetch the units used for the cursor y positions (HBARS, or the 
+waveform vertical position with VBARS).
+
+The units returned can be: VOLTS, DIVISIONS, DECIBELS UNKNOWN AMPS 
+VOLTSSQUARED AMPSSQUARED VOLTSAMPS.
+
+=head2 get_cursor_source
+
+$src = $s->get_cursor_source();
+
+Fetch the source waveform being used with the cursors, determines
+the units of the cursor for horizontal bar (HBAR, Y) cursors. 
+
+=head2 set_cursor_source
+
+$s->set_cursor_sourch($chan);
+
+$s->set_cursor_source(channel => $chan);
+
+=head2 set_cursor_xunits
+
+$s->set_cursor_xunits($units);
+
+$s->set_cursor_xunits(unit=>$units);
+
+Set the units used for VBAR (x) cursor, for VBAR the possible
+units are (SEConds|s) or (HERtz|Hz). HBAR cursor units
+cannot be changed. 
+
+=head2 get_cursor_dx
+
+$delt = $s->get_cursor_dx();
+
+Fetch the difference between x (VBAR) cursor positions.
+
+=head2 get_cursor_dy
+
+$delt = $s->get_cursor_dy();
+
+Fetch the difference between y (HBAR) cursor positions.
+
+=head2 get_cursor_x1
+
+$pos = $s->get_cursor_x1();
+
+Fetch the x position of cursor 1 (VBAR), typically in
+units of seconds. 
+
+=head2 get_cursor_x2
+
+$pos = $s->get_cursor_x2();
+
+Fetch the x position of cursor 2 (VBAR), typically in
+units of seconds. 
+
+=head2 get_cursor_y1
+
+$pos = $s->get_cursor_y1();
+
+Fetch the y position of cursor 1 (HBAR), typically in
+units of volts, but possibly other units 
+
+=head2 get_cursor_y2
+
+$pos = $s->get_cursor_y2();
+
+Fetch the y position of cursor 2 (HBAR), typically in
+units of volts, but possibly other units. 
+
+=head2 set_cursor_x1
+
+$s->set_cursor_x1($location);
+
+$s->set_cursor_x1(position => $location);
+
+set cursor 1 x location (VBAR type cursor)
+
+=head2 set_cursor_x2
+
+$s->set_cursor_x2($location);
+
+$s->set_cursor_x2(position => $location);
+
+set cursor 2 x location (VBAR type cursor)
+
+=head2 set_cursor_y1
+
+$s->set_cursor_y1($location);
+
+$s->set_cursor_y1(position => $location);
+
+set cursor 1 y position (HBAR type)
+
+=head2 set_cursor_y2
+
+$s->set_cursor_y2($location);
+
+$s->set_cursor_y2(position => $location);
+
+set cursor 2 y position (HBAR type)
+
+=head2 get_cursor_v1
+
+$vcursor = $s->get_cursor_v1();
+
+If using HBAR (y) cursors, get the vertical position of cursors;
+if using VBAR (x) cursors, get the waveform voltage (or other vertical unit)
+at the cursor1 position.
+
+=head2 get_cursor_v2
+
+$vcursor = $s->get_cursor_v2();
+
+If using HBAR (y) cursors, get the vertical position of cursors;
+if using VBAR (x) cursors, get the waveform voltage (or other vertical unit)
+at the cursor2 position.
+
+=head2 get_cursor_dv
+
+$dv = $s->get_cursor_dv();
+
+Get the vertical distance between the cursors (dy if HBAR cursors,
+dv2-dv1 if VBAR cursors)
+
+=head2 $hashref = $s->get_cursor()
+
+Fetches cursor information and returns it in a hash,
+in a form that can be used with set_cursor()
+
+=head2 set_cursor
+
+$s->set_cursor( type=>$type,
+               x1 => $x1, x2 => $x2, ...);
+
+sets cursor information. If used with a hash from get_cursor, the
+entries that cannot be used to set the cursors are ignored
+
+=head1 DISPLAY CONTROLS    
+
+=head2 get_display_contrast
+
+$cont = $s->get_display_contrast()
+
+Fetches the display contrast:  1 .. 100
+
+=head2 set_display_contrast
+
+$s->set_display_contrast($cont)
+
+(alternate set_display_contrast(contrast => number) )
+Set the display contrast, percent 1..100
+
+=head2 get_display_format
+
+$form = $s->get_display_format()
+
+Fetch the display format: YT or XY
+
+=head2 set_display_format
+
+$s->set_display_format($format);
+
+$s->set_display_format(format => $format);
+
+Where $format = XY or YT.
+
+=head2 get_display_persist
+
+$pers = $s->get_display_persist()
+
+Fetch the display persistance, values 1,2,5,INF,OFF
+Numbers are in seconds.
+
+=head2 set_display_persist
+
+$s->set_display_persist($pers);
+
+$s->set_display_persist(persist=>$pers);
+
+Sets display persistence. $pers = 1,2,5 seconds, INF, or OFF
+
+=head2 get_display_style
+
+$style = $s->get_display_style()
+
+Fetch the display style = 'DOTS' or 'VECTORS'
+
+=head2 set_display_style
+
+$s->set_display_style($style)l\;
+
+$s->set_display_style(style=>$style);
+
+Sets the display style: $style is DOTs or VECtors
+
+=head2 get_display
+
+$hashref = $s->get_display();
+
+Fetch display settings (contrast, format, etc) in a
+hash, that can be used with "set_display".
+
+=head2 set_display
+
+$s->set_display(contrast=>$contrast, ...)
+
+Set the display characteristics
+
+=head1 FILESYSTEM ROUTINES
+
+=head2 get_cwd
+
+$s->get_cwd();
+
+Gets the current working directory on any USB flash drive
+plugged into the oscilloscope, or a null string ( '' ) if 
+no drive is plugged in.
+
+=head2 set_cwd
+
+$s->set_cwd($cwd);
+
+$s->set_cwd(cwd => $cwd);
+
+Set the current working directory on the flash drive.
+The flash drive is on the "A:" drive, and the cwd uses
+"DOS" type syntax.  For compatibility, forward slashes
+are translated to backslashes. 
+
+It would be a good idea to check for errors after
+this call.
+
+=head2 delete
+
+$self->delete($file);
+
+$self->delete(file => $file);
+
+Delete a file from the USB filesystem; use DOS format, and
+note that the USB filesystem is on "A:\topdir\subdir..."
+
+For ease of use, this routine translates forward slashes
+to backslashes.  It would be a good idea to check for errors
+after calling this routine. 
+
+=head2 get_dir
+
+@files = $s->get_dir();
+
+Get a list of filenames in the current (USB flash drive)
+directory. 
+
+=head2 get_freespace
+
+$bytes = $s->get_freespace();
+
+Get the amount of freespace on the USB flash.
+
+=head2 mkdir
+
+$s->mkdir($dirname);
+
+$s->mkdir(directory=>$dirname);
+
+Create a directory on the flash drive, uses MSDOS
+file syntax, only on the A: drive.
+
+Forward slashes are translated to backslashes for compatibility.
+
+It is a good idea to check for errors after calling this routine.
+
+=head2 rename
+
+$s->rename($old,$new);
+
+$s->rename(old=>$old, new=>$new);
+
+Rename $old filepath to $new filepath. Note that these are in
+MSDOS file syntax, all on the "A:" drive. 
+
+Forward slashes are translated to backslashes.
+
+It is a good idea to check for errors after calling this routine.
+
+=head2 rmdir
+
+$s->rmdir($dir);
+
+$s->rmdir(directory=>$rmdir);
+
+Removes a directory from the USB flash drive. The directory
+name is in MSDOS syntax; forward slashes are translated to 
+backslashes. 
+
+A directory must be empty before deletion; it is a good idea
+to check for errors after calling this routien.
+
+=head1 HARDCOPY ROUTINES
+
+=head2 get_hardcopy_format
+
+$format = $s->get_hardcopy_format();
+
+Fetch the hardcopy format, returns one of:
+
+=over 4
+
+ BMP BUBBLEJET DESKJET DPU3445 DPU411 DPU412 EPSC60 EPSC80 
+
+ EPSIMAGE EPSON INTERLEAF JPEG LASERJET PCX RLE THINK TIFF
+
+=back
+
+=head2 set_hardcopy_format
+
+$s->set_hardcopy_format($format);
+
+$s->set_hardcopy_format(format => $format);
+
+Set the 'hardcopy' format, used for screen captures:
+
+=over 4
+
+ BMP BUBBLEJET DESKJET DPU3445 DPU411 DPU412 EPSC60 EPSC80 
+
+ EPSIMAGE EPSON INTERLEAF JPEG LASERJET PCX RLE THINK TIFF
+
+=back
+
+=head2 get_hardcopy_layout
+
+$layout = $s->get_hardcopy_layout();
+
+Fetch the hardcopy layout: PORTRAIT or LANDSCAPE
+
+=head2 set_hardcopy_layout
+
+$s->set_hardcopy_layout($layout);
+
+$s->set_hardcopy_layout(layout => $layout);
+
+Set the hardcopy layout: LANdscpe or PORTRait.
+
+=head2 get_hardcopy_port
+
+$port = $s->get_hardcopy_port();
+
+Fetch the port used for hardcopy printing; for the TDS2024B, this
+should aways return 'USB'.
+
+=head2 set_hardcopy_port
+
+$s->set_hardcopy_port($port);
+
+$s->set_hardcopy_port(port => $port);
+
+Set the hardcopy port; for the TDS2024B, this should always be USB.
+Included for compatibility with other scopes.
+
+=head2 get_hardcopy
+
+$hashref = get_hardcopy();
+
+Fetch hardcopy parameters (format, layout, port; although
+port is always 'USB') and return in a hashref.
+
+=head2 set_hardcopy
+
+$s->set_hardcopy(format=>$format, layout=>$layout, port=>$port);
+
+Set hardcopy parameters; this can use a hashref returned from
+get_hardcopy();
+
+=head2 get_image
+
+$img = $s->get_image();
+
+$img = $s->get_image($filename[, $force]);
+
+$img = $s->get_image(file=>$filename, force=>$force,
+                 timeout=>$timeout, read_length=>$rlength,
+                   [hardcopy options]);
+
+Fetch a screen-capture image of the scope, using the the current
+hardcopy options (format, layout).  If the filename is specified, write
+to that filename (in addition to returning the image data); error
+if the file already exists, unless $force is true. 
+
+timeout (in seconds) and read_length (in bytes) are only passed with
+the "hash" form of the call. 
+
+=head1 HORIZONTAL CONTROL ROUTINES
+
+=head2 get_horiz_view
+
+$view = $s->get_horiz_view();
+
+Fetch the horizontal view: MAIN, WINDOW, ZONE
+
+WINDOW is a selection of the MAIN view; ZONE is
+the same as MAIN, but with vertical bar cursors
+to show the range displayed in WINDOW view.
+
+=head2 set_horiz_view
+
+$s->set_horiz_view($view);
+
+$s->set_horiz_view(view=>$view);
+
+Set the horizontal view to MAIn, WINDOW, or ZONE.
+
+=head2 get_horiz_position
+
+$pos = $s->get_horiz_position();
+
+Fetch the horizontal position of the main view, in seconds; this
+is the difference between the trigger point and the horizontal 
+center of the screen. 
+
+=head2 set_horiz_position
+
+$s->set_horiz_position($t);
+
+$s->set_horiz_position(time => $t);
+
+Set the horizontal position, in seconds, for the main view.
+Positive time values puts the trigger point to the left of the
+center of the screen.
+
+=head2 get_delay_position
+
+$time = $s->get_delay_position();
+
+Fetch the delay time for the WINDOW view. Time is relative to the
+center of the screen.
+
+=head2 set_delay_position
+
+$s->set_delay_position($time);
+
+$s->set_delay_position(delaytime=>$time);
+
+Set the postion of the WINDOW view horizontally. $time is in
+seconds, relative to the center of the screen.
+
+=head2 get_horiz_scale
+
+$secdiv = $s->get_horiz_scale();
+
+Fetch the scale (in seconds/division) for the 'main' view.
+
+=head2 set_horiz_scale
+
+$s->set_horiz_scale($secdiv);
+
+$s->set_horiz_scale(scale=>$secdiv);
+
+Set the horizontal scale, main window, to $secdiv
+seconds/division.
+
+=head2 get_delay_scale
+
+$secdiv = $s->get_delay_scale();
+
+Fetch the scale (in seconds/division) for the 'window' view.
+
+=head2 set_del_scale
+
+$s->set_del_scale($secdiv);
+
+$s->set_del_scale(delayscale=>$secdiv);
+
+Set the horizontal scale, window view, to $secdiv
+seconds/division.
+
+=head2 get_recordlength
+
+$samples = $s->get_recordlength();
+
+Returns record length, in number of samples. For the TDS200B,
+this is always 2500, so a constant is returned. 
+
+=head2 get_horizontal
+
+$hashref = $s->get_horizontal();
+
+Fetch a hashref, with entries that describe the horizontal setup, and
+can be passesd to set_horizontal
+
+keys: view, time, delaytime, scale, delayscale, recordlength
+
+=head2 set_horizontal
+
+$s->set_horizontal(time=>..., scale=>...);
+
+Set the horizontal characteristics. See get_horizontal()
+
+=head1 MATH/FFT ROUTINES
+
+=head2 get_math_definition
+
+$string = $s->get_math_definition();
+
+Fetch the definition used for the MATH waveform
+
+=head2 set_math_definition
+
+$s->set_math_definition($string);
+
+$s->set_math_definition(math => $string);
+
+Define the 'MATH' waveform; the input is sufficiently complex that
+the user should check for errors after calling this routine.
+
+Choices:
+
+=over
+
+    CH1+CH2
+
+    CH3+CH4
+
+    CH1-CH2
+
+    CH2-CH1
+
+    CH3-CH4
+
+    CH4-CH3 
+
+    CH1*CH2
+
+    CH3*CH4
+
+    FFT (CHx[, <window>])
+
+=back
+
+<window> is HANning, FLATtop, or RECTangular.
+
+=head2 get_math_position
+
+$y => $s->get_math_position();
+
+Fetch the MATH trace vertical position, in divisions
+from the center of the screen. 
+
+=head2 set_math_position
+
+$s->set_math_position($y);
+
+$s->set_math_postition(position=>$y);
+
+Set the MATH trace veritical position, in divisions from the center
+of the screen.
+
+=head2 get_fft_xposition
+
+$pos = $s->get_fft_xposition();
+
+Fetch FFT horizontal position, a percentage of the total FFT 
+length, relative to the center of the screen.
+
+=head2 set_fft_xposition
+
+$s->set_fft_xposition($percent);
+
+$s->set_fft_xposition(fft_xposition=>$percent);
+
+Set the horizontal position of the FFT trace; the "percent"
+of the trace is placed at the center of the screen.
+
+=head2 get_fft_xscale
+
+$scale = $s->get_fft_xscale();
+
+Fetch the horizontal zoom factor for FFT display,
+possible values are 1,2,5 and 10.
+
+=head2 set_fft_xscale
+
+$s->set_fft_xscale($zoom);
+
+$s->set_fft_xscale(fft_xscale => $zoom);
+
+Set the FFT horizontal scale zoom factor: 1,2,5, or 10.
+
+=head2 get_fft_position
+
+$divs = $s->get_fft_position();
+
+Fetch the y position of the FFT display, in division from the
+screen center.
+
+=head2 set_fft_position
+
+$s->set_fft_position($divs);
+
+$s->set_fft_position(fft_position=>$divs);
+
+Set the FFT trace y position, in screen divisions relative to the
+screen center. 
+
+=head2 get_fft_scale
+
+$zoom = $s->get_fft_scale();
+
+Fetch the FFT vertical zoom factor, returns one of 0.5, 1, 2, 5, 10
+
+=head2 set_fft_scale
+
+$s->set_fft_scale($zoom);
+
+$s->set_fft_yscale(fft_scale => $zoom);
+
+Set the fft vertical zoom factor, valid values are 
+0.5, 1, 2, 5, 10
+
+=head1 MEASUREMENT ROUTINES
+
+The TDS2024B manual suggests using the 'IMMediate' measurements;
+when measurements 1..5 are used, it results in an on-screen display
+of the measurement results, because the on-screen display is update
+(at most) every 500ms. It would be a good idea to check for errors
+after calling get_measurement_value, because errors can result if
+the waveform is out of range.  Also note that when the MATH trace
+is in FFT mode, 'normal' measurement is not possible. 
+
+The 'IMMediate' measurements cannot be accessed from the scope
+front panel, so will be cached even if the scope is in an 'unlocked'
+state. (see set_locked) 
+
+=head2 get_measurement_type
+
+$type = $s->get_measurement_type($n);
+
+$type = $s->get_measurement_type(measurement=>$n);
+
+Fetch the measurement type for measurement $n = 'IMMediate' or 1..5
+$n defaults to 'IMMediate'
+
+returns one of:
+ FREQuency | MEAN | PERIod |
+PHAse | PK2pk | CRMs | MINImum | MAXImum | RISe | FALL |
+PWIdth | NWIdth | NONE 
+
+=head2 set_measurement_type
+
+$s->set_measurement_type($n,$type);
+
+$s->set_measurement_type(measurement=>$n, type=>$type);
+
+$s->set_measurement_type($type);     (defaults to $n = 'IMMediate')
+
+Set the measurement type, for measurement $n= 'IMMediate', 1..5
+
+The type is one of:  FREQuency | MEAN | PERIod |
+PHAse | PK2pk | CRMs | MINImum | MAXImum | RISe | FALL | PWIdth | NWIdth 
+or NONE (only for $n=1..5).
+
+=head2 get_measurement_units
+
+$units = $s->get_measurement_units($n);
+
+$units = $s->get_measurement_units(measurement=>$n);
+
+Fetch the measurement units for measurement $n (IMMediate, 1..5)
+result:  V, A, S, Hz, VA, AA, VV
+
+If $n is missing or undefined, uses IMMediate. 
+
+=head2 get_measurement_source
+
+$wfm = $s->get_measurement_source($n);
+
+$wfm = $s->get_measurement_source(measurement=>$n);
+
+Fetch the source waveform for measurements: CH1..CH4 or MATH
+for measurement $n = IMMediate, 1..5
+
+If $n is undefined or missing, IMMediate is used. 
+
+=head2 set_measurement_source
+
+$s->set_measurement_source($n,$wfm);
+
+$s->set_measurement_source(measurement=>$n, measurement_source => $wfm);
+
+Set the measurement source, CH1..CH4 or MATH for measurement 
+$n = IMMediate, 1..5.  If $n is undefined or missing uses IMMediate. 
+
+=head2 get_measurement_value
+
+$val = $s->get_measurement_value($n);
+
+$val = $s->get_measurement_value(measurement=>$n);
+
+Fetch  measurement value, measurement $n = IMMediate, 1..5
+If $n is missing or undefined, use IMMediate. 
+
+=head1 TRIGGER ROUTINES
+
+=head2 trigger
+
+$s->trigger();
+
+Force a trigger, equivalent to pushing the "FORCE TRIGGE" button on
+front panel
+
+=head2 get_trig_coupling
+
+$coupling = $s->get_trig_coupling();
+
+returns $coupling = AC|DC|HFREJ|LFREJ|NOISEREJ
+
+(only applies to 'EDGE' trigger)
+
+=head2 set_trig_coupling
+
+$s->set_trig_coupling($coupling);
+
+$s->set_trig_coupling(coupling=>$coupling);
+
+Set trigger coupling, $coupling = AC|DC|HFRej|LFRej|NOISErej
+Only applies to EDGE trigger
+
+=head2 get_trig_slope
+
+$sl = $s->get_trig_slope();
+
+Fetch the trigger slope, FALL or RISE
+only applies to EDGE trigger.
+
+=head2 set_trig_slope
+
+$s->set_trig_slope($sl);
+
+$s->set_trig_slope(slope=>$sl);
+
+Set the trigger slope: RISE|UP|POS|+  or FALL|DOWN|NEG|-
+
+Only applies to EDGE trigger
+
+=head2 get_trig_source
+
+$ch = $s->get_trig_source([$trigtype]);
+
+$ch = $s->get_trig_source([type=>$trigtype]);
+
+Fetch the trigger source, returns one of CH1..4, EXT, EXT5,  LINE
+
+(EXT5 is 'external source, attenuated by a factor of 5')
+
+Trigger type is the "currently selected" trigger type, unless
+specified with the type parameter.
+
+=head2 set_trig_source
+
+$s->set_trig_source($ch);
+
+$s->set_trig_source(source=>$ch[, type=>$type]);
+
+Set the trigger source to one of CH1..4, EXT, EXT5, LINE (or 'AC LINE') 
+for the current trigger type, unless type=>$type is specified.
+
+=head2 get_trig_frequency
+
+$f = $s->get_trig_frequency();
+
+Fetch the trigger frequency in Hz. This function is not for use when
+in 'video' trigger type. If the frequcency is less than 10Hz, 1Hz
+is returned.
+
+=head2 get_trig_holdoff
+
+$hold = $s->get_trig_holdoff();
+
+Fetch the trigger holdoff, in seconds
+
+=head2 set_trig_holdoff
+
+$s->set_trig_holdoff($time);
+
+$s->set_trig_holdoff(holdoff=>$time);
+
+Set the trigger holdoff. If $time is a number it is
+taken to be in seconds; text can be passed with the
+usual order-of-magnitude and unit suffixes. 
+
+holdoff can range from 500ns to 10s
+
+=head2 get_trig_level
+
+$lev = $s->get_trig_level();
+
+Fetch the trigger level, in volts
+
+=head2 set_trig_level
+
+$s->set_trig_level($lev);
+
+$s->set_trig_level(level => $lev);
+
+Set the trigger level, in volts.  The usual magnitude/suffix 
+rules apply. This routine has no effect when the trigger ssource 
+is set to 'AC LINE'
+
+=head2 get_trig_mode
+
+$mode = $s->get_trig_mode();
+
+Fetch the trigger mode: AUTO or NORMAL
+
+=head2 set_trig_mode
+
+$s->set_trig_mode($mode);
+
+$s->set_trig_mode(mode=>$mode);
+
+Set the trigger mode: AUTO or NORMAL
+
+=head2 get_trig_type
+
+$type = $s->get_trig_type();
+
+Fetch the trigger type, returns EDGE or PULSE or VIDEO.
+
+=head2 set_trig_type
+
+$s->set_trig_type($type);
+
+$s->set_trig_type(type=>$type);
+
+Set trigger type to EDGE, PULse or VIDeo. 
+
+=head2 get_trig_pulse_width
+
+$wid = $s->get_trig_pulse_width();
+
+Fetch trigger pulse width for PULSE trigger type
+
+=head2 set_trig_pulse_width
+
+$s->set_trig_pulse_width($wid);
+
+$s->set_trig_pulse_width(width=>$wid);
+
+Set the pulse width for PULSE type triggers, in seconds. Valid
+range is from 33ns to 10s.
+
+=head2 get_trig_pulse_polarity
+
+$pol = $s->get_trig_pulse_polarity();
+
+Fetch the polarity for the PULSE type trigger,
+returns POSITIVE or NEGATIVE
+
+=head2 set_trig_pulse_polarity
+
+$s->set_trig_pulse_polarity($pol);
+
+$s->set_trig_pulse_polarity(pulse_polarity=>$pol);
+
+Set the polarity for PULSE type trigger.  
+
+$pol can be (Postive|P|+) or (Negative|N|M|-)
+
+=head2 get_trig_pulse_when
+
+$when = $s->get_trig_pulse_when();
+
+Fetch the "when" condition for pulse triggering, possible
+values are 
+
+=over 4
+
+EQUAL: triggers on trailing edge of specified width)
+
+NOTEQUAL: triggers on trailing edge of pulse shorter than specified
+width, or if pulse continues longer than specified width.
+
+INSIDE: triggers on the trailing edge of pulses that are less than
+the specified width.
+
+OUTSIDE: triggers when a pulse continues longer than the specified
+width
+
+=back
+
+=head2 set_trig_pulse_when
+
+$s->set_trig_pulse_when($when);
+
+$s->set_trig_pulse_when(pulse_when=>$when);
+
+Set the PULSE type trigger to trigger on the specified 
+condition, relative to the pulse width.
+
+=over 4
+
+EQ|EQUAL|= : trigger on trailing edge of pulse equal to 'width'.
+
+NOTE|NOTEQUAL|NE|!=|<>: trigger on trailing edge of pulse that is shorter than specified width, or when the pulse exceeds the specified width.
+
+IN|INSIDE|LT|< : trigger on trailing edge when less than specified width
+
+OUT|OUTSIDE|GT|> : trigger when pulse width exceeds specified width.
+
+The pulse width for this trigger is set by set_trig_pulse_width();
+
+=back
+
+=head2 get_trig_vid_line
+
+$line = $s->get_trig_vid_line();
+
+Get the video line number for triggering when
+SYNC is set to LINENUM.
+
+=head2 set_trig_vid_line
+
+$s->set_trig_vid_line($line);
+
+$s->set_trig_vid_line(vid_line => $line);
+
+Set the video line number for triggering with video
+trigger, when SYNC is set to LINENUM.
+
+=head2 get_trig_vid_polarity
+
+$pol = $s->get_trig_vid_polarity();
+
+Fetch the video trigger polarity: NORMAL or INVERTED
+
+=head2 set_trig_vid_polarity
+
+$s->set_trig_vid_polarity($pol);
+
+$s->set_trig_vid_polarity(vid_polarity=>$pol);
+
+Set the video trigger polarity: NORMal|-SYNC or INVerted|+SYNC
+
+=head2 get_trig_vid_standard
+
+$std = $s->get_trig_vid_standard();
+
+Fetch the video standard used for video-type triggering;
+returns NTSC or PAL (PAL = PAL or SECAM).
+
+=head2 set_trig_vid_standard
+
+$s->set_trig_vid_standard($std);
+
+$s->set_trig_vid_standard(vid_standard=>$std);
+
+Set the video standard used for video triggering. 
+$std = NTSC, PAL, SECAM  (SECAM selects PAL triggering).
+
+=head2 get_trig_vid_sync
+
+$sync = $s->get_trig_vid_sync();
+
+Fetcht the syncronization used for video trigger, possible
+values are FIELD, LINE, ODD, EVEN and LINENUM.
+
+=head2 set_trig_vid_sync
+
+$s->set_trig_vid_sync($sync);
+
+$s->set_trig_vid_sync(vid_sync => $sync);
+
+Set the synchronization used for video triggering; possible values
+are FIELD, LINE, ODD, EVEN, and LINENum.
+
+=head2 get_trig_state
+
+$state = $s->get_trig_state();
+
+Fetch the trigger state (warning: this is not a good way to determine
+if acquisition is completed).  Possible values are:
+
+=over 4
+
+ARMED: aquiring pretrigger information, triggers ignored
+
+READY: ready to accept a trigger
+
+TRIGGER: trigger has been accepted, scope is processing postrigger information.
+
+AUTO: in auto mode, acquiring even without a trigger.
+
+SAVE: acquisition stopped, or all channels off.
+
+SCAN: scope is in scan mode 
+
+=back
+
+=head1 WAVEFORM ROUTINES
+
+=head2 get_data_width
+
+$nbytes = $s->get_data_width();
+
+Fetch the number of bytes transferred per waveform sample, returns 1 or 2. 
+
+Note that only the MSB is used, unless the waveform is averaged or a 
+MATH waveform. 
+
+=head2 set_data_width
+
+$s->set_data_width($nbytes);
+
+$s->set_data_width(nbytes=>$nbytes);
+
+Set the number of bytes per waveform sample, either 1 or 2. 
+
+Note that only the MSB is used for waveforms that are not the
+result of averaging or MATH operations.
+
+=head2 get_data_encoding
+
+$enc = $s->get_data_encoding();
+
+Fetch the encoding that is used to transfer waveform
+data from the scope. 
+
+returns one of 
+
+=over 4
+
+ASCII: numbers returned as ascii signed  integers, comma separated
+
+RIBINARY: signed integer binary, MSB transferred first (if width=2)
+
+RPBINARY: unsigned integer binary, MSB first
+
+SRIBINARY: signed integer binary, LSB first
+
+SRPBINARY: unsigned integer binary, LSB first
+
+=back
+
+RIBINARY is the fastest transfer mode, particularly with width=1,
+as is used for simple waveform traces, with values ranging from
+-128..127 with 0 corresponding to the center of the screen. 
+
+(width = 2 data range -32768 .. 32767 with center = 0) 
+
+For unsigned data, width=1, range is 0..255 with 127 at center,
+width=2 range is 0..65535.
+
+In all cases the "lower limit" is one division below the bottom of the
+screen, and the "upper limit" is one division above the top of the screen.
+
+=head2 set_data_encoding
+
+$s->set_data_encoding($enc);
+
+$s->set_data_encoding(encoding=>$enc);
+
+Set the waveform transfer encoding, see get_waveform_encoding for
+possible values and their meanings.
+
+=head2 get_data_start
+
+$i = $s->get_data_start();
+
+Fetch the index of the first waveform sample 
+for transfers $i = 1..2500
+
+=head2 set_data_start
+
+$s->set_data_start($i);
+
+$s->set_data_start(start=>$i);
+
+Set the index of the first waveform sample
+for transfers, $i = 1..2500.
+
+=head2 get_data_stop
+
+$i = $s->get_data_stop();
+
+Fetch the index of the last waveform sample 
+for transfers $i = 1..2500
+
+=head2 set_data_stop
+
+$s->set_data_stop($i);
+
+$s->set_data_stop(stop=>$i);
+
+Set the index of the lat waveform sample
+for transfers, $i = 1..2500.
+
+=head2 get_data_destination
+
+$dst = $s->get_data_destination();
+
+Fetch the destination (REFA..REFD) for data transfered
+TO the scope. 
+
+=head2 set_data_destination
+
+$s->set_data_destination($dst);
+
+$s->set_data_destination(destination=>$dst);
+
+Set the destination ($dst = REFA..REFD) for waveforms
+transferred to the scope. 
+
+=head2 set_data_init
+
+$s->set_data_init();
+
+initialize all data parameters (source, destination, encoding, etc)
+to factory defaults
+
+=head2 get_data_source
+
+$src = $s->get_data_source();
+
+Fetch the source of waveforms transferred FROM the scope.
+
+Possible values are CH1..CH4, MATH, or REFA..REFD.
+
+=head2 set_data_source
+
+$s->set_data_source($src);
+
+$s->set_data_source(source => $src);
+
+Set the source of waveforms transferred from the scope. Possible
+values are CH1..CH4, MATH, or REFA..REFD. 
+
+=head2 get_data
+
+  $h = $s->get_data();
+
+return a hash reference with data transfer information
+such as width, encoding, source, etc, suitable for use with
+the  set_data($h) routine
+
+=head2 set_data
+
+$s->set_data(width=>$w, start=>$istart, ... );
+
+set data transfer characteristics, call with a hash
+or hashref similar to what one gets from get_data()
+
+=head2 get_waveform
+
+$hashref = $s->get_waveform();
+
+$hashref = $s->get_waveform( waveform=>$wfm,
+                             start=>$startbin, stop=>$stopbin,
+                             ...data parameters...);
+
+Fetch waveform from specified channel; if parameters are not
+set, use the current setup from the scope (see get_data_source) 
+The value of $wfm can be CH1..4, MATH, or REFA..D.
+
+returns $hashref = { v=>[voltages], t=>[times], various x,y parameters };
+
+Note that voltages and times are indexed starting at '1', or at the
+'data_start' index  (see set_data_start())  
+    $hashref->{v}->[1]  ...first voltage sample, default
+
+    Alternately:
+    $s->set_data_start(33);
+    ...
+    $hashref->{v}->[33]  ... first voltage sample
+
+    The hashref contains keys DAT:STAR and DAT:STOP for start and stop
+    sample numbers. 
+
+If you are going to alter the data in $hashref->{v}->[], make
+sure to delete($hashref->{rawdata}) before the waveform is transmitted
+to the scope, this will case the rawdata to be regenerated from 
+the $hashref->{v}->[] entries.
+
+=head2 create_waveform
+
+$hwfd = $s->create_waveform();
+
+$hwfd = $s->create_waveform($t0,$t1[,$n[,\&vfunc]]);
+
+$hwfd = $s->create_waveform(tstart=>$t0, tstop=>$t1[, nbins=$n][, vfunc=\&vfunc]);
+
+returns a hashref with an array of time values (useful for creating
+a waveform) starting at $t0 and ending at $t1 with $n bins. Please
+note that the TDS2024B can use $n=2500 at most, although this routine
+will work for larger values of $n.  If $n is not specified $n=2500 for 
+a simple waveform, and $n=1250 for an 'envelope' waveform. 
+
+$t0 and $t1 can be numbers, in seconds, or text with suffixes: $t1='33ms'
+
+The bin numbers start with '1', matching the scope behavior: $hwfd->{t}->[1] = $t0 ... $hwfd->{t}->[$n] = $t1
+
+If a "vfunc" is given, it is called with the time values:
+
+    $v = vfunc($t);  # $t in seconds   
+
+If vfunc returns an array of two voltages, it is taken as "min,max" values
+for an 'ENVELOPE' style waveform:
+
+   ($vmin,$vmax) = vfunc($t);
+
+In either case, the result is 
+analyzed to produce a 'rawdata' entry with 8 bit waveform data, 
+filling in the parameters needed for
+transmitting the waveform to the scope. 
+
+If you do not provide a reference to a "vfunc" function, you will
+have to create and fill in an array: $hwfd->{v}->[$n] = voltage($n)
+If you do not specify the $t0 and $t1 times, then you will also
+have to create and fill in the $hwfd->{t}->[$n] = time($n) array.
+
+To make use of an "envelope" waveform, fill in $hwfd->{vmin}->[$n]
+and $hwfd->{vmax}->[$n].
+
+=head2 put_waveform
+
+$s->put_waveform($hwfm);
+
+$s->put_waveform(waveform=>$hwfm, 
+    [destination=>$dst, position=>$ypos, scale=>$yscale] )
+
+Store waveform to one of the REFA..REFD traces. If not set explicitly
+in the call arguments, uses the location set in the scope (see 
+get_data_destination).
+
+The vertical position of the trace is set with $ypos = divisions from
+the screen center, and the vertical scale with $yscale = V/div. 
+
+If  $hwfm->{rawdata} exists, it will be transmitted to the scope
+unchanged. Otherwise the $hwfm->{rawdata} entry will be regenerated
+from the $hwfm->{v}->[]  (or $hwfm->{vmin|vmax}->[]) array(s).  
+
+The error/consistency checking is certainly not complete, so 
+doing something 'tricky' with the $hwfm hash may give unexpected
+results.
+
+=head2 print_waveform
+
+$s->print_waveform($hwfm [,$IOhandle]);
+
+$s->print_waveform(waveform=>$hwfm [,output=>$iohandle]);
+
+print information from the waveform stored in a
+hasref $hwfm, taken from get_waveform();
+
+This is mostly for diagnostic purposes.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Charles Lane
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;    # End of Lab::Instrument::TDS2024B

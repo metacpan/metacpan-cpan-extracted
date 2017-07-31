@@ -1,5 +1,5 @@
 package Pod::Weaver::PluginBundle::MSCHOUT;
-$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.31';
+$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.32';
 # ABSTRACT: Pod::Weaver configuration the way MSCHOUT does it
 
 # Dependencies
@@ -67,7 +67,7 @@ Pod::Weaver::PluginBundle::MSCHOUT - Pod::Weaver configuration the way MSCHOUT d
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -92,7 +92,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Schout.
+This software is copyright (c) 2017 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

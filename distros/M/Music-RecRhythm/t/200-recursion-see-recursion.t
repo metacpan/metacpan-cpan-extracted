@@ -119,4 +119,22 @@ for my $sref (@suite) {
     $testidx++;
 }
 
-plan tests => 4 * @suite;
+# beats in module version 0.03 now passed in following $extra...
+my @beat_seen;
+my @levels;
+for my $i ( 0 .. 2 ) {
+    # NOTE that the set must not contain values the same as the current
+    # index; this avoids the current beat value being confused with the
+    # current index
+    $levels[$i] = Music::RecRhythm->new( set => [ ( $i + 1 ) * 2 ] );
+    $levels[ $i - 1 ]->next( $levels[$i] ) if $i;
+}
+$levels[0]->recurse(
+    sub {
+        my ( $rset, $param, $extra, @beats ) = @_;
+        push @beat_seen, \@beats;
+    },
+);
+$deeply->( \@beat_seen, [ [2], [ 2, 4 ], [ 2, 4, 6 ] ] );
+
+plan tests => 4 * @suite + 1;

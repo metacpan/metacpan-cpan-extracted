@@ -1,32 +1,64 @@
 package Dist::Zilla::PluginBundle::MSCHOUT;
-$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.31';
+$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.32';
 # ABSTRACT: Use L<Dist::Zilla> like MSCHOUT does
 
 use Moose;
-use Moose::Autobox;
+use MooseX::AttributeShortcuts;
+use namespace::autoclean 0.09;
 
-with 'Dist::Zilla::Role::PluginBundle::Easy';
+use Dist::Zilla 4.102341;
 
-has is_task => (
-    is      => 'ro',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => sub { $_[0]->payload->{task} }
-);
+use Dist::Zilla::PluginBundle::Classic;
+use Dist::Zilla::PluginBundle::Filter;
+use Dist::Zilla::PluginBundle::Git 1.101230;
+
+use Dist::Zilla::Plugin::ArchiveRelease;
+use Dist::Zilla::Plugin::AutoPrereqs;
+use Dist::Zilla::Plugin::AutoVersion;
+use Dist::Zilla::Plugin::Bugtracker;
+use Dist::Zilla::Plugin::CheckPrereqsIndexed;
+use Dist::Zilla::Plugin::FakeRelease;
+use Dist::Zilla::Plugin::Git::NextVersion;
+use Dist::Zilla::Plugin::Homepage;
+use Dist::Zilla::Plugin::InsertCopyright;
+use Dist::Zilla::Plugin::MetaJSON;
+use Dist::Zilla::Plugin::MinimumPerl;
+use Dist::Zilla::Plugin::NextRelease;
+use Dist::Zilla::Plugin::PodWeaver;
+use Dist::Zilla::Plugin::Prereqs::AuthorDeps;
+use Dist::Zilla::Plugin::RemovePrereqs;
+use Dist::Zilla::Plugin::Repository;
+use Dist::Zilla::Plugin::Signature;
+use Dist::Zilla::Plugin::TaskWeaver 0.093330;
+use Dist::Zilla::Plugin::TravisYML;
+use Dist::Zilla::Plugin::Twitter;
+
+use Pod::Elemental::Transformer::List;
+use Pod::Weaver::Section::AllowOverride;
+
+with qw(Dist::Zilla::Role::PluginBundle::Easy
+        Dist::Zilla::Role::PluginBundle::Config::Slicer
+        Dist::Zilla::Role::PluginBundle::PluginRemover);
+
+has is_task => (is => 'lazy', isa => 'Bool');
+
+has release_branch => (is => 'lazy', isa => 'Str');
+
+has upload => (is => 'lazy', isa => 'Bool');
+
+has use_travis => (is => 'lazy', isa => 'Bool');
+
+has use_twitter => (is => 'lazy', isa => 'Bool');
 
 sub configure {
     my $self = shift;
 
     my $args = $self->payload;
 
-    my $upload = $$args{no_upload} ? 0 : 1;
-    my $release_branch = $$args{release_branch} || 'build/releases';
-    my $use_travis = $$args{use_travis} ? 1 : 0;
-
     my @remove = qw(PodVersion);
 
     # if not uploading, remove the upload plugin, and the confirmation plugin
-    unless ($upload) {
+    unless ($self->upload) {
         push @remove, 'UploadToCPAN', 'ConfirmRelease';
     }
 
@@ -38,17 +70,20 @@ sub configure {
     });
 
     # add FakeRelease plugin if uploads are off
-    unless ($upload) {
+    unless ($self->upload) {
         $self->add_plugins('FakeRelease');
     }
 
     $self->add_plugins(
         qw(
             AutoPrereqs
+            MinimumPerl
+            InsertCopyright
             Repository
             Bugtracker
             Homepage
             Signature
+            Prereqs::AuthorDeps
             MetaJSON
             ArchiveRelease
         ),
@@ -71,9 +106,9 @@ sub configure {
 
     # we must add Travis before Git::CommitBuild because CommitBuild needs to
     # include the .travis.yml file
-    if ($use_travis) {
+    if ($self->use_travis) {
         $self->add_plugins(
-            [ 'TravisYML' => { build_branch => $release_branch } ]
+            [ 'TravisYML' => { build_branch => $self->release_branch } ]
         );
     }
 
@@ -82,8 +117,8 @@ sub configure {
             Git::Check
             Git::Commit
         ),
-        [ 'Git::CommitBuild' => { release_branch => $release_branch } ],
-        [ 'Git::Tag'         => { branch => $release_branch } ],
+        [ 'Git::CommitBuild' => { release_branch => $self->release_branch } ],
+        [ 'Git::Tag'         => { branch => $self->release_branch } ],
         [
             'Git::Push'        => {
                 push_to => [
@@ -100,16 +135,61 @@ sub configure {
         [ RemovePrereqs => { remove => 'Module::Signature' } ]
     );
 
-    if ($$args{use_twitter} and $upload) {
+    if ($self->use_twitter and $self->upload) {
         $self->add_plugins(
             [ Twitter => { hash_tags => '#perl' } ]
         );
     }
 }
 
+sub _option {
+    my ($self, $name, $default) = @_;
+
+    if (exists $self->payload->{$name}) {
+        return $self->payload->{$name}
+    }
+    else {
+        return $default;
+    }
+}
+
+sub _build_is_task {
+    my $self = shift;
+
+    # recognize older option name "task" if present
+    my $task = $self->_option('task');
+    if (defined $task) {
+        return $task;
+    }
+
+    $self->_option('is_task', 0);
+}
+
+sub _build_release_branch {
+    my $self = shift;
+
+    $self->_option('release_branch', 'build/releases');
+}
+
+sub _build_upload {
+    my $self = shift;
+
+    ! $self->_option('no_upload', 0);
+}
+
+sub _build_use_travis {
+    my $self = shift;
+
+    $self->_option('use_travis', 0);
+}
+
+sub _build_use_twitter {
+    my $self = shift;
+
+    $self->_option('use_twitter', 0);
+}
+
 __PACKAGE__->meta->make_immutable;
-no Moose;
-1;
 
 __END__
 
@@ -121,17 +201,13 @@ Dist::Zilla::PluginBundle::MSCHOUT - Use L<Dist::Zilla> like MSCHOUT does
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
 This is the pluginbundle that MSCHOUT uses. Use it as:
 
  [@MSCHOUT]
-
-Optionally, for a dist that you do not want to upload to CPAN:
- [@MSCHOUT]
- no_upload = 1
 
 It's equivalent to:
 
@@ -140,6 +216,8 @@ It's equivalent to:
  remove = PodVersion
 
  [AutoPrereqs]
+ [MinimumPerl]
+ [InsertCopyright]
  [PodWeaver]
  [Repository]
  [Bugtracker]
@@ -161,9 +239,22 @@ It's equivalent to:
 
 =head2 Options
 
+Plugins can be removed from the bundle via L<Dist::Zilla::PluginBundle::PluginRemover>:
+
+ [@MSCHOUT]
+ -remove = AutoPrereqs
+ ...
+
 The following configuration settings are available:
 
 =over 4
+
+=item *
+
+is_task
+
+Replaces C<Pod::Weaver> with C<Task::Weaver> and uses C<AutoVersion> instead of
+C<Git::NextVersion>
 
 =item *
 
@@ -179,13 +270,6 @@ Sets the release branch name.  Default is C<build/releases>.
 
 =item *
 
-task
-
-Replaces C<Pod::Weaver> with C<Task::Weaver> and uses C<AutoVersion> instead of
-C<Git::NextVersion>
-
-=item *
-
 use_travis
 
 Enables the L<TravisYML|Dist::Zilla::Plugin::TravisYML> Dist Zilla plugin.
@@ -198,6 +282,17 @@ Enables the L<Twitter|Dist::Zilla::Plugin::Twitter> Dist Zilla plugin.  If
 C<no_upload> is set, this plugin is skipped.
 
 =back
+
+This PluginBundle supports C<ConfigSlicer>, so you can pass in options to the
+plugins used like this:
+
+  [@MSCHOUT]
+  RemovePrereqs.remove = Module::Signature
+
+This PluginBundle also supports C<PluginRemover>, so removing a plugin is as simple as:
+
+  [@MSCHOUT]
+  -remove = NextRelease
 
 =for Pod::Coverage configure
 
@@ -217,7 +312,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Schout.
+This software is copyright (c) 2017 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

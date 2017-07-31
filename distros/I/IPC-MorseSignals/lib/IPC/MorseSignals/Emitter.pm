@@ -3,12 +3,12 @@ package IPC::MorseSignals::Emitter;
 use strict;
 use warnings;
 
-use Carp qw/croak/;
-use POSIX qw/SIGUSR1 SIGUSR2/;
-use Time::HiRes qw/usleep/;
+use Carp        qw<croak>;
+use POSIX       qw<SIGUSR1 SIGUSR2>;
+use Time::HiRes qw<usleep>;
 
 use Bit::MorseSignals::Emitter;
-use base qw/Bit::MorseSignals::Emitter/;
+use base qw<Bit::MorseSignals::Emitter>;
 
 =head1 NAME
 
@@ -16,11 +16,17 @@ IPC::MorseSignals::Emitter - Base class for IPC::MorseSignals emitters.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
+
+=head1 WARNING
+
+Due to the POSIX signals specification (which I wasn't aware of at the time I wrote this module), this module is by nature completely unreliable and will never work properly.
+It is therefore B<deprecated>.
+Please don't use it (if you were actually crazy enough to use it).
 
 =head1 SYNOPSIS
 
@@ -43,9 +49,18 @@ sub _check_self {
 
 =head1 METHODS
 
-=head2 C<< new < delay => $seconds, speed => $bauds, %bme_options > >>
+=head2 C<new>
 
-Creates a new emitter object. C<delay> specifies the delay between two sends, in seconds, while C<speed> is the number of bits sent per second. The delay value has priority over the speed. Default delay is 1 second. Extra arguments are passed to L<Bit::MorseSignals::Emitter/new>.
+    my $ime = IPC::MorseSignals::Emitter->new(
+     delay => $seconds,
+     speed => $bauds,
+     %bme_options,
+    );
+
+Creates a new emitter object.
+C<delay> specifies the delay between two sends, in seconds, while C<speed> is the number of bits sent per second.
+The delay value has priority over the speed, and defaults to 1 second.
+Extra arguments are passed to L<Bit::MorseSignals::Emitter/new>.
 
 =cut
 
@@ -66,7 +81,9 @@ sub new {
  bless $self, $class;
 }
 
-=head2 C<send $pid>
+=head2 C<send>
+
+    $ime->send($pid);
 
 Sends messages enqueued with L<Bit::MorseSignals::Emitter/post> to the process C<$pid> (or to all the C<@$pid> if C<$pid> is an array reference, in which case duplicated targets are stripped off).
 
@@ -89,7 +106,10 @@ sub send {
  }
 }
 
-=head2 C<< delay < $seconds > >>
+=head2 C<delay>
+
+    my $delay = $ime->delay;
+    $ime->delay($seconds);
 
 Returns the current delay in seconds, or set it if an argument is provided.
 
@@ -102,7 +122,10 @@ sub delay {
  return $self->{delay};
 }
 
-=head2 C<< speed < $bauds > >>
+=head2 C<speed>
+
+    my $speed = $ime->speed;
+    $ime->speed($bauds);
 
 Returns the current speed in bauds, or set it if an argument is provided.
 
@@ -147,7 +170,8 @@ You can contact me by mail or on C<irc.perl.org> (vincent).
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-ipc-morsesignals-emitter at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-MorseSignals>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-ipc-morsesignals-emitter at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-MorseSignals>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -157,7 +181,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007,2008,2013 Vincent Pit, all rights reserved.
+Copyright 2007,2008,2013,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

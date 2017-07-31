@@ -1,6 +1,7 @@
 #define PERL_NO_GET_CONTEXT 1
 #include "EXTERN.h"
 #include "perl.h"
+#include "callchecker0.h"
 #include "XSUB.h"
 
 #define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
@@ -9,8 +10,12 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef CvISXSUB
-# define CvISXSUB(cv) !!CvXSUB(cv)
+# define CvISXSUB(cv) (cBOOL(CvXSUB(cv)))
 #endif /* !CvISXSUB */
 
 #ifndef CvISXSUB_on
@@ -24,6 +29,12 @@
 #ifndef gv_stashpvs
 # define gv_stashpvs(name, flags) gv_stashpvn(""name"", sizeof(name)-1, flags)
 #endif /* !gv_stashpvs */
+
+#if PERL_VERSION_GE(5,19,4)
+typedef SSize_t array_ix_t;
+#else /* <5.19.4 */
+typedef I32 array_ix_t;
+#endif /* <5.19.4 */
 
 #ifndef newSV_type
 # define newSV_type(type) THX_newSV_type(aTHX_ type)
@@ -39,17 +50,34 @@ static SV *THX_newSV_type(pTHX_ svtype type)
 # define SvRV_set(rv, tgt) (SvRV(rv) = (tgt))
 #endif /* !SvRV_set */
 
+#ifndef mg_findext
+# define mg_findext(sv, type, vtbl) THX_mg_findext(aTHX_ sv, type, vtbl)
+static MAGIC *THX_mg_findext(pTHX_ SV *sv, int type, MGVTBL const *vtbl)
+{
+	MAGIC *mg;
+	if(sv)
+		for(mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic)
+			if(mg->mg_type == type && mg->mg_virtual == vtbl)
+				return mg;
+	return NULL;
+}
+#endif /* !mg_findext */
+
 #ifndef G_WANT
 # define G_WANT (G_SCALAR|G_ARRAY|G_VOID)
 #endif /* !G_WANT */
 
 #ifdef CXt_LOOP
 # define case_CXt_LOOP_ case CXt_LOOP:
-#else /* !CXt_LOOP */
+#elif defined(CXt_LOOP_FOR)
 # define case_CXt_LOOP_ \
 		case CXt_LOOP_FOR: case CXt_LOOP_PLAIN: \
 		case CXt_LOOP_LAZYSV: case CXt_LOOP_LAZYIV:
-#endif /* !CXt_LOOP */
+#else /* !CXt_LOOP && !CXt_LOOP_FOR */
+# define case_CXt_LOOP_ \
+		case CXt_LOOP_ARY: case CXt_LOOP_LAZYSV: case CXt_LOOP_LAZYIV: \
+		case CXt_LOOP_LIST: case CXt_LOOP_PLAIN:
+#endif /* !CXt_LOOP && !CXt_LOOP_FOR */
 
 #ifdef CXt_GIVEN
 # define case_OP_LEAVEGIVEN_ case OP_LEAVEGIVEN:
@@ -67,6 +95,10 @@ static SV *THX_newSV_type(pTHX_ svtype type)
 # define case_CXt_WHEN_ /* nothing */
 #endif /* !CXt_WHEN */
 
+#if !PERL_VERSION_GE(5,10,1)
+typedef unsigned Optype;
+#endif /* <5.10.1 */
+
 #define BLK_LOOP_HAS_MY_OP PERL_VERSION_GE(5,9,5)
 
 #if BLK_LOOP_HAS_MY_OP
@@ -78,6 +110,16 @@ static SV *THX_newSV_type(pTHX_ svtype type)
 # define blk_loop_next_op blk_loop.next_op
 # define blk_loop_last_op blk_loop.last_op
 #endif /* !BLK_LOOP_HAS_MY_OP */
+
+#ifndef OpMORESIB_set
+# define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+# define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+# define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+#endif /* !OpMORESIB_set */
+#ifndef OpSIBLING
+# define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+# define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif /* !OpSIBLING */
 
 #if PERL_VERSION_GE(5,9,5)
 # define Op_pmreplroot op_pmreplrootu.op_pmreplroot
@@ -102,29 +144,27 @@ static SV *THX_newSV_type(pTHX_ svtype type)
 /*
  * continuation structure
  *
- * An escape continuation is reified as a CV, with a pointer to
- * the necessary C-level data structure attached via the pad slot.
- * The CvPADLIST is a pad-style AV, with its first two entries being
- * sufficiently normal pad structure to satisfy pad_undef().  The third
- * entry is an SV whose PV points to a struct continuation_guts.
- * There is an optional fourth entry, described in the next paragraph.
+ * An escape continuation is reified as a CV.  The CV is of the XSUB
+ * type, and the underlying XSUB is THX_xsfunc_go(), which implements
+ * control transfer through the continuation.  A magic structure (with
+ * vtable contsub_mgvtbl) is attached to the CV.  The mg_obj of the magic
+ * structure contains an SV whose PV points to a struct continuation_guts.
  *
- * The CV is of the XSUB type (and hence doesn't use its CvPADLIST slot
- * normally), and the underlying XSUB is xsfunc_go(), which implements
- * control transfer through the continuation.  Optionally, the CV can
- * be blessed into Scope::Escape::Continuation, which provides a method
- * interface.  The method code doesn't actually care whether the CV is
- * blessed.  If the user wants it both ways, there can be two CVs pointing
- * at the same struct continuation_guts, with differing blessedness.
- * To avoid unnecessary cloning, they each have a weak reference to the
- * other, held in the fourth pad slot.
+ * Optionally, the CV can be blessed into Scope::Escape::Continuation,
+ * which provides a method interface.  The method code doesn't actually
+ * care whether the CV is blessed.  If the user wants it both ways,
+ * there can be two CVs pointing at the same struct continuation_guts,
+ * with differing blessedness.  To avoid unnecessary cloning, they each
+ * have a weak reference to the other, held in the mg_ptr slot.  In that
+ * case mg_len is set to HEf_SVKEY, to arrange for the weak ref SV to be
+ * freed when the CV is freed.  When no such weak ref has been set up,
+ * mg_ptr is NULL and mg_len is zero.
  *
  * The struct continuation_guts is mainly concerned with describing the
  * context that it is intended to continue from.  It also has a validity
  * flag, which is automatically cleared in some situations, to cleanly
  * detect invalid transfers.  There is a chain of all the continuations
  * relevant to the currently stacked scopes, as part of this scheme.
- * Finally, the structure has a reserved NUL byte to keep it a valid PV.
  *
  * The leaveop member of the structure is expected to point to the op
  * that would normally be used for local return from the target context.
@@ -145,7 +185,6 @@ struct continuation_guts {
 	I32 cxstackix;
 	I32 savestackix;
 	bool may_be_valid;
-	U8 nul;
 };
 
 static struct continuation_guts *top_contgut;
@@ -156,7 +195,7 @@ static void THX_check_cont_leaveop(pTHX_ struct continuation_guts *contgut)
 	PERL_CONTEXT *tgtcx =
 		&contgut->stackinfo->si_cxstack[contgut->cxstackix];
 	OP *leaveop = contgut->leaveop;
-	I32 leaveop_type;
+	Optype leaveop_type;
 	if(!leaveop) croak("broken continuation: no leaveop\n");
 	leaveop_type = leaveop->op_type;
 	switch(CxTYPE(tgtcx)) {
@@ -215,15 +254,9 @@ static void THX_check_cont_leaveop(pTHX_ struct continuation_guts *contgut)
 	}
 }
 
-enum {
-	CONTPAD_NAMES,
-	CONTPAD_PAD,
-	CONTPAD_GUT,
-	CONTPAD_BASE_SIZE,
-	CONTPAD_OTHER_BLESSEDNESS = CONTPAD_BASE_SIZE
-};
+static MGVTBL const contsub_mgvtbl;
 
-static void xsfunc_go(pTHX_ CV *contsub);
+static void THX_xsfunc_go(pTHX_ CV *contsub);
 
 #define contsub_from_contref(contref) THX_contsub_from_contref(aTHX_ contref)
 static CV *THX_contsub_from_contref(pTHX_ SV *contref)
@@ -231,7 +264,7 @@ static CV *THX_contsub_from_contref(pTHX_ SV *contref)
 	CV *contsub;
 	if(!(SvROK(contref) && (contsub = (CV*)SvRV(contref)) &&
 			SvTYPE((SV*)contsub) == SVt_PVCV &&
-			CvISXSUB(contsub) && CvXSUB(contsub) == xsfunc_go))
+			CvISXSUB(contsub) && CvXSUB(contsub) == THX_xsfunc_go))
 		croak("Scope::Escape::Continuation method invoked on wrong "
 			"type of object");
 	return contsub;
@@ -241,7 +274,8 @@ static CV *THX_contsub_from_contref(pTHX_ SV *contref)
 	THX_contgutsv_from_contsub(aTHX_ contsub)
 static SV *THX_contgutsv_from_contsub(pTHX_ CV *contsub)
 {
-	return *av_fetch(CvPADLIST(contsub), CONTPAD_GUT, 0);
+	return mg_findext((SV*)contsub, PERL_MAGIC_ext,
+		(MGVTBL*)&contsub_mgvtbl)->mg_obj;
 }
 
 #define contgut_from_contsub(contsub) THX_contgut_from_contsub(aTHX_ contsub)
@@ -265,19 +299,10 @@ static SV *THX_make_contref_from_contgutsv(pTHX_ SV *contgutsv, bool blessp)
 {
 	CV *contsub = (CV*)newSV_type(SVt_PVCV);
 	SV *contref = sv_2mortal(newRV_noinc((SV*)contsub));
-	AV *contpad = newAV();
-	AvREAL_off(contpad);
-	av_extend(contpad, CONTPAD_BASE_SIZE-1);
-	av_store(contpad, CONTPAD_NAMES, (SV*)newAV());
-	{
-		AV *pad = newAV();
-		av_store(pad, 0, &PL_sv_undef);
-		av_store(contpad, CONTPAD_PAD, (SV*)pad);
-	}
-	CvPADLIST(contsub) = contpad;
-	av_store(contpad, CONTPAD_GUT, SvREFCNT_inc(contgutsv));
+	sv_magicext((SV*)contsub, contgutsv, PERL_MAGIC_ext,
+		(MGVTBL*)&contsub_mgvtbl, NULL, 0);
 	CvISXSUB_on(contsub);
-	CvXSUB(contsub) = xsfunc_go;
+	CvXSUB(contsub) = THX_xsfunc_go;
 	if(blessp) sv_bless(contref, stash_esccont);
 	return contref;
 }
@@ -286,30 +311,32 @@ static SV *THX_make_contref_from_contgutsv(pTHX_ SV *contgutsv, bool blessp)
 	THX_make_contref_from_contsub(aTHX_ contsub, blessp)
 static SV *THX_make_contref_from_contsub(pTHX_ CV *contsub, bool blessp)
 {
-	AV *padlist;
-	SV **wr_ptr, *wr, *hr;
+	SV *wr, *hr;
 	CV *othersub;
-	if(!!SvOBJECT((SV*)contsub) == !!blessp)
+	MAGIC *mg;
+	if(cBOOL(SvOBJECT((SV*)contsub)) == cBOOL(blessp))
 		return sv_2mortal(newRV_inc((SV*)contsub));
-	padlist = CvPADLIST(contsub);
-	wr_ptr = av_fetch(padlist, CONTPAD_OTHER_BLESSEDNESS, 0);
-	wr = wr_ptr ? *wr_ptr : NULL;
+	mg = mg_findext((SV*)contsub, PERL_MAGIC_ext, (MGVTBL*)&contsub_mgvtbl);
+	wr = mg->mg_len ? (SV*)mg->mg_ptr : NULL;
 	if(wr && SvROK(wr))
 		return sv_2mortal(newRV_inc(SvRV(wr)));
-	hr = make_contref_from_contgutsv(contgutsv_from_contsub(contsub),
-		blessp);
+	hr = make_contref_from_contgutsv(mg->mg_obj, blessp);
 	othersub = (CV*)SvRV(hr);
-	if(wr && wr != &PL_sv_undef) {
+	if(wr) {
 		SvRV_set(wr, SvREFCNT_inc((SV*)othersub));
 		SvROK_on(wr);
 	} else {
 		wr = newRV_inc((SV*)othersub);
-		av_store(padlist, CONTPAD_OTHER_BLESSEDNESS, wr);
+		mg->mg_ptr = (char*)wr;
+		mg->mg_len = HEf_SVKEY;
 	}
 	sv_rvweaken(wr);
+	mg = mg_findext((SV*)othersub, PERL_MAGIC_ext,
+		(MGVTBL*)&contsub_mgvtbl);
 	wr = newRV_inc((SV*)contsub);
 	sv_rvweaken(wr);
-	av_store(CvPADLIST(othersub), CONTPAD_OTHER_BLESSEDNESS, wr);
+	mg->mg_ptr = (char*)wr;
+	mg->mg_len = HEf_SVKEY;
 	return hr;
 }
 
@@ -547,7 +574,7 @@ static I32 THX_cont_status(pTHX_
 	return flags;
 }
 
-static void xsfunc_go(pTHX_ CV *contsub)
+static void THX_xsfunc_go(pTHX_ CV *contsub)
 {
 	struct continuation_guts *contgut, *cg;
 	PERL_SI *tgtstki;
@@ -577,7 +604,7 @@ static void xsfunc_go(pTHX_ CV *contsub)
 		case G_ARRAY: {
 			dSP; dMARK;
 			SV **rets = MARK+1;
-			I32 retc = SP - MARK, i;
+			array_ix_t retc = SP - MARK, i;
 			AV *retav = newAV();
 			retval = (SV*)retav;
 			sv_2mortal(retval);
@@ -594,8 +621,12 @@ static void xsfunc_go(pTHX_ CV *contsub)
 	tgtcxix = contgut->cxstackix;
 	tgtcx = &cxstack[tgtcxix];
 	dounwind(tgtcxix);
+#ifdef cx_topblock
+	cx_topblock(tgtcx);
+#else /* !cx_topblock */
 	TOPBLOCK(tgtcx);
 	leave_scope(contgut->savestackix);
+#endif /* !cx_topblock */
 	PL_curcop = tgtcx->blk_oldcop;
 	switch(status & G_WANT) {
 		default: {
@@ -609,7 +640,7 @@ static void xsfunc_go(pTHX_ CV *contsub)
 		case G_ARRAY: {
 			dSP;
 			AV *retav = (AV*)retval;
-			I32 retc = av_len(retav) + 1;
+			array_ix_t retc = av_len(retav) + 1;
 			EXTEND(SP, retc);
 			Copy(AvARRAY(retav), SP+1, retc, SV*);
 			SP += retc;
@@ -617,6 +648,19 @@ static void xsfunc_go(pTHX_ CV *contsub)
 		} break;
 	}
 	PL_restartop = contgut->leaveop;
+#if PERL_VERSION_GE(5,17,2) && !PERL_VERSION_GE(5,17,3)
+	if(PL_restartop->op_type == OP_LEAVEWRITE) {
+		/*
+		 * For Perl 5.17.2 only, leavewrite has dodgy stack
+		 * handling in which it pops an extra item from the stack.
+		 * We work around it by pushing a dummy item for it
+		 * to pop.
+		 */
+		dSP;
+		XPUSHs(&PL_sv_undef);
+		PUTBACK;
+	}
+#endif /* >=5.17.2 && <5.17.3 */
 #if CATCHER_USES_GHOST_JMPENV
 	{
 		/*
@@ -640,17 +684,17 @@ static void xsfunc_go(pTHX_ CV *contsub)
 	JMPENV_JUMP(3);
 }
 
-static OP *caught_pp_current_escape_continuation(pTHX)
+#define pp_current_escape_continuation_caught() \
+	THX_pp_current_escape_continuation_caught(aTHX)
+static OP *THX_pp_current_escape_continuation_caught(pTHX)
 {
 	SV *contref, *contgutsv;
 	struct continuation_guts *contgut;
 	contgutsv = newSV_type(SVt_PV);
 	SAVEFREESV(contgutsv);
 	Newx(contgut, 1, struct continuation_guts);
-	contgut->nul = 0;
 	SvPV_set(contgutsv, (char *)contgut);
 	SvLEN_set(contgutsv, sizeof(struct continuation_guts));
-	SvCUR_set(contgutsv, STRUCT_OFFSET(struct continuation_guts, nul));
 	contgut->jmpenv = PL_top_env;
 	contgut->stackinfo = PL_curstackinfo;
 	contgut->leaveop = cUNOPx(PL_op)->op_first;
@@ -673,7 +717,9 @@ static OP *caught_pp_current_escape_continuation(pTHX)
 	return PL_op->op_next;
 }
 
-static OP *docatch_for_pp_current_escape_continuation(pTHX)
+#define docatch_for_pp_current_escape_continuation() \
+	THX_docatch_for_pp_current_escape_continuation(aTHX)
+static OP *THX_docatch_for_pp_current_escape_continuation(pTHX)
 {
 	/* the logic here must (mostly) match docatch() */
 	OP *curop = PL_op;
@@ -685,7 +731,7 @@ static OP *docatch_for_pp_current_escape_continuation(pTHX)
 	JMPENV_PUSH(ret);
 	switch(ret) {
 		case 0: {
-			PL_op = caught_pp_current_escape_continuation(aTHX);
+			PL_op = pp_current_escape_continuation_caught();
 			runops:
 			CALLRUNOPS(aTHX);
 			JMPENV_POP;
@@ -724,24 +770,25 @@ static OP *docatch_for_pp_current_escape_continuation(pTHX)
 	}
 }
 
-static OP *pp_current_escape_continuation(pTHX)
+static OP *THX_pp_current_escape_continuation(pTHX)
 {
 	if(CATCH_GET) {
-		return docatch_for_pp_current_escape_continuation(aTHX);
+		return docatch_for_pp_current_escape_continuation();
 	} else {
-		return caught_pp_current_escape_continuation(aTHX);
+		return pp_current_escape_continuation_caught();
 	}
 }
 
-#define gen_current_escape_continuation_op(blessp) \
-		THX_gen_current_escape_continuation_op(aTHX_ blessp)
-static OP *THX_gen_current_escape_continuation_op(pTHX_ bool blessp)
+#define newOP_current_escape_continuation(blessp) \
+		THX_newOP_current_escape_continuation(aTHX_ blessp)
+static OP *THX_newOP_current_escape_continuation(pTHX_ bool blessp)
 {
 	OP *op;
 	NewOpSz(0, op, sizeof(UNOP));
-	op->op_type = OP_PUSHMARK;
-	op->op_ppaddr = pp_current_escape_continuation;
+	op->op_type = OP_CUSTOM;
+	op->op_ppaddr = THX_pp_current_escape_continuation;
 	if(blessp) op->op_private |= 1;
+	op->op_next = op;
 	PL_hints |= HINT_BLOCK_SCOPE;
 	return op;
 }
@@ -751,7 +798,7 @@ static OP *THX_gen_current_escape_continuation_op(pTHX_ bool blessp)
 static void THX_fixup_escape_target(pTHX_ OP *target, OP *op)
 {
 	OP *special_kid = NULL;
-	if(op->op_ppaddr == pp_current_escape_continuation) {
+	if(op->op_ppaddr == THX_pp_current_escape_continuation) {
 		cUNOPx(op)->op_first = target;
 		return;
 	}
@@ -775,8 +822,8 @@ static void THX_fixup_escape_target(pTHX_ OP *target, OP *op)
 				while(target->op_type == OP_NULL)
 					target = cUNOPx(target)->op_first;
 				if(target->op_type != OP_LINESEQ)
-					target = cLOGOPx(target)
-							->op_first->op_sibling;
+					target = OpSIBLING(
+						cLOGOPx(target)->op_first);
 				target = cLISTOPx(target)->op_last;
 			}
 		} break;
@@ -787,78 +834,78 @@ static void THX_fixup_escape_target(pTHX_ OP *target, OP *op)
 		case OP_SORT: {
 			if((op->op_flags & (OPf_STACKED|OPf_SPECIAL)) ==
 					(OPf_STACKED|OPf_SPECIAL)) {
-				special_kid =
-					cLISTOPx(op)->op_first->op_sibling;
+				special_kid = OpSIBLING(cLISTOPx(op)->op_first);
 				fixup_escape_target(&null_end_op,
 					cUNOPx(special_kid)->op_first);
 			}
 		} break;
 	}
 	if(op->op_flags & OPf_KIDS) {
-		for(op = cUNOPx(op)->op_first; op; op = op->op_sibling) {
+		for(op = cUNOPx(op)->op_first; op; op = OpSIBLING(op)) {
 			if(op != special_kid)
 				fixup_escape_target(target, op);
 		}
 	}
 }
 
-static void (*next_peep)(pTHX_ OP*);
-
-static void my_peep(pTHX_ OP *first)
-{
-	if(first) {
-		OP *root = first;
-		while(root->op_sibling)
-			root = root->op_sibling;
-		while(root->op_next)
-			root = root->op_next;
-		fixup_escape_target(root, root);
-	}
-	next_peep(aTHX_ first);
-}
-
 /*
- * special operators handled as functions
+ * continuation target fixup
  *
- * This code intercepts the compilation of calls to magic functions,
- * and compiles them to custom ops that are better run that way than as
- * real functions.
+ * To populate the leaveop member of the continuation structure, we want
+ * to examine the op tree at the end of compilation.  We don't want to
+ * do it immediately when ops are built, because they're liable to get
+ * moved around: this is a fixup to perform when the tree is finalised.
+ * The only way to perform such a fixup is via the peephole optimiser
+ * hook, but unfortunately that doesn't get a pointer to the root op,
+ * but only a pointer to the start of the execution chain.  Thus we have
+ * the problem of getting from the start op to the root op.
+ *
+ * Normally the tree structure has a leavesub op at the root, and there's
+ * a sequence of statements a couple of levels down, with the starting
+ * point being a nextstate at the beginning of that sequence.  To get
+ * to the root, we walk along the sibling chain to get to the end of
+ * the statement sequence, then walk the execution chain to go up the
+ * couple of levels to the root.  Note that any execution-order loops
+ * will be among ops nested inside statements, so walking the sibling
+ * chain skips past them.
+ *
+ * However, we can also be given a fake op sequence for a nominal
+ * CV wrapping code embedded in a regexp via /(?{})/.  In that case,
+ * following the above algorithm does lead to an apparent execution-order
+ * loop.  (Not a real loop; it's among ops that never get executed.)
+ * We detect the loop and abort the attempt to fixup in that case.
+ * This means that we can't (yet) generate continuations inside re
+ * eval code.  It's not clear what that would mean at the top level
+ * inside /(?{})/, but it would be meaningful at lower levels, so we'd
+ * like to fix that in the future.
  */
 
-#define rvop_cv(rvop) THX_rvop_cv(aTHX_ rvop)
-static CV *THX_rvop_cv(pTHX_ OP *rvop)
+static void (*THX_next_peep)(pTHX_ OP*);
+
+static void THX_my_peep(pTHX_ OP *first)
 {
-	switch(rvop->op_type) {
-		case OP_CONST: {
-			SV *rv = cSVOPx_sv(rvop);
-			return SvROK(rv) ? (CV*)SvRV(rv) : NULL;
-		} break;
-		case OP_GV: return GvCV(cGVOPx_gv(rvop));
-		default: return NULL;
+	if(first) {
+		OP *root = first, *slow;
+		while(OpHAS_SIBLING(root)) root = OpSIBLING(root);
+		slow = root;
+		while(root->op_next) {
+			root = root->op_next;
+			if(!root->op_next) break;
+			if(root == slow) goto skip_fixup;
+			slow = slow->op_next;
+			root = root->op_next;
+		}
+		fixup_escape_target(root, root);
 	}
+	skip_fixup:
+	THX_next_peep(aTHX_ first);
 }
 
-static OP *(*nxck_entersub)(pTHX_ OP *o);
-static CV *curescfunc_cv, *curesccont_cv;
-
-static OP *myck_entersub(pTHX_ OP *op)
+static OP *THX_ck_entersub_curesc(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
-	OP *pushop, *cvop;
-	CV *cv;
-	pushop = cUNOPx(op)->op_first;
-	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
-	for(cvop = pushop; cvop->op_sibling; cvop = cvop->op_sibling) ;
-	if(!(cvop->op_type == OP_RV2CV &&
-			!(cvop->op_private & OPpENTERSUB_AMPER)))
-		return nxck_entersub(aTHX_ op);
-	cv = rvop_cv(cUNOPx(cvop)->op_first);
-	if(cv == curescfunc_cv || cv == curesccont_cv) {
-		op = nxck_entersub(aTHX_ op);   /* for prototype checking */
-		op_free(op);
-		return gen_current_escape_continuation_op(cv == curesccont_cv);
-	} else {
-		return nxck_entersub(aTHX_ op);
-	}
+	entersubop = ck_entersub_args_proto(entersubop, namegv, ckobj);
+	op_free(entersubop);
+	return newOP_current_escape_continuation(CvXSUBANY((CV*)ckobj).any_i32);
 }
 
 MODULE = Scope::Escape PACKAGE = Scope::Escape
@@ -866,15 +913,22 @@ MODULE = Scope::Escape PACKAGE = Scope::Escape
 PROTOTYPES: DISABLE
 
 BOOT:
+{
+	CV *curescfunc_cv, *curesccont_cv;
 	null_end_op.op_type = OP_NULL;
 	null_end_op.op_ppaddr = PL_ppaddr[OP_NULL];
 	stash_esccont = gv_stashpvs("Scope::Escape::Continuation", 1);
-	next_peep = PL_peepp;
-	PL_peepp = my_peep;
-	nxck_entersub = PL_check[OP_ENTERSUB];
-	PL_check[OP_ENTERSUB] = myck_entersub;
+	THX_next_peep = PL_peepp;
+	PL_peepp = THX_my_peep;
 	curescfunc_cv = get_cv("Scope::Escape::current_escape_function", 0);
 	curesccont_cv = get_cv("Scope::Escape::current_escape_continuation", 0);
+	CvXSUBANY(curescfunc_cv).any_i32 = 0;
+	CvXSUBANY(curesccont_cv).any_i32 = 1;
+	cv_set_call_checker(curescfunc_cv, THX_ck_entersub_curesc,
+		(SV*)curescfunc_cv);
+	cv_set_call_checker(curesccont_cv, THX_ck_entersub_curesc,
+		(SV*)curesccont_cv);
+}
 
 void
 current_escape_function(...)
@@ -912,7 +966,7 @@ PROTOTYPE: $@
 PPCODE:
 	PUSHMARK(SP+1);
 	/* the modified SP is intentionally lost here */
-	xsfunc_go(aTHX_ contsub_from_contref(contref));
+	THX_xsfunc_go(aTHX_ contsub_from_contref(contref));
 	/* does not return */
 
 SV *

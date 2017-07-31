@@ -4,7 +4,6 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Net/HTTP/Tiny.pm
 t/delimitation.at

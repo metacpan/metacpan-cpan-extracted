@@ -2,20 +2,45 @@ use Test2::V0;
 use Test::Alien;
 use Alien::autoconf;
 use Env qw( @PATH );
+use File::chdir;
+use File::Temp qw( tempdir );
+use Path::Tiny qw( path );
 
 alien_ok 'Alien::autoconf';
 
-my @cmd = ('autoconf', '--version');
-
+my $wrapper;
 if($^O eq 'MSWin32')
 {
   require Alien::MSYS;
   push @PATH, Alien::MSYS::msys_path();
-  @cmd = ('sh', -c => 'autoconf --version');
+  $wrapper = sub { [ 'sh', -c => "@_" ] };
+}
+else
+{
+  $wrapper = sub { [@_] };
 }
 
-run_ok(\@cmd)
+my $dist_dir = path(Alien::autoconf->dist_dir);
+
+run_ok($wrapper->($_, '--version'))
   ->success
-  ->note;
+  ->note for qw( autoconf autoheader autoreconf autoscan autoupdate );
+
+my $configure_ac = path('corpus/configure.ac')->absolute;
+
+subtest 'try with very basic configure.ac' => sub {
+
+  local $CWD = tempdir( CLEANUP => 1 );
+
+  $configure_ac->copy('configure.ac');
+
+  run_ok($wrapper->('autoconf', -o => 'configure', $configure_ac))
+    ->success
+    ->note;
+
+  run_ok($wrapper->('./configure', '--version'))
+    ->success
+    ->note;
+};
 
 done_testing;

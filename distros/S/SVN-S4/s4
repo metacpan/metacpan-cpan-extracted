@@ -29,7 +29,7 @@ use vars qw ($VERSION);
 #======================================================================
 # main
 
-$VERSION = '1.064';
+$VERSION = '1.066';
 
 autoflush STDOUT 1;
 autoflush STDERR 1;
@@ -428,6 +428,7 @@ sub cmd_checkout {
     unless (defined $url && ($nopts == 1 || $nopts == 2)) {
         die "%Error: s4 checkout only supports these forms: checkout URL | checkout URL PATH";
     }
+    @Opt_CmdParams = $SvnOpt->stripOneArg('--sparse',@Opt_CmdParams);
     if (!defined $path) {
 	# Grab basename of url. I know svn co would do this implicitly, but
 	# we do other things with the $path like parse the viewspec, so
@@ -437,7 +438,8 @@ sub cmd_checkout {
     }
     $s4->checkout (revision=>($opts{revision}[0]||$opts{urlrev}[0]),
 		   url=>$url, path=>$path,
-		   fallback_cmd=>raw_svn_command());
+		   fallback_cmd=>raw_svn_command(),
+		   sparse => $opts{"--sparse"});
 }
 
 sub cmd_commit {
@@ -664,25 +666,35 @@ would otherwise need to be a global file.  If the file is unchanged you'll
 get HEAD (basically a global file), but you can also edit it locally to
 make changes.
 
-=head2 checkout
+=head2 checkout [--sparse]
 
 s4 checkout behaves exactly the same way as svn checkout, unless the top
 directory that you check out contains a file called Project.viewspec.
 If Project.viewspec is present, s4 does the following steps instead.
 
-1. Check out/update the top directory with --non-recursive, so that
-subdirectories are not fetched.
+1. Check out/update the top directory. If --sparse is present, s4 will
+only checkout the top directory's immediate children. Otherwise, the
+entire directory tree is checked out.
 
 2. Parse the Project.viewspec file to see how the working area should be
 laid out.  Project.viewspec specifies which directories in your working
 area should be mapped to which URLs in the repository.  If any problems
 are found during viewspec parsing, s4 ends with an error.
 
-3. Do a series of "svn switch" commands to build the working area.
+3. If --sparse is present, s4 will checkout only the portions
+of the directory tree that will not be switched out according to the
+Project.viewspec. This avoids checking out large subdirectories that
+will immediately get switched out afterwards. So using --sparse can
+generally only speed your checkouts up.
+
+4. Do a series of "svn switch" commands to build the working area.
 In normal svn, you cannot switch a directory unless it is already
 in the working copy, and checked in.  S4 works around this (see
 SVN::S4::ViewSpec.pm if you must know), so the viewspec can put any
 directory at any location.
+
+5. If --sparse is present, s4 will change the 'depth' field of all
+directories to infinity, so future updates will be handled correctly
 
 =head2 fixprop
 

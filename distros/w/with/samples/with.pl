@@ -30,7 +30,7 @@ hlagh;         # Pants::hlagh
  use with \$deuce;
  hlagh;        # Deuce::hlagh 1
  main::hlagh;  # Pants::hlagh
- 
+
  {
   use with \Deuce->new(2); # Constant blessed reference
   hlagh;       # Deuce::hlagh 2

@@ -5,10 +5,10 @@ use Test::More tests => 4;
 
 BEGIN { use_ok "Net::HTTP::Tiny", qw(http_get); }
 
-eval { http_get("http://www.guardian.co.uk") };
+eval { http_get("http://www.irregularwebcomic.net") };
 is $@, "", "chunk delimitation";
 
-eval { http_get("http://www.slashdot.org") };
+eval { http_get("http://www.thedailywtf.com") };
 is $@, "", "length delimitation";
 
 eval { http_get("http://www.google.co.uk") };

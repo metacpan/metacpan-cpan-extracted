@@ -1,5 +1,6 @@
 package Lab::Bus::USBtmc;
-$Lab::Bus::USBtmc::VERSION = '3.553';
+#ABSTRACT: USBtmc (Test & Measurement) Linux kernel driver bus
+$Lab::Bus::USBtmc::VERSION = '3.554';
 # "sys/ioctl.ph" throws a warning about FORTIFY_SOURCE, but
 # this alternate is (perhaps?) not present on all systems,
 # so do a workaround
@@ -459,13 +460,22 @@ sub _search_twin {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Bus::USBtmc - USBtmc bus
+Lab::Bus::USBtmc - USBtmc (Test & Measurement) Linux kernel driver bus
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -490,7 +500,6 @@ On Windows, please use L<Lab::Bus::VISA>. The interfaces are (errr, will be) ide
 Note: you don't need to explicitly handle bus objects. The Instruments will create them themselves, and existing bus will
 be automagically reused.
 
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -499,8 +508,6 @@ be automagically reused.
   });
 
 Return blessed $self, with @_ accessible through $self->config().
-
-
 
 =head1 Thrown Exceptions
 
@@ -564,7 +571,6 @@ here requires modification.
 Unfortunately, it's not so easy for a little perl module to tell what
 variety of kernel module is being used, so that will be up to the user. 
 
-
 See C<Lab::Instrument::Read()>.
 
 =head2 connection_write
@@ -572,7 +578,6 @@ See C<Lab::Instrument::Read()>.
   $tmc->connection_write( $InstrumentHandle, { Cmd => $Command } );
 
 Sends $Command to the instrument specified by the handle.
-
 
 =head2 connection_read
 
@@ -615,7 +620,7 @@ Lots, I'm sure.
 
 =over 4
 
-=item 
+=item
 
 L<Lab::Bus>
 
@@ -625,19 +630,16 @@ and many more...
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer <schroeer@cpan.org>, 
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and David Kalok,
-           2010      Matthias Völker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
-           2012      Hermann Kraus
-           2016      Chuck Lane
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2012       Hermann Kraus
+            2016       Charles Lane, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

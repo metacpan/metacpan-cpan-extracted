@@ -3,6 +3,11 @@ Revision history for Perl extension SVN::S4
 The contributors that suggested a given feature are shown in [].  [by ...]
 indicates the contributor was also the author of the fix; Thanks!
 
+* SVN::S4 1.066 2017-07-24
+
+**** Add 's4 co --sparse' for faster checkouts.  [by Sam Steffl]
+
+
 * SVN::S4 1.064 2017-04-26
 
 **** Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]

@@ -6,8 +6,28 @@ use Mojo::JSON;
 use Mojo::Util 'deprecated';
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '1.19';
+our $VERSION = '1.21';
 my $X_RE = qr{^x-};
+
+has _default_response => sub {
+  return {
+    description => "Default response.",
+    schema      => {
+      type       => "object",
+      required   => ["errors"],
+      properties => {
+        errors => {
+          type  => "array",
+          items => {
+            type       => "object",
+            required   => ["message"],
+            properties => {message => {"type" => "string"}, path => {"type" => "string"}}
+          }
+        }
+      }
+    }
+  };
+};
 
 has _security_cb => undef;
 has _validator => sub { JSON::Validator::OpenAPI::Mojolicious->new; };
@@ -34,6 +54,8 @@ sub register {
     $app->renderer->add_handler(openapi => \&_render);
     push @{$app->renderer->classes}, __PACKAGE__;
   }
+
+  $self->_default_response($config->{default_response}) if exists $config->{default_response};
 
   $self->{log_level} = $ENV{MOJO_OPENAPI_LOG_LEVEL} || $config->{log_level} || 'warn';
   $self->{renderer} = $config->{renderer} || \&_render_json;
@@ -81,6 +103,7 @@ sub _add_routes {
       my $to      = $op_spec->{'x-mojo-to'};
       my $endpoint;
 
+      $op_spec->{responses}{default} ||= $self->_default_response;
       $op_spec->{'x-all-parameters'} = [@path_parameters, @{$op_spec->{parameters} || []}];
       $has_options = 1 if lc $http_method eq 'options';
       $route_path = _route_path($path, $op_spec);
@@ -103,7 +126,8 @@ sub _add_routes {
     }
 
     unless ($has_options) {
-      $route->options($route_path => sub { _render_route_spec($_[0], $path) });
+      $route->options($route_path)
+        ->to('openapi.default_options' => 1, cb => sub { _render_route_spec($_[0], $path) },);
     }
   }
 }
@@ -273,7 +297,10 @@ sub _security_action {
 
   return sub {
     my $c = shift;
-    my @security_or = @{$c->openapi->spec->{security} || $global};
+    return 1 if $c->req->method eq 'OPTIONS' && $c->match->stack->[-1]{'openapi.default_options'};
+
+    my $spec = $c->openapi->spec || {};
+    my @security_or = @{$spec->{security} || $global};
     my %res;
 
     return 1 unless @security_or;    # Nothing to check
@@ -545,6 +572,34 @@ Note that setting this attribute is discourage.
 See L<JSON::Validator/coerce> for possible values that C<coerce> can take.
 
 Default: 1
+
+=item * default_response
+
+Used to set the "default" response schema, unless already specified in the
+spec. Set this argument to C<undef()> if you don't want the default to be
+added.
+
+Default value:
+
+  {
+    description => "Default response.",
+    schema      => {
+      type       => "object",
+      required   => ["errors"],
+      properties => {
+        errors => {
+          type  => "array",
+          items => {
+            type       => "object",
+            required   => ["message", "path"],
+            properties => {message => {"type" => "string"}, path => {"type" => "string"}}
+          }
+        }
+      }
+    }
+  }
+
+Note! The default "description" might change.
 
 =item * log_level
 
@@ -828,7 +883,6 @@ __DATA__
 <body>
 <div class="container">
   %= include "mojolicious/plugin/openapi/header"
-  %= include "mojolicious/plugin/openapi/endpoint"
   %= include "mojolicious/plugin/openapi/resources"
   %= include "mojolicious/plugin/openapi/footer"
 </div>

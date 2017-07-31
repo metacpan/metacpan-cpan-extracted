@@ -8,7 +8,7 @@ use App::clad;
 
 # PODNAME: clad
 # ABSTRACT: Parallel SSH client
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 exit App::clad->main(@ARGV);
 
@@ -24,7 +24,7 @@ clad - Parallel SSH client
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -108,8 +108,7 @@ Specify a directory to write log files to.  Each host will have its own log file
 
 =item --log
 
-Same as C<--log-dir>, but the location is chosen by L<File::HomeDir#my_dist_data>
-(using C<Clustericious-Admin> as the dist).
+Same as C<--log-dir>, but the location is ~/clad/log.
 
 =item --purge
 

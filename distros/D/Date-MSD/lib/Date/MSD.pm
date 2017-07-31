@@ -4,13 +4,13 @@ Date::MSD - conversion between flavours of Mars Sol Date
 
 =head1 SYNOPSIS
 
-	use Date::MSD qw(js_to_msd msd_to_cmsdnf cmsdn_to_js);
+    use Date::MSD qw(js_to_msd msd_to_cmsdnf cmsdn_to_js);
 
-	$msd = js_to_msd($js);
-	($cmsdn, $cmsdf) = msd_to_cmsdnf($msd, $tz);
-	$js = cmsdn_to_js($cmsdn, $cmsdf, $tz);
+    $msd = js_to_msd($js);
+    ($cmsdn, $cmsdf) = msd_to_cmsdnf($msd, $tz);
+    $js = cmsdn_to_js($cmsdn, $cmsdf, $tz);
 
-	# and 69 other conversion functions
+    # and 69 other conversion functions
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK;
@@ -465,7 +465,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007, 2009, 2010, 2012
+Copyright (C) 2007, 2009, 2010, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

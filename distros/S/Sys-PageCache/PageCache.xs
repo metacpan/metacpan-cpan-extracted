@@ -6,7 +6,6 @@ extern "C" {
 #include "XSUB.h"
 #include "ppport.h"
 
-#define _LARGEFILE_SOURCE
 #define _FILE_OFFSET_BITS 64
 #include <stdlib.h>
 #include <sys/mman.h>

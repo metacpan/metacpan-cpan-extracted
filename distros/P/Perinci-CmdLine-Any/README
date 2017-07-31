@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Perinci::CmdLine::Any - Choose Perinci::CmdLine implementation (::Lite
+    or ::Classic)
 
+VERSION
+    This document describes version 0.14 of Perinci::CmdLine::Any (from Perl
+    distribution Perinci-CmdLine-Any), released on 2017-07-22.
+
+SYNOPSIS
     In your command-line script (this will pick ::Lite first):
 
      #!perl
@@ -14,33 +21,54 @@ SYNOPSIS
      Perinci::CmdLine::Any->new(url => '/Package/func')->run;
 
 DESCRIPTION
-
     This module lets you use Perinci::CmdLine::Lite or
     Perinci::CmdLine::Classic.
 
     If you want to force using a specific class, you can set the
-    PERINCI_CMDLINE_ANY environment variable, e.g. the command below will
+    "PERINCI_CMDLINE_ANY" environment variable, e.g. the command below will
     only try to use Perinci::CmdLine::Classic:
 
      % PERINCI_CMDLINE_ANY=Perinci::CmdLine::Classic yourapp.pl
      % PERINCI_CMDLINE_ANY=classic yourapp.pl
 
     If you want to prefer to Perinci::CmdLine::Classic (but user will still
-    be able to override using PERINCI_CMDLINE_ANY):
+    be able to override using "PERINCI_CMDLINE_ANY"):
 
      use Perinci::CmdLine::Any -prefer_lite => 0;
 
 ENVIRONMENT
+  PERINCI_CMDLINE_ANY => str
+    Either specify module name, or "lite" or "classic".
 
- PERINCI_CMDLINE_ANY => str
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Any>.
 
-    Either specify module name, or lite or classic.
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Perinci::CmdLine::Lite, Perinci::CmdLine::Classic
 
     Another alternative backend, but not available through
     Perinci::CmdLine::Any since it works by generating script instead:
     Perinci::CmdLine::Inline
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

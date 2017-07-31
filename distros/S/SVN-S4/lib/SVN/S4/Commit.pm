@@ -17,7 +17,7 @@ use SVN::S4;
 use SVN::S4::Debug qw (DEBUG is_debug);
 use SVN::S4::Path;
 
-our $VERSION = '1.064';
+our $VERSION = '1.066';
 
 our @Commit_status_data;
 our @Commit_unsafe_data;  # [path,status,pstatus]

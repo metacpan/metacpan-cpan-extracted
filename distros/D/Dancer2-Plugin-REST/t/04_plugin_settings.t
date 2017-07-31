@@ -19,9 +19,9 @@ my $yaml = YAML::Dump($data);
     use Dancer2;
     use Dancer2::Plugin::REST;
 
-    set environment => 'test';
-    set serializer => 'JSON';
     prepare_serializer_for_format;
+
+    set environment => 'test';
 
     get '/' => sub { "root" };
     get '/:something.:format' => sub {
@@ -45,10 +45,8 @@ my @tests = (
         response => $yaml,
     },
     {
-        path => '/foo.foobar',
-        response => qr/unsupported format requested: foobar/ms,
-    },
-    {
+        # doing it a second time to make sure we don't have a lingering
+        # serializer
         path => '/',
         response => 'root',
     },
@@ -57,16 +55,18 @@ my @tests = (
 plan tests => scalar(@tests);
 
 for my $test ( @tests ) {
-    my $response = $plack_test->request( GET $test->{path} );
+    subtest $test->{path} => sub { 
+        my $response = $plack_test->request( GET $test->{path} );
 
-    if (ref($test->{response})) {
-        like( $response->content, $test->{response},
-            "response looks good for 'GET $test->{path}'" );
-    }
-    else {
-        is( $response->content, $test->{response},
-            "response looks good for 'GET $test->{path}'" );
-    }
+        if (ref($test->{response})) {
+            like( $response->content, $test->{response},
+                "response looks good for 'GET $test->{path}'" );
+        }
+        else {
+            is( $response->content, $test->{response},
+                "response looks good for 'GET $test->{path}'" );
+        }
+    };
 }
 
 

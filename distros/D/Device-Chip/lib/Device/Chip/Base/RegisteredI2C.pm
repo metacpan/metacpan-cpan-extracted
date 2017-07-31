@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015,2017 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Base::RegisteredI2C;
 
@@ -11,13 +11,14 @@ use base qw( Device::Chip );
 
 use utf8;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 
 use constant PROTOCOL => "I2C";
 
 use constant REG_ADDR_SIZE => 8;
+use constant REG_DATA_SIZE => 8;
 
 =encoding UTF-8
 
@@ -35,6 +36,34 @@ values. This is a common pattern that a lot of I²C chips adhere to.
 
 =cut
 
+=head1 CONSTANTS
+
+=cut
+
+=head2 REG_DATA_SIZE
+
+Gives the number of bits of data each register occupies. Normally this value
+is 8, but sometimes chips like high-resolution ADCs and DACs might work with a
+larger size like 16 or 24. This value ought to be a multiple of 8.
+
+Overriding this constant to a different value will affect the interpretation
+of the C<$len> parameter to the register reading and writing methods.
+
+=cut
+
+sub REG_DATA_BYTES
+{
+   my $self = shift;
+
+   my $bytes = int( ( $self->REG_DATA_SIZE + 7 ) / 8 );
+
+   # cache it for next time
+   my $pkg = ref $self || $self;
+   { no strict 'refs'; *{"${pkg}::REG_DATA_BYTES"} = sub { $bytes }; }
+
+   return $bytes;
+}
+
 =head1 METHODS
 
 The following methods documented with a trailing call to C<< ->get >> return
@@ -47,7 +76,7 @@ L<Future> instances.
    $val = $chip->read_reg( $reg, $len )->get
 
 Performs a C<write_then_read> I²C transaction, sending the register number as
-a single byte value, then attempts to read the given length of bytes.
+a single byte value, then attempts to read the given number of register slots.
 
 =cut
 
@@ -59,11 +88,11 @@ sub read_reg
    $self->REG_ADDR_SIZE == 8 or
       croak "TODO: Currently unable to cope with REG_ADDR_SIZE != 8";
 
-   my $f = $self->protocol->write_then_read( pack( "C", $reg ), $len );
+   my $f = $self->protocol->write_then_read( pack( "C", $reg ), $len * $self->REG_DATA_BYTES );
 
    if( $self->{devicechip_regcache}[$reg] ) {
       $self->{devicechip_regcache}[$reg] = $f
-         ->transform( done => sub { substr $_[0], 0, 1 } );
+         ->transform( done => sub { substr $_[0], 0, $self->REG_DATA_BYTES } );
    }
 
    return $f;
@@ -87,7 +116,7 @@ sub write_reg
       croak "TODO: Currently unable to cope with REG_ADDR_SIZE != 8";
 
    defined $self->{devicechip_regcache}[$reg] and
-      $self->{devicechip_regcache}[$reg] = Future->done( substr $val, 0, 1 );
+      $self->{devicechip_regcache}[$reg] = Future->done( substr $val, 0, $self->REG_DATA_BYTES );
 
    $self->protocol->write( pack( "C", $reg ) . $val );
 }
@@ -141,7 +170,7 @@ sub cached_write_reg
    my $self = shift;
    my ( $reg, $val ) = @_;
 
-   my $len = length $val;
+   my $len = length( $val ) / $self->REG_DATA_BYTES;
    $len == 1 or
       croak "TODO: Currently unable to cope with \$len != 1";
 

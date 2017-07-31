@@ -20,6 +20,14 @@ use Socket qw(AF_INET);
 
 my $AF_INET6 = eval { Socket::AF_INET6() };
 
+my %PROTO = (
+    tftp => 1,
+    ftp  => 2,
+    rcp  => 3,
+    scp  => 4,
+    sftp => 5
+);
+
 ##################################################
 # Start Public Module
 ##################################################
@@ -35,7 +43,10 @@ sub config_copy {
         catos      => 0,
         timeout    => 10,
         source     => 4,
-        dest       => 3
+        dest       => 3,
+        protocol   => 'tftp',
+        username   => 'cisco',
+        password   => 'cisco'
     );
 
     my %args;
@@ -46,13 +57,24 @@ sub config_copy {
         %args = @_;
         for (keys(%args)) {
             if ((/^-?(?:tftp)?server$/i) || (/^-?tftp$/)) {
-                $params{tftpserver} = $args{$_}
+                $params{server} = $args{$_}
             } elsif (/^-?catos$/i) {
                 if ($args{$_} == 1) {
                     $params{catos} = 1
                 }
+            } elsif (/^-?user(?:name)?$/i) {
+                $params{username} = $args{$_}
+            } elsif (/^-?pass(?:word)?$/i) {
+                $params{password} = $args{$_}
             } elsif (/^-?timeout$/i) {
                 $params{timeout} = $args{$_}
+            } elsif (/^-?proto(?:col)?$/i) {
+                if (exists($PROTO{ lc ($args{$_})})) {
+                    $params{protocol} = lc ($args{$_})
+                } else {
+                    $Cisco::SNMP::LASTERROR = "Invalid protocol `$args{$_}'";
+                    return undef
+                }
             } elsif (/^-?family$/i) {
                  if ($args{$_} =~ /^(?:(?:(:?ip)?v?(?:4|6))|${\AF_INET}|$AF_INET6)$/) {
                     if ($args{$_} =~ /^(?:(?:(:?ip)?v?4)|${\AF_INET})$/) {
@@ -95,9 +117,9 @@ sub config_copy {
         return undef
     }
 
-    # tftpserver must be defined if put/get
-    if (($params{op} ne 'wr') && !defined $params{tftpserver}) {
-        $params{tftpserver} = hostname
+    # server must be defined if put/get
+    if (($params{op} ne 'wr') && !defined $params{server}) {
+        $params{server} = hostname
     }
 
     # inherit from new()
@@ -105,10 +127,15 @@ sub config_copy {
         $params{family} = $self->{family}
     }
 
-    # resolve tftpserver our way
-    if (defined $params{tftpserver}) {
-        if (defined(my $ret = Cisco::SNMP::_resolv($params{tftpserver}, $params{family}))) {
-            $params{tftpserver} = $ret->{addr};
+    if ($params{catos} && $params{protocol} != 'tftp') {
+        $Cisco::SNMP::LASTERROR = "CatOS only supports tftp";
+        return undef
+    }
+
+    # resolve server our way
+    if (defined $params{server}) {
+        if (defined(my $ret = Cisco::SNMP::_resolv($params{server}, $params{family}))) {
+            $params{server} = $ret->{addr};
             $params{family}     = $ret->{family}
         } else {
             return undef
@@ -175,7 +202,7 @@ sub config_copy {
     # Check status, wait done
     $response = $session->get_request('1.3.6.1.4.1.9.9.96.1.1.1.1.10.' . $instance);
     if (!defined $response) {
-        $Cisco::SNMP::LASTERROR = "tftp NOT SUPPORTED (after setup)";
+        $Cisco::SNMP::LASTERROR = "$params{protocol} NOT SUPPORTED (after setup)";
         return undef
     }
 
@@ -184,11 +211,11 @@ sub config_copy {
     while ($response->{'1.3.6.1.4.1.9.9.96.1.1.1.1.10.' . $instance} <= 2) {
         $response = $session->get_request('1.3.6.1.4.1.9.9.96.1.1.1.1.10.' . $instance);
         if (!defined $response) {
-            $Cisco::SNMP::LASTERROR = "IOS TFTP `$params{op}' FAILED - cannot verify completion";
+            $Cisco::SNMP::LASTERROR = "IOS $params{protocol} `$params{op}' FAILED - cannot verify completion";
             return undef
         }
         if ($loop++ == $params{timeout}) {
-            $Cisco::SNMP::LASTERROR = "IOS TFTP `$params{op}' FAILED - timeout during completion verification";
+            $Cisco::SNMP::LASTERROR = "IOS $params{protocol} `$params{op}' FAILED - timeout during completion verification";
             return undef
         }
         sleep 1
@@ -206,7 +233,7 @@ sub config_copy {
     } elsif ($response->{'1.3.6.1.4.1.9.9.96.1.1.1.1.10.' . $instance} == 4) {
         $response = $session->get_request('1.3.6.1.4.1.9.9.96.1.1.1.1.13.' . $instance);
         $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.14.' . $instance, INTEGER, 6);
-        $Cisco::SNMP::LASTERROR = "IOS TFTP `$params{op}' FAILED - " . $ioserr{$response->{'1.3.6.1.4.1.9.9.96.1.1.1.1.13.' . $instance}};
+        $Cisco::SNMP::LASTERROR = "IOS $params{protocol} `$params{op}' FAILED - " . $ioserr{$response->{'1.3.6.1.4.1.9.9.96.1.1.1.1.13.' . $instance}};
         return undef
     } else {
         $Cisco::SNMP::LASTERROR = "Cannot determine success or failure";
@@ -266,7 +293,7 @@ sub _config_copy {
     );
 
     if ($params->{catos}) {
-        $response = $session->set_request('1.3.6.1.4.1.9.5.1.5.1.0', OCTET_STRING, $params->{tftpserver});
+        $response = $session->set_request('1.3.6.1.4.1.9.5.1.5.1.0', OCTET_STRING, $params->{server});
         $response = $session->set_request('1.3.6.1.4.1.9.5.1.5.2.0', OCTET_STRING, $params->{file});
         $response = $session->set_request('1.3.6.1.4.1.9.5.1.5.3.0', INTEGER, 1);
         if ($params->{op} eq 'put') {
@@ -300,19 +327,23 @@ sub _config_copy {
         $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.14.' . $instance, INTEGER, 6);
         $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.14.' . $instance, INTEGER, 5);
 
-          # ccCopyProtocol (1 = TFTP)
-        $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.2.' . $instance, INTEGER, 1);
+          # ccCopyProtocol
+        $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.2.' . $instance, INTEGER, $PROTO{$params->{protocol}});
 
         if (!defined $response) {
             $Cisco::SNMP::LASTERROR = "IOS TFTP `$params->{op}' NOT SUPPORTED - trying old way";
+            if ($params->{protocol} ne 'tftp') {
+                $Cisco::SNMP::LASTERROR = "Old way does not support `$params->{protocol}'";
+                return -1
+            }
             if ($params->{family} == $AF_INET6) {
                 $Cisco::SNMP::LASTERROR = "IOS TFTP `$params->{op}' old way does not support IPv6";
                 return -1
             }
             if ($params->{op} eq 'put') {
-                $response = $session->set_request('1.3.6.1.4.1.9.2.1.50.' . $params->{tftpserver}, OCTET_STRING, $params->{file})
+                $response = $session->set_request('1.3.6.1.4.1.9.2.1.50.' . $params->{server}, OCTET_STRING, $params->{file})
             } else {
-                $response = $session->set_request('1.3.6.1.4.1.9.2.1.55.' . $params->{tftpserver}, OCTET_STRING, $params->{file})
+                $response = $session->set_request('1.3.6.1.4.1.9.2.1.55.' . $params->{server}, OCTET_STRING, $params->{file})
             }
             if (defined $response) {
                 return 0
@@ -321,6 +352,14 @@ sub _config_copy {
                 return -1
             }
         }
+
+        if ($params->{protocol} ne 'tftp') {
+            $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.7.' . $instance, OCTET_STRING, $params->{username});
+            if ($params->{protocol} ne 'rcp') {
+                $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.8.' . $instance, OCTET_STRING, $params->{password});
+            }
+        }
+
           # ccCopySourceFileType [.3] (1 = networkFile, 3 = startupConfig, 4 = runningConfig)
           # ccCopyDestFileType [.4] (1 = networkFile, 3 = startupConfig, 4 = runningConfig)
         if ($params->{op} eq 'put') {
@@ -336,7 +375,7 @@ sub _config_copy {
 
         if (defined $response) {
               # ccCopyServerAddressRev1
-            $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.16.' . $instance, OCTET_STRING, $params->{tftpserver})
+            $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.16.' . $instance, OCTET_STRING, $params->{server})
         } else {
               # Deprecated
               # ccCopyServerAddress
@@ -344,7 +383,7 @@ sub _config_copy {
                 $Cisco::SNMP::LASTERROR = "ccCopyServerAddressRev1 not supported (requried for IPv6)";
                 return -1
             }
-            $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.5.' . $instance, IPADDRESS, $params->{tftpserver})
+            $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.5.' . $instance, IPADDRESS, $params->{server})
         }
           # ccCopyFileName
         $response = $session->set_request('1.3.6.1.4.1.9.9.96.1.1.1.1.6.' . $instance, OCTET_STRING, $params->{file})
@@ -408,11 +447,15 @@ startup-config or vice versa.  Valid options are:
                  4, v4, ip4, ipv4, AF_INET (constant)
                Valid values for IPv6:
                  6, v6, ip6, ipv6, AF_INET6 (constant)
+  -password  Password for 'ftp', 'scp', 'sftp'      'cisco'
+  -protocol  'ftp', 'rcp', 'scp', 'sftp', 'tftp'    'tftp'
   -source    'startup-config', 'running-config'     'running-config'
              or filename on TFTP server
-  -tftp      TFTP server address                    localhost
+  -server    Copy server address                    localhost
   -timeout   Seconds until timeout for completion   10
              check
+  -username  Username for 'ftp', 'rcp', 'scp',      'cisco'
+             'sftp'
 
 The default behavior with no options is C<copy running-config
 startup-config>.

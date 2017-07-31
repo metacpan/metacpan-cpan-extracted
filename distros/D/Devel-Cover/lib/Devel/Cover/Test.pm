@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 use Carp;
 
@@ -208,7 +208,7 @@ sub run_test {
     }
 
     my $version = int(($] - 5) * 1000 + 0.5);
-    if ($version % 2 && $version < 24) {
+    if ($version % 2 && $version < 26) {
         plan skip_all => "Perl version $] is an obsolete development version";
         return;
     }
@@ -392,7 +392,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 METHODS
 

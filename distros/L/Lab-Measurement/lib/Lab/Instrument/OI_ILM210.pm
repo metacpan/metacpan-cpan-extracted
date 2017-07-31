@@ -1,5 +1,6 @@
 package Lab::Instrument::OI_ILM210;
-$Lab::Instrument::OI_ILM210::VERSION = '3.553';
+#ABSTRACT: Oxford Instruments ILM Intelligent Level Meter
+$Lab::Instrument::OI_ILM210::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 
@@ -29,6 +30,8 @@ sub get_level {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -36,6 +39,10 @@ sub get_level {
 =head1 NAME
 
 Lab::Instrument::OI_ILM210 - Oxford Instruments ILM Intelligent Level Meter
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -51,7 +58,6 @@ Lab::Instrument::OI_ILM210 - Oxford Instruments ILM Intelligent Level Meter
 
 The Lab::Instrument::OI_ILM210 class implements an interface to the Oxford Instruments 
 ILM helium level meter (tested with the ILM210).
-
 
 =head1 CONSTRUCTOR
 
@@ -89,11 +95,17 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2010-2011 Andreas K. Hüttel (L<http://www.akhuettel.de/>)
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012-2013  Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

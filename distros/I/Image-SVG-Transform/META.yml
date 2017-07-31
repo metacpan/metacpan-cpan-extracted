@@ -26,4 +26,4 @@ requires:
 resources:
   bugtracker: http://github.com/perlDreamer/Image-SVG-Transform/issues
   repository: git://github.com/perlDreamer/Image-SVG-Transform.git
-version: '0.07'
+version: '0.08'

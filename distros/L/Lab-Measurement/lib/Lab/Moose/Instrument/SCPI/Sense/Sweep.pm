@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Sweep;
-$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.553';
+#ABSTRACT: Role for the SCPI SENSe:SWEep subsystem
+$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.554';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -9,21 +10,6 @@ use Carp;
 
 use namespace::autoclean;
 
-
-=head1 NAME
-
-Lab::Moose::Instrument::SCPI::Sense::Sweep - Role for SCPI SENSe:SWEep
-subsystem.
-
-=head1 METHODS
-
-=head2 sense_sweep_points_query
-
-=head2 sense_sweep_points
-
-Query/Set the number of points in the sweep.
-
-=cut
 
 cache sense_sweep_points => ( getter => 'sense_sweep_points_query' );
 
@@ -41,13 +27,6 @@ sub sense_sweep_points {
     $self->cached_sense_sweep_points($value);
 }
 
-=head2 sense_sweep_count_query
-
-=head2 sense_sweep_count
-
-Query/Set the number of sweeps initiated by a trigger (like INIT).
-
-=cut
 
 cache sense_sweep_count => ( getter => 'sense_sweep_count_query' );
 
@@ -65,3 +44,44 @@ sub sense_sweep_count {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::SCPI::Sense::Sweep - Role for the SCPI SENSe:SWEep subsystem
+
+=head1 VERSION
+
+version 3.554
+
+=head1 METHODS
+
+=head2 sense_sweep_points_query
+
+=head2 sense_sweep_points
+
+Query/Set the number of points in the sweep.
+
+=head2 sense_sweep_count_query
+
+=head2 sense_sweep_count
+
+Query/Set the number of sweeps initiated by a trigger (like INIT).
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,161 @@
+#!/m1/shared/bin/perl
+
+use strict;
+use warnings;
+
+use Biblio::SIF::Patron;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my $term;
+my ($print_header, $format);
+
+my %esc2str = (
+    '\t' => "\t",
+    '\n' => "\n",
+    '\r' => "\r",
+    '\\' => "\\",
+);
+
+my %char2method = qw(
+
+    i   id
+    j   institution_id
+
+    f   first_name
+    l   last_name
+    n   first_last_name
+    N   last_first_name
+
+    p   purge_date
+    x   expiration_date
+
+    B   barcodes
+    G   groups
+    S   statuses
+    b   barcode1
+    g   group1
+    s   status1
+    1b  barcode1
+    2b  barcode2
+    3b  barcode3
+    1g  group1
+    2g  group2
+    3g  group3
+    1s  status1
+    2s  status2
+    3s  status3
+
+);
+
+$char2method{'M'} = sub {
+    my @notes = $_->notes;
+    join('; ', @notes);
+};
+
+my %char2desc = ( %char2method, M => 'notes' );
+GetOptions(
+    'l|list-codes' => sub {
+        foreach (sort { lc($char2desc{$a}) cmp lc($char2desc{$b}) } keys %char2desc) {
+            printf "%%%-3s %s\n", $_, $char2desc{$_};
+        }
+        exit 0
+    },
+    'h|header' => \$print_header,
+    'f|format=s' => \$format,
+    't|terminator=s' => \$term,
+    'z' => sub { $term = "\x00\n" },
+    'Z' => sub { $term = "\x0a\x00\x0a" },
+    '0' => sub { $term = "\x00" },
+    'n' => sub { $term = "\n" },
+    'c' => sub { $term = "\x0d\x0a" },
+    'crlf' => sub { $term = "\x0d\x0a" },
+);
+
+$format = shift @ARGV unless defined $format;
+my $emitter = compile_format($format);
+my $iter = Biblio::SIF::Patron->iterator(
+    @ARGV ? shift @ARGV : \*STDIN,
+    'terminator' => $term,
+);
+{
+    local $_;
+    while (defined ($_ = $iter->())) {
+        print $emitter->(), "\n";
+    }
+}
+
+sub compile_format {
+    my ($fmt) = @_;
+    my @code;
+    while ($fmt =~ /
+        \G
+        (?:
+            ( \\[tnr\\] )
+            |
+            (?:
+                %{
+                    (.+?)
+                }
+            )
+            |
+            %(\d)a { (.+?) }
+            |
+            %(\d*[A-Za-z])
+            |
+            ([^\\%]+)
+            |
+            (.)
+        )
+    /xgc) {
+        my ($esc, $method, $addr_num, $addr_method, $code, $str, $char) = ($1, $2, $3, $4, $5, $6, $7);
+        if (defined $esc) {
+            push @code, sub {
+                $esc2str{$esc}
+            };
+        }
+        elsif (defined $method) {
+            push @code, sub {
+                my $str = $_->$method;
+                $str;
+            };
+        }
+        elsif (defined $addr_num) {
+            push @code, sub {
+                my $str = '';
+                eval {
+                    my $addr = $_->address($addr_num);
+                    $str = $addr->$addr_method;
+                };
+                $str;
+            };
+        }
+        elsif (defined $code) {
+            my $method = $char2method{$code};
+            if (ref $method) {
+                push @code, $method;
+            }
+            else {
+                exit usage() unless defined $method;
+                push @code, sub {
+                    my $str = $_->$method;
+                    $str;
+                };
+            }
+        }
+        elsif (defined $str) {
+            push @code, sub { $str };
+        }
+        elsif (defined $char) {
+            push @code, sub { $char };
+        }
+    }
+    return sub {
+        my @result;
+        foreach my $c (@code) {
+            push @result, $c->($_);
+        }
+        return @result;
+    };
+}
+

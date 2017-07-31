@@ -1,0 +1,56 @@
+---
+abstract: 'evaluate some javascript using the best available Javascript implementation'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JavaScript-Any
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  JavaScript::Any:
+    file: lib/JavaScript/Any.pm
+    version: '0.002'
+  JavaScript::Any::Context:
+    file: lib/JavaScript/Any/Context.pm
+    version: '0.002'
+  JavaScript::Any::Context::Duktape:
+    file: lib/JavaScript/Any/Context/Duktape.pm
+    version: '0.002'
+  JavaScript::Any::Context::JE:
+    file: lib/JavaScript/Any/Context/JE.pm
+    version: '0.002'
+  JavaScript::Any::Context::V8:
+    file: lib/JavaScript/Any/Context/V8.pm
+    version: '0.002'
+requires:
+  Class::Tiny: '0'
+  Exporter::Shiny: '1.000000'
+  JSON::PP: '0'
+  Ref::Util: '0'
+  Role::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.008003'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/JavaScript-Any/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=JavaScript-Any
+  homepage: https://metacpan.org/release/JavaScript-Any
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-javascript-any.git
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

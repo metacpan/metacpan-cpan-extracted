@@ -1,0 +1,14 @@
+Changes
+lib/Params/Check/Item.pm
+Makefile.PL
+ignore.txt
+MANIFEST			This list of files
+README
+test.pl
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/03-manifest.t
+t/10-checks.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

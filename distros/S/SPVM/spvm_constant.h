@@ -2,33 +2,15 @@
 #define SPVM_CONSTANT_H
 
 #include "spvm_base.h"
-
-enum {
-  SPVM_CONSTANT_C_CODE_BYTE,
-  SPVM_CONSTANT_C_CODE_SHORT,
-  SPVM_CONSTANT_C_CODE_INT,
-  SPVM_CONSTANT_C_CODE_LONG,
-  SPVM_CONSTANT_C_CODE_FLOAT,
-  SPVM_CONSTANT_C_CODE_DOUBLE,
-  SPVM_CONSTANT_C_CODE_STRING,
-};
-
-extern const char* const SPVM_CONSTANT_C_CODE_NAMES[];
+#include "spvm_value.h"
 
 struct SPVM_constant {
   SPVM_TYPE* type;
-  union {
-    // byte, short, int value is saved to long_value
-    int64_t long_value;
-    float float_value;
-    double double_value;
-    const char* string_value;
-  } uv;
+  SPVM_VALUE value;
   uint64_t tmp_ulong_value;
-  int32_t code;
   int32_t constant_pool_index;
-  _Bool is_undef;
   _Bool sign;
+  _Bool resolved;
 };
 
 SPVM_CONSTANT* SPVM_CONSTANT_new(SPVM_COMPILER* compiler);

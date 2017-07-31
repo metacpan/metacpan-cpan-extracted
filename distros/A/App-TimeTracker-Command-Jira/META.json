@@ -1,16 +1,16 @@
 {
    "abstract" : "App::TimeTracker Jira plugin",
    "author" : [
-      "Michael Kröll <pepl@cpan.org>"
+      "Michael Kr\u00f6ll <pepl@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-TimeTracker-Command-Jira",
    "prereqs" : {
@@ -56,7 +56,7 @@
    "provides" : {
       "App::TimeTracker::Command::Jira" : {
          "file" : "lib/App/TimeTracker/Command/Jira.pm",
-         "version" : "0.5"
+         "version" : "0.6"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,7 @@
          "web" : "https://github.com/pepl/App-TimeTracker-Jira"
       }
    },
-   "version" : "0.5"
+   "version" : "0.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

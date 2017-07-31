@@ -1,0 +1,28 @@
+---
+abstract: 'Extract data from Google Analytics using Mojo UserAgent'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-GoogleAnalytics
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojo::JWT: '0.05'
+  Mojolicious: '7.30'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-googleanalytics/issues
+  homepage: https://github.com/jhthorsen/mojo-googleanalytics
+  repository: https://github.com/jhthorsen/mojo-googleanalytics.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

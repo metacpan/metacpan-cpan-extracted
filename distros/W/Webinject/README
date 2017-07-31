@@ -25,7 +25,7 @@ CONSTRUCTOR
         'external:'
 
     nooutput
-        suppress all output to STDOUT, create only logilfes
+        suppress all output to STDOUT, create only logfiles
 
     break_on_errors
         stop after the first testcase fails, otherwise Webinject would go on
@@ -81,6 +81,17 @@ CONSTRUCTOR
 
     gnuplot
         Defines the path to your gnuplot binary.
+
+    postbodybasedir
+        Path to a directory from which all relative test case postbody
+        directives are based.
+
+        When test cases include a "postbody" directive with a "file=>..."
+        value, and that value is a relative location, Webinject will prepend
+        this directory path.
+
+        If not supplied, the directory containing the current test case file
+        is prepended to any relative "file=>" values.
 
 METHODS
   engine

@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Koha;
 #ABSTRACT: Class exposing info about a Koha instance.
-$Koha::Contrib::Tamil::Koha::VERSION = '0.050';
+$Koha::Contrib::Tamil::Koha::VERSION = '0.051';
 use Moose;
 
 use Carp;
@@ -168,7 +168,7 @@ Koha::Contrib::Tamil::Koha - Class exposing info about a Koha instance.
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 ATTRIBUTES
 

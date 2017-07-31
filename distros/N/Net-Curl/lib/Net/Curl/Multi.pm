@@ -5,7 +5,7 @@ use warnings;
 use Net::Curl ();
 use Exporter 'import';
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 our @EXPORT_OK = grep { /^CURL/x } keys %{Net::Curl::Multi::};
 our %EXPORT_TAGS = ( constants => \@EXPORT_OK );
@@ -152,12 +152,26 @@ Calls L<curl_multi_perform(3)>.
 Rethrows exceptions from callbacks.
 Throws L</Net::Curl::Multi::Code> on error.
 
-=item wait( TIMEOUT_MS )
+=item wait( [OTHER_FDS], TIMEOUT_MS )
 
 This method polls on all file descriptors used by the curl easy handles contained in the given multi handle set.
 It will block until activity is detected on at least one of the handles or TIMEOUT_MS has passed.
 
  my $active = $multi->wait(1000);
+
+It will also poll on all filehandles requested. Each event descriptor is a hash and requires keys: fd - file number of the handle and events - a bitmask of the events to wait for. On detected event it will return the data in revents key.
+
+ my $ev_read_stdin = {
+   fd => fileno STDIN,
+   events => CURL_WAIT_POLLIN,
+ };
+
+ my $active = $multi->wait( [ $ev_read_stdin ], 1000 );
+ if ( $active and $ev_read_stdin->{revents} == CURL_WAIT_POLLIN )
+ {
+   # STDIN is ready to read
+   ...
+ }
 
 Calls L<curl_multi_wait(3)>
 (L<available since libcurl/7.28.0|http://curl.haxx.se/libcurl/c/curl_multi_wait.html>).
@@ -307,7 +321,7 @@ L<libcurl-errors(3)>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2011 Przemyslaw Iskra <sparky at pld-linux.org>.
+Copyright (c) 2011-2015 Przemyslaw Iskra <sparky at pld-linux.org>.
 
 You may opt to use, copy, modify, merge, publish, distribute and/or sell
 copies of the Software, and permit persons to whom the Software is furnished

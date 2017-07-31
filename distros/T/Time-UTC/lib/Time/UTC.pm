@@ -4,63 +4,58 @@ Time::UTC - manipulation of UTC in terms of TAI
 
 =head1 SYNOPSIS
 
-	use Time::UTC qw(
-		utc_start_segment
-		foreach_utc_segment_when_complete
-		utc_start_tai_instant utc_start_utc_day
-		utc_segment_of_tai_instant utc_segment_of_utc_day
-	);
+    use Time::UTC qw(
+	utc_start_segment
+	foreach_utc_segment_when_complete
+	utc_start_tai_instant utc_start_utc_day
+	utc_segment_of_tai_instant utc_segment_of_utc_day);
 
-	$seg = utc_start_segment;
-	foreach_utc_segment_when_complete { ... $_[0] ... };
+    $seg = utc_start_segment;
+    foreach_utc_segment_when_complete { ... $_[0] ... };
 
-	$instant = utc_start_tai_instant;
-	$day = utc_start_utc_day;
+    $instant = utc_start_tai_instant;
+    $day = utc_start_utc_day;
 
-	$seg = utc_segment_of_tai_instant($instant);
-	$seg = utc_segment_of_utc_day($day);
+    $seg = utc_segment_of_tai_instant($instant);
+    $seg = utc_segment_of_utc_day($day);
 
-	use Time::UTC qw(
-		utc_day_leap_seconds utc_day_seconds
-		utc_check_instant
-	);
+    use Time::UTC qw(
+	utc_day_leap_seconds utc_day_seconds utc_check_instant);
 
-	$secs = utc_day_leap_seconds($day);
-	$secs = utc_day_seconds($day);
-	utc_check_instant($day, $secs);
+    $secs = utc_day_leap_seconds($day);
+    $secs = utc_day_seconds($day);
+    utc_check_instant($day, $secs);
 
-	use Time::UTC qw(tai_to_utc utc_to_tai);
+    use Time::UTC qw(tai_to_utc utc_to_tai);
 
-	($day, $secs) = tai_to_utc($instant);
-	$instant = utc_to_tai($day, $secs);
+    ($day, $secs) = tai_to_utc($instant);
+    $instant = utc_to_tai($day, $secs);
 
-	use Time::UTC qw(
-		utc_secs_to_hms utc_hms_to_secs
-		utc_day_to_ymd utc_ymd_to_day
-		utc_instant_to_ymdhms utc_ymdhms_to_instant
-	);
+    use Time::UTC qw(
+	utc_secs_to_hms utc_hms_to_secs
+	utc_day_to_ymd utc_ymd_to_day
+	utc_instant_to_ymdhms utc_ymdhms_to_instant);
 
-	($hr, $mi, $sc) = utc_secs_to_hms($secs);
-	$secs = utc_hms_to_secs($hr, $mi, $sc);
+    ($hr, $mi, $sc) = utc_secs_to_hms($secs);
+    $secs = utc_hms_to_secs($hr, $mi, $sc);
 
-	($yr, $mo, $dy) = utc_day_to_ymd($day);
-	$day = utc_ymd_to_day($yr, $mo, $dy);
+    ($yr, $mo, $dy) = utc_day_to_ymd($day);
+    $day = utc_ymd_to_day($yr, $mo, $dy);
 
-	($yr, $mo, $dy, $hr, $mi, $sc) =
-		utc_instant_to_ymdhms($day, $secs);
-	($day, $secs) = utc_ymdhms_to_instant(
-				$yr, $mo, $dy, $hr, $mi, $sc);
+    ($yr, $mo, $dy, $hr, $mi, $sc) =
+	utc_instant_to_ymdhms($day, $secs);
+    ($day, $secs) = utc_ymdhms_to_instant(
+			$yr, $mo, $dy, $hr, $mi, $sc);
 
-	use Time::UTC qw(
-		utc_day_to_mjdn utc_mjdn_to_day
-		utc_day_to_cjdn utc_cjdn_to_day
-	);
+    use Time::UTC qw(
+	utc_day_to_mjdn utc_mjdn_to_day
+	utc_day_to_cjdn utc_cjdn_to_day);
 
-	$mjdn = utc_day_to_mjdn($day);
-	$day = utc_mjdn_to_day($mjdn);
+    $mjdn = utc_day_to_mjdn($day);
+    $day = utc_mjdn_to_day($mjdn);
 
-	$cjdn = utc_day_to_cjdn($day);
-	$day = utc_cjdn_to_day($cjdn);
+    $cjdn = utc_day_to_cjdn($day);
+    $day = utc_cjdn_to_day($cjdn);
 
 =head1 DESCRIPTION
 
@@ -264,7 +259,7 @@ use Carp qw(croak);
 use Math::BigRat 0.08;
 use Time::UTC::Segment 0.007;
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -832,7 +827,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, 2006, 2007, 2009, 2010, 2012
+Copyright (C) 2005, 2006, 2007, 2009, 2010, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

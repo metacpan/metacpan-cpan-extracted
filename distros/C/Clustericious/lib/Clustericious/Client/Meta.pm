@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: simple meta object for constructing clients
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 our %Routes; # hash from class name to array ref of routes.
 our %RouteAttributes; # hash from class name to hash ref of attributes.
@@ -90,7 +90,7 @@ Clustericious::Client::Meta - simple meta object for constructing clients
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 METHODS
 
@@ -181,6 +181,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

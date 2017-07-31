@@ -2,8 +2,8 @@ NAME
     App::tracepm - Trace dependencies of your Perl script
 
 VERSION
-    This document describes version 0.20 of App::tracepm (from Perl
-    distribution App-tracepm), released on 2017-07-10.
+    This document describes version 0.21 of App::tracepm (from Perl
+    distribution App-tracepm), released on 2017-07-29.
 
 SYNOPSIS
     This distribution provides command-line utility called tracepm.
@@ -76,6 +76,10 @@ FUNCTIONS
         *   "prereqscanner_lite_recurse": Like "prereqscanner_lite", but
             recurses.
 
+    *   module => *str*
+
+        --module MOD is equivalent to --script 'use MOD'.
+
     *   multiple_runs => *array[hash]*
 
         Parameter to run script multiple times.
@@ -116,7 +120,7 @@ FUNCTIONS
 
     *   script => *str*
 
-        Path to script file (script to be packed).
+        Path to script file.
 
     *   trap_script_output => *bool*
 
@@ -150,7 +154,7 @@ HOMEPAGE
     <https://metacpan.org/release/App-tracepm>.
 
 SOURCE
-    Source repository is at <https://github.com/perlancar/perl-App-tracepm>.
+    Source repository is at <https://github.com/sharyanto/perl-App-tracepm>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

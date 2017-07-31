@@ -1,0 +1,8 @@
+Revision history for PGObject-Util-Replication-Standby
+
+0.02	2017-07-28
+	Added standby promotion to functionality
+
+0.01    2017-07-26
+        First version, released on an unsuspecting world.
+

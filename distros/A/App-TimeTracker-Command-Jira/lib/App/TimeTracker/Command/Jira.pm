@@ -15,12 +15,6 @@ use Path::Class;
 use Try::Tiny;
 use Unicode::Normalize ();
 
-has 'jira' => (
-    is            => 'rw',
-    isa           => 'Str',
-    documentation => 'JIRA ticket ID',
-    predicate     => 'has_jira'
-);
 has 'jira_client' => (
     is         => 'ro',
     isa        => 'Maybe[JIRA::REST]',
@@ -66,6 +60,20 @@ sub _build_jira_client {
 
 }
 
+after ['_load_attribs_start','_load_attribs_continue','_load_attribs_append'] => sub {
+    my ($class,$meta) = @_;
+
+    $meta->add_attribute(
+        'jira' => {
+            is            => 'rw',
+            isa           => 'Str',
+            documentation => 'JIRA ticket ID',
+            predicate     => 'has_jira'
+        }
+    );
+    return;
+};
+
 before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $self = shift;
     return unless $self->has_jira;
@@ -93,7 +101,25 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
             my $subject = $self->_safe_ticket_subject( $ticket->{fields}->{summary} // '' );
             $branch .= '_' . $subject;
         }
-        $self->branch($branch) unless $self->branch;
+
+        # Get existing branches matching the ticket number
+        my @branches = map { s/^\*?\s+//; $_ }
+            $self->repository->run('branch','--list',$self->jira.'*');
+        if (scalar @branches == 0) {
+            say 'Creating new branch "'.$branch.'".'
+                unless $self->branch || $self->no_branch;
+        } elsif (scalar @branches == 1) {
+            $branch = $branches[0];
+        } else {
+            say 'More than one branch for '.$self->jira.'? I don\'t know what to do!';
+            foreach (@branches) {
+                say " * $_";
+            }
+            return;
+        }
+
+        $self->branch($branch)
+            unless $self->branch;
     }
 };
 
@@ -282,7 +308,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 =head1 VERSION
 
-version 0.5
+version 0.6
 
 =head1 DESCRIPTION
 
@@ -376,7 +402,7 @@ Michael Kröll <pepl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Kröll.
+This software is copyright (c) 2017 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

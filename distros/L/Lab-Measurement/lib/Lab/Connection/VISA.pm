@@ -1,7 +1,6 @@
 package Lab::Connection::VISA;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: VISA-type connection
-$Lab::Connection::VISA::VERSION = '3.553';
+$Lab::Connection::VISA::VERSION = '3.554';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -49,7 +48,7 @@ Lab::Connection::VISA - VISA-type connection
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

@@ -11,13 +11,16 @@ my %opt;
 my ($opt_help, $opt_man);
 
 GetOptions(
-  'community=s' => \$opt{community},
-  'dest=s'      => \$opt{dest},
-  'source=s'    => \$opt{source},
-  'tftp=s'      => \$opt{tftp},
-  'write!'      => \$opt{write},
-  'help!'       => \$opt_help,
-  'man!'        => \$opt_man
+  'community=s'  => \$opt{community},
+  'dest=s'       => \$opt{dest},
+  'P|protocol=s' => \$opt{protocol},
+  'password=s'   => \$opt{password},
+  'source=s'     => \$opt{source},
+  'tftp=s'       => \$opt{server}, # legacy
+  'S|server=s'   => \$opt{server},
+  'username=s'   => \$opt{username},
+  'help!'        => \$opt_help,
+  'man!'         => \$opt_man
 ) or pod2usage(-verbose => 0);
 
 pod2usage(-verbose => 1) if defined $opt_help;
@@ -29,6 +32,9 @@ if (!@ARGV) {
 }
 
 $opt{community} = $opt{community} || 'private';
+$opt{protocol}  = $opt{protocol}  || 'tftp';
+$opt{username}  = $opt{useranme}  || 'cisco';
+$opt{password}  = $opt{password}  || 'cisco';
 $opt{dest}      = $opt{dest}      || 'start';
 $opt{source}    = $opt{source}    || 'run';
 
@@ -43,8 +49,17 @@ if (($opt{dest}   !~ /^run(?:ning)?(?:-config)?$/i) &&
 if (((($opt{dest}   !~ /^run(?:ning)?(?:-config)?$/i) &&
       ($opt{dest}   !~ /^start(?:up)?(?:-config)?$/i)) ||
      (($opt{source} !~ /^run(?:ning)?(?:-config)?$/i) &&
-      ($opt{source} !~ /^start(?:up)?(?:-config)?$/i))) && (!defined $opt{tftp})) {
-    print "$0: TFTP required for source or dest not run or start\n";
+      ($opt{source} !~ /^start(?:up)?(?:-config)?$/i))) && (!defined $opt{server})) {
+    print "$0: server required for source or dest not run or start\n";
+    exit 1
+}
+
+if ((defined $opt{server}) && 
+   (($opt{dest}   =~ /^run(?:ning)?(?:-config)?$/i) &&
+    ($opt{source} =~ /^start(?:up)?(?:-config)?$/i)) ||
+   (($opt{source} =~ /^run(?:ning)?(?:-config)?$/i) &&
+    ($opt{dest}   =~ /^start(?:up)?(?:-config)?$/i))) {
+    print "$0: server requires source or dest\n";
     exit 1
 }
 
@@ -64,7 +79,7 @@ for (@ARGV) {
     }
 
     # copy local (run / start)
-    if (!defined $opt{tftp}) {
+    if (!defined $opt{server}) {
         print "$_: copy $opt{source} $opt{dest} - ";
         if (defined(my $conf = $cm->config_copy(
                 source => $opt{source},
@@ -77,32 +92,26 @@ for (@ARGV) {
         next
     }
 
-    # TFTP get
+    # get
     my $src  = $opt{source};
     my $dest = $opt{dest};
-    if (($opt{dest} !~ /^run(?:ning)?(?:-config)?$/i) &&
-        ($opt{dest} !~ /^start(?:up)?(?:-config)?$/i)) {
-        $dest = $opt{tftp} . ":/" . $opt{dest}
-    # TFTP put
+    if (($opt{source} =~ /^run(?:ning)?(?:-config)?$/i) &&
+        ($opt{dest} =~ /^start(?:up)?(?:-config)?$/i)) {
+        $dest = $opt{server} . ":/" . $opt{dest}
+    # put
     } else {
-        $src = $opt{tftp} . ":/" . $opt{source}
+        $src = $opt{server} . ":/" . $opt{source}
     }
     printf "$_: copy $src $dest - ";
     if (defined(my $conf = $cm->config_copy(
-            tftp   => $opt{tftp},
-            source => $opt{source},
-            dest   => $opt{dest}
+            server   => $opt{server},
+            protocol => $opt{protocol},
+            username => $opt{username},
+            password => $opt{password},
+            source   => $opt{source},
+            dest     => $opt{dest}
         ))) {
         printf "START: %s / END: %s\n", $conf->ccStartTime, $conf->ccEndTime;
-        # copy run start if successful
-        if ($opt{write}) {
-            print "$_: copy run start - ";
-            if (defined($conf = $cm->config_copy())) {
-                printf "START: %s / END: %s\n", $conf->ccStartTime, $conf->ccEndTime
-            } else {
-                printf "Error: %s\n", Cisco::SNMP::Config->error
-            }
-        }
     } else {
         printf "Error: %s\n", Cisco::SNMP::Config->error
     }
@@ -141,19 +150,25 @@ C<copy run start> on host are options.
 
  -d <file>        File name for destination.  Can be 'start' or 'run' 
  --dest           for local device files.  Can be any filename for 
-                  TFTP destination.
+                  network destination.
                   DEFAULT:  (or not specified) 'start'.
+
+ -P <proto>       Protocol.  See Cisco::SNMP::Config.
+ --protocol       DEFAULT:  (or not specified) 'tftp'.
+
+ -p <passwd>      Password for required protocols.
+ --password       See Cisco::SNMP::Config.
+
+ -S <IP>          Server address or hostname.
+ --server         DEFAULT:  (or not specified) [none].
 
  -s <file>        File name for source.  Can be 'start' or 'run' 
  --source         for local device files.  Can be any filename for 
-                  TFTP source.
+                  network source.
                   DEFAULT:  (or not specified) 'run'.
 
- -t <IP>          TFTP server address or hostname.
- --tftp           DEFAULT:  (or not specified) [none].
-
- -w               Perform a 'copy run start' if TFTP is successful.
- --write
+ -u <username>    Username for required protocols.
+ --username       See Cisco::SNMP::Config.
 
 =head1 LICENSE
 

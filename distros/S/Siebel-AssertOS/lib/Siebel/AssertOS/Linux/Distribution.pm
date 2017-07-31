@@ -1,19 +1,15 @@
 package Siebel::AssertOS::Linux::Distribution;
 
-use 5.006000;
 use strict;
 use warnings;
-
 require Exporter;
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw( distribution_name distribution_version );
 
-our $VERSION = "0.07";
-
+our $VERSION = '0.9'; # VERSION
+our @ISA                     = qw(Exporter);
+our @EXPORT_OK               = qw( distribution_name distribution_version );
 our $release_files_directory = '/etc';
 our $standard_release_file   = 'lsb-release';
-
-our %release_files = (
+our %release_files           = (
     'gentoo-release'        => 'gentoo',
     'fedora-release'        => 'fedora',
     'centos-release'        => 'centos',
@@ -43,7 +39,6 @@ our %release_files = (
     'pardus-release'        => 'pardus',
     'system-release'        => 'amazon',
 );
-
 our %version_match = (
     'gentoo'  => 'Gentoo Base System release (.*)',
     'debian'  => '(.+)',
@@ -59,6 +54,8 @@ our %version_match = (
     'amazon'                  => 'Amazon Linux AMI release (.+)$',
 );
 
+ # :TODO:29/07/2017 13:49:50:ARFREITAS: create a separated module to hold this object
+ # to facilitate unit testing
 sub new {
     my %self = (
         'DISTRIB_ID'          => '',
@@ -75,14 +72,17 @@ sub new {
 sub distribution_name {
     my $self = shift || new();
     my $distro;
+
     if ( $distro = $self->_get_lsb_info() ) {
         return $distro if ($distro);
     }
 
     foreach (qw(enterprise-release fedora-release)) {
+
         if ( -f "$release_files_directory/$_"
             && !-l "$release_files_directory/$_" )
         {
+
             if ( -f "$release_files_directory/$_"
                 && !-l "$release_files_directory/$_" )
             {
@@ -90,28 +90,37 @@ sub distribution_name {
                 $self->{'release_file'} = $_;
                 return $self->{'DISTRIB_ID'};
             }
+
         }
     }
 
     foreach ( keys %release_files ) {
+
         if ( -f "$release_files_directory/$_"
             && !-l "$release_files_directory/$_" )
         {
+
             if ( -f "$release_files_directory/$_"
                 && !-l "$release_files_directory/$_" )
             {
+
                 if ( $release_files{$_} eq 'redhat' ) {
+
                     foreach my $rhel_deriv ( 'centos', 'scientific', ) {
                         $self->{'pattern'}      = $version_match{$rhel_deriv};
                         $self->{'release_file'} = 'redhat-release';
+
                         if ( $self->_get_file_info() ) {
                             $self->{'DISTRIB_ID'}   = $rhel_deriv;
                             $self->{'release_file'} = $_;
                             return $self->{'DISTRIB_ID'};
                         }
+
                     }
+
                     $self->{'pattern'} = '';
                 }
+
                 $self->{'release_file'} = $_;
                 $self->{'DISTRIB_ID'}   = $release_files{$_};
                 return $self->{'DISTRIB_ID'};
@@ -125,9 +134,11 @@ sub distribution_version {
     my $self = shift || new();
     my $release;
     return $release if ( $release = $self->_get_lsb_info('DISTRIB_RELEASE') );
+
     if ( !$self->{'DISTRIB_ID'} ) {
         $self->distribution_name() or die 'No version because no distro.';
     }
+
     $self->{'pattern'}         = $version_match{ $self->{'DISTRIB_ID'} };
     $release                   = $self->_get_file_info();
     $self->{'DISTRIB_RELEASE'} = $release;
@@ -138,6 +149,7 @@ sub _get_lsb_info {
     my $self  = shift;
     my $field = shift || 'DISTRIB_ID';
     my $tmp   = $self->{'release_file'};
+
     if ( -r "$release_files_directory/" . $standard_release_file ) {
         $self->{'release_file'} = $standard_release_file;
         $self->{'pattern'}      = $field . '=(.+)';
@@ -147,6 +159,7 @@ sub _get_lsb_info {
             return $info;
         }
     }
+
     $self->{'release_file'} = $tmp;
     $self->{'pattern'}      = '';
     undef;

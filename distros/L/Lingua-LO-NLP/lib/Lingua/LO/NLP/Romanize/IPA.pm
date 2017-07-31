@@ -5,7 +5,7 @@ use 5.012000;
 use utf8;
 use feature qw/ unicode_strings say /;
 use charnames qw/ :full lao /;
-use version 0.77; our $VERSION = version->declare('v0.2.0');
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 use Carp;
 use Lingua::LO::NLP::Analyze;
 use parent 'Lingua::LO::NLP::Romanize::PCGN';
@@ -26,7 +26,7 @@ L<Lingua::LO::NLP::Romanize> as a factory:
 =cut
 
 my %CONSONANTS = (
-   'ກ'  => 'k',
+   'ກ'  => 'k', # TODO: split /g/+/k/ here?
    'ຂ'  => [qw/ kʰ k /],
    'ຄ'  => [qw/ kʰ k /],
    'ງ'  => 'ŋ',
@@ -149,7 +149,7 @@ my %TONE_DIACRITICS = (
     LOW => "\N{COMBINING GRAVE ACCENT}",
     MID => "\N{COMBINING MACRON}",                          MID_STOP => "\N{COMBINING MACRON}",
     HIGH => "\N{COMBINING ACUTE ACCENT}",                   HIGH_STOP => "\N{COMBINING ACUTE ACCENT}",
-    LOW_RISING => "\N{COMBINING CARON}",
+    RISING => "\N{COMBINING CARON}",
     HIGH_FALLING => "\N{COMBINING CIRCUMFLEX ACCENT}",
     MID_FALLING => "\N{COMBINING CIRCUMFLEX ACCENT BELOW}",
 );

@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '0.040';
+our $VERSION = '0.042';
 
 use parent 'Module::Build';
 
@@ -16,7 +16,7 @@ no warnings;
 use Archive::Extract;
 use warnings;
 use Sort::Versions;
-use List::MoreUtils qw/uniq first_index/;
+use List::Util qw/uniq/;
 use ExtUtils::Installed;
 use File::Copy qw/move/;
 use Env qw( @PATH );
@@ -699,10 +699,10 @@ sub alien_detect_blib_scheme {
   (undef, my $dir, undef) = File::Spec->splitpath( __FILE__ );
   my @dirs = File::Spec->splitdir($dir);
 
-  my $index = first_index { $_ eq 'blib' } @dirs;
-  return 0 if $index == -1;
+  shift @dirs while @dirs && $dirs[0];
+  return unless @dirs;
 
-  if ( $dirs[$index+1] eq 'lib' ) {
+  if ( $dirs[1] && $dirs[1] eq 'lib' ) {
     print qq{'blib' scheme is detected. Setting ALIEN_BLIB=1. If this has been done in error, please set ALIEN_BLIB and restart build process to disambiguate.\n};
     return 1;
   }

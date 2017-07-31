@@ -3,25 +3,35 @@ abstract: 'Convert various epoch times to Time::Moment times.'
 author:
   - 'Tim Heaney <heaney@cpan.org>'
 build_requires:
+  Math::Int64: '0'
   Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Time-Moment-Epoch
 requires:
+  Data::Printer: '0'
+  Exporter: '0'
+  Getopt::Long: '0'
+  Hash::MostUtils: '0'
+  JSON: '0'
+  List::MoreUtils: '0'
   Math::BigFloat: '0'
   Math::BigInt: '0'
+  Pod::Usage: '0'
   Scalar::Util: '0'
   Time::Moment: '0'
-  perl: v5.10.0
+  experimental: '0'
+  parent: '0'
+  perl: v5.24.0
   strict: '0'
   warnings: '0'
-version: '1.002'
+version: '1.003002'
 x_contributors:
   - 'Mary Ehlers <regina.verb.ae@gmail.com>'
   - 'iopuckoi <iopuckoi@gmail.com>'

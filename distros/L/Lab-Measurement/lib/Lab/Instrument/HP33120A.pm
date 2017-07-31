@@ -1,5 +1,6 @@
 package Lab::Instrument::HP33120A;
-$Lab::Instrument::HP33120A::VERSION = '3.553';
+#ABSTRACT: HP 33120A 15MHz function/arbitrary waveform generator
+$Lab::Instrument::HP33120A::VERSION = '3.554';
 use 5.006;
 use strict;
 use warnings;
@@ -7,13 +8,6 @@ use Lab::Instrument;
 use Try::Tiny;
 use Carp;
 use English;
-
-=head1 NAME
-
-Lab::Instrument::HP33120A - HP 33120A 15MHz function/arbitrary waveform generator
-
-=cut
-
 
 our @ISA = ("Lab::Instrument");
 
@@ -77,34 +71,6 @@ our %fields = (
     },
 );
 
-=head1 SYNOPSIS
-
-
-    use Lab::Instrument::HP33120A;
-
-    my $g = new Lab::Instrument::HP33120A (
-                connection_type => 'LinuxGPIB',
-                gpib_address => 10
-               );
-    $g->set_frequency('3.78kHz');
-    $g->set_shape('square');
-
-    ...
-
-
-=head1 Getting started, system control
-
-
-=head2 new
-
-$g = new Lab::Instrument::HP33120A->(%options);
-
-      options:  gpib_board => 0,
-                gpib_address => 10,
-                connection_type => 'LinuxGPIB',
-                no_cache => 1,  # turn off cache
-
-=cut
 
 sub new {
     my $proto = shift;
@@ -129,27 +95,12 @@ sub _device_init {
 
 }
 
-=head2 get_id
-
-$id = $g->get_id();
-
-reads the *IDN? string from device
-
-=cut
 
 sub get_id {
     my $self = shift;
     return $self->query('*IDN?');
 }
 
-=head2 get_status
-
-%status = $g->get_status();
-
-return a hash with status bits
-{ ERROR => .., DATA=> .. 
-
-=cut
 
 sub get_status {
     my $self = shift;
@@ -168,14 +119,6 @@ sub get_status {
     return %status;
 }
 
-=head2 get_error
-
-$errmsg = $g->get_error();
-
-Fetch the first error in the error queue.  Returns
-($code,$message); code == 0 means 'no error'
-
-=cut
 
 sub get_error {
     my $self = shift;
@@ -188,13 +131,6 @@ sub get_error {
     return ( $code, $msg );
 }
 
-=head2 reset
-
-$g->reset();
-
-reset the function generator (*RST, *CLS)
-
-=cut
 
 our $rst_cache = {
     shape     => 'SIN',
@@ -255,26 +191,12 @@ sub reset {
 
 }
 
-=head2 get_trigger_slope
-
-$slope = $g->get_trigger_slope();
-
-fetch the trigger slope, returns POS or NEG
-=cut
 
 sub get_trigger_slope {
     my $self = shift;
     return $self->query('TRIG:SLOP?');
 }
 
-=head2 set_trigger_slope
-
-$g->set_trigger_slope($slope);
-
-set the slope of the signal used to trigger
-$slope = 'POS','+' or 'NEG','-'
-
-=cut
 
 sub set_trigger_slope {
     my $self = shift;
@@ -294,29 +216,12 @@ sub set_trigger_slope {
     $self->write("TRIG:SLOP $sl");
 }
 
-=head2 wait_complete
-
-$g->wait_complete();
-
-Wait for operations to be completed
-
-TODO: probably need to revise, with a *OPC? checking loop
-
-=cut
 
 sub wait_complete {
     my $self = shift;
     $self->write('*WAI');
 }
 
-=head2 trigger
-
-$g->trigger();
-
-Send a bus trigger to the function generator, wait 
-until trigger complete.
-
-=cut
 
 sub trigger {
     my $self = shift;
@@ -324,31 +229,12 @@ sub trigger {
     $self->wait_complete();
 }
 
-=head2 get_trigger_source
-
-$src = $g->get_trigger_source();
-
-fetch the 'trigger source' from the function generator.
-Possible values are 'IMM', 'BUS' or 'EXT'.  IMM => immediate
-self-triggering; BUS => gpib/serial trigger input, such as *TRG;
-EXT => external trigger input.
-
-=cut
 
 sub get_trigger_source {
     my $self = shift;
     return $self->query("TRIG:SOUR?");
 }
 
-=head2 set_trigger_source
-
-$g->set_trigger_source($src);
-
-Set the trigger source for the function generator. Possible
-values are 'IMM' (immediate, i.e., internal free-running self-trigger)
-'BUS' GPIB *TRG type triggering; 'EXT' trigger from external input.
-
-=cut
 
 sub set_trigger_source {
     my $self = shift;
@@ -371,13 +257,6 @@ sub set_trigger_source {
     $self->write("TRIG:SOUR $s");
 }
 
-=head2 set_display
-
-$g->set_display(BOOL);
-
-turn the display off (BOOL = false) or on (BOOL = true)
-
-=cut
 
 sub set_display {
     my $self = shift;
@@ -397,29 +276,12 @@ sub set_display {
     $self->write("DISP $state");
 }
 
-=head2 get_display
-
-$display_on = $g->get_display();
-
-get the state of the display (boolean)
-
-=cut
 
 sub get_display {
     my $self = shift;
     return $self->query("DISP?");
 }
 
-=head2 set_text
-
-$g->set_text("text to show");
-
-display text on the function generator, in the place
-of the usual voltage/frequency/etc. Text is truncated
-at 11 chars, comma, semicolon, period are combined with
-char, so not counted in length
-
-=cut
 
 sub set_text {
     my $self = shift;
@@ -428,13 +290,6 @@ sub set_text {
     $self->write("DISP:TEXT '$in'");
 }
 
-=head2 get_text
-
-$mytext = $g->get_text();
-
-fetches the text shown on the display with set_text
-
-=cut
 
 sub get_text {
     my $self = shift;
@@ -443,54 +298,24 @@ sub get_text {
     return $s[0];
 }
 
-=head2 clear_text
-
-$g->clear_text();
-
-remove the text from the display
-
-=cut
 
 sub clear_text {
     my $self = shift;
     $self->write("DISP:TEXT:CLE");
 }
 
-=head2 beep
-
-$g->beep();
-
-Cause the function generator to 'beep'
-
-=cut
 
 sub beep {
     my $self = shift;
     $self->write("SYST:BEEP");
 }
 
-=head2 get_sync
-
-$sync = $g->get_sync();
-
-fetch boolean value indicating whether 'sync' output on the
-front panel is enabled
-
-=cut
 
 sub get_sync {
     my $self = shift;
     return $self->query("OUTP:SYNC?");
 }
 
-=head2 set_sync
-
-$g->set_sync($sync);
-
-enable or disable SYNC output on front panel. $sync is
-a boolean (1/true/yes/on) => sync output enabled
-
-=cut
 
 sub set_sync {
     my $self = shift;
@@ -510,17 +335,6 @@ sub set_sync {
     $self->write("OUTP:SYNC $sync");
 }
 
-=head2 save_setup
-
-$g->save_setup($n);
-
-save function generator setup to internal non-volatile
-memory.  $n = 0..3.  
-
-NOTE: $n=0 is overwritten by the 'current
-setup' when the generator is turned off.
- 
-=cut
 
 sub save_setup {
     my $self = shift;
@@ -534,14 +348,6 @@ sub save_setup {
     $self->write("*SAV $n");
 }
 
-=head2 recall_setup
-
-$g->recall_setup($n);
-
-restore function generator configuration from internal 
-non-volatile memory. $n=0..3
-
-=cut
 
 sub recall_setup {
     my $self = shift;
@@ -558,14 +364,6 @@ sub recall_setup {
     $self->reset_device_cache();
 }
 
-=head2 delete_setup
-
-$g->delete_setup($n);
-
-delete one of the internal non-volatile setups
-$n=0..3
-
-=cut
 
 sub delete_setup {
     my $self = shift;
@@ -580,16 +378,6 @@ sub delete_setup {
     $self->write("MEM:STAT:DEL $n");
 }
 
-=head2 get_load
-
-$zload = $g->get_load();
-
-fetch the output load impedance of the generator. Possible 
-values are '50' and 'INF'. This does NOT make any physical
-changes in the generator, but affects the internal calculation
-of amplitudes.
-
-=cut
 
 sub get_load {
     my $self = shift;
@@ -598,16 +386,6 @@ sub get_load {
     return $z;
 }
 
-=head2 set_load
-
-$g->set_load($z);
-
-Tell the function generator what load impedance the output
-is being terminated to, so that other characteristics can be
-correctly calculated.  Possible values are '50', 'INF', 'MIN', 'MAX'
-(can also use '50ohm', '0.05kohm', etc)
-
-=cut
 
 sub set_load {
     my $self = shift;
@@ -645,29 +423,12 @@ sub set_load {
     $self->write("OUTP:LOAD $z");
 }
 
-=head1 Basic waveform output routines
-
-=head2 get_shape
-
-$shape = $g->get_shape();
-
-returns the waveform shape = SIN|SQU|TRI|RAMP|USER
-
-=cut
 
 sub get_shape {
     my $self = shift;
     return $self->query('FUNC:SHAP?');
 }
 
-=head2 set_shape
-
-$g=>set_shape($shape);
-
-Sets the output function shape = SIN|SQU|TRI|RAMP|USER
-USER = arbitary waveform, separately selected
-
-=cut
 
 sub set_shape {
     my $self  = shift;
@@ -702,45 +463,12 @@ sub set_shape {
     $self->write("FUNC:SHAP $s");
 }
 
-=head2 get_frequency
-
-$f = $g->get_frequency();
-
-reads the function generator frequency, in Hz
-
-=cut
 
 sub get_frequency {
     my $self = shift;
     return $self->query("FREQ?");
 }
 
-=head2 set_frequency
-
-$g->set_frequency($f);
-
-sets the function generator frequency in Hz. The
-frequency limits are 10mHz to 15MHz . The frequency
-can be specified as a simple number (in Hz), MIN, MAX
-or a string in standard IEEE488-2 NRf format. 
-NOTE: if you use the  Hz unit, the standard is
-to interpret mHz as megahertz. 
-
-=over
-
-set_frequency(10)    10Hz
-
-set_frequency('0.01kHz')  10Hz
-
-set_frequency('1mHz')    1E6 Hz
-
-set_frequency('10m')     10e-3 Hz (note, without Hz, `m' means `milli')
-
-=back
-
-The upper frequency limit depends on the function shape
-
-=cut
 
 sub set_frequency {
     my $self = shift;
@@ -769,29 +497,12 @@ sub set_frequency {
     $self->write("FREQ $f");
 }
 
-=head2 get_duty_cycle
-
-$dc = $g->get_duty_cycle()'
-
-fetch the duty cycle, in percent; only relevent for
-square waves
-
-=cut
 
 sub get_duty_cycle {
     my $self = shift;
     return $self->query('PULS:DCYC?');
 }
 
-=head2 set_duty_cycle
-
-$g->set_duty_cycle(percent);
-
-sets the square wave duty cycle,  in percent. The available
-range depends on frequency, so percent = 20..80 for  <= 5MHz
-and percent = 40..60 for higher frequencies
-
-=cut
 
 sub set_duty_cycle {
     my $self = shift;
@@ -822,53 +533,12 @@ sub set_duty_cycle {
     $self->write("PULS:DCYC $dc");
 }
 
-=head2 get_amplitude
-
-$vamp = $g->get_amplitude();
-
-fetch the function amplitude, default is amplitude in volts 
-peak-to-peak (Vpp), but depending on the  units setting
-[see get_vunit()], so might be Vrms or dBm.
-
-=cut
 
 sub get_amplitude {
     my $self = shift;
     return $self->query("volt?");
 }
 
-=head2 set_amplitude
-
-$g->set_amplitude($vamp);
-
-sets the function amplitude,  in units from the 
-set_vunit() call, defaults to Vpp.
-
-The amplitude can be either a number,
-or string with magnitude (and optionally, units), 
-MAX or MIN.
-
-Examples: `100uV', `50mV', `123E-3', `20dBm', `5.5E1dBmV'.
-
-NOTE: attaching units with $vamp does not change vunit,
-so if vunit=`VPP' and you set $vamp=`5.5e1dBmV', you'll
-get 55mVpp. 
-
-The minimum and maximum
-amplitudes depend on the output load selection,
-the function shape, and the DC offset.
-
-Max output voltage is +-20V into a high-Z load,
-+-10V into 50 ohm load.
-
-
-TODO: automatically adjust units based on 
-input text: 4Vpp, 3.5Vrms, 7.3dbm ...
-
-Since limits are rather hard to determine, you should
-check for errors after setting.
-
-=cut
 
 sub set_amplitude {
     my $self = shift;
@@ -940,28 +610,12 @@ sub set_amplitude {
     $self->write("VOLT $v");
 }
 
-=head2 get_vunit
-
-$unit = $g->get_vunit()
-
-Fetch the units that are being used to specify the output amplitude
-Possible values are VPP, VRMS, DBM, or DEF (default, VPP)
-
-=cut
 
 sub get_vunit {
     my $self = shift;
     return $self->query("VOLT:UNIT?");
 }
 
-=head2 set_vunit
-
-$g->set_vunit($unit);
-
-Set the way that amplitudes are specified. Possible 
-values are Vpp, Vrms, dBm or DEF (default = Vpp)
-
-=cut
 
 sub set_vunit {
     my $self = shift;
@@ -989,31 +643,12 @@ sub set_vunit {
     $self->write("VOLT:UNIT $u");
 }
 
-=head2 get_offset
-
-$voff = $g->get_offset();
-
-Get the DC offset in volts (not affected by vunit)
-
-=cut
 
 sub get_offset {
     my $self = shift;
     return $self->query("VOLT:OFFS?");
 }
 
-=head2 set_offset
-
-$g->set_offset($voff);
-
-Set the DC offset, either as a number (volts), as a string
-'100mV', '0.01kV' '1e3u', MIN or MAX.  The specification of
-the DC offset is not affected by the selection of vunit.
-
-Note that the DC offset is limited in combination with the
-output load, amplitude, and function shape. 
-
-=cut
 
 sub set_offset {
     my $self = shift;
@@ -1058,21 +693,6 @@ sub set_offset {
 # use a "special" cache for this, because we need to store
 # an array of names
 
-=head1 Arbitrary 'user' waveforms
-
-
-=head2 get_waveform_list
-
-@list = $g->get_waveform_list();
-
-Get a list of the available 'user' waveforms. Five of these
-are built-in, up to four are user-storable in non-volatile
-memory, and possibly VOLATILE for a waveform in volatile memory
-
-The names of the five built-in arbitrary waveforms are:
-SINC, NEG_RAMP, EXP_RISE, EXP_FALL, and CARDIAC.
-
-=cut
 
 sub get_waveform_list {
     my $self = shift;
@@ -1091,28 +711,12 @@ sub get_waveform_list {
     return ( @{ $self->{waveform}->{user} } );
 }
 
-=head2 get_user_waveform
-
-$wname = $g->get_user_waveform();
-
-Fetches the name of the currently selected 'user' waveform.
-
-=cut
 
 sub get_user_waveform {
     my $self = shift;
     return $self->query("FUNC:USER?");
 }
 
-=head2 set_user_waveform
-
-$g->set_user_waveform($wname);
-
-Sets the name of the current 'user' waveform. This
-should be a name from the $g->get_waveform_list()
-set of nonvolatile waveforms, or 'VOLATILE'.
-
-=cut
 
 sub set_user_waveform {
     my $self = shift;
@@ -1141,34 +745,6 @@ sub set_user_waveform {
     $self->write("FUNC:USER $in");
 }
 
-=head2 load_waveform
-
-$g->load_waveform(...);
-
-store waveform as 'volatile' data (can be used by selecting 'volatile'
-user waveform) perhaps for persistant storage.
-
-=over
-
-load_waveform(v1,v2,v3...)   voltages   |v(j)| <= 1
-
-load_waveform(d1,d2,d3...)   DAC values |d(j)| < 2048
-
-load_waveform(\@array)       voltages or DAC values
-
-load_waveform(waveform=>[voltage array ref]);
-
-load_waveform(dac=>[DAC array ref]);
-
-=back
-
-number of data points 8..16000
-
-In the first three cases above, where it is not specified "voltage"
-or "DAC" values, it is assumed to be voltages if the quantities are
-within the range -1..+1, and otherwise assumed to be DAC values. 
-
-=cut
 
 sub load_waveform {
     my $self = shift;
@@ -1251,14 +827,6 @@ sub load_waveform {
     $self->write($cmd);
 }
 
-=head2 get_waveform_average
-
-$vavg = $g->get_waveform_average($name);
-
-calculates and returns the 'average voltage' of 
-waveform $name (nonvolatile stored waveform, or VOLATILE)
-
-=cut
 
 sub get_waveform_average {
     my $self = shift;
@@ -1282,15 +850,6 @@ sub get_waveform_average {
     return $self->query("DATA:ATTR:AVER? $name");
 }
 
-=head2 get_waveform_crestfactor
-
-$vcr = $g->get_waveform_crestfactor($name);
-
-
-calculates and returns the voltage 'crest factor' 
-(ratio of Vpeak/Vrms) for the waveform stored in $name.
-
-=cut
 
 sub get_waveform_crestfactor {
     my $self = shift;
@@ -1314,12 +873,6 @@ sub get_waveform_crestfactor {
     return $self->query("DATA:ATTR:CFAC? $name");
 }
 
-=head2 get_waveform_points
-
-$npts = $g->get_waveform_points($name)
-Returns the number of points in the waveform $name
-
-=cut
 
 sub get_waveform_points {
     my $self = shift;
@@ -1343,14 +896,6 @@ sub get_waveform_points {
     return $self->query("DATA:ATTR:POIN? $name");
 }
 
-=head2 get_waveform_peak2peak
-
-$vpp = $g->get_waveform_peak2peak($name);
-
-calculates and returns the peak-to-peak voltage
-of waveform $name
-
-=cut
 
 sub get_waveform_peak2peak {
     my $self = shift;
@@ -1374,22 +919,6 @@ sub get_waveform_peak2peak {
     return $self->query("DATA:ATTR:PTP? $name");
 }
 
-=head2 store_waveform
-
-$g->store_waveform($name);
-
-Stores the waveform in VOLATILE to non-volatile
-memory as $name.  Note that $name cannot be one
-of the 'hard-coded' names, is a maximum of 8 characters
-in length, must start with a-z, and contain only
-alphanumeric and underscore (_) characters. All
-names are converted to uppercase.
-
-There is memory for 4 user waveforms to be stored, 
-after which some must be deleted to allow further
-storage.
-
-=cut
 
 sub store_waveform {
     my $self = shift;
@@ -1432,14 +961,6 @@ sub store_waveform {
     $self->write("DATA:COPY $name");
 }
 
-=head2 delete_waveform
-
-$g->delete_waveform($name);
-
-Delete one of the non-volatile user waveforms (or VOLATILE).
-Note that the 5 'built-in' user waveforms cannot be deleted.
-
-=cut
 
 sub delete_waveform {
     my $self = shift;
@@ -1480,29 +1001,12 @@ sub delete_waveform {
     $self->write("DATA:DEL $name");
 }
 
-=head2 get_waveform_free
-
-$n = $g->get_waveform_free();
-
-returns the number of 'free' user waveform storage 
-areas (0..4) that can be used for $g->store_waveform
-
-=cut
 
 sub get_waveform_free {
     my $self = shift;
     return $self->query('DATA:NVOL:FREE?');
 }
 
-=head1 Modulation
-
-=head2 get_modulation
-
-$mod = $g->get_modulation();
-
-Fetch the type of modulation being used: NONE,AM,FM,BURST,FSK,SWEEP
-
-=cut
 
 sub get_modulation {
     my $self = shift;
@@ -1517,14 +1021,6 @@ sub get_modulation {
     return $mod;
 }
 
-=head2 set_modulation
-
-$g->set_modulation($mod);
-
-Set the type of modulation to use: NONE,AM,FM,BURST,FSK,SWEEP
-if $mod='' or 'off', selects NONE.
-
-=cut
 
 sub set_modulation {
     my $self = shift;
@@ -1573,13 +1069,6 @@ sub set_modulation {
     }
 }
 
-=head2 set_am_depth
-
-$g->set_am_depth(percent);
-  
-set AM modulation depth percent: 0..120, MIN, MAX
-
-=cut
 
 sub set_am_depth {
     my $self = shift;
@@ -1601,41 +1090,18 @@ sub set_am_depth {
     $self->write("AM:DEPT $d");
 }
 
-=head2 get_am_depth
-
-$depth = $g->get_am_depth();
-
-get the AM modulation depth, in percent
-
-=cut    
 
 sub get_am_depth {
     my $self = shift;
     return $self->query("AM:DEPT?");
 }
 
-=head2 get_am_shape
-
-$shape = $g->get_am_shape();
-
-gets the waveform used for AM modulation
-returns $shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
-
-=cut
 
 sub get_am_shape {
     my $self = shift;
     return $self->query("AM:INT:FUNC?");
 }
 
-=head2 set_am_shape
-
-$g->set_am_shape($shape);
-
-sets the waveform used for AM modulation
-$shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
-
-=cut
 
 sub set_am_shape {
     my $self = shift;
@@ -1670,30 +1136,12 @@ sub set_am_shape {
     $self->write("AM:INT:FUNC $s");
 }
 
-=head2 get_am_frequency
-
-$freq = $g->get_am_frequency();
-
-get the frequency of the AM modulation
-
-=cut
 
 sub get_am_frequency {
     my $self = shift;
     return $self->query("AM:INT:FREQ?");
 }
 
-=head2 set_am_frequency
-
-$g->set_am_frequency($f);
-
-sets the frequency of AM modulation 
-$f = value in Hz,  10mHz..20kHz, MIN, MAX
-
-Note that $f can be a string, with suffixes, and that 
-'mHz' suffix -> MEGAHz   'm' suffix with no 'Hz' -> millihertz
-
-=cut
 
 sub set_am_frequency {
     my $self = shift;
@@ -1717,28 +1165,12 @@ sub set_am_frequency {
     $self->write("AM:INT:FREQ $f");
 }
 
-=head2 get_am_source
-
-$source = $g->get_am_source();
-
-get the source of the AM modulation signal: BOTH|EXT
-
-=cut
 
 sub get_am_source {
     my $self = shift;
     return $self->query("AM:SOUR?");
 }
 
-=head2 set_am_source
-
-$g->set_am_source(BOTH|EXT);
-
-
-set the source of the AM modulation; BOTH = internal+external
-EXT = external only.   INT = translated to BOTH
-
-=cut
 
 sub set_am_source {
     my $self = shift;
@@ -1762,37 +1194,12 @@ sub set_am_source {
     $self->write("AM:SOUR $s");
 }
 
-=head2 get_fm_deviation
-
-$dev = $g->get_fm_deviation();
-
-fetch the FM modulation deviation, in Hz
-
-=cut
 
 sub get_fm_deviation {
     my $self = shift;
     return $self->query("FM:DEV?");
 }
 
-=head2 set_fm_deviation
-
-$g->set_fm_deviation($dev);
-
-Set the FM modulation deviation in Hz. $dev can be a simple
-number, in Hz, or a string with suffixes, or MIN or MAX.
-
-Ex: $dev='10.3kHz'  $dev='1.2MHZ' $dev='200m'
-NOTE: MHZ -> megahertz (case independent). A simple 'm' suffix => millihertz
-
-dev range 10mHz .. 7.5MHz
-carrier frequency must be >= deviation frequency
-carrier + deviation < peak frequency for carrier waveform + 100kHz
-So: 15.1MHz for sine and square
-200kHz for triangle and ramp
-5.1MHz for 'user' waveforms
-
-=cut
 
 sub set_fm_deviation {
     my $self = shift;
@@ -1815,30 +1222,12 @@ sub set_fm_deviation {
     $self->write("FM:DEV $d");
 }
 
-=head2 get_fm_shape
-
-$shape = $g->get_fm_shape();
-
-gets the waveform used for FM modulation
-returns $shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
-
-=cut
 
 sub get_fm_shape {
     my $self = shift;
     return $self->query("FM:INT:FUNC?");
 }
 
-=head2 set_fm_shape
-
-$g->set_fm_shape($shape);
-
-sets the waveform used for FM modulation
-$shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
-
-NOTE: NOISE and DC cannot be used as FM carrier
-
-=cut
 
 sub set_fm_shape {
     my $self = shift;
@@ -1873,30 +1262,12 @@ sub set_fm_shape {
     $self->write("FM:INT:FUNC $s");
 }
 
-=head2 get_fm_frequency
-
-$freq = $g->get_fm_frequency();
-
-get the frequency of the FM modulation, in Hz
-
-=cut
 
 sub get_fm_frequency {
     my $self = shift;
     return $self->query("FM:INT:FREQ?");
 }
 
-=head2 set_fm_frequency
-
-$g->set_fm_frequency($f);
-
-sets the frequency of AM modulation 
-$f = value in Hz,  10mHz..10kHz, MIN, MAX
-
-Note that $f can be a string with the usual suffixes,
-but XmHz -> X megahz   Xm-> X millihz
-
-=cut
 
 sub set_fm_frequency {
     my $self = shift;
@@ -1920,37 +1291,12 @@ sub set_fm_frequency {
     $self->write("FM:INT:FREQ $f");
 }
 
-=head2 get_burst_cycles
-
-$ncyc = $g->get_burst_cycles();
-
-Fetch the number of cycles in burst modulation
-
-=cut
 
 sub get_burst_cycles {
     my $self = shift;
     return $self->query("BM:NCYC?");
 }
 
-=head2 set_burst_cycles
-
-$g->set_burst_cycles($ncyc);
-
-Set the number of cycles in burst modulation. 
-$ncyc is an integer 1..50,000  or MIN or MAX or INF
-
-For SIN, SQU, or USER waveform shapes, the minumim number of cycles
-is related to the carrier frequency.
-<= 1MHz   min 1 cycle
-1..2MHz   min 2 cycles
-2..3MHz   min 3 cycles
-3..4MHz   min 4 cycles
-4..5MHz   min 5 cycles
-
-For carrier frequency <= 100Hz, cycles <= 500sec * carrier freq
-
-=cut
 
 sub set_burst_cycles {
     my $self = shift;
@@ -2007,30 +1353,12 @@ sub set_burst_cycles {
     $self->write("BM:NCYC $ncyc");
 }
 
-=head2 get_burst_phase
-
-$ph = $g->get_burst_phase();
-
-Fetches the starting phase of the burst, in degrees, when
-bursts are triggered. 
-
-=cut
 
 sub get_burst_phase {
     my $self = shift;
     return $self->query("BM:PHAS?");
 }
 
-=head2 set_burst_phase
-
-$g->set_burst_phase($ph);
-
-Sets the starting phase of burst, in degrees (or MIN or MAX)
-from -360 to 360 in 0.001 degree increments.
-
-phase examples: 30.1, '20deg', 'min', 'max'
-
-=cut
 
 sub set_burst_phase {
     my $self = shift;
@@ -2055,33 +1383,12 @@ sub set_burst_phase {
     $self->write("BM:PHAS $ph");
 }
 
-=head2 get_burst_rate
-
-$rate = $g->get_burst_rate();
-
-Fetch the burst rate (in Hz) for internally triggered bursts
-
-=cut   
 
 sub get_burst_rate {
     my $self = shift;
     return $self->query("BM:INT:RATE?");
 }
 
-=head2 set_burst_rate
-
-$g->set_burst_rate($rate);
-
-Set the burst rate (in Hz) for internally triggered bursts.
-$rate can be a simple number, or a string with the usual
-suffixes.  Note that 'mHz' (case independent) -> megahertz
-while 'm' -> millihertz.   Rate 10mHz .. 50kHz  or MIN or MAX
-
-If the burst rate is too large for the carrier frequency and
-burst count, the function generator will (silently) adjust to
-continually retrigger.
-
-=cut
 
 sub set_burst_rate {
     my $self = shift;
@@ -2105,27 +1412,12 @@ sub set_burst_rate {
     $self->write("BM:INT:RATE $f");
 }
 
-=head2 get_burst_source
-
-$source = $g->get_burst_source();
-
-Fetch the source of the burst modulation: INT or EXT
-
-=cut
 
 sub get_burst_source {
     my $self = shift;
     return $self->query("BM:SOUR?");
 }
 
-=head2 set_burst_source
-
-$g->set_burst_source($source);
-
-Set the source of burst modulation: $source = 'INT' or 'EXT'.
-If source is external, burst cycle count, rate, are ignored.
-
-=cut
 
 sub set_burst_source {
     my $self = shift;
@@ -2145,31 +1437,12 @@ sub set_burst_source {
     $self->write("BM:SOUR $s");
 }
 
-=head2 get_fsk_frequency
-
-$freq = $g->get_fsk_frequency();
-
-get the FSK 'hop' frequency, in Hz
-
-=cut
 
 sub get_fsk_frequency {
     my $self = shift;
     return $self->query("FSK:FREQ?");
 }
 
-=head2 set_fsk_frequency
-
-$g->set_fsk_frequency($f);
-
-sets the FSK 'hop' frequency 
-$f = value in Hz,  10mHz..15MHz, MIN, MAX
-(max freq 100kHz for TRIANGLE and RAMP shapes)
-
-Note that $f can be a string with the usual suffixes,
-but XmHz -> X megahz   Xm-> X millihz
-
-=cut
 
 sub set_fsk_frequency {
     my $self = shift;
@@ -2196,32 +1469,12 @@ sub set_fsk_frequency {
     $self->write("FSK:FREQ $f");
 }
 
-=head2 get_fsk_rate
-
-$rate = $g->get_fsk_rate();
-
-Fetch the rate at which fsk shifts between frequencies (in Hz) for 
-internally triggered modulation.
-
-=cut   
 
 sub get_fsk_rate {
     my $self = shift;
     return $self->query("FSK:INT:RATE?");
 }
 
-=head2 set_fsk_rate
-
-$g->set_fsk_rate($rate);
-
-Set the rate for fsk shifting between frequencies (in Hz) for 
-internally triggered modulation.
-
-$rate can be a simple number, or a string with the usual
-suffixes.  Note that 'mHz' (case independent) -> megahertz
-while 'm' -> millihertz.   Rate 10mHz .. 50kHz  or MIN or MAX
-
-=cut
 
 sub set_fsk_rate {
     my $self = shift;
@@ -2244,27 +1497,12 @@ sub set_fsk_rate {
     $self->write("FSK:INT:RATE $f");
 }
 
-=head2 get_fsk_source
-
-$source = $g->get_fsk_source();
-
-Fetch the source of the FSK modulation: INT or EXT
-
-=cut
 
 sub get_fsk_source {
     my $self = shift;
     return $self->query("FSK:SOUR?");
 }
 
-=head2 set_fsk_source
-
-$g->set_fsk_source($source);
-
-Set the source of FSK modulation: $source = 'INT' or 'EXT'.
-If source is external, FSK rate is ignored.
-
-=cut
 
 sub set_fsk_source {
     my $self = shift;
@@ -2284,46 +1522,18 @@ sub set_fsk_source {
     $self->write("FSK:SOUR $s");
 }
 
-=head2 get_sweep_start_frequency
-
-$g->get_sweep_start_frequency();
-
-Fetch the starting frequency of the sweep, in Hz
-
-=cut
 
 sub get_sweep_start_frequency {
     my $self = shift;
     return $self->query("FREQ:STAR?");
 }
 
-=head2 get_sweep_stop_frequency
-
-$g->get_sweep_stop_frequency();
-
-Fetch the stopping frequency of the sweep, in Hz
-
-=cut
 
 sub get_sweep_stop_frequency {
     my $self = shift;
     return $self->query("FREQ:STOP?");
 }
 
-=head2 set_sweep_start_frequency
-
-$g->set_sweep_start_frequency($f);
-
-sets the frequency sweep  starting frequency 
-$f = value in Hz,  10mHz..15MHz, MIN, MAX
-
-Note that $f can be a string with the usual suffixes,
-but XmHz -> X megahz   Xm-> X millihz
-
-if fstart>fstop, sweep decreases in frequency;
-if fstart<fstop, sweep increases in frequency.
-
-=cut
 
 sub set_sweep_start_frequency {
     my $self = shift;
@@ -2347,20 +1557,6 @@ sub set_sweep_start_frequency {
     $self->write("FREQ:STAR $f");
 }
 
-=head2 set_sweep_stop_frequency
-
-$g->set_sweep_stop_frequency($f);
-
-sets the frequency sweep  stopping frequency 
-$f = value in Hz,  10mHz..15MHz, MIN, MAX
-
-Note that $f can be a string with the usual suffixes,
-but XmHz -> X megahz   Xm-> X millihz
-
-if fstart>fstop, sweep decreases in frequency;
-if fstart<fstop, sweep increases in frequency.
-
-=cut
 
 sub set_sweep_stop_frequency {
     my $self = shift;
@@ -2384,27 +1580,12 @@ sub set_sweep_stop_frequency {
     $self->write("FREQ:STOP $f");
 }
 
-=head2 get_sweep_spacing
-
-$spc = $g->get_sweep_spacing();
-
-Fetches the sweep 'spacing', returns 'LIN' or 'LOG' for linear
-or logarithmic spacing.
-
-=cut
 
 sub get_sweep_spacing {
     my $self = shift;
     return $self->query("SWE:SPAC?");
 }
 
-=head2 set_sweep_spacing
-
-$g->set_sweep_spacing($spc);
-
-Sets sweep to either LIN or LOG spacing
-
-=cut
 
 sub set_sweep_spacing {
     my $self = shift;
@@ -2425,32 +1606,12 @@ sub set_sweep_spacing {
     $self->write("SWE:SPAC $s");
 }
 
-=head2 get_sweep_time
-
-$time = $g->get_sweep_time();
-
-Fetch the time (in seconds) to sweep from starting to stopping frequency.
-
-=cut
 
 sub get_sweep_time {
     my $self = shift;
     return $self->query("SWE:TIME?");
 }
 
-=head2 set_sweep_time
-
-$g->set_sweep_time($time);
-
-Sets the time to sweep between starting and stopping frequencies. The
-number of frequencies steps is internally calculated by the function
-generator.
-
-$time can be a simple number (in seconds) or a string with
-suffices such as "5ms" "0.03ks", or MIN or MAX. The range of sweep
-times is 1ms .. 500s
-
-=cut
 
 sub set_sweep_time {
     my $self = shift;
@@ -2662,3 +1823,772 @@ sub _parseNRf($\[$@];@) {
 }
 
 1;    # End of Lab::Instrument::HP33120A
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::HP33120A - HP 33120A 15MHz function/arbitrary waveform generator
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+    use Lab::Instrument::HP33120A;
+
+    my $g = new Lab::Instrument::HP33120A (
+                connection_type => 'LinuxGPIB',
+                gpib_address => 10
+               );
+    $g->set_frequency('3.78kHz');
+    $g->set_shape('square');
+
+    ...
+
+=head1 Getting started, system control
+
+=head2 new
+
+$g = new Lab::Instrument::HP33120A->(%options);
+
+      options:  gpib_board => 0,
+                gpib_address => 10,
+                connection_type => 'LinuxGPIB',
+                no_cache => 1,  # turn off cache
+
+=head2 get_id
+
+$id = $g->get_id();
+
+reads the *IDN? string from device
+
+=head2 get_status
+
+%status = $g->get_status();
+
+return a hash with status bits
+{ ERROR => .., DATA=> .. 
+
+=head2 get_error
+
+$errmsg = $g->get_error();
+
+Fetch the first error in the error queue.  Returns
+($code,$message); code == 0 means 'no error'
+
+=head2 reset
+
+$g->reset();
+
+reset the function generator (*RST, *CLS)
+
+=head2 get_trigger_slope
+
+$slope = $g->get_trigger_slope();
+
+fetch the trigger slope, returns POS or NEG
+
+=head2 set_trigger_slope
+
+$g->set_trigger_slope($slope);
+
+set the slope of the signal used to trigger
+$slope = 'POS','+' or 'NEG','-'
+
+=head2 wait_complete
+
+$g->wait_complete();
+
+Wait for operations to be completed
+
+TODO: probably need to revise, with a *OPC? checking loop
+
+=head2 trigger
+
+$g->trigger();
+
+Send a bus trigger to the function generator, wait 
+until trigger complete.
+
+=head2 get_trigger_source
+
+$src = $g->get_trigger_source();
+
+fetch the 'trigger source' from the function generator.
+Possible values are 'IMM', 'BUS' or 'EXT'.  IMM => immediate
+self-triggering; BUS => gpib/serial trigger input, such as *TRG;
+EXT => external trigger input.
+
+=head2 set_trigger_source
+
+$g->set_trigger_source($src);
+
+Set the trigger source for the function generator. Possible
+values are 'IMM' (immediate, i.e., internal free-running self-trigger)
+'BUS' GPIB *TRG type triggering; 'EXT' trigger from external input.
+
+=head2 set_display
+
+$g->set_display(BOOL);
+
+turn the display off (BOOL = false) or on (BOOL = true)
+
+=head2 get_display
+
+$display_on = $g->get_display();
+
+get the state of the display (boolean)
+
+=head2 set_text
+
+$g->set_text("text to show");
+
+display text on the function generator, in the place
+of the usual voltage/frequency/etc. Text is truncated
+at 11 chars, comma, semicolon, period are combined with
+char, so not counted in length
+
+=head2 get_text
+
+$mytext = $g->get_text();
+
+fetches the text shown on the display with set_text
+
+=head2 clear_text
+
+$g->clear_text();
+
+remove the text from the display
+
+=head2 beep
+
+$g->beep();
+
+Cause the function generator to 'beep'
+
+=head2 get_sync
+
+$sync = $g->get_sync();
+
+fetch boolean value indicating whether 'sync' output on the
+front panel is enabled
+
+=head2 set_sync
+
+$g->set_sync($sync);
+
+enable or disable SYNC output on front panel. $sync is
+a boolean (1/true/yes/on) => sync output enabled
+
+=head2 save_setup
+
+$g->save_setup($n);
+
+save function generator setup to internal non-volatile
+memory.  $n = 0..3.  
+
+NOTE: $n=0 is overwritten by the 'current
+setup' when the generator is turned off.
+
+=head2 recall_setup
+
+$g->recall_setup($n);
+
+restore function generator configuration from internal 
+non-volatile memory. $n=0..3
+
+=head2 delete_setup
+
+$g->delete_setup($n);
+
+delete one of the internal non-volatile setups
+$n=0..3
+
+=head2 get_load
+
+$zload = $g->get_load();
+
+fetch the output load impedance of the generator. Possible 
+values are '50' and 'INF'. This does NOT make any physical
+changes in the generator, but affects the internal calculation
+of amplitudes.
+
+=head2 set_load
+
+$g->set_load($z);
+
+Tell the function generator what load impedance the output
+is being terminated to, so that other characteristics can be
+correctly calculated.  Possible values are '50', 'INF', 'MIN', 'MAX'
+(can also use '50ohm', '0.05kohm', etc)
+
+=head1 Basic waveform output routines
+
+=head2 get_shape
+
+$shape = $g->get_shape();
+
+returns the waveform shape = SIN|SQU|TRI|RAMP|USER
+
+=head2 set_shape
+
+$g=>set_shape($shape);
+
+Sets the output function shape = SIN|SQU|TRI|RAMP|USER
+USER = arbitary waveform, separately selected
+
+=head2 get_frequency
+
+$f = $g->get_frequency();
+
+reads the function generator frequency, in Hz
+
+=head2 set_frequency
+
+$g->set_frequency($f);
+
+sets the function generator frequency in Hz. The
+frequency limits are 10mHz to 15MHz . The frequency
+can be specified as a simple number (in Hz), MIN, MAX
+or a string in standard IEEE488-2 NRf format. 
+NOTE: if you use the  Hz unit, the standard is
+to interpret mHz as megahertz. 
+
+=over
+
+set_frequency(10)    10Hz
+
+set_frequency('0.01kHz')  10Hz
+
+set_frequency('1mHz')    1E6 Hz
+
+set_frequency('10m')     10e-3 Hz (note, without Hz, `m' means `milli')
+
+=back
+
+The upper frequency limit depends on the function shape
+
+=head2 get_duty_cycle
+
+$dc = $g->get_duty_cycle()'
+
+fetch the duty cycle, in percent; only relevent for
+square waves
+
+=head2 set_duty_cycle
+
+$g->set_duty_cycle(percent);
+
+sets the square wave duty cycle,  in percent. The available
+range depends on frequency, so percent = 20..80 for  <= 5MHz
+and percent = 40..60 for higher frequencies
+
+=head2 get_amplitude
+
+$vamp = $g->get_amplitude();
+
+fetch the function amplitude, default is amplitude in volts 
+peak-to-peak (Vpp), but depending on the  units setting
+[see get_vunit()], so might be Vrms or dBm.
+
+=head2 set_amplitude
+
+$g->set_amplitude($vamp);
+
+sets the function amplitude,  in units from the 
+set_vunit() call, defaults to Vpp.
+
+The amplitude can be either a number,
+or string with magnitude (and optionally, units), 
+MAX or MIN.
+
+Examples: `100uV', `50mV', `123E-3', `20dBm', `5.5E1dBmV'.
+
+NOTE: attaching units with $vamp does not change vunit,
+so if vunit=`VPP' and you set $vamp=`5.5e1dBmV', you'll
+get 55mVpp. 
+
+The minimum and maximum
+amplitudes depend on the output load selection,
+the function shape, and the DC offset.
+
+Max output voltage is +-20V into a high-Z load,
++-10V into 50 ohm load.
+
+TODO: automatically adjust units based on 
+input text: 4Vpp, 3.5Vrms, 7.3dbm ...
+
+Since limits are rather hard to determine, you should
+check for errors after setting.
+
+=head2 get_vunit
+
+$unit = $g->get_vunit()
+
+Fetch the units that are being used to specify the output amplitude
+Possible values are VPP, VRMS, DBM, or DEF (default, VPP)
+
+=head2 set_vunit
+
+$g->set_vunit($unit);
+
+Set the way that amplitudes are specified. Possible 
+values are Vpp, Vrms, dBm or DEF (default = Vpp)
+
+=head2 get_offset
+
+$voff = $g->get_offset();
+
+Get the DC offset in volts (not affected by vunit)
+
+=head2 set_offset
+
+$g->set_offset($voff);
+
+Set the DC offset, either as a number (volts), as a string
+'100mV', '0.01kV' '1e3u', MIN or MAX.  The specification of
+the DC offset is not affected by the selection of vunit.
+
+Note that the DC offset is limited in combination with the
+output load, amplitude, and function shape. 
+
+=head1 Arbitrary 'user' waveforms
+
+=head2 get_waveform_list
+
+@list = $g->get_waveform_list();
+
+Get a list of the available 'user' waveforms. Five of these
+are built-in, up to four are user-storable in non-volatile
+memory, and possibly VOLATILE for a waveform in volatile memory
+
+The names of the five built-in arbitrary waveforms are:
+SINC, NEG_RAMP, EXP_RISE, EXP_FALL, and CARDIAC.
+
+=head2 get_user_waveform
+
+$wname = $g->get_user_waveform();
+
+Fetches the name of the currently selected 'user' waveform.
+
+=head2 set_user_waveform
+
+$g->set_user_waveform($wname);
+
+Sets the name of the current 'user' waveform. This
+should be a name from the $g->get_waveform_list()
+set of nonvolatile waveforms, or 'VOLATILE'.
+
+=head2 load_waveform
+
+$g->load_waveform(...);
+
+store waveform as 'volatile' data (can be used by selecting 'volatile'
+user waveform) perhaps for persistant storage.
+
+=over
+
+load_waveform(v1,v2,v3...)   voltages   |v(j)| <= 1
+
+load_waveform(d1,d2,d3...)   DAC values |d(j)| < 2048
+
+load_waveform(\@array)       voltages or DAC values
+
+load_waveform(waveform=>[voltage array ref]);
+
+load_waveform(dac=>[DAC array ref]);
+
+=back
+
+number of data points 8..16000
+
+In the first three cases above, where it is not specified "voltage"
+or "DAC" values, it is assumed to be voltages if the quantities are
+within the range -1..+1, and otherwise assumed to be DAC values. 
+
+=head2 get_waveform_average
+
+$vavg = $g->get_waveform_average($name);
+
+calculates and returns the 'average voltage' of 
+waveform $name (nonvolatile stored waveform, or VOLATILE)
+
+=head2 get_waveform_crestfactor
+
+$vcr = $g->get_waveform_crestfactor($name);
+
+calculates and returns the voltage 'crest factor' 
+(ratio of Vpeak/Vrms) for the waveform stored in $name.
+
+=head2 get_waveform_points
+
+$npts = $g->get_waveform_points($name)
+Returns the number of points in the waveform $name
+
+=head2 get_waveform_peak2peak
+
+$vpp = $g->get_waveform_peak2peak($name);
+
+calculates and returns the peak-to-peak voltage
+of waveform $name
+
+=head2 store_waveform
+
+$g->store_waveform($name);
+
+Stores the waveform in VOLATILE to non-volatile
+memory as $name.  Note that $name cannot be one
+of the 'hard-coded' names, is a maximum of 8 characters
+in length, must start with a-z, and contain only
+alphanumeric and underscore (_) characters. All
+names are converted to uppercase.
+
+There is memory for 4 user waveforms to be stored, 
+after which some must be deleted to allow further
+storage.
+
+=head2 delete_waveform
+
+$g->delete_waveform($name);
+
+Delete one of the non-volatile user waveforms (or VOLATILE).
+Note that the 5 'built-in' user waveforms cannot be deleted.
+
+=head2 get_waveform_free
+
+$n = $g->get_waveform_free();
+
+returns the number of 'free' user waveform storage 
+areas (0..4) that can be used for $g->store_waveform
+
+=head1 Modulation
+
+=head2 get_modulation
+
+$mod = $g->get_modulation();
+
+Fetch the type of modulation being used: NONE,AM,FM,BURST,FSK,SWEEP
+
+=head2 set_modulation
+
+$g->set_modulation($mod);
+
+Set the type of modulation to use: NONE,AM,FM,BURST,FSK,SWEEP
+if $mod='' or 'off', selects NONE.
+
+=head2 set_am_depth
+
+$g->set_am_depth(percent);
+
+set AM modulation depth percent: 0..120, MIN, MAX
+
+=head2 get_am_depth
+
+$depth = $g->get_am_depth();
+
+get the AM modulation depth, in percent
+
+=head2 get_am_shape
+
+$shape = $g->get_am_shape();
+
+gets the waveform used for AM modulation
+returns $shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
+
+=head2 set_am_shape
+
+$g->set_am_shape($shape);
+
+sets the waveform used for AM modulation
+$shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
+
+=head2 get_am_frequency
+
+$freq = $g->get_am_frequency();
+
+get the frequency of the AM modulation
+
+=head2 set_am_frequency
+
+$g->set_am_frequency($f);
+
+sets the frequency of AM modulation 
+$f = value in Hz,  10mHz..20kHz, MIN, MAX
+
+Note that $f can be a string, with suffixes, and that 
+'mHz' suffix -> MEGAHz   'm' suffix with no 'Hz' -> millihertz
+
+=head2 get_am_source
+
+$source = $g->get_am_source();
+
+get the source of the AM modulation signal: BOTH|EXT
+
+=head2 set_am_source
+
+$g->set_am_source(BOTH|EXT);
+
+set the source of the AM modulation; BOTH = internal+external
+EXT = external only.   INT = translated to BOTH
+
+=head2 get_fm_deviation
+
+$dev = $g->get_fm_deviation();
+
+fetch the FM modulation deviation, in Hz
+
+=head2 set_fm_deviation
+
+$g->set_fm_deviation($dev);
+
+Set the FM modulation deviation in Hz. $dev can be a simple
+number, in Hz, or a string with suffixes, or MIN or MAX.
+
+Ex: $dev='10.3kHz'  $dev='1.2MHZ' $dev='200m'
+NOTE: MHZ -> megahertz (case independent). A simple 'm' suffix => millihertz
+
+dev range 10mHz .. 7.5MHz
+carrier frequency must be >= deviation frequency
+carrier + deviation < peak frequency for carrier waveform + 100kHz
+So: 15.1MHz for sine and square
+200kHz for triangle and ramp
+5.1MHz for 'user' waveforms
+
+=head2 get_fm_shape
+
+$shape = $g->get_fm_shape();
+
+gets the waveform used for FM modulation
+returns $shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
+
+=head2 set_fm_shape
+
+$g->set_fm_shape($shape);
+
+sets the waveform used for FM modulation
+$shape = (SIN|SQU|TRI|RAMP|NOIS|USER)
+
+NOTE: NOISE and DC cannot be used as FM carrier
+
+=head2 get_fm_frequency
+
+$freq = $g->get_fm_frequency();
+
+get the frequency of the FM modulation, in Hz
+
+=head2 set_fm_frequency
+
+$g->set_fm_frequency($f);
+
+sets the frequency of AM modulation 
+$f = value in Hz,  10mHz..10kHz, MIN, MAX
+
+Note that $f can be a string with the usual suffixes,
+but XmHz -> X megahz   Xm-> X millihz
+
+=head2 get_burst_cycles
+
+$ncyc = $g->get_burst_cycles();
+
+Fetch the number of cycles in burst modulation
+
+=head2 set_burst_cycles
+
+$g->set_burst_cycles($ncyc);
+
+Set the number of cycles in burst modulation. 
+$ncyc is an integer 1..50,000  or MIN or MAX or INF
+
+For SIN, SQU, or USER waveform shapes, the minumim number of cycles
+is related to the carrier frequency.
+<= 1MHz   min 1 cycle
+1..2MHz   min 2 cycles
+2..3MHz   min 3 cycles
+3..4MHz   min 4 cycles
+4..5MHz   min 5 cycles
+
+For carrier frequency <= 100Hz, cycles <= 500sec * carrier freq
+
+=head2 get_burst_phase
+
+$ph = $g->get_burst_phase();
+
+Fetches the starting phase of the burst, in degrees, when
+bursts are triggered. 
+
+=head2 set_burst_phase
+
+$g->set_burst_phase($ph);
+
+Sets the starting phase of burst, in degrees (or MIN or MAX)
+from -360 to 360 in 0.001 degree increments.
+
+phase examples: 30.1, '20deg', 'min', 'max'
+
+=head2 get_burst_rate
+
+$rate = $g->get_burst_rate();
+
+Fetch the burst rate (in Hz) for internally triggered bursts
+
+=head2 set_burst_rate
+
+$g->set_burst_rate($rate);
+
+Set the burst rate (in Hz) for internally triggered bursts.
+$rate can be a simple number, or a string with the usual
+suffixes.  Note that 'mHz' (case independent) -> megahertz
+while 'm' -> millihertz.   Rate 10mHz .. 50kHz  or MIN or MAX
+
+If the burst rate is too large for the carrier frequency and
+burst count, the function generator will (silently) adjust to
+continually retrigger.
+
+=head2 get_burst_source
+
+$source = $g->get_burst_source();
+
+Fetch the source of the burst modulation: INT or EXT
+
+=head2 set_burst_source
+
+$g->set_burst_source($source);
+
+Set the source of burst modulation: $source = 'INT' or 'EXT'.
+If source is external, burst cycle count, rate, are ignored.
+
+=head2 get_fsk_frequency
+
+$freq = $g->get_fsk_frequency();
+
+get the FSK 'hop' frequency, in Hz
+
+=head2 set_fsk_frequency
+
+$g->set_fsk_frequency($f);
+
+sets the FSK 'hop' frequency 
+$f = value in Hz,  10mHz..15MHz, MIN, MAX
+(max freq 100kHz for TRIANGLE and RAMP shapes)
+
+Note that $f can be a string with the usual suffixes,
+but XmHz -> X megahz   Xm-> X millihz
+
+=head2 get_fsk_rate
+
+$rate = $g->get_fsk_rate();
+
+Fetch the rate at which fsk shifts between frequencies (in Hz) for 
+internally triggered modulation.
+
+=head2 set_fsk_rate
+
+$g->set_fsk_rate($rate);
+
+Set the rate for fsk shifting between frequencies (in Hz) for 
+internally triggered modulation.
+
+$rate can be a simple number, or a string with the usual
+suffixes.  Note that 'mHz' (case independent) -> megahertz
+while 'm' -> millihertz.   Rate 10mHz .. 50kHz  or MIN or MAX
+
+=head2 get_fsk_source
+
+$source = $g->get_fsk_source();
+
+Fetch the source of the FSK modulation: INT or EXT
+
+=head2 set_fsk_source
+
+$g->set_fsk_source($source);
+
+Set the source of FSK modulation: $source = 'INT' or 'EXT'.
+If source is external, FSK rate is ignored.
+
+=head2 get_sweep_start_frequency
+
+$g->get_sweep_start_frequency();
+
+Fetch the starting frequency of the sweep, in Hz
+
+=head2 get_sweep_stop_frequency
+
+$g->get_sweep_stop_frequency();
+
+Fetch the stopping frequency of the sweep, in Hz
+
+=head2 set_sweep_start_frequency
+
+$g->set_sweep_start_frequency($f);
+
+sets the frequency sweep  starting frequency 
+$f = value in Hz,  10mHz..15MHz, MIN, MAX
+
+Note that $f can be a string with the usual suffixes,
+but XmHz -> X megahz   Xm-> X millihz
+
+if fstart>fstop, sweep decreases in frequency;
+if fstart<fstop, sweep increases in frequency.
+
+=head2 set_sweep_stop_frequency
+
+$g->set_sweep_stop_frequency($f);
+
+sets the frequency sweep  stopping frequency 
+$f = value in Hz,  10mHz..15MHz, MIN, MAX
+
+Note that $f can be a string with the usual suffixes,
+but XmHz -> X megahz   Xm-> X millihz
+
+if fstart>fstop, sweep decreases in frequency;
+if fstart<fstop, sweep increases in frequency.
+
+=head2 get_sweep_spacing
+
+$spc = $g->get_sweep_spacing();
+
+Fetches the sweep 'spacing', returns 'LIN' or 'LOG' for linear
+or logarithmic spacing.
+
+=head2 set_sweep_spacing
+
+$g->set_sweep_spacing($spc);
+
+Sets sweep to either LIN or LOG spacing
+
+=head2 get_sweep_time
+
+$time = $g->get_sweep_time();
+
+Fetch the time (in seconds) to sweep from starting to stopping frequency.
+
+=head2 set_sweep_time
+
+$g->set_sweep_time($time);
+
+Sets the time to sweep between starting and stopping frequencies. The
+number of frequencies steps is internally calculated by the function
+generator.
+
+$time can be a simple number (in seconds) or a string with
+suffices such as "5ms" "0.03ks", or MIN or MAX. The range of sweep
+times is 1ms .. 500s
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Charles Lane, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

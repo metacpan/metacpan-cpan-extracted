@@ -1,7 +1,6 @@
 package Lab::SCPI;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
-$Lab::SCPI::VERSION = '3.553';
+$Lab::SCPI::VERSION = '3.554';
 use 5.010;
 use warnings;
 no warnings 'recursion';
@@ -571,7 +570,7 @@ Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and paramet
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 Interface
 

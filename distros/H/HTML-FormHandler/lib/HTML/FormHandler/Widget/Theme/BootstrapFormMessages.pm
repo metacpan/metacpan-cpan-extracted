@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Theme::BootstrapFormMessages;
 # ABSTRACT: role to render form messages using Bootstrap styling
-$HTML::FormHandler::Widget::Theme::BootstrapFormMessages::VERSION = '0.40067';
+$HTML::FormHandler::Widget::Theme::BootstrapFormMessages::VERSION = '0.40068';
 use Moose::Role;
 
 
@@ -56,7 +56,7 @@ HTML::FormHandler::Widget::Theme::BootstrapFormMessages - role to render form me
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

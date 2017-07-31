@@ -4,3 +4,13 @@
   - Modify Protocol Buffers build to work without a system tool not installed on CPAN Testers machines.
 0.03 2017-07-15
   - Add build tools prereqs checking. Only build if system prereqs are installed.
+0.04_01 2017-07-20
+  - Developer Release: Add auto tools build prereqs from Alien packages. Add paths to auto tools macros.
+0.04_02 2017-07-20
+  - Developer Release: Add auto tools build prereqs from Alien packages. Add paths to auto tools macros.
+0.05 2017-07-21
+  - Can now build without auto tools being pre-installed. Additional code enhancements.
+0.06 2017-07-23
+  - Hot patch gRPC code so it can build with Linux distributions using gcc7.x.
+0.07 2017-07-24
+  - gRPC is incompatible with latest OpenSSL libraries. Force build to use included Google BoringSSL library.

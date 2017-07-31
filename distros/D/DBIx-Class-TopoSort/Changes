@@ -1,5 +1,8 @@
 Revision history for DBIx::Class::TopoSort (ordered by revision number).
 
+0.050010 Aug 27 2017 19:30:00 PDT
+    - Support multiple sources pointing to the same table (Thanks, aeruder!)
+
 0.050002 Mar 02 2014 08:30:00 PDT
     - Require a useful YAML parser for testing
 

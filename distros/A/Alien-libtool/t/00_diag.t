@@ -14,9 +14,9 @@ $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::MM
   Alien::Build::Plugin::Build::Autoconf
-  Alien::MSYS
   Env
   ExtUtils::MakeMaker
+  File::chdir
   Test2::V0
   Test::Alien
   Test::More

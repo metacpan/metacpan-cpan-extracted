@@ -1,2 +1,39 @@
+NAME
+    Acme::CPANLists::PERLANCAR::Self - Organizing my own dists
+
+VERSION
+    This document describes version 0.003 of
+    Acme::CPANLists::PERLANCAR::Self (from Perl distribution
+    Acme-CPANLists-PERLANCAR-Self), released on 2017-07-28.
+
 DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANLists-PERLANCAR-Self>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANLists-PERLANCAR-Self>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANLists-PERLAN
+    CAR-Self>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANLists - about the Acme::CPANLists namespace
+
+    acme-cpanlists - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

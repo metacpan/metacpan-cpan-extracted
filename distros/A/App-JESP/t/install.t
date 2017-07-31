@@ -3,6 +3,8 @@
 use Test::Most;
 use App::JESP;
 
+use Carp::Always;
+
 # use Log::Any::Adapter qw/Stderr/;
 
 ok( my $jesp = App::JESP->new({ dsn => 'dbi:SQLite:dbname=:memory:', username => undef, password => undef, home => 'bla' }) );

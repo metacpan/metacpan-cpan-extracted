@@ -1,7 +1,6 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus::RS232;
-$Lab::Bus::RS232::VERSION = '3.553';
+#ABSTRACT: RS232 or Virtual Comm port bus
+$Lab::Bus::RS232::VERSION = '3.554';
 use strict;
 use warnings;
 
@@ -294,6 +293,8 @@ sub _search_twin {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -301,6 +302,10 @@ sub _search_twin {
 =head1 NAME
 
 Lab::Bus::RS232 - RS232 or Virtual Comm port bus
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -361,13 +366,17 @@ Probably many. So far BrutalRead and Clear are not implemented because not neede
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2010      Matthias Voelker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2010       Andreas K. Huettel
+            2011-2012  Andreas K. Huettel, Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -4,55 +4,52 @@ Data::Float - details of the floating point data type
 
 =head1 SYNOPSIS
 
-	use Data::Float qw(have_signed_zero);
+    use Data::Float qw(have_signed_zero);
 
-	if(have_signed_zero) { ...
+    if(have_signed_zero) { ...
 
-	# and many other constants; see text
+    # and many other constants; see text
 
-	use Data::Float qw(
-		float_class float_is_normal float_is_subnormal
-		float_is_nzfinite float_is_zero float_is_finite
-		float_is_infinite float_is_nan
-	);
+    use Data::Float qw(
+	float_class float_is_normal float_is_subnormal
+	float_is_nzfinite float_is_zero float_is_finite
+	float_is_infinite float_is_nan);
 
-	$class = float_class($value);
+    $class = float_class($value);
 
-	if(float_is_normal($value)) { ...
-	if(float_is_subnormal($value)) { ...
-	if(float_is_nzfinite($value)) { ...
-	if(float_is_zero($value)) { ...
-	if(float_is_finite($value)) { ...
-	if(float_is_infinite($value)) { ...
-	if(float_is_nan($value)) { ...
+    if(float_is_normal($value)) { ...
+    if(float_is_subnormal($value)) { ...
+    if(float_is_nzfinite($value)) { ...
+    if(float_is_zero($value)) { ...
+    if(float_is_finite($value)) { ...
+    if(float_is_infinite($value)) { ...
+    if(float_is_nan($value)) { ...
 
-	use Data::Float qw(float_sign signbit float_parts);
+    use Data::Float qw(float_sign signbit float_parts);
 
-	$sign = float_sign($value);
-	$sign_bit = signbit($value);
-	($sign, $exponent, $significand) = float_parts($value);
+    $sign = float_sign($value);
+    $sign_bit = signbit($value);
+    ($sign, $exponent, $significand) = float_parts($value);
 
-	use Data::Float qw(float_hex hex_float);
+    use Data::Float qw(float_hex hex_float);
 
-	print float_hex($value);
-	$value = hex_float($string);
+    print float_hex($value);
+    $value = hex_float($string);
 
-	use Data::Float qw(float_id_cmp totalorder);
+    use Data::Float qw(float_id_cmp totalorder);
 
-	@sorted_floats = sort { float_id_cmp($a, $b) } @floats;
-	if(totalorder($a, $b)) { ...
+    @sorted_floats = sort { float_id_cmp($a, $b) } @floats;
+    if(totalorder($a, $b)) { ...
 
-	use Data::Float qw(
-		pow2 mult_pow2 copysign
-		nextup nextdown nextafter
-	);
+    use Data::Float qw(
+	pow2 mult_pow2 copysign nextup nextdown nextafter);
 
-	$x = pow2($exp);
-	$x = mult_pow2($value, $exp);
-	$x = copysign($magnitude, $sign_from);
-	$x = nextup($x);
-	$x = nextdown($x);
-	$x = nextafter($x, $direction);
+    $x = pow2($exp);
+    $x = mult_pow2($value, $exp);
+    $x = copysign($magnitude, $sign_from);
+    $x = nextup($x);
+    $x = nextdown($x);
+    $x = nextafter($x, $direction);
 
 =head1 DESCRIPTION
 
@@ -178,7 +175,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -1385,7 +1382,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2008, 2010, 2012
+Copyright (C) 2006, 2007, 2008, 2010, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

@@ -1,7 +1,7 @@
 package Log::ger::Util;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2017-07-30'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +11,11 @@ require Log::ger::Heavy;
 
 sub _dump {
     unless ($Log::ger::_dumper) {
-        eval { require Data::Dmp };
+        eval {
+            require Data::Dmp;
+            $Data::Dmp::OPT_REMOVE_PRAGMAS = 1;
+            1;
+        };
         if ($@) {
             no warnings 'once';
             require Data::Dumper;
@@ -243,7 +247,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

@@ -33,7 +33,7 @@ sub cache_and_test {
 }
 
 cache_and_test "1.0" => sub {
-    my $r = fadvise $filename, 0, int($file_size * 1.0), POSIX_FADV_DONTNEED;
+    my $r = fadvise $filename, 0, 0, POSIX_FADV_DONTNEED;
 
     is($r, 1, "return value of fadvise");
 

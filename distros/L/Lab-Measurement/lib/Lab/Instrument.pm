@@ -1,7 +1,6 @@
 package Lab::Instrument;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Instrument base class
-$Lab::Instrument::VERSION = '3.553';
+$Lab::Instrument::VERSION = '3.554';
 use strict;
 use warnings;
 
@@ -1319,7 +1318,7 @@ Lab::Instrument - Instrument base class
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

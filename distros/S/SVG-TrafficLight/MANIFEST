@@ -1,8 +1,12 @@
 Changes
+README.md
 bin/traffic_light
 lib/SVG/TrafficLight.pm
 Makefile.PL
 MANIFEST
+LICENCE
+GPL
+Artistic
 sample/tl.svg
 t/01-load.t
 t/02-defaults.t

@@ -1,3 +1,5 @@
 See also the git repository.
 
+ * 0.03 - prev() method for bi-directional foo also passing of parent
+          beat durations to callback whilst recursing.
  * 0.01 - released on a mostly unsuspecting world.

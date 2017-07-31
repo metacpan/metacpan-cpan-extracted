@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Self;
 
-our $DATE = '2017-01-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Organizing my own dists
@@ -18,7 +18,7 @@ Acme::CPANLists::PERLANCAR::Self - Organizing my own dists
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANLists::PERLANCAR::Self (from Perl distribution Acme-CPANLists-PERLANCAR-Self), released on 2017-01-06.
+This document describes version 0.003 of Acme::CPANLists::PERLANCAR::Self (from Perl distribution Acme-CPANLists-PERLANCAR-Self), released on 2017-07-28.
 
 =head1 DESCRIPTION
 

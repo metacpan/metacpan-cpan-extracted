@@ -1,0 +1,197 @@
+#! perl
+
+#####################################################################
+## ABSTRACT: Convert various epoch times to Time::Moment times.
+## PODNAME: convert_epoch
+our $VERSION = '1.003002'; ## VERSION
+#####################################################################
+
+use v5.24;
+use warnings;
+use Data::Printer;
+use Getopt::Long;
+use List::MoreUtils 'any';
+use Pod::Usage;
+use Time::Moment::Epoch ':all';
+
+my %opt;
+GetOptions(
+	\%opt,
+	'conversion=s@',
+	'debug!',
+	'help|?',
+	'man',
+	'reverse',
+	'verbose!',
+) or pod2usage(2);
+pod2usage(1) if $opt{help};
+pod2usage(-verbose => 2) if $opt{man};
+$opt{conversion} //= ['unix'];
+p %opt if $opt{debug};
+
+for my $conv ($opt{conversion}->@*) {
+    pod2usage("unknown conversion: '$conv'")
+        unless any {$conv eq $_} @conversions;
+}
+
+for my $arg (@ARGV) {
+    for my $conv ($opt{conversion}->@*) {
+		no strict 'refs';
+
+        my $tm = $opt{reverse}
+			? "to_$conv"->($arg)
+			: $conv->($arg);
+
+        p $tm if $opt{debug};
+
+        say $opt{verbose}
+            ? sprintf("%20s: %s => %s", $conv, $arg, $tm)
+            : $tm;
+    }
+}
+
+__END__
+
+=pod
+
+=for :stopwords Tim Heaney Ehlers Mary iopuckoi
+
+=head1 NAME
+
+convert_epoch - Convert various epoch times to Time::Moment times.
+
+=head1 NAME
+
+convert_epoch - convert the given number to a date
+
+=head1 SYNOPSIS
+
+convert_epoch [OPTIONS] number [number ...]
+
+=head1 EXAMPLES
+
+Default is Unix time and brief output.
+
+    $ ./convert_epoch 1234567890
+    2009-02-13T23:31:30Z
+
+Choose a different conversion.
+
+    $ ./convert_epoch --conversion=google_calendar 1234567890
+    2007-03-16T23:31:30Z
+
+You can use a short option too.
+
+    $ ./convert_epoch -c google_calendar 1234567890
+    2007-03-16T23:31:30Z
+
+You can ask for more details with verbose output.
+
+    $ ./convert_epoch 1234567890 --verbose
+    unix: 1234567890 => 2009-02-13T23:31:30Z
+
+This is handy if you're doing more than one conversion at a time.
+
+    $ ./convert_epoch -c google_calendar 1234567890 1500000000
+    2007-03-16T23:31:30Z 
+    2015-03-17T02:40:00Z
+
+    $ ./convert_epoch -c google_calendar 1234567890 1500000000 -v
+         google_calendar: 1234567890 => 2007-03-16T23:31:30Z
+         google_calendar: 1500000000 => 2015-03-17T02:40:00Z
+
+And downright necessary if you're doing more than one conversion type
+as well.
+
+    $ ./convert_epoch -c unix -c google_calendar 1234567890 1500000000
+    2009-02-13T23:31:30Z
+    2007-03-16T23:31:30Z
+    2017-07-14T02:40:00Z
+    2015-03-17T02:40:00Z
+
+    $ ./convert_epoch -c unix -c google_calendar 1234567890 1500000000 -v
+                    unix: 1234567890 => 2009-02-13T23:31:30Z
+         google_calendar: 1234567890 => 2007-03-16T23:31:30Z
+                    unix: 1500000000 => 2017-07-14T02:40:00Z
+         google_calendar: 1500000000 => 2015-03-17T02:40:00Z
+
+You can reverse the calculations too.
+
+    $ ./convert_epoch --reverse 2009-02-13T23:31:30Z
+    1234567890
+
+    $ ./convert_epoch -r -c unix -c google_calendar -v 2009-02-13T23:31:30Z
+                    unix: 2009-02-13T23:31:30Z => 1234567890
+         google_calendar: 2009-02-13T23:31:30Z => 1297899090
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--conversion=STRING>
+
+Use STRING as the conversion type. Choices are:
+
+    apfs
+    chrome
+    cocoa
+    dos
+    google_calendar
+    icq
+    java
+    mozilla
+    ole
+    symbian
+    unix
+    uuid_v1
+    windows_date
+    windows_file
+    windows_system
+
+Default is unix. This option can be repeated for more than one
+conversion at a time.
+
+=item B<--debug>
+
+Prints extra messages.
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--reverse>
+
+Reverse the conversions (from Time::Moment to given epoch type).
+
+=item B<--verbose>
+
+Prints results in more detail.
+
+=back
+
+=head1 DESCRIPTION
+
+B<convert_epoch> will apply the given conversions from
+Time::Moment::Epoch to the given numbers (or to the given dates, if
+reverse option is used).
+
+=head1 VERSION
+
+version 1.003002
+
+=head1 AUTHOR
+
+Tim Heaney <heaney@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tim Heaney.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

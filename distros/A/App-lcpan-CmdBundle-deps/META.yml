@@ -19,7 +19,7 @@ name: App-lcpan-CmdBundle-deps
 requires:
   App::lcpan: '1.017'
   Clone::Util: '0.03'
-  Log::ger: '0.011'
+  Log::ger: '0.019'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-deps
   homepage: https://metacpan.org/release/App-lcpan-CmdBundle-deps
   repository: git://github.com/perlancar/perl-App-lcpan-CmdBundle-deps.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -339,11 +339,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
       name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'

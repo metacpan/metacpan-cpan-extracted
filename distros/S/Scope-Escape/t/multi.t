@@ -2,7 +2,12 @@ use warnings;
 use strict;
 
 BEGIN {
-	eval { require Scope::Cleanup; Scope::Cleanup->VERSION(0.001); };
+	if("$]" >= 5.019004 && "$]" < 5.022) {
+		require Test::More;
+		Test::More::plan(skip_all =>
+			"this perl can't handle death during unwinding");
+	}
+	eval { require Scope::Cleanup; Scope::Cleanup->VERSION(0.003); };
 	if($@ ne "") {
 		require Test::More;
 		Test::More::plan(skip_all => "no Scope::Cleanup");

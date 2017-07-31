@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 

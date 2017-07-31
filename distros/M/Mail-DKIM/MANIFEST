@@ -40,7 +40,7 @@ lib/Mail/DKIM/Verifier.pm
 Makefile.PL
 MANIFEST
 README.md
-sample_mime_lite.pl
+scripts/sample_mime_lite.pl
 scripts/dkimsign.pl
 scripts/dkimverify.pl
 scripts/test_bare_rsa_sha1.pl

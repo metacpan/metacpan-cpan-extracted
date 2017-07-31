@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Frequency;
-$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.553';
+#ABSTRACT: Role for the SCPI SENSe:FREQuency subsystem
+$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.554';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -11,33 +12,6 @@ use namespace::autoclean;
 
 with 'Lab::Moose::Instrument::SCPI::Sense::Sweep';
 
-
-=head1 NAME
-
-Lab::Moose::Instrument::SCPI::Sense::Frequency -  Role for SCPI SENSe:FREQuency
-subsystem.
-
-=head1 METHODS
-
-=head2 sense_frequency_start_query
-
- my $freq = $self->sense_frequency_start_query();
-
-Query the starting point of the frequency sweep.
-
-=head2 sense_frequency_start
-
- $self->sense_frequency_start(value => 4e9);
-
-Set the starting point of the frequency sweep.
-
-=head2 sense_frequency_stop_query
-
-=head2 sense_frequency_stop
-
-Query and set the end point of the frequency sweep.
-
-=cut
 
 cache sense_frequency_start => ( getter => 'sense_frequency_start_query' );
 
@@ -75,14 +49,6 @@ sub sense_frequency_stop {
     $self->cached_sense_frequency_stop($value);
 }
 
-=head2 sense_frequency_linear_array
-
- my $arrayref = $self->sense_frequency_linear_array();
-
-Helper method to get an arrayref of all points in the frequency sweep.
-Does not provide a cached form, but will read it's input from cache.
-
-=cut
 
 sub sense_frequency_linear_array {
     my ( $self, $channel, %args ) = validated_channel_getter( \@_ );
@@ -110,3 +76,57 @@ sub sense_frequency_linear_array {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::SCPI::Sense::Frequency - Role for the SCPI SENSe:FREQuency subsystem
+
+=head1 VERSION
+
+version 3.554
+
+=head1 METHODS
+
+=head2 sense_frequency_start_query
+
+ my $freq = $self->sense_frequency_start_query();
+
+Query the starting point of the frequency sweep.
+
+=head2 sense_frequency_start
+
+ $self->sense_frequency_start(value => 4e9);
+
+Set the starting point of the frequency sweep.
+
+=head2 sense_frequency_stop_query
+
+=head2 sense_frequency_stop
+
+Query and set the end point of the frequency sweep.
+
+=head2 sense_frequency_linear_array
+
+ my $arrayref = $self->sense_frequency_linear_array();
+
+Helper method to get an arrayref of all points in the frequency sweep.
+Does not provide a cached form, but will read it's input from cache.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

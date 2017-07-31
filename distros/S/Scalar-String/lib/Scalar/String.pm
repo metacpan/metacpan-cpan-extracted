@@ -98,7 +98,7 @@ package Scalar::String;
 use warnings;
 use strict;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -131,7 +131,7 @@ if($@ eq "") {
 __DATA__
 
 use Carp qw(croak);
-BEGIN { require utf8 if "$]" >= 5.008; }
+BEGIN { require utf8 if "$]" >= 5.008; 1; }
 
 =head1 FUNCTIONS
 
@@ -291,7 +291,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2009, 2010, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

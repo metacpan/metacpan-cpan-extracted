@@ -1,5 +1,8 @@
 Revision history for DBM::Deep (ordered by revision number).
 
+2.0014 Jul 27 22:15:00 2017 EDT
+    - Fix for tests failing on 5.26 (Thanks, DrHyde!)
+
 2.0013 Jan 01 20:30:00 2016 EDT
     - Updates to documentation by garu (Thanks!, GH#14, GH#15, GH#16)
 

@@ -1,5 +1,11 @@
 Revision history for IPC-MorseSignals
 
+0.17    2017-07-23 21:10 UTC
+        With this release, this module is formally deprecated. Don't expect any
+        new release.
+        + Doc : Document deprecation.
+        + Doc : Fix miscellaneous nits.
+
 0.16    2013-08-22 20:35 UTC
         This is a maintenance release. The code contains no functional change.
         Satisfied users of version 0.15 can skip this update.
@@ -93,7 +99,7 @@ Revision history for IPC-MorseSignals
         + Add : Unicode support. Enabled by passing utf8 => 1 to m{send,recv}.
         + Chg : The speed must now be passed to msend() by speed => $speed.
         + Chg : Tests no longer pass their result with pipes.
-        + Doc : <apeiron>  Prof_Vince, 'truely' isn't a word.
+        + Doc : <apeiron> 'truely' isn't a word.
         + Fix : t/11-speed.t didn't fail properly (as if those tests don't fail
                 enough yet!).
         + Fix : t/02-sigusr.t didn't check properly the returned value.
@@ -105,7 +111,7 @@ Revision history for IPC-MorseSignals
         + Add : samples/bench.pl, a transfer speed benchmark script.
         + Add : New tests : t/02-sigusr.t, t/11-speed.t
         + Fix : Warnings when the transfer fails.
-	+ Doc : The protocol was documented.
+        + Doc : The protocol was documented.
 
 0.01    2007-08-15 21:20 UTC
         First version, released on an unsuspecting world.

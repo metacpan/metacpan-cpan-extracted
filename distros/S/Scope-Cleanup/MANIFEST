@@ -4,11 +4,11 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Scope/Cleanup.pm
 lib/Scope/Cleanup.xs
 t/caller.t
+t/closure.t
 t/context.t
 t/die.t
 t/error.t
@@ -17,6 +17,7 @@ t/exit.t
 t/pod_cvg.t
 t/pod_syn.t
 t/scope.t
+t/stack_realloc.t
 t/via_death.t
 t/via_die.t
 t/via_escape.t

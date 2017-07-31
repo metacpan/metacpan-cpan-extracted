@@ -1,22 +1,12 @@
 package Lab::Data::Analysis;
-$Lab::Data::Analysis::VERSION = '3.553';
+#ABSTRACT: Analyze data from 'Trace' files
+$Lab::Data::Analysis::VERSION = '3.554';
 use 5.006;
 use strict;
 use Clone qw(clone);
 use warnings;
 use Carp;
 use Data::Dumper;
-
-=head1 NAME
-
-Lab::Data::Analysis - Analyze data from 'Trace' files
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
 
 # default config values, copied to $self->{CONFIG} initially
 
@@ -49,69 +39,6 @@ our $_DefaultAnalyzer = {
 
 our $_LOADED = {};
 
-=head1 SYNOPSIS
-
-
-
-    use Lab::Data::Analysis;
-
-    my $t = Lab::Data::Analysis->new();
-
-    $t->open($tracefile);
-
-    RANDOM ACCESS:
-
-    $t->MakeIndex();
- 
-    $t->PrintIndex();
-
-    my $fhdr = $t->ReadFileHeader();
-
-    my $rhdr = $t->ReadRunHeader(run=>3);
-
-    my $ev = $t->ReadEvent(run=>3, event=>77);
-
-    
-    ... do analysis...
-
-
-
-    SEQUENTIAL:
-
-    my $fhdr = $t->ReadFileHeader();
-
-    while (defined($rhdr = $t->ReadRunHeader()) {
-       
-        print "Run: ",$rhdr->{RUN},"\n";
-
-        while (defined($ev = $t->ReadEvent()) {
-             
-            print "Event: ", $ev->{EVENT}, "\n";
-
-            do analysis...
-        }
-    }
-
-
-    Note that "random access" and "sequential" can be mixed,
-    if you keep track of the file position. 
-
-
-
-
-
-=head1 SUBROUTINES/METHODS
-
-=head2 new
-
-my $t = Lab::Data::Analysis->new();    # do 'open' later
-
-my $t = Lab::Data::Analysis->new($tracefile);
-
-my $t = Lab::Data::Analysis->new( file => $tracefile,
-                                  ...options );
-
-=cut
 
 sub new {
     my $proto = shift;
@@ -298,15 +225,6 @@ sub _seek {
     }
 }
 
-=head2 open
-
-$t->open($file);
-
-$t->open(file=>$file, ...);
-
-Open a trace file for reading. 
-
-=cut
 
 sub open {
     my $self = shift;
@@ -327,19 +245,6 @@ sub open {
 
 }
 
-=head2 rewind
-
-$t->rewind();
-
-Position to beginning of file for sequential access. 
-
-Not sure that this is really needed: ReadFileHeader() automatically
-goes to the beginning of the file; ReadRunHeader(run=>firstrun) should
-read the header of the first run in the file, and leave the file
-positioned to start reading events.  
-
-
-=cut
 
 sub rewind {
     my $self = shift;
@@ -350,15 +255,6 @@ sub rewind {
     $self->_seek( $self->{FILE_BEGIN} );
 }
 
-=head2 MakeIndex
-
-$t->MakeIndex();
-
-Compile an index of Runs/Events in a tracefile, for later use.
-
-Be warned: this may take some time for large files.
-
-=cut
 
 sub MakeIndex {
     my $self = shift;
@@ -459,13 +355,6 @@ sub MakeIndex {
     $self->_seek($iloc);
 }
 
-=head2 PrintIndex
-
-$t->PrintIndex();
-
-Print an index of the tracefile, showing locations of runs/events, etc.
-
-=cut	
 
 sub PrintIndex {
     my $self = shift;
@@ -544,34 +433,6 @@ sub PrintIndex {
 
 }
 
-=head2 ReadEvent
-
-my $event = $t->ReadEvent();
-
-my $event = $t->ReadEvent($stream);
-
-my $event = $t->ReadEvent([$stream1[, $stream2...]]);
-
-my $event = $t->ReadEvent(stream=>$stream);
-
-my $event = $t->ReadEvent(stream=>[$stream1[,$stream2...]]);
-
-Also can use a no_global=>1 option to exclude the 'global' (stream=0) stream,
-which just has comments. Adding run=>$run, event=>$event parameters causes
-FindEvent(run=>..., event=>...) to be called before reading the event. 
-
-Read an event, starting at the current file position. This may
-involve skipping over (and ignoring) lines until reaching the next EVENT 
-line. The event is returned in a hash structure, containing the
-raw data in all data streams for the event, up to the following EVENT
-marker, the "STOP RUN" marker, or the end of the file.
-
-Returns 'undef' if no more events remain in the file.
-
-Data streams can be selected by passing $stream parameter, 
-and multiple streams by passing reference to an array.
-
-=cut
 
 sub ReadEvent {
     my $self = shift;
@@ -763,26 +624,6 @@ sub ReadEvent {
     return $ev;
 }
 
-=head2 ReadFileHeader
-
-my $hdr = $t->ReadFileHeader([$shift]);
-
-my $hdr = $t->ReadFileHeader(shift=>$shift);
-
-
-Read the header of the data file (before the start of the
-first run), and store in a hashref.  If '$shift' is true
-(=1,'yes', 'true') then leave the file positioned after
-the file header.  The 'shift' parameter is usually not
-needed, because ReadRunHeader will just read from the
-start of the file to the first run. 
-
-If 'shift' is not specified, then the file position is
-restored to where it was prior to the ReadFileHeader
-call, which can be useful if the file header is 
-read later in the analysis. 
-
-=cut
 
 sub ReadFileHeader {
     my $self = shift;
@@ -856,23 +697,6 @@ sub ReadFileHeader {
     return $hdr;
 }
 
-=head2 ReadRunHeader
-
-my $rhdr = $t->ReadRunHeader();
-
-my $rhdr = $t->ReadRunHeader($run);
-
-my $rhdr = $t->ReadRunHeader(run=>$run);
-
-Reads the header information between the start of run and the first
-event. If the run number is not given, reads from the current file
-position until the run is found. Returns undef if the file is not
-found. 
-
-Returns a hashref with the information, and leaves the file
-positioned at the first event of the run.
-
-=cut
 
 sub ReadRunHeader {
     my $self = shift;
@@ -982,25 +806,6 @@ sub ReadRunHeader {
     return $hdr;
 }
 
-=head2 FindEvent
-
-$t->FindEvent($run,$event);
-
-$t->FindEvent(run=>$run, event=>$event);
-
-Find the specified event in the specified run (if run=undef or <=0, then
-use current run). Returns undef if the event is not found, otherwise
-returns the file position and leaves the file positioned so that ReadEvent
-will read the specified event.
-
-If event is undefined, defaults to the 'next event'; for files that
-have been indexed event=-1 returns the LAST event (-2 next to last, etc).
-Without an index event < 0 is treated as event=0. 
-
-
-Note that this routine is MUCH more efficient if an index is created.
-
-=cut
 
 sub FindEvent {
     my $self = shift;
@@ -1126,18 +931,6 @@ sub FindEvent {
     }
 }
 
-=head2 PrintDefaultAnalyzer
-
-$t->PrintDefaultAnalyzer([$stream, $stream,...]);
-
-$t->PrintDefaultAnalyzer(stream=>[$stream1,$stream2,...]);
-
-Print the 'default' analyzer modules for the selected streams
-(default = 'all streams'). If the file header has not yet been
-read, this routine reads the file header to get the setup information
-about the data streams. 
-
-=cut
 
 sub PrintDefaultAnalyzer {
     my $self = shift;
@@ -1177,23 +970,6 @@ sub PrintDefaultAnalyzer {
     print "\n" if $dirty;
 }
 
-=head2 ConnectAnalyzer
-
-$t->ConnectAnalyzer([[$stream],$module]);
-
-$t->ConnectAnalyzer(stream=>$stream, module=>$module);
-
-Connect an analysis module to a data stream. If the stream
-is unspecified, try to connect to all data streams. If
-the module is unspecified, try to use a 'default' module
-for the stream.  Note that connecting multiple analysis 
-modules to a stream results in the module being called
-in sequence, using the result from the previous
-analysis module. 
-
-Default modules are in Lab::Data::Analysis:: ...
-
-=cut
 
 sub ConnectAnalyzer {
     my $self = shift;
@@ -1259,22 +1035,6 @@ sub _findDefAnalyzer {
     return undef;
 }
 
-=head2 Analyze
-
-my $ev = $t->Analyze($ev[,$options,[,$stream1,$stream2,...]);
-
-my $ev = $t->Analyze(event=>$ev[, stream=>$stream1][,analyzeroptions=>..]);
-
-my $ev = $t->Analyze(event=>$ev[, stream=>[$stream1,$stream2,...]
-           [, analyzeroptions=>]);
-
-
-runs the analysis chain on the given event, for the given streams
-(default: all streams).  The event is returned with analysis
-data added to the hashref.  Options for the analyzer (in the
-key=>value form) can be passed if the hash calling form is used.
-
-=cut
 
 sub Analyze {
     my $self = shift;
@@ -1339,3 +1099,238 @@ sub Analyze {
 }
 
 1;    # End of Lab::Data::Analysis
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Data::Analysis - Analyze data from 'Trace' files
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+    use Lab::Data::Analysis;
+
+    my $t = Lab::Data::Analysis->new();
+
+    $t->open($tracefile);
+
+    RANDOM ACCESS:
+
+    $t->MakeIndex();
+ 
+    $t->PrintIndex();
+
+    my $fhdr = $t->ReadFileHeader();
+
+    my $rhdr = $t->ReadRunHeader(run=>3);
+
+    my $ev = $t->ReadEvent(run=>3, event=>77);
+
+    
+    ... do analysis...
+
+
+
+    SEQUENTIAL:
+
+    my $fhdr = $t->ReadFileHeader();
+
+    while (defined($rhdr = $t->ReadRunHeader()) {
+       
+        print "Run: ",$rhdr->{RUN},"\n";
+
+        while (defined($ev = $t->ReadEvent()) {
+             
+            print "Event: ", $ev->{EVENT}, "\n";
+
+            do analysis...
+        }
+    }
+
+
+    Note that "random access" and "sequential" can be mixed,
+    if you keep track of the file position. 
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new
+
+my $t = Lab::Data::Analysis->new();    # do 'open' later
+
+my $t = Lab::Data::Analysis->new($tracefile);
+
+my $t = Lab::Data::Analysis->new( file => $tracefile,
+                                  ...options );
+
+=head2 open
+
+$t->open($file);
+
+$t->open(file=>$file, ...);
+
+Open a trace file for reading. 
+
+=head2 rewind
+
+$t->rewind();
+
+Position to beginning of file for sequential access. 
+
+Not sure that this is really needed: ReadFileHeader() automatically
+goes to the beginning of the file; ReadRunHeader(run=>firstrun) should
+read the header of the first run in the file, and leave the file
+positioned to start reading events.  
+
+=head2 MakeIndex
+
+$t->MakeIndex();
+
+Compile an index of Runs/Events in a tracefile, for later use.
+
+Be warned: this may take some time for large files.
+
+=head2 PrintIndex
+
+$t->PrintIndex();
+
+Print an index of the tracefile, showing locations of runs/events, etc.
+
+=head2 ReadEvent
+
+my $event = $t->ReadEvent();
+
+my $event = $t->ReadEvent($stream);
+
+my $event = $t->ReadEvent([$stream1[, $stream2...]]);
+
+my $event = $t->ReadEvent(stream=>$stream);
+
+my $event = $t->ReadEvent(stream=>[$stream1[,$stream2...]]);
+
+Also can use a no_global=>1 option to exclude the 'global' (stream=0) stream,
+which just has comments. Adding run=>$run, event=>$event parameters causes
+FindEvent(run=>..., event=>...) to be called before reading the event. 
+
+Read an event, starting at the current file position. This may
+involve skipping over (and ignoring) lines until reaching the next EVENT 
+line. The event is returned in a hash structure, containing the
+raw data in all data streams for the event, up to the following EVENT
+marker, the "STOP RUN" marker, or the end of the file.
+
+Returns 'undef' if no more events remain in the file.
+
+Data streams can be selected by passing $stream parameter, 
+and multiple streams by passing reference to an array.
+
+=head2 ReadFileHeader
+
+my $hdr = $t->ReadFileHeader([$shift]);
+
+my $hdr = $t->ReadFileHeader(shift=>$shift);
+
+Read the header of the data file (before the start of the
+first run), and store in a hashref.  If '$shift' is true
+(=1,'yes', 'true') then leave the file positioned after
+the file header.  The 'shift' parameter is usually not
+needed, because ReadRunHeader will just read from the
+start of the file to the first run. 
+
+If 'shift' is not specified, then the file position is
+restored to where it was prior to the ReadFileHeader
+call, which can be useful if the file header is 
+read later in the analysis. 
+
+=head2 ReadRunHeader
+
+my $rhdr = $t->ReadRunHeader();
+
+my $rhdr = $t->ReadRunHeader($run);
+
+my $rhdr = $t->ReadRunHeader(run=>$run);
+
+Reads the header information between the start of run and the first
+event. If the run number is not given, reads from the current file
+position until the run is found. Returns undef if the file is not
+found. 
+
+Returns a hashref with the information, and leaves the file
+positioned at the first event of the run.
+
+=head2 FindEvent
+
+$t->FindEvent($run,$event);
+
+$t->FindEvent(run=>$run, event=>$event);
+
+Find the specified event in the specified run (if run=undef or <=0, then
+use current run). Returns undef if the event is not found, otherwise
+returns the file position and leaves the file positioned so that ReadEvent
+will read the specified event.
+
+If event is undefined, defaults to the 'next event'; for files that
+have been indexed event=-1 returns the LAST event (-2 next to last, etc).
+Without an index event < 0 is treated as event=0. 
+
+Note that this routine is MUCH more efficient if an index is created.
+
+=head2 PrintDefaultAnalyzer
+
+$t->PrintDefaultAnalyzer([$stream, $stream,...]);
+
+$t->PrintDefaultAnalyzer(stream=>[$stream1,$stream2,...]);
+
+Print the 'default' analyzer modules for the selected streams
+(default = 'all streams'). If the file header has not yet been
+read, this routine reads the file header to get the setup information
+about the data streams. 
+
+=head2 ConnectAnalyzer
+
+$t->ConnectAnalyzer([[$stream],$module]);
+
+$t->ConnectAnalyzer(stream=>$stream, module=>$module);
+
+Connect an analysis module to a data stream. If the stream
+is unspecified, try to connect to all data streams. If
+the module is unspecified, try to use a 'default' module
+for the stream.  Note that connecting multiple analysis 
+modules to a stream results in the module being called
+in sequence, using the result from the previous
+analysis module. 
+
+Default modules are in Lab::Data::Analysis:: ...
+
+=head2 Analyze
+
+my $ev = $t->Analyze($ev[,$options,[,$stream1,$stream2,...]);
+
+my $ev = $t->Analyze(event=>$ev[, stream=>$stream1][,analyzeroptions=>..]);
+
+my $ev = $t->Analyze(event=>$ev[, stream=>[$stream1,$stream2,...]
+           [, analyzeroptions=>]);
+
+runs the analysis chain on the given event, for the given streams
+(default: all streams).  The event is returned with analysis
+data added to the hashref.  Options for the analyzer (in the
+key=>value form) can be passed if the hash calling form is used.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Charles Lane
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

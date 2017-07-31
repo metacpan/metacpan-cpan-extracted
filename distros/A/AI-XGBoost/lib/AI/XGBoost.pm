@@ -5,7 +5,7 @@ use warnings;
 use AI::XGBoost::Booster;
 use Exporter::Easy ( OK => ['train'] );
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.008';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>
 
@@ -39,7 +39,7 @@ AI::XGBoost - Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -208,5 +208,11 @@ This software is Copyright (c) 2017 by Pablo Rodríguez González.
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ruben
+
+Ruben <me@ruben.tech>
 
 =cut

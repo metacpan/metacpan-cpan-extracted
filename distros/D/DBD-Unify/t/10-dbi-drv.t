@@ -67,7 +67,7 @@ is ($dbh->do ("update foo set baz = 1 where bar = 'Wrong'"), undef, "do update")
 is   ($DBI::err, -2046,					"err -2046");
 is   ($DBI::errstr, "Invalid table name.",		"Invalid table name");
 like ($DBI::state, qr{^(?:S1000|30500)?$},		"err state S1000/30500");
-is   ($DBI::rows,   -1,					"err row count");
+ok   ($DBI::rows <= 0,					"err row count");
 
 # Methods common to all handles
 

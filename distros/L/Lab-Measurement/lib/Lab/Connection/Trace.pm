@@ -1,7 +1,6 @@
 package Lab::Connection::Trace;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Trace communication with instruments
-$Lab::Connection::Trace::VERSION = '3.553';
+$Lab::Connection::Trace::VERSION = '3.554';
 use 5.010;
 use warnings;
 use strict;
@@ -293,7 +292,7 @@ Lab::Connection::Trace - Trace communication with instruments
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

@@ -6,14 +6,13 @@ For example, running this code
 ```perl
 #!/usr/bin/env perl
 
-use v5.10;
-use strict;
+use v5.26;
 use warnings;
-use Time::Moment::Epoch;
+use Time::Moment::Epoch qw(:all);
 
-say Time::Moment::Epoch::unix(1234567890);
+say unix(1234567890);
 
-say Time::Moment::Epoch::chrome(12879041490654321);
+say chrome(12879041490654321);
 ```
 
 would give
@@ -23,19 +22,18 @@ would give
 2009-02-13T23:31:30.654321Z
 ```
 
-**Update:** Now there are functions in the other direction too! For example, running this
+Now there are functions in the other direction too! For example, running this
 
 ```perl
 #!/usr/bin/env perl
 
-use v5.10;
-use strict;
+use v5.26;
 use warnings;
-use Time::Moment::Epoch;
+use Time::Moment::Epoch qw(:all);
 
-say Time::Moment::Epoch::to_unix('2009-02-13T23:31:30Z');
+say to_unix('2009-02-13T23:31:30Z');
 
-say Time::Moment::Epoch::to_chrome('2009-02-13T23:31:30.654321Z');
+say to_chrome('2009-02-13T23:31:30.654321Z');
 ```
 
 gives
@@ -44,6 +42,8 @@ gives
 1234567890
 12879041490654321
 ```
+
+See the included scripts `bin/convert_epoch` and `bin/is_epoch` for more example usage.
 
 ## Contributors
 

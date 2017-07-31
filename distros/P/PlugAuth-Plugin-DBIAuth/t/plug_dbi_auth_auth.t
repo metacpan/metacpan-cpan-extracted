@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use File::HomeDir::Test;
+use Test2::Plugin::FauxHomeDir;
+use File::Glob qw( bsd_glob );
 use Test::PlugAuth::Plugin::Auth;
 
 unless(eval qq{ require DBD::SQLite; 1 })
@@ -9,7 +10,7 @@ unless(eval qq{ require DBD::SQLite; 1 })
   plan skip_all => 'Test requires DBD::SQLite';
 }
 
-my $home = File::HomeDir->my_home;
+my $home = bsd_glob('~');
 my $dbfile = File::Spec->catfile($home, 'auth.sqlite');
 
 run_tests 'PlugAuth::Plugin::DBIAuth', {}, {

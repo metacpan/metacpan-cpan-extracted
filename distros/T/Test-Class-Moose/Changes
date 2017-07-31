@@ -1,5 +1,14 @@
 Revision history for Perl distribution Test-Class-Moose
 
+0.85     2017-07-29
+
+  [ENHANCEMENTS]
+
+  * All report objects now have start_time and end_time methods.
+
+  * Added support for the "bare => 1" import option to
+    Test::Class::Moose::Role. Implemented by Desmond Daignault. PR #80.
+
 0.84     2017-05-15
 
   [ENHANCEMENTS]

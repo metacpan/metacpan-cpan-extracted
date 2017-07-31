@@ -204,16 +204,6 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
             // [START]Preorder traversal position
             
             switch (op_cur->code) {
-              case SPVM_OP_C_CODE_EVAL: {
-                
-                SPVM_DYNAMIC_ARRAY_push(eval_stack, op_cur);
-                
-                break;
-              }
-              case SPVM_OP_C_CODE_SWITCH: {
-                cur_case_bytecode_indexes = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-                break;
-              }
               case SPVM_OP_C_CODE_BLOCK: {
                 if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_LOOP) {
                   // Add goto
@@ -226,6 +216,12 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                   
                   SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, 0);
                   SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, 0);
+                }
+                else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_SWITCH) {
+                  cur_case_bytecode_indexes = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+                }
+                else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
+                  SPVM_DYNAMIC_ARRAY_push(eval_stack, op_cur);
                 }
               }
             }
@@ -382,7 +378,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                           for (i = 0; i < length; i++) {
                             SPVM_OP* op_case = SPVM_DYNAMIC_ARRAY_fetch(switch_info->op_cases, case_pos);
                             SPVM_OP* op_constant = op_case->first;
-                            if (op_constant->uv.constant->uv.long_value - min == i) {
+                            if (op_constant->uv.constant->value.int_value - min == i) {
                               // Case
                               int32_t* case_bytecode_index_ptr = SPVM_DYNAMIC_ARRAY_fetch(cur_case_bytecode_indexes, case_pos);
                               int32_t case_bytecode_index = *case_bytecode_index_ptr;
@@ -427,7 +423,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                           for (i = 0; i < length; i++) {
                             SPVM_OP* op_case = SPVM_DYNAMIC_ARRAY_fetch(switch_info->op_cases, case_pos);
                             SPVM_OP* op_constant = op_case->first;
-                            if (op_constant->uv.constant->uv.long_value - min == i) {
+                            if (op_constant->uv.constant->value.int_value - min == i) {
                               // Case
                               int64_t* case_bytecode_index_ptr = SPVM_DYNAMIC_ARRAY_fetch(cur_case_bytecode_indexes, case_pos);
                               int64_t case_bytecode_index = *case_bytecode_index_ptr;
@@ -491,8 +487,8 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                               for (j = i + 1; j < length; j++) {
                                 SPVM_OP* op_case_i = SPVM_DYNAMIC_ARRAY_fetch(ordered_op_cases, i);
                                 SPVM_OP* op_case_j = SPVM_DYNAMIC_ARRAY_fetch(ordered_op_cases, j);
-                                int32_t match_i = op_case_i->first->uv.constant->uv.long_value;
-                                int32_t match_j = op_case_j->first->uv.constant->uv.long_value;
+                                int32_t match_i = op_case_i->first->uv.constant->value.int_value;
+                                int32_t match_j = op_case_j->first->uv.constant->value.int_value;
                                 
                                 int32_t* case_bytecode_index_i = SPVM_DYNAMIC_ARRAY_fetch(ordered_case_bytecode_indexes, i);
                                 int32_t* case_bytecode_index_j = SPVM_DYNAMIC_ARRAY_fetch(ordered_case_bytecode_indexes, j);
@@ -514,7 +510,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                           for (i = 0; i < length; i++) {
                             SPVM_OP* op_case = SPVM_DYNAMIC_ARRAY_fetch(ordered_op_cases, i);
                             SPVM_OP* op_constant = op_case->first;
-                            int32_t match = op_constant->uv.constant->uv.long_value;
+                            int32_t match = op_constant->uv.constant->value.int_value;
 
                             int32_t* case_bytecode_index_ptr = SPVM_DYNAMIC_ARRAY_fetch(ordered_case_bytecode_indexes, i);
                             int32_t case_bytecode_index = *case_bytecode_index_ptr;
@@ -569,8 +565,8 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                               for (j = i + 1; j < length; j++) {
                                 SPVM_OP* op_case_i = SPVM_DYNAMIC_ARRAY_fetch(ordered_op_cases, i);
                                 SPVM_OP* op_case_j = SPVM_DYNAMIC_ARRAY_fetch(ordered_op_cases, j);
-                                int32_t match_i = (int32_t)op_case_i->first->uv.constant->uv.long_value;
-                                int32_t match_j = (int32_t)op_case_j->first->uv.constant->uv.long_value;
+                                int32_t match_i = (int32_t)op_case_i->first->uv.constant->value.int_value;
+                                int32_t match_j = (int32_t)op_case_j->first->uv.constant->value.int_value;
                                 
                                 int32_t* case_bytecode_index_i = SPVM_DYNAMIC_ARRAY_fetch(ordered_case_bytecode_indexes, i);
                                 int32_t* case_bytecode_index_j = SPVM_DYNAMIC_ARRAY_fetch(ordered_case_bytecode_indexes, j);
@@ -592,7 +588,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                           for (i = 0; i < length; i++) {
                             SPVM_OP* op_case = SPVM_DYNAMIC_ARRAY_fetch(ordered_op_cases, i);
                             SPVM_OP* op_constant = op_case->first;
-                            int32_t match = (int32_t)op_constant->uv.constant->uv.long_value;
+                            int32_t match = (int32_t)op_constant->uv.constant->value.int_value;
 
                             int32_t* case_bytecode_index_ptr = SPVM_DYNAMIC_ARRAY_fetch(ordered_case_bytecode_indexes, i);
                             int32_t case_bytecode_index = *case_bytecode_index_ptr;
@@ -1165,11 +1161,11 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     
                     break;
                   }
-                  case SPVM_OP_C_CODE_MALLOC: {
+                  case SPVM_OP_C_CODE_NEW: {
                     if (op_cur->first->code == SPVM_OP_C_CODE_CONSTANT) {
                       SPVM_CONSTANT* constant = op_cur->first->uv.constant;
                       
-                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_MALLOC_STRING);
+                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_NEW_STRING);
                       SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->constant_pool_index >> 24) & 0xFF);
                       SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->constant_pool_index >> 16) & 0xFF);
                       SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->constant_pool_index >> 8) & 0xFF);
@@ -1179,7 +1175,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur->first);
                       
                       if (SPVM_TYPE_is_array(compiler, type)) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_MALLOC_ARRAY);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_NEW_ARRAY);
                         if (SPVM_TYPE_is_array_numeric(compiler, type)) {
                           if (strcmp(type->name, "byte[]") == 0) {
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_BYTE);
@@ -1208,7 +1204,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                         }
                       }
                       else {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_MALLOC_OBJECT);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_NEW_OBJECT);
                         
                         const char* package_name = op_cur->first->uv.type->name;
                         
@@ -1847,154 +1843,150 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     }
                     
                     _Bool bytecode_set = 0;
-                    if (constant->code == SPVM_CONSTANT_C_CODE_BYTE) {
-                      // Currently not used logic
-                      assert(0);
-                      if (constant->uv.long_value == 0) {
+                    if (constant->type->id == SPVM_TYPE_C_ID_BYTE) {
+                      if (constant->value.byte_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_BYTE_0);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 1) {
+                      else if (constant->value.byte_value == 1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_BYTE_1);
                         bytecode_set = 1;
                       }
                       else {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_BYTE);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.byte_value);
                         bytecode_set = 1;
                       }
                     }
-                    else if (constant->code == SPVM_CONSTANT_C_CODE_SHORT) {
-                      // Currently not used logic
-                      assert(0);
+                    else if (constant->type->id == SPVM_TYPE_C_ID_SHORT) {
                       
-                      if (constant->uv.long_value == 0) {
+                      if (constant->value.short_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_SHORT_0);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 1) {
+                      else if (constant->value.short_value == 1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_SHORT_1);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value >= -128 && constant->uv.long_value <= 127) {
+                      else if (constant->value.short_value >= -128 && constant->value.short_value <= 127) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_BYTE_TO_SHORT);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.short_value & 0xFF);
                         bytecode_set = 1;
                       }
                       else {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_SHORT);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->uv.long_value >> 8) & 0xFF);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->value.short_value >> 8) & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.short_value & 0xFF);
                         bytecode_set = 1;
                       }
                     }
-                    else if (constant->code == SPVM_CONSTANT_C_CODE_INT) {
-                      if (constant->uv.long_value == -1) {
+                    else if (constant->type->id == SPVM_TYPE_C_ID_INT) {
+                      if (constant->value.int_value == -1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_M1);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 0) {
+                      else if (constant->value.int_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_0);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 1) {
+                      else if (constant->value.int_value == 1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_1);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 2) {
+                      else if (constant->value.int_value == 2) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_2);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 3) {
+                      else if (constant->value.int_value == 3) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_3);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 4) {
+                      else if (constant->value.int_value == 4) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_4);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 5) {
+                      else if (constant->value.int_value == 5) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_INT_5);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value >= -128 && constant->uv.long_value <= 127) {
+                      else if (constant->value.int_value >= -128 && constant->value.int_value <= 127) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_BYTE_TO_INT);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.int_value & 0xFF);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value >= -32768 && constant->uv.long_value <= 32767) {
+                      else if (constant->value.int_value >= -32768 && constant->value.int_value <= 32767) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_SHORT_TO_INT);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->uv.long_value >> 8) & 0xFF);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->value.int_value >> 8) & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.int_value & 0xFF);
                         bytecode_set = 1;
                       }
                     }
-                    else if (constant->code == SPVM_CONSTANT_C_CODE_LONG) {
-                      if (constant->uv.long_value == -1) {
+                    else if (constant->type->id == SPVM_TYPE_C_ID_LONG) {
+                      if (constant->value.long_value == -1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_M1);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 0) {
+                      else if (constant->value.long_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_0);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 1) {
+                      else if (constant->value.long_value == 1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_1);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 2) {
+                      else if (constant->value.long_value == 2) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_2);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 3) {
+                      else if (constant->value.long_value == 3) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_3);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 4) {
+                      else if (constant->value.long_value == 4) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_4);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value == 5) {
+                      else if (constant->value.long_value == 5) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_LONG_5);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value >= -128 && constant->uv.long_value <= 127) {
+                      else if (constant->value.long_value >= -128 && constant->value.long_value <= 127) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_BYTE_TO_LONG);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.long_value & 0xFF);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.long_value >= -32768 && constant->uv.long_value <= 32767) {
+                      else if (constant->value.long_value >= -32768 && constant->value.long_value <= 32767) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_PUSH_SHORT_TO_LONG);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->uv.long_value >> 8) & 0xFF);
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->uv.long_value & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant->value.long_value >> 8) & 0xFF);
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant->value.long_value & 0xFF);
                         bytecode_set = 1;
                       }
                     }
-                    else if (constant->code == SPVM_CONSTANT_C_CODE_FLOAT) {
-                      if (constant->uv.float_value == 0) {
+                    else if (constant->type->id == SPVM_TYPE_C_ID_FLOAT) {
+                      if (constant->value.float_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_FLOAT_0);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.float_value == 1) {
+                      else if (constant->value.float_value == 1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_FLOAT_1);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.float_value == 2) {
+                      else if (constant->value.float_value == 2) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_FLOAT_2);
                         bytecode_set = 1;
                       }
                     }
-                    else if (constant->code == SPVM_CONSTANT_C_CODE_DOUBLE) {
-                      if (constant->uv.double_value == 0) {
+                    else if (constant->type->id == SPVM_TYPE_C_ID_DOUBLE) {
+                      if (constant->value.double_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_DOUBLE_0);
                         bytecode_set = 1;
                       }
-                      else if (constant->uv.double_value == 1) {
+                      else if (constant->value.double_value == 1) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_DOUBLE_1);
                         bytecode_set = 1;
                       }
                     }
-                    else if (constant->code == SPVM_CONSTANT_C_CODE_STRING) {
+                    else if (constant->type->id == SPVM_TYPE_C_ID_STRING) {
                       break;
                     }
                     else {
@@ -2002,10 +1994,10 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     }
                     
                     if (!bytecode_set) {
-                      if (constant->code == SPVM_CONSTANT_C_CODE_INT || constant->code == SPVM_CONSTANT_C_CODE_FLOAT) {
+                      if (constant->type->id == SPVM_TYPE_C_ID_INT || constant->type->id == SPVM_TYPE_C_ID_FLOAT) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_LOAD_CONSTANT);
                       }
-                      else if (constant->code == SPVM_CONSTANT_C_CODE_LONG || constant->code == SPVM_CONSTANT_C_CODE_DOUBLE) {
+                      else if (constant->type->id == SPVM_TYPE_C_ID_LONG || constant->type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_LOAD_CONSTANT2);
                       }
                       else {

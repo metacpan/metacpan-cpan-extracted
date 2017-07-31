@@ -1,6 +1,20 @@
+0.55     2017-07-23
+
+- Skip all the tests unless List::SomeUtils 0.56 is installed. This fixes the
+  issue where trying to install the new List::SomeUtils ends up pulling this
+  distribution, which then fails because an older LSU is installed but doesn't
+  export mode(). Reported by John SJ Anderson. GH #1.
+
+
+0.54     2017-07-22
+
+- Added a new function, mode(), requested by Jerrad Pierce. GH #2.
+
+
 0.53     2017-06-01
 
 - Moved issue tracking to GitHub.
+
 
 0.52     2016-05-06
 

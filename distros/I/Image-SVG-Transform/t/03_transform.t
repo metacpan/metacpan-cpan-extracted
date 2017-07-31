@@ -38,6 +38,10 @@ $trans->extract_transforms("translate(5,10)");
 my $view3a = $trans->transform([10, 10]);
 is_deeply $view3a, [15, 20], 'X&Y translation from 10,10 to 15,20';
 
+$trans->extract_transforms("translate(5, 10)");
+my $view3a = $trans->transform([10, 10]);
+is_deeply $view3a, [15, 20], 'X&Y translation from 10,10 to 15,20';
+
 $trans->extract_transforms("scale(3)");
 my $view4 = $trans->transform([12, 7]);
 is_deeply $view4, [36, 21], '3X scaling from 12,7 to 36,21';

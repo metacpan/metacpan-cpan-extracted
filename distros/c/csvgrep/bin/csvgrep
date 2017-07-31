@@ -10,6 +10,7 @@ use Getopt::Long;
 my $SHOW_COUNT_THRESHOLD = 7;
 my $usage_string         = "usage: $0 [-h] [-d <dir>] [-i] <pattern> <file>\n";
 my $case_insensitive     = 0;
+my $match_column         = 0;
 my $column_spec;
 
 
@@ -44,10 +45,17 @@ sub show_matching_rows
 
     while (<$fh>) {
         $total_rows++;
-        next unless ($case_insensitive && /$pattern/io)
+        next unless $match_column
+                 || ($case_insensitive && /$pattern/io)
                  || (!$case_insensitive && /$pattern/o);
         my $status = $parser->parse($_);
         my @columns = $parser->fields;
+
+        next if $match_column
+             && (   ($case_insensitive  && $columns[$match_column] !~ /$pattern/io)
+                 || (!$case_insensitive && $columns[$match_column] !~ /$pattern/o)
+                );
+
         if ($column_spec) {
             @columns = @columns[@col_indices];
         }
@@ -75,6 +83,7 @@ sub process_command_line
         'help|h'            => \$help,
         'columns|c=s'       => \$column_spec,
         'directory|d=s'     => \$dirpath,
+        'match-column|mc=i' => \$match_column,
     ) || die $usage_string;
 
     die $usage_string if ($help);
@@ -158,6 +167,21 @@ which takes a comma-separated list of column numbers:
  | Mary Poppins | PL Travers   | 1934 |
  | Frankenstein | Mary Shelley | 1818 |
  +--------------+--------------+------+
+
+By default the pattern will be matched against the whole line,
+but you can use B<--match-column> or B<-mc> to specify that the pattern
+should only be matched against a specific column:
+
+ % csvgrep -mc 0 -c 0,1,3 -i mary books.csv
+ +--------------+--------------+------+
+ | Book         | Author       | Date |
+ +--------------+--------------+------+
+ | Mary Poppins | PL Travers   | 1934 |
+ +--------------+--------------+------+
+
+The number of the match column refers to the numbering of the full set
+of columns, regardless of whether you've used the B<-c> option.
+This means you can match against a column that you're not displaying.
 
 The pattern can be a Perl regexp,
 but you'll probably need to quote it from your shell:

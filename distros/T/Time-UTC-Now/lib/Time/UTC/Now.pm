@@ -4,22 +4,22 @@ Time::UTC::Now - determine current time in UTC correctly
 
 =head1 SYNOPSIS
 
-	use Time::UTC::Now
-		qw(now_utc_rat now_utc_sna now_utc_flt now_utc_dec);
+    use Time::UTC::Now qw(
+	now_utc_rat now_utc_sna now_utc_flt now_utc_dec);
 
-	($day, $secs, $bound) = now_utc_rat;
-	($day, $secs, $bound) = now_utc_rat(1);
-	($day, $secs, $bound) = now_utc_sna;
-	($day, $secs, $bound) = now_utc_sna(1);
-	($day, $secs, $bound) = now_utc_flt;
-	($day, $secs, $bound) = now_utc_flt(1);
-	($day, $secs, $bound) = now_utc_dec;
-	($day, $secs, $bound) = now_utc_dec(1);
+    ($day, $secs, $bound) = now_utc_rat;
+    ($day, $secs, $bound) = now_utc_rat(1);
+    ($day, $secs, $bound) = now_utc_sna;
+    ($day, $secs, $bound) = now_utc_sna(1);
+    ($day, $secs, $bound) = now_utc_flt;
+    ($day, $secs, $bound) = now_utc_flt(1);
+    ($day, $secs, $bound) = now_utc_dec;
+    ($day, $secs, $bound) = now_utc_dec(1);
 
-	use Time::UTC::Now qw(utc_day_to_mjdn utc_day_to_cjdn);
+    use Time::UTC::Now qw(utc_day_to_mjdn utc_day_to_cjdn);
 
-	$mjdn = utc_day_to_mjdn($day);
-	$cjdn = utc_day_to_cjdn($day);
+    $mjdn = utc_day_to_mjdn($day);
+    $cjdn = utc_day_to_cjdn($day);
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ package Time::UTC::Now;
 use warnings;
 use strict;
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -299,7 +299,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2010, 2012
+Copyright (C) 2006, 2007, 2009, 2010, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

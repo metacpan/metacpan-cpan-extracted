@@ -13,8 +13,6 @@ BEGIN {
     };
 }
 
-plan 15;
-
 create_config_ok 'common';
 
 my $cluster = Test::Clustericious::Cluster->new;
@@ -39,6 +37,8 @@ $t->get_ok($cluster->urls->[0] . "/number")
 $t->get_ok($cluster->urls->[1] . "/number")
   ->status_is(200)
   ->content_is(1);
+
+done_testing;
 
 __DATA__
 

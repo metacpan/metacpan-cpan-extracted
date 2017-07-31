@@ -4,7 +4,7 @@
       "Leon Wright <techman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +21,7 @@
       },
       "develop" : {
          "requires" : {
+            "Test::Perl::Critic" : "0",
             "Test::Spelling" : "0.12"
          }
       },
@@ -57,11 +58,11 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/techman83/WebService-Strava3",
-         "web" : "https://github.com/techman83/WebService-Strava3"
+         "url" : "git://github.com/techman83/WebService-Freshservice",
+         "web" : "https://github.com/techman83/WebService-Freshservice"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

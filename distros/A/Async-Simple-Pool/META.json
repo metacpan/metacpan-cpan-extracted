@@ -58,18 +58,22 @@
    "provides" : {
       "Async::Simple::Pool" : {
          "file" : "lib/Async/Simple/Pool.pm",
-         "version" : "0.08"
+         "version" : "0.12"
       },
       "Async::Simple::Task" : {
          "file" : "lib/Async/Simple/Task.pm",
-         "version" : "0.08"
+         "version" : "0.12"
       },
       "Async::Simple::Task::Fork" : {
          "file" : "lib/Async/Simple/Task/Fork.pm",
-         "version" : "0.08"
+         "version" : "0.12"
+      },
+      "Async::Simple::Task::ForkTmpFile" : {
+         "file" : "lib/Async/Simple/Task/ForkTmpFile.pm",
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

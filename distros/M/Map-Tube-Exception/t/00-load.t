@@ -3,7 +3,7 @@
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 26;
+use Test::More tests => 27;
 
 BEGIN {
     use_ok('Map::Tube::Exception')                          || print "Bail out!\n";
@@ -32,6 +32,7 @@ BEGIN {
     use_ok('Map::Tube::Exception::MissingPluginFormatter')  || print "Bail out!\n";
     use_ok('Map::Tube::Exception::InvalidLineColor')        || print "Bail out!\n";
     use_ok('Map::Tube::Exception::MissingMapData')          || print "Bail out!\n";
+    use_ok('Map::Tube::Exception::MalformedMapData')        || print "Bail out!\n";
 }
 
 diag( "Testing Map::Tube::Exception $Map::Tube::Exception::VERSION, Perl $], $^X" );

@@ -1,0 +1,38 @@
+<%ARGS>
+$Owner => undef
+$Password => ''
+$Description => ''
+</%ARGS>
+<%INIT>
+my $token = RT::AuthToken->new($session{CurrentUser});
+my ($error, $authstring);
+
+if (!$Owner) {
+    $error = loc("Owner required. Please refresh the page and try again.");
+}
+elsif (!length($Description)) {
+    $error = loc("Description cannot be blank.");
+}
+elsif (!length($Password)) {
+    $error = loc("Please enter your current password.");
+}
+elsif (!$session{CurrentUser}->IsPassword($Password) ) {
+    $error = loc("Please enter your current password correctly.");
+}
+else {
+    ((my $ok), (my $msg), $authstring) = $token->Create(
+        Owner       => $Owner,
+        Description => $Description,
+    );
+}
+</%INIT>
+% if ($error) {
+<& /Elements/AuthToken/CreateForm, Owner => $Owner, Error => $error, Description => $Description &>
+% } else {
+<div class="authtoken-success">
+<p><&|/l, $Description&>This is your new authentication token. Treat it carefully like a password. Please save it now because you cannot access it again.</&></p>
+<br>
+<span class="authstring"><% $authstring %></span>
+</div>
+% }
+

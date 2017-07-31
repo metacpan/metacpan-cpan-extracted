@@ -1,0 +1,16 @@
+<& /Elements/Header, Title => loc('My authentication tokens') &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<div class="auth-tokens">
+<p><&|/l&>Authentication tokens allow other applications to use your user account without having to share your password, while allowing you to revoke access on an application-specific basis. Changing your password <em>does not</em> invalidate your auth tokens; you must revoke them here.</&></p>
+<br>
+
+<& /Elements/AuthToken/CreateButton, %ARGS, Owner => $UserObj->Id &>
+<& /Elements/AuthToken/List, %ARGS, Owner => $UserObj->Id &>
+</div>
+
+<%INIT>
+my @results;
+my $UserObj = $session{'CurrentUser'}->UserObj;
+</%INIT>

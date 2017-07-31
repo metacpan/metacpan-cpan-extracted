@@ -117,9 +117,10 @@ Start with a prepared header, otherwise one is created.
 example: 
 
  my $msg = Mail::Message->build
-  ( From   => 'me@home.nl'
-  , To     => Mail::Address->new('your name', 'you@yourplace.aq')
-  , Cc     => 'everyone@example.com'
+  ( From    => 'me@home.nl'
+  , To      => Mail::Address->new('your name', 'you@yourplace.aq')
+  , Cc      => 'everyone@example.com'
+  , Subject => "Let's talk",
   , $other_message->get('Bcc')
 
   , data   => [ "This is\n", "the first part of\n", "the message\n" ]
@@ -304,20 +305,20 @@ the right type.
 You may wish to construct a message to be stored in a some kind
 of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
-Mail::Box subroutine addMessage process, the message will get L<coerce()|Mail::Message/"Internals">-d
+L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.000,
-built on February 02, 2017.
+This module is part of Mail-Message distribution version 3.001,
+built on July 26, 2017.
 
 Do not forget to read
-L</Mail::Box-Overview>,
-L</Mail::Box-Cookbook>, and
-L</Mail::Box-Index>.
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
 Examples are included in the Mail-Box distribution, directories 'examples'
 and 'scripts'.
 
@@ -325,15 +326,15 @@ Browseable manuals, papers, and other released material van be found
 at  Website: F<http://perl.overmeer.net/mailbox/>
 
 The central modules (in separate distributions) in the MailBox suite are:
-L</Mail::Message>,
-L</Mail::Box>,
-L</Mail::Box::IMAP4>,
-L</Mail::Box::POP3>,
-L</Mail::Box::Parser::C>,
-L</Mail::Box::Dbx> (unpublished),
-L</Mail::Transport>,
-L</Object::Realize::Later>, and
-L</User::Identity>.
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
 
 Please post questions or ideas to the author F<markov@cpan.org>.
 
@@ -343,5 +344,5 @@ Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

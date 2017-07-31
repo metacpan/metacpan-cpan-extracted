@@ -1,7 +1,7 @@
 package Finance::BankUtils::ID::Mechanize;
 
 our $DATE = '2017-07-20'; # DATE
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 use 5.010;
 use strict;
@@ -64,7 +64,7 @@ Finance::BankUtils::ID::Mechanize - A subclass of WWW::Mechanize
 
 =head1 VERSION
 
-This document describes version 0.48 of Finance::BankUtils::ID::Mechanize (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
+This document describes version 0.49 of Finance::BankUtils::ID::Mechanize (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
 
 =head1 SYNOPSIS
 

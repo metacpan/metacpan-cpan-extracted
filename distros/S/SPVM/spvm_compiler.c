@@ -23,11 +23,13 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
   
   // Copy constant pool to runtime
-  runtime->constant_pool = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(compiler->constant_pool->length, sizeof(int32_t));
+  int64_t runtime_constant_pool_byte_size = (int64_t)compiler->constant_pool->length * (int64_t)sizeof(int32_t);
+  runtime->constant_pool = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(runtime_constant_pool_byte_size);
   memcpy(runtime->constant_pool, compiler->constant_pool->values, compiler->constant_pool->length * sizeof(int32_t));
   
   // Copy bytecodes to runtime
-  runtime->bytecodes = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(compiler->bytecode_array->length, sizeof(uint8_t));
+  int64_t runtime_bytecodes_byte_size = (int64_t)compiler->bytecode_array->length * (int64_t)sizeof(uint8_t);
+  runtime->bytecodes = SPVM_UTIL_ALLOCATOR_safe_malloc(runtime_bytecodes_byte_size);
   memcpy(runtime->bytecodes, compiler->bytecode_array->values, compiler->bytecode_array->length * sizeof(uint8_t));
   
   SPVM_DYNAMIC_ARRAY* op_packages = compiler->op_packages;
@@ -65,6 +67,7 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->cur_line = 0;
   compiler->cur_file = NULL;
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+  compiler->cur_template_args = NULL;
   
   compiler->start_sub_name = NULL;
   
@@ -127,7 +130,7 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
     // Entry point
     int32_t entyr_point_package_name_length = (int32_t)strlen(entyr_point_package_name);
     int32_t entry_point_sub_name_length =  (int32_t)(entyr_point_package_name_length + 6);
-    char* entry_point_sub_name = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(entry_point_sub_name_length + 1, sizeof(char));
+    char* entry_point_sub_name = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(entry_point_sub_name_length + 1);
     strncpy(entry_point_sub_name, entyr_point_package_name, entyr_point_package_name_length);
     strncpy(entry_point_sub_name + entyr_point_package_name_length, "::main", 6);
     entry_point_sub_name[entry_point_sub_name_length] = '\0';
@@ -135,9 +138,9 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   }
   
   // use standard module
-  SPVM_OP* op_use_std = SPVM_OP_new_op_use_from_package_name(compiler, "std", "CORE", 0);
+  SPVM_OP* op_use_std = SPVM_OP_new_op_use_from_package_name(compiler, "stdout", "CORE", 0);
   SPVM_DYNAMIC_ARRAY_push(compiler->op_use_stack, op_use_std);
-  SPVM_HASH_insert(compiler->op_use_symtable, "std", strlen("std"), op_use_std);
+  SPVM_HASH_insert(compiler->op_use_symtable, "stdout", strlen("stdout"), op_use_std);
   
   /* call SPVM_yyparse */
   SPVM_yydebug = 0;

@@ -29,7 +29,7 @@
          "requires" : {
             "DateTime" : "0",
             "File::ShareDir" : "1.00",
-            "Getopt::Alt" : "v0.3.8",
+            "Getopt::Alt" : "v0.4.4",
             "Jenkins::API" : "0.11",
             "Moo" : "2.0",
             "Path::Tiny" : "0.076",
@@ -43,7 +43,7 @@
    "provides" : {
       "App::JenkinsCli" : {
          "file" : "lib/App/JenkinsCli.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "git://github.com/ivanwills/App-jenkins-cli.git"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

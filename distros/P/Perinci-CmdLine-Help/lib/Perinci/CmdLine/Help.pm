@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Help;
 
-our $DATE = '2017-01-27'; # DATE
-our $VERSION = '0.14'; # VERSION
+our $DATE = '2017-07-24'; # DATE
+our $VERSION = '0.16'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,6 +42,17 @@ $SPEC{gen_help} = {
         per_arg_yaml => {
             schema => 'bool*',
         },
+        ggls_res => {
+            summary => 'Full result from gen_getopt_long_spec_from_meta()',
+            schema  => 'array*', # XXX envres
+            description => <<'_',
+
+If you already call <pm:Perinci::Sub::GetArgs::Argv>'s
+`gen_getopt_long_spec_from_meta()`, you can pass the _full_ enveloped result
+here, to avoid calculating twice.
+
+_
+        },
     },
 };
 sub gen_help {
@@ -59,17 +70,16 @@ sub gen_help {
 
     # summary
     my $progname = $args{program_name};
-    push @help, $progname;
     {
         my $sum = $args{program_summary} // $meta->{summary};
         last unless $sum;
-        push @help, " - ", $sum, "\n";
+        push @help, $progname, " - ", $sum, "\n\n";
     }
 
     my $clidocdata;
 
     # usage
-    push @help, "\nUsage:\n";
+    push @help, "Usage:\n";
     {
         for (sort {
             ($common_opts->{$a}{order} // 99) <=>
@@ -87,6 +97,7 @@ sub gen_help {
             common_opts  => $common_opts,
             per_arg_json => $args{per_arg_json},
             per_arg_yaml => $args{per_arg_yaml},
+            (ggls_res => $args{ggls_res}) x defined($args{ggls_res}),
         );
         die [500, "gen_cli_doc_data_from_meta failed: ".
                  "$res->[0] - $res->[1]"] unless $res->[0] == 200;
@@ -243,7 +254,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.14 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2017-01-27.
+This document describes version 0.16 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2017-07-24.
 
 =head1 DESCRIPTION
 
@@ -254,7 +265,11 @@ formatting options first though).
 =head1 FUNCTIONS
 
 
-=head2 gen_help(%args) -> [status, msg, result, meta]
+=head2 gen_help
+
+Usage:
+
+ gen_help(%args) -> [status, msg, result, meta]
 
 Generate help message for Perinci::CmdLine-based app.
 
@@ -265,6 +280,14 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<common_opts> => I<hash> (default: {})
+
+=item * B<ggls_res> => I<array>
+
+Full result from gen_getopt_long_spec_from_meta().
+
+If you already call L<Perinci::Sub::GetArgs::Argv>'s
+C<gen_getopt_long_spec_from_meta()>, you can pass the I<full> enveloped result
+here, to avoid calculating twice.
 
 =item * B<meta>* => I<hash>
 
@@ -319,7 +342,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

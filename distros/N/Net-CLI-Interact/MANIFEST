@@ -32,6 +32,7 @@ lib/Net/CLI/Interact/Transport/Net_OpenSSH.pm
 lib/Net/CLI/Interact/Transport/Platform/Unix.pm
 lib/Net/CLI/Interact/Transport/Platform/Win32.pm
 lib/Net/CLI/Interact/Transport/Role/ConnectCore.pm
+lib/Net/CLI/Interact/Transport/Role/StripControlChars.pm
 lib/Net/CLI/Interact/Transport/Serial.pm
 lib/Net/CLI/Interact/Transport/SSH.pm
 lib/Net/CLI/Interact/Transport/Telnet.pm

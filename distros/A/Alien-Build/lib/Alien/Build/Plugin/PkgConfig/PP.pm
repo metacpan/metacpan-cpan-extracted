@@ -7,7 +7,7 @@ use Carp ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -60,8 +60,16 @@ sub init
     my($build) = @_;
     require PkgConfig;
     my $pkg = PkgConfig->find($self->pkg_name, search_path => [@PKG_CONFIG_PATH]);
-    die "second load of PkgConfig.pm @{[ $self->pkg_name ]} failed: @{[ $pkg->errmsg ]}"
-      if $pkg->errmsg;
+    if($pkg->errmsg)
+    {
+      $build->log("Trying to load the pkg-config information from the source code build");
+      $build->log("of your package failed");
+      $build->log("You are currently using the pure-perl implementation of pkg-config");
+      $build->log("(AB Plugin is named PkgConfig::PP, which uses PkgConfig.pm");
+      $build->log("It may work better with the real pkg-config.");
+      $build->log("Try installing your OS' version of pkg-config or unset ALIEN_BUILD_PKG_CONFIG");
+      die "second load of PkgConfig.pm @{[ $self->pkg_name ]} failed: @{[ $pkg->errmsg ]}"
+    }
     $build->runtime_prop->{cflags}  = _cleanup scalar $pkg->get_cflags;
     $build->runtime_prop->{libs}    = _cleanup scalar $pkg->get_ldflags;
     $build->runtime_prop->{version} = $pkg->pkg_version;
@@ -95,7 +103,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -138,6 +146,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

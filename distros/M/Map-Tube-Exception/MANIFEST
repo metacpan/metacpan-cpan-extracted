@@ -23,6 +23,7 @@ lib/Map/Tube/Exception/InvalidNodeObject.pm
 lib/Map/Tube/Exception/InvalidStationId.pm
 lib/Map/Tube/Exception/InvalidStationName.pm
 lib/Map/Tube/Exception/InvalidSupportedObject.pm
+lib/Map/Tube/Exception/MalformedMapData.pm
 lib/Map/Tube/Exception/MissingLineId.pm
 lib/Map/Tube/Exception/MissingLineName.pm
 lib/Map/Tube/Exception/MissingMapData.pm

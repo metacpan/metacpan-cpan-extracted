@@ -10,7 +10,7 @@ use Test::More tests => 7;
 use IPC::MorseSignals::Emitter;
 use IPC::MorseSignals::Receiver;
 
-my @msgs = qw/€éèë 月語 x tata たTÂ/;
+my @msgs = qw<€éèë 月語 x tata たTÂ>;
 
 sub cp { join '.', map ord, split //, $_[0] }
 

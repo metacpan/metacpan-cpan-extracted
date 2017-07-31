@@ -1,5 +1,8 @@
 Revision history for BankAccount::Validator::UK
 
+0.31  2017-07-27T10:30:00:+01:00
+      - Added new sort codes 230088 and 040004. (v4.40)
+
 0.30  2017-06-10T13:50:00:+01:00
       - Updated the valacdos.txt dated 2017-07-03.
       - Removed the following sorting codes from the range

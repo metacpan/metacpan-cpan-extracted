@@ -18,7 +18,7 @@ lib/WWW/Search/Ebay/Motors.pm
 lib/WWW/Search/Ebay/Stores.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 META.yml
 README
 README.md

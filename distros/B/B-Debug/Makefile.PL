@@ -6,12 +6,15 @@ WriteMakefile
    NAME	           => "B::Debug",
    VERSION_FROM    => "Debug.pm",
    PREREQ_PM => {'B'          => 0,
-                 'Test::More' => 0},
+                 'Test::More' => 0,
+              ($] >= 5.0217003 ?
+                ('deprecate'  => 0.03) : ()),
+                },
    ($] >= 5.005 ?
-    ('AUTHOR' => 'Malcolm Beattie <mbeattie@sable.ox.ac.uk>, Reini Urban <rurban@cpan.org>',
+    ('AUTHOR' => 'Malcolm Beattie <retired>, Reini Urban <rurban@cpan.org>',
      'ABSTRACT' => 'print debug info about ops') : ()),
    ($ExtUtils::MakeMaker::VERSION gt '6.30' ?
-    ('LICENSE'                => 'perl', ) : ()),
+    ('LICENSE'                => 'perl') : ()),
    (($ExtUtils::MakeMaker::VERSION gt '6.31' and $ExtUtils::MakeMaker::VERSION lt '6.46') ?
     ('EXTRA_META'  => "recommends:\n" .
      "    B::Flags:                      0.04\n"
@@ -28,3 +31,18 @@ WriteMakefile
    }) : (),
    SIGN => 1,
   );
+
+package MY;
+sub depend {
+  "
+README : \$(VERSION_FROM)
+	pod2text \$(VERSION_FROM) > README
+
+release : dist
+	echo git commit -a -m\"release \$(VERSION)\"
+	git tag \$(VERSION)
+	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
+	git push
+	git push --tags
+"
+}

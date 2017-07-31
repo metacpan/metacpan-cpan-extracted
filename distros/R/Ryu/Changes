@@ -1,5 +1,11 @@
 Revision history for Ryu
 
+0.023     2017-07-29 22:25:42+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    * ->map with a string parameter will use that as a hashref key lookup
+    on plain hashref items
+
 0.022     2017-07-09 14:33:16+08:00 Asia/Kuala_Lumpur
     New features:
 
@@ -44,7 +50,6 @@ Revision history for Ryu
     New features:
 
     * ->first - convenience wrapper for ->take(1)
-
 
 0.015     2017-05-22 21:22:25+08:00 Asia/Kuala_Lumpur
     New features:

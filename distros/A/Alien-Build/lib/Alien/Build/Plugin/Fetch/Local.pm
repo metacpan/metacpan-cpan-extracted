@@ -7,7 +7,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Local file plugin for fetching files
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 has '+url' => '';
@@ -75,6 +75,7 @@ sub init
         type     => 'file',
         filename => $path->basename,
         path     => $path->stringify,
+        tmp      => 0,
       };
     }
     else
@@ -100,13 +101,13 @@ Alien::Build::Plugin::Fetch::Local - Local file plugin for fetching files
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
  use alienfile;
  meta->prop->{start_url} = 'patch/libfoo-1.00.tar.gz';
- plugin 'Fetch::Local' => ();
+ plugin 'Fetch::Local';
 
 =head1 DESCRIPTION
 
@@ -115,7 +116,8 @@ instead.  It picks the appropriate fetch plugin based on your platform and envir
 In some cases you may need to use this plugin directly instead.
 
 This fetch plugin fetches files from the local file system.  It is mostly useful if you
-intend to bundle packages with your Alien.
+intend to bundle packages (as tarballs or zip files) with your Alien.  If you intend to
+bundle a source tree, use L<Alien::Build::Plugin::Fetch::LocalDir>.
 
 =head1 PROPERTIES
 
@@ -134,7 +136,21 @@ This property is for compatibility with other fetch plugins, but is not used.
 
 =head1 SEE ALSO
 
-L<Alien::Build::Plugin::Download::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
+=over 4
+
+=item L<Alien::Build::Plugin::Download::Negotiate>
+
+=item L<Alien::Build::Plugin::Fetch::LocalDir>
+
+=item L<Alien::Build>
+
+=item L<alienfile>
+
+=item L<Alien::Build::MM>
+
+=item L<Alien>
+
+=back
 
 =head1 AUTHOR
 
@@ -147,6 +163,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

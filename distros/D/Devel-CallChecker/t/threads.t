@@ -25,6 +25,7 @@ BEGIN {
 
 use threads;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Test::More tests => 3;
 use Thread::Semaphore ();
 use threads::shared;

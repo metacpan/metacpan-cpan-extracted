@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: App-TimeTracker-Command-Jira
 provides:
   App::TimeTracker::Command::Jira:
     file: lib/App/TimeTracker/Command/Jira.pm
-    version: '0.5'
+    version: '0.6'
 requires:
   App::TimeTracker::Utils: '0'
   Data::Dumper: '0'
@@ -35,4 +35,5 @@ resources:
   bugtracker: https://github.com/pepl/app-timetracker-command-jira/issues
   homepage: https://github.com/pepl/App-TimeTracker-Jira
   repository: https://github.com/pepl/App-TimeTracker-Jira.git
-version: '0.5'
+version: '0.6'
+x_serialization_backend: 'YAML::Tiny version 1.66'

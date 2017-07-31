@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Self::CLIWithSubcommands;
 
-our $DATE = '2017-01-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our @Module_Lists = (
     {
@@ -19,6 +19,7 @@ our @Module_Lists = (
             {module => 'App::shcompgen'     , scripts => ['shcompgen']},
             {module => 'App::short'         , scripts => ['short']},
             {module => 'App::TableDataUtils', scripts => ['gen-rand-table']},
+            {module => 'App::perlmv::u'     , scripts => ['perlmv-u']},
             {module => 'App::trash::u'      , scripts => ['trash-u']},
             {module => 'App::upf'           , scripts => ['upf']},
             {module => 'App::wp::xmlrpc'    , scripts => ['wp-xmlrpc']},
@@ -43,7 +44,7 @@ Acme::CPANLists::PERLANCAR::Self::CLIWithSubcommands - Distributions that contai
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANLists::PERLANCAR::Self::CLIWithSubcommands (from Perl distribution Acme-CPANLists-PERLANCAR-Self), released on 2017-01-06.
+This document describes version 0.003 of Acme::CPANLists::PERLANCAR::Self::CLIWithSubcommands (from Perl distribution Acme-CPANLists-PERLANCAR-Self), released on 2017-07-28.
 
 =head1 MODULE LISTS
 
@@ -74,6 +75,8 @@ This document describes version 0.002 of Acme::CPANLists::PERLANCAR::Self::CLIWi
 =item * L<App::short>
 
 =item * L<App::TableDataUtils>
+
+=item * L<App::perlmv::u>
 
 =item * L<App::trash::u>
 

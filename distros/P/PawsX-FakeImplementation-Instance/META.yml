@@ -1,0 +1,26 @@
+---
+abstract: 'A Paws extension to help you write fake AWS services'
+author:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+build_requires:
+  Paws::Kinesis::MemoryCaller: '0'
+  Paws::Net::MultiplexCaller: '0.03'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PawsX-FakeImplementation-Instance
+requires:
+  Paws: '0'
+  UUID: '0'
+resources:
+  bugtracker: https://github.com/pplu/pawsx-fakeimplementation-instance/issues/
+  repository: https://github.com/pplu/pawsx-fakeimplementation-instance/
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

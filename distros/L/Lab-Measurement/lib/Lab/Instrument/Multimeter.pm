@@ -1,6 +1,6 @@
-
 package Lab::Instrument::Multimeter;
-$Lab::Instrument::Multimeter::VERSION = '3.553';
+#ABSTRACT: Generic digital multimeter base class
+$Lab::Instrument::Multimeter::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 
@@ -73,13 +73,19 @@ sub get_error {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::Multimeter - Generic digital multimeter interface
+Lab::Instrument::Multimeter - Generic digital multimeter base class
+
+=head1 VERSION
+
+version 3.554
 
 =head1 DESCRIPTION
 
@@ -131,7 +137,6 @@ Display a message on the front panel.
 
 Clear the message displayed on the front panel.
 
-
 =head1 CAVEATS/BUGS
 
 none known so far :)
@@ -148,11 +153,17 @@ none known so far :)
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-  Copyright 2011 Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

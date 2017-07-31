@@ -1,6 +1,6 @@
 package Proc::tored::Flag;
 # ABSTRACT: Ties a runtime flag to the existence of a touch file
-$Proc::tored::Flag::VERSION = '0.17';
+$Proc::tored::Flag::VERSION = '0.18';
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ Proc::tored::Flag - Ties a runtime flag to the existence of a touch file
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ version 0.17
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -18,7 +18,7 @@ use SVN::S4;
 use SVN::S4::Debug qw (DEBUG is_debug);
 use SVN::S4::Path;
 
-our $VERSION = '1.064';
+our $VERSION = '1.066';
 our $Info = 1;
 
 
@@ -333,6 +333,104 @@ sub viewspec_compare_rev {
 	}
     }
     return 1;  # all revs were the same, return true
+}
+
+sub populate_non_switched_dirs {
+    my $self = shift;
+    my $basePath = shift;
+    my %params = (@_); #all params
+
+    my $rev = $params{revision};
+    $rev = $self->which_rev (revision=>$rev, path=>$params{url});
+
+    my $dir = "$params{path}/$basePath";
+    opendir(my $DIR, $dir) or die "opening dir $dir : $1";
+    while (my $file = readdir($DIR)) {
+        if($file eq "." || $file eq ".." || $file eq ".svn") {
+            next;
+        }
+        my $relPath = $self->clean_filename("$basePath$file");
+        my $isSwitch = 0;
+        my $isParent = 0;
+        foreach my $action (@{$self->{vs_actions}}) {
+            if ($action->{cmd} eq "switch") {
+                if ($action->{dir} eq $relPath) {
+                    #DEBUG "path $relPath is switched dir\n";
+                    $isSwitch = 1;
+                    last;
+                } elsif ($action->{dir} =~ /^$relPath\//) {
+                    #DEBUG "path $relPath is parent of switched dir $action->{dir}\n";
+                    $isParent = 1;
+                    last;
+                }
+            }
+        }
+        if ($isParent) {
+            my $cmd = "$self->{svn_binary} update --set-depth immediates ".
+                "$params{path}/$relPath -r$rev";
+            $cmd .= ' --quiet' if $self->quiet;
+            #DEBUG "s4: Updating immediates-depth $relPath\n";
+            $self->run ($cmd);
+            $self->populate_non_switched_dirs("$relPath/", %params);
+        }
+        elsif (!$isSwitch) {
+            my $cmd = "$self->{svn_binary} update --set-depth infinity ".
+                "$params{path}/$relPath -r$rev";
+            $cmd .= ' --quiet' if $self->quiet;
+            #DEBUG "s4: Updating infinity-depth: $relPath\n";
+            #DEBUG "Executing: $cmd\n";
+            $self->run ($cmd);
+        } else {
+            #DEBUG "Not populating switched dir $relPath";
+        }
+    }
+    closedir($DIR);
+}
+
+sub set_dirs_depth_infinity {
+    my $self = shift;
+    my $basePath = shift;
+    my %params = (@_); #all params
+
+    my $rev = $params{revision};
+    $rev = $self->which_rev (revision=>$rev, path=>$params{url});
+
+    my $dir = "$params{path}/$basePath";
+    opendir(my $DIR, $dir) or die "opening dir $dir : $1";
+    while (my $file = readdir($DIR)) {
+        if ($file eq "." || $file eq ".." || $file eq ".svn") {
+            next;
+        }
+        my $relPath = $self->clean_filename("$basePath$file");
+        my $isParent = 0;
+        my $isSwitch = 0;
+        my $itemRev = $rev;
+        foreach my $action (@{$self->{vs_actions}}) {
+            if ($action->{cmd} eq "switch") {
+                if ($action->{dir} eq $relPath) {
+                    #DEBUG "path $relPath is switched dir\n";
+                    $isSwitch = 1;
+                    $itemRev = $action->{rev};
+                    last;
+                } elsif ($action->{dir} =~ /^$relPath\//) {
+                    #DEBUG "path $relPath is parent of switched dir $action->{dir}\n";
+                    $isParent = 1;
+                    last;
+                }
+            }
+        }
+        if($isParent || $isSwitch) {
+            my $cmd = "$self->{svn_binary} update --set-depth infinity ".
+                "$params{path}/$relPath -r$itemRev";
+            $cmd .= ' --quiet' if $self->quiet;
+            #DEBUG "s4: Updating infinity-depth $relPath\n";
+            $self->run ($cmd);
+            if($isParent) {
+                $self->set_parent_dirs_depth_infinity ("$relPath/", %params);
+            }
+        }
+    }
+    closedir($DIR);
 }
 
 sub apply_viewspec {

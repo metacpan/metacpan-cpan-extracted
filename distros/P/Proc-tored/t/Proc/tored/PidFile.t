@@ -41,8 +41,8 @@ subtest 'positive path' => sub {
 subtest 'atomicity' => sub {
   scope_guard { $pidfile->clear_file };
 
-  $pidfile->write_lock_file->touch;
-  scope_guard { $pidfile->write_lock_file->remove };
+  $pidfile->lockfile->file->touch;
+  scope_guard { $pidfile->lockfile->file->remove };
   is $pidfile->write_file, 0, 'write_file returns 0 if write_lock fails';
 };
 

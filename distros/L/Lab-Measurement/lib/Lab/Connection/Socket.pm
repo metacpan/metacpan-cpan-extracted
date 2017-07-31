@@ -1,7 +1,6 @@
 package Lab::Connection::Socket;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: IP socket connection
-$Lab::Connection::Socket::VERSION = '3.553';
+$Lab::Connection::Socket::VERSION = '3.554';
 use Lab::Bus::Socket;
 use Lab::Connection;
 use Lab::Exception;
@@ -59,7 +58,7 @@ Lab::Connection::Socket - IP socket connection
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 COPYRIGHT AND LICENSE
 

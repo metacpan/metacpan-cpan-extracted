@@ -1,6 +1,6 @@
 package Outthentic;
 
-our $VERSION = '0.3.4';
+our $VERSION = '0.3.6';
 
 1;
 
@@ -287,9 +287,9 @@ sub run_story_file {
 
           if (-f project_root_dir()."/cpanfile" ){
             $story_command  = "PATH=\$PATH:".project_root_dir()."/local/bin/ perl -I ".story_cache_dir().
-            " -I ".project_root_dir()."/local/lib/perl5 -MOutthentic::Glue::Perl $story_dir/story.pl";
+            " -I ".project_root_dir()."/local/lib/perl5 -I".project_root_dir()."/lib " ."-MOutthentic::Glue::Perl $story_dir/story.pl";
           } else {
-            $story_command = "perl -I ".story_cache_dir()." -MOutthentic::Glue::Perl $story_dir/story.pl";
+            $story_command = "perl -I ".story_cache_dir()." -I ".project_root_dir()."/lib"." -MOutthentic::Glue::Perl $story_dir/story.pl";
           }
 
           print_story_header();
@@ -465,7 +465,7 @@ sub print_meta {
 
     my $task_name = get_prop('task_name');
 
-    note( ( nocolor() ? short_story_name($task_name) : colored( ['yellow'], short_story_name($task_name) ) ));
+    #note( ( nocolor() ? short_story_name($task_name) : colored( ['yellow'], short_story_name($task_name) ) ));
 
     while (my $i = <META>){
         chomp $i;
@@ -494,6 +494,8 @@ sub short_story_name {
     }
 
     my $story_vars = story_vars_pretty();
+
+    $short_story_dir ||= "/";
 
     my @ret;
 

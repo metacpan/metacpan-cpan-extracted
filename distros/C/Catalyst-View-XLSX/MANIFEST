@@ -1,0 +1,17 @@
+CHANGES
+dist.ini
+lib/Catalyst/Helper/View/XLSX.pm
+lib/Catalyst/View/XLSX.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
+README.pod
+t/00-load.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/View/XLSX.pm
+t/live-test.t
+META.json                                Module JSON meta-data (added by MakeMaker)

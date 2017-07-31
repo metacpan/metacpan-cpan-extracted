@@ -1,5 +1,13 @@
 Revision history for MooseX-AttributeShortcuts
 
+0.034     2017-07-25 19:18:32 CDT-0500
+	* Make optional requirements optional.  Thanks @ppisar!  Closes #19
+
+0.033     2017-07-24 21:52:45 CDT-0500
+	* Detect if MooseX::SemiAffordanceAccessor has been applied to the
+	  attribute, and conform our behaviour to it if necessary.  Add some docs,
+	  tests around this.
+
 0.032     2017-06-13 21:59:13 CDT-0500
 	* Move builder method name generation into its own method, provided by the
 	  common 'HasAnonBuilder' role, to allow for easier overriding when

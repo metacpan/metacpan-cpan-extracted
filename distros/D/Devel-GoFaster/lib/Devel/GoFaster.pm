@@ -4,9 +4,9 @@ Devel::GoFaster - optimise executable Perl ops
 
 =head1 SYNOPSIS
 
-	use Devel::GoFaster;
+    use Devel::GoFaster;
 
-	use Devel::GoFaster "global";
+    use Devel::GoFaster "global";
 
 =head1 DESCRIPTION
 
@@ -50,11 +50,11 @@ this module.
 package Devel::GoFaster;
 
 { use 5.006; }
-use Lexical::SealRequireHints 0.007;
+use Lexical::SealRequireHints 0.008;
 use warnings;
 use strict;
 
-our $VERSION = "0.000";
+our $VERSION = "0.001";
 
 eval { local $SIG{__DIE__};
 	require XSLoader;
@@ -132,7 +132,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2015, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

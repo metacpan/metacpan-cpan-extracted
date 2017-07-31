@@ -6,10 +6,26 @@ use Test::Spec;
 use Test::Exception;
 use Time::HiRes qw/ sleep /;
 
-plan tests => 18;
-
-# use lib '../lib';
+use lib '../lib';
 use Async::Simple::Task::Fork;
+
+
+if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
+    plan tests => 1;
+
+    describe 'All' => sub {
+        it 'fallback' => sub {
+            ok( 1, 'Your OS does not support threads... fallback to tmpfiles' );
+        }
+    };
+
+    runtests unless caller;
+
+    exit;
+};
+
+
+plan tests => 18;
 
 my $task;
 my $timeout    = 1;

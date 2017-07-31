@@ -1,9 +1,9 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
+META.json
 META.yml
-Makefile.PL
 README
 lib/Perl4/CoreLibs.pm
 lib/abbrev.pl

@@ -1,378 +1,89 @@
 package Pcore::API::DockerHub;
 
-use Pcore -const, -class, -result, -export => { CONST => [qw[$DOCKERHUB_PROVIDER_BITBUCKET $DOCKERHUB_PROVIDER_GITHUB $DOCKERHUB_SOURCE_TAG $DOCKERHUB_SOURCE_BRANCH]] };
-require Pcore::API::DockerHub::Repository;
+use Pcore -const, -class, -result, -export => { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERHUB_SOURCE_TYPE_BRANCH]] };
+use Pcore::Util::Scalar qw[is_plain_coderef];
 
-# https://github.com/RyanTheAllmighty/Docker-Hub-API
+has username => ( is => 'ro', isa => Str, required => 1 );
+has password => ( is => 'ro', isa => Str, required => 1 );
 
-has api_username => ( is => 'ro', isa => Str, required => 1 );
-has api_password => ( is => 'ro', isa => Str, required => 1 );
-has namespace => ( is => 'lazy', isa => Str );
+has _login_token => ( is => 'ro', isa => Str, init_arg => undef );
+has _reg_queue => ( is => 'ro', isa => HashRef [ArrayRef], init_arg => undef );
 
-has login_token => ( is => 'ro', isa => Str, init_arg => undef );
+const our $BASE_URL => 'https://hub.docker.com/v2';
 
-const our $API_VERSION => 2;
-const our $URL         => "https://hub.docker.com/v$API_VERSION";
+const our $DOCKERHUB_SOURCE_TYPE_TAG    => 'tag';
+const our $DOCKERHUB_SOURCE_TYPE_BRANCH => 'branch';
 
-const our $DOCKERHUB_PROVIDER_BITBUCKET => 1;
-const our $DOCKERHUB_PROVIDER_GITHUB    => 2;
-
-const our $DOCKERHUB_SOURCE_TAG    => 1;
-const our $DOCKERHUB_SOURCE_BRANCH => 2;
-
-const our $DOCKERHUB_PROVIDER_NAME => {
-    $DOCKERHUB_PROVIDER_BITBUCKET => 'bitbucket',
-    $DOCKERHUB_PROVIDER_GITHUB    => 'github',
+const our $DOCKERHUB_SOURCE_TYPE_NAME => {
+    $DOCKERHUB_SOURCE_TYPE_TAG    => 'Tag',
+    $DOCKERHUB_SOURCE_TYPE_BRANCH => 'Branch',
 };
 
-const our $DOCKERHUB_SOURCE_NAME => {
-    $DOCKERHUB_SOURCE_TAG    => 'Tag',
-    $DOCKERHUB_SOURCE_BRANCH => 'Branch',
+const our $DEF_PAGE_SIZE => 250;
+
+const our $BUILD_STATUS_TEXT => {
+    -4 => 'cancelled',
+    -1 => 'error',
+    0  => 'queued',
+    2  => '???',
+    3  => 'building',
+    10 => 'success',
 };
 
 sub BUILDARGS ( $self, $args = undef ) {
-    $args->{api_username} ||= $ENV->user_cfg->{DOCKERHUB}->{username} if $ENV->user_cfg->{DOCKERHUB}->{username};
+    $args->{username} ||= $ENV->user_cfg->{DOCKERHUB}->{username};
 
-    $args->{api_password} ||= $ENV->user_cfg->{DOCKERHUB}->{password} if $ENV->user_cfg->{DOCKERHUB}->{password};
-
-    $args->{namespace} ||= $ENV->user_cfg->{DOCKERHUB}->{namespace} if $ENV->user_cfg->{DOCKERHUB}->{namespace};
+    $args->{password} ||= $ENV->user_cfg->{DOCKERHUB}->{password};
 
     return $args;
 }
 
-sub _build_namespace ($self) {
-    return $self->api_username;
-}
+sub _login ( $self, $cb ) {
+    state $endpoint = '/users/login/';
 
-sub login ( $self, % ) {
-    my %args = (
-        cb => undef,
-        splice @_, 1,
-    );
+    if ( $self->{_login_token} ) {
+        $cb->( $self->{_login_token} );
 
-    return $self->request(
+        return;
+    }
+
+    push $self->{_req_queue}->{$endpoint}->@*, $cb;
+
+    return if $self->{_req_queue}->{$endpoint}->@* > 1;
+
+    return $self->_req(
         'post',
-        '/users/login/',
+        $endpoint,
         undef,
-        { username => $self->api_username, password => $self->api_password },
-        sub ($res) {
-            if ( $res->{data}->{detail} ) {
-                $res->{reason} = delete $res->{data}->{detail};
-            }
-
-            if ( $res->is_success && $res->{data}->{token} ) {
-                $self->{login_token} = delete $res->{data}->{token};
-            }
-
-            $args{cb}->($res) if $args{cb};
-
-            return;
-        }
-    );
-}
-
-sub get_user ( $self, % ) {
-    my %args = (
-        username => $self->api_username,
-        cb       => undef,
-        splice @_, 1,
-    );
-
-    return $self->request( 'get', "/users/$args{username}/", undef, undef, $args{cb} );
-}
-
-sub get_registry_settings ( $self, % ) {
-    my %args = (
-        cb => undef,
-        splice @_, 1,
-    );
-
-    return $self->request( 'get', "/users/@{[$self->api_username]}/registry-settings/", 1, undef, $args{cb} );
-}
-
-# GET REPOS
-sub get_all_repos ( $self, % ) {
-    my %args = (
-        namespace => $self->namespace,
-        cb        => undef,
-        splice @_, 1,
-    );
-
-    return $self->request(
-        'get',
-        "/users/$args{namespace}/repositories/",
-        1, undef,
-        sub ($res) {
-            if ( $res->is_success ) {
-                my $result = {};
-
-                for my $repo ( $res->{data}->@* ) {
-                    $repo = bless $repo, 'Pcore::API::DockerHub::Repository';
-
-                    $repo->set_status( $res->status );
-
-                    $repo->{api} = $self;
-
-                    $result->{ $repo->id } = $repo;
-                }
-
-                $res->{data} = $result;
-            }
-
-            $args{cb}->($res) if $args{cb};
-
-            return;
-        }
-    );
-}
-
-sub get_repos ( $self, % ) {
-    my %args = (
-        page      => 1,
-        page_size => 100,
-        namespace => $self->namespace,
-        cb        => undef,
-        splice @_, 1,
-    );
-
-    return $self->request(
-        'get',
-        "/repositories/$args{namespace}/?page_size=$args{page_size}&page=$args{page}",
-        1, undef,
-        sub($res) {
-            if ( $res->is_success ) {
-                $res->{count} = delete $res->{data}->{count};
-
-                $res->{next} = delete $res->{data}->{next};
-
-                $res->{previous} = delete $res->{data}->{previous};
-
-                my $result = {};
-
-                for my $repo ( $res->{data}->{results}->@* ) {
-                    $repo = bless $repo, 'Pcore::API::DockerHub::Repository';
-
-                    $repo->set_status( $res->status );
-
-                    $repo->{api} = $self;
-
-                    $result->{ $repo->id } = $repo;
-                }
-
-                $res->{data} = $result;
-            }
-
-            $args{cb}->($res) if $args{cb};
-
-            return;
-        }
-    );
-}
-
-sub get_starred_repos ( $self, % ) {
-    my %args = (
-        page      => 1,
-        page_size => 100,
-        namespace => $self->namespace,
-        cb        => undef,
-        splice @_, 1,
-    );
-
-    return $self->request(
-        'get',
-        "/users/$args{namespace}/repositories/starred/?page_size=$args{page_size}&page=$args{page}",
-        1, undef,
-        sub($res) {
-            if ( $res->is_success ) {
-                $res->{count} = delete $res->{data}->{count};
-
-                $res->{next} = delete $res->{data}->{next};
-
-                $res->{previous} = delete $res->{data}->{previous};
-
-                my $result = {};
-
-                for my $repo ( $res->{data}->{results}->@* ) {
-                    $repo = bless $repo, 'Pcore::API::DockerHub::Repository';
-
-                    $repo->set_status( $res->status );
-
-                    $repo->{api} = $self;
-
-                    $result->{ $repo->id } = $repo;
-                }
-
-                $res->{data} = $result;
-            }
-
-            $args{cb}->($res) if $args{cb};
-
-            return;
-        }
-    );
-}
-
-sub get_repo ( $self, $repo_name, % ) {
-    my %args = (
-        namespace => $self->namespace,
-        cb        => undef,
-        splice @_, 2,
-    );
-
-    return $self->request(
-        'get',
-        "/repositories/$args{namespace}/$repo_name/",
-        1, undef,
-        sub($res) {
-            if ( $res->is_success ) {
-                my $repo = bless $res->{data}, 'Pcore::API::DockerHub::Repository';
-
-                $repo->set_status( $res->status, $res->reason );
-
-                $repo->{api} = $self;
-
-                $_[0] = $repo;
-
-                $res = $repo;
-            }
-
-            $args{cb}->($res) if $args{cb};
-
-            return;
-        }
-    );
-}
-
-# CREATE REPO / AUTOMATED BUILD
-sub create_repo ( $self, $repo_name, % ) {
-    my %args = (
-        namespace => $self->namespace,
-        private   => 0,
-        desc      => q[],
-        full_desc => q[],
-        cb        => undef,
-        splice @_, 2,
-    );
-
-    return $self->request(
-        'post',
-        '/repositories/',
-        1,
-        {   name             => $repo_name,
-            namespace        => $args{namespace},
-            is_private       => $args{private},
-            description      => $args{desc},
-            full_description => $args{full_desc},
+        {   username => $self->{username},
+            password => $self->{password},
         },
         sub ($res) {
-            if ( $res->is_success ) {
-                my $repo = bless $res->{data}, 'Pcore::API::DockerHub::Repository';
-
-                $repo->set_status( $res->status, $res->reason );
-
-                $repo->{api} = $self;
-
-                $_[0] = $repo;
-
-                $res = $repo;
+            if ( !$res ) {
+                $res->{reason} = $res->{data}->{detail} if $res->{data}->{detail};
             }
-            else {
-                if ( $res->{data}->{__all__} ) {
-                    $res->{reason} = $res->{data}->{__all__}->[0] if $res->{data}->{__all__}->[0];
-                }
+            elsif ( $res->{data}->{token} ) {
+                $self->{_login_token} = delete $res->{data}->{token};
             }
 
-            $args{cb}->($res) if $args{cb};
+            while ( my $cb = shift $self->{_req_queue}->{$endpoint}->@* ) {
+                $cb->($res);
+            }
 
             return;
         }
     );
 }
 
-sub create_automated_build ( $self, $repo_name, $provider, $vcs_repo_name, $desc, % ) {
-    my %args = (
-        namespace  => $self->namespace,
-        private    => 0,
-        active     => 1,
-        build_tags => undef,
-        cb         => undef,
-        splice( @_, 5 ),
-    );
-
-    my $build_tags;
-
-    # prepare build tags
-    if ( !$args{build_tags} ) {
-        $build_tags = [
-            {   name                => '{sourceref}',                                      # docker build tag name
-                source_type         => $DOCKERHUB_SOURCE_NAME->{$DOCKERHUB_SOURCE_TAG},    # Branch, Tag
-                source_name         => '/.*/',                                             # barnch / tag name in the source repository
-                dockerfile_location => q[/],
-            },
-        ];
-    }
-    else {
-        for ( $args{build_tags}->@* ) {
-            my %build_tags = $_->%*;
-
-            $build_tags{source_type} = $DOCKERHUB_SOURCE_NAME->{ $build_tags{source_type} };
-
-            push $build_tags->@*, \%build_tags;
-        }
-    }
-
-    return $self->request(
-        'post',
-        "/repositories/$args{namespace}/$repo_name/autobuild/",
-        1,
-        {   name                => $repo_name,
-            namespace           => $args{namespace},
-            is_private          => $args{private},
-            active              => $args{active} ? \1 : \0,
-            dockerhub_repo_name => "$args{namespace}/$repo_name",
-            provider            => $DOCKERHUB_PROVIDER_NAME->{$provider},
-            vcs_repo_name       => $vcs_repo_name,
-            description         => $desc,
-            build_tags          => $build_tags,
-        },
-        sub ($res) {
-            if ( $res->is_success ) {
-                my $repo = bless $res->{data}, 'Pcore::API::DockerHub::Repository';
-
-                $repo->set_status( $res->status, $res->reason );
-
-                $repo->{api} = $self;
-
-                $_[0] = $repo;
-
-                $res = $repo;
-            }
-            else {
-                if ( $res->{data}->{detail} ) {
-                    $res->{reason} = $res->{data}->{detail};
-                }
-                elsif ( $res->{data}->{__all__} ) {
-                    $res->{reason} = $res->{data}->{__all__}->[0] if $res->{data}->{__all__}->[0];
-                }
-            }
-
-            $args{cb}->($res) if $args{cb};
-
-            return;
-        }
-    );
-}
-
-# PRIVATE METHODS
-sub request ( $self, $type, $path, $auth, $data, $cb ) {
+sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb ) {
     my $blocking_cv = defined wantarray ? AE::cv : undef;
 
     my $request = sub {
-        P->http->$type(
-            $URL . $path,
+        P->http->$method(
+            $BASE_URL . $endpoint,
             headers => {
                 CONTENT_TYPE => 'application/json',
-                $auth ? ( AUTHORIZATION => 'JWT ' . $self->{login_token} ) : (),
+                $require_auth ? ( AUTHORIZATION => 'JWT ' . $self->{_login_token} ) : (),
             },
             body => $data ? P->data->to_json($data) : undef,
             on_finish => sub ($res) {
@@ -387,18 +98,22 @@ sub request ( $self, $type, $path, $auth, $data, $cb ) {
         );
     };
 
-    if ( !$auth ) {
+    if ( !$require_auth ) {
         $request->();
     }
-    elsif ( $self->{login_token} ) {
+    elsif ( $self->{_login_token} ) {
         $request->();
     }
     else {
-        $self->login(
-            cb => sub ($res) {
-                if ( $res->is_success ) {
+        $self->_login(
+            sub ($res) {
+
+                # login ok
+                if ($res) {
                     $request->();
                 }
+
+                # login failure
                 else {
                     $cb->($res) if $cb;
 
@@ -413,6 +128,488 @@ sub request ( $self, $type, $path, $auth, $data, $cb ) {
     return $blocking_cv ? $blocking_cv->recv : ();
 }
 
+# USER / NAMESPACE
+sub get_user ( $self, $username, $cb = undef ) {
+    return $self->_req( 'get', "/users/$username/", undef, undef, $cb );
+}
+
+sub get_user_registry_settings ( $self, $username, $cb = undef ) {
+    return $self->_req( 'get', "/users/$username/registry-settings/", 1, undef, $cb );
+}
+
+sub get_user_orgs ( $self, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/user/orgs/?page_size=$DEF_PAGE_SIZE&page=1",
+        1, undef,
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $org ( $res->{data}->{results}->@* ) {
+                    $data->{ $org->{orgname} } = $org;
+                }
+
+                $res->{data} = $data;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+# CREATE REPO / AUTOMATED BUILD
+sub create_repo ( $self, $repo_id, $desc, @args ) {
+    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+
+    my %args = (
+        private   => 0,
+        full_desc => q[],
+        @args
+    );
+
+    my ( $namespace, $name ) = split m[/]sm, $repo_id;
+
+    return $self->_req(
+        'post',
+        '/repositories/',
+        1,
+        {   namespace        => $namespace,
+            name             => $name,
+            is_private       => $args{private},
+            description      => $desc,
+            full_description => $args{full_desc},
+        },
+        $cb
+    );
+}
+
+sub create_autobuild ( $self, $repo_id, $scm_provider, $scm_repo_id, $desc, @args ) {
+    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+
+    my %args = (
+        desc       => undef,
+        private    => 0,
+        active     => 1,
+        build_tags => undef,
+        @args,
+    );
+
+    my ( $namespace, $name ) = split m[/]sm, $repo_id;
+
+    my $build_tags;
+
+    # prepare build tags
+    if ( !$args{build_tags} ) {
+        $build_tags = [
+            {   name                => '{sourceref}',                                                # docker build tag name
+                source_type         => $DOCKERHUB_SOURCE_TYPE_NAME->{$DOCKERHUB_SOURCE_TYPE_TAG},    # Branch, Tag
+                source_name         => '/.*/',                                                       # barnch / tag name in the source repository
+                dockerfile_location => q[/],
+            },
+        ];
+    }
+    else {
+        for ( $args{build_tags}->@* ) {
+            my %build_tags = $_->%*;
+
+            $build_tags{source_type} = $DOCKERHUB_SOURCE_TYPE_NAME->{ lc $build_tags{source_type} };
+
+            push $build_tags->@*, \%build_tags;
+        }
+    }
+
+    return $self->_req(
+        'post',
+        "/repositories/$repo_id/autobuild/",
+        1,
+        {   namespace           => $namespace,
+            name                => $name,
+            description         => $desc,
+            is_private          => $args{private} ? \1 : \0,
+            active              => $args{active} ? \1 : \0,
+            dockerhub_repo_name => $repo_id,
+            provider            => $scm_provider,
+            vcs_repo_name       => $scm_repo_id,
+            description         => $desc,
+            build_tags          => $build_tags,
+        },
+        $cb
+    );
+}
+
+# REPO
+sub get_all_repos ( $self, $namespace, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/users/$namespace/repositories/",
+        1, undef,
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $repo ( $res->{data}->@* ) {
+                    $repo->{id} = "$repo->{namespace}/$repo->{name}";
+
+                    $data->{ $repo->{id} } = $repo;
+                }
+
+                $res->{data} = $data;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+sub get_repo ( $self, $repo_id, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/repositories/$repo_id/",
+        1, undef,
+        sub($res) {
+            if ($res) {
+                $res->{data}->{id} = $repo_id;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+sub remove_repo ( $self, $repo_id, $cb = undef ) {
+    return $self->_req( 'delete', "/repositories/$repo_id/", 1, undef, $cb );
+}
+
+sub set_desc ( $self, $repo_id, $desc, $cb = undef ) {
+    return $self->_req( 'patch', "/repositories/$repo_id/", 1, { description => $desc }, $cb );
+}
+
+sub set_full_desc ( $self, $repo_id, $desc, $cb = undef ) {
+    return $self->_req( 'patch', "/repositories/$repo_id/", 1, { full_description => $desc }, $cb );
+}
+
+# REPO TAGS
+# TODO gel all pages
+sub get_tags ( $self, $repo_id, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/repositories/$repo_id/tags/?page_size=$DEF_PAGE_SIZE&page=1",
+        1, undef,
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $tag ( $res->{data}->{results}->@* ) {
+                    $data->{ $tag->{id} } = $tag;
+                }
+
+                $res->{data} = $data;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+sub delete_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
+    return $self->_req( 'delete', "/repositories/$repo_id/tags/$tag_name/", 1, undef, $cb );
+}
+
+# REPO WEBHOOKS
+# TODO get all pages
+sub get_webhooks ( $self, $repo_id, $cb = undef ) {
+    return $self->_req( 'get', "/repositories/$repo_id/webhooks/?page_size=$DEF_PAGE_SIZE&page=1", 1, undef, $cb );
+}
+
+sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url, $cb = undef ) {
+    return $self->_req(
+        'post',
+        "/repositories/$repo_id/webhook_pipeline/",
+        1,
+        {   name                  => $webhook_name,
+            expect_final_callback => \0,
+            webhooks              => [
+                {   name     => $webhook_name,
+                    hook_url => $webhook_url,
+                }
+            ],
+        },
+        $cb
+    );
+}
+
+sub delete_webhook ( $self, $repo_id, $webhook_name, $cb = undef ) {
+    return $self->_req( 'delete', "/repositories/$repo_id/webhook_pipeline/$webhook_name/", 1, undef, $cb );
+}
+
+# AUTOBUILD LINKS
+sub get_autobuild_links ( $self, $repo_id, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/repositories/$repo_id/links/",
+        1, undef,
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $link ( $res->{data}->{results}->@* ) {
+                    $data->{ $link->{id} } = $link;
+                }
+
+                $res->{data} = $data;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+sub create_autobuild_link ( $self, $repo_id, $target_repo_id, $cb = undef ) {
+    return $self->_req( 'post', "/repositories/$repo_id/links/", 1, { to_repo => $target_repo_id }, $cb );
+}
+
+sub delete_autobuild_link ( $self, $repo_id, $link_id, $cb = undef ) {
+    return $self->_req( 'delete', "/repositories/$repo_id/links/$link_id/", 1, undef, $cb );
+}
+
+# BUILD
+# TODO get all pages
+sub get_build_history ( $self, $repo_id, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/repositories/$repo_id/buildhistory/?page_size=$DEF_PAGE_SIZE&page=1",
+        1, undef,
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $build ( $res->{data}->{results}->@* ) {
+                    $data->{ $build->{id} } = $build;
+
+                    $build->{status_text} = $BUILD_STATUS_TEXT->{ $build->{status} };
+                }
+
+                $res->{data} = $data;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+sub get_autobuild_settings ( $self, $repo_id, $cb = undef ) {
+    return $self->_req( 'get', "/repositories/$repo_id/autobuild/", 1, undef, $cb );
+}
+
+sub unlink_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
+    my $blocking_cv = defined wantarray ? AE::cv : undef;
+
+    my ( $delete_autobuild_tag_status, $delete_tag_status );
+
+    my $cv = AE::cv {
+        my $res = result [ 200, "autobuild: $delete_autobuild_tag_status->{reason}, tag: $delete_tag_status->{reason}" ];
+
+        $cb->($res) if $cb;
+
+        $blocking_cv->($res) if $blocking_cv;
+
+        return;
+    };
+
+    $cv->begin;
+
+    $cv->begin;
+    $self->delete_autobuild_tag_by_name(
+        $repo_id,
+        $tag_name,
+        sub ($res) {
+            $delete_autobuild_tag_status = $res;
+
+            $cv->end;
+
+            return;
+        }
+    );
+
+    $cv->begin;
+    $self->delete_tag(
+        $repo_id,
+        $tag_name,
+        sub ($res) {
+            $delete_tag_status = $res;
+
+            $cv->end;
+
+            return;
+        }
+    );
+
+    $cv->end;
+
+    return $blocking_cv ? $blocking_cv->recv : ();
+}
+
+# AUTOBUILD TAGS
+sub get_autobuild_tags ( $self, $repo_id, $cb = undef ) {
+    return $self->_req(
+        'get',
+        "/repositories/$repo_id/autobuild/tags/",
+        1, undef,
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $tag ( $res->{data}->{results}->@* ) {
+                    $data->{ $tag->{id} } = $tag;
+                }
+
+                $res->{data} = $data;
+            }
+
+            $cb->($res) if $cb;
+
+            return;
+        }
+    );
+}
+
+sub create_autobuild_tag ( $self, $repo_id, $tag_name, $source_name, $source_type, $dockerfile_location, $cb = undef ) {
+    my ( $namespace, $name ) = split m[/]sm, $repo_id;
+
+    return $self->_req(
+        'post',
+        "/repositories/$repo_id/autobuild/tags/",
+        1,
+        {   name                => $tag_name,
+            dockerfile_location => $dockerfile_location // '/',
+            source_name         => $source_name,
+            source_type         => $DOCKERHUB_SOURCE_TYPE_NAME->{ lc $source_type },
+            isNew               => \1,
+            repoName            => $name,
+            namespace           => $namespace,
+        },
+        $cb
+    );
+}
+
+sub delete_autobuild_tag_by_id ( $self, $repo_id, $autobuild_tag_id, $cb = undef ) {
+    return $self->_req( 'delete', "/repositories/$repo_id/autobuild/tags/$autobuild_tag_id/", 1, undef, $cb );
+}
+
+sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
+    my $blocking_cv = defined wantarray ? AE::cv : undef;
+
+    my $on_finish = sub ($res) {
+        $cb->($res) if $cb;
+
+        $blocking_cv->($res) if $blocking_cv;
+
+        return;
+    };
+
+    # get autobuild tags
+    $self->get_autobuild_tags(
+        $repo_id,
+        sub ($res) {
+            if ( !$res ) {
+                $on_finish->($res);
+            }
+            else {
+                my $found_autobuild_tag;
+
+                for my $autobuild_tag ( values $res->{data}->%* ) {
+                    if ( $autobuild_tag->{name} eq $autobuild_tag_name ) {
+                        $found_autobuild_tag = $autobuild_tag;
+
+                        last;
+                    }
+                }
+
+                if ( !$found_autobuild_tag ) {
+                    $on_finish->( result [ 404, 'Autobuild tag was not found' ] );
+                }
+                else {
+                    $self->delete_autobuild_tag_by_id( $repo_id, $found_autobuild_tag->{id}, $on_finish );
+                }
+            }
+
+            return;
+        }
+    );
+
+    return $blocking_cv ? $blocking_cv->recv : ();
+}
+
+sub trigger_autobuild ( $self, $repo_id, $source_name, $source_type, $cb = undef ) {
+    return $self->_req(
+        'post',
+        "/repositories/$repo_id/autobuild/trigger-build/",
+        1,
+        {   source_name         => $source_name,
+            source_type         => $DOCKERHUB_SOURCE_TYPE_NAME->{ lc $source_type },
+            dockerfile_location => '/',
+        },
+        $cb
+    );
+}
+
+sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
+    my $blocking_cv = defined wantarray ? AE::cv : undef;
+
+    my $on_finish = sub ($res) {
+        $cb->($res) if $cb;
+
+        $blocking_cv->($res) if $blocking_cv;
+
+        return;
+    };
+
+    # get autobuild tags
+    $self->get_autobuild_tags(
+        $repo_id,
+        sub ($res) {
+            if ( !$res ) {
+                $on_finish->($res);
+            }
+            else {
+                my $found_autobuild_tag;
+
+                for my $autobuild_tag ( values $res->{data}->%* ) {
+                    if ( $autobuild_tag->{name} eq $autobuild_tag_name ) {
+                        $found_autobuild_tag = $autobuild_tag;
+
+                        last;
+                    }
+                }
+
+                if ( !$found_autobuild_tag ) {
+                    $on_finish->( result [ 404, 'Autobuild tag was not found' ] );
+                }
+                else {
+                    $self->trigger_autobuild( $repo_id, $found_autobuild_tag->{source_name}, $found_autobuild_tag->{source_type}, $on_finish );
+                }
+            }
+
+            return;
+        }
+    );
+
+    return $blocking_cv ? $blocking_cv->recv : ();
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -420,7 +617,12 @@ sub request ( $self, $type, $path, $auth, $data, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 292, 367             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 78, 189, 323, 333,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 350, 378, 382, 417,  |                                                                                                                |
+## |      | 489, 508, 512, 556,  |                                                                                                                |
+## |      | 569                  |                                                                                                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 167                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

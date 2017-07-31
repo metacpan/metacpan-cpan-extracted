@@ -1,7 +1,6 @@
 package Lab::Connection::USBtmc;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: F</dev/usbtmc> Linux USB Test&Measurement kernel driver connection
-$Lab::Connection::USBtmc::VERSION = '3.553';
+$Lab::Connection::USBtmc::VERSION = '3.554';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -97,7 +96,7 @@ Lab::Connection::USBtmc - F</dev/usbtmc> Linux USB Test&Measurement kernel drive
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

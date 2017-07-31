@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-jQuery
 
+0.05      2017-07-23 00:15:49 -0400
+  - Remove dependency on File::HomeDir
+
 0.04      2016-04-24 19:30:28 -0400
   - Dist::Zilla 6.x compatability
 

@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Biblio::SIF::Patron;
+
+my %addrtype2label = qw();
+my %addrstatus2label = qw();
+
+my %col = (
+    'num'  => "\e[33m",
+    'norm' => "\e[0m",
+    'name' => "\e[32;1m",
+    'inst' => "\e[33m",
+    'bcode' => "\e[34;1m",
+    'group' => "\e[35;1m",
+    'email' => "\e[32m",
+);
+
+if (@ARGV == 1) {
+    open STDIN, '<', $ARGV[0] or die "Can't open input file $ARGV[0]: $!";
+}
+
+my $iter = Biblio::SIF::Patron->iterator(\*STDIN);
+my $n = 0;
+while (my $patron = $iter->()) {
+    $n++;
+    my $inst   = $patron->institution_id;
+    my $id     = $patron->id;
+    my $name   = $patron->last_first_name;
+    my $purge  = $patron->purge_date;
+    my $expire = $patron->expiration_date;
+    tr/./-/ for $purge, $expire;
+    my @S = $patron->statuses;
+    my @G = $patron->groups;
+    my @B = $patron->barcodes;
+    my $naddr  = $patron->num_addresses;
+    my @A = map { $patron->address($_) } 1..$naddr;
+    print <<"EOS";
+$col{num}\[$n]$col{norm}
+$col{name}$name $col{inst}$inst$col{norm} (exp. $expire, purge $purge)
+EOS
+    foreach (@G) {
+        last if !$_;
+        my $s = shift @S;
+        my $b = shift @B;
+        my $slabel = $s eq 1 ? '' : " \e[31;1m*$s\e[0m";
+        print "$col{group}$_ $col{bcode}$b$slabel\n";
+    }
+    foreach my $addr (@A) {
+        my ($type, $status, $begin, $end) = map { $addr->$_ } qw(type status begin_date end_date);
+        if ($type == 1) {
+            my @lines = grep { length } map { $addr->$_ } qw(line1 line2 line3 line4 line5);
+            my ($phone, $cell, $fax) = map { $addr->$_ } qw(phone cell_phone fax);
+            my $slabel = $status eq 'N' ? '' : " \e[31;1m*$status\e[0m";
+            my $last = join(' ', $addr->city, $addr->state, $addr->postal_code);
+            $last =~ s/^ +| +$//g;
+            my $lines = join("\n  ", @lines, $last);
+            tr/./-/ for $begin, $end;
+            print <<"EOS";
+Address ($begin to $end)$slabel:
+  $lines
+EOS
+            for ($phone, $cell, $fax) {
+                $_ = "$1-$2-$3" if /^(?:1-?)?(\d{3})(\d{3})(\d{4})$/;
+            }
+            if (grep { $_ } $phone, $cell, $fax) {
+                print "  $phone\n"     if $phone;
+                print "  $cell (C)\n"  if $cell;
+                print "  $fax (F)\n"   if $fax;
+            }
+        }
+        elsif ($type == 3) {
+            print $col{email}, $addr->line1, "$col{norm}\n";
+        }
+    }
+    my @notes = $patron->notes;
+    print "NOTE:\n  ", @_ for @notes;
+    print "\n";
+}
+

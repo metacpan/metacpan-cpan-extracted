@@ -19,13 +19,9 @@ sub CLI ($self) {
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run($opt);
+    my $dist = $self->get_dist;
 
-    return;
-}
-
-sub run ( $self, $args ) {
-    $self->dist->build->deploy( $args->%* );
+    $dist->build->deploy( $opt->%* );
 
     return;
 }

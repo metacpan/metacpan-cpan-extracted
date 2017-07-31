@@ -9,13 +9,9 @@ sub CLI ($self) {
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run;
+    my $dist = $self->get_dist;
 
-    return;
-}
-
-sub run ($self) {
-    $self->dist->build->update;
+    $dist->build->update;
 
     return;
 }

@@ -1,5 +1,5 @@
 package Math::Currency::USD;
-$Math::Currency::USD::VERSION = '0.51';
+$Math::Currency::USD::VERSION = '0.52';
 # ABSTRACT: USD Currency Module for Math::Currency
 
 use strict;
@@ -21,7 +21,7 @@ Math::Currency::USD - USD Currency Module for Math::Currency
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SOURCE
 

@@ -1,5 +1,6 @@
 package Lab::XPRESS::Sweep::LogBlock;
-$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.553';
+#ABSTRACT: Sweep add-on for matrix logging
+$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.554';
 use Role::Tiny;
 requires qw/LOG write_LOG/;
 
@@ -10,54 +11,6 @@ use Carp;
 use Data::Dumper;
 
 
-=pod
-
-=head1 NAME
-
-Lab::XPRESS::Sweep::LogBlock -- Sweep add-on for matrix logging.
-
-=head1 SYNOPSIS
-
-   # define your columns
-
-   # parameters controlled by the XPRESS sweeps
-   $DataFile->add_column('gate');
-   $DataFile->add_column('bias');
-
-   # parameters in the block, here we have a block with 2 columns.
-   $DataFile->add_column('frequency');
-   $DataFile->add_column('transmission');
-
-   # Define your sweeps ... 
-
-   # In your measurement subroutine: Get block and log
-   $matrix = $instrument->get_block(...)   
-   $sweep->LogBlock(
-	prefix => [$gate, $bias],
-	block => $matrix);
-
-=head1 DESCRIPTION
-    
-This role exports the single method C<LogBlock>. The valid parameters are:
-
-=over
-
-=item block (mandatory)
-
-List of rows (e.g. C<[[1, 2, 3], [2, 3, 4]]>), which shell be written
- to the data file.
-
-=item prefix
-
-List of parameters which shell be prefixed to each row of the block.
-
-=item file
-
-Index of the target data file (default: 0).
-
-=back
-    
-=cut
 
 sub LogBlock {
     my $sweep = shift;
@@ -122,3 +75,70 @@ sub LogBlock {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::XPRESS::Sweep::LogBlock - Sweep add-on for matrix logging
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+   # define your columns
+
+   # parameters controlled by the XPRESS sweeps
+   $DataFile->add_column('gate');
+   $DataFile->add_column('bias');
+
+   # parameters in the block, here we have a block with 2 columns.
+   $DataFile->add_column('frequency');
+   $DataFile->add_column('transmission');
+
+   # Define your sweeps ... 
+
+   # In your measurement subroutine: Get block and log
+   $matrix = $instrument->get_block(...)   
+   $sweep->LogBlock(
+	prefix => [$gate, $bias],
+	block => $matrix);
+
+=head1 DESCRIPTION
+
+This role exports the single method C<LogBlock>. The valid parameters are:
+
+=over
+
+=item block (mandatory)
+
+List of rows (e.g. C<[[1, 2, 3], [2, 3, 4]]>), which shell be written
+ to the data file.
+
+=item prefix
+
+List of parameters which shell be prefixed to each row of the block.
+
+=item file
+
+Index of the target data file (default: 0).
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

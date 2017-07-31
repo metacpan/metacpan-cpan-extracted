@@ -4,13 +4,13 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Music-RecRhythm",
    "no_index" : {
@@ -49,7 +49,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_homepageresources" : {
       "repository" : {
          "type" : "git",
@@ -57,5 +57,5 @@
          "web" : "https://github.com/thrig/Music-RecRhythm"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

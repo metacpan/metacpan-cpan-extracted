@@ -164,6 +164,7 @@ and make sure that the tests all succeed. Then submit the patch.
 
    cat <<EOF;
 ====
+From: sbeck@cpan.org
 To: perl5-porters@perl.org
 Subject: PATCH: Bump Locale-Codes from $old to $new 
 

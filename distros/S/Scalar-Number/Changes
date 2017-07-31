@@ -1,3 +1,43 @@
+version 0.007; 2017-07-28
+
+  * bugfix: avoid passing magic variables $1 et al into functions where
+    they might unexpectedly change value
+
+  * port to Perl 5.17.1, which changed the behaviour of signed zeroes
+    in Perl arithmetic again
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * add note to documentation about core problems with zeroes
+
+  * when soft-loading Scalar::Util, avoid the Perl core bug regarding the
+    context applied to file scope of required modules, in case of a future
+    version of Scalar::Util becoming vulnerable and running on an old Perl
+
+  * no longer include a Makefile.PL in the distribution
+
+  * use full stricture in author tests
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * use cBOOL() where appropriate
+
+  * in the test suite, put some library code into module form
+
+  * correct dynamic_config setting to 0
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+  * correctly sort MANIFEST
+
 version 0.006; 2010-10-23
 
   * port to Perl 5.13.6, which changed the behaviour of signed zeroes

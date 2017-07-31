@@ -200,6 +200,18 @@ Contents of SUBORDINATES:
                   line comments, each line is represented by a list entry.
                   The lines in this list are not newline terminated; empty
                   entries represent empty comment lines.
+  REMARK          The SUBORDINATES of the node is unused.
+                  The NAME component contains a reference to a list of
+                  comment info array references.  In the case of a single-
+                  line comment, the list will contain only one element; in
+                  case of multi-line comments, each line is represented by a
+                  list entry.  A comment info array element is a triplet
+                  (three element list) with [0] = filename, [1] = line
+                  number, [2] = comment text.
+                  The comment text (index 2) is not newline terminated; empty
+                  entries represent empty comment lines.
+                  The COMMENT element (described below) uses the same
+                  definition of a "comment line".
 
 
 The COMMENT element holds the comment text that follows the IDL declaration
@@ -210,14 +222,21 @@ The lines in this list are not newline terminated. The COMMENT field is a
 reference to this list, or contains the value 0 if no comment is present
 at the IDL item.
 
+Comment lines are not simple strings, a reference to an array is used that
+contains the name of the file, the line number and the comment text in that
+order.
+
 The SCOPEREF element is a reference back to the node of the module or
 interface enclosing the current node. If the current node is already
-at the global scope level, then the SCOPEREF is 0. If the current node
-is inside an INCFILE, the SCOPEREF element points to the corresponding
-INCFILE node (the INCFILE reference was introduced in IDLtree version
-1.3.)  All nodes have this element except for the parameter nodes of
-methods and the component nodes of structs/unions/exceptions.
+at the global scope level then the SCOPEREF is 0.
+Special case: For a reopened module, the SCOPEREF points to the previous
+opening of the same module. In case of multiple reopenings, each reopening
+points to the previous opening. The SCOPEREF of the initial module finally
+points to the enclosing scope.
+All nodes have this element except for the parameter nodes of methods and
+the component nodes of structs/unions/exceptions.
 
--- Last updated: 2003/07/25
+
+-- Last updated: 2017/07/23
 -- okellogg@users.sourceforge.net
 

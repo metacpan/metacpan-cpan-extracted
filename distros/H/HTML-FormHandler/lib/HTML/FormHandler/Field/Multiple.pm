@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::Multiple;
 # ABSTRACT: multiple select list
-$HTML::FormHandler::Field::Multiple::VERSION = '0.40067';
+$HTML::FormHandler::Field::Multiple::VERSION = '0.40068';
 use Moose;
 extends 'HTML::FormHandler::Field::Select';
 
@@ -39,7 +39,7 @@ HTML::FormHandler::Field::Multiple - multiple select list
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

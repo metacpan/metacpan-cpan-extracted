@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Fatal: '0'
   Test::More: '0'
+  Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -27,5 +28,5 @@ requires:
   charnames: '0'
   perl: '5.012000'
   version: '0.77'
-version: v0.2.0
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

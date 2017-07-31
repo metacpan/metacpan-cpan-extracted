@@ -4,7 +4,7 @@
       "Steve Caldwell <scaldwell@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -40,6 +40,7 @@
             "Exporter" : "0",
             "Scalar::Util" : "0",
             "Set::Object" : "0",
+            "Type::Tiny" : "0",
             "boolean" : "0",
             "perl" : "5.008005"
          }
@@ -64,7 +65,7 @@
          "web" : "https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler"
       }
    },
-   "version" : "0.01",
+   "version" : "0.05",
    "x_contributors" : [
       "Stephen Caldwell <steve@campusexplorer.com>"
    ],

@@ -17,7 +17,7 @@ Module::Build->subclass(code => q{
 	},
 	build_requires => {
 		"Module::Build" => 0,
-		"Test::More" => 0,
+		"Test::More" => "0.41",
 		"perl" => "5.006",
 		"strict" => 0,
 		"warnings" => 0,
@@ -42,8 +42,17 @@ Module::Build->subclass(code => q{
 	},
 	dynamic_config => 1,
 	meta_add => { distribution_type => "module" },
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Net-HTTP-Tiny\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Net-HTTP-Tiny",
+			},
+		},
+	},
 	test_types => { author => ".at" },
-	create_makefile_pl => "passthrough",
 	sign => 1,
 )->create_build_script;
 

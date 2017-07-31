@@ -1,7 +1,7 @@
 package Perinci::Access::Simple::Server::Pipe;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ sub send_response {
     my $self = shift;
     my $res = $self->res // [500, "BUG: Response not set"];
     log_trace("Sending response to stdout: %s", $res);
-    my $v = $self->req->{v} // 1.1;
+    my $v = ($self->req ? $self->req->{v} : undef) // 1.1;
     insert_riap_stuffs_to_res($res, $v);
     $res = $cleanser->clone_and_clean($res);
     print "j", $json->encode($res), "\015\012";
@@ -113,7 +113,7 @@ Perinci::Access::Simple::Server::Pipe - (Base) class for creating Riap::Simple s
 
 =head1 VERSION
 
-This document describes version 0.25 of Perinci::Access::Simple::Server::Pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-03.
+This document describes version 0.26 of Perinci::Access::Simple::Server::Pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-28.
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-Simple-Server>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Simple-Server>.
 
 =head1 BUGS
 

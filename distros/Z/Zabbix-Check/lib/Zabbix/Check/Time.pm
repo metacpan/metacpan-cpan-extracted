@@ -5,38 +5,16 @@ Zabbix::Check::Systemd - Zabbix check for system time
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 
 Zabbix check for system time
 
-	UserParameter=cpan.zabbix.check.time.epoch,/usr/bin/perl -MZabbix::Check::Time -e_epoch
-	UserParameter=cpan.zabbix.check.time.zone,/usr/bin/perl -MZabbix::Check::Time -e_zone
-	UserParameter=cpan.zabbix.check.time.ntp_offset[*],/usr/bin/perl -MZabbix::Check::Time -e_ntp_offset -- $1 $2
-
-=head3 epoch
-
-gets system time epoch in seconds
-
-=head3 zone
-
-gets system time zone, eg: +0200
-
-=head3 ntp_offset $1 $2
-
-gets system time difference by NTP server
-
-$1: I<server, by defaut pool.ntp.org>
-
-$2: I<port, by default 123>
-
 =cut
 use strict;
 use warnings;
-no warnings qw(qw utf8);
-use v5.14;
-use utf8;
+use v5.10.1;
 use POSIX;
 use Net::NTP;
 use Lazy::Utils;
@@ -47,13 +25,9 @@ use Zabbix::Check;
 BEGIN
 {
 	require Exporter;
-	# set the version for version checking
-	our $VERSION     = '1.10';
-	# Inherit from Exporter to export functions and variables
+	our $VERSION     = '1.11';
 	our @ISA         = qw(Exporter);
-	# Functions and variables which are exported by default
 	our @EXPORT      = qw(_epoch _zone _ntp_offset);
-	# Functions and variables which can be optionally exported
 	our @EXPORT_OK   = qw();
 }
 
@@ -74,7 +48,7 @@ sub _zone
 
 sub _ntp_offset
 {
-	my ($server, $port) = map(zbxDecode($_), @ARGV);
+	my ($server, $port) = map(zbx_decode($_), @ARGV);
 	$server = "pool.ntp.org" unless $server;
 	my $result = "";
 	my %ntp;
@@ -100,11 +74,11 @@ B<CPAN> L<https://metacpan.org/release/Zabbix-Check>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016  Orkun Karaduman <orkunkaraduman@gmail.com>
+Copyright (C) 2017  Orkun Karaduman <orkunkaraduman@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

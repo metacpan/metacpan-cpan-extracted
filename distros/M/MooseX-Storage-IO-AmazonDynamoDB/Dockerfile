@@ -21,10 +21,11 @@ RUN cpanm Paws
 
 # Install the rest using cpanfile
 ADD cpanfile $APPDIR/
-RUN cpanm --installdeps $APPDIR
+RUN cpanm --installdeps --with-develop $APPDIR
 
 # Setup to use appuser going forward
 USER $APPUSER
+ENV HOME=/home/$APPUSER
 WORKDIR $APPDIR
 
 # Add github known host

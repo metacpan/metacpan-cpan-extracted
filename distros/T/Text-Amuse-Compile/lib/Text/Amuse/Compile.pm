@@ -33,11 +33,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =cut
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 =head1 SYNOPSIS
 
@@ -169,6 +169,14 @@ The selected font size (from the C<extra> hashref)
 An hashref of key/value pairs to pass to each template in the
 C<options> namespace. This is internal
 
+=item coverpage_only_if_toc
+
+Generate a cover page only if there is a ToC in the document.
+
+When compiling a virtual file (a collection) the option is ignored,
+because L<Text::Amuse::Compile::Merged> C<wants_toc> always returns
+true.
+
 =item extra
 
 In the constructor arguments, a shallow copy will be stored in
@@ -264,6 +272,8 @@ has extra_opts => (is => 'ro', isa => HashRef, default => sub { +{} });
 sub slides {
     return shift->sl_pdf;
 }
+
+has coverpage_only_if_toc => (is => 'ro', isa => Bool, default => sub { 0 });
 
 sub BUILDARGS {
     my ($class, %params) = @_;
@@ -628,6 +638,7 @@ sub _compile_file {
                 epub_embed_fonts => $self->epub_embed_fonts,
                 luatex => $self->luatex,
                 fileobj => $fileobj,
+                coverpage_only_if_toc => $self->coverpage_only_if_toc,
                );
 
     my $muse = Text::Amuse::Compile::File->new(%args);

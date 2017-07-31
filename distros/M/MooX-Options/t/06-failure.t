@@ -7,7 +7,7 @@ use Carp;
 
 local $ENV{TEST_FORCE_COLUMN_SIZE} = 78;
 
-eval <<__EOF__
+eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     package FailureNegatableWithFormat;
     use Moo;
     use MooX::Options;
@@ -25,7 +25,7 @@ like $@,
     qr/^Negatable\sparams\sis\snot\susable\swith\snon\sboolean\svalue,\sdon't\spass\sformat\sto\suse\sit\s\!/x,
     "negatable and format are incompatible";
 
-eval <<__EOF__
+eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     package FailureNegativableWithFormat;
     use Moo;
     use MooX::Options;
@@ -47,7 +47,7 @@ for my $ban (
     qw/help man usage option new_with_options parse_options options_usage _options_data _options_config/
     )
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     package FailureHelp$ban;
     use Moo;
     use MooX::Options;
@@ -63,7 +63,7 @@ __EOF__
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package FailureRoleMyRole;
         use Moo::Role;
@@ -85,9 +85,9 @@ __EOF__
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
-        package t;
+        package FailureRedefined;
         use Moo;
         sub _options_data {};
         sub _options_config {};
@@ -97,11 +97,12 @@ __EOF__
 __EOF__
         ;
     like $@, qr/^Subroutine\s_options_data\sredefined/x, 'redefined methods';
-    ok( !t->can('new_with_options'), 't has crash' );
+    ok( !FailureRedefined->can('new_with_options'),
+        'FailureRedefined has crash' );
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package MissingWith;
         use MooX::Options;
@@ -115,7 +116,7 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package MissingAround;
         sub with {};
@@ -130,7 +131,7 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package MissingHas;
         sub with {};
@@ -146,7 +147,7 @@ Ensure to load a Role::Tiny compatible module like Moo or Moose before using Moo
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package IllegalShortEnding;
         use Moo;
@@ -163,7 +164,7 @@ __EOF__
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package ShortOptionConflict;
         use Moo;
@@ -181,7 +182,7 @@ __EOF__
 }
 
 {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package ShortShortConflict;
         use Moo;
@@ -199,7 +200,7 @@ __EOF__
 }
 
 trap {
-    eval <<__EOF__
+    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {
         package NonNegatableNegated;
         use Moo;

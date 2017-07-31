@@ -8,6 +8,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Scalar::Util: '0'
+  Storable: '0'
   Test::Builder::Module: '0'
   Test::LeakTrace: '0'
   Test::More: '0.96'
@@ -19,7 +21,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Text::ParseWords: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,13 +30,14 @@ name: List-SomeUtils
 provides:
   List::SomeUtils:
     file: lib/List/SomeUtils.pm
-    version: '0.54'
+    version: '0.56'
   List::SomeUtils::PP:
     file: lib/List/SomeUtils/PP.pm
-    version: '0.54'
+    version: '0.56'
 requires:
   Carp: '0'
   Exporter: '0'
+  List::Util: '0'
   Module::Implementation: '0'
   perl: '5.006'
   strict: '0'
@@ -44,7 +47,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/List-SomeUtils/issues
   homepage: http://metacpan.org/release/List-SomeUtils
   repository: git://github.com/houseabsolute/List-SomeUtils.git
-version: '0.54'
+version: '0.56'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -55,7 +58,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@DROLSKY/MakeMaker'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -79,23 +82,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::License
       name: '@DROLSKY/License'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@DROLSKY/ExecDir'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DROLSKY/ShareDir'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@DROLSKY/Manifest'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@DROLSKY/CheckVersionIncrement'
@@ -103,19 +106,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@DROLSKY/TestRelease'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DROLSKY/ConfirmRelease'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@DROLSKY/UploadToCPAN'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::VersionFromMainModule
       name: '@DROLSKY/VersionFromMainModule'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@DROLSKY/Authority'
@@ -123,7 +126,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@DROLSKY/AutoPrereqs'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@DROLSKY/CopyFilesFromBuild'
@@ -142,7 +145,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -151,10 +154,10 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.009'
+              version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
@@ -170,19 +173,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@DROLSKY/MetaConfig'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@DROLSKY/MetaJSON'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@DROLSKY/MetaYAML'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@DROLSKY/NextRelease'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -190,7 +193,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@DROLSKY/Test::More with subtest'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -198,7 +201,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Modules for use with tidyall'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -206,7 +209,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -350,7 +353,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@DROLSKY/PodSyntaxTests'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -598,7 +601,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
@@ -698,7 +701,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.54
+          tag: v0.56
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -770,7 +773,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
@@ -782,52 +785,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.009'
+      version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.009'
+    version: '6.010'
 x_authority: cpan:DROLSKY
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
@@ -842,4 +845,4 @@ x_contributors:
   - 'Toby Inkster <mail@tobyinkster.co.uk>'
   - 'Tokuhiro Matsuno <tokuhirom@cpan.org>'
   - 'Tom Wyant <wyant@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,7 +1,6 @@
 package Lab::Connection::IsoBus;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Oxford Instruments IsoBus connection
-$Lab::Connection::IsoBus::VERSION = '3.553';
+$Lab::Connection::IsoBus::VERSION = '3.554';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -95,7 +94,7 @@ Lab::Connection::IsoBus - Oxford Instruments IsoBus connection
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

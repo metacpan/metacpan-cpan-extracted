@@ -1,4 +1,18 @@
 Revision history for Net-Amazon-DynamoDB-Marshaler
 
+0.05  2017-07-21 15:50:33 UTC
+        - Fix force_type so that it converts vals, and drops undefs.
+
+0.04  2017-07-21 01:11:07 UTC
+        - Added force_type option to dynamodb_marshal()
+        - Refactor how we check for numnbers, using Types::Standard instead of looks_like_number.
+
+0.03  2017-07-20 23:15:29 UTC
+        - Handle numbers that are out-of-bounds for DynamoDB
+
+0.02  2017-07-20 17:36:50 UTC
+        - Handle empty strings correctly
+        - Setup Docker development framework
+
 0.01  2017-07-11 13:56:03 PDT
         - Initial release

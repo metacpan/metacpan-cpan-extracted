@@ -7,7 +7,7 @@ use Moo;
 use AnyEvent::FTP::Request;
 
 # ABSTRACT: FTP Server connection class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 with 'AnyEvent::FTP::Role::Event';
 
@@ -82,7 +82,7 @@ AnyEvent::FTP::Server::Connection - FTP Server connection class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 METHODS
 
@@ -122,7 +122,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

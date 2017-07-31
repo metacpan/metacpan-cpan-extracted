@@ -14,7 +14,6 @@ $modules{$_} = $_ for qw(
   CPAN::ReleaseHistory
   Capture::Tiny
   File::Copy::Recursive
-  File::HomeDir
   File::chdir
   Git::Wrapper
   HTTP::Date
@@ -26,6 +25,7 @@ $modules{$_} = $_ for qw(
   PerlX::Maybe
   PerlX::Maybe::XS
   Sort::Versions
+  Test2::Plugin::FauxHomeDir
   Test::More
   URI
   URI::file

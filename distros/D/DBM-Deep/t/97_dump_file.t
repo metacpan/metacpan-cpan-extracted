@@ -3,7 +3,8 @@ use warnings FATAL => 'all';
 
 use Test::More;
 use Test::Deep;
-use t::common qw( new_fh );
+use lib 't';
+use common qw( new_fh );
 use utf8;
 
 use_ok( 'DBM::Deep' );

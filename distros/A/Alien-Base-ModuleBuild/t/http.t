@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Cwd qw( abs_path );
 use File::chdir;
 use FindBin;
@@ -35,7 +32,7 @@ my $INDEX_PATH = File::Spec->catfile( $FILE_HOST, 'index.html' );
 }
 $INC{'Test/Alien/Base/HTTP.pm'} = __FILE__;
 
-use_ok('Alien::Base::ModuleBuild::Repository::HTTP');
+require Alien::Base::ModuleBuild::Repository::HTTP;
 
 my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new;
 
@@ -43,38 +40,38 @@ my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new;
 my $html = q#Some <a href=link>link text</a> stuff. And a little <A HREF="link2">different link text</a>. AN ALL CAPS TAG <A HREF="link3">ALL CAPS</A> <A HREF=link4>ALL CAPS NO QUOTES</A>. <!--  <a href="dont_follow.html">you can't see me!</a> -->#;
 my $correct = [qw/link link2 link3 link4/];
 
-SKIP: {
+subtest 'find linsk with xtor' => sub {
   no warnings 'once';
-  skip "HTML::LinkExtor not detected", 2 
+  skip_all "HTML::LinkExtor not detected"
     unless $Alien::Base::ModuleBuild::Repository::HTTP::Has_HTML_Parser; 
 
   my @targets = $repo->find_links_preferred($html);
-  is_deeply( \@targets, $correct, "parse HTML for anchor targets (HTML::LinkExtor)");
+  is( \@targets, $correct, "parse HTML for anchor targets (HTML::LinkExtor)");
 
   my @disp_targets = $repo->find_links($html);
-  is_deeply( \@disp_targets, $correct, "parse HTML for anchor targets (HTML::LinkExtor, dispatched)");
-}
+  is( \@disp_targets, $correct, "parse HTML for anchor targets (HTML::LinkExtor, dispatched)");
+};
 
-{
+subtest 'find links with Text::Balanced' => sub {
   my @targets = $repo->find_links_textbalanced($html);
-  is_deeply( \@targets, $correct, "parse HTML for anchor targets (Text::Balanced)");
+  is( \@targets, $correct, "parse HTML for anchor targets (Text::Balanced)");
 
   # force Text::Balanced in dispatcher
   $Alien::Base::ModuleBuild::Repository::HTTP::Has_HTML_Parser = 0;
   my @disp_targets = $repo->find_links($html);
-  is_deeply( \@disp_targets, $correct, "parse HTML for anchor targets (Text::Balanced, dispatched)");
-}
+  is( \@disp_targets, $correct, "parse HTML for anchor targets (Text::Balanced, dispatched)");
+};
 
 subtest 'connection() and protocol_class' => sub {
   subtest 'HTTP::Tiny' => sub {
     my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new(
       protocol_class => 'HTTP::Tiny',
     );
-    isa_ok $repo->connection, 'HTTP::Tiny', 'default HTTP class';
+    isa_ok $repo->connection, 'HTTP::Tiny';
   };
 
   subtest 'LWP::UserAgent' => sub {
-    plan skip_all => 'No LWP::UserAgent detected'
+    skip_all 'No LWP::UserAgent detected'
       unless eval { require LWP::UserAgent; 1 };
     my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new(
       protocol_class => 'LWP::UserAgent',
@@ -84,7 +81,7 @@ subtest 'connection() and protocol_class' => sub {
 
   subtest 'default' => sub {
     my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new;
-    isa_ok $repo->connection, 'HTTP::Tiny', 'default HTTP class';
+    isa_ok $repo->connection, 'HTTP::Tiny';
   };
 
   subtest 'invalid class' => sub {
@@ -103,16 +100,16 @@ subtest 'list_files()' => sub {
       host => 'http://example.com',
       location => '/index.html',
     );
-    is_deeply [ $repo->list_files ], [ 'relativepackage.txt' ];
+    is [ $repo->list_files ], [ 'relativepackage.txt' ];
   };
   subtest 'LWP::UserAgent' => sub {
-    plan skip_all => 'No LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
+    skip_all 'No LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
     my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new(
       protocol_class => 'LWP::UserAgent',
       host => URI::file->new($INDEX_PATH)->as_string,
       # location doesn't work for file:// URLs
     );
-    is_deeply [ $repo->list_files ], [ 'relativepackage.txt' ];
+    is [ $repo->list_files ], [ 'relativepackage.txt' ];
   };
 };
 
@@ -125,7 +122,7 @@ subtest 'get_file()' => sub {
     is $file, 'test.tar.gz';
   };
   subtest 'LWP::UserAgent' => sub {
-    plan skip_all => 'No LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
+    skip_all 'No LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
     my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new(
       protocol_class => 'LWP::UserAgent',
     );
@@ -151,7 +148,7 @@ subtest 'get()' => sub {
     is $filename, 'test.tar.gz';
   };
   subtest 'LWP::UserAgent' => sub {
-    plan skip_all => 'No LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
+    skip_all 'No LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
     my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new(
       protocol_class => 'LWP::UserAgent',
     );

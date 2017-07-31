@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "URI::Escape" => "1.31"
   },
-  "VERSION" => "3.26",
+  "VERSION" => "3.27",
   "clean" => {
     "FILES" => [
       "t/TEST"
@@ -59,7 +59,7 @@ my %FallbackPrereqs = (
   "WWW::Form::UrlEncoded" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.030
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
 if ($mp_version == 2) {     requires('mod_perl2', '1.999022'); } elsif ($mp_version == 1) {     requires('mod_perl', '1.27'); }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -110,15 +110,18 @@ sub mod_perl_version {
     return 2;
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.030
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
+  $version_or_range ||= 0;
   warn "$module already exists in $mm_key -- need to do a sane metamerge!"
     if exists $WriteMakefileArgs{$mm_key}{$module}
-      and $WriteMakefileArgs{$mm_key}{$module} ne ($version_or_range || 0);
+      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
+      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
   warn "$module already exists in FallbackPrereqs -- need to do a sane metamerge!"
-    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne ($version_or_range || 0);
-  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range || 0;
+    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
+        and $FallbackPrereqs{$module} ne $version_or_range;
+  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
   return;
 }
 

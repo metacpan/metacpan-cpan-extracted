@@ -1,5 +1,5 @@
 package # Hide from PAUSE
-    t::common;
+    common;
 
 use strict;
 use warnings FATAL => 'all';

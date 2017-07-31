@@ -4,6 +4,7 @@ use utf8;
 
 use Test::Mock::Guard qw/mock_guard/;
 
+use lib '.';
 use t::Util;
 use SemVer::V2::Strict;
 

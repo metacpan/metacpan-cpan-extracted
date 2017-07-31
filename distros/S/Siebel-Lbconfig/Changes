@@ -1,10 +1,167 @@
 ==================================================
-Changes from 2015-09-30 00:00:00 +0000 to present.
+Changes from 2016-07-29 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2016-09-29 20:43:49 +0000
+version 0.003 at 2017-07-29 15:33:11 +0000
 ------------------------------------------
+
+  Change: 9484f319165ea7e6aaaaffde1e3f80bdde9a19e6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-07-29 12:30:50 +0000
+
+    Pod improvements for Lbconfig
+
+    Fixed some types in Pod Added a cpanfile for Siebel::Lbconfig
+    distribution Replaced @Basic from Dist::Zilla in order to copy the
+    cpanfile after building Removed unnecessary Authordep from
+    Siebel-Srvrmgr/dist.ini 
+
+  Change: 9cbdcde321dd7f22374244a1674713acb33433cb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-22 14:18:20 +0000
+
+    Bug fix within Siebel::Srvrmgr::OS::Unix
+
+    Siebel::Srvrmgr::OS::Unix::get_procs had a bug introduced by
+    Proc::ProcessTable::Process
+
+    Some workaround were added to try to avoid the "NaN" bug. 
+
+-----------------------------------------
+version 0.30 at 2017-01-15 03:10:48 +0000
+-----------------------------------------
+
+  Change: 663c703dbb9dc79f8e3ca7d137686345a50f2585
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-15 01:10:48 +0000
+
+    Bug fix Fixed bug introduced in previous release Replaced eval() with
+    Try::Tiny 
+
+  Change: be76434f9049d8f85dd49f9d33efa9ec92899454
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-10 00:16:42 +0000
+
+    Fixes for Windows Last implementations had bugs when running on
+    Windows 
+
+  Change: 1069144cd7c24ea51369aa20afc73078be2835c4
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-08 21:29:39 +0000
+
+    Updated dependency version 
+
+  Change: f7428ff5f0492fb1059007100a1df11503391945
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-08 20:27:01 +0000
+
+    Migrated bundle to Dist::Zilla 
+
+  Change: 60600b28ba2e332f3595cdbea4bbed4c04824406
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-08 20:15:49 +0000
+
+    API Changes More fixes due API changes Adding more test dependencies
+    on bundle and dist.ini 
+
+  Change: 68cf07fed5fd183fdc0107ae7bcb6ef791caaf14
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-08 17:59:02 +0000
+
+    Moving developer test to xt folder Setting environment variables to
+    execute this test is not pratical 
+
+  Change: 097b0ac04e9a671b48b92ff1a9d8744ec68e1c68
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-08 17:57:54 +0000
+
+    API changes New Moose::Role to make a connection attribute as
+    required 
+
+  Change: 8eb1c1be3cacc512d62e438d57cc98b4a543cd84
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-01-08 17:56:02 +0000
+
+    API changes Subclasses of Siebel::Srvrmgr::Daemon that uses a
+    connection now have a new attribute Updated the relative tests, other
+    distros still be be updated 
+
+  Change: f8c6b3a804a612188f4dc3c19af273bba6dc7928
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-19 20:57:08 +0000
+
+    Minor adjustments to improve reliability on different perls 
+
+  Change: 5e4ba9e3398730f4f3bb986993ea7935d0e02bab
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-18 22:17:40 +0000
+
+    More fixes due API change to support offline data Changed the test
+    t/Siebel-Srvrmgr-Exporter.t to use offline data Moved the test that
+    uses IPC and srvrmgr-mock.pl to the xt directory 
+
+  Change: ec73bbea535a89db462a6dcd090e131e3d9b5d42
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-18 14:25:24 +0000
+
+    Fixed tests, added Pod 
+
+  Change: db7ac80cd1b1e12b67ae014f9f46dc6e9123caab
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-15 00:37:24 +0000
+
+    Adding offline parsing support Finished API changes to support that
+    Finished reviewing and updating the unit tests Minor enhancements
+    (code refactoring) 
+
+  Change: 51a78efbdb8c67281df57ab558a6e7be662c5e15
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-12 00:58:04 +0000
+
+    Breaking compatibility with previous versions Daemon and subclasses
+    don't have anymore attributes related to srvrmgr program Those
+    attributes are now moved to Siebel::Srvrmgr::Connection Subclasses of
+    Siebel::Srvrmgr::Daemon now must receive a Connection object as
+    parameter for the run method Siebel::Srvrmgr::Daemon::Light changes
+    are already complete, Heavy in progress Fixed a bug on
+    Siebel::Srvrmgr::IPC and added a unit test for it Changed the shebang
+    line for srvrmgr-mock.pl program 
+
+  Change: 344be088238c55a18fb12ca1773d167eeb1fd8e0
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-09 08:58:43 +0000
+
+    Adding Siebel::Srvrmgr::Daemon::Offline Code cleanup: replaced
+    YAML::Syck with YAML::XS all over the project Moved the attributes
+    max_retries and retries from Siebel::Srvrmgr::Daemon to
+    Siebel::Srvrmgr::Daemon::Heavy Removed the attribute reset_retries
+    from Siebel::Srvrmgr::Daemon Small refactorings and Pod fixes 
+
+  Change: f1c609b439f6f2ec988d30b6174e4b647dc82e1e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-06 03:16:06 +0000
+
+    Replaced Getopt::Std with Getopt::Long on export_comps.pl Adding
+    feature of offline Siebel::Srvrmgr::Daemon Increasing versions of
+    distributions 
+
+-----------------------------------------
+version 0.28 at 2016-12-04 02:20:35 +0000
+-----------------------------------------
+
+  Change: 408746b029a2bf9545f7a863c26e85e15ee8678d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-04 00:20:35 +0000
+
+    Merge branch 'master' of
+    github.com:glasswalk3r/siebel-monitoring-tools 
+
+  Change: 3f0a3eab36f22b8de137233de33844bfdaf1c6fb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-12-04 00:19:21 +0000
+
+    Fixed issue #8 
 
   Change: fb86a8bf0ece68042e219a7893fedc1e1bf1db21
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
@@ -24,10 +181,6 @@ version 0.002 at 2016-09-29 20:43:49 +0000
   Date : 2016-09-29 12:29:42 +0000
 
     Finished preparation for release (Pod basically, added more tests) 
-
------------------------------------------
-version 0.28 at 2016-09-29 02:27:09 +0000
------------------------------------------
 
   Change: 2a1987640a0dc1b571015195a79025b2732867b4
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
@@ -139,1302 +292,12 @@ version 0.28 at 2016-09-29 02:27:09 +0000
     change invalidated some output files that are no longer valid Small
     refactoring (sub parsing of arguments) 
 
------------------------------------------
-version 0.26 at 2016-06-11 01:52:09 +0000
------------------------------------------
-
   Change: 10fa36719569f1ada4268b74f8c9904471b004c9
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
   Date : 2016-06-10 22:52:09 +0000
 
     added Dist::Zilla::Plugin::MetaJSON to improve kwalitee 
 
-  Change: 642b5f355418202cdf6eb75d17afc8db41f6658a
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-06-05 14:59:21 +0000
-
-    Added validations to Moose roles Duration and ToString 
-
-  Change: 20d73682fba330722731b86da0a684e006766abe
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-05-29 12:29:32 +0000
-
-    Added POD Included additional requirements in dist.ini 
-
-  Change: 09616e70c479b2d44404f90d2e0cf66be1f2edcf
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-05-26 17:50:29 +0000
-
-    Preparations for release of SCPC Moved functionality from scpc.pl to
-    modules Improved generated HTML report with CSS Added usage of
-    Dist::Zilla::Plugin::OurPkgVersion Created tests for the distribution
-    (for now, only the Template module is being tested) 
-
-  Change: 4d5de6fa87795714df328373e3765ac96ff0363b
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-04-01 16:56:34 +0000
-
-    Forcing only Perl 5.14 to be acceptable 
-
-  Change: dfbb678b14569e76b91382c5ab554ae67b59220d
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2016-03-29 23:58:40 +0000
-
-    Fixes for Siebel-Srvrmgr-Exporter to work with Daemon::Light Fixes
-    for Nagios-Plugin and Bundle 
-
-  Change: 634377fd6cc581476067fc2024177a0f4c7c4db4
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-03-29 21:01:44 +0000
-
-    Using Dist::Zilla::Plugin::OurPkgVersion instead of PkgVersion Added
-    dinamic replacement of Siebel::Srvrmgr::Daemon::Heavy by Light in MS
-    Windows to avoid issue
-    https://github.com/glasswalk3r/siebel-monitoring-tools/issues/5 
-
-  Change: 8aa432c855bded5120234ee6b30a9eaaea2e79a7
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-03-23 18:09:17 +0000
-
-    Migrated from Dist::Zilla::Plugin::PkgVersion to OurPkgVersion Also
-    fixed some minor things like declaring module version or lack of
-    usage of pragmas like strict and warnings 
-
-  Change: 7c39f0fb659fd30844a7a180bb6cf7d307f11e1c
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-03-23 11:47:46 +0000
-
-    Small fixes due tests with Perl::Critic 
-
-  Change: bc3a91b7cbb8b9c9653b239075c9d43403aa46d7
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-03-22 23:00:57 +0000
-
-    Removed MooseX::Storage as a dependency MooseX::Storage does much
-    more than was necessary to use MooseX::Storage dependencies was
-    causing PPM packages generation to fail Fixed Pod Refactored code
-    Fixed tests that were depending on MooseX::Storage No class that used
-    MooseX::Storage is capable of using retrieve method anymore (none
-    actually was doing it anyway) 
-
-  Change: 0bcb8ac00fa3b172bb72fe328df3bef1ad0f803f
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-03-22 21:50:16 +0000
-
-    Enhancing output validation 
-
-  Change: 50957fe4c989deb6e63d707617ad699e7d9bbb3d
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2016-02-22 22:49:27 +0000
-
-    Fixing dependencies due changes on Nagios::Plugin 
-
-  Change: 5a81b1e5bdd366bb54c541ef4c3c830b5a6570b5
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-01-14 00:21:40 +0000
-
-    Added more information about the tests due latest report failures for
-    Siebel-Srvrmgr-Exporter Added more tests Incremented the release
-    versions 
-
-  Change: 461ce4cf17214455e52a2e8e2cac6b9f40e0d9c6
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-01-14 00:21:27 +0000
-
-    Refactored _submit_cmd 
-
-  Change: 7e6e5a69f968fd9c22784b4382091e07c2b93923
-  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
-  Date : 2016-01-13 22:42:23 +0000
-
-    Merge pull request #6 from Manwar/fix-pod-error
-
-    - Fixed typo in the package Siebel::Srvrmgr::Exporter. 
-
-  Change: 670d04959d8d5f41ebb3b6c0cf54f3a3cff63fc9
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2016-01-09 21:28:38 +0000
-
-    - Fixed typo in the package Siebel::Srvrmgr::Exporter. 
-
-  Change: 44fd35dc9c6715eb1c804905c69a3b021a0bc582
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-01-09 18:14:20 +0000
-
-    Fixed usage of a perl interpreter to execute the test as explained in
-    http://wiki.cpantesters.org/wiki/CPANAuthorNotes -> "How should I
-    invoke perl from my test scripts? 
-
-  Change: a3fbf8c6295f87e8b017154f017de26c70bc8a6c
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2016-01-03 11:58:04 +0000
-
-    Explicit declaring version of Term::YAP prereqi (export_comps.pl
-    loads this with require instead) 
-
-  Change: 5a9024a152ad679a4716adb52b842bf6782a30fa
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-15 22:48:50 +0000
-
-    Improved dist.ini by adding META data 
-
-  Change: c00ad2dc79b7aa6babf15244d3ed5bf444153312
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-15 22:23:56 +0000
-
-    Added Dist::Zilla::Plugin::MetaProvides to improve Kwalitee 
-
-  Change: 282fd93e03a320e6cc8fea4c29f06ac6bb625486
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-15 11:43:09 +0000
-
-    NOW the bug with Dist::Zilla is fixed for Windows 
-
-  Change: 442b4b0020826d99c7601ab380f729abec52cd3c
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-15 11:35:10 +0000
-
-    Fixed introduced bug on win32 systems with Dist::Zilla 
-
-  Change: 45f231d6a155c2353a27011a9822b52e39e3209f
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-14 10:10:29 +0000
-
-    Merge branch 'master' of
-    github.com:glasswalk3r/siebel-monitoring-tools 
-
-  Change: 0f004b89ffecb7a7e3785ec9bb1d8b669bbc2344
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-14 10:09:39 +0000
-
-    Minor fixes Incrementing release version 
-
-  Change: 565bbaccb675b9f99b14bb2b0b057b0100da2396
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-03 18:57:02 +0000
-
-    Reviewing errors report from release 0.22 Some tests where modified
-    to support parallel testing Improved Pod 
-
-  Change: 28a59519916fbef6af732baa27e900f424c9e8bd
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-12-02 21:54:18 +0000
-
-    Fixed minor bugs 
-
-  Change: b4ea8afc8fa6a160d70032ed54777a76d84736a4
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-29 14:27:27 +0000
-
-    Due issues with Extutils::MakeMaker not honoring TEST_REQUIRES, added
-    some distros as PreReqs in dist.ini Added specific PreReqs for Linux
-    in dist.ini Removed overrided shift_command from
-    Siebel::Srvrmgr::Daemon::Light Included more tests for
-    Siebel::Srvrgrm::Util:::DaemonIni Added more tests for
-    Siebel::Srvrmgr::Daemon of shift_command and push_command Fixed a bug
-    with shift_command of Siebel::Srvrmgr::Daemon Refactored tests for
-    Siebel::Srvrmgr::Daemon and subclasses 
-
-  Change: d098fc11cd3ad9a85ac0d6905dbb26f668086b7d
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-28 13:51:26 +0000
-
-    Added tests for Siebel::Srvrmgr::Util::IniDaemon Fixed minor bugs
-    found after testing creation Added additional verifications of INI
-    file 
-
-  Change: eb579b2b6fc1d337f727bfa12631a2e28266ff50
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-23 00:13:05 +0000
-
-    Fixed but with Siebel::Srvrmgr::Daemon::Light shift_command Still
-    refactoring tests on Siebel::Srvrmgr::Daemon and subclasses Created
-    "stress" tests for both subclasses of Siebel::Srvrmgr::Daemon 
-
-  Change: b46c9046a1e2956ccf604c701916280238cdb752
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-22 14:25:12 +0000
-
-    Still fixing details of Dist::Zilla Renamed method shift_commands to
-    shift_command (semantics) Create method push_command Started
-    refactoring the tests due changes to the API and found opportunities
-    to simplify those tests (still working on them) Removed the test that
-    expects that run() executed from Siebel::Srvrmgr::Daemon will raise
-    an exception (doesn't work that way anymore) 
-
-  Change: d3064f68eb490d4efbf8149061d18b2dfb0b1706
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-22 00:53:44 +0000
-
-    Fixed tests due latest changes 
-
-  Change: 5d9e3439f287a7dcf49fcf717df45bf46f07561b
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-21 18:47:46 +0000
-
-    Added some fixes, but still with problem due Term::YAP 
-
-  Change: 18547b0bf57084c232fe97f7be0381c0a35868f5
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-21 17:52:53 +0000
-
-    Finished migrating Siebel::Srvrmgr to Dist::Zilla Added more regex
-    tests for OutputFactory Fixed introduced bug after messing with
-    list_comp regex on OutputFactory Moved DaemonHeavyRuns.t to xt
-    directory Fixed configuration of ChangelogFromGit Now versioning of
-    all modules and srvrmgr-mock.pl is controlled by Dist::Zilla 
-
-  Change: bb49a8619f2031e3dee257cfafd7f6cd1a2d573f
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-21 13:49:48 +0000
-
-    Migrating Siebel-Srvrmgr to Dist::Zilla Also added missed files from
-    child projects 
-
-  Change: 143c8fa5b587765aeaf26447fcec78f8565e2583
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-21 13:36:15 +0000
-
-    Adding Dist::Zilla for smaller projects Siebel-Srvrmgr-Exporter now
-    uses Dist::Zilla Improved dist.ini of Siebel-Params-Checker 
-
-  Change: afdd4f2a6d8e9d01134f6e1d210133bf16331599
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-21 12:31:03 +0000
-
-    Preparations to distribute Siebel-Srvrmgr-Exporter as a standalone
-    distribution 
-
-  Change: de396288c2d7b4d11980277147381e64d4a58d04
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-17 21:52:15 +0000
-
-    Improved Dist::Zilla use Added dependencies versions to
-    Siebel::Srvrmgr::Daemon::Action subclasses Used a workaround to
-    include the auto version also to scpc.pl 
-
-  Change: 54021fa5e9c746655d6a00071c85f9534c9bf74a
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-17 21:03:38 +0000
-
-    Several modifications and fixes Using Template Toolkit to generate
-    output Removed the usage of a regular expression for the component
-    alias and using the complete componente alias instead Now the "list
-    comp" will use a wildcard to match only the servers that have the
-    component configured, reducing the output list considerably Report
-    format will be dinamic: if the number of servers is smaller than the
-    number of parameters, they will be used as the table headers, other
-    the parameters will be used Added Pod to Siebel::Params::Checker
-    Relaxed the regex used to validate the Output class from
-    Siebel::Srvrmgr::ListParser::OutputFactory so will cards in the list
-    comp command will be accepted 
-
-  Change: f0f6185753a4ed3084338c369a01994237e5b37a
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-15 02:19:50 +0000
-
-    first commit, still pending to add Pod and tests 
-
-  Change: 64c72b4c5cf831ab2310df35bbcba937f1cd0783
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-15 02:11:56 +0000
-
-    Fixed Pod And did small refactorings too 
-
-  Change: 0f0bd51e8b9449a5818f69425a74895cb5846d65
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-11-03 23:42:42 +0000
-
-    Moved author tests to xt directory 
-
-  Change: e1ca5376ac38f9a4ae0903e86089a8e0aa8c91ff
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-10-18 11:36:10 +0000
-
-    Improving Kwalitee 
-
-  Change: 30a13240c571f47a32bbd54072de384005538312
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-10-10 15:48:08 +0000
-
-    Updating tests and mock stuff Due the latests changes to the
-    interface, the tests that were failing are now fixed. Implemented
-    tests for Siebel::Srvrmgr::OS::Process Included POD for
-    Siebel::Srvrmgr::ListParser::Output::ListProcs::Proc Fixed introduced
-    bug of Siebel::Srvrmgr::Daemon::Ligh 
-
-  Change: 0a9c4e6eb55a50421cf888f730bdef31d141d170
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-10-07 00:50:57 +0000
-
-    Enabled again checking of errors for _process_stdout For some reason
-    it was commented, so non-fatal errors from srvrmgr where not
-    generating exceptions 
-
-  Change: c50319c279f1b4995e04d90fc1c5a82f31078c87
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-10-07 00:48:00 +0000
-
-    Bug fixes and improvements Fixed usage of blessed() Implemented the
-    usage of -k parameter for setting the output delimiter Modified
-    Daemon::Heavy and Daemon::Light to implement their own password
-    provider 
-
-  Change: 9b31672461d6469561bb7b72c74db9f747ef4d24
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-26 16:46:06 +0000
-
-    Bug fixes Fixed implementation of debugging on Daemon to include all
-    attributes and properly handling the data types Relaxed the regex for
-    "list procs" on OutputFactory Missed several files on MANIFEST, fixed
-    that now 
-
-  Change: 2f9c057ac3fa1c59fda5af0458b7f3d506a3dc28
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-26 01:14:31 +0000
-
-    Introduced ListProcs Added parser for "list procs" command Modified
-    all required classes to add it Included tests Refactored ListTasks by
-    creating the Moose Role ByServer Fixed endless errors with Pod 
-
-  Change: 462be8ef5e7050e0b646ceefa8029297a8554538
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-25 02:34:41 +0000
-
-    Fixed bugs Minor improvements to logging Fixed Pod, included more
-    information 
-
-  Change: 33dfd1db241a983c1995d09c5f65fe5e31e7c37f
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-24 16:05:50 +0000
-
-    Fixed to correct Moose Role Changed the name of the Moose Role that
-    defines the interface of a Enterprise log archive and missed some
-    references to it 
-
-  Change: b45bdff7f0e0794134352513a39cceb2efd19c8c
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-24 15:43:54 +0000
-
-    Merge branch 'master' of
-    github.com:glasswalk3r/siebel-monitoring-tools Same old song 
-
-  Change: 85657dbd16e16885bf3c7ffbafbc614cab7ae0bf
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-24 15:42:48 +0000
-
-    Moved attribute to Siebel::Srvrmgr::OS::Process 
-
-  Change: 064042d600681a6c8af26bee8eef3dfe8de2c196
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-23 23:28:16 +0000
-
-    More tests, small refactoring Added tests for Enterprise.pm
-    Refactored code from OSUnix.t Fixed small bug on LoadPreferences
-    Replacing 'ref' with 'blessed' on ListParams.pm 
-
-  Change: adb0e09085c1832c4387f51fae2ad5bcf89daefb
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-23 01:03:42 +0000
-
-    Revision of interface of Siebel process handling 
-
-  Change: 6281ff971cd15ecf535eb7fb436e96fbe253e757
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-22 00:59:41 +0000
-
-    Small fixes, new implementations Added a new subclass of
-    Siebel::Srvrmgr::OS::Process to include information recovered from
-    the Siebel Server Small fixes regarding POD Added a new test of
-    Siebel::Srvrmgr::Daemon::Action to catch subclasses not overriding
-    required methods 
-
-  Change: 299f42b4fc3dfecd3c4310234fe6c755d077eb63
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-21 11:07:15 +0000
-
-    POD and generalization of example Included POD Updated POD modified
-    proc_mon.pl to be more generic 
-
-  Change: 2b62cb26b36854efbff531934212b48843fbf9a5
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-19 11:32:08 +0000
-
-    Added additional checking of component availability To avoid warnings
-    and pushing empty values of cpu and memory to RRDTool 
-
-  Change: cbf9af2484732ffc371f758d29b9838c44f6044f
-  Author: Alceu Rodrigues de Freitas Junior
-  <alcjunio@localhost.localdomain>
-  Date : 2015-09-18 21:25:52 +0000
-
-    Fixes Lot of fixes implemented, code under test 
-
-  Change: 962e8cdaeb85ebd6fcbfe7c6be20576075433847
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-17 16:55:15 +0000
-
-    Initial release Still to update after latest refactoring of
-    Siebel::Srvrmgr::OS::Unix 
-
-  Change: 4f00ff200891cf00fa8b75203eb92c5089ca14b2
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-17 16:49:54 +0000
-
-    Refactoring Siebel::Srvrmgr::OS::Unix breaking down classes to lower
-    coupling tests to be implemented 
-
-  Change: 427364dc41d5d788b19dc9ebd87d7cff8f950659
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-16 01:23:53 +0000
-
-    Changes for Siebel::Srvrmgr::OS::Unix added dependencies do
-    Makefile.PL fixed bug regarding validation of expected number of
-    fields from the Enterprise log file Incremented release version Still
-    has errors from test file, that needs an update 
-
-  Change: 0fcd6632638c1ce42865639a1673b46a5e70a807
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-14 11:10:06 +0000
-
-    Added new dependency 
-
-  Change: fc38a08d5f6bb18479ff402b5a6d49b77a34b0e8
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-14 11:08:14 +0000
-
-    New implementations to read Siebel Enterprise log files created
-    Archive.pm updated Unix.pm to secure read the Siebel Enterprise log
-    file, also allowing the persistence of lines already read and
-    processed 
-
-  Change: dc2d5b8831e0470c1f5586b155588c34a029dc98
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-09-07 23:29:36 +0000
-
-    Changes to improve Kwalitee 
-
-  Change: f3c2f77f74e53af4faaea77db209337738113a3b
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-08-14 12:47:52 +0000
-
-    Increased version 
-
-  Change: 52d9104b74b283f60cfbeb4e23221dd886d8bedf
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-08-14 12:46:21 +0000
-
-    Added more modules dependencies 
-
-  Change: 6578ec3dfde4e2228e9e39089db85ea1f45797a1
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-08-14 12:35:14 +0000
-
-    Preparations for a new CPAN release updated version of the
-    distribution updated the MANIFEST 
-
-  Change: 596665891cb292d1d37f3a851c3669b910ed7944
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-08-09 02:55:40 +0000
-
-    Fixed errors regarding temporary files on Windows Files were not
-    being removed correctly and generating warnings during the tests 
-
-  Change: 51292e26146052ef8439a5d1824484b15350c52a
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-08-03 10:54:37 +0000
-
-    More temporary dirs for temporary files Added usage of
-    Test::TempDir::Tiny to Serializable Moose Role Added method store to
-    Serializable to avoid loading it on other classes Remove
-    OSUnix_simple.t since all tests are being done in OSUnix.t Added
-    tests to OSUnix.t for newer methods and attributes 
-
-  Change: e02f98c09f736609e33a0fd00567ff560015d976
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-07-28 12:09:16 +0000
-
-    Temporary directories and new tests of Siebel::Srvrmgr::OS::Unix
-    Added Test::TempDir::Tiny as a dependency for tests Merge the tests
-    executed by t/OSUnix.t and OSUnix_Simple.t Added more tests to
-    t/OSUnix.t 
-
-  Change: d7a9b76db4680779bfee8f12a5627eb78ebcf5b0
-  Author: U-ALCJUNIO-BR\alcjunio <alcjunio@ALCJUNIO-BR.br.oracle.com>
-  Date : 2015-07-23 13:33:00 +0000
-
-    Ignoring lines already read Added new attributes to handle the
-    feature to ignore lines of the Siebel Enterprise log already read. 
-
-  Change: 18ad033178e397d3202a3cafbe8ba969d76bf8b2
-  Author: U-ALCJUNIO-BR\alcjunio <alcjunio@ALCJUNIO-BR.br.oracle.com>
-  Date : 2015-07-23 10:41:10 +0000
-
-    Fixed typo that was not enabling interpolation of $! in case of
-    errors reading the enterprise log file 
-
-  Change: 11e880846b7abff9c50708a02cd7cd2c28937135
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-07-20 10:46:55 +0000
-
-    Fixes for concurrent test Added code to use temporary directories for
-    temporary files, which should allow concurrent test executions (prove
-    -j or multiple perl interpreters running tests). Hopefully that will
-    fix Windows errors to remove those files due file locking. 
-
-  Change: bdf754f0fe22423e682e73e2be0bdac26b4da933
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-07-07 16:19:34 +0000
-
-    Removed non-blocking configuration Not supported by Windows, didn't
-    improve execution speed at all in Linux 
-
-  Change: 6016a713f61d2f5429c201141249bad7f63e48c2
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-07-06 11:11:42 +0000
-
-    Error message improvement Added the reason ($@) of error trying to
-    load Siebel::Srvrmgr::OS::Unix, which will skip all tests 
-
-  Change: cf01a20aa6cee74fcf0fdd4bdd28de22879278ef
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-07-05 19:29:53 +0000
-
-    Improvements Performance improvements to Daemon::Heavy Performance
-    improvements to ListParser and ListParser::FSA Added support to time
-    zone on Duration class 
-
-  Change: 43c604ea6ad0e32464c2e793d2ff3788b638f18a
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-06-21 13:13:48 +0000
-
-    Proper configuration of time zone in DateTime objects Changes related
-    to set time zone properly Small fixes related to test Duration and
-    ToString Moose roles attributes and methods Fixed a introduced bug in
-    t/OSUnix_simple.t due latest change in Siebel::Srvrmgr::OS::Unix 
-
-  Change: bf65ee723bc0ad3af5cf6206cbb8ff18dff82336
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-06-12 01:20:29 +0000
-
-    Extended processes returned by Siebel::Srvrmgr::OS::Unix
-
-    Now the processes returned by this class will not only be those
-    related to Siebel components. Added a new dependency to the
-    Makefile.PL to support this change. 
-
-  Change: d92f24d5b4f248547b60c84a041281bc383f1c21
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-06-07 16:04:21 +0000
-
-    Refactoring More improvements to usage of Log::Log4perl to reduce
-    reading the configuration file over and over again Added use of Fcntl
-    to set the handlers of child process to use non-blocking mode
-    _check_error method is now being invoked only once of lines read from
-    STDOUT of child process instead of line by line 
-
-  Change: 5672094a70a6a714c580e0bab596ca3da7bcaa88
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-06-06 18:22:49 +0000
-
-    Updated MANIFEST 
-
-  Change: 841950f9159edab9a5686da7f1a3b7c147f0fac8
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-06-06 18:20:40 +0000
-
-    Code review Removed infinite attribute from Siebel::Srvrmgr::Daemon
-    class, subclasses and tests since is not used (and not tested as
-    well) :q! 
-
-  Change: 2ae1abcfd4452def663ca520bdc53f154d7671e3
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-06-06 01:42:36 +0000
-
-    Final touches for new release "Fixed" md5sum checksum of
-    Siebel-Srmvrgr-Exporter.t 
-
-  Change: 2eb9a29b0867fb610e68ded2e76d05491202dd10
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-05-28 12:05:03 +0000
-
-    Clean up Removing unnecesary files MANIFEST was updated 
-
-  Change: e14ace6d48d424cc813b2ec0230ff0984269ec13
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-05-28 01:29:13 +0000
-
-    Preparing for release 0.17!
-
-    added references to contribuitions made by
-    yaroslav.shabalin@gmail.com refactored _check_error of
-    Siebel::Srvrmgr::Daemon fixed bugs after refactoring run method of
-    Siebel::Srvrmgr::Daemon::Heavy replaced warn() messages from
-    t/Test/Siebel/Srvrmgr/Daemon.pm with diag() fixed error (?) with
-    t/Test/Siebel/Srvrmgr/ListParser/Output/Tabular/ListServers.pm, which
-    may had happened due out samples change 
-
-  Change: 6cc748a5e5ecbeed6f6d85e8c66ae469a84c0ff4
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-05-26 11:43:27 +0000
-
-    refactoring on Daemon.pm and subclasses regarding the _check_error
-    method refactoring on Daemon.pm and subclasses regarding passing
-    around Log4perl instance as parameter for method since it is not
-    necessary anymore renamed method _create_handle_buffer to
-    _manage_handlers refactored _manage_handlers for code readability and
-    moved logging code not related outside the method Fixed a bug with
-    ListServers.pm Modified tests for Daemon.pm classes (adding new
-    methods to be tested) Test::Daemon still has a bug to remove the log
-    file Removing Exporter::TermPulse.pm usage in favor of Term::YAP Not
-    tested yet! This code might be unstable! 
-
-  Change: 4db9eb4507b3afa632d118b04c1ae2fa9d5a7211
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-04-03 00:56:58 +0000
-
-    adding/updating Pod 
-
-  Change: 09ad0ce8b420bd0837e998246208705e7cd9be5d
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-04-03 00:15:53 +0000
-
-    Fixed Pod for Set.pm Fixed Pod for LoadPreferences.pm Starting adding
-    changes to ListServer.pm to retrieve objects
-    (Siebel::Srvrmgr::ListParser::Output::ListServers::Server) instead of
-    a hash reference 
-
-  Change: b3076930fb847674001473fd9426cabb7f1ccaad
-  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
-  Date : 2015-04-02 15:33:00 +0000
-
-    Update TODO 
-
-  Change: 86a359ff6003946b5d75ce852661b3fb22530530
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-31 13:45:35 +0000
-
-    reverted changes on ListServers.pm to be able to make release 0.16 to
-    fix 0.15 
-
-  Change: 559ff6abbc7c4a7daf19dd83be9287cfcf74bc18
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-31 01:54:48 +0000
-
-    Adding Duration and ToString roles to the output of ListServers.pm
-    Fixing Pod TODO now has something truly related to what is missing in
-    the distribution 
-
-  Change: 77d8658eab9fdd378e1b6153ad0495b3778e2c02
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-30 23:39:08 +0000
-
-    Added missing dependencies Already preparing a new release because of
-    that :-) 
-
-  Change: 8a800d672d013b45f86ae36095bef7ed651cab46
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-03-30 02:36:13 +0000
-
-    Signed-off-by: glasswalk3r <glasswalk3r@yahoo.com.br> 
-
-  Change: fc243d864c8e3009ee9158580493d933bad8df34
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-03-30 02:34:31 +0000
-
-    Signed-off-by: glasswalk3r <glasswalk3r@yahoo.com.br> 
-
-  Change: f2d5a1acee3d87311541cc53214209f82e7524ad
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-03-30 02:29:37 +0000
-
-    Merge branch 'master' of
-    https://github.com/glasswalk3r/siebel-monitoring-tools 
-
-  Change: 5a112ba3f5fd1c896d3a082b74ce6fd3f4e64d0e
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-03-30 02:25:50 +0000
-
-    Signed-off-by: glasswalk3r <glasswalk3r@yahoo.com.br> 
-
-  Change: b6afb57c94bc3c9bf14bc61dcbd77dedf725cb73
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-30 02:00:36 +0000
-
-    no patch for FSA::Rules is necessary anymore 
-
-  Change: 6ca1829aa9dda7706f99e8c8875671c4ef4f6532
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-30 01:40:11 +0000
-
-    Fixed bug in the Duration.t test Updated the Pod 
-
-  Change: aed4f9a2ca42bd5c882a3818962f25457cc3c1b5
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-29 12:38:08 +0000
-
-    merge 
-
-  Change: 6e6f71c4836cb9d310edc32895e958c15ee29008
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-29 12:36:34 +0000
-
-    Merge branch 'master' of
-    github.com:glasswalk3r/siebel-monitoring-tools
-
-    Conflicts:
-
-    Siebel-Srvrmgr/Makefile.PL 
-
-  Change: f2959283a3ed70f61348a5e4bee8d91696ee8fdb
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-29 12:32:52 +0000
-
-    fixed bugs related to Exporter and all srvmrgr-mock.pl store_data.pl
-    received some improvements 
-
-  Change: 54c0aafb79528b3bb40a16504edca0ccf8ddec7d
-  Author: glasswalk3r <glasswalk3r@yahoo.com.br>
-  Date : 2015-03-26 14:24:45 +0000
-
-    Updated Makefile.PL regarding new project home. Fixed a minor bug in
-    Daemon.pm related to MS Windows not having a reliable HOME
-    environment variable. Now all results will be tested anyway to
-    provide better feedback in case of errors. Fixed tests of OSUnix.pm
-    to not execute on non-UNIX OS. Selective removing OSUnix.pm of Pod
-    coverage testing on non-UNIX OS.
-
-    Signed-off-by: glasswalk3r <glasswalk3r@yahoo.com.br> 
-
-  Change: 1deef1dd4bb7fc479f09ceebb381409a3440b484
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-25 02:55:06 +0000
-
-    Fixed smalls bugs in Pod Fixed wrong output for "list params" on
-    svrmgr-mock.pl Fixed bugs in Siebel::Srvrmgr::Exporter due API
-    changes Copied and added modified Term::Pulse to fix bugs related to
-    manage the child process 
-
-  Change: 155d729f6ae4a0d113f3a152ae4c984a8692abaf
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-24 23:35:03 +0000
-
-    Added more information in the exception for undefined fields pattern
-    Added more information to SYNOPSIS 
-
-  Change: 6709b8b480d50002c7b9458c47301fe6d49de26b
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-24 21:49:38 +0000
-
-    fixed Pod added more dependencies to Makefile.PL fixed small bugs on
-    t/DaemonHeavyRuns.t added new test to enable to test
-    Siebel::Srvrmgr::OS::Unix in perl distros < 5.16 
-
-  Change: 2df048b001a1d482be88fbbc446bf526d7727458
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-23 03:32:25 +0000
-
-    Added fixes to the tests Updated Pod Update bundle 
-
-  Change: aa3b1b8c3e0502147669208e1fadd3425fa2576d
-  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
-  Date : 2015-03-22 12:41:31 +0000
-
-    ./finishGoogleCodeGitHubWikiMigration: Moved ProjectHome.md from wiki
-    branch to README.md in master branch. 
-
-  Change: 0dfe9d479a080904d0de954f5d39e97ce45455d9
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-03-19 14:14:20 +0000
-
-    added more Duration tests 
-
-  Change: 416d433749969e9f22d25cc9b691e729e28e3c9e
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-03-16 14:43:07 +0000
-
-    FSA::Rules memory leak is fixed now on CPAN, changing it's version on
-    Makefile.PL to match the fix 
-
-  Change: 835280de43d11f9ab203d06c3a3a0b7dbd01b8ab
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-03-04 00:26:19 +0000
-
-    test script for Siebel::Srvrmgr::OS::Unix 
-
-  Change: 3f2a8620ed98587a7eccb5346dbd43760e1d0b70
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-02-23 01:13:04 +0000
-
-    Still hunting memory leaks, seems to be finally fixed now (still need
-    to patch FSA::Rules although) 
-
-  Change: ae7c3865bb8fdf3862ad5ca3b5e5da42aa4cf657
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-02-22 14:44:16 +0000
-
-    still hunting memory leaks 
-
-  Change: 79caa64790e25666f511e43954ea41ba3d965065
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-02-08 22:44:18 +0000
-
-    Fixed more bugs due changes in the API 
-
-  Change: dfc5dfb8abf650a7214e884e8163abfde67c3815
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2015-02-08 04:41:42 +0000
-
-    Addind Duration.pm to Comp.pm Refactoring all method and attributes
-    to ListComp::Comp.pm Fixed minor bugs Fixed Pod Moved constructor
-    details from ListComp::Comp to ListComp::Server 
-
-  Change: c6fdba49f48a2f8efd86846b178d2fadf4eb786e
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-11-24 00:51:12 +0000
-
-    started creating tests for tasks validations (still failing)) 
-
-  Change: 880908d43ba11c659d279c98731a4cdeac8fbbc8
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-10-07 03:09:16 +0000
-
-    Modified Siebel::Srvrmgr::ListParser::Output::ListTasks to use news
-    roles, tests included Fixed minor bugs with
-    Test::Siebel::Srvrmgr::Daemon Fixed bugs in t/DaemonHeavyLeak.t
-    Replaced Config::Tiny with Config::IniFiles in t/DaemonHeavyRuns.t
-    Fixed bugs in t/DaemonHeavyRuns.t Fixed minor bug in srvrmgr-mock.pl
-    Added set_delimiter and updated list_params in
-    Siebel::Srvrmgr::ListParser::OutputFactory Added set_delimiter to
-    Siebel::Srvrmgr::ListParser::FSA Added role to
-    Siebel::Srvrmgr::ListParser::Output::Tabular Fixed Pod using tabs
-    instead of spaces in several modules Moved cmd_stack to
-    Siebel::Srvrmgr::Daemon class Implemented proper error checking in
-    Siebel::Srvrmgr::Daemon through _check_error method Implemented
-    Siebel::Srvrmgr::OS::Unix Changed defaults of read_timeout and
-    buffer_size of Siebel::Srvrmgr::Daemon::Heavy Changed
-    Siebel::Srvrmgr::Daemon::Heavy to properly override parent class run
-    method Improved push_stash method from
-    Siebel::Srvrmgr::Daemon::ActionStash Moved check_system from
-    Siebel::Srvrmgr::Daemon::Light to Siebel::Srvrmgr::IPC Fixed warning
-    about File::Temp::tmpnam redefinition Updated Makefile.PL with new
-    dependencies for REQUIRES and TEST_REQUIRES 
-
-  Change: 1fb76f3199212616bafca8a40aa71f84c54dfa6d
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-09-11 15:13:53 +0000
-
-    Added new method to_string to some classes (unfinished) Added locked
-    control to Daemon and subclasses Fixed bug regarding _setup_commands
-    and check_cmd 
-
-  Change: 96bbf4e4a3f2bc73c9ad530b9edfea72347d0010
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-08-02 04:00:51 +0000
-
-    created class Siebel::Srvrmgr::OS::Unix to retrieve Siebel process
-    information from UNIX-like OS (untested) 
-
-  Change: 3beec61827af8259fca6286f47bc5d6ac24439ed
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-08-02 03:59:42 +0000
-
-    Added "list hidden parameters" to OutputFactory Added execution
-    control to Daemon None tested :) 
-
-  Change: c5548d203fecc5048c2b913132d2bc875410a017
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-07-29 23:33:40 +0000
-
-    removed TODO tests that were causing errors updated Pod included into
-    the regex of list params validation to accept "advanced" as well 
-
-  Change: 3addf2295e6a59b04a8c61737fb2c63314712f6b
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-07-14 21:57:37 +0000
-
-    fixed Pod added list params output configuration to example files 
-
-  Change: c068e29cc377ebfeee43b14f2aa3d3d1a4b8ff39
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-07-12 02:48:51 +0000
-
-    Fixed bug with
-    Siebel::Srvrmgr::ListParser::Output::Tabular::ListParams Fixed also
-    de output files used for testing Fixed error in the Pod of the rest
-    of modules 
-
-  Change: 5f0b8b0b124e871b4a37d4102104d3b64dd7e5d6
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-07-09 22:21:26 +0000
-
-    Missed adding Devel::AssertOS includes in the previous release... we
-    should also garantee that the release uses a reliable release of
-    Devel::AssertOS 
-
-  Change: 30317587a1e6647b87f6413c9c0bd97472585b8a
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-07-08 15:24:41 +0000
-
-    updated log4perl-debug.txt with more details to enable debugging
-    added ChangeLog to MANIFEST 
-
-  Change: 92898969729247acb17e9e354a310578a6431b51
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-07-07 14:48:35 +0000
-
-    Added more parsing possibilities to
-    Siebel::Srvrmgr::ListParser::Output::Tabular::ListParams Added more
-    tests to Siebel::Srvrmgr::ListParser::Output::Tabular::ListParams
-    Moved all regular expressions to identify and validate command
-    submission to Siebel::Srvrmgr::ListParser::OutputFactory
-    Siebel::Srvrmgr::ListParser now feeds
-    Siebel::Srvrmgr::ListParser::FSA with regular expressions from
-    OutputFactory POD updated 
-
-  Change: 54f27a913828406df03a3e50fa2b8085cfe85501
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-06-28 01:43:01 +0000
-
-    added new output files for testing version 8.1.1.7 with "list
-    sessions" output 
-
-  Change: 503a72f0aed3ed95cc4181de1894d0976e9f8116
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-06-28 01:35:36 +0000
-
-    -fixed bugs for list sessions output -fixed POD 
-
-  Change: e38fc142e38c57626a6e45ba012be51bf80b0872
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-06-17 02:40:20 +0000
-
-    small fixes, specially to POD 
-
-  Change: 36c9df919664dc3a15ba5dc33fd5d71f051c8ae1
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-24 22:12:25 +0000
-
-    updated POD 
-
-  Change: ee09c54f19c6a03cf5ffd1020d8b04ceb488df51
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-23 19:33:34 +0000
-
-    finished tests of ListSessions bug corrections 
-
-  Change: fc16f238bbf1128f9623dde45af800c8e8f0a7ec
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-23 02:57:57 +0000
-
-    added list sessions support, pending finishing the tests and
-    validating 
-
-  Change: 234b5a4e36fcec47bc8410f702858bfa1c037689
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-11 23:52:50 +0000
-
-    fixed all tests regarding changes in the roles Check::Component and
-    Check::Server 
-
-  Change: b8311f13dd46fbaa4b5b91e53f4e3b7adacd0041
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-11 22:44:15 +0000
-
-    small fixes 
-
-  Change: c5e9701b9bc9184c80ff4080abcee8994fcb8e59
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-11 22:40:21 +0000
-
-    resolve local directory removing and accepting replacements 
-
-  Change: 7574a45fc7359804082bf92fc033ff61074b4b6b
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-05-11 16:17:57 +0000
-
-    merged bugs fixes from release 0.11 
-
-  Change: b508c54c2277e955c429ec7e7efb71592fb7fac5
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-03-18 12:19:16 +0000
-
-    renamed to a reflect the correct nature of the configuration XML
-    Schema (for both components and tasks)) 
-
-  Change: 95671890103db83ab53bb1af625e11a197df2909
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-03-18 12:18:05 +0000
-
-    Fixed XML Schema and XML instance of it 
-
-  Change: bdbb922a7ce3cf0bd3a7d4dad061033e9e02206d
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-03-17 00:37:31 +0000
-
-    turning Siebel::Srvrmgr::Action::Check::Server and Component into
-    general usage Moose roles 
-
-  Change: 66a4c2564b024cf57d2e0750d0e774d7b218c92c
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-02-12 03:08:25 +0000
-
-    small fixes to allow tests running without hardcodes of srvrmgr path 
-
-  Change: 26079465e032617971a5e82d9f2225f2ca720274
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-02-08 21:40:03 +0000
-
-    added output testing with Test::Output added Test::Output as a
-    dependency 
-
-  Change: 78d8f7f48699debe2ccccd24433989cf76869b93
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-02-05 21:20:12 +0000
-
-    finish modifications to have task monitoring plug-in 
-
-  Change: e740746289442555ab5305dd5dbcfe3ddcf5b137
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-21 01:00:41 +0000
-
-    refactoring 
-
-  Change: 75fd78b019f9d5fca04b9950814611edea99b61e
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-20 01:42:30 +0000
-
-    added support for new changes in the API fixed minor bugs in
-    Siebel::Srvrmgr::Daemon::Action::CheckComps::Component 
-
-  Change: 3bd07f3b15d39ac419a65938a171bf26b7a0148d
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-12 20:19:19 +0000
-
-    last fixes due recent API changes, all testing passing 
-
-  Change: e40f3a86170bb69913ac4e3a4b142120b9d9ff3d
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-11 22:00:28 +0000
-
-    Fixing bug related to wrong file/package name relation 
-
-  Change: 3e39422ec8986f0165042880ec376aa0ecddc324
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-11 21:57:52 +0000
-
-    more fixes dues API change 
-
-  Change: 73c943255576c39c36d031ee7dca4f7f5e96526a
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-11 21:40:37 +0000
-
-    more bug fixes due API Changes 
-
-  Change: c4b4a0a98cde11a4884f661de60b455a2c74e61f
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-11 18:19:51 +0000
-
-    more fixes related to API changes 
-
-  Change: b9a44a93ce34e61cd695bb7b112858c99e10b90f
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-07 01:48:19 +0000
-
-    fixed remaining bugs regarding output from srvrmgr updated output
-    files fixed a bug in the shell script to automate data extraction now
-    can deal with UTF-8 data with BOM automatically 
-
-  Change: 38b1ce6a7766095467a774b555727c2ab7a8eee3
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-06 22:29:04 +0000
-
-    changes related to API changes (separate parsing of delimited data
-    from fixed width data) 
-
-  Change: 44997ea4099f070c895a72f51bac88247a19a225
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-06 02:18:01 +0000
-
-    fixed remaining bugs regarding output from srvrmgr updated output
-    files added a shell script to automate data extraction 
-
-  Change: 1a64024e73938b82deadb9a66772c47e5fc3d32b
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-05 19:24:07 +0000
-
-    fixed some bugs, but still need to check the wrong file formats
-    recovered from "list params" and "list tasks" commands 
-
-  Change: 468b8f52908e59e3089a0c23f7e86a05423c8e02
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-04 19:44:53 +0000
-
-    fixing due last API changes 
-
-  Change: 59f5f7e9734f2dd77f3d2cdee7e0c635b654f29f
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-03 01:28:39 +0000
-
-    changes related to API changes (separate parsing of delimited data
-    from fixed width data) 
-
-  Change: 67f3526522a42f6051e15e301315d95e36e90c74
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2014-01-01 22:59:06 +0000
-
-    changes related to API changes (separate parsing of delimited data
-    from fixed width data) fixed bugs identified while parsing "list comp
-    def" output with fixed format 
-
-  Change: faa071fa56b8ce1825a41340e3f96d69f170db4b
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-12-30 15:52:34 +0000
-
-    fixing the tests due the API changes 
-
-  Change: 076c9f2cc865aad85b06bffb0554d50a60025786
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-12-30 04:16:00 +0000
-
-    fixing the tests due the API changes added tests from Struct and
-    subclasses of it 
-
-  Change: 53ce8ae8861c226b522075bc27e23ce15290cc91
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-12-28 15:32:30 +0000
-
-    started fixing the tests due the API changes 
-
-  Change: 2b44abf91bd0dc3b3988d97dabb5f12ec24a06e0
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-12-09 00:12:19 +0000
-
-    complete refactoring to be able to parse fixed sized and delimeted
-    output from srvrmgr (still incomplete, all tests will fail)
-    list_cmd.txt broke to two lists of commands (depending on the type of
-    output) 
-
-  Change: 2dda8712d30f06034d565b5eadfcd118e93b822b
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-12-06 02:08:09 +0000
-
-    changes related to API changes (separate parsing of delimited data
-    from fixed width data) 
-
-  Change: ef2223a63f73c071bf55613c4631d01c1cc0a305
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-12-04 21:48:55 +0000
-
-    changes related to API changes (separate parsing of delimited data
-    from fixed width data) 
-
-  Change: 7c5f172d1dc7c6486291bad2ca0323938527e3f7
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-11-29 23:22:40 +0000
-
-    changes related to API changes (separate parsing of delimited data
-    from fixed width data) 
-
-  Change: 124297fcf92dd9c6dd2ca2df2d811ab77f3da94b
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-11-27 09:17:50 +0000
-
-    changes related to API changes added more tests to OutputFactory 
-
-  Change: 3b7a64c9ff1cd9074a924b49c490b346cf2adf98
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-11-24 19:42:46 +0000
-
-    complete refactoring to be able to parse fixed sized and delimeted
-    output from srvrmgr (still incomplete, all tests will fail)
-    Siebel::Srvrmgr::ListParser::Output::Greetings renamed to
-    Siebel::Srvrmgr::ListParser::Output::Enterprise 
-
-  Change: 7bdd1d2a54b393927e580fe69865704394b9eb74
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-11-05 15:51:07 +0000
-
-    export_comps.pl now gests the version from same source as Makefile.PL
-    added ChangeLog, automatically generated, replacing Changes 
-
-  Change: 572c1a792c10d2ffab6ede915c4a3306365ab360
-  Author: alceu.freitas.jr@gmail.com
-  <alceu.freitas.jr@gmail.com@f8da17be-bb99-043e-0d47-acc943b59c7d>
-  Date : 2013-11-05 15:50:25 +0000
-
-    comp_mon.pl now gests the version from same source as Makefile.PL
-    added ChangeLog, automatically generated, replacing Changes 
-
-================================================
-Plus 4 releases after 2015-09-30 00:00:00 +0000.
-================================================
+=================================================
+Plus 10 releases after 2016-07-29 00:00:00 +0000.
+=================================================

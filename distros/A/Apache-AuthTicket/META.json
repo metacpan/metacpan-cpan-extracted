@@ -1,0 +1,54 @@
+{
+   "abstract" : "Cookie Based Access and Authorization Module",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Apache-AuthTicket",
+   "prereqs" : {
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Test" : "1.39",
+            "CGI" : "3.12",
+            "Class::Accessor::Fast" : "0",
+            "DBI" : "0",
+            "Digest::MD5" : "0",
+            "MIME::Base64" : "0",
+            "MRO::Compat" : "0",
+            "ModPerl::VersionUtil" : "0",
+            "SQL::Abstract" : "0",
+            "Storable" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-apache-authticket at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthTicket"
+      },
+      "homepage" : "http://search.cpan.org/dist/Apache-AuthTicket/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/apache-authticket.git",
+         "web" : "https://github.com/mschout/apache-authticket"
+      }
+   },
+   "version" : "0.94",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

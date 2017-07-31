@@ -1,7 +1,7 @@
 package Log::ger::Format;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2017-07-30'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use parent qw(Log::ger::Plugin);
 
@@ -22,7 +22,7 @@ Log::ger::Format - Use a format plugin
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

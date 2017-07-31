@@ -1,0 +1,29 @@
+---
+abstract: 'Perl extension for proper name parsing, normalization, recognition, and classification'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Names-GB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Text::Capitalize: '1.1'
+  Text::LevenshteinXS: '0.03'
+  Text::Names: '0'
+  perl: '5.0'
+resources:
+  repository: git://github.com/nigelhorne/Text-Names-GB.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

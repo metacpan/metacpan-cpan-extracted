@@ -1,3 +1,72 @@
+version 0.005; 2017-07-28
+
+  * port to Perl 5.15.3, where the structure of padlists changed, and
+    to later Perls that change the padlist further, by ceasing use of
+    a fake padlist in favour of attaching objects to subroutines via magic
+
+  * port to Perl 5.17.1, where the peephole optimiser can see a
+    pathological op structure when regexp eval code (/(?{})/) is being
+    compiled
+
+  * work around a short-lived core bug affecting Perl 5.17.2, which
+    changed the stack behaviour of leavewrite ops
+
+  * port to Perl 5.17.6, where pushmark ops became more significant to
+    the peephole optimiser, by marking the current-continuation ops as
+    custom ops rather than disguising them as pushmark ops
+
+  * port to Perl 5.19.4, where the C type of array indices has changed
+
+  * port to Perl 5.23.8, where the context stack system has been tweaked
+
+  * update to accommodate PERL_OP_PARENT builds of Perl 5.21.11 or later
+    (which is the default from Perl 5.25.1)
+
+  * document the problem with generating continuations inside regexp
+    eval code
+
+  * skip tests involving non-local control transfers during unwinding
+    on Perls affected by [perl #124156] (bug introduced in Perl 5.19.4,
+    fixed in Perl 5.22.0)
+
+  * update tests for Perl 5.19.4's changed semantics for non-local control
+    transfers during unwinding (only visible starting with Perl 5.22.0,
+    because of the bug introduced at the same time)
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * only run tests that use Scope::Cleanup if a bugfixed version of it
+    (avoiding stack reallocation problems) is available
+
+  * trigger custom op generation via Devel::CallChecker rather than by
+    hooking the underlying op checker
+
+  * test that all modules have matching version numbers
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * use cBOOL() where appropriate
+
+  * initialise op_next of custom ops to avoid an unclean dependence on
+    the state of op_first
+
+  * remove some unnecessary code from the logic for referencing a C
+    structure from an SV
+
+  * use preferred C type for op types
+
+  * rename internal gen_*_op() function into a better style
+
+  * consistently use THX_ prefix on internal function names
+
+  * convert .cvsignore to .gitignore
+
 version 0.004; 2011-04-27
 
   * bugfix: create extra mortal reference to return values, to avoid

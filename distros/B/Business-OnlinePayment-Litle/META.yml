@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/Jayceh/Business--OnlinePayment--Litle/issues
   homepage: http://search.cpan.org/dist/Business-OnlinePayment-Litle/
   repository: git://github.com/Jayceh/Business--OnlinePayment--Litle.git
-version: '0.956'
+version: '0.957'
 x_contributors:
   - 'Daina Pettit <dpettit@bluehost.com>'
   - 'David Bartle <captindave@gmail.com>'

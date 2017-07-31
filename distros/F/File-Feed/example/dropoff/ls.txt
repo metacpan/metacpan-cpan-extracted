@@ -1,0 +1,9 @@
+total 24
+drwxr-xr-x 2 paul paul 4096 Jun 18 09:50 archive
+drwxr-xr-x 2 paul paul 4096 Jul  2 15:55 dropoff
+-rw-r--r-- 1 paul paul  106 Jul  2 15:48 feed.kv
+-rw-r--r-- 1 paul paul    0 Jul  2 15:47 files.kv
+drwxr-xr-x 2 paul paul 4096 Jul  2 15:46 new
+drwxr-xr-x 2 paul paul 4096 Jun 13 14:30 pickup
+drwxr-xr-x 2 paul paul 4096 Jun 18 15:53 shadow
+-rw-r--r-- 1 paul paul    0 Jun 13 14:30 @idle

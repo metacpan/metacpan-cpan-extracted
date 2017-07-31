@@ -13,6 +13,7 @@ my @files = (
     'lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm',
     't/00-check-deps.t',
     't/00-compile.t',
+    't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/02-parameterized.t',
     't/03-lazy.t',
@@ -39,6 +40,7 @@ my @files = (
     't/old/01-basic.t',
     't/old/04-clearer-and-predicate.t',
     't/old/07-trigger.t',
+    't/others/semiaffordanceaccessor.t',
     't/predicate.t',
     't/trigger.t'
 );

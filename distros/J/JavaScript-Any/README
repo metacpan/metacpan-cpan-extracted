@@ -1,0 +1,66 @@
+NAME
+    JavaScript::Any - evaluate some javascript using the best available
+    Javascript implementation
+
+SYNOPSIS
+      use JavaScript::Any qw( jseval );
+  
+      my $sum = jseval('1 + 2');   # 3
+
+    Or:
+
+      use JavaScript::Any;
+  
+      my $context = JavaScript::Any->new_context;
+      $context->define( say => sub { print @_, "\n" } );
+      $context->eval('say(1 + 2)');
+
+DESCRIPTION
+    This module is a thin wrapper around JavaScript::V8, JavaScript::Duktape,
+    and JE, allowing you to evaluate strings of Javascript code from Perl.
+
+  Status
+    This is a very early alpha version. The API still needs documenting and
+    cleaning up a lot.
+
+    In particular, the API for defining custom Javascript functions exposes
+    differences between the alternative Javascript implementations. Future
+    versions of JavaScript::Any will smooth some of these out.
+
+  Functional Interface
+    This module can export one function. It is not exported by default.
+
+    `jseval($str)`
+        Evaluates the string of Javascript in a fresh context and returns the
+        result.
+
+  Object-Oriented Interface
+    For more advanced features, use the object-oriented interface.
+
+    `JavaScript::Any->new_context(%opts)`
+        Factory method returning an object which implements the
+        JavaScript::Any::Context API.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=JavaScript-Any>.
+
+SEE ALSO
+    JavaScript::Any::Context.
+
+    JavaScript::V8, JavaScript::Duktape, JE.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

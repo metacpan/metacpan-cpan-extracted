@@ -1,5 +1,11 @@
 Revision history for XML::XPath
 
+1.42  2017-07-30 MANWAR
+      - Fixed GitHub issue #5 (abstract is undef in meta files). Thanks @y.
+
+1.41  2017-07-28 MANWAR
+      - Fixed GitHub issue #4 (can't use non-ascii first character as element name). Thanks @nanis, @ikegami.
+
 1.40  2016-11-13 MANWAR
       - Proposed fix for RT #118726.
 

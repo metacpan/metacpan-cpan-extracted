@@ -2,7 +2,7 @@ package MooseX::Storage::IO::AmazonDynamoDB;
 
 use strict;
 use 5.014;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Data::Dumper;
 use JSON::MaybeXS;
@@ -37,6 +37,11 @@ parameter document_client_builder => (
     default => sub { sub { PawsX::DynamoDB::DocumentClient->new() } },
 );
 
+parameter force_type => (
+    isa     => 'HashRef',
+    default => sub {{}},
+);
+
 role {
     my $p = shift;
 
@@ -46,6 +51,7 @@ role {
     my $table_name_method = $p->table_name_method;
     my $client_attr       = $p->document_client_attribute_name;
     my $client_builder    = $p->document_client_builder;
+    my $force_type        = $p->force_type;
 
     has $client_attr => (
         is      => 'ro',
@@ -73,6 +79,7 @@ role {
                 $p->key_attr => $item_key,
             },
             ConsistentRead => 1,
+            force_type => $force_type,
         );
 
         return undef unless $packed;
@@ -108,6 +115,7 @@ role {
         $client->put(
             TableName => $table_name,
             Item => $packed,
+            force_type => $force_type,
         );
     };
 };
@@ -140,6 +148,7 @@ Then, configure your Moose class via a call to Storage:
   with Storage(io => [ 'AmazonDynamoDB' => {
       table_name => 'my_docs',
       key_attr   => 'doc_id',
+      force_type => { doc_id => 'S' },
   }]);
 
   has 'doc_id'  => (is => 'ro', isa => 'Str', required => 1);
@@ -228,6 +237,12 @@ Specifies the name of the DynamoDB table to use for your objects - see the examp
 =head3 table_name_method
 
 By default, this role will add a method named 'dynamo_db_table_name' to your class (see below for method description). If you want to use a different name for this method (e.g., because it conflicts with an existing method), you can change it via this parameter.
+
+=head3 force_type
+
+Gets passed to L<Net::Amazon::DynamoDB::Marshaler> when converting our packed data to DynamoDB format.
+
+It is highly recommended that you set the types for any attributes that are part of a key (either key_attr, or an attribute that's part of an index). Read up on force_type in L<Net::Amazon::DynamoDB::Marshaler> for more details.
 
 =head3 document_client_attribute_name
 

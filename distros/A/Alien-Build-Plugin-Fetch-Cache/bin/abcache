@@ -7,14 +7,14 @@ use 5.010;
 use Path::Tiny qw( path );
 use Pod::Usage qw( pod2usage );
 use Getopt::Long qw( GetOptions );
-use File::HomeDir;
 use Sereal 3.015 qw( decode_sereal );
+use File::Glob qw( bsd_glob );
 use URI;
 use Number::Bytes::Human qw( format_bytes );
 
 # ABSTRACT: Command line interface to Alien::Build::Plugin::Fetch::Cache
 # PODNAME: abcache
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 my $opt_list;
@@ -27,7 +27,7 @@ GetOptions(
   'help|h'    => sub { pod2usage( -exitval => 0 ) },
 ) || pod2usage( -exitval => 2 );
 
-my $root = path(File::HomeDir->my_home, '.alienbuild/plugin_fetch_cache');
+my $root = path(bsd_glob '~/.alienbuild/plugin_fetch_cache');
 
 sub recurse
 {
@@ -121,7 +121,7 @@ abcache - Command line interface to Alien::Build::Plugin::Fetch::Cache
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

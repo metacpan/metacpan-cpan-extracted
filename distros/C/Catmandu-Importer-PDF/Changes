@@ -1,0 +1,14 @@
+0.012  2017-07-28 13:36:55 CEST
+  - fix dates in Poppler that uses poppler-glib version lower than 0.45.0
+
+0.011  2017-07-27 11:32:25 CEST
+  - depend on lower version of Glib::Object::Introspection for centos 7
+  - add tests
+  - change pod
+
+0.01  2017-07-26 11:35:44 CEST
+  - add Catmandu::Importer::PDF
+  - add Catmandu::Importer::PDFPages
+  - add Catmandu::Importer::PDFInfo
+  - add tests
+  - add travis integration

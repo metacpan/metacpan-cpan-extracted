@@ -1,5 +1,5 @@
 package Math::Currency::JPY;
-$Math::Currency::JPY::VERSION = '0.51';
+$Math::Currency::JPY::VERSION = '0.52';
 # ABSTRACT: JPY Currency Module for Math::Currency
 
 use strict;
@@ -21,7 +21,7 @@ Math::Currency::JPY - JPY Currency Module for Math::Currency
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SOURCE
 

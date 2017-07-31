@@ -5,7 +5,7 @@ use warnings;
 
 use Moo;
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 has 'error'         => ( is => 'ro' );
 has 'new_contents'  => ( is => 'ro' );
@@ -31,7 +31,7 @@ Code::TidyAll::Result - Result returned from processing a file/source
 
 =head1 VERSION
 
-version 0.61
+version 0.63
 
 =head1 SYNOPSIS
 

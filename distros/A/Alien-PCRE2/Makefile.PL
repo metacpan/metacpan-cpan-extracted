@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.009_000;
+our $VERSION = 0.018_000;
 
 use ExtUtils::MakeMaker;
 use Alien::Build::MM;
@@ -12,9 +12,14 @@ BEGIN {
     use English qw(-no_match_vars);  # for $OSNAME
 }
 
-# fix read-only blib/lib in MS Windows
+# MS Windows OS, fix read-only blib/lib directory & enable GNU configure/make
+my $configure_requires_windows = {};
 if ( $OSNAME eq 'MSWin32' ) {
     push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
+    $configure_requires_windows = {
+        'Alien::MSYS'  => '0.08',
+        'Alien::gmake' => '0.20',
+    };
 }
 
 my $abmm = Alien::Build::MM->new;
@@ -27,12 +32,15 @@ WriteMakefile($abmm->mm_args(
     AUTHOR           => 'Will Braswell <wbraswell@cpan.org>',
     LICENSE          => 'perl_5',
 #    EXE_FILES        => ['bin/pcre2-config', 'bin/pcre2grep', 'bin/pcre2test'],  # error, no rule to make target 'bin/pcre2grep'
-#    MAKE             => 'gmake',  # DEV NOTE, CORRELATION #ap003: must set env var MAKE=gmake to change Alien::Build process, does not work to set it in Makefile.PL
 
     CONFIGURE_REQUIRES => {
-        # DEV NOTE, CORRELATION #ap001: must install IO::Socket::SSL & Alien::Build from Makefile.PL (which becomes META.json, for CPAN) & .travis.yml & appveyor.yml 
         'IO::Socket::SSL'       => '2.043',
-        'Alien::Build'          => '0.60',  # provides Alien::Build::MM
+        'Alien::Build'          => '0.66',  # provides Alien::Build::MM
+        %{$configure_requires_windows}
+    },
+
+    PREREQ_PM => {
+        'Test2::Suite'          => '0.000072',  # provides Test2::V0
     },
 
     META_MERGE => {

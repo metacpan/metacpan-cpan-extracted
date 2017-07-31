@@ -1,9 +1,5 @@
-use strict;
-use warnings;
 use Test::Clustericious::Cluster;
-use Test2::Bundle::More;
-
-plan 4;
+use Test2::V0 -no_srand => 1;
 
 my $cluster = Test::Clustericious::Cluster->new;
 
@@ -16,6 +12,8 @@ $t->get_ok("$url/bar")
   ->status_is(200)
   ->content_is('foo.example.com');
 
+done_testing;
+
 __DATA__
 
 @@ lib/Foo.pm
@@ -23,7 +21,6 @@ package Foo;
 
 use Mojo::Base qw( Mojolicious );
 use Net::hostent;
-use Test::More;
 
 sub startup
 {

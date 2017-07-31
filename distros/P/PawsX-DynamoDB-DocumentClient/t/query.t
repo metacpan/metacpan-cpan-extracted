@@ -66,6 +66,34 @@ is_deeply(
     'transform_arguments() marshalls correct args',
 );
 
+is_deeply(
+    {
+        $class->transform_arguments(
+            ExpressionAttributeValues => {
+                ':username' => '1234',
+            },
+            ExclusiveStartKey => {
+                username => '1000',
+            },
+            TableName => 'users',
+            force_type => {
+                ':username' => 'S',
+                username => 'S',
+            },
+        )
+    },
+    {
+        ExpressionAttributeValues => {
+            ':username' => { S => '1234' },
+        },
+        ExclusiveStartKey => {
+            username => { S => '1000' },
+        },
+        TableName => 'users',
+    },
+    'transform_arguments() handles force_type',
+);
+
 my $test_output1 = Paws::DynamoDB::QueryOutput->new(
     Count => 2,
     Items => [

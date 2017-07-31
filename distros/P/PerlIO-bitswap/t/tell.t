@@ -1,13 +1,13 @@
 use warnings;
 use strict;
 
-use Test::More tests => 21*3 + 10*3;
+use Test::More tests => 22*3 + 11*3;
 
 my $test_input = "\x01\x02\x04\x08\x10\x20\x40\x80";
 my $out;
 my $f;
 
-open($f, "<:bitswap(0)", \$test_input);
+ok open($f, "<:bitswap(0)", \$test_input);
 $/ = \1;
 is tell($f), 0;
 is scalar(<$f>), "\x01";
@@ -32,7 +32,7 @@ is scalar(<$f>), undef;
 is tell($f), 8;
 $f = undef;
 
-open($f, "<:bitswap(4)", \$test_input);
+ok open($f, "<:bitswap(4)", \$test_input);
 $/ = \1;
 is tell($f), 0;
 is scalar(<$f>), "\x10";
@@ -57,7 +57,7 @@ is scalar(<$f>), undef;
 is tell($f), 8;
 $f = undef;
 
-open($f, "<:bitswap(24)", \$test_input);
+ok open($f, "<:bitswap(24)", \$test_input);
 $/ = \1;
 is tell($f), 0;
 is scalar(<$f>), "\x08";
@@ -83,7 +83,7 @@ is tell($f), 8;
 $f = undef;
 
 $out = "";
-open($f, ">:bitswap(0)", \$out);
+ok open($f, ">:bitswap(0)", \$out);
 is tell($f), 0;
 print $f "\x01";
 is tell($f), 1;
@@ -105,7 +105,7 @@ $f = undef;
 is $out, $test_input;
 
 $out = "";
-open($f, ">:bitswap(4)", \$out);
+ok open($f, ">:bitswap(4)", \$out);
 is tell($f), 0;
 print $f "\x10";
 is tell($f), 1;
@@ -127,7 +127,7 @@ $f = undef;
 is $out, $test_input;
 
 $out = "";
-open($f, ">:bitswap(24)", \$out);
+ok open($f, ">:bitswap(24)", \$out);
 is tell($f), 0;
 print $f "\x08";
 is tell($f), 1;

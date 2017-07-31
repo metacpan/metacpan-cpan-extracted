@@ -1,0 +1,51 @@
+==================================================
+Changes from 2017-05-29 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.1.1 at 2017-07-28 10:38:00 +0000
+------------------------------------------
+
+  Change: 4a97669590f5ebaa31a168a287bbfc58d22c8828
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-07-28 18:37:51 +0000
+
+    Added function of uploading to cpan automatically 
+
+  Change: 37fdba6ea06cc1e1cb46e684500445ef0e804ec9
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-07-28 18:34:33 +0000
+
+    Fixed SplitBlast bug 
+
+------------------------------------------
+version 0.1.0 at 2017-07-28 09:45:39 +0000
+------------------------------------------
+
+  Change: 3fc5c3a80cb28d189a224d3f13136c874a5d6db2
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-07-28 17:45:13 +0000
+
+    Added 'fasta' subcommand, 'split' and 'splitblast' subsubcommand 
+
+  Change: b72cd7dad78814fda13c951351a2d5115f31d7ba
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-07-28 17:40:10 +0000
+
+    Added CLI biotools 
+
+  Change: 3f0f1b1b9b5dda6caeda670bd58e084ad8ce34ad
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-07-28 17:38:25 +0000
+
+    Added PBS and PBS::Queue module 
+
+  Change: a27f6320a4c8650a73789ed43cbc1ddee4164a82
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-07-26 14:35:47 +0000
+
+    Initialize gitrepo with `dzil new` 
+
+================================================
+Plus 2 releases after 2017-05-29 00:00:00 +0000.
+================================================

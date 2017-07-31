@@ -15,9 +15,9 @@ meta-spec:
 name: Devel-IPerl-Plugin-Chart-Plotly
 requires:
   Chart::Plotly::Plot: '0'
-  Const::Fast: '0'
   Devel::IPerl::Display::HTML: '0'
   English: '0'
+  Module::Find: '0'
   Moo::Role: '0'
   Role::Tiny: '0'
   namespace::autoclean: '0'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly
   repository: https://github.com/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'YAML::Tiny version 1.69'

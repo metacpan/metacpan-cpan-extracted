@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use LWP::UserAgent ();
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 our $log_file ||= "~/curl.log";
 our $log_output = defined $log_output ? $log_output : 1;
 our $curl_options = defined $curl_options ? $curl_options : "-k";

@@ -1,0 +1,66 @@
+=head1 APACHE 2.4 PORTING NOTES
+
+=head2 VERY IMPORTANT!!!
+
+Apache 2.4 has a B<VERY> different authentication API from previous versions.
+You will not be able to simply upgrade to Apache 2.4, and install an updated
+L<Apache2::AuthTicket> module to migrate to 2.4.  You will also need to update
+your configuration file because the way things are configured in Apache 2.4 is
+different.  This has nothing to do with AuthTicket itself.  It is due to the
+way Authentication and Authorization works inside apache.
+
+This document attempts to help you understand what has changed and what changes
+are required.
+
+If you have subclassed L<Apache2::AuthTicket> then you will also need to port
+the code in your subclass over to the new Apache API as well.
+
+=head2 Configuration Changes
+
+=over 4
+
+=item *
+
+Remove all C<PerlAuthzHandler> entries.
+
+C<PerlAuthzHandler> does not exist in Apache 2.4.
+
+=item *
+
+Add C<Require all granted> to your C<LoginHandler> and C<LoginScript> handlers.
+
+You B<MUST> have at least one C<Require> directive under apache 2.4.  If you do
+not have this, apache will produce the error:
+
+ AuthType configured with no corresponding authorization directives error
+
+When trying to access these handlers.  The solution is to use C<Require all granted>.
+
+=item *
+
+Remove C<${auth_name}Satisfy> directives.
+
+Satisfy support is removed as it is no longer needed with Apache 2.4.
+
+You are expected to use C<RequireAll> or C<RequireAny> instead.
+
+=item *
+
+If you have any C<Require> directives that require anything other than
+C<valid-user> C<user ...> C<all ...>, then you will need to subclass
+C<Apache2::AuthTicket> and write an Authz provider to handle this.  This is not
+common.
+
+This would be configured with something like:
+
+ PerlAddAuthzProvider species My::AuthTicket->authz_species
+
+This would call C<My::AuthTicket::authz_species()> for any
+C<Require species kilingon> type directives.  Again, if you are just requring
+C<user> or C<valid-user> you do not need to do this.  Apache supplies an authz
+provider that handles those for you.
+
+See the C<README.apache-2.4.pod> in the L<Apache2::AuthCookie> distribution for
+details on how to write an authz provider method.
+
+=back

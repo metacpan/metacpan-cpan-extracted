@@ -1,6 +1,6 @@
-FROM <: $pcore_dockerhub_namespace :>/pcore:latest
+FROM <: $dockerhub_pcore_repo_id | raw :>:devel
 
-MAINTAINER <: $author :>
+MAINTAINER <: $author | raw :>
 
 USER root
 

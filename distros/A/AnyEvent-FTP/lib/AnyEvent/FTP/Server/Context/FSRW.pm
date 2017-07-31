@@ -5,14 +5,14 @@ use warnings;
 use 5.010;
 use Moo;
 use File::chdir;
-use File::Share qw( dist_file );
+use File::ShareDir::Dist qw( dist_share );
 use File::Which qw( which );
 use File::Temp qw( tempfile );
 
 extends 'AnyEvent::FTP::Server::Context::FS';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::TransferPrep';
@@ -338,10 +338,9 @@ sub cmd_stou
         $shared{$cmd} = [ $which ];
       }
       else {
-        require AnyEvent::FTP; # dist_file needs this loaded so it can find it in %INC
         $shared{$cmd} = [
           $^X,  # use the same Perl
-          dist_file 'AnyEvent-FTP', 'ppt/' . $cmd . '.pl',
+          File::Spec->catfile((dist_share('AnyEvent-FTP') or die "unable to find share directory") , 'ppt', "$cmd.pl"),
         ];
       }
     }
@@ -364,7 +363,7 @@ AnyEvent::FTP::Server::Context::FSRW - FTP Server client context class with full
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -430,7 +429,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

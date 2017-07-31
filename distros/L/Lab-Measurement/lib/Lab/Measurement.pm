@@ -1,7 +1,6 @@
 package Lab::Measurement;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Log, describe and plot data on the fly
-$Lab::Measurement::VERSION = '3.553';
+$Lab::Measurement::VERSION = '3.554';
 use strict;
 use warnings;
 use Lab::Generic;
@@ -24,7 +23,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

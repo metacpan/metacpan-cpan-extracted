@@ -17,12 +17,13 @@ use Alien::GvaScript 1.021000;      # javascript files
 use Encode::Guess;                  # guessing if pod source is utf8 or latin1
 use Config;                         # where are the script directories
 use Getopt::Long    qw/GetOptions/; # parsing options from command-line
+use Module::Metadata;               # get version number from module
 
 #----------------------------------------------------------------------
 # globals
-#----------------------------------------------------------------------
+#---------------------------------------------------------------------
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 # some subdirs never contain Pod documentation
 my @ignore_toc_dirs = qw/auto unicore/; 
@@ -333,9 +334,10 @@ sub serve_pod {
                    ? $self->fake_perltoc 
                    : $self->slurp_file($sources[0], ":crlf");
 
+  (my $mod_name = $path) =~ s[/][::]g;
   my $version = @sources > 1 
-    ? $self->parse_version($self->slurp_file($sources[-1], ":crlf")) 
-    : $self->parse_version($content);
+    ? $self->parse_version($self->slurp_file($sources[-1], ":crlf"), $mod_name)
+    : $self->parse_version($content, $mod_name);
 
   for my $filter (@podfilters) {
     $filter->($content);
@@ -350,7 +352,6 @@ sub serve_pod {
 
   my $parser = Pod::POM->new;
   my $pom = $parser->parse_text($content) or die $parser->error;
-  (my $mod_name = $path) =~ s[/][::]g;
   my $view = $self->mk_view(version         => $version,
                             mtime           => $mtime,
                             path            => $path,
@@ -1214,60 +1215,17 @@ sub slurp_file {
 }
 
 
-
-# parse_version: code copied and adapted from Module::Build::ModuleInfo,
-# but working on in-memory string instead of opening the file
-my $VARNAME_REGEXP = qr/ # match fully-qualified VERSION name
-  ([\$*])         # sigil - $ or *
-  (
-    (             # optional leading package name
-      (?:::|\')?  # possibly starting like just :: (ala $::VERSION)
-      (?:\w+(?:::|\'))*  # Foo::Bar:: ...
-    )?
-    VERSION
-  )\b
-/x;
-
-my $VERS_REGEXP = qr/ # match a VERSION definition
-  (?:
-    \(\s*$VARNAME_REGEXP\s*\) # with parens
-  |
-    $VARNAME_REGEXP           # without parens
-  )
-  \s*
-  =[^=~]  # = but not ==, nor =~
-/x;
-
-
-
-
 sub parse_version {
-  # my ($self, $content) = @_ # don't copy $content for efficiency, use $_[1]
-  my $result;
-  my $in_pod = 0;
-  while ($_[1] =~ /^.*$/mg) { # $_[1] is $content
-    my $line = $&;
-    chomp $line;
-    next if $line =~ /^\s*#/;
-    $in_pod = $line =~ /^=(?!cut)/ ? 1 : $line =~ /^=cut/ ? 0 : $in_pod;
+  my ($self, $content, $mod_name) = @_;
 
-    # Would be nice if we could also check $in_string or something too
-    last if !$in_pod && $line =~ /^__(?:DATA|END)__$/;
+  # filehandle on string content
+  open my $fh, "<", \$content;
+  my $mm = Module::Metadata->new_from_handle($fh, $mod_name)
+    or die "couldn't create Module::Metadata";
 
-    next unless $line =~ $VERS_REGEXP;
-    my( $sigil, $var, $pkg ) = $2 ? ( $1, $2, $3 ) : ( $4, $5, $6 );
-    $line =~ s/\bour\b//;
-    my $eval = qq{q#  Hide from _packages_inside()
-                   #; package Pod::POM::Web::_version;
-                   no strict;
-                   local $sigil$var;
-                    \$$var=undef; do { $line }; \$$var
-                 };
-    no warnings;
-    $result = eval($eval) || "";
-  }
-  return $result;
+  return $mm->version;
 }
+
 
 
 sub _extract_items { # recursively grab all nodes of type 'item'
@@ -1991,7 +1949,7 @@ Laurent Dami, C<< <laurent.d...@justice.ge.ch> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2014 Laurent Dami, all rights reserved.
+Copyright 2007-2017 Laurent Dami, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 use Test::Clustericious::Cluster;
 BEGIN {
   skip_all 'test requires Clustericious 1.24'
@@ -9,8 +7,6 @@ BEGIN {
       1;
     };
 }
-
-plan 4;
 
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok( qw( Foo Bar ) );
@@ -36,6 +32,8 @@ is(
   undef,
   'client(2)',
 );
+
+done_testing;
 
 __DATA__
 

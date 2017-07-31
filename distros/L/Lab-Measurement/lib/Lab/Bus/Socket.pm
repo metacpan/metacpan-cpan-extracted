@@ -1,7 +1,6 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus::Socket;
-$Lab::Bus::Socket::VERSION = '3.553';
+#ABSTRACT: IP network socket bus
+$Lab::Bus::Socket::VERSION = '3.554';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -226,26 +225,31 @@ sub connection_clear {
 
 1;
 
+__END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Bus::Socket - IP socket bus
+Lab::Bus::Socket - IP network socket bus
 
-=head1 SYNOPSIS
+=head1 VERSION
 
-This is the IP socket bus class.
+version 3.554
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2012      David Kalok
-           2013      Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2012       David Kalok
+            2013       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

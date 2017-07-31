@@ -1,10 +1,6 @@
-#
-# Driver for SIKA TLK43/42/41 controller with RS485 MODBUS-RTU interface
-# (over RS232)
-#
-
 package Lab::Instrument::TemperatureControl::TLK43;
-$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.553';
+#ABSTRACT: Electronic process controller TLKA41/42/43 (SIKA GmbH) with RS485 MODBUS-RTU interface
+$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Lab::Bus::MODBUS_RS232;
@@ -463,9 +459,19 @@ sub write_address
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Lab::Instrument::TLK43 - Electronic process controller TLKA41/42/43 (SIKA GmbH)
+Lab::Instrument::TemperatureControl::TLK43 - Electronic process controller TLKA41/42/43 (SIKA GmbH) with RS485 MODBUS-RTU interface
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -490,20 +496,17 @@ converter (e.g. "GRS 485 ISO" RS232 - RS485 Converter).
 The following parameter list configures the RS232 port correctly for a setup with the GRS485 converter and a speed of 19200 baud:
 Port => '/dev/ttyS0', Interface => 'RS232', Baudrate => 19200, Parity => 'none', Databits => 8, Stopbits => 1, Handshake => 'none'
 
-
 =head1 CONSTRUCTOR
 
     my $tlk=new(\%options);
 
 =head1 METHODS
- 
 
 =head2 read_temperature
 
     $temp = read_temperature();
 
 Returns the currently measured temperature, or undef on errors.
-
 
 =head2 set_setpoint
 
@@ -526,7 +529,6 @@ set_setpoint() will cut off the decimal values according to the value of the "dP
 
 =back
 
-
 =head2 set_active_setpoint
 
     $success=$tlk->set_active_setpoint($Value);
@@ -543,7 +545,6 @@ set_setpoint() will cut off the decimal values according to the value of the "dP
 
 =back
 
-
 =head2 read_range
 
     $value=$tlk->read_range({ mem_addresss => (0x0200..0xFFFF || Name), MemCount => (1..4) })
@@ -551,7 +552,6 @@ set_setpoint() will cut off the decimal values according to the value of the "dP
 Read the values of $MemCount memory slots from $mem_address on. The Address may be specified as a 16bit Integer in the valid range,
 or as an address name (see TLK43.pm, %fields{'MemTable'}). $MemCount may be in the range 1..4.
 Returns the memory as an array (one byte per field)
-
 
 =head2 read_address_int
 
@@ -561,15 +561,12 @@ Read the value of the 16bit word at $mem_address on. The Address may be specifie
 or as an address name (see TLK43.pm, %fields{'MemTable'}).
 Returns the value as unsigned integer (internally (byte1 << 8) + byte2)
 
-
-
 =head2 write_address
 
     $success=$tlk->write_address({ mem_address => (0x0200...0xFFFF || Name), mem_value => Value (16 bit word) });
 
 Write $Value to the given address. The Address may be specified as a 16bit Integer in the valid range,
 or as an address name (see TLK43.pm, %fields{'MemTable'}).
-
 
 =head2 set_setpoint_slot
 
@@ -586,7 +583,6 @@ exceed the nSP-parameter set in the device (set_setpoint_slot return undef in th
 
 =back
 
-
 =head1 CAVEATS/BUGS
 
 probably many
@@ -599,11 +595,16 @@ probably many
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2010 Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

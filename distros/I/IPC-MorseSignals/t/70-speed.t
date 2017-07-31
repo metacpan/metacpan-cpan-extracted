@@ -9,7 +9,7 @@ my $n;
 use Test::More tests => 1 + ($n = 5);
 
 use lib 't/lib';
-use IPC::MorseSignals::TestSuite qw/bench init cleanup/;
+use IPC::MorseSignals::TestSuite qw<bench init cleanup>;
 
 *IPC::MorseSignals::TestSuite::diag = *Test::More::diag;
 

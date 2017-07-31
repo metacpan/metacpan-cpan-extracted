@@ -26,7 +26,7 @@ ok($j1->{state} eq "COMPLETE", "job 1 complete when job 2 starts");
 my $pid3 = fork { sub => sub { } };
 my $j3 = Forks::Super::Job::get($pid3);
 $t = Time::HiRes::time() - $t;
-okl($t >= 4.25, "job 2 took ${t}s to start expected >5s"); ### 3 ###
+okl($t >= 3.85, "job 2 took ${t}s to start expected >5s"); ### 3 ###
 
 ok($j2->{state} eq "ACTIVE", "job 2 still running");
 waitall;

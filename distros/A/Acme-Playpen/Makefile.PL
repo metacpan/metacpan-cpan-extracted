@@ -17,13 +17,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Acme::Playpen",
   "PREREQ_PM" => {
+    "Acme::Playpen::Utilities" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "2.03",
+  "VERSION" => "2.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,6 +32,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Acme::Playpen::Utilities" => 0,
   "Test::More" => "0.88",
   "strict" => 0,
   "warnings" => 0

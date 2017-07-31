@@ -4,8 +4,8 @@ PerlIO::bitswap - I/O layer to swap bits and bytes
 
 =head1 SYNOPSIS
 
-	open($fh, "<:bitswap(7)", $filename);
-	open($fh, ">:bitswap(7)", $filename);
+    open($fh, "<:bitswap(7)", $filename);
+    open($fh, ">:bitswap(7)", $filename);
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ package PerlIO::bitswap;
 use warnings;
 use strict;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -80,7 +80,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

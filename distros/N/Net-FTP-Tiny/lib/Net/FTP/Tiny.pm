@@ -4,9 +4,9 @@ Net::FTP::Tiny - minimal FTP client
 
 =head1 SYNOPSIS
 
-	use Net::FTP::Tiny qw(ftp_get);
+    use Net::FTP::Tiny qw(ftp_get);
 
-	$data = ftp_get("ftp://ftp.iana.org/tz/data/iso3166.tab");
+    $data = ftp_get("ftp://ftp.iana.org/tz/data/iso3166.tab");
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 # Set up superclass manually, rather than via "parent", to avoid non-core
 # dependency.
@@ -379,11 +379,6 @@ sub ftp_get($) {
 
 =back
 
-=head1 BUGS
-
-IPv6 support is largely untested.  Reports of experiences with it would
-be appreciated.
-
 =head1 SEE ALSO
 
 L<IO::Socket::IP>,
@@ -396,7 +391,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2012, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

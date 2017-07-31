@@ -9,12 +9,6 @@ sub CLI ($self) {
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
-    $self->new->run;
-
-    return;
-}
-
-sub run ($self) {
     state $init = !!require Pcore::Dist::Build;
 
     Pcore::Dist::Build->new->setup;

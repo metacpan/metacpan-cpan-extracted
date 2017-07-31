@@ -1,5 +1,11 @@
 Revision history for Getopt-Alt
 
+0.4.4   2017-07-23
+        Updating for release of version 0.4.4
+        Added test for processing unknown type (Ivan Wills)
+        Added test to make sure that sub parameter is set (Ivan Wills)
+        Setting minimum Perl version to 5.10 (Ivan Wills)
+
 0.4.3   2017-05-14
         Updating for release of version 0.4.3
         Updated license (Ivan Wills)

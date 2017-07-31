@@ -1,5 +1,6 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.553';
+#ABSTRACT: Text based data file ('Gnuplot style')
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.554';
 use 5.010;
 use warnings;
 use strict;
@@ -46,61 +47,6 @@ sub BUILD {
     $self->log_comment( comment => join( "\t", @columns ) );
 }
 
-=head1 NAME
-
-Lab::Moose::DataFile::Gnuplot - Text based data file.
-
-=head1 SYNOPSIS
-
- use Lab::Moose;
-
- my $folder = datafolder();
- 
- my $file = datafile(
-     type => 'Gnuplot',
-     folder => $folder,
-     filename => 'gnuplot-file.dat',
-     columns => [qw/gate bias current/]
-     );
-
- $file->log_comment(comment => "some extra comment");
- $file->log_newline();
- 
- $file->log(gate => 1, bias => 2, current => 3);
-
- $block = [1, 2, 3, 4, 5, 6];
- $file->log_block(
-    prefix => {gate => 1, bias => 2},
-    block => $block
- );
-
-=head1 METHODS
-
-=head2 new
-
-Supports the following attributtes in addition to the L<Lab::Moose::DataFile>
-requirements:
-
-=over
-
-=item * columns
-
-(mandatory) arrayref of column names
-
-=item * precision 
-
-The numbers are formatted with a C<%.${precision}g> format specifier. Default
-is 10.
-
-=back
-
-=head2 log
-
- $file->log(column1 => $value1, column2 => $value2, ...);
- 
-Log one line of data.
-
-=cut
 
 sub log {
     my $self = shift;
@@ -153,20 +99,6 @@ sub _log_bare {
     $self->_num_data_rows( ++$num );
 }
 
-=head2 log_block
-
- $file->log_block(
-     prefix => {column1 => $value1, ...},
-     block => $block,
-     add_newline => 0
- );
-
-Log a 1D or 2D PDL or array ref. The first dimension runs over the datafile
-rows. You can add prefix columns, which will be the same for each line in the
-block. E.g. when using a spectrum analyzer inside a voltage sweep, one would
-log the returned PDL prefixed with the sweep voltage.
-
-=cut
 
 sub log_block {
     my $self = shift;
@@ -224,13 +156,6 @@ sub log_block {
     }
 }
 
-=head2 log_newline
-
- $file->log_newline();
-
-print "\n" to the datafile.
-
-=cut
 
 sub log_newline {
     my $self = shift;
@@ -238,14 +163,6 @@ sub log_newline {
     print {$fh} "\n";
 }
 
-=head2 log_comment
-
- $file->log_comment(comment => $string);
-
-log a comment string, which will be prefixed with '#'. If C<$string> contains
-newline characters, several lines of comments will be written.
-
-=cut
 
 sub log_comment {
     my $self = shift;
@@ -263,3 +180,106 @@ sub log_comment {
 __PACKAGE__->meta->make_immutable();
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+ use Lab::Moose;
+
+ my $folder = datafolder();
+ 
+ my $file = datafile(
+     type => 'Gnuplot',
+     folder => $folder,
+     filename => 'gnuplot-file.dat',
+     columns => [qw/gate bias current/]
+     );
+
+ $file->log_comment(comment => "some extra comment");
+ $file->log_newline();
+ 
+ $file->log(gate => 1, bias => 2, current => 3);
+
+ $block = [1, 2, 3, 4, 5, 6];
+ $file->log_block(
+    prefix => {gate => 1, bias => 2},
+    block => $block
+ );
+
+=head1 METHODS
+
+=head2 new
+
+Supports the following attributtes in addition to the L<Lab::Moose::DataFile>
+requirements:
+
+=over
+
+=item * columns
+
+(mandatory) arrayref of column names
+
+=item * precision 
+
+The numbers are formatted with a C<%.${precision}g> format specifier. Default
+is 10.
+
+=back
+
+=head2 log
+
+ $file->log(column1 => $value1, column2 => $value2, ...);
+
+Log one line of data.
+
+=head2 log_block
+
+ $file->log_block(
+     prefix => {column1 => $value1, ...},
+     block => $block,
+     add_newline => 0
+ );
+
+Log a 1D or 2D PDL or array ref. The first dimension runs over the datafile
+rows. You can add prefix columns, which will be the same for each line in the
+block. E.g. when using a spectrum analyzer inside a voltage sweep, one would
+log the returned PDL prefixed with the sweep voltage.
+
+=head2 log_newline
+
+ $file->log_newline();
+
+print "\n" to the datafile.
+
+=head2 log_comment
+
+ $file->log_comment(comment => $string);
+
+log a comment string, which will be prefixed with '#'. If C<$string> contains
+newline characters, several lines of comments will be written.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

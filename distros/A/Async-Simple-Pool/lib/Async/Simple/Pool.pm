@@ -194,7 +194,7 @@ use namespace::autoclean;
 use Class::Load;
 use Clone;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 =head2 data
 
@@ -293,10 +293,14 @@ Task object class name. Default is 'Async::Simple::Fork'.
 =cut
 
 has task_class => (
-    is       => 'ro',
+    is       => 'rw',
     isa      => 'Str',
     required => 1,
-    default  => 'Async::Simple::Task::Fork',
+    default  => (
+        $^O =~ /^(dos|os2|MSWin32|NetWare)$/
+            ? 'Async::Simple::Task::ForkTmpFile'
+            : 'Async::Simple::Task::Fork'
+    ),
 );
 
 

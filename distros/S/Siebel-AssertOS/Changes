@@ -1,0 +1,157 @@
+==================================================
+Changes from 2016-07-29 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.9 at 2017-07-29 17:05:09 +0000
+----------------------------------------
+
+  Change: 0c412682c6797cc979e23e0a7177c47f584666d5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-07-29 14:02:21 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/siebel-gnu-tools 
+
+  Change: df135ec1b5331242da563eb0bb83d94bdf280c8d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-07-29 14:00:41 +0000
+
+    Migration to Dist::Zilla
+
+    The distribution was changed to use Dist::Zilla Added more tests
+    Added a cpanfile 
+
+  Change: f3534a3c723baf85fa0ac2e44b4744d873b6568d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-07-09 21:23:04 +0000
+
+    Converted CRLF to LF 
+
+  Change: fedc1328cf87840e7839324b9c479e386ca0f224
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-07-09 21:12:17 +0000
+
+    Refactoring for modern Perl
+
+    Declaring imports with version to use with Dist::Zilla Removed
+    multiple shift() calls when possible inside subs Changed code style
+    (removing empty lines) 
+
+  Change: 3899666a4215538666bc6617708e01e04ec2d7fc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-06-21 22:46:50 +0000
+
+    Linked the project homepage with the wiki 
+
+  Change: 5abe100f4b331da9a81846af9aadf53b3dcea5c1
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-10-04 20:40:49 +0000
+
+    Checking if environment variables of Siebel Server are in place and
+    returning an exception in the case they are not 
+
+  Change: 1835181495baa8079af541fe50b06cefdf666fc7
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-10-03 22:17:12 +0000
+
+    fixed bugs due reidentation add option on configuration file wether
+    to remove or not files 
+
+  Change: b83b62a6bf8d3770c2e578788fcd18aafbcf2559
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-10-03 20:52:41 +0000
+
+    Added more documentation Finished properly reidenting the code 
+
+  Change: e5f3651534ed1cc3cc471d121be9c2424180cf28
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-09-29 22:22:15 +0000
+
+    Reidented everything to work with vim to work as recommened at
+    https://wiki.python.org/moin/Vim Reviewing harcodes and modifying to
+    use a INI file for configuration Adding docstrings 
+
+  Change: f8a9bcd0bec0248c4c39b3aa8e742fe98f78723f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-09-24 12:17:14 +0000
+
+    Initial release, must use INI file for configuration instead of
+    hardcodes 
+
+  Change: 882646c695043660a799e44f4b9c5bb10fabbca6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-04-06 10:18:36 +0000
+
+    Updated meta information of Makefile.PL for all projects Converted
+    Siebel-LocalDB-Dumper files with dos2unix 
+
+  Change: 30748d4c57d9d96f2f57de17c59423b377f425a5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-04-05 01:26:21 +0000
+
+    Increased version (CPAN failed to index release 0.06) 
+
+  Change: 9eb6050b8fea235a17a6797205f55dc76ca6551b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-04-05 01:20:47 +0000
+
+    Updated Pod Updated Linux::Distribution Added MANIFEST to version
+    control Added $VERSION as recommented by CPAN FQA 
+
+  Change: f6518df809240ca4b804838a851887a311622973
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2015-03-26 01:17:03 +0000
+
+    Update README.md 
+
+  Change: 219990e6c0306dd11a9928d9ed632ad1cdcb7f08
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2015-03-26 01:16:35 +0000
+
+    Update README.md 
+
+  Change: 09236c7aee98e758edb33e49ed77f409b09abdf8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2015-03-26 01:16:17 +0000
+
+    Update README.md 
+
+  Change: 3488ee289b0d914601be8c75ed255e1289efd87a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-03-26 01:12:10 +0000
+
+    Added Markdown version of README 
+
+  Change: fda91ad661e45df04dd6d943e9f6f5cfeb8456fa
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-03-26 01:06:10 +0000
+
+    Moved the entire distribution to Siebel GNU Tools Updated Pod Fixed
+    minor bugs with the tests Fixed rt.cpan.org ticket #103090: incorrect
+    META.yml 
+
+  Change: 626f5dcead7cc573f6c2d59364f883daf3a29281
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2015-03-20 23:48:07 +0000
+
+    ./finishGoogleCodeGitHubWikiMigration: Moved ProjectHome.md from wiki
+    branch to README.md in master branch. 
+
+  Change: f648a70a5ca75986649fbe756d5abc0b850d571e
+  Author: alceu.freitas.jr@gmail.com
+  <alceu.freitas.jr@gmail.com@684d313b-2c3d-a47f-bf59-9e113587a5b8>
+  Date : 2014-09-05 12:14:09 +0000
+
+    removed usage of experimental given/when updated Makefile 
+
+  Change: 7c76a9ddf9778ecf506618229843778828ad8f19
+  Author: alceu.freitas.jr
+  <alceu.freitas.jr@684d313b-2c3d-a47f-bf59-9e113587a5b8>
+  Date : 2013-08-26 18:56:46 +0000
+
+    - updated README of Devel-AssertOS-OSFeatures-SupportsSiebel/README -
+    initial release of QueryParser 
+
+===============================================
+Plus 1 release after 2016-07-29 00:00:00 +0000.
+===============================================

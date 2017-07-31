@@ -1,10 +1,29 @@
 Revision history for Date-Easy
 
+0.04      2017-07-27 17:47:54-07:00 America/Los_Angeles
+
+    [Bug Fixes]
+    * `add_months` was returning a Time::Piece instead of a Date::Easy
+      object (fixed)
+
+    [New Features]
+    * New `day_of_year` method
+      returns day of year (1-366)
+    * New `split` method
+      splits to (Y, m, d) for date, (Y, m, d, H, M, S) for datetime
+    * New methods: `add_seconds`, `subtract_seconds`, `add_minutes`,
+      `subtract_minutes`, `add_hours`, `subtract_hours`, `add_days`,
+      `subtract_days`, `add_weeks`, `subtract_weeks`, `subtract_months`,
+      `add_years`, `subtract_years`
+    * New class: Date::Easy::Units
+      simpler interface for date math
+
+    [Docs]
+    * Added "Language" section to "Limitations"
+    * Added "Inspiration and Credits" section to POD
+    * Documented effects of upstream bug RT/105031
+
 0.03      2017-02-21 19:45:46-08:00 America/Los_Angeles
-
-	[Promote to Full Version]
-
-0.02_01   2017-02-09 15:27:17-08:00 America/Los_Angeles (TRIAL RELEASE)
 
     [New Features]
     * New `add_months` method

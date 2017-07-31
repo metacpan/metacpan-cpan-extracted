@@ -1,16 +1,16 @@
 package with;
 
-use 5.009004;
+use 5.009_004;
 
 use strict;
 use warnings;
 
-use Carp qw/croak/;
+use Carp           qw<croak>;
 use Filter::Util::Call;
-use Text::Balanced qw/extract_variable extract_quotelike extract_multiple/;
-use Scalar::Util qw/refaddr set_prototype/;
+use Text::Balanced qw<extract_variable extract_quotelike extract_multiple>;
+use Scalar::Util   qw<refaddr set_prototype>;
 
-use Sub::Prototype::Util qw/flatten wrap/;
+use Sub::Prototype::Util qw<flatten wrap>;
 
 =head1 NAME
 
@@ -18,11 +18,17 @@ with - Lexically call methods with a default object.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+
+=head1 WARNING
+
+This module was an early experiment which turned out to be completely unpractical.
+Therefore its use is officially B<deprecated>.
+Please don't use it, and don't hesitate to contact me if you want to reuse the namespace.
 
 =head1 SYNOPSIS
 
@@ -47,7 +53,7 @@ our $VERSION = '0.02';
      use with \$deuce;
      hlagh;        # Deuce::hlagh 1
      Pants::hlagh; # Pants::hlagh
- 
+
      {
       use with \Deuce->new(2);
       hlagh;       # Deuce::hlagh 2
@@ -63,7 +69,9 @@ our $VERSION = '0.02';
 
 =head1 DESCRIPTION
 
-This pragma lets you define a default object against with methods will be called in the current scope when possible. It is enabled by the C<use with \$obj> idiom (note that you must pass a reference to the object). If you C<use with> several times in the current scope, the default object will be the last specified one.
+This pragma lets you define a default object against with methods will be called in the current scope when possible.
+It is enabled by the C<use with \$obj> idiom (note that you must pass a reference to the object).
+If you C<use with> several times in the current scope, the default object will be the last specified one.
 
 =cut
 
@@ -94,15 +102,15 @@ my $extractor = [
 ];
 
 my %skip;
-$skip{$_} = 1 for qw/my our local sub do eval goto return
-                     if else elsif unless given when or and 
+$skip{$_} = 1 for qw<my our local sub do eval goto return
+                     if else elsif unless given when or and
                      while until for foreach next redo last continue
                      eq ne lt gt le ge cmp
                      map grep system exec sort print say
                      new
-                     STDIN STDOUT STDERR/;
+                     STDIN STDOUT STDERR>;
 
-my @core = qw/abs accept alarm atan2 bind binmode bless caller chdir chmod
+my @core = qw<abs accept alarm atan2 bind binmode bless caller chdir chmod
               chomp chop chown chr chroot close closedir connect cos crypt
               dbmclose dbmopen defined delete die do dump each endgrent
               endhostent endnetent endprotoent endpwent endservent eof eval
@@ -125,7 +133,7 @@ my @core = qw/abs accept alarm atan2 bind binmode bless caller chdir chmod
               sqrt srand stat study sub substr symlink syscall sysopen sysread
               sysseek system syswrite tell telldir tie tied time times
               truncate uc ucfirst umask undef unlink unpack unshift untie use
-              utime values vec wait waitpid wantarray warn write/;
+              utime values vec wait waitpid wantarray warn write>;
 
 my %core;
 $core{$_} = prototype "CORE::$_" for @core;
@@ -291,7 +299,7 @@ sub import {
               : exists $core{$1} ? corewrap $1, $2
                                  : subwrap $1, $2, prototype($caller.'::'.$1)
    /sexg;
-  s/\Q$;\E(\C{4})\Q$;\E/${$components[unpack('N',$1)]}/g;
+  s/\Q$;\E([\x00-\xff]{4})\Q$;\E/${$components[unpack('N',$1)]}/g;
   $_ .= $lastline if defined $lastline;
   return $count;
  }
@@ -306,16 +314,23 @@ sub unimport {
 
 The main problem to address is that lexical scoping and source modification can only occur at compile time, while object creation and method resolution happen at run-time.
 
-The C<use with \$obj> statement stores an address to the variable C<$obj> in the C<with> field of the hints hash C<%^H>. It also starts a source filter that replaces function calls with calls to C<with::defer>, passing the name of the original function as the first argument. When the replaced function has a prototype or is part of the core, the call is deferred to a corresponding wrapper generated in the C<with> namespace. Some keywords that couldn't possibly be replaced are also completely skipped. C<no with> undefines the hint and deletes the source filter, stopping any subsequent modification in the current scope.
+The C<use with \$obj> statement stores an address to the variable C<$obj> in the C<with> field of the hints hash C<%^H>.
+It also starts a source filter that replaces function calls with calls to C<with::defer>, passing the name of the original function as the first argument.
+When the replaced function has a prototype or is part of the core, the call is deferred to a corresponding wrapper generated in the C<with> namespace.
+Some keywords that couldn't possibly be replaced are also completely skipped.
+C<no with> undefines the hint and deletes the source filter, stopping any subsequent modification in the current scope.
 
-When the script is executed, deferred calls first fetch the default object back from the address stored into the hint. If the object C<< ->can >> the original function name, a method call is issued. If not, the calling namespace is inspected for a subroutine with the proper name, and if it's present the program C<goto>s into it. If that fails too, the core function with the same name is recalled if possible, or an "Undefined subroutine" error is thrown.
+When the script is executed, deferred calls first fetch the default object back from the address stored into the hint.
+If the object C<< ->can >> the original function name, a method call is issued.
+If not, the calling namespace is inspected for a subroutine with the proper name, and if it's present the program C<goto>s into it.
+If that fails too, the core function with the same name is recalled if possible, or an "Undefined subroutine" error is thrown.
 
 =head1 IGNORED KEYWORDS
 
 A call will never be dispatched to a method whose name is one of :
 
     my our local sub do eval goto return
-    if else elsif unless given when or and 
+    if else elsif unless given when or and
     while until for foreach next redo last continue
     eq ne lt gt le ge cmp
     map grep system exec sort print say
@@ -328,11 +343,17 @@ No function or constant is exported by this pragma.
 
 =head1 CAVEATS
 
-Most likely slow. Almost surely non thread-safe. Contains source filters, hence brittle. Messes with the dreadful prototypes. Crazy. Will have bugs.
+Most likely slow.
+Almost surely non thread-safe.
+Contains source filters, hence brittle.
+Messes with the dreadful prototypes.
+Crazy.
+Will have bugs.
 
 Don't put anything on the same line of C<use with \$obj> or C<no with>.
 
-When there's a function in the caller namespace that has a core function name, and when no method with the same name is present, the ambiguity is resolved in favor of the caller namespace. That's different from the usual perl semantics where C<sub push; push @a, 1> gets resolved to CORE::push.
+When there's a function in the caller namespace that has a core function name, and when no method with the same name is present, the ambiguity is resolved in favor of the caller namespace.
+That's different from the usual perl semantics where C<sub push; push @a, 1> gets resolved to CORE::push.
 
 If a method has the same name as a prototyped function in the caller namespace, and if a called is deferred to the method, it will have its arguments passed by value.
 
@@ -350,11 +371,12 @@ L<Sub::Prototype::Util> 0.08.
 
 Vincent Pit, C<< <perl at profvince.com> >>, L<http://www.profvince.com>.
 
-You can contact me by mail or on #perl @ FreeNode (vincent or Prof_Vince).
+You can contact me by mail or on C<irc.perl.org> (vincent).
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-with at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=with>. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-with at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=with>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -368,7 +390,7 @@ A fair part of this module is widely inspired from L<Filter::Simple> (especially
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Vincent Pit, all rights reserved.
+Copyright 2008,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

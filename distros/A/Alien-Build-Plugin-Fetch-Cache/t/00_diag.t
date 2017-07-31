@@ -14,11 +14,11 @@ $modules{$_} = $_ for qw(
   Capture::Tiny
   Digest::MD5
   ExtUtils::MakeMaker
-  File::HomeDir
   File::chdir
   Number::Bytes::Human
   Path::Tiny
   Sereal
+  Test2::Plugin::FauxHomeDir
   Test2::V0
   Test::Alien::Build
   Test::Script

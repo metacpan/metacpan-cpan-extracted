@@ -3,37 +3,39 @@ abstract: 'reliably run code upon exit of dynamic scope'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Devel::CallChecker: 0.003
-  ExtUtils::CBuilder: 0.15
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.008001
-  strict: 0
-  warnings: 0
+  Devel::CallChecker: '0.003'
+  ExtUtils::CBuilder: '0.15'
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.008001
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Scope-Cleanup
 provides:
   Scope::Cleanup:
     file: lib/Scope/Cleanup.pm
-    version: 0.002
+    version: '0.003'
 requires:
-  Devel::CallChecker: 0.003
-  Exporter: 0
-  XSLoader: 0
-  parent: 0
-  perl: 5.008001
-  strict: 0
-  warnings: 0
+  Devel::CallChecker: '0.003'
+  Exporter: '0'
+  XSLoader: '0'
+  parent: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Scope-Cleanup
   license: http://dev.perl.org/licenses/
-version: 0.002
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

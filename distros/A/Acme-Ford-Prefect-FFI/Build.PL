@@ -21,17 +21,20 @@ my $builder = Module::Build->new(
     dist_author       => 'Graham Ollis <plicease@wdlabs.com>',
     license           => 'perl',
     configure_requires => {
-      'Module::Build' => 0.38,
-      'Acme::Alien::DontPanic' => '0.031',
+      'Module::Build' => '0.38',
+      'Acme::Alien::DontPanic' => '0.042',
     },
     build_requires    => {
       'ExtUtils::CBuilder' => 0,
     },
     requires          => {
       'perl'                   => '5.008001',
-      'FFI::Platypus'          => '0.08',
-      'Acme::Alien::DontPanic' => '0.031',
-      'FFI::CheckLib'          => '0.11',
+      'FFI::Platypus'          => '0.47',
+      'Acme::Alien::DontPanic' => '0.042',
+      'FFI::CheckLib'          => '0.15',
+    },
+    test_requires => {
+      'Test2::V0'              => 0,
     },
     meta_merge => {
       resources  => {

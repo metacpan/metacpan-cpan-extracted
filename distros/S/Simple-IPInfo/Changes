@@ -1,5 +1,10 @@
 Release history for Perl module Simple::IPInfo
 
+0.12 2017-07 ABBYPAN
+    - fix originas different as's same ip range
+    - speed up iterate_ipinfo
+    - fix add_ipinfo.pl -i bug
+
 0.10 2017-04- ABBYPAN
     - add iso3166 code support : country_code, area_code; and isp_code
     - add iterate_ipinfo for large file

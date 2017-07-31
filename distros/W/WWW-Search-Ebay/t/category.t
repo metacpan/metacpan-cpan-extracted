@@ -1,10 +1,13 @@
 
-# $Id: category.t,v 1.3 2013-03-03 03:42:41 Martin Exp $
+use warnings;
+use strict;
+
+my $VERSION = 1.04;
 
 use blib;
 use Bit::Vector;
 use Data::Dumper;
-use Test::More no_plan;
+use Test::More 'no_plan';
 
 use WWW::Search::Test;
 BEGIN
@@ -61,7 +64,7 @@ $oV->Fill;
 $iVall = $oV->to_Dec;
 foreach my $oResult (@ao)
   {
-  $oV->Bit_Off(0) unless like($oResult->url, qr{\Ahttp://(cgi|www)\d*\.ebay\.com},
+  $oV->Bit_Off(0) unless like($oResult->url, qr{\Ahttps?://[^.]+\.ebay\.com},
                               'result URL is really from ebay.com');
   $oV->Bit_Off(1) unless cmp_ok($oResult->title, 'ne', '',
                                 'result Title is not empty');

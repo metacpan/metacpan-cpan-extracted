@@ -1,9 +1,5 @@
-use strict;
-use warnings;
-
-use Test::More;
-
-use_ok('Alien::Base::ModuleBuild::Repository::HTTP');
+use Test2::V0 -no_srand => 1;
+use Alien::Base::ModuleBuild::Repository::HTTP;
 
 my $repo = Alien::Base::ModuleBuild::Repository::HTTP->new;
 

@@ -2,18 +2,19 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Service management using a pid file and touch files",
-  "AUTHOR" => "Jeff Ober <jeffober\@gmail.com>",
+  "AUTHOR" => "Jeff Ober <sysread\@fastmail.fm>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Proc-tored",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Proc::tored",
   "PREREQ_PM" => {
     "Auto::Mata" => "0.07",
@@ -30,13 +31,14 @@ my %WriteMakefileArgs = (
     "Types::Standard" => 0
   },
   "TEST_REQUIRES" => {
+    "Devel::Cover" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Path::Tiny" => "0.097",
     "Test2::Bundle::Extended" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t t/Proc/*.t t/Proc/tored/*.t"
   }
@@ -46,6 +48,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Auto::Mata" => "0.07",
   "Carp" => 0,
+  "Devel::Cover" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "Fcntl" => 0,

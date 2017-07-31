@@ -1,5 +1,17 @@
 Revision history for Alien-autoconf
 
+0.05      2017-07-28 11:32:02 -0400
+  - Fix undef warning
+
+0.04_03   2017-07-27 21:37:19 -0400
+  - Support running out of a blib on Strawberry Perl
+
+0.04_02   2017-07-27 06:02:20 -0400
+  - Fix small but important syntax error introduced in 0.04_01
+
+0.04_01   2017-07-27 05:39:48 -0400
+  - Support running out of a blib
+
 0.03      2017-07-07 12:14:32 -0400
   - Set PERL environment variable (except on MSWin32)
 

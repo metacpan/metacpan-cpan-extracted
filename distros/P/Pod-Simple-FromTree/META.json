@@ -4,13 +4,13 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pod-Simple-FromTree",
    "prereqs" : {
@@ -45,14 +45,19 @@
    "provides" : {
       "Pod::Simple::FromTree" : {
          "file" : "lib/Pod/Simple/FromTree.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Pod-Simple-FromTree@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Simple-FromTree"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.002"
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

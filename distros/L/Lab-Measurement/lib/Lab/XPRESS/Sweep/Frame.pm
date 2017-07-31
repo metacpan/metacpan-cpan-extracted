@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Frame;
-$Lab::XPRESS::Sweep::Frame::VERSION = '3.553';
-
+#ABSTRACT: Frames for nested sweep structures
+$Lab::XPRESS::Sweep::Frame::VERSION = '3.554';
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
 use Lab::Exception;
@@ -72,11 +72,19 @@ sub add_slave {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-	Lab::XPRESS::Sweep::Frame - 
+Lab::XPRESS::Sweep::Frame - Frames for nested sweep structures
 
-.
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -97,7 +105,7 @@ sub add_slave {
 
 =head1 DESCRIPTION
 
-Parent: Lab::XPRESS::Sweep::Sweep
+Parent: Lab::XPRESS::Sweep
 
 The Lab::XPRESS::Sweep::Frame class implements a module to organize a nested sweep structure in the Lab::XPRESS::Sweep framework.
 
@@ -105,7 +113,7 @@ The Frame object has no parameters.
 .
 
 =head1 CONSTRUCTOR
-	
+
 	my $frame = $hub->Frame();
 
 Instantiates a new Frame object.
@@ -117,15 +125,15 @@ Instantiates a new Frame object.
 =head2 add_master
 
 	$frame->add_master($sweep);
-	
+
 use this methode to add a master sweep to the frame object. A Frame accepts only a single master sweep.
-	
+
 .
-	
+
 =head2 add_slave
 
 	$frame->add_slave($sweep);
-	
+
 use this methode to add a slave sweep to the frame object. A Frame can have several slave sweeps.
 
 The order in which the slave sweeps are added to the frame object, defines the sequence in which the individual slave sweeps will be executed.
@@ -133,7 +141,7 @@ The order in which the slave sweeps are added to the frame object, defines the s
 	$frame->add_slave($sweep_1);
 	$frame->add_slave($sweep_2);
 	$frame->add_slave($sweep_3);
-	
+
 The frame object accepts also another frame object as a slave sweep. This way you can build up a multi level nested sweep structure.
 
 	my $inner_frame = $hub->Frame();
@@ -154,11 +162,27 @@ The frame object accepts also another frame object as a slave sweep. This way yo
 	
 	
 	$outer_frame->start();
-	
+
 .
 
 =head2 start
 
 	$frame->start();
-	
+
 use this methode to execute the nested sweeps.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Stefan Geissler
+            2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

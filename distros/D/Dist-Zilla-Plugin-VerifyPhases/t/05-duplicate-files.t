@@ -54,7 +54,11 @@ use Term::ANSIColor 2.01 'colorstrip';
     $tzil->build;
 
     is(
-        scalar(grep { /\[VerifyPhases\]/ } map { colorstrip($_) } @{ $tzil->log_messages }),
+        scalar(
+            grep { ! /^\[VerifyPhases\] ---- this is the last .* plugin ----$/ }
+            grep { /\[VerifyPhases\]/ }
+            map { colorstrip($_) } @{ $tzil->log_messages }
+        ),
         0,
         'no warnings were logged - the duplicate file was removed before the end of the build',
     );

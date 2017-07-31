@@ -3,7 +3,7 @@ package RPi::ADC::ADS;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 require XSLoader;
 XSLoader::load('RPi::ADC::ADS', $VERSION);
@@ -320,9 +320,15 @@ sub volts {
     my $dev = $self->device;
     my @write_buf = $self->register;
 
-    return voltage_c(
+    my $v =  voltage_c(
         $addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution
     );
+
+    if ($self->channel > 3 && $v < 0){
+        return 0;
+    }
+
+    return $v;
 }
 sub raw {
     my ($self, $channel) = @_;
@@ -335,7 +341,14 @@ sub raw {
     my $dev = $self->device;
     my @write_buf = $self->register;
 
-    return raw_c($addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution);
+    my $r = raw_c($addr, $dev, $write_buf[0], $write_buf[1], $self->_resolution);
+
+    if ($self->channel > 3 && $r < 0){
+        return 0;
+    }
+
+    return $r;
+
 }
 sub percent {
     my ($self, $channel) = @_;
@@ -354,6 +367,10 @@ sub percent {
 
     $percent = 100 if $percent > 100;
     
+    if ($self->channel > 3 && $percent < 0){
+        return 0;
+    }
+
     return sprintf("%.2f", $percent);
 }
 
@@ -412,7 +429,7 @@ List of pinout connections between the ADC and the Raspberry Pi.
 
     ADC     Pi
     -----------
-    VDD     Vcc
+    VDD     3.3V+
     GND     Gnd
     SCL     SCL
     SDA     SDA
@@ -589,13 +606,12 @@ for those who want to tinker with the innards.
 
 =head2 bits
 
-Separates the 16-bit wide configuration register and returns an array
-containing the Most Significant Byte as the first element, and the Least
-Significant Byte as the second element.
+Merges the two 8-bit bytes of the configuration register as its currently
+configured, and returns it as one 16-bit integer.
 
 Parameters: None
 
-Return: Array of two elements (MSB, LSB).
+Return: 16-bit signed integer.
 
 =head2 register 
 
@@ -661,7 +677,7 @@ Implemented as:
         char * dev
         char * wbuf1
         char * wbuf2
-        int resolution
+        int res
 
 C<wbuf1> is the most significant byte (bits 15-8) for the configuration
 register, C<wbuf2> being the least significant byte (bits 7-0).
@@ -678,7 +694,7 @@ Implemented as:
         char * dev
         char * wbuf1
         char * wbuf2
-        int resolution
+        int res
 
 See L</fetch> for details on the C<wbuf> arguments.
 
@@ -694,7 +710,7 @@ Implemented as:
         char * dev
         char * wbuf1
         char * wbuf2
-        int resolution
+        int res
 
 See L</fetch> for details on the C<wbuf> arguments.
 
@@ -711,7 +727,7 @@ Implemented as:
         char * dev
         char * wbuf1
         char * wbuf2
-        int resolution
+        int res
 
 See L</fetch> for details on the C<wbuf> arguments.
 

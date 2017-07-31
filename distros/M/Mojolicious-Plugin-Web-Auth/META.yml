@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojolicious::Plugin::Web::Auth:
     file: lib/Mojolicious/Plugin/Web/Auth.pm
-    version: '0.14'
+    version: '0.15'
   Mojolicious::Plugin::Web::Auth::Base:
     file: lib/Mojolicious/Plugin/Web/Auth/Base.pm
   Mojolicious::Plugin::Web::Auth::OAuth:
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/hayajo/Mojolicious-Plugin-Web-Auth/issues
   homepage: https://github.com/hayajo/Mojolicious-Plugin-Web-Auth
   repository: git://github.com/hayajo/Mojolicious-Plugin-Web-Auth.git
-version: '0.14'
+version: '0.15'
 x_contributors:
   - 'hayato imai <hayato.imai@global-netcore.jp>'
   - 'hayato imai <imaiha@imaiha-dev.localdomain>'
@@ -67,5 +67,7 @@ x_contributors:
   - 'Shohei Kameda <shoheik@cpan.org>'
   - 'Pavel Bashinsky <levonet@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-  - 'Hayato Imai <hayato.imai@gmail.com>'
   - '今井隼人 <imai.h@imaihayato-no-MacBook-Pro.local>'
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+  - 'hayajo <hayato.imai@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

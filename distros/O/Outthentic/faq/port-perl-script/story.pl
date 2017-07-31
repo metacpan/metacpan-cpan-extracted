@@ -1,0 +1,3 @@
+use Cow;
+
+Cow::hello();

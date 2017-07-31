@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bc6bc71f46547d2f1eb492d3ea546d38b696e6c0 Changes
+SHA1 413de42ef3d546ba08d8b8c5902ba08d572e8e65 INSTALL
+SHA1 43dae1e8e65629a90df93c4d1230c0dacaef8ffc LICENSE
+SHA1 3cce9a51da584de797863cd93ead934dc36eeaf4 MANIFEST
+SHA1 dd3b2f707a9def7e9da7504f9e797cc1cb17a89d META.json
+SHA1 bb878893109263afa9ca7ad9d5bded9dde6b8f47 META.yml
+SHA1 064152f658659483a80d79cf305964e8f3e91240 Makefile.PL
+SHA1 70d860e603b6b30659c8e7d63e5fbb62111154dd README
+SHA1 ae08270b025462ff62c836f1e7835491d5cb00dc README.md
+SHA1 7ecd5afe90447ca03f9f58c9e894677f00e83130 SQLite.xs
+SHA1 fb7e0d6dce407bb90fbcbca26cfeea7e1792ae0d cpanfile
+SHA1 5df473be0a86b7d636b35a81e131ac0725da30ff dist.ini
+SHA1 05e562ad05d1f6ba3276d61f86fb0a4a2ac4500b examples/api.pl
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2283c48e73b1e81e157b325618605178f8ab11e6 inc/Devel/AssertOS/Android.pm
+SHA1 03930e5fb644ac12321f9db0554a0a7b0a3d7adf inc/Devel/AssertOS/Linux.pm
+SHA1 4451b3c7db67d260722f595ac36f61ffb5f94a86 inc/Devel/CheckOS.pm
+SHA1 67d10f60222a150d99a023840c60eae12aea6c1f lib/Database/Async/SQLite.pm
+SHA1 957966c8987c770c23a5d3d53b556e60c3c9f2bf ppport.h
+SHA1 a47c312d04987e7f7f2648e119ad69112cfb0f63 sqlite_thread/Makefile
+SHA1 58da86778ad4023785e83a4770b49717a88ec726 sqlite_thread/sqlite_dbh.cpp
+SHA1 ad4b5bf0c8461c34072ef9502faa66f5dc78574e sqlite_thread/sqlite_dbh.h
+SHA1 a0fcde61ac732b3edc8e44f2f38e6d1e3a74d78d sqlite_thread/sqlite_queue.cpp
+SHA1 9cf676e554cf74bac6e8db72265cdd73d12702b1 sqlite_thread/sqlite_queue.h
+SHA1 9c43984974506f7005d25d76041b4500fc1ab8ea sqlite_thread/sqlite_sth.cpp
+SHA1 4a115c7ef7f243b1ad0f132e0cd9aeb1b5daefa9 sqlite_thread/sqlite_sth.h
+SHA1 380380864ac67d0cd2329a2cd43868f80e7c6074 sqlite_thread/sqlite_thread.cpp
+SHA1 b42f17e21988a12cca6179335d60bc748b8e524e sqlite_thread/sqlite_thread.h
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 c6e9cbd372d35ffc6b708503c67012e825374e5d t/00-compile.t
+SHA1 108bb99d21a4593141629b1cfd125c8a63110de4 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 ea7ef734531d7bcd1315694efca6cd5ae6c26b6a t/basic.t
+SHA1 7802b41a1fdabb96d6f335b96f86b2958c6effa9 typemap
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIbBAEBAgAGBQJZfLBoAAoJEG2WkcbynxAlxu4P+KsTjJfDIeL3Th9NACjsMQ4Z
+3biiz92/tq0hnMR7R3DOG0Bn5xMQCRzQ9OUwuzxOFszb/omzRLsZCnC9o7XYwsxj
+gm9RTySqwoOV3rXAs4CLpiSgyktZdZ4KPT/NilohgI4BHi6wDvtLdFkht32EK3u3
+3a0iBYlfLa6KFSmgVKEpgykdCgQa8aEMs7R5NfMfuWo+gTxnIpsGwVjRMACgtvTM
+STTQdRhCkQtVoDHpWI1MdK0t34fSqOVH6m1VL8jolWyD3yhyGM17yQRB03bL/dRC
+NeoqPTWSzB6YtLQjZU1Z6U/+cfVU2PwJ2+bLYk0x9Bxqbu2M2wA1ui6JVgvrp+vi
+fWHOJUnVUEWfgMoLqUrFvqPmLpc/G8KCPNbjAo25BwWA4vTUMCQNXXXkWG2triB8
+7AWhrsOUt1UWiugBYHz2hv07taJYiuCNgOs2N0M2CHCHlbeGdwi/oYDGLGkyKqLI
+WwQjM2ZzO5SijfqGbTAfZTopWPjQLDgddo+qeBNgQKmHHwhukTDKmbXMMM82waTd
+NNanOSrToq7nIIgiqP42eM55EKqMqEgPX3LEBlMs6y0gyltXBgeOoM3EUytGH7m2
+Qf8jpE97oPHqV+kYrG7cMFbrrHVleHjUdpA8MAudg6fRPKaLYND9gFVipeGkYpQ6
+Vit0NeRdySZ4D3kDbGE=
+=AkQ7
+-----END PGP SIGNATURE-----

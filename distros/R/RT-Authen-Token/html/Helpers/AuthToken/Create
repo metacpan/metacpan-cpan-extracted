@@ -1,0 +1,2 @@
+<& /Elements/AuthToken/CreateResults, %ARGS &>
+% $m->abort;

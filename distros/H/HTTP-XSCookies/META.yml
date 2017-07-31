@@ -4,6 +4,7 @@ author:
   - 'Gonzalo Diethelm (gonzus@cpan.org)'
 build_requires:
   Data::Dumper: '0'
+  Date::Parse: '0'
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
@@ -24,5 +25,5 @@ requires:
   perl: '5.008009'
 resources:
   repository: https://github.com/gonzus/http-xscookies
-version: '0.000011'
+version: '0.000014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

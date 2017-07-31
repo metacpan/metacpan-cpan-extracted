@@ -11,7 +11,7 @@ author.yml
 corpus/example1.tar
 cpanfile
 dist.ini
-examples/alienfile.castxml
+examples/castxml.alienfile
 lib/Alien/Build/Git.pm
 lib/Alien/Build/Plugin/Download/Git.pm
 lib/Alien/Build/Plugin/Fetch/Git.pm

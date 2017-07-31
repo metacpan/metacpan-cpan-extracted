@@ -3,12 +3,12 @@ package main;
 use strict;
 use warnings;
 use 5.010;
-use File::HomeDir;
 use FindBin ();
 use Path::Class qw( dir file );
 use Path::Class ();
 use File::Spec;
 use Test::More;
+use File::Glob qw( bsd_glob );
 use Cwd ();
 
 $ENV{LC_ALL} = 'C';
@@ -28,7 +28,7 @@ do {
 
 if(defined $ENV{AEF_PORT} && ! defined $ENV{AEF_CONFIG})
 {
-  $ENV{AEF_CONFIG} //= file( File::HomeDir->my_home, 'etc', 'localhost.yml' )->stringify;
+  $ENV{AEF_CONFIG} //= file( bsd_glob '~/etc/localhost.yml' )->stringify;
 }
 
 if(defined $ENV{AEF_CONFIG})

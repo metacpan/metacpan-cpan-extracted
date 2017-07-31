@@ -16,6 +16,7 @@ binmode(STDERR, ':utf8');
 my $verbose;
 my $help;
 my $man;
+my @inputDirs;
 my $inputDir;
 my @inputFiles;
 my $inputFile;
@@ -31,7 +32,7 @@ Getopt::Long::Configure ("bundling");
 GetOptions('help|?'     => \$help,
 	   'man'     => \$man,
 	   'verbose|v'     => \$verbose,
-	   'input-dir|d=s' => \$inputDir,
+	   'input-dir|d=s' => \@inputDirs,
 	   'input-file|i=s' => \@inputFiles,
 	   'output-file|o=s' => \$outputFile,
 	   'file-list|l=s' => \$fileList,
@@ -46,10 +47,15 @@ foreach $inputFile (@inputFiles) {
     $brat->_bratAnnotations($brat->loadFile($inputFile));
 } 
 
-if (defined $inputDir) {
+foreach $inputDir (@inputDirs) {
 #    $brat->_inputDir($inputDir);
     $brat->loadDir($inputDir);
 }
+
+# if (defined $inputDir) {
+# #    $brat->_inputDir($inputDir);
+#     $brat->loadDir($inputDir);
+# }
 
 if (defined $fileList) {
     $brat->loadList($fileList);
@@ -79,6 +85,7 @@ where option can be --help --man --verbose
 =item --input-dir <filename>, -d <filename>
 
 Specification of the name of the directory containing the input files.
+Several directories can be specified.
 
 =item --input-file <filename>, -i <filename>
 

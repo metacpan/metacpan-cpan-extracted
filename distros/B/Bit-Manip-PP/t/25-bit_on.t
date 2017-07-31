@@ -34,21 +34,9 @@ use Test::More;
     }
 }
 
-{   # ref 0..255
+# scalar ref
 
-    my @v = qw(
-        1 2 4 8 16 32 64 128
-    );
-
-    for (0..7){
-        my $d = 0;
-        my $ret = bit_on(\$d, $_);
-        is $d, $v[$_], "turning on bit $_ on $d ok with ref";
-        is $ret, 0, "...and return is zero";
-    }
-}
-
-{ # ref 0-15 bits
+{ # 0 - 15 bits
 
     my @v = qw(
         1 2 4 8 16 32 64 128
@@ -58,10 +46,11 @@ use Test::More;
 
     for (0..15){
         my $d = 0;
-        my $ret = bit_on(\$d, $_);
-        is $d, $v[$_], "turning on bit $_ on $d ok with ref";
-        is $ret, 0, "...and return is zero";
+        bit_on(\$d, $_);
+        is $d, $v[$_], "turning on bit $_ on $d ok as reference";
+        # printf("%d: %b\n", $x, $x);
     }
 }
+
 done_testing();
 

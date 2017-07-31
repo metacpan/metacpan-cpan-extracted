@@ -1,3 +1,25 @@
+version 0.011; 2017-07-29
+
+  * update automatic configuration to not rely on . in @INC, which is
+    no longer necessarily there from Perl 5.25.7
+
+  * respect extra_linker_flags in automatic configuration tests
+
+  * avoid declaration-after-statement in C code (not valid in C90)
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * avoid some compiler warnings that arise on Perl 5.6
+
+  * regularise layout of CLONE method definition
+
+  * fix a typo in a C comment
+
 version 0.010; 2012-02-16
 
   * repair portability to pre-5.8.6 non-threading Perls

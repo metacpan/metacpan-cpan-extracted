@@ -1,5 +1,5 @@
 package Math::Currency::de_DE;
-$Math::Currency::de_DE::VERSION = '0.51';
+$Math::Currency::de_DE::VERSION = '0.52';
 # ABSTRACT: de_DE Locale Module for Math::Currency
 
 use utf8;
@@ -42,7 +42,7 @@ Math::Currency::de_DE - de_DE Locale Module for Math::Currency
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SOURCE
 

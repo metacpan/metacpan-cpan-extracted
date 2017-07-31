@@ -4,11 +4,11 @@ Attribute::Lexical - sane scoping of function/variable attributes
 
 =head1 SYNOPSIS
 
-	use Attribute::Lexical "CODE:Funky" => \&funky_attr_handler;
-	sub thingy :Funky { ... }
+    use Attribute::Lexical "CODE:Funky" => \&funky_attr_handler;
+    sub thingy :Funky { ... }
 
-	$handler = Attribute::Lexical->handler_for_caller(
-			[caller(0)], "CODE:Funky");
+    $handler = Attribute::Lexical->handler_for_caller([caller(0)],
+		"CODE:Funky");
 
 =head1 DESCRIPTION
 
@@ -130,6 +130,7 @@ take special measures to cause code to run later.
 package Attribute::Lexical;
 
 { use 5.006001; }
+use Lexical::SealRequireHints 0.008;
 use warnings;
 use strict;
 
@@ -139,11 +140,10 @@ use constant _KLUDGE_FAKE_MRO           => "$]" < 5.009005;
 use constant _KLUDGE_UNIVERSAL_INVOCANT => 1;   # bug#68654 or bug#81098
 
 use Carp qw(croak);
-use Lexical::SealRequireHints 0.005;
 use Params::Classify 0.000 qw(is_string is_ref);
 use if !_KLUDGE_FAKE_MRO, "mro";
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 # Hints stored in %^H only maintain referenceful structure during the
 # compilation phase.  Copies of %^H that are accessible via caller(),
@@ -155,7 +155,7 @@ my %interned_handler;
 
 {
 	package Attribute::Lexical::UNIVERSAL;
-	our $VERSION = "0.004";
+	our $VERSION = "0.005";
 }
 
 unshift @UNIVERSAL::ISA, "Attribute::Lexical::UNIVERSAL";
@@ -430,7 +430,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2009, 2010, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

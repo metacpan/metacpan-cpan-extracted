@@ -8,7 +8,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encode_json encode_json_unblessed decode_json decode_json_safe);
-our $VERSION = 1.000006;
+our $VERSION = 1.003001;
 
 require XSLoader;
 XSLoader::load('JSON::XS::ByteString', $VERSION);
@@ -36,7 +36,7 @@ And you can force it to produce numbers in JSON by putting references to numbers
 
 All the string data are treated as UTF-8 octets and just copy them in and out directly, except C<">, C<\> and characters that C<< ord($char) < 32 >>
 
-C<decode_json> won't die with invalid json string.
+C<decode_json> will return an undef without exceptions with invalid json string.
 
 =head1 DESIGN CONSIDERATION
 
@@ -63,16 +63,11 @@ Get a JSON string from a perl data structure. Treat blessed objects as strings (
 
 Get the perl data structure back from a JSON string.
 
-If the given string is not a valid JSON string, it will return a partial data without exceptions right before it encountered the unrecognized character.
+If the given string is not a valid JSON string, it will return an undef without exceptions but warns an offset where it encountered the unrecognized character.
 
 =head2 $perl_data = decode_json_safe($json_string)
 
-The same as C<decode_json>
-
-This function is only for compatible with older versions.
-
-=cut
-*decode_json_safe = \&JSON::XS::ByteString::decode_json;
+The same as C<decode_json> except that C<decode_json_safe> will not warn.
 
 =head1 SEE ALSO
 

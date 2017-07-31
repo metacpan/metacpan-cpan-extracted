@@ -1,5 +1,6 @@
 package Lab::Instrument::Source;
-$Lab::Instrument::Source::VERSION = '3.553';
+#ABSTRACT: Generic voltage source base class
+$Lab::Instrument::Source::VERSION = '3.554';
 use strict;
 use warnings;
 use 5.010;
@@ -551,15 +552,19 @@ sub set_range {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::Source - base class for voltage source instruments
+Lab::Instrument::Source - Generic voltage source base class
 
-=head1 SYNOPSIS
+=head1 VERSION
+
+version 3.554
 
 =head1 DESCRIPTION
 
@@ -685,7 +690,7 @@ C<set_level> returns always C<$level>.
 For a multi-channel device, add the channel number as a parameter:
 
   $new_volt=$self->set_voltage($voltage,$channel);
-  
+
 =head2 _set_level($targetlvl)
 
 Function Stub. Has to be overwritten by device driver.
@@ -701,7 +706,6 @@ The function should return the source level from the device cache.
 If called with the option C< from_device =E<gt> 1 >, the value should be fetched from the device.
 Should return the current source level.
 
-
 =head2 get_range()
 
 Function Stub. Has to be overwritten by device driver.
@@ -716,7 +720,6 @@ Function Stub. Has to be overwritten by device driver.
 
 The function should set the source range on the device.
 Should return the newly set source range.
-
 
 =head2 sweep_to_level
 
@@ -744,7 +747,6 @@ Returns the source level currently set.
   The device_settings given to the parent at instantiation (or the default_device_settings if present) will be used as default
   values, which can be overwritten by parameters to create_subsource().  
 
-
 =head1 CAVEATS/BUGS
 
 Probably many.
@@ -767,12 +769,22 @@ This class inherits the gate protection mechanism.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2008 Daniel Schröer (<schroeer@cpan.org>)
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and Daniela Taubert
-           2011      Florian Olbrich and Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Alexei Iankilevitch, Alois Dirnaichner, Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

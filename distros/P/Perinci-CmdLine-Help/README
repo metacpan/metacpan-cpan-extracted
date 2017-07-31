@@ -1,8 +1,86 @@
-DESCRIPTION
+NAME
+    Perinci::CmdLine::Help - Generate help message for
+    Perinci::CmdLine-based app
 
+VERSION
+    This document describes version 0.16 of Perinci::CmdLine::Help (from
+    Perl distribution Perinci-CmdLine-Help), released on 2017-07-24.
+
+DESCRIPTION
     Currently used by Perinci::CmdLine::Lite and App::riap. Eventually I
     want Perinci::CmdLine to use this also (needs prettier and more
     sophisticated formatting options first though).
 
+FUNCTIONS
+  gen_help
+    Usage:
+
+     gen_help(%args) -> [status, msg, result, meta]
+
+    Generate help message for Perinci::CmdLine-based app.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   common_opts => *hash* (default: {})
+
+    *   ggls_res => *array*
+
+        Full result from gen_getopt_long_spec_from_meta().
+
+        If you already call Perinci::Sub::GetArgs::Argv's
+        "gen_getopt_long_spec_from_meta()", you can pass the *full*
+        enveloped result here, to avoid calculating twice.
+
+    *   meta* => *hash*
+
+        Function metadata, must be normalized.
+
+    *   per_arg_json => *bool*
+
+    *   per_arg_yaml => *bool*
+
+    *   program_name* => *str*
+
+    *   program_summary => *str*
+
+    *   subcommands => *hash*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Help>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Help>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Help>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,5 +1,6 @@
 package Lab::Moose::DataFolder;
-$Lab::Moose::DataFolder::VERSION = '3.553';
+#ABSTRACT: Create a data directory with meta data
+$Lab::Moose::DataFolder::VERSION = '3.554';
 use 5.010;
 use warnings;
 use strict;
@@ -32,50 +33,6 @@ BEGIN {
     @ARGV_COPY = ( $0, @ARGV );
 }
 
-=head1 NAME
-
-Lab::Moose::DataFolder - Create a data directory with meta data.
-
-=head1 DESCRIPTION
-
-A data logging setup consists of one Lab::Moose::DataFolder and one or more
-L<Lab::Moose::DataFile> objects which live inside the DataFolder.
-
-=head1 METHODS
-
-=head2 new
-
- my $folder = Lab::Moose::DataFolder(path => 'foldername');
-
-The actual foldername will consist of the C<path> argument and a numeric
-suffix. Calling this function repeatedly will create the directories
-F<foldername_001>, F<foldername_002>, ..., F<foldername_999>,
-F<foldername_1000>.
-
-After creation, the actual filename is contained in the C<path> attribute:
-
- my $path = $folder->path();
-
-This method will create the following files in the folder:
-
-=over
-
-=item F<< <SCRIPT> .pl >>
-
-A copy of the user script. You can change the name of this script by setting
-the C<script_name> attribute in the constructor.
-
-=item F<META.yml>
-
-A YAML file containing meta data.
-The L<Lab::Moose::DataFile::Meta> object is contained in the C<meta_file>
-attribute:
-
- my $meta_file = $folder->meta_file();
-
-=back
-
-=cut
 
 has path => (
     is        => 'ro',
@@ -209,3 +166,69 @@ sub _get_folder_number {
 
 __PACKAGE__->meta->make_immutable();
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::DataFolder - Create a data directory with meta data
+
+=head1 VERSION
+
+version 3.554
+
+=head1 DESCRIPTION
+
+A data logging setup consists of one Lab::Moose::DataFolder and one or more
+L<Lab::Moose::DataFile> objects which live inside the DataFolder.
+
+=head1 METHODS
+
+=head2 new
+
+ my $folder = Lab::Moose::DataFolder(path => 'foldername');
+
+The actual foldername will consist of the C<path> argument and a numeric
+suffix. Calling this function repeatedly will create the directories
+F<foldername_001>, F<foldername_002>, ..., F<foldername_999>,
+F<foldername_1000>.
+
+After creation, the actual filename is contained in the C<path> attribute:
+
+ my $path = $folder->path();
+
+This method will create the following files in the folder:
+
+=over
+
+=item F<< <SCRIPT> .pl >>
+
+A copy of the user script. You can change the name of this script by setting
+the C<script_name> attribute in the constructor.
+
+=item F<META.yml>
+
+A YAML file containing meta data.
+The L<Lab::Moose::DataFile::Meta> object is contained in the C<meta_file>
+attribute:
+
+ my $meta_file = $folder->meta_file();
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

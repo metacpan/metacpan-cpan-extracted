@@ -1,0 +1,152 @@
+NAME
+
+  LinAlg::Vector - Extensive vector library based on Moose class system.
+
+VERSION
+
+  Version 0.01
+
+SYNOPSIS
+
+  LinAlg::Vector proveds an object-oriented interface for creating and using 
+  vectors composed of numbers. It supports most mathematical functions such
+  as add, subtract, dot, cross, scale, unit, and projection. Additionally,
+  convenience functions for comparing vectors, and stringifying them are
+  also provided.
+
+  All vector methods, except for C<set>, will not modify the underlying 
+  vector -- they all will return new vectors.
+
+  An example of performing the triple-product of three vectors:
+
+      use LinAlg::Vector;
+
+      my $v1 = LinAlg::Vector->new([1,2,3]);
+      my $v2 = LinAlg::Vector->new([4,5,6]);
+      my $v3 = LinAlg::Vector->new([7,8,9]);
+      my $s1 = $v1->dot($v2->cross($v3));
+
+CONSTRUCTOR
+
+  The constructor takes in either a hash or an Array reference. The only
+  valid key-val pair in the hash is C<data=>[]>. Examples of using the
+  constructor are:
+    
+    LinAlg::Vector->new(data=>[1,2,3]);
+    LinAlg::Vector->new([1,2,3]);
+
+METHODS
+
+raw
+
+  returns a copy of the underlying data array. If you manipulate the 
+  returned copy, it will not affect the original vector data.
+
+toString
+
+  returns a stringified version of the vector
+
+len
+
+  returns the length of the vector
+
+eq VEC2,[PRECISION]
+
+  returns 1 if this vector is equivalent to VEC2 (same length and
+  element values are all the same). Optinally, you can pass in PRECISION,
+  which can fine-tune what power-of-10 you round elements to when comparing.
+  Examples are:
+
+    my $v1 = LinAlg::Vector->new([1,2]);
+    my $v2 = LinAlg::Vector->new([1.001,1.999]);
+    $v1->eq($v2);       #returns 0
+    $v1->eq($v2, -2);   #rounds each element to nearest 10**-2. returns 1
+
+get IDX
+    
+  returns the element at index IDX. Zero-indexed.
+
+set IDX,VAL
+
+  sets the element VAL at index IDX. Zero-indexed. retuns the value just set.
+
+copy
+
+  returns copy of LinAlg::Vector, with a copy of the underlying data as well.
+
+add VEC2
+
+  adds VEC2 to this vector and returns a new vector.
+
+subt VEC2
+
+  subtracts VEC2 from this vector and returns a new vector.
+
+dot VEC2
+
+  performs a dot-product with this vector and VEC2 and returns the scalar.
+
+x
+
+  returns C<get(0)>
+
+y
+
+  returns C<get(1)>
+
+z
+
+  returns C<get(2)>
+
+cross VEC2
+
+  performs cross-product with VEC2 and returns result vector. The operation
+  is 'this' x VEC2. If 'this' and VEC2 are not of length 3, an error is thrown.
+
+scale NUM
+
+  scales this vector by NUM and returns new vector.
+
+mag
+
+  returns the magnitude of this vector: sqrt(this->dot(this))
+
+unit
+
+  returns the unit vector for this vector: this->scale(1/this->mag)
+
+proj VEC2
+
+  returns the projected vector of this vector onto VEC2.
+
+rotate
+
+  Not Yet Implemented
+
+SEE ALSO
+
+  LinAlg::Matrix
+
+AUTHOR
+
+  Samuel Steffl, C<sam@ssteffl.com>
+
+BUGS
+
+  Please report any bugs or feature requests through the web interface at 
+  L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LinAlg-Vector>.
+  I will be notified, and then you'll automatically be notified of 
+  progress on your bug as I make changes.
+
+SUPPORT
+
+  You can find documentation for this module with the perldoc command.
+
+    perldoc LinAlg::Matrix
+
+LICENSE AND COPYRIGHT
+
+  Copyright 2017 Samuel Steffl.
+
+  This is free software; you can redistribute it and/or modify it under the
+  same terms as the Perl 5 programming language system itself.

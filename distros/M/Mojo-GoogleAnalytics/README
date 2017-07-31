@@ -1,0 +1,200 @@
+NAME
+    Mojo::GoogleAnalytics - Extract data from Google Analytics using Mojo
+    UserAgent
+
+SYNOPSIS
+      my $ga     = Mojo::GoogleAnalytics->new("/path/to/credentials.json");
+      my $report = $ga->batch_get({
+        viewId     => "ga:152749100",
+        dateRanges => [{startDate => "7daysAgo", endDate => "1daysAgo"}],
+        dimensions => [{name => "ga:country"}, {name => "ga:browser"}],
+        metrics    => [{expression => "ga:pageviews"}, {expression => "ga:sessions"}],
+        orderBys   => [{fieldName => "ga:pageviews", sortOrder => "DESCENDING"}],
+        pageSize   => 10,
+      });
+
+      print $report->rows_to_table(as => "text");
+
+DESCRIPTION
+    Mojo::GoogleAnalytics is a Google Analytics client which allow you to
+    extract data non-blocking.
+
+    This module is work in progress and currently EXPERIMENTAL. Let me know
+    if you start using it or has any feedback regarding the API.
+
+ATTRIBUTES
+  authorization
+      $hash_ref = $self->authorization;
+
+    Holds authorization data, extracted by "authorize". This can be useful
+    to set from a cache if Mojo::GoogleAnalytics objects are created and
+    destroyed frequently, but with the same credentials.
+
+  client_email
+      $str = $self->client_email;
+
+    Example: "some-app@some-project.iam.gserviceaccount.com".
+
+  client_id
+      $str = $self->client_id;
+
+    Example: "103742165385019792511".
+
+  private_key
+      $str = $self->private_key;
+
+    Holds the content of a pem file that looks like this:
+
+      -----BEGIN PRIVATE KEY-----
+      ...
+      ...
+      -----END PRIVATE KEY-----
+
+  ua
+      $ua = $self->ua;
+      $self = $self->ua(Mojo::UserAgent->new);
+
+    Holds a Mojo::UserAgent object.
+
+  view_id
+      $str = $self->view_id;
+      $self = $self->view_id("ga:152749100");
+
+    Default "viewId", used by "get_report".
+
+METHODS
+  authorize
+      $self = $self->authorize;
+      $self = $self->authorize(sub { my ($self, $err) = @_; });
+
+    This method will set "authorization". Note that this method is
+    automatically called from inside of "batch_get", unless already
+    authorized.
+
+  batch_get
+      $report = $self->batch_get($query);
+      $self = $self->batch_get($query, sub { my ($self, $err, $report) = @_ });
+
+    Used to extract data from Google Analytics. $report will be a
+    Mojo::Collection if $query is an array ref, and a single
+    Mojo::GoogleAnalytics::Report object if $query is a hash.
+
+    $err is a string on error and false value on success.
+
+  from_file
+      $self = $self->from_file("/path/to/credentials.json");
+
+    Used to load attributes from a JSON credentials file, generated from
+    <https://console.developers.google.com/apis/credentials>. Example file:
+
+      {
+        "type": "service_account",
+        "project_id": "cool-project-238176",
+        "private_key_id": "01234abc6780dc2a3284851423099daaad8cff92",
+        "private_key": "-----BEGIN PRIVATE KEY-----...\n-----END PRIVATE KEY-----\n",
+        "client_email": "some-name@cool-project-238176.iam.gserviceaccount.com",
+        "client_id": "103742165385019792511",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+      }
+
+    Note: The JSON credentials file will probably contain more fields than
+    is listed above.
+
+  get_report
+      $report = $self->get_report($query);
+      $self = $self->get_report($query, sub { my ($self, $err, $report) = @_ });
+
+    This method is the same as "batch_get", but will do some translations on
+    the input queries before passing it on to "batch_get". Example:
+
+      $self->get_report({
+        dimensions => "ga:productName",
+        metrics    => "ga:productListClicks,ga:productListViews",
+        interval   => [qw(7daysAgo 1daysAgo)],
+        order_by   => ["ga:productListClicks desc"],
+        filters    => [ ["ga:currencyCode" => "eq" => ["USD"]] ],
+      });
+
+    * dimensions
+
+      "dimensions" will be translated from a comma separated string, or
+      passed on directly to Google Analytics if not. The example above
+      results in this query:
+
+        dimensions => [{name => "ga:productName"}]
+
+    * filters
+
+      "filters" is a simpler version of "dimensionFilterClauses" and
+      "metricFilterClauses". The format is:
+
+        filters => [ [$fieldName, $operator, $value] ]
+
+      The $operator will be used to determine if the expression should go
+      into "dimensionFilterClauses" or "metricFilterClauses".
+
+        Input operator | Filter group          | Analytics operator
+        ---------------|-----------------------|----------------------
+        eq             | dimensionFilterClause | EXACT
+        ^              | dimensionFilterClause | BEGINS_WITH
+        $              | dimensionFilterClause | ENDS_WITH
+        =~             | dimensionFilterClause | REGEXP
+        substr         | dimensionFilterClause | PARTIAL
+        ==             | metricFilterClause    | EQUAL
+        >              | metricFilterClause    | GREATER_THAN
+        <              | metricFilterClause    | LESS_THAN
+
+      The filter will be "NOT" if the operator is prefixed with "!".
+
+    * interval
+
+      "interval" can be used as a simpler version of "dateRanges". The
+      example above results in:
+
+        dateRanges => [{startDate => "7daysAgo", endDate => "1daysAgo"}]
+
+      Note that "endDate" will default to "1daysAgo" if not present.
+
+    * metrics
+
+      "metrics" will be translated from a comma separated string, or passed
+      on directly to Google Analytics if not. The example above results in
+      this query:
+
+        metrics => [{name => "ga:productListClicks"}, {name => "ga:productListViews"}]
+
+    * order_by
+
+      "order_by" can be used as a simpler version to "orderBys". The example
+      above results in:
+
+        orderBys => [{fieldName => "ga:productListClicks", sortOrder => "DESCENDING'}]
+
+      The sort order can be "asc" or "desc". Will result in
+      "SORT_ORDER_UNSPECIFIED" unless present.
+
+    * rows
+
+      Alias for "pageSize".
+
+    * viewId
+
+      "viewId" will be set from "view_id" if not present in the query.
+
+  new
+      $self = Mojo::GoogleAnalytics->new(%attrs);
+      $self = Mojo::GoogleAnalytics->new(\%attrs);
+      $self = Mojo::GoogleAnalytics->new("/path/to/credentials.json");
+
+    Used to construct a new Mojo::GoogleAnalytics object. Calling "new()"
+    with a single argument will cause "from_file" to be called with that
+    argument.
+
+AUTHOR
+    Jan Henning Thorsen
+
+COPYRIGHT AND LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

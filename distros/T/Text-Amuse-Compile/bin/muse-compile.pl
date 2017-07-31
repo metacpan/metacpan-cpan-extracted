@@ -40,6 +40,7 @@ GetOptions (\%options,
                luatex
                version
                verbose
+               coverpage-only-if-toc
                purge
                help/) or die "Bad option passed!\n";
 
@@ -220,6 +221,11 @@ Use lualatex instead of xelatex.
 =item --purge
 
 Purge old files before compiling. Not supported for recursive compilation.
+
+=item --coverpage-only-if-toc
+
+Create a coverpage only if there is a table of contents, otherwise use
+an article class.
 
 =back
 

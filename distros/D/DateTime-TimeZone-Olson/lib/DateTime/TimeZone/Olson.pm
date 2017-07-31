@@ -4,25 +4,23 @@ DateTime::TimeZone::Olson - timezones from the Olson database
 
 =head1 SYNOPSIS
 
-	use DateTime::TimeZone::Olson qw(olson_version);
+    use DateTime::TimeZone::Olson qw(olson_version);
 
-	$version = olson_version;
+    $version = olson_version;
 
-	use DateTime::TimeZone::Olson qw(
-		olson_canonical_names olson_link_names olson_all_names
-		olson_links
-		olson_country_selection
-	);
+    use DateTime::TimeZone::Olson qw(
+	olson_canonical_names olson_link_names olson_all_names
+	olson_links olson_country_selection);
 
-	$names = olson_canonical_names;
-	$names = olson_link_names;
-	$names = olson_all_names;
-	$links = olson_links;
-	$countries = olson_country_selection;
+    $names = olson_canonical_names;
+    $names = olson_link_names;
+    $names = olson_all_names;
+    $links = olson_links;
+    $countries = olson_country_selection;
 
-	use DateTime::TimeZone::Olson qw(olson_tz);
+    use DateTime::TimeZone::Olson qw(olson_tz);
 
-	$tz = olson_tz("America/New_York");
+    $tz = olson_tz("America/New_York");
 
 =head1 DESCRIPTION
 
@@ -48,7 +46,7 @@ use Time::OlsonTZ::Data 0.201012 qw(
 	olson_tzfile
 );
 
-our $VERSION = "0.006";
+our $VERSION = "0.007";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -229,7 +227,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2011, 2012, 2013
+Copyright (C) 2010, 2011, 2012, 2013, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

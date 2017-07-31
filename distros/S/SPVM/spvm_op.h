@@ -100,7 +100,6 @@ enum {
   SPVM_OP_C_CODE_CONVERT,
   SPVM_OP_C_CODE_POP,
   SPVM_OP_C_CODE_UNDEF,
-  SPVM_OP_C_CODE_MALLOC,
   SPVM_OP_C_CODE_ARRAY_LENGTH,
   SPVM_OP_C_CODE_CONDITION,
   SPVM_OP_C_CODE_DIE,
@@ -112,6 +111,8 @@ enum {
   SPVM_OP_C_CODE_EVAL,
   SPVM_OP_C_CODE_BLOCK_END,
   SPVM_OP_C_CODE_EXCEPTION_VAR,
+  SPVM_OP_C_CODE_ASSIGN_PROCESS,
+  SPVM_OP_C_CODE_NEW,
 };
 
 extern const char* const SPVM_OP_C_CODE_NAMES[];
@@ -160,6 +161,7 @@ struct SPVM_op {
     SPVM_PACKAGE* package;
     SPVM_ENUMERATION* enumeration;
     SPVM_SWITCH_INFO* switch_info;
+    SPVM_USE* use;
   } uv;
   int32_t code;
   int32_t flag;
@@ -169,6 +171,15 @@ struct SPVM_op {
   _Bool rvalue;
 };
 
+SPVM_OP* SPVM_OP_build_new_object(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM_OP* op_type);
+
+SPVM_OP* SPVM_OP_build_and(SPVM_COMPILER* compiler, SPVM_OP* op_and, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_or(SPVM_COMPILER* compiler, SPVM_OP* op_or, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_not(SPVM_COMPILER* compiler, SPVM_OP* op_not, SPVM_OP* op_first);
+
+void SPVM_OP_resolve_constant(SPVM_COMPILER* compiler, SPVM_OP* op_constant);
+SPVM_OP* SPVM_OP_fold_constant(SPVM_COMPILER* compiler, SPVM_OP* op_cur);
+
 SPVM_OP* SPVM_OP_new_op_use_from_package_name(SPVM_COMPILER* compiler, const char* package_name, const char* file, int32_t line);
 
 SPVM_OP* SPVM_OP_get_op_block_from_op_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub);
@@ -176,9 +187,6 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 void SPVM_OP_convert_to_op_constant_true(SPVM_COMPILER* compiler, SPVM_OP* op);
 void SPVM_OP_convert_to_op_constant_false(SPVM_COMPILER* compiler, SPVM_OP* op);
-void SPVM_OP_convert_not_to_if(SPVM_COMPILER* compiler, SPVM_OP* op);
-void SPVM_OP_convert_and_to_if(SPVM_COMPILER* compiler, SPVM_OP* op);
-void SPVM_OP_convert_or_to_if(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 void SPVM_OP_resolve_type(SPVM_COMPILER* compiler, SPVM_TYPE* type, int32_t name_length);
 
@@ -213,7 +221,7 @@ SPVM_OP* SPVM_OP_build_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, S
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block);
 SPVM_OP* SPVM_OP_build_unop(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
 SPVM_OP* SPVM_OP_build_array_elem(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_term);
-SPVM_OP* SPVM_OP_build_assignop(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_constant(SPVM_COMPILER* compiler, SPVM_OP* op_constant);
 
 void SPVM_OP_resolve_op_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_convert_type);

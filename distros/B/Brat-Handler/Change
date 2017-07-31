@@ -1,4 +1,15 @@
 Revision history for Perl extension Brat::Handler.
 
+0.11
+     - when loading files from a directory, check if it is brat file (.ann extension)
+     - add script for printing term list in a file or standard output
+     - add script for printing relation list in a file or standard output
+     - add functions for getting term list and relation list as array
+     - for each script: several directories containing files to load can be specified
+     - term id can start with TS (or T)
+     - add functions for global statistics
+     - add functions for getting term and relations types
+     - add script for printing statistics
+     - bug correction in the method loadFiles
 0.1
      - Version of YaTeA with a CPAN configuration

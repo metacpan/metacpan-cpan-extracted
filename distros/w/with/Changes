@@ -1,5 +1,12 @@
 Revision history for with
 
+0.03    2017-07-23 21:30 UTC
+        With this release, this module is formally deprecated. Don't expect any
+        new release.
+        + Doc : Document deprecation.
+        + Fix : Deprecation warnings for \C.
+        + Upd : Metadata overhaul.
+
 0.02    2008-05-14 21:40 UTC
         + Doc : Added a few caveats.
         + Doc : POD quirks.

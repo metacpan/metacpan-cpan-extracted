@@ -4,21 +4,23 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Alien::Build: '0.49'
-  Alien::Build::MM: '0.40'
+  Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::Autoconf: '0.47'
   Env: '0'
   ExtUtils::MakeMaker: '6.52'
+  File::chdir: '0'
+  Path::Tiny: '0'
   Test2::V0: '0.000060'
   Test::Alien: '0'
   Test::More: '0.94'
   perl: '5.008001'
 configure_requires:
-  Alien::Build: '0.40'
-  Alien::Build::MM: '0.40'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +28,12 @@ meta-spec:
 name: Alien-autoconf
 requires:
   Alien::Base: '0.038'
+  Path::Tiny: '0'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-autoconf/issues
   homepage: https://metacpan.org/pod/Alien::autoconf
   repository: git://github.com/plicease/Alien-autoconf.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

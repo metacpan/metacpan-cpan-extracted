@@ -15,15 +15,15 @@ build_requires:
   IO::Zlib: '0'
   Net::SSLeay: '1.49'
   Sort::Versions: '0'
+  Test2::Suite: '0.000072'
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Build: '0.61'
-  Alien::Build::MM: '0.61'
+  Alien::Build: '0.66'
+  Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::SearchDep: '0.53'
-  Alien::PCRE2: '0.012'
+  Alien::PCRE2: '0.013'
   ExtUtils::CBuilder: '0'
-  File::Find::Rule: '0.34'
   IO::Socket::SSL: '2.043'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
@@ -51,5 +51,5 @@ resources:
   homepage: https://neurobin.org/projects/softwares/libs/jpcre2/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/alien-jpcre2.git
-version: '0.005000'
+version: '0.008000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

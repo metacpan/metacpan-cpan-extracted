@@ -29,7 +29,7 @@ requires:
   MooseX::Role::Parameterized: '0'
   MooseX::Storage: '0'
   Paws: '0'
-  PawsX::DynamoDB::DocumentClient: '0'
+  PawsX::DynamoDB::DocumentClient: '0.05'
   Type::Tiny: '0'
   namespace::autoclean: '0'
   perl: '5.014'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB/issues
   homepage: https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB
   repository: https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'Stephen Caldwell <steve@campusexplorer.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

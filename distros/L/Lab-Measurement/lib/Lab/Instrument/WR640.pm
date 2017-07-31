@@ -1,5 +1,6 @@
 package Lab::Instrument::WR640;
-$Lab::Instrument::WR640::VERSION = '3.553';
+#ABSTRACT: LeCroy WaveRunner 640 digital oscilloscope
+$Lab::Instrument::WR640::VERSION = '3.554';
 use 5.006;
 use strict;
 use warnings;
@@ -10,18 +11,6 @@ use English;
 use Time::HiRes qw(sleep);
 use Clone 'clone';
 use Data::Dumper;
-
-=head1 NAME
-
-Lab::Instrument::WR640 - Control LeCroy WaveRunner 640
-digital oscilloscope, via ethernet VICP protocol
-(maybe USBTMC also)
-
-=head1 VERSION
-
-Version 3.530
-
-=cut
 
 our $DEBUG   = 0;
 our @ISA     = ("Lab::Instrument");
@@ -82,71 +71,6 @@ our %fields  = (
     },
 );
 
-=head1 SYNOPSIS
-
-=over 4
-
-    use Lab::Instrument::WR640;
-
-    my $s = new Lab::Instrument::WR640 (
-        address => '192.168.1.1',
-    );
-   
-
-=back
-
-Many of the 'quantities' passed to the code can use scientific
-notation, order of magnitude suffixes ('u', 'm', etc) and unit
-suffixes. The routines can be called using positional parameters
-(check the documentation for order), or with keyword parameters. 
-
-There are a few 'big' routines that let you set many parameters
-in one call, use keyword parameters for those. 
-
-In general, keywords passed TO these routines are case-independent,
-with only the first few characters being significant. So, in the
-example above: state=>'Run', state=>'running', both work. In cases
-where the keywords distinguish an "on/off" situation (RUN vs STOP 
-for acquistion, for example) you can use a Boolean quantity, and
-again, the Boolean values are flexible:
-
-=over
-
-TRUE = 't' or 'y' or 'on' or number!=0
-
-FALSE = 'f' or 'n' or 'off' or number ==0
-
-(only the first part of these is checked, case independent)
-
-=back
-
-The oscilloscope input 'channels' are CH1..CH4, but 
-there are also MATH, REFA..REFD that can be displayed
-or manipulated.  To perform operations on a channel, one
-should first $s->set_channel($chan);  Channel can be
-specified as 1..4 for the input channels, and it will
-be translated to 'CH1..CH4'.
-
-
-The state of the TDS2024B scope is cached only when the
-front-panel is in a 'locked' state, so that it cannot be
-changed by users fiddling with knobs.  
-
-
-
-=head1 GENERAL/SYSTEM ROUTINES
-
-=head2 new
-
-my $s = new Lab::Instrument::TDS2024B(
-         usb_serial => '...',
-);
-
-serial only needed if multiple TDS2024B scopes are attached, it
-defaults to '*', which selects the first TDS2024B found.  See
-Lab::Bus::USBtmc.pm documentation for more information.
-
-=cut
 
 sub new {
     my $proto = shift;
@@ -530,13 +454,6 @@ sub _parseNRf {
 
 }
 
-=head2 reset
-
-$s->reset()
-
-Reset the oscilloscope (*RST)
-
-=cut
 
 sub reset {
     my $self = shift;
@@ -581,13 +498,6 @@ sub _debug {
     }
 }
 
-=head2 get_error
-
-($code,$message) = $s->get_error();
-
-Fetch an error from the device error queue
-
-=cut
 
 sub get_error {
     my $self = shift;
@@ -607,46 +517,6 @@ sub get_error {
 
 }
 
-=head2 get_status
-
-$status = $s->get_status(['statusbit']);
-
-Fetches the scope status, and returns either the requested
-status bit (if a 'statusbit' is supplied) or a reference to
-a hash of status information. Reading the status register
-causes it to be cleared.  A status bit 'ERROR' is combined
-from the other error bits.
-
-Example: $s->get_status('OPC');
-
-Example: $s->get_status()->{'DDE'};
-
-
-Status bit names:
-
-=over 
-
-B<PON>: Power on
-
-B<URQ>: User Request (not used)
-
-B<CME>: Command Error
-
-B<EXE>: Execution Error
-
-B<DDE>: Device Error
-
-B<QYE>: Query Error
-
-B<RQC>: Request Control (not used)
-
-B<OPC>: Operation Complete
-
-B<ERROR>: CME or EXE or DDE or QYE
-
-=back
-
-=cut
 
 our $sbits = [qw(OPC RQC QYE DDE EXE CME URQ PON)];
 
@@ -667,13 +537,6 @@ sub get_status {
     return $s;
 }
 
-=head2 test_busy
-
-$busy = $s->test_busy();
-
-Returns 1 if busy (waiting for trigger, etc), 0 if not busy.
-
-=cut
 
 sub test_busy {
     my $self = shift;
@@ -681,13 +544,6 @@ sub test_busy {
     return 0;
 }
 
-=head2 get_id
-
-$s->get_id()
-
-Fetch the *IDN? string from device
-
-=cut
 
 sub get_id {
     my $self = shift;
@@ -704,15 +560,6 @@ sub get_id {
     return $self->{device_cache}->{ID};
 }
 
-=head2 recall
-
-$s->recall($n);
-
-$s->recall(n => $n);
-
-Recall setup 0..6
-
-=cut
 
 sub recall {
     my $self = shift;
@@ -784,13 +631,161 @@ sub get_waveform {
     return $self->query("$ch:WF?");
 }
 
-=head1 AUTHOR
+1;
 
-Chuck Lane, C<< <lane at duphy4.physics.drexel.edu> >>
+__END__
 
-This code is publically available under the same terms
-as Perl. 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::WR640 - LeCroy WaveRunner 640 digital oscilloscope
+
+=head1 VERSION
+
+version 3.554
+
+=head1 SYNOPSIS
+
+=over 4
+
+    use Lab::Instrument::WR640;
+
+    my $s = new Lab::Instrument::WR640 (
+        address => '192.168.1.1',
+    );
+
+=back
+
+Many of the 'quantities' passed to the code can use scientific
+notation, order of magnitude suffixes ('u', 'm', etc) and unit
+suffixes. The routines can be called using positional parameters
+(check the documentation for order), or with keyword parameters. 
+
+There are a few 'big' routines that let you set many parameters
+in one call, use keyword parameters for those. 
+
+In general, keywords passed TO these routines are case-independent,
+with only the first few characters being significant. So, in the
+example above: state=>'Run', state=>'running', both work. In cases
+where the keywords distinguish an "on/off" situation (RUN vs STOP 
+for acquistion, for example) you can use a Boolean quantity, and
+again, the Boolean values are flexible:
+
+=over
+
+TRUE = 't' or 'y' or 'on' or number!=0
+
+FALSE = 'f' or 'n' or 'off' or number ==0
+
+(only the first part of these is checked, case independent)
+
+=back
+
+The oscilloscope input 'channels' are CH1..CH4, but 
+there are also MATH, REFA..REFD that can be displayed
+or manipulated.  To perform operations on a channel, one
+should first $s->set_channel($chan);  Channel can be
+specified as 1..4 for the input channels, and it will
+be translated to 'CH1..CH4'.
+
+The state of the TDS2024B scope is cached only when the
+front-panel is in a 'locked' state, so that it cannot be
+changed by users fiddling with knobs.  
+
+=head1 GENERAL/SYSTEM ROUTINES
+
+=head2 new
+
+my $s = new Lab::Instrument::TDS2024B(
+         usb_serial => '...',
+);
+
+serial only needed if multiple TDS2024B scopes are attached, it
+defaults to '*', which selects the first TDS2024B found.  See
+Lab::Bus::USBtmc.pm documentation for more information.
+
+=head2 reset
+
+$s->reset()
+
+Reset the oscilloscope (*RST)
+
+=head2 get_error
+
+($code,$message) = $s->get_error();
+
+Fetch an error from the device error queue
+
+=head2 get_status
+
+$status = $s->get_status(['statusbit']);
+
+Fetches the scope status, and returns either the requested
+status bit (if a 'statusbit' is supplied) or a reference to
+a hash of status information. Reading the status register
+causes it to be cleared.  A status bit 'ERROR' is combined
+from the other error bits.
+
+Example: $s->get_status('OPC');
+
+Example: $s->get_status()->{'DDE'};
+
+Status bit names:
+
+=over
+
+B<PON>: Power on
+
+B<URQ>: User Request (not used)
+
+B<CME>: Command Error
+
+B<EXE>: Execution Error
+
+B<DDE>: Device Error
+
+B<QYE>: Query Error
+
+B<RQC>: Request Control (not used)
+
+B<OPC>: Operation Complete
+
+B<ERROR>: CME or EXE or DDE or QYE
+
+=back
+
+=head2 test_busy
+
+$busy = $s->test_busy();
+
+Returns 1 if busy (waiting for trigger, etc), 0 if not busy.
+
+=head2 get_id
+
+$s->get_id()
+
+Fetch the *IDN? string from device
+
+=head2 recall
+
+$s->recall($n);
+
+$s->recall(n => $n);
+
+Recall setup 0..6
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Charles Lane
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;    # End of Lab::Instrument::TDS2024B

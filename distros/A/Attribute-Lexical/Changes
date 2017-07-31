@@ -1,3 +1,24 @@
+version 0.005; 2017-07-30
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints
+    (for compatibility with early-loaded warnings.pm, for not breaking
+    version-implied features, and for require argument context) and
+    invoke it earlier to make sure it takes effect in time
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * test that all modules have matching version numbers
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * convert .cvsignore to .gitignore
+
 version 0.004; 2011-07-26
 
   * bugfix: require bugfixed version of Lexical::SealRequireHints (for

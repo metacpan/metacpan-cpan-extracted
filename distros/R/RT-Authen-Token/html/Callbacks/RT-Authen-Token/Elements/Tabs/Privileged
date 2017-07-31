@@ -1,0 +1,28 @@
+<%INIT>
+return unless $session{'CurrentUser'}->HasRight( Right => 'ManageAuthTokens', Object => RT->System );
+
+if (my $prefs = Menu->child('preferences')) {
+    if (my $settings = $prefs->child('settings')) {
+        $settings->child('about_me')->add_after(auth_tokens => title => loc('Auth Tokens'), path => '/Prefs/AuthTokens.html');
+    }
+}
+
+my $admin = Menu->child('admin')
+    or return;
+
+my $request_path = $HTML::Mason::Commands::r->path_info;
+$request_path =~ s!/{2,}!/!g;
+if ( $request_path =~ m{^(/Admin/Users|/User/(Summary|History)\.html)} and $admin->child("users") ) {
+    if ( $DECODED_ARGS->{'id'} && $DECODED_ARGS->{'id'} =~ /^\d+$/ ) {
+        my $id = $DECODED_ARGS->{'id'};
+        my $obj = RT::User->new( $session{'CurrentUser'} );
+        $obj->Load($id);
+
+        if ( $obj and $obj->id ) {
+            my $tabs = PageMenu();
+            $tabs->child(auth_tokens => title => loc('Auth Tokens'), path => '/Admin/Users/AuthTokens.html?id=' . $id);
+        }
+    }
+}
+
+</%INIT>

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.012000;
 use utf8;
-use version 0.77; our $VERSION = version->declare('v0.2.0');
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 use Carp;
 use Scalar::Util 'blessed';
 use Class::Accessor::Fast 'antlers';

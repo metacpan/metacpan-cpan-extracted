@@ -1,0 +1,16 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Mojo/GoogleAnalytics.pm
+lib/Mojo/GoogleAnalytics/Report.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/auth.t
+t/batch_get.t
+t/get-report.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 use version;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Net::SNMP qw(:asn1 :snmp);
 

@@ -61,7 +61,7 @@
          "web" : "https://github.com/mschout/perl-log-dispatch-filerotate"
       }
    },
-   "version" : "1.27",
+   "version" : "1.29",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

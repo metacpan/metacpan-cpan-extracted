@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find libtool
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::libtool - Build or find libtool
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

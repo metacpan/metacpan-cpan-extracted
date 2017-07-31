@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "re-engine-PCRE2",
    "no_index" : {
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::PCRE2" : "0",
             "Data::Dumper" : "0",
             "Devel::CheckLib" : "1.00",
             "Test::More" : "0.88"
@@ -29,6 +30,7 @@
       },
       "configure" : {
          "requires" : {
+            "Alien::PCRE2" : "0",
             "Devel::CheckLib" : "1.00",
             "ExtUtils::MakeMaker" : "6.31"
          }
@@ -49,6 +51,6 @@
          "url" : "https://github.com/rurban/re-engine-PCRE2/"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

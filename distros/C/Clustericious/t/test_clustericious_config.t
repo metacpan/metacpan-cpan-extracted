@@ -89,7 +89,7 @@ subtest create_config_ok => sub {
 
 subtest create_directory_ok => sub {
 
-  use File::HomeDir;
+  use File::Glob qw( bsd_glob );
   use File::Spec;
 
   my $r;
@@ -108,7 +108,7 @@ subtest create_directory_ok => sub {
   
   ok -d $r, "r = $r";
   
-  my $expected = File::Spec->catfile(File::HomeDir->my_home, qw( foo bar baz ));
+  my $expected = File::Spec->catfile(bsd_glob '~/foo/bar/baz');
   
   ok -d $expected, "expected = $expected";
 

@@ -1,5 +1,5 @@
 ######################################################################
-    Net::Google::Drive::Simple 0.12
+    Net::Google::Drive::Simple 0.13
 ######################################################################
 
 NAME
@@ -204,6 +204,11 @@ METHODS
 
     "$gd->file_delete( file_id )"
         Delete the file with the specified ID from Google Drive.
+
+    "$gd->drive_mvdir( "/gdrive/path/to/file", "/path/to/new/folder" )"
+        Move an existing file to a new folder. Removes the file's "parent"
+        setting (pointing to the old folder) and then adds the new folder as
+        a new parent.
 
 Error handling
     In case of an error while retrieving information from the Google Drive

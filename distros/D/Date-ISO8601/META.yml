@@ -3,39 +3,41 @@ abstract: 'the three ISO 8601 numerical calendars'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 conflicts:
-  Math::BigInt: 0
-  Math::BigRat: 0
+  Math::BigInt: '< 1.64'
+  Math::BigRat: '< 0.08'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Date-ISO8601
 provides:
   Date::ISO8601:
     file: lib/Date/ISO8601.pm
-    version: 0.004
+    version: '0.005'
 requires:
-  Carp: 0
-  Exporter: 0
-  constant: 0
-  integer: 0
-  parent: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Exporter: '0'
+  constant: '0'
+  integer: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-ISO8601
   license: http://dev.perl.org/licenses/
-version: 0.004
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

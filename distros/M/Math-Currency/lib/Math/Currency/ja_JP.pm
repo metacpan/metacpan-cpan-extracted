@@ -1,5 +1,5 @@
 package Math::Currency::ja_JP;
-$Math::Currency::ja_JP::VERSION = '0.51';
+$Math::Currency::ja_JP::VERSION = '0.52';
 # ABSTRACT: ja_JP Locale Module for Math::Currency
 
 use utf8;
@@ -42,7 +42,7 @@ Math::Currency::ja_JP - ja_JP Locale Module for Math::Currency
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SOURCE
 

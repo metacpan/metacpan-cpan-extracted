@@ -15,7 +15,7 @@ has par_cfg => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );     
 has name     => ( is => 'lazy', isa => Str,  init_arg => undef );                               # Dist-Name
 has is_pcore => ( is => 'lazy', isa => Bool, init_arg => undef );
 has is_main  => ( is => 'ro',   isa => Bool, default  => 0, init_arg => undef );                # main process dist
-has scm => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::API::SCM'] ], init_arg => undef );
+has scm => ( is => 'lazy', isa => Maybe [ ConsumerOf ['Pcore::API::SCM'] ], init_arg => undef );
 has build => ( is => 'lazy', isa => InstanceOf ['Pcore::Dist::Build'], init_arg => undef );
 has id      => ( is => 'lazy', isa => HashRef, clearer => 1, init_arg => undef );
 has version => ( is => 'lazy', isa => Object,  clearer => 1, init_arg => undef );
@@ -157,11 +157,6 @@ sub find_dist_root ( $self, $path ) {
 
 sub dir_is_dist_root ( $self, $path ) {
     return -f $path . '/share/dist.perl' ? 1 : 0;
-}
-
-# CONSTRUCTOR
-sub create ( $self, @args ) {
-    return P->class->load('Pcore::Dist::Build')->new->create(@args);
 }
 
 # BUILDERS
@@ -321,27 +316,31 @@ sub version_string ($self) {
 sub _build_docker ($self) {
     if ( $self->docker_cfg && -f $self->root . 'Dockerfile' ) {
         my $docker = {
-            namespace      => $self->docker_cfg->{namespace},
-            repo_name      => lc $self->name,
-            from_repo_name => undef,
+            repo_namespace => $self->docker_cfg->{repo_namespace},
+            repo_name      => $self->docker_cfg->{repo_name},
+            repo_id        => undef,
+            from           => undef,
+            from_repo_id   => undef,
             from_tag       => undef,
         };
 
-        $docker->{id} = "$docker->{namespace}/$docker->{repo_name}";
+        return if !$docker->{repo_namespace} || !$docker->{repo_name};
+
+        $docker->{repo_id} = "$docker->{repo_namespace}/$docker->{repo_name}";
 
         my $dockerfile = P->file->read_bin( $self->root . 'Dockerfile' );
 
         if ( $dockerfile->$* =~ /^FROM\s+([^:]+):?(.*?)$/sm ) {
-            $docker->{from_repo_name} = $1;
+            $docker->{from_repo_id} = $1;
 
             $docker->{from_tag} = $2 // 'latest';
 
-            $docker->{from} = "$docker->{from_repo_name}:$docker->{from_tag}";
+            $docker->{from} = "$docker->{from_repo_id}:$docker->{from_tag}";
 
             return $docker;
         }
         else {
-            die q[Can't parse Dockerfile.];
+            die q[Error parsing "FROM" command in Dockerfile];
         }
     }
     else {

@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Alien-Google-GRPC,
-version 0.03:
+version 0.07:
 
   Locates installed gRPC library. If not, downloads from Github and does a local install.
 

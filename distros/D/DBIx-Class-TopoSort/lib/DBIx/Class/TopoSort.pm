@@ -5,7 +5,7 @@ use 5.008_004;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.050002';
+our $VERSION = '0.050010';
 
 use Graph;
 
@@ -17,9 +17,12 @@ sub toposort_graph {
 
     my @source_names = $schema->sources;
 
-    my %table_source = map { 
-        $schema->source($_)->name => $_
-    } @source_names;
+    my %table_sources;
+    foreach my $name ( @source_names ) {
+        my $table_name = $schema->source($name)->name;
+        $table_sources{$table_name} //= [];
+        push @{ $table_sources{$table_name} }, $name;
+    }
 
     foreach my $name ( @source_names ) {
         my $source = $schema->source($name);
@@ -30,10 +33,10 @@ sub toposort_graph {
             my $rel_info = $source->relationship_info($rel_name);
 
             if ( $rel_info->{attrs}{is_foreign_key_constraint} ) {
-                $g->add_edge(
-                    $table_source{$schema->source($rel_info->{source})->name},
-                    $name,
-                );
+                my $sources = $table_sources{$schema->source($rel_info->{source})->name};
+                foreach my $source ( @$sources ) {
+                    $g->add_edge($source, $name);
+                }
             }
         }
     }

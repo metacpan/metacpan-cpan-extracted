@@ -11,6 +11,8 @@ requires('Carp');
 requires('Getopt::Long');
 requires('HTML::TreeBuilder');
 requires('LWP::UserAgent');
+
+test_requires('File::Slurp');
 test_requires('Test::More');
 
 use Env;

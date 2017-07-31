@@ -202,8 +202,8 @@ sub _generate_meta_json ( $self, $tree ) {
     # resources
     my $upstream_meta;
 
-    if ( $self->dist->scm && $self->dist->scm->upstream && $self->dist->scm->upstream->hosting_api_class ) {
-        $upstream_meta = $self->dist->scm->upstream->hosting_api->cpan_meta;
+    if ( $self->dist->scm && $self->dist->scm->upstream ) {
+        $upstream_meta = $self->dist->scm->upstream->get_cpan_meta;
     }
     else {
         $upstream_meta = {};
@@ -286,9 +286,7 @@ PERL
 ## |======+======================+================================================================================================================|
 ## |    3 | 51                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (21)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 |                      | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls                                                          |
-## |      | 205                  | * Found method-call chain of length 4                                                                          |
-## |      | 206                  | * Found method-call chain of length 5                                                                          |
+## |    2 | 206                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

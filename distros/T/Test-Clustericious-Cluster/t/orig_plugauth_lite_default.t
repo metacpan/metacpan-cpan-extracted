@@ -4,8 +4,6 @@ use Test2::Bundle::More;
 use Test::Mojo;
 use Mojolicious::Lite;
 
-plan 14;
-
 plugin 'plug_auth_lite';
 
 my $t = Test::Mojo->new;
@@ -31,3 +29,4 @@ $t->get_ok("/authz/user/foo/bar/baz")
   ->status_is(200)
   ->content_is('ok', 'authz succeeded');
 
+done_testing;

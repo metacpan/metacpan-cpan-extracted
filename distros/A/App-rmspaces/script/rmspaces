@@ -18,10 +18,12 @@
 use strict;
 use warnings;
 use File::Copy;
+use File::Spec;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 
 my $help = 0;
+my $force = 0;
 my $verbose = 0;
 my $separator = '_';
 my $target = ' ';
@@ -29,6 +31,7 @@ my $target = ' ';
 GetOptions('separator=s' => \$separator,
            'target=s' => \$target,
            'verbose' => \$verbose,
+           'force' => \$force,
            'help' => \$help) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -36,8 +39,13 @@ pod2usage(1) if $help;
 pod2usage(2) if scalar @ARGV < 1;
 foreach my $source (@ARGV) {
   die "$source: no such file\n" if not(-e $source);
-  my $dest = $source;
-  if($dest =~ s/$target/$separator/g) {
+  my ($volume, $directory, $filename) = File::Spec->splitpath($source);
+  if($filename =~ s/$target/$separator/g) {
+    my $dest = File::Spec->catpath($volume, $directory, $filename);
+    if (-e $dest && ! $force) {
+      print "Could not move $source. $dest already exists. Use --force to overwrite.\n";
+      exit 3;
+    }
     move($source, $dest);
     print "$source was moved to $dest\n";
   }
@@ -65,6 +73,10 @@ Use -h for detailed help.
 =item B<-v, --verbose>
 
 Print information on each file rmspaces tried to apply substitutions on. This may be useful if you are using wildcards.
+
+=item B<-f, --force>
+
+Force file overwrite if destiny file already exists.
 
 =item B<-s, --separator>
 

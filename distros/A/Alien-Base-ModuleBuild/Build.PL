@@ -22,7 +22,7 @@ my %build_args = (
     'Capture::Tiny'    => 0.17,
     'File::chdir'      => 0.1005,
     'Sort::Versions'   => 0,
-    'List::MoreUtils'  => 0,
+    'List::Util'       => '1.45',
     'URI'              => 0,
     'File::ShareDir'   => 0,
     'Archive::Extract' => 0,
@@ -33,7 +33,8 @@ my %build_args = (
     'JSON::PP'         => 0,
   },
   test_requires => {
-    'Test::More'       => 0.94,
+    'Test2::V0'              => '0.000071',
+    'Test2::Require::Module' => '0.000071',
   },
   recommends => {
     'HTML::LinkExtor' => 0,

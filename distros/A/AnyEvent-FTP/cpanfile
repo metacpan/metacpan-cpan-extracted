@@ -1,8 +1,7 @@
 requires "AnyEvent" => "0";
-requires "File::Share" => "0";
+requires "File::ShareDir::Dist" => "0";
 requires "File::Which" => "0";
 requires "File::chdir" => "0";
-requires "List::MoreUtils" => "0";
 requires "Moo" => "2.0";
 requires "Path::Class" => "0.26";
 requires "PerlIO::eol" => "0";
@@ -15,7 +14,6 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
-  requires "File::HomeDir" => "0.91";
   requires "perl" => "5.010001";
 };
 

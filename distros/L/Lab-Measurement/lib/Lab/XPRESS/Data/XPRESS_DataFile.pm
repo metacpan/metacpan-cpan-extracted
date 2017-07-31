@@ -1,11 +1,12 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.553';
+#ABSTRACT: XPRESS data file module
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.554';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Storable qw(dclone);
 use File::Copy;
 use Lab::XPRESS::Data::XPRESS_logger;
-use Lab::XPRESS::Sweep::Sweep;
+use Lab::XPRESS::Sweep;
 
 
 our $counter        = 0;
@@ -188,7 +189,7 @@ sub add_column {
     my $self = shift;
     my $col  = shift;
 
-    if ( eval "return exists &Lab::XPRESS::Sweep::Sweep::$col;" ) {
+    if ( eval "return exists &Lab::XPRESS::Sweep::$col;" ) {
         Lab::Exception::Warning->throw(
             "$col is not an alowed column name. Sorry. \n");
     }
@@ -595,3 +596,33 @@ sub DESTROY {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::XPRESS::Data::XPRESS_DataFile - XPRESS data file module
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

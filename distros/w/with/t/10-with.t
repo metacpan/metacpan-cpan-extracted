@@ -40,9 +40,9 @@ foo 'main', 0;
   main::foo 'main', 2;
   my $ref = \&foo;
   $ref->('main', 2);
- 
+
   no with;
-  foo 'main', 0; 
+  foo 'main', 0;
  }
 
 

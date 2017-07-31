@@ -19,7 +19,7 @@ use base qw( Exporter );
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 our @aliens;
@@ -128,9 +128,21 @@ sub _flags
 {
   my($class, $method) = @_;
   my $static = "${method}_static";
-  $class->can($static) && $class->can('install_type') && $class->install_type eq 'share'
+  $class->can($static) && $class->can('install_type') && $class->install_type eq 'share' && (!$class->can('xs_load'))
     ? $class->$static
     : $class->$method;
+}
+
+{
+  my $seen = 0;
+  sub _warn_cpp
+  {
+    return if $seen;
+    my $ctx = context();
+    $ctx->diag("Test::Alien xs_ok C++ is considered experimental");
+    $ctx->release;
+    $seen++;
+  }
 }
 
 sub xs_ok
@@ -157,12 +169,23 @@ sub xs_ok
   # modify it.
   $xs->{xs} = "@{[ $xs->{xs} ]}";
   $xs->{pxs} ||= {};
+  $xs->{cbuilder_compile} ||= {};
+  $xs->{link_compile}     ||= {};
+
+  if($xs->{cpp} || $xs->{'C++'})
+  {
+    _warn_cpp();
+    $xs->{pxs}->{'C++'} = 1;
+    $xs->{cbuilder_compile}->{'C++'} = 1;
+    $xs->{cpp} = 1;
+  }
+
   my $verbose = $xs->{verbose};
   my $ok = 1;
   my @diag;
   my $dir = _tempdir( CLEANUP => 1, TEMPLATE => 'testalienXXXXX' );
   my $xs_filename = File::Spec->catfile($dir, 'test.xs');
-  my $c_filename  = File::Spec->catfile($dir, 'test.c');
+  my $c_filename  = File::Spec->catfile($dir, $xs->{cpp} ? 'test.cpp' : 'test.c');
   
   my $ctx = context();
   my $module;
@@ -236,6 +259,7 @@ sub xs_ok
         $cb->compile(
           source               => $c_filename,
           extra_compiler_flags => [shellwords map { _flags $_, 'cflags' } @aliens],
+          %{ $xs->{cbuilder_compile} },
         );
       };
       ($obj, $@);
@@ -262,6 +286,7 @@ sub xs_ok
             objects            => [$obj],
             module_name        => $module,
             extra_linker_flags => [shellwords map { _flags $_, 'libs' } @aliens],
+            %{ $xs->{cbuilder_link} },
           );
         };
         ($lib, $@);
@@ -298,17 +323,36 @@ sub xs_ok
         my $pmpath = File::Spec->catfile($dir, @modparts, "$modfname.pm");
         mkpath(dirname($pmpath), 0, 0700);
         open my $fh, '>', $pmpath;
-        print $fh '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
-          package $module;
+        
+        my($alien_with_xs_load, @rest) = grep { $_->can('xs_load') } @aliens;
+        
+        if($alien_with_xs_load)
+        {
+          print $fh '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
+            package $module;
+            
+            use strict;
+            use warnings;
+            
+            $alien_with_xs_load->xs_load('$module', '\$VERSION', @rest);
+            
+            1;
+          };
+        }
+        else
+        {
+          print $fh '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
+            package $module;
           
-          use strict;
-          use warnings;
-          require XSLoader;
-          our \$VERSION = '0.01';
-          XSLoader::load('$module','\$VERSION');
+            use strict;
+            use warnings;
+            require XSLoader;
+            our \$VERSION = '0.01';
+            XSLoader::load('$module','\$VERSION');
           
-          1;
-        };
+            1;
+          };
+        }
         close $fh;
 
         {
@@ -552,7 +596,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -716,6 +760,10 @@ List reference containing the dynamic libraries.
 
 Tool binary directory.
 
+=item runtime_prop
+
+Runtime properties.
+
 =back
 
 See L<Test::Alien::Synthetic> for more details.
@@ -759,11 +807,25 @@ The XS code.  This is the only required element.
 
 =item pxs
 
-The L<ExtUtils::ParseXS> arguments passes as a hash reference.
+Extra L<ExtUtils::ParseXS> arguments passed in as a hash reference.
+
+=item cbuilder_compile
+
+Extra The L<ExtUtils::CBuilder> arguments passed in as a hash reference.
+
+=item cbuilder_link
+
+Extra The L<ExtUtils::CBuilder> arguments passed in as a hash reference.
 
 =item verbose
 
 Spew copious debug information via test note.
+
+=item C++ or cpp
+
+[EXPERIMENTAL]
+
+XS should be compiled as C++.
 
 =back
 
@@ -873,6 +935,34 @@ Diab Jerius (DJERIUS)
 Roy Storey
 
 Ilya Pavlov
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@
       "Abby Pan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +23,7 @@
          "requires" : {
             "Data::Validate::IP" : "0",
             "JSON" : "0",
+            "Memoize" : "0",
             "Net::CIDR" : "0",
             "SimpleR::Reshape" : "0"
          }
@@ -36,7 +37,7 @@
          "web" : "https://github.com/abbypan/Simple-IPInfo"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

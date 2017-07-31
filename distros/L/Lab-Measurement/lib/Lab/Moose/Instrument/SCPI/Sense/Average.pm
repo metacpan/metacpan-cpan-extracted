@@ -1,5 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Average;
-$Lab::Moose::Instrument::SCPI::Sense::Average::VERSION = '3.553';
+#ABSTRACT: Role for the SCPI SENSe:AVERage subsystem
+$Lab::Moose::Instrument::SCPI::Sense::Average::VERSION = '3.554';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -9,23 +10,8 @@ use Carp;
 
 use namespace::autoclean;
 
-
 cache sense_average_state => ( getter => 'sense_average_state_query' );
 
-=head1 NAME
-
-Lab::Moose::Instrument::SCPI::Sense::Average - Role for SCPI SENSe:AVERage
-subsystem.
-
-=head1 METHODS
-
-=head2 sense_average_state_query
-
-=head2 sense_average_state
-
-Query/Set whether averaging is turned on/off.
-
-=cut
 
 sub sense_average_state_query {
     my ( $self, $channel, %args ) = validated_channel_getter( \@_ );
@@ -40,13 +26,6 @@ sub sense_average_state {
     return $self->cached_sense_average_state($value);
 }
 
-=head2 sense_average_count_query
-
-=head2 sense_average_count
-
-Query/Set the number of measurements used for an average.
-
-=cut
 
 cache sense_average_count => (
     getter => 'sense_average_count_query',
@@ -67,3 +46,44 @@ sub sense_average_count {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::SCPI::Sense::Average - Role for the SCPI SENSe:AVERage subsystem
+
+=head1 VERSION
+
+version 3.554
+
+=head1 METHODS
+
+=head2 sense_average_state_query
+
+=head2 sense_average_state
+
+Query/Set whether averaging is turned on/off.
+
+=head2 sense_average_count_query
+
+=head2 sense_average_count
+
+Query/Set the number of measurements used for an average.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

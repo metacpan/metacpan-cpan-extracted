@@ -59,7 +59,7 @@
          "web" : "https://github.com/atrodo/App-MechaCPAN"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Greg Arnold <greg@arnoldassociates.com>",
       "Jon Gentle <atrodo@atrodo.org>"

@@ -45,6 +45,7 @@ $tzil->build;
 
 cmp_deeply(
     [
+        grep { ! /^\[VerifyPhases\] ---- this is the last .* plugin ----$/ }
         grep { /\[VerifyPhases\]/ }
         map { colorstrip($_) } @{ $tzil->log_messages }
     ],

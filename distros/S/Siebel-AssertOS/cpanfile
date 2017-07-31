@@ -1,0 +1,18 @@
+requires "Exporter" => "0";
+requires "perl" => "5.008009";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+  requires "perl" => "5.008009";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.008009";
+};
+
+on 'develop' => sub {
+  requires "Test::Kwalitee" => "1.21";
+  requires "Test::More" => "0.88";
+  requires "Test::Pod::Coverage" => "0";
+};

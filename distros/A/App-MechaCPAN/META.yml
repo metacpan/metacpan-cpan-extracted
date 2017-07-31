@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/atrodo/App-MechaCPAN/issues
   homepage: https://github.com/atrodo/App-MechaCPAN
   repository: https://github.com/atrodo/App-MechaCPAN.git
-version: '0.19'
+version: '0.20'
 x_contributors:
   - 'Greg Arnold <greg@arnoldassociates.com>'
   - 'Jon Gentle <atrodo@atrodo.org>'

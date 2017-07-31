@@ -5,9 +5,12 @@ use warnings;
 use Alien::Build::Plugin;
 use Path::Tiny ();
 use File::Which ();
+use File::chdir;
+use File::Temp qw( tempdir );
+use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '0.66'; # VERSION
+our $VERSION = '0.75'; # VERSION
 
 
 has '+format' => 'tar';
@@ -40,7 +43,9 @@ has tar_cmd => sub {
     # is probably a better plugin to use on windows anyway.
     : _which('tar') && $^O ne 'MSWin32'
       ? 'tar'
-      : undef;
+      : _which('ptar')
+        ? 'ptar'
+        : undef;
 };
 
 
@@ -71,9 +76,6 @@ sub _mv
   rename($from, $to) || die "unable to rename: $!";
 }
 
-# Most modern tars can handle compressed archives on the
-# fly, but until we have a way to probe for that (TODO)
-# we will copy, decompress in a separate process.
 sub _dcon
 {
   my($self, $src) = @_;
@@ -84,25 +86,32 @@ sub _dcon
   if($src =~ /\.(gz|tgz|Z|taz)$/)
   {
     $self->gzip_cmd(_which('gzip')) unless defined $self->gzip_cmd;
-    $cmd = $self->gzip_cmd;
+    if($src =~ /\.(gz|tgz)$/)
+    {
+      $cmd = $self->gzip_cmd unless $self->_tar_can('tar.gz');
+    }
+    elsif($src =~ /\.(Z|taz)$/)
+    {
+      $cmd = $self->gzip_cmd unless $self->_tar_can('tar.Z');
+    }
   }
   elsif($src =~ /\.(bz2|tbz)$/)
   {
     $self->bzip2_cmd(_which('bzip2')) unless defined $self->bzip2_cmd;
-    $cmd = $self->bzip2_cmd;
+    $cmd = $self->bzip2_cmd unless $self->_tar_can('tar.bz2');
   }
   elsif($src =~ /\.(xz|txz)$/)
   {
     $self->xz_cmd(_which('xz')) unless defined $self->xz_cmd;
-    $cmd = $self->xz_cmd;
+    $cmd = $self->xz_cmd unless $self->_tar_can('tar.xz');
   }
   
-  if($src =~ /\.(gz|bz2|xz|Z)$/)
+  if($cmd && $src =~ /\.(gz|bz2|xz|Z)$/)
   {
     $name = $src;
     $name =~ s/\.(gz|bz2|xz|Z)$//g;
   }
-  elsif($src =~ /\.(tgz|tbz|txz|taz)$/)
+  elsif($cmd && $src =~ /\.(tgz|tbz|txz|taz)$/)
   {
     $name = $src;
     $name =~ s/\.(tgz|tbz|txz|taz)$/.tar/;
@@ -124,10 +133,15 @@ sub handles
   $ext = 'tar.gz'  if $ext eq 'tgz';
   $ext = 'tar.bz2' if $ext eq 'tbz';
   $ext = 'tar.xz'  if $ext eq 'txz';
+
+  return 1 if $ext eq 'tar.gz' && $self->_tar_can('tar.gz');
+  return 1 if $ext eq 'tar.Z' && $self->_tar_can('tar.Z');
+  return 1 if $ext eq 'tar.bz2' && $self->_tar_can('tar.bz2');
+  return 1 if $ext eq 'tar.xz' && $self->_tar_can('tar.xz');
   
-  return if $ext =~ s/\.(gz|Z)$// && !$self->gzip_cmd;
-  return if $ext =~ s/\.bz2$// && !$self->bzip2_cmd;
-  return if $ext =~ s/\.xz$// && !$self->xz_cmd;
+  return if $ext =~ s/\.(gz|Z)$// && (!$self->gzip_cmd);
+  return if $ext =~ s/\.bz2$//    && (!$self->bzip2_cmd);
+  return if $ext =~ s/\.xz$//     && (!$self->xz_cmd);
   
   return 1 if $ext eq 'tar' && $self->tar_cmd;
   return 1 if $ext eq 'zip' && $self->unzip_cmd;
@@ -139,15 +153,15 @@ sub init
 {
   my($self, $meta) = @_;
   
-  if($self->format eq 'tar.xz')
+  if($self->format eq 'tar.xz' && !$self->handles('tar.xz'))
   {
     $meta->add_requires('share' => 'Alien::xz' => '0.06');
   }
-  elsif($self->format eq 'tar.bz2')
+  elsif($self->format eq 'tar.bz2' && !$self->handles('tar.bz2'))
   {
     $meta->add_requires('share' => 'Alien::Libbz2' => '0.22');
   }
-  elsif($self->format eq 'tar.gz')
+  elsif($self->format =~ /^tar\.(gz|Z)$/ && !$self->handles($self->format))
   {
     $meta->add_requires('share' => 'Alien::gzip' => '0.03');
   }
@@ -184,13 +198,13 @@ sub init
         $src = $dcon_name;
       }
       
-      if($src =~ /\.tar$/i)
-      {
-        $self->_run($build, $self->tar_cmd, 'xf', $src);
-      }
-      elsif($src =~ /\.zip$/i)
+      if($src =~ /\.zip$/i)
       {
         $self->_run($build, $self->unzip_cmd, $src);
+      }
+      elsif($src =~ /\.tar/ || $src =~ /(\.tgz|\.tbz|\.txz|\.taz)$/i)
+      {
+        $self->_run($build, $self->tar_cmd, 'xf', $src);
       }
       else
       {
@@ -200,9 +214,71 @@ sub init
   );
 }
 
-1;
+my %tars;
 
-__END__
+sub _tar_can
+{
+  my($self, $ext) = @_;
+
+  my $tar = $self->tar_cmd;
+
+  return 1 if $ext eq 'tar';
+  
+  unless(%tars)
+  {
+    my $name = '';
+    while(<DATA>)
+    {
+      if(/^\[ (.*) \]$/)
+      {
+        $name = $1;
+      }
+      else
+      {
+        $tars{$name} .= $_;
+      }
+    }
+    
+    foreach my $key (keys %tars)
+    {
+      $tars{$key} = unpack "u", $tars{$key};
+    }
+  }
+
+  my $name = "xx.$ext";
+
+  return 0 unless $tars{$name};
+
+  local $CWD = tempdir( CLEANUP => 1 );
+  
+  my $cleanup = sub {
+    my $save = $CWD;
+    unlink $name;
+    unlink 'xx.txt';
+    $CWD = '..';
+    rmdir $save;
+  };
+  
+  Path::Tiny->new($name)->spew_raw($tars{$name});
+
+  my(undef, $exit) = capture_merged {
+    system 'tar', 'xf', $name;
+    $?;
+  };
+  
+  if($exit)
+  {
+    $cleanup->();
+    return 0;
+  }
+  
+  my $content = eval { Path::Tiny->new('xx.txt')->slurp };
+  $cleanup->();
+  
+  return defined $content && $content eq "xx\n";
+}
+
+1;
 
 =pod
 
@@ -214,7 +290,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 0.66
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -283,6 +359,34 @@ Roy Storey
 
 Ilya Pavlov
 
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Juan Julián Merelo Guervós (JJ)
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2017 by Graham Ollis.
@@ -291,3 +395,27 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__DATA__
+[ xx.tar.xz ]
+M_3=Z6%H```3FUK1&`@`A`18```!T+^6CX`?_`&!=`#Q@M.AX.4O&N38V648.
+M[J6L\\<_[3M*R;CASOTX?P=AC_+TG]8[KH(8/FH'K8A88=^>]Y`\*#,F=7,6
+MMB.:40OP*L85<<5!.@M$*(&TH(*TAWN"E)(+1>_I$^W5V^4=``!FY,=\7,&)
+9IP`!?(`0````:OY*7K'$9_L"``````196@``
+
+[ xx.tar.bz2 ]
+M0EIH.3%!62936=+(]$0``$A[D-$0`8!``7^``!!AI)Y`!```""``=!JGIH-(
+MT#0]0/2!**---&F@;4#0&:D;X?(6@JH(2<%'N$%3VHC-9E>S/N@"6&I*1@GN
+JNHCC2>$I5(<0BKR.=XBZ""HVZ;T,CV\LJ!K&*?9`#\7<D4X4)#2R/1$`
+
+[ xx.tar.gz ]
+M'XL(`(;*<%D``ZNHT"NI*&&@*3`P,#`S,5$`T>9FIF#:P`C"AP)C!4-C0V,3
+M0Q-30W-S!0-#(W-#0P8%`]HZ"P)*BTL2BX!.R<_)R2Q.QZT.J"PM#8\Y$(\H
+>P.DA`BHJN`;:":-@%(R"43`*!@```)9R\&H`"```
+
+[ xx.tar.Z]
+M'YV0>/"XH(.'#H"#"!,J7,BPH<.'$"-*1`BCH@T:-$``J`CCAHT:&CG"D)%Q
+MH\B3,T#$F+&21@P:-6+<N`$"1@P9-V+$`%!SHL^?0(,*!5!G#ITP<DR^8<,F
+MS9PS0Q<:#6/&3-2%)V&$/*GQJM>O8,.*'1I0P=BS:-.J7<NVK=NW<./*G4NW
+7KMV[>//JW<NWK]^_@`,+'DRXL.'#0P$`
+

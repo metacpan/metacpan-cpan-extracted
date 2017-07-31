@@ -1,6 +1,6 @@
 package App::calendr;
 
-$App::calendr::VERSION   = '0.15';
+$App::calendr::VERSION   = '0.18';
 $App::calendr::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::calendr - Application to display supported Calendar.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.18
 
 =cut
 
@@ -60,8 +60,8 @@ act on it.In case none C<flag> passed in it would show the current calendar mont
             Gregorian date (YYYY-MM-DD)
 
 
-        --julian: Int
-            Julian date
+        --jday: Int
+            Julian day
 
 
         --month: String
@@ -69,7 +69,7 @@ act on it.In case none C<flag> passed in it would show the current calendar mont
 
 
         --name: String
-            Calendar name e.g. Bahai,Gregorian,Hijri,Persian,Saka.
+            Calendar name e.g. Bahai,Gregorian,Hebrew,Hijri,Julian,Persian,Saka.
             Default is Gregorian.
 
 
@@ -98,7 +98,11 @@ The following supported calendars can be installed individually.
 
 =item * L<Calendar::Gregorian>
 
+=item * L<Calendar::Hebrew>
+
 =item * L<Calendar::Hijri>
+
+=item * L<Calendar::Julian>
 
 =item * L<Calendar::Persian>
 
@@ -180,12 +184,12 @@ sub run {
             my ($year, $month, $day) = split /\-/, $self->gregorian, 3;
             print $calendar->from_gregorian($year, $month, $day) and return;
         }
-        elsif (defined $self->julian) {
-            my $julian = $self->julian;
-            die "ERROR: Invalid julian date '$julian'.\n"
-                unless ($julian =~ /^\d+\.?\d?$/);
+        elsif (defined $self->jday) {
+            my $julian_day = $self->jday;
+            die "ERROR: Invalid julian day '$julian_day'.\n"
+                unless ($julian_day =~ /^\d+\.?\d?$/);
 
-            print $calendar->from_julian($self->julian) and return;
+            print $calendar->from_julian($julian_day) and return;
         }
         elsif (defined $self->list_month_names) {
             my $month_names = $calendar->date->months;
@@ -233,7 +237,9 @@ sub _supported_calendars {
     return {
         'BAHAI'     => 'Calendar::Bahai',
         'GREGORIAN' => 'Calendar::Gregorian',
+        'HEBREW'    => 'Calendar::Hebrew',
         'HIJRI'     => 'Calendar::Hijri',
+        'JULIAN'    => 'Calendar::Julian',
         'PERSIAN'   => 'Calendar::Persian',
         'SAKA'      => 'Calendar::Saka',
     };

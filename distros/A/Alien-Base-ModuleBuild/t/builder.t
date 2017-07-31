@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0 -no_srand => 1;
 
 BEGIN {
   delete $ENV{ACTIVESTATE_PPM_BUILD};
@@ -120,7 +117,7 @@ subtest 'override temp and share' => sub {
 };
 
 subtest 'destdir' => sub {
-  plan skip_all => 'TODO on MSWin32' if $^O eq 'MSWin32';
+  skip_all 'TODO on MSWin32' if $^O eq 'MSWin32';
 
   open my $fh, '>', 'build.pl';
   print $fh <<'EOF';

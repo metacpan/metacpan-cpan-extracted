@@ -1,7 +1,6 @@
 package Lab::Bus;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Bus base class
-$Lab::Bus::VERSION = '3.553';
+$Lab::Bus::VERSION = '3.554';
 use strict;
 
 use Lab::Generic;
@@ -164,7 +163,7 @@ Lab::Bus - Bus base class
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 SYNOPSIS
 

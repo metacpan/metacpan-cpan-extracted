@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+eval 'exec /usr/bin/perl5.10.0 -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use Biblio::SIF::Patron;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my $term;
+my ($keyfile, $field);
+my $print_duplicates;
+my $verbose;
+my $quiet;
+my %wantseen;
+
+my $num_total      = 0;
+my $num_duplicates = 0;
+my $num_picked     = 0;
+my $num_missed     = 0;
+
+my $subsequent;
+
+my %esc2str = (
+    '\t' => "\t",
+    '\n' => "\n",
+    '\r' => "\r",
+    '\\' => "\\",
+);
+
+GetOptions(
+    'f|file=s' => \$keyfile,
+    'k|field=s' => \$field,
+    'K' => sub { $field = '#'              },
+    'S' => sub { $subsequent = 0             },
+    'r' => sub { $field = 'id'             },
+    'i' => sub { $field = 'institution_id' },
+    'j' => sub { $field = 'institution_id' },  # For consistency with other patron SIF tools
+    's' => sub { $field = 'ssn'            },
+    'd|print-duplicates' => \$print_duplicates,
+    'v|verbose' => \$verbose,
+    'q|quiet' => \$quiet,
+    # Terminators
+    't|terminator=s' => \$term,
+    'z' => sub { $term = "\x00\n" },
+    'Z' => sub { $term = "\x0a\x00\x0a" },
+    '0' => sub { $term = "\x00" },
+    'n' => sub { $term = "\n" },
+    'crlf' => sub { $term = "\x0d\x0a" },
+);
+
+# --- Build the key --> record mapping
+
+$wantseen{$_} = 0 for @ARGV;
+if (defined $keyfile) {
+    open my $keyfh, '<', $keyfile
+        or die "Can't open keyfile $keyfile: $!";
+    while (<$keyfh>) {
+        chomp;
+        next if /^$/;  # Skip blank lines
+        $wantseen{$_} = 0;
+    }
+}
+
+my $iter = Biblio::SIF::Patron->iterator(\*STDIN,
+    'terminator' => $term,
+);
+while (defined (my $patron = $iter->())) {
+    $num_total++;
+    my $key = $field eq '#' ? $num_total : $patron->$field;
+    next if !exists $wantseen{$key} && !$subsequent;
+    if ($wantseen{$key}) {
+        # XXX Duplicate!
+        $num_duplicates++;
+        print $patron if $print_duplicates;
+    }
+    else {
+        $wantseen{$key} = 1;
+        print $patron;
+        $num_picked++;
+        $subsequent = 1 if defined $subsequent;
+    }
+}
+
+while (my ($key, $seen) = each %wantseen) {
+    if (!$seen) {
+        $num_missed++;
+        if ($verbose) {
+            print STDERR "Not found: $key\n";
+        }
+    }
+}
+
+printf STDERR <<'EOS', $num_picked, $num_missed, $num_duplicates, $num_total if !$quiet;
+%6d Picked
+%6d Not found in input
+%6d Duplicate keys
+------ ------------------
+%6d Total
+EOS

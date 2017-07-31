@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,17 +14,15 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 9928dc7a4dd6f9db851d6933abf0683827a5cdb9 .cvsignore
-SHA1 55d25b692f117e219fc09b61e35b42aa9cbb2ff2 Build.PL
-SHA1 22dc7e14d195893362e63e272c00ba04362ed049 Changes
-SHA1 d4de4641b75af26f9d93a489d0f53966fbc91d07 MANIFEST
-SHA1 dc1a4d65575e25fbfafd7b96593e3c2e6e9a7cee META.json
-SHA1 4d0b8b17f4dba4cfb66ed2fd30ac8d65714bb689 META.yml
-SHA1 2157ae40589595d6cc1585fd7279b25bcf8f5852 Makefile.PL
-SHA1 47900d2c324dc0f1d18a4db1eef63ff9eea9cdee README
-SHA1 49d78d49f902332430cdc0b949a7d1f3c6976a25 lib/Memoize/.cvsignore
-SHA1 e5c0fe45611103f8193fe9b652f6a45c28f07c0e lib/Memoize/Once.pm
-SHA1 fe8593b8d39ce5c8092e3de7eab3f4b9625fd7c9 lib/Memoize/Once.xs
+SHA1 ae91619ae36dfbc41c83d71e10ffa0d3d0f4cb09 .gitignore
+SHA1 7f021bca50ca9e23120d8971b0ab153a9e981d3d Build.PL
+SHA1 dd08aa248b892b271e59dcd9411d09b4ac2a413b Changes
+SHA1 42515d7f51182f769fbfee7e71809d844572b160 MANIFEST
+SHA1 d78274670ac280048560512353eb506868ec2386 META.json
+SHA1 d5ed061a44dd721f2ddda5b544f63b4b9f2ede78 META.yml
+SHA1 a129d5982cdb0c59497f49cf62c2f41d0a4c7f46 README
+SHA1 77f94f8ad98ffe2eac913541eb366ef50b402e63 lib/Memoize/Once.pm
+SHA1 b767ef3b0d8faa7653bf49e0f66383d7e5253b48 lib/Memoize/Once.xs
 SHA1 8a0f01f5a831e1a81bf3973d5333a1ac0cbacd90 t/bad_syntax.t
 SHA1 91861ee4db3c51b10c37257181d9abb0f98f62f5 t/basic.t
 SHA1 880bc2dc8e3cb5315a70754e99cc67e7313b7d4b t/context.t
@@ -39,9 +37,9 @@ SHA1 900b013bdf7c6daf834ed1e0d5a6cc967f35911f t/recurse.t
 SHA1 b54748c5006246aa998380e147ecbe5ce8f60721 t/struct.t
 SHA1 fa5df4862f6f8bcec46b230f18d3ff6b621dc429 t/undef.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk3isboACgkQOV9mt2VyAVH2WgCeNsWcP5UjJjdLhppK7c9x8qWl
-/kcAn1E9EFfdviT9YptdFriM4d77vEeZ
-=RP5f
+iEYEARECAAYFAll8jWYACgkQOV9mt2VyAVHqNACfeHF19Q7zfzSieioVgm1qjIcY
+NpAAn3dC8xQZNew8L2prRiAf0RhtLI3g
+=acHd
 -----END PGP SIGNATURE-----

@@ -1,7 +1,7 @@
 package Perinci::Sub::GetArgs::Argv;
 
-our $DATE = '2017-04-19'; # DATE
-our $VERSION = '0.81'; # VERSION
+our $DATE = '2017-07-22'; # DATE
+our $VERSION = '0.82'; # VERSION
 
 use 5.010001;
 use strict;
@@ -893,6 +893,17 @@ cases, like for tab completion, this is harmless so you can turn this option on.
 
 _
         },
+        ggls_res => {
+            summary => 'Full result from gen_getopt_long_spec_from_meta()',
+            schema  => 'array*', # XXX envres
+            description => <<'_',
+
+If you already call `gen_getopt_long_spec_from_meta()`, you can pass the _full_ enveloped result
+here, to avoid calculating twice.
+
+_
+            tags => ['category:optimization'],
+        },
     },
     result => {
         description => <<'_',
@@ -933,7 +944,7 @@ sub get_args_from_argv {
     my $rargs = $fargs{args} // {};
 
     # 1. first we generate Getopt::Long spec
-    my $genres = gen_getopt_long_spec_from_meta(
+    my $genres = $fargs{ggls_res} // gen_getopt_long_spec_from_meta(
         meta => $meta, meta_is_normalized => 1,
         args => $rargs,
         common_opts  => $common_opts,
@@ -1113,7 +1124,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.81 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-04-19.
+This document describes version 0.82 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-07-22.
 
 =head1 SYNOPSIS
 
@@ -1323,6 +1334,13 @@ C<get_args_from_argv()>. Example:
          summary => 'Display version and exit',
      },
  }
+
+=item * B<ggls_res> => I<array>
+
+Full result from gen_getopt_long_spec_from_meta().
+
+If you already call C<gen_getopt_long_spec_from_meta()>, you can pass the I<full> enveloped result
+here, to avoid calculating twice.
 
 =item * B<ignore_converted_code> => I<bool> (default: 0)
 

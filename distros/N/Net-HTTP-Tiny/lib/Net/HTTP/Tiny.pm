@@ -4,9 +4,9 @@ Net::HTTP::Tiny - minimal HTTP client
 
 =head1 SYNOPSIS
 
-	use Net::HTTP::Tiny qw(http_get);
+    use Net::HTTP::Tiny qw(http_get);
 
-	$dat = http_get("http://maia.usno.navy.mil/ser7/tai-utc.dat");
+    $dat = http_get("http://maia.usno.navy.mil/ser7/tai-utc.dat");
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 # Set up superclass manually, rather than via "parent", to avoid non-core
 # dependency.
@@ -387,7 +387,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2012, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

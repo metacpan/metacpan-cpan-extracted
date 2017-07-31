@@ -9,6 +9,15 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef EXPECT
 # ifdef __GNUC__
 #  define EXPECT(e, v) __builtin_expect(e, v)
@@ -17,8 +26,8 @@
 # endif /* !__GNUC__ */
 #endif /* !EXPECT */
 
-#define likely(t) EXPECT(!!(t), 1)
-#define unlikely(t) EXPECT(!!(t), 0)
+#define likely(t) EXPECT(cBOOL(t), 1)
+#define unlikely(t) EXPECT(cBOOL(t), 0)
 
 #ifndef PERL_STATIC_INLINE
 # define PERL_STATIC_INLINE static
@@ -213,7 +222,7 @@ PERL_STATIC_INLINE bool THX_going_faster(pTHX_ pMY_CXT)
 	HE *ent = hv_fetch_ent(GvHV(PL_hintgv), MY_CXT.hint_on_key_sv, 0,
 			MY_CXT.hint_on_key_hash);
 	SV *on_sv = ent ? HeVAL(ent) : MY_CXT.global_on_sv;
-	return !!SvTRUE(on_sv);
+	return cBOOL(SvTRUE(on_sv));
 }
 
 PERL_STATIC_INLINE OP *skip_null_ops(OP *o)
@@ -330,7 +339,7 @@ static void THX_my_rpeep(pTHX_ OP *first)
 			make_op_faster(o);
 		}
 	}
-	return MY_CXT.THX_next_rpeep(aTHX_ first);
+	MY_CXT.THX_next_rpeep(aTHX_ first);
 }
 
 # else /* !QHAVE_RPEEPP */
@@ -438,7 +447,7 @@ static void THX_my_peep(pTHX_ OP *first)
 		my_peep_rec(seen, first);
 		ptr_table_free(seen);
 	}
-	return MY_CXT.THX_next_peep(aTHX_ first);
+	MY_CXT.THX_next_peep(aTHX_ first);
 }
 
 # endif /* !QHAVE_RPEEPP */

@@ -1,7 +1,7 @@
 {
    "abstract" : "OpenAPI / Swagger plugin for Mojolicious",
    "author" : [
-      "Joel Berger <joel.a.berger@gmail.com>"
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/jhthorsen/mojolicious-plugin-openapi.git"
       }
    },
-   "version" : "1.19",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

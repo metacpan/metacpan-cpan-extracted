@@ -1,5 +1,10 @@
 Revision history for URI
 
+1.72      2017-07-25
+    - Convert the dist to Dist::Zilla for authoring.
+    - Remove recommendation of Business::ISBN as urn/isbn.pm is deprecated
+    - Use Test::Needs instead of raw eval in urn-isbn.t
+
 2016-01-08   Karen Etheridge <ether@cpan.org>
 
   Release 1.71
@@ -166,6 +171,9 @@ Revision history for URI
 2011-01-22   Gisle Aas <gisle@ActiveState.com>
 
   Release 1.57
+
+  Perl 5.6 is no longer supported; use backpan.cpan.org to obtain obsolete
+  versions of URI.
 
   Mark Stosberg (8):
       typo fix: s/do deal/to deal/
@@ -522,7 +530,7 @@ Revision history for URI
    Relative URIs that start with the query string directly (i.e. "?q")
    are now absolutized as specified in rfc2396bis.  See:
    http://www.apache.org/~fielding/uri/rev-2002/issues.html#003-relative-query
-   
+
    Added URI::Split module.  It's a lightweight module that can be
    used to parse and compose URI string to/from its component parts.
 

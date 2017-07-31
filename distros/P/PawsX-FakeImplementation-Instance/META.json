@@ -1,0 +1,60 @@
+{
+   "abstract" : "A Paws extension to help you write fake AWS services",
+   "author" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PawsX-FakeImplementation-Instance",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "Pod::Markdown" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Paws" : "0",
+            "UUID" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Paws::Kinesis::MemoryCaller" : "0",
+            "Paws::Net::MultiplexCaller" : "0.03",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/pawsx-fakeimplementation-instance/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/pawsx-fakeimplementation-instance/",
+         "web" : "https://github.com/pplu/pawsx-fakeimplementation-instance/"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

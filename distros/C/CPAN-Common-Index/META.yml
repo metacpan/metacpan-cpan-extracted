@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,19 +35,21 @@ no_index:
 provides:
   CPAN::Common::Index:
     file: lib/CPAN/Common/Index.pm
-    version: '0.007'
+    version: '0.010'
   CPAN::Common::Index::LocalPackage:
     file: lib/CPAN/Common/Index/LocalPackage.pm
-    version: '0.007'
+    version: '0.010'
   CPAN::Common::Index::MetaDB:
     file: lib/CPAN/Common/Index/MetaDB.pm
-    version: '0.007'
+    version: '0.010'
   CPAN::Common::Index::Mirror:
     file: lib/CPAN/Common/Index/Mirror.pm
-    version: '0.007'
+    version: '0.010'
   CPAN::Common::Index::Mux::Ordered:
     file: lib/CPAN/Common/Index/Mux/Ordered.pm
-    version: '0.007'
+    version: '0.010'
+recommends:
+  IO::Uncompress::Gunzip: '0'
 requires:
   CPAN::DistnameInfo: '0'
   CPAN::Meta::YAML: '0'
@@ -60,7 +62,6 @@ requires:
   File::Temp: '0.19'
   File::stat: '0'
   HTTP::Tiny: '0'
-  IO::Uncompress::Gunzip: '0'
   Module::Load: '0'
   Search::Dict: '1.07'
   Tie::Handle::SkipHeader: '0'
@@ -73,7 +74,7 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index/issues
   homepage: https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index
   repository: https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index.git
-version: '0.007'
+version: '0.010'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'David Golden <xdg@xdg.me>'

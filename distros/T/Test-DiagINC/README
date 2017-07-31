@@ -2,7 +2,7 @@ NAME
     Test::DiagINC - List modules and versions loaded if tests fail
 
 VERSION
-    version 0.006
+    version 0.008
 
 SYNOPSIS
         # preferably load before anything else

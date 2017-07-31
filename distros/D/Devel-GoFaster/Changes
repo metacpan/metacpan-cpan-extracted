@@ -1,3 +1,25 @@
+version 0.001; 2017-07-30
+
+  * bugfix: fix compilability on some C compilers by avoiding the use of
+    "return" in void functions
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for not
+    breaking version-implied features and for require argument context)
+
+  * bugfix: declare required version of Lexical::SealRequireHints
+    consistently between the module code and the metadata
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * avoid some compiler warnings that arise on Perl 5.6
+
+  * use cBOOL() where appropriate
+
 version 0.000; 2015-03-06
 
   * initial released version

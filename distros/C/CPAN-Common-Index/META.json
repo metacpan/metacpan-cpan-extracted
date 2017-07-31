@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -35,6 +35,9 @@
          "requires" : {
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::Encoding" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::ReleaseStatus::FromVersion" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -56,6 +59,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "IO::Uncompress::Gunzip" : "0"
+         },
          "requires" : {
             "CPAN::DistnameInfo" : "0",
             "CPAN::Meta::YAML" : "0",
@@ -68,7 +74,6 @@
             "File::Temp" : "0.19",
             "File::stat" : "0",
             "HTTP::Tiny" : "0",
-            "IO::Uncompress::Gunzip" : "0",
             "Module::Load" : "0",
             "Search::Dict" : "1.07",
             "Tie::Handle::SkipHeader" : "0",
@@ -101,23 +106,23 @@
    "provides" : {
       "CPAN::Common::Index" : {
          "file" : "lib/CPAN/Common/Index.pm",
-         "version" : "0.007"
+         "version" : "0.010"
       },
       "CPAN::Common::Index::LocalPackage" : {
          "file" : "lib/CPAN/Common/Index/LocalPackage.pm",
-         "version" : "0.007"
+         "version" : "0.010"
       },
       "CPAN::Common::Index::MetaDB" : {
          "file" : "lib/CPAN/Common/Index/MetaDB.pm",
-         "version" : "0.007"
+         "version" : "0.010"
       },
       "CPAN::Common::Index::Mirror" : {
          "file" : "lib/CPAN/Common/Index/Mirror.pm",
-         "version" : "0.007"
+         "version" : "0.010"
       },
       "CPAN::Common::Index::Mux::Ordered" : {
          "file" : "lib/CPAN/Common/Index/Mux/Ordered.pm",
-         "version" : "0.007"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -132,7 +137,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/CPAN-Common-Index"
       }
    },
-   "version" : "0.007",
+   "version" : "0.010",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "David Golden <xdg@xdg.me>",

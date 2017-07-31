@@ -9299,7 +9299,7 @@ currency:
       ARS: Argentine Peso
       AUD: Australian Dollar
       AWG: Aruban Florin
-      AZN: Azerbaijanian Manat
+      AZN: Azerbaijan Manat
       BAM: Convertible Mark
       BBD: Barbados Dollar
       BDT: Taka
@@ -9346,7 +9346,7 @@ currency:
       GHS: Ghana Cedi
       GIP: Gibraltar Pound
       GMD: Dalasi
-      GNF: Guinea Franc
+      GNF: Guinean Franc
       GTQ: Quetzal
       GYD: Guyana Dollar
       HKD: Hong Kong Dollar
@@ -9366,13 +9366,13 @@ currency:
       KES: Kenyan Shilling
       KGS: Som
       KHR: Riel
-      KMF: Comoro Franc
+      KMF: Comorian Franc
       KPW: North Korean Won
       KRW: Won
       KWD: Kuwaiti Dinar
       KYD: Cayman Islands Dollar
       KZT: Tenge
-      LAK: Kip
+      LAK: Lao Kip
       LBP: Lebanese Pound
       LKR: Sri Lanka Rupee
       LRD: Liberian Dollar
@@ -9488,9 +9488,9 @@ currency:
       australian dollar: 
         - AUD
         - Australian Dollar
-      azerbaijanian manat: 
+      azerbaijan manat: 
         - AZN
-        - Azerbaijanian Manat
+        - Azerbaijan Manat
       bahamian dollar: 
         - BSD
         - Bahamian Dollar
@@ -9569,9 +9569,9 @@ currency:
       colombian peso: 
         - COP
         - Colombian Peso
-      comoro franc: 
+      comorian franc: 
         - KMF
-        - Comoro Franc
+        - Comorian Franc
       congolese franc: 
         - CDF
         - Congolese Franc
@@ -9650,9 +9650,9 @@ currency:
       guarani: 
         - PYG
         - Guarani
-      guinea franc: 
+      guinean franc: 
         - GNF
-        - Guinea Franc
+        - Guinean Franc
       guyana dollar: 
         - GYD
         - Guyana Dollar
@@ -9686,9 +9686,6 @@ currency:
       kina: 
         - PGK
         - Kina
-      kip: 
-        - LAK
-        - Kip
       kuna: 
         - HRK
         - Kuna
@@ -9701,6 +9698,9 @@ currency:
       kyat: 
         - MMK
         - Kyat
+      lao kip: 
+        - LAK
+        - Lao Kip
       lari: 
         - GEL
         - Lari
@@ -10023,7 +10023,7 @@ currency:
       152: Chilean Peso
       156: Yuan Renminbi
       170: Colombian Peso
-      174: Comoro Franc
+      174: Comorian Franc
       188: Costa Rican Colon
       191: Kuna
       192: Cuban Peso
@@ -10039,7 +10039,7 @@ currency:
       270: Dalasi
       292: Gibraltar Pound
       320: Quetzal
-      324: Guinea Franc
+      324: Guinean Franc
       328: Guyana Dollar
       332: Gourde
       340: Lempira
@@ -10060,7 +10060,7 @@ currency:
       410: Won
       414: Kuwaiti Dinar
       417: Som
-      418: Kip
+      418: Lao Kip
       422: Lebanese Pound
       426: Loti
       430: Liberian Dollar
@@ -10134,7 +10134,7 @@ currency:
       940: Uruguay Peso en Unidades Indexadas (URUIURUI)
       941: Serbian Dinar
       943: Mozambique Metical
-      944: Azerbaijanian Manat
+      944: Azerbaijan Manat
       946: Romanian Leu
       947: WIR Euro
       948: WIR Franc
@@ -10195,9 +10195,9 @@ currency:
       australian dollar: 
         - '036'
         - Australian Dollar
-      azerbaijanian manat: 
+      azerbaijan manat: 
         - 944
-        - Azerbaijanian Manat
+        - Azerbaijan Manat
       bahamian dollar: 
         - '044'
         - Bahamian Dollar
@@ -10276,9 +10276,9 @@ currency:
       colombian peso: 
         - 170
         - Colombian Peso
-      comoro franc: 
+      comorian franc: 
         - 174
-        - Comoro Franc
+        - Comorian Franc
       congolese franc: 
         - 976
         - Congolese Franc
@@ -10357,9 +10357,9 @@ currency:
       guarani: 
         - 600
         - Guarani
-      guinea franc: 
+      guinean franc: 
         - 324
-        - Guinea Franc
+        - Guinean Franc
       guyana dollar: 
         - 328
         - Guyana Dollar
@@ -10393,9 +10393,6 @@ currency:
       kina: 
         - 598
         - Kina
-      kip: 
-        - 418
-        - Kip
       kuna: 
         - 191
         - Kuna
@@ -10408,6 +10405,9 @@ currency:
       kyat: 
         - 104
         - Kyat
+      lao kip: 
+        - 418
+        - Lao Kip
       lari: 
         - 981
         - Lari
@@ -46180,11 +46180,13 @@ langvar:
       1994: Standardized Resian orthography
       1996: German orthography of 1996
       abl1943: Orthographic formulation of 1943 - Official in Brazil (Formulario Ortografico de 1943 - Oficial no Brasil)
+      akuapem: Akuapem Twi
       alalc97: ALA-LC Romanization, 1997 edition
       aluku: Aluku dialect
       ao1990: Portuguese Language Orthographic Agreement of 1990 (Acordo Ortografico da Lingua Portuguesa de 1990)
       arevela: Eastern Armenian
       arevmda: Western Armenian
+      asante: Asante Twi
       baku1926: Unified Turkic Latin Alphabet (Historical)
       balanka: The Balanka dialect of Anii
       barla: The Barlavento dialect group of Kabuverdianu
@@ -46259,12 +46261,18 @@ langvar:
       "\"academic\" (\"governmental\") variant of belarusian as codified in 1959": 
         - 1959acad
         - "\"Academic\" (\"governmental\") variant of Belarusian as codified in 1959"
+      akuapem twi: 
+        - akuapem
+        - Akuapem Twi
       ala-lc romanization, 1997 edition: 
         - alalc97
         - ALA-LC Romanization, 1997 edition
       aluku dialect: 
         - aluku
         - Aluku dialect
+      asante twi: 
+        - asante
+        - Asante Twi
       basic english: 
         - basiceng
         - Basic English

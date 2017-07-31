@@ -22,7 +22,6 @@ my %WriteMakefileArgs = (
     "List::UtilsBy" => "0.10",
     "Log::Any" => "1.045",
     "Log::Any::Adapter" => "1.045",
-    "Mixin::Event::Dispatch" => "2.000",
     "Ref::Util" => "0.111",
     "Scalar::Util" => "1.47",
     "Syntax::Keyword::Try" => "0.04",
@@ -46,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "Test::Warnings" => "0.024"
   },
-  "VERSION" => "0.022",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +63,6 @@ my %FallbackPrereqs = (
   "Log::Any" => "1.045",
   "Log::Any::Adapter" => "1.045",
   "Log::Any::Adapter::TAP" => "0.003002",
-  "Mixin::Event::Dispatch" => "2.000",
   "Ref::Util" => "0.111",
   "Scalar::Util" => "1.47",
   "Syntax::Keyword::Try" => "0.04",

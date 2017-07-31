@@ -1,0 +1,9 @@
+lib/Data/Result.pm
+lib/Data/Result/Moo.pm
+t/Data-Result.t
+t/Data-Result-Moo.t
+Changes
+MANIFEST
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

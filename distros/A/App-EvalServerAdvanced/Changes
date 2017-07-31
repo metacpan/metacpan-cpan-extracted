@@ -1,3 +1,6 @@
+0.018 - July 27th 2017
+  * Fix a bug where the server would drop messages if given all at once
+
 0.017 - June 3rd 2017
   * Use the file object instead of the decoded content when writing __code to /tmp
 

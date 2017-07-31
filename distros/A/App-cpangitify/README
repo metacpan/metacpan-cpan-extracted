@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.14
+    version 0.16
 
 SYNOPSIS
 
@@ -124,7 +124,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Mohammad S Anwar (MANWAR)
 
 COPYRIGHT AND LICENSE
 

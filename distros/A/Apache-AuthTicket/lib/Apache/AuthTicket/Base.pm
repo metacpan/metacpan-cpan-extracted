@@ -1,8 +1,5 @@
 package Apache::AuthTicket::Base;
-BEGIN {
-  $Apache::AuthTicket::Base::VERSION = '0.93';
-}
-
+$Apache::AuthTicket::Base::VERSION = '0.94';
 # ABSTRACT: Common methods for all Apache::AuthTicket versions.
 
 use strict;
@@ -138,13 +135,26 @@ sub parse_ticket {
     return $ticket;
 }
 
+sub _client_ip {
+    my $self = shift;
+
+    my $conn = $self->request->connection;
+
+    if ($conn->can('client_ip')) {      # 2.4+
+        return $conn->client_ip;
+    }
+
+    # apache < 2.4
+    return $conn->remote_ip;
+}
+
 sub _is_ticket_signature_valid {
     my ($self, $data, $hash, $secret) = @_;
 
     my @fields = ($secret, $data);
 
     if ($self->get_config('TicketCheckIP')) {
-        my $ip = $self->request->connection->remote_ip;
+        my $ip = $self->_client_ip;
         push @fields, $ip;
     }
 
@@ -381,7 +391,7 @@ sub make_ticket {
 
     # only add ip if TicketCheckIP is on.
     if ($self->get_config('TicketCheckIP')) {
-        push @fields, $self->request->connection->remote_ip;
+        push @fields, $self->_client_ip;
     }
 
     if ($self->get_config('TicketCheckBrowser')) {
@@ -635,7 +645,7 @@ sub apache_const { die "unimplemented" }
 
 1;
 
-
+__END__
 
 =pod
 
@@ -645,7 +655,7 @@ Apache::AuthTicket::Base - Common methods for all Apache::AuthTicket versions.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -920,7 +930,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

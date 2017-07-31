@@ -3,10 +3,10 @@ package IPC::MorseSignals::Receiver;
 use strict;
 use warnings;
 
-use Carp qw/croak/;
+use Carp qw<croak>;
 
 use Bit::MorseSignals::Receiver;
-use base qw/Bit::MorseSignals::Receiver/;
+use base qw<Bit::MorseSignals::Receiver>;
 
 =head1 NAME
 
@@ -14,11 +14,17 @@ IPC::MorseSignals::Receiver - Base class for IPC::MorseSignals receivers.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
+
+=head1 WARNING
+
+Due to the POSIX signals specification (which I wasn't aware of at the time I wrote this module), this module is by nature completely unreliable and will never work properly.
+It is therefore B<deprecated>.
+Please don't use it (if you were actually crazy enough to use it).
 
 =head1 SYNOPSIS
 
@@ -31,13 +37,16 @@ our $VERSION = '0.16';
 
 =head1 DESCRIPTION
 
-This module installs C<$SIG{qw/USR1 USR2/}> handlers and forwards the bits received to an underlying L<Bit::MorseSignals> receiver.
+This module installs C<< $SIG{qw<USR1 USR2>} >> handlers and forwards the bits received to an underlying L<Bit::MorseSignals> receiver.
 
 =head1 METHODS
 
 =head2 C<new>
 
-Creates a new receiver object. Its arguments are passed to L<Bit::MorseSignals::Receiver/new>, in particular the C<done> callback.
+    my $imr = IPC::MorseSignals::Receiver->new(%bmr_options);
+
+Creates a new receiver object.
+Its arguments are passed to L<Bit::MorseSignals::Receiver/new>, in particular the C<done> callback.
 
 =cut
 
@@ -48,7 +57,7 @@ sub new {
  croak 'The first argument must be a hash reference to the %SIG hash'
   unless $sig and ref $sig eq 'HASH';
  my $self = bless $class->SUPER::new(@_), $class;
- @{$sig}{qw/USR1 USR2/} = (sub { $self->push(0) }, sub { $self->push(1) });
+ @{$sig}{qw<USR1 USR2>} = (sub { $self->push(0) }, sub { $self->push(1) });
  return $self;
 }
 
@@ -84,7 +93,8 @@ You can contact me by mail or on C<irc.perl.org> (vincent).
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-ipc-morsesignals-receiver at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-MorseSignals>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-ipc-morsesignals-receiver at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-MorseSignals>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -94,7 +104,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007,2008,2013 Vincent Pit, all rights reserved.
+Copyright 2007,2008,2013,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

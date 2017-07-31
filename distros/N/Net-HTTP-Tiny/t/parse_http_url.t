@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 169;
+use Test::More 0.41 tests => 169;
 
 use Net::HTTP::Tiny ();
 

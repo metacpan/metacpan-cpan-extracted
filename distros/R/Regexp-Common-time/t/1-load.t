@@ -1,7 +1,9 @@
-
+use strict;
+use warnings;
 use Test::More tests => 1;
 BEGIN { use_ok('Regexp::Common::time') };
 
+diag( "Testing Regexp::Common::time $Regexp::Common::time::VERSION, Perl $], $^X" );
 
 # code taken from the module itself:
 my $can_posix  = 0;
@@ -21,4 +23,3 @@ eval
 };
 diag "POSIX: $can_posix";
 diag "I18N:  $can_locale";
-

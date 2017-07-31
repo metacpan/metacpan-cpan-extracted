@@ -7,14 +7,14 @@ use warnings;
 
 package Mail::Message::Convert::HtmlFormatPS;
 use vars '$VERSION';
-$VERSION = '3.000';
+$VERSION = '3.001';
 
 use base 'Mail::Message::Convert';
 
 use Mail::Message::Body::String;
 
 use HTML::TreeBuilder;
-use HTML::FormatText;
+use HTML::FormatPS;
 
 
 sub init($)
@@ -44,7 +44,5 @@ sub format($)
       , data     => [ $self->{MMCH_formatter}->format($tree) ]
       );
 }
-
-#------------------------------------------
 
 1;

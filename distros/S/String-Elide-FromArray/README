@@ -1,0 +1,97 @@
+NAME
+    String::Elide::FromArray - Truncate string containing list of items
+
+VERSION
+    This document describes version 0.001 of String::Elide::FromArray (from
+    Perl distribution String-Elide-FromArray), released on 2017-07-28.
+
+SYNOPSIS
+     use String::Elide::FromArray qw(elide);
+
+                                            #     01234567890123456
+     elide([qw/foo/],                  11); # -> "foo"
+     elide([qw/foo bar/],              11); # -> "foo, bar"
+     elide([qw/foo bar baz/],          11); # -> "foo, bar,.."
+
+     elide([qw/foo bar baz/],          15); # -> "foo, bar, baz"
+     elide([qw/foo bar baz qux/],      15); # -> "foo, bar, baz.."
+
+     elide([qw/foo bar baz qux/],      15, {max_items => 2});
+                                            # -> "foo, bar, .."
+
+     elide([qw/foo bar baz qux/],      15, {max_items => 2, list_marker => 'etc'});
+                                            # -> "foo, bar, etc"
+
+     elide([qw/foo bar baz/],          11, {sep => '|'});
+                                            # -> "foo|bar|baz"
+
+     elide([qw/foo bar baz/],          11, {marker=>"--"});
+                                            # -> "foo, bar,--"
+
+     elide([qw/aaa bbbbb/],            11, {max_item_len=>4});
+                                            # -> "aaa, bb.."
+
+     elide([qw/aaa bbbbb c d e/],      11, {max_item_len=>4, item_marker=>"*"});
+                                            # -> "aaa, bbb*.."
+
+DESCRIPTION
+    This module provides a single function "elide()" to truncate a string
+    containing list of items. You provide the array containing the items.
+
+FUNCTIONS
+  elide(\@ary, $len[, \%opts]) => str
+    Join @ary using "sep" (default is ", "), the truncate the resulting
+    string so it has a maximum length of $len. Some options are available:
+
+    *   sep => str (default: ', ')
+
+        String used to join the items.
+
+    *   marker => str (default: '..')
+
+        String added at the end of elided string.
+
+    *   max_item_len => int
+
+        If specified, then each item will be elided first.
+
+    *   item_marker => str (default: '..')
+
+        String added at the end of elided string.
+
+    *   max_items => int
+
+        If specified, only join at most this number of items.
+
+    *   list_marker => str (default: '..')
+
+        Last item added when number of items exceeds "max_items".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Elide-FromArray>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Elide-FromArray>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Elide-FromArra
+    y>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::Elide, String::Truncate, String::Elide::Parts
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

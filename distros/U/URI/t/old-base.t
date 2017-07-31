@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.96;
 use URI::URL qw(url);
 use URI::Escape qw(uri_escape uri_unescape);
 use File::Temp 'tempdir';
@@ -850,7 +850,7 @@ EOM
 	);
 
     note "  Relative    +  Base  =>  Expected Absolute URL";
-    note "================================================\n";
+    note "------------------------------------------------\n";
     for my $test (@absolute_tests) {
 	my($rel, $abs) = @$test;
 	my $abs_url = new URI::URL $abs;

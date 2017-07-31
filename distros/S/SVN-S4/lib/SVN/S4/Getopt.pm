@@ -13,7 +13,7 @@ use Data::Dumper;
 ######################################################################
 #### Configuration Section
 
-our $VERSION = '1.064';
+our $VERSION = '1.066';
 
 our %_Aliases =
     (
@@ -138,6 +138,8 @@ our %_Args =
   'checkout'	=> {
       s4_changed => 1,
       args => (''
+	       .' [--sparse]'			# S4 addition
+	       #
 	       .' [--depth ARG]'
 	       .' [--force]'
 	       .' [--ignore-externals]'

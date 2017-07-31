@@ -1,3 +1,19 @@
+version 0.004; 2017-07-30
+
+  * in doc, note when core versions started warning and were removed
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * include META.json in distribution
+
+  * correct a typo in documentation
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
 version 0.003; 2011-03-18
 
   * bugfix: in shellwords.pl, require Text::ParseWords 3.25, because

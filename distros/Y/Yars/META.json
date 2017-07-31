@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,11 +48,10 @@
          "requires" : {
             "Clustericious" : "1.20",
             "File::Find::Rule" : "0",
-            "File::HomeDir" : "0.91",
             "Hash::MoreUtils" : "0",
             "IO::Uncompress::Gunzip" : "0",
             "JSON::MaybeXS" : "0",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.45",
             "Log::Log4perl" : "0",
             "Number::Bytes::Human" : "0.09",
             "Path::Class" : "0.26",
@@ -86,7 +85,7 @@
          "web" : "https://github.com/clustericious/Yars"
       }
    },
-   "version" : "1.28",
+   "version" : "1.30",
    "x_contributors" : [
       "Marty Brandon",
       "Graham Ollis <plicease@cpan.org>",

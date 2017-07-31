@@ -4,8 +4,6 @@ use Test2::Bundle::More;
 use Test::Mojo;
 use Mojolicious::Lite;
 
-plan 11;
-
 plugin 'plug_auth_lite', {
   auth => sub {
     my($user, $pass) = @_;
@@ -36,3 +34,5 @@ $t->get_ok("http://foo:bar\@127.0.0.1:$port/auth")
 $t->get_ok("http://foo:foo\@127.0.0.1:$port/auth")
   ->status_is(403)
   ->content_is('not ok', 'auth failed');
+
+done_testing;

@@ -6,7 +6,7 @@
                                                
 
 
-This is the README for IP::China version 20170608.
+This is the README for IP::China version 20170704.
 
 IP::China is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -59,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm IP::China
 
-To install the module from the source file, IP-China-20170608.tar.gz,
+To install the module from the source file, IP-China-20170704.tar.gz,
 follow this sequence of commands:
 
-    tar xfz IP-China-20170608.tar.gz
-    cd IP-China-20170608
+    tar xfz IP-China-20170704.tar.gz
+    cd IP-China-20170704
     perl Makefile.PL
     make
     make install
@@ -88,6 +88,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sat Jun 17 08:02:14 2017.
+This README was written on Sun Jul 30 15:32:31 2017.
 
 -----------------------------------------------------------------------------

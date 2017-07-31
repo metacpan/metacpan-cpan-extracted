@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Retired;
 
-our $DATE = '2017-07-01'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 our @Module_Lists = (
     # list: Retired modules
@@ -64,6 +64,15 @@ Superseded by <pm:PERLANCAR::Module::List>.
 _
                 alternate_modules => ['PERLANCAR::Module::List'],
             },
+            {
+                module => 'App::CreateSparseFile',
+                description => <<'_',
+
+I didn't know about the `fallocate` command.
+
+_
+                'x.date' => '2017-07-18',
+            },
         ],
     },
 );
@@ -83,7 +92,7 @@ Acme::CPANLists::PERLANCAR::Retired - Retired modules
 
 =head1 VERSION
 
-This document describes version 0.23 of Acme::CPANLists::PERLANCAR::Retired (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-01.
+This document describes version 0.25 of Acme::CPANLists::PERLANCAR::Retired (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-28.
 
 =head1 MODULE LISTS
 
@@ -136,6 +145,11 @@ Superseded by L<PERLANCAR::Module::List>.
 
 
 Alternate modules: L<PERLANCAR::Module::List>
+
+=item * L<App::CreateSparseFile>
+
+I didn't know about the C<fallocate> command.
+
 
 =back
 

@@ -25,5 +25,5 @@ requires:
   MIME::Base64: '3.13'
   Net::SSLeay: '1.58'
   URI::Encode: '0.09'
-version: '1.21'
+version: '1.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

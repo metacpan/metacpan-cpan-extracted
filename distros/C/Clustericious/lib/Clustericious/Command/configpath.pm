@@ -7,7 +7,7 @@ use Mojo::Base 'Clustericious::Command';
 use Clustericious;
 
 # ABSTRACT: Print the configuration path
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 has description => <<EOT;
@@ -38,7 +38,7 @@ Clustericious::Command::configpath - Print the configuration path
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

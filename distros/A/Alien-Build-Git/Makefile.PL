@@ -54,13 +54,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Archive::Tar" => 0,
     "Exporter" => 0,
-    "Test2::Compare::Custom" => "0.000060",
+    "Test2::Tools::URL" => 0,
     "Test2::V0" => "0.000060",
     "Test::Alien" => 0,
     "Test::Alien::Build" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,7 +79,7 @@ my %FallbackPrereqs = (
   "File::chdir" => 0,
   "Path::Tiny" => 0,
   "PerlX::Maybe" => "0.003",
-  "Test2::Compare::Custom" => "0.000060",
+  "Test2::Tools::URL" => 0,
   "Test2::V0" => "0.000060",
   "Test::Alien" => 0,
   "Test::Alien::Build" => 0,

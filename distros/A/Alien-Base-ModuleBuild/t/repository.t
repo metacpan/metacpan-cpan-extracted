@@ -1,11 +1,10 @@
-use strict;
-use warnings;
-
-use Test::More;
-
+use Test2::V0 -no_srand => 1;
 use File::chdir;
-# make sure that t/lib with the full path is in @INC
-use lib do { local $CWD = 't/lib' };
+use lib 't/lib';
+use File::Spec;
+
+@INC = map { File::Spec->rel2abs($_) } @INC;
+
 local $CWD = 't';
 
 require RepositoryTest;

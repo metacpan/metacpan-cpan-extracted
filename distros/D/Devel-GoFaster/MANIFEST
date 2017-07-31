@@ -4,7 +4,6 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Devel/GoFaster.pm
 lib/Devel/GoFaster.xs

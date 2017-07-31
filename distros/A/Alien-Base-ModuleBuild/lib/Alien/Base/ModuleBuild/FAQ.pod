@@ -131,7 +131,7 @@ building a mini XS or FFI extension and using it.  It even has tests for tool or
 distributions (like L<Alien::gmake> and L<Alien::patch>).  Here is a short example, there
 are many others included with the L<Test::Alien> documentation:
 
- use Test2::Bundle::Simple;
+ use Test2::V0;
  use Test::Alien 0.05;
  use Alien::Editline;
  
@@ -510,7 +510,7 @@ L<https://groups.google.com/forum/#!forum/perl5-alien>
 
 =item Open a support ticket
 
-If you have an issue with L<Alie::Base> itself, then please open a support ticket on the
+If you have an issue with L<Alien::Base> itself, then please open a support ticket on the
 project's GitHub issue tracker.
 
 L<https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues>

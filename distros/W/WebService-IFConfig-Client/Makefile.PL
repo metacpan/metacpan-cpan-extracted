@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-IFConfig-Client",
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "WebService::IFConfig::Client",
   "PREREQ_PM" => {
     "JSON" => 0,
     "Moose" => 0,
     "REST::Client" => 0,
-    "feature" => 0,
+    "experimental" => "0.016",
     "strict" => 0,
     "vars" => 0,
     "warnings" => 0
@@ -29,9 +29,10 @@ my %WriteMakefileArgs = (
     "HTTP::Server::Simple" => 0,
     "HTTP::Server::Simple::CGI" => 0,
     "Test::More" => 0,
+    "feature" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "1.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "REST::Client" => 0,
   "Test::More" => 0,
+  "experimental" => "0.016",
   "feature" => 0,
   "parent" => 0,
   "strict" => 0,

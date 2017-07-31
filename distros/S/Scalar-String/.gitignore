@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Scalar-String-*
+/lib/Scalar/String.c
+/lib/Scalar/String.o

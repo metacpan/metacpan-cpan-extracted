@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test::Alien;
 use Acme::Alien::DontPanic2;
 

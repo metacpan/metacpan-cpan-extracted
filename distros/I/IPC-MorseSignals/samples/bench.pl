@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use POSIX qw/SIGINT SIGTERM SIGKILL SIGHUP EXIT_FAILURE/;
+use POSIX qw<SIGINT SIGTERM SIGKILL SIGHUP EXIT_FAILURE>;
 
-use lib qw{blib/lib t/lib};
+use lib qw<blib/lib t/lib>;
 
-use IPC::MorseSignals::TestSuite qw/init bench cleanup/;
+use IPC::MorseSignals::TestSuite qw<init bench cleanup>;
 
 sub diag { print STDERR "@_\n" };
 *IPC::MorseSignals::TestSuite::diag = *main::diag;

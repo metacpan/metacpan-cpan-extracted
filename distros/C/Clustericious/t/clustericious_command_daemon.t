@@ -3,7 +3,6 @@ use warnings;
 use Test::Clustericious::Command;
 use Test::More;
 use YAML::XS qw( Load );
-use File::HomeDir;
 use Path::Class qw( file );
 
 requires undef, 3;

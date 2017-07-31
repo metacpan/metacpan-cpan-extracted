@@ -1,9 +1,13 @@
 package Set::IntervalTree;
 
+# ABSTRACT: Perform range-based lookups on sets of ranges
+
 use 5.006001;
 use strict;
 use warnings;
 use Carp;
+
+our $VERSION = '0.11'; # VERSION
 
 require Exporter;
 use AutoLoader;
@@ -27,7 +31,6 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.10';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -60,12 +63,20 @@ XSLoader::load('Set::IntervalTree', $VERSION);
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
+
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Set::IntervalTree - Perform range-based lookups on sets of ranges.
+Set::IntervalTree - Perform range-based lookups on sets of ranges
+
+=head1 VERSION
+
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -175,17 +186,25 @@ A $tree->print() serialization method might be useful for debugging.
 The source code for this module contains a reusable template-based 
 C++ header for Interval trees that might be useful.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Ben Booth, E<lt>benbooth@cpan.orgE<gt>
+=over 4
+
+=item *
+
+Benjamin Booth <benbooth@cpan.org>
+
+=item *
+
+Stephan Loyd <sloyd@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Ben Booth
+This software is copyright (c) 2012 by Benjamin Booth.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
-
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

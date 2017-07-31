@@ -17,7 +17,7 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
@@ -142,7 +142,8 @@ sub write_limits {
     my @l2 = ();
 
     open(my $lhf, '>', $LIMITS{file});
-    while (my ($key,$val) = each %LIMITS) {
+    foreach my $key (sort keys %LIMITS) {
+        my $val = $LIMITS{$key};
         if ($key =~ s/^sys\|//) {
             push @l2, "$key:$val\n";
         }

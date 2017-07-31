@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -222,8 +222,8 @@ sub toString {
     push @to_display, 
   	grep { defined $job->{$_} } qw(real_pid style cmd exec sub args dir 
                                        start end reaped status closure child_fh
-                                       pgid queue_priority timeout expiration
-				       signal_pid remote);
+                                       ppid pgid queue_priority 
+                                       timeout expiration signal_pid remote);
     my @output = ();
     no warnings 'uninitialized';
     foreach my $attr (@to_display) {
@@ -1458,7 +1458,11 @@ sub _read_signal_pid {
         if ($pid) {
             $job->{signal_pid} = $pid;
             if ($^O eq 'MSWin32') {
-                $job->{pgid} = $job->{signal_pid};
+                if ($job->{timeout} || $job->{expiration}) {
+                    $job->{pgid} = $job->{signal_pid};
+                } else {
+                    $job->{pgid} ||= $job->{signal_pid};
+                }
             }
             close $job->{signal_ipc_pipe}[0];
             close $job->{signal_ipc_pipe}[1];
@@ -2575,7 +2579,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.90
+0.91
 
 =head1 SYNOPSIS
 

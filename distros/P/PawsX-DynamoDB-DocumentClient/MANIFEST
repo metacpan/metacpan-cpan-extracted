@@ -31,7 +31,9 @@ t/live-batch-get.t
 t/live-batch-write.t
 t/live-delete.t
 t/live-get.t
+t/live-put-force-type.t
 t/live-put.t
+t/live-query-force-type.t
 t/live-query.t
 t/live-scan.t
 t/live-update.t

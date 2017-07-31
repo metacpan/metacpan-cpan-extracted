@@ -1,7 +1,6 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus::IsoBus;
-$Lab::Bus::IsoBus::VERSION = '3.553';
+#ABSTRACT: Oxford Instruments ISOBUS bus
+$Lab::Bus::IsoBus::VERSION = '3.554';
 use strict;
 use Lab::Connection;
 use Scalar::Util qw(weaken);
@@ -210,13 +209,22 @@ sub _search_twin {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Bus::IsoBus - Oxford Instruments IsoBus bus
+Lab::Bus::IsoBus - Oxford Instruments ISOBUS bus
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -227,7 +235,7 @@ This is the IsoBus bus class. Typically you create it implicit through instrumen
 	base_connection => new Lab::Bus::VISA_GPIB({ gpib_board => 0, gpib_address => 24}),
 	isobus_addres => 2,
   }
-  
+
 =head1 METHODS
 
 =head2 connection_new
@@ -244,7 +252,6 @@ to identify and handle the calling instrument:
 
 See C<Lab::Instrument::Read()>.
 
-
 =head2 connection_write
 
   $isobus->connection_write( $InstrumentHandle, { command => $command, wait_status => $wait_status } );
@@ -259,14 +266,11 @@ For further information refer to the specific connection class of $base_connecti
 Puts in front of the $command-string the isobus_adress, e.g. "@1$command". Passes the modified argument hash to the base_connection.
 For further information refer to the specific connection class of $base_connection.
 
-
 =head2 connection_clear
 
   $isobus->connection_clear( $InstrumentHandle );
 
 Clears the specified connection $InstrumentHandle.
-
-
 
 =head2 connection_query
 
@@ -274,7 +278,6 @@ Clears the specified connection $InstrumentHandle.
 
 Puts in front of the $command-string the isobus_adress, e.g. "@1$command". Passes the modified argument hash to the base_connection.
 For further information refer to the specific connection class of $base_connection.
-
 
 =head1 SEE ALSO
 
@@ -288,14 +291,18 @@ For further information refer to the specific connection class of $base_connecti
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, David Kalok, Florian Olbrich, Stefan Geissler
+            2013       Stefan Geissler
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/cynovg/WG-API.svg?branch=master)](https://travis-ci.org/cynovg/WG-API) [![Coverage Status](https://img.shields.io/coveralls/cynovg/WG-API/master.svg?style=flat)](https://coveralls.io/r/cynovg/WG-API?branch=master) [![Gitter chat](https://badges.gitter.im/cynovg/WG-API.png)](https://gitter.im/cynovg/WG-API)
+[![Build Status](https://travis-ci.org/cynovg/WG-API.svg?branch=master)](https://travis-ci.org/cynovg/WG-API) [![Coverage Status](https://img.shields.io/coveralls/cynovg/WG-API/master.svg?style=flat)](https://coveralls.io/r/cynovg/WG-API?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/WG-API.svg)](https://metacpan.org/release/WG-API)
 # NAME
 
 WG::API - Module for work with Wargaming.net Public API
 
 # VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 # SYNOPSIS
 
@@ -25,23 +25,25 @@ This module provide access to WG Public API
 
     Rerquired application id: [https://developers.wargaming.net/documentation/guide/getting-started/](https://developers.wargaming.net/documentation/guide/getting-started/)
 
-- _wot_
+# METHODS
+
+- **wot**
 
     Returns a WoT instance
 
-- _wowp_
+- **wowp**
 
     Returns A WoWp instance
 
-- _wows_
+- **wows**
 
     Returns a WoWs instance
 
-- _net_
+- **net**
 
     Returns a NET instance
 
-- _auth_
+- **auth**
 
     Return a Auth instance
 
@@ -83,7 +85,7 @@ WG API Reference [https://developers.wargaming.net/](https://developers.wargamin
 
 # AUTHOR
 
-cynovg , `<cynovg at cpan.org>`
+Cyrill Novgorodcev , `<cynovg at cpan.org>`
 
 # LICENSE AND COPYRIGHT
 

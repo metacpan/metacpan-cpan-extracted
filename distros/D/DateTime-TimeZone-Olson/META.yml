@@ -3,34 +3,36 @@ abstract: 'timezones from the Olson database'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DateTime-TimeZone-Olson
 provides:
   DateTime::TimeZone::Olson:
     file: lib/DateTime/TimeZone/Olson.pm
-    version: 0.006
+    version: '0.007'
 requires:
-  DateTime::TimeZone::Tzfile: 0.010
-  Time::OlsonTZ::Data: 0.201012
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  DateTime::TimeZone::Tzfile: '0.010'
+  Time::OlsonTZ::Data: '0.201012'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-TimeZone-Olson
   license: http://dev.perl.org/licenses/
   repository: git://git.fysh.org/zefram/DateTime-TimeZone-Olson.git
-version: 0.006
+version: '0.007'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

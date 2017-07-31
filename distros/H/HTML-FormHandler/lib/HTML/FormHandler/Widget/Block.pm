@@ -1,6 +1,6 @@
 package HTML::FormHandler::Widget::Block;
 # ABSTRACT: base block renderer
-$HTML::FormHandler::Widget::Block::VERSION = '0.40067';
+$HTML::FormHandler::Widget::Block::VERSION = '0.40068';
 
 use Moose;
 with 'HTML::FormHandler::TraitFor::Types';
@@ -53,6 +53,7 @@ sub build_label_class { [] }
 has 'render_list' => (
     is      => 'rw',
     isa     => 'ArrayRef[Str]',
+    lazy => 1,
     traits  => ['Array'],
     builder => 'build_render_list',
     handles => {
@@ -62,7 +63,16 @@ has 'render_list' => (
         get_render_list    => 'get',
     }
 );
-sub build_render_list { [] }
+
+has 'build_render_list_method' => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    traits  => ['Code'],
+    handles => {'build_render_list' => 'execute_method'},
+    default => sub { \&default_build_render_list },
+);
+
+sub default_build_render_list { [] }
 
 has 'content' => ( is => 'rw' );
 has 'after_plist' => ( is => 'rw' );
@@ -157,7 +167,7 @@ HTML::FormHandler::Widget::Block - base block renderer
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 SYNOPSIS
 
@@ -173,6 +183,10 @@ Base block renderer to be used with L<HTML::FormHandler::Blocks>.
 =item render_list
 
 List of names of objects to render (fields and blocks)
+
+=item build_render_list_method
+
+Coderef for constructing the list of names of objects to render (fields and blocks)
 
 =item tag
 
@@ -206,7 +220,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

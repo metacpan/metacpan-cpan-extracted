@@ -1,0 +1,74 @@
+#!perl
+
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.26'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Log::ger::LevelFromEnv;
+use Log::ger::Output 'Screen';
+
+require Perinci::Access::Simple::Server::Pipe;
+
+Perinci::Access::Simple::Server::Pipe->new->run;
+
+1;
+# ABSTRACT: Default Riap::Simple server over pipe
+# PODNAME: peri-pipe
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-pipe - Default Riap::Simple server over pipe
+
+=head1 VERSION
+
+This document describes version 0.26 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-28.
+
+=head1 SYNOPSIS
+
+ # access the server
+ % perl -MPerinci::Access -e'
+     my $pa = Perinci::Access->new;
+     my $res = $pa->request(call=>"riap+pipe:/path/to/peri-pipe////Foo/func",
+                            {args=>{arg1=>1, arg2=>2}});'
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Access-Simple-Server>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Simple-Server>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access-Simple-Server>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::Access::Simple::Server::Pipe>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

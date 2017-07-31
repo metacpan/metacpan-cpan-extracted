@@ -8,7 +8,7 @@ build_requires:
   Test::Trap: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -34,10 +34,11 @@ requires:
   Pod::Usage: '0'
   Text::LineFold: '0'
   perl: v5.8.1
+  strictures: '2'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Options
   homepage: https://metacpan.org/celogeek/MooX-Options
   license: http://dev.perl.org/licenses/
   repository: https://github.com/celogeek/MooX-Options.git
-version: '4.100'
+version: '4.101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

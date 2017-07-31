@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Biblio::SIF::Patron;
+use YAML qw(Dump);
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+my $term;
+
+GetOptions(
+    't|terminator=s' => \$term,
+    'z' => sub { $term = "\x00\n" },
+    'Z' => sub { $term = "\x0a\x00\x0a" },
+    '0' => sub { $term = "\x00" },
+    'n' => sub { $term = "\n" },
+    'crlf' => sub { $term = "\x0d\x0a" },
+);
+
+my $iter = Biblio::SIF::Patron->iterator(
+    @ARGV ? shift @ARGV : \*STDIN,
+    'terminator' => $term,
+);
+{
+    local $_;
+    while (defined ($_ = $iter->())) {
+        print YAML::Dump($_->as_hash);
+    }
+}
+

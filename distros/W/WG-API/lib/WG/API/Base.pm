@@ -1,78 +1,191 @@
 package WG::API::Base;
 
-use 5.014;
+use Modern::Perl '2015';
 use Moo::Role;
+
 use WG::API::Error;
 use LWP::UserAgent;
 use JSON;
 use Data::Dumper;
+use Log::Any qw($log);
 
 =encoding utf8
 
 =head1 VERSION
 
-Version v0.8.3
+Version v0.8.5
 
 =cut
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.5';
 
-has application_id => (
-    is  => 'ro',
-    require => 1,
-);
+=head1 SYNOPSIS
 
-has ua => ( 
-    is  => 'ro',
-    default => sub{ LWP::UserAgent->new() },
-);
+Base class for all instances
 
-has language => (
-    is  => 'ro',
-    default => sub{ 'ru' },
-);
+=cut
 
 requires 'api_uri';
 
-has status => (
-    is  => 'rw',
+=head1 ATTRIBUTES
+
+=over 1
+
+=item I<application_id*>
+
+Rerquired application id: L<https://developers.wargaming.net/documentation/guide/getting-started/>
+
+=back
+
+=cut
+
+has application_id => (
+    is      => 'ro',
+    require => 1,
 );
 
-has response => (
-    is  => 'rw',
+=over 1
+
+=item I<language>
+
+=back
+
+=cut
+
+has language => (
+    is      => 'ro',
+    default => sub {'ru'},
 );
 
-has meta_data => (
-    is  => 'rw',
-);
+=over 1
 
-has error => (
-    is  => 'rw',
-);
+=item I<status>
+
+Return request status
+
+=back
+
+=cut
+
+has status => ( is => 'rw', );
+
+=over 1
+
+=item I<response>
+
+Return response
+
+=back
+
+=cut
+
+has response => ( is => 'rw', );
+
+=over 1
+
+=item I<meta_data>
+
+Return meta data from response
+
+=back
+
+=cut
+
+has meta_data => ( is => 'rw', );
+
+=over 1
+
+=item I<debug>
+
+Get current debug mode
+
+=back
+
+=cut
 
 has debug => (
-    is => 'ro',
+    is      => 'rw',
+    writer => 'set_debug',
     default => '0',
 );
+
+=head1 METHODS
+
+=over 1
+
+=item B<ua>
+
+Returns a user agent instance
+
+=back
+
+=cut
+
+#@returns LWP::UserAgent
+has ua => (
+    is      => 'ro',
+    default => sub { LWP::UserAgent->new() },
+);
+
+=over 1
+
+=item B<error>
+
+Returns a WG::API::Error instance if defined;
+
+=back
+
+=cut
+
+#@returns WG::API::Error
+has error => ( is => 'rw', );
+
+=over 1
+
+=item B<set_debug>
+
+Set debug mode
+
+=back
+
+=over 1
+
+=item B<log>
+
+Logger
+
+=back
+
+=cut
+
+sub log {
+    my ( $self, $event ) = @_;
+
+    return unless $self->debug;
+
+    $log->debug($event);
+}
 
 sub _request {
     my ( $self, $method, $uri, $params, $required_params, %passed_params ) = @_;
 
-    $self->status( undef );
+    $self->status(undef);
 
     unless ( $self->_validate_params( $required_params, %passed_params ) ) {    #check required params
-            $self->status( 'error' );
-            $self->error( WG::API::Error->new(
+        $self->status('error');
+        $self->error(
+            WG::API::Error->new(
                 code    => '997',
                 message => 'missing a required field',
                 field   => 'xxx',
                 value   => 'xxx',
                 raw     => 'xxx',
-            ) );
+            )
+        );
         return;
     }
 
-    $method = "_".$method;                                                              # add prefix for private methods
+    $method = "_" . $method;    # add prefix for private methods
 
     $self->$method( $uri, $params, %passed_params );
 
@@ -80,12 +193,12 @@ sub _request {
 }
 
 sub _validate_params {
-    my ( $self, $required_params, %passed_params ) = @_;
+    my ( undef, $required_params, %passed_params ) = @_;
 
-    return undef if $required_params && ! keys %passed_params;                               #without params when they are needed
+    return if $required_params && !keys %passed_params;    #without params when they are needed
 
-    for ( @$required_params ) {
-        return undef unless defined $passed_params{ $_ };
+    for (@$required_params) {
+        return unless defined $passed_params{$_};
     }
 
     return 'passed';
@@ -94,18 +207,14 @@ sub _validate_params {
 sub _get {
     my ( $self, $uri, $params, %passed_params ) = @_;
 
-    my $url = sprintf 'https://%s/%s/?application_id=%s',
-            $passed_params{ 'api_uri' } ? $passed_params{ 'api_uri' } : $self->api_uri,
-            $uri ? $uri : '',
-            $self->application_id,
-    ;
-    for ( @$params ) {
-        $url .= sprintf "&%s=%s", $_, $passed_params{ $_ } if defined $passed_params{ $_ }; 
+    my $url = sprintf 'https://%s/%s/?application_id=%s', $self->api_uri, $uri, $self->application_id;
+    for (@$params) {
+        $url .= sprintf "&%s=%s", $_, $passed_params{$_} if defined $passed_params{$_};
     }
 
-    warn sprintf "METHOD GET, URL: %s\n", $url if $self->debug;
+    $self->log( sprintf "METHOD GET, URL: %s\n", $url );
 
-    my $response = $self->ua->get( $url ); 
+    my HTTP::Response $response = $self->ua->get($url);
 
     return $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
 }
@@ -113,23 +222,19 @@ sub _get {
 sub _post {
     my ( $self, $uri, $params, %passed_params ) = @_;
 
-    my $url = sprintf 'https://%s/%s/', 
-        $passed_params{ 'api_uri' } ? $passed_params{ 'api_uri' } : $self->api_uri,
-        $uri ? $uri : '';
+    my $url = sprintf 'https://%s/%s/', $self->api_uri, $uri;
 
     #remove unused fields
-    if ( $params && %passed_params ) {
-        my %params;
-        @params{ keys %passed_params } = ();
-        delete @params{ @$params };
-        delete $passed_params{ $_ } for keys %params;
-    }
+    my %params;
+    @params{ keys %passed_params } = ();
+    delete @params{@$params};
+    delete $passed_params{$_} for keys %params;
 
-    $passed_params{ 'application_id' } = $self->application_id;
+    $passed_params{'application_id'} = $self->application_id;
 
-    warn sprintf "METHOD POST, URL %s, %s\n", $url, Dumper \%passed_params if $self->debug;
+    $self->log( sprintf "METHOD POST, URL %s, %s\n", $url, Dumper \%passed_params );
 
-    my $response = $self->ua->post( $url, \%passed_params ); 
+    my HTTP::Response $response = $self->ua->post( $url, \%passed_params );
 
     return $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
 }
@@ -137,7 +242,7 @@ sub _post {
 sub _parse {
     my ( $self, $response ) = @_;
 
-    if ( ! $response ) { 
+    if ( !$response ) {
         $response = {
             status => 'error',
             error  => {
@@ -148,7 +253,8 @@ sub _parse {
                 raw     => Dumper $response,
             },
         };
-    } elsif ( ! $response->{ 'status' } ) {
+    }
+    elsif ( !$response->{'status'} ) {
         $response = {
             status => 'error',
             error  => {
@@ -161,17 +267,18 @@ sub _parse {
         };
     }
 
-    $self->status( delete $response->{ 'status' } );
+    $self->status( delete $response->{'status'} );
 
     if ( $self->status eq 'error' ) {
-        $self->error( WG::API::Error->new( $response->{ 'error' } ) );
-    } else {
-        $self->error( undef );
-        $self->meta_data( $response->{ 'meta' } );
-        $self->response( $response->{ 'data' } );
+        $self->error( WG::API::Error->new( $response->{'error'} ) );
+    }
+    else {
+        $self->error(undef);
+        $self->meta_data( $response->{'meta'} );
+        $self->response( $response->{'data'} );
     }
 
-    warn Dumper $self->error if $self->debug;
+    $self->log( $self->error );
 
     return;
 }
@@ -219,7 +326,7 @@ WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 
-cynovg , C<< <cynovg at cpan.org> >>
+Cyrill Novgorodcev , C<< <cynovg at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -264,4 +371,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of WG::API::Base
+1;    # End of WG::API::Base

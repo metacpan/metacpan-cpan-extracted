@@ -55,13 +55,14 @@ my %WriteMakefileArgs = (
     "Test::Moose" => 0,
     "Test::Moose::More" => "0.047",
     "Test::More" => "0.94",
+    "Test::Requires" => 0,
     "blib" => "1.01",
     "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.032",
+  "VERSION" => "0.034",
   "test" => {
-    "TESTS" => "t/*.t t/builder/*.t t/handles/*.t t/inline_subtyping/*.t t/is/*.t t/isa/*.t t/old/*.t"
+    "TESTS" => "t/*.t t/builder/*.t t/handles/*.t t/inline_subtyping/*.t t/is/*.t t/isa/*.t t/old/*.t t/others/*.t"
   }
 );
 
@@ -90,6 +91,7 @@ my %FallbackPrereqs = (
   "Test::Moose" => 0,
   "Test::Moose::More" => "0.047",
   "Test::More" => "0.94",
+  "Test::Requires" => 0,
   "aliased" => 0,
   "blib" => "1.01",
   "constant" => 0,

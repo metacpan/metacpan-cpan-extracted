@@ -6,14 +6,14 @@ use 5.010001;
 use Role::Tiny::With;
 use Path::Class::Dir;
 use Path::Class::File;
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 use YAML::XS qw( Dump LoadFile );
 use DateTime;
 
 with 'PlugAuth::Role::Plugin';
 
 # ABSTRACT: Audit log for authentication/authorization
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 
 with 'PlugAuth::Role::Plugin';
@@ -126,8 +126,7 @@ sub log_filename
   }
   
   my $filename = Path::Class::File->new(
-    File::HomeDir->my_home,
-    '.plugauth_plugin_audit',
+    bsd_glob('~/.plugauth_plugin_audit'),
     sprintf("%04d", $year),
     sprintf("%02d", $month),
     sprintf("%02d", $day),
@@ -151,7 +150,7 @@ PlugAuth::Plugin::Audit - Audit log for authentication/authorization
 
 =head1 VERSION
 
-version 0.35
+version 0.38
 
 =head1 SYNOPSIS
 

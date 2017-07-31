@@ -1,5 +1,8 @@
 Revision history for Perl extension Semver-V2-Strict
 
+0.16 2017-07-25T15:15:29Z
+    - support perl 5.26
+
 0.15 2017-03-29T11:08:27Z
     - enable static install
 

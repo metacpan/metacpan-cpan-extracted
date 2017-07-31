@@ -1,7 +1,6 @@
-#!/usr/bin/perl
-
 package Lab::Instrument::AH2700A;
-$Lab::Instrument::AH2700A::VERSION = '3.553';
+#ABSTRACT: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
+$Lab::Instrument::AH2700A::VERSION = '3.554';
 use strict;
 use Time::HiRes qw (usleep);
 use Lab::Instrument;
@@ -468,20 +467,30 @@ sub get_volt {
 
 1;
 
+__END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
 Lab::Instrument::AH2700A - Andeen-Hagerling AH2700A ultra-precision capacitance bridge
 
-=head1 LICENSE
+=head1 VERSION
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2013       Christian Butschkow
+            2016       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

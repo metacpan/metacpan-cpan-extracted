@@ -1,0 +1,297 @@
+#! perl
+
+#####################################################################
+## ABSTRACT: Guess if the given string could be an epoch time.
+## PODNAME: is_epoch
+our $VERSION = '1.003002'; ## VERSION
+#####################################################################
+
+use v5.24;
+use warnings;
+use experimental 'signatures';
+use Data::Printer;
+use Getopt::Long;
+use JSON;
+use Math::BigInt try => 'GMP';
+use Pod::Usage;
+use Time::Moment::Epoch ':all';
+
+my %opt = (
+	max_date => '9999-12-31T23:59:59Z',
+	min_date => '0001-01-01T00:00:00Z',
+	output	 => 'as_string',
+);
+
+GetOptions(
+	\%opt,
+
+	'max_date=s',
+	'min_date=s',
+	'output=s',
+
+	'debug!',
+	'help|?',
+	'man',
+	'verbose!',
+) or pod2usage(2);
+pod2usage(1) if $opt{help};
+pod2usage(-verbose => 2) if $opt{man};
+p %opt if $opt{debug};
+
+my $epochs = get_epochs(@ARGV);
+
+if ($opt{output} eq 'as_string') {
+	as_string($epochs);
+} elsif ($opt{output} eq 'as_json') {
+	as_json($epochs);
+} else {
+	die "Don't know how to output '$opt{output}'";
+}
+
+sub get_epochs (@args) {
+	my %convs = (
+		floats	   => [qw(icq)],
+		hex64bits  => [qw(ole)],
+		hex128bits => [qw(windows_system)],
+		ints	   => [qw(apfs chrome cocoa dos google_calendar
+						  icq java mozilla symbian unix uuid_v1
+						  windows_date windows_file)],
+	);
+
+	# Version 1 UUID's have timestamps in them. For example,
+	# 33c41a44-6cea-11e7-907b-a6006ad3dba0 => 1e76cea33c41a44
+	# -------- ----  ---               $+{high}$+{mid}$+{low}
+	# low      mid   high
+	#  8        4     3
+	# and 1e76cea33c41a44 => 2017-07-20T01:24:40.472634Z
+	my $UUIDv1 = qr{(?<low>[0-9A-Fa-f]{8})    -?
+                    (?<mid>[0-9A-Fa-f]{4})    -?
+                    1                            # this means version 1
+                    (?<high>[0-9A-Fa-f]{3})   -?
+                    [0-9A-Fa-f]{4}            -?
+                    [0-9A-Fa-f]{12}              }mxs;
+	
+	my %epochs;
+	for my $arg (@args) {
+
+		# Full UUIDv1 string (with or without hyphens).
+		if ($arg =~ /^$UUIDv1$/) {
+			my $bstr = Math::BigInt->new("0x$+{high}$+{mid}$+{low}")->bstr;
+			if (my $href = try_as($bstr, 'uuid_v1')) {
+				$epochs{$arg}{uuid_v1} = $href;
+			}
+		}
+
+		# Floating point number.
+		if ($arg =~ /^-?\d+\.\d+$/) {
+			if (my $href = try_as($arg, $convs{floats}->@*)) {
+				$epochs{$arg}{float} = $href;
+			}
+		}
+
+		# Decimal number.
+		if ($arg =~ /^-?\d+$/) {
+			if (my $href = try_as($arg, $convs{ints}->@*)) {
+				$epochs{$arg}{decimal} = $href;
+			}
+		}
+
+		# Hexadecimal number.
+		if ($arg =~ /^[0-9a-fA-F]+$/) {
+			my $bstr = Math::BigInt->new("0x$arg")->bstr;
+			if (my $href = try_as($bstr, $convs{ints}->@*)) {
+				$epochs{$arg}{hexadecimal} = $href;
+			}
+
+			# Some hexadecimals could be big-endian or little-endian.
+			if (length($arg) == 8 or length($arg) == 16) {
+				my $swapped = swap_endian($arg);
+				my $bstr = Math::BigInt->new("0x$swapped")->bstr;
+				if (my $href = try_as($bstr, $convs{ints}->@*)) {
+					$epochs{$arg}{hexadecimal_swapped} = $href;
+				}
+			}
+		}
+
+		# 64-bit Hexadecimal.
+		if ($arg =~ /^[0-9a-fA-F]{16}$/) {
+			if (my $href = try_as($arg, $convs{hex64bits}->@*)) {
+				$epochs{$arg}{hex64bit} = $href;
+			}
+		}
+
+		# 128-bit Hexadecimal.
+		if ($arg =~ /^(?:0x)?[0-9a-fA-F]{32}$/) {
+			if (my $href = try_as($arg, $convs{hex128bits}->@*)) {
+				$epochs{$arg}{hex128bit} = $href;
+			}
+		}
+
+	}
+	return \%epochs;
+}
+
+sub as_json ($epochs) {
+	if (my $results = stringify($epochs, 0)) {
+		say encode_json($results);
+	} else {
+		say "no results" if $opt{verbose};
+	}
+}
+
+sub as_string ($epochs) {
+	if (my $results = stringify($epochs)) {
+		say for reverse sort @{$results};
+	} else {
+		say "no results" if $opt{verbose};
+	}
+}
+
+sub stringify ($epochs, $flatten=1) {
+	my $stringified;
+	for my $arg (keys $epochs->%*) {
+		for my $type (keys $epochs->{$arg}->%*) {
+			for my $conv (keys $epochs->{$arg}{$type}->%*) {
+				my $s = $epochs->{$arg}{$type}{$conv}->to_string;
+				next if $s lt $opt{min_date} or $s gt $opt{max_date};
+				if ($flatten) {
+					push @$stringified,
+						"$epochs->{$arg}{$type}{$conv}\t($arg, $type, $conv)";
+				} else {
+					$stringified->{$arg}{$type}{$conv} = $s;
+				}
+			}
+		}
+	}
+	return $stringified;
+}
+
+sub swap_endian ($bs) {
+	my $HB = qr{(?<hb>[0-9a-fA-F]{2})};
+	if ($bs =~ /^$HB$HB$HB$HB$HB?$HB?$HB?$HB?$/) {
+		no warnings 'uninitialized';
+		return join q{}, reverse $-{hb}->@*;
+	}
+	return;
+}
+
+sub try_as ($arg, @convs) {
+	no strict 'refs';
+	my %h;
+	for my $conv (@convs) {
+		if (my $tm = $conv->($arg)) {
+			$h{$conv} = $tm;
+		}
+	}
+	return \%h;
+}
+
+__END__
+
+=pod
+
+=for :stopwords Tim Heaney Ehlers Mary iopuckoi
+
+=head1 NAME
+
+is_epoch - Guess if the given string could be an epoch time.
+
+=head1 NAME
+
+is_epoch - guess if the given number is an epoch
+
+=head1 SYNOPSIS
+
+is_epoch [OPTIONS] number [number ...]
+
+=head1 EXAMPLES
+
+Default is year 0001 to 9999, which is probably too much output. To
+get less, change the min and max values:
+
+    $ is_epoch 1234567890 --min 2007 --max 2017
+    2016-12-22T00:22:36Z    (1234567890, decimal, dos)
+    2009-02-13T23:31:30Z    (1234567890, decimal, unix)
+    2007-03-16T23:31:30Z    (1234567890, decimal, google_calendar)
+
+You can also ask for JSON output instead.
+
+    $ is_epoch 1234567890 --min 2007 --max 2017 --output=as_json
+    {"1234567890":{"decimal":{"dos":"2016-12-22T00:22:36Z","unix":"2009-02-13T23:31:30Z","google_calendar":"2007-03-16T23:31:30Z"}}}
+
+To make it more readable, just pipe it json_xs or jq whatever your
+favorite JSON prettifier is.
+
+    $ is_epoch 1234567890 --min 2007 --max 2017 --output=as_json | json_xs
+    {
+       "1234567890" : {
+          "decimal" : {
+             "unix" : "2009-02-13T23:31:30Z",
+             "dos" : "2016-12-22T00:22:36Z",
+             "google_calendar" : "2007-03-16T23:31:30Z"
+          }
+       }
+    }
+
+Most things are looking for a decimal or hexadecimal string, but you
+can also put a whole UUID in and it will grab the parts that make the
+date-time.
+
+    $ is_epoch 33c41a44-6cea-11e7-907b-a6006ad3dba0
+    2017-07-20T01:24:40.472634Z    (33c41a44-6cea-11e7-907b-a6006ad3dba0, uuid_v1, uuid_v1)
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--debug>
+
+Prints extra messages.
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--max_date=STRING>
+
+Maximum date to print out. Default is 9999-12-31T23:59:59Z. It's just a string compare, so you can include as little or as much of an ISO-8601 date as you want (e.g., --max_date=2017).
+
+=item B<--min_date=STRING>
+
+Minimum date to print out. Default is 0001-01-01T00:00:00Z. It's just a string compare, so you can include as little or as much of an ISO-8601 date as you want (e.g., --min_date=2017).
+
+=item B<--output=STRING>
+
+Output format (as_string or as_json). Default as_string.
+
+=item B<--verbose>
+
+Prints results in more detail.
+
+=back
+
+=head1 DESCRIPTION
+
+B<is_epoch> will guess if any of the conversions from
+Time::Moment::Epoch gives a reasonable date for the given numbers.
+
+=head1 VERSION
+
+version 1.003002
+
+=head1 AUTHOR
+
+Tim Heaney <heaney@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tim Heaney.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

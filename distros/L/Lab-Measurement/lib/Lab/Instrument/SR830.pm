@@ -1,5 +1,6 @@
 package Lab::Instrument::SR830;
-$Lab::Instrument::SR830::VERSION = '3.553';
+#ABSTRACT: Stanford Research SR830 lock-in amplifier
+$Lab::Instrument::SR830::VERSION = '3.554';
 use strict;
 use Lab::Instrument;
 use Data::Dumper;
@@ -253,13 +254,19 @@ sub id {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
+Lab::Instrument::SR830 - Stanford Research SR830 lock-in amplifier
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -272,7 +279,7 @@ Lab::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
     ($x,$y) = $sr->get_xy();
     ($r,$phi) = $sr->get_rphi();
-    
+
 =head1 DESCRIPTION
 
 The Lab::Instrument::SR830 class implements an interface to the
@@ -329,7 +336,7 @@ Returns the value of the time constant that was actually set, as number in secon
 Returns the time constant, as number in seconds.
 
 =head2 set_frequency
- 
+
   $sr830->set_frequency(334);
 
 Sets reference frequency; value given in Hz. Values between 0.001 Hz and 102 kHz can be set.
@@ -352,7 +359,6 @@ Sets output amplitude to the value given (in V); values between 4 mV and 5 V are
 
 Returns amplitude of the sine output in V.
 
-
 =head2 id
 
   $id=$sr830->id();
@@ -371,12 +377,20 @@ command to change a property like amplitude or time constant might have to be ex
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-  (c) 2005-2010 Daniel Schröer
-      2011 Andreas K. Hüttel
+  Copyright 2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2013       Andreas K. Huettel
+            2014       Alois Dirnaichner, Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

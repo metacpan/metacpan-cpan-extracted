@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,16 +15,16 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 3ec943112e5232abeb9fd1374355c5513be1e04b .gitignore
-SHA1 a456b26eb594e685689a057c353379a08c299c08 Build.PL
-SHA1 1430dfe1b43a1e17fda08167ee86abd4f1f62b10 Changes
-SHA1 d72747413a44e1650e0d784107455aaf4ada30ea MANIFEST
-SHA1 1e96c26de4a6427beae6a7fe9b405bbd26d8ea35 META.json
-SHA1 a0bfcc7e466ebab2a63bfc9e9b14b69f8a1211ff META.yml
-SHA1 53380dfd209add8663abe51f6ee717b92e03c861 Makefile.PL
-SHA1 062664f5ebb85f54aa712ae1c7bdb7de9cd80050 README
-SHA1 ba5e8152f5a720dd363d31496a87ca77ffc680b6 lib/Scope/Cleanup.pm
-SHA1 bbc7e765a7f1772cb434adadd08de7de0a7db260 lib/Scope/Cleanup.xs
+SHA1 36c632aef087919c9158dcd855c6dca8afacecf6 Build.PL
+SHA1 f8e24c4fc37a53d4963e5df36b947f24de6b7660 Changes
+SHA1 b8142eeac853d9253c218f37f0bd677f8ac06f6f MANIFEST
+SHA1 667c8ec1b1e785da50958c964075b814f4b1037d META.json
+SHA1 f406eb4e2367a0bec3021bf1fda037f7fded92e2 META.yml
+SHA1 4b5e0ea6faffe74cd43ae759384d84ae939de69a README
+SHA1 053431ed09a4ce5a33f0e77a54d93574faa383b0 lib/Scope/Cleanup.pm
+SHA1 c253d63b1a3427d69897ea25026f3291e7b8800b lib/Scope/Cleanup.xs
 SHA1 e8b04765297a6f9d16246fb804a2340928359ffe t/caller.t
+SHA1 0526c36fae0fd78ccd8bb7eff9b6123cc8154aab t/closure.t
 SHA1 cb14a2902760dca7194b6b180eec57149ac99d74 t/context.t
 SHA1 63cce23aa95e3991cfe4bf6ff265d9139bb999ea t/die.t
 SHA1 a3cc405d6ea93579af81d8dab62bd9ba0d481ddb t/error.t
@@ -33,6 +33,7 @@ SHA1 f4465409f78a87440325a988ee00e1cc49454fc8 t/exit.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 a71df8027625d207c7a47cf7e2f45a67e39143b6 t/scope.t
+SHA1 b7107e7ff9163a35e1f4f34b40cbb5123f36c955 t/stack_realloc.t
 SHA1 354ac411c197257c2cefc14701e5ad6e5e43d187 t/via_death.t
 SHA1 0b1c333d723a700a89d1821c7399e01eaddff6fd t/via_die.t
 SHA1 bf960ffa4692251443d2c32205634348cf265fce t/via_escape.t
@@ -41,9 +42,9 @@ SHA1 04087e00138a5ca63ed4ac9d3bb0719bdb3602c5 t/via_fmtlocalret.t
 SHA1 0ddd52d73862b10cb79c135f59f612eecbfa8180 t/via_return.t
 SHA1 4368c21ddc37c0beff442c8f513077717ee9cce0 t/via_sublocalret.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk8tRkoACgkQOV9mt2VyAVEcXwCeM5UJJddGNIUCBUQzO/d6iijl
-384An3fFacKU5+53R5fgjaaTZlApECF2
-=sjxp
+iEYEARECAAYFAll65TAACgkQOV9mt2VyAVGPNgCgpsaLMMaF8CgwD6HlAqD5OEkG
+EeMAoKf+nnfhPc5PGCjp9hyY65SBPDso
+=yfPv
 -----END PGP SIGNATURE-----

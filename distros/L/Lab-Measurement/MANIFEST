@@ -9,7 +9,9 @@ MANIFEST.SKIP
 META.json
 Makefile.PL
 README
+appveyor.yml
 dist.ini
+dokutoc.yml
 examples/DAQ/AnalysisSummary
 examples/DAQ/DAQ_2024B
 examples/DAQ/DAQ_WR640
@@ -150,10 +152,10 @@ lib/Lab/Instrument/Yokogawa7651.pm
 lib/Lab/Instrument/YokogawaGS200.pm
 lib/Lab/Measurement.pm
 lib/Lab/Measurement/Backends.pod
+lib/Lab/Measurement/Developer/Testing.pod
 lib/Lab/Measurement/Developer/Write-A-Source-Driver.pod
 lib/Lab/Measurement/Installation.pod
 lib/Lab/Measurement/KeyboardHandling.pm
-lib/Lab/Measurement/Testing.pod
 lib/Lab/Measurement/Tutorial.pod
 lib/Lab/Moose.pm
 lib/Lab/Moose/Connection.pm
@@ -200,6 +202,7 @@ lib/Lab/SCPI.pm
 lib/Lab/XPRESS/Data/XPRESS_DataFile.pm
 lib/Lab/XPRESS/Data/XPRESS_logger.pm
 lib/Lab/XPRESS/Data/XPRESS_plotter.pm
+lib/Lab/XPRESS/Sweep.pm
 lib/Lab/XPRESS/Sweep/DietersCrazyTempSweep.pm
 lib/Lab/XPRESS/Sweep/Dummy.pm
 lib/Lab/XPRESS/Sweep/Frame.pm
@@ -211,7 +214,6 @@ lib/Lab/XPRESS/Sweep/Power.pm
 lib/Lab/XPRESS/Sweep/PulseLength.pm
 lib/Lab/XPRESS/Sweep/PulsePeriod.pm
 lib/Lab/XPRESS/Sweep/Repeater.pm
-lib/Lab/XPRESS/Sweep/Sweep.pm
 lib/Lab/XPRESS/Sweep/Temperature.pm
 lib/Lab/XPRESS/Sweep/Time.pm
 lib/Lab/XPRESS/Sweep/Voltage.pm
@@ -268,7 +270,6 @@ t/XPRESS/Sweep-Voltage.yml
 t/pod.t
 'utilities/labview/LV Socket Com.txt'
 'utilities/labview/LV Socket Com.vi'
-weaver.ini
 xt/critic/lib.t
 xt/critic/moose.t
 xt/critic/tests.t

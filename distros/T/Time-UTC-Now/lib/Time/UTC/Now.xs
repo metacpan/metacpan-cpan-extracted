@@ -3,6 +3,17 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#define PERL_DECIMAL_VERSION \
+	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_GE(r,v,s) \
+	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
 #ifndef newSVpvs
 # define newSVpvs(string) newSVpvn(""string"", sizeof(string)-1)
 #endif /* !newSVpvs */
@@ -57,6 +68,12 @@
 #  define MY_CXT_CLONE NOOP
 # endif /* !PERL_IMPLICIT_CONTEXT */
 #endif /* !MY_CXT_CLONE */
+
+#if PERL_VERSION_GE(5,7,3)
+# define PERL_UNUSED_THX() NOOP
+#else /* <5.7.3 */
+# define PERL_UNUSED_THX() ((void)(aTHX+0))
+#endif /* <5.7.3 */
 
 #define TAI_EPOCH_MJD 36204
 
@@ -114,7 +131,7 @@ struct mechanism {
  * ntv.time      Unix time number, as seconds plus microseconds
  * leap_state    leap second state
  * ntv.maxerror  alleged maximum possible error, in microseconds
- * tx.offset     offset being applied to clock, in microsecods
+ * tx.offset     offset being applied to clock, in microseconds
  * tx.tolerance  possible inaccuracy of clock rate, in scaled ppm
  *
  * The leap second state can be:
@@ -262,6 +279,7 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 	struct timex txx;
 # endif /* !QHAVE_STRUCT_TIMEX_TIME */
 	long maxerr, offset, err_s, err_ns;
+	PERL_UNUSED_THX();
 # if defined(QHAVE_STRUCT_TIMEX_TIME) ? \
 	defined(QHAVE_STRUCT_TIMEX_TIME_STATE) : \
 	defined(QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE)
@@ -436,6 +454,7 @@ static int THX_try_getsystemtimeasfiletime(pTHX_ struct nowtime *nt)
 	U32 ft_hi, ft_lo;
 	U16 clunks, msec, dasec;
 # endif /* !(HAS_QUAD && UINT64_C) */
+	PERL_UNUSED_THX();
 	fts.dwHighDateTime = 0xffffffff;
 	GetSystemTimeAsFileTime(&fts);
 	if(fts.dwHighDateTime & 0x80000000)
@@ -490,6 +509,7 @@ static int THX_try_getsystemtimeasfiletime(pTHX_ struct nowtime *nt)
 static int THX_try_gettimeofday(pTHX_ struct nowtime *nt)
 {
 	struct timeval tv;
+	PERL_UNUSED_THX();
 	if(-1 == gettimeofday(&tv, NULL) || tv.tv_sec < 0)
 		return GOT_NOTHING;
 	nt->dayno = UNIX_EPOCH_DAYNO + tv.tv_sec / 86400;
@@ -582,8 +602,9 @@ static int THX_now_utc_best(pTHX_ struct nowtime *nt, int min_got)
 	int i;
 	if(min_got < GOT_TIME) min_got = GOT_TIME;
 	for(i = 0; i != MECH_COUNT; i++) {
+		int got;
 		if(mechanisms[i].max_got < min_got) break;
-		int got = mechanisms[i].THX_try(aTHX_ &ntt);
+		got = mechanisms[i].THX_try(aTHX_ &ntt);
 		if(got >= min_got) {
 			*nt = ntt;
 			if(got == GOT_BOUND) return got;
@@ -661,6 +682,7 @@ static void THX_flt_setup(pTHX)
 	 * cover rounding in conversion of the uncertainty value itself.
 	 */
 	NV significand_step;
+	PERL_UNUSED_THX();
 	for(significand_step = 1; ; ) {
 		NV try_step = significand_step * ((NV)0.5);
 		if((((NV)1.0) + try_step) - ((NV)1.0) != try_step)
@@ -693,7 +715,8 @@ BOOT:
 	{ MY_CXT_INIT; (void)MY_CXT; }
 	flt_setup();
 
-void CLONE(...)
+void
+CLONE(...)
 CODE:
 	PERL_UNUSED_VAR(items);
 	{ MY_CXT_CLONE; }

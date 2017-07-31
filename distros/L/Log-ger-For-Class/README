@@ -1,18 +1,144 @@
-SYNOPSIS
+NAME
+    Log::ger::For::Class - Add logging to class
 
+VERSION
+    This document describes version 0.002 of Log::ger::For::Class (from Perl
+    distribution Log-ger-For-Class), released on 2017-07-30.
+
+SYNOPSIS
      use Log::ger::For::Class qw(add_logging_to_class);
      add_logging_to_class(classes => [qw/My::Class My::SubClass/]);
      # now method calls to your classes are logged, by default at level 'trace'
 
 DESCRIPTION
-
     Most of the things that apply to Log::ger::For::Package also applies to
     this module, since this module uses add_logging_to_package() as its
     backend.
 
-SEE ALSO
+FUNCTIONS
+  add_logging_to_class
+    Usage:
 
+     add_logging_to_class(%args) -> any
+
+    Add logging to class.
+
+    Logging will be done using Log::ger.
+
+    Currently this function adds logging around method calls, e.g.:
+
+     -> Class::method(...)
+     <- Class::method() = RESULT
+     ...
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   classes* => *array[str]*
+
+        Classes to add logging to.
+
+    *   filter_methods => *array[str]*
+
+        Filter methods to add logging to.
+
+        The default is to add logging to all non-private methods. Private
+        methods are those prefixed by "_".
+
+    *   import_hook => *bool* (default: 0)
+
+        Whether to install import (@INC) hook instead.
+
+        If this setting is true, then instead of installing logging to all
+        existing packages, an @INC import hook will be installed instead so
+        that subsequent modules that are loaded and that match "packages"
+        will be logged. So to log all subsequent loaded modules, you can set
+        "packages" to "['.*']".
+
+    *   logger_args => *any*
+
+        Pass arguments to logger.
+
+        This allows passing arguments to logger routine.
+
+    *   postcall_logger => *code*
+
+        Supply custom postcall logger.
+
+        Just like "precall_logger", but code will be called after
+        subroutine/method is called. Code will be given a hashref argument
+        \%args containing these keys: "args" (arrayref, a shallow copy of
+        the original @_), "orig" (coderef, the original subroutine/method),
+        "name" (string, the fully-qualified subroutine/method name),
+        "result" (arrayref, the subroutine/method result), "logger_args"
+        (arguments given when adding logging).
+
+        You can use this mechanism to customize logging.
+
+    *   precall_logger => *code*
+
+        Supply custom precall logger.
+
+        Code will be called when logging subroutine/method call. Code will
+        be given a hashref argument \%args containing these keys: "args"
+        (arrayref, a shallow copy of the original @_), "orig" (coderef, the
+        original subroutine/method), "name" (string, the fully-qualified
+        subroutine/method name), "logger_args" (arguments given when adding
+        logging).
+
+        You can use this mechanism to customize logging.
+
+        The default logger accepts these arguments (can be supplied via
+        "logger_args"):
+
+        *   "indent" => INT (default: 0)
+
+        Indent according to nesting level.
+
+        *   "max_depth" => INT (default: -1)
+
+        Only log to this nesting level. -1 means unlimited.
+
+        *   "log_sub_args" => BOOL (default: 1)
+
+        Whether to display subroutine arguments when logging subroutine
+        entry. The default can also be supplied via environment
+        "LOG_SUB_ARGS".
+
+        *   "log_sub_result" => BOOL (default: 1)
+
+        Whether to display subroutine result when logging subroutine exit.
+        The default can also be set via environment "LOG_SUB_RESULT".
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-For-Class>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-For-Class>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-For-Class>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Log::ger::For::Package
 
     Log::ger::For::DBI, an application of this module.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

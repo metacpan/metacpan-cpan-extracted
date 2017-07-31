@@ -50,8 +50,8 @@ sub _invalid_author {
 
 =head1 NAME
 
-checkdep - Check an author's distributions for prerequisites that are lagging
-behind newer versions
+checkdep - Check an author's distributions for prerequisites that have had
+newer releases
 
 =head1 DESCRIPTION
 

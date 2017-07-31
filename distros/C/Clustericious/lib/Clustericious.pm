@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use 5.010;
 use File::Spec;
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
+use File::Path qw( mkpath );
 
 # ABSTRACT: A framework for RESTful processing systems.
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 sub _testing
@@ -26,8 +27,8 @@ sub _config_path
     (
       [ $ENV{CLUSTERICIOUS_CONF_DIR} ],
       (!_testing) ? (
-        [ File::HomeDir->my_home, 'etc' ],
-        [ File::HomeDir->my_dist_config('Clustericious') ],
+        [ bsd_glob('~'), 'etc' ],
+        [ bsd_glob('~/.config/Perl/Clustericious') ],
         [ '', 'etc' ],
       ) : (),
     );
@@ -46,16 +47,14 @@ sub _slurp_pid ($)
 
 sub _dist_dir
 {
-  require Path::Class::File;
-  require Path::Class::Dir;
-  $_ = __FILE__; s{(Clustericious).pm}{.$1.devshare}; -e $_
-    ? Path::Class::File->new(__FILE__)->parent->parent->subdir('share')
-    : do {
-      require File::ShareDir;
-      Path::Class::Dir->new(
-        File::ShareDir::dist_dir('Clustericious'),
-      );
-    }
+  state $dir;
+  $dir //= do {
+    require Path::Class::Dir;
+    require File::ShareDir::Dist;
+    Path::Class::Dir->new(
+      File::ShareDir::Dist::dist_share('Clustericious') or die "unable to find share directory",
+    );
+  };
 }
 
 sub _generate_port
@@ -66,14 +65,20 @@ sub _generate_port
   IO::Socket::INET->new(Listen => 5, LocalAddr => "127.0.0.1")->sockport
 }
 
+sub _my_dist_data
+{
+  my $dir = bsd_glob '~/.local/share/Perl/dist/Clustericious';
+  mkpath $dir, 0, 0700;
+  $dir;
+}
+
 sub _default_url
 {
   my(undef, $app_name) = @_;
-  require File::HomeDir;
   require Path::Class::File;
   require JSON::MaybeXS;
   require Mojo::URL;
-  my $file = Path::Class::File->new(File::HomeDir->my_dist_data("Clustericious", { create => 1 } ), 'default_ports.json');
+  my $file = Path::Class::File->new(_my_dist_data(), 'default_ports.json');
 
   $app_name =~ s{::}{-};
   
@@ -109,7 +114,7 @@ Clustericious - A framework for RESTful processing systems.
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -230,6 +235,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

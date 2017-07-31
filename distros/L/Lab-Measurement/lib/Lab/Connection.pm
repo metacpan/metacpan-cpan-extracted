@@ -1,7 +1,6 @@
-#!/usr/bin/perl -w
-
 package Lab::Connection;
-$Lab::Connection::VERSION = '3.553';
+#ABSTRACT: Connection base class
+$Lab::Connection::VERSION = '3.554';
 use strict;
 
 #use POSIX; # added for int() function
@@ -324,14 +323,22 @@ sub DESTROY {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
 
-
 =head1 NAME
 
 Lab::Connection - Connection base class
+
+=head1 VERSION
+
+version 3.554
 
 =head1 SYNOPSIS
 
@@ -361,7 +368,6 @@ That would be, for example
   Lab::Connection::VISA_GPIB
 
 Towards the instrument, these look the same, but they work with different drivers/backends.
-
 
 =head1 CONSTRUCTOR
 
@@ -436,7 +442,6 @@ The same as Query with the 'brutal' option set to 1.
 
 The same as Query with 'read_length' set to 10240.
 
-
 =head2 config
 
 Provides unified access to the fields in initial @_ to all the cild classes.
@@ -448,7 +453,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $GPIB_Address = $connection->Config()->{'gpib_address'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -467,13 +472,19 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2010-2011  Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich, Hermann Kraus, Stefan Geissler
+            2013       Alois Dirnaichner, Christian Butschkow, Stefan Geissler
+            2014       Alexei Iankilevitch
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

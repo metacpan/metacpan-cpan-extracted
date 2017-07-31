@@ -4,7 +4,8 @@ use warnings FATAL => 'all';
 use Test::More;
 use Test::Deep;
 
-use t::common qw( new_dbm );
+use lib 't';
+use common qw( new_dbm );
 
 use_ok( 'DBM::Deep' );
 

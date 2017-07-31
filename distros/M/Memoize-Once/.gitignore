@@ -1,0 +1,14 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Memoize-Once-*
+/lib/Memoize/callchecker0.h
+/lib/Memoize/Once.c
+/lib/Memoize/Once.o

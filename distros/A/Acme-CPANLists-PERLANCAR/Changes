@@ -1,3 +1,17 @@
+0.25    2017-07-28 (PERLANCAR)
+
+	- Add module list: CLIWithUndo.
+
+
+0.24    2017-07-28 (PERLANCAR)
+
+	- Retired: Add App::CreateSparseFile.
+
+        - [build] Rebuild with updated DZP:Acme::CPANLists which adds modules
+          mentioned in module lists as prereqs (phase=x_mentions,
+          rel=x_mentions).
+
+
 0.23    2017-07-01 (PERLANCAR)
 
 	- Avoided: add module Module::Path.

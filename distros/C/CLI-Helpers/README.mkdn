@@ -4,7 +4,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 # VERSION
 
-version 1.2
+version 1.3
 
 # SYNOPSIS
 
@@ -301,7 +301,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Brad Lhotsky.
+This software is Copyright (c) 2017 by Brad Lhotsky.
 
 This is free software, licensed under:
 

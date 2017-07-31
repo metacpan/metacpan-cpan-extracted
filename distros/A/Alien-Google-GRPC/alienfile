@@ -1,33 +1,59 @@
 use alienfile;
 
+use Capture::Tiny ':all';
+use Env qw( @PATH @ACLOCAL_PATH );
+
+use  Alien::m4;
+unshift @PATH,  Alien::m4->bin_dir;
+unshift @ACLOCAL_PATH,  Alien::m4->dist_dir . "/share/aclocal";
+
+use Alien::libtool;
+unshift @PATH, Alien::libtool->bin_dir;
+unshift @ACLOCAL_PATH,  Alien::libtool->dist_dir . "/share/aclocal";
+
+use Alien::automake;
+unshift @PATH, Alien::automake->bin_dir;
+unshift @ACLOCAL_PATH,  Alien::automake->dist_dir . "/share/aclocal";
+
+use Alien::autoconf;
+unshift @PATH, Alien::autoconf->bin_dir;
+unshift @ACLOCAL_PATH,  Alien::autoconf->dist_dir . "/share/aclocal";
+unshift @ACLOCAL_PATH,  Alien::autoconf->dist_dir . "/share/autoconf";
+
 probe sub {
   my($build) = @_;  # $build is the Alien::Build instance.
-  system 'pkg-config --exists grpc++';
+  system( 'pkg-config --exists grpc++ > /dev/null 2>&1' );
   return 'share' unless $? == 0;
 
-  my $cmd_result = qx(protoc --version);
-  return 'system' if $cmd_result =~ /libprotoc.3/;
-  return 'share';
+  my ($cmd_result) = capture {
+    system( 'protoc', '--version');
+  };
+  return 'share' unless $cmd_result =~ /libprotoc.3/;
+
+  return 'system';
 };
+
+ meta->prop->{start_url} = 'http://github.com/grpc/grpc#v1.4.2';
+ plugin 'Download::Git' =>(
+   version => qr/^v([0-9\.]+)$/,
+ );
 
 share {
 
-  download [ 'git clone -b $(curl -L http://grpc.io/release) https://github.com/grpc/grpc; '
-           . 'cd grpc; git submodule update --init' ];
-
-  extract [ 'mv %{.install.download} .; '
-          . 'mkdir -p  %{.install.download}; '
-          . 'touch %{.install.download}/placate_alien_sensibilities.x' ];
-
   build [
-    [ 'git submodule update --init' ],
+    [ '%{git} submodule update --init' ],
+    ## Hot patch so new gcc7.x warnings are not converted into error. 
+    ## -Werror is considered to be bad to use in production code. 
+    [ 'find . -type f -not -regex ".*\.\(o\|h\|c\|a\|t\|cc\|so\)" -exec sed -i -e "s/-Werror/-Wno-excessive-errors/g" {} \;' ],
     [ 'bash <<"USE_A_SHELL"
         echo "** Build Dir is: "; pwd
-        prefix=%{.install.prefix}  PROTOBUF_CONFIG_OPTS=--prefix=%{.install.prefix} make
+        prefix=%{.install.prefix}  PROTOBUF_CONFIG_OPTS=--prefix=%{.install.prefix} EMBED_OPENSSL=true make
         prefix=%{.install.prefix} make install
         cd ./third_party/protobuf
         make install
+        make clean
         cd ../../
+        make clean
 USE_A_SHELL
     ' ],
   ];
@@ -39,6 +65,7 @@ USE_A_SHELL
     [ 'echo "-L%{.install.prefix}/lib -lgrpc -lgrpc++ -lprotobuf -lpthread"', \'%{.runtime.libs}'    ],
     [ 'echo "-I%{.install.prefix}/include -pthread"', \'%{.runtime.cflags}'    ],
   ];
+
 };
 
 sys {
@@ -48,4 +75,5 @@ sys {
     [ 'pkg-config --libs   grpc grpc++  protobuf', \'%{.runtime.libs}'    ],
   ];
 };
+
 

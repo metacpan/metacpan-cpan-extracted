@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Service;
 # ABSTRACT: represents a TR064 service
-$Net::Fritz::Service::VERSION = 'v0.0.8';
+$Net::Fritz::Service::VERSION = 'v0.0.9';
 
 use Digest::MD5 qw(md5_hex);
 use SOAP::Lite; # +trace => [ transport => sub { print $_[0]->as_string } ]; # TODO: remove
@@ -318,7 +318,7 @@ Net::Fritz::Service - represents a TR064 service
 
 =head1 VERSION
 
-version v0.0.8
+version v0.0.9
 
 =head1 SYNOPSIS
 
@@ -376,8 +376,8 @@ The I<serviceId> (string) of this service.
 =head2 controlURL
 
 The I<controlURL> (URL string) of this service which is needed to
-L<call|Net::Fritz::Action/call> any L<Net::Fritz::Action>s of this
-service.
+L<call|/call(action_name [argument_hash])> any L<Net::Fritz::Action>s
+of this service.
 
 =head2 eventSubURL
 
@@ -413,12 +413,12 @@ service information in parsed XML format
 
 =back
 
-=head2 call(I<action_name [I<parameter> => I<value>] [...])
+=head2 call(I<action_name> [I<argument_hash>])
 
 Calls the L<Net::Fritz::Action> named I<action_name> of this service.
 Response data from the service call is wrapped as L<Net::Fritz::Data>.
-If the action expects parameters, they must be passed as
-key=L<gt>value pairs.
+If the action expects parameters, they must be provided via the
+I<argument_hash> as key=E<gt>value pairs.
 
 If no matching action is found, the parameters don't match the action
 or any other error occurs, a L<Net::Fritz::Error> is returned.

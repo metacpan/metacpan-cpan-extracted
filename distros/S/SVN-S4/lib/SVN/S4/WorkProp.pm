@@ -13,7 +13,7 @@ use vars qw($AUTOLOAD);
 use SVN::S4;
 use SVN::S4::Debug qw (DEBUG is_debug);
 
-our $VERSION = '1.064';
+our $VERSION = '1.066';
 
 # Legal characters in keys/values.
 # Overly strict; INI format doesn't allow []; or whitespace

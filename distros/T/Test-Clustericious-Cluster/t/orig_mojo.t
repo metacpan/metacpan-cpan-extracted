@@ -4,8 +4,6 @@ use 5.010001;
 use Test::Clustericious::Cluster;
 use Test2::Bundle::More;
 
-plan 9;
-
 my $cluster = Test::Clustericious::Cluster->new;
 $cluster->create_cluster_ok(
   'Foo',
@@ -24,6 +22,8 @@ $t->get_ok($cluster->urls->[1])
 # make sure autoextraction worked
 like $INC{'Foo.pm'}, qr{/lib/Foo\.pm$}, "Foo.pm looks like it was read from a real placew";
 ok   -f $INC{'Foo.pm'},                 "Foo.pm is a real file";
+
+done_testing;
 
 __DATA__
 

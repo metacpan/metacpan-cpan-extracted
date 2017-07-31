@@ -27,11 +27,12 @@ sub make_arg_transformer {
     my $to_marshall = $args{to_marshall} || die;
     my %to_marshall = map { $_ => 1 } @$to_marshall;
     return sub {
-        my ($name, $val) = @_;
+        my ($name, $val, $force_type) = @_;
         return $val unless $to_marshall{$name};
         die "$method_name(): $name must be a hashref"
             unless ref $val && ref $val eq 'HASH';
-        return dynamodb_marshal($val);
+        $force_type ||= {};
+        return dynamodb_marshal($val, force_type => $force_type);
     };
 }
 

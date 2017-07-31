@@ -1,12 +1,10 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
-lib/Memoize/.cvsignore
 lib/Memoize/Once.pm
 lib/Memoize/Once.xs
 t/bad_syntax.t

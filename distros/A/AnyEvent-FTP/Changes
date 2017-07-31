@@ -1,6 +1,15 @@
 Revision history for AnyEvent-FTP
 
+0.14      2017-07-26 07:42:52 -0400
+  - Remove dependency on List::MoreUtils
+  - Migrate from File::ShareDir to File::ShareDir::Dist
+
+0.11      2017-07-22 23:58:59 -0400
+  - Remove dependency on File::HomeDir
+
 0.10      2017-07-07 18:13:24 -0400
+  - Bundle ls from Perl Power Tools for platforms that do not
+    have a compliant ls
 
 0.09      2015-08-03 14:38:44 -0400
   - AnyEvent::FTP::Server::Context::FSRW no longer attempts to return

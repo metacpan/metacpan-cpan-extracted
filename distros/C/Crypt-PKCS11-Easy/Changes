@@ -1,5 +1,11 @@
 Changelog for Crypt-PKCS11-Easy
 
+0.172091 2017-07-28T14:58:58Z
+ - Fix Changes
+
+0.172090 2017-07-28T14:55:23Z
+ - [gh #6] sign and verify in 1024 byte chunks (Ioan Rogers)
+
 0.162150 2016-08-02T21:41:33Z
  - [Closes #4] Support encryption - tested with RSA PKCS and OAEP (Ioan
    Rogers)

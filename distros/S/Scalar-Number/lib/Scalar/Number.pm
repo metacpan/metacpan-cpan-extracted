@@ -4,19 +4,19 @@ Scalar::Number - numeric aspects of scalars
 
 =head1 SYNOPSIS
 
-	use Scalar::Number qw(scalar_num_part);
+    use Scalar::Number qw(scalar_num_part);
 
-	$num = scalar_num_part($scalar);
+    $num = scalar_num_part($scalar);
 
-	use Scalar::Number qw(sclnum_is_natint sclnum_is_float);
+    use Scalar::Number qw(sclnum_is_natint sclnum_is_float);
 
-	if(sclnum_is_natint($value)) { ...
-	if(sclnum_is_float($value)) { ...
+    if(sclnum_is_natint($value)) { ...
+    if(sclnum_is_float($value)) { ...
 
-	use Scalar::Number qw(sclnum_val_cmp sclnum_id_cmp);
+    use Scalar::Number qw(sclnum_val_cmp sclnum_id_cmp);
 
-	@sorted_nums = sort { sclnum_val_cmp($a, $b) } @floats;
-	@sorted_nums = sort { sclnum_id_cmp($a, $b) } @floats;
+    @sorted_nums = sort { sclnum_val_cmp($a, $b) } @floats;
+    @sorted_nums = sort { sclnum_id_cmp($a, $b) } @floats;
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ package Scalar::Number;
 use warnings;
 use strict;
 
-our $VERSION = "0.006";
+our $VERSION = "0.007";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -135,14 +135,15 @@ BEGIN {
 	# We need the refaddr() function from Scalar::Util.  However, if
 	# Scalar::Util isn't available then we can reimplement it less
 	# efficiently.
-	eval { local $SIG{__DIE__}; require Scalar::Util; };
+	eval { local $SIG{__DIE__}; require Scalar::Util; 1; };
 	if($@ eq "") {
 		*_refaddr = \&Scalar::Util::refaddr;
 	} else {
 		*_refaddr = sub($) {
 			overload::StrVal($_[0]) =~ /0x([0-9a-f]+)\)\z/
 				or die "don't understand StrVal output";
-			return hex_natint($1);
+			my $hex = $1;
+			return hex_natint($hex);
 		};
 	}
 }
@@ -185,6 +186,7 @@ my %zero = (
 	"+0+0" => 0,
 	"+0-0" => +0.0,
 	"-0+0" => -0.0,
+	"-0-0" => -0.0,
 );
 sub scalar_num_part($) {
 	my($val) = @_;
@@ -214,7 +216,8 @@ sub scalar_num_part($) {
 		}) {
 			$val = "0";
 		}
-		return my $zero = $zero{sprintf("%+.f%+.f", $val, -$val)};
+		my $nval = -(my $vc = $val);
+		return my $zero = $zero{sprintf("%+.f%+.f", $val, $nval)};
 	} else {
 		return 0 + $val;
 	}
@@ -239,7 +242,8 @@ sub sclnum_is_natint($) {
 	my($val) = @_;
 	if(have_signed_zero && $val == 0) {
 		$val = $_[0];
-		return sprintf("%+.f%+.f", $val, -$val) eq "+0+0";
+		my $nval = -(my $vc = $val);
+		return sprintf("%+.f%+.f", $val, $nval) eq "+0+0";
 	} elsif(int($val) != $val) {
 		return 0;
 	} elsif(significand_bits+1 >= natint_bits) {
@@ -287,7 +291,8 @@ sub sclnum_is_float($) {
 	my($val) = @_;
 	if(have_signed_zero && $val == 0.0) {
 		$val = $_[0];
-		return sprintf("%+.f%+.f", $val, -$val) ne "+0+0";
+		my $nval = -(my $vc = $val);
+		return sprintf("%+.f%+.f", $val, $nval) ne "+0+0";
 	} elsif(int($val) != $val || float_is_infinite($val)) {
 		return 1;
 	} elsif(significand_bits+1 >= natint_bits) {
@@ -406,6 +411,7 @@ of a particular sign.
 =cut
 
 my %zero_order = (
+	"-0-0" => 0,
 	"-0+0" => 0,
 	"+0+0" => 1,
 	"+0-0" => 2,
@@ -418,8 +424,10 @@ sub sclnum_id_cmp($$) {
 		return +1;
 	} elsif(have_signed_zero && $a == 0 && $b == 0) {
 		($a, $b) = @_;
-		return $zero_order{sprintf("%+.f%+.f", $a, -$a)} <=>
-			$zero_order{sprintf("%+.f%+.f", $b, -$b)};
+		my $na = -(my $ac = $a);
+		my $nb = -(my $bc = $b);
+		return $zero_order{sprintf("%+.f%+.f", $a, $na)} <=>
+			$zero_order{sprintf("%+.f%+.f", $b, $nb)};
 	} else {
 		return sclnum_val_cmp($a, $b);
 	}
@@ -438,6 +446,16 @@ semantics) to know in advance which of them one is using.  The pure Perl
 version of this module can't operate on such a system, but the XS version
 works fine.  This problem is resolved by Perl 5.8's new numeric semantics.
 
+Perl doesn't consistently maintain the distinction between integer
+and floating point zeroes, where the latter are signed.  Zeroes of
+one type are liable to be mutated into another type by being used as
+operands in numeric operations.  From Perl 5.8 onwards, weird zeroes can
+arise that don't consistently behave as any kind of pure numeric zero.
+The functions of this module are always careful to avoid causing side
+effects on their arguments.  If given a weird zero, the functions of
+this module will treat it as some kind of pure numeric zero, but there
+is no guarantee of which kind it will be treated as.
+
 =head1 SEE ALSO
 
 L<Data::Float>,
@@ -450,7 +468,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007, 2009, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2007, 2009, 2010, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

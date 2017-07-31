@@ -14,13 +14,21 @@ while ( <$fh> ) {
   chomp;
   my ( $s, $e, $d ) = m#^(\d+),(\d+),(.*)$#;
   $d //= '';
+  #print "$old_s, $old_e, $old_d => $s, $e, $d\n" if($d==15169);
   if ( ( $old_d eq $d ) and (
-          ( $old_e + 1 == $s )
-              or
-          ( $s>=$old_s and $s<$old_e and $e>$old_e )
+          ( $s<=$old_e+1 )
       )) {
-    $old_e = $e;
-  }elsif( ( $old_d eq $d ) and ($s>=$old_s) and ($e<=$old_e) ){
+      $old_e = $old_e>$e ? $old_e : $e;
+  }elsif( ($old_d eq $d) and ($s>=$old_s) and ($e<=$old_e)){
+          #not change
+  }elsif(($old_d ne $d) and ($old_e>$s)){
+    print $fhw join( ",", $old_s, $s-1, $old_d ), "\n";
+    if($e>$old_e){
+        ( $old_s, $old_e, $old_d ) = ( $s, $e, $d );
+    }else{
+        print $fhw join( ",", $s, $e, $d ), "\n";
+        ( $old_s, $old_e, $old_d ) = ( $e+1, $old_e, $old_d );
+    }
   }
   else {
     print $fhw join( ",", $old_s, $old_e, $old_d ), "\n";

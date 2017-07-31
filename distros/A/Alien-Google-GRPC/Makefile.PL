@@ -5,16 +5,14 @@
 use strict;
 use warnings;
 
+use 5.010;
 use ExtUtils::MakeMaker;
 
 die 'Unsupported OS' if $^O eq 'MSWin32';
-system 'pkg-config --exists grpc++';
+system( 'pkg-config --exists grpc++ > /dev/null 2>&1' );
 if($? != 0){
-print "NOTE: Both gPRC and pkg-config are not installed. So, will build gRPC if build other prereqs are installed.\n";
-die "This module neeeds *git, autoconf, automake and libtool to build\n" unless (qx(which git) =~ /git/);
-die "This module neeeds git, *autoconf, automake and libtool to build\n" unless (qx(which autoconf) =~ /autoconf/);
-die "This module neeeds git, autoconf, *automake and libtool to build\n" unless (qx(which automake) =~ /automake/);
-die "This module neeeds git, autoconf, automake and *libtool to build\n" unless (qx(which libtoolize) =~ /libtoolize/);
+print "NOTE: Both gPRC and pkg-config are not installed. Will build gRPC if build other prereqs are installed.\n";
+die "This module neeeds git to build\n" unless (qx(which git) =~ /git/);
 }
 
 my %WriteMakefileArgs = (
@@ -27,11 +25,23 @@ my %WriteMakefileArgs = (
   },
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "0.40",
+    "Alien::Build::Git" => "0.02",
     "Alien::Build::MM" => "0.40",
+    "Alien::Build::Plugin::Download::Git" => "0.02",
+    "Alien::Build::Plugin::Extract::Directory" => "0.65",
+    "Alien::Build::Plugin::Fetch::Git" => "0.02",
+    "Alien::Build::Plugin::Prefer::SortVersions" => "0.65",
+    "Alien::autoconf" => "0.03",
+    "Alien::automake" => "0.05",
+    "Alien::git" => "0.02",
+    "Alien::libtool" => "0.04",
+    "Alien::m4" => "0.11",
+    "Capture::Tiny" => "0.46",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-Google-GRPC",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Alien::Google::GRPC",
   "PREREQ_PM" => {
     "Alien::Base" => 0,
@@ -40,10 +50,11 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "Data::Dumper" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +64,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => 0,
   "Alien::Build" => "0.40",
   "Alien::Build::MM" => "0.40",
+  "Capture::Tiny" => 0,
   "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "Test::More" => 0,

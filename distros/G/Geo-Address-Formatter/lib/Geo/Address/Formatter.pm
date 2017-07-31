@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.61';
+$Geo::Address::Formatter::VERSION = '1.62';
 use strict;
 use warnings;
 use feature qw(say);
@@ -229,8 +229,10 @@ sub _postformat {
                 if ($text =~ m/$regexp/){
                     my $tmp1 = $1;
                     my $tmp2 = $2;
+                    my $tmp3 = $3;
                     $replacement =~ s/\$1/$tmp1/;
                     $replacement =~ s/\$2/$tmp2/;
+                    $replacement =~ s/\$3/$tmp3/;
                 }
             }
             $text =~ s/$regexp/$replacement/;
@@ -603,7 +605,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.61
+version 1.62
 
 =head1 SYNOPSIS
 

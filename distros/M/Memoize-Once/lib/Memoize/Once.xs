@@ -4,13 +4,38 @@
 #include "callchecker0.h"
 #include "XSUB.h"
 
-static OP *mypp_readonly_or_assign(pTHX)
+#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#define PERL_DECIMAL_VERSION \
+	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_GE(r,v,s) \
+	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
+#ifndef OpMORESIB_set
+# define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+# define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+# define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+#endif /* !OpMORESIB_set */
+#ifndef OpSIBLING
+# define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+# define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif /* !OpSIBLING */
+
+static OP *THX_pp_readonly_or_assign(pTHX)
 {
 	dSP;
 	return SvREADONLY(TOPs) ? PL_op->op_next : cLOGOP->op_other;
 }
 
-static OP *mypp_sassign_memo(pTHX)
+static OP *THX_pp_sassign_memo(pTHX)
 {
 	dSP;
 	SV *val, *var;
@@ -24,25 +49,29 @@ static OP *mypp_sassign_memo(pTHX)
 	return PL_op->op_next;
 }
 
-static OP *myck_entersub_once(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
+static OP *THX_ck_entersub_once(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
 {
-	OP *pushop, *thunkop, *storeop, *assignop, *memoop, *oraop;
+	OP *pushop, *thunkop, *cvop, *storeop, *assignop, *memoop, *oraop;
 	entersubop = ck_entersub_args_proto(entersubop, namegv, protosv);
 	pushop = cUNOPx(entersubop)->op_first;
-	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
-	thunkop = pushop->op_sibling;
-	if(!thunkop || !thunkop->op_sibling || thunkop->op_sibling->op_sibling)
+	if(!OpHAS_SIBLING(pushop)) pushop = cUNOPx(pushop)->op_first;
+	thunkop = OpSIBLING(pushop);
+	if(!thunkop || !(cvop = OpSIBLING(thunkop)) || OpHAS_SIBLING(cvop))
 		return entersubop;
-	pushop->op_sibling = thunkop->op_sibling;
-	thunkop->op_sibling = NULL;
+	OpMORESIB_set(pushop, cvop);
+	OpLASTSIB_set(thunkop, NULL);
 	op_free(entersubop);
 	storeop = newSVREF(newSVOP(OP_CONST, 0, newRV_noinc(newSV(0))));
+#if PERL_VERSION_GE(5,25,6)
+	assignop = newBINOP(OP_SASSIGN, 0, thunkop, thunkop);
+#else /* <5.25.6 */
 	assignop = newUNOP(OP_SASSIGN, 0, thunkop);
-	assignop->op_ppaddr = mypp_sassign_memo;
+#endif /* <5.25.6 */
+	assignop->op_ppaddr = THX_pp_sassign_memo;
 	memoop = newLOGOP(OP_ORASSIGN, 0, storeop, assignop);
 	oraop = memoop->op_type == OP_ORASSIGN ? memoop :
 		cUNOPx(memoop)->op_first;
-	oraop->op_ppaddr = mypp_readonly_or_assign;
+	oraop->op_ppaddr = THX_pp_readonly_or_assign;
 	return memoop;
 }
 
@@ -53,7 +82,7 @@ PROTOTYPES: DISABLE
 BOOT:
 {
 	CV *once_cv = get_cv("Memoize::Once::once", 0);
-	cv_set_call_checker(once_cv, myck_entersub_once, (SV*)once_cv);
+	cv_set_call_checker(once_cv, THX_ck_entersub_once, (SV*)once_cv);
 }
 
 void

@@ -44,7 +44,7 @@ CatalystX::OAuth2::Schema::Result::Code - A table for registering grant codes
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 AUTHOR
 

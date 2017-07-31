@@ -9,11 +9,11 @@ See the ChangeLog file for a complete history
 REQUIREMENTS
 
     It has been ported and tested on DataServer 6.3AB, 6.3BE, 8.1CC, 8.1CE,
-    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.2BC, 8.3E/64, 8.3F/64, 8.3I/64, and 8.3KAB/64,
-    but this does not mean it might not work on U2000 databases or other
-    DataServer releases. I do not have a DS 9.x to play with.
+    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.2BC, 8.3E/64, 8.3F/64, 8.3I/64, 8.3KAB/64,
+    and 9.1B, but this does not mean it might not work on U2000 databases or
+    other DataServer releases.
 
-    I use DBI 1.628 and perl-5.8.7 through perl5.16.3, but might get it to
+    I use DBI 1.633 and perl-5.8.7 through perl5.22.0, but might get it to
     work with DBI 0.93 or higher and perl 5.6.1 (the modern toolchain will
     require 5.8.1 as of Apr 2013). But then again, in that case you should
     consider an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite.
@@ -25,13 +25,17 @@ REQUIREMENTS
     the best (or better, upgrade to a perl that supports scalarIO).
 
     If you plan to use DataServer 8.1 or higher database in Unicode encoding
-    (UTF-8), use perl5.8.4 or up. See the Unicode site for the differences
-    between the Unicode standards if you want to know what to expect
-    (http://www.unicode.org/versions/enumeratedversions.html) an
+    (UTF-8), use perl5.8.4 or up. Note that $LANG will need to match your
+    database locale. See the Unicode site for the differences between the
+    Unicode standards if you want to know what to expect
+    (http://www.unicode.org/versions/enumeratedversions.html) and
     http://www.unicode.org/history/publicationdates.html for their age.
 
       Perl    Unicode
       ------  -------
+                9.0.0  UCD 9.0.0 released 21 Jun 2016
+      5.24.0    8.0.0  UCD 8.0.0 released 17 Jun 2015
+      5.22.0    7.0.0  UCD 7.0.0 released 16 Jun 2014
       5.20.0    6.3.0  UCD 6.3.0 released 30 Sep 2013
       5.18.0    6.2.0  UCD 6.2.0 released 26 Sep 2012
       5.16.0    6.1.0  UCD 6.1.0 released 31 Jan 2012
@@ -249,7 +253,7 @@ ACKNOWLEDGEMENTS
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 1999-2015  H.Merijn Brand <h.m.brand@xs4all.nl>
+    Copyright (C) 1999-2017  H.Merijn Brand <h.m.brand@xs4all.nl>
 
     This library is free software; you can redistribute it and/or modify
     it under the same terms as Perl itself. 

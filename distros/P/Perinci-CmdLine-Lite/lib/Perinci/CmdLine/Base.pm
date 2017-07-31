@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '1.76'; # VERSION
+our $DATE = '2017-07-22'; # DATE
+our $VERSION = '1.77'; # VERSION
 
 use 5.010001;
 use strict;
@@ -994,6 +994,7 @@ sub _parse_argv2 {
             per_arg_yaml        => $self->{per_arg_yaml},
             common_opts         => $copts,
             strict              => $r->{in_completion} ? 0:1,
+            (ggls_res            => $r->{_ggls_res}) x defined($r->{_ggls_res}),
             on_missing_required_args => sub {
                 my %a = @_;
 
@@ -1423,11 +1424,15 @@ sub run {
         # set defaults
         $r->{action} //= 'call';
 
-        # activate logging
+        # init logging
         if ($self->log) {
             require Log::ger::App;
+            my $default_level = do {
+                my $dry_run = $r->{dry_run} // $self->default_dry_run;
+                $dry_run ? 'info' : 'warn';
+            };
             Log::ger::App->import(
-                level => $r->{log_level} // $self->log_level,
+                level => $r->{log_level} // $self->log_level // $default_level,
                 name  => $self->program_name,
             );
         }
@@ -1552,7 +1557,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.76 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-14.
+This document describes version 1.77 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-22.
 
 =head1 DESCRIPTION
 
@@ -2203,15 +2208,13 @@ C<$r> per-request stash/hash (see L</"REQUEST KEYS">).
 Passing the cmdline object can be useful, e.g. to call action_help(), to get the
 settings of the Perinci::CmdLine, etc.
 
-=head2 per_arg_json => bool
+=head2 per_arg_json => bool (default: 1 in ::Lite)
 
-This will be passed to L<Perinci::Sub::GetArgs::Argv>, which has this value
-default to 1.
+This will be passed to L<Perinci::Sub::GetArgs::Argv>.
 
-=head2 per_arg_yaml => bool (default: 1)
+=head2 per_arg_yaml => bool (default: 0 in ::Lite)
 
-This will be passed to L<Perinci::Sub::GetArgs::Argv>, which has this value
-default to 1.
+This will be passed to L<Perinci::Sub::GetArgs::Argv>.
 
 =head2 program_name => str
 

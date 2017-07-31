@@ -1,6 +1,6 @@
 package HTML::FormHandler::Field::MonthDay;
 # ABSTRACT: select list 1 to 31
-$HTML::FormHandler::Field::MonthDay::VERSION = '0.40067';
+$HTML::FormHandler::Field::MonthDay::VERSION = '0.40068';
 use Moose;
 extends 'HTML::FormHandler::Field::IntRange';
 
@@ -24,7 +24,7 @@ HTML::FormHandler::Field::MonthDay - select list 1 to 31
 
 =head1 VERSION
 
-version 0.40067
+version 0.40068
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ FormHandler Contributors - see HTML::FormHandler
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gerda Shank.
+This software is copyright (c) 2017 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

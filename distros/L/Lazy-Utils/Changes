@@ -1,3 +1,6 @@
+1.22	2017-07-23
+		- Fixed requires bytes and utf8 packages
+
 1.21	2017-06-10
 		- Bug fix: exiting for system2() sub-process
 		- Added array_to_hash()

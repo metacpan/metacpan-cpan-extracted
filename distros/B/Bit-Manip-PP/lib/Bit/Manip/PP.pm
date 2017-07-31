@@ -3,7 +3,7 @@ package Bit::Manip::PP;
 use warnings;
 use strict;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -13,6 +13,7 @@ our @EXPORT_OK = qw(
     bit_set
     bit_clr
     bit_toggle
+    bit_tog
     bit_on
     bit_off
     bit_bin
@@ -104,6 +105,9 @@ sub bit_clr {
     my ($data, $lsb, $nbits) = @_;
     return bit_set($data, $lsb, $nbits, 0);
 }
+
+*bit_tog = \&bit_toggle;
+
 sub bit_toggle {
     my ($data, $bit) = @_;
 
@@ -149,8 +153,8 @@ sub _check_lsb {
     if ($lsb < 0){
         die "\$lsb param can't be negative\n";
     }
-    if (($lsb + 1) >= $msb){
-        die "\$lsb param must be less than \$msb\n";
+    if (($lsb + 1) > $msb){
+        die "\$lsb param must be less than or equal to \$msb\n";
     }
 }
 sub _check_value {
@@ -176,21 +180,20 @@ Bit::Manip::PP - Pure Perl functions to simplify bit string manipulation
 
 =head1 SYNOPSIS
 
-    use Bit::Manip::PP qw(:all);
+    use Bit::Manip qw(:all);
 
     my $b;    # bit string
     $b = 128; # 10000000
 
-    $b = bit_toggle($b, 4); # 10010000
-    $b = bit_toggle($b, 4); # 10000000
+    # toggle a bit off and on
 
-    bit_toggle(\$b, 4); # same as above, but with a reference
+    $b = bit_tog($b, 4); # 10010000
+    $b = bit_tog($b, 4); # 10000000
 
-    $b = bit_off($b, 7);    # 0 
-    $b = bit_on($b, 7);     # 10000000 
+    # turn a bit off, then back on
 
-    bit_off(\$b, 7);
-    bit_on(\$b, 7);
+    $b = bit_off($b, 7);    # 0
+    $b = bit_on($b, 7);     # 10000000
 
     # get the value of a range of bits...
     # in this case, we'll print the value of bits 4-3
@@ -203,10 +206,9 @@ Bit::Manip::PP - Pure Perl functions to simplify bit string manipulation
     # let's set bits 4-2 to binary 101
 
     $b = 0b10000000;
+    my $num_bits = 3; # 0b101 in the call is 3 bits
 
-    $b = bit_set($b, 2, 3, 0b101); # 10010100
-
-    bit_set(\$b, 2, 3, 0b101); # reference
+    $b = bit_set($b, 2, $num_bits, 0b101); # 10010100
 
     # clear some bits
 
@@ -217,15 +219,12 @@ Bit::Manip::PP - Pure Perl functions to simplify bit string manipulation
 
     $b = bit_clr($b, $lsb, $num_bits); # 11000111
 
-    bit_clr(\$b, $lsb, $num_bits); # reference
-
     # helpers
 
     my ($num_bits, $lsb) = (3, 2);
     print bit_mask($num_bits, $lsb); # 28, or 11100
 
     print bit_bin(255); # 11111111 (same as printf("%b", 255);)
-
 
 =head1 DESCRIPTION
 
@@ -243,13 +242,13 @@ Currently, up to 32-bit integers are supported.
 
 =head1 EXPORT_OK
 
-Use the C<:all> tag (eg: C<use Bit::Manip::PP qw(:all);>) to import the
-following functions into your namespace, or pick and choose individually:
+Use the C<:all> tag (eg: C<use Bit::Manip qw(:all);>) to import the following
+functions into your namespace, or pick and choose individually:
 
-    bit_get 
+    bit_get
     bit_set
     bit_clr
-    bit_toggle
+    bit_tog
     bit_on
     bit_off
     bit_bin
@@ -258,7 +257,7 @@ following functions into your namespace, or pick and choose individually:
 
 =head1 FUNCTIONS
 
-=head2 bit_get
+=head2 bit_get($data, $msb, $lsb)
 
 Retrieves the value of specified bits within a bit string.
 
@@ -281,11 +280,11 @@ Optional: Integer, the Least Significant Bit (rightmost) of the group of bits to
 collect the value for (starting at 0 from the right). A value of C<0> means
 return the value from C<$msb> through to the very end of the bit string. A
 value of C<1> will capture from C<$msb> through to bit C<1> (second from
-right). This value must be equal to or lower than C<$msb>.
+right). If C<$msb> is equal to C<$lsb>, we'll return just that bit.
 
 Return: Integer, the modified C<$data> param.
 
-=head2 bit_set
+=head2 bit_set($data, $lsb, $nbits, $value)
 
 Allows you to set a value for specific bits in your bit string.
 
@@ -293,9 +292,7 @@ Parameters:
 
     $data
 
-Mandatory: Integer, the bit string you want to manipulate bits in. Optionally,
-send in a reference to the scalar, and we'll work directly on it instead of
-passing by value and getting the updated value returned.
+Mandatory: Integer, the bit string you want to manipulate bits in.
 
     $lsb
 
@@ -303,27 +300,27 @@ Mandatory: Integer, the least significant bit (rightmost) in the bit range you
 want to manipulate. For example, if you wanted to set a new value for bits
 C<7-5>, you'd send in C<5>.
 
-    $bits
+    $nbits
 
-Mandatory: Integer, the number of bits you plan on setting. This is so that any
-leading zeros are honoured.
+Mandatory: Integer, the number of bits you're sending in. We need this param
+in the event your leading bit is a zero. For example, if you're sending in
+C<0b111> or C<0b001>, this param would be C<3>.
 
     $value
 
 Mandatory: Integer, the value that you want to change the specified bits to.
 Easiest if you send in a binary string (eg: C<0b1011> in Perl).
 
-Return: Integer, the modified C<$data> param if <C$data> is passed in by value,
-or C<0> if passed in by reference.
+Return: Integer, the modified C<$data> param.
 
-Example: 
+Example:
 
 You have an 8-bit register where the MSB is a start bit, and the rest
 of the bits are zeroed out:
 
     my $data = 0b10000000; # (0x80, or 128)
 
-The datasheet for the hardware you're writing to requires you to set bits 
+The datasheet for the hardware you're writing to requires you to set bits
 C<6-4> to C<111> in binary (always start from bit 0, not 1):
 
     10000000
@@ -335,7 +332,7 @@ Code:
     my $x = bit_set($data, 4, 3, 0b111); # (0x07, or 7)
     printf("%b\n", $x); # prints 11110000
 
-=head2 bit_clr
+=head2 bit_clr($data, $lsb, $nbits)
 
 Clear (unset to 0) specific bits in the bit string.
 
@@ -343,9 +340,7 @@ Parameters:
 
     $data
 
-Mandatory: Integer, the bit string you want to manipulate bits in. Optionally,
-send in a reference to the scalar, and we'll work directly on it instead of
-passing by value and getting the updated value returned.
+Mandatory: Integer, the bit string you want to manipulate bits in.
 
     $lsb
 
@@ -358,10 +353,15 @@ in C<5>.
 Mandatory: Integer, the number of bits you're wanting to clear, starting from
 the C<$lsb> bit, and clearing the number of bits to the left.
 
-Return: Integer, the modified C<$data> param if <C$data> is passed in by value,
-or C<0> if passed in by reference.
+Returns the modified bit string.
 
-=head2 bit_toggle
+=head2 bit_toggle($data, $bit)
+
+See L</bit_tog>.
+
+=head2 bit_tog($data, $bit)
+
+AKA: C<bit_toggle()>.
 
 Toggles a single bit. If it's C<0> it'll toggle to C<1> and vice-versa.
 
@@ -369,75 +369,52 @@ Parameters:
 
     $data
 
-Mandatory: Integer, the number/bit string to toggle a bit in. Optionally,
-send in a reference to the scalar, and we'll work directly on it instead of
-passing by value and getting the updated value returned.
+Mandatory: Integer, the number/bit string to toggle a bit in.
 
     $bit
 
 Mandatory: Integer, the bit number counting from the right-most (LSB) bit
 starting from C<0>.
 
-Return: Integer, the modified C<$data> param if <C$data> is passed in by value,
-or C<0> if passed in by reference.
+Return: Integer, the modified C<$data> param.
 
-=head2 bit_on
+=head2 bit_on($data, $bit)
 
-Sets a single bit (sets to C<1>), regardless of its current state.
+Sets a single bit (sets to C<1>), regardless of its current state. This is just
+a short form of setting a single bit with L<bit_set>.
 
 Parameters:
 
     $data
 
-Mandatory: Integer, the number/bit string to toggle a bit in. Optionally,
-send in a reference to the scalar, and we'll work directly on it instead of
-passing by value and getting the updated value returned.
+Mandatory: Integer, the number/bit string to toggle a bit in.
 
     $bit
 
 Mandatory: Integer, the bit number counting from the right-most (LSB) bit
 starting from C<0>.
 
-Return: Integer, the modified C<$data> param if <C$data> is passed in by value,
-or C<0> if passed in by reference.
+Return: Integer, the modified C<$data> param.
 
-=head2 bit_off
+=head2 bit_off($data, $bit)
 
-Unsets a single bit (sets to C<0>), regardless of its current state.
+Unsets a single bit (sets to C<0>), regardless of its current state. This is
+just a short form of clearing a single bit with L<bit_set>.
 
 Parameters:
 
     $data
 
-Mandatory: Integer, the number/bit string to toggle a bit in. Optionally,
-send in a reference to the scalar, and we'll work directly on it instead of
-passing by value and getting the updated value returned.
+Mandatory: Integer, the number/bit string to toggle a bit in.
 
     $bit
 
 Mandatory: Integer, the bit number counting from the right-most (LSB) bit
 starting from C<0>.
 
-Return: Integer, the modified C<$data> param if <C$data> is passed in by value,
-or C<0> if passed in by reference.
+Return: Integer, the modified C<$data> param.
 
-=head2 bit_mask
-
-Generates a bit mask for the specific bits you specify.
-
-Parameters:
-
-    $bits
-
-Mandatory: Integer, the number of bits to get the mask for.
-
-    $lsb
-
-Mandatory: Integer, the LSB at which you plan on implementing your change.
-
-Return: Integer, the bit mask ready to be applied.
-
-=head2 bit_bin
+=head2 bit_bin($data)
 
 Returns the binary representation of a number as a string of ones and zeroes.
 
@@ -447,7 +424,7 @@ Parameters:
 
 Mandatory: Integer, the number you want to convert.
 
-=head2 bit_count
+=head2 bit_count($num, $set)
 
 Returns either the total count of bits in a number, or just the number of set
 bits (if the C<$set>, parameter is sent in and is true).
@@ -469,6 +446,22 @@ all four of the total).
 
 Return: Integer, the number of bits that make up the number if C<$set> is C<0>,
 and the number of set bits (1's) if C<$set> is true.
+
+=head2 bit_mask($nbits, $lsb)
+
+Generates a bit mask for the specific bits you specify.
+
+Parameters:
+
+    $nbits
+
+Mandatory: Integer, the number of bits to get the mask for.
+
+    $lsb
+
+Mandatory: Integer, the LSB at which you plan on implementing your change.
+
+Return: Integer, the bit mask ready to be applied.
 
 =head1 AUTHOR
 

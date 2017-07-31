@@ -4,13 +4,13 @@
       "Orkun Karaduman <orkunkaraduman@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lazy-Utils",
    "no_index" : {
@@ -54,5 +54,5 @@
          "web" : "https://github.com/orkunkaraduman/Lazy-Utils"
       }
    },
-   "version" : "1.21"
+   "version" : "1.22"
 }

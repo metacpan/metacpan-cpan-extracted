@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution AI-PredictionClient-Alien-TensorFlowServingProtos,
-version 0.03:
+version 0.05:
 
   Builds C++ client library for TensorFlow Serving.
 

@@ -1,5 +1,6 @@
 package Lab::Instrument::TemperatureDiode::SI420;
-$Lab::Instrument::TemperatureDiode::SI420::VERSION = '3.553';
+#ABSTRACT: SI420 (???)
+$Lab::Instrument::TemperatureDiode::SI420::VERSION = '3.554';
 use strict;
 use Math::Complex;
 use Lab::Instrument::TemperatureDiode;
@@ -71,3 +72,33 @@ sub convert2Kelvin {
 
     return $value;
 }
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Instrument::TemperatureDiode::SI420 - SI420 (???)
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2013       Andreas K. Huettel, Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,4 +1,6 @@
 use strict;
+
+use lib '.';
 use t::Util;
 
 use_ok $_ for qw(

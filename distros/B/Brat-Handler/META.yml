@@ -11,7 +11,7 @@ configure_requires:
   Test::Pod: '0'
   Test::Pod::Coverage: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,13 +20,12 @@ name: Brat-Handler
 provides:
   Brat::Handler:
     file: lib/Brat/Handler.pm
-    version: '0.1'
+    version: '0.11'
   Brat::Handler::File:
     file: lib/Brat/Handler/File.pm
-    version: '0.1'
+    version: '0.11'
 requires:
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.1'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.11'

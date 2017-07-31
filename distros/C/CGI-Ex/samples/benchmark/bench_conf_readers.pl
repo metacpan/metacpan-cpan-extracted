@@ -4,7 +4,7 @@ use strict;
 use vars qw($PLACEHOLDER);
 use Benchmark qw(cmpthese timethese);
 use CGI::Ex::Conf;
-use POSIX qw(tmpnam);
+use File::Temp ();
 
 $PLACEHOLDER = chr(186).'~'.chr(186);
 
@@ -223,7 +223,7 @@ my $conf = eval $str;
 my %TESTS = ();
 
 ### do perl
-my $file = tmpnam(). '.pl';
+my $file = File::Temp->new(SUFFIX => '.pl');
 open OUT, ">$file";
 print OUT $str;
 close OUT;
@@ -233,7 +233,7 @@ $TESTS{pl} = sub {
 $files{pl} = $file;
 
 ### do a generic conf_write
-#my $file2 = tmpnam(). '.g_conf';
+#my $file2 = File::Temp->new(SUFFIX => '.g_conf');
 #&generic_conf_write($file2, $conf);
 #local $CGI::Ex::Conf::EXT_READERS{g_conf} = \&generic_conf_read;
 #$TESTS{g_conf} = sub {
@@ -243,7 +243,7 @@ $files{pl} = $file;
 
 
 if (eval {require JSON}) {
-  my $_file = tmpnam(). '.json';
+  my $_file = File::Temp->new(SUFFIX => '.json');
   my $str = JSON::objToJson($conf, {pretty => 1, indent => 2});
   open(my $fh, ">$_file");
   print $fh $str;
@@ -261,7 +261,7 @@ if (eval {require JSON}) {
 
 ### load in the rest of the tests that we support
 if (eval {require Storable}) {
-  my $_file = tmpnam(). '.sto';
+  my $_file = File::Temp->new(SUFFIX => '.sto');
   &Storable::store($conf, $_file);
   $TESTS{sto} = sub {
     my $hash = $cob->read_ref($_file);
@@ -270,7 +270,7 @@ if (eval {require Storable}) {
 }
 
 if (eval {require Storable}) {
-  my $_file = tmpnam(). '.sto2';
+  my $_file = File::Temp->new(SUFFIX => '.sto2');
   &Storable::store($conf, $_file);
   $TESTS{sto2} = sub {
     my $hash = &Storable::retrieve($_file);
@@ -279,7 +279,7 @@ if (eval {require Storable}) {
 }
 
 if (eval {require YAML}) {
-  my $_file = tmpnam(). '.yaml';
+  my $_file = File::Temp->new(SUFFIX => '.yaml');
   &YAML::DumpFile($_file, $conf);
   $TESTS{yaml} = sub {
     my $hash = $cob->read_ref($_file);
@@ -288,7 +288,7 @@ if (eval {require YAML}) {
 }
 
 if (eval {require YAML}) {
-  my $_file = tmpnam(). '.yaml2';
+  my $_file = File::Temp->new(SUFFIX => '.yaml2');
   &YAML::DumpFile($_file, $conf);
   $TESTS{yaml2} = sub {
     my $hash = &YAML::LoadFile($_file);
@@ -297,7 +297,7 @@ if (eval {require YAML}) {
 }
 
 if (eval {require YAML}) {
-  my $_file = tmpnam(). '.yaml';
+  my $_file = File::Temp->new(SUFFIX => '.yaml');
   &YAML::DumpFile($_file, $conf);
   $cob->preload_files($_file);
   $TESTS{yaml3} = sub {
@@ -307,7 +307,7 @@ if (eval {require YAML}) {
 }
 
 if (eval {require Config::IniHash}) {
-  my $_file = tmpnam(). '.ini';
+  my $_file = File::Temp->new(SUFFIX => '.ini');
   &Config::IniHash::WriteINI($_file, $conf);
   $TESTS{ini} = sub {
     local $^W = 0;
@@ -317,7 +317,7 @@ if (eval {require Config::IniHash}) {
 }
 
 if (eval {require XML::Simple}) {
-  my $_file = tmpnam(). '.xml';
+  my $_file = File::Temp->new(SUFFIX => '.xml');
   my $xml = XML::Simple->new->XMLout($conf);
   open  OUT, ">$_file" || die $!;
   print OUT $xml;

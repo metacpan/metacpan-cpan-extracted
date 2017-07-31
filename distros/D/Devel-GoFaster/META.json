@@ -4,13 +4,13 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-GoFaster",
    "prereqs" : {
@@ -37,7 +37,7 @@
          },
          "requires" : {
             "Carp" : "0",
-            "Lexical::SealRequireHints" : "0.006",
+            "Lexical::SealRequireHints" : "0.008",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -46,14 +46,20 @@
    },
    "provides" : {
       "Devel::GoFaster" : {
-         "file" : "lib/Devel/GoFaster.pm"
+         "file" : "lib/Devel/GoFaster.pm",
+         "version" : "0.001"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-GoFaster@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-GoFaster"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.000"
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

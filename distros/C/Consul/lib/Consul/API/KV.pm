@@ -1,5 +1,5 @@
 package Consul::API::KV;
-$Consul::API::KV::VERSION = '0.020';
+$Consul::API::KV::VERSION = '0.021';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -56,7 +56,7 @@ sub get_all {
 
 sub put {
     my ($self, $key, $value, %args) = @_;
-    croak 'usage: $kv->put($key, $value, [%args])' if grep { !defined } ($key, $value);
+    croak 'usage: $kv->put($key, $value, [%args])' unless defined($key) && @_ >= 3;
     $$self->_api_exec($$self->_kv_endpoint."/".$key, 'PUT', %args, _content => $value);
 }
 
@@ -74,19 +74,20 @@ sub keys {
 }
 
 package Consul::API::KV::Response;
-$Consul::API::KV::Response::VERSION = '0.020';
+$Consul::API::KV::Response::VERSION = '0.021';
 use Convert::Base64 qw(decode_base64);
 
 use Moo;
-use Types::Standard qw(Str Int);
+use Types::Standard qw(Str Int Maybe);
 
-has key          => ( is => 'ro', isa => Str, init_arg => 'Key',         required => 1 );
-has value        => ( is => 'ro', isa => Str, init_arg => 'Value',       required => 1, coerce => sub { decode_base64($_[0]) });
-has flags        => ( is => 'ro', isa => Int, init_arg => 'Flags',       required => 1 );
-has session      => ( is => 'ro', isa => Str, init_arg => 'Session' );
-has create_index => ( is => 'ro', isa => Int, init_arg => 'CreateIndex', required => 1 );
-has modify_index => ( is => 'ro', isa => Int, init_arg => 'ModifyIndex', required => 1 );
-has lock_index   => ( is => 'ro', isa => Int, init_arg => 'LockIndex',   required => 1 );
+has key          => ( is => 'ro', isa => Str,        init_arg => 'Key',         required => 1 );
+has value        => ( is => 'ro', isa => Maybe[Str], init_arg => 'Value',       required => 1,
+                      coerce => sub { !defined $_[0] ? undef : decode_base64($_[0]) });
+has flags        => ( is => 'ro', isa => Int,        init_arg => 'Flags',       required => 1 );
+has session      => ( is => 'ro', isa => Str,        init_arg => 'Session' );
+has create_index => ( is => 'ro', isa => Int,        init_arg => 'CreateIndex', required => 1 );
+has modify_index => ( is => 'ro', isa => Int,        init_arg => 'ModifyIndex', required => 1 );
+has lock_index   => ( is => 'ro', isa => Int,        init_arg => 'LockIndex',   required => 1 );
 
 1;
 

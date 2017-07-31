@@ -1,5 +1,5 @@
 ---
-abstract: "List prereqs that need a version bump for an author's distributions"
+abstract: "Compare the required version of a distribution's prerequisites against their most recent release"
 author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
@@ -18,10 +18,10 @@ no_index:
     - t
     - inc
 requires:
-  MetaCPAN::Client: '0'
+  MetaCPAN::Client: '2.0107'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/module-checkdep-version/issues
   repository: https://github.com/stevieb9/module-checkdep-version.git
-version: '0.05'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

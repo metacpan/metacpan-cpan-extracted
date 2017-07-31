@@ -3,7 +3,7 @@ use alienfile;
 probe sub { 'share' };
 
 share {
-  requires 'Alien::autoconf' => '0.03';
+  requires 'Alien::autoconf' => '0.05';
   requires 'Alien::m4'       => '0.11';
   requires 'Path::Tiny'      => '0.077';
 
@@ -14,7 +14,7 @@ share {
     filter => qr/^automake-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );
-  plugin Extract => 'tar.gz',
+  plugin Extract => 'tar.gz';
   
   patch sub {
     my($build) = @_;
@@ -27,6 +27,36 @@ share {
     Path::Tiny->new('bin/aclocal.in')->edit_lines(sub {
       s/"\@datadir\@/'\@datadir\@'."/g;
     });
+    
+    my @in = grep { $_->basename =~ /\.in$/ } Path::Tiny->new('bin')->children;
+    push @in, Path::Tiny->new('lib/Automake/Config.in');
+    
+    foreach my $in (@in)
+    {
+      $in->copy($in->sibling($in->basename . '~'));
+      my($shebang, @lines) = $in->lines;
+
+      my @preamble = ($shebang);
+      while(defined $lines[0] && $lines[0] =~ /^#/)
+      {
+        push @preamble, shift(@lines);
+      }
+
+      s/'\@datadir\@(.*?)'/"\$ENV{ALIEN_AUTOMAKE_ROOT}\/share$1"/g for @lines;
+      @lines = (
+        "BEGIN {\n",
+        "  use strict;\n",
+        "  use warnings;\n",
+        "  use File::Spec;\n",
+        "  my(\$v,\$d) = File::Spec->splitpath(File::Spec->rel2abs(__FILE__));\n",
+        "  my \@d = File::Spec->splitdir(\$d);\n",
+        "  pop \@d for 1..2;\n",
+        "  \$ENV{ALIEN_AUTOMAKE_ROOT} ||= File::Spec->catpath(\$v,File::Spec->catdir(\@d), '');\n",
+        "}\n",
+        @lines,
+      );
+      $in->spew(@preamble, @lines);
+    }
   };
   
   plugin 'Build::Autoconf' => ();

@@ -1,6 +1,6 @@
 package Siebel::Lbconfig::Daemon::Action::ListServers;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 use Moose 2.0401;
 use namespace::autoclean 0.13;
 use Siebel::Srvrmgr::Daemon::ActionStash 0.27;
@@ -17,7 +17,9 @@ Siebel::Lbconfig::Daemon::Action::ListServers - subclass to information from C<l
 
 =head1 DESCRIPTION
 
-Siebel::Lbconfig::Daemon::Action::ListServers will simply recover and "return" the output of C<list servers>
+C<Siebel::Lbconfig::Daemon::Action::ListServers> is a subclass of L<Siebel::Srvrmgr::Daemon::Action>.
+
+C<Siebel::Lbconfig::Daemon::Action::ListServers> will simply recover and "return" the output of C<list servers>
 command. See C<do_parsed> method for details.
 
 =head1 EXPORTS
@@ -70,5 +72,44 @@ override 'do_parsed' => sub {
     }
 
 };
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Siebel::Srvrmgr::Daemon::ActionStash>
+
+=item *
+
+L<Siebel::Srvrmgr::Daemon::Action>
+
+=back
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+This file is part of Siebel Monitoring Tools.
+
+Siebel Monitoring Tools is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Siebel Monitoring Tools is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Siebel Monitoring Tools.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
 
 __PACKAGE__->meta->make_immutable;

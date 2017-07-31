@@ -101,11 +101,13 @@ use strict;
 use warnings;
 use SomeService::DB;
 use Capture::Tiny qw( capture_stderr );
+use File::Glob qw( bsd_glob );
 
 BEGIN {
   capture_stderr {
     Rose::Planter->plant(
-      "SomeService::Objects" => File::Spec->catfile(File::HomeDir->my_home, qw( lib SomeService Objects autolib)));
+      "SomeService::Objects" => bsd_glob('~/lib/SomeService/Objects/autolib'),
+    );
   };
 }
 
@@ -125,14 +127,13 @@ package SomeService::DB;
 
 use strict;
 use warnings;
-use File::HomeDir;
+use File::Glob qw( bsd_glob );
 use base qw( Rose::Planter::DB );
 use Clustericious::Config;
 use DBI;
-use File::HomeDir;
 use Test::More;
 
-my $home = File::HomeDir->my_home;
+my $home = bsd_glob '~';
 my $db_filename = "$home/database.sqlite";
 my $dbh = DBI->connect("dbi:SQLite:dbname=$db_filename", '', '', { RaiseError => 1, AutoCommit => 1 });
 
@@ -171,7 +172,6 @@ package SomeService::Objects;
 
 use strict;
 use warnings;
-use File::HomeDir;
 use File::Spec;
 use Rose::Planter
     loader_params => {

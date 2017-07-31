@@ -1,7 +1,10 @@
 See the git repository. In particular:
 
-1.00 converted module internals to Moo. This changed the return value of some
-     of the routines, notably the setters, so those can no longer be chained.
+1.04 add abs2rel and rel2abs methods, & other cleanups.
+
+1.00 converted module internals to Moo. This changed the return value
+     of some of the routines, notably the setters, so those can no
+     longer be chained.
 
 0.84 in particular fixed interval2freq to not suck terribly at negative
      intervals, among other fixes and improvements.

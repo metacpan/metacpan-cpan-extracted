@@ -5,13 +5,11 @@
 use strict;
 use warnings;
 
-use English qw< -no_match_vars >;
-
 use File::Spec qw<>;
 
 use Test::More;
 
-our $VERSION = '1.128';
+our $VERSION = '1.130';
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );
 

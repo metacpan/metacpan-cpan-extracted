@@ -2,8 +2,7 @@ use strict;
 use warnings;
 use 5.010001;
 BEGIN { delete $ENV{CLUSTERICIOUS_CONF_DIR} }
-use File::HomeDir::Test;
-use File::HomeDir;
+use Test2::Plugin::FauxHomeDir;
 use Test::More tests => 20;
 use Test::Mojo;
 use Path::Class::Dir;
@@ -11,13 +10,13 @@ use YAML::XS qw( Dump LoadFile );
 use Path::Class::File;
 use Path::Class::Dir;
 use JSON::MaybeXS qw( encode_json );
+use File::Glob qw( bsd_glob );
 
 delete $ENV{HARNESS_ACTIVE};
 $ENV{LOG_LEVEL} = 'FATAL';
 
 my $etc = Path::Class::Dir
-  ->new(File::HomeDir->my_home)
-  ->subdir('etc');
+  ->new(bsd_glob('~/etc'));
 $etc->mkpath(0,0700);
 
 $etc->file('PlugAuth.conf')->spew(Dump({
@@ -43,7 +42,7 @@ my($year, $month, $day) = do {
     ->status_is(200);
   
   my $log = eval {
-    my $dir = Path::Class::Dir->new(File::HomeDir->my_home, '.plugauth_plugin_audit');
+    my $dir = Path::Class::Dir->new(bsd_glob('~/.plugauth_plugin_audit'));
     ($dir) = $dir->children;
     ($dir) = $dir->children;
     ($dir) = $dir->children;

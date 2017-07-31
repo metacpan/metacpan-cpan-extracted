@@ -1,17 +1,24 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Data::Integer 0.003 qw(min_sint max_uint hex_natint);
-use Test::More tests => 1 + 3 + 4*22 + 5*8 + 6*2;
+use Test::More;
+use t::NumForms qw(zpat zero_forms natint_forms float_forms);
 
-do "t/num_forms.pl" or die $@ || $!;
+my @all_zeroes = zero_forms();
+my @good_zeroes = ( natint_forms("0"), float_forms("+0"), float_forms("-0") );
+plan tests => 1 + 3*@all_zeroes + 4*(@good_zeroes + 13) + 5*8 + 6*2;
 
-BEGIN { use_ok "Scalar::Number", qw(scalar_num_part sclnum_id_cmp); }
+use_ok "Scalar::Number", qw(scalar_num_part sclnum_id_cmp);
 
-foreach my $nzero (0, +0.0, -0.0) {
+foreach my $nzero (@all_zeroes) {
+	my $nwarn = 0;
+	local $SIG{__WARN__} = sub { $nwarn++; };
 	my $tzero = $nzero;
-	scalar_num_part($tzero);
+	ok scalar_num_part($tzero) == 0;
 	is zpat($tzero), zpat($nzero);
+	is $nwarn, 0;
 }
 
 sub match($$) {
@@ -30,9 +37,7 @@ sub match($$) {
 	is $nwarn, 0;
 }
 
-match 0, 0;
-match +0.0, +0.0;
-match -0.0, -0.0;
+match $_, $_ foreach @good_zeroes;
 match 1, 1;
 match 1.5, 1.5;
 match -3, -3;
@@ -44,13 +49,6 @@ match "00", "0";
 match "0 but true", "0";
 match *match, +0.0;
 match undef, +0.0;
-
-match "0.0", "0.0";
-match "+0.0", "+0.0";
-match "-0.0", "-0.0";
-match "0", "0";
-match "+0", "+0";
-match "-0", "-0";
 
 SKIP: {
 	eval { require Scalar::Util };

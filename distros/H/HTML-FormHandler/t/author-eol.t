@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -55,9 +55,11 @@ my @files = (
     'lib/HTML/FormHandler/Field/PrimaryKey.pm',
     'lib/HTML/FormHandler/Field/Repeatable.pm',
     'lib/HTML/FormHandler/Field/Repeatable/Instance.pm',
+    'lib/HTML/FormHandler/Field/RequestToken.pm',
     'lib/HTML/FormHandler/Field/Reset.pm',
     'lib/HTML/FormHandler/Field/Result.pm',
     'lib/HTML/FormHandler/Field/RmElement.pm',
+    'lib/HTML/FormHandler/Field/Role/RequestToken.pm',
     'lib/HTML/FormHandler/Field/Second.pm',
     'lib/HTML/FormHandler/Field/Select.pm',
     'lib/HTML/FormHandler/Field/SelectCSV.pm',
@@ -172,10 +174,12 @@ my @files = (
     'lib/HTML/FormHandler/Wizard.pm',
     't/01app.t',
     't/author-eol.t',
+    't/author-no-tabs.t',
     't/basic.t',
     't/blocks/basic.t',
     't/blocks/block_list.t',
     't/blocks/blocktags.t',
+    't/blocks/build_render_list_method.t',
     't/blocks/loading.t',
     't/blocks/nested.t',
     't/blocks/render_units.t',
@@ -222,6 +226,7 @@ my @files = (
     't/fields/novalue.t',
     't/fields/password.t',
     't/fields/repeatable.t',
+    't/fields/request_token.t',
     't/fields/select.t',
     't/fields/select2.t',
     't/fields/selectcsv.t',
@@ -267,7 +272,6 @@ my @files = (
     't/moose/field_traits.t',
     't/moose/no_extend.t',
     't/moose/subclass_roles.t',
-    't/release-no-tabs.t',
     't/render/actions.t',
     't/render/array.t',
     't/render/basic.t',

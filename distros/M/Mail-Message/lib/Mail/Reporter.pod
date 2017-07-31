@@ -7,15 +7,28 @@ Mail::Reporter - base-class and error reporter for Mail::Box
 =head1 INHERITANCE
 
  Mail::Reporter is extended by
+   Mail::Box
+   Mail::Box::Collection
+   Mail::Box::Identity
+   Mail::Box::Locker
+   Mail::Box::MH::Index
+   Mail::Box::MH::Labels
+   Mail::Box::Manager
    Mail::Box::Parser
+   Mail::Box::Search
+   Mail::Box::Thread::Manager
+   Mail::Box::Thread::Node
    Mail::Message
    Mail::Message::Body
+   Mail::Message::Body::Delayed
    Mail::Message::Convert
    Mail::Message::Field
    Mail::Message::Field::Attribute
    Mail::Message::Head
    Mail::Message::Head::FieldGroup
    Mail::Message::TransferEnc
+   Mail::Server
+   Mail::Transport
 
 =head1 SYNOPSIS
 
@@ -297,13 +310,13 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.000,
-built on February 02, 2017.
+This module is part of Mail-Message distribution version 3.001,
+built on July 26, 2017.
 
 Do not forget to read
-L</Mail::Box-Overview>,
-L</Mail::Box-Cookbook>, and
-L</Mail::Box-Index>.
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
 Examples are included in the Mail-Box distribution, directories 'examples'
 and 'scripts'.
 
@@ -311,15 +324,15 @@ Browseable manuals, papers, and other released material van be found
 at  Website: F<http://perl.overmeer.net/mailbox/>
 
 The central modules (in separate distributions) in the MailBox suite are:
-L</Mail::Message>,
-L</Mail::Box>,
-L</Mail::Box::IMAP4>,
-L</Mail::Box::POP3>,
-L</Mail::Box::Parser::C>,
-L</Mail::Box::Dbx> (unpublished),
-L</Mail::Transport>,
-L</Object::Realize::Later>, and
-L</User::Identity>.
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
 
 Please post questions or ideas to the author F<markov@cpan.org>.
 
@@ -329,5 +342,5 @@ Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -1,5 +1,9 @@
 #! /usr/bin/perl -w
 
+my $VERSION = 1.02;
+
+use blib;
+
 use Shell::POSIX::Select qw($Prompt);
 
 $Prompt='Custom Prompt for loop 1';

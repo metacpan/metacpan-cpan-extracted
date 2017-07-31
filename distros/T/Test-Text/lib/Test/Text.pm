@@ -3,18 +3,24 @@ package Test::Text;
 use warnings;
 use strict;
 use utf8; # Files and dictionaries might use utf8
+use Encode;
 
 use Carp;
 use File::Slurp::Tiny 'read_file';
 use Text::Hunspell;
-use v5.14;
+use v5.12;
 
-use version; our $VERSION = qv('0.4.0'); # More extensions
+use version; our $VERSION = qv('0.4.2'); # Works with UTF8
 
 use base 'Test::Builder::Module'; # Included in Test::Simple
 
 my $CLASS = __PACKAGE__;
 our @EXPORT= 'just_check';
+
+BEGIN {
+  binmode *STDOUT, ":encoding(utf8)";
+  binmode *STDERR, ":encoding(utf8)";
+}
 
 # Module implementation here
 sub new {
@@ -40,7 +46,7 @@ sub new {
 				  "$data_dir/$language.aff",    # Hunspell or other affix file
 				  "$data_dir/$language.dic"     # Hunspell or other dictionary file
 				   );
-  croak if !$speller;
+  croak "Couldn't create speller: $1" if !$speller;
   $self->{'_speller'} = $speller;
   $speller->add_dic("$dir/words.dic"); #word.dic should be in the text directory
   return $self;
@@ -67,10 +73,9 @@ sub check {
       $file_content = _strip_code( $file_content);
     }
     my @words = ($file_content =~ m{\b(\p{L}+)\b}g);
-
     for my $w (@words) {
       next if !$w;
-      $tb->ok( $speller->check( $w),  "'$w'");
+      $tb->ok( $speller->check( $w),  "'". encode_utf8($w) . "'");
     }
   }
 }
@@ -82,7 +87,7 @@ sub _strip_urls {
 }
 
 sub _strip_code {
-  my $text = shift || carp "No text";
+  my $text = shift || carp "No text in _strip_code";
   $text =~ s/~~~[\w\W]*?~~~//g;
   $text =~ s/```[\w\W]*?```//g;
   $text =~ s/`[^`]*`//g;

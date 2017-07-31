@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Complete::Man",
   "PREREQ_PM" => {
-    "Complete::Util" => "0.52",
+    "Complete::Util" => "0.57",
     "Exporter" => 0,
+    "File::Which" => 0,
     "Filename::Compressed" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,9 +38,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Util" => "0.52",
+  "Complete::Util" => "0.57",
   "Exporter" => 0,
   "File::Spec" => 0,
+  "File::Which" => 0,
   "Filename::Compressed" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

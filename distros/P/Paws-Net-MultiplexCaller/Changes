@@ -1,0 +1,10 @@
+0.03 2017-07-25
+ - Paws::Net::MultiplexCaller does not throw Paws::Exception objects that it receives: they should
+   already be thrown by the callers. This was ill-placed logic to fix how PawsX::FakeImplementation::Instance
+   was handling exceptions
+
+0.02 2017-07-24
+ - The unsuspecting worlds' computers have no AWS credentials on them, making tests fail. Fixed
+
+0.01 2017-07-24
+ - Initial release to an unsuspecting world

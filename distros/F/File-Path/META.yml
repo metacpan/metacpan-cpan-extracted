@@ -31,5 +31,5 @@ requires:
   File::Spec: '0'
 resources:
   repository: https://github.com/jkeenan/File-Path.git
-version: '2.14'
+version: '2.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

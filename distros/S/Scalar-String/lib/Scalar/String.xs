@@ -3,6 +3,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 MODULE = Scalar::String PACKAGE = Scalar::String
 
 PROTOTYPES: DISABLE
@@ -11,7 +15,7 @@ bool
 sclstr_is_upgraded(SV *value)
 PROTOTYPE: $
 CODE:
-	RETVAL = !!SvUTF8(value);
+	RETVAL = cBOOL(SvUTF8(value));
 OUTPUT:
 	RETVAL
 

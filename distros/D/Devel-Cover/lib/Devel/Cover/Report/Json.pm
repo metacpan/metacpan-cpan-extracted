@@ -10,10 +10,10 @@ package Devel::Cover::Report::Json;
 use strict;
 use warnings;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 use Devel::Cover::DB::IO::JSON;
-use Devel::Cover::Dumper;  # For debugging
+# use Devel::Cover::Dumper;  # For debugging
 
 sub add_runs
 {
@@ -56,7 +56,7 @@ Devel::Cover::Report::Json - JSON backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

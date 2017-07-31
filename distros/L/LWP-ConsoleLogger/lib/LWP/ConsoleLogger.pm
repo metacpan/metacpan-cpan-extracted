@@ -4,7 +4,7 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-$LWP::ConsoleLogger::VERSION = '0.000035';
+$LWP::ConsoleLogger::VERSION = '0.000036';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
 use DateTime qw();
 use HTML::Restrict qw();
@@ -179,7 +179,7 @@ sub request_callback {
         $self->_log_params( $req, $_ ) for ( 'GET', $req->method );
     }
 
-    $self->_log_headers( 'request', $req->headers );
+    $self->_log_headers( 'request (before sending)', $req->headers );
 
     # This request might have a body.
     return unless $req->content;
@@ -193,6 +193,8 @@ sub response_callback {
     my $self = shift;
     my $res  = shift;
     my $ua   = shift;
+
+    $self->_log_headers( 'request (after sending)', $res->request->headers );
 
     if ( $self->dump_status ) {
         $self->_debug( '==> ' . $res->status_line . "\n" );
@@ -223,7 +225,6 @@ sub _log_headers {
     $t->captions( [ ucfirst $type . ' Header', 'Value' ] );
 
     foreach my $name ( sort $headers->header_field_names ) {
-        next if $name eq 'Cookie' || $name eq 'Set-Cookie';
         my $val = (
             any { $name eq $_ }
             @{ $self->headers_to_redact }
@@ -533,7 +534,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000035
+version 0.000036
 
 =head1 SYNOPSIS
 

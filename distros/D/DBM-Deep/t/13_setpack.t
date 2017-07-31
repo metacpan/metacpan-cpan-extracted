@@ -3,7 +3,8 @@ use warnings FATAL => 'all';
 
 use Config;
 use Test::More;
-use t::common qw( new_fh );
+use lib 't';
+use common qw( new_fh );
 
 use_ok( 'DBM::Deep' );
 

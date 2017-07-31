@@ -10,14 +10,13 @@ use Mojo::Template;
 use Log::Log4perl qw( :nowarn );
 use Storable ();
 use Clustericious::Config::Helpers ();
-use File::HomeDir ();
 use Mojo::URL;
 use File::Spec;
 use File::Temp ();
 use Carp ();
 
 # ABSTRACT: Configuration files for Clustericious nodes.
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 
 our %singletons;
@@ -233,7 +232,7 @@ Clustericious::Config - Configuration files for Clustericious nodes.
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -259,7 +258,7 @@ In your ~/etc/hypnotoad.conf:
 
  listen :
    - <%= $url %>
- # home uses File::HomeDir to find the calling users'
+ # home uses ~ to find the calling users'
  # home directory
  pid_file : <%= home %>/<%= $app %>/hypnotoad.pid
  env :
@@ -370,6 +369,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Curt Tilmes
+
+Yanick Champoux
 
 =head1 COPYRIGHT AND LICENSE
 

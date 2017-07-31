@@ -3,23 +3,23 @@
 use strict;
 use warnings;
 
-use Module::Build 0.3601;
+use Module::Build 0.28;
 
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.3601"
+    "Module::Build" => "0.28"
   },
   "c_source" => "c",
   "configure_requires" => {
-    "Module::Build" => "0.3601"
+    "Module::Build" => "0.28"
   },
   "dist_abstract" => "Unicode case-folding for case-insensitive lookups.",
   "dist_author" => [
     "Andrew Rodland <arodland\@cpan.org>"
   ],
   "dist_name" => "Unicode-CaseFold",
-  "dist_version" => "1.00",
+  "dist_version" => "1.01",
   "license" => "perl",
   "module_name" => "Unicode::CaseFold",
   "need_compiler" => 0,
@@ -35,7 +35,6 @@ my %module_build_args = (
     "strict" => 0,
     "warnings" => 0
   },
-  "script_files" => [],
   "test_requires" => {
     "Test::More" => 0,
     "utf8" => 0
@@ -44,7 +43,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Module::Build" => "0.3601",
+  "Module::Build" => "0.28",
   "Test::More" => 0,
   "utf8" => 0
 );
@@ -56,6 +55,7 @@ unless ( eval { Module::Build->VERSION(0.4004) } ) {
 }
 
 my $build = Module::Build->new(%module_build_args);
+
 
 my $build_xs;
 $build_xs = 0 if grep { $_ eq '--pp' } @ARGV;

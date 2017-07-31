@@ -10,6 +10,11 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
 #ifndef cBOOL
 # define cBOOL(x) ((bool)!!(x))
 #endif /* !cBOOL */
@@ -124,6 +129,12 @@ static void *THX_ptr_table_fetch(pTHX_ PTR_TBL_t *tbl, void *from)
 
 #endif /* QUSE_CUSTOM_OPS && !ptr_table_new */
 
+#if PERL_VERSION_GE(5,7,3)
+# define PERL_UNUSED_THX() NOOP
+#else /* <5.7.3 */
+# define PERL_UNUSED_THX() ((void)(aTHX+0))
+#endif /* <5.7.3 */
+
 #if PERL_VERSION_GE(5,11,0)
 # define case_SVt_RV_
 #else /* <5.11.0 */
@@ -159,22 +170,34 @@ static void *THX_ptr_table_fetch(pTHX_ PTR_TBL_t *tbl, void *from)
 #define sv_is_untyped_ref(sv) (SvROK(sv) && !SvOBJECT(SvRV(sv)))
 #define sv_is_untyped_blessed(sv) (SvROK(sv) && SvOBJECT(SvRV(sv)))
 
-static bool THX_sv_is_undef(pTHX_ SV *sv) { return cBOOL(sv_is_undef(sv)); }
+static bool THX_sv_is_undef(pTHX_ SV *sv) {
+	PERL_UNUSED_THX();
+	return cBOOL(sv_is_undef(sv));
+}
 
-static bool THX_sv_is_string(pTHX_ SV *sv) { return cBOOL(sv_is_string(sv)); }
+static bool THX_sv_is_string(pTHX_ SV *sv) {
+	PERL_UNUSED_THX();
+	return cBOOL(sv_is_string(sv));
+}
 
-static bool THX_sv_is_glob(pTHX_ SV *sv) { return cBOOL(sv_is_glob(sv)); }
+static bool THX_sv_is_glob(pTHX_ SV *sv) {
+	PERL_UNUSED_THX();
+	return cBOOL(sv_is_glob(sv));
+}
 
 static bool THX_sv_is_regexp(pTHX_ SV *sv) {
+	PERL_UNUSED_THX();
 	PERL_UNUSED_ARG(sv);
 	return cBOOL(sv_is_regexp(sv));
 }
 
 static bool THX_sv_is_untyped_ref(pTHX_ SV *sv) {
+	PERL_UNUSED_THX();
 	return cBOOL(sv_is_untyped_ref(sv));
 }
 
 static bool THX_sv_is_untyped_blessed(pTHX_ SV *sv) {
+	PERL_UNUSED_THX();
 	return cBOOL(sv_is_untyped_blessed(sv));
 }
 
@@ -235,6 +258,7 @@ static struct rtype_metadata {
 #define scalar_class(arg) THX_scalar_class(aTHX_ arg)
 static I32 THX_scalar_class(pTHX_ SV *arg)
 {
+	PERL_UNUSED_THX();
 	if(sv_is_glob(arg)) {
 		return SCLASS_GLOB;
 	} else if(sv_is_regexp(arg)) {
@@ -297,6 +321,7 @@ static I32 THX_read_reftype(pTHX_ SV *reftype)
 #define ref_type(referent) THX_ref_type(aTHX_ referent)
 static I32 THX_ref_type(pTHX_ SV *referent)
 {
+	PERL_UNUSED_THX();
 	switch(SvTYPE(referent)) {
 		case SVt_NULL: case SVt_IV: case SVt_NV: case_SVt_RV_
 		case SVt_PV: case SVt_PVIV: case SVt_PVNV:
@@ -324,6 +349,7 @@ static const char *THX_blessed_class(pTHX_ SV *referent)
 {
 	HV *stash = SvSTASH(referent);
 	const char *name = HvNAME_get(stash);
+	PERL_UNUSED_THX();
 	return name ? name : "__ANON__";
 }
 
@@ -573,8 +599,8 @@ static OP *THX_pp_check_dyn_battr(pTHX)
 #endif /* QUSE_CUSTOM_OPS */
 
 #ifndef PERL_ARGS_ASSERT_CROAK_XS_USAGE
-static void S_croak_xs_usage(pTHX_ const CV *, const char *);
-# define croak_xs_usage(cv, params) S_croak_xs_usage(aTHX_ cv, params)
+static void S_croak_xs_usage(const CV *, const char *);
+# define croak_xs_usage(cv, params) S_croak_xs_usage(cv, params)
 #endif /* !PERL_ARGS_ASSERT_CROAK_XS_USAGE */
 
 static void THX_xsfunc_scalar_class(pTHX_ CV *cv)
@@ -713,21 +739,21 @@ BOOT:
 	SV *tsv = sv_2mortal(newSV(0));
 #if QUSE_CUSTOM_OPS
 	ppmap = ptr_table_new();
-# define SETUP_CUSTOM_OP(cv, THX_ppfunc) \
+# define SETUP_CUSTOM_OP(pcv, THX_ppfunc) \
 	do { \
-		ptr_table_store(ppmap, FPTR2DPTR(void*, cv), \
+		ptr_table_store(ppmap, FPTR2DPTR(void*, pcv), \
 			FPTR2DPTR(void*, THX_ppfunc)); \
-		cv_set_call_checker(cv, THX_ck_entersub_pc, (SV*)cv); \
+		cv_set_call_checker(pcv, THX_ck_entersub_pc, (SV*)pcv); \
 	} while(0)
 #else /* !QUSE_CUSTOM_OPS */
-# define SETUP_CUSTOM_OP(cv, THX_ppfunc) ((void)0)
+# define SETUP_CUSTOM_OP(pcv, THX_ppfunc) ((void)0)
 #endif /* !QUSE_CUSTOM_OPS */
 #define SETUP_SIMPLE_UNARY_XSUB(NAME) \
 	do { \
-		CV *cv = newXSproto_portable("Params::Classify::"#NAME, \
+		CV *pcv = newXSproto_portable("Params::Classify::"#NAME, \
 			THX_xsfunc_##NAME, __FILE__, "$"); \
-		CvXSUBANY(cv).any_i32 = PC_ALLOW_UNARY; \
-		SETUP_CUSTOM_OP(cv, THX_pp_##NAME); \
+		CvXSUBANY(pcv).any_i32 = PC_ALLOW_UNARY; \
+		SETUP_CUSTOM_OP(pcv, THX_pp_##NAME); \
 	} while(0)
 	SETUP_SIMPLE_UNARY_XSUB(scalar_class);
 	SETUP_SIMPLE_UNARY_XSUB(ref_type);
@@ -750,16 +776,16 @@ BOOT:
 		sclassmeta->keyword_sv =
 			newSVpvn_share(keyword_pv, strlen(keyword_pv), 0);
 		for(; variant >= 0; variant -= PC_CROAK) {
-			CV *cv;
+			CV *pcv;
 			sv_setpvf(tsv, "Params::Classify::%s_%s",
 				variant & PC_CROAK ? "check" : "is",
 				variant & PC_ABLE ? "able" :
 				variant & PC_STRICTBLESS ? "strictly_blessed" :
 				lckeyword);
-			cv = newXSproto_portable(SvPVX(tsv),
+			pcv = newXSproto_portable(SvPVX(tsv),
 				THX_xsfunc, __FILE__, is_refish ? "$;$" : "$");
-			CvXSUBANY(cv).any_i32 = cvflags | variant;
-			SETUP_CUSTOM_OP(cv, THX_pp_check_sclass);
+			CvXSUBANY(pcv).any_i32 = cvflags | variant;
+			SETUP_CUSTOM_OP(pcv, THX_pp_check_sclass);
 		}
 	}
 }

@@ -9,7 +9,7 @@ Provides a geocoding functionality using https://geocode.xyz
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 
@@ -52,6 +52,7 @@ environment variables:
 
 You can also set your own User-Agent object:
 
+    use LWP::UserAgent::Throttled;
     $geocoder->ua(LWP::UserAgent::Throttled->new());
 
 ## reverse\_geocode

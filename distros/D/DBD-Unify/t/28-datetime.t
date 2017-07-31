@@ -7,6 +7,11 @@ use Test::More;
 
 use DBI qw(:sql_types);
 
+BEGIN {	# Force sensible date format
+    $ENV{DATEFMT} = "YYYY-MM-DD";
+    $ENV{TIMEFMT} = "HH:MM";
+    }
+
 my $UNIFY  = $ENV{UNIFY};
 exists $ENV{DBPATH} && -d $ENV{DBPATH} && -r "$ENV{DBPATH}/file.db" or
     plan skip_all => "\$DBPATH not set";
@@ -34,7 +39,7 @@ unless ($dbh) {
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>
     "create table xx (",
-    "    xs numeric       (4) not null,",
+    "    xs  numeric (4) not null,",
     "    xdt datetime",
     ")"), "create");
 if ($dbh->err) {
@@ -44,7 +49,7 @@ if ($dbh->err) {
 ok ($dbh->commit, "commit");
 
 ok (1, "-- FILL THE TABLE");
-ok ($dbh->do ("insert into xx values (0, 02/05/2012)"));
+ok ($dbh->do ("insert into xx values (0, '2012-02-05')"));
 foreach my $v ( 1 .. 5 ) {
     my $dt = "2012-02-05 12:20:30.00$v";
     ok ($dbh->do ("insert into xx values ($v, '$dt')"), "INS $v");
@@ -62,16 +67,16 @@ ok ($dbh->commit, "commit");
 $" = ", ";
 ok (1, "-- SELECT FROM THE TABLE");
 my %result_ok = (
-    0 => "0, '2012-02-05 00:00:00.000'",
-    1 => "1, '2012-02-05 12:20:30.001'",
-    2 => "2, '2012-02-05 12:20:30.002'",
-    3 => "3, '2012-02-05 12:20:30.003'",
-    4 => "4, '2012-02-05 12:20:30.004'",
-    5 => "5, '2012-02-05 12:20:30.005'",
-    6 => "6, '2012-02-06 12:20:30.000'",
-    7 => "7, '2012-02-07 12:20:30.000'",
-    8 => "8, '2012-02-08 12:20:30.000'",
-    9 => "9, '2012-02-09 12:20:30.000'",
+     0 =>  "0, '2012-02-05 00:00:00.000'",
+     1 =>  "1, '2012-02-05 12:20:30.001'",
+     2 =>  "2, '2012-02-05 12:20:30.002'",
+     3 =>  "3, '2012-02-05 12:20:30.003'",
+     4 =>  "4, '2012-02-05 12:20:30.004'",
+     5 =>  "5, '2012-02-05 12:20:30.005'",
+     6 =>  "6, '2012-02-06 12:20:30.000'",
+     7 =>  "7, '2012-02-07 12:20:30.000'",
+     8 =>  "8, '2012-02-08 12:20:30.000'",
+     9 =>  "9, '2012-02-09 12:20:30.000'",
     10 => "10, '2012-02-10 12:20:30.000'",
     );
 ok ($sth = $dbh->prepare ("select * from xx where xs between 0 and 5"), "sel prepare");
@@ -88,7 +93,7 @@ ok (1, "-- Check the internals");
     foreach my $attr (qw(NAME uni_type TYPE PRECISION SCALE)) {
 	#printf STDERR "\n%-20s %s\n", $attr, "@{$sth->{$attr}}";
 	is ("@{$sth->{$attr}}", $attr{$attr}, "attr $attr");
-    }
+	}
     }
 ok ($sth->execute, "execute");
 while (my ($xs, $xdt) = $sth->fetchrow_array ()) {

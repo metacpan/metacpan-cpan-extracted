@@ -44,7 +44,6 @@
             "List::UtilsBy" : "0.10",
             "Log::Any" : "1.045",
             "Log::Any::Adapter" : "1.045",
-            "Mixin::Event::Dispatch" : "2.000",
             "Ref::Util" : "0.111",
             "Scalar::Util" : "1.47",
             "Syntax::Keyword::Try" : "0.04",
@@ -91,7 +90,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

@@ -39,7 +39,7 @@
       "runtime" : {
          "requires" : {
             "Module::Runtime" : "0",
-            "Net::Amazon::DynamoDB::Marshaler" : "0",
+            "Net::Amazon::DynamoDB::Marshaler" : "0.05",
             "Paws" : "0",
             "PerlX::Maybe" : "0",
             "Scalar::Util" : "0",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/stevecaldwell77/PawsX-DynamoDB-DocumentClient"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Stephen Caldwell <steve@campusexplorer.com>"
    ],

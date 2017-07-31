@@ -1,5 +1,5 @@
 package Consul::Check;
-$Consul::Check::VERSION = '0.020';
+$Consul::Check::VERSION = '0.021';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -57,7 +57,7 @@ sub _build__json_hash {
 }
 
 package Consul::Check::Script;
-$Consul::Check::Script::VERSION = '0.020';
+$Consul::Check::Script::VERSION = '0.021';
 use Moo;
 use Types::Standard qw(Str);
 use JSON::MaybeXS;
@@ -79,7 +79,7 @@ sub _build__json {
 with qw(Consul::Check);
 
 package Consul::Check::TTL;
-$Consul::Check::TTL::VERSION = '0.020';
+$Consul::Check::TTL::VERSION = '0.021';
 use Moo;
 use Types::Standard qw(Str);
 use JSON::MaybeXS;
@@ -99,7 +99,7 @@ sub _build__json {
 with qw(Consul::Check);
 
 package Consul::Check::HTTP;
-$Consul::Check::HTTP::VERSION = '0.020';
+$Consul::Check::HTTP::VERSION = '0.021';
 use Moo;
 use Types::Standard qw(Str Bool);
 use JSON::MaybeXS;
@@ -124,7 +124,7 @@ sub _build__json {
 }
 
 package Consul::Check::TCP;
-$Consul::Check::TCP::VERSION = '0.020';
+$Consul::Check::TCP::VERSION = '0.021';
 use Moo;
 use Types::Standard qw(Str);
 use JSON::MaybeXS;
@@ -146,7 +146,7 @@ sub _build__json {
 with qw(Consul::Check);
 
 package Consul::Check::Docker;
-$Consul::Check::Docker::VERSION = '0.020';
+$Consul::Check::Docker::VERSION = '0.021';
 use Moo;
 use Types::Standard qw(Str);
 use JSON::MaybeXS;

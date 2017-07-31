@@ -1,0 +1,54 @@
+#! /usr/bin/perl -w
+
+# Failure to Identify select Loops
+#
+# When a properly formed select loop appears in certain contexts,
+# such as before a line containing certain patterns of dollar signs
+# or quotes,
+# it will not be properly identified and translated into standard Perl.
+#
+# The following is such an example:
+#
+#    use Shell::POSIX::Select;
+#    select (@names) { print ; }
+#    # $X$
+#
+# The failure of the filtering routine to rewrite the loop causes the
+# compiler to issue the following fatal error when it sees the
+# { following the (LIST):
+#	
+# syntax error at filename line X, near ") {"
+#
+# This of course prevents the program from running.
+#
+# The problem is either a bug in Filter::Simple, or one of the modules on
+# which it depends.
+# Until this is resolved, you may be able to 
+# handle such cases by explicitly turning filtering off before the offending
+# code is encountered, using the no directive:
+#
+#    use Shell::POSIX::Select;     # filtering ON
+#    select (@names) { print ; }
+#
+#    no Shell::POSIX::Select;      # filtering OFF
+#    # $X$
+
+# Is this resolved?
+
+my $VERSION = 1.02;
+
+use blib;
+
+# case 1:
+
+    use Shell::POSIX::Select;
+    select (@names) { print ; }
+    # $X$
+
+# case 2:
+
+    use Shell::POSIX::Select;     # filtering ON
+    select (@names) { print ; }
+
+    no Shell::POSIX::Select;      # filtering OFF
+    # $X$

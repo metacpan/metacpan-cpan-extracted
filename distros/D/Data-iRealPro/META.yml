@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  App::Packager: '1.42'
   Data::Struct: '1.701'
   Font::TTF: '1.06'
   HTML::Entities: '3.69'
@@ -27,5 +28,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://github.com/sciurius/perl-Data-iRealPro
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

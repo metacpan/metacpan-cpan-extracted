@@ -18,8 +18,8 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "AI::PredictionClient::Alien::TensorFlowServingProtos" => "0.03";
-  requires "Alien::Google::GRPC" => "0.03";
+  requires "AI::PredictionClient::Alien::TensorFlowServingProtos" => "0.05";
+  requires "Alien::Google::GRPC" => "0.06";
   requires "ExtUtils::MakeMaker" => "0";
   requires "Inline" => "0";
   requires "Inline::CPP" => "0";

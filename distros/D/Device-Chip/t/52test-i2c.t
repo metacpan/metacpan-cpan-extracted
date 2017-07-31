@@ -14,7 +14,7 @@ my $i2c = $adapter->make_protocol( 'I2C' )->get;
 ok( defined $i2c, 'defined $i2c' );
 
 {
-   test_out( '    # Subtest: ->write' );
+   test_out( qr/\s*# Subtest: ->write\n/ );
    test_out( '    ok 1 - write' );
    test_out( '    1..1' );
    test_out( 'ok 1 - ->write' );
@@ -28,7 +28,7 @@ ok( defined $i2c, 'defined $i2c' );
 
 {
    test_out( 'ok 1 - ->write_then_read return' );
-   test_out( '    # Subtest: ->write_then_read' );
+   test_out( qr/\s*# Subtest: ->write_then_read\n/ );
    test_out( '    ok 1 - write_then_read' );
    test_out( '    1..1' );
    test_out( 'ok 2 - ->write_then_read' );

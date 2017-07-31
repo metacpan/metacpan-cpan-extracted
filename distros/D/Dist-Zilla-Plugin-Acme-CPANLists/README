@@ -1,19 +1,53 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Acme::CPANLists - Plugin to use when building
+    Acme::CPANLists::* distribution
 
+VERSION
+    This document describes version 0.03 of
+    Dist::Zilla::Plugin::Acme::CPANLists (from Perl distribution
+    Dist-Zilla-Plugin-Acme-CPANLists), released on 2017-07-28.
+
+SYNOPSIS
     In dist.ini:
 
      [Acme::CPANLists]
 
 DESCRIPTION
-
-    This plugin is to be used when building Acme::CPANLists::*
+    This plugin is to be used when building "Acme::CPANLists::*"
     distribution. It currently does the following:
 
-      * Fill the Abstract from the first module/author list's summary
+    *   Fill the Abstract from the first module/author list's summary
+
+    *   Add prereq to the mentioned modules (phase=x_mentions,
+        relationship=x_mentions)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Acme-CPANLists>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Acme-CPANLists>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Acm
+    e-CPANLists>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Acme::CPANLists
 
     Pod::Weaver::Plugin::Acme::CPANLists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

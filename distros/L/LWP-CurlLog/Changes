@@ -1,5 +1,8 @@
 Revision history for LWP::CurlLog
 
+0.02 Fri Jul 21 16:16:34 CDT 2017
+    - Include dependency of LWP::UserAgent
+
 0.01 Mon May 29 16:43:01 CDT 2017
     - LWP::CurlLog a way of logging LWP requests as curl command options
 

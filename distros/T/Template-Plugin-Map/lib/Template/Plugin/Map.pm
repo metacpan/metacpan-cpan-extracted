@@ -1,5 +1,13 @@
+#
+# This file is part of Template-Plugin-Map
+#
+# This software is copyright (c) 2017 by Michael Schout <mschout@cpan.org>.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
 package Template::Plugin::Map;
-$Template::Plugin::Map::VERSION = '0.02';
+$Template::Plugin::Map::VERSION = '0.03';
 # ABSTRACT: map VMethod for Template::Tookit
 
 use strict;
@@ -26,7 +34,7 @@ Template::Plugin::Map - map VMethod for Template::Tookit
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -60,7 +68,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Michael Schout <mschout@cpan.org>.
+This software is copyright (c) 2017 by Michael Schout <mschout@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

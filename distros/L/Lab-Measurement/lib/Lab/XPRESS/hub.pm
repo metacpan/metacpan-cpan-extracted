@@ -1,5 +1,6 @@
 package Lab::XPRESS::hub;
-$Lab::XPRESS::hub::VERSION = '3.553';
+#ABSTRACT: The XPRESS main hub
+$Lab::XPRESS::hub::VERSION = '3.554';
 use Lab::Exception;
 use strict;
 use Exporter 'import';
@@ -145,3 +146,32 @@ sub show_available_objects {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::XPRESS::hub - The XPRESS main hub
+
+=head1 VERSION
+
+version 3.554
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

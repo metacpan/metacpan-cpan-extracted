@@ -15,6 +15,7 @@ build_requires:
   Test::Moose: '0'
   Test::Moose::More: '0.047'
   Test::More: '0.94'
+  Test::Requires: '0'
   blib: '1.01'
   constant: '0'
   lib: '0'
@@ -23,7 +24,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: '0'
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,16 +37,16 @@ no_index:
 provides:
   MooseX::AttributeShortcuts:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: '0.032'
+    version: '0.034'
   MooseX::AttributeShortcuts::Trait::Attribute:
     file: lib/MooseX/AttributeShortcuts/Trait/Attribute.pm
-    version: '0.032'
+    version: '0.034'
   MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder:
     file: lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm
-    version: '0.032'
+    version: '0.034'
   MooseX::AttributeShortcuts::Trait::Role::Attribute:
     file: lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm
-    version: '0.032'
+    version: '0.034'
 requires:
   List::Util: '1.33'
   Moose: '1.14'
@@ -67,15 +68,15 @@ resources:
   bugtracker: https://github.com/RsrchBoy/moosex-attributeshortcuts/issues
   homepage: https://github.com/RsrchBoy/moosex-attributeshortcuts
   repository: https://github.com/RsrchBoy/moosex-attributeshortcuts.git
-version: '0.032'
+version: '0.034'
 x_BuiltWith:
   modules:
-    CPAN::Meta: '2.150005'
+    CPAN::Meta: '2.150010'
     ExtUtils::MakeMaker: '7.24'
-    File::Spec: 3.63_01
+    File::Spec: '3.67'
     IO::Handle: '1.36'
     IPC::Open3: '1.20'
-    List::Util: '1.47'
+    List::Util: 1.46_02
     Moose: '2.2005'
     Moose::Exporter: '2.2005'
     Moose::Meta::TypeConstraint: '2.2005'
@@ -85,6 +86,7 @@ x_BuiltWith:
     Moose::Util::TypeConstraints: '2.2005'
     MooseX::Meta::TypeConstraint::Mooish: '0.001'
     MooseX::Role::Parameterized: '1.10'
+    MooseX::SemiAffordanceAccessor: '0.10'
     MooseX::Types::Common::String: '0.001014'
     MooseX::Types::Moose: '0.50'
     MooseX::Types::Path::Class: '0.09'
@@ -98,32 +100,33 @@ x_BuiltWith:
     Test::HasVersion: '0.014'
     Test::MinimumVersion: '0.101082'
     Test::Moose: '2.2005'
-    Test::Moose::More: '0.047'
-    Test::More: '1.302085'
+    Test::Moose::More: '0.048'
+    Test::More: '1.302086'
     Test::NoSmartComments: '0.005'
     Test::NoTabs: '2.00'
     Test::Pod: '1.51'
     Test::Pod::Coverage: '1.10'
     Test::Pod::LinkCheck: '0.008'
+    Test::Requires: '0.10'
     Test::Spelling: '0.20'
     aliased: '0.34'
     blib: '1.06'
     constant: '1.33'
-    lib: '0.63'
+    lib: '0.64'
     namespace::autoclean: '0.28'
     strict: '1.11'
-    warnings: '1.36'
+    warnings: '1.37'
   perl:
-    original: v5.24.1
+    original: v5.26.0
     qv: 1
     version:
       - 5
-      - 24
-      - 1
+      - 26
+      - 0
   platform: linux
 x_Dist_Zilla:
   perl:
-    version: '5.024001'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::NextRelease
@@ -137,10 +140,10 @@ x_Dist_Zilla:
           version_by_branch: '0'
           version_regexp: (?^:^(\d.\d+(_\d\d)?)(-TRIAL|)$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/Git::NextVersion'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@RSRCHBOY/CopyrightYearFromGit'
@@ -153,7 +156,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -161,7 +164,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::Fixups
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::Fixups'
       version: '0.014'
@@ -169,7 +172,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -188,7 +191,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: '0'
       name: '@RSRCHBOY/Git::GatherDir'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -241,7 +244,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@RSRCHBOY/Test::ReportPrereqs'
-      version: '0.026'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@RSRCHBOY/AutoPrereqs'
@@ -400,7 +403,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
+          Module::Metadata: '1.000033'
           version: '0.004'
       name: '@RSRCHBOY/MetaProvides::Package'
       version: '2.004003'
@@ -408,7 +411,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaData::BuiltWith
       config:
         Dist::Zilla::Plugin::MetaData::BuiltWith:
-          $Module::Metadata::VERSION: '1.000031'
+          $Module::Metadata::VERSION: '1.000033'
           _stash_key: x_BuiltWith
           external_file_name: misc/built_with.json
           show_config: '0'
@@ -461,10 +464,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/Git::Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -483,12 +486,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RSRCHBOY/Git::Commit'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Test::CheckDeps
       config:
@@ -506,14 +509,14 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
+          Module::Metadata: '1.000033'
           version: '0.004'
       name: '@RSRCHBOY/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch
       name: '@RSRCHBOY/Travis::ConfigForReleaseBranch'
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::SchwartzRatio
       name: '@RSRCHBOY/SchwartzRatio'
@@ -525,16 +528,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '1'
-          tag: '0.032'
+          tag: '0.034'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RSRCHBOY/Git::Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -546,10 +549,10 @@ x_Dist_Zilla:
           release_branch: ~
           release_message: 'Build results of %h (on %b)'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Build'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -561,10 +564,10 @@ x_Dist_Zilla:
           release_branch: release/cpan
           release_message: 'Full build of CPAN release %v%t'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Release'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -574,10 +577,10 @@ x_Dist_Zilla:
             - 'origin refs/heads/release/cpan:refs/heads/release/cpan'
           remotes_must_exist: '1'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.13.0
+          git_version: 2.13.3
           repo_root: .
       name: '@RSRCHBOY/Git::Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Twitter
       name: '@RSRCHBOY/Twitter'
@@ -600,7 +603,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: '1'
       name: '@RSRCHBOY/GitHub::Update'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -609,9 +612,9 @@ x_Dist_Zilla:
           quiet: '0'
           run:
             - 'mkdir -p releases ; mv %s releases/'
-          version: '0.044'
+          version: '0.045'
       name: '@RSRCHBOY/Run::AfterRelease'
-      version: '0.044'
+      version: '0.045'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@RSRCHBOY/ConfirmRelease'
@@ -794,6 +797,14 @@ x_Dist_Zilla:
               version: '4.015'
       name: '@RSRCHBOY/PodWeaver'
       version: '4.008'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: suggests
+      name: Prereqs
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

@@ -8,8 +8,10 @@ my $build = Module::Build->new(
    requires => {
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.04',
+      'Device::Chip::Base::RegisteredI2C' => '0.10',
    },
    build_requires => {
+      'Test::Device::Chip::Adapter' => 0,
       'Test::More' => '0.88', # done_testing
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires

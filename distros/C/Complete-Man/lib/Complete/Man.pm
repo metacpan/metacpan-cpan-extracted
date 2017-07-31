@@ -1,7 +1,7 @@
 package Complete::Man;
 
-our $DATE = '2016-10-20'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-29'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,9 +15,11 @@ our @EXPORT_OK = qw(complete_manpage complete_manpage_section);
 
 sub _complete_manpage_or_section {
     require Complete::Util;
+    require File::Which;
 
     my $which = shift;
     my %args = @_;
+    my $use_mandb = $args{use_mandb} // 1;
 
     if ($which eq 'section' && $ENV{MANSECT}) {
         return Complete::Util::complete_array_elem(
@@ -33,42 +35,60 @@ sub _complete_manpage_or_section {
 
     return [] unless $ENV{MANPATH};
 
-    require Filename::Compressed;
+    my @manpages;
+    my %sections;
 
-    my @res;
-    my %res;
-    for my $dir (split /:/, $ENV{MANPATH}) {
-        next unless -d $dir;
-        opendir my($dh), $dir or next;
-        for my $sectdir (readdir $dh) {
-            next unless $sectdir =~ /\Aman/;
-            next if $sect && !grep {$sectdir eq $_} @$sect;
-            opendir my($dh), "$dir/$sectdir" or next;
-            my @files = readdir($dh);
-            for my $file (@files) {
-                next if $file eq '.' || $file eq '..';
-                my $chkres = Filename::Compressed::check_compressed_filename(
-                    filename => $file,
-                );
-                my $name = $chkres ? $chkres->{uncompressed_filename} : $file;
-                if ($which eq 'section') {
-                    $name =~ /\.(\w+)\z/ and $res{$1}++; # extract section name
-                } else {
-                    $name =~ s/\.\w+\z//; # strip section name
-                    push @res, $name;
+    if ($use_mandb && File::Which::which("apropos")) {
+        # it's simpler to just use 'apropos' to read mandb, instead of directly
+        # reading dbm file and the screwed up situation of the availability of
+        # *DBM_File.
+        for my $line (`apropos -r .`) {
+            $line =~ /^(\S+?) \(([^)]+)\)\s*-/ or next;
+            push @manpages, $1;
+            $sections{$2}++;
+        }
+    } else {
+        # in the absence of 'apropos', list the man files. slooow.
+        require Filename::Compressed;
+
+        for my $dir (split /:/, $ENV{MANPATH}) {
+            next unless -d $dir;
+            opendir my($dh), $dir or next;
+            for my $sectdir (readdir $dh) {
+                next unless $sectdir =~ /\Aman/;
+                next if $sect && !grep {$sectdir eq $_} @$sect;
+                opendir my($dh), "$dir/$sectdir" or next;
+                my @files = readdir($dh);
+                for my $file (@files) {
+                    next if $file eq '.' || $file eq '..';
+                    my $chkres =
+                        Filename::Compressed::check_compressed_filename(
+                            filename => $file,
+                        );
+                    my $name = $chkres ?
+                        $chkres->{uncompressed_filename} : $file;
+                    if ($which eq 'section') {
+                        # extract section name
+                        $name =~ /\.(\w+)\z/ and $sections{$1}++;
+                    } else {
+                        # strip section name
+                        $name =~ s/\.\w+\z//;
+                        push @manpages, $name;
+                    }
                 }
             }
         }
     }
+
     if ($which eq 'section') {
         Complete::Util::complete_hash_key(
-            word => $args{word},
-            hash => \%res,
+            word  => $args{word},
+            hash  => \%sections,
         );
     } else {
         Complete::Util::complete_array_elem(
-            word => $args{word},
-            array => \@res,
+            word  => $args{word},
+            array => \@manpages,
         );
     }
 }
@@ -96,6 +116,10 @@ _
 Can also be a comma-separated list to allow multiple sections.
 
 _
+        },
+        use_mandb => {
+            schema => ['bool*'],
+            default => 1,
         },
     },
     result_naked => 1,
@@ -143,7 +167,7 @@ Complete::Man - Complete from list of available manpages
 
 =head1 VERSION
 
-This document describes version 0.07 of Complete::Man (from Perl distribution Complete-Man), released on 2016-10-20.
+This document describes version 0.09 of Complete::Man (from Perl distribution Complete-Man), released on 2017-07-29.
 
 =head1 SYNOPSIS
 
@@ -163,7 +187,11 @@ This document describes version 0.07 of Complete::Man (from Perl distribution Co
 =head1 FUNCTIONS
 
 
-=head2 complete_manpage(%args) -> any
+=head2 complete_manpage
+
+Usage:
+
+ complete_manpage(%args) -> any
 
 Complete from list of available manpages.
 
@@ -182,6 +210,8 @@ Only search from specified section(s).
 
 Can also be a comma-separated list to allow multiple sections.
 
+=item * B<use_mandb> => I<bool> (default: 1)
+
 =item * B<word>* => I<str>
 
 =back
@@ -189,7 +219,11 @@ Can also be a comma-separated list to allow multiple sections.
 Return value:  (any)
 
 
-=head2 complete_manpage_section(%args) -> any
+=head2 complete_manpage_section
+
+Usage:
+
+ complete_manpage_section(%args) -> any
 
 Complete from list of available manpage sections.
 
@@ -232,7 +266,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

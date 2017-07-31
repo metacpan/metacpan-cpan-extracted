@@ -1,5 +1,9 @@
 Revision history for Perl extension Cisco::SNMP.
 
+1.03  Mon Jul 24 12:30:00 2017
+      - Updated C::M::Config to allow other protocols than just TFTP.
+      - Updated bin/cisco-conf.pl for above changes.
+
 1.02  Fri Dec  9 12:30:00 2016
       - Fix version compare for Socket module (for IPv6) with 'use version'.
 

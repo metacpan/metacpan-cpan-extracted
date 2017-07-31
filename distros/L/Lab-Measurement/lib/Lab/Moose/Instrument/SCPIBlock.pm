@@ -1,7 +1,6 @@
 package Lab::Moose::Instrument::SCPIBlock;
-#Dist::Zilla: +PodWeaver
 #ABSTRACT: Role for handling SCPI/IEEE 488.2 block data
-$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.553';
+$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.554';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -82,7 +81,7 @@ Lab::Moose::Instrument::SCPIBlock - Role for handling SCPI/IEEE 488.2 block data
 
 =head1 VERSION
 
-version 3.553
+version 3.554
 
 =head1 DESCRIPTION
 

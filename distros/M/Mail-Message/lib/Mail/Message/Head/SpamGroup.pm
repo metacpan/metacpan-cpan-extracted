@@ -5,7 +5,7 @@
 
 package Mail::Message::Head::SpamGroup;
 use vars '$VERSION';
-$VERSION = '3.000';
+$VERSION = '3.001';
 
 use base 'Mail::Message::Head::FieldGroup';
 

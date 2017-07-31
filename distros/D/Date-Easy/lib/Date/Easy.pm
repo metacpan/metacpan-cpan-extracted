@@ -4,21 +4,23 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 use Date::Easy::Date ();
 use Date::Easy::Datetime ();
+use Date::Easy::Units ();
 
 use Exporter;
 use parent 'Exporter';
-our @EXPORT = ( @Date::Easy::Date::EXPORT_OK, @Date::Easy::Datetime::EXPORT_OK, );
+our @EXPORT = ( @Date::Easy::Date::EXPORT_OK, @Date::Easy::Datetime::EXPORT_OK, @Date::Easy::Units::EXPORT_OK, );
 
 
 sub import
 {
 	Date::Easy::Date->import(':all');
 	Date::Easy::Datetime->import(':all', @_[1..$#_]);
-	@_ = (shift);
+	Date::Easy::Units->import(':all');
+	@_ = (shift);									# throw away all args except the first (package name)
 	goto &Exporter::import;
 }
 
@@ -41,7 +43,7 @@ Date::Easy - easy dates with Time::Piece compatibility
 
 =head1 VERSION
 
-This document describes version 0.03 of Date::Easy.
+This document describes version 0.04 of Date::Easy.
 
 =head1 SYNOPSIS
 
@@ -75,6 +77,15 @@ This document describes version 0.03 of Date::Easy.
     say datetime("Jan 1 2000 midnight")->time_zone;
     # prints "UTC"
 
+
+    # UNITS
+
+    # basically just like the interface from Date::Piece
+    say today + 3 * months;
+    say now + 2 * hours - 5 * minutes;
+    say 8 * weeks;
+    # prints "8 weeks"
+
 =head1 DESCRIPTION
 
 Date::Easy provides simple date and datetime objects that will do what you expect, provided you
@@ -83,9 +94,11 @@ for this:
 
     use Date::Easy::Date ':all';
     use Date::Easy::Datetime ':all';
+    use Date::Easy::Units ':all';
 
-So, for full details, you should see the docs for L<Date::Easy::Date> and L<Date::Easy::Datetime>.
-However, there are also a few parameters you can pass to Date::Easy (see L</USAGE>).
+So, for full details, you should see the docs for L<Date::Easy::Date>, L<Date::Easy::Datetime> and
+L<Date::Easy::Units>.  However, there are also a few parameters you can pass to Date::Easy (see
+L</USAGE>).
 
 =head2 Quick Start
 
@@ -110,7 +123,8 @@ attributes of the objects:
 
 or you can do simple date math with them.  You may add and subtract integers to/from a date, which
 are interpreted as days, and you may add and subtract integers to/from a datetime, which are
-interpreted as seconds.
+interpreted as seconds.  Adding and subtracting units objects to/from dates and datetimes add or
+subtract the appropriate quantity of the appropriate unit to/from the date or datetime.
 
 That's really all there is to it, for the basics.
 
@@ -153,6 +167,30 @@ is to say, it will probably handle most common uses, but may fail for pathologic
 
 Date::Easy doesn't deal with leap seconds at all.
 
+=head3 Language
+
+Currently, Date::Easy only speaks English.  Specifically, that means:
+
+=over
+
+=item *
+
+When parsing human-readable strings, it can only understand abbreviations and whole names of days of
+the week and months of the year if they are in English.
+
+=item *
+
+When converting to human-readable strings, using C<strftime> (or C<as> with a non-class-string
+argument, which just calls C<strftime> underneath), it will I<probably> only render days of the week
+and months of the year in English.  However, it I<may> respect the current locale, depending on your
+system's underlying POSIX C<strftime> implementation.
+
+=item *
+
+If you convert a unit (L<Date::Easy::Units>) to a string, you get the English name for the unit.
+
+=back
+
 =head1 USAGE
 
 There are a few parameters you can pass to Date::Easy at C<use> time.  These are passed through to
@@ -162,26 +200,49 @@ L<Date::Easy::Datetime>.  Thus the following are equivalent:
     # is the same as:
     use Date::Easy::Date ':all';
     use Date::Easy::Datetime qw< :all local >;
+    use Date::Easy::Units ':all';
 
     use Date::Easy 'UTC';
     # is the same as:
     use Date::Easy::Date ':all';
     use Date::Easy::Datetime qw< :all UTC >;
+    use Date::Easy::Units ':all';
 
     use Date::Easy 'GMT';
     # is the same as:
     use Date::Easy::Date ':all';
     use Date::Easy::Datetime qw< :all GMT >;
+    use Date::Easy::Units ':all';
 
 As the Date::Easy::Datetime docs will tell you, "UTC" and "GMT" are exactly equivalent as far as
 Date::Easy is concerned.  Passing "local" is redundant, as it is the default, but perhaps you just
 want to be explicit.
 
-=head1 BUGS, CAVEATS and NOTES
+=head1 DETAILS
 
-These docs are currently just the basics; more complete docs coming soon.  For far more than you
-ever wanted to know about Date::Easy, please refer to my blog series
-I<L<A Date with CPAN|http://blogs.perl.org/users/buddy_burden/2015/09/a-date-with-cpan-part-1-state-of-the-union.html>>.
+For more details on datetimes, see L<Date::Easy::Datetime>.
+
+For more details on dates, see L<Date::Easy::Date>.
+
+For more details on units, see L<Date::Easy::Units>.
+
+=head1 INSPIRATION AND CREDITS
+
+For far more than you ever wanted to know about Date::Easy, including inspirations and design goals,
+please refer to my blog series I<L<A Date with
+CPAN|http://blogs.perl.org/users/buddy_burden/2015/09/a-date-with-cpan-part-1-state-of-the-union.html>>.
+
+The implementation of both dates and datetimes is almost entirely handled by L<Time::Piece>, by Matt
+Sergeant and Jarkko Hietaniemi (based on ideas from Larry Wall).
+
+The interface of datetimes (such as method names and data ranges) more closely conforms to that of
+L<DateTime>, by Dave Rolsky.
+
+The interface of constructors (such as `today` and `date`) and that of units objects is shamelessly
+stolen from L<Date::Piece>, by Eric Wilhelm.
+
+Date::Easy exists by standing on the shoulders of these giants.  All I did was glue the bits
+together.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

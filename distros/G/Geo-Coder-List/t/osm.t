@@ -47,6 +47,7 @@ OSM: {
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
+		sleep(1);	# Don't get blacklisted
 
 		my $ua = LWP::UserAgent::Throttled->new();
 		$ua->throttle({ 'nominatim.openstreetmap.org' => 1 });

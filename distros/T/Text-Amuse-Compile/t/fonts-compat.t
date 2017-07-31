@@ -48,6 +48,18 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->serif_fonts ],
                   name => 'PT Serif',
                   desc => 'Paratype (cyrillic)',
                  },
+                 {
+                  name => 'Noto Serif',
+                  desc => 'Noto Serif',
+                 },
+                 {
+                  name => 'Gentium Book Basic',
+                  desc => 'Gentium',
+                 },
+                 {
+                  name => 'Cormorant Garamond',
+                  desc => 'Garamond',
+                 },
            ]);
 is_deeply([ Text::Amuse::Compile::TemplateOptions->mono_fonts ],
           [
@@ -84,16 +96,16 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->sans_fonts ],
                   desc => 'Iwona',
                  },
                  {
-                  name => 'Linux Biolinum O',
-                  desc => 'Linux Biolinum',
-                 },
-                 {
                   name => 'DejaVu Sans',
                   desc => 'DejaVu Sans',
                  },
                  {
                   name => 'PT Sans',
                   desc => 'PT Sans (cyrillic)',
+                 },
+                 {
+                  name => 'Noto Sans',
+                  desc => 'Noto Sans',
                  },
            ]);
 
@@ -140,6 +152,18 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->all_fonts ],
                   desc => 'Paratype (cyrillic)',
                  },
                  {
+                  name => 'Noto Serif',
+                  desc => 'Noto Serif',
+                 },
+                 {
+                  name => 'Gentium Book Basic',
+                  desc => 'Gentium',
+                 },
+                 {
+                  name => 'Cormorant Garamond',
+                  desc => 'Garamond',
+                 },
+                 {
                   name => 'CMU Sans Serif',
                   desc => 'Computer Modern Sans Serif',
                  },
@@ -156,16 +180,16 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->all_fonts ],
                   desc => 'Iwona',
                  },
                  {
-                  name => 'Linux Biolinum O',
-                  desc => 'Linux Biolinum',
-                 },
-                 {
                   name => 'DejaVu Sans',
                   desc => 'DejaVu Sans',
                  },
                  {
                   name => 'PT Sans',
                   desc => 'PT Sans (cyrillic)',
+                 },
+                 {
+                  name => 'Noto Sans',
+                  desc => 'Noto Sans',
                  },
                  {
                   name => 'CMU Typewriter Text',

@@ -1,0 +1,22 @@
+---
+name: MARC-Matcher
+version: 0.02
+author: []
+abstract: MARC record matcher
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Getopt::Long: 0
+  MARC::Loop: 0
+  Text::LevenshteinXS: 0
+build_requires:
+  Test::More: 0
+provides:
+  MARC::Matcher:
+    file: lib/MARC/Matcher.pm
+    version: 0.02
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

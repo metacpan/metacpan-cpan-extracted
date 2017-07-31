@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Acme::CPANLists::Blacklist;
 
-our $DATE = '2017-07-06'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-28'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
@@ -130,8 +130,8 @@ sub after_build {
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
 
     my @all_prereqs;
-    for my $phase (keys %$prereqs_hash) {
-        for my $rel (keys %{ $prereqs_hash->{$phase} }) {
+    for my $phase (grep {!/x_/} keys %$prereqs_hash) {
+        for my $rel (grep {!/x_/} keys %{ $prereqs_hash->{$phase} }) {
             for my $mod (keys %{ $prereqs_hash->{$phase}{$rel} }) {
                 push @all_prereqs, $mod
                     unless $mod ~~ @all_prereqs;
@@ -186,7 +186,7 @@ Dist::Zilla::Plugin::Acme::CPANLists::Blacklist - Blacklist prereqs using a CPAN
 
 =head1 VERSION
 
-This document describes version 0.03 of Dist::Zilla::Plugin::Acme::CPANLists::Blacklist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-06.
+This document describes version 0.04 of Dist::Zilla::Plugin::Acme::CPANLists::Blacklist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-28.
 
 =head1 SYNOPSIS
 
@@ -197,6 +197,8 @@ In F<dist.ini>:
 
 During build, if there is a prereq to a module listed in the above list, the
 build process will be aborted.
+
+Currently prereqs with custom phase (/^x_/) or custom relationship are ignored.
 
 =head1 DESCRIPTION
 

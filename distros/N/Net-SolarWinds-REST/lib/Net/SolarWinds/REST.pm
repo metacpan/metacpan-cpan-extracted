@@ -40,7 +40,7 @@ use JSON qw();
 use URI::Encode qw(uri_encode);
 use POSIX qw(strftime);
 
-our $VERSION="1.21";
+our $VERSION="1.22";
 
 use base qw(Net::SolarWinds::ConstructorHash Net::SolarWinds::LogMethods Net::SolarWinds::Helper);
 use constant RESULT_CLASS=>'Net::SolarWinds::Result';

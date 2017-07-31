@@ -1,6 +1,11 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.42
+
+  * Fix tests failing due to dns changes elsewhere
+  * Moved sample_mime_lite.pl to scripts directory
+
 Version 0.41
 
   * Fix to better comply with DKIM specification:
