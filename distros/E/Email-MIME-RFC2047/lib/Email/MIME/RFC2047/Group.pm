@@ -1,9 +1,9 @@
 package Email::MIME::RFC2047::Group;
-$Email::MIME::RFC2047::Group::VERSION = '0.96';
+$Email::MIME::RFC2047::Group::VERSION = '0.97';
 use strict;
 use warnings;
 
-# ABSTRACT: Handling of MIME encoded mailbox groups
+# ABSTRACT: MIME encoded mailbox groups
 
 use base qw(Email::MIME::RFC2047::Address);
 
@@ -109,11 +109,11 @@ __END__
 
 =head1 NAME
 
-Email::MIME::RFC2047::Group - Handling of MIME encoded mailbox groups
+Email::MIME::RFC2047::Group - MIME encoded mailbox groups
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 

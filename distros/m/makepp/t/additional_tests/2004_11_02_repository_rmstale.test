@@ -1,7 +1,12 @@
 ###	SPAR <http://www.cpan.org/scripts/>
+###	2	644	1381956736	1382127816	hint
+Ccache at least up to version 3.1.9 is known to make this test die,
+bug report https://bugzilla.samba.org/show_bug.cgi?id=8728 refers.
 ###	1	644	1329052295	1329052295	is_relevant.pl
 have_cc
-###	30	644	1099447329	1342866492	makepp_test_script.pl
+###	28	644	1099447329	1381956819	makepp_test_script.pl
+local $ENV{CCACHE_DISABLE} = 1 if $ENV{AUTOMATED_TESTING}; # Else faile with hint to let user know.
+
 makepp 'BUILD=1';
 
 print "Checking that ./x exits nonzero...\n";
@@ -10,16 +15,12 @@ system './x' or die;
 
 c_cp qw(targlist targlist-1);
 
-makepp 'BUILD=1';
-
-c_cp qw(targlist targlist-2);
-
 # The x.o timestamp has to change, or else we might not rebuild x
 wait_timestamp 'x.o';
 
 makepp '--rm_stale';
 
-c_cp qw(targlist targlist-3);
+c_cp qw(targlist targlist-2);
 
 # Scanner removed the stale include file:
 -f 'stale2' and die;
@@ -83,7 +84,5 @@ endif
 /* Repos */
 ###	1	644	1099447358	1099447329	answers/targlist-1
 frail1 frail2 stale1 stale2
-###	1	644	1099447360	1099447330	answers/targlist-2
-frail frail1 frail2 stale stale1 stale2
-###	1	644	1099447362	1099447333	answers/targlist-3
+###	1	644	1099447362	1099447333	answers/targlist-2
 

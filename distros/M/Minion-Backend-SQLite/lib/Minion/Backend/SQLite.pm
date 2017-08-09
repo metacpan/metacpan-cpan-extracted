@@ -6,7 +6,7 @@ use Mojo::SQLite;
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 has 'sqlite';
 
@@ -188,11 +188,13 @@ sub retry_job {
 
   return !!$self->sqlite->db->query(
     q{update minion_jobs
-      set delayed = (datetime('now', ? || ' seconds')),
+      set attempts = coalesce(?, attempts),
+        delayed = (datetime('now', ? || ' seconds')),
         priority = coalesce(?, priority), queue = coalesce(?, queue),
         retried = datetime('now'), retries = retries + 1, state = 'inactive'
       where id = ? and retries = ?},
-    $options->{delay} // 0, @$options{qw(priority queue)}, $id, $retries
+    $options->{attempts}, $options->{delay} // 0,
+    @$options{qw(priority queue)}, $id, $retries
   )->rows;
 }
 
@@ -255,7 +257,7 @@ sub _try {
   my $tx = $db->begin;
   my $res = $db->query(
     qq{select id from minion_jobs as j
-       where delayed <= datetime('now')
+       where delayed <= datetime('now') and id = coalesce(?, id)
        and (json_array_length(parents) = 0 or not exists (
          select 1 from minion_jobs as parent, json_each(j.parents) as parent_id
          where parent.id = parent_id.value
@@ -263,7 +265,7 @@ sub _try {
        )) and queue in ($queues_in) and state = 'inactive'
        and task in ($tasks_in)
        order by priority desc, id
-       limit 1}, @$queues, @$tasks
+       limit 1}, $options->{id}, @$queues, @$tasks
   );
   my $job_id = ($res->arrays->first // [])->[0] // return undef;
   $db->query(
@@ -315,8 +317,15 @@ Minion::Backend::SQLite - SQLite backend for Minion job queue
   use Minion;
   my $minion = Minion->new(SQLite => 'sqlite:test.db');
 
+  # Mojolicious (via Mojolicious::Plugin::Minion)
+  $self->plugin(Minion => { SQLite => 'sqlite:test.db' });
+
   # Mojolicious::Lite (via Mojolicious::Plugin::Minion)
   plugin Minion => { SQLite => 'sqlite:test.db' };
+
+  # Share the database connection cache
+  helper sqlite => sub { state $sqlite = Mojo::SQLite->new('sqlite:test.db') };
+  plugin Minion => { SQLite => app->sqlite };
 
 =head1 DESCRIPTION
 
@@ -371,6 +380,12 @@ from C<inactive> to C<active> state, or return C<undef> if queues were empty.
 These options are currently available:
 
 =over 2
+
+=item id
+
+  id => '10023'
+
+Dequeue a specific job.
 
 =item queues
 
@@ -722,6 +737,12 @@ retried to change options.
 These options are currently available:
 
 =over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted.
 
 =item delay
 

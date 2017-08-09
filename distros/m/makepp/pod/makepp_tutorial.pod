@@ -2,7 +2,7 @@
 
 makepp_tutorial -- Tutorial on writing makefiles
 
-=for vc $Id: makepp_tutorial.pod,v 1.15 2012/02/07 22:26:15 pfeiffer Exp $
+=for vc $Id: makepp_tutorial.pod,v 1.16 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -189,11 +189,11 @@ rules.  A makefile for building this program could look like this:
  	perl {{
  	  print "my_program is built\n";
  	}}
- 
+
     # Compilation commands:
     processing.o: processing.cxx
  	c++ -c processing.cxx -o processing.o
- 
+
     gui.o: gui.cxx
  	c++ -c gui.cxx -o gui.o
 
@@ -312,11 +312,11 @@ looks like this:
     # Link command:
     my_program: processing.o gui.o
  	c++ processing.o gui.o -o my_program
- 
+
     # Compilation commands:
     processing.o: processing.cxx
  	c++ -c processing.cxx -o processing.o
- 
+
     gui.o: gui.cxx
  	c++ -c gui.cxx -o gui.o
 
@@ -342,15 +342,15 @@ each time the information is needed.
     # Define the symbols we might want to change:
     CXX	:= c++
     CXXFLAGS := -g
- 
+
     OBJECTS	:= processing.o gui.o
- 
+
     my_program: $(OBJECTS)
  	$(CXX) $(OBJECTS) -o my_program
- 
+
     processing.o: processing.cxx
  	$(CXX) $(INCLUDES) $(CXXFLAGS) -c processing.cxx -o processing.o
- 
+
     gui.o: gui.cxx
  	$(CXX) $(CXXFLAGS) -c gui.cxx -o gui.o
 
@@ -492,7 +492,7 @@ pattern rules.  For example,
     # Put the object files into a separate directory:
     objects/%.o: %.cpp
  	$(CXX) $(CXXFLAGS) -c $(input) -o $(output)
- 
+
     # Run a preprocessor to make source files:
     moc_%.cxx: %.h
  	$(MOC) $(input) -o $(output)
@@ -506,10 +506,10 @@ rewrite our makefile for our simple program like this:
  				# compiler, if there are any.
     LIBS     := -L/usr/X11R6/lib -lX11 # Contains libraries we need to link in.
     OBJECTS  := processing.o gui.o
- 
+
     my_program: $(OBJECTS)
  	$(CXX) $(inputs) -o $(output) $(LIBS)
- 
+
     %.o: %.cxx
  	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $(input) -o $(output)
 
@@ -533,10 +533,10 @@ fragment:
 
     CXXFLAGS := -g -O2
     FAST_CXXFLAGS := -DNO_DEBUG -O6 -malign-double -funroll-all-loops
- 
+
     %.o: %.cpp
  	$(CXX) $(CXXFLAGS) -c $(input) -o $(output)
- 
+
     time_critical_subs.o: time_critical_subs.cpp
  	$(CXX) $(FAST_CXXFLAGS) -c $(input) -o $(output)
 
@@ -547,10 +547,10 @@ specific targets.  In this example, it would look like this:
 
     CXXFLAGS := -g -O2
     FAST_CXXFLAGS := -DNO_DEBUG -O6 -malign-double -funroll-all-loops
- 
+
     %.o: %.cpp
  	$(CXX) $(CXXFLAGS) -c $(input) -o $(output)
- 
+
     time_critical_subs.o: CXXFLAGS := $(FAST_CXXFLAGS)
 
 In general, if you specify a variable name after a list of targets, then
@@ -577,11 +577,11 @@ build process.  For example, a very common procedure in makefiles is
 something like this:
 
     prefix=/usr/local
- 
+
     install: our_program
  	&install -m 0755 our_program $(prefix)/bin
  	&install -m 0644 $(wildcard *.png) $(prefix)/share/our_program/icons
- 
+
     .PHONY: install
 
 When someone types S<C<makepp install>>, then makepp first builds
@@ -640,15 +640,15 @@ Here is a sample makefile fragment that illustrates some commonly used
 phony targets:
 
     PROGRAMS	:= combobulator discombobulator
- 
+
     $(phony all): $(PROGRAMS)	# All is the first target, so it's the default.
- 
+
     combobulator: $(COMBOBULATOR_OBJS)
  	$(CXX) $(inputs) -o $(output)
- 
+
     discombobulator: $(DISCOMBOBULATOR_OBJS)
  	$(CXX) $(inputs) -o $(output)
- 
+
     #
     # This target makes sure everything is compiled, and then puts the
     # programs into a place where everyone can access them.  We make the
@@ -657,24 +657,24 @@ phony targets:
     # undo this.
     #
     prefix	:= /usr/local
- 
+
     $(phony install): all
  	&install -d $(prefix)/bin $(prefix)/share/combobulate
  	&install -m 0755 $(PROGRAMS) $(prefix)/bin
  	&install -m 0644 $(wildcard *.xbm) $(prefix)/share/combobulate
- 
+
     #
     # This target makes a source distribution for shipping out to someone.
     #
     VERSION := 3.14
- 
+
     $(phony distribution):
  	rm -rf combobulate-$(VERSION)	# Get rid of previous junk, if any.
  	&mkdir combobulate-$(VERSION)
  	&cp -l $(wildcard *.c *.h) Makefile README INSTALL combobulate-$(VERSION)
  	tar cf - combobulate-$(VERSION) | gzip -9c > combobulate-$(VERSION).tar.gz
  	rm -rf combobulate-$(VERSION)
- 
+
     #
     # This target runs regression tests to make sure the program(s) are
     # doing what they are supposed to do.
@@ -732,12 +732,12 @@ makefile (suggested name is C<RootMakeppfile>, but C<Makeppfile> will also
 work):
 
     # Top level makefile:
- 
+
     CXX	:= c++
     CXXFLAGS := -O2
     my_program: main.o goodies/libgoodies.so
  	$(CXX) $(inputs) -o $(output)
- 
+
     %.o: %.cxx
  	$(CXX) $(CXXFLAGS) -c $(input) -o $(output)
 
@@ -746,12 +746,12 @@ C<goodies> which builds C<libgoodies.so>, like
 this:
 
     # goodies/Makefile
- 
+
     CXX	:= c++
     CXXFLAGS := -O2
- 
+
     MODULES = candy.o chips.o licorice.o cookies.o popcorn.o spinach.o
- 
+
     libgoodies.so: $(MODULES)
  	$(CXX) -shared $(inputs) -o $(output)
  			# Note that the command is written assuming that
@@ -759,7 +759,7 @@ this:
  			# "goodies", not the top level subdirectory.
  			# Makepp cds into this directory before executing
  			# any commands from this makefile.
- 
+
     %.o: %.cxx
  	$(CXX) $(CXXFLAGS) -fpic -c $(input) -o $(output)
 
@@ -828,7 +828,7 @@ contain the following definitions:
     # standard_defs.mk
     CXX	:= c++
     CXXFLAGS := -O2
- 
+
     #
     # We've also included a pattern rule that might be useful in one or more
     # subdirectories.  This pattern rule is for C compilation for putting
@@ -847,10 +847,10 @@ The top level C<Makefile> might look like this:
 
     # Top level makefile
     include standard_defs.mk
- 
+
     my_program: main.o goodies/libgoodies.so
  	$(CXX) $(inputs) -o $(output)
- 
+
     #
     # Note that this pattern rule overrides the one found in standard_defs.mk,
     # because makepp sees it later.  This pattern rule is for compilation for
@@ -864,12 +864,12 @@ And the subdirectory's makefile might look like this:
 
     # goodies/Makefile
     include standard_defs.mk
- 
+
     MODULES = candy.o chips.o licorice.o cookies.o popcorn.o spinach.o
- 
+
     libgoodies.so: $(MODULES)
  	$(CXX) -shared $(inputs) -o $(output)
- 
+
     # We don't need the pattern rule for compilation of .cxx to .o files,
     # because it's contained in standard_defs.mk.
 
@@ -897,7 +897,7 @@ that go into a program or a library.  The previous makefile, for
 example, contained this line:
 
     MODULES = candy.o chips.o licorice.o cookies.o popcorn.o spinach.o
- 
+
     libgoodies.so: $(MODULES)
  	$(CXX) -shared $(inputs) -o $(output)
 
@@ -1100,10 +1100,10 @@ options.  Suppose for example that you usually compile your program with
 optimization:
 
     CFLAGS	:= -O2
- 
+
     %.o: %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
- 
+
     my_program: *.o
  	$(CC) $(inputs) -o $(output)
 
@@ -1139,10 +1139,10 @@ different directory, like this:
 			# needed.
     CFLAGS	:= -O2
     OBJDIR	;= $(ARCH)-optim
- 
+
     $(OBJDIR)/%.o: %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
- 
+
     $(OBJDIR)/my_program: $(OBJDIR)/*.o
  	$(CC) $(inputs) -o $(output)
 

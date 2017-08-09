@@ -1,3 +1,27 @@
+0.023   2017-08-03 (PERLANCAR)
+
+        - [Internal] Change the numeric values of level, to accomodate more room
+          for custom levels".
+
+	- Defer set default null routines so other module can customize
+	  levels.
+
+
+0.022   2017-08-03 (PERLANCAR)
+
+	- [Bugfix] Fix stupid copy-paste mistake [RT#122687].
+
+	- [doc] Fix copy-paste mistake [RT#122689].
+
+
+0.021   2017-08-02 (PERLANCAR)
+
+	- [Bugfix] Output, Layout: set() now properly replaces hooks from
+	  previous output/layout plugin (need to remove from all phases).
+
+        - Add output for testing: ArrayML.
+
+
 0.020   2017-07-30 (PERLANCAR)
 
 	- [ux] Enable $Data::Dmp::OPT_REMOVE_PRAGMAS.

@@ -7,6 +7,8 @@ sub gl_functions {
     qw(
       glGetString
       glShaderSource_p
+      glpCheckErrors
+      glpSetAutoCheckErrors
       glAccum
       glActiveProgramEXT
       glActiveShaderProgram

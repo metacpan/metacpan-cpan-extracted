@@ -10,9 +10,11 @@ use Term::ANSIColor ();
 use Path::Class qw( file dir );
 use File::ShareDir ();
 use Dist::Zilla::Util::CurrentCmd ();
+use Path::Tiny qw( path );
+use File::Glob qw( bsd_glob );
 
 # ABSTRACT: Dist::Zilla plugin bundle used by Plicease
-our $VERSION = '2.20'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -32,7 +34,7 @@ sub mvp_multivalue_args { qw(
 
 my %plugin_versions = qw(
   Alien                0.023
-  Author::Plicease.*   2.20
+  Author::Plicease.*   2.21
   OurPkgVersion        0.12
   MinimumPerl          1.006
   InstallGuide         1.200006
@@ -298,6 +300,16 @@ sub configure
       print STDERR "\n";
     }
   }
+  
+  foreach my $test (map { path($_) } bsd_glob ('t/*.t'))
+  {
+    my @lines = grep !/-no_srand => 1/, grep /use Test2::V0/, $test->lines_utf8;
+    next unless @lines;
+    print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+    print STDERR "$test has Test2::V0 without -no_srand";
+    print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+    print STDERR "\n";    
+  }
 
   foreach my $name (qw( t/00_diag.txt t/00_diag.pre.txt ), 
                       map { "xt/release/$_.t" } qw( build_environment unused eol no_tabs pod strict fixme changes pod_coverage pod_spelling_common pod_spelling_system version ))
@@ -328,7 +340,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.20
+version 2.21
 
 =head1 SYNOPSIS
 

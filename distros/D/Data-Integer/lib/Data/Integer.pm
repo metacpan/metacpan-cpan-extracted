@@ -4,142 +4,137 @@ Data::Integer - details of the native integer data type
 
 =head1 SYNOPSIS
 
-	use Data::Integer qw(natint_bits);
+    use Data::Integer qw(natint_bits);
 
-	$n = natint_bits;
+    $n = natint_bits;
 
-	# and other constants; see text
+    # and other constants; see text
 
-	use Data::Integer qw(nint sint uint nint_is_sint nint_is_uint);
+    use Data::Integer qw(nint sint uint nint_is_sint nint_is_uint);
 
-	$ni = nint($ni);
-	$si = sint($si);
-	$ui = uint($ui);
-	if(nint_is_sint($ni)) { ...
-	if(nint_is_uint($ni)) { ...
+    $ni = nint($ni);
+    $si = sint($si);
+    $ui = uint($ui);
+    if(nint_is_sint($ni)) { ...
+    if(nint_is_uint($ni)) { ...
 
-	use Data::Integer qw(
-		nint_sgn sint_sgn uint_sgn
-		nint_abs sint_abs uint_abs
-		nint_cmp sint_cmp uint_cmp
-		nint_min sint_min uint_min
-		nint_max sint_max uint_max
-		nint_neg sint_neg uint_neg
-		nint_add sint_add uint_add
-		nint_sub sint_sub uint_sub
-	);
+    use Data::Integer qw(
+	nint_sgn sint_sgn uint_sgn
+	nint_abs sint_abs uint_abs
+	nint_cmp sint_cmp uint_cmp
+	nint_min sint_min uint_min
+	nint_max sint_max uint_max
+	nint_neg sint_neg uint_neg
+	nint_add sint_add uint_add
+	nint_sub sint_sub uint_sub);
 
-	$sn = nint_sgn($ni);
-	$sn = sint_sgn($si);
-	$sn = uint_sgn($ui);
-	$ni = nint_abs($ni);
-	$si = sint_abs($si);
-	$ui = uint_abs($ui);
-	@sorted_nints = sort { nint_cmp($a, $b) } @nints;
-	@sorted_sints = sort { sint_cmp($a, $b) } @sints;
-	@sorted_uints = sort { uint_cmp($a, $b) } @uints;
-	$ni = nint_min($na, $nb);
-	$si = sint_min($sa, $sb);
-	$ui = uint_min($ua, $ub);
-	$ni = nint_max($na, $nb);
-	$si = sint_max($sa, $sb);
-	$ui = uint_max($ua, $ub);
-	$ni = nint_neg($ni);
-	$si = sint_neg($si);
-	$ui = uint_neg($ui);
-	$ni = nint_add($na, $nb);
-	$si = sint_add($sa, $sb);
-	$ui = uint_add($ua, $ub);
-	$ni = nint_sub($na, $nb);
-	$si = sint_sub($sa, $sb);
-	$ui = uint_sub($ua, $ub);
+    $sn = nint_sgn($ni);
+    $sn = sint_sgn($si);
+    $sn = uint_sgn($ui);
+    $ni = nint_abs($ni);
+    $si = sint_abs($si);
+    $ui = uint_abs($ui);
+    @sorted_nints = sort { nint_cmp($a, $b) } @nints;
+    @sorted_sints = sort { sint_cmp($a, $b) } @sints;
+    @sorted_uints = sort { uint_cmp($a, $b) } @uints;
+    $ni = nint_min($na, $nb);
+    $si = sint_min($sa, $sb);
+    $ui = uint_min($ua, $ub);
+    $ni = nint_max($na, $nb);
+    $si = sint_max($sa, $sb);
+    $ui = uint_max($ua, $ub);
+    $ni = nint_neg($ni);
+    $si = sint_neg($si);
+    $ui = uint_neg($ui);
+    $ni = nint_add($na, $nb);
+    $si = sint_add($sa, $sb);
+    $ui = uint_add($ua, $ub);
+    $ni = nint_sub($na, $nb);
+    $si = sint_sub($sa, $sb);
+    $ui = uint_sub($ua, $ub);
 
-	use Data::Integer qw(
-		sint_shl uint_shl
-		sint_shr uint_shr
-		sint_rol uint_rol
-		sint_ror uint_ror
-	);
+    use Data::Integer qw(
+	sint_shl uint_shl
+	sint_shr uint_shr
+	sint_rol uint_rol
+	sint_ror uint_ror);
 
-	$si = sint_shl($si, $dist);
-	$ui = uint_shl($ui, $dist);
-	$si = sint_shr($si, $dist);
-	$ui = uint_shr($ui, $dist);
-	$si = sint_rol($si, $dist);
-	$ui = uint_rol($ui, $dist);
-	$si = sint_ror($si, $dist);
-	$ui = uint_ror($ui, $dist);
+    $si = sint_shl($si, $dist);
+    $ui = uint_shl($ui, $dist);
+    $si = sint_shr($si, $dist);
+    $ui = uint_shr($ui, $dist);
+    $si = sint_rol($si, $dist);
+    $ui = uint_rol($ui, $dist);
+    $si = sint_ror($si, $dist);
+    $ui = uint_ror($ui, $dist);
 
-	use Data::Integer qw(
-		nint_bits_as_sint nint_bits_as_uint
-		sint_bits_as_uint uint_bits_as_sint
-	);
+    use Data::Integer qw(
+	nint_bits_as_sint nint_bits_as_uint
+	sint_bits_as_uint uint_bits_as_sint);
 
-	$si = nint_bits_as_sint($ni);
-	$ui = nint_bits_as_uint($ni);
-	$ui = sint_bits_as_uint($si);
-	$si = uint_bits_as_sint($ui);
+    $si = nint_bits_as_sint($ni);
+    $ui = nint_bits_as_uint($ni);
+    $ui = sint_bits_as_uint($si);
+    $si = uint_bits_as_sint($ui);
 
-	use Data::Integer qw(
-		sint_not uint_not
-		sint_and uint_and
-		sint_nand uint_nand
-		sint_andn uint_andn
-		sint_or uint_or
-		sint_nor uint_nor
-		sint_orn uint_orn
-		sint_xor uint_xor
-		sint_nxor uint_nxor
-		sint_mux uint_mux
-	);
+    use Data::Integer qw(
+	sint_not uint_not
+	sint_and uint_and
+	sint_nand uint_nand
+	sint_andn uint_andn
+	sint_or uint_or
+	sint_nor uint_nor
+	sint_orn uint_orn
+	sint_xor uint_xor
+	sint_nxor uint_nxor
+	sint_mux uint_mux);
 
-	$si = sint_not($si);
-	$ui = uint_not($ui);
-	$si = sint_and($sa, $sb);
-	$ui = uint_and($ua, $ub);
-	$si = sint_nand($sa, $sb);
-	$ui = uint_nand($ua, $ub);
-	$si = sint_andn($sa, $sb);
-	$ui = uint_andn($ua, $ub);
-	$si = sint_or($sa, $sb);
-	$ui = uint_or($ua, $ub);
-	$si = sint_nor($sa, $sb);
-	$ui = uint_nor($ua, $ub);
-	$si = sint_orn($sa, $sb);
-	$ui = uint_orn($ua, $ub);
-	$si = sint_xor($sa, $sb);
-	$ui = uint_xor($ua, $ub);
-	$si = sint_nxor($sa, $sb);
-	$ui = uint_nxor($ua, $ub);
-	$si = sint_mux($sa, $sb, $sc);
-	$ui = uint_mux($ua, $ub, $uc);
+    $si = sint_not($si);
+    $ui = uint_not($ui);
+    $si = sint_and($sa, $sb);
+    $ui = uint_and($ua, $ub);
+    $si = sint_nand($sa, $sb);
+    $ui = uint_nand($ua, $ub);
+    $si = sint_andn($sa, $sb);
+    $ui = uint_andn($ua, $ub);
+    $si = sint_or($sa, $sb);
+    $ui = uint_or($ua, $ub);
+    $si = sint_nor($sa, $sb);
+    $ui = uint_nor($ua, $ub);
+    $si = sint_orn($sa, $sb);
+    $ui = uint_orn($ua, $ub);
+    $si = sint_xor($sa, $sb);
+    $ui = uint_xor($ua, $ub);
+    $si = sint_nxor($sa, $sb);
+    $ui = uint_nxor($ua, $ub);
+    $si = sint_mux($sa, $sb, $sc);
+    $ui = uint_mux($ua, $ub, $uc);
 
-	use Data::Integer qw(
-		sint_madd uint_madd
-		sint_msub uint_msub
-		sint_cadd uint_cadd
-		sint_csub uint_csub
-		sint_sadd uint_sadd
-		sint_ssub uint_ssub
-	);
+    use Data::Integer qw(
+	sint_madd uint_madd
+	sint_msub uint_msub
+	sint_cadd uint_cadd
+	sint_csub uint_csub
+	sint_sadd uint_sadd
+	sint_ssub uint_ssub);
 
-	$si = sint_madd($sa, $sb);
-	$ui = uint_madd($ua, $ub);
-	$si = sint_msub($sa, $sb);
-	$ui = uint_msub($ua, $ub);
-	($carry, $si) = sint_cadd($sa, $sb, $carry);
-	($carry, $ui) = uint_cadd($ua, $ub, $carry);
-	($carry, $si) = sint_csub($sa, $sb, $carry);
-	($carry, $ui) = uint_csub($ua, $ub, $carry);
-	$si = sint_sadd($sa, $sb);
-	$ui = uint_sadd($ua, $ub);
-	$si = sint_ssub($sa, $sb);
-	$ui = uint_ssub($ua, $ub);
+    $si = sint_madd($sa, $sb);
+    $ui = uint_madd($ua, $ub);
+    $si = sint_msub($sa, $sb);
+    $ui = uint_msub($ua, $ub);
+    ($carry, $si) = sint_cadd($sa, $sb, $carry);
+    ($carry, $ui) = uint_cadd($ua, $ub, $carry);
+    ($carry, $si) = sint_csub($sa, $sb, $carry);
+    ($carry, $ui) = uint_csub($ua, $ub, $carry);
+    $si = sint_sadd($sa, $sb);
+    $ui = uint_sadd($ua, $ub);
+    $si = sint_ssub($sa, $sb);
+    $ui = uint_ssub($ua, $ub);
 
-	use Data::Integer qw(natint_hex hex_natint);
+    use Data::Integer qw(natint_hex hex_natint);
 
-	print natint_hex($value);
-	$value = hex_natint($string);
+    print natint_hex($value);
+    $value = hex_natint($string);
 
 =head1 DESCRIPTION
 
@@ -185,7 +180,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -1408,7 +1403,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007, 2010, 2015 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2007, 2010, 2015, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

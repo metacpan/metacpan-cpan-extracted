@@ -1,5 +1,5 @@
-#!/usr/bin/perl -w
-# $Id: makepp_build_cache_control,v 1.9 2010/09/13 21:17:25 pfeiffer Exp $
+#!/usr/bin/env perl
+# $Id: makepp_build_cache_control,v 1.10 2013/02/16 15:11:37 pfeiffer Exp $
 
 $0 =~ s![^/\\]+$!makeppbuiltin!;
 unshift @ARGV, '-MMpp::BuildCacheControl';

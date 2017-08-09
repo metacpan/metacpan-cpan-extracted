@@ -35,9 +35,7 @@ use VPIT::TestHelpers threads => [ $module, $thread_safe_var ];
 
 my $could_not_create_thread = 'Could not create thread';
 
-use Test::Leaner (
- tests => 1 + (2 + 2 * 2) + 6 + (2 * 4 + 1) * 2 + (4 + 1) + (6 + 1) + 1
-);
+use Test::Leaner;
 
 sub is_loaded {
  my ($affirmative, $desc) = @_;
@@ -184,10 +182,19 @@ sub sync_master {
   cond_broadcast $locks_down[$id];
  }
 
- {
+ LOCK: {
   lock $locks_up[$id];
-  cond_wait $locks_up[$id] until $locks_up[$id] == $peers;
+  my $timeout = time() + 10;
+  until ($locks_up[$id] == $peers) {
+   if (cond_timedwait $locks_up[$id], $timeout) {
+    last LOCK;
+   } else {
+    return 0;
+   }
+  }
  }
+
+ return 1;
 }
 
 sub sync_slave {
@@ -203,6 +210,8 @@ sub sync_slave {
   $locks_up[$id]++;
   cond_signal $locks_up[$id];
  }
+
+ return 1;
 }
 
 for my $first_thread_ends_first (0, 1) {
@@ -244,7 +253,7 @@ for my $first_thread_ends_first (0, 1) {
 
    is_loaded 1, "$here, end";
 
-   return;
+   return 1;
   });
 
   skip "$could_not_create_thread (parallel 1)" => (4 * 2) unless defined $thr1;
@@ -269,7 +278,7 @@ for my $first_thread_ends_first (0, 1) {
 
    is_loaded 1, "$here, end";
 
-   return;
+   return 1;
   });
 
   sync_master($_) for 0 .. 5;
@@ -350,9 +359,6 @@ is_loaded 0, 'main body, after simple clone';
 # Test clone outliving its parent
 
 SKIP: {
- my $kid_tid;
- share($kid_tid);
-
  my $kid_done;
  share($kid_done);
 
@@ -360,10 +366,10 @@ SKIP: {
   my $here = 'outliving clone, parent thread';
   is_loaded 0, "$here, beginning";
 
-  my $no_kid;
-
   do_load;
   is_loaded 1, "$here, after loading";
+
+  my $kid_tid;
 
   SKIP: {
    my $kid = spawn(sub {
@@ -372,52 +378,40 @@ SKIP: {
     is_loaded 1, "$here, beginning";
 
     {
-     lock $kid_tid;
-     $kid_tid = threads->tid();
-     cond_signal $kid_tid;
-    }
-
-    is_loaded 1, "$here, kid tid was communicated";
-
-    {
      lock $kid_done;
      cond_wait $kid_done until $kid_done;
     }
 
     is_loaded 1, "$here, end";
 
-    return;
+    return 1;
    });
 
-   unless (defined $kid) {
-    $no_kid = 1;
-    skip "$could_not_create_thread (outliving clone child)" => 3;
+   if (defined $kid) {
+    $kid_tid = $kid->tid;
+   } else {
+    $kid_tid = 0;
+    skip "$could_not_create_thread (outliving clone child)" => 2;
    }
   }
 
   is_loaded 1, "$here, end";
 
-  return $no_kid;
+  return $kid_tid;
  });
 
- skip "$could_not_create_thread (outliving clone parent)" => (3 + 3)
+ skip "$could_not_create_thread (outliving clone parent)" => (3 + 2)
                                                          unless defined $parent;
 
- my $no_kid = $parent->join;
+ my $kid_tid = $parent->join;
  if (my $err = $parent->error) {
   die $err;
  }
 
- unless ($no_kid) {
-  my $tid = do {
-   lock $kid_tid;
-   cond_wait $kid_tid until defined $kid_tid;
-   $kid_tid;
-  };
-
-  my $kid = threads->object($tid);
+ if ($kid_tid) {
+  my $kid = threads->object($kid_tid);
   if (defined $kid) {
-   {
+   if ($kid->is_running) {
     lock $kid_done;
     $kid_done = 1;
     cond_signal $kid_done;
@@ -432,3 +426,5 @@ is_loaded 0, 'main body, after outliving clone';
 
 do_load;
 is_loaded 1, 'main body, loaded at end';
+
+done_testing();

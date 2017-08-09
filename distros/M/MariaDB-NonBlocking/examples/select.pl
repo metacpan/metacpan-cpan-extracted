@@ -25,7 +25,8 @@ eval {
 
 my $res = MariaDB::NonBlocking::Select::query_once_per_connection(
             $pool,
-            q{SELECT 1, CONNECTION_ID(), RAND(50)},
+            q{SELECT 1, CONNECTION_ID(), RAND(50) as rand},
+            {want_hashrefs => 1},
           );
 use Data::Dumper; say Dumper($res);
 $_->disconnect for @$pool;

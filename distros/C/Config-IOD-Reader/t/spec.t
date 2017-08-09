@@ -12,9 +12,16 @@ use Test::More 0.98;
 my $dir = dist_dir('IOD-Examples');
 diag ".IOD files are at $dir";
 
-my $reader = Config::IOD::Reader->new;
+my $reader = Config::IOD::Reader->new(
+    enable_expr => 1,
+    expr_vars => {
+        a => 2,
+        b => 3,
+        bar => "baz",
+    },
+);
 
-my @files = glob "$dir/examples/*.iod";
+my @files = (glob("$dir/examples/*.iod"), glob("$dir/examples/expr/*.iod"));
 diag explain \@files;
 
 for my $file (@files) {

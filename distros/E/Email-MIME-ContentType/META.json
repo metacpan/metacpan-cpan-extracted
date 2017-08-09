@@ -59,7 +59,7 @@
          "web" : "https://github.com/rjbs/Email-MIME-ContentType"
       }
    },
-   "version" : "1.020",
+   "version" : "1.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -431,7 +431,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.020",
+                  "tag" : "1.021",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
@@ -542,6 +542,6 @@
       "Pali <pali@cpan.org>",
       "Thomas Szukala <ts@abusix.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

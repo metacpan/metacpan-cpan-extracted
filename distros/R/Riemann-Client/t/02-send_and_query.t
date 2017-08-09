@@ -20,20 +20,24 @@ SKIP: {
         port => $ENV{RIEMANN_SERVER_PORT} || 5555,
     );
 
-    my %msg = (
-        service => $rand->randpattern('cCcnCnc'),
-        metric  => rand(10),
-        state   => 'ok',
-        description => 'a',
-    );
+    my $service = $rand->randpattern('CcCcnCnc');
+    my $tags = ["furball","tarball", "meatball"];
 
+    my %msg = (
+        service => $service,
+        metric  => rand(10),
+        tags    => $tags,
+        state   => 'ok',
+        description => 'my preciousssss'
+    );
 
     ok ($r->send(\%msg), "Message sent over tcp");
 
-    my $res = $r->query('host = "' . hostfqdn() . '"');
+    my $res = $r->query('service = "' . $service .'"');
     ok($res->{ok}, "Query is ok");
     is(ref $res->{events}, 'ARRAY', "Got an array as query response");
     is(ref $res->{events}->[0], 'Event', "Array of events");
+    ok($res->{events}->[0]->{tags} = $tags, "Returned tags match sent tags");
 
     my %msg2 = (
         service => $rand->randpattern('cCcnCnc'),
@@ -60,7 +64,7 @@ SKIP: {
 
     ok ($rudp->send(\%msg), "Message sent over udp");
 
-    # Make the message too bit to send over UDP
+    # Make the message too big to send over UDP
     $msg{description} = 'a' x 20000;
     dies_ok { $rudp->send(\%msg) } "Send dies with message too long";
 

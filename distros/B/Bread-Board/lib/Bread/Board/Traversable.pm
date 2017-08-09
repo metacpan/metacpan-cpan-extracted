@@ -1,7 +1,7 @@
 package Bread::Board::Traversable;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: role for traversing a container service tree
-$Bread::Board::Traversable::VERSION = '0.34';
+$Bread::Board::Traversable::VERSION = '0.35';
 use Moose::Role;
 
 with 'MooseX::Clone' => { -version => 0.05 };
@@ -119,7 +119,7 @@ Bread::Board::Traversable - role for traversing a container service tree
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Infinity Interactive.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,6 @@
 package Plack::Middleware::Auth::Negotiate;
+$Plack::Middleware::Auth::Negotiate::VERSION = '0.172130';
+# ABSTRACT: Negotiate authentication middleware (SPNEGO)
 
 use 5.006;
 use strict;
@@ -9,18 +11,6 @@ use Plack::Util::Accessor 'keytab';
 use Scalar::Util;
 use MIME::Base64;
 use GSSAPI;
-
-=head1 NAME
-
-Plack::Middleware::Auth::Negotiate - Negotiate authentication middleware (SPNEGO)
-
-=head1 VERSION
-
-Version 0.02
-
-=cut
-
-our $VERSION = '0.02';
 
 sub prepare_app {
 	my $self = shift;
@@ -79,7 +69,7 @@ sub gssapi_verify {
 		$gss_input_token,
 		GSS_C_NO_CHANNEL_BINDINGS,
 		my $gss_client_name,
-		my $out_mech,
+		undef,
 		my $gss_output_token,
 		my $out_flags,
 		my $out_time,
@@ -108,6 +98,23 @@ sub gss_exit {
 	}
 	return;
 }
+
+
+1; # End of Plack::Middleware::Auth::Negotiate
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Plack::Middleware::Auth::Negotiate - Negotiate authentication middleware (SPNEGO)
+
+=head1 VERSION
+
+version 0.172130
 
 =head1 SYNOPSIS
 
@@ -180,60 +187,14 @@ provided with L<GSSAPI>.
 
 =head1 AUTHOR
 
-Adrian Kreher, C<< <avuserow at cpan.org> >>
+Adrian Kreher <avuserow@cpan.org>
 
-=head1 BUGS
+=head1 COPYRIGHT AND LICENSE
 
-Please report any bugs or feature requests to
-C<bug-plack-middleware-auth-negotiate at rt.cpan.org>, or through the web
-interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Plack-Middleware-Auth-Negotiate>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+This software is Copyright (c) 2011 by Adrian Kreher <avuserow@cpan.org>.
 
-=head1 SUPPORT
+This is free software, licensed under:
 
-You can find documentation for this module with the perldoc command.
-
-    perldoc Plack::Middleware::Auth::Negotiate
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2011 Adrian Kreher.
-
-This program is distributed under the (Revised) BSD License:
-L<http://www.opensource.org/licenses/bsd-license.php>
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-
-* Neither the name of Adrian Kreher's Organization
-nor the names of its contributors may be used to endorse or promote
-products derived from this software without specific prior written
-permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+  The (three-clause) BSD License
 
 =cut
-
-1; # End of Plack::Middleware::Auth::Negotiate

@@ -1,0 +1,37 @@
+=head1 NAME
+
+togff3
+
+=head1 USAGE
+
+    Usage: recs togff3 <args> [<files>]
+       Each input record is formatted as a GFF3 (General Feature Format version 3)
+       line and output to stdout.
+    
+       The input records should contain the following fields:
+    
+          seq_id source type start end score strand phase attributes
+    
+       These are the same fields obtained when using the corresponding
+       "fromgff3" command.
+    
+       Refer to the GFF3 spec for field details:
+         https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md
+    
+    Arguments:
+       --filename-key|fk <keyspec>  Add a key with the source filename (if no
+                                    filename is applicable will put NONE)
+    
+      Help Options:
+          --help  This help screen
+    
+    Examples:
+       Parse GFF3 and filter to just mRNA features, writing back out GFF3:
+          recs fromgff3 hg38.gff | recs grep '{{type}} eq "mRNA"' | recs togff3
+
+=head1 SEE ALSO
+
+L<App::RecordStream::Bio>
+
+=cut
+

@@ -1,3 +1,9 @@
+1.770   2017-07-31 (PERLANCAR)
+
+	- [Incompatible change] Change per_arg_yaml default from 1 to 0 to
+	  be compatible with Perinci::CmdLine::Lite.
+
+
 1.76    2017-07-14 (PERLANCAR)
 
 	- No functional changes since last dev release.

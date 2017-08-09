@@ -1,0 +1,13 @@
+1.001
+  -- Inital Release
+1.002
+  -- Added VERSION to AnyEvent::HTTP::MultiGet
+  -- Removed un-needed with statements
+1.003
+  -- Added supprot for big file downloads!
+1.004
+  -- AnyEvent::HTTP::MultiGet now supports on_body request
+  -- Many Unit tests added
+  -- Pod clean ups
+  -- on_body now gets the HTTP::Request object vs the request_id
+  -- Registered AnyEvent::HTTP::MultiGet with log4perl as a wrapper class

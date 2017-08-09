@@ -5,7 +5,7 @@ use Pcore::Handle::DBI::Const qw[:ODBC_TYPES];
 use DBI qw[];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
-use Pcore::Util::Scalar qw[weaken blessed looks_like_number is_plain_arrayref is_plain_coderef];
+use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef];
 use Pcore::Util::UUID qw[uuid_str];
 
 # NOTE http://habrahabr.ru/post/149635/
@@ -288,7 +288,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     my ( $dbh, $rows ) = $self->{h};
 
     # query is sth
-    if ( blessed $query) {
+    if ( is_blessed_ref $query) {
         my $sth;
 
         if ( ref $query eq 'Pcore::Handle::DBI::STH' ) {

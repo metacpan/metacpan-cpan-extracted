@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Number::Phone;
+use Number::Phone 3.1;
 
 my %tests = (
     '+44 20 8771 2924' => '+44.2087712924',   # UK

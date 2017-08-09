@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::ApacheTest;
-$Dist::Zilla::Plugin::ApacheTest::VERSION = '0.03';
+$Dist::Zilla::Plugin::ApacheTest::VERSION = '0.04';
 # ABSTRACT: DEPRECATED ApacheTest Compatibility Module.
 
 use Moose;
@@ -22,7 +22,7 @@ Dist::Zilla::Plugin::ApacheTest - DEPRECATED ApacheTest Compatibility Module.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ L<@ApacheTest|Dist::Zilla::PluginBundle::ApacheTest>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/dist-zilla-plugin-apachetest>
+The development version is on github at L<https://github.com/mschout/dist-zilla-plugin-apachetest>
 and may be cloned from L<git://github.com/mschout/dist-zilla-plugin-apachetest.git>
 
 =head1 BUGS
@@ -55,7 +55,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Schout.
+This software is copyright (c) 2017 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

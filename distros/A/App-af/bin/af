@@ -11,7 +11,7 @@ use File::chdir;
 # VERSION
 
 
-package App::af::download 0.11 {
+package App::af::download 0.12 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -82,7 +82,7 @@ package App::af::download 0.11 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::probe 0.11 {
+package App::af::probe 0.12 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -133,7 +133,7 @@ package App::af::probe 0.11 {
   }
 }
 
-package App::af::install 0.11 {
+package App::af::install 0.12 {
   use Moose;
   use namespace::autoclean;
   use File::Temp qw( tempdir );
@@ -348,7 +348,7 @@ package App::af::install 0.11 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::requires 0.11 {
+package App::af::requires 0.12 {
   use Moose;
   use namespace::autoclean;
   use YAML qw( Dump );
@@ -383,7 +383,7 @@ package App::af::requires 0.11 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::missing 0.11 {
+package App::af::missing 0.12 {
   use Moose;
   use namespace::autoclean;
   use Capture::Tiny qw( capture );
@@ -399,7 +399,7 @@ package App::af::missing 0.11 {
     
     $self->check_phase;
     
-    my $build = $self->build;
+    my(undef,undef, $build) = capture { $self->build };
     
     my @reqs;
     my %need;
@@ -442,7 +442,7 @@ package App::af::missing 0.11 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::prop 0.11 {
+package App::af::prop 0.12 {
   use Moose;
   use namespace::autoclean;
 
@@ -544,7 +544,7 @@ package App::af::prop 0.11 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::list 0.11 {
+package App::af::list 0.12 {
   use Moose;
   use namespace::autoclean;
   use Path::Tiny qw( path );
@@ -638,7 +638,7 @@ af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

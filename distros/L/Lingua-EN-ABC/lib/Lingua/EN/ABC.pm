@@ -9,8 +9,9 @@ use warnings;
 use strict;
 use Carp;
 use JSON::Parse 'json_file_to_perl';
+use Convert::Moji 'make_regex';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Load the data from the file.
 
@@ -18,23 +19,60 @@ my $json = __FILE__;
 $json =~ s!\.pm$!/abc.json!;
 my $abc = json_file_to_perl ($json);
 
+# American
+my @a;
+# British
+my @b;
+# Canadian
+my @c;
+# British Oxford
+my @bo;
+# Map from either American or British version to its entry
+my %any2e;
+for my $e (@$abc) {
+    $any2e{$e->{a}} = $e;
+    $any2e{$e->{b}} = $e;
+    push @a, $e->{a};
+    push @b, $e->{b};
+    # co is "Canadian output".
+    if ($e->{ca}) {
+	$e->{co} = $e->{a};
+    }
+    else {
+	$e->{co} = $e->{b};
+    }
+    # bo is "British Oxford".
+    if ($e->{oxford}) {
+	$e->{bo} = $e->{a};
+    }
+    else {
+	$e->{bo} = $e->{b};
+    }
+    # ao is "American output".
+    if ($e->{aam}) {
+	$e->{ao} = "$e->{a}/$e->{b}";
+    }
+    else {
+	$e->{ao} = $e->{a};
+    }
+}
+
+# Word-matching regexes
+
+my $a_re = make_regex (@a);
+my $b_re = make_regex (@b);
+my $c_re = make_regex (@c);
+my $bo_re = make_regex (@bo);
+
 sub a2b
 {
     my ($text, %options) = @_;
     my $oxford = $options{oxford};
-    for my $e (@$abc) {
-	if ($oxford && $e->{oxford}) {
-	    # Skip spellings marked as Oxford.
-	    next;
-	}
-	my $american = $e->{a};
-	my $british = $e->{b};
-	if ($e->{bam}) {
-	    # The British spelling is ambiguous, e.g. metre/meter,
-	    # programme/program.
-	    $british .= "/$e->{a}";
-	}
-	$text =~ s/\b$american\b/$british/g;
+    if ($oxford) {
+	$text =~ s/\b($a_re)\b/$any2e{$1}{bo}/g;
+    }
+    else {
+	$text =~ s/\b($a_re)\b/$any2e{$1}{b}/g;
     }
     return $text;
 }
@@ -42,84 +80,39 @@ sub a2b
 sub b2a
 {
     my ($text) = @_;
-    for my $e (@$abc) {
-	my $american = $e->{a};
-	my $british = $e->{b};
-	if ($e->{aam}) {
-	    $american .= "/$e->{b}";
-	}
-	$text =~ s/\b$british\b/$american/g;
-    }
+    $text =~ s/\b($b_re)\b/$any2e{$1}{ao}/g;
     return $text;
 }
 
 sub a2c
 {
     my ($text) = @_;
-    for my $e (@$abc) {
-	if ($e->{ca} || $e->{o}) {
-	    next;
-	}
-	my $american = $e->{a};
-	my $canadian = $e->{b};
-	if ($e->{bam}) {
-	    $canadian .= "/$e->{a}";
-	}
-	$text =~ s/\b$american\b/$canadian/g;
-    }
+    $text =~ s/\b($a_re)\b/$any2e{$1}{co}/g;
     return $text;
 }
 
 sub c2a
 {
     my ($text) = @_;
-    for my $e (@$abc) {
-	if ($e->{oxford} || $e->{ca}) {
-	    # Skip spellings marked as Oxford and spellings where
-	    # Canadian is the same as American.
-	    next;
-	}
-	my $american = $e->{a};
-	my $canadian = $e->{b};
-	if ($e->{bam}) {
-	    # The British spelling is ambiguous, e.g. metre/meter,
-	    # programme/program.
-	    $canadian .= "/$e->{a}";
-	}
-	$text =~ s/\b$canadian\b/$american/g;
-    }
+    $text =~ s/\b($b_re)\b/$any2e{$1}{ao}/g;
     return $text;
 }
 
 sub c2b
 {
     my ($text, %options) = @_;
-    for my $e (@$abc) {
-	if ($options{oxford} && $e->{oxford}) {
-	    # Do not convert Oxford spellings.
-	    next;
-	}
-	# Here we do not check the value of ca, but just convert any
-	# American spellings which may be found in the Canadian text.
-	my $canadian = $e->{a};
-	my $british = $e->{b};
-	$text =~ s/\b$canadian\b/$british/g;
+    my $type = 'b';
+    if ($options{oxford}) {
+	$type = 'bo';
     }
+    $text =~ s/\b($a_re)\b/$any2e{$1}{$type}/g;
     return $text;
 }
 
 sub b2c
 {
     my ($text) = @_;
-    for my $e (@$abc) {
-	if ($e->{ca}) {
-	    # Convert the word if this is spelt differently in Canada
-	    # and the UK.
-	    my $canadian = $e->{a};
-	    my $british = $e->{b};
-	    $text =~ s/\b$british\b/$canadian/g;
-	}
-    }
+    $text =~ s/\b($b_re)\b/$any2e{$1}{co}/g;
     return $text;
 }
 

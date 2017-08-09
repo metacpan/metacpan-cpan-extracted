@@ -1,0 +1,44 @@
+Return-Path: f.desar@free.fr
+Received: from mip.hushmail.com (LHLO smtp1.hushmail.com) (65.39.178.78) by
+ server with LMTP; Tue, 7 Mar 2017 17:55:44 +0000 (UTC)
+Received: from smtp1.hushmail.com (localhost [127.0.0.1])
+	by smtp1.hushmail.com (Postfix) with SMTP id 0F2EF40314
+	for <william.braswell@autoparallel.com>; Tue,  7 Mar 2017 17:55:44 +0000 (UTC)
+X-Hush-Verified-Domain: free.fr
+X-Hush-Real-Recipient: william.braswell@autoparallel.com
+Received: from smtp1-g21.free.fr (unknown [212.27.42.1])
+	by smtp1.hushmail.com (Postfix) with ESMTP
+	for <william.braswell@autoparallel.com>; Tue,  7 Mar 2017 17:55:38 +0000 (UTC)
+Received: from [IPv6:2a01:e35:8a59:5440:e559:3978:edd5:c7d3] (unknown [IPv6:2a01:e35:8a59:5440:e559:3978:edd5:c7d3])
+	(Authenticated sender: f.desar)
+	by smtp1-g21.free.fr (Postfix) with ESMTPSA id 57D94B00586
+	for <william.braswell@autoparallel.com>; Tue,  7 Mar 2017 18:55:32 +0100 (CET)
+From: =?utf-8?Q?Fran=C3=A7ois_D=C3=A9sarm=C3=A9nien?= <f.desar@free.fr>
+Content-Type: multipart/alternative; boundary="Apple-Mail=_E77B7410-6B48-42C2-A2CA-7D2E9FC863BE"
+Subject: Parse::Yapp copyright transfer agreement
+Message-Id: <087E711D-4B20-491F-8932-BE4C471AE048@free.fr>
+Date: Tue, 7 Mar 2017 18:55:31 +0100
+To: "William N. Braswell Jr." <william.braswell@autoparallel.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+X-Mailer: Apple Mail (2.3124)
+
+
+--Apple-Mail=_E77B7410-6B48-42C2-A2CA-7D2E9FC863BE
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
+
+Hi,
+
+Here is the signed document.
+
+Congratulations : you are now officially the copyright holder for the =
+Parse::Yapp modules, although
+it would be nice of you not to forget to keep my name attached to the =
+copyright notices as the original
+creator and copyright holder of the original modules (mostly for =
+sentimental reasons :-)).
+
+Enjoy and best regards,
+
+Fran=C3=A7ois

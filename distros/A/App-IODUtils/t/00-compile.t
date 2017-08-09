@@ -13,15 +13,15 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/delete-iod-key',
-    'bin/delete-iod-section',
-    'bin/dump-iod',
-    'bin/get-iod-key',
-    'bin/get-iod-section',
-    'bin/insert-iod-key',
-    'bin/insert-iod-section',
-    'bin/list-iod-sections',
-    'bin/parse-iod'
+    'script/delete-iod-key',
+    'script/delete-iod-section',
+    'script/dump-iod',
+    'script/get-iod-key',
+    'script/get-iod-section',
+    'script/insert-iod-key',
+    'script/insert-iod-section',
+    'script/list-iod-sections',
+    'script/parse-iod'
 );
 
 # no fake home requested

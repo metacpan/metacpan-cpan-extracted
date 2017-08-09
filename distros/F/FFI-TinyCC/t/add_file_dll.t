@@ -1,30 +1,24 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 use FFI::Platypus;
 use File::Temp qw( tempdir );
 use File::chdir;
-use Path::Class qw( file dir );
 use Config;
 
-plan skip_all => "unsupported on $^O" if $^O =~ /^(darwin|MSWin32|gnukfreebsd)$/;
-plan skip_all => "unsupported on $^O $Config{archname}" if $^O eq 'linux' && $Config{archname} =~ /^arm/;
-plan tests => 1;
+skip_all "unsupported on $^O" if $^O =~ /^(darwin|MSWin32|gnukfreebsd)$/;
+skip_all "unsupported on $^O $Config{archname}" if $^O eq 'linux' && $Config{archname} =~ /^arm/;
 
 subtest 'dll' => sub {
 
   # TODO: on windows can we create a .a that points to
   # the dll and use that to indirectly add the dll?
-  plan skip_all => 'unsupported on windows' if $^O eq 'MSWin32';
-  plan tests => 2;
+  skip_all 'unsupported on windows' if $^O eq 'MSWin32';
   
   local $CWD = tempdir( CLEANUP => 1 );
   
-  my $dll = file( $CWD, "bar." . FFI::TinyCC::_dlext() );
+  my $dll = "$CWD/bar." . FFI::TinyCC::_dlext();
 
   subtest 'create' => sub {
-    plan tests => 3;
     my $tcc = FFI::TinyCC->new;
     
     eval { $tcc->set_output_type('dll') };
@@ -45,8 +39,6 @@ subtest 'dll' => sub {
   };
   
   subtest 'use' => sub {
-  
-    plan tests => 3;
   
     my $tcc = FFI::TinyCC->new;
     
@@ -69,3 +61,5 @@ subtest 'dll' => sub {
   };
   
 };
+
+done_testing;

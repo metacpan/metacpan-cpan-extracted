@@ -4,7 +4,7 @@
 # Test we're not root and if unpacking used our uid (nfs) and managed to chmod to a strange value.
 #
 my( $mode, $uid ) = (stat 'Makeppfile')[2, 4];
-$> && $uid == $> && ($mode & 0777) == 0421;
+$> && $uid == $> && ($mode & 0777) == 0421 && !open my $fh, 'h'; # Cygwin can read mode-0 files.
 ###	17	421	1164350872	1058653868	Makeppfile
 #
 # Test ignoring files and directories which are not readable.

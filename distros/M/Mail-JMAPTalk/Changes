@@ -1,5 +1,8 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.08  Tue Aug 8 16:45:54 AEST 2017
+    - add support for accountId in blob upload (thanks rsto)
+
 0.07  Thu Mar 2 19:04:00 CET 2017
     - implement JMAP auth
 

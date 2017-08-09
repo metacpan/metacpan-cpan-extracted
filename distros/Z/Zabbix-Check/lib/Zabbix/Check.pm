@@ -5,44 +5,45 @@ Zabbix::Check - System and service checks for Zabbix
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 
 System and service checks for Zabbix
 
-	UserParameter=cpan.zabbix.check.installed,/usr/bin/env bash -c "/usr/bin/perl -MZabbix::Check 2>/dev/null; if [ \$? -eq 0 ]; then echo 1; else echo 0; fi"
-	UserParameter=cpan.zabbix.check.version,/usr/bin/perl -MZabbix::Check -e_version
+	UserParameter=cpan.zabbix.check.installed,/usr/bin/env bash -c "/usr/bin/env perl -MZabbix::Check 2>/dev/null; if [ \$? -eq 0 ]; then echo 1; else echo 0; fi"
+	UserParameter=cpan.zabbix.check.version,/usr/bin/env perl -MZabbix::Check -e_version
 	# Disk
-	UserParameter=cpan.zabbix.check.disk.discovery,/usr/bin/perl -MZabbix::Check::Disk -e_discovery
-	UserParameter=cpan.zabbix.check.disk.bps[*],/usr/bin/perl -MZabbix::Check::Disk -e_bps -- $1 $2
-	UserParameter=cpan.zabbix.check.disk.iops[*],/usr/bin/perl -MZabbix::Check::Disk -e_iops -- $1 $2
-	UserParameter=cpan.zabbix.check.disk.ioutil[*],/usr/bin/perl -MZabbix::Check::Disk -e_ioutil -- $1
+	UserParameter=cpan.zabbix.check.disk.discovery,/usr/bin/env perl -MZabbix::Check::Disk -e_discovery
+	UserParameter=cpan.zabbix.check.disk.bps[*],/usr/bin/env perl -MZabbix::Check::Disk -e_bps -- $1 $2
+	UserParameter=cpan.zabbix.check.disk.iops[*],/usr/bin/env perl -MZabbix::Check::Disk -e_iops -- $1 $2
+	UserParameter=cpan.zabbix.check.disk.ioutil[*],/usr/bin/env perl -MZabbix::Check::Disk -e_ioutil -- $1
 	# Supervisor
-	UserParameter=cpan.zabbix.check.supervisor.installed,/usr/bin/perl -MZabbix::Check::Supervisor -e_installed
-	UserParameter=cpan.zabbix.check.supervisor.running,/usr/bin/perl -MZabbix::Check::Supervisor -e_running
-	UserParameter=cpan.zabbix.check.supervisor.worker_discovery,/usr/bin/perl -MZabbix::Check::Supervisor -e_worker_discovery
-	UserParameter=cpan.zabbix.check.supervisor.worker_status[*],/usr/bin/perl -MZabbix::Check::Supervisor -e_worker_status -- $1
+	UserParameter=cpan.zabbix.check.supervisor.installed,/usr/bin/env perl -MZabbix::Check::Supervisor -e_installed
+	UserParameter=cpan.zabbix.check.supervisor.running,/usr/bin/env perl -MZabbix::Check::Supervisor -e_running
+	UserParameter=cpan.zabbix.check.supervisor.worker_discovery,/usr/bin/env perl -MZabbix::Check::Supervisor -e_worker_discovery
+	UserParameter=cpan.zabbix.check.supervisor.worker_status[*],/usr/bin/env perl -MZabbix::Check::Supervisor -e_worker_status -- $1
 	# RabbitMQ
-	UserParameter=cpan.zabbix.check.rabbitmq.installed,/usr/bin/perl -MZabbix::Check::RabbitMQ -e_installed
-	UserParameter=cpan.zabbix.check.rabbitmq.running,/usr/bin/perl -MZabbix::Check::RabbitMQ -e_running
-	UserParameter=cpan.zabbix.check.rabbitmq.vhost_discovery[*],/usr/bin/perl -MZabbix::Check::RabbitMQ -e_vhost_discovery -- $1
-	UserParameter=cpan.zabbix.check.rabbitmq.queue_discovery[*],/usr/bin/perl -MZabbix::Check::RabbitMQ -e_queue_discovery -- $1
-	UserParameter=cpan.zabbix.check.rabbitmq.queue_status[*],/usr/bin/perl -MZabbix::Check::RabbitMQ -e_queue_status -- $1 $2 $3
+	UserParameter=cpan.zabbix.check.rabbitmq.installed,/usr/bin/env perl -MZabbix::Check::RabbitMQ -e_installed
+	UserParameter=cpan.zabbix.check.rabbitmq.running,/usr/bin/env perl -MZabbix::Check::RabbitMQ -e_running
+	UserParameter=cpan.zabbix.check.rabbitmq.vhost_discovery[*],/usr/bin/env perl -MZabbix::Check::RabbitMQ -e_vhost_discovery -- $1
+	UserParameter=cpan.zabbix.check.rabbitmq.queue_discovery[*],/usr/bin/env perl -MZabbix::Check::RabbitMQ -e_queue_discovery -- $1
+	UserParameter=cpan.zabbix.check.rabbitmq.queue_status[*],/usr/bin/env perl -MZabbix::Check::RabbitMQ -e_queue_status -- $1 $2 $3
 	# Systemd
-	UserParameter=cpan.zabbix.check.systemd.installed,/usr/bin/perl -MZabbix::Check::Systemd -e_installed
-	UserParameter=cpan.zabbix.check.systemd.system_status,/usr/bin/perl -MZabbix::Check::Systemd -e_system_status
-	UserParameter=cpan.zabbix.check.systemd.service_discovery[*],/usr/bin/perl -MZabbix::Check::Systemd -e_service_discovery -- $1
-	UserParameter=cpan.zabbix.check.systemd.service_status[*],/usr/bin/perl -MZabbix::Check::Systemd -e_service_status -- $1
+	UserParameter=cpan.zabbix.check.systemd.installed,/usr/bin/env perl -MZabbix::Check::Systemd -e_installed
+	UserParameter=cpan.zabbix.check.systemd.system_status,/usr/bin/env perl -MZabbix::Check::Systemd -e_system_status
+	UserParameter=cpan.zabbix.check.systemd.service_discovery[*],/usr/bin/env perl -MZabbix::Check::Systemd -e_service_discovery -- $1
+	UserParameter=cpan.zabbix.check.systemd.service_status[*],/usr/bin/env perl -MZabbix::Check::Systemd -e_service_status -- $1
 	# Time
-	UserParameter=cpan.zabbix.check.time.epoch,/usr/bin/perl -MZabbix::Check::Time -e_epoch
-	UserParameter=cpan.zabbix.check.time.zone,/usr/bin/perl -MZabbix::Check::Time -e_zone
-	UserParameter=cpan.zabbix.check.time.ntp_offset[*],/usr/bin/perl -MZabbix::Check::Time -e_ntp_offset -- $1 $2
+	UserParameter=cpan.zabbix.check.time.epoch,/usr/bin/env perl -MZabbix::Check::Time -e_epoch
+	UserParameter=cpan.zabbix.check.time.zone,/usr/bin/env perl -MZabbix::Check::Time -e_zone
+	UserParameter=cpan.zabbix.check.time.ntp_offset[*],/usr/bin/env perl -MZabbix::Check::Time -e_ntp_offset -- $1 $2
 	# Redis
-	UserParameter=cpan.zabbix.check.redis.installed,/usr/bin/perl -MZabbix::Check::Redis -e_installed
-	UserParameter=cpan.zabbix.check.redis.discovery,/usr/bin/perl -MZabbix::Check::Redis -e_discovery
-	UserParameter=cpan.zabbix.check.redis.running[*],/usr/bin/perl -MZabbix::Check::Redis -e_running -- $1
-	UserParameter=cpan.zabbix.check.redis.info[*],/usr/bin/perl -MZabbix::Check::Redis -e_info -- $1 $2
+	UserParameter=cpan.zabbix.check.redis.installed,/usr/bin/env perl -MZabbix::Check::Redis -e_installed
+	UserParameter=cpan.zabbix.check.redis.discovery,/usr/bin/env perl -MZabbix::Check::Redis -e_discovery
+	UserParameter=cpan.zabbix.check.redis.running[*],/usr/bin/env perl -MZabbix::Check::Redis -e_running -- $1
+	UserParameter=cpan.zabbix.check.redis.info[*],/usr/bin/env perl -MZabbix::Check::Redis -e_info -- $1 $2
+	UserParameter=cpan.zabbix.check.redis.resptime[*],/usr/bin/env perl -MZabbix::Check::Redis -e_resptime -- $1
 
 =head1 DISK
 
@@ -200,6 +201,12 @@ $1: I<key>
 
 $2: I<bind, by defaut 127.0.0.1:6379>
 
+=head2 resptime $1
+
+gets single GET command response time from Redis
+
+$1: I<bind, by defaut 127.0.0.1:6379>
+
 =cut
 use strict;
 use warnings;
@@ -212,7 +219,7 @@ use Lazy::Utils;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.11';
+	our $VERSION     = '1.12';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw(zbx_encode zbx_decode print_discovery _version);
 	our @EXPORT_OK   = qw();

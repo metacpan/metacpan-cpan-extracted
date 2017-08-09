@@ -2,10 +2,10 @@ package Alien::Hunspell;
 
 use strict;
 use warnings;
-use parent 'Alien::Base';
+use base 'Alien::Base';
 
 # ABSTRACT: Install hunspell
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 
@@ -24,7 +24,7 @@ Alien::Hunspell - Install hunspell
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

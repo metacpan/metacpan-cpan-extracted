@@ -1,3 +1,7 @@
+v0.10.6 2017-08-01T18:05:17Z
+ - set permisisons for /var/run/postgresql
+ - POD fixed
+
 v0.10.5 2017-07-27T11:30:04Z
  - docker.json updated
 

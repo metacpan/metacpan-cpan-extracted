@@ -1,11 +1,41 @@
-DESCRIPTION
+NAME
+    IOD::Examples - Example IOD configuration files
 
+VERSION
+    This document describes version 0.201 of IOD::Examples (from Perl
+    distribution IOD-Examples), released on 2017-08-05.
+
+DESCRIPTION
     This distribution contains various examples of IOD configuration files
     in its per-dist share dir. It also serves as a spectest.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IOD-Examples>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-IOD-Examples>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IOD-Examples>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     IOD
 
     Config::IOD, Config::IOD::Reader
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

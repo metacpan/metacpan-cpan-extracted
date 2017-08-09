@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use App::CISetup::Travis::ConfigFile;
 use App::CISetup::Types qw( Bool CodeRef Dir Str );
@@ -109,6 +109,8 @@ sub _cf_params {
 sub _stored_params_from_file {
     my $self = shift;
     my $file = shift;
+
+    return unless $file->exists;
 
     return
         unless my ($yaml)

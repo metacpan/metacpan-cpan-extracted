@@ -1,7 +1,7 @@
 package Perinci::Access::Simple::Server::Pipe;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.26'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.27'; # VERSION
 
 use 5.010001;
 use strict;
@@ -113,7 +113,7 @@ Perinci::Access::Simple::Server::Pipe - (Base) class for creating Riap::Simple s
 
 =head1 VERSION
 
-This document describes version 0.26 of Perinci::Access::Simple::Server::Pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-28.
+This document describes version 0.27 of Perinci::Access::Simple::Server::Pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-08-03.
 
 =head1 SYNOPSIS
 

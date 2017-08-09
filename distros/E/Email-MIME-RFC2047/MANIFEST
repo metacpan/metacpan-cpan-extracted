@@ -8,7 +8,6 @@ Makefile.PL
 README.pod
 dist.ini
 lib/Email/MIME/RFC2047.pm
-lib/Email/MIME/RFC2047.pod
 lib/Email/MIME/RFC2047/Address.pm
 lib/Email/MIME/RFC2047/AddressList.pm
 lib/Email/MIME/RFC2047/Decoder.pm

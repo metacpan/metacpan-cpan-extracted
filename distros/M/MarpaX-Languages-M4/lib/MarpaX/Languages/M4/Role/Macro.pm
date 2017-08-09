@@ -6,7 +6,7 @@ use Moops;
 
 role MarpaX::Languages::M4::Role::Macro {
 
-    our $VERSION = '0.017'; # VERSION
+    our $VERSION = '0.019'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -34,7 +34,7 @@ MarpaX::Languages::M4::Role::Macro - M4 Macro role
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 AUTHOR
 

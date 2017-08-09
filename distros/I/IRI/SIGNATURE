@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 aead923afc532ee302a3bf3fbb56a78dc4b16531 Changes
+SHA1 604438d90773b897ea025c83eb96cdc8ea7a54c8 Changes.ttl
+SHA1 d85e189ae71e9d9f81a4e1b35930f099fc9bff8d Changes.xml
+SHA1 88a9956a698251e7037d96cf9091eb61793d5ab7 MANIFEST
+SHA1 2eaf9cd668c97bf4ef2063375b184c16973509ff META.yml
+SHA1 1a9ed8f5fe8997c1d8ff525e093f6c72676144c7 Makefile.PL
+SHA1 1b080a25d9a14cf6498ee9ee1b713a352161bb9b README
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 f2b49d1094c2ec3a0073451d44e88530b3595c48 lib/IRI.pm
+SHA1 8239904ffc3b6705243167ccb7ed4da00d5d2543 t/00-simple.t
+SHA1 dcdc21dd75dd1bfc59ea44a886565bf94a133504 t/bugs.t
+SHA1 49bf69502718d2931ede3fa80220628841d3ab2d t/coercion.t
+SHA1 c179a0e5169b56dd5d6c8eae04cba68383158224 xt/pod-coverage.t
+SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlmHdEIACgkQhPK6VMqoyC0VlwCgkZwMjCck0QWHsJOgUB2qn8UF
+WaoAoI1lkuWWxVU7vyg25sZf/GIsR4BM
+=7Jqv
+-----END PGP SIGNATURE-----

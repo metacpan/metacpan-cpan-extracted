@@ -2,7 +2,7 @@
 
 makepp_builtin -- Built in rules for makepp
 
-=for vc $Id: makepp_builtin.pod,v 1.12 2012/02/07 22:26:15 pfeiffer Exp $
+=for vc $Id: makepp_builtin.pod,v 1.13 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -52,26 +52,26 @@ the compilation command is changed as expected.
     #
     %.o: %.c
  	$(CC) $(CFLAGS) $(CPPFLAGS) -c $(input) -o $(output)
- 
+
     #
     # For C++ programs:
     #
     %.o: %.cxx # and also %.cc, %.cpp, %.c++, and %.C
  	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $(input) -o $(output)
- 
+
     #
     # For Fortran programs:
     #
     %.o: %.f
  	$(FC) $(FFLAGS) -c $(input) -o $(output)
- 
+
     #
     # Yacc and lex:
     #
     %.c: %.y
  	$(YACC) $(YFLAGS) $(input)
  	&mv -f y.tab.c $(output)
- 
+
     %.c: %.l
  	$(LEX) $(LFLAGS) -t $(input) -o $(output)
 

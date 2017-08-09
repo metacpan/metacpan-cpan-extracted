@@ -40,7 +40,7 @@ perl				# A double-paren Perl statement.
 
 perl {
   $Mpp::pid = $$;
-  run qw(script.pl statement-script.out b);
+  run qw(./script.pl statement-script.out b);
 }
 
 
@@ -66,7 +66,7 @@ rule-script.out:
 	makeperl {{
 	  $$Mpp::pid = $$$$;		# How much is that in Euros? :-)
 	}}
-	&script.pl $(output) d
+	&./script.pl $(output) d
 ###	2	755	1067451878	1066077772	script.pl
 open my $f, ">>$ARGV[0]" or die "open $ARGV[0]: $!";
 print $f "$0: running $ARGV[1] (", $Mpp::pid == $$ ? 'same' : 'different', " pid)\n";
@@ -80,9 +80,9 @@ ghijkl
 multi1
 multi2
 ###	1	644	1104006511	1209131381	answers/statement-script.out
-script.pl: running b (same pid)
+./script.pl: running b (same pid)
 ###	1	644	1067451878	1209131415	answers/rule-script.out
-script.pl: running d (same pid)
+./script.pl: running d (same pid)
 ###	1	644	1067451878	1066078086	answers/statements
 xyz abc def foo bar
 ###	2	644	1067451878	1066078086	answers/oneline

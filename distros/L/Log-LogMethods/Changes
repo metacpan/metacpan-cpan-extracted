@@ -1,2 +1,8 @@
 - 1.001
   Inital Relase
+
+- 1.002
+  Bug fix, added null check for $self->level
+
+- 1.003
+  Bug fix, added no warnings 'redefine' when methods are being defined

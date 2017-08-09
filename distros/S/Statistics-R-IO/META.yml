@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ name: Statistics-R-IO
 requires:
   Carp: '0'
   Class::Method::Modifiers: '0'
-  Class::Tiny: '0'
+  Class::Tiny: '1.001'
   Class::Tiny::Antlers: '0.023'
   Math::Complex: '0'
   Scalar::Util: '0'
@@ -29,4 +29,5 @@ requires:
 resources:
   homepage: https://github.com/cubranic/Statistics-R-IO
   repository: https://github.com/cubranic/Statistics-R-IO.git
-version: '1.0001'
+version: '1.0002'
+x_serialization_backend: 'YAML::Tiny version 1.70'

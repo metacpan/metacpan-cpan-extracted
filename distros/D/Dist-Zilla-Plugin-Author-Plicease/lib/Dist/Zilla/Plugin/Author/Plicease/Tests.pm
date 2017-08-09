@@ -10,7 +10,7 @@ use Data::Section { installer => method_installer }, -setup;
 use Dist::Zilla::MintingProfile::Author::Plicease;
 
 # ABSTRACT: add author only release tests to xt/release
-our $VERSION = '2.20'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 with 'Dist::Zilla::Role::FileGatherer';
@@ -184,7 +184,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.20
+version 2.21
 
 =head1 SYNOPSIS
 

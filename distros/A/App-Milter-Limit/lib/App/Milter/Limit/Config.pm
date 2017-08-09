@@ -1,8 +1,19 @@
+#
+# This file is part of App-Milter-Limit
+#
+# This software is copyright (c) 2010 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package App::Milter::Limit::Config;
-$App::Milter::Limit::Config::VERSION = '0.52';
+$App::Milter::Limit::Config::VERSION = '0.53';
 # ABSTRACT: Milter Limit configuration object
 
 use strict;
+use warnings;
+
 use base qw(Class::Singleton Class::Accessor);
 use Config::Tiny;
 
@@ -28,6 +39,8 @@ sub _new_instance {
 
 sub init {
     my $self = shift;
+
+    no warnings 'uninitialized';
 
     my $conf = $self->global;
     if (my $user = $$conf{user}) {
@@ -79,7 +92,7 @@ App::Milter::Limit::Config - Milter Limit configuration object
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -141,7 +154,7 @@ L<Config::Tiny>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/milter-limit>
+The development version is on github at L<https://github.com/mschout/milter-limit>
 and may be cloned from L<git://github.com/mschout/milter-limit.git>
 
 =head1 BUGS

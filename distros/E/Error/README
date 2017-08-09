@@ -21,7 +21,7 @@ SYNOPSIS
 	record Error::Simple("A simple error")
 	    and return;
     }
- 
+
     unlink($file) or throw Error::Simple("$file: $!",$!);
 
     try {
@@ -79,11 +79,11 @@ Please also read the perlmodinstall man page, if available.
 
 Share and Enjoy !!
 
-Arun Kumar U 
+Arun Kumar U
 <u_arunkumar@yahoo.com>
 
 -------------------------------------------------------------------------------
-    Only wimps use tape backup: *real* men just upload their important 
+    Only wimps use tape backup: *real* men just upload their important
     stuff on ftp, and let the rest of the world mirror it.
                                                            - Linus Torvalds
 -------------------------------------------------------------------------------

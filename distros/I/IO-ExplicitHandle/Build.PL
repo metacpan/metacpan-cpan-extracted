@@ -6,7 +6,6 @@ use Module::Build;
 
 Module::Build->new(
 	module_name => "IO::ExplicitHandle",
-	dist_version => "0.000",
 	license => "perl",
 	configure_requires => {
 		"Module::Build" => 0,
@@ -23,7 +22,7 @@ Module::Build->new(
 		"warnings" => 0,
 	},
 	requires => {
-		"Lexical::SealRequireHints" => "0.007",
+		"Lexical::SealRequireHints" => "0.008",
 		"XSLoader" => 0,
 		"perl" => "5.006",
 		"strict" => 0,
@@ -34,7 +33,16 @@ Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-IO-ExplicitHandle\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=IO-ExplicitHandle",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

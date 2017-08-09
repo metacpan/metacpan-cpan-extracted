@@ -1,3 +1,13 @@
+0.011     2017-08-07 09:39:39+10:00 Australia/Melbourne
+ - added enable_remote_exec, disabled by default since Consul 0.8.0
+
+0.010     2017-08-07 09:17:20+10:00 Australia/Melbourne
+ - removed rpc_port, deprecated from Consul 0.9.0
+
+0.009     2017-08-01 22:28:20+10:00 Australia/Melbourne
+ - wan_join method, connect multiple Consul instances together for
+   cross-datacenter applications
+
 0.008     2017-02-01 11:50:33+11:00 Australia/Melbourne
  - Converted to a Moo class internally
  - Allow ports to be specified by caller

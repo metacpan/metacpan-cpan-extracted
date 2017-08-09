@@ -1,11 +1,11 @@
-# WordNet::Extend::Insert.pm version 0.030
-# Updated: 10/13/16
+# WordNet::Extend::Insert.pm version 0.040
+# Updated: 03/19/17
 #                                           
-# Ted Pedersen, University of Minnesota Duluth             
-# tpederse at d.umn.edu
-#
 # Jon Rusert, University of Minnesota Duluth
 # ruse0008 at d.umn.edu
+#
+# Ted Pedersen, University of Minnesota Duluth             
+# tpederse at d.umn.edu
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,15 +38,15 @@ WordNet.
 
  @in1 = ("crackberry","noun","withdef.1", "A BlackBerry, a handheld device considered addictive for its networking capability.");    
 
- @in2 = ("slackberry","noun","withdef.2", "A mocking name for crackberry.");
+ #@in2 = ("slackberry","noun","withdef.2", "A mocking name for crackberry.");
 
  @loc1 = ("withdef.5","cellphone#n#1");
 
- @loc2 = ("withdef.6","crackberry#n#1");
+ #@loc2 = ("withdef.6","crackberry#n#1");
 
  $insert->attach(\@in1, \@loc1);
 
- $insert->merge(\@in2, \@loc2);
+ #$insert->merge(\@in2, \@loc2);
 
 =head1 DESCRIPTION
 
@@ -73,7 +73,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 @EXPORT = ();
 
-$VERSION = '0.030';
+$VERSION = '0.040';
 
 #**************Variables**********************
 $wn = WordNet::QueryData->new; #to be used to access data from wordnet
@@ -169,13 +169,18 @@ sub attach()
 	$base = 1;
     }
     
-    my @newSyn = @{$_[$base]};
-    $base = $base +1;
-    if(scalar @newSyn == 1) #in second form
-     {
-	my @tempSyn = split("\t", $newSyn[0]);
-	@newSyn = @tempSyn;
+    my @newSyn = ();
+    
+    if(ref($_[$base]) eq 'ARRAY')
+    {
+	@newSyn =@{$_[$base]};
     }
+    else
+    {
+	@newSyn = split("\t", $_[$base]);
+    }
+    
+    $base = $base +1;
     my $pos = substr($newSyn[1], 0, 1);
     my @location = @{$_[$base]};
     my $write = 1; #write flag changes to 0 if error occurs so no write() will occur.
@@ -321,9 +326,18 @@ sub attach()
 		}
 	    }
 
-	    $indexPos ="$newSyn[0] $pos 1 1 \@ 1 0 $newOffset";
-	    $dataPos = "$newOffset $hypData{'lex_filenum'} $pos 01 $newSyn[0] 0 001 \@ $hypData{'synset_offset'} $pos 0000 | $newSyn[3]"; 
-	    $indexSense = "$newSyn[0]%$posNum:$hypData{'lex_filenum'}:00:: $newOffset 1 0";
+	    my $lowerSyn = lc($newSyn[0]);
+	    $indexPos ="$lowerSyn $pos 1 1 \@ 1 0 $newOffset";
+	    if($pos eq 'v')
+	    {
+		$dataPos = "$newOffset $hypData{'lex_filenum'} $pos 01 $newSyn[0] 0 001 \@ $hypData{'synset_offset'} $pos 0000 01 + 01 00 | $newSyn[3]"; 
+	    }
+	    else
+	    {
+		$dataPos = "$newOffset $hypData{'lex_filenum'} $pos 01 $newSyn[0] 0 001 \@ $hypData{'synset_offset'} $pos 0000 | $newSyn[3]";		
+	    }
+	    
+	    $indexSense = "$lowerSyn%$posNum:$hypData{'lex_filenum'}:00:: $newOffset 1 0";
 
 	    close WNDATATEMP;
 	    open WNDATATEMP, "$dataFile.temp" or die $!;
@@ -338,7 +352,11 @@ sub attach()
 		    {
 			if(exists $offsetMap{$tempLine[$i]})
 			{
-			    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    #only change offsets with respect to current pos or first offset
+			    if($tempLine[$i+1] eq $pos || $i == 0)
+			    {
+				$tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    }
 			}
 			
 		    }
@@ -385,7 +403,7 @@ sub attach()
 			#add in $indexPos alphabetically
 			if($alpha == 1)
 			{
-			    if(($tempLine[0] cmp $newSyn[0]) == 1 )
+			    if(($tempLine[0] cmp $lowerSyn) == 1 )
 			    {
 				print WNINDEXNEW "$indexPos  \n";
 				$alpha = 0;
@@ -424,7 +442,7 @@ sub attach()
 		    #add in $indexSense alphabetically
 		    if($alpha == 1)
 		    {
-			if(($tempLine[0] cmp $newSyn[0]) == 1 )
+			if(($tempLine[0] cmp $lowerSyn) == 1 )
 			{
 			    print WNSENSENEW "$indexSense\n";
 			    $alpha = 0;
@@ -433,7 +451,15 @@ sub attach()
 		    
 		    if(exists $offsetMap{$tempLine[1]})
 		    {
-			$tempLine[1] = "$offsetMap{$tempLine[1]}";
+			my $percLoc = index($tempLine[0], '%');
+			my $tPNumLoc = $perlLoc + 1;
+			my $targetPosNum = substr $tempLine[0], $tPNumLoc, 1;
+
+			#only change corresponding pos words
+			if($targetPosNum == $posNum)
+			{
+			    $tempLine[1] = "$offsetMap{$tempLine[1]}";
+			}
 		    }
 		    $tempIn = join(' ', @tempLine);
 		    
@@ -507,10 +533,20 @@ sub attach()
 		    print WNDATATEMP "$tempIn\n";
 		}
 	    }
-	   	    
-	    $indexPos ="$newSyn[0] $pos $newSynNum $lemmaIndex{'p_cnt'} $lemmaIndex{'ptr_symbol'} $newSynNum $lemmaIndex{'tagsense_cnt'} $lemmaIndex{'synset_offset'} $newOffset";
-	    $dataPos = "$newOffset $hypData{'lex_filenum'} $pos 01 $newSyn[0] 0 001 @ $hypData{'synset_offset'} $pos 0000 | $newSyn[3]"; 
-	    $indexSense = "$newSyn[0]%$posNum:$hypData{'lex_filenum'}:00:: $newOffset $newSynNum 0";
+
+	    my $lowerSyn = lc($newSyn[0]);
+	    $indexPos ="$lowerSyn $pos $newSynNum $lemmaIndex{'p_cnt'} $lemmaIndex{'ptr_symbol'} $newSynNum $lemmaIndex{'tagsense_cnt'} $lemmaIndex{'synset_offset'} $newOffset";
+	    
+	    if($pos eq 'v')
+	    {
+		$dataPos = "$newOffset $hypData{'lex_filenum'} $pos 01 $newSyn[0] 0 001 \@ $hypData{'synset_offset'} $pos 0000 01 + 01 00 | $newSyn[3]";
+	    }
+	    else
+	    {
+		$dataPos = "$newOffset $hypData{'lex_filenum'} $pos 01 $newSyn[0] 0 001 \@ $hypData{'synset_offset'} $pos 0000 | $newSyn[3]";
+	    }
+	    
+	    $indexSense = "$lowerSyn%$posNum:$hypData{'lex_filenum'}:00:: $newOffset $newSynNum 0";
 
 	    close WNDATATEMP;
 	    open WNDATATEMP, "$dataFile.temp" or die $!;
@@ -525,7 +561,11 @@ sub attach()
 		    {
 			if(exists $offsetMap{$tempLine[$i]})
 			{
-			    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    #only change offsets with respect to current pos or first offset on line
+			    if($tempLine[$i+1] eq $pos || $i == 0)
+			    {
+				$tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    }
 			}
 			
 		    }
@@ -603,7 +643,7 @@ sub attach()
 		    #add in $indexSense alphabetically
 		    if($alpha == 1)
 		    {
-			if(($tempLine[0] cmp $newSyn[0]) == 1 )
+			if(($tempLine[0] cmp $lowerSyn) == 1 )
 			{
 			    print WNSENSENEW "$indexSense\n";
 			    $alpha = 0;
@@ -612,7 +652,15 @@ sub attach()
 		    
 		    if(exists $offsetMap{$tempLine[1]})
 		    {
-			$tempLine[1] = "$offsetMap{$tempLine[1]}";
+			my $percLoc = index($tempLine[0], '%');
+			my $tPNumLoc = $perlLoc + 1;
+			my $targetPosNum = substr $tempLine[0], $tPNumLoc, 1;
+
+			#only change corresponding pos words
+			if($targetPosNum == $posNum)
+			{
+			    $tempLine[1] = "$offsetMap{$tempLine[1]}";
+			}
 		    }
 		    $tempIn = join(' ', @tempLine);
 		    
@@ -631,6 +679,194 @@ sub attach()
 	close WNDATANEW;
 	close WNSENSENEW;
 
+	my $changeDataFile = "";
+	if($write == 1)#if write was successful,  data files needs to change offsets
+	{
+	    my $changePos = '';
+	    my $changeLocationPos = '';
+	    if($pos eq 'n')
+	    {
+		$changePos1 = 'v';
+		$changeLocationPos1 = 'verb';
+		$changePos2 = 'r';
+		$changeLocationPos2 = 'adv';
+		$changePos3 = 'a';
+		$changeLocationPos3 = 'adj';
+	    }
+	    else
+	    {
+		$changePos1 = 'n';
+		$changeLocationPos1 = 'noun';
+		$changePos2 = 'r';
+		$changeLocationPos2 = 'adv';
+		$changePos3 = 'a';
+		$changeLocationPos3 = 'adj';
+	    }
+
+	    $changeDataFile1 = "$WNSEARCHDICT/data.$changeLocationPos1";
+
+	    open (CHANGEDATANEW, '>', "$changeDataFile1.new") or die $!;
+
+	    my $fhData = select(CHANGEDATANEW);
+	    $|=1;
+	    select($fhData);
+       	
+	    open CHANGEDATA, "$changeDataFile1" or die $!;
+
+	    my $curLine = 1;
+	    while(<CHANGEDATA>)
+	    {
+		for $tempIn (split("\n"))
+		{
+		    if($curLine > $wnCRLength)
+		    {
+			my $spaceTmp = $tempIn;
+			$spaceTmp =~ /( *)$/;
+			my $spaces = length($1);
+			
+			my @tempLine = split /\s/, $tempIn;
+			for my $i (0 .. $#tempLine)
+			{
+			    if(exists $offsetMap{$tempLine[$i]})
+			    {
+				#only change offsets with respect to current pos
+				if($tempLine[$i+1] eq $pos)
+				{
+				    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+				}
+			    }
+			}
+			
+			$tempIn = join(' ', @tempLine);
+
+			for($i=1; $i <= $spaces; $i++)
+			{
+			    $tempIn = $tempIn . " ";
+			}
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    else
+		    {
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    $curLine+=1;
+		}	 
+	    }
+
+	    close CHANGEDATA;
+	    close CHANGEDATANEW;
+
+	    $changeDataFile2 = "$WNSEARCHDICT/data.$changeLocationPos2";
+
+	    open (CHANGEDATANEW, '>', "$changeDataFile2.new") or die $!;
+
+	    my $fhData = select(CHANGEDATANEW);
+	    $|=1;
+	    select($fhData);
+       	
+	    open CHANGEDATA, "$changeDataFile2" or die $!;
+
+	    my $curLine = 1;
+	    while(<CHANGEDATA>)
+	    {
+		for $tempIn (split("\n"))
+		{
+		    if($curLine > $wnCRLength)
+		    {
+			my $spaceTmp = $tempIn;
+			$spaceTmp =~ /( *)$/;
+			my $spaces = length($1);
+			
+			my @tempLine = split /\s/, $tempIn;
+			for my $i (0 .. $#tempLine)
+			{
+			    if(exists $offsetMap{$tempLine[$i]})
+			    {
+				#only change offsets with respect to current pos
+				if($tempLine[$i+1] eq $pos)
+				{
+				    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+				}
+			    }
+			}
+			
+			$tempIn = join(' ', @tempLine);
+
+			for($i=1; $i <= $spaces; $i++)
+			{
+			    $tempIn = $tempIn . " ";
+			}
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    else
+		    {
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    $curLine+=1;
+		}	 
+	    }
+
+	    close CHANGEDATA;
+	    close CHANGEDATANEW;
+
+	    $changeDataFile3 = "$WNSEARCHDICT/data.$changeLocationPos3";
+
+	    open (CHANGEDATANEW, '>', "$changeDataFile3.new") or die $!;
+
+	    my $fhData = select(CHANGEDATANEW);
+	    $|=1;
+	    select($fhData);
+       	
+	    open CHANGEDATA, "$changeDataFile3" or die $!;
+
+	    my $curLine = 1;
+	    while(<CHANGEDATA>)
+	    {
+		for $tempIn (split("\n"))
+		{
+		    if($curLine > $wnCRLength)
+		    {
+			my $spaceTmp = $tempIn;
+			$spaceTmp =~ /( *)$/;
+			my $spaces = length($1);
+			
+			my @tempLine = split /\s/, $tempIn;
+			for my $i (0 .. $#tempLine)
+			{
+			    if(exists $offsetMap{$tempLine[$i]})
+			    {
+				#only change offsets with respect to current pos
+				if($tempLine[$i+1] eq $pos)
+				{
+				    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+				}
+			    }
+			}
+			
+			$tempIn = join(' ', @tempLine);
+
+			for($i=1; $i <= $spaces; $i++)
+			{
+			    $tempIn = $tempIn . " ";
+			}
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    else
+		    {
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    $curLine+=1;
+		}	 
+	    }
+
+	    close CHANGEDATA;
+	    close CHANGEDATANEW;
+
+	    
+	}
+
+	
+	
 	if($write == 1)#if write was successful, overwrite old files with new.
 	{
 	    #make backup files for last change
@@ -641,6 +877,9 @@ sub attach()
 	    copy($indexFile, "$indexFile.last");
 	    copy($dataFile, "$dataFile.last");
 	    copy($senseFile, "$senseFile.last");
+	    copy($changeDataFile1, "$changeDataFile1.last"); 
+	    copy($changeDataFile2, "$changeDataFile2.last");
+	    copy($changeDataFile3, "$changeDataFile3.last"); 
 	    
 	    #if no backup files exists for restoreWordnet() make for easy revert.
 	    my $backupcheck = "$indexFile.backup";
@@ -648,6 +887,9 @@ sub attach()
 	    {
 		copy($indexFile, "$indexFile.backup");
 		copy($dataFile, "$dataFile.backup");
+		copy($changeDataFile1, "$changeDataFile1.backup");
+		copy($changeDataFile2, "$changeDataFile2.backup");
+		copy($changeDataFile3, "$changeDataFile3.backup");
 	    }
 
 	    unless(-f "$senseFile.backup")
@@ -664,9 +906,15 @@ sub attach()
 	    unlink $indexFile;
 	    unlink $dataFile;
 	    unlink $senseFile;
+	    unlink $changeDataFile1;
+	    unlink $changeDataFile2;
+	    unlink $changeDataFile3;
 	    move("$indexFile.new", $indexFile);
 	    move("$dataFile.new", $dataFile);
 	    move("$senseFile.new", $senseFile);
+	    move("$changeDataFile1.new", $changeDataFile1);
+	    move("$changeDataFile2.new", $changeDataFile2);
+	    move("$changeDataFile3.new", $changeDataFile3);
 	}
     }
 
@@ -696,13 +944,18 @@ sub merge()
 	$base = 1;
     }
     
-    my @newSyn = @{$_[$base]};
-    $base = $base +1;
-    if(scalar @newSyn == 1) #in second form
-     {
-	my @tempSyn = split("\t", $newSyn[0]);
-	@newSyn = @tempSyn;
+    my @newSyn = ();
+
+    if(ref($_[$base]) eq 'ARRAY')
+    {
+	@newSyn =@{$_[$base]};
     }
+    else
+    {
+	@newSyn = split("\t", $_[$base]);
+    }
+
+    $base = $base +1;
     my $pos = substr($newSyn[1], 0, 1);
     my @location = @{$_[$base]};
     my $write = 1; #write flag changes to 0 if error occurs so no write() will occur.
@@ -841,11 +1094,26 @@ sub merge()
 		    print WNDATATEMP "$tempIn\n";
 		}
 	    }
-	   	    
-	    $indexPos = "$newSyn[0] $pos 1 $synIndex{'p_cnt'} $synIndex{'ptr_symbol'} 1 0 $locationOffset";
+
+	    my $lowerSyn = lc($newSyn[0]);
+	    $indexPos = "$lowerSyn $pos 1 $synIndex{'p_cnt'} $synIndex{'ptr_symbol'} 1 0 $locationOffset";
 	    my $wcnt = $synData{'w_cnt'} + 1;
-	    $dataPos = "$locationOffset $synData{'lex_filenum'} $synData{'ss_type'} $wcnt $synData{'word_lex_id'} $newSyn[0] 0 $synData{'p_cnt'} $synData{'ptr'} | $synData{'gloss'}";
-	    $indexSense = "$newSyn[0]%$posNum:$synData{'lex_filenum'}:00:: $locationOffset 1 0";
+	    if(length $wcnt < 2)
+	    {
+		$wcnt = "0".$wcnt; #needs to be represented by 2 digit number.
+	    }
+	    
+	    if($pos eq 'v')
+	    {
+		$dataPos = "$locationOffset $synData{'lex_filenum'} $synData{'ss_type'} $wcnt $synData{'word_lex_id'} $newSyn[0] 0 $synData{'p_cnt'} $synData{'ptr'} $synData{'f_cnt'} $synData{'frames'} | $synData{'gloss'}";
+	
+	    }
+	    else
+	    {
+		$dataPos = "$locationOffset $synData{'lex_filenum'} $synData{'ss_type'} $wcnt $synData{'word_lex_id'} $newSyn[0] 0 $synData{'p_cnt'} $synData{'ptr'} | $synData{'gloss'}";
+	    }
+	    
+	    $indexSense = "$lowerSyn%$posNum:$synData{'lex_filenum'}:00:: $locationOffset 1 0";
 
 	    close WNDATATEMP;
 	    open WNDATATEMP, "$dataFile.temp" or die $!;
@@ -865,9 +1133,12 @@ sub merge()
 		    {
 			if(exists $offsetMap{$tempLine[$i]})
 			{
-			    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    #only change offsets with respect to current pos or first offset
+			    if($tempLine[$i+1] eq $pos || $i == 0)
+			    {
+				$tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    }
 			}
-
 		    }
 		    $tempIn = join(' ', @tempLine);
 
@@ -900,7 +1171,7 @@ sub merge()
 			#add in $indexPos alphabetically
 			if($alpha == 1)
 			{
-			    if(($tempLine[0] cmp $newSyn[0]) == 1 )
+			    if(($tempLine[0] cmp $lowerSyn) == 1 )
 			    {
 				print WNINDEXNEW "$indexPos  \n";
 				$alpha = 0;
@@ -937,7 +1208,7 @@ sub merge()
 		    #add in $indexSense alphabetically
 		    if($alpha == 1)
 		    {
-			if(($tempLine[0] cmp $newSyn[0]) == 1 )
+			if(($tempLine[0] cmp $lowerSyn) == 1 )
 			{
 			    print WNSENSENEW "$indexSense\n";
 			    $alpha = 0;
@@ -946,7 +1217,15 @@ sub merge()
 		    
 		    if(exists $offsetMap{$tempLine[1]})
 		    {
-			$tempLine[1] = "$offsetMap{$tempLine[1]}";
+			my $percLoc = index($tempLine[0], '%');
+			my $tPNumLoc = $perlLoc + 1;
+			my $targetPosNum = substr $tempLine[0], $tPNumLoc, 1;
+
+			#only change corresponding pos words
+			if($targetPosNum == $posNum)
+			{
+			    $tempLine[1] = "$offsetMap{$tempLine[1]}";
+			}
 		    }
 		    $tempIn = join(' ', @tempLine);
 
@@ -1015,15 +1294,24 @@ sub merge()
             }
 	    
 	    
-	    
-	    $indexPos = "$newSyn[0] $pos $newSynNum $lemmaIndex{'p_cnt'} $lemmaIndex{'ptr_symbol'} $newSynNum $lemmaIndex{'tagsense_cnt'} $lemmaIndex{'synset_offset'} $locationOffset";
+	    my $lowerSyn = lc($newSyn[0]);
+	    $indexPos = "$lowerSyn $pos $newSynNum $lemmaIndex{'p_cnt'} $lemmaIndex{'ptr_symbol'} $newSynNum $lemmaIndex{'tagsense_cnt'} $lemmaIndex{'synset_offset'} $locationOffset";
 	    my $wcnt = $synData{'w_cnt'} + 1;
 	    if(length $wcnt < 2)
 	    {
 		$wcnt = "0".$wcnt; #needs to be represented by 2 digit number.
 	    }
-	    $dataPos = "$locationOffset $synData{'lex_filenum'} $synData{'ss_type'} $wcnt $synData{'word_lex_id'} $newSyn[0] 0 $synData{'p_cnt'} $synData{'ptr'} | $synData{'gloss'}";
-	    $indexSense = "$newSyn[0]%$posNum:$synData{'lex_filenum'}:00:: $locationOffset $newSynNum 0";
+
+	    if($pos eq 'v')
+	    {
+		$dataPos = "$locationOffset $synData{'lex_filenum'} $synData{'ss_type'} $wcnt $synData{'word_lex_id'} $newSyn[0] 0 $synData{'p_cnt'} $synData{'ptr'} $synData{'f_cnt'} $synData{'frames'} | $synData{'gloss'}";
+            }
+            else
+            {
+                $dataPos = "$locationOffset $synData{'lex_filenum'} $synData{'ss_type'} $wcnt $synData{'word_lex_id'} $newSyn[0] 0 $synData{'p_cnt'} $synData{'ptr'} | $synData{'gloss'}";
+            }
+
+	    $indexSense = "$lowerSyn%$posNum:$synData{'lex_filenum'}:00:: $locationOffset $newSynNum 0";
 
 	    close WNDATATEMP;
 	    open WNDATATEMP, "$dataFile.temp" or die $!;
@@ -1043,9 +1331,12 @@ sub merge()
 		    {
 			if(exists $offsetMap{$tempLine[$i]})
 			{
-			    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    #only change offsets with respect to current pos or first offset
+			    if($tempLine[$i+1] eq $pos || $i == 0)
+			    {
+				$tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+			    }
 			}
-
 		    }
 		    $tempIn = join(' ', @tempLine);
 
@@ -1107,7 +1398,7 @@ sub merge()
 		    #add in $indexSense alphabetically
 		    if($alpha == 1)
 		    {
-			if(($tempLine[0] cmp $newSyn[0]) == 1 )
+			if(($tempLine[0] cmp $lowerSyn) == 1 )
 			{
 			    print WNSENSENEW "$indexSense\n";
 			    $alpha = 0;
@@ -1116,7 +1407,15 @@ sub merge()
 		    
 		    if(exists $offsetMap{$tempLine[1]})
 		    {
-			$tempLine[1] = "$offsetMap{$tempLine[1]}";
+			my $percLoc = index($tempLine[0], '%');
+			my $tPNumLoc = $perlLoc + 1;
+			my $targetPosNum = substr $tempLine[0], $tPNumLoc, 1;
+
+			#only change corresponding pos words
+			if($targetPosNum == $posNum)
+			{
+			    $tempLine[1] = "$offsetMap{$tempLine[1]}";
+			}
 		    }
 		    $tempIn = join(' ', @tempLine);
 
@@ -1134,23 +1433,214 @@ sub merge()
 	close WNDATANEW;
 	close WNSENSENEW;
 
+	my $changeDataFile = "";
+	if($write == 1)#if write was successful,  data files needs to change offsets
+	{
+	    my $changePos = '';
+	    my $changeLocationPos = '';
+	    if($pos eq 'n')
+	    {
+		$changePos1 = 'v';
+		$changeLocationPos1 = 'verb';
+		$changePos2 = 'r';
+		$changeLocationPos2 = 'adv';
+		$changePos3 = 'a';
+		$changeLocationPos3 = 'adj';
+	    }
+	    else
+	    {
+		$changePos1 = 'n';
+		$changeLocationPos1 = 'noun';
+		$changePos2 = 'r';
+		$changeLocationPos2 = 'adv';
+		$changePos3 = 'a';
+		$changeLocationPos3 = 'adj';
+	    }
+
+	    $changeDataFile1 = "$WNSEARCHDICT/data.$changeLocationPos1";
+
+	    open (CHANGEDATANEW, '>', "$changeDataFile1.new") or die $!;
+
+	    my $fhData = select(CHANGEDATANEW);
+	    $|=1;
+	    select($fhData);
+       	
+	    open CHANGEDATA, "$changeDataFile1" or die $!;
+
+	    my $curLine = 1;
+	    while(<CHANGEDATA>)
+	    {
+		for $tempIn (split("\n"))
+		{
+		    if($curLine > $wnCRLength)
+		    {
+			my $spaceTmp = $tempIn;
+			$spaceTmp =~ /( *)$/;
+			my $spaces = length($1);
+			
+			my @tempLine = split /\s/, $tempIn;
+			for my $i (0 .. $#tempLine)
+			{
+			    if(exists $offsetMap{$tempLine[$i]})
+			    {
+				#only change offsets with respect to current pos
+				if($tempLine[$i+1] eq $pos)
+				{
+				    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+				}
+			    }
+			}
+			
+			$tempIn = join(' ', @tempLine);
+
+			for($i=1; $i <= $spaces; $i++)
+			{
+			    $tempIn = $tempIn . " ";
+			}
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    else
+		    {
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    $curLine+=1;
+		}	 
+	    }
+
+	    close CHANGEDATA;
+	    close CHANGEDATANEW;
+
+	    $changeDataFile2 = "$WNSEARCHDICT/data.$changeLocationPos2";
+
+	    open (CHANGEDATANEW, '>', "$changeDataFile2.new") or die $!;
+
+	    my $fhData = select(CHANGEDATANEW);
+	    $|=1;
+	    select($fhData);
+       	
+	    open CHANGEDATA, "$changeDataFile2" or die $!;
+
+	    my $curLine = 1;
+	    while(<CHANGEDATA>)
+	    {
+		for $tempIn (split("\n"))
+		{
+		    if($curLine > $wnCRLength)
+		    {
+			my $spaceTmp = $tempIn;
+			$spaceTmp =~ /( *)$/;
+			my $spaces = length($1);
+			
+			my @tempLine = split /\s/, $tempIn;
+			for my $i (0 .. $#tempLine)
+			{
+			    if(exists $offsetMap{$tempLine[$i]})
+			    {
+				#only change offsets with respect to current pos
+				if($tempLine[$i+1] eq $pos)
+				{
+				    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+				}
+			    }
+			}
+			
+			$tempIn = join(' ', @tempLine);
+
+			for($i=1; $i <= $spaces; $i++)
+			{
+			    $tempIn = $tempIn . " ";
+			}
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    else
+		    {
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    $curLine+=1;
+		}	 
+	    }
+
+	    close CHANGEDATA;
+	    close CHANGEDATANEW;
+
+	    $changeDataFile3 = "$WNSEARCHDICT/data.$changeLocationPos3";
+
+	    open (CHANGEDATANEW, '>', "$changeDataFile3.new") or die $!;
+
+	    my $fhData = select(CHANGEDATANEW);
+	    $|=1;
+	    select($fhData);
+       	
+	    open CHANGEDATA, "$changeDataFile3" or die $!;
+
+	    my $curLine = 1;
+	    while(<CHANGEDATA>)
+	    {
+		for $tempIn (split("\n"))
+		{
+		    if($curLine > $wnCRLength)
+		    {
+			my $spaceTmp = $tempIn;
+			$spaceTmp =~ /( *)$/;
+			my $spaces = length($1);
+			
+			my @tempLine = split /\s/, $tempIn;
+			for my $i (0 .. $#tempLine)
+			{
+			    if(exists $offsetMap{$tempLine[$i]})
+			    {
+				#only change offsets with respect to current pos
+				if($tempLine[$i+1] eq $pos)
+				{
+				    $tempLine[$i] = "$offsetMap{$tempLine[$i]}";
+				}
+			    }
+			}
+			
+			$tempIn = join(' ', @tempLine);
+
+			for($i=1; $i <= $spaces; $i++)
+			{
+			    $tempIn = $tempIn . " ";
+			}
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    else
+		    {
+			print CHANGEDATANEW "$tempIn\n";
+		    }
+		    $curLine+=1;
+		}	 
+	    }
+
+	    close CHANGEDATA;
+	    close CHANGEDATANEW;
+   
+	}
+	
 	if($write == 1)#if write was successful, overwrite old files with new.
 	{
 	    #make backup files for last change
 	    #first remove old last files
 	    unlink glob "$WNSEARCHDICT/*.last";
 
-	    #next make new last files
+	    #next make new last files                
 	    copy($indexFile, "$indexFile.last");
 	    copy($dataFile, "$dataFile.last");
 	    copy($senseFile, "$senseFile.last");
-	    	    
-	    #if no backup files for restoreWordnet() exists make for easy revert.
+	    copy($changeDataFile1, "$changeDataFile1.last"); 
+	    copy($changeDataFile2, "$changeDataFile2.last");
+	    copy($changeDataFile3, "$changeDataFile3.last"); 
+	    
+	    #if no backup files exists for restoreWordnet() make for easy revert.
 	    my $backupcheck = "$indexFile.backup";
 	    unless(-f $backupcheck)
 	    {
 		copy($indexFile, "$indexFile.backup");
 		copy($dataFile, "$dataFile.backup");
+		copy($changeDataFile1, "$changeDataFile1.backup");
+		copy($changeDataFile2, "$changeDataFile2.backup");
+		copy($changeDataFile3, "$changeDataFile3.backup");
 	    }
 
 	    unless(-f "$senseFile.backup")
@@ -1167,9 +1657,15 @@ sub merge()
 	    unlink $indexFile;
 	    unlink $dataFile;
 	    unlink $senseFile;
+	    unlink $changeDataFile1;
+	    unlink $changeDataFile2;
+	    unlink $changeDataFile3;
 	    move("$indexFile.new", $indexFile);
 	    move("$dataFile.new", $dataFile);
 	    move("$senseFile.new", $senseFile);
+	    move("$changeDataFile1.new", $changeDataFile1);
+	    move("$changeDataFile2.new", $changeDataFile2);
+	    move("$changeDataFile3.new", $changeDataFile3);
 	}
     }
 
@@ -1194,40 +1690,64 @@ sub restoreWordNet()
     if(-f "$WNSEARCHDICT/index.noun.backup")
     {
 	unlink "$WNSEARCHDICT/index.noun";
-	unlink "$WNSEARCHDICT/data.noun";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.noun.backup", "$WNSEARCHDICT/index.noun");
+    }
+
+    if(-f "$WNSEARCHDICT/data.noun.backup")
+    {
+	unlink "$WNSEARCHDICT/data.noun";
+	$backupFlag = 1;
+
 	move("$WNSEARCHDICT/data.noun.backup", "$WNSEARCHDICT/data.noun");
     }
 
     if(-f "$WNSEARCHDICT/index.verb.backup")
     {
 	unlink "$WNSEARCHDICT/index.verb";
-	unlink "$WNSEARCHDICT/data.verb";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.verb.backup", "$WNSEARCHDICT/index.verb");
-	move("$WNSEARCHDICT/data.verb.backup", "$WNSEARCHDICT/data.verb");
     }
 
+    if(-f "$WNSEARCHDICT/data.verb.backup")
+    {
+	unlink "$WNSEARCHDICT/data.verb";
+	$backupFlag = 1;
+
+	move("$WNSEARCHDICT/data.verb.backup", "$WNSEARCHDICT/data.verb");
+    }
+    
     if(-f "$WNSEARCHDICT/index.adj.backup")
     {
 	unlink "$WNSEARCHDICT/index.adj";
-	unlink "$WNSEARCHDICT/data.adj";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.adj.backup", "$WNSEARCHDICT/index.adj");
+    }
+
+    if(-f "$WNSEARCHDICT/data.adj.backup")
+    {
+	unlink "$WNSEARCHDICT/data.adj";
+	$backupFlag = 1;
+
 	move("$WNSEARCHDICT/data.adj.backup", "$WNSEARCHDICT/data.adj");
     }
 
     if(-f "$WNSEARCHDICT/index.adv.backup")
     {
 	unlink "$WNSEARCHDICT/index.adv";
-	unlink "$WNSEARCHDICT/data.adv";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.adv.backup", "$WNSEARCHDICT/index.adv");
+    }
+
+    if(-f "$WNSEARCHDICT/data.adv.backup")
+    {
+	unlink "$WNSEARCHDICT/data.adv";
+	$backupFlag = 1;
+
 	move("$WNSEARCHDICT/data.adv.backup", "$WNSEARCHDICT/data.adv");
     }
     
@@ -1258,40 +1778,64 @@ sub revertLastChange()
     if(-f "$WNSEARCHDICT/index.noun.last")
     {
 	unlink "$WNSEARCHDICT/index.noun";
-	unlink "$WNSEARCHDICT/data.noun";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.noun.last", "$WNSEARCHDICT/index.noun");
-	move("$WNSEARCHDICT/data.noun.last", "$WNSEARCHDICT/data.noun");
     }
 
+    if(-f "$WNSEARCHDICT/data.noun.last")
+    {
+	unlink "$WNSEARCHDICT/data.noun";
+	$backupFlag = 1;
+
+	move("$WNSEARCHDICT/data.noun.last", "$WNSEARCHDICT/data.noun");
+    }
+    
     if(-f "$WNSEARCHDICT/index.verb.last")
     {
 	unlink "$WNSEARCHDICT/index.verb";
-	unlink "$WNSEARCHDICT/data.verb";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.verb.last", "$WNSEARCHDICT/index.verb");
+    }
+
+    if(-f "$WNSEARCHDICT/data.verb.last")
+    {
+	unlink "$WNSEARCHDICT/data.verb";
+	$backupFlag = 1;
+
 	move("$WNSEARCHDICT/data.verb.last", "$WNSEARCHDICT/data.verb");
     }
 
     if(-f "$WNSEARCHDICT/index.adj.last")
     {
 	unlink "$WNSEARCHDICT/index.adj";
-	unlink "$WNSEARCHDICT/data.adj";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.adj.last", "$WNSEARCHDICT/index.adj");
+    }
+
+    if(-f "$WNSEARCHDICT/data.adj.last")
+    {
+	unlink "$WNSEARCHDICT/data.adj";
+	$backupFlag = 1;
+
 	move("$WNSEARCHDICT/data.adj.last", "$WNSEARCHDICT/data.adj");
     }
 
     if(-f "$WNSEARCHDICT/index.adv.last")
     {
 	unlink "$WNSEARCHDICT/index.adv";
-	unlink "$WNSEARCHDICT/data.adv";
 	$backupFlag = 1;
 
 	move("$WNSEARCHDICT/index.adv.last", "$WNSEARCHDICT/index.adv");
+    }
+
+    if(-f "$WNSEARCHDICT/data.adv.last")
+    {
+	unlink "$WNSEARCHDICT/data.adv";
+	$backupFlag = 1;
+
 	move("$WNSEARCHDICT/data.adv.last", "$WNSEARCHDICT/data.adv");
     }
 
@@ -1522,6 +2066,34 @@ sub getDataInfo()
     $dataInfo{'ptr'} = $ptrs;
 
     $dataPtr = $dataPtr + $offset; #move ptr past retrieved info.
+    
+    #if verb obtain frames as well
+    if($pos eq "verb")
+    {
+	$dataInfo{'f_cnt'} = $data[$dataPtr];
+	$dataPtr+=1;
+
+	$offset = 0;
+	my $fcnt = $dataInfo{'f_cnt'};
+	my $frames = "";
+
+	while($fcnt > 0)
+	{
+	    my $fptr = $dataPtr + $offset;
+	    $frames = $frames . " $data[$fptr]"; #append + from frames
+	    $fptr+=1;
+	    $frames = $frames . " $data[$fptr]";
+	    $fptr+=1;
+	    $frames = $frames . " $data[$fptr]";
+	    $fcnt-=1;
+	    $offset+=3; #makes up for 3 extracted data points
+	}
+	$frames =~ s/^\s+//; #remove extra front whitespace
+	$dataInfo{'frames'} = $frames;
+
+	$dataPtr = $dataPtr + $offset; #move ptr past retrieved info
+    }
+    
     $dataPtr+=1; #skip over '|' in file.
     my $size = scalar @data;
     my $gloss = "";

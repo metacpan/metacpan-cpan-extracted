@@ -3,9 +3,9 @@
 # Note: This script is a CLI  for Riap function /Business/ID/Mandiri/parse_mandiri_account
 # and generated automatically using Perinci::CmdLine::Gen version 0.47
 
-our $DATE = '2017-07-18'; # DATE
+our $DATE = '2017-08-03'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ parse-mandiri-account - Parse/validate Mandiri account number
 
 =head1 VERSION
 
-This document describes version 0.12 of parse-mandiri-account (from Perl distribution App-IndonesianBankingUtils), released on 2017-07-18.
+This document describes version 0.13 of parse-mandiri-account (from Perl distribution App-IndonesianBankingUtils), released on 2017-08-03.
 
 =head1 SYNOPSIS
 

@@ -58,7 +58,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.37';
+our $VERSION  = '7.39';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -538,6 +538,9 @@ L<Mojolicious::Static> object.
 
   # Add another class with static files in DATA section
   push @{$app->static->classes}, 'Mojolicious::Plugin::Fun';
+
+  # Remove built-in favicon
+  delete $app->static->extra->{'favicon.ico'};
 
 =head2 types
 
@@ -1089,6 +1092,8 @@ Victor Engmark
 Viliam Pucik
 
 Wes Cravens
+
+William Lindley
 
 Yaroslav Korshak
 

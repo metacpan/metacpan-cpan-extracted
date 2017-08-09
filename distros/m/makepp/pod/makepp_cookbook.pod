@@ -2,7 +2,7 @@
 
 makepp_cookbook -- The best way to set up makefiles for various situations
 
-=for vc $Id: makepp_cookbook.pod,v 1.26 2012/02/07 22:26:15 pfeiffer Exp $
+=for vc $Id: makepp_cookbook.pod,v 1.33 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -10,8 +10,10 @@ I discovered that practically no one ever reads a manual for a make tool,
 because frankly no one really is interested in the make process itself--we are
 only interested in results.  So this cookbook was put together in hopes that
 people will be able to get what they need quickly from the examples without
-wading through the manual.  This shows howto type questions, whereas stumbling
-blocks will be found in the L<frequently asked questions|makepp_faq>.
+wading through the manual.  This shows howto type questions, whereas
+installation instructions and stumbling blocks will be found in the
+L<frequently asked questions|makepp_faq>.
+
 
 =head2 Building libraries
 
@@ -137,7 +139,7 @@ to do it.  First, here is an example where all the files are explicitly
 listed:
 
     LIBRARY_FILES = a b c d e
- 
+
     libmine.a: $(LIBRARY_FILES).o
  	&rm -f $(output)
  	$(AR) cr $(output) $(inputs)
@@ -161,15 +163,14 @@ This approach is not recommended for several reasons:
 
 =item *
 
-Suppose you remove a source file from the current directory.  It's still
-in the library, because you didn't rebuild the library from scratch.  As
-a result, anything that links with this library will have the stale
-F<.o> file, and that can screw up your builds.  (I once got thoroughly
-confused by this when I was trying to remove dead code from a project: I
-kept deleting files and it still linked, so I thought the code was dead.
-had the modules I removed.  However, when someone else rebuilt the
-project from scratch, it didn't link any more!  The problem was that the
-old F<.o> files were still in the archive.)
+Suppose you remove a source file from the current directory.  It's still in
+the library, because you didn't rebuild the library from scratch.  As a
+result, anything that links with this library will have the stale F<.o> file,
+and that can screw up your builds.  (I once got thoroughly confused by this
+when I was trying to remove dead code from a project: I kept deleting files
+and it still linked, so I thought the code was dead.  However, when someone
+else rebuilt the project from scratch, it didn't link any more!  The problem
+was that the old F<.o> files were still in the archive.)
 
 Also, depending on your options to C<ar> and your implementation of
 C<ar> (e.g., if you use the C<q> option instead of C<r>), you can wind
@@ -232,12 +233,13 @@ to work even when you switch to a different OS.  See the libtool
 documentation for details.  Here's a sample Makefile:
 
     LIBTOOL := libtool
- 
+
     libflick.la : $(only_targets *.lo)
  	$(LIBTOOL) --mode=link $(CC) $(inputs) -o $(output)
- 
+
     %.lo : %.c
  	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $(input) -o $(output)
+
 
 =head2 Building on several different machines or networks
 
@@ -299,7 +301,7 @@ following:
  		    # filename (leaving the directory) and prefixing with -I.
     %.o : %.cpp
  	$(CXX) $(CXXFLAGS) $(TCL_INCLUDE) $(input) -o $(output)
- 
+
     TCL_LIB ;= $((first_available
  	   /usr/local/stow/tcl-8.4.5-nothread/lib/libtcl8.4.so
  	   /usr/lib/libtcl8.4.so /usr/lib/libtcl.so
@@ -318,7 +320,7 @@ what the byte order is.  However, perl has already computed these
 things, so you can just use its answers.
 
 Perl's autoconfigure script makes all of its configuration information
-available through the %Config hash.  There's no syntax to access a Perl
+available through the C<%Config> hash.  There's no syntax to access a Perl
 hash directly in makepp, but you can drop into Perl and set scalar
 variables, which are directly accessible from makepp:
 
@@ -349,6 +351,7 @@ with, which might not be the same C compiler you want to use.  In fact,
 it might not even exist on your system, since you probably installed
 Perl via a binary package.
 
+
 =head2 Tips for using wildcards
 
 =head3 Matching all files except a certain subset
@@ -371,7 +374,7 @@ difference operations.  For example,
     SUBDIRS ;= $(filter_out *test* *$(ARCH)*, $(shell find . -type d -print))
  			    # Returns all subdirectories that don't have
  			    # "test" or $(ARCH) in them.
- 
+
     $(filter $(patsubst test_dir/test_%.o, %.o, $(wildcard test_dir/*.o)), \
  	     $(wildcard *.o))
  			    # Returns a list of .o files in the current
@@ -403,6 +406,7 @@ list, but at present, you have to tell it to exclude it manually:
 Makepp does not know any way to build the stale F<.o> file any more
 since its source file is gone, so the S<C<$(only_targets )>> function
 will exclude it from the dependency list.
+
 
 =head2 Tips for multiple directories
 
@@ -472,17 +476,17 @@ Finally, you would put the following into the F<standard_defs.mk> file
  			      # all your include files in there, this will
  			      # find them.
     INCLUDES := -I$(INCLUDE_DIR)
- 
+
     %.lo : %.c
  	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $(input) -o $(output)
- 
+
     lib$(relative_to ., ..).la: $(only_targets *.lo)
  	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(output) $(inputs)
  		      # $(relative_to ., ..) returns the name of the current
  		      # subdirectory relative to the upper level
  		      # subdirectory.  So if this makefile is xyz/Makefile,
  		      # this rule will build xyz/libxyz.la.
- 
+
     # Publish public include files into the top-level include directory:
     $(INCLUDE_DIR)/public_%.h : public_%.h
  	:build_check symlnk
@@ -497,11 +501,11 @@ modified to be something like this:
     # Top level makefile:
     MAKEFILES := $(wildcard **/Makeppfile)  # List of all subdirectories to
  					   # get makefiles from.
- 
+
     load_makefile $(MAKEFILES)       # Load them all in.
- 
+
     include standard_defs.mk         # Get compile command for main.o.
- 
+
     program : $(ARCH)/main.o */**/$(ARCH)/*.la
  	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(inputs) -o $(output) $(LIBS)
  				    # */**/$(ARCH) excludes the subdirectory
@@ -532,17 +536,17 @@ following:
  			# all your include files in there, this will
  			# find them.
     INCLUDES := -I$(INCLUDE_DIR)
- 
+
     $(ARCH)/%.lo : %.c
  	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $(input) -o $(output)
- 
+
     $(ARCH)/lib$(relative_to ., ..).la: $(only_targets *.lo)
  	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(output) $(inputs)
  		      # $(relative_to ., ..) returns the name of the current
  		      # subdirectory relative to the upper level
  		      # subdirectory.  So if this makefile is xyz/Makefile,
  		      # this rule will build xyz/$(ARCH)/libxyz.la.
- 
+
     # Copy public include files into the top-level include directory:
     $(INCLUDE_DIR)/public_%.h : public_%.h
  	&cp $(input) $(output)
@@ -584,17 +588,17 @@ Here's an example of doing just that:
     SUBDIRS := $(filter_out *CVS* other-unwanted_dirs $(wildcard **))
     CFLAGS := -g -O2
     INCLUDES := -Iincludes
- 
+
     %.lo: %.c
  	$(LIBTOOL) --mode=compile $(CC) $(INCLUDES) $(CFLAGS) -c $(input) -o $(output)
- 
+
     $(foreach)/lib$(notdir $(foreach)).la: $(foreach)/*.lo : foreach $(SUBDIRS)
  	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(output) $(inputs)
  			       # Rule to make all of the libraries.
- 
+
     program : main.o **/*.la
  	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(output) $(inputs)
- 
+
     includes/$(notdir $(foreach)) : $(foreach) : foreach **/public_*.h
  	&cp $(input) $(output)
  			       # Sample rule for copying the publically
@@ -657,9 +661,9 @@ directories, your top-level makefile may reference the C<clean> target
 
     # Top-level makefile
     SUBDIRS := sub1 sub2
- 
+
     # build rules here
- 
+
     # Clean up after the build:
     $(phony clean): $(SUBDIRS)/clean
  	&rm -fm .makepp_log $(only_targets *)
@@ -669,6 +673,7 @@ makefile, and have it process all of the directories, like this:
 
     $(phony clean):
  	&rm -fm $(only_targets **/*)
+
 
 =head2 Using Qt's moc preprocessor
 
@@ -690,13 +695,13 @@ explicitly with something like this:
     MODULES	:= whatever modules you happen to have in your program
     MOC_MODULES := $(patsubst %.h, moc_%, $(&grep -l /Q_OBJECT/ *.h))
  			# Scans all the .h files for the Q_OBJECT macro.
- 
+
     my_program: $(MODULES).o $(MOC_MODULES).o
  	$(CXX) $(inputs) -o $(output)
- 
+
     moc_%.cxx: %.h		# Makes the moc files from the .h files.
  	$(MOC) $(input) -o $(output)
- 
+
     %.o: %.cxx
  	$(CXX) $(CXXFLAGS) -c $(input) -o $(output)
 
@@ -721,9 +726,9 @@ many files as your widget anyway.)  For example:
       Q_OBJECT
     // ...
     }
- 
+
     // my_widget.cpp
- 
+
     #include "my_widget.h"
     #include "my_widget.moc"	// my_widget.moc is the output from the
  				// moc preprocessor.
@@ -748,6 +753,7 @@ if it doesn't already exist, or if it's out of date.
 
 This second approach is the one that I usually use because it speeds up
 compilation.
+
 
 =head2 Replacements for deprecated make idioms
 
@@ -779,7 +785,7 @@ For example,
     else
       no_implicit_load . # Prevent automatic loading of any other makefiles.
     endif
- 
+
     $(phony clean):
  	&rm -f $(wildcard **/*.o)
 
@@ -793,16 +799,16 @@ Some makefiles reinvoke themselves with a different value of a variable,
 e.g., the debug target in the following makefile fragment
 
     .PHONY: all debug
- 
+
     optimized:
  	$(MAKE) program CFLAGS=-O2
- 
+
     debug:
  	$(MAKE) program CFLAGS=-g
- 
+
     program: a.o b.o
  	$(CC) $(CFLAGS) $^ -o $@
- 
+
     %.o : %.c
  	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -815,19 +821,19 @@ different sets of object files, like this:
     CFLAGS := -O2
     DEBUG_FLAGS := -g
     MODULES := a b
- 
+
     program: $(MODULES).o
  	 $(CC) $(CFLAGS) $(inputs) -o $(output)
- 
+
     debug/program: debug/$(MODULES).o
  	 $(CC) $(DEBUG_FLAGS) $(inputs) -o $(output)
- 
+
     %.o : %.c
  	 $(CC) $(CFLAGS) -c $(input) -o $(output)
- 
+
     debug/%.o : %.c
  	 $(CC) $(DEBUG_FLAGS) -c $(input) -o $(output)
- 
+
     $(phony debug): debug/program
 
 The advantage of doing it this way is (a) you don't need to rebuild
@@ -841,16 +847,17 @@ The following makefile is exactly equivalent:
     load_makefile debug CFLAGS=-g
  			   # Override CFLAGS when invoked in debug subdirectory
     CFLAGS := -O2          # Value of CFLAGS when invoked in this subdirectory
- 
+
     program: a.o b.o
  	$(CC) $(CFLAGS) $^ -o $@
- 
+
     %.o : %.c
  	$(CC) $(CFLAGS) -c $< -o $@
- 
+
     $(phony debug): debug/program
  			   # If user types "makepp debug", builds
  			   # debug/program instead of program.
+
 
 =head2 Miscellaneous tips
 
@@ -867,9 +874,10 @@ the link phase:
 
 =head3 How do I make sure my output directories exist?
 
-You can specify a rule to build the output directory, then make sure
-that each file that goes in the output directory depends on it.  But
-it's usually easier to do something like this:
+You can specify a rule to build the output directory, then make sure that each
+file that goes in the output directory depends on it.  But it's usually easier
+to do one of these statements be near the top of your makefile, so they are
+executed before anything that could possibly need the directory:
 
     # The classical way
     dummy := $(shell test -d $(OUTPUT_DIRECTORY) || mkdir -p $(OUTPUT_DIRECTORY))
@@ -877,15 +885,22 @@ it's usually easier to do something like this:
  		# $(OUTPUT_DIRECTORY) and having a rule to make it.
  		# Note that you must use := instead of = to force it to
  		# execute immediately.
+
     # An alternative approach: using Perl code, OUTPUT_DIRECTORY local var
     perl_begin
       -d $OUTPUT_DIRECTORY or mkdir $OUTPUT_DIRECTORY;
     perl_end
+
     # The modern way, does nothing for existing directories
     &mkdir -p $(OUTPUT_DIRECTORY)
 
-One of these statements should be near the top of your makefile, so they are
-executed before anything that could possibly need the directory.
+If you have various rules, which may need to create more than one directory,
+here's a generic variable to put at the beginning of each such rule:
+
+    mkdir = @&mkdir -p $(sort $(dir $(outputs))) # sorting eliminates duplicates
+    a/b1 a/b2 c/d/e f/g x y z:	# need to precreate a/ c/d/ & f/
+ 	$(mkdir)
+ 	...
 
 =head3 How do I force a command to execute on every build?
 
@@ -894,6 +909,11 @@ execute it, like this:
 
     dummy := $(shell date > last_build_timestamp)
 
+Or, if it can be achieved by a builtin, simply write it at the top level of
+your makefile, i.e. outside of any rule:
+
+    &expr localtime -o last_build_timestamp
+
 Or put it in a perl block, like this:
 
     perl_begin
@@ -901,7 +921,8 @@ Or put it in a perl block, like this:
     perl_end
 
 This approach has the disadvantage that it will be executed even if an
-unrelated target is being run.
+unrelated target is being run.  Even if you are only invoking C<mpp --dry-run>
+all of the above will be performed.
 
 A second approach is to declare the file as a phony target, even if it
 is a real file.  This will force makepp to reexecute the command to
@@ -918,7 +939,7 @@ print out only the relevant part of the command by using
 S<C<$(filter_out )>>, like this:
 
     ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(ADDL_CXX_FLAGS) $(DEBUG_FLAGS)
- 
+
     %.o : %.c
  	@&echo $(notdir $(CC)) ... \
  	     $(filter_out -I* $(ADDL_CXX_FLAGS), $(ALL_CFLAGS)) \
@@ -934,3 +955,69 @@ C<print> function (which adds a newline, so you don't want several of them):
 
     target:
  	@... $(print interesting part) ...
+
+This is not as good as the previous technique, because it will already print
+when scanning the command, even if it finds it doesn't need to rerun the rule.
+
+=head3 How do I convert a file into dependencies?
+
+For some obscure file formats it's not worthwhile to implement a
+L<scanner|makepp_scanning>.  In one project we have xml files, say
+F<foobar.xml> which contains the dependencies for F<foobar.out>:
+
+    <files>
+      <file>a</file>
+      <file>b</file>
+      <file>c</file>
+    </files>
+
+We decided to adhere to this simple layout, so we don't need to parse xml.
+With the builtin C<&sed>, here's what we do with three simple substitutions
+for the three kinds of lines:
+
+    %.d: %.xml
+        &sed 's!<files>!$(stem).out: \\! || s!<file>(.+)</file>!$$1 \\! || s!</files>!# Empty!' \
+            $(input) -o $(output)
+
+    include foobar.d
+
+Attempting to include this, produces C<foobar.d> first:
+
+    foobar.out: \
+      a \
+      b \
+      c \
+    # Empty
+
+Empty (just a comment or really empty) line avoids having to worry about the
+trailing backslash.  An alternative producing a multiline list is:
+
+    %.d: %.xml
+        &sed 's!<files>!$(stem).out: \$$((! || s!</files>!))! || s!<.+?>!!g' \
+            $(input) -o $(output)
+
+    include foobar.d
+
+This produces an equivalent:
+
+    foobar.out: $((
+      a
+      b
+      c
+    ))
+
+If you have more complex rewriting to do, define a function within the
+makefile or in a module which you include.  E.g. undefining C<$_> will skip
+input lines:
+
+    sub myfilter {
+      return undef $_ if /<!--/;	# skip comment lines
+      my $stem = f_stem;
+      s!<files>!$stem.out: \$((! || s!</files>!))! || s!<.+?>!!g;
+    }
+
+    %.d: %.xml
+        &sed 's!<files>!$(stem).out: \$$((! || s!</files>!))! || s!<.+?>!!g' \
+            $(input) -o $(output)
+
+    include foobar.d

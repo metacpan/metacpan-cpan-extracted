@@ -10,7 +10,7 @@ use Path::Tiny qw(path);
 
 use Exporter qw(import);
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 our @EXPORT_OK = qw(git_files_to_commit git_modified_files);
 
@@ -57,12 +57,12 @@ sub _parse_status {
         my $name = $1;
 
         # on renames, parse but throw away the "renamed from" filename
-        if ( $mode =~ /R/ ) {
+        if ( $mode =~ /[CR]/ ) {
             /\G([^\0]+)\0/g;
         }
 
         # deletions and renames don't cause tidying
-        next unless $mode =~ /[MAC]/;
+        next unless $mode =~ /[MA]/;
         next if $index_only && $mode =~ /^ /;
 
         push @files, $name;

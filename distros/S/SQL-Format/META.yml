@@ -30,17 +30,17 @@ no_index:
 provides:
   SQL::Format:
     file: lib/SQL/Format.pm
-    version: '0.18'
+    version: '0.19'
 requires:
-  perl: '5.008001'
+  perl: '5.010000'
 resources:
   bugtracker: https://github.com/xaicron/p5-SQL-Format/issues
   homepage: https://github.com/xaicron/p5-SQL-Format
   repository: git://github.com/xaicron/p5-SQL-Format.git
-version: '0.18'
+version: '0.19'
 x_authority: cpan:XAICRON
 x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Yuji Shimada <xaicron@gmail.com>'
   - 'karupanerura <karupa@cpan.org>'
-  - 'xaicron <xaicron@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -13,7 +13,7 @@ use Text::Diff::Table;
 
 use Exporter qw(import);
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 my $test = Test::Builder->new;
 
@@ -95,7 +95,7 @@ tidyall
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 

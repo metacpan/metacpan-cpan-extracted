@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 e367f5f660ae2ae98fadfbd323b7ab90ee0ccf82 Changes
+SHA1 5b5c1bedbf70e7a4e1278c7d664a2dfabd335f3f MANIFEST
+SHA1 8f52df8b3277bb7ac5cc79da5d1df831237a0cb3 META.json
+SHA1 7147a636e2f5ee7e6b629d3b3ad0e701895a691d META.yml
+SHA1 967e2f1c26c2a492f64fc9a17b321f95e5c170d4 Makefile.PL
+SHA1 329c31d9d8bc263124079d2469e9d2a8c895558a README
+SHA1 07c8a462f4878bbc9b12b5089e1255184ec1d819 gallery.pl
+SHA1 27e0d5b5e6c6e90590cc63480a31e2722f7d3334 lib/App/Gallery.pm
+SHA1 226a50c6aaec161d97ea64365bc8ae217ba7fed4 t/100x400.png
+SHA1 531e3174dc16538ba5be566c310f95450af6d673 t/800x200.png
+SHA1 7d391f026facfc7224b8582c53cf5f4db01155a0 t/App-Gallery.t
+SHA1 b05414fd4ab8f8e62cb16e0ed0ab57dcb39514da t/example-tmpl
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAll/OksQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYubUD/0QxWNdmLGlSJt330V8tuFL/aiFtRzlpYNK
+VBRtGyBPvUxwylyKStq73srq53XNY2O+EJVmt9XH3JvpZxtEXJEOh7E7kk+tnV3C
+u/fZNTW6T49nyujCBGfzs2IZSpyKBRBJfyrTeSHp/+3RBRmL71htx2qqw/HNq1Jy
+Hhrx50r1GseIvWlJVAD3Sohy07MCdemjXmtT2XfbM0L+v0fu7jIlKQLNbR8jWkg4
+tG8ur1vTq8OBtccINF4iQPyY80NREgXCDKrhFl7qsgLySrCq4lh0ouLT5s936wfV
+uCxunMOpQjVk3fLsaHY4kq46D7VSvO57W/zh/34YnmdNtMv8Zv2l+AGZrL8guYmm
+Z6ZLmuZtU6fPPwpYo0mfagx42vWccW6aeq6z9uPoga3ONIDwGHQC/FjN6ZJSAv7r
+N12Qz4WS81mVJd6DhIjY1FhMvltRQ1/mwsD4mtokmhcOU3XqKFmmRgsr+fXbIrkS
+VXq89xFcaTsKVwRvDVcU4WTQ7WTuPR1Oj7ByjVt/oUZy7hZwk4T/pxdtS4Y/A79Y
+p3+aalPBEkiqaV+7IjFn5s1RCfjKSKoPCdSqCdIuvQEpL57amJDSU7OfIEEii+7H
+Z2bApk9Rpv1SPDe5UIsK5mi9ULxOaoxniq4Jm//29W6EEK1wozdHYMou3XjKENzV
+phTtjGFCfg==
+=nqsG
+-----END PGP SIGNATURE-----

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: A message broker for WebSockets
 # PODNAME: mercury
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ mercury - A message broker for WebSockets
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -221,13 +221,17 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Joel Berger Mohammad S Anwar William Lindley
+=for stopwords Joel Berger Justin Hunter Mohammad S Anwar William Lindley
 
 =over 4
 
 =item *
 
 Joel Berger <joel.a.berger@gmail.com>
+
+=item *
+
+Justin Hunter <justin.d.hunter@gmail.com>
 
 =item *
 

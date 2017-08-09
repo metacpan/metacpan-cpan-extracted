@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 a70322d58c70fd1983f6f11c2ba28d4cf7c65ee7 Changes
+SHA1 40c6f1c842efac1110a5ff943e46fe39c53138b3 LICENSE
+SHA1 6b9f600ccdde86edb80e5341b9ab66c8a400bf90 MANIFEST
+SHA1 438b9a7b2507f8fe0c6c60e8507a503b3dfb586c MANIFEST.SKIP
+SHA1 9014f1f28a2a7c3fe47abc9fa9451de6214a87ae META.json
+SHA1 61c1ab461ab9a65084217ddb4b8bf209a43f4315 META.yml
+SHA1 0956e3d4531fb9343aba8654d643f46729111a82 Makefile.PL
+SHA1 a92b0e3d294e6b15242ab930293e0587a287df86 README
+SHA1 fcc34a03c99103cc1a13e306210296b2f7ee5e05 lib/Number/Phone/CountryCode.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 c985a5f343adfd44c02ddf90efa70d3601d1c34b t/author-signature.t
+SHA1 5ae13612f941b0813c677eddf4272baa6e8fe88a t/basic.t
+SHA1 e91a363d3ccc0aded6861b70ab6dfdaa2965752e t/codes.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWX9R8KQl27WkM10aAQi/vRAA6afN6fGesg+zflROPhDLGrQBwGzRZsyr
+qlLLMkg/Nf5/XPrd9YCugw+Gn86th29Gt2XQiEOLlLj/IOYQRxOI8ytxcBc09tVY
+eqRldupZwTBZtTy0o3rCEH3V4Gf4CHwCNNU+4EdScuX/1PxqrTwmjlq8OibCueuu
+G1Vdmr2D6Z/xC7xpf2jq3+HNoQkl8Xpakrc0mL2hdZxAXTS/tp7biiFpVBe25Wsk
+APVANPWt2O9XEqosvH5DphxEWcXavQIrN7AcJL/P7xLBwHkMToJb2ygv5Yd2w7wt
+oJg8QsUfvgPwZ9EyHpW+AgWMLl3J4TfOn9VTPrmkuUeTwkFgNzotr/Io4pap8ayd
+5jAmX9DKCYTMCd9K1MlyDkUXVSpr+RTLF4hiXpE0PfISF3HPhvwGtiDd2hIy1dXu
+FWLnMbdNT9MPhvoZ5c6aAj4OemWhNnoF+JDHmta/9vvY3jODXEHGDqQFJ0aDhq6L
+4oPv7ZDoQQqC6ef5RriWqQjBBR3gd46H62POM4ooamxBZtGQ4asiX4fgmehazHq2
+ALKy4ck90qFhhDmrT+cs26FCDXx5/nHgVrTpiV/7EftHjSV5pb1jk/4a3DM9FqW+
+e877b9t/F0F41sbS/eq2n6YKBSHgcUhWoNEUbH8YEi5cuwgcnxTf8s1FU9rKzEl8
+M1dLLl9P4Uw=
+=OKeH
+-----END PGP SIGNATURE-----

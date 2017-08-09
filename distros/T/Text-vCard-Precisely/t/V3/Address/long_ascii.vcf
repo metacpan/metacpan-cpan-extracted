@@ -1,0 +1,5 @@
+BEGIN:VCARD
+VERSION:3.0
+ADR;TYPE=HOME,WORK:pobox;long named extended;long named street;long named
+  city;long named region;post_code;United States of America
+END:VCARD

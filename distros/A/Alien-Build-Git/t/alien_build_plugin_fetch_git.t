@@ -22,12 +22,15 @@ subtest 'fetch with tag' => sub {
 
   my $ret;
   my $error;
-  note capture_merged {
+  my $out;
+  
+  note $out = capture_merged {
     $ret = eval { $build->fetch("$example1#0.02") };
     $error = $@;
   };
   
   is $error, '';
+  diag $out if $error;
 
   is(
     $ret,
@@ -49,12 +52,15 @@ subtest 'fetch without tag' => sub {
 
   my $ret;
   my $error;
-  note capture_merged {
+  my $out;
+  
+  note $out = capture_merged {
     $ret = eval { $build->fetch("$example1") };
     $error = $@;
   };
   
   is $error, '';
+  diag $out if $error;
 
   my $url_check = Test2::Compare::Custom->new(
     name => 'UrlCheck',

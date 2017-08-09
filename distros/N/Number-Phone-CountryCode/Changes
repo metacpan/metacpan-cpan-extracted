@@ -1,5 +1,17 @@
 Revision history for Number::Phone::CountryCode.
 
+0.03  2017-07-31
+    - Mark this module as DEPRECATED in favor of Number::Phone::Country
+    - Add support for: Cocos (Keeling) Islands (CC), Congo (CG),
+      Cook Islands (CK), Cuba (CU), Dominica (DM), Spain (ES), Georgia (GE),
+      Guinea (GN), Guam (GU), Guyana (GY), Iceland (IS), Montenegro (ME),
+      Mali (ML), Laos (LA), Malta (MT), Myanmar (MM), Nepal (NP),
+      Oman (OM), Russia (RU), Svalbard and Jan Mayen (SJ), Syria (SY),
+      Tonga Islands (TO), Zambia (ZM), Bouvet Island,
+      British Indian Ocean Territory (IO),
+      Heard Island & Mcdonald Islands (HM),
+      French Southern Territories (TF), Pitcairn (PN)
+
 0.02  Sat Feb 20 2009
     - Makefile.PL: only require version 5.008
     - add support for: India (IN), China (CN), Chad (TD)

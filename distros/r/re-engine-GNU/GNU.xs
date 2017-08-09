@@ -496,18 +496,22 @@ GNU_exec_set_capture_string(pTHX_ REGEXP * const rx,
     /* From our point of view, it is equivalent to test if saved_copy */
     /* is available */
 #if REGEXP_SAVED_COPY_CAN
-    short canCow = 1;
+#ifdef PERL_ANY_COW
+    short canCow = SvCANCOW(sv);
+#else
+    short canCow = 0;
+#endif
 #else
     short canCow = 0;
 #endif
     if (canCow != 0) {
 #if REGEXP_SAVED_COPY_CAN
-      if ((REGEXP_SAVED_COPY_GET(r) != NULL
-           && SvIsCOW(REGEXP_SAVED_COPY_GET(r))
-           && SvPOKp(REGEXP_SAVED_COPY_GET(r))
-           && SvIsCOW(sv)
-           && SvPOKp(sv)
-           && SvPVX(sv) == SvPVX(REGEXP_SAVED_COPY_GET(r)))) {
+      if ((REGEXP_SAVED_COPY_GET(r) != NULL)
+          && SvIsCOW(REGEXP_SAVED_COPY_GET(r))
+          && SvPOKp(REGEXP_SAVED_COPY_GET(r))
+          && SvIsCOW(sv)
+          && SvPOKp(sv)
+          && (SvPVX(sv) == SvPVX(REGEXP_SAVED_COPY_GET(r)))) {
         /* just reuse saved_copy SV */
         if (isDebug) {
           fprintf(stderr, "%s: ... reusing save_copy SV\n", logHeader);
@@ -781,13 +785,17 @@ GNU_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend, char *strbeg, I
     if ((flags & REXEC_NOT_FIRST) != REXEC_NOT_FIRST) {
       const I32 length = strend - strbeg;
 #if REGEXP_SAVED_COPY_CAN
-      short canCow = 1;
-      short doCow = canCow ? (REGEXP_SAVED_COPY_GET(r) != NULL
+#ifdef PERL_ANY_COW
+      short canCow = SvCANCOW(sv);
+#else
+      short canCow = 0;
+#endif
+      short doCow = canCow ? ((REGEXP_SAVED_COPY_GET(r) != NULL)
                               && SvIsCOW(REGEXP_SAVED_COPY_GET(r))
                               && SvPOKp(REGEXP_SAVED_COPY_GET(r))
                               && SvIsCOW(sv)
                               && SvPOKp(sv)
-                              && SvPVX(sv) == SvPVX(REGEXP_SAVED_COPY_GET(r))) : 0;
+                              && (SvPVX(sv) == SvPVX(REGEXP_SAVED_COPY_GET(r)))) : 0;
 #else
       short canCow = 0;
       short doCow = 0;
@@ -795,7 +803,7 @@ GNU_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend, char *strbeg, I
       RX_MATCH_COPY_FREE(rx);
       if ((flags & REXEC_COPY_STR) == REXEC_COPY_STR) {
         /* Adapted from perl-5.10. Not performant, I know */
-        if (canCow != 0 && doCow != 0) {
+        if ((canCow != 0) && (doCow != 0)) {
 #if REGEXP_SAVED_COPY_CAN
           if (isDebug) {
             fprintf(stderr, "%s: ... reusing save_copy SV\n", logHeader);

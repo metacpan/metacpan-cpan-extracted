@@ -3,9 +3,9 @@
 use warnings;
 use strict;
 
-use Test::More tests=>7;
+use Test::More tests => 6;
 
-BEGIN { use_ok( 'Carp::Assert::More' ); }
+use Carp::Assert::More;
 
 use constant PASS => 1;
 use constant FAIL => 2;
@@ -31,4 +31,3 @@ for my $case ( @cases ) {
         is( $@, "", $desc );
     }
 }
-

@@ -1,3 +1,6 @@
+0.10  Mon, 31 Jul 2017 13:10:40 +0100
+  * Port to Perl 5.21.4, where a gv op may contain an RV rather than a GV.
+
 0.09  Mon, 12 Mar 2012 19:49:40 +0000
   * Depend on B::Utils version 0.19, which explicitly exports its XS
     API symbols for Windows.

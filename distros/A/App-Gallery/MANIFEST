@@ -1,0 +1,13 @@
+Changes
+gallery.pl
+lib/App/Gallery.pm
+Makefile.PL
+MANIFEST
+README
+t/100x400.png
+t/800x200.png
+t/App-Gallery.t
+t/example-tmpl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

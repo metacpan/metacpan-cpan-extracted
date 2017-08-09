@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Mercury;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Plugin for Mojolicious to add Mercury functionality
 
 #pod =head1 SYNOPSIS
@@ -44,20 +44,20 @@ our $VERSION = '0.012';
 #pod
 #pod =item L<Mercury::Controller::PubSub>
 #pod
-#pod Establish a L<Pub/Sub pattern|Mercury::Pattern::PubSub> on a topic.
+#pod Establish a L<PubE<sol>Sub pattern|Mercury::Pattern::PubSub> on a topic.
 #pod Pub/Sub allows publishers to publish messages that will be received by
 #pod all subscribers, useful for event notifications.
 #pod
 #pod =item L<Mercury::Controller::PubSub::Cascade>
 #pod
-#pod Establish a L<Pub/Sub pattern|Mercury::Pattern::PubSub> on a topic in
+#pod Establish a L<PubE<sol>Sub pattern|Mercury::Pattern::PubSub> on a topic in
 #pod a heirarchy, with subscribers to parent topics receiving messages sent
 #pod to child topics. More efficient when dealing with large numbers of
 #pod topics.
 #pod
 #pod =item L<Mercury::Controller::PushPull>
 #pod
-#pod Establish a L<Push/Pull pattern|Mercury::Pattern::PushPull> on a topic.
+#pod Establish a L<PushE<sol>Pull pattern|Mercury::Pattern::PushPull> on a topic.
 #pod Push/Pull allows publishers to publish messages that will be received by
 #pod one and only one subscriber in a round-robin fashion, useful for job
 #pod workers
@@ -167,7 +167,7 @@ Mojolicious::Plugin::Mercury - Plugin for Mojolicious to add Mercury functionali
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -211,20 +211,20 @@ The built-in controllers are:
 
 =item L<Mercury::Controller::PubSub>
 
-Establish a L<Pub/Sub pattern|Mercury::Pattern::PubSub> on a topic.
+Establish a L<PubE<sol>Sub pattern|Mercury::Pattern::PubSub> on a topic.
 Pub/Sub allows publishers to publish messages that will be received by
 all subscribers, useful for event notifications.
 
 =item L<Mercury::Controller::PubSub::Cascade>
 
-Establish a L<Pub/Sub pattern|Mercury::Pattern::PubSub> on a topic in
+Establish a L<PubE<sol>Sub pattern|Mercury::Pattern::PubSub> on a topic in
 a heirarchy, with subscribers to parent topics receiving messages sent
 to child topics. More efficient when dealing with large numbers of
 topics.
 
 =item L<Mercury::Controller::PushPull>
 
-Establish a L<Push/Pull pattern|Mercury::Pattern::PushPull> on a topic.
+Establish a L<PushE<sol>Pull pattern|Mercury::Pattern::PushPull> on a topic.
 Push/Pull allows publishers to publish messages that will be received by
 one and only one subscriber in a round-robin fashion, useful for job
 workers

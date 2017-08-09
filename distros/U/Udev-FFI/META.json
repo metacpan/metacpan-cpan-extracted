@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl bindings for libudev using ffi.",
    "author" : [
-      "Ilya Pavlov, <iluxz@mail.ru>"
+      "Ilya Pavlov, <ilux@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.0.13",
@@ -41,7 +41,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "PkgConfig" : "0.16026"
+         },
          "requires" : {
+            "FFI::CheckLib" : "0",
             "FFI::Platypus" : "0",
             "perl" : "5.008001"
          }
@@ -55,7 +59,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.097002"
+         "version" : "0.097003"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -84,8 +88,9 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.097002",
+   "version" : "0.097003",
    "x_contributors" : [
-      "Ilya <ilya@orz1e1.mydomain>"
+      "Ilya <ilya@orz1e1.mydomain>",
+      "Ilya Pavlov <iluxz@mail.ru>"
    ]
 }

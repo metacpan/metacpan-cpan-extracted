@@ -2,7 +2,7 @@
 
 makepp_functions -- Functions in makepp
 
-=for vc $Id: makepp_functions.pod,v 1.48 2012/06/09 20:43:14 pfeiffer Exp $
+=for vc $Id: makepp_functions.pod,v 1.52 2016/09/06 19:59:45 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -82,13 +82,14 @@ returns the standard output.  This requires perl to be built for PerlIO.  If
 the name does not name a function it is transformed to an invocation of
 L<call|/call_variable_words>.
 
-As with variables you have a choice of C<$(name ...)> or C<${name ...}>.  Where
-the arguments contain these signs, either use the other, or double it as in
-C<$((name ...() ))>.  Doubling is also useful if you need the arguments to
-span several lines.  The newlines are then treated as spaces, except maybe in
-C<define>.  There is also the syntax C<$[name ...]> or C<$[[name ...]]>, which
-gets evaluated while reading the makefile, before grokking rules and other
-constructs.
+As with variables you have a choice of C<$(name ...)> or C<${name ...}>.  If
+you want to embed the same parenthesis, it must be paired, the other doesn't
+matter: C<$(name ...(){...)> or C<${name ...{}(...}>.  (However for
+L<map|/map_words_perlcode> and L<perl|/perl_perlcode> the first closing paren
+ends the expression.)  Doubling allows the arguments to span several lines.
+The newlines are then treated as spaces, except maybe in C<define>.  There is
+also the syntax C<$[name ...]> or C<$[[name ...]]>, which gets evaluated while
+reading the makefile, before grokking rules and other constructs.
 
 Makepp has a number of builtin functions which may be useful.  It supports
 almost all of GNU make's textual functions (see GNU make's documentation for
@@ -232,7 +233,8 @@ Searches for a file of the given name in the directory ., .., ../..,
 ../../.., etc., until the file is found or the root directory is reached
 or the directory is located on a different file system.  (This last
 requirement is to prevent problems with automounters or hung network
-filesystems.)
+filesystems.)  If you have a F<RootMakeppfile>, that is also a barrier which
+prevents searching higher.
 
 For example, if you have a project with many levels of subdirectories, you
 could include this common fragment in all of the makefiles (e.g., by using the
@@ -339,8 +341,9 @@ that the implementation of all classes or functions defined in a header file
 C<xyz.h> are compiled into an object file called C<xyz.o> (or C<xyz.lo>).  So
 makepp's algorithm for inferring object dependencies starts with one or a few
 objects that we know have to be linked into the program.  It looks at which
-files were included with C<#include> in those sources, and tries to find
-corresponding object files for each of the include files.
+files were included with C<#include> in those sources (building those sources
+if need be), and tries to find corresponding object files for each of the
+include files.
 
 S<C<$(infer_objects )>> needs to be mentioned in the dependency list of a
 program, like this:
@@ -837,12 +840,12 @@ directories in the list I<dirs>:
     dirs := a b c d
     files := $(foreach dir,$(dirs),$(wildcard $(dir)/*))
 
-Here text is C<$(wildcard $(dir)/*)>. The first repetition finds the value ‘a’
+Here text is C<$(wildcard $(dir)/*)>. The first repetition finds the value C<a>
 for dir, so it produces the same result as C<$(wildcard a/*)>; the second
 repetition produces the result of C<$(wildcard b/*)>; and the third, that of
 C<$(wildcard c/*)>.
 
-This example has the same result (except for setting ‘dirs’) as the following example:
+This example has the same result (except for setting C<dirs>) as the following example:
 
     files := $(wildcard a/* b/* c/* d/*)
 
@@ -852,7 +855,7 @@ When text is complicated, you can improve readability by giving it a name, with 
     dirs := a b c d
     files := $(foreach dir,$(dirs),$(find_files))
 
-Here we use the variable find_files this way. We use plain ‘=’ to define a
+Here we use the variable find_files this way. We use plain C<=> to define a
 recursively-expanding variable, so that its value contains an actual function
 call to be reexpanded under the control of foreach; a simply-expanded variable
 would not do, since wildcard would be called only once at the time of defining

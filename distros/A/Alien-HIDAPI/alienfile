@@ -1,0 +1,46 @@
+use alienfile;
+
+plugin 'PkgConfig' => (
+    pkg_name =>  $^O eq 'linux' ?  'hidapi-libusb' : 'hidapi'
+);
+
+share {
+  requires 'Alien::autoconf' => '0.03';
+  requires 'Alien::automake' => '0.05';
+  requires 'Alien::libtool'  => '0.02';
+  requires 'Alien::m4'       => '0.11';
+
+  if ($^O eq 'darwin') {
+    meta->after_hook(gather_share => sub {
+      my($build) = @_;
+      $build->runtime_prop->{$_} .= '-framework CoreFoundation -framework IOKit' for qw( libs libs_static );
+
+    });
+  } elsif ($^O eq 'linux') {
+    requires 'Alien::LibUSB' => '0.2';
+    requires 'Alien::libudev' => '0.11';
+    
+    meta->after_hook(gather_share => sub {
+      my($build) = @_;
+      $build->runtime_prop->{$_} .= ' ' . Alien::LibUSB->libs . ' ' . Alien::libudev->libs for qw( libs libs_static );
+    });
+    
+  }
+
+  plugin Download => (
+      url => 'https://github.com/signal11/hidapi/archive/master.tar.gz'
+  );
+
+  plugin Extract => 'tar.gz';
+
+  plugin 'Build::Autoconf' => ();
+
+  build [
+    './bootstrap',
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+  ];
+
+  plugin 'Gather::IsolateDynamic' => ();
+};

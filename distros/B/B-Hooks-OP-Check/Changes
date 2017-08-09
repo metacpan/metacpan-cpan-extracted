@@ -1,5 +1,9 @@
 Revision history for B-Hooks-OP-Check
 
+0.22      2017-07-31 16:25:05Z
+  * Use cleaner wrap_op_checker() API to control op checking.
+  * Use core's Perl_check_t typedef instead of inventing our own.
+
 0.21      2017-05-11 14:19:03Z
   * re-add the creation of B/Hooks/OP/Check/Install/Files.pm to installation
 

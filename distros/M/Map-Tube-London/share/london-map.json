@@ -3,2152 +3,2152 @@
    "stations" : {
       "station" : [
          {
-            "line" : "Overground",
-            "name" : "Acton Central",
             "id" : "A001",
-            "link" : "W031,S008"
+            "name" : "Acton Central",
+            "link" : "W031,S008",
+            "line" : "Overground:20"
          },
          {
-            "id" : "A002",
+            "line" : "District:6,Piccadilly:15",
             "link" : "C018,E002,S009,T011",
-            "line" : "District,Piccadilly",
-            "name" : "Acton Town"
+            "name" : "Acton Town",
+            "id" : "A002"
          },
          {
-            "name" : "Aldgate",
-            "line" : "Circle,Metropolitan",
+            "link" : "L012,T009",
+            "line" : "Metropolitan:1,Circle:19",
             "id" : "A003",
-            "link" : "L012,T009"
+            "name" : "Aldgate"
          },
          {
             "link" : "L012,T009,W029",
-            "id" : "A004",
+            "line" : "Hammersmith & City:19,District:42",
             "name" : "Aldgate East",
-            "line" : "District,Hammersmith & City"
+            "id" : "A004"
          },
          {
-            "name" : "All Saints",
-            "line" : "DLR",
             "id" : "A005",
+            "name" : "All Saints",
+            "line" : "DLR:19",
             "link" : "P011,L004"
          },
          {
             "name" : "Alperton",
-            "line" : "Piccadilly",
             "id" : "A006",
+            "line" : "Piccadilly:11",
             "link" : "P002,S032"
          },
          {
-            "id" : "A007",
             "link" : "C012",
+            "line" : "Metropolitan:34",
             "name" : "Amersham",
-            "line" : "Metropolitan"
+            "id" : "A007"
          },
          {
-            "line" : "Overground",
-            "name" : "Anerly",
+            "link" : "P004,N015",
+            "line" : "",
             "id" : "A008",
-            "link" : "P004,N015"
+            "name" : "Anerly"
          },
          {
-            "name" : "Angel",
-            "line" : "Northern",
+            "line" : "Northern:31",
             "link" : "O002,K013",
+            "name" : "Angel",
             "id" : "A009"
          },
          {
             "link" : "T010,H024",
-            "id" : "A010",
+            "line" : "Northern:9",
             "name" : "Archway",
-            "line" : "Northern"
+            "id" : "A010"
          },
          {
-            "link" : "B021,S020",
             "id" : "A011",
             "name" : "Arnos Grove",
-            "line" : "Piccadilly"
+            "line" : "Piccadilly:50",
+            "link" : "B021,S020"
          },
          {
             "name" : "Arsenal",
-            "line" : "Piccadilly",
             "id" : "A012",
-            "link" : "F006,H028"
+            "link" : "F006,H028",
+            "line" : "Piccadilly:44"
          },
          {
-            "link" : "W018,S037",
             "id" : "A013",
-            "line" : "DLR",
-            "name" : "Abbey Road"
+            "name" : "Abbey Road",
+            "line" : "DLR:26",
+            "link" : "W018,S037"
          },
          {
-            "line" : "Circle,Hammersmith & City,Bakerloo,Metropolitan,Jubilee",
             "name" : "Baker Street",
+            "id" : "B001",
             "link" : "B018,R004,M005,G008,S023,E011,F004",
-            "id" : "B001"
+            "line" : "Hammersmith & City:11,Jubilee:14,Metropolitan:9,Bakerloo:17,Circle:11"
          },
          {
-            "name" : "Balham",
-            "line" : "Northern",
             "link" : "C023,T003",
-            "id" : "B002"
+            "line" : "Northern:44",
+            "id" : "B002",
+            "name" : "Balham"
          },
          {
             "id" : "B003",
-            "link" : "S002,S024,L013,M011,L012,W008",
-            "other_link" : "Tunnel:M009",
             "name" : "Bank",
-            "line" : "Central,DLR,Northern,Waterloo & City"
+            "link" : "S002,S024,L013,M011,L012,W008",
+            "line" : "Northern:34,Central:25,Waterloo & City:1,DLR:2",
+            "other_link" : "Tunnel:M009"
          },
          {
-            "id" : "B004",
+            "line" : "Hammersmith & City:16,Metropolitan:4,Circle:16",
             "link" : "F002,M011",
             "name" : "Barbican",
-            "line" : "Circle,Hammersmith & City,Metropolitan"
+            "id" : "B004"
          },
          {
-            "name" : "Barking",
-            "line" : "District,Hammersmith & City,Overground",
             "id" : "B005",
+            "name" : "Barking",
+            "line" : "Hammersmith & City:29,District:52,Overground:78",
             "link" : "E006,U003,W037"
          },
          {
             "name" : "Barkingside",
-            "line" : "Central",
             "id" : "B006",
-            "link" : "N004,F001"
+            "link" : "N004,F001",
+            "line" : "Central:36"
          },
          {
-            "line" : "District,Piccadilly",
+            "link" : "E003,H005,W022",
+            "line" : "District:12,Piccadilly:29",
             "name" : "Barons Court",
-            "id" : "B007",
-            "link" : "E003,H005,W022"
+            "id" : "B007"
          },
          {
             "link" : "N016,P001",
-            "id" : "B008",
-            "line" : "Circle,District",
-            "name" : "Bayswater"
+            "line" : "District:26,Circle:35",
+            "name" : "Bayswater",
+            "id" : "B008"
          },
          {
-            "line" : "DLR",
-            "name" : "Beckton",
+            "line" : "DLR:39",
+            "link" : "G001",
             "id" : "B009",
-            "link" : "G001"
+            "name" : "Beckton"
          },
          {
+            "line" : "DLR:36",
             "link" : "R009,C034",
             "id" : "B010",
-            "line" : "DLR",
             "name" : "Beckton Park"
          },
          {
             "id" : "B011",
-            "link" : "U003,D002",
             "name" : "Becontree",
-            "line" : "District"
+            "link" : "U003,D002",
+            "line" : "District:53"
          },
          {
+            "link" : "C013,H006",
+            "line" : "Northern:19",
             "name" : "Belsize Park",
-            "line" : "Northern",
-            "id" : "B012",
-            "link" : "C013,H006"
+            "id" : "B012"
          },
          {
-            "line" : "Jubilee",
-            "name" : "Bermondsey",
             "link" : "L013,C005",
+            "line" : "Jubilee:21",
+            "name" : "Bermondsey",
             "id" : "B013"
          },
          {
-            "link" : "L012,M006",
+            "name" : "Bethnal Green",
             "id" : "B014",
-            "line" : "Central",
-            "name" : "Bethnal Green"
+            "line" : "Central:27",
+            "link" : "L012,M006"
          },
          {
-            "line" : "Circle,District",
-            "name" : "Blackfriars",
+            "line" : "District:37,Circle:24",
+            "link" : "T001,M003",
             "id" : "B015",
-            "link" : "T001,M003"
+            "name" : "Blackfriars"
          },
          {
+            "line" : "",
             "link" : "T006,W001,S016,W002",
-            "id" : "B016",
             "name" : "Blackhose Road",
-            "line" : "Overground,Victoria"
+            "id" : "B016"
          },
          {
-            "line" : "DLR",
+            "link" : "P011,E007",
+            "line" : "DLR:31",
             "name" : "Blackwall",
-            "id" : "B017",
-            "link" : "P011,E007"
+            "id" : "B017"
          },
          {
-            "line" : "Central,Jubilee",
-            "name" : "Bond Street",
             "id" : "B018",
-            "link" : "G009,B001,O005,M004"
+            "name" : "Bond Street",
+            "link" : "G009,B001,O005,M004",
+            "line" : "Jubilee:15,Central:19"
          },
          {
-            "line" : "Northern",
+            "link" : "E012,L013",
+            "line" : "Northern:36",
             "name" : "Borough",
-            "id" : "B019",
-            "link" : "E012,L013"
+            "id" : "B019"
          },
          {
+            "name" : "Boston Manor",
             "id" : "B020",
             "link" : "N011,O003",
-            "line" : "Piccadilly",
-            "name" : "Boston Manor"
+            "line" : "Piccadilly:18"
          },
          {
             "link" : "W034,A011",
-            "id" : "B021",
-            "line" : "Piccadilly",
-            "name" : "Bounds Green"
+            "line" : "Piccadilly:49",
+            "name" : "Bounds Green",
+            "id" : "B021"
          },
          {
             "id" : "B022",
-            "link" : "D007,P014",
-            "line" : "DLR",
-            "name" : "Bow Church"
+            "name" : "Bow Church",
+            "line" : "DLR:22",
+            "link" : "D007,P014"
          },
          {
-            "link" : "M006,B027",
             "id" : "B023",
-            "line" : "District,Hammersmith & City",
-            "name" : "Bow Road"
+            "name" : "Bow Road",
+            "line" : "Hammersmith & City:23,District:46",
+            "link" : "M006,B027"
          },
          {
-            "name" : "Brent Cross",
-            "line" : "Northern",
+            "link" : "H006,H019",
+            "line" : "Northern:16",
             "id" : "B024",
-            "link" : "H006,H019"
+            "name" : "Brent Cross"
          },
          {
-            "line" : "Victoria",
+            "link" : "S028",
+            "line" : "Victoria:16",
             "name" : "Brixton",
-            "id" : "B025",
-            "link" : "S028"
+            "id" : "B025"
          },
          {
+            "name" : "Brockley",
             "id" : "B026",
-            "link" : "H030,N003",
-            "line" : "Overground",
-            "name" : "Brockley"
+            "line" : "Overground:38",
+            "link" : "H030,N003"
          },
          {
-            "line" : "District,Hammersmith & City",
             "name" : "Bromley-by-Bow",
             "id" : "B027",
-            "link" : "W018,B023"
+            "link" : "W018,B023",
+            "line" : "Hammersmith & City:24,District:47"
          },
          {
-            "link" : "F005,K003",
             "id" : "B028",
             "name" : "Brondesbury",
-            "line" : "Overground"
+            "line" : "Overground:65",
+            "link" : "F005,K003"
          },
          {
             "name" : "Buckhurst Hill",
-            "line" : "Central",
             "id" : "B029",
+            "line" : "Central:45",
             "link" : "L015,R007,W036"
          },
          {
-            "line" : "Northern",
-            "name" : "Burnt Oak",
             "id" : "B030",
+            "name" : "Burnt Oak",
+            "line" : "Northern:13",
             "link" : "C026,E010"
          },
          {
+            "id" : "B031",
             "name" : "Bushey",
-            "line" : "Overground",
             "link" : "C011,W010",
-            "id" : "B031"
+            "line" : "Overground:3"
          },
          {
+            "link" : "H028,K013",
+            "line" : "Piccadilly:42",
             "name" : "Caledonian Road",
-            "line" : "Piccadilly",
-            "id" : "C001",
-            "link" : "H028,K013"
+            "id" : "C001"
          },
          {
             "link" : "H023,C003",
+            "line" : "Overground:58",
             "id" : "C002",
-            "line" : "Overground",
             "name" : "Caledonian Road & Barnsbury"
          },
          {
-            "line" : "Overground",
-            "name" : "Camden Road",
             "link" : "C002,K006",
-            "id" : "C003"
+            "line" : "Overground:59",
+            "id" : "C003",
+            "name" : "Camden Road"
          },
          {
-            "line" : "Northern",
+            "link" : "C013,K005,M008,E017",
+            "line" : "",
             "name" : "Camden Town",
-            "id" : "C004",
-            "link" : "C013,K005,M008,E017"
+            "id" : "C004"
          },
          {
-            "name" : "Canada Water",
-            "line" : "Overground,Jubilee",
+            "line" : "Overground:47,Jubilee:22",
             "link" : "B013,C006,S033,R008",
-            "id" : "C005"
+            "id" : "C005",
+            "name" : "Canada Water"
          },
          {
             "link" : "C005,N008,W021,H020",
+            "line" : "Jubilee:23,DLR:8",
             "id" : "C006",
-            "line" : "DLR,Jubilee",
             "name" : "Canary Wharf"
          },
          {
-            "id" : "C007",
             "link" : "N008,W024,R011,E007,S036",
-            "line" : "DLR,Jubilee",
+            "line" : "Jubilee:25,DLR:29",
+            "id" : "C007",
             "name" : "Canning Town"
          },
          {
-            "line" : "Circle,District",
-            "name" : "Cannon Street",
+            "line" : "District:39,Circle:22",
             "link" : "M009,M003",
-            "id" : "C008"
+            "id" : "C008",
+            "name" : "Cannon Street"
          },
          {
             "name" : "Canonbury",
-            "line" : "Overground",
             "id" : "C009",
+            "line" : "Overground:56",
             "link" : "D004,H023"
          },
          {
+            "id" : "C010",
             "name" : "Canons Park",
-            "line" : "Jubilee",
             "link" : "S026,Q002",
-            "id" : "C010"
+            "line" : "Jubilee:2"
          },
          {
-            "line" : "Overground",
+            "id" : "C011",
             "name" : "Carpenders Park",
             "link" : "H013,B031",
-            "id" : "C011"
+            "line" : "Overground:4"
          },
          {
             "id" : "C012",
-            "link" : "C019,C016,A007",
-            "line" : "Metropolitan",
-            "name" : "Chalfont & Latimer"
+            "name" : "Chalfont & Latimer",
+            "line" : "Metropolitan:32",
+            "link" : "C019,C016,A007"
          },
          {
+            "line" : "Northern:20",
             "link" : "C004,B012",
             "id" : "C013",
-            "line" : "Northern",
             "name" : "Chalk Farm"
          },
          {
-            "link" : "H026,S024",
             "id" : "C014",
-            "line" : "Central",
-            "name" : "Chancery Lane"
+            "name" : "Chancery Lane",
+            "line" : "Central:23",
+            "link" : "H026,S024"
          },
          {
-            "line" : "Northern,Bakerloo",
-            "name" : "Charing Cross",
             "link" : "P006,E015,L006",
-            "id" : "C015"
+            "line" : "Northern:27,Bakerloo:21",
+            "id" : "C015",
+            "name" : "Charing Cross"
          },
          {
-            "line" : "Metropolitan",
-            "name" : "Chesham",
             "id" : "C016",
-            "link" : "C012"
+            "name" : "Chesham",
+            "link" : "C012",
+            "line" : "Metropolitan:33"
          },
          {
-            "id" : "C017",
             "link" : "G007,R007",
-            "line" : "Central",
-            "name" : "Chigwell"
+            "line" : "Central:40",
+            "name" : "Chigwell",
+            "id" : "C017"
          },
          {
+            "line" : "District:7",
             "link" : "T011,A002",
-            "id" : "C018",
             "name" : "Chiswick Park",
-            "line" : "District"
+            "id" : "C018"
          },
          {
+            "id" : "C019",
             "name" : "Chorleywood",
-            "line" : "Metropolitan",
             "link" : "R006,C012",
-            "id" : "C019"
+            "line" : "Metropolitan:31"
          },
          {
-            "line" : "Northern",
-            "name" : "Clapham Common",
+            "line" : "Northern:42",
             "link" : "C022,C023",
-            "id" : "C020"
+            "id" : "C020",
+            "name" : "Clapham Common"
          },
          {
-            "link" : "I002",
             "id" : "C021",
-            "line" : "Overground",
-            "name" : "Clapham Junction"
+            "name" : "Clapham Junction",
+            "line" : "Overground:29",
+            "link" : "I002"
          },
          {
-            "line" : "Northern",
             "name" : "Clapham North",
-            "link" : "S028,C020",
-            "id" : "C022"
+            "id" : "C022",
+            "line" : "Northern:41",
+            "link" : "S028,C020"
          },
          {
+            "line" : "Northern:43",
             "link" : "C020,B002",
-            "id" : "C023",
             "name" : "Clapham South",
-            "line" : "Northern"
+            "id" : "C023"
          },
          {
-            "id" : "C024",
             "link" : "O001",
-            "line" : "Piccadilly",
+            "line" : "Piccadilly:53",
+            "id" : "C024",
             "name" : "Cockfosters"
          },
          {
-            "line" : "Northern",
+            "id" : "C025",
             "name" : "Collers Wood",
             "link" : "T004,S017",
-            "id" : "C025"
+            "line" : ""
          },
          {
             "id" : "C026",
-            "link" : "H019,B030",
-            "line" : "Northern",
-            "name" : "Collindale"
+            "name" : "Collindale",
+            "line" : "",
+            "link" : "H019,B030"
          },
          {
+            "name" : "Covent Garden",
             "id" : "C027",
-            "link" : "H026,L006",
-            "line" : "Piccadilly",
-            "name" : "Covent Garden"
+            "line" : "Piccadilly:38",
+            "link" : "H026,L006"
          },
          {
-            "line" : "DLR",
-            "name" : "Crossharbour",
             "id" : "C028",
+            "name" : "Crossharbour",
+            "line" : "DLR:11",
             "link" : "S014,M013"
          },
          {
-            "link" : "U004,H009",
             "id" : "C029",
             "name" : "Crouch Hill",
-            "line" : "Overground"
+            "line" : "Overground:69",
+            "link" : "U004,H009"
          },
          {
-            "id" : "C030",
             "link" : "M010,W009",
-            "line" : "Metropolitan",
-            "name" : "Croxley"
+            "line" : "Metropolitan:28",
+            "name" : "Croxley",
+            "id" : "C030"
          },
          {
+            "line" : "Overground:42",
+            "link" : "S035",
             "name" : "Crystal Palace",
-            "line" : "Overground",
-            "id" : "C031",
-            "link" : "S035"
+            "id" : "C031"
          },
          {
+            "line" : "DLR:33",
             "link" : "R011,P013",
             "id" : "C032",
-            "name" : "Custom House for ExCeL",
-            "line" : "DLR"
+            "name" : "Custom House for ExCeL"
          },
          {
+            "id" : "C033",
             "name" : "Cutty Sark for Maritime Greenwich",
-            "line" : "DLR",
-            "link" : "I003,G011",
-            "id" : "C033"
+            "line" : "DLR:14",
+            "link" : "I003,G011"
          },
          {
-            "link" : "B010,G001",
+            "name" : "Cyprus",
             "id" : "C034",
-            "line" : "DLR",
-            "name" : "Cyprus"
+            "link" : "B010,G001",
+            "line" : "DLR:37"
          },
          {
+            "id" : "D001",
             "name" : "Dagenham East",
-            "line" : "District",
-            "link" : "D002,E013",
-            "id" : "D001"
+            "line" : "District:55",
+            "link" : "D002,E013"
          },
          {
-            "link" : "B011,D001",
             "id" : "D002",
             "name" : "Dagenham Heathway",
-            "line" : "District"
+            "line" : "District:54",
+            "link" : "B011,D001"
          },
          {
-            "line" : "Overground",
-            "name" : "Dalston Junction",
+            "line" : "Overground:55",
             "link" : "H003,D004",
+            "name" : "Dalston Junction",
             "id" : "D003"
          },
          {
-            "link" : "D003,H001,C009",
+            "name" : "Dalston Kingsland",
             "id" : "D004",
-            "line" : "Overground",
-            "name" : "Dalston Kingsland"
+            "line" : "Overground:79",
+            "link" : "D003,H001,C009"
          },
          {
-            "line" : "Central",
+            "id" : "D005",
             "name" : "Debden",
-            "link" : "L015,T002",
-            "id" : "D005"
+            "line" : "Central:47",
+            "link" : "L015,T002"
          },
          {
-            "line" : "DLR",
-            "name" : "Deptford Bridge",
+            "line" : "DLR:16",
             "link" : "G011,E014",
+            "name" : "Deptford Bridge",
             "id" : "D006"
          },
          {
             "name" : "Devons Road",
-            "line" : "DLR",
             "id" : "D007",
-            "link" : "L004,B022"
+            "link" : "L004,B022",
+            "line" : "DLR:21"
          },
          {
             "link" : "N001,W030",
-            "id" : "D008",
+            "line" : "Jubilee:7",
             "name" : "Dollis Hill",
-            "line" : "Jubilee"
+            "id" : "D008"
          },
          {
-            "id" : "E001",
             "link" : "E002,W014",
-            "line" : "Central,District",
-            "name" : "Ealing Broadway"
+            "line" : "District:4,Central:8",
+            "name" : "Ealing Broadway",
+            "id" : "E001"
          },
          {
-            "line" : "District,Piccadilly",
             "name" : "Ealing Common",
             "id" : "E002",
-            "link" : "A002,N007,E001"
+            "link" : "A002,N007,E001",
+            "line" : "District:5,Piccadilly:14"
          },
          {
+            "id" : "E003",
             "name" : "Earl's Court",
-            "line" : "District,Piccadilly",
-            "link" : "B007,K004,H022,W015,G003,W022",
-            "id" : "E003"
+            "line" : "District:23,Piccadilly:30",
+            "link" : "B007,K004,H022,W015,G003,W022"
          },
          {
             "id" : "E004",
-            "link" : "W028,N006",
             "name" : "East Acton",
-            "line" : "Central"
+            "link" : "W028,N006",
+            "line" : "Central:11"
          },
          {
-            "id" : "E005",
+            "line" : "Northern:7",
             "link" : "H024,F003",
             "name" : "East Finchley",
-            "line" : "Northern"
+            "id" : "E005"
          },
          {
-            "link" : "U005,B005",
             "id" : "E006",
             "name" : "East Ham",
-            "line" : "District,Hammersmith & City"
+            "link" : "U005,B005",
+            "line" : "Hammersmith & City:28,District:51"
          },
          {
             "name" : "East India",
-            "line" : "DLR",
             "id" : "E007",
-            "link" : "C007,B017"
+            "link" : "C007,B017",
+            "line" : "DLR:30"
          },
          {
-            "line" : "District",
             "name" : "East Putney",
             "id" : "E008",
-            "link" : "P015,S019"
+            "link" : "P015,S019",
+            "line" : "District:17"
          },
          {
-            "line" : "Metropolitan,Piccadilly",
-            "name" : "Eastcote",
             "id" : "E009",
+            "name" : "Eastcote",
+            "line" : "Metropolitan:17,Piccadilly:6",
             "link" : "R002,R014"
          },
          {
-            "name" : "Edgware",
-            "line" : "Northern",
+            "line" : "Northern:12",
             "link" : "B030",
-            "id" : "E010"
+            "id" : "E010",
+            "name" : "Edgware"
          },
          {
-            "name" : "Edgware Road",
-            "line" : "Circle,District,Hammersmith & City,Bakerloo",
+            "link" : "P001,M005,B001",
+            "line" : "Hammersmith & City:10,District:28,Bakerloo:15,Circle:10",
             "id" : "E011",
-            "link" : "P001,M005,B001"
+            "name" : "Edgware Road"
          },
          {
-            "link" : "L002,K001,B019",
-            "id" : "E012",
             "name" : "Elephant & Castle",
-            "line" : "Bakerloo,Northern"
+            "id" : "E012",
+            "link" : "L002,K001,B019",
+            "line" : "Bakerloo:25"
          },
          {
-            "line" : "District",
-            "name" : "Elm Park",
+            "line" : "District:56",
             "link" : "D001,H031",
+            "name" : "Elm Park",
             "id" : "E013"
          },
          {
-            "link" : "D006,L007",
+            "name" : "Elverson Road",
             "id" : "E014",
-            "line" : "DLR",
-            "name" : "Elverson Road"
+            "link" : "D006,L007",
+            "line" : ""
          },
          {
             "link" : "C015,W008,T001,W027",
+            "line" : "Northern:28,District:35,Bakerloo:22,Circle:26",
             "id" : "E015",
-            "name" : "Embankment",
-            "line" : "Circle,District,Northern,Bakerloo"
+            "name" : "Embankment"
          },
          {
-            "name" : "Epping",
-            "line" : "Central",
+            "link" : "T002",
+            "line" : "Central:49",
             "id" : "E016",
-            "link" : "T002"
+            "name" : "Epping"
          },
          {
             "link" : "C004,W006,M008,S010",
+            "other_link" : "Street:K013",
+            "line" : "Northern:22,Overground:19,Victoria:8",
             "id" : "E017",
-            "name" : "Euston",
-            "line" : "Northern,Overground,Victoria",
-            "other_link" : "Street:K013"
+            "name" : "Euston"
          },
          {
+            "name" : "Euston Square",
             "id" : "E018",
             "link" : "G008,K013",
-            "name" : "Euston Square",
-            "line" : "Circle,Hammersmith & City,Metropolitan"
+            "line" : "Hammersmith & City:13,Metropolitan:7,Circle:13"
          },
          {
+            "name" : "Fairlop",
             "id" : "F001",
-            "link" : "B006,H004",
-            "line" : "Central",
-            "name" : "Fairlop"
+            "line" : "Central:37",
+            "link" : "B006,H004"
          },
          {
-            "line" : "Circle,Hammersmith & City,Metropolitan",
+            "line" : "Hammersmith & City:15,Metropolitan:5,Circle:15",
+            "link" : "K013,B004",
             "name" : "Farringdon",
-            "id" : "F002",
-            "link" : "K013,B004"
+            "id" : "F002"
          },
          {
-            "id" : "F003",
+            "line" : "Northern:6",
             "link" : "E005,M007,W017",
-            "line" : "Northern",
-            "name" : "Finchley Central"
+            "name" : "Finchley Central",
+            "id" : "F003"
          },
          {
-            "line" : "Metropolitan,Jubilee",
             "name" : "Finchley Road",
             "id" : "F004",
-            "link" : "W019,S034,B001,W013,H012"
+            "link" : "W019,S034,B001,W013,H012",
+            "line" : "Jubilee:11,Metropolitan:10"
          },
          {
+            "name" : "Finchley Road & Frognal",
             "id" : "F005",
-            "link" : "H007,B028",
-            "line" : "Overground",
-            "name" : "Finchley Road & Frognal"
+            "line" : "Overground:63",
+            "link" : "H007,B028"
          },
          {
-            "line" : "Victoria,Piccadilly",
-            "name" : "Finsbury Park",
             "link" : "H023,S001,A012,M002",
-            "id" : "F006"
+            "line" : "Victoria:5,Piccadilly:45",
+            "id" : "F006",
+            "name" : "Finsbury Park"
          },
          {
-            "id" : "F007",
+            "line" : "Overground:40",
             "link" : "S035,H030",
-            "name" : "Forest Hill",
-            "line" : "Overground"
+            "id" : "F007",
+            "name" : "Forest Hill"
          },
          {
-            "line" : "District",
-            "name" : "Fulham Broadway",
+            "link" : "W015,P003",
+            "line" : "District:20",
             "id" : "F008",
-            "link" : "W015,P003"
+            "name" : "Fulham Broadway"
          },
          {
-            "id" : "G001",
             "link" : "C034,B009",
-            "line" : "DLR",
-            "name" : "Gallions Reach"
+            "line" : "DLR:38",
+            "name" : "Gallions Reach",
+            "id" : "G001"
          },
          {
-            "name" : "Gants Hill",
-            "line" : "Central",
+            "line" : "Central:34",
             "link" : "R003,N004",
+            "name" : "Gants Hill",
             "id" : "G002"
          },
          {
-            "id" : "G003",
+            "line" : "District:29,Piccadilly:31,Circle:32",
             "link" : "S012,H022,E003",
-            "name" : "Gloucester Road",
-            "line" : "Circle,District,Piccadilly"
+            "id" : "G003",
+            "name" : "Gloucester Road"
          },
          {
             "id" : "G004",
+            "name" : "Goldhawk Road",
             "link" : "H005,S004",
-            "line" : "Circle,Hammersmith & City",
-            "name" : "Goldhawk Road"
+            "line" : "Hammersmith & City:2,Circle:2"
          },
          {
             "name" : "Goodge Street",
-            "line" : "Northern",
             "id" : "G005",
+            "line" : "Northern:24",
             "link" : "W006,T005"
          },
          {
+            "name" : "Gospel Oak",
             "id" : "G006",
             "link" : "K006,U004,H007",
-            "name" : "Gospel Oak",
-            "line" : "Overground"
+            "line" : "Overground:61"
          },
          {
-            "id" : "G007",
-            "link" : "H004,C017",
             "name" : "Grange Hill",
-            "line" : "Central"
+            "id" : "G007",
+            "line" : "Central:39",
+            "link" : "H004,C017"
          },
          {
-            "link" : "B001,E018",
+            "name" : "Great Portland Street",
             "id" : "G008",
-            "line" : "Circle,Hammersmith & City,Metropolitan",
-            "name" : "Great Portland Street"
+            "line" : "Hammersmith & City:12,Metropolitan:8,Circle:12",
+            "link" : "B001,E018"
          },
          {
-            "name" : "Green Park",
-            "line" : "Victoria,Jubilee,Piccadilly",
+            "line" : "Jubilee:16,Victoria:11,Piccadilly:35",
             "link" : "V002,O005,B018,W027,H036,P006",
+            "name" : "Green Park",
             "id" : "G009"
          },
          {
-            "id" : "G010",
+            "line" : "Central:5",
             "link" : "N012,P005",
-            "line" : "Central",
+            "id" : "G010",
             "name" : "Greenford"
          },
          {
-            "line" : "DLR",
-            "name" : "Greenwich",
             "id" : "G011",
+            "name" : "Greenwich",
+            "line" : "DLR:15",
             "link" : "C033,D006"
          },
          {
-            "link" : "T011,K008,S008",
             "id" : "G012",
-            "line" : "District,Overground",
-            "name" : "Gunnersbury"
+            "name" : "Gunnersbury",
+            "line" : "District:3,Overground:22",
+            "link" : "T011,K008,S008"
          },
          {
-            "id" : "H001",
+            "line" : "Overground:80",
             "link" : "D004,H029",
-            "line" : "Overground",
-            "name" : "Hackney Central"
+            "name" : "Hackney Central",
+            "id" : "H001"
          },
          {
+            "line" : "Overground:82",
             "link" : "H029,S030",
-            "id" : "H002",
-            "line" : "Overground",
-            "name" : "Hackney Wick"
+            "name" : "Hackney Wick",
+            "id" : "H002"
          },
          {
+            "line" : "Overground:54",
             "link" : "H035,D003",
-            "id" : "H003",
             "name" : "Haggerston",
-            "line" : "Overground"
+            "id" : "H003"
          },
          {
-            "name" : "Hainault",
-            "line" : "Central",
             "id" : "H004",
-            "link" : "F001,G007"
+            "name" : "Hainault",
+            "link" : "F001,G007",
+            "line" : "Central:38"
          },
          {
-            "line" : "Circle,District,Hammersmith & City,Piccadilly",
-            "name" : "Hammersmith",
+            "line" : "Hammersmith & City:1,District:11,Piccadilly:28,Circle:1",
             "link" : "G004,B007,R001,T011",
+            "name" : "Hammersmith",
             "id" : "H005"
          },
          {
-            "name" : "Hampstead",
-            "line" : "Northern",
             "id" : "H006",
-            "link" : "B012,B024"
+            "name" : "Hampstead",
+            "link" : "B012,B024",
+            "line" : "Northern:18"
          },
          {
+            "name" : "Hampstead Heath",
             "id" : "H007",
             "link" : "G006,F005",
-            "line" : "Overground",
-            "name" : "Hampstead Heath"
+            "line" : "Overground:62"
          },
          {
             "name" : "Hanger Lane",
-            "line" : "Central",
-            "link" : "P005,N006",
-            "id" : "H008"
+            "id" : "H008",
+            "line" : "Central:7",
+            "link" : "P005,N006"
          },
          {
-            "line" : "Overground",
+            "id" : "H009",
             "name" : "Haringay Green Lanes",
             "link" : "C029,S016",
-            "id" : "H009"
+            "line" : ""
          },
          {
-            "name" : "Harlesden",
-            "line" : "Overground,Bakerloo",
             "link" : "S029,W031",
+            "line" : "Overground:13,Bakerloo:7",
+            "name" : "Harlesden",
             "id" : "H010"
          },
          {
             "link" : "K007,H015",
+            "line" : "Overground:7,Bakerloo:1",
             "id" : "H011",
-            "name" : "Harrow & Wealdstone",
-            "line" : "Overground,Bakerloo"
+            "name" : "Harrow & Wealdstone"
          },
          {
             "id" : "H012",
+            "name" : "Harrow-on-the-Hill",
             "link" : "N005,W013,W020,N009,M010,F004",
-            "line" : "Metropolitan",
-            "name" : "Harrow-on-the-Hill"
+            "line" : "Metropolitan:14"
          },
          {
+            "line" : "Overground:5",
             "link" : "H015,C011",
-            "id" : "H013",
-            "line" : "Overground",
-            "name" : "Hatch End"
+            "name" : "Hatch End",
+            "id" : "H013"
          },
          {
-            "link" : "H017,H034",
-            "id" : "H014",
             "name" : "Hatton Cross",
-            "line" : "Piccadilly"
+            "id" : "H014",
+            "line" : "Piccadilly:23",
+            "link" : "H017,H034"
          },
          {
+            "line" : "Overground:6",
             "link" : "H011,H013",
-            "id" : "H015",
             "name" : "Headstone Lane",
-            "line" : "Overground"
+            "id" : "H015"
          },
          {
-            "line" : "Piccadilly",
-            "name" : "Heathrow Terminal 1,2,3",
+            "line" : "Piccadilly:26",
             "link" : "H018,H014",
-            "id" : "H016"
+            "id" : "H016",
+            "name" : "Heathrow Terminal 1,2,3"
          },
          {
-            "line" : "Piccadilly",
             "name" : "Heathrow Terminal 4",
-            "link" : "H016",
-            "id" : "H017"
-         },
-         {
-            "line" : "Piccadilly",
-            "name" : "Heathrow Terminal 5",
-            "id" : "H018",
+            "id" : "H017",
+            "line" : "Piccadilly:24",
             "link" : "H016"
          },
          {
-            "id" : "H019",
+            "id" : "H018",
+            "name" : "Heathrow Terminal 5",
+            "line" : "Piccadilly:25",
+            "link" : "H016"
+         },
+         {
             "link" : "B024,C026",
-            "line" : "Northern",
-            "name" : "Hendon Central"
+            "line" : "Northern:15",
+            "name" : "Hendon Central",
+            "id" : "H019"
          },
          {
-            "name" : "Heron Quays",
-            "line" : "DLR",
             "id" : "H020",
-            "link" : "C006,S014"
+            "name" : "Heron Quays",
+            "link" : "C006,S014",
+            "line" : "DLR:9"
          },
          {
-            "name" : "High Barnet",
-            "line" : "Northern",
             "id" : "H021",
+            "name" : "High Barnet",
+            "line" : "Northern:1",
             "link" : "T007"
          },
          {
+            "line" : "District:24,Circle:33",
             "link" : "G003,N016,E003",
-            "id" : "H022",
             "name" : "High Street Kensington",
-            "line" : "Circle,District"
+            "id" : "H022"
          },
          {
-            "link" : "K013,F006,C009,C002",
             "id" : "H023",
             "name" : "Highbury & Islington",
-            "line" : "Overground,Victoria"
+            "link" : "K013,F006,C009,C002",
+            "line" : "Overground:57,Victoria:6"
          },
          {
             "name" : "Highgate",
-            "line" : "Northern",
+            "id" : "H024",
             "link" : "A010,E005",
-            "id" : "H024"
+            "line" : "Northern:8"
          },
          {
-            "name" : "Hillingdon",
-            "line" : "Metropolitan,Piccadilly",
             "link" : "I001,U006",
+            "line" : "Metropolitan:21,Piccadilly:2",
+            "name" : "Hillingdon",
             "id" : "H025"
          },
          {
+            "line" : "Central:22,Piccadilly:39",
             "link" : "O005,C014,C027,R015",
-            "id" : "H026",
-            "line" : "Central,Piccadilly",
-            "name" : "Holborn"
+            "name" : "Holborn",
+            "id" : "H026"
          },
          {
+            "link" : "S003,N016",
+            "line" : "Central:14",
             "name" : "Holland Park",
-            "line" : "Central",
-            "id" : "H027",
-            "link" : "S003,N016"
+            "id" : "H027"
          },
          {
-            "link" : "A012,C001",
             "id" : "H028",
             "name" : "Holloway Road",
-            "line" : "Piccadilly"
+            "line" : "Piccadilly:43",
+            "link" : "A012,C001"
          },
          {
-            "id" : "H029",
-            "link" : "H001,H002",
             "name" : "Homerton",
-            "line" : "Overground"
+            "id" : "H029",
+            "line" : "Overground:81",
+            "link" : "H001,H002"
          },
          {
             "id" : "H030",
-            "link" : "F007,B026",
             "name" : "Honor Oak Park",
-            "line" : "Overground"
+            "line" : "Overground:39",
+            "link" : "F007,B026"
          },
          {
-            "link" : "E013,U002",
             "id" : "H031",
-            "line" : "District",
-            "name" : "Hornchurch"
+            "name" : "Hornchurch",
+            "line" : "District:57",
+            "link" : "E013,U002"
          },
          {
-            "line" : "Piccadilly",
             "name" : "Hounslow Central",
             "id" : "H032",
+            "line" : "Piccadilly:21",
             "link" : "H034,H033"
          },
          {
-            "name" : "Hounslow East",
-            "line" : "Piccadilly",
             "id" : "H033",
-            "link" : "H032,O003"
+            "name" : "Hounslow East",
+            "link" : "H032,O003",
+            "line" : "Piccadilly:20"
          },
          {
-            "line" : "Piccadilly",
+            "line" : "Piccadilly:22",
+            "link" : "H014,H032",
             "name" : "Hounslow West",
-            "id" : "H034",
-            "link" : "H014,H032"
+            "id" : "H034"
          },
          {
-            "id" : "H035",
+            "line" : "Overground:53",
             "link" : "S005,H003",
             "name" : "Hoxton",
-            "line" : "Overground"
+            "id" : "H035"
          },
          {
+            "line" : "Piccadilly:34",
             "link" : "G009,K015",
             "id" : "H036",
-            "line" : "Piccadilly",
             "name" : "Hyde Park Corner"
          },
          {
-            "name" : "Ickenham",
-            "line" : "Metropolitan,Piccadilly",
             "id" : "I001",
+            "name" : "Ickenham",
+            "line" : "Metropolitan:20,Piccadilly:3",
             "link" : "R012,H025"
          },
          {
-            "link" : "W015,C021",
             "id" : "I002",
-            "line" : "Overground",
-            "name" : "Imperial Wharf"
+            "name" : "Imperial Wharf",
+            "line" : "Overground:28",
+            "link" : "W015,C021"
          },
          {
-            "link" : "M013,C033",
             "id" : "I003",
             "name" : "Island Gardens",
-            "line" : "DLR"
+            "line" : "DLR:13",
+            "link" : "M013,C033"
          },
          {
             "id" : "K001",
+            "name" : "Kennington",
             "link" : "W008,E012,O004",
-            "line" : "Northern",
-            "name" : "Kennington"
+            "line" : "Northern:38"
          },
          {
-            "name" : "Kensal Green",
-            "line" : "Overground,Bakerloo",
+            "link" : "W031,Q001",
+            "line" : "Overground:15,Bakerloo:9",
             "id" : "K002",
-            "link" : "W031,Q001"
+            "name" : "Kensal Green"
          },
          {
             "link" : "W031,B028",
-            "id" : "K003",
+            "line" : "Overground:67",
             "name" : "Kensal Rise",
-            "line" : "Overground"
+            "id" : "K003"
          },
          {
-            "line" : "District,Overground",
+            "id" : "K004",
             "name" : "Kensington (Olympia)",
-            "link" : "E003,S003,W015",
-            "id" : "K004"
+            "line" : "District:22,Overground:26",
+            "link" : "E003,S003,W015"
          },
          {
             "name" : "Kentish Town",
-            "line" : "Northern",
             "id" : "K005",
+            "line" : "Northern:11",
             "link" : "C004,T010"
          },
          {
-            "line" : "Overground",
-            "name" : "Kentish Town West",
             "link" : "C003,G006",
-            "id" : "K006"
+            "line" : "Overground:60",
+            "id" : "K006",
+            "name" : "Kentish Town West"
          },
          {
-            "link" : "H011,S013",
             "id" : "K007",
-            "line" : "Overground,Bakerloo",
-            "name" : "Kenton"
+            "name" : "Kenton",
+            "link" : "H011,S013",
+            "line" : "Overground:8,Bakerloo:2"
          },
          {
-            "id" : "K008",
+            "line" : "District:2",
             "link" : "G012,R005",
             "name" : "Kew Gardens",
-            "line" : "District,Overground"
+            "id" : "K008"
          },
          {
             "name" : "Kilburn",
-            "line" : "Jubilee",
+            "id" : "K009",
             "link" : "W030,W019",
-            "id" : "K009"
+            "line" : "Jubilee:9"
          },
          {
-            "link" : "Q001,S010",
+            "name" : "Kilburn High Road",
             "id" : "K010",
-            "line" : "Overground",
-            "name" : "Kilburn High Road"
+            "link" : "Q001,S010",
+            "line" : "Overground:17"
          },
          {
-            "id" : "K011",
+            "line" : "Bakerloo:11",
             "link" : "Q001,M001",
-            "line" : "Bakerloo",
-            "name" : "Kilburn Park"
+            "name" : "Kilburn Park",
+            "id" : "K011"
          },
          {
-            "line" : "DLR",
+            "id" : "K012",
             "name" : "King George V",
             "link" : "L014,W039",
-            "id" : "K012"
+            "line" : "DLR:43"
          },
          {
             "name" : "King's Cross St. Pancras",
-            "line" : "Circle,Hammersmith & City,Victoria,Metropolitan,Piccadilly,Northern",
+            "id" : "K013",
             "other_link" : "Street:E017",
-            "link" : "H023,E018,F002,A009,R015,C001",
-            "id" : "K013"
+            "line" : "Northern:30,Hammersmith & City:14,Victoria:7,Metropolitan:6,Circle:14",
+            "link" : "H023,E018,F002,A009,R015,C001"
          },
          {
             "link" : "Q002,W013",
-            "id" : "K014",
-            "line" : "Jubilee",
-            "name" : "Kingsbury"
+            "line" : "Jubilee:4",
+            "name" : "Kingsbury",
+            "id" : "K014"
          },
          {
-            "id" : "K015",
-            "link" : "H036,S012",
             "name" : "Knightsbridge",
-            "line" : "Piccadilly"
+            "id" : "K015",
+            "line" : "Piccadilly:33",
+            "link" : "H036,S012"
          },
          {
-            "line" : "Circle,Hammersmith & City",
-            "name" : "Ladbroke Grove",
             "link" : "L005,W025",
-            "id" : "L001"
+            "line" : "Hammersmith & City:6,Circle:6",
+            "id" : "L001",
+            "name" : "Ladbroke Grove"
          },
          {
-            "name" : "Lambeth North",
-            "line" : "Bakerloo",
+            "line" : "Bakerloo:24",
             "link" : "W008,E012",
+            "name" : "Lambeth North",
             "id" : "L002"
          },
          {
-            "id" : "L003",
             "link" : "Q003,M004",
-            "name" : "Lancaster Gate",
-            "line" : "Central"
+            "line" : "Central:17",
+            "id" : "L003",
+            "name" : "Lancaster Gate"
          },
          {
-            "id" : "L004",
+            "line" : "DLR:20",
             "link" : "A005,D007",
-            "line" : "DLR",
-            "name" : "Langdon Park"
+            "name" : "Langdon Park",
+            "id" : "L004"
          },
          {
-            "line" : "Circle,Hammersmith & City",
-            "name" : "Latimer Road",
+            "line" : "Hammersmith & City:5,Circle:5",
             "link" : "W035,L001",
+            "name" : "Latimer Road",
             "id" : "L005"
          },
          {
-            "link" : "T005,C015,P006,C027",
             "id" : "L006",
             "name" : "Leicester Square",
-            "line" : "Northern,Piccadilly"
+            "link" : "T005,C015,P006,C027",
+            "line" : "Northern:26,Piccadilly:37"
          },
          {
-            "name" : "Lewisham",
-            "line" : "DLR",
+            "line" : "DLR:18",
             "link" : "E014",
+            "name" : "Lewisham",
             "id" : "L007"
          },
          {
-            "line" : "Central",
             "name" : "Leyton",
-            "link" : "S030,L010",
-            "id" : "L008"
+            "id" : "L008",
+            "line" : "Central:30",
+            "link" : "S030,L010"
          },
          {
-            "line" : "Overground",
             "name" : "Leyton Midland Road",
             "id" : "L009",
+            "line" : "Overground:74",
             "link" : "W002,W004"
          },
          {
-            "line" : "Central",
+            "link" : "L008,W003,S007",
+            "line" : "Central:31",
             "name" : "Leytonstone",
-            "id" : "L010",
-            "link" : "L008,W003,S007"
+            "id" : "L010"
          },
          {
-            "id" : "L011",
             "link" : "W026,S002",
-            "name" : "Limehouse",
-            "line" : "DLR"
+            "line" : "DLR:4",
+            "id" : "L011",
+            "name" : "Limehouse"
          },
          {
-            "id" : "L012",
             "link" : "M011,A003,A004,B003,B014",
-            "line" : "Central,Circle,Hammersmith & City,Metropolitan",
-            "name" : "Liverpool Street"
+            "line" : "Hammersmith & City:18,Central:26,Metropolitan:2,Circle:18",
+            "name" : "Liverpool Street",
+            "id" : "L012"
          },
          {
+            "name" : "London Bridge",
             "id" : "L013",
             "link" : "S021,B013,B019,B003",
-            "name" : "London Bridge",
-            "line" : "Northern,Jubilee"
+            "line" : "Northern:35,Jubilee:20"
          },
          {
-            "line" : "DLR",
-            "name" : "London City Airport",
+            "line" : "DLR:42",
+            "link" : "P010,K012",
             "id" : "L014",
-            "link" : "P010,K012"
+            "name" : "London City Airport"
          },
          {
+            "name" : "Loughton",
             "id" : "L015",
-            "link" : "B029,D005",
-            "line" : "Central",
-            "name" : "Loughton"
+            "line" : "Central:46",
+            "link" : "B029,D005"
          },
          {
-            "line" : "Bakerloo",
-            "name" : "Maida Vale",
+            "line" : "Bakerloo:12",
+            "link" : "K011,W007",
             "id" : "M001",
-            "link" : "K011,W007"
+            "name" : "Maida Vale"
          },
          {
-            "name" : "Manor House",
-            "line" : "Piccadilly",
+            "link" : "F006,T012",
+            "line" : "Piccadilly:46",
             "id" : "M002",
-            "link" : "F006,T012"
+            "name" : "Manor House"
          },
          {
-            "id" : "M003",
             "link" : "C008,B015",
-            "line" : "Circle,District",
+            "line" : "District:38,Circle:23",
+            "id" : "M003",
             "name" : "Mansion House"
          },
          {
             "name" : "Marble Arch",
-            "line" : "Central",
             "id" : "M004",
+            "line" : "Central:18",
             "link" : "L003,B018"
          },
          {
-            "link" : "B001,E011",
             "id" : "M005",
             "name" : "Marylebone",
-            "line" : "Bakerloo"
+            "line" : "Bakerloo:16",
+            "link" : "B001,E011"
          },
          {
             "link" : "B014,S030,S027,B023",
+            "line" : "Hammersmith & City:22,District:45,Central:28",
             "id" : "M006",
-            "name" : "Mile End",
-            "line" : "Central,District,Hammersmith & City"
+            "name" : "Mile End"
          },
          {
-            "link" : "F003",
             "id" : "M007",
-            "line" : "Northern",
-            "name" : "Mill Hill East"
+            "name" : "Mill Hill East",
+            "line" : "Northern:5",
+            "link" : "F003"
          },
          {
-            "id" : "M008",
             "link" : "C004,E017",
-            "line" : "Northern",
+            "line" : "",
+            "id" : "M008",
             "name" : "Momington Crescent"
          },
          {
-            "link" : "T009,C008",
-            "id" : "M009",
-            "line" : "Circle,District",
             "name" : "Monument",
-            "other_link" : "Tunnel:B003"
+            "id" : "M009",
+            "other_link" : "Tunnel:B003",
+            "line" : "District:40,Circle:21",
+            "link" : "T009,C008"
          },
          {
             "id" : "M010",
+            "name" : "Moor Park",
             "link" : "N013,C030,R006,H012",
-            "line" : "Metropolitan",
-            "name" : "Moor Park"
+            "line" : "Metropolitan:27"
          },
          {
-            "id" : "M011",
+            "line" : "Northern:33,Hammersmith & City:17,Metropolitan:3,Circle:17",
             "link" : "L012,B004,B003,O002",
-            "line" : "Circle,Northern,Hammersmith & City,Metropolitan",
+            "id" : "M011",
             "name" : "Moorgate"
          },
          {
-            "name" : "Morden",
-            "line" : "Northern",
+            "line" : "Northern:49",
             "link" : "S017",
-            "id" : "M012"
+            "id" : "M012",
+            "name" : "Morden"
          },
          {
-            "link" : "C028,I003",
+            "name" : "Mudchute",
             "id" : "M013",
-            "line" : "DLR",
-            "name" : "Mudchute"
+            "link" : "C028,I003",
+            "line" : "DLR:12"
          },
          {
+            "line" : "Jubilee:6",
             "link" : "W013,D008",
             "id" : "N001",
-            "name" : "Neasden",
-            "line" : "Jubilee"
+            "name" : "Neasden"
          },
          {
-            "line" : "Overground",
             "name" : "New Cross",
-            "link" : "S033",
-            "id" : "N002"
+            "id" : "N002",
+            "line" : "Overground:36",
+            "link" : "S033"
          },
          {
-            "line" : "Overground",
-            "name" : "New Cross Gate",
             "link" : "B026,S033",
+            "line" : "Overground:37",
+            "name" : "New Cross Gate",
             "id" : "N003"
          },
          {
             "name" : "Newbury Park",
-            "line" : "Central",
+            "id" : "N004",
             "link" : "G002,B006",
-            "id" : "N004"
+            "line" : "Central:35"
          },
          {
-            "id" : "N005",
-            "link" : "P012,H012",
             "name" : "Northwick Park",
-            "line" : "Metropolitan"
+            "id" : "N005",
+            "line" : "Metropolitan:13",
+            "link" : "P012,H012"
          },
          {
+            "line" : "Central:10",
             "link" : "H008,W014,E004",
             "id" : "N006",
-            "name" : "North Acton",
-            "line" : "Central"
+            "name" : "North Acton"
          },
          {
-            "id" : "N007",
             "link" : "E002,P002",
-            "line" : "Piccadilly",
-            "name" : "North Ealing"
+            "line" : "Piccadilly:13",
+            "name" : "North Ealing",
+            "id" : "N007"
          },
          {
-            "link" : "C006,C007",
             "id" : "N008",
-            "line" : "Jubilee",
-            "name" : "North Greenwich"
+            "name" : "North Greenwich",
+            "link" : "C006,C007",
+            "line" : "Jubilee:24"
          },
          {
-            "name" : "North Harrow",
-            "line" : "Metropolitan",
             "id" : "N009",
+            "name" : "North Harrow",
+            "line" : "Metropolitan:23",
             "link" : "H012,P008"
          },
          {
             "id" : "N010",
+            "name" : "North Wembley",
             "link" : "S013,W012",
-            "line" : "Overground,Bakerloo",
-            "name" : "North Wembley"
+            "line" : "Overground:10,Bakerloo:4"
          },
          {
-            "id" : "N011",
-            "link" : "S009,B020",
             "name" : "Northfields",
-            "line" : "Piccadilly"
+            "id" : "N011",
+            "line" : "Piccadilly:17",
+            "link" : "S009,B020"
          },
          {
             "name" : "Northolt",
-            "line" : "Central",
             "id" : "N012",
-            "link" : "S015,G010"
+            "link" : "S015,G010",
+            "line" : "Central:4"
          },
          {
+            "line" : "Metropolitan:26",
             "link" : "N014,M010",
             "id" : "N013",
-            "name" : "Northwood",
-            "line" : "Metropolitan"
+            "name" : "Northwood"
          },
          {
             "id" : "N014",
-            "link" : "P008,N013",
             "name" : "Northwood Hills",
-            "line" : "Metropolitan"
+            "line" : "Metropolitan:25",
+            "link" : "P008,N013"
          },
          {
+            "id" : "N015",
             "name" : "Norwood Junction",
-            "line" : "Overground",
-            "link" : "A008,W016",
-            "id" : "N015"
+            "line" : "Overground:45",
+            "link" : "A008,W016"
          },
          {
-            "link" : "H027,Q003,B008,H022",
-            "id" : "N016",
             "name" : "Notting Hill Gate",
-            "line" : "Central,Circle,District"
+            "id" : "N016",
+            "link" : "H027,Q003,B008,H022",
+            "line" : "District:25,Central:15,Circle:34"
          },
          {
             "name" : "Oakwood",
-            "line" : "Piccadilly",
             "id" : "O001",
-            "link" : "S020,C024"
+            "link" : "S020,C024",
+            "line" : "Piccadilly:52"
          },
          {
+            "name" : "Old Street",
             "id" : "O002",
-            "link" : "M011,A009",
-            "line" : "Northern",
-            "name" : "Old Street"
+            "line" : "Northern:32",
+            "link" : "M011,A009"
          },
          {
             "name" : "Osterley",
-            "line" : "Piccadilly",
-            "link" : "H033,B020",
-            "id" : "O003"
+            "id" : "O003",
+            "line" : "Piccadilly:19",
+            "link" : "H033,B020"
          },
          {
+            "name" : "Oval",
             "id" : "O004",
             "link" : "S028,K001",
-            "name" : "Oval",
-            "line" : "Northern"
+            "line" : "Northern:39"
          },
          {
+            "line" : "Central:20,Victoria:10,Bakerloo:19",
+            "link" : "G009,W006,B018,R004,P006,H026",
             "name" : "Oxford Circus",
-            "line" : "Central,Victoria,Bakerloo",
-            "id" : "O005",
-            "link" : "G009,W006,B018,R004,P006,H026"
+            "id" : "O005"
          },
          {
-            "id" : "P001",
             "link" : "B008,W007,E011,R010",
-            "name" : "Paddington",
-            "line" : "District,Circle,Hammersmith & City,Bakerloo"
+            "line" : "Hammersmith & City:9,District:27,Bakerloo:14,Circle:9",
+            "id" : "P001",
+            "name" : "Paddington"
          },
          {
-            "link" : "N007,A006",
-            "id" : "P002",
             "name" : "Park Royal",
-            "line" : "Piccadilly"
+            "id" : "P002",
+            "line" : "Piccadilly:12",
+            "link" : "N007,A006"
          },
          {
-            "name" : "Parsons Green",
-            "line" : "District",
             "id" : "P003",
+            "name" : "Parsons Green",
+            "line" : "District:19",
             "link" : "F008,P015"
          },
          {
-            "line" : "Overground",
-            "name" : "Penge West",
+            "line" : "Overground:43",
             "link" : "S035,A008",
-            "id" : "P004"
+            "id" : "P004",
+            "name" : "Penge West"
          },
          {
-            "line" : "Central",
             "name" : "Perivale",
+            "id" : "P005",
             "link" : "G010,H008",
-            "id" : "P005"
+            "line" : "Central:6"
          },
          {
-            "link" : "O005,C015,L006,G009",
+            "name" : "Piccadilly Circus",
             "id" : "P006",
-            "line" : "Bakerloo,Piccadilly",
-            "name" : "Piccadilly Circus"
+            "line" : "Bakerloo:20,Piccadilly:36",
+            "link" : "O005,C015,L006,G009"
          },
          {
-            "link" : "V001,V002",
             "id" : "P007",
-            "line" : "Victoria",
-            "name" : "Pimlico"
+            "name" : "Pimlico",
+            "line" : "Victoria:13",
+            "link" : "V001,V002"
          },
          {
             "id" : "P008",
-            "link" : "N009,N014",
             "name" : "Pinner",
-            "line" : "Metropolitan"
+            "link" : "N009,N014",
+            "line" : "Metropolitan:24"
          },
          {
-            "id" : "P009",
+            "line" : "Hammersmith & City:26,District:49",
             "link" : "W018,U005",
-            "name" : "Plaistow",
-            "line" : "District,Hammersmith & City"
+            "id" : "P009",
+            "name" : "Plaistow"
          },
          {
-            "name" : "Pontoon Dock",
-            "line" : "DLR",
+            "link" : "W024,L014",
+            "line" : "DLR:41",
             "id" : "P010",
-            "link" : "W024,L014"
+            "name" : "Pontoon Dock"
          },
          {
-            "line" : "DLR",
             "name" : "Poplar",
             "id" : "P011",
+            "line" : "DLR:6",
             "link" : "B017,W021,W026,A005"
          },
          {
-            "line" : "Metropolitan",
             "name" : "Preston Road",
-            "link" : "W013,N005",
-            "id" : "P012"
+            "id" : "P012",
+            "line" : "Metropolitan:12",
+            "link" : "W013,N005"
          },
          {
+            "line" : "DLR:34",
+            "link" : "C032,R009",
             "name" : "Prince Regent",
-            "line" : "DLR",
-            "id" : "P013",
-            "link" : "C032,R009"
+            "id" : "P013"
          },
          {
-            "line" : "DLR",
-            "name" : "Pudding Mill Lane",
             "id" : "P014",
-            "link" : "B022,S030"
+            "name" : "Pudding Mill Lane",
+            "link" : "B022,S030",
+            "line" : "DLR:23"
          },
          {
-            "line" : "District",
             "name" : "Putney Bridge",
             "id" : "P015",
-            "link" : "P003,E008"
+            "link" : "P003,E008",
+            "line" : "District:18"
          },
          {
-            "line" : "Overground,Bakerloo",
-            "name" : "Queen's Park",
             "id" : "Q001",
+            "name" : "Queen's Park",
+            "line" : "Bakerloo:10",
             "link" : "K002,K011,K010"
          },
          {
-            "link" : "C010,K014",
-            "id" : "Q002",
             "name" : "Queensbury",
-            "line" : "Jubilee"
+            "id" : "Q002",
+            "link" : "C010,K014",
+            "line" : "Jubilee:3"
          },
          {
-            "line" : "Central",
-            "name" : "Queensway",
+            "line" : "Central:16",
             "link" : "N016,L003",
+            "name" : "Queensway",
             "id" : "Q003"
          },
          {
-            "name" : "Ravenscourt Park",
-            "line" : "District",
             "link" : "H005,S025",
+            "line" : "District:10",
+            "name" : "Ravenscourt Park",
             "id" : "R001"
          },
          {
-            "link" : "W020,E009,S011",
+            "name" : "Rayners Lane",
             "id" : "R002",
-            "line" : "Piccadilly,Metropolitan",
-            "name" : "Rayners Lane"
+            "line" : "Metropolitan:16,Piccadilly:7",
+            "link" : "W020,E009,S011"
          },
          {
             "id" : "R003",
-            "link" : "W003,G002",
             "name" : "Redbridge",
-            "line" : "Central"
+            "line" : "Central:33",
+            "link" : "W003,G002"
          },
          {
-            "line" : "Bakerloo",
+            "link" : "B001,O005",
+            "line" : "Bakerloo:18",
             "name" : "Regent's Park",
-            "id" : "R004",
-            "link" : "B001,O005"
+            "id" : "R004"
          },
          {
+            "line" : "District:1,Overground:24",
             "link" : "K008",
             "id" : "R005",
-            "name" : "Richmond",
-            "line" : "District,Overground"
+            "name" : "Richmond"
          },
          {
-            "link" : "M010,C019",
+            "name" : "Rickmansworth",
             "id" : "R006",
-            "line" : "Metropolitan",
-            "name" : "Rickmansworth"
+            "line" : "Metropolitan:30",
+            "link" : "M010,C019"
          },
          {
-            "link" : "C017,B029",
+            "name" : "Roding Valley",
             "id" : "R007",
-            "line" : "Central",
-            "name" : "Roding Valley"
+            "line" : "Central:41",
+            "link" : "C017,B029"
          },
          {
-            "line" : "Overground",
-            "name" : "Rotherhithe",
             "link" : "C005,W005",
-            "id" : "R008"
+            "line" : "Overground:48",
+            "id" : "R008",
+            "name" : "Rotherhithe"
          },
          {
+            "id" : "R009",
             "name" : "Royal Albert",
-            "line" : "DLR",
             "link" : "P013,B010",
-            "id" : "R009"
+            "line" : "DLR:35"
          },
          {
-            "line" : "Circle,Hammersmith & City",
-            "name" : "Royal Oak",
+            "link" : "W025,P001",
+            "line" : "Hammersmith & City:8,Circle:8",
             "id" : "R010",
-            "link" : "W025,P001"
+            "name" : "Royal Oak"
          },
          {
-            "line" : "DLR",
             "name" : "Royal Victoria",
             "id" : "R011",
+            "line" : "DLR:32",
             "link" : "C007,C032"
          },
          {
+            "name" : "Ruislip",
             "id" : "R012",
             "link" : "R014,I001",
-            "name" : "Ruislip",
-            "line" : "Metropolitan,Piccadilly"
+            "line" : "Metropolitan:19,Piccadilly:4"
          },
          {
             "id" : "R013",
-            "link" : "W023,S015",
-            "line" : "Central",
-            "name" : "Ruislip Gardens"
+            "name" : "Ruislip Gardens",
+            "line" : "Central:2",
+            "link" : "W023,S015"
          },
          {
-            "line" : "Metropolitan,Piccadilly",
-            "name" : "Ruislip Manor",
             "id" : "R014",
-            "link" : "E009,R012"
+            "name" : "Ruislip Manor",
+            "link" : "E009,R012",
+            "line" : "Metropolitan:18,Piccadilly:5"
          },
          {
-            "link" : "K013,H026",
             "id" : "R015",
-            "line" : "Piccadilly",
-            "name" : "Russel Square"
+            "name" : "Russel Square",
+            "link" : "K013,H026",
+            "line" : ""
          },
          {
+            "line" : "Victoria:4",
             "link" : "F006,T006",
-            "id" : "S001",
             "name" : "Seven Sisters",
-            "line" : "Victoria"
+            "id" : "S001"
          },
          {
+            "line" : "Overground:50,DLR:3",
             "link" : "B003,T008,W029,W005,L011",
             "id" : "S002",
-            "line" : "DLR,Overground",
             "name" : "Shadwell"
          },
          {
             "id" : "S003",
-            "link" : "W028,H027,W031,K004",
             "name" : "Shepherd's Bush",
-            "line" : "Central,Overground"
+            "line" : "Overground:25,Central:13",
+            "link" : "W028,H027,W031,K004"
          },
          {
-            "line" : "Circle,Hammersmith & City",
-            "name" : "Shepherd's Bush Market",
             "link" : "G004,W035",
+            "line" : "Hammersmith & City:3,Circle:3",
+            "name" : "Shepherd's Bush Market",
             "id" : "S004"
          },
          {
-            "id" : "S005",
+            "line" : "",
             "link" : "W029,H035",
-            "line" : "Overground",
+            "id" : "S005",
             "name" : "Shoreditch High Steet"
          },
          {
             "id" : "S006",
-            "link" : "V002,S012",
-            "line" : "Circle,District",
-            "name" : "Sloane Square"
+            "name" : "Sloane Square",
+            "line" : "District:31,Circle:30",
+            "link" : "V002,S012"
          },
          {
             "link" : "L010,S018",
+            "line" : "Central:42",
             "id" : "S007",
-            "name" : "Snaresbrook",
-            "line" : "Central"
+            "name" : "Snaresbrook"
          },
          {
+            "line" : "Overground:21",
             "link" : "A001,G012",
-            "id" : "S008",
-            "line" : "Overground",
-            "name" : "South Acton"
+            "name" : "South Acton",
+            "id" : "S008"
          },
          {
-            "name" : "South Ealing",
-            "line" : "Piccadilly",
+            "line" : "Piccadilly:16",
+            "link" : "A002,N011",
             "id" : "S009",
-            "link" : "A002,N011"
+            "name" : "South Ealing"
          },
          {
+            "line" : "",
             "link" : "K010,E017",
             "id" : "S010",
-            "name" : "South Hamstead",
-            "line" : "Overground"
+            "name" : "South Hamstead"
          },
          {
-            "line" : "Piccadilly",
+            "line" : "Piccadilly:8",
+            "link" : "R002,S031",
             "name" : "South Harrow",
-            "id" : "S011",
-            "link" : "R002,S031"
+            "id" : "S011"
          },
          {
             "link" : "S006,G003,K015",
-            "id" : "S012",
-            "line" : "Circle,District,Piccadilly",
-            "name" : "South Kensington"
+            "line" : "District:30,Piccadilly:32,Circle:31",
+            "name" : "South Kensington",
+            "id" : "S012"
          },
          {
-            "line" : "Overground,Bakerloo",
             "name" : "South Kenton",
-            "link" : "K007,N010",
-            "id" : "S013"
+            "id" : "S013",
+            "line" : "Overground:9,Bakerloo:3",
+            "link" : "K007,N010"
          },
          {
-            "link" : "H020,C028",
             "id" : "S014",
             "name" : "South Quay",
-            "line" : "DLR"
+            "link" : "H020,C028",
+            "line" : "DLR:10"
          },
          {
-            "id" : "S015",
             "link" : "R013,N012",
-            "line" : "Central",
+            "line" : "Central:3",
+            "id" : "S015",
             "name" : "South Ruislip"
          },
          {
-            "name" : "South Tottenham",
-            "line" : "Overground",
+            "link" : "H009,B016",
+            "line" : "Overground:71",
             "id" : "S016",
-            "link" : "H009,B016"
+            "name" : "South Tottenham"
          },
          {
-            "id" : "S017",
             "link" : "C025,M012",
-            "line" : "Northern",
+            "line" : "Northern:48",
+            "id" : "S017",
             "name" : "South Wimbledon"
          },
          {
-            "id" : "S018",
+            "line" : "Central:43",
             "link" : "S007,W036",
-            "line" : "Central",
-            "name" : "South Woodford"
+            "name" : "South Woodford",
+            "id" : "S018"
          },
          {
+            "id" : "S019",
             "name" : "Southfields",
-            "line" : "District",
-            "link" : "E008,W033",
-            "id" : "S019"
+            "line" : "District:16",
+            "link" : "E008,W033"
          },
          {
-            "name" : "Southgate",
-            "line" : "Piccadilly",
+            "link" : "A011,O001",
+            "line" : "Piccadilly:51",
             "id" : "S020",
-            "link" : "A011,O001"
+            "name" : "Southgate"
          },
          {
-            "link" : "W008,L013",
             "id" : "S021",
-            "line" : "Jubilee",
-            "name" : "Southwark"
+            "name" : "Southwark",
+            "line" : "Jubilee:19",
+            "link" : "W008,L013"
          },
          {
-            "link" : "W027,V002",
-            "id" : "S022",
             "name" : "St. James's Park",
-            "line" : "Circle,District"
+            "id" : "S022",
+            "link" : "W027,V002",
+            "line" : ""
          },
          {
+            "line" : "Jubilee:13",
             "link" : "S034,B001",
-            "id" : "S023",
             "name" : "St. John's Wood",
-            "line" : "Jubilee"
+            "id" : "S023"
          },
          {
-            "id" : "S024",
+            "line" : "Central:24",
             "link" : "C014,B003",
-            "line" : "Central",
-            "name" : "St. Paul's"
+            "name" : "St. Paul's",
+            "id" : "S024"
          },
          {
-            "link" : "T011,R001",
+            "name" : "Stamford Brook",
             "id" : "S025",
-            "line" : "District",
-            "name" : "Stamford Brook"
+            "link" : "T011,R001",
+            "line" : "District:9"
          },
          {
-            "link" : "C010",
             "id" : "S026",
-            "line" : "Jubilee",
-            "name" : "Stanmore"
+            "name" : "Stanmore",
+            "line" : "Jubilee:1",
+            "link" : "C010"
          },
          {
-            "line" : "District,Hammersmith & City",
-            "name" : "Stepney Green",
+            "link" : "W029,M006",
+            "line" : "Hammersmith & City:21,District:44",
             "id" : "S027",
-            "link" : "W029,M006"
+            "name" : "Stepney Green"
          },
          {
-            "line" : "Northern,Victoria",
-            "name" : "Stockwell",
+            "line" : "Northern:40,Victoria:15",
+            "link" : "B025,V001,O004,C022",
             "id" : "S028",
-            "link" : "B025,V001,O004,C022"
+            "name" : "Stockwell"
          },
          {
             "link" : "W012,H010",
+            "line" : "Overground:12,Bakerloo:6",
             "id" : "S029",
-            "line" : "Overground,Bakerloo",
             "name" : "Stonebridge Park"
          },
          {
-            "line" : "Central,DLR,Overground,Jubilee",
-            "name" : "Stratford",
             "id" : "S030",
-            "link" : "M006,L008,W018,P014,H002,S037,S038"
+            "name" : "Stratford",
+            "link" : "M006,L008,W018,P014,H002,S037,S038",
+            "line" : "Overground:83,Jubilee:27,Central:29,DLR:24"
          },
          {
-            "name" : "Sudbury Hill",
-            "line" : "Piccadilly",
             "id" : "S031",
+            "name" : "Sudbury Hill",
+            "line" : "Piccadilly:9",
             "link" : "S032,S011"
          },
          {
-            "line" : "Piccadilly",
-            "name" : "Sudbury Town",
             "link" : "A006,S031",
+            "line" : "Piccadilly:10",
+            "name" : "Sudbury Town",
             "id" : "S032"
          },
          {
+            "id" : "S033",
             "name" : "Surrey Quays",
-            "line" : "Overground",
             "link" : "N003,N002,C005",
-            "id" : "S033"
+            "line" : "Overground:35"
          },
          {
-            "id" : "S034",
             "link" : "F004,S023",
-            "line" : "Jubilee",
+            "line" : "Jubilee:12",
+            "id" : "S034",
             "name" : "Swiss Cottage"
          },
          {
-            "id" : "S035",
             "link" : "P004,C031,F007",
-            "line" : "Overground",
-            "name" : "Sydenham"
+            "line" : "Overground:41",
+            "name" : "Sydenham",
+            "id" : "S035"
          },
          {
-            "link" : "C007,W018",
             "id" : "S036",
             "name" : "Star Lane",
-            "line" : "DLR"
+            "link" : "C007,W018",
+            "line" : "DLR:28"
          },
          {
             "name" : "Stratford High Street",
-            "line" : "DLR",
+            "id" : "S037",
             "link" : "S030,A013",
-            "id" : "S037"
+            "line" : "DLR:25"
          },
          {
-            "line" : "DLR",
             "name" : "Stratford International",
-            "link" : "S030",
-            "id" : "S038"
+            "id" : "S038",
+            "line" : "",
+            "link" : "S030"
          },
          {
-            "link" : "B015,E015",
+            "name" : "Temple",
             "id" : "T001",
-            "line" : "Circle,District",
-            "name" : "Temple"
+            "link" : "B015,E015",
+            "line" : "District:36,Circle:25"
          },
          {
-            "id" : "T002",
+            "line" : "Central:48",
             "link" : "D005,E016",
-            "name" : "Theydon Bois",
-            "line" : "Central"
+            "id" : "T002",
+            "name" : "Theydon Bois"
          },
          {
+            "name" : "Tooting Bec",
             "id" : "T003",
-            "link" : "B002,T004",
-            "line" : "Northern",
-            "name" : "Tooting Bec"
+            "line" : "Northern:45",
+            "link" : "B002,T004"
          },
          {
             "id" : "T004",
-            "link" : "T003,C025",
             "name" : "Tooting Broadway",
-            "line" : "Northern"
+            "line" : "Northern:46",
+            "link" : "T003,C025"
          },
          {
-            "id" : "T005",
             "link" : "G005,L006",
-            "line" : "Northern",
+            "line" : "Northern:25,Central:21",
+            "id" : "T005",
             "name" : "Tottenham Court Road"
          },
          {
+            "line" : "Victoria:3",
             "link" : "S001,B016",
             "id" : "T006",
-            "line" : "Victoria",
             "name" : "Tottenham Hale"
          },
          {
-            "line" : "Northern",
-            "name" : "Totteridge & Whetstone",
+            "link" : "W038,H021",
+            "line" : "Northern:2",
             "id" : "T007",
-            "link" : "W038,H021"
+            "name" : "Totteridge & Whetstone"
          },
          {
-            "link" : "S002",
-            "id" : "T008",
-            "line" : "DLR",
             "name" : "Tower Gateway",
-            "other_link" : "Street:T009"
+            "id" : "T008",
+            "link" : "S002",
+            "other_link" : "Street:T009",
+            "line" : "DLR:1"
          },
          {
-            "other_link" : "Street:T008",
             "name" : "Tower Hill",
-            "line" : "Circle,District",
             "id" : "T009",
-            "link" : "A003,A004,M009"
+            "link" : "A003,A004,M009",
+            "line" : "District:41,Circle:20",
+            "other_link" : "Street:T008"
          },
          {
+            "id" : "T010",
             "name" : "Tufnell Park",
-            "line" : "Northern",
             "link" : "K005,A010",
-            "id" : "T010"
+            "line" : "Northern:10"
          },
          {
-            "id" : "T011",
             "link" : "S025,C018,G012,H005,A002",
-            "line" : "District,Piccadilly",
-            "name" : "Turnham Green"
+            "line" : "District:8,Piccadilly:27",
+            "name" : "Turnham Green",
+            "id" : "T011"
          },
          {
             "link" : "M002,W034",
+            "line" : "Piccadilly:47",
             "id" : "T012",
-            "name" : "Turnpike Lane",
-            "line" : "Piccadilly"
+            "name" : "Turnpike Lane"
          },
          {
-            "id" : "U001",
             "link" : "U002",
+            "line" : "District:59",
             "name" : "Upminster",
-            "line" : "District"
+            "id" : "U001"
          },
          {
-            "name" : "Upminster Bridge",
-            "line" : "District",
+            "line" : "District:58",
+            "link" : "H031,U001",
             "id" : "U002",
-            "link" : "H031,U001"
+            "name" : "Upminster Bridge"
          },
          {
-            "link" : "B005,B011",
             "id" : "U003",
-            "line" : "District",
-            "name" : "Upney"
+            "name" : "Upney",
+            "link" : "B005,B011",
+            "line" : ""
          },
          {
-            "id" : "U004",
             "link" : "G006,C029",
-            "name" : "Upper Holloway",
-            "line" : "Overground"
+            "line" : "Overground:68",
+            "id" : "U004",
+            "name" : "Upper Holloway"
          },
          {
-            "line" : "District,Hammersmith & City",
+            "id" : "U005",
             "name" : "Upton Park",
             "link" : "P009,E006",
-            "id" : "U005"
+            "line" : "Hammersmith & City:27,District:50"
          },
          {
-            "link" : "H025",
+            "name" : "Uxbridge",
             "id" : "U006",
-            "line" : "Metropolitan,Piccadilly",
-            "name" : "Uxbridge"
+            "link" : "H025",
+            "line" : "Metropolitan:22,Piccadilly:1"
          },
          {
-            "line" : "Victoria",
-            "name" : "Vauxhall",
+            "line" : "Victoria:14",
             "link" : "S028,P007",
-            "id" : "V001"
+            "id" : "V001",
+            "name" : "Vauxhall"
          },
          {
             "id" : "V002",
-            "link" : "P007,G009,S006,S022",
             "name" : "Victoria",
-            "line" : "Circle,District,Victoria"
+            "link" : "P007,G009,S006,S022",
+            "line" : "District:32,Victoria:12,Circle:29"
          },
          {
-            "link" : "B016",
-            "id" : "W001",
             "name" : "Walthamstow Central",
-            "line" : "Victoria"
+            "id" : "W001",
+            "link" : "B016",
+            "line" : "Victoria:1"
          },
          {
-            "name" : "Walthamstow Queen's Road",
-            "line" : "Overground",
             "link" : "B016,L009",
-            "id" : "W002"
+            "line" : "Overground:73",
+            "id" : "W002",
+            "name" : "Walthamstow Queen's Road"
          },
          {
             "id" : "W003",
-            "link" : "L010,R003",
-            "line" : "Central",
-            "name" : "Wanstead"
+            "name" : "Wanstead",
+            "line" : "Central:32",
+            "link" : "L010,R003"
          },
          {
             "name" : "Wanstead Park",
-            "line" : "Overground",
             "id" : "W004",
-            "link" : "L009,W037"
+            "link" : "L009,W037",
+            "line" : "Overground:76"
          },
          {
             "link" : "R008,S002",
+            "line" : "Overground:49",
             "id" : "W005",
-            "line" : "Overground",
             "name" : "Wapping"
          },
          {
             "name" : "Warren Street",
-            "line" : "Northern,Victoria",
             "id" : "W006",
-            "link" : "O005,E017,G005"
+            "link" : "O005,E017,G005",
+            "line" : "Northern:23,Victoria:9"
          },
          {
-            "id" : "W007",
-            "link" : "M001,P001",
             "name" : "Warwick Avenue",
-            "line" : "Bakerloo"
+            "id" : "W007",
+            "line" : "Bakerloo:13",
+            "link" : "M001,P001"
          },
          {
+            "name" : "Waterloo",
             "id" : "W008",
-            "link" : "E015,L002,W027,S021,B003,K001",
-            "line" : "Northern,Bakerloo,Jubilee,Waterloo & City",
-            "name" : "Waterloo"
+            "line" : "Northern:29,Jubilee:18,Waterloo & City:2,Bakerloo:23",
+            "link" : "E015,L002,W027,S021,B003,K001"
          },
          {
-            "line" : "Metropolitan",
+            "line" : "Metropolitan:29",
+            "link" : "C030",
             "name" : "Watford",
-            "id" : "W009",
-            "link" : "C030"
+            "id" : "W009"
          },
          {
             "link" : "B031,W011",
-            "id" : "W010",
-            "line" : "Overground",
-            "name" : "Watford High Street"
+            "line" : "Overground:2",
+            "name" : "Watford High Street",
+            "id" : "W010"
          },
          {
-            "id" : "W011",
             "link" : "W010",
-            "line" : "Overground",
-            "name" : "Watford Junction"
+            "line" : "Overground:1",
+            "name" : "Watford Junction",
+            "id" : "W011"
          },
          {
             "id" : "W012",
-            "link" : "N010,S029",
             "name" : "Wembley Central",
-            "line" : "Overground,Bakerloo"
+            "line" : "Overground:11,Bakerloo:5",
+            "link" : "N010,S029"
          },
          {
-            "link" : "K014,N001,F004,P012,H012",
             "id" : "W013",
-            "line" : "Metropolitan,Jubilee",
-            "name" : "Wembley Park"
+            "name" : "Wembley Park",
+            "line" : "Jubilee:5,Metropolitan:11",
+            "link" : "K014,N001,F004,P012,H012"
          },
          {
+            "line" : "Central:9",
             "link" : "E001,N006",
             "id" : "W014",
-            "line" : "Central",
             "name" : "West Acton"
          },
          {
-            "id" : "W015",
+            "line" : "District:21,Overground:27",
             "link" : "E003,F008,K004,I002",
-            "line" : "District,Overground",
+            "id" : "W015",
             "name" : "West Brompton"
          },
          {
-            "name" : "West Croydon",
-            "line" : "Overground",
             "id" : "W016",
+            "name" : "West Croydon",
+            "line" : "Overground:46",
             "link" : "N015"
          },
          {
-            "link" : "F003,W038",
+            "name" : "West Finchley",
             "id" : "W017",
-            "line" : "Northern",
-            "name" : "West Finchley"
+            "link" : "F003,W038",
+            "line" : "Northern:4"
          },
          {
-            "id" : "W018",
             "link" : "S030,B027,P009,S036,A013",
+            "line" : "Hammersmith & City:25,District:48,Jubilee:26,DLR:27",
             "name" : "West Ham",
-            "line" : "DLR,Jubilee,District,Hammersmith & City"
+            "id" : "W018"
          },
          {
-            "name" : "West Hampstead",
-            "line" : "Jubilee",
+            "line" : "Overground:64,Jubilee:10",
+            "link" : "K009,F004",
             "id" : "W019",
-            "link" : "K009,F004"
+            "name" : "West Hampstead"
          },
          {
-            "link" : "H012,R002",
             "id" : "W020",
-            "line" : "Metropolitan",
-            "name" : "West Harrow"
+            "name" : "West Harrow",
+            "line" : "Metropolitan:15",
+            "link" : "H012,R002"
          },
          {
+            "id" : "W021",
             "name" : "West India Quay",
-            "line" : "DLR",
-            "link" : "P011,C006,W026",
-            "id" : "W021"
+            "line" : "DLR:7",
+            "link" : "P011,C006,W026"
          },
          {
-            "name" : "West Kensington",
-            "line" : "District",
             "link" : "E003,B007",
+            "line" : "District:13",
+            "name" : "West Kensington",
             "id" : "W022"
          },
          {
             "name" : "West Ruislip",
-            "line" : "Central",
-            "link" : "R013",
-            "id" : "W023"
+            "id" : "W023",
+            "line" : "Central:1",
+            "link" : "R013"
          },
          {
-            "id" : "W024",
+            "line" : "DLR:40",
             "link" : "C007,P010",
-            "name" : "West Silvertown",
-            "line" : "DLR"
+            "id" : "W024",
+            "name" : "West Silvertown"
          },
          {
-            "id" : "W025",
+            "line" : "Hammersmith & City:7,Circle:7",
             "link" : "L001,R010",
-            "line" : "Circle,Hammersmith & City",
+            "id" : "W025",
             "name" : "Westbourne Park"
          },
          {
-            "line" : "DLR",
-            "name" : "Westferry",
             "link" : "P011,L011,W021",
+            "line" : "DLR:5",
+            "name" : "Westferry",
             "id" : "W026"
          },
          {
-            "line" : "Circle,District,Jubilee",
             "name" : "Westminster",
             "id" : "W027",
+            "line" : "District:34,Jubilee:17,Circle:27",
             "link" : "S022,G009,W008,E015"
          },
          {
-            "line" : "Central",
+            "id" : "W028",
             "name" : "White City",
             "link" : "E004,S003,W035",
-            "id" : "W028"
+            "line" : "Central:12"
          },
          {
-            "id" : "W029",
             "link" : "A004,S027,S002,S005",
-            "line" : "District,Hammersmith & City,Overground",
+            "line" : "Hammersmith & City:20,District:43,Overground:51",
+            "id" : "W029",
             "name" : "Whitechapel"
          },
          {
             "link" : "D008,K009",
-            "id" : "W030",
+            "line" : "Jubilee:8",
             "name" : "Willesden Green",
-            "line" : "Jubilee"
+            "id" : "W030"
          },
          {
-            "name" : "Willesdon Junction",
-            "line" : "Overground,Bakerloo",
             "link" : "H010,K002,K003,A001,S003",
+            "line" : "",
+            "name" : "Willesdon Junction",
             "id" : "W031"
          },
          {
-            "link" : "W033",
             "id" : "W032",
-            "line" : "District",
-            "name" : "Wimbledon"
+            "name" : "Wimbledon",
+            "line" : "District:14",
+            "link" : "W033"
          },
          {
-            "link" : "S019,W032",
-            "id" : "W033",
             "name" : "Wimbledon Park",
-            "line" : "District"
+            "id" : "W033",
+            "link" : "S019,W032",
+            "line" : "District:15"
          },
          {
-            "link" : "T012,B021",
             "id" : "W034",
-            "line" : "Piccadilly",
-            "name" : "Wood Green"
+            "name" : "Wood Green",
+            "line" : "Piccadilly:48",
+            "link" : "T012,B021"
          },
          {
-            "line" : "Circle,Hammersmith & City",
+            "line" : "Hammersmith & City:4,Circle:4",
+            "link" : "W028,S004,L005",
             "name" : "Wood Lane",
-            "id" : "W035",
-            "link" : "W028,S004,L005"
+            "id" : "W035"
          },
          {
+            "line" : "Central:44",
             "link" : "B029,S018",
-            "id" : "W036",
             "name" : "Woodford",
-            "line" : "Central"
+            "id" : "W036"
          },
          {
-            "line" : "Overground",
-            "name" : "Woodgrange Park",
             "link" : "W004,B005",
+            "line" : "Overground:77",
+            "name" : "Woodgrange Park",
             "id" : "W037"
          },
          {
+            "line" : "Northern:3",
+            "link" : "W017,T007",
             "name" : "Woodside Park",
-            "line" : "Northern",
-            "id" : "W038",
-            "link" : "W017,T007"
+            "id" : "W038"
          },
          {
             "id" : "W039",
+            "name" : "Woolwich Arsenal",
             "link" : "K012",
-            "line" : "DLR",
-            "name" : "Woolwich Arsenal"
+            "line" : "DLR:44"
          }
       ]
    },
@@ -2156,43 +2156,43 @@
       "line" : [
          {
             "color" : "#550000",
-            "name" : "Bakerloo",
-            "id" : "Bakerloo"
+            "id" : "Bakerloo",
+            "name" : "Bakerloo"
          },
          {
             "color" : "#8B0000",
-            "name" : "Central",
-            "id" : "Central"
+            "id" : "Central",
+            "name" : "Central"
          },
          {
+            "id" : "Circle",
             "color" : "#FFFF00",
-            "name" : "Circle",
-            "id" : "Circle"
+            "name" : "Circle"
          },
          {
-            "color" : "#006400",
             "name" : "District",
+            "color" : "#006400",
             "id" : "District"
          },
          {
-            "id" : "DLR",
             "name" : "DLR",
+            "id" : "DLR",
             "color" : "#00CED1"
          },
          {
-            "color" : "#FF69B4",
             "name" : "Hammersmith & City",
+            "color" : "#FF69B4",
             "id" : "Hammersmith & City"
          },
          {
+            "name" : "Jubilee",
             "id" : "Jubilee",
-            "color" : "#2F4F4F",
-            "name" : "Jubilee"
+            "color" : "#2F4F4F"
          },
          {
-            "id" : "Metropolitan",
+            "name" : "Metropolitan",
             "color" : "#8B008B",
-            "name" : "Metropolitan"
+            "id" : "Metropolitan"
          },
          {
             "id" : "Northern",
@@ -2200,23 +2200,23 @@
             "name" : "Northern"
          },
          {
+            "name" : "Overground",
             "id" : "Overground",
-            "color" : "#ff4f00",
-            "name" : "Overground"
+            "color" : "#ff4f00"
          },
          {
-            "name" : "Piccadilly",
+            "id" : "Piccadilly",
             "color" : "#000080",
-            "id" : "Piccadilly"
+            "name" : "Piccadilly"
          },
          {
+            "color" : "#000080",
             "id" : "Victoria",
-            "name" : "Victoria",
-            "color" : "#000080"
+            "name" : "Victoria"
          },
          {
-            "color" : "#00CED1",
             "name" : "Waterloo & City",
+            "color" : "#00CED1",
             "id" : "Waterloo & City"
          }
       ]

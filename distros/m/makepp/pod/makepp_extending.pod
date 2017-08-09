@@ -2,7 +2,7 @@
 
 makepp_extending -- How to extend makepp using Perl
 
-=for vc $Id: makepp_extending.pod,v 1.21 2012/05/15 21:26:30 pfeiffer Exp $
+=for vc $Id: makepp_extending.pod,v 1.24 2016/09/12 20:33:41 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -24,11 +24,11 @@ Thus any Perl code you write has access to all makefile variables.  Global
 variables are stored in the C<Mpp::global> package.  See L<Makefile
 variables|makepp_variables/"Variables and Perl"> for the details.
 
-Each of the statements (L<ifperl / ifmakeperl|makepp_statements/ifperl_perlcode>,
-L<perl / makeperl|makepp_statements/perl_perlcode>, L<sub /
-makesub|makepp_statements/sub>), the functions (L<perl /
-makeperl|makepp_functions/perl_perlcode>, L<map / makemap|makepp_functions/map_words_perlcode>) and
-the rule action (L<perl / makeperl|makepp_rules/perl>) for writing Perl code
+Each of the statements (L<ifperl E<sol> ifmakeperl|makepp_statements/ifperl_perlcode>,
+L<perl E<sol> makeperl|makepp_statements/perl_perlcode>, L<sub E<sol>
+makesub|makepp_statements/sub>), the functions (L<perl E<sol>
+makeperl|makepp_functions/perl_perlcode>, L<map E<sol> makemap|makepp_functions/map_words_perlcode>) and
+the rule action (L<perl E<sol> makeperl|makepp_rules/perl>) for writing Perl code
 directly in the makefile come in two flavours.  The first is absolutely normal
 Perl, meaning you have to use the C<f_> prefix as explained in the next
 section, if you want to call makepp functions.  The second variant first
@@ -55,12 +55,12 @@ example:
     sub f_myfunc {
       my $argument = &arg; 	# Name the argument.
       my( undef, $mkfile, $mkfile_line ) = @_; # Name the arguments.
- 
+
       ... do something here
- 
+
       return $return_value;
     }
- 
+
     XYZ := $(myfunc my func arguments)
 
 If your function takes no arguments, there is nothing to do.  If your function
@@ -127,7 +127,7 @@ something like this:
     sub f_foo {
       ...
       chdir $makefile->{CWD};
- 
+
       ... etc.
     }
 
@@ -169,15 +169,17 @@ exactly the same as Shell) arguments.  If such a function cannot be found,
 this passes all strings to L<C<run>|/run_script_arguments>.
 
     sub c_mycmd { my @args = @_; ... }
- 
+
     $(phony callcmd):
     	&mycmd 'arg with space' arg2 "arg3" # calls c_mycmd
- 
+
     %.out: %.in
-    	&myscript -o $(output) $(input) # calls external myscript
+    	&./myscript -o $(output) $(input) # calls external myscript
 
 You can write your commands within the framework of the builtins, allowing you
 to use the same standard options as they have, and the I/O handling they give.
+As of Perl 5.26 you may have to give a relative path to an external script,
+since F<.> can be dropped from C<@INC>.
 
 The block operator C<Mpp::Cmds::frame> is followed by a single letter option
 list of the builtins (maximally C<qw(f i I o O r s)>).  Even if you specify
@@ -193,19 +195,19 @@ else the option value is stored in it.
     sub c_my_ocmd {		# Typical output case
       local @ARGV = @_;
       Mpp::Cmds::frame {
- 
+
  	... print something here with @ARGV, with options already automatically removed
- 
+
       } 'f', qw(o O);
     }
- 
+
     sub c_my_icmd {		# Typical input case with 2 options
       local @ARGV = @_;
       my( $short, $long );
       Mpp::Cmds::frame {
- 
+
  	... do something here with <>
- 
+
       } qw(i I r s),		# s specifies only --separator, not -s
  	[qw(s short), \$short],	# No option arg -> $short == 1
  	[qw(l long), \$long, 1, sub { warn "got arg $long"}];
@@ -242,7 +244,7 @@ real work into a lib, as pod2html does.  This lib can then get used in the top
 level, so that it's already present:
 
     perl { use mylib }		# gets forked to all rules which needn't reparse it
- 
+
     %.out: %.in
     	makeperl { run qw'myscript -o $(output) $(input)' }
 
@@ -318,14 +320,14 @@ So the file F<Mpp/Signature/shared_object.pm> might contain the following:
           $finfo) = @_;          # A special structure that contains everything
                                  # makepp knows about this file.  See
                                  # Mpp/File.pm for details.
- 
+
       if ($finfo->{NAME} =~ /\.s[oa]$/) { # Does the file name end in .so or .sa?
         return $finfo->file_exists ? 'exists' : '';
                                  # Always return the same signature if the file
                                  # exists.  In this case, the signature is the
                                  # string "exists".
       }
- 
+
       Mpp::Signature::c_compilation_md5::signature;
                                  # If the file didn't end in .so or .sa,
                                  # delegate to makepp's usual signature method.

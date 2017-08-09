@@ -1,0 +1,9 @@
+0.002    2017-08-03 (PERLANCAR)
+
+         - Rename dist/module from Log-ger-LevelFromEnv to
+           Log-ger-Level-FromEnv.
+
+
+0.001    2017-06-19 (PERLANCAR)
+
+         - First release.

@@ -1,20 +1,15 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 use Config;
 use File::Temp qw( tempdir );
 use File::chdir;
 use FFI::Platypus;
-use Path::Class qw( file dir );
 
-plan skip_all => 'may be unsupported';
-plan skip_all => "unsupported on $^O" if $^O =~ /bsd$/i || $^O eq 'darwin';
-plan tests => 1;
+skip_all 'may be unsupported';
+skip_all "unsupported on $^O" if $^O =~ /bsd$/i || $^O eq 'darwin';
 
 subtest exe => sub
 {
-  plan tests => 5;
   local $CWD = tempdir( CLEANUP => 1 );
 
   my $tcc = FFI::TinyCC->new;
@@ -34,14 +29,14 @@ subtest exe => sub
   
   my $exe = "foo$Config{exe_ext}";
   
-  note "exe=" . file($CWD, $exe);
+  note "exe=" . "$CWD/$exe";
   
   eval { $tcc->output_file($exe) };
   is $@, '', 'tcc.output_file';
   
   ok -f $exe, "created output file";
   
-  system file($CWD, $exe), 'list', 'form';
+  system "$CWD/$exe", 'list', 'form';
   my $ret = $?;
   is $ret >> 8, 42, 'return value 42';
   unless($ret >> 8 == 42)
@@ -62,3 +57,4 @@ subtest exe => sub
 
 };
 
+done_testing;

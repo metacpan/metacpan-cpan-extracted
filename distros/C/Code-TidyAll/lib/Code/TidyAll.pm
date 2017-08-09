@@ -12,7 +12,7 @@ use Data::Dumper;
 use Date::Format;
 use Digest::SHA qw(sha1_hex);
 use File::Find qw(find);
-use File::Zglob;
+use File::Zglob qw(zglob);
 use List::SomeUtils qw(uniq);
 use Module::Runtime qw( use_module );
 use Path::Tiny qw(path);
@@ -28,7 +28,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -176,6 +176,13 @@ has 'plugins_for_mode' => (
     init_arg => undef,
 );
 
+has '_plugins_for_path' => (
+    is  => 'lazy',
+    isa => t( 'HashRef', of => t('HashRef') ),
+    default  => sub { {} },
+    init_arg => undef,
+);
+
 with qw( Code::TidyAll::Role::HasIgnore Code::TidyAll::Role::Tempdir );
 
 sub _build_backup_dir {
@@ -192,6 +199,11 @@ sub _build_base_sig {
     my $self = shift;
     my $active_plugins = join( q{|}, map { $_->name } @{ $self->plugin_objects } );
     return $self->_sig( [ $Code::TidyAll::VERSION || 0, $active_plugins ] );
+}
+
+sub _sig {
+    my ( $self, $data ) = @_;
+    return sha1_hex( join( ',', @$data ) );
 }
 
 sub _build_cache {
@@ -216,6 +228,18 @@ sub _build_plugins_for_mode {
     return $plugins;
 }
 
+sub _plugin_conf_matches_mode {
+    my ( $self, $conf, $mode ) = @_;
+
+    if ( my $only_modes = $conf->{only_modes} ) {
+        return 0 if ( q{ } . $only_modes . q{ } ) !~ / $mode /;
+    }
+    if ( my $except_modes = $conf->{except_modes} ) {
+        return 0 if ( q{ } . $except_modes . q{ } ) =~ / $mode /;
+    }
+    return 1;
+}
+
 sub _build_plugin_objects {
     my $self = shift;
     my @plugin_objects = map { $self->_load_plugin( $_, $self->plugins->{$_} ) }
@@ -226,6 +250,32 @@ sub _build_plugin_objects {
     # alphabetical
     # TODO: These should probably sort in a consistent way independent of locale
     return [ sort { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) } @plugin_objects ];
+}
+
+sub _load_plugin {
+    my ( $self, $plugin_name, $plugin_conf ) = @_;
+
+    # Extract first name in case there is a description
+    #
+    my ($plugin_fname) = ( $plugin_name =~ /^(\S+)/ );
+
+    my $plugin_class = (
+        $plugin_fname =~ /^\+/
+        ? substr( $plugin_fname, 1 )
+        : "Code::TidyAll::Plugin::$plugin_fname"
+    );
+    try {
+        use_module($plugin_class) || die 'not found';
+    }
+    catch {
+        die qq{could not load plugin class '$plugin_class': $_};
+    };
+
+    return $plugin_class->new(
+        name    => $plugin_name,
+        tidyall => $self,
+        %$plugin_conf
+    );
 }
 
 sub BUILD {
@@ -242,14 +292,37 @@ sub BUILD {
         );
     }
 
-    $self->{plugins_for_path} = {};
-
     unless ( $self->no_backups ) {
         $self->backup_dir->mkpath( { mode => 0775 } );
         $self->_purge_backups_periodically();
     }
 
     @INC = ( @{ $self->inc }, @INC );
+}
+
+sub _purge_backups_periodically {
+    my ($self) = @_;
+    my $cache = $self->cache;
+    my $last_purge_backups = $cache->get('last_purge_backups') || 0;
+    if ( time > $last_purge_backups + $self->backup_ttl_secs ) {
+        $self->_purge_backups();
+        $cache->set( 'last_purge_backups', time() );
+    }
+}
+
+sub _purge_backups {
+    my ($self) = @_;
+    $self->msg('purging old backups') if $self->verbose;
+    find(
+        {
+            follow => 0,
+            wanted => sub {
+                unlink $_ if -f && /\.bak$/ && time > ( stat($_) )[9] + $self->backup_ttl_secs;
+            },
+            no_chdir => 1
+        },
+        $self->backup_dir
+    );
 }
 
 sub new_from_conf_file {
@@ -284,6 +357,17 @@ sub new_from_conf_file {
     }
 
     return $class->new(%params);
+}
+
+sub _read_conf_file {
+    my ( $class, $conf_file ) = @_;
+    my $conf_string = $conf_file->slurp_utf8;
+    my $root_dir    = $conf_file->parent;
+    $conf_string =~ s/\$ROOT/$root_dir/g;
+    my $conf_hash = Code::TidyAll::Config::INI::Reader->read_string($conf_string);
+    die qq{'$conf_file' did not evaluate to a hash}
+        unless ( ref($conf_hash) eq 'HASH' );
+    return $conf_hash;
 }
 
 sub _dump_params {
@@ -350,44 +434,6 @@ sub _recurse_dump {
     die '_recurse_dump was called with a value that is neither a hashref nor an arrayref';
 }
 
-sub _load_plugin {
-    my ( $self, $plugin_name, $plugin_conf ) = @_;
-
-    # Extract first name in case there is a description
-    #
-    my ($plugin_fname) = ( $plugin_name =~ /^(\S+)/ );
-
-    my $plugin_class = (
-        $plugin_fname =~ /^\+/
-        ? substr( $plugin_fname, 1 )
-        : "Code::TidyAll::Plugin::$plugin_fname"
-    );
-    try {
-        use_module($plugin_class) || die 'not found';
-    }
-    catch {
-        die qq{could not load plugin class '$plugin_class': $_};
-    };
-
-    return $plugin_class->new(
-        name    => $plugin_name,
-        tidyall => $self,
-        %$plugin_conf
-    );
-}
-
-sub _plugin_conf_matches_mode {
-    my ( $self, $conf, $mode ) = @_;
-
-    if ( my $only_modes = $conf->{only_modes} ) {
-        return 0 if ( q{ } . $only_modes . q{ } ) !~ / $mode /;
-    }
-    if ( my $except_modes = $conf->{except_modes} ) {
-        return 0 if ( q{ } . $except_modes . q{ } ) =~ / $mode /;
-    }
-    return 1;
-}
-
 sub process_all {
     my $self = shift;
 
@@ -400,7 +446,7 @@ sub process_paths {
     @paths = map {
         try { $_->realpath }
             || $_->absolute
-    } map { path($_) } @paths;
+    } map { path($_) } sort { $a cmp $b } @paths;
 
     if ( $self->jobs > 1 && @paths > 1 ) {
         return $self->_process_parallel(@paths);
@@ -515,6 +561,21 @@ sub process_file {
     return $result;
 }
 
+sub _small_path {
+    my ( $self, $path ) = @_;
+    die sprintf( q{'%s' is not underneath root dir '%s'!}, $path, $self->root_dir )
+        unless index( $path, $self->root_dir ) == 0;
+    return path( substr( $path . q{}, length( $self->root_dir ) + 1 ) );
+}
+
+sub plugins_for_path {
+    my ( $self, $path ) = @_;
+
+    $self->_plugins_for_path->{$path}
+        ||= [ grep { $_->matches_path($path) } @{ $self->plugin_objects } ];
+    return @{ $self->_plugins_for_path->{$path} };
+}
+
 sub _cache_model_for {
     my ( $self, $path, $full_path ) = @_;
     return $self->cache_model_class->new(
@@ -523,6 +584,21 @@ sub _cache_model_for {
         cache_engine => $self->no_cache ? undef : $self->cache,
         base_sig     => $self->base_sig,
     );
+}
+
+sub _backup_file {
+    my ( $self, $path, $contents ) = @_;
+    unless ( $self->no_backups ) {
+        my $backup_file = $self->backup_dir->child( $self->_backup_filename($path) );
+        $backup_file->parent->mkpath( { mode => 0775 } );
+        $backup_file->spew($contents);
+    }
+}
+
+sub _backup_filename {
+    my ( $self, $path ) = @_;
+
+    return join( q{}, $path, '-', time2str( '%Y%m%d-%H%M%S', time ), '.bak' );
 }
 
 sub process_source {
@@ -599,54 +675,15 @@ sub process_source {
     }
 }
 
-sub _read_conf_file {
-    my ( $class, $conf_file ) = @_;
-    my $conf_string = $conf_file->slurp_utf8;
-    my $root_dir    = $conf_file->parent;
-    $conf_string =~ s/\$ROOT/$root_dir/g;
-    my $conf_hash = Code::TidyAll::Config::INI::Reader->read_string($conf_string);
-    die qq{'$conf_file' did not evaluate to a hash}
-        unless ( ref($conf_hash) eq 'HASH' );
-    return $conf_hash;
-}
-
-sub _backup_file {
-    my ( $self, $path, $contents ) = @_;
-    unless ( $self->no_backups ) {
-        my $backup_file = $self->backup_dir->child( $self->_backup_filename($path) );
-        $backup_file->parent->mkpath( { mode => 0775 } );
-        $backup_file->spew($contents);
-    }
-}
-
-sub _backup_filename {
-    my ( $self, $path ) = @_;
-
-    return join( q{}, $path, '-', time2str( '%Y%m%d-%H%M%S', time ), '.bak' );
-}
-
-sub _purge_backups_periodically {
-    my ($self) = @_;
-    my $cache = $self->cache;
-    my $last_purge_backups = $cache->get('last_purge_backups') || 0;
-    if ( time > $last_purge_backups + $self->backup_ttl_secs ) {
-        $self->_purge_backups();
-        $cache->set( 'last_purge_backups', time() );
-    }
-}
-
-sub _purge_backups {
-    my ($self) = @_;
-    $self->msg('purging old backups') if $self->verbose;
-    find(
-        {
-            follow => 0,
-            wanted => sub {
-                unlink $_ if -f && /\.bak$/ && time > ( stat($_) )[9] + $self->backup_ttl_secs;
-            },
-            no_chdir => 1
-        },
-        $self->backup_dir
+sub _error_result {
+    my ( $self, $msg, $path, $orig_contents, $new_contents ) = @_;
+    $self->msg( '%s', $msg );
+    return Code::TidyAll::Result->new(
+        path          => $path,
+        state         => 'error',
+        error         => $msg,
+        orig_contents => $orig_contents,
+        new_contents  => $new_contents,
     );
 }
 
@@ -677,12 +714,11 @@ sub _find_conf_file_upward {
             my $try_path = $search_dir->child($conf_name);
             return $try_path if $try_path->is_file;
         }
-        if ( $search_dir eq '/' ) {
-            return undef;
-        }
-        else {
-            $search_dir = $search_dir->parent;
-        }
+
+        my $parent = $search_dir->parent;
+        last if $parent eq $search_dir;
+        $search_dir = $parent;
+
         die 'inf loop!' if ++$cnt > 100;
     }
 }
@@ -690,49 +726,46 @@ sub _find_conf_file_upward {
 sub find_matched_files {
     my ($self) = @_;
 
-    my @matched_files;
-    my $plugins_for_path = $self->{plugins_for_path};
+    my $plugins_for_path = $self->_plugins_for_path;
     my $root_length      = length( $self->root_dir );
-    foreach my $plugin ( @{ $self->plugin_objects } ) {
-        my @selected = grep { -f && !-l } $self->_zglob( $plugin->selects );
-        my @ignores = ( @{ $self->ignores || [] }, @{ $plugin->ignores || [] } );
-        if (@ignores) {
-            my %is_ignored = map { ( $_, 1 ) } $self->_zglob( \@ignores );
-            @selected = grep { !$is_ignored{$_} } @selected;
-        }
-        if ( my $shebang = $plugin->shebang ) {
-            my $re = join '|', map {quotemeta} @{$shebang};
-            $re       = qr/^#!.*\b(?:$re)\b/;
-            @selected = grep {
-                my $fh;
-                open $fh, '<', $_ and <$fh> =~ /$re/;
-            } @selected;
-        }
-        push( @matched_files, @selected );
-        foreach my $file (@selected) {
+
+    my @all;
+    for my $plugin ( @{ $self->plugin_objects } ) {
+        my @matched = $self->_matched_by_plugin($plugin);
+        push @all, @matched;
+
+        # When we end up in process_source we'll need to know which plugins
+        # match a given file. This could be (re-)calculated When we call
+        # ->plugins_for_path($file) there but since we already know the path
+        # to plugin mapping, we might as well store it here.
+        for my $file (@matched) {
             my $path = substr( $file, $root_length + 1 );
             $plugins_for_path->{$path} ||= [];
-            push( @{ $plugins_for_path->{$path} }, $plugin );
+            push @{ $plugins_for_path->{$path} }, $plugin;
         }
     }
 
-    return map { path($_) } sort( uniq(@matched_files) );
+    return map { path($_) } uniq(@all);
 }
 
-sub plugins_for_path {
-    my ( $self, $path ) = @_;
+sub _matched_by_plugin {
+    my $self   = shift;
+    my $plugin = shift;
 
-    $self->{plugins_for_path}->{$path}
-        ||= [ grep { $_->matches_path($path) } @{ $self->plugin_objects } ];
-    return @{ $self->{plugins_for_path}->{$path} };
-}
+    my %is_ignored = map { $_ => 1 }
+        $self->_zglob( [ @{ $self->ignores || [] }, @{ $plugin->ignores || [] } ] );
+    my @matched = grep { !$is_ignored{$_} } grep { -f && !-l } $self->_zglob( $plugin->selects );
 
-sub _parse_zglob_list {
-    my ( $self, $zglobs ) = @_;
-    if ( my ($bad_zglob) = ( grep {m{^/}} @{$zglobs} ) ) {
-        die qq{zglob '$bad_zglob' should not begin with slash};
-    }
-    return $zglobs;
+    my $shebang = $plugin->shebang
+        or return @matched;
+
+    my $re = join '|', map {quotemeta} @{$shebang};
+    $re = qr/^#!.*\b(?:$re)\b/;
+    return grep {
+        my $fh;
+        open $fh, '<', $_ or die $!;
+        scalar <$fh> =~ /$re/;
+    } @matched;
 }
 
 sub _zglob {
@@ -742,25 +775,13 @@ sub _zglob {
     my @files;
     foreach my $glob (@$globs) {
         try {
-            push( @files, File::Zglob::zglob( join( "/", $self->root_dir, $glob ) ) );
+            push @files, zglob( join( "/", $self->root_dir, $glob ) );
         }
         catch {
             die qq{error parsing '$glob': $_};
         }
     }
     return uniq(@files);
-}
-
-sub _small_path {
-    my ( $self, $path ) = @_;
-    die sprintf( q{'%s' is not underneath root dir '%s'!}, $path, $self->root_dir )
-        unless index( $path, $self->root_dir ) == 0;
-    return path( substr( $path . q{}, length( $self->root_dir ) + 1 ) );
-}
-
-sub _sig {
-    my ( $self, $data ) = @_;
-    return sha1_hex( join( ',', @$data ) );
 }
 
 sub msg {
@@ -773,18 +794,6 @@ sub _build_msg_outputter {
         my $format = shift;
         printf "$format\n", @_;
     };
-}
-
-sub _error_result {
-    my ( $self, $msg, $path, $orig_contents, $new_contents ) = @_;
-    $self->msg( '%s', $msg );
-    return Code::TidyAll::Result->new(
-        path          => $path,
-        state         => 'error',
-        error         => $msg,
-        orig_contents => $orig_contents,
-        new_contents  => $new_contents,
-    );
 }
 
 1;
@@ -803,7 +812,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 

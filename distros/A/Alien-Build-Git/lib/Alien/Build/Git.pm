@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Alien::Build tools for interacting with git
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alien::Build::Git - Alien::Build tools for interacting with git
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

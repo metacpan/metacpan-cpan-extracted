@@ -52,7 +52,7 @@ for( <build_cache/*_aa> ) {
   c_echo 'an improper modification', "-o>>$_";
 }
 
-makepp qw(--build-cache build_cache -F subdir3 aa);
+makepp \'', qw(--build-cache build_cache -F subdir3 aa);
 
 1;                          # No error.
 ###	34	644	1103934641	1103934641	Makeppfile

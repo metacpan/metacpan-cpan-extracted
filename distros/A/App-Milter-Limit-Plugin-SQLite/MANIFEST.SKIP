@@ -1,0 +1,13 @@
+^blib/
+^MANIFEST\.bak$
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^\.git/
+^\.gitignore$
+^dist\.ini$
+^MYMETA
+^\.travis\.yml$
+^\.build$
+^releases$
+.*\.tar\.gz$

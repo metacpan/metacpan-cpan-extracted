@@ -1,0 +1,124 @@
+{
+   "abstract" : "ternary logic and related operations",
+   "author" : [
+      "Martin Becker <becker-cpan-mp@cozap.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Logic-Ternary",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Math::BigInt" : "1.78",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::ModInt" : "0",
+            "Term::ReadLine" : "0"
+         },
+         "requires" : {
+            "Math::BigInt" : "1.78",
+            "Role::Basic" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Logic::Ternary" : {
+         "file" : "lib/Math/Logic/Ternary.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::Command" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/Command.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::Mode" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/Mode.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::Operator" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/Operator.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::Parser" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/Parser.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::Session" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/Session.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::State" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/State.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Calculator::Version" : {
+         "file" : "lib/Math/Logic/Ternary/Calculator/Version.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Expression" : {
+         "file" : "lib/Math/Logic/Ternary/Expression.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Object" : {
+         "file" : "lib/Math/Logic/Ternary/Object.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::TAPI27" : {
+         "file" : "lib/Math/Logic/Ternary/TAPI27.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::TAPI_9" : {
+         "file" : "lib/Math/Logic/Ternary/TAPI_9.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::TFP_81" : {
+         "file" : "lib/Math/Logic/Ternary/TFP_81.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Trit" : {
+         "file" : "lib/Math/Logic/Ternary/Trit.pm",
+         "version" : "0.004"
+      },
+      "Math::Logic::Ternary::Word" : {
+         "file" : "lib/Math/Logic/Ternary/Word.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Math-Logic-Ternary@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Bug/Report.html?Queue=Math-Logic-Ternary"
+      },
+      "homepage" : "https://vera.in-ulm.de/ternary-logic/"
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

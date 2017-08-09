@@ -6,7 +6,7 @@ files and substitute values.
 
 An easy way of reading input where some lines are read conditionally and other
 files included: .if/.else/.elseif/.fi, do: .include .let .print, loops: .while
-.for; subroutine definition & call - and more.
+.for; subroutine definition & call; write to other streams - and more.
 
 Few changes are needed to your program, just open a file with this
 module and use C<< <$fh> >> and C<< $fh->getline >>, etc.
@@ -57,6 +57,9 @@ Within input you may:
   can be used in if/loop conditions
 
 * log to stdout and stderr
+
+* write to named streams opened by the main Perl script; these can transparently
+  call Perl functions.
 
 * read lines to pre-processor variables
 
@@ -109,4 +112,4 @@ See L<http://dev.perl.org/licenses/> for more information.
 This was, to begin with, called Text::ReadConditionally - renamed to what seems
 to be a more descriptive name.
 
-SCCS: @(#)README	1.3 05/22/17 20:25:16
+SCCS: %W% %G% %U%

@@ -3,8 +3,9 @@ package Specio::Constraint::Role::IsaType;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
+use Scalar::Util qw( blessed );
 use Specio::PartialDump qw( partial_dump );
 use Storable qw( dclone );
 
@@ -40,24 +41,56 @@ sub _wrap_message_generator {
     my $self      = shift;
     my $generator = shift;
 
-    my $class = $self->class;
+    my $type          = ( split /::/, blessed $self)[-1];
+    my $class         = $self->class;
+    my $allow_classes = $self->_allow_classes;
 
     unless ( defined $generator ) {
         $generator = sub {
-            my $description = shift;
-            my $value       = shift;
+            shift;
+            my $value = shift;
 
-            return
-                  "Validation failed for $description with value "
-                . partial_dump($value)
-                . '(not isa '
-                . $class . ')';
+            return "An undef will never pass an $type check (wants $class)"
+                unless defined $value;
+
+            if ( ref $value && !blessed $value) {
+                my $dump = partial_dump($value);
+                return
+                    "An unblessed reference ($dump) will never pass an $type check (wants $class)";
+            }
+
+            if ( !blessed $value) {
+                return
+                    "An empty string will never pass an $type check (wants $class)"
+                    unless length $value;
+
+                if (
+                    $value =~ /\A
+                        \s*
+                        -?[0-9]+(?:\.[0-9]+)?
+                        (?:[Ee][\-+]?[0-9]+)?
+                        \s*
+                        \z/xs
+                    ) {
+                    return
+                        "A number ($value) will never pass an $type check (wants $class)";
+                }
+
+                if ( !$allow_classes ) {
+                    my $dump = partial_dump($value);
+                    return
+                        "A plain scalar ($dump) will never pass an $type check (wants $class)";
+                }
+            }
+
+            my $got = blessed $value;
+            $got ||= $value;
+
+            return "The $got class is not a subclass of the $class class";
         };
     }
 
-    my $d = $self->description;
-
-    return sub { $generator->( $d, @_ ) };
+    return sub { $generator->( undef, @_ ) };
 }
 ## use critic
 
@@ -77,7 +110,7 @@ Specio::Constraint::Role::IsaType - Provides a common implementation for Specio:
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 DESCRIPTION
 

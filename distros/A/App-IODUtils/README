@@ -1,12 +1,78 @@
-SYNOPSIS
+NAME
+    App::IODUtils - IOD utilities
 
+VERSION
+    This document describes version 0.15 of App::IODUtils (from Perl
+    distribution App-IODUtils), released on 2017-08-05.
+
+SYNOPSIS
     This distribution provides the following command-line utilities:
 
-    #INSERT_EXECS_LIST
+    *   delete-iod-key
+
+    *   delete-iod-section
+
+    *   dump-iod
+
+    *   get-iod-key
+
+    *   get-iod-section
+
+    *   insert-iod-key
+
+    *   insert-iod-section
+
+    *   list-iod-sections
+
+    *   parse-iod
 
     The main feature of these utilities is tab completion.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-IODUtils>.
 
-    #INSERT_BLOCK: App::PMUtils see_also
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-IODUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IODUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Below is the list of distributions that provide CLI utilities for
+    various purposes, with the focus on providing shell tab completion
+    feature.
+
+    App::DistUtils, utilities related to Perl distributions.
+
+    App::DzilUtils, utilities related to Dist::Zilla.
+
+    App::GitUtils, utilities related to git.
+
+    App::IODUtils, utilities related to IOD configuration files.
+
+    App::LedgerUtils, utilities related to Ledger CLI files.
+
+    App::PlUtils, utilities related to Perl scripts.
+
+    App::PMUtils, utilities related to Perl modules.
+
+    App::ProgUtils, utilities related to programs.
+
+    App::WeaverUtils, utilities related to Pod::Weaver.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

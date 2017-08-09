@@ -89,7 +89,7 @@ print STDERR "$subdir done\n";
 exit 0;
 ###	19	644	1103936101	1185560328	Makeppfile.in
 perl_begin
-  $Mpp::build_cache_error_hook = sub {
+  $Mpp::BuildCache::error_hook = sub {
     # If this file doesn't show up, then there hasn't been any stress, so the
     # test isn't doing its job (and thus it fails even if it reveals no bugs).
     open my $fh, '>', '../build_cache_stress' or die $!;

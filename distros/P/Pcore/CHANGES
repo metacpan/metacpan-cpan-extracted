@@ -1,3 +1,7 @@
+v0.46.1 2017-08-01T09:56:55Z
+ - docker build status text improved to display unknown statuses
+ - l10n deferred calls updated
+
 v0.46.0 2017-07-30T06:57:52Z
  - dist issues api updated
  - use Cpanel::JSON::XS instead of JSON::XS

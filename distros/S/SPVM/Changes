@@ -1,3 +1,29 @@
+0.0240 2017-08-07
+  - fix number literal bug that hex number e and E is floating point specifier
+  - add byte and short number literal syntax
+    123b
+    123s
+  - hex number only allow A, B, C, D, E, F because f is used to specify the number is floating point
+    and b is used to specify the number is byte
+  - fix array float store and load bug
+  - support underline in number literal
+    123_123
+    0xFF_FF
+0.0239 2017-08-05
+  - cleanup enum internal logic
+  - fix clang compiler error
+  - fix all warnings 
+0.0238 2017-08-04
+  - Support nested switch statement
+0.0237 2017-08-03
+  - improve SPVM call_sub performance
+0.0236 2017-08-01
+  - add __END__
+  - SPVM exception can be cached from Perl's eval { ... }
+  - fix one character string bug.
+0.0235 2017-07-31
+  - fix default return value
+  - imporve exception message
 0.0234 2017-07-29
   - rename malloc to new. you can also define new function for object initialization.
     my $obj = new Foo;

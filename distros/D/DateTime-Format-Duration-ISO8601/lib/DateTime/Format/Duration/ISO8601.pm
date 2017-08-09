@@ -1,7 +1,7 @@
 package DateTime::Format::Duration::ISO8601;
 
-our $DATE = '2017-07-20'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-08-02'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -116,7 +116,7 @@ sub parse_duration_as_deltas {
         (?:T
             (?:(?<hours>[0-9]+)H)?
             (?:(?<minutes>[0-9]+)M)?
-            (?:(?<seconds>[0-9]+(?:\.([0-9]+)?))S)?
+            (?:(?<seconds>[0-9]+(?:\.([0-9]+))?)S)?
         )?
         $
     };
@@ -138,7 +138,7 @@ sub parse_duration_as_deltas {
 sub _error {
     my ($self, @args) = @_;
 
-    return unless ref $self->{ on_error } eq 'CODE';
+    die @args unless ref $self and ref $self->{ on_error } eq 'CODE';
 
     return $self->{ on_error }->(@args);
 }
@@ -158,7 +158,7 @@ DateTime::Format::Duration::ISO8601 - Format DateTime::Duration object as ISO860
 
 =head1 VERSION
 
-This document describes version 0.004 of DateTime::Format::Duration::ISO8601 (from Perl distribution DateTime-Format-Duration-ISO8601), released on 2017-07-20.
+This document describes version 0.005 of DateTime::Format::Duration::ISO8601 (from Perl distribution DateTime-Format-Duration-ISO8601), released on 2017-08-02.
 
 =head1 SYNOPSIS
 

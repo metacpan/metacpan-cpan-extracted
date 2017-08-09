@@ -2,7 +2,15 @@ package # hide from PAUSE
     Helper;
 
 use parent 'Exporter';
-our @EXPORT = qw(@REMOVED_PLUGINS assert_no_git all_plugins_in_prereqs notexists);
+our @EXPORT = qw(
+    @REMOVED_PLUGINS
+    assert_no_git
+    all_plugins_in_prereqs
+    no_git_tempdir
+    git_in_path
+    notexists
+    recursive_child_files
+);
 
 use Test::More 0.96;
 use Test::Deep;
@@ -15,6 +23,8 @@ use namespace::clean;
 $ENV{USER} = 'notether';
 delete $ENV{DZIL_AIRPLANE};
 delete $ENV{FAKE_RELEASE};
+
+$ENV{HOME} = Path::Tiny->tempdir->stringify;
 
 {
     use Dist::Zilla::PluginBundle::Author::ETHER;
@@ -87,7 +97,7 @@ sub all_plugins_in_prereqs
             if (exists $additional{$plugin})
             {
                 # plugin was added in via an extra option, therefore the
-                # plugin should have been added to develop prereqs
+                # plugin should have been added to develop prereqs, and not be a runtime prereq
                 ok(
                     exists $dist_meta->{prereqs}{develop}{requires}{$plugin},
                     $plugin . ' is a develop prereq of the distribution',
@@ -118,13 +128,68 @@ sub all_plugins_in_prereqs
     }
 } }
 
+# provides a temp directory that is guaranteed to not be inside a git repository
+# directory is cleaned up when $tempdir goes out of scope
+sub no_git_tempdir
+{
+    my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
+    mkdir $tempdir if not -d $tempdir;    # FIXME: File::Temp::newdir doesn't make the directory?!
+
+    my $in_git = git_in_path($tempdir);
+    ok(!$in_git, 'tempdir is not in a real git repository');
+
+    return $tempdir;
+}
+
+# checks if a .git directory is in the current or any parent directory
+sub git_in_path
+{
+    my $in_git;
+    my $dir = path($_[0]);
+    my $count = 0;
+    while (not $dir->is_rootdir) {
+        # this should never happen.
+        do { diag "failed to detect that $dir is at the root?!"; last } if $dir eq $dir->parent;
+
+        my $checkdir = path($dir, '.git');
+        if (-d $checkdir) {
+            note "found $checkdir in $_[0]";
+            $in_git = 1;
+            last;
+        }
+        $dir = $dir->parent;
+    }
+    continue {
+        die "too many iterations when traversing $tempdir!"
+            if $count++ > 100;
+    }
+    return $in_git;
+}
+
 # TODO: replace with Test::Deep::notexists($key)
 sub notexists
 {
-    my $key = shift;
+    my @keys = @_;
     Test::Deep::code(sub {
-        !exists $_[0]->{$key} ? 1 : (0, "'$key' key exists");
+        # TODO return 0 unless $self->test_reftype($_[0], 'HASH');
+        return (0, 'not a HASH') if ref $_[0] ne 'HASH';
+        foreach my $key (@keys) {
+            return (0, "'$key' key exists") if exists $_[0]->{$key};
+        }
+        return 1;
     });
+}
+
+# simple Path::Tiny helper: like `find $dir -type f`
+sub recursive_child_files
+{
+    my $dir = shift;
+    my @found_files;
+    $dir->visit(
+        sub { push @found_files, $_->relative($dir)->stringify if -f },
+        { recurse => 1 },
+    );
+    @found_files;
 }
 
 1;

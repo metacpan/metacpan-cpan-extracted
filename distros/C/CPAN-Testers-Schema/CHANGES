@@ -1,5 +1,39 @@
 Changelog for CPAN-Testers-Schema
 
+0.018     2017-08-05 12:42:52-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed name of "guid" unique constraint on Stats table. By default,
+      DBIx::Class uses the name of the table (cpanstats) in the
+      constraint name, but this makes it harder for that name to change
+      in the future. Now the name of the constraint is just "guid".
+
+    [Added]
+
+    - Allow test reports to be re-processed. If a test report has
+      already been processed (based on its guid), the Stats entry will
+      be updated.
+
+0.017     2017-08-04 14:06:17-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed some POD formatting issues in the Stats result class. Thanks
+      @manwar!
+
+    - Added the correct dependency declaration for Data::UUID, which was
+      causing Travis tests to fail. Thanks @manwar!
+
+0.016     2017-08-03 21:38:38-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed old schema version with incorrect size of field. Since these
+      old tables aren't put through an ALTER TABLE process, we can edit
+      the original versions without triggering an upgrade. This means we
+      can do minor adjustments to match reality without major problems.
+
 0.015     2017-07-08 12:07:35-05:00 America/Chicago
 
     [Fixed]

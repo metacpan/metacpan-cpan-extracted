@@ -8,7 +8,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.125'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.127'
                                       },
                       'requires' => {
                                       'Dist::Zilla' => '5',
@@ -195,7 +195,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Prereqs' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0.006',
                                       'Dist::Zilla::Plugin::PromptIfStale' => '0.004',
-                                      'Dist::Zilla::Plugin::PruneCruft' => '0',
                                       'Dist::Zilla::Plugin::Readme' => '0',
                                       'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.142180',
                                       'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.004',
@@ -267,7 +266,6 @@ do { my $x = {
                                    'Exporter' => '0',
                                    'File::Spec' => '0',
                                    'File::pushd' => '0',
-                                   'HTTP::Tiny' => '0',
                                    'JSON::MaybeXS' => '0',
                                    'Module::Metadata' => '0',
                                    'Moose::Util' => '0',

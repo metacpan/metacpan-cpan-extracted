@@ -11,9 +11,11 @@
 #include <src/glew.c>
 #include <src/glew-context.c>
 
+#include "gl_errors.h"
 #include "const-c.inc"
 
 static int _done_glewInit = 0;
+static int _auto_check_errors = 0;
 
 /*
   Maybe one day we'll allow Perl callbacks for GLDEBUGPROCARB
@@ -101,6 +103,33 @@ CODE:
     RETVAL = _done_glewInit;
 OUTPUT:
     RETVAL
+
+int
+glpSetAutoCheckErrors(...)
+CODE:
+    int state;
+    if (items == 1) {
+        state = (int)SvIV(ST(0));
+        if (state != 0 && state != 1 )
+            croak( "Usage: glpSetAutoCheckErrors(1|0)\n" );
+        _auto_check_errors = state;
+    }
+    RETVAL = _auto_check_errors;
+OUTPUT:
+    RETVAL
+
+void
+glpCheckErrors()
+CODE:
+    int err = GL_NO_ERROR;
+    int error_count = 0;
+    while ( ( err = glGetError() ) != GL_NO_ERROR ) {
+        /* warn( "OpenGL error: %d", err ); */
+        warn( "glpCheckErrors: OpenGL error: %d %s", err, gl_error_string(err) );
+	error_count++;
+    }
+    if( error_count )
+      croak( "glpCheckErrors: %d OpenGL errors encountered.", error_count );
 
 # This isn't a bad idea, but I postpone this API and the corresponding
 # typemap hackery until later

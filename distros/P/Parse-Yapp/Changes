@@ -159,6 +159,22 @@ Revision history for Perl extension Yapp.
 	- Updated copyright boundaries
     - Stress test added (compile and check a full C++ grammar)
 1.04 Mon Feb 12 16:46:37 CET 2001
-    - Bug correction in YappParse.yp _Lexer sub to accept '\\' litterals
+    - Bug correction in YappParse.yp _Lexer sub to accept '\\' literals
       (Thanks to Denis Barbier to catch this one)
 1.05 Sun Nov  4 20:32:32 CET 2001
+1.06 Wed Jun 14 2017
+    - First Release In Over 15 Years, 
+      How's That For Long-Term Stability?!?  :-)
+    - Bug Fix, Unescaped Left Curly Braces { In Regular Expressions,
+      Fatal Since Perl v5.25.1, Minor Changes In YappParse.yp & Parse.pm
+    - Typo Fixes, POD Spelling & Syntax
+    - Copyright Assignment Documents, Desarmenien To Braswell
+1.20 Wed Jun 14 2017
+    - Bug Fix, CPAN Version Dependencies Failure, 
+      Enable Module Version In Parse::Yapp,
+      Not Just Distribution Version In Parse::Yapp::Driver
+    - Bump Version
+1.21 Fri Aug 04 2017
+    - Typo Fixes, POD Spelling (thanks to Gregor Herrmann)
+    - Bug Fix, Missing POD Encoding (thanks to Gregor Herrmann)
+

@@ -1,4 +1,4 @@
-# $Id: Signature.pm,v 1.14 2012/03/04 13:56:35 pfeiffer Exp $
+# $Id: Signature.pm,v 1.15 2012/11/02 20:32:07 pfeiffer Exp $
 package Mpp::Signature;
 
 =head1 NAME
@@ -63,8 +63,7 @@ sub get {
   my( $name, $sep, $re ) = split /(\.\(?|\()/, $fullname, 2;
   $name =~ tr/-/_/;
   $name = 'c_compilation_md5' if $name eq 'C'; # Alias
-  my $sig = eval "use Mpp::Signature::$name; \$Mpp::Signature::${name}::$name" ||
-    eval "use Signature::$name; warn qq!$mkfile_line: name Signature::$name is deprecated, rename to Mpp::Signature::$name\n!; \$Signature::${name}::$name";
+  my $sig = eval "use Mpp::Signature::$name; \$Mpp::Signature::${name}::$name";
   if( defined $re ) {
     die "$mkfile_line: Can't add suffixes to inexistent signature $name\n" unless $sig;
     die "$mkfile_line: Signature $name doesn't support adding suffixes\n" unless UNIVERSAL::can( $sig, 'recognizes_file' );

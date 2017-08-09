@@ -1,7 +1,7 @@
 package Log::ger::Plugin;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ sub set {
     }
 
     $args{prefix} ||= $pkg . '::';
+    $args{replace_package_regex} = $pkg->_replace_package_regex;
     Log::ger::Util::set_plugin(%args);
 }
 
@@ -40,6 +41,8 @@ sub set_for_current_package {
 }
 
 sub _import_sets_for_current_package { 0 }
+
+sub _replace_package_regex { undef }
 
 sub import {
     if (@_ > 1) {
@@ -66,7 +69,7 @@ Log::ger::Plugin - Use a plugin
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 

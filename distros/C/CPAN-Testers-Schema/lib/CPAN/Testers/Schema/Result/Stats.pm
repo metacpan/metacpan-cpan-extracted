@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Stats;
-our $VERSION = '0.015';
+our $VERSION = '0.018';
 # ABSTRACT: The basic statistics information extracted from test reports
 
 #pod =head1 SYNOPSIS
@@ -74,11 +74,12 @@ primary_column 'id', {
 #pod =cut
 
 # Must be unique for foreign keys to work
-unique_column 'guid', {
+column 'guid', {
     data_type   => 'char',
     is_nullable => 0,
     size        => 36,
 };
+unique_constraint guid => [qw( guid )];
 
 #pod =attr state
 #pod
@@ -138,7 +139,7 @@ column 'postdate', {
 column 'tester', {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 100,
+    size        => 255,
 };
 
 #pod =attr dist
@@ -150,7 +151,7 @@ column 'tester', {
 column 'dist', {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 100,
+    size        => 255,
 };
 
 #pod =attr version
@@ -162,7 +163,7 @@ column 'dist', {
 column 'version', {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 20,
+    size        => 255,
 };
 
 #pod =attr platform
@@ -174,7 +175,7 @@ column 'version', {
 column 'platform',  {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 20,
+    size        => 255,
 };
 
 #pod =attr perl
@@ -187,7 +188,7 @@ column 'platform',  {
 column 'perl',  {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 10,
+    size        => 255,
 };
 
 #pod =attr osname
@@ -199,7 +200,7 @@ column 'perl',  {
 column 'osname',  {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 20,
+    size        => 255,
 };
 
 #pod =attr osvers
@@ -211,7 +212,7 @@ column 'osname',  {
 column 'osvers',  {
     data_type   => 'varchar',
     is_nullable => 0,
-    size        => 20,
+    size        => 255,
 };
 
 #pod =attr fulldate
@@ -222,9 +223,9 @@ column 'osvers',  {
 #pod =cut
 
 column 'fulldate', {
-    data_type   => 'char',
+    data_type   => 'varchar',
     is_nullable => 0,
-    size        => 8,
+    size        => 32,
 };
 
 #pod =attr type
@@ -234,13 +235,9 @@ column 'fulldate', {
 #pod
 #pod =over 4
 #pod
-#pod =item 2
+#pod =item 2 - This is a valid Perl 5 test report
 #pod
-#pod This is a valid Perl 5 test report
-#pod
-#pod =item 3
-#pod
-#pod This report was marked invalid by a user
+#pod =item 3 - This report was marked invalid by a user
 #pod
 #pod =back
 #pod
@@ -286,7 +283,7 @@ CPAN::Testers::Schema::Result::Stats - The basic statistics information extracte
 
 =head1 VERSION
 
-version 0.015
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -414,13 +411,9 @@ possibilities are:
 
 =over 4
 
-=item 2
+=item 2 - This is a valid Perl 5 test report
 
-This is a valid Perl 5 test report
-
-=item 3
-
-This report was marked invalid by a user
+=item 3 - This report was marked invalid by a user
 
 =back
 
@@ -456,7 +449,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Oriol Soriano, Doug Bell.
+This software is copyright (c) 2017 by Oriol Soriano, Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

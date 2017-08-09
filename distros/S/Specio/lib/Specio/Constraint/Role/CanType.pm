@@ -3,9 +3,10 @@ package Specio::Constraint::Role::CanType;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use Scalar::Util qw( blessed );
+use Specio::PartialDump qw( partial_dump );
 use Storable qw( dclone );
 
 use Role::Tiny;
@@ -40,33 +41,82 @@ sub _wrap_message_generator {
     my $self      = shift;
     my $generator = shift;
 
-    my @methods = @{ $self->methods };
+    my $type          = ( split /::/, blessed $self)[-1];
+    my @methods       = @{ $self->methods };
+    my $all_word_list = _word_list(@methods);
+    my $allow_classes = $self->_allow_classes;
 
     unless ( defined $generator ) {
         $generator = sub {
             shift;
             my $value = shift;
 
+            return
+                "An undef will never pass an $type check (wants $all_word_list)"
+                unless defined $value;
+
             my $class = blessed $value;
-            $class ||= $value;
+            if ( !defined $class ) {
+
+                # If we got here we know that blessed returned undef, so if
+                # it's a ref then it must not be blessed.
+                if ( ref $value ) {
+                    my $dump = partial_dump($value);
+                    return
+                        "An unblessed reference ($dump) will never pass an $type check (wants $all_word_list)";
+                }
+
+                # If it's defined and not an unblessed ref it must be a
+                # string. If we allow classes (vs just objects) then it might
+                # be a valid class name.  But an empty string is never a valid
+                # class name. We cannot call q{}->can.
+                return
+                    "An empty string will never pass an $type check (wants $all_word_list)"
+                    unless length $value;
+
+                if ( ref \$value eq 'GLOB' ) {
+                    return
+                        "A glob will never pass an $type check (wants $all_word_list)";
+                }
+
+                if (
+                    $value =~ /\A
+                        \s*
+                        -?[0-9]+(?:\.[0-9]+)?
+                        (?:[Ee][\-+]?[0-9]+)?
+                        \s*
+                        \z/xs
+                    ) {
+                    return
+                        "A number ($value) will never pass an $type check (wants $all_word_list)";
+                }
+
+                $class = $value if $allow_classes;
+
+                # At this point we either have undef or a non-empty string in
+                # $class.
+                unless ( defined $class ) {
+                    my $dump = partial_dump($value);
+                    return
+                        "A plain scalar ($dump) will never pass an $type check (wants $all_word_list)";
+                }
+            }
 
             my @missing = grep { !$value->can($_) } @methods;
 
             my $noun = @missing == 1 ? 'method' : 'methods';
             my $list = _word_list( map {qq['$_']} @missing );
 
-            return "$class is missing the $list $noun";
+            return "The $class class is missing the $list $noun";
         };
     }
 
-    my $d = $self->description;
-
-    return sub { $generator->( $d, @_ ) };
+    return sub { $generator->( undef, @_ ) };
 }
 ## use critic
 
 sub _word_list {
-    my @items = shift;
+    my @items = sort { $a cmp $b } @_;
 
     return $items[0] if @items == 1;
     return join ' and ', @items if @items == 2;
@@ -94,7 +144,7 @@ Specio::Constraint::Role::CanType - Provides a common implementation for Specio:
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 DESCRIPTION
 

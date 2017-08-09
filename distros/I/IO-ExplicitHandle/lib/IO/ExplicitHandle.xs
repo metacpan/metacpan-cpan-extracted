@@ -9,6 +9,11 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
 #ifndef hv_fetchs
 # define hv_fetchs(hv, keystr, lval) \
 		hv_fetch(hv, ""keystr"", sizeof(keystr)-1, lval)
@@ -43,11 +48,18 @@ typedef OP *(*Perl_check_t)(pTHX_ OP *);
 typedef unsigned Optype;
 #endif /* <5.10.1 */
 
+#if PERL_VERSION_GE(5,7,3)
+# define PERL_UNUSED_THX() NOOP
+#else /* <5.7.3 */
+# define PERL_UNUSED_THX() ((void)(aTHX+0))
+#endif /* <5.7.3 */
+
 #ifndef wrap_op_checker
 # define wrap_op_checker(c,n,o) THX_wrap_op_checker(aTHX_ c,n,o)
 static void THX_wrap_op_checker(pTHX_ Optype opcode,
 	Perl_check_t new_checker, Perl_check_t *old_checker_p)
 {
+	PERL_UNUSED_THX();
 	if(*old_checker_p) return;
 	OP_REFCNT_LOCK;
 	if(!*old_checker_p) {
@@ -69,21 +81,21 @@ static bool THX_in_strictexplicithandle(pTHX)
 	return svp && SvTRUE(*svp);
 }
 
-#define qerror_implicit_op(c) THX_qerror_implicit_op(aTHX_ c)
-static void THX_qerror_implicit_op(pTHX_ Optype opcode)
+#define qerror_unspec_handle_op(c) THX_qerror_unspec_handle_op(aTHX_ c)
+static void THX_qerror_unspec_handle_op(pTHX_ Optype opcode)
 {
-	qerror(mess("Implicit I/O handle in %s", PL_op_desc[opcode]));
+	qerror(mess("Unspecified I/O handle in %s", PL_op_desc[opcode]));
 }
 
 #define EXPLICITHANDLE_OP_CHECKER(OPNAME, opname, is_bad) \
-	static Perl_check_t nxck_##opname; \
-	static OP *myck_##opname(pTHX_ OP *op) \
+	static Perl_check_t THX_nxck_##opname; \
+	static OP *THX_myck_##opname(pTHX_ OP *op) \
 	{ \
 		if(!in_strictexplicithandle()) \
-			return nxck_##opname(aTHX_ op); \
-		op = nxck_##opname(aTHX_ op); \
+			return THX_nxck_##opname(aTHX_ op); \
+		op = THX_nxck_##opname(aTHX_ op); \
 		if(op->op_type == OP_##OPNAME && (is_bad)) \
-			qerror_implicit_op(OP_##OPNAME); \
+			qerror_unspec_handle_op(OP_##OPNAME); \
 		return op; \
 	}
 
@@ -104,13 +116,13 @@ EXPLICITHANDLE_OP_CHECKER(EOF, eof,
 
 EXPLICITHANDLE_OP_CHECKER(TELL, tell, !(op->op_private & 15))
 
-static Perl_check_t nxck_rv2sv;
-static OP *myck_rv2sv(pTHX_ OP *op)
+static Perl_check_t THX_nxck_rv2sv;
+static OP *THX_myck_rv2sv(pTHX_ OP *op)
 {
 	OP *rvop;
 	GV *gv;
-	if(!in_strictexplicithandle()) return nxck_rv2sv(aTHX_ op);
-	op = nxck_rv2sv(aTHX_ op);
+	if(!in_strictexplicithandle()) return THX_nxck_rv2sv(aTHX_ op);
+	op = THX_nxck_rv2sv(aTHX_ op);
 	if(op->op_type == OP_RV2SV && (op->op_flags & OPf_KIDS) &&
 			(rvop = cUNOPx(op)->op_first) &&
 			(rvop->op_type == OP_GV) && (gv = cGVOPx_gv(rvop)) &&
@@ -124,7 +136,8 @@ static OP *myck_rv2sv(pTHX_ OP *op)
 			case '-':
 			case '%':
 			case '.':
-				qerror(mess("Implicit I/O handle in $%c", nc));
+				qerror(mess("Unspecified I/O handle in $%c",
+						nc));
 		}
 	}
 	return op;
@@ -136,16 +149,17 @@ PROTOTYPES: DISABLE
 
 BOOT:
 
-	wrap_op_checker(OP_PRINT, myck_print, &nxck_print);
-	wrap_op_checker(OP_PRTF, myck_prtf, &nxck_prtf);
+	wrap_op_checker(OP_PRINT, THX_myck_print, &THX_nxck_print);
+	wrap_op_checker(OP_PRTF, THX_myck_prtf, &THX_nxck_prtf);
 #if Q_HAVE_SAY
-	wrap_op_checker(OP_SAY, myck_say, &nxck_say);
+	wrap_op_checker(OP_SAY, THX_myck_say, &THX_nxck_say);
 #endif /* Q_HAVE_SAY */
-	wrap_op_checker(OP_CLOSE, myck_close, &nxck_close);
-	wrap_op_checker(OP_ENTERWRITE, myck_enterwrite, &nxck_enterwrite);
-	wrap_op_checker(OP_EOF, myck_eof, &nxck_eof);
-	wrap_op_checker(OP_TELL, myck_tell, &nxck_tell);
-	wrap_op_checker(OP_RV2SV, myck_rv2sv, &nxck_rv2sv);
+	wrap_op_checker(OP_CLOSE, THX_myck_close, &THX_nxck_close);
+	wrap_op_checker(OP_ENTERWRITE, THX_myck_enterwrite,
+		&THX_nxck_enterwrite);
+	wrap_op_checker(OP_EOF, THX_myck_eof, &THX_nxck_eof);
+	wrap_op_checker(OP_TELL, THX_myck_tell, &THX_nxck_tell);
+	wrap_op_checker(OP_RV2SV, THX_myck_rv2sv, &THX_nxck_rv2sv);
 
 void
 import(SV *classname)

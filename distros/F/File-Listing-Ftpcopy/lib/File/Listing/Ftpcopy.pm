@@ -8,7 +8,7 @@ use Carp qw( croak );
 use Time::Local qw( timelocal );
 
 # ABSTRACT: parse directory listing using ftpparse from ftpcopy
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub parse_dir ($;$$$)
@@ -156,7 +156,7 @@ File::Listing::Ftpcopy - parse directory listing using ftpparse from ftpcopy
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

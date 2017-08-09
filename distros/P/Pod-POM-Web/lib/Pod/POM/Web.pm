@@ -23,7 +23,7 @@ use Module::Metadata;               # get version number from module
 # globals
 #---------------------------------------------------------------------
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 # some subdirs never contain Pod documentation
 my @ignore_toc_dirs = qw/auto unicore/; 

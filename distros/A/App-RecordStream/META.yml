@@ -109,7 +109,7 @@ resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=App-RecordStream
   homepage: https://github.com/benbernard/RecordStream
   repository: https://github.com/benbernard/RecordStream.git
-version: 4.0.23
+version: 4.0.24
 x_contributors:
   - 'Ben Bernard <github@benjaminbernard.com>'
   - 'Brandon Forehand <b4hand@users.sf.net>'

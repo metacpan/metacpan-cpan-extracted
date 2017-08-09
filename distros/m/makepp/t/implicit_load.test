@@ -26,9 +26,15 @@ c: subdir2/d subdir2/subsubdir/e
 x: ../outside/y
 	&cp -l $(input) x
 ###	D	755	1143323853	1143323853	outside/
-###	2	644	1143324382	1143323853	outside/Makeppfile
-y:
+###	8	644	1143324382	1404410028	outside/Makeppfile
+no_implicit_load o*
+
+y: oh/y
 	&echo foo bar -o y
+
+&mkdir oh
+&echo 'perl { die }' -o oh/Makeppfile # New dir to be considered for no load
+&touch oh/y
 ###	D	755	1067451875	990028507	subdir1/
 ###	2	644	1067451875	990027944	subdir1/Makeppfile
 b:

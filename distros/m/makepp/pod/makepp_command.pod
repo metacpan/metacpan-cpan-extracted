@@ -2,7 +2,7 @@
 
 makepp -- Command line syntax for makepp
 
-=for vc $Id: makepp_command.pod,v 1.59 2012/10/14 15:16:04 pfeiffer Exp $
+=for vc $Id: makepp_command.pod,v 1.65 2014/07/20 16:20:48 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,8 @@ B<L:>E<nbsp>L<--last-chance-rules|/last_chance_rules>,
   L<--load-makefile|/load_makefile_makefile>,
   L<--load-makeppfile|/load_makefile_makefile>,
   L<--log|/log_logfilename>,
-  L<--log-file|/log_logfilename>,E<nbsp>
+  L<--log-file|/log_logfilename>,
+  L<--loop|/loop>,E<nbsp>
 B<M:>E<nbsp>L<-m|/m_method>,
   L<--makefile|/f_makefile>,
   L<$MAKEFLAGS|/_makeflags>,
@@ -104,8 +105,9 @@ B<S:>E<nbsp>L<-s|/s>,
   L<--signature|/m_method>,
   L<--signature-method|/m_method>,
   L<--silent|/s>,
-  L<--stop|/stop>,
-  L<--stop-after-loading|/stop>,
+  L<--stop|/loop>,
+  L<--stop-after-loading|/loop>,
+  L<--stop-before-building|/loop>,
   L<--stop-on-race|/stop_race>,
   L<--stop-race|/stop_race>,
   L<--symlink-in-rep-as-file|/symlink_in_rep_as_file>,
@@ -119,6 +121,9 @@ B<V:>E<nbsp>L<-V|/v>,
   L<--version|/v>,
   L<--virtual-sandbox|/virtual_sandbox>,E<nbsp>
 B<W:>E<nbsp>L<-W|/w_filename>,
+  L<--warn-undef|/warn_undef>,
+  L<--warn-undefined-variables|/warn_undef>,
+  L<--warn-undef-var|/warn_undef>,
   L<--what-if|/w_filename>
 
 B<makepp> S<[ I<option> ... ]> S<[ I<VAR=value> ]> S<[ I<target> ... ]>
@@ -469,6 +474,34 @@ Changes the name of the log file to the indicated name.  By default, the log
 file is called F<.makepp/log>.  This file is readable with L<makepplog,
 mppl|makepplog>.
 
+=item --loop
+
+=item --stop
+
+=item --stop-before-building
+
+=item --stop-after-loading
+
+Makepp will repeatedly stop itself (go to sleep), before it analyzes and
+builds anything, for you to wake it up when you are ready.  It will tell you
+some commands to choose from for waking it up again.  If you do it in a Shell,
+you get the prompt and can then fore- or background it.  If you do it within
+an IDE, it'll just sleep, and you can awaken it from another Shell.  Depending
+on where you start it, closing that window may or may not terminate makepp, so
+check how to cope with this in your environment.
+
+The intention is that you can start makepp this way before you're finished
+editing some files.  Depending on your project structure and size, this can
+allow makepp to get a headstart of many seconds worth of work by the time
+you're done.  Then every time you can edit more and awaken it again, unless
+you change something in your Makefile, which will go unnoticed until you start
+a new instance of makepp.  The same applies to
+L<repositories|makepp_repositories>, which must never change while makepp is
+running.
+
+If you use C<prebuild> or C<$(make)>, on the first round it will stop when it
+gets to that point.
+
 =item -m I<method>
 
 =item --signature=I<method>
@@ -689,7 +722,7 @@ sandboxes|makepp_sandboxes>.
 
 =item --populate-bc-only
 
-Don't import for the build cache.  This is useful when you want to
+Don't import from the build cache.  This is useful when you want to
 donate targets to the cache, but you don't want to rely on the contents
 of the cache (e.g. for mission-critical builds).
 
@@ -763,6 +796,12 @@ Note that if you build in a repository, you have to give this option there
 first, because the importing makepp doesn't know what might be stale in the
 repository.
 
+Legacy makefiles sometimes put the rule to generate an include file after the
+include statement.  Mpp works around that like gmake, by reloading at the end
+of the makefile if needed.  But this means on a rebuild it looks stale at the
+point where it is needed, and will be deleted.  Therefore this option turns
+off this kind of reloading.
+
 =item -s
 
 =item --quiet
@@ -788,33 +827,12 @@ See L<partitioning into sandboxes|makepp_sandboxes>.
 Downgrade violations of "in-sandbox" and "dont-read" to warnings instead of
 errors.  See L<partitioning into sandboxes|makepp_sandboxes>.
 
-=item --stop
-
-=item --stop-after-loading
-
-After loading the top level Makeppfile, and any others explicitly or
-implicitly (through dependencies from other directories) loaded from there,
-makepp will stop itself (go to sleep).  This happens before it analyzes
-anything else.  It will tell you the command needed to wake it up again.  If
-you do it in a Shell, you get the prompt and can then fore- or background it.
-If you do it within an IDE, it'll just sleep, and you can awaken it from
-another Shell.
-
-The intention is that you can start makepp this way before you're finished
-editing some files.  Depending on your project structure and size, this can
-allow makepp to get a headstart of many seconds worth of work by the time
-you're done.
-
-If you use C<prebuild> or C<$(make)> it will stop when it gets to that point,
-so it might not be so useful.  Nor will it consider regeneration of
-Makeppfiles, but this is not expected to happen frequently.
-
 =item --stop-race
 
 =item --stop-on-race
 
-Exit in error rather than only warning about a sandbox access collision that
-could be fixed.
+Exit in error rather than only warning about a build cache access collision
+that could be fixed.
 
 =item --symlink-in-rep-as-file
 
@@ -891,6 +909,15 @@ changed (it might or might not be rebuilt, depending on whether it is up
 to date with respect to its dependencies), but everything that depends
 on it thinks that it has changed.  This can be useful for debugging a
 makefile.
+
+=item --warn-undef
+
+=item --warn-undef-var
+
+=item --warn-undefined-variables
+
+Emit a warning anytime a variable a value is used that has not been
+initialized, at least to the empty string.
 
 =back
 

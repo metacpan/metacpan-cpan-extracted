@@ -28,94 +28,94 @@ no_index:
 provides:
   Code::TidyAll:
     file: lib/Code/TidyAll.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Cache:
     file: lib/Code/TidyAll/Cache.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::CacheModel:
     file: lib/Code/TidyAll/CacheModel.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::CacheModel::Shared:
     file: lib/Code/TidyAll/CacheModel/Shared.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Config::INI::Reader:
     file: lib/Code/TidyAll/Config/INI/Reader.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Git::Precommit:
     file: lib/Code/TidyAll/Git/Precommit.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Git::Prereceive:
     file: lib/Code/TidyAll/Git/Prereceive.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Git::Util:
     file: lib/Code/TidyAll/Git/Util.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin:
     file: lib/Code/TidyAll/Plugin.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::CSSUnminifier:
     file: lib/Code/TidyAll/Plugin/CSSUnminifier.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::JSBeautify:
     file: lib/Code/TidyAll/Plugin/JSBeautify.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::JSHint:
     file: lib/Code/TidyAll/Plugin/JSHint.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::JSLint:
     file: lib/Code/TidyAll/Plugin/JSLint.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::JSON:
     file: lib/Code/TidyAll/Plugin/JSON.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::MasonTidy:
     file: lib/Code/TidyAll/Plugin/MasonTidy.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PHPCodeSniffer:
     file: lib/Code/TidyAll/Plugin/PHPCodeSniffer.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PerlCritic:
     file: lib/Code/TidyAll/Plugin/PerlCritic.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PerlTidy:
     file: lib/Code/TidyAll/Plugin/PerlTidy.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PerlTidySweet:
     file: lib/Code/TidyAll/Plugin/PerlTidySweet.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PodChecker:
     file: lib/Code/TidyAll/Plugin/PodChecker.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PodSpell:
     file: lib/Code/TidyAll/Plugin/PodSpell.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::PodTidy:
     file: lib/Code/TidyAll/Plugin/PodTidy.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Plugin::SortLines:
     file: lib/Code/TidyAll/Plugin/SortLines.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Result:
     file: lib/Code/TidyAll/Result.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Role::HasIgnore:
     file: lib/Code/TidyAll/Role/HasIgnore.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Role::Tempdir:
     file: lib/Code/TidyAll/Role/Tempdir.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::SVN::Precommit:
     file: lib/Code/TidyAll/SVN/Precommit.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::SVN::Util:
     file: lib/Code/TidyAll/SVN/Util.pm
-    version: '0.63'
+    version: '0.65'
   Code::TidyAll::Util::Zglob:
     file: lib/Code/TidyAll/Util/Zglob.pm
-    version: '0.63'
+    version: '0.65'
   Test::Code::TidyAll:
     file: lib/Test/Code/TidyAll.pm
-    version: '0.63'
+    version: '0.65'
 recommends:
   Parallel::ForkManager: '0'
 requires:
@@ -127,6 +127,7 @@ requires:
   Digest::SHA: '0'
   Exporter: '0'
   File::Find: '0'
+  File::Spec: '0'
   File::Which: '0'
   File::Zglob: '0'
   File::pushd: '0'
@@ -162,7 +163,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/perl-code-tidyall/issues
   homepage: http://metacpan.org/release/Code-TidyAll
   repository: git://github.com/houseabsolute/perl-code-tidyall.git
-version: '0.63'
+version: '0.65'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -274,7 +275,7 @@ x_Dist_Zilla:
               version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
@@ -736,7 +737,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.63
+          tag: v0.65
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -896,4 +897,4 @@ x_contributors:
   - 'Sergey Romanov <sromanov-dev@yandex.ru>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'timgimyee <tim.gim.yee@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.69'

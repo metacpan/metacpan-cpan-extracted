@@ -1,5 +1,12 @@
 Revision history for Perl extension Catalyst::Plugin::Static::Simple
 
+0.34   2017-08-02 09:56 Los Angeles
+       - Remove MYMETA.* (RT#108814)
+       - Fix installing on 5.26.0+ (RT#121861)
+       - Fix security vulnerability, when serving static files with dots in the
+         names (RT#120558)
+       - Fix typo in POD (RT#87098)
+
 0.33   2014-09-26 17:00 BST
        - In the case where someone is trying to merge configurations
        and some config sets use the depracated 'static' keyword, the

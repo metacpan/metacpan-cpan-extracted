@@ -8,6 +8,7 @@ use JSON::Parse 'parse_json';
 use LWP::UserAgent;
 use MIME::Base64 'encode_base64';
 use Net::SSH::Perl::Key;
+use Data::Dumper;
 
 sub new {
 	my $class = shift;
@@ -51,6 +52,7 @@ sub _request {
 			return undef;
 		}
 	} elsif ($params{method} eq "PUT") {
+print Dumper($ua);
 		$response = $ua->put("$self->{url}/$params{path}", Content => $params{content}, %$h);
 		return !!$response->is_success;
 	} elsif ($params{method} eq "DELETE") {
@@ -99,6 +101,11 @@ sub ls {
 		return \%results;
 	}
 	return undef;
+}
+
+sub ln {
+	my ($self, $src, $dst) = @_;
+	return $self->_request(path => $dst, method => "PUT", headers => {Location => $src, "content-type" => "application/json; type=link"});
 }
 
 1;
@@ -154,3 +161,8 @@ Create a directory. It requires a single argument, the Manta path of the directo
 
 List contents of a directory. It requires a single argument, the Manta path of the directory to list. It returns a hashref (keying on the object path) of hashrefs (or undef on failure). Each hashref has the following keys: C<type> - the MIME type; C<mtime> - the modification time in YYYY-mm-ddTHH:MM:ss.sssZ format; C<size> - size of the object in bytes; and C<etag> - UUID of the object
 
+=head2 ln
+
+Create a snaplink. It requires two parameters, the path from the source object and the path to the new snaplink.
+
+It returns true on success and false on failure.

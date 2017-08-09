@@ -1,7 +1,7 @@
 package Bencher::Scenario::SPVM::Sum;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,11 +12,11 @@ use SPVM 'Examples::Sum';
 our $scenario = {
     summary => 'Benchmark SPVM (sum two numbers)',
     modules => {
-        'SPVM' => {},
+        'SPVM' => {version => '0.0238'},
         'SPVM::Examples' => {}, # to pull SPVM/Examples/Sum.spvm
     },
     participants => [
-        { name => 'SPVM', code => sub { SPVM::Examples::Sum::sum(SPVM::int(3), SPVM::int(5))->value } },
+        { name => 'SPVM', code => sub { SPVM::Examples::Sum::sum(3, 5) } },
         { name => 'Perl', code => sub { My::Sum::sum(3, 5) } },
     ],
 };
@@ -40,7 +40,7 @@ Bencher::Scenario::SPVM::Sum - Benchmark SPVM (sum two numbers)
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::SPVM::Sum (from Perl distribution Bencher-Scenarios-SPVM), released on 2017-06-21.
+This document describes version 0.002 of Bencher::Scenario::SPVM::Sum (from Perl distribution Bencher-Scenarios-SPVM), released on 2017-08-04.
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<SPVM> 0.0201
+L<SPVM> 0.0238
 
 L<SPVM::Examples> 0.001
 
@@ -84,10 +84,10 @@ Benchmark with default options (C<< bencher -m SPVM::Sum >>):
 
  #table1#
  +-------------+-----------+-----------+------------+---------+---------+
- | participant | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+ | participant | rate (/s) | time (ns) | vs_slowest |  errors | samples |
  +-------------+-----------+-----------+------------+---------+---------+
- | SPVM        |    330000 |     3     |          1 | 3.3e-09 |      20 |
- | Perl        |  10000000 |     0.099 |         31 | 8.4e-10 |      20 |
+ | SPVM        |    940700 |      1063 |          1 |   1e-10 |      20 |
+ | Perl        |  10000000 |        96 |         11 | 1.9e-10 |      24 |
  +-------------+-----------+-----------+------------+---------+---------+
 
 

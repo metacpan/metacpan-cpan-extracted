@@ -2,7 +2,7 @@
 
 makepp_build_cache -- How to set up and use build caches
 
-=for vc $Id: makepp_build_cache.pod,v 1.28 2012/05/23 18:30:17 pfeiffer Exp $
+=for vc $Id: makepp_build_cache.pod,v 1.29 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -398,10 +398,10 @@ You can also use these commands from a makefile after loading them, with a
 C<&>-prefix as follows for the example of C<create>:
 
     perl { use Mpp::BuildCacheControl } # It's a Perl module, so use instead of include.
- 
+
     my_cache:
 	&create $(CACHE_OPTIONS) $(output) # Call a loaded builtin.
- 
+
     build_cache $(prebuild my_cache)
 
 The valid commands, which also take a few of the standard options described in

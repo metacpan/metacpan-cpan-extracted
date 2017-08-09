@@ -1,30 +1,38 @@
 {
    "abstract" : "Module to interface with the ORCID webservice",
    "author" : [
-      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
-      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
-      "Simeon Warner <simeon.warner@cornell.edu>"
+      "Patrick Hochstenbach C<< <patrick.hochstenbach at ugent.be> >>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-ORCID",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Software::License" : "0",
-            "Test::Exception" : "0.31"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
@@ -32,6 +40,7 @@
             "JSON::XS" : "2.3"
          },
          "requires" : {
+            "HTTP::Tiny" : "0",
             "JSON" : "2.51",
             "LWP::UserAgent" : "0",
             "Moo" : "1.000008",
@@ -40,43 +49,35 @@
             "namespace::clean" : "0.24",
             "perl" : "v5.10.1"
          }
-      }
-   },
-   "provides" : {
-      "WWW::ORCID" : {
-         "file" : "lib/WWW/ORCID.pm",
-         "version" : "0.0101"
       },
-      "WWW::ORCID::API" : {
-         "file" : "lib/WWW/ORCID/API.pm",
-         "version" : 0
-      },
-      "WWW::ORCID::API::Common" : {
-         "file" : "lib/WWW/ORCID/API/Common.pm",
-         "version" : 0
-      },
-      "WWW::ORCID::API::Pub" : {
-         "file" : "lib/WWW/ORCID/API/Pub.pm",
-         "version" : 0
-      },
-      "WWW::ORCID::Transport" : {
-         "file" : "lib/WWW/ORCID/Transport.pm",
-         "version" : 0
-      },
-      "WWW::ORCID::Transport::HTTP::Tiny" : {
-         "file" : "lib/WWW/ORCID/Transport/HTTP/Tiny.pm",
-         "version" : 0
-      },
-      "WWW::ORCID::Transport::LWP" : {
-         "file" : "lib/WWW/ORCID/Transport/LWP.pm",
-         "version" : 0
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.112",
+            "Test::Exception" : "0.32",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/WWW-ORCID/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/WWW-ORCID",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/WWW-ORCID.git",
+         "web" : "https://github.com/LibreCat/WWW-ORCID"
+      }
    },
-   "version" : "0.0101"
+   "version" : "0.0201",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
+

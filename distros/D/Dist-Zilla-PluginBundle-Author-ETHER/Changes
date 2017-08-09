@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.127     2017-08-06 03:16:22Z
+          - fix test library's type handling on older Dist::Zilla
+
+0.126     2017-08-02 04:31:30Z
+          - minor fixes to distribution prereqs
+          - fixed logic for adding default configs for certain plugins and
+            their roles
+
 0.125     2017-05-21 01:43:09Z
           - fix tests to work on older perls (thanks, [EnsureLatestPerl])
           - [UseUnsafeInc] (with dot_in_INC=0) is only enabled in perls

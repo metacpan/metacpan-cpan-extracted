@@ -2,13 +2,69 @@
 
 makepp_release_notes -- Major changes in each version of makepp
 
-=for vc $Id: makepp_release_notes.pod,v 1.79 2012/05/29 21:31:38 pfeiffer Exp $
+=for vc $Id: makepp_release_notes.pod,v 1.88 2014/08/03 21:10:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
 =head2 Version 2.1 (under development)
 
 =over 4
+
+=item *
+
+Warning and error messages switched to GNU style.
+
+=item *
+
+=item *
+
+Pattern rules can pick up phony dependencies (gmake compatibility), rule option :no-phony prevents that.
+
+=item *
+
+Builtin L<&template|makepp_builtins/template_option_macro_definition_filename>
+mini-language documentation rewritten.  It now has an
+C<@include(I<filename>)@> macro.
+
+=item *
+
+C Scanner now takes into account compiler specific path variables like
+C<C_INCLUDE_PATH> or C<LIB>.
+
+=item *
+
+Parens now nest as in GNU make or Shell: C<$(name ...()...)>
+
+=item *
+
+New environment variable C<MAKEPP_DEBUG>.
+
+=item *
+
+Installation defaults for html-doc and man have changed slightly.
+
+=item *
+
+The new option C<--loop> is the successor to C<--stop-after-loading>, which it
+enhances to get the head start for every edit compile cycle in an endless
+loop.
+
+=item *
+
+The C<include> statements and the functions C<find-first-upwards> and
+C<find-upwards> will no longer search higher than a F<RootMakeppfile>, if one
+is present.
+
+=item *
+
+The gmake style of putting the rule to make an include file after the include
+statement is not recommended, but now supported.  Thus the option
+C<--defer-include> has been removed.
+
+=item *
+
+All pre-2.0 features which issued deprecated-warnings are eliminated, as are
+C<$Mpp::Makefile::legacy_functions> and C<$MAKEPP_INSTALL_OLD_MODULES>.
 
 =item *
 

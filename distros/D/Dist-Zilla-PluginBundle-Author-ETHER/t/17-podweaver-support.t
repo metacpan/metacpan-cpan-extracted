@@ -91,9 +91,12 @@ subtest $_->{test_name} => sub
     my $extra_content = $_->{extra_content} // '';
     my $expected_pod = all(map { re($_) } @{ $_->{pod} });
 
+    my $tempdir = no_git_tempdir();
+
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     {   # merge into root section

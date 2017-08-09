@@ -5,7 +5,7 @@ use Moose;
 use Carp ();
 
 # ABSTRACT: Generate boilerplate documentation for Alien::Base subclass
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 with 'Dist::Zilla::Role::FileMunger';
@@ -207,7 +207,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.20
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -345,7 +345,7 @@ In your script or module:
  use {{ $class }}{{ $optversion }};
  use Env qw( @PATH );
  
- unshift @ENV, {{ $class }}->bin_dir;
+ unshift @PATH, {{ $class }}->bin_dir;
 
 __[ __DESCRIPTION__ ]__
 =head1 DESCRIPTION

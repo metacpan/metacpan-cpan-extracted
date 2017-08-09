@@ -6,7 +6,7 @@ use Mojo::Util 'monkey_patch';
 use JSON::MaybeXS 'JSON';
 use Mojo::JSON ();
 
-our $VERSION = '0.012';
+our $VERSION = '1.000';
 
 my $BINARY = JSON::MaybeXS->new(utf8 => 1, canonical => 1, allow_nonref => 1,
 	allow_unknown => 1, allow_blessed => 1, convert_blessed => 1);
@@ -152,6 +152,17 @@ regardless of whether it has been used as a string.
  print encode_json([$num1, $num2, $str]);
  # Mojo::JSON or Cpanel::JSON::XS >= 3.0109: [13,14,"13"]
  # JSON::XS or JSON::PP: ["13",14,"13"]
+
+=head2 Duplicate Keys
+
+L<Mojo::JSON>, L<JSON::XS>, and L<JSON::PP> will silently accept duplicate keys
+in the same JSON object when decoding a JSON string. L<Cpanel::JSON::XS>
+version 3.0235 or greater will throw an exception if duplicate keys are
+encountered.
+
+ print dumper decode_json('{"foo":1, "bar":2, "foo":3}');
+ # Mojo::JSON, JSON::XS, or JSON::PP: { bar => 2, foo => 3 }
+ # Cpanel::JSON::XS >= 3.0235: "Duplicate keys not allowed" exception
 
 =head1 BUGS
 

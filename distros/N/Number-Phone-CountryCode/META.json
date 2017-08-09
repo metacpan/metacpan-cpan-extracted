@@ -1,0 +1,66 @@
+{
+   "abstract" : "DEPRECATED - Country Phone Dialing Prefixes",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Number-Phone-CountryCode",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Deprecated" : "0",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-number-phone-countrycode at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Phone-CountryCode"
+      },
+      "homepage" : "http://search.cpan.org/dist/Number-Phone-CountryCode/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/number-phone-countrycode"
+      }
+   },
+   "version" : "0.03",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,5 +1,10 @@
 Revision history for Alien-Hunspell
 
+0.11      2017-07-30 07:16:30 -0400
+  - use Alien::Autotools in share build
+  - Only run xs test on development releases
+    (Test::Alien support for C++ seems to need some work)
+
 0.10      2017-07-07 03:22:40 -0400
 
 0.09_02   2017-06-27 15:14:41 -0400

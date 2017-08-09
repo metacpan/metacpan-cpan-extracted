@@ -1,26 +1,29 @@
---- #YAML:1.0
-name:               Proc-InvokeEditor
-version:            1.07
-abstract:           Interface to external editor from perl
+---
+abstract: 'Interface to external editor from perl'
 author:
-    - Michael Stevens <mstevens@etla.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Michael Stevens <mstevens@etla.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp::Assert:  0.11
-    File::Spec:    0.82
-    File::Temp:    0.12
-    IPC::Cmd:      0
-    Test::More:    0.08
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proc-InvokeEditor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp::Assert: '0.11'
+  File::Spec: '0.82'
+  File::Temp: '0.12'
+  IPC::Cmd: '0'
+  Test::More: '0.08'
+resources:
+  repository: https://github.com/mstevens/Proc--InvokeEditor.git
+version: '1.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

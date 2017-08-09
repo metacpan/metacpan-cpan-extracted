@@ -1,5 +1,8 @@
 Revision history for Pod-POM-Web
 
+1.22 03.08.2017
+  - request.t failed on perl 5.24 because HTTP::Request has no version number 
+
 1.21 30.07.2017
   - rely on Module::Metadata to parse version numbers
 

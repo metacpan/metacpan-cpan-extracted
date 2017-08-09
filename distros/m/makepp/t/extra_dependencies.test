@@ -1,26 +1,25 @@
 ###	SPAR <http://www.cpan.org/scripts/>
-###	30	644	1164352699	1179177721	Makeppfile
+###	29	644	1164352699	1404837541	Makeppfile
 #
 # This is a test of lines that specify extra dependencies but no rules.
 #
 
 .PHONY: all
 
-all: a
+# Try some crazy indentation (broken before 2014-07-08)
+ all: a
 
-a: b
+    a: c d
+  a: b
 	&echo a -o $@
 	&cat $^ -o>>$@
-
-a: c d
-
 #
 # Test out this obfuscated idiom for changing two files at once with
 # one command:
 #
-b: c
+    b: c
 
-c:
+  c:
 	&echo c -o c
 	&echo b -o b
 	&cat d -o>>c

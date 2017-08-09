@@ -32,12 +32,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "IO::Handle" => 0,
-    "IOD::Examples" => "0.15",
+    "IOD::Examples" => "0.201",
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
-  "IOD::Examples" => "0.15",
+  "IOD::Examples" => "0.201",
   "IPC::Open3" => 0,
   "JSON::PP" => 0,
   "MIME::Base64" => 0,

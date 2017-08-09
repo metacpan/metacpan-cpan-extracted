@@ -7,7 +7,6 @@ examples/fast.pl
 examples/hello-template.pl
 examples/hello.pl
 examples/microhttpd.pl
-lib/.DS_Store
 lib/Mojo.pm
 lib/Mojo/Asset.pm
 lib/Mojo/Asset/File.pm

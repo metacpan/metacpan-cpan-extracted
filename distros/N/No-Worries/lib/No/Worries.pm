@@ -13,8 +13,8 @@
 package No::Worries;
 use strict;
 use warnings;
-our $VERSION  = "1.4";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.31 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.5";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.32 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -202,29 +202,29 @@ Here are the relevant sub-modules and what they provide:
 
 =over
 
-=item * log_trace()
-
-=item * log_debug(ARGUMENTS)
-
-=item * log_info(ARGUMENTS)
-
-=item * log_warning(ARGUMENTS)
-
-=item * log_error(ARGUMENTS)
-
-=item * log_wants_trace()
-
-=item * log_wants_debug()
-
-=item * log_wants_info()
-
-=item * log_wants_warning()
-
-=item * log_wants_error()
-
 =item * log_filter(FILTER)
 
 =item * log_configure(PATH)
+
+=item * log_wants_error()
+
+=item * log_wants_warning()
+
+=item * log_wants_info()
+
+=item * log_wants_debug()
+
+=item * log_wants_trace()
+
+=item * log_error(ARGUMENTS)
+
+=item * log_warning(ARGUMENTS)
+
+=item * log_info(ARGUMENTS)
+
+=item * log_debug(ARGUMENTS)
+
+=item * log_trace()
 
 =item * log2std(INFO)
 
@@ -283,6 +283,8 @@ Here are the relevant sub-modules and what they provide:
 =item L<No::Worries::String> - string handling:
 
 =over
+
+=item * string_bytefmt(NUMBER[, PRECISION])
 
 =item * string_escape(STRING)
 
@@ -372,4 +374,4 @@ L<Params::Validate>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2016
+Copyright (C) CERN 2012-2017

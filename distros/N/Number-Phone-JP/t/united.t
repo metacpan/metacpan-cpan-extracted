@@ -105,6 +105,7 @@ ok($tel->set_number('0570 097123')->is_valid_number, 'checking for 0570 097123')
 ok($tel->set_number('0570 098123')->is_valid_number, 'checking for 0570 098123');
 ok($tel->set_number('0570 099123')->is_valid_number, 'checking for 0570 099123');
 ok($tel->set_number('0570 111123')->is_valid_number, 'checking for 0570 111123');
+ok($tel->set_number('0570 120123')->is_valid_number, 'checking for 0570 120123');
 ok($tel->set_number('0570 200123')->is_valid_number, 'checking for 0570 200123');
 ok($tel->set_number('0570 222123')->is_valid_number, 'checking for 0570 222123');
 ok($tel->set_number('0570 300123')->is_valid_number, 'checking for 0570 300123');
@@ -141,7 +142,6 @@ ok(!$tel->set_number('0570 116123')->is_valid_number, 'checking for 0570 116123'
 ok(!$tel->set_number('0570 117123')->is_valid_number, 'checking for 0570 117123');
 ok(!$tel->set_number('0570 118123')->is_valid_number, 'checking for 0570 118123');
 ok(!$tel->set_number('0570 119123')->is_valid_number, 'checking for 0570 119123');
-ok(!$tel->set_number('0570 120123')->is_valid_number, 'checking for 0570 120123');
 ok(!$tel->set_number('0570 121123')->is_valid_number, 'checking for 0570 121123');
 ok(!$tel->set_number('0570 122123')->is_valid_number, 'checking for 0570 122123');
 ok(!$tel->set_number('0570 123123')->is_valid_number, 'checking for 0570 123123');

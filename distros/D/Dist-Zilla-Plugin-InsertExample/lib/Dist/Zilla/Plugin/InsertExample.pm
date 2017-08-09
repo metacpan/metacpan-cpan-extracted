@@ -1,73 +1,77 @@
-package Dist::Zilla::Plugin::InsertExample;
-
 use strict;
 use warnings;
-use Moose;
-use Path::Class qw( dir );
-use List::Util qw( first );
+use 5.014;
 
-# ABSTRACT: Insert example into your POD from a file
-our $VERSION = '0.07'; # VERSION
+package Dist::Zilla::Plugin::InsertExample 0.09 {
+
+  use Moose;
+  use List::Util qw( first );
+
+  # ABSTRACT: Insert example into your POD from a file
 
 
-with 'Dist::Zilla::Role::FileMunger';
-with 'Dist::Zilla::Role::FileFinderUser' => {
-  default_finders => [ qw( :InstallModules :ExecFiles ) ],
-};
+  with 'Dist::Zilla::Role::FileMunger';
+  with 'Dist::Zilla::Role::FileFinderUser' => {
+    default_finders => [ qw( :InstallModules :ExecFiles ) ],
+  };
 
-has remove_boiler => (is => 'ro', isa => 'Int');
+  has remove_boiler => (is => 'ro', isa => 'Int');
+  has indent        => (is => 'ro', isa => 'Int', default => 1);
 
-sub munge_files
-{
-  my($self) = @_;
-  $self->munge_file($_) for @{ $self->found_files };
-}
-
-sub munge_file
-{
-  my($self, $file) = @_;
-
-  my $content = $file->content;
-  if($content =~ s{^#\s*EXAMPLE:\s*(.*)\s*$}{$self->_slurp_example($1)."\n"}meg)
+  sub munge_files
   {
-    $self->log([ 'adding examples in %s', $file->name]);
-    $file->content($content);
+    my($self) = @_;
+    $self->munge_file($_) for @{ $self->found_files };
   }
-}
 
-sub _slurp_example
-{
-  my($self, $filename) = @_;
-
-  my $fh;
-
-  if(my $file = first { $_->name eq $filename } @{ $self->zilla->files })
+  sub munge_file
   {
+    my($self, $file) = @_;
+  
     my $content = $file->content;
-    open $fh, '<', \$content;
-  }
-  elsif($file = dir($self->zilla->root)->file($filename))
-  {
-    $self->log_fatal("no such example file $filename") unless -r $file;
-    $fh = $file->openr;  
-  }
-
-  while(<$fh>)
-  {
-    if($self->remove_boiler)
+    if($content =~ s{^#\s*EXAMPLE:\s*(.*)\s*$}{$self->_slurp_example($1)."\n"}meg)
     {
-      next if /^\s*$/;
-      next if /^#!\/usr\/bin\/perl/;
-      next if /^use strict;$/;
-      next if /^use warnings;$/;
-      return '' if eof $fh;
+      $self->log([ 'adding examples in %s', $file->name]);
+      $file->content($content);
     }
-    return join "\n", map { " $_" } split /\n/, $_ . do { local $/; my $rest = <$fh>; defined $rest ? $rest : '' };
   }
 
-}
+  sub _slurp_example
+  {
+    my($self, $filename) = @_;
+ 
+    my $fh;
 
-__PACKAGE__->meta->make_immutable;
+    if(my $file = first { $_->name eq $filename } @{ $self->zilla->files })
+    {
+      my $content = $file->content;
+      open $fh, '<', \$content;
+    }
+    elsif($file = $self->zilla->root->child($filename))
+    {
+      $self->log_fatal("no such example file $filename") unless -r $file;
+      $fh = $file->openr;  
+    }
+
+    my $indent = ' ' x $self->indent;
+
+    while(<$fh>)
+    {
+      if($self->remove_boiler)
+      {
+        next if /^\s*$/;
+        next if /^#!\/usr\/bin\/perl/;
+        next if /^use strict;$/;
+        next if /^use warnings;$/;
+        return '' if eof $fh;
+      }
+      return join "\n", map { "$indent$_" } split /\n/, $_ . do { local $/; my $rest = <$fh>; defined $rest ? $rest : '' };
+    }
+
+  }
+
+  __PACKAGE__->meta->make_immutable;
+}
 
 1;
 
@@ -83,7 +87,7 @@ Dist::Zilla::Plugin::InsertExample - Insert example into your POD from a file
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -140,6 +144,14 @@ source root.
 
 Remove the C<#!/usr/bin/perl>, C<use strict;> or C<use warnings;> from
 the beginning of your example before inserting them into the POD.
+
+=head2 indent
+
+Specifies the number of spaces to indent by.  This is 1 by default,
+because it is sufficient to force POD to consider it a verbatim
+paragraph.  I understand a lot of Perl programmers out there prefer
+4 spaces.  You can also set this to 0 to get no indentation at all
+and it won't be a verbatim paragraph at all.
 
 =head1 AUTHOR
 

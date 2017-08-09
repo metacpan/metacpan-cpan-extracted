@@ -3,7 +3,7 @@ package Specio::Constraint::Enum;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use B ();
 use Role::Tiny::With;
@@ -47,8 +47,8 @@ with 'Specio::Constraint::Role::Interface';
         my $self = shift;
         my $val  = shift;
 
-        return sprintf( <<'EOF', $val, $self->_env_var_name, $val );
-( !ref( %s ) && $%s{ %s } )
+        return sprintf( <<'EOF', ($val) x 2, $self->_env_var_name, $val );
+( !ref( %s ) && defined( %s ) && $%s{ %s } )
 EOF
     };
 
@@ -87,7 +87,7 @@ Specio::Constraint::Enum - A class for constraints which require a string matchi
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 

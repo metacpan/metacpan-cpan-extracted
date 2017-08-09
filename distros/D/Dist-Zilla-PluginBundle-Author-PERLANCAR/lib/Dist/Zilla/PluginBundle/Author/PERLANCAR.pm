@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.58'; # VERSION
+our $DATE = '2017-08-01'; # DATE
+our $VERSION = '0.590'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -43,6 +43,7 @@ sub configure {
         'Rinci::Validate',
         'SetScriptShebang',
         'Test::Compile',
+        'Test::Perl::Critic',
         'Test::Rinci',
         'StaticInstall', # by default enable static install because 99% of the time my dist is pure-perl
         'EnsureSQLSchemaVersionedTest',
@@ -70,7 +71,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.58 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-07-08.
+This document describes version 0.590 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-08-01.
 
 =head1 SYNOPSIS
 

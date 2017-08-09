@@ -14,7 +14,7 @@ use Storable;
 use Test::BrewBuild;
 use Test::BrewBuild::Git;
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 $| = 1;
 
@@ -23,12 +23,7 @@ use constant REPO_PREFIX => 'https://github.com/';
 my ($log, $last_run_status, $results_returned);
 $ENV{BB_RUN_STATUS} = 'PASS';
 
-my $lcd;
-
-if ($ENV{BB_RPI_LCD}){
-    my @pins = split /,/, $ENV{BB_RPI_LCD};
-    $lcd = _lcd(@pins) if @pins == 6;
-}
+my $lcd; # RPi specific testing
 
 sub new {
     my ($class, %args) = @_;
@@ -62,7 +57,7 @@ sub auto {
 
     my $log = $log->child('auto');
 
-    $log->_5("commencing auto run dispatch sequence");
+    $log->_5("\nCommencing auto run dispatch sequence");
 
     $last_run_status = $ENV{BB_RUN_STATUS};
 
@@ -89,10 +84,10 @@ sub auto {
     while (1){
 
         if (! $runs){
-            $log->_6("commencing run $run_count");
+            $log->_6("COMMENCING RUN: $run_count\n");
         }
         else {
-            $log->_6("commencing run $run_count of $runs");
+            $log->_6("COMMENCING RUN: $run_count of $runs");
         }
 
         my $results = $self->dispatch(%params);
@@ -116,18 +111,25 @@ sub auto {
             $results_returned = 0;
         }
 
-    
         if ($self->{rpi}){
             $log->_7("RPi specific testing enabled");
 
             if ($ENV{BB_RPI_LCD}){
                 if ($results_returned){
-                    my $commit = $git->revision(remote => 1, repo => $params{repo});
+                    my $commit = $git->revision(
+                        remote => 1, repo => $params{repo}
+                    );
                     $commit = substr $commit, 0, 7;
 
                     my $time = strftime(
                         "%Y-%m-%d %H:%M:%S", localtime(time)
                     );
+
+                    my @pins = split /,/, $ENV{BB_RPI_LCD};
+
+                    if (! $lcd && @pins == 6){
+                        $lcd = _lcd(@pins);
+                    }
 
                     $lcd->clear;
 
@@ -137,8 +139,11 @@ sub auto {
                     $lcd->position(0, 1);
                     $lcd->print($ENV{BB_RUN_STATUS});
 
-                    $lcd->position(9, 1);
+                    $lcd->position(5, 1);
                     $lcd->print($commit);
+
+                    $lcd->position(13, 1);
+                    $lcd->print($run_count);
                 }
                 else {
                     $log->_1(
@@ -159,7 +164,7 @@ sub auto {
 
         my $sleep_msg =
             "auto run complete. Sleeping for $sleep seconds, then restarting" .
-            " if more runs required";
+            " if more runs required\n";
 
         $log->_6($sleep_msg);
 

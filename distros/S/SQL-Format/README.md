@@ -329,6 +329,12 @@ Argument details are:
 
         Default value is `''`
 
+    - $opts->{for\_update}
+
+        Alias for `$opts-`{suffix} = 'FOR UPDATE';>.
+
+        This option provides compatibility with [SQL::Maker](https://metacpan.org/pod/SQL::Maker).
+
     - $opts->{limit}
     - $opts->{offset}
     - $opts->{order\_by}

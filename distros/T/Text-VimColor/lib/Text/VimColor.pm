@@ -13,11 +13,11 @@ use warnings;
 use strict;
 
 package Text::VimColor;
-# git description: v0.25-8-g77558c1
+# git description: v0.26-5-g9246ba6
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Syntax highlight text using Vim
-$Text::VimColor::VERSION = '0.26';
+$Text::VimColor::VERSION = '0.28';
 use constant HAVE_ENCODING => ($] >= 5.008001); # PerlIO::encoding & utf8::is_utf8
 
 use IO::File;
@@ -562,10 +562,9 @@ __END__
 =encoding UTF-8
 
 =for :stopwords Geoff Richards Randy Stauner ACKNOWLEDGEMENTS ansi html xml DOCTYPE XHTML
-XSL XSLT XSL-FO pdf inline stylesheet filetype unencoded Hinrik Matyukhin
-Sigurðsson Vyacheslav mattn Örn PreProc Todo TODO syntaxes Moolenaar cpan
-testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto
-metadata placeholders metacpan
+XSL XSLT XSL-FO pdf inline stylesheet filetype unencoded PreProc Todo TODO
+syntaxes Moolenaar cpan testmatrix url annocpan anno bugtracker rt cpants
+kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -573,7 +572,7 @@ Text::VimColor - Syntax highlight text using Vim
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -1165,7 +1164,7 @@ Randy Stauner <rwstauner@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Geoff Richards Hinrik Örn Sigurðsson Vyacheslav Matyukhin mattn
+=for stopwords Geoff Richards Hinrik Örn Sigurðsson mattn Vyacheslav Matyukhin
 
 =over 4
 
@@ -1179,11 +1178,11 @@ Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 
 =item *
 
-Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+mattn <mattn.jp@gmail.com>
 
 =item *
 
-mattn <mattn.jp@gmail.com>
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
 
 =back
 

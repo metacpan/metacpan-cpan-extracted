@@ -1,5 +1,5 @@
 package Consul::Service;
-$Consul::Service::VERSION = '0.021';
+$Consul::Service::VERSION = '0.022';
 use namespace::autoclean;
 
 use Moo;

@@ -3,9 +3,9 @@ NAME
     as ISO8601 duration string
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     DateTime::Format::Duration::ISO8601 (from Perl distribution
-    DateTime-Format-Duration-ISO8601), released on 2017-07-20.
+    DateTime-Format-Duration-ISO8601), released on 2017-08-02.
 
 SYNOPSIS
      use DateTime::Format::Duration::ISO8601;

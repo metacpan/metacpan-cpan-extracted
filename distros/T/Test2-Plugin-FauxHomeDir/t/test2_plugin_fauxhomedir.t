@@ -7,14 +7,7 @@ my $faux = defined $ENV{HOME}
     ? $ENV{USERPROFILE}
     : undef;
 
-my $user = defined $ENV{USER}
-  ? $ENV{USER}
-  : defined $ENV{USERNAME}
-    ? $ENV{USERNAME}
-    : undef;
-
 bail_out 'no HOME or USERPROFILE' unless $faux;
-bail_out 'no USER or USERNAME' unless $user;
 
 is($faux, D(), 'faux home is defined');
 ok(-d $faux,   'faux home is a directory');

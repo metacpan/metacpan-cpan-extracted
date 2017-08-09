@@ -14,6 +14,7 @@ lib/Log/ger/Heavy.pm
 lib/Log/ger/Layout.pm
 lib/Log/ger/Output.pm
 lib/Log/ger/Output/Array.pm
+lib/Log/ger/Output/ArrayML.pm
 lib/Log/ger/Output/Null.pm
 lib/Log/ger/Output/String.pm
 lib/Log/ger/Plugin.pm
@@ -21,6 +22,7 @@ lib/Log/ger/Plugin/MultilevelLog.pm
 lib/Log/ger/Util.pm
 t/00-compile.t
 t/01-basic.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/format-none.t

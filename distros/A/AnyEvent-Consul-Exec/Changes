@@ -1,5 +1,9 @@
 Revision history for AnyEvent-Consul-Exec
 
+0.003     2017-08-06 10:11:42+10:00 Australia/Melbourne
+- Improve session and KV acquisition and cleanup
+- Support for running commands in remote datacenters
+
 0.002     2017-07-29 16:20:54+10:00 Australia/Melbourne
 - Add the 'wait' option
 

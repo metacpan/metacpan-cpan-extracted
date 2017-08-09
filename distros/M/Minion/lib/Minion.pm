@@ -16,7 +16,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '7.03';
+our $VERSION = '7.05';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -25,6 +25,22 @@ sub enqueue {
   my $id   = $self->backend->enqueue(@_);
   $self->emit(enqueue => $id);
   return $id;
+}
+
+sub foreground {
+  my ($self, $id) = @_;
+
+  return undef unless my $job = $self->job($id);
+  return undef
+    unless $job->retry({attempts => 1, queue => 'minion_foreground'});
+
+  my $worker = $self->worker->register;
+  $job = $worker->dequeue(0 => {id => $id, queues => ['minion_foreground']});
+  my $err;
+  if ($job) { $job->finish unless defined($err = $job->_run) }
+  $worker->unregister;
+
+  return defined $err ? die $err : !!$job;
 }
 
 sub job {
@@ -393,6 +409,13 @@ Job priority, defaults to C<0>. Jobs with a higher priority get performed first.
 Queue to put job in, defaults to C<default>.
 
 =back
+
+=head2 foreground
+
+  my $bool = $minion->foreground($id);
+
+Retry job in C<minion_foreground> queue, then perform it right away with a
+temporary worker in this process, very useful for debugging.
 
 =head2 job
 

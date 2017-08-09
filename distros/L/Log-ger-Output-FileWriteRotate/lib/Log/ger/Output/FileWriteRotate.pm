@@ -1,7 +1,7 @@
 package Log::ger::Output::FileWriteRotate;
 
-our $DATE = '2017-06-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -42,7 +42,7 @@ Log::ger::Output::FileWriteRotate - Log to File::Write::Rotate
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2017-06-24.
+This document describes version 0.002 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2017-08-02.
 
 =head1 SYNOPSIS
 
@@ -98,6 +98,12 @@ feature.
 L<Log::ger>
 
 L<File::Write::Rotate>
+
+L<Log::ger::Output::SimpleFile>
+
+L<Log::ger::Output::File>
+
+L<Log::ger::Output::DirWriteRotate>
 
 =head1 AUTHOR
 

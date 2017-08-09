@@ -55,5 +55,6 @@ SemEvalTask14-2016/system_variations/Insertion500.pl
 SemEvalTask14-2016/system_variations/Task14SubmittedSystem.pl
 t/WordNet-Extend-Insert.t
 t/WordNet-Extend-Locate.t
+word2vecSimilarity.py
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

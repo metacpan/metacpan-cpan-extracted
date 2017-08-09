@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Query::Insert;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use base qw( JsonSQL::Query::Query );
 
@@ -19,10 +19,10 @@ use JsonSQL::Param::Insert;
 
 
 sub new {
-    my ( $class, $query_rulesets, $json_query ) = @_;
+    my ( $class, $query_rulesets, $json_query, $quote_char ) = @_;
     
     # Inherit from JsonSQL::Query::Query base class.
-    my $self = $class->SUPER::new($query_rulesets, 'insert');
+    my $self = $class->SUPER::new($query_rulesets, 'insert', $quote_char);
     if ( eval { $self->is_error } ) {
         return (0, "Could not create JsonSQL INSERT query object: $self->{message}");
     }
@@ -93,7 +93,7 @@ JsonSQL::Query::Insert - JsonSQL::Query::Insert object. Stores a Perl representa
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -213,12 +213,12 @@ following properties:
 
 =item table => { table => "table1" }
 
-    Generates: INSERT INTO 'table1'
+    Generates: INSERT INTO "table1"
 See L<JsonSQL::Param::Table> for more info.
 
 =item values => [ { column => "scientist", value = "Einstein" }, { column => "theory", value = "Relativity" } ]
 
-    Generates ('scientist','theory') VALUES (?,?)
+    Generates ("scientist","theory") VALUES (?,?)
         Bind: ['Einstein','Relativity']
 See L<JsonSQL::Param::InsertValues> for more info.
 
@@ -230,7 +230,7 @@ See L<JsonSQL::Param::InsertValues> for more info.
 
 =item returning => { column => "column_id" }
 
-    Generates: RETURNING 'column_id';
+    Generates: RETURNING "column_id";
 See L<JsonSQL::Param::Insert> for more info.
 
 =back
@@ -254,12 +254,13 @@ A set of whitelisting rules is required to successfully use this module to gener
 
 =head1 METHODS
 
-=head2 Constructor new($query_rulesets, $json_query)
+=head2 Constructor new($query_rulesets, $json_query, $quote_char)
 
 Instantiates and returns a new JsonSQL::Query::Insert object.
 
     $query_rulesets      => The whitelisting rules to validate the query with.
     $json_query          => A stringified JSON object representing the query.
+    $quote_char          => Optional: the character to use for quoting identifiers. The SUPER defaults to ANSI double quotes.
 
 Returns (0, <error message>) on failure.
 

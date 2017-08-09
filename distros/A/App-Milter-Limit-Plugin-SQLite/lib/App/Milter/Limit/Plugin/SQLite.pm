@@ -1,9 +1,18 @@
-package App::Milter::Limit::Plugin::SQLite;
-our $VERSION = '0.51';
+#
+# This file is part of App-Milter-Limit-Plugin-SQLite
+#
+# This software is copyright (c) 2010 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
 
+package App::Milter::Limit::Plugin::SQLite;
+$App::Milter::Limit::Plugin::SQLite::VERSION = '0.52';
 # ABSTRACT: SQLite driver for App::Milter::Limit
 
 use strict;
+use warnings;
 use base qw(App::Milter::Limit::Plugin Class::Accessor);
 use DBI;
 use File::Spec;
@@ -74,8 +83,10 @@ sub _init_database {
     my $uid = $self->config_get('global', 'user');
     my $gid = $self->config_get('global', 'group');
 
-    my $db_file = $self->db_file;
-    chown $uid, $gid, $db_file or die "chown($db_file): $!";
+    if (defined $uid and defined $gid) {
+        my $db_file = $self->db_file;
+        chown $uid, $gid, $db_file or die "chown($db_file): $!";
+    }
 }
 
 sub child_init {
@@ -220,7 +231,7 @@ sub _reset {
 
 1;
 
-
+__END__
 
 =pod
 
@@ -230,7 +241,7 @@ App::Milter::Limit::Plugin::SQLite - SQLite driver for App::Milter::Limit
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -238,7 +249,7 @@ version 0.51
 
 =head1 DESCRIPTION
 
-This module implements the C<App::Milter::Limit> backend using a SQLite data
+This module implements the L<App::Milter::Limit> backend using a SQLite data
 store.
 
 =head1 METHODS
@@ -281,9 +292,19 @@ default: C<milter>
 L<App::Milter::Limit::Plugin>,
 L<App::Milter::Limit>
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/mschout/milter-limit-plugin-sqlite>
+and may be cloned from L<git://github.com/mschout/milter-limit-plugin-sqlite.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to bug-app-milter-limit-plugin-sqlite@rt.cpan.org or through the web interface at:
+ http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit-Plugin-SQLite
+
 =head1 AUTHOR
 
-  Michael Schout <mschout@cpan.org>
+Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -293,7 +314,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

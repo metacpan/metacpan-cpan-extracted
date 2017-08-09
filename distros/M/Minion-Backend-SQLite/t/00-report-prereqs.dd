@@ -13,7 +13,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Minion' => '7.01',
+                                      'Minion' => '7.05',
                                       'Mojo::SQLite' => '3.000',
                                       'Mojolicious' => '7.29',
                                       'Sys::Hostname' => '0',

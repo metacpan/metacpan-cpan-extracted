@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Codepeek;
 # ABSTRACT: (DEPRECATED) Service for Codepeek - http://codepeek.com
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 use parent 'App::Nopaste::Service';
 
@@ -51,7 +51,7 @@ App::Nopaste::Service::Codepeek - (DEPRECATED) Service for Codepeek - http://cod
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 DEPRECATION NOTICE
 

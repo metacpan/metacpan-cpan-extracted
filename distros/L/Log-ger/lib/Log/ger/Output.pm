@@ -1,9 +1,13 @@
 package Log::ger::Output;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use parent 'Log::ger::Plugin';
+
+# we only use one output, so set() should replace all hooks from previously set
+# plugin package
+sub _replace_package_regex { qr/\ALog::ger::Output::/ }
 
 1;
 # ABSTRACT: Set logging output
@@ -20,7 +24,7 @@ Log::ger::Output - Set logging output
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -36,7 +40,7 @@ or:
 
  use Log::ger::Output 'Screen', (
      use_color=>1,
- ...
+     ...
  );
 
 To set for current package only:

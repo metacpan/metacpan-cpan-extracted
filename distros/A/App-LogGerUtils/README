@@ -1,0 +1,39 @@
+NAME
+    App::LogGerUtils - Command-line utilities related to Log::ger
+
+VERSION
+    This document describes version 0.002 of App::LogGerUtils (from Perl
+    distribution App-LogGerUtils), released on 2017-08-03.
+
+SYNOPSIS
+    This distribution provides the following command-line utilities related
+    to Log::ger:
+
+    *   log-ger-demo-screen-colors
+
+    *   log-ger-demo-screen-colors-with-levels-like-logany
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-LogGerUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-LogGerUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-LogGerUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

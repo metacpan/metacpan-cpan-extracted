@@ -1476,12 +1476,12 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 			Tuneup for update to Unicode 9.0 tables: broken (COPTIC) SAMPI Ϡ/Ⳁ, ḃ, Ḃ, ⫏
 			Tuneup for ⩔⩓.
 			Add ÷×‒∑ to Shift-Numpad-/*-+
-				Breaks build; disabled.
+				Breaks build; disabled (on Add_Base): [non_VK] becomes too large, and we cannot construct basekeys.
 			AltGr-inverted Ctrl chars: uc-super on Green, smallcaps on Ripe, phonetics on MathBlue.
 			Add -tail to bindings of AltGr-→.
 			Tuneup right tails/hooks on AltGr-→.
 				All the left/right-tailed characters of http://www.rejc2.co.uk/ipakeyboard/ are where expected now.
-			Add greekize lc (and uc) on Ripe³ (AltGrInv) Ctrl	(at least on Latin).
+			Add greekize lc (and uc) on Ripe³ (AltGrInv) Ctrl	(at least on Latin/Cyrillic).
 				Complement rare “extra” control-char icons.
 			Same on Greek \ (AltGrInv) Ctrl (and likewise superscript forms to Greek [/] AltInv Ctrl).
 			Add Greek superscripts/subscripts to Greek [/] Ctrl.
@@ -1544,3 +1544,51 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
                   -2265	2aa2	// ≥ -> ⪢	// GREATER-THAN OR EQUAL TO	-> DOUBLE NESTED GREATER-THAN [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=US-Base ⇒ <pseudo-manual-whiten>)
                   +2264	2a7d	// ≤ -> ⩽	// LESS-THAN OR EQUAL TO	-> LESS-THAN OR SLANTED EQUAL TO [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)
                   +2265	2a7e	// ≥ -> ⩾	// GREATER-THAN OR EQUAL TO	-> GREATER-THAN OR SLANTED EQUAL TO [Common; Supplemental Mathematical Operators; 3.2] (via VisLr=USLatin-AltGr ⇒ <any-calculated-)
+
+0.72:	new_from_configfile_string() was not documented correctly.
+	split out new methods massage_full(), parse_add_configstring();
+	new methods merge_configstrings(), merge_confighash(), merge_hash(), parse_add_configfile();
+	start collecting XKB docs.
+	start implementing XKB output
+		(not finished; manual list of keysymbols; no separate CapsLock bindings; no duplication of keys; limited keypad;
+		 limited logic to generate dead key names).
+	new method flatten_unit().
+	use flatten_unit() for Windows’s output.
+		fixes a bug with lCtrl-lAlt-; on Cyrillic ?!
+	new key `skip_extra_layers_WIN´ to allow restoring backward compatibility (did not emit them on VKs before).
+	do not emit VK's specially now.
+		(⇒ minor incompatibility with GR and HB with AltGr-inverted to-Cyrillic prefix)
+		(Broken deadkeys emitted on ABNT_C1; needed to disable extra layers on ABNT_C1.)
+	Fix problems defining Shift-numeric keys in the main layer.
+		(replaces ⦂ by ⟌ on AltGr-^ — probably fine.)
+	prefix=HEX was allowed only at end of a Face specification.
+	Allow LinkFace to be a recipe (untested).
+	New key Prefix_Base_Altern (Windows only).
+		(Currently provenance is not documented for prefixed assignments obtained via this map.)
+	Fix IfPrefix[]().
+	New directive Shortcut(FACE_RECIPE_NAME).  Same as Face(), but preserves active prefix, and no caching is done.
+	In addition to layer NAME², also autogenerate NAME²⁺ for the next 2 maps after those in NAME² (for visual -> RECT).
+	Likewise for NAME₁, NAME₂, NAME₂₊ for corresponding rectangles in the next row of rectangles.
+	Autogenerate Face recipes for NAME⁴ as Layers(NAME²+Name²⁺), and NAME₄ as Layers(NAME²+Name₂).
+
+	build_here.cmd:
+	extra_c.zip:
+	izKeys.patch:
+	test-klc-tr.pl:		Needed edits to support extra KLLC_* flags we generate on Hebrew.
+
+	izKeys-visual-maps-base.html:	Fix description of Math Font variants.
+
+	izKeys.kbdd:	Add Math Italic variants of ı,ȷ (as if Greek 7,*).
+			Math Bold-Italic was delivering Math Bold digits (instead of having no digits).
+			Add skip_extra_layers_WIN=SPACE (just in case).
+			Micro-fix for DOUBLE_GRAVE.
+			Add ÷×‒∑ to Shift-Numpad-/*-+
+			Move FUNKEYS from Ripe  to the specific Mnu face.
+			Move FUNKEYS from Ripe² to the specific Mnu-Ctrl face.
+				(These 2 remove a few meaningless prefixed assignments.)
+			Enable ModArrows and Prefix_Base_Altern.
+			Enable prefix on Menu-Arrows: AltGr-$ (as ↦), Blue (as ⇨), AltGr-^ (as ⮕ ➡), AltGr-~ (as ↪), AltGr-/ (as ⇸)
+				AltGr-. (as ⇢), AltGr-` (as ⊐), AltGr-' (as ▷).
+					(Something also visible on AltGr-Arrows;  ⤳ appears twice)
+			Fully populate Script-Arrows (on AltGr-Mnu).
+				(Including CJK WAVY DASH 〰???)

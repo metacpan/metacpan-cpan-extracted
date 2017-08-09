@@ -47,13 +47,13 @@ Apply the new version number v.vv to the newly created module.
 
 =head1 AUTHOR 
 
-Toby Thurston -- 20 Feb 2016 
+Toby Thurston -- 30 Jul 2017
 
 =cut
 
 my $want_diff   = 0;
 my $want_update = 0;
-my $new_version = '2.18';
+my $new_version = '2.19';
 my $module_name = 'Maps.pm';
 my $lib_module_name = File::Spec->catfile(qw(lib Geo Coordinates OSGB), $module_name);
 
@@ -71,12 +71,12 @@ die pod2usage() if @ARGV || ! $options_ok;
 
 sub polygon_area_in_km {
     my $p = shift;
-    my $a = 0;
+    my $area = 0;
     for (my $i=1; $i < scalar @{$p}; $i++) {
-        $a = $a + $p->[$i-1][0] * $p->[$i][1]
-                - $p->[$i-1][1] * $p->[$i][0];
+        $area = $area + $p->[$i-1][0] * $p->[$i][1]
+                      - $p->[$i-1][1] * $p->[$i][0];
     }
-    return $a/2_000_000;
+    return $area/2_000_000;
 }
 
 # return the ll and ur corners as a list of points
@@ -130,8 +130,8 @@ while ( <$control> ) {
     next unless my ($id, $file, $sides, $max_inset_area, $max_sheet_area, $short_name, $long_name) =
           $_ =~ /([A-Z])\s+(\S+)\s+(\d)\D+(\d+)\D+(\d+)\s+(\S+)\s+(\S.*)$/osmx;
 
-    $long_name =~ s/\A\"(.*)\"\Z/$1/s or
-    $long_name =~ s/\A\'(.*)\'\Z/$1/s;
+    $long_name =~ s/\A\"(.*)\"\Z/$1/sx or
+    $long_name =~ s/\A\'(.*)\'\Z/$1/sx;
 
     my $catalogue_name = File::Spec->catfile($map_dir, sprintf('catalogue-%s.txt', $file));
     my $polygons_name  = File::Spec->catfile($map_dir, sprintf('polygons-%s.txt', $file));
@@ -179,7 +179,7 @@ for my $s (@series_to_build) {
     }
 
     close $cat;
-    open my $fh, '<', $s->{poly_file} or die "Cannot open polygon file for $series\n";
+    open my $fh, '<', $s->{poly_file} or croak "Cannot open polygon file for $series\n";
     warn "Reading polygons for $s->{long_name}\n";
     LINE:
     while (<$fh>) {
@@ -308,16 +308,12 @@ for my $s (@series_to_build) {
     close $fh;
 }
 
-my $pm;
-if ($want_update) {
-    open $pm, '>', $lib_module_name;
-    warn "Writing to $lib_module_name\n";
-}
-else {
-    open $pm, '>', $module_name;
-    warn "Writing to $module_name\n";
-}
-print $pm <<'END_PREAMBLE';
+my $pm_handle;
+my $pm_name = $want_update ? $lib_module_name : $module_name;
+
+open $pm_handle, '>', $pm_name or croak "Cannot open $pm_name for update";
+warn "Writing to $pm_name\n";
+print $pm_handle <<'END_PREAMBLE';
 package Geo::Coordinates::OSGB::Maps;
 use base qw(Exporter);
 use strict;
@@ -325,26 +321,26 @@ use warnings;
 our @EXPORT_OK = qw(%maps %name_for_map_series);
 our %maps;
 END_PREAMBLE
-print $pm "our \$VERSION = '$new_version';\n";
-print $pm "our \%name_for_map_series = ( \n";
+print $pm_handle "our \$VERSION = '$new_version';\n";
+print $pm_handle "our \%name_for_map_series = ( \n";
 for my $s (@series_to_build) {
-    printf $pm "  %s => '%s',\n", $s->{id}, $s->{long_name};
+    printf $pm_handle "  %s => '%s',\n", $s->{id}, $s->{long_name};
 }
-print $pm ");\n";
+print $pm_handle ");\n";
 
 for my $m (@sheets) {
-    print $pm '$maps{"', $m->{key}, '"} = { ';
-    printf $pm 'bbox => [[%d, %d], [%d, %d]], ', $m->{bbox}->[0][0], $m->{bbox}->[0][1], $m->{bbox}->[1][0], $m->{bbox}->[1][1];
+    print $pm_handle '$maps{"', $m->{key}, '"} = { ';
+    printf $pm_handle 'bbox => [[%d, %d], [%d, %d]], ', $m->{bbox}->[0][0], $m->{bbox}->[0][1], $m->{bbox}->[1][0], $m->{bbox}->[1][1];
     for my $f ( qw{area series number parent title} ) {
         die "No f\n" unless defined $f;
         die "No $f in $m->{key}\n" unless defined $m->{$f};
-        printf $pm "%s => '%s', ", $f, $m->{$f};
+        printf $pm_handle "%s => '%s', ", $f, $m->{$f};
     }
-    print $pm 'polygon => [', join(',', map { sprintf '[%d,%d]', $_->[0], $_->[1] } @{$m->{poly}}), ']'; # no comma because last
-    print $pm " };\n";
+    print $pm_handle 'polygon => [', join(',', map { sprintf '[%d,%d]', $_->[0], $_->[1] } @{$m->{poly}}), ']'; # no comma because last
+    print $pm_handle " };\n";
 }
 
-print $pm "1;\n\n";
+print $pm_handle "1;\n\n";
 my @pod;
 push @pod, '=pod';
 push @pod, '';
@@ -422,8 +418,8 @@ push @pod, '=back';
 push @pod, '';
 push @pod, '=cut';
 push @pod, '';
-print $pm join "\n", @pod;
-close $pm;
+print $pm_handle join "\n", @pod;
+close $pm_handle;
 warn sprintf "Wrote %d sheet definitions to maps module\n", scalar @sheets;
 
 if ($want_diff && -f $module_name) {

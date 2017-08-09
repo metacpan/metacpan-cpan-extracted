@@ -1,7 +1,7 @@
 package Bencher::Scenarios::SPVM;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Benchmark SPVM
@@ -18,7 +18,7 @@ Bencher::Scenarios::SPVM - Benchmark SPVM
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::SPVM (from Perl distribution Bencher-Scenarios-SPVM), released on 2017-06-21.
+This document describes version 0.002 of Bencher::Scenarios::SPVM (from Perl distribution Bencher-Scenarios-SPVM), released on 2017-08-04.
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 package Log::ger::Format::Block;
 
-our $DATE = '2017-06-30'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-08-01'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -56,23 +56,18 @@ Log::ger::Format::Block - Use formatting using block instead of sprintf-style
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
  use Log::ger::Format 'Block';
  use Log::ger;
 
-After that, you can use your logging routine a la L<Log::Contextual>:
+After that, you can use your logging routine a la L<Log::Contextual> in the
+importing package:
 
  # the following block won't run if debug is off
  log_debug { "the new count in the database is " . $rs->count };
-
-To install only for current package:
-
- use Log::ger::Format;
- BEGIN { Log::ger->set_for_current_package('Block') }
- use Log::ger;
 
 =head1 DESCRIPTION
 

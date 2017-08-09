@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.75'; # VERSION
+our $VERSION = '0.91'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -398,6 +398,8 @@ sub probe
       die $error;
     }
     $self->log("error in probe (will do a share install): $@");
+    $self->log("Don't panic, we will attempt a share build from source if possible.");
+    $self->log("Do not file a bug unless you expected a system install to succeed.");
     $type = 'share';
   }
   
@@ -535,7 +537,7 @@ sub extract
       $CWD = "$tmp";
     },
     verify => sub {
-      my @list = grep { $_->basename !~ /^\./, } _path('.')->children;
+      my @list = grep { $_->basename !~ /^\./ && $_->basename ne 'pax_global_header' } _path('.')->children;
       
       my $count = scalar @list;
       
@@ -958,7 +960,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.75
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -1120,6 +1122,34 @@ Virtually everything else, including gcc on windows.
 The main difference is that with Visual C++ C<-LIBPATH> should be used instead
 of C<-L>, and static libraries should have the C<.LIB> suffix instead of C<.a>.
 
+=item system_type
+
+C<$^O> is frequently good enough to make platform specific logic in your
+L<alienfile>, this handles the case when $^O can cover platforms that provide
+multiple environments that Perl might run under.  The main example is windows,
+but others may be added in the future.
+
+=over 4
+
+=item unix
+
+=item vms
+
+=item windows-activestate
+
+=item windows-microsoft
+
+=item windows-mingw
+
+=item windows-strawberry
+
+=item windows-unknown
+
+=back
+
+Note that C<cygwin> and C<msys> are considered C<unix> even though they run
+on windows!
+
 =back
 
 =item start_url
@@ -1209,6 +1239,12 @@ relevant once the install process is complete.
 
 The version of L<Alien::Build> used to install the library or tool.
 
+=item alt
+
+Alternate configurations.  If the alienized package has multiple
+libraries this could be used to store the different compiler or
+linker flags for each library.
+
 =item cflags
 
 The compiler flags
@@ -1227,7 +1263,7 @@ Linux and C<gmake> on FreeBSD.
 
 The install type.  Is one of:
 
-=over
+=over 4
 
 =item system
 

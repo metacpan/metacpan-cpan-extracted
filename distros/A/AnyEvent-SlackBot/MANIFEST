@@ -1,0 +1,8 @@
+lib/AnyEvent/SlackBot.pm
+t/AnyEvent-SlackBot.t
+Makefile.PL
+MANIFEST
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

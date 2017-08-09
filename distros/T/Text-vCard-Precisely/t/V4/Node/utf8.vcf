@@ -1,0 +1,16 @@
+BEGIN:VCARD
+VERSION:4.0
+FN:Forrest Gump
+NICKNAME:一期一会
+IMPP:aim:johndoe@aol.com
+LANG:en-us
+LANG:ja-jp
+GEO:39.95;-75.1667
+ORG:Bubba Gump Shrimp Co.
+TITLE:Shrimp Man
+ROLE:Section 9
+CATEGORIES:fisher
+NOTE:It's a note!
+XML:<b>Not an xCard XML element</b>
+KEY;TYPE=PGP:http://example.com/key.pgp
+END:VCARD

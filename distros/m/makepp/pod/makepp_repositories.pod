@@ -3,7 +3,7 @@
 makepp_repositories -- How to use repositories for variant builds, for
 maintaining a central set of sources, and other things
 
-=for vc $Id: makepp_repositories.pod,v 1.23 2012/02/07 22:26:15 pfeiffer Exp $
+=for vc $Id: makepp_repositories.pod,v 1.24 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ like this:
     OBJECTS = a.o b.o c.o
     my_program: $(OBJECTS)
     	cc $(inputs) -o $(output)
- 
+
     %.o: %.c
     	cc $(CFLAGS) -c $(input) -o $(output)
 
@@ -156,15 +156,15 @@ For example, consider a slight modification to the above makefile:
 
     CFLAGS   := -O2
     A_CFLAGS := -O6 -funroll-loops
- 
+
     OBJECTS := a.o b.o c.o
- 
+
     my_program: $(OBJECTS)
     	cc $(inputs) -o $(output)
- 
+
     %.o: %.c
     	cc $(CFLAGS) -c $(input) -o $(output)
- 
+
     a.o: a.c
     	cc $(A_CFLAGS) -c $(input) -o $(output)
 

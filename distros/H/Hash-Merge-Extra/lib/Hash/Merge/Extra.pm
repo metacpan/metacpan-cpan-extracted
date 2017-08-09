@@ -5,7 +5,43 @@ use warnings FATAL => 'all';
 
 use Hash::Merge qw(_merge_hashes);
 
-our $VERSION = '0.01'; # Don't forget to change in pod below
+our $VERSION = '0.02'; # Don't forget to change in pod below
+
+use constant L_ADDITIVE => {
+    'SCALAR' => {
+        'SCALAR' => sub { defined $_[0] ? $_[0] : $_[1] },
+        'ARRAY'  => sub { defined $_[0] ? $_[0] : $_[1] },
+        'HASH'   => sub { defined $_[0] ? $_[0] : $_[1] },
+    },
+    'ARRAY' => {
+        'SCALAR' => sub { $_[0] },
+        'ARRAY'  => sub { [ @{$_[0]}, @{$_[1]} ] },
+        'HASH'   => sub { $_[0] },
+    },
+    'HASH' => {
+        'SCALAR' => sub { $_[0] },
+        'ARRAY'  => sub { $_[0] },
+        'HASH'   => sub { _merge_hashes(@_) },
+    },
+};
+
+use constant R_ADDITIVE => {
+    'SCALAR' => {
+        'SCALAR' => sub { defined $_[1] ? $_[1] : $_[0] },
+        'ARRAY'  => sub { $_[1] },
+        'HASH'   => sub { $_[1] },
+    },
+    'ARRAY' => {
+        'SCALAR' => sub { defined $_[1] ? $_[1] : $_[0] },
+        'ARRAY'  => sub { [ @{$_[1]}, @{$_[0]} ] },
+        'HASH'   => sub { $_[1] },
+    },
+    'HASH' => {
+        'SCALAR' => sub { defined $_[1] ? $_[1] : $_[0] },
+        'ARRAY'  => sub { $_[1] },
+        'HASH'   => sub { _merge_hashes(@_) },
+    },
+};
 
 use constant L_OVERRIDE => {
     'SCALAR' => {
@@ -21,7 +57,7 @@ use constant L_OVERRIDE => {
     'HASH' => {
         'SCALAR' => sub { $_[0] },
         'ARRAY'  => sub { $_[0] },
-        'HASH'   => sub { _merge_hashes($_[0], $_[1]) },
+        'HASH'   => sub { _merge_hashes(@_) },
     },
 };
 
@@ -39,7 +75,7 @@ use constant R_OVERRIDE => {
     'HASH' => {
         'SCALAR' => sub { $_[1] },
         'ARRAY'  => sub { $_[1] },
-        'HASH'   => sub { _merge_hashes($_[0], $_[1]) },
+        'HASH'   => sub { _merge_hashes(@_) },
     },
 };
 
@@ -80,35 +116,24 @@ use constant R_REPLACE => {
 };
 
 my %INDEX = (
-    OVERRIDE => {
-        L_OVERRIDE => L_OVERRIDE,
-        R_OVERRIDE => R_OVERRIDE
-    },
-    REPLACE => {
-        L_REPLACE => L_REPLACE,
-        R_REPLACE => R_REPLACE
-    },
+    L_ADDITIVE      => L_ADDITIVE,
+    L_OVERRIDE      => L_OVERRIDE,
+    L_REPLACE       => L_REPLACE,
+
+    R_ADDITIVE      => R_ADDITIVE,
+    R_OVERRIDE      => R_OVERRIDE,
+    R_REPLACE       => R_REPLACE,
 );
 
 sub import {
     shift; # throw off package name
 
-    my %req = map { $_ => 1 } @_;
-    my %done;
-
-    while (my ($grp, $behs) = each %INDEX) {
-        while (my ($k, $v) = each %{$behs}) {
-            next if (keys %req and not exists $req{$k});
-            Hash::Merge::specify_behavior($v, $k);
-            $done{$k}++;
-        }
-    }
-
-    for (keys %req) {
-        unless (exists $done{$_}) {
+    for (@_ ? @_ : keys %INDEX) {
+        unless (exists $INDEX{$_}) {
             require Carp;
             Carp::croak "Unable to register $_ (no such behavior)";
         }
+        Hash::Merge::specify_behavior($INDEX{$_}, $_);
     }
 }
 
@@ -122,7 +147,7 @@ Hash::Merge::Extra - Collection of extra behaviors for L<Hash::Merge>
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -145,7 +170,7 @@ Nothing registered if passed empty list:
 
     use Hash::Merge::Extra qw();
 
-Resister only specified behaviors:
+Only specified behaviors registered if list defined:
 
     use Hash::Merge::Extra qw(L_OVERRIDE R_REPLACE);
 
@@ -153,9 +178,13 @@ Resister only specified behaviors:
 
 =over 4
 
+=item L_ADDITIVE, R_ADDITIVE
+
+Hashes merged, arrays joined, scalars overrided if undefined. Left and right precedence.
+
 =item L_OVERRIDE, R_OVERRIDE
 
-Merge hashes, override arrays and scalars. Left and right precedence
+Merge hashes, override arrays and scalars. Left and right precedence.
 
 =item L_REPLACE, R_REPLACE
 

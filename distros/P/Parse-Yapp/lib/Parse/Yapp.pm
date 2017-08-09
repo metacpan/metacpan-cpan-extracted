@@ -1,7 +1,9 @@
 #
 # Module Parse::Yapp.pm.
 #
-# Copyright (c) 1998-2001, Francois Desarmenien, all right reserved.
+# Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+# Copyright © 2017 William N. Braswell, Jr.
+# All Rights Reserved.
 #
 # See the Copyright section at the end of the Parse/Yapp.pm pod section
 # for usage and distribution rights.
@@ -15,12 +17,14 @@ use vars qw($VERSION @ISA);
 
 use Parse::Yapp::Output;
 
-# $VERSION is in Parse/Yapp/Driver.pm
-
+# CORRELATION #py001: $VERSION must be changed in both Parse::Yapp & Parse::Yapp::Driver
+our $VERSION = '1.21';
 
 1;
 
 __END__
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -109,6 +113,8 @@ This file is divided in three sections, separated by C<%%>:
 
 =item B<The Header Section> section may optionally contain:
 
+=over
+
 =item *
 
 One or more code blocks enclosed inside C<%{> and C<%}> just like in
@@ -123,7 +129,7 @@ be avoided to make a reentrant parser module.
 Precedence declarations, introduced by C<%left>, C<%right> and C<%nonassoc>
 specifying associativity, followed by the list of tokens or litterals
 having the same precedence and associativity.
-The precedence beeing the latter declared will be having the highest level.
+The precedence being the latter declared will be having the highest level.
 (see the yacc or bison manuals for a full explanation of how they work,
 as they are implemented exactly the same way in Parse::Yapp)
 
@@ -149,6 +155,9 @@ parsed but (almost) ignored.
 C<%expect> followed by a number, suppress warnings about number of Shift/Reduce
 conflicts when both numbers match, a la bison.
 
+=back
+
+=back
 
 =item B<The Rule Section> contains your grammar rules:
 
@@ -172,7 +181,7 @@ conflict)
 
 A rhs may be followed by an optional C<%prec> directive, followed
 by a token, giving the rule an explicit precedence (see yacc manuals
-for its precise meaning) and optionnal semantic action code block (see
+for its precise meaning) and optional semantic action code block (see
 below).
 
     exp:   '-' exp %prec NEG { -$_[1] }
@@ -229,8 +238,8 @@ their return values.
 $_[1] to $_[n] are the parameters just as $1 to $n in yacc, while
 $_[0] is the parser object itself.
 
-Having $_[0] beeing the parser object itself allows you to call
-parser methods. Thats how the yacc macros are implemented:
+Having $_[0] being the parser object itself allows you to call
+parser methods. That's how the yacc macros are implemented:
 
 	yyerrok is done by calling $_[0]->YYErrok
 	YYERROR is done by calling $_[0]->YYError
@@ -252,7 +261,7 @@ return respectivly the current input token that made the parse fail,
 its semantic value (both can be used to modify their values too, but
 I<know what you are doing> ! See I<Error reporting routine> section for
 an example), a list which contains the tokens the parser expected when
-the failure occured and a reference to the lexer routine.
+the failure occurred and a reference to the lexer routine.
 
 Note that if C<$_[0]-E<gt>YYCurtok> is declared as a C<%nonassoc> token,
 it can be included in C<$_[0]-E<gt>YYExpect> list whenever the input
@@ -274,7 +283,7 @@ through the method
 
 where index is an integer. Its value being I<1 .. n> returns the same values
 than I<$_[1] .. $_[n]>, but I<-n .. 0> returns values on the left of the rule
-beeing reduced (It is related to I<$-n .. $0 .. $n> in yacc, but you
+being reduced (It is related to I<$-n .. $0 .. $n> in yacc, but you
 cannot use I<$_[0]> or I<$_[-n]> constructs in Parse::Yapp for obvious reasons)
 
 
@@ -289,7 +298,7 @@ or ParseYapp.yp files in the distribution for some examples).
 That's how you can make you parser module reentrant: all of your
 module states and variables are held inside the parser object.
 
-Note: unfortunatly, method calls in Perl have a lot of overhead,
+Note: unfortunately, method calls in Perl have a lot of overhead,
       and when YYData is used, it may be called a huge number
       of times. If your are not a *real* purist and efficiency
       is your concern, you may access directly the user-space
@@ -350,7 +359,7 @@ data area.
 It is its duty to return the next token and value to the parser.
 They C<must> be returned as a list of two variables, the first one
 is the token known by the parser (symbolic or literal), the second
-one beeing anything you want (usualy the content of the token, or the
+one being anything you want (usually the content of the token, or the
 literal value) from a simple scalar value to any complex reference,
 as the parsing driver never use it but to call semantic actions:
 
@@ -375,14 +384,14 @@ meaningful error messages, instead of the default which is to print
 
 So you will need an Error reporting sub.
 
-item C<Error reporting routine>
+=item C<Error reporting routine>
 
 If you want one, write it knowing that it is passed as parameter
-the parser object. So you can share information whith the lexer
+the parser object. So you can share information with the lexer
 routine quite easily.
 
 You can also use the C<$_[0]-E<gt>YYErrok> method in it, which will
-resume parsing as if no error occured. Of course, since the invalid
+resume parsing as if no error occurred. Of course, since the invalid
 token is still invalid, you're supposed to fix the problem by
 yourself.
 
@@ -452,7 +461,7 @@ where value is a bitfield, each bit representing a specific debug output:
     0x08         Parse Stack dump
     0x10         Error Recovery tracing
 
-To have a full debugging ouput, use
+To have a full debugging output, use
 
     debug => 0x1F
 
@@ -489,7 +498,8 @@ or have any questions related to it, feel free to contact the author.
 
 =head1 AUTHOR
 
-Francois Desarmenien  <francois@fdesar.net>
+William N. Braswell, Jr. <wbraswell_cpan@NOSPAM.nym.hush.com>
+(Remove "NOSPAM".)
 
 =head1 SEE ALSO
 
@@ -497,8 +507,9 @@ yapp(1) perl(1) yacc(1) bison(1).
 
 =head1 COPYRIGHT
 
-The Parse::Yapp module and its related modules and shell scripts are copyright
-(c) 1998-2001 Francois Desarmenien, France. All rights reserved.
+The Parse::Yapp module and its related modules and shell scripts are copyright:
+Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+Copyright © 2017 William N. Braswell, Jr.
 
 You may use and distribute them under the terms of either
 the GNU General Public License or the Artistic License,

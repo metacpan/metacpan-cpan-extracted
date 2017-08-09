@@ -5,6 +5,7 @@ use Pcore::Ext;
 use Pcore::Share::Ext_v6_2_0;
 use Pcore::Share::WWW;
 use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Text qw[decode_utf8];
 use JavaScript::Packer qw[];
 use JavaScript::Beautifier qw[];
 
@@ -132,8 +133,8 @@ around run => sub ( $orig, $self, $req ) {
     my $ext_app_js = $self->_prepare_ext_app_js(
         {   overrides => $ext_framework->get_overrides,
             locale    => {
-                class_name      => $ext_app->{l10n_class_name},
-                messages        => to_json($locale_messages),
+                class_name => $ext_app->{l10n_class_name},
+                messages   => \decode_utf8( to_json( $locale_messages, readable => 1 )->$* ),
                 plural_form_exp => $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 'null',
             },
             api_map => to_json(

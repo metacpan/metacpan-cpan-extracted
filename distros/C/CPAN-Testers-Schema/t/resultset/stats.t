@@ -72,8 +72,10 @@ subtest 'insert_test_report' => sub {
         released => 1327657454,
     });
 
+    my $stat_id;
     subtest 'upload exists' => sub {
         my $stat = $rs->insert_test_report($report);
+        $stat_id = $stat->id;
 
         isa_ok $stat, 'CPAN::Testers::Schema::Result::Stats';
         ok looks_like_number($stat->id), 'an id was generated';
@@ -92,6 +94,14 @@ subtest 'insert_test_report' => sub {
         is $stat->uploadid, 169497, 'correct uploadid';
     };
 
+    subtest 'reprocess report' => sub {
+        $report->report->{result}{grade} = 'PASS';
+        $report->update({ report => $report->report });
+        my $stat = $rs->insert_test_report( $report );
+        is $stat->id, $stat_id, 'stat is updated, not duplicated';
+        is $stat->guid, 'd0ab4d36-3343-11e7-b830-917e22bfee97', 'correct guid';
+        is $stat->state, 'pass', 'correctly changed test state';
+    };
 };
 
 done_testing;

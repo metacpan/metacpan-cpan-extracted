@@ -1,5 +1,5 @@
 package Consul::API::ACL;
-$Consul::API::ACL::VERSION = '0.021';
+$Consul::API::ACL::VERSION = '0.022';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -73,7 +73,7 @@ sub list {
 }
 
 package Consul::API::ACL::Info;
-$Consul::API::ACL::Info::VERSION = '0.021';
+$Consul::API::ACL::Info::VERSION = '0.022';
 use Moo;
 use Types::Standard qw(Str);
 
@@ -85,7 +85,7 @@ has type         => ( is => 'ro', isa => Str, init_arg => 'Type',        require
 has rules        => ( is => 'ro', isa => Str, init_arg => 'Rules',       required => 1 );
 
 package Consul::API::ACL::Success;
-$Consul::API::ACL::Success::VERSION = '0.021';
+$Consul::API::ACL::Success::VERSION = '0.022';
 use Moo;
 use Types::Standard qw(Str);
 

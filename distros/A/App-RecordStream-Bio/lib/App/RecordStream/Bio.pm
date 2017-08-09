@@ -2,7 +2,7 @@ package App::RecordStream::Bio;
 
 use strict;
 use 5.010;
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # For informational purposes only in the fatpacked file, so it's OK to fail.
 # For now, classes are still under the App::RecordStream::Operation namespace
@@ -58,6 +58,8 @@ L<recs-fromgff3>
 L<recs-fromsam>
 
 L<recs-tofasta>
+
+L<recs-togff3>
 
 Looking for C<fromfastq> or C<tofastq>?  Install the
 L<recs-fastq|https://github.com/MullinsLab/recs-fastq> package.

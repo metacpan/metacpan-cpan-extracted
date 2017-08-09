@@ -1,5 +1,5 @@
 {
-   "abstract" : "Lint xml files using xmllint and report the failure rate",
+   "abstract" : "Lint xml files in parallel using xmllint and report the failure rate",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -24,14 +24,16 @@
             "Carp" : "0",
             "Data::Table::Text" : "0",
             "Digest::SHA" : "0",
-            "Encode" : "0"
+            "Encode" : "0",
+            "Test::More" : "0",
+            "Test::SharedFork" : "0"
          }
       }
    },
    "provides" : {
       "Data::Edit::Xml::Lint" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm",
-         "version" : "2017.717"
+         "version" : "20170801"
       },
       "Data::Edit::Xml::Lint::Report" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm"
@@ -43,5 +45,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.717"
+   "version" : "20170801"
 }

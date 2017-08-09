@@ -1,7 +1,7 @@
 package Config::IOD::Reader;
 
-our $DATE = '2017-01-16'; # DATE
-our $VERSION = '0.32'; # VERSION
+our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.33'; # VERSION
 
 use 5.010001;
 use strict;
@@ -230,7 +230,7 @@ Config::IOD::Reader - Read IOD/INI configuration files
 
 =head1 VERSION
 
-This document describes version 0.32 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2017-01-16.
+This document describes version 0.33 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2017-08-05.
 
 =head1 SYNOPSIS
 
@@ -296,6 +296,7 @@ The supported terms:
  number
  string (double-quoted and single-quoted)
  undef literal
+ simple variable ($abc, no namespace, no array/hash sigil, no special variables)
  function call (only the 'val' function is supported)
  grouping (parenthesis)
 
@@ -310,6 +311,9 @@ The C<val()> function refers to the configuration key. If the argument contains
 ".", it will be assumed as C<SECTIONNAME.KEYNAME>, otherwise it will access the
 current section's key. Since parsing is done in a single pass, you can only
 refer to the already mentioned key.
+
+Code will be compiled using Perl's C<eval()> in the
+C<Config::IOD::Expr::_Compiled> namespace, with C<no strict>, C<no warnings>.
 
 =head1 ATTRIBUTES
 
@@ -532,7 +536,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

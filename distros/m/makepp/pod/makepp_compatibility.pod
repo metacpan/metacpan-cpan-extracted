@@ -2,7 +2,7 @@
 
 makepp_compatibility -- Compatibility list for makepp
 
-=for vc $Id: makepp_compatibility.pod,v 1.40 2012/10/14 15:18:27 pfeiffer Exp $
+=for vc $Id: makepp_compatibility.pod,v 1.43 2015/08/09 16:24:51 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -10,11 +10,20 @@ makepp_compatibility -- Compatibility list for makepp
 
 The many Perl versions available and still installed on many machines come
 with various subtle bugs.  We have tried to work around most of them, but a
-few remain.  We have a test suite of around 75 tests, all of which usually
+few remain.  We have a test suite of around 95 tests, all of which usually
 pass.  On some platforms lacking some features, notably Cygwin, a few tests
 are explicitly skipped.  This table shows with what version this has been
 tested where, and whether it was successful.  We would like to hear of your
 results on other platforms too!
+
+Note that you get a comparable overview when going to the top right CPAN tab
+and choosing Perl/Platform Version Matrix
+(L<http://matrix.cpantesters.org/?dist=makepp>).  But they give a red bar even
+if only one out of about hundred tests fail.  And since those test are
+automated on screened off machines, it can be hard to find out or even fix
+what is going wrong.  Often it is something that could be worked around, like
+compiler, operating or file system particularities or wrong environment
+variables.
 
 =for html
 <ul>
@@ -23,7 +32,8 @@ results on other platforms too!
 <li>failed: <b class="bad">&nbsp;<i>/</i>&nbsp;</b></li>
 <li>Click the navigation side bar's close button (&#xd7;) to have more space for the table!</li>
 </ul>
-<table border="1" cellspacing="3" cellpadding="3">
+<div class='compatibility'>
+<table cellspacing="3" cellpadding="3">
 
 =for comment
 The following table, where each table row must be separated by an empty line,
@@ -31,58 +41,59 @@ has the structure " OS#x|x|x#x|x|...#".  Here 'x' means success, '/' means
 failure, empty means not tested, and anything else is a footnote link to the
 list below.  The first two lines are special, based on the OS field being
 empty.  This is converted to html by install.pl and readable as is in other
-formats.  The 1st header line is currently not dynamic.
+formats.
 
-		#|||||||||			5.8						#|	5.10	#||||		5.12			#|| 5.14		#| 5.16		#
+		#|||||||||			5.8						#|	5.10	#||||		5.12			#|| 5.14		#|||	 5.16			#||	5.18		# 5.20	#||| 5.22			#|| 5.24		# 5.26	#
 
-		# .0	| .1	| .2	| .3	| .4	| .5	| .6	| .7	| .8	| .9	# .0	| .1	# .0	| .1	| .2	| .3	| .4	# .0	| .1	| .2	# .0	| .1	#
+		# .0	| .1	| .2	| .3	| .4	| .5	| .6	| .7	| .8	| .9	# .0	| .1	# .0	| .1	| .2	| .3	| .4	# .0	| .1	| .2	# .0	| .1	| .2	| .3	# .0	| .1	| .2	# .0	# .0	| .1	| .2	| .3	# .0	| .1	| .2	# .0	#
 
- GNU/Linux (x86)# x	| x	| x	| x	| x	|	| x	| x	| x	| x	# x	| x	# x	| x	| x	| x	| x	# x	| x	| x	# x	| x	#
+ GNU/Linux (x86)# x	| x	| x	| x	| x	|	| x	| x	| x	| x	# x	| x	# x	| x	| x	| x	| x	# x	| x	| x	# x	| x	| x	| x	# x	| x	|	# x	# x	| x	| x	| x	# x	| x	| x	# x	#
 
- GNU/Linux (amd64)#	|	|	|	|	| x	|	|	|	| x	#	|	#	|	| x	| x	|	# x	|	| x	#	|	#
+ GNU/Linux (amd64)#	|	|	|	|	| x	|	|	|	| x	#	|	#	|	| x	| x	|	# x	|	| x	#	|	| x	| x	#	|	|	#	#	|	|	|	#	|	|	#	#
 
- GNU/Linux (S/390)#	|	|	|	|	|	|	|	| x	| x	# x	| x	#	|	|	|	|	#	|	|	#	|	#
+ GNU/Linux (S/390)#	|	|	|	|	|	|	|	| x	| x	# x	| x	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
 
- FreeBSD (x86)	#	|	|	|	|	|	|	|	| x	| x	# x	| x	# x	| x	| x	| x	|	#	| x	|	#	|	#
+ FreeBSD (x86)	#	|	|	|	|	|	|	|	| x	| x	# x	| x	# x	| x	| x	| x	|	#	| x	|	#	|	| x	| x	#	| x	| x	# x	#	|	|	|	#	|	|	#	#
 
- NetBSD (x86)	#	|	|	|	|	|	|	|	|	| x	# x	| x	# x	| x	| x	| x	|	#	| x	| x	#	|	#
+ NetBSD (x86)	#	|	|	|	|	|	|	|	|	| x	# x	| x	# x	| x	| x	| x	|	#	| x	| x	#	|	| x	| x	#	| x	|	#	#	|	|	|	#	|	|	#	#
 
- NetBSD (Alpha)	#	|	|	|	|	|	|	|	|	| x	# x	| x	#	|	|	|	|	#	|	|	#	|	#
+ NetBSD (Alpha)	#	|	|	|	|	|	|	|	|	| x	# x	| x	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
 
- OpenBSD (x86)	# x	|	|	|	|	|	|	|	|	| x	# x	| x	# x	| x	| x	|	| x	# x	| x	| x	# x	| x	#
-
-
- AIX (PPC)	#	| x	| x	|	|	|	|	| x	| x	|	#	|	#	|	|	|	|	#	|	|	#	| x	#
-
- Darwin (x86)	#	|	|	|	|	|	|	|	|	|	#	|	#	| x	|	|	|	#	|	| x	#	|	#
-
- Darwin (PPC)	#	|	|	|	|	|	| x	| x	| x	| x	# x	| x	# x	| x	| x	|	|	#	|	|	#	|	#
-
- HP/UX (IA64)	# x	|	|	| x	|	|	|	|	|	|	#	|	#	|	|	|	|	#	|	|	#	|	#
-
- Irix		#	|	|	|	|	|	|	|	| x	|	#	|	#	|	|	|	|	#	|	|	#	|	#
-
- Solaris (Sparc)# x	| x	| x	| x	| x	| x	| x	| x	| x	| x	# x	|	# x	| x	|	|	|	#	|	|	# x	| x	#
-
- Solaris (64bit)#	| x	|	|	|	|	|	|	| x	|	# x	|	#	|	|	|	|	#	|	|	#	|	#
-
- Solaris (x86)	#	| x	|	|	|	|	|	|	| x	| x	# x	| x	# x	| x	| x	|	|	#	|	|	#	|	#
+ OpenBSD (x86)	# x	|	|	|	|	|	|	|	|	| x	# x	| x	# x	| x	| x	|	| x	# x	| x	| x	# x	| x	| x	|	# x	| x	|	#	#	|	|	|	#	|	|	#	#
 
 
- BS2000 (S/390)	#	| x	|	|	|	|	|	|	|	|	# /	|	#	|	|	|	|	#	|	|	#	|	#
+ AIX (PPC)	#	| x	| x	|	|	|	|	| x	| x	|	#	|	#	|	|	|	|	#	|	|	#	| x	|	|	#	| x	|	#	#	|	|	|	#	|	|	#	#
 
- z/OS USS (S/390)#	|	|	|	|	|	|	|	| zOS	|	# /	|	#	|	|	|	|	#	|	|	#	|	#
+ Darwin (x86)	#	|	|	|	|	|	|	|	|	|	#	|	#	| x	|	|	|	#	|	| x	#	|	|	|	#	|	| x	# x	#	|	|	|	#	|	|	#	#
+
+ Darwin (PPC)	#	|	|	|	|	|	| x	| x	| x	| x	# x	| x	# x	| x	| x	|	|	#	|	|	#	|	| x	|	#	| x	|	#	#	|	|	|	#	|	|	#	#
+
+ HP/UX (IA64)	# x	|	|	| x	|	|	|	|	|	|	#	|	#	|	|	|	|	#	|	|	#	|	|	|	#	| x	|	# x	#	|	|	|	#	|	|	#	#
+
+ Irix		#	|	|	|	|	|	|	|	| x	|	#	|	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
+
+ Solaris (Sparc)# x	| x	| x	| x	| x	| x	| x	| x	| x	| x	# x	|	# x	| x	|	|	|	#	|	|	# x	| x	|	|	# x	| x	|	# x	#	|	|	|	#	|	|	#	#
+
+ Solaris (64bit)#	| x	|	|	|	|	|	|	| x	|	# x	|	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
+
+ Solaris (x86)	#	| x	|	|	|	|	|	|	| x	| x	# x	| x	# x	| x	| x	|	|	#	|	|	#	|	| x	|	#	|	|	#	#	|	|	|	#	|	|	#	#
 
 
- Cygwin (x86)	#	|	|	|	|	|	|	| Win	| x	|	# x	| x	#	|	|	|	|	#	|	| x	#	|	#
+ BS2000 (S/390)	#	| x	|	|	|	|	|	|	|	|	# /	|	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
 
- MinGW MSYS	#	|	|	|	|	|	|	|	| x	|	#	|	#	|	|	|	|	#	|	|	#	|	#
+ z/OS USS (S/390)#	|	|	|	|	|	|	|	| zOS	|	# /	|	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
 
- Stawberry	#	|	|	|	|	|	|	|	| x	| x	# x	| x	#	| x	| x	| x	|	#	|	| x	# x	| x	#
 
- ActiveState Win# x	| x	| x	| x	| x	|	| x	| x	| x	| x	# x	| x	# x	| x	|	| x	|	# x	|	| x	#	| x	#
+ Cygwin (x86)	#	|	|	|	|	|	|	| Win	| x	|	# x	| x	#	|	|	|	|	#	|	| x	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
+
+ MinGW MSYS	#	|	|	|	|	|	|	|	| x	|	#	|	#	|	|	|	|	#	|	|	#	|	|	|	#	|	|	#	#	|	|	|	#	|	|	#	#
+
+ Stawberry	#	|	|	|	|	|	|	|	| x	| x	# x	| x	#	| x	| x	| x	|	#	|	| x	# x	| x	| x	| x	# x	|	|	#	#	|	|	|	#	|	|	#	#
+
+ ActiveState Win# x	| x	| x	| x	| x	|	| x	| x	| x	| x	# x	| x	# x	| x	|	| x	|	# x	|	| x	#	| x	|	| x	#	|	|	#	#	|	|	|	#	|	|	#	#
 
 =for html </table>
+</div>
 
 =over
 
@@ -198,6 +209,18 @@ a more realistic Windows SMB server, where the situation might be different.
 A few special characters are not allowed in filenames.  Linking and symbolic
 linking fails.  The file permission mask and owner are mount options, while
 the time stamps are not settable.
+
+=item Mixed Case Sensitive & Insensitive File Names
+
+Makepp's file name handling is either fully case sensitive or not, depending
+on the directory where it was invoked.  If this directory is case insensitive,
+but it is mounted on a path containing upper case letters within the case
+sensitive part of the path, then makepp will trip.
+
+If you need this setup to work (e.g. the Windows host is reachable as
+F</mnt/hgfs/C> from Linux inside VMware) you will have to design your Makefile
+as though you were on a case sensitive file system and C<export
+MAKEPP_CASE_SENSITIVE_FILENAMES=1> before you call makepp.
 
 =back
 

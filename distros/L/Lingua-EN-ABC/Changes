@@ -1,5 +1,11 @@
 Revision history for perl module Lingua::EN::ABC
 
+0.07 2017-07-31
+
+* Simpler method of conversion
+* Depends on Convert::Moji
+* overly/over added
+
 0.06 2016-08-31
 
 * Documentation updates

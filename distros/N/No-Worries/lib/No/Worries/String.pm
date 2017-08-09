@@ -13,8 +13,8 @@
 package No::Worries::String;
 use strict;
 use warnings;
-our $VERSION  = "1.4";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.5";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -28,9 +28,28 @@ use Params::Validate qw(validate validate_pos :types);
 #
 
 our(
-    @_Map,     # mapping of characters to escaped strings
-    %_Plural,  # pluralization cache
+    @_ByteSuffix,  # byte suffixes used by bytefmt
+    @_Map,         # mapping of characters to escaped strings
+    %_Plural,      # pluralization cache
 );
+
+#
+# format a number of bytes
+#
+
+sub string_bytefmt ($;$) {
+    my($number, $precision) = @_;
+    my($index);
+
+    $precision = 2 unless defined($precision);
+    $index = 0;
+    while ($_ByteSuffix[$index] and $number > 1024) {
+        $index++;
+        $number /= 1024.0;
+    }
+    return("$number $_ByteSuffix[$index]") if $number =~ /^\d+$/;
+    return(sprintf("%.${precision}f %s", $number, $_ByteSuffix[$index]));
+}
 
 #
 # escape a string (quite compact, human friendly but not Perl eval()'able)
@@ -83,6 +102,44 @@ sub string_quantify ($$) {
 }
 
 #
+# return the real length of a string (removing ANSI Escape sequences)
+#
+
+sub _strlen ($) {
+    my($string) = @_;
+
+    return(0) unless defined($string);
+    $string =~ s/\x1b\[[0-9;]*[mGKH]//g;
+    return(length($string));
+}
+
+#
+# return an aligned and padded string
+#
+
+sub _strpad ($$$) {
+    my($string, $length, $align) = @_;
+    my($strlen, $before, $after);
+
+    $string = "" unless defined($string);
+    $strlen = _strlen($string);
+    $align ||= "left";
+    if ($align eq "left") {
+        $before = 0;
+        $after = $length - $strlen;
+    } elsif ($align eq "right") {
+        $before = $length - $strlen;
+        $after = 0;
+    } elsif ($align eq "center") {
+        $before = ($length - $strlen) >> 1;
+        $after = $length - $strlen - $before;
+    } else {
+        die("unexpected alignment: $align\n");
+    }
+    return((" " x $before) . $string . (" " x $after));
+}
+
+#
 # transform a table into a string
 #
 
@@ -95,7 +152,7 @@ my %string_table_options = (
 );
 
 sub string_table ($@) {
-    my($lines, %option, @length, $index, $length, $format, $result);
+    my($lines, %option, @collen, $index, $length, $result);
 
     # handle options
     $lines = shift(@_);
@@ -108,38 +165,43 @@ sub string_table ($@) {
     foreach my $line ($option{header} ? ($option{header}) : (), @{ $lines }) {
         $index = 0;
         foreach my $entry (@{ $line }) {
-            $length = defined($entry) ? length($entry) : 0;
-            $length[$index] = $length
-                unless defined($length[$index]) and $length[$index] >= $length;
+            $length = _strlen($entry);
+            $collen[$index] = $length
+                unless defined($collen[$index]) and $collen[$index] >= $length;
             $index++;
         }
     }
-    # setup formatting
-    $length = length($option{colsep}) * (@length - 1);
-    $index = 0;
-    foreach my $colen (@length) {
-        $length += $colen;
-        if ($option{align}[$index] and $option{align}[$index] eq "right") {
-            $colen = "%" . $colen . "s";
-        } else {
-            $colen = "%-" . $colen . "s";
-        }
-        $index++;
+    # compute total length
+    $length = length($option{colsep}) * (@collen - 1);
+    foreach my $collen (@collen) {
+        $length += $collen;
     }
-    $format = join($option{colsep}, @length) . "\n";
     $result = "";
     # format header
     if ($option{header}) {
         $result .= $option{indent};
-        $result .= sprintf($format, @{ $option{header} });
+        $index = 0;
+        while ($index < @collen) {
+            $result .= $option{colsep} if $index;
+            $result .= _strpad($option{header}[$index],
+                               $collen[$index], $option{align}[$index]);
+            $index++;
+        }
+        $result .= "\n";
         $result .= $option{indent};
         $result .= substr($option{headsep} x $length, 0, $length) . "\n";
     }
     # format lines
     foreach my $line (@{ $lines }) {
         $result .= $option{indent};
-        $result .= sprintf($format, map(defined($_) ? $_ : "",
-                                        map($line->[$_], 0 .. $#length)));
+        $index = 0;
+        while ($index < @collen) {
+            $result .= $option{colsep} if $index;
+            $result .= _strpad($line->[$index],
+                               $collen[$index], $option{align}[$index]);
+            $index++;
+        }
+        $result .= "\n";
     }
     return($result);
 }
@@ -161,6 +223,7 @@ sub string_trim ($) {
 # module initialization
 #
 
+@_ByteSuffix = qw(B kB MB GB TB PB EB ZB YB);
 foreach my $ord (0 .. 255) {
     $_Map[$ord] = 32 <= $ord && $ord < 127 ?
         chr($ord) : sprintf("\\x%02x", $ord);
@@ -189,7 +252,7 @@ sub import : method {
 
     $pkg = shift(@_);
     grep($exported{$_}++, map("string_$_",
-        qw(escape plural quantify table trim)));
+        qw(bytefmt escape plural quantify table trim)));
     export_control(scalar(caller()), $pkg, \%exported, @_);
 }
 
@@ -204,6 +267,9 @@ No::Worries::String - string handling without worries
 =head1 SYNOPSIS
 
   use No::Worries::String qw(*);
+
+  # format a number of bytes
+  printf("%s has %s\n", $path, string_bytefmt(-s $path));
 
   # escape a string
   printf("found %s\n", string_escape($data));
@@ -233,6 +299,12 @@ default):
 
 =over
 
+=item string_bytefmt(NUMBER[, PRECISION])
+
+return the given NUMBER formatted as a number of bytes with a suffix such as
+C<kB> or C<GB>; the default precision (i.e. number of digits after the decimal
+dot) is 2
+
 =item string_escape(STRING)
 
 return a new string with all potentially non-printable characters escaped;
@@ -254,7 +326,8 @@ a formatted multi-line string; supported options:
 
 =over
 
-=item * C<align>: array reference of alignment directions (default: left)
+=item * C<align>: array reference of alignment directions (default: "left");
+possible values are "left", "center" and "right"
 
 =item * C<colsep>: column separator string (default: " | ")
 
@@ -280,4 +353,4 @@ L<No::Worries>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2016
+Copyright (C) CERN 2012-2017

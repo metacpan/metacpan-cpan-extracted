@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 README
 TODO-apple
+TODO-X11
 t/UI-KeyboardLayout.t
 lib/UI/KeyboardLayout.pm
 lib/UI/KeyboardLayout/izKeys.pod
@@ -68,4 +69,5 @@ examples/mini-en.kbdd
 examples/build-test.pl
 examples/logo-base.html
 examples/HOWTO-release-version
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

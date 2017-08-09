@@ -6,6 +6,7 @@ WriteMakefile(
     NAME              => 'Regexp::Common::time',
     VERSION_FROM      => 'lib/Regexp/Common/time.pm',
     LICENSE           => 'unrestricted',
+    MIN_PERL_VERSION  => 5.006,
     BUILD_REQUIRES    => {
      'Test::More'     =>  '0.40',
     },
@@ -19,7 +20,7 @@ WriteMakefile(
     META_MERGE        => {
       "meta-spec" => { version => 2 },
       provides    => {
-          'Regexp::Common::time' => { file => 'lib/Regexp/Common/time.pm', version => '0.13' },
+          'Regexp::Common::time' => { file => 'lib/Regexp/Common/time.pm', version => '0.14' },
       },
       resources => {
         repository => {

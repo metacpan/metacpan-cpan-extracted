@@ -1,0 +1,196 @@
+NAME
+    App::PerlCriticUtils - Command-line utilities related to Perl::Critic
+
+VERSION
+    This document describes version 0.001 of App::PerlCriticUtils (from Perl
+    distribution App-PerlCriticUtils), released on 2017-08-02.
+
+SYNOPSIS
+    This distribution provides the following command-line utilities related
+    to Perl::Critic:
+
+    *   pcpcat
+
+    *   pcpdoc
+
+    *   pcpless
+
+    *   pcpman
+
+    *   pcppath
+
+FUNCTIONS
+  pcpcat
+    Usage:
+
+     pcpcat(%args) -> [status, msg, result, meta]
+
+    Print Perl::Critic policy module source code.
+
+    Examples:
+
+    *   Example #1:
+
+         pcpcat( policies => ["Variables/ProhibitMatchVars"]);
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   policies* => *array[perl::modname]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pcpdoc
+    Usage:
+
+     pcpdoc(%args) -> [status, msg, result, meta]
+
+    Show documentation of Perl::Critic policy module.
+
+    Examples:
+
+    *   Example #1:
+
+         pcpdoc( policy => "Variables/ProhibitMatchVars");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   policy* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pcpless
+    Usage:
+
+     pcpless(%args) -> [status, msg, result, meta]
+
+    Show Perl::Critic policy module source code with `less`.
+
+    Examples:
+
+    *   Example #1:
+
+         pcpless( policy => "Variables/ProhibitMatchVars");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   policy* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pcpman
+    Usage:
+
+     pcpman(%args) -> [status, msg, result, meta]
+
+    Show manpage of Perl::Critic policy module.
+
+    Examples:
+
+    *   Example #1:
+
+         pcpman( policy => "Variables/ProhibitMatchVars");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   policy* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pcppath
+    Usage:
+
+     pcppath(%args) -> [status, msg, result, meta]
+
+    Get path to locally installed Perl::Critic policy module.
+
+    Examples:
+
+    *   Example #1:
+
+         pcppath( policies => ["Variables/ProhibitMatchVars"]);
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   policies* => *array[perl::modname]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PerlCriticUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PerlCriticUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlCriticUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

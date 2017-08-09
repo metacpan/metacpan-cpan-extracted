@@ -69,3 +69,44 @@ options:
 ENDUSAGE
     return;
 }
+
+=pod
+
+=head1 NAME
+
+prefix - Read from stdin, write to stdout with prepended information
+
+=head1 SYNOPSIS
+
+    $ tail -F /var/log/messages | prefix
+
+=head1 DESCRIPTION
+
+prefix(1) reads lines from its stdin and writes them to stdout after prepending one or more bits of information.
+
+By default, prefix(1) prepends the current time as both a human-readable datetime and an epoch time, separated by a single space.
+
+=head1 OPTIONS
+
+    --format=[hash,tab,csv,space]
+                        Format output as hash, tab-delimited, csv, or space-delimited values (default: space).
+    --hires             Use sub-second resolution time (via Time::HiRes).
+    --h, --help         Show this options summary.
+    --host              Prepend local hostname to each line.
+    --host-sans=SUFFIX  Prepend local hostname to each line, without SUFFIX.
+    --iso               Use ISO-compliant time format.
+    --label=LABELNAME   When emitting output in hash format, use LABELNAME as the name of the field containing the input data (default: 'd').
+    --no-date           Do not prepend any date or time to output -- same effect as --no-epoch --no-human-date.
+    --no-human-date     Do not prepend human-readable date/time to output.
+    --no-epoch          Do not prepend machine-readable time to output.
+    --order=CSV         Specify what to produce on output, and in what order (default: "lt,tm,d").
+    --perl=PERLCODE     Evaluate the given perl once per line, and prepend its return value to output.
+    --perlf=FILENAME    Like --perl, but pulls perl code from the specified file.
+    --pretee=FILENAME   Before prefixing input lines, append them to FILENAME.
+    --short             Reformat human-readable timestamp to just include month, day, and time (hours, minutes, seconds).
+    --shorter           Reformat human-readable timestamp to just include abbreviated time (hours, minutes).
+    --tai[=mode]        Use TAI time per mode: 0 = TAI, 10 = TAI-10 (default), 35 = TAI-35
+    --tee=FILENAME      After prefixing input lines, append them to FILENAME.
+    --with=STRING       Prepend with the literal string.
+
+=cut

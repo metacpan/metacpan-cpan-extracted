@@ -5,7 +5,7 @@ package IO::ReadPreProcess;
 # It provides IO::Handle-ish functions to slot in easily to most scripts.
 
 # Author: Alain D D Williams <addw@phcomp.co.uk> March 2015, 2016, 2017 Copyright (C) the author.
-# SCCS: @(#)ReadPreProcess.pm	1.12 06/03/17 16:59:37
+# SCCS: @(#)ReadPreProcess.pm	1.13 08/03/17 15:16:04
 
 use 5.006;
 use strict;
@@ -18,11 +18,11 @@ our $errstr; # Error string
 
 use Math::Expression;
 
-our $VERSION = 0.83;
+our $VERSION = 0.84;
 
 # Control directive recognised by getline():
 my %ctlDirectives = map { $_ => 1 } qw/ break case close continue do done echo else elseif elsif endswitch error eval exit
-    fi for if include last let local next noop print read return set sub switch test unless until while /;
+    fi for if include last let local next noop out print read return set sub switch test unless until while /;
 
 # Directives that can be used in a condition:
 my %condDirectives = map { $_ => 1 } qw/ include read test /;
@@ -56,7 +56,9 @@ sub new
 	Frame =>	undef,	# Reference to current frame (last in FrameStk)
 
 	subs =>		{},	# Keys are known sub
-        Streams =>	{},	# Input streams
+	Streams =>	{},	# Input streams
+
+	out =>		"",	# Name of current output stream, empty string is return line to program
 
 	# Public properties:
 	MaxLoopCount =>	50,	# Max times that a loop can go round
@@ -64,6 +66,7 @@ sub new
 	PipeOK =>	0,	# True if allowed to open a pipe
 	Trim =>		1,	# Trim input lines
 	OnError =>	'warn',	# Can set to: warn, die, ''
+	OutStreams =>	{},	# Key: name, value: Stream
 
 	Place =>	'??',	# Last read location: current file/line#
 
@@ -74,6 +77,10 @@ sub new
         trace =>	0,	# 1 trace directives, 2 trace generated input
 	@_
     }, $class;
+
+    # These output streams are given for free:
+    $self->{OutStreams}->{STDOUT} = *STDOUT{IO} unless( defined($self->{OutStreams}->{STDOUT}));
+    $self->{OutStreams}->{STDERR} = *STDERR{IO} unless( defined($self->{OutStreams}->{STDERR}));
 
     # Produce an escaped version of the directive start string. All the RE special prefix with a backslash.
     # This will be used at the start of an RE but we want it taken literally.
@@ -804,13 +811,52 @@ sub putline {
     push @{$self->{Frame}->{PushedInput}}, @_
 }
 
+# Wrapper for _getline()
+# The point is that we might be outputting to a stream rather than returning
+# a line of input to the program.
+sub getline {
+    my $self = shift;
+
+    while(1) {
+        my $l = $self->_getline;
+
+        return $l if($self->{out} eq "");    # No stream set, return to caller
+
+        $self->writeToStream($self->{out}, $l);
+    }
+}
+
+# Write the argument line $l to the output $stream
+# It can be an IO::FILE or subroutine
+sub writeToStream {
+    my ($self, $stream, $l) = @_;
+
+    my $strm = $self->{OutStreams}->{$stream};
+
+    if( !defined($strm)) {
+        # This could result in many messages
+        $self->SetError("Output stream unknown: '$stream'");
+        return;
+    }
+    if(ref $strm eq 'IO::File' or ref $strm eq 'IO::Handle') {
+        print $strm $l;
+        return;
+    }
+    if(ref $strm eq 'CODE') {
+        &$strm($l);
+        return;
+    }
+    # Should not get here
+    $self->SetError("Output stream '$stream' is not an IO::File or IO::Handle or subroutine, but is: " . ref $strm);
+}
+
 # Called when every line is read
 # One problem with this is that it cannot store anything in a local variable
 # as it returns once it finds a line that it cannot process itself.
 # Store in the object.
 # Can't store 'static' since there may be different files open for different purposes.
 # getline() getlines() close() are deliberately compatible with IO::Handle. new() is not, it is more complicated.
-sub getline {
+sub _getline {
     my $self = shift;
 
     return $self->SetError("A file has not been opened", 1)
@@ -1215,19 +1261,38 @@ EVAL_RESTART:	# Restart parsing here after a .eval
             exit $code;
         }
 
-        # Print a line, -e print to stderr
+        # Print a line, -e print to stderr, -o stream write to named stream
         # Line parsed for escapes
         if($dir eq 'print') {
-            my $stream = $arg =~ s/^-e\b\s*// ? \*STDERR : \*STDOUT;
+            my $stream = 'STDOUT';
+            $stream = 'STDERR' if($arg =~ s/^-e\b\s*//);
+            $stream = $1 if($arg =~ s/^-o\s*(\w+)\b\s*//);
+
             return undef unless(defined($arg = $self->ProcEscapes($arg)));
-            print $stream "$arg\n";
+            $self->writeToStream($stream, "$arg\n");
+            next;
+        }
+
+        # Set the current output stream
+        if($dir eq 'out') {
+            if($arg eq "") {
+                $self->{out} = "";
+            } elsif($arg =~ s/^(\w+)\s*$//) {
+                if(defined($self->{OutStreams}->{$1})) {
+                    $self->{out} = $1;
+                } else {
+                    $self->SetError("Unknown output stream '$1'");
+                }
+            } else {
+                $self->SetError("Bad or missing stream name '$arg'");
+            }
             next;
         }
 
         # Close this file, return to the one that .included it - if any
         # This may result in EOF. Check at loop top
         if($dir eq 'return') {
-	    # Evaluate expression after .return - in context of the .sub
+            # Evaluate expression after .return - in context of the .sub
             my $ret = undef;
             $ret = $self->{Math}->ParseToScalar($arg) if($arg =~ /\S/);
             $vh->{_} = [$ret];
@@ -1301,7 +1366,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
         # No operation
         next if($dir eq 'noop');
 
-	# Subroutine definition
+        # Subroutine definition
         if($dir eq 'sub') {
             return undef
                 unless($self->readSub($dir, $_, $arg));
@@ -1423,7 +1488,7 @@ files and substitute values.
 
 An easy way of reading input where some lines are read conditionally and other
 files included: .if/.else/.elseif/.fi, do: .include .let .print, loops: .while
-.for; subroutine definition & call - and more.
+.for; subroutine definition & call; write to other streams - and more.
 
 Provides IO::Handle-ish functions and input diamond - thus easy to slot in to existing scripts.
 
@@ -1542,11 +1607,33 @@ This may be overridden on an individual loop with the C<-i> option.
 
 Default 50.
 
+=item OutStreams
+
+This defines output streams that may be written to by C<.out> and C<.print -o>. The
+streams can either be C<IO::File> or a reference to a function (when the line will be passed as
+the only argument).
+
+The members C<STDOUT> and C<STDERR> are added if not passed, given values C<*STDOUT{IO}> and C<*STDERR{IO}>.
+Names must match the RE C</w+/>.
+
+Eg:
+
+    my $lf = IO::File->new('logFile', 'w+');
+    sub func {
+        say "func called '$_[0]'";
+    }
+
+    OutStreams => { fun => \&func, log => $lf }
+
+This provides the ability to write to multiple places, however the file (or function) must
+be opened by the Perl script. C<IO::ReadPreProcess> does not provide the ability to
+open new files.
+
 =back
 
 =head1 PUBLIC PROPERTIES
 
-The properties C<Trim>, C<OnError>, C<MaxLoopCount>, C<PipeOK> and C<Raw> (see C<new>)
+The properties C<Trim>, C<OnError>, C<MaxLoopCount>, C<OutStreams>, C<PipeOK> and C<Raw> (see C<new>)
 may be directly assigned to at any time.
 
 Eg:
@@ -1620,7 +1707,7 @@ If there is an error in opening a file look at C<$IO::ReadPreProcess::errstr>;
 
 Example:
 
-    $fh->open(Fd => \*STDIN, File => 'Standard input');
+    $fh->open(Fd => \*STDIN, File => 'Standard input', OutStreams => { log => $lf });
 
 =item C<close>
 
@@ -1748,8 +1835,15 @@ The condition may also be one of the directives: C<.include> C<.read> C<.test>
 
 =item C<.print>
 
-The rest of the line will be printed to C<stdout>. If the line starts C<-e> it will
-be output to C<stderr>.
+The rest of the line will be printed to C<stdout>.
+
+If the line starts C<-e> it will be written to output stream C<STDERR>.
+
+If the line starts C<-o strm> it will be written to output stream C<strm>.
+
+Eg:
+
+    .print -o log Something interesting has happened!
 
 The following escapes will be recognised and substitutions performed:
 
@@ -1830,6 +1924,18 @@ A new frame is created for every file opened, C<if>, C<while>, C<sub> executed, 
 =item C<.close>
 
 This is only needed to close named streams. The C<-s name> option is needed.
+
+=item C<.out>
+
+This diverts output to the output stream (see: C<OutStreams>) mentioned.
+Lines generated will be sent there until a C<.out> directive without an argument.
+
+Eg:
+
+    .out index
+    Meals in London
+    Times of the last tube trains
+    .out
 
 =item C<.local>
 

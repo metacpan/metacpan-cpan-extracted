@@ -22,6 +22,5 @@ t/14_overload.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-cpan-changes.t
-t/release-kwalitee.t
 t/style-trailing-space.t
 weaver.ini

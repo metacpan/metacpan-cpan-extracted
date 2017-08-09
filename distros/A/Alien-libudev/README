@@ -1,0 +1,41 @@
+NAME
+
+    Alien::libudev - Perl distribution for libudev
+
+INSTALL
+
+        cpan Alien::libudev
+
+eudev
+
+    Apparently, you can't build libudev separately from systemd anymore.
+    Some Gentoo developers have forked udev as eudev, with the aim of
+    keeping it isolated from systemd. This is what this module builds.
+
+    If you prefer systemd's libudev, install it over your distro's package
+    manager. e.g. on Debian:
+
+        sudo apt-get install libudev-dev
+
+    Installing this module on a system with systemd's libudev is
+    effectively a no-op.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-libudev
+
+SEE ALSO
+
+    https://github.com/gentoo/eudev
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

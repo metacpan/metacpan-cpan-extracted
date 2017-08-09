@@ -10,10 +10,9 @@ use JSON;
 
 my $json = JSON->new->allow_nonref->pretty->canonical;
 
-my $reader = Config::IOD::Reader->new(enable_expr=>1);
-for (glob "share/examples/*.iod") {
+my $reader = Config::IOD::Reader->new(enable_expr=>1, expr_vars=>{a=>2, b=>3, bar=>"baz"});
+for (glob("share/examples/*.iod"), glob "share/examples/expr/*.iod") {
     next if /TODO-|invalid-/;
     say "$_ ...";
     write_text("$_.json", $json->encode($reader->read_file($_)));
 }
-

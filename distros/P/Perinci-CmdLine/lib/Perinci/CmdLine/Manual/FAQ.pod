@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual::FAQ - FAQs
 
 =head1 VERSION
 
-This document describes version 1.52 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2017-07-07.
+This document describes version 1.77 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
 
 =head1 NOMENCLATURE
 
@@ -53,10 +53,8 @@ PC:Lite (see next question).
 
 PC:Lite stays more lightweight by avoiding the use of libraries that have large
 dependencies or add too much to startup overhead. This includes replacing
-L<Perinci::Access> with L<Perinci::Access::Lite> for metadata access, avoiding
-L<Text::ANSITable> for formatting results, and replacing L<Log::Any::App> (which
-uses the relatively heavy L<Log::Log4perl>) with L<Log::Any::Adapter::Screen>
-for logging.
+L<Perinci::Access> with L<Perinci::Access::Lite> for metadata access and
+avoiding L<Text::ANSITable> for formatting results.
 
 Implementation-wise, the two share a lot of common code in the form of their
 base class, L<Perinci::CmdLine::Base>. The interface is also 99% the same.
@@ -149,12 +147,6 @@ output stream (streaming result).
 
 =item * Undo
 
-=item * More advanced logging
-
-Only logging to screen is currently supported by PC::Lite, using
-L<Log::Any::Adapter::Screen>. PC::Classic, using L<Log::Any::App> can log to
-files, directories, syslog, and other outputs.
-
 =item * I18N
 
 =item * The following environment variables
@@ -243,21 +235,14 @@ above.
 
 =head2 How do I enable/view log messages?
 
-The framework produces log messages using L<Log::Any>. You can display them on
-the screen, e.g. using L<Log::Any::Adapter::Screen> like:
+The framework produces log messages using L<Log::ger>. You can display them on
+the screen, e.g. using L<Log::ger::App> like:
 
- % perl -MLog::Any::Adapter=Screen,min_level,trace /path/to/yourscript.pl
+ % TRACE=1 perl -MLog::ger::App /path/to/yourscript.pl
 
 or:
 
- % TRACE=1 PERL5OPT=-MLog::Any::Adapter::Screen yourscript.pl
-
-Log::Any::Adapter::Screen has a few other options and observes a few other
-environment variables (e.g. for prefixing with timestamp, etc). See its
-documentation for more details.
-
-For sending logs to files, there are other Log::Any adapters you can look at.
-Also take a look at L<Log::Any::App>.
+ % TRACE=1 PERL5OPT=-MLog::ger::App yourscript.pl
 
 =head2 How do I debug my CLI script?
 

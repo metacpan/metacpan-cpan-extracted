@@ -7,7 +7,14 @@ share {
   requires 'Alien::m4'       => '0.11';
   requires 'Path::Tiny'      => '0.077';
 
-  meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
+  if($^O eq 'MSWin32')
+  {
+    meta->prop->{env}->{PERL} = '/usr/bin/perl' if meta->prop->{platform}->{system_type} eq 'windows-mingw';
+  }
+  else
+  {
+    meta->prop->{env}->{PERL} = $^X;
+  }
 
   plugin Download => (
     url => 'ftp://ftp.gnu.org/gnu/automake',
@@ -59,47 +66,7 @@ share {
     }
   };
   
-  plugin 'Build::Autoconf' => ();
-  
-  requires 'IPC::Cmd';
-  requires 'Capture::Tiny';
-  requires 'Path::Tiny';
-  
-  meta->around_hook(build => sub {
-    my($orig, $build, @rest) = @_;
-
-    my $autoconf_bin = IPC::Cmd::can_run('autoconf');
-    print "***************************************************\n";
-    print "autoconf path = @{[ defined $autoconf_bin ? $autoconf_bin : 'undef' ]}\n";
-    if($autoconf_bin)
-    {
-      my($version) = Capture::Tiny::capture_merged(sub {
-        system $autoconf_bin, '--version';
-      });
-      print "[version]\n";
-      print "$version\n";
-    }
-    print "***************************************************\n";
-     my $ret = eval { $orig->($build, @rest) };
-    print "***************************************************\n";
-    my $log = Path::Tiny->new('config.log');
-    if(-f $log)
-    {
-      print $log->slurp;
-    }
-    else
-    {
-      print "no config.log\n";
-    }
-    print "***************************************************\n";
-
-    my $error = $@;
-    if(my $error = $@)
-    {
-      die $error;
-    }
-    $ret;
-  });
+  plugin 'Build::Autoconf' => ( msys_version => '0.08' );
   
   build [
     '%{configure} --disable-shared',

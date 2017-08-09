@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:4.0
+ADR;LABEL="Mr. John Q. Public, Esq.
+Mail Drop: TNE QB
+123 Main Street
+Any
+  Town, CA  91921-1234
+U.S.A.":;;123 Main Street;Any Town;CA;91921-
+  1234;U.S.A.
+END:VCARD

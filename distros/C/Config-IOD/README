@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Config::IOD - Read and write IOD/INI configuration files
 
+VERSION
+    This document describes version 0.34 of Config::IOD (from Perl
+    distribution Config-IOD), released on 2017-08-05.
+
+SYNOPSIS
      use Config::IOD;
      my $iod = Config::IOD->new(
          # list of known attributes, with their default values
@@ -27,11 +33,10 @@ SYNOPSIS
     See Config::IOD::Document for methods available for $doc.
 
 DESCRIPTION
-
     This module is a round-trip parser for IOD configuration format (IOD is
-    an INI-like format with more precise specification, some extra
-    features, and 99% compatible with typical INI format). Round-trip means
-    all whitespaces and comments are preserved, so you get byte-by-byte
+    an INI-like format with more precise specification, some extra features,
+    and 99% compatible with typical INI format). Round-trip means all
+    whitespaces and comments are preserved, so you get byte-by-byte
     equivalence if you dump back the parsed document into string.
 
     Aside from parsing, methods for modifying IOD documents (add/delete
@@ -41,30 +46,182 @@ DESCRIPTION
     Config::IOD::Reader instead.
 
 ATTRIBUTES
+  default_section => str (default: "GLOBAL")
+    If a key line is specified before any section line, this is the section
+    that the key will be put in.
 
-    # INSERT_BLOCK: Config::IOD::Base attributes
+  enable_encoding => bool (default: 1)
+    If set to false, then encoding notation will be ignored and key value
+    will be parsed as verbatim. Example:
+
+     name = !json null
+
+    With "enable_encoding" turned off, value will not be undef but will be
+    string with the value of (as Perl literal) "!json null".
+
+    Turning off this setting will violate IOD.
+
+  enable_quoting => bool (default: 1)
+    If set to false, then quotes on key value will be ignored and key value
+    will be parsed as verbatim. Example:
+
+     name = "line 1\nline2"
+
+    With "enable_quoting" turned off, value will not be a two-line string,
+    but will be a one line string with the value of (as Perl literal) "line
+    1\\nline2".
+
+    *Turning off this setting will violate IOD.*
+
+  enable_bracket => bool (default: 1)
+    If set to false, then JSON literal array will be parsed as verbatim.
+    Example:
+
+     name = [1,2,3]
+
+    With "enable_bracket" turned off, value will not be a three-element
+    array, but will be a string with the value of (as Perl literal)
+    "[1,2,3]".
+
+    *Turning off this setting will violate IOD.*
+
+  enable_brace => bool (default: 1)
+    If set to false, then JSON literal object (hash) will be parsed as
+    verbatim. Example:
+
+     name = {"a":1,"b":2}
+
+    With "enable_brace" turned off, value will not be a hash with two pairs,
+    but will be a string with the value of (as Perl literal)
+    '{"a":1,"b":2}'.
+
+    *Turning off this setting will violate IOD.*
+
+  enable_tilde => bool (default: 1)
+    If set to true (the default), then value that starts with "~" (tilde)
+    will be assumed to use !path encoding, unless an explicit encoding has
+    been otherwise specified.
+
+    Example:
+
+     log_dir = ~/logs  ; ~ will be resolved to current user's home directory
+
+    With "enable_tilde" turned off, value will still be literally "~/logs".
+
+    *Turning off this setting will violate IOD.*
+
+  allow_encodings => array
+    If defined, set list of allowed encodings. Note that if
+    "disallow_encodings" is also set, an encoding must also not be in that
+    list.
+
+    Also note that, for safety reason, if you want to enable "expr"
+    encoding, you'll also need to set "enable_expr" to 1.
+
+  disallow_encodings => array
+    If defined, set list of disallowed encodings. Note that if
+    "allow_encodings" is also set, an encoding must also be in that list.
+
+    Also note that, for safety reason, if you want to enable "expr"
+    encoding, you'll also need to set "enable_expr" to 1.
+
+  enable_expr => bool (default: 0)
+    Whether to enable "expr" encoding. By default this is turned on, for
+    safety. Please see "EXPRESSION" for more details.
+
+  allow_directives => array
+    If defined, only directives listed here are allowed. Note that if
+    "disallow_directives" is also set, a directive must also not be in that
+    list.
+
+  disallow_directives => array
+    If defined, directives listed here are not allowed. Note that if
+    "allow_directives" is also set, a directive must also be in that list.
+
+  allow_bang_only => bool (default: 1)
+    Since the mistake of specifying a directive like this:
+
+     !foo
+
+    instead of the correct:
+
+     ;!foo
+
+    is very common, the spec allows it. This reader, however, can be
+    configured to be more strict.
+
+  allow_duplicate_key => bool (default: 1)
+    If set to 0, you can forbid duplicate key, e.g.:
+
+     [section]
+     a=1
+     a=2
+
+    or:
+
+     [section]
+     a=1
+     b=2
+     c=3
+     a=10
+
+    In traditional INI file, to specify an array you specify multiple keys.
+    But when there is only a single key, it is unclear if the value is a
+    single-element array or a scalar. You can use this setting to avoid this
+    array/scalar ambiguity in config file and force user to use JSON
+    encoding or bracket to specify array:
+
+     [section]
+     a=[1,2]
+
+    *Turning off this setting will violate IOD.*
+
+  ignore_unknown_directive => bool (default: 0)
+    If set to true, will not die if an unknown directive is encountered. It
+    will simply be ignored as a regular comment.
+
+    *Turning on this setting will violate IOD.*
 
 METHODS
-
- new(%attrs) => obj
-
- $reader->read_file($filename) => obj
-
+  new(%attrs) => obj
+  $reader->read_file($filename) => obj
     Read IOD configuration from a file. Return Config::IOD::Document
     instance. Die on errors.
 
- $reader->read_string($str) => obj
-
+  $reader->read_string($str) => obj
     Read IOD configuration from a string. Return Config::IOD::Document
     instance. Die on errors.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Config-IOD>.
 
+SOURCE
+    Source repository is at <https://github.com/sharyanto/perl-Config-IOD>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     IOD - specification
 
-    Config::IOD::Reader - if you just need to read a configuration file,
-    you should probably use this module instead. It's lighter, faster, and
-    has a simpler interface.
+    Config::IOD::Reader - if you just need to read a configuration file, you
+    should probably use this module instead. It's lighter, faster, and has a
+    simpler interface.
 
     IOD::Examples - sample documents
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

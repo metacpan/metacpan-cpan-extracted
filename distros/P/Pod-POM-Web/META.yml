@@ -16,10 +16,10 @@ name: Pod-POM-Web
 provides:
   Pod::POM::Web:
     file: lib/Pod/POM/Web.pm
-    version: '1.21'
+    version: '1.22'
   Pod::POM::Web::Indexer:
     file: lib/Pod/POM/Web/Indexer.pm
-    version: '1.19'
+    version: '1.22'
 recommends:
   AnnoCPAN::Perldoc::Filter: '0'
   PPI::HTML: '0'
@@ -44,4 +44,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Pod-POM-Web
-version: '1.21'
+version: '1.22'

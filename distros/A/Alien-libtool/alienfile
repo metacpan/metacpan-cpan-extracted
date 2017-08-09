@@ -32,10 +32,10 @@ share {
       s{\@pkgdatadir\@}{\$prefix/share/libtool}g;
       s{\@aclocaldir\@}{\$prefix/share/aclocal}g;
     });
-    foreach my $man (map { Path::Tiny->new($_) } qw( doc/libtool.1 doc/libtoolize.1 ))
-    {
-      $man->touch;
-    }
+    my($makefile) = Path::Tiny->new('Makefile.in');
+    $makefile->edit_lines(sub {
+      s{\@HELP2MAN\@}{perl -e1 --}g;
+    });
   };
   
   meta->after_hook(

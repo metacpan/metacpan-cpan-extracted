@@ -1,9 +1,13 @@
 package Log::ger::Layout;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use parent qw(Log::ger::Plugin);
+
+# we only use one output, so set() should replace all hooks from previously set
+# plugin package
+sub _replace_package_regex { qr/\ALog::ger::Layout::/ }
 
 1;
 # ABSTRACT: Use a layout plugin
@@ -20,14 +24,14 @@ Log::ger::Layout - Use a layout plugin
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 
 To set globally:
 
  use Log::ger::Layout;
- Log::ger::Format->set('Pattern');
+ Log::ger::Layout->set('Pattern');
 
 or:
 

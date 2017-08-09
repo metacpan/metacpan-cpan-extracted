@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.64.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,25 +12,35 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 d1d94cacb554f9b27727c4f58a48ed9823f0b91a Changes
-SHA1 69ce7fe315a6f9e68f406c766a18b00f8ff4916c LICENSE
-SHA1 b0859449d35ae7177f2aedb2fc2ced06d1515420 MANIFEST
-SHA1 88b668b19645d7b5d4681aeb0990e93442c1b9cb META.yml
-SHA1 456acc24d8056ddc09f2e80499c13d36547e0faf Makefile.PL
-SHA1 6b8866e1af7c50fba6a7593b6aed58a009c40baf README
-SHA1 411bdd1ac3cd00fd43501a7666eea4e4662163d9 dist.ini
-SHA1 bbe4d4fa099ed76d213ce800e00e4776a7b1eec3 lib/Pod/Weaver/Section/SourceGitHub.pm
+SHA1 ea7ccd9aeb4086b0cb5ed1e83b9fd1d7f7b50fbe Changes
+SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
+SHA1 22050ec806750dd106f8112ba5d9a052464ad8b5 MANIFEST
+SHA1 dfc3b2e64d8af9154ac417d7082892803722040a MANIFEST.SKIP
+SHA1 5030fab256b01952d5003c983262f146daa6c314 META.json
+SHA1 039e5092789255e2047a4422073157eedfeadca6 META.yml
+SHA1 66b934d6999e072a2ef33bb7fe7b53c47e924d9b Makefile.PL
+SHA1 4b339ff55d05a49996b1455c0258bf1e63103cb7 README
+SHA1 3f1ecb453a84a5d05ed5b061281c491a013347fd lib/Pod/Weaver/Section/SourceGitHub.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
 SHA1 b75fb765351465e34c836e8608be1c3c6525d1cf t/compile.t
-SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
-SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
-SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
-SHA1 b683e5354a6b991da17a94e51852513b95acb60b weaver.ini
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v2
 
-iEYEARECAAYFAk1IOdgACgkQ+CqvSzp9LOyM5wCfchyo7DUNSnT3dcDWtAbhH3CD
-bxYAoIlnSaIIAcIcbHaA/R93ZEtWJrbr
-=cnqF
+iQIVAwUBWX+GyaQl27WkM10aAQgxMw/+PU7yjwq5kkoLbfPQmJyGNmAV9gxOr15W
+xpaqdw0aCjyVm2/aXjjrFu2so7lgC/7MYXP5sq7H9DwZtQyt3WfQp4A0kfo2qyc0
+gUKmacXjduGfU2A+52c8WyqrJZ960AI4wP/5uU6h6TTVL6jg6fD2bxZTSOzfiP0H
+9LLDN44Py8+GJkus1Cfedg+jHlFHIjtVPLMYUs/iRFx/NWXnCsLkCgv2xVI/PLkX
+x2VfG99ladBkxPQiaA1Ssku6NkzoX2k6LqOJx8NPSvoYNGrcohOgBnJn4wFlCuTD
+npSKVjPYtW2Ylph4idNo1XaarcUw8f/avlkPoFTMLMCj5Z33QYdVMS7D/yAueQ+G
+wJxgPdgm4umhtmfCghk2VZ+dNmGGqLNp4zxQUe9O1ulTPh4Mp3UWqK/2oqEIRGN5
+bw8DrD7LUvHL9wJXtp9Q/RBX6H1xCq8Amyk61J1OzVQFUWIFbttAX2YV2FJXHUoT
+E+hyNcoH4dQk6U2Q7kf2SkjwYJZFT6Um5Vh6OAI4SbGrRKrLaY8mjnVNTSMIbJa9
+BEJak+vxBYlODvCjQdx8RJsINckraU0Q63K+yIwiLr+VDSOk9fjY9+IQqIHTXbng
+4z4WB3FYW/MJowzXJb+Kp/d442jicP9fm0vjdsG3RfHHQ6TwRq4YZl/f+KyC6311
+ll7meLsZcNk=
+=VZKb
 -----END PGP SIGNATURE-----

@@ -65,8 +65,8 @@ share {
 if($^O eq 'MSWin32')
 {
   sys {
-    requires 'Alien::MSYS' => '0.08';
-    requires 'Capture::Tiny';
+    #requires 'Alien::MSYS' => '0.08';
+    #requires 'Capture::Tiny';
 
     gather sub {
       my($build) = @_;

@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::MakeMaker::ApacheTest;
-$Dist::Zilla::Plugin::MakeMaker::ApacheTest::VERSION = '0.03';
+$Dist::Zilla::Plugin::MakeMaker::ApacheTest::VERSION = '0.04';
 # ABSTRACT: Dist::Zilla Plugin That Configures Makefile.PL for Apache::Test
 
 use Moose;
@@ -117,7 +117,7 @@ Dist::Zilla::Plugin::MakeMaker::ApacheTest - Dist::Zilla Plugin That Configures 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,7 @@ L<MakeMaker::Awesome|Dist::Zilla::Plugin::MakeMaker::Awesome>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/dist-zilla-plugin-apachetest>
+The development version is on github at L<https://github.com/mschout/dist-zilla-plugin-apachetest>
 and may be cloned from L<git://github.com/mschout/dist-zilla-plugin-apachetest.git>
 
 =head1 BUGS
@@ -177,7 +177,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Schout.
+This software is copyright (c) 2017 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

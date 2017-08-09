@@ -1,0 +1,7 @@
+Revision history for Alien-Role-Alt
+
+0.02      2017-08-04 15:03:56 -0400
+  - Add missing prereq Class::Method::Modifiers
+
+0.01      2017-08-01 14:53:34 -0400
+  - initial version

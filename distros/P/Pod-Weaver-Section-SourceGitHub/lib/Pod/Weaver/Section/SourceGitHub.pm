@@ -1,8 +1,5 @@
 package Pod::Weaver::Section::SourceGitHub;
-BEGIN {
-  $Pod::Weaver::Section::SourceGitHub::VERSION = '0.54';
-}
-
+$Pod::Weaver::Section::SourceGitHub::VERSION = '0.56';
 # ABSTRACT: Add SOURCE pod section for a github repository
 
 use Moose;
@@ -74,7 +71,7 @@ sub _build_repo_data {
         $url =~ s{^git\@github.com:/*}{github.com/}i;
         $url =~ s/\.git$//i;
 
-        my $repo_web = "http://$url";
+        my $repo_web = "https://$url";
         my $repo_git = "git://$url.git";
 
         return [ $repo_git, $repo_web ];
@@ -94,7 +91,7 @@ sub _build_repo_web {
 no Moose;
 1;
 
-
+__END__
 
 =pod
 
@@ -104,7 +101,7 @@ Pod::Weaver::Section::SourceGitHub - Add SOURCE pod section for a github reposit
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -125,7 +122,7 @@ adds the C<SOURCE> section.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/pod-weaver-section-sourcegithub>
+The development version is on github at L<https://github.com/mschout/pod-weaver-section-sourcegithub>
 and may be cloned from L<git://github.com/mschout/pod-weaver-section-sourcegithub.git>
 
 =head1 BUGS
@@ -135,17 +132,13 @@ Please report any bugs or feature requests to bug-pod-weaver-section-sourcegithu
 
 =head1 AUTHOR
 
-  Michael Schout <mschout@cpan.org>
+Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Michael Schout.
+This software is copyright (c) 2017 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

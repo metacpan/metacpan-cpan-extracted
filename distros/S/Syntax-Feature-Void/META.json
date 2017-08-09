@@ -4,9 +4,9 @@
       "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
-      "unrestricted"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Feature::Void" : {
          "file" : "lib/Syntax/Feature/Void.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
@@ -49,12 +49,10 @@
          "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Void"
       },
       "homepage" : "http://search.cpan.org/dist/Syntax-Feature-Void/",
-      "license" : [
-         "http://creativecommons.org/publicdomain/zero/1.0/"
-      ],
       "repository" : {
          "url" : "http://github.com/ikegami/perl-Syntax-Feature-Void"
       }
    },
-   "version" : "v1.0.0"
+   "version" : "v1.2.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

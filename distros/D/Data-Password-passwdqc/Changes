@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::Password::passwdqc.
 
+0.09  Sat Aug  5 08:56:53 SGT 2017
+        - Add support for passing the login name and real name (gecos). (Dylan William Hardison)
+
 0.08  Sat Mar  4 22:40:52 SGT 2017
         - Fix build with recent EUMM and some make, thanks to Slaven Rezic RT#120447
         - Update to passwdqc v1.3.1

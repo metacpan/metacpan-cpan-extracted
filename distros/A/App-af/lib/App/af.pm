@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.014;
 
-package App::af 0.11 {
+package App::af 0.12 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -79,7 +79,7 @@ package App::af 0.11 {
   requires 'main';  
 }
 
-package App::af::default 0.11 {
+package App::af::default 0.12 {
 
   use Moose;
   with 'App::af';
@@ -94,7 +94,7 @@ package App::af::default 0.11 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::role::alienfile 0.11 {
+package App::af::role::alienfile 0.12 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -177,7 +177,7 @@ package App::af::role::alienfile 0.11 {
   }  
 }
 
-package App::af::role::phase 0.11 {
+package App::af::role::phase 0.12 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -204,7 +204,7 @@ package App::af::role::phase 0.11 {
   
 }
 
-package App::af::role::libandblib 0.11 {
+package App::af::role::libandblib 0.12 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -253,7 +253,7 @@ package App::af::role::libandblib 0.11 {
 
 }
 
-package App::af::opt 0.11 {
+package App::af::opt 0.12 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -296,7 +296,7 @@ App::af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

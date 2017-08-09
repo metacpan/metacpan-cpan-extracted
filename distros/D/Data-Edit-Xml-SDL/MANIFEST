@@ -1,0 +1,7 @@
+Build.PL
+lib/Data/Edit/Xml/.directory
+lib/Data/Edit/Xml/SDL.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

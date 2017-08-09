@@ -1,0 +1,67 @@
+{
+   "abstract" : "Add SOURCE pod section for a github repository",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pod-Weaver-Section-SourceGitHub",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Signature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Pod::Weaver::Role::Section" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-pod-weaver-section-sourcegithub at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Section-SourceGitHub"
+      },
+      "homepage" : "http://search.cpan.org/dist/Pod-Weaver-Section-SourceGitHub/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/pod-weaver-section-sourcegithub.git",
+         "web" : "https://github.com/mschout/pod-weaver-section-sourcegithub"
+      }
+   },
+   "version" : "0.56",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

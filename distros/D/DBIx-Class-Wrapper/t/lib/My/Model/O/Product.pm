@@ -1,7 +1,7 @@
 package My::Model::O::Product;
 use Moose;
 extends 'DBIx::Class::Wrapper::Object';
-has 'o' => ( is => 'ro' , required => 1 , handles => [ 'id' , 'name' ] );
+has 'o' => ( is => 'ro' , required => 1 , handles => [ 'id' , 'name', 'colour' ] );
 sub turn_on{
     my ($self) = @_;
     return "Turning on $self";

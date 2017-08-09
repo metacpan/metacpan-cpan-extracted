@@ -1,0 +1,42 @@
+NAME
+
+    Alien::gperf - Perl distribution for GNU gperf
+
+USAGE
+
+        use Alien::gperf;
+        use Env qw( @PATH );
+    
+        unshift @PATH, Alien::gperf->bin_dir;
+        system gperf, '--version';
+
+DESCRIPTION
+
+    GNU gperf is a perfect hash function generator. For a given list of
+    strings, it produces a hash function and hash table, in form of C or
+    C++ code, for looking up a value depending on the input string. The
+    hash function is perfect, which means that the hash table has no
+    collisions, and the hash table lookup needs a single string comparison
+    only.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-gperf
+
+SEE ALSO
+
+    GNU gperf <https://www.gnu.org/software/gperf/>
+
+    Alien
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

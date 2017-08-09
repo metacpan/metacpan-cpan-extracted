@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99010  Jul 31 2017 Alexander Nalobin
+    - CI regexp in recursive whois server match
+
 2.99009  Jun 24 2017 Gregory Oschwald
     - Do not warn if newsrv is undefined 
 

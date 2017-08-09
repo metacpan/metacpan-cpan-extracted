@@ -1,20 +1,30 @@
---- #YAML:1.0
-name:               Number-Phone-CountryCode
-version:            0.02
-abstract:           Country phone dialing prefixes
+---
+abstract: 'DEPRECATED - Country Phone Dialing Prefixes'
 author:
-    - Michael Schout <mschout@gkg.net>
-license:            unknown
-distribution_type:  module
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Class::Accessor:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.48
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Number-Phone-CountryCode
+requires:
+  Class::Accessor: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Phone-CountryCode
+  homepage: http://search.cpan.org/dist/Number-Phone-CountryCode/
+  repository: git://github.com/mschout/number-phone-countrycode
+version: '0.03'
+x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,39 @@
+NAME
+    Log::ger::Level::Like::RubyLogging - Define logging levels like Ruby's
+    logging library
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+     # load before 'use Log::ger' in any package/target
+     use Log::ger::Level::Like::RubyLogging;
+
+DESCRIPTION
+    From the documentation of the Logging library [1]: "Logging is a
+    flexible logging library for use in Ruby programs based on the design of
+    Java's log4j library. It features a hierarchical logging system, custom
+    level names, multiple output destinations per log event, custom
+    formatting, and more."
+
+    This module changes the Log::ger levels to:
+
+        unknown => 0,
+        fatal   => 10,
+        error   => 20,
+        warn    => 30,
+        info    => 40,
+        debug   => 50,
+
+SEE ALSO
+    [1] <http://www.rubydoc.info/gems/logging/file/README.md>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -39,7 +39,7 @@ prereqs:
 
   develop:
     requires:
-      - Dist::Zilla: 6.008
+      - Dist::Zilla: 6.010
       - Test::Warnings: 0.026
       - Test::NoTabs: 1.4
 

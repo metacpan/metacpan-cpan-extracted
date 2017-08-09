@@ -1,26 +1,29 @@
 package Getopt::Long::Subcommand;
 
-our $DATE = '2017-01-06'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-08-01'; # DATE
+our $VERSION = '0.101'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require Exporter;
 our @ISA = qw(Exporter);
+## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT = qw(
                     GetOptions
             );
+## use critic
 
-# XXX completion is actually only allowed at the top-level
+# XXX completion & configure are actually only allowed at the top-level
 my @known_cmdspec_keys = qw(
     options
     subcommands
     default_subcommand
     summary description
     completion
+    configure
 );
 
 sub _cmdspec_opts_to_gl_ospec {
@@ -49,13 +52,22 @@ sub _cmdspec_opts_to_gl_ospec {
 sub _gl_getoptions {
     require Getopt::Long;
 
-    my ($ospec, $pass_through, $res) = @_;
-    #$log->tracef('[comp][glsubc] Performing Getopt::Long::GetOptions');
+    my ($ospec, $configure, $pass_through, $res) = @_;
 
-    my $old_conf = Getopt::Long::Configure(
-        'no_ignore_case', 'no_getopt_compat', 'gnu_compat', 'bundling',
-        ('pass_through') x !!$pass_through,
-    );
+    my @configure = @{
+        $configure //
+            ['no_ignore_case', 'no_getopt_compat', 'gnu_compat', 'bundling']
+        };
+    if ($pass_through) {
+        push @configure, 'pass_through'
+            unless grep { $_ eq 'pass_through' } @configure;
+    } else {
+        @configure = grep { $_ ne 'pass_through' } @configure;
+    }
+    log_trace('[comp][glsubc] Performing Getopt::Long::GetOptions (configure: %s)',
+              $pass_through, \@configure);
+
+    my $old_conf = Getopt::Long::Configure(@configure);
     local $SIG{__WARN__} = sub {} if $pass_through;
 
     # ugh, this is ugly. the problem we're trying to solve: in the case of 'subc
@@ -65,15 +77,15 @@ sub _gl_getoptions {
     # passed as the third argument to the handler.
     local $res->{_non_options_argv} = [];
 
-    #$log->tracef('[comp][glsubc] @ARGV before Getopt::Long::GetOptions: %s', \@ARGV);
-    #$log->tracef('[comp][glsubc] spec for Getopt::Long::GetOptions: %s', $ospec);
+    log_trace('[comp][glsubc] @ARGV before Getopt::Long::GetOptions: %s', \@ARGV);
+    log_trace('[comp][glsubc] spec for Getopt::Long::GetOptions: %s', $ospec);
     my $gl_res = Getopt::Long::GetOptions(
         %$ospec,
         '<>' => sub { push @{ $res->{_non_options_argv} }, $_[0] },
     );
     @ARGV = @{ $res->{_non_options_argv} };
 
-    #$log->tracef('[comp][glsubc] @ARGV after  Getopt::Long::GetOptions: %s', \@ARGV);
+    log_trace('[comp][glsubc] @ARGV after Getopt::Long::GetOptions: %s', \@ARGV);
     Getopt::Long::Configure($old_conf);
     $gl_res;
 }
@@ -89,7 +101,7 @@ sub _GetOptions {
 
     # check command spec
     {
-        #$log->tracef("[comp][glsubc] Checking cmdspec keys: %s", [keys %$cmdspec]);
+        log_trace("[comp][glsubc] Checking cmdspec keys: %s", [keys %$cmdspec]);
         for my $k (keys %$cmdspec) {
             (grep { $_ eq $k } @known_cmdspec_keys)
                 or die "Unknown command specification key '$k'" .
@@ -97,19 +109,15 @@ sub _GetOptions {
         }
     }
 
-    my $has_opts = $cmdspec->{options} && keys(%{$cmdspec->{options}});
-    unless ($has_opts) {
-        $res->{success} = 1;
-        return $res;
-    }
-
     my $has_subcommands = $cmdspec->{subcommands} &&
         keys(%{$cmdspec->{subcommands}});
+    #log_trace("TMP:has_subcommands=%s", $has_subcommands);
     my $pass_through = $has_subcommands || $is_completion;
 
     my $ospec = _cmdspec_opts_to_gl_ospec(
         $cmdspec->{options}, $is_completion, $res);
-    unless (_gl_getoptions($ospec, $pass_through, $res)) {
+    unless (_gl_getoptions(
+        $ospec, $cmdspec->{configure}, $pass_through, $res)) {
         $res->{success} = 0;
         return $res;
     }
@@ -169,9 +177,9 @@ sub _GetOptions {
     }
     $res->{success} //= 1;
 
-    #$log->tracef('[comp][glsubc] Final @ARGV: %s', \@ARGV) unless $stash->{path};
-    #$log->tracef('[comp][glsubc] TMP: stash=%s', $stash);
-    #$log->tracef('[comp][glsubc] TMP: res=%s', $res);
+    log_trace('[comp][glsubc] Final @ARGV: %s', \@ARGV) unless $stash->{path};
+    #log_trace('[comp][glsubc] TMP: stash=%s', $stash);
+    #log_trace('[comp][glsubc] TMP: res=%s', $res);
     $res;
 }
 
@@ -194,8 +202,10 @@ sub GetOptions {
             if ($ENV{COMP_LINE}) {
                 $is_completion++;
                 require Complete::Bash;
-                ($words, $cword) = @{ Complete::Bash::parse_cmdline(undef, undef, {truncate_current_word=>1}) };
-                ($words, $cword) = @{ Complete::Bash::join_wordbreak_words($words, $cword) };
+                ($words, $cword) = @{ Complete::Bash::parse_cmdline(
+                    undef, undef, {truncate_current_word=>1}) };
+                ($words, $cword) = @{ Complete::Bash::join_wordbreak_words(
+                    $words, $cword) };
             } elsif ($ENV{COMMAND_LINE}) {
                 $is_completion++;
                 require Complete::Tcsh;
@@ -219,6 +229,17 @@ sub GetOptions {
             words => $words, cword => $cword, getopt_spec=>$ospec,
             extras => {
                 stash => $res->{stash},
+            },
+            bundling => do {
+                if (!$cmdspec{configure}) {
+                    1;
+                } elsif (grep { $_ eq 'bundling' } @{ $cmdspec{configure} }) {
+                    1;
+                } elsif (grep { $_ eq 'no_bundling' } @{ $cmdspec{configure} }) {
+                    0;
+                } else {
+                    0;
+                }
             },
             completion => sub {
                 my %args = @_;
@@ -255,7 +276,6 @@ sub GetOptions {
     }
 
     # cleanup unneeded details
-
     $res;
 }
 
@@ -274,7 +294,7 @@ Getopt::Long::Subcommand - Process command-line options, with subcommands and co
 
 =head1 VERSION
 
-This document describes version 0.09 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2017-01-06.
+This document describes version 0.101 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2017-08-01.
 
 =head1 SYNOPSIS
 
@@ -383,6 +403,18 @@ tcsh) is first checked. If it exists, we are in completion mode and C<@ARGV> is
 parsed/formed from it. We then perform parsing to get subcommand names. Finally
 we hand it off to L<Complete::Getopt::Long>.
 
+=head1 CAVEATS
+
+=head2 Common options take precedence over subcommand options
+
+Common options (e.g. C<--help>) are parsed and removed from the command-line
+first. This is done for convenience so you can do something like C<cmd subc
+--help> or C<cmd --help subc> to get help. The consequence is you cannot have a
+subcommand option with the same name as common option.
+
+Similarly, options for a subcommand takes precedence over its sub-subcommand,
+and so on.
+
 =head1 FUNCTIONS
 
 =head2 GetOptions(%cmdspec) => hash
@@ -424,6 +456,16 @@ using the first argument, or your option handler can also set the subcommand
 using:
 
  $_[2]{subcommand_name} = 'something';
+
+=item * configure => arrayref
+
+Custom Getopt::Long configuration. The default is:
+
+ ['no_ignore_case', 'no_getopt_compat', 'gnu_compat', 'bundling']
+
+Note that even though you use custom configuration here, the tab completion
+(performed by L<Complete::Getopt::Long> only supports C<no_ignore_case>,
+C<gnu_compat>, and C<no_getopt_compat>.
 
 =back
 
@@ -494,7 +536,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Bread::Board::Dumper;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Pretty printer for visualizing the layout of your Bread::Board
-$Bread::Board::Dumper::VERSION = '0.34';
+$Bread::Board::Dumper::VERSION = '0.35';
 use Moose;
 
 sub dump {
@@ -18,23 +18,39 @@ sub dump {
         $output .= join('', $indent, "service: ", $thing->name, "\n" );
 
         if ($thing->does('Bread::Board::Service::WithDependencies')) {
-            while (my($key, $value) = each %{ $thing->dependencies }) {
-                $output .= $self->dump($value, $indent);
+            my $deps = $thing->dependencies;
+            for my $key (sort keys %{$deps}) {
+                $output .= $self->dump($deps->{$key}, $indent);
             }
         }
     }
     elsif ($thing->isa('Bread::Board::Container')) {
         $output = join('', $indent, "container: ", $thing->name, "\n" );
 
-        my ($key, $value);
+        $output .= $self->_dump_container($thing, $indent);
+    }
+    elsif ($thing->isa('Bread::Board::Container::Parameterized')) {
+        my $params = join ', ', @{ $thing->allowed_parameter_names };
+        $output = join('', $indent, "container: ", $thing->name, " [$params]\n" );
+        $output .= $self->_dump_container($thing, $indent);
+    }
 
-        while (($key, $value) = each %{ $thing->sub_containers }) {
-            $output .= $self->dump($value, $indent);
-        }
+    return $output;
+}
 
-        while (($key, $value) = each %{ $thing->services }) {
-            $output .= $self->dump($value, $indent);
-        }
+sub _dump_container {
+    my ($self, $c, $indent) = @_;
+
+    my $output = '';
+
+    my $subs = $c->sub_containers;
+    for my $key (sort keys %{$subs}) {
+        $output .= $self->dump($subs->{$key}, $indent);
+    }
+
+    my $services = $c->services;
+    for my $key (sort keys %{$services}) {
+        $output .= $self->dump($services->{$key}, $indent);
     }
 
     return $output;
@@ -56,7 +72,7 @@ Bread::Board::Dumper - Pretty printer for visualizing the layout of your Bread::
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -100,7 +116,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Infinity Interactive.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

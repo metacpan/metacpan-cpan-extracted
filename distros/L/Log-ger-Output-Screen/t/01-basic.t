@@ -32,7 +32,7 @@ subtest "basics" => sub {
     is($stderr, "fatal\nerror\nwarn\n");
     is($stdout, "");
 
-    Log::ger::Util::set_level(1);
+    Log::ger::Util::set_level(10);
     Log::ger::init_target(hash => $h);
 
     ($stdout, $stderr, $exit) = capture {

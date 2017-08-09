@@ -1,10 +1,7 @@
-use strict;
-use warnings;
-use Test::More tests => 2;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 
 subtest 'no arguments' => sub {
-  plan tests => 2;
   my $tcc = FFI::TinyCC->new;
 
   eval { $tcc->compile_string(q{int main(int argc, char *argv[]) { return 22; }}) };
@@ -14,7 +11,6 @@ subtest 'no arguments' => sub {
 };
 
 subtest 'arguments' => sub {
-  plan tests => 2;
   my $tcc = FFI::TinyCC->new;
   
   eval { $tcc->compile_string(q{
@@ -34,3 +30,5 @@ subtest 'arguments' => sub {
   
   is $tcc->run('foo', 'bar'), 0, 'tcc.run';
 };
+
+done_testing;

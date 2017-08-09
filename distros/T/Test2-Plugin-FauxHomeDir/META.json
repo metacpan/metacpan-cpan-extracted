@@ -61,7 +61,7 @@
          "web" : "https://github.com/plicease/Test2-Plugin-FauxHomeDir"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

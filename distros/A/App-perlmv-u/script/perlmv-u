@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-01'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010;
 use strict;
@@ -78,7 +78,7 @@ perlmv-u - Rename files using Perl code, with undo/redo
 
 =head1 VERSION
 
-This document describes version 0.001 of perlmv-u (from Perl distribution App-perlmv-u), released on 2017-07-28.
+This document describes version 0.003 of perlmv-u (from Perl distribution App-perlmv-u), released on 2017-08-01.
 
 =head1 SYNOPSIS
 
@@ -275,6 +275,14 @@ Alias for --dry-run.
 
 =back
 
+=head2 Options for subcommand undo
+
+=over
+
+=item B<--ignore-errors>
+
+=back
+
 =head1 COMPLETION
 
 This script has shell tab completion capability with support for several
@@ -351,6 +359,8 @@ List of available configuration parameters:
 
 
 =head2 Configuration for subcommand undo
+
+ ignore_errors (see --ignore-errors)
 
 =head1 ENVIRONMENT
 

@@ -4,7 +4,6 @@ BEGIN {
     use_ok 'Device::HID';
 }
 
-use Data::Hexdumper qw(hexdump);
 use strict;
 use warnings;
 

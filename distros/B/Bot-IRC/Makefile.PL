@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Bot-IRC",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Bot::IRC",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -22,15 +22,16 @@ my %WriteMakefileArgs = (
     "DBI" => 0,
     "Daemon::Device" => 0,
     "Date::Format" => 0,
+    "Date::Parse" => 0,
     "DateTime" => 0,
     "DateTime::Format::Human::Duration" => 0,
+    "Email::Mailer" => 0,
     "Email::Valid" => 0,
     "Encode" => 0,
     "File::Grep" => 0,
     "IO::Socket" => 0,
     "IO::Socket::SSL" => 0,
     "JSON::XS" => 0,
-    "Mail::Send" => 0,
     "Math::Expression" => 0,
     "Math::Units" => 0,
     "Time::Crontab" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "blib" => "1.01",
     "constant" => 0
   },
-  "VERSION" => "1.16",
+  "VERSION" => "1.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,8 +65,10 @@ my %FallbackPrereqs = (
   "DBI" => 0,
   "Daemon::Device" => 0,
   "Date::Format" => 0,
+  "Date::Parse" => 0,
   "DateTime" => 0,
   "DateTime::Format::Human::Duration" => 0,
+  "Email::Mailer" => 0,
   "Email::Valid" => 0,
   "Encode" => 0,
   "File::Grep" => 0,
@@ -75,7 +78,6 @@ my %FallbackPrereqs = (
   "IO::Socket::SSL" => 0,
   "IPC::Open3" => 0,
   "JSON::XS" => 0,
-  "Mail::Send" => 0,
   "Math::Expression" => 0,
   "Math::Units" => 0,
   "Test::Lib" => 0,

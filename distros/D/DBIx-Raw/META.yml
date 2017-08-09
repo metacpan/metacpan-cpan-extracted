@@ -33,4 +33,4 @@ requires:
   MIME::Base64: '0'
   Mouse: '0'
   perl: '5.006'
-version: '0.15'
+version: '0.16'

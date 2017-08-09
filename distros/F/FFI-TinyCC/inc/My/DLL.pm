@@ -2,7 +2,7 @@ package My::DLL;
 
 use strict;
 use warnings;
-use autodie qw( :all );  # need IPC::System::Simple
+use autodie;
 use Alien::TinyCC;
 use Archive::Ar 2.02;
 use File::Temp qw( tempdir );
@@ -11,19 +11,19 @@ use Config;
 use File::Basename qw( dirname basename );
 use base qw( Exporter );
 use File::Copy qw( copy );
-use Path::Class::File ();
+use Path::Tiny qw( path );
 use File::chdir;
 
 our @EXPORT = qw( tcc_clean tcc_build tcc_name );
 
-my $share = Path::Class::File
-  ->new(dirname $INC{'My/DLL.pm'})
+my $share = path(__FILE__)
   ->absolute
-  ->dir
   ->parent
-  ->subdir('share');
+  ->parent
+  ->parent
+  ->child('share');
 
-my $log = $share->file('build.log')->opena;
+my $log = $share->child('build.log')->opena;
 
 sub tcc_clean
 {
@@ -33,15 +33,15 @@ sub tcc_clean
     print $log "unlink $_", "\n";
     unlink $_;
   }
-  if(-d $share->subdir('lib'))
+  if(-d $share->child('lib'))
   {
-    for($share->subdir('lib')->children)
+    for($share->child('lib')->children)
     {
       print $log "unlink $_", "\n";
       unlink $_;
     }
-    print $log "rmdir " . $share->subdir('lib'), "\n";
-    rmdir $share->subdir('lib');
+    print $log "rmdir " . $share->child('lib'), "\n";
+    rmdir $share->child('lib');
   }
 }
 
@@ -51,26 +51,24 @@ sub tcc_build
   
   print $log "--- build ", time, '---', "\n";
 
-  my $libdir = Path::Class::Dir->new(
-    Alien::TinyCC->libtcc_library_path,
-  )->absolute;
+  my $libdir = path(Alien::TinyCC->libtcc_library_path)->absolute;
 
   if($^O eq 'MSWin32')
   {
     do {
-      my $from = $libdir->file('libtcc.dll');
+      my $from = $libdir->child('libtcc.dll');
       my $to   = tcc_name();
       print $log "copy $from => $to", "\n";
       copy($from => $to)
       || die "unable to copy $from => $to $!";
     };
 
-    $share->subdir('lib')->mkpath(0, 0755);
+    $share->child('lib')->mkpath;
     
-    foreach my $file ($libdir->subdir('lib')->children)
+    foreach my $file ($libdir->child('lib')->children)
     {
       my $from = $file;
-      my $to   = $share->file('lib', basename $file);
+      my $to   = $share->child('lib', basename $file);
       print $log "copy $from $to", "\n";
       copy($from => $to)
       || die "unable to copy $from => $to $!";
@@ -78,12 +76,12 @@ sub tcc_build
   }
   else
   {
-    my $lib = $libdir->file('libtcc.a');
+    my $lib = $libdir->child('libtcc.a');
     print $log "lib = $lib", "\n";
 
     die "unable to find libtcc.a" unless -f $lib;
 
-    my $tmp = Path::Class::Dir->new(tempdir( CLEANUP => 1 ));
+    my $tmp = path(tempdir( CLEANUP => 1 ));
     print $log "tmp = $tmp", "\n";
 
     do {
@@ -113,7 +111,7 @@ sub tcc_build
 
 sub tcc_name
 {
-  $^O eq 'MSWin32' ? $share->file('libtcc.dll') : $share->file("libtcc.$Config{dlext}");
+  $^O eq 'MSWin32' ? $share->child('libtcc.dll') : $share->child("libtcc.$Config{dlext}");
 }
 
 1;

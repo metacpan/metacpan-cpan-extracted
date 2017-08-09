@@ -96,3 +96,13 @@ ReadPreProcess.pm: Tweak example; bump version for when this is next released
 
 addw: Fri 09 Jun 2017 07:55
 test.t: Fix testing of pseudo comment/directive: Enable
+
+addw: Thu 03 Aug 2017 15:12
+test.t: Implement keys/directives CheckFn & Out - to enable testing of the new .out directive
+README: Implement keys/directives CheckFn & Out - to enable testing of the new .out directive
+
+addw: Thu 03 Aug 2017 15:14
+MANIFEST: New Tests/9_xx files to test new .out directive
+
+addw: Thu 03 Aug 2017 15:16
+ReadPreProcess.pm: Implement OutStreams, bump to version 0.84

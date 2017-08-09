@@ -1,9 +1,20 @@
+#
+# This file is part of App-Milter-Limit
+#
+# This software is copyright (c) 2010 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package App::Milter::Limit::Plugin;
-$App::Milter::Limit::Plugin::VERSION = '0.52';
+$App::Milter::Limit::Plugin::VERSION = '0.53';
 # ABSTRACT: Milter Limit driver plugin base class
 
 use strict;
+use warnings;
 use base 'Class::Singleton';
+
 use App::Milter::Limit::Config;
 
 sub _new_instance {
@@ -58,7 +69,7 @@ App::Milter::Limit::Plugin - Milter Limit driver plugin base class
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -122,7 +133,7 @@ the configured expire time period.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/milter-limit>
+The development version is on github at L<https://github.com/mschout/milter-limit>
 and may be cloned from L<git://github.com/mschout/milter-limit.git>
 
 =head1 BUGS

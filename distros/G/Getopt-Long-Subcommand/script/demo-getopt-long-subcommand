@@ -1,0 +1,223 @@
+#!perl
+
+our $DATE = '2017-08-01'; # DATE
+our $VERSION = '0.101'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Complete::Util qw(complete_array_elem);
+use Getopt::Long::Subcommand qw(GetOptions);
+#use Log::Any::IfLOG '$log';
+
+my %Opts;
+my $res = GetOptions(
+    summary => 'Command with subcommands',
+    # generic options
+    options => {
+        'help|h|?' => \$Opts{help},
+        'version|v' => \$Opts{version},
+        'verbose' => sub {},
+    },
+    subcommands => {
+        subc1 => {
+            summary => 'First subcommand',
+            options => {
+                'flag1|1' => sub{},
+                'flag2|f' => sub{},
+                'fruit=s' => sub{},
+            },
+        },
+        subc2 => {
+            summary => 'Second subcommand',
+            options => {
+                'bool|b!' => sub{},
+                'int=i' => sub{},
+                'fruit=s' => sub{},
+            },
+        },
+        subc3 => {
+            summary => 'Third subcommand',
+            options => {
+                'float|F=f' => sub{},
+                'str|text|S=s' => sub{},
+                'array=s@' => sub{},
+                'int-comp-array=i' => sub{},
+                'str-comp-sub=s' => sub{},
+            },
+            subcommands => {
+                subsubc1 => {
+                    summary => 'First subsubcommand',
+                    options => {
+                        'str|text|S=s' => sub{},
+                        'array=s@' => sub{},
+                        'city=s' => sub {},
+                    },
+                },
+                subsubc2 => {
+                    summary => 'Second subsubcommand',
+                },
+            },
+        },
+    },
+    completion => sub {
+        my %args = @_;
+        my $subc  = $args{subcommand};
+        my $word  = $args{word};
+        my $ospec = $args{ospec} // '';
+
+        #$log->tracef("subc: %s", $subc);
+        if ($ospec eq 'int-comp-array=i') {
+            return complete_array_elem(array=>[1..10], word=>$word);
+        } elsif ($ospec eq 'str-comp-sub=s') {
+            return complete_array_elem(array=>[map {"$word$_"} "a".."z"],
+                                       word=>$word);
+        } elsif ($subc->[0] eq 'subc1' && $ospec eq 'fruit=s') {
+            return complete_array_elem(array=>[qw/apple apricot avocado/],
+                                       word=>$word);
+        } elsif ($subc->[0] eq 'subc2' && $ospec eq 'fruit=s') {
+            return complete_array_elem(array=>[qw/banana blueberry blackberry/],
+                                       word=>$word);
+        } elsif ($subc->[0] eq 'subc3' && $subc->[1] eq 'subsubc1'
+                     && $ospec eq 'city=s') {
+            return complete_array_elem(array=>[qw/bandung solo surabaya/],
+                                       word=>$word);
+        } else {
+            return undef;
+        }
+    },
+);
+
+if ($Opts{help}) {
+    say <<_;
+Usage:
+  $0 --help
+  $0 --version
+  $0 <subcommand> [generic options] [subcommand options]
+
+Subcommands:
+  subc1 - First subcommand
+  subc2 - Second subcommand
+  subc3 - Third subcommand
+
+Generic options:
+  --help, -h, -?
+  --version, -v
+  --verbose
+
+Options for subcommand subc1:
+  ...
+
+Options for subcommand subc2:
+  ...
+
+Options for subcommand subc3:
+  ...
+_
+    exit 0;
+}
+
+if ($Opts{version}) {
+    no warnings;
+    say "$0 version $main::VERSION";
+    exit 0;
+}
+
+#say $res ? "Getopt failed" : "Getopt succeeded";
+# ABSTRACT: Script to demonstrate Getopt::Long::Subcommand
+# PODNAME: demo-getopt-long-subcommand
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+demo-getopt-long-subcommand - Script to demonstrate Getopt::Long::Subcommand
+
+=head1 VERSION
+
+This document describes version 0.101 of demo-getopt-long-subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2017-08-01.
+
+=head1 SYNOPSIS
+
+ % demo-getopt-long-subcommand -h
+ % demo-
+
+Activate completion using (can be put in your bash startup file):
+
+ % complete -C demo-getopt-long-subcommand demo-getopt-long-subcommand
+
+Test completion:
+
+ % demo-getopt-long-subcommand <tab>
+ % demo-getopt-long-subcommand -<tab>
+ % demo-getopt-long-complete --int 1 -<tab>
+ # and so on
+
+=head2
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C demo-getopt-long-subcommand demo-getopt-long-subcommand
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete demo-getopt-long-subcommand 'p/*/`demo-getopt-long-subcommand`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Long-Subcommand>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Subcommand>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Subcommand>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

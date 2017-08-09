@@ -1,4 +1,6 @@
 ###	SPAR <http://www.cpan.org/scripts/>
+###	1	644	1236523730	1380446472	hint
+This test is trivial and fundamental.  Something is totally wrong!
 ###	13	644	1067451873	965331711	Makeppfile
 #
 # This test is about the simplest possible test of a makefile, using
@@ -13,8 +15,6 @@ file2:
 
 file1:
 	&echo 1 -o $(target)
-###	1	644	1236523730	1236523730	hint
-This test is fundamental.  Something is totally wrong!
 ###	D	755	1067451873	965332260	answers
 ###	1	644	1067451873	965332255	answers/file1
 1

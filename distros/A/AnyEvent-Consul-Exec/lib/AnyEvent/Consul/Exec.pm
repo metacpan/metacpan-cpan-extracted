@@ -1,5 +1,5 @@
 package AnyEvent::Consul::Exec;
-$AnyEvent::Consul::Exec::VERSION = '0.002';
+$AnyEvent::Consul::Exec::VERSION = '0.003';
 # ABSTRACT: Execute a remote command across a Consul cluster
 
 use 5.020;
@@ -7,7 +7,7 @@ use warnings;
 use strict;
 use experimental qw(postderef);
 
-use Consul 0.021;
+use Consul 0.022;
 use AnyEvent;
 use AnyEvent::Consul;
 use JSON::MaybeXS;
@@ -22,6 +22,7 @@ sub new {
     slurpy Dict[
       command => Str,
       wait    => Optional[Int],
+      dc      => Optional[Str],
       node    => Optional[Str],
       service => Optional[Str],
       tag     => Optional[Str],
@@ -33,6 +34,7 @@ sub new {
   map { $self->{$_} //= sub {} } @callbacks;
   $self->{wait} //= 2;
   $self->{consul_args} //= [];
+  $self->{dc_args} = $self->{dc} ? [dc => $self->{dc}] : [];
   return bless $self, $class;
 }
 
@@ -41,7 +43,8 @@ sub _wait_responses {
 
   $self->{_c}->kv->get_all(
     "_rexec/$self->{_sid}",
-    index => $index, 
+    index => $index,
+    $self->{dc_args}->@*,
     cb => sub {
       my ($kv, $meta) = @_;
       my @changed = grep { $_->modify_index > $index } $kv->@*;
@@ -103,6 +106,7 @@ sub _fire_event {
   $self->{_c}->event->fire(
     "_rexec",
     payload => encode_json($payload),
+    $self->{dc_args}->@*,
     $self->{node}    ? (node    => $self->{node})    : (),
     $self->{service} ? (service => $self->{service}) : (),
     $self->{tag}     ? (tag     => $self->{tag})     : (),
@@ -116,28 +120,89 @@ sub _setup_job {
     Command => $self->{command},
     Wait    => $self->{wait} * 1_000_000_000, # nanoseconds
   };
-  $self->{_c}->kv->put("_rexec/$self->{_sid}/job", encode_json($job), cb => sub { $self->_fire_event });
+  $self->{_c}->kv->put(
+    "_rexec/$self->{_sid}/job",
+    encode_json($job),
+    acquire => $self->{_sid},
+    $self->{dc_args}->@*,
+    cb => sub { $self->_fire_event },
+  );
 }
 
 sub _start_session {
   my ($self) = @_;
-  $self->{_c}->session->create(Consul::Session->new(name => "exec", ttl => "10s"), cb => sub {
+
+  my $session_started_cb = sub {
     $self->{_sid} = shift;
     $self->{_refresh_guard} = AnyEvent->timer(after => "5s", interval => "5s", cb => sub {
-      $self->{_c}->session->renew($self->{_sid});
+      $self->{_c}->session->renew(
+        $self->{_sid},
+        $self->{dc_args}->@*,
+      );
     });
     $self->_setup_job;
-  });
+  };
+
+  if ($self->{dc}) {
+    $self->{_c}->health->service(
+      "consul",
+      $self->{dc_args}->@*,
+      cb => sub {
+        my ($services) = @_;
+        my $service = shift $services->@*;
+        unless ($service) {
+          # XXX no consuls at remote DC
+          ...
+        }
+        my $node = $service->node->name;
+        $self->{_c}->session->create(
+          Consul::Session->new(
+            name     => 'Remote exec via ...', # XXX local node name
+            behavior => 'delete',
+            ttl      => "15s",
+            node     => $node,
+          ),
+          $self->{dc_args}->@*,
+          cb => $session_started_cb,
+        );
+      },
+      error_cb => sub {
+        my ($err) = @_;
+        $self->_cleanup(sub { $self->{on_error}->($err) });
+      },
+    );
+  }
+
+  else {
+    $self->{_c}->session->create(
+      Consul::Session->new(
+        name     => 'Remote exec',
+        behavior => 'delete',
+        ttl      => "15s",
+      ),
+      cb => $session_started_cb,
+    );
+  }
 }
 
 sub _cleanup {
   my ($self, $cb) = @_;
   delete $self->{_refresh_guard};
   if ($self->{_sid}) {
-    $self->{_c}->kv->delete("_rexec/$self->{_sid}", recurse => 1, cb => sub {
-      delete $self->{_sid};
-      delete $self->{_c};
-      $cb->();
+    $self->{_c}->session->destroy(
+      $self->{_sid},
+      $self->{dc_args}->@*,
+      cb => sub {
+      $self->{_c}->kv->delete(
+        "_rexec/$self->{_sid}",
+        recurse => 1,
+        $self->{dc_args}->@*,
+        cb => sub {
+          delete $self->{_sid};
+          delete $self->{_c};
+          $cb->();
+        },
+      );
     });
   }
   else {
@@ -276,6 +341,11 @@ C<-wait> option to C<consul exec>.
 The C<node>, C<service> and C<tag> each take basic regexes that will be used to
 match nodes to run the command on. See the corresponding options to C<consul exec>
 for more info.
+
+The C<dc> option can take the name of the datacenter to run the command in. The
+exec mechanism is limited to a single datacentre. This option will cause
+L<AnyEvent::Consul::Exec> to find a Consul agent in the named datacenter and
+execute the command there (without it, the local node is used).
 
 =head1 CALLBACKS
 

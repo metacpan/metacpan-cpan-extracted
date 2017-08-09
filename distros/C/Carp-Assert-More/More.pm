@@ -7,8 +7,7 @@ use Carp::Assert;
 
 use vars qw( $VERSION @ISA @EXPORT );
 
-*_fail_msg = *Carp::Assert::_fail_msg;
-
+sub _any(&;@);
 
 =head1 NAME
 
@@ -16,15 +15,19 @@ Carp::Assert::More - convenience wrappers around Carp::Assert
 
 =head1 VERSION
 
-Version 1.14
+Version 1.16
 
 =cut
 
 BEGIN {
-    $VERSION = '1.14';
+    $VERSION = '1.16';
     @ISA = qw(Exporter);
     @EXPORT = qw(
+        assert_all_keys_in
+        assert_arrayref
+        assert_coderef
         assert_defined
+        assert_empty
         assert_exists
         assert_fail
         assert_hashref
@@ -32,6 +35,7 @@ BEGIN {
         assert_integer
         assert_is
         assert_isa
+        assert_isa_in
         assert_isnt
         assert_lacks
         assert_like
@@ -45,6 +49,7 @@ BEGIN {
         assert_nonref
         assert_nonzero
         assert_nonzero_integer
+        assert_numeric
         assert_positive
         assert_positive_integer
         assert_undefined
@@ -109,7 +114,7 @@ sub assert_is($$;$) {
     return if $string eq $match;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_isnt( $string, $unmatch [,$name] )
@@ -129,7 +134,7 @@ sub assert_isnt($$;$) {
     return if defined($string) && defined($unmatch) && ($string ne $unmatch);
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_like( $string, qr/regex/ [,$name] )
@@ -150,7 +155,7 @@ sub assert_like($$;$) {
     return if $string =~ $regex;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_unlike( $string, qr/regex/ [,$name] )
@@ -173,7 +178,7 @@ sub assert_unlike($$;$) {
     return if $string !~ $regex;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_defined( $this [, $name] )
@@ -186,7 +191,7 @@ sub assert_defined($;$) {
     return if defined( $_[0] );
 
     require Carp;
-    &Carp::confess( _fail_msg($_[1]) );
+    &Carp::confess( Carp::Assert::_fail_msg($_[1]) );
 }
 
 =head2 assert_undefined( $this [, $name] )
@@ -199,7 +204,7 @@ sub assert_undefined($;$) {
     return unless defined( $_[0] );
 
     require Carp;
-    &Carp::confess( _fail_msg($_[1]) );
+    &Carp::confess( Carp::Assert::_fail_msg($_[1]) );
 }
 
 =head2 assert_nonblank( $this [, $name] )
@@ -216,10 +221,29 @@ sub assert_nonblank($;$) {
     return if $this ne "";
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
+
 =head1 NUMERIC ASSERTIONS
+
+=head2 assert_numeric( $n [, $name] )
+
+Asserts that C<$n> looks like a number, according to C<Scalar::Util::looks_like_number>.
+
+=cut
+
+sub assert_numeric {
+    my $n    = shift;
+    my $name = shift;
+
+    require Scalar::Util;
+
+    assert( Scalar::Util::looks_like_number( $n ), $name );
+
+    return;
+}
+
 
 =head2 assert_integer( $this [, $name ] )
 
@@ -227,7 +251,7 @@ Asserts that I<$this> is an integer, which may be zero or negative.
 
     assert_integer( 0 );      # pass
     assert_integer( 14 );     # pass
-    assert_integer( -14 );    # FAIL
+    assert_integer( -14 );    # pass
     assert_integer( '14.' );  # FAIL
 
 =cut
@@ -240,7 +264,7 @@ sub assert_integer($;$) {
     return if $this =~ /^-?\d+$/;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_nonzero( $this [, $name ] )
@@ -263,7 +287,7 @@ sub assert_nonzero($;$) {
     return if $this+0 != 0;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_positive( $this [, $name ] )
@@ -284,7 +308,7 @@ sub assert_positive($;$) {
     return if $this+0 > 0;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_nonnegative( $this [, $name ] )
@@ -308,7 +332,7 @@ sub assert_nonnegative($;$) {
     return if $this+0 >= 0;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_negative( $this [, $name ] )
@@ -329,7 +353,7 @@ sub assert_negative($;$) {
     return if $this+0 < 0;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_nonzero_integer( $this [, $name ] )
@@ -434,9 +458,75 @@ sub assert_isa($$;$) {
     return if ref($this) eq $type;
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
+
+=head2 assert_isa_in( $obj, \@types [, $description] )
+
+Assert that the blessed C<$obj> isa one of the types in C<\@types>.
+
+    assert_isa_in( $obj, [ 'My::Foo', 'My::Bar' ], 'Must pass either a Foo or Bar object' );
+
+=cut
+
+sub assert_isa_in($$;$) {
+    my $obj   = shift;
+    my $types = shift;
+    my $name  = shift;
+
+    require Scalar::Util;
+
+    my $ok = _any { Scalar::Util::blessed($obj) && $obj->isa($_) } @{$types};
+    assert( $ok, $name );
+
+    return;
+}
+
+
+=head2 assert_empty( $this [, $name ] )
+
+I<$this> must be a ref to either a hash or an array.  Asserts that that
+collection contains no elements.  Will assert (with its own message,
+not I<$name>) unless given a hash or array ref.   It is OK if I<$this> has
+been blessed into objecthood, but the semantics of checking an object to see
+if it does not have keys (for a hashref) or returns 0 in scalar context (for
+an array ref) may not be what you want.
+
+    assert_empty( 0 );       # FAIL
+    assert_empty( 'foo' );   # FAIL
+    assert_empty( undef );   # FAIL
+    assert_empty( {} );      # pass
+    assert_empty( [] );      # pass
+    assert_empty( {foo=>1} );# FAIL
+    assert_empty( [1,2,3] ); # FAIL
+
+=cut
+
+sub assert_empty($;$) {
+    my $ref = shift;
+    my $name = shift;
+
+    require Scalar::Util;
+
+    my $underlying_type;
+    if ( Scalar::Util::blessed( $ref ) ) {
+        $underlying_type = Scalar::Util::reftype( $ref );
+    }
+    else {
+        $underlying_type = ref( $ref );
+    }
+
+    if ( $underlying_type eq 'HASH' ) {
+        assert_is( scalar keys %{$ref}, 0, $name );
+    }
+    elsif ( $underlying_type eq 'ARRAY' ) {
+        assert_is( scalar @{$ref}, 0, $name );
+    }
+    else {
+        assert_fail( 'Not an array or hash reference' );
+    }
+}
 
 =head2 assert_nonempty( $this [, $name ] )
 
@@ -496,7 +586,7 @@ sub assert_nonref($;$) {
     return unless ref( $this );
 
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_hashref( $ref [,$name] )
@@ -527,6 +617,8 @@ sub assert_hashref($;$) {
     return assert_isa( $ref, 'HASH', $name );
 }
 
+=head2 assert_arrayref( $ref [, $name] )
+
 =head2 assert_listref( $ref [,$name] )
 
 Asserts that I<$ref> is defined, and is a reference to a (possibly empty) list.
@@ -535,13 +627,30 @@ B<NB:> The same caveat about objects whose underlying structure is a
 hash (see C<assert_hashref>) applies here; this method returns false
 even for objects whose underlying structure is an array.
 
+C<assert_listref> is an alias for C<assert_arrayref> and may go away in
+the future.  Use C<assert_arrayref> instead.
+
 =cut
 
-sub assert_listref($;$) {
-    my $ref = shift;
+sub assert_arrayref($;$) {
+    my $ref  = shift;
     my $name = shift;
 
     return assert_isa( $ref, 'ARRAY', $name );
+}
+*assert_listref = *assert_arrayref;
+
+=head2 assert_coderef( $ref [,$name] )
+
+Asserts that I<$ref> is defined, and is a reference to a closure.
+
+=cut
+
+sub assert_coderef($;$) {
+    my $ref = shift;
+    my $name = shift;
+
+    return assert_isa( $ref, 'CODE', $name );
 }
 
 =head1 SET AND HASH MEMBERSHIP
@@ -567,7 +676,7 @@ sub assert_in($$;$) {
         return if $string eq $element;
     }
     require Carp;
-    &Carp::confess( _fail_msg($name) );
+    &Carp::confess( Carp::Assert::_fail_msg($name) );
 }
 
 =head2 assert_exists( \%hash, $key [,$name] )
@@ -595,7 +704,7 @@ sub assert_exists($$;$) {
     for ( @list ) {
         if ( !exists( $hash->{$_} ) ) {
             require Carp;
-            &Carp::confess( _fail_msg($name) );
+            &Carp::confess( Carp::Assert::_fail_msg($name) );
         }
     }
 }
@@ -624,10 +733,38 @@ sub assert_lacks($$;$) {
     for ( @list ) {
         if ( exists( $hash->{$_} ) ) {
             require Carp;
-            &Carp::confess( _fail_msg($name) );
+            &Carp::confess( Carp::Assert::_fail_msg($name) );
         }
     }
 }
+
+
+=head2 assert_all_keys_in( \%hash, \@names [, $name ] )
+
+Asserts that each key in C<%hash> is in the list of C<@names>.
+
+This is used to ensure that there are no extra keys in a given hash.
+
+    assert_all_keys_in( $obj, [qw( height width depth )], '$obj can only contain height, width and depth keys' );
+
+=cut
+
+sub assert_all_keys_in {
+    my $hash       = shift;
+    my $valid_keys = shift;
+    my $name       = shift;
+
+    assert_hashref( $hash );
+    assert_listref( $valid_keys );
+
+    foreach my $key ( keys %{$hash} ) {
+        assert_in( $key, $valid_keys, $name );
+    }
+
+    return;
+}
+
+
 
 =head1 UTILITY ASSERTIONS
 
@@ -641,13 +778,21 @@ accidentally use C<assert($msg)>, which of course never fires.
 
 sub assert_fail(;$) {
     require Carp;
-    &Carp::confess( _fail_msg($_[0]) );
+    &Carp::confess( Carp::Assert::_fail_msg($_[0]) );
+}
+
+
+# Since List::Util doesn't have any() all the way back.
+sub _any(&;@) {
+    my $sub = shift;
+    $sub->($_) && return 1 for @_;
+    return 0;
 }
 
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2012 Andy Lester.
+Copyright 2005-2017 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0.
@@ -655,6 +800,7 @@ it under the terms of the Artistic License version 2.0.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to
+Eric A. Zarko,
 Bob Diss,
 Pete Krawczyk,
 David Storrs,

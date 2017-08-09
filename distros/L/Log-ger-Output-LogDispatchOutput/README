@@ -1,25 +1,53 @@
-SYNOPSIS
+NAME
+    Log::ger::Output::LogDispatchOutput - Send logs to a Log::Dispatch
+    output
 
+VERSION
+    This document describes version 0.002 of
+    Log::ger::Output::LogDispatchOutput (from Perl distribution
+    Log-ger-Output-LogDispatchOutput), released on 2017-08-03.
+
+SYNOPSIS
      use Log::ger::Output LogDispatchOutput => (
          output => 'Screen', # choose Log::Dispatch::Screen
          args => {stderr=>1, newline=>1},
      );
 
 DESCRIPTION
-
     This output sends logs to a Log::Dispatch output.
 
 CONFIGURATION
+  output
+  args
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Output-LogDispatchOutput>.
 
- output
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Output-LogDispatchOutput>.
 
- args
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-LogDis
+    patchOutput>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::ger::Output::LogDispatch
 
     Log::ger
 
     Log::Dispatch
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

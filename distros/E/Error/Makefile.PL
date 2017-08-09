@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME	     => 'Error',
 	VERSION_FROM => 'lib/Error.pm',
-	PREREQ_PM => 
+	PREREQ_PM =>
 	{
 		'Scalar::Util' => 0,
 		'warnings' => 0,

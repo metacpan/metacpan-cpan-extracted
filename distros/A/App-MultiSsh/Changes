@@ -1,5 +1,15 @@
 Revision history for App-MultiSsh
 
+0.20   2017-08-06
+        Updating for release of version 0.20
+        Updated date (Ivan Wills)
+        Added better error and fixed test failure (Ivan Wills)
+        Added documentation about new flag (Ivan Wills)
+        Config fixes (Ivan Wills)
+        Changing the tmux command work with in nested window (Ivan Wills)
+        Added new argument --tmux-nested to allow mssh to run inside another tmux window (Ivan Wills)
+        Added writing out host closer to output so that the host is attached to the output (Ivan Wills)
+
 0.19   2016-03-06
         Updating for release of version 0.19
         Fixed spelling (Ivan Wills)

@@ -20,7 +20,7 @@ my $simple_select = '{
     ]
 }';
 
-my $simple_result = "SELECT *\nFROM 'test_table'";
+my $simple_result = qq(SELECT *\nFROM "test_table");
 
 my ( $select_query, $err ) = JsonSQL::Query::Select->new($basic_ruleset, $simple_select);
 ok($select_query, 'Create a simple SELECT query object');
@@ -49,7 +49,7 @@ my $qualified_select = '{
     }
 }';
 
-my $qualified_result = "SELECT 'field1', 'field2' AS 'test'\nFROM 'MySchema'.'table1'\nWHERE (('field2' = ?) AND ('field1' = ?) AND (('field2' = ?) OR ('field3' > ?)))";
+my $qualified_result = qq(SELECT "field1", "field2" AS "test"\nFROM "MySchema"."table1"\nWHERE (("field2" = ?) AND ("field1" = ?) AND (("field2" = ?) OR ("field3" > ?))));
 
 ( $select_query, $err ) = JsonSQL::Query::Select->new($basic_ruleset, $qualified_select);
 ok($select_query, 'Create a more complicated SELECT query object');
@@ -69,7 +69,7 @@ my $join_select = '{
         ]
 }';
 
-my $join_result = "SELECT 'MySchema'.'table1'.'field1', 'MySchema'.'table2'.*\nFROM 'MySchema'.'table1' INNER JOIN 'MySchema'.'table2' ON 'MySchema'.'table2'.'field2' = 'MySchema'.'table2'.'field1'";
+my $join_result = qq(SELECT "MySchema"."table1"."field1", "MySchema"."table2".*\nFROM "MySchema"."table1" INNER JOIN "MySchema"."table2" ON "MySchema"."table2"."field2" = "MySchema"."table2"."field1");
 
 ( $select_query, $err ) = JsonSQL::Query::Select->new($basic_ruleset, $join_select);
 ok($select_query, 'Create a SELECT query object with JOIN');
@@ -88,7 +88,7 @@ my $allowed_select = '{
     ]
 }';
 
-my $allowed_result = "SELECT *\nFROM 'AllowedTable'";
+my $allowed_result = qq(SELECT *\nFROM "AllowedTable");
 
 ( $select_query, $err ) = JsonSQL::Query::Select->new($simple_ruleset, $allowed_select);
 ok($select_query, 'Create a simple SELECT with whitelisting in effect');

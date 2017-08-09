@@ -137,6 +137,15 @@ my %ct_tests = (
                 'charset' => 'us-ascii',
             },
     },
+
+    qq(text/plain;\r\n charset=us-ascii;\r\n attribute="\r\n value1 \r\n value2\r\n value3\r\n value4\r\n "\r\n ) => {
+            'type' => 'text',
+            'subtype' => 'plain',
+            'attributes' => {
+                'attribute' => ' value1  value2 value3 value4 ',
+                'charset' => 'us-ascii',
+            },
+    },
 );
 
 my %non_strict_ct_tests = (
@@ -155,6 +164,8 @@ sub test {
     $expect->{composite} = $expect->{subtype};
 
     local $_;
+    $info =~ s/\r/\\r/g;
+    $info =~ s/\n/\\n/g;
     is_deeply(parse_content_type($string), $expect, $info);
 }
 

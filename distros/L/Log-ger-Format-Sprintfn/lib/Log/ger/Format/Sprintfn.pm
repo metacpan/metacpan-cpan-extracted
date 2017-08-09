@@ -1,7 +1,7 @@
 package Log::ger::Format::Sprintfn;
 
-our $DATE = '2017-06-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-01'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ Log::ger::Format::Sprintfn - Use Text::sprintfn for formatting instead of sprint
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -82,11 +82,7 @@ After that:
  log_debug 'user is %(username)s, details are %(detail)s',
      {username=>"Foo", detail=>{...}};
 
-To install only for current package:
-
- use Log::ger::Format;
- Log::ger::Format->set_for_current_package('Sprintfn');
- use Log::ger;
+Note that this only has effect in the importing package.
 
 =head1 DESCRIPTION
 

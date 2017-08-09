@@ -3,8 +3,8 @@ mv /tmp/iz/* .
 cp -p ../CURRENT/index.html ../CURRENT/HOWTO-install-deinstall-and-tables .
 unzip html.zip
 unzip apple.zip
-unzip src.zip text-tables
 chmod a+r *.html *.zip README*
+unzip src.zip text-tables
 
 
   add line with the new version to ../index.html
@@ -13,3 +13,9 @@ chmod a+r *.html *.zip README*
   change the end of HOWTO-install-deinstall-and-tables to the content of text-tables
       (Fix 2 lines [Cyrillic last but one, Hebrew after /?] in the inserted part — visible in FCW.)
       	Only the second one is visible if Emacs on Unix, showing in a console on Windows.
+
+========================= Build
+
+#set PERL5OPT=&& D:\Programs\cygwin\bin\perl.exe  -wC31 -I UI-KeyboardLayout/lib UI-KeyboardLayout/examples/build-iz.pl UI-KeyboardLayout/examples/izKeys.kbdd
+cd iz-71
+..\UI-KeyboardLayout\examples\build_here.cmd 2>&1 | tee 00b00

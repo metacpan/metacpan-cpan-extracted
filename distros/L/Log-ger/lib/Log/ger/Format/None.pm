@@ -1,7 +1,7 @@
 package Log::ger::Format::None;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 sub get_hooks {
     return {
@@ -28,7 +28,7 @@ Log::ger::Format::None - Perform no formatting on the message
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,19 @@
+#
+# This file is part of App-Milter-Limit
+#
+# This software is copyright (c) 2010 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package App::Milter::Limit::Log;
-$App::Milter::Limit::Log::VERSION = '0.52';
+$App::Milter::Limit::Log::VERSION = '0.53';
 # ABSTRACT: logging functions for App::Milter::Limit
 
 use strict;
+use warnings;
+
 use base 'Exporter';
 use Sys::Syslog ();
 
@@ -31,7 +42,7 @@ App::Milter::Limit::Log - logging functions for App::Milter::Limit
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -62,7 +73,7 @@ log a message a level warn.  C<App::Milter::Limit> provides this via C<$SIG{__WA
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/milter-limit>
+The development version is on github at L<https://github.com/mschout/milter-limit>
 and may be cloned from L<git://github.com/mschout/milter-limit.git>
 
 =head1 BUGS

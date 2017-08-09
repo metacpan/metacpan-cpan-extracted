@@ -2,9 +2,7 @@
 use strict;
 use warnings;
 
-# This test data is taken directly from the OS etst files OSTN02
-#
-
+# This test data is taken directly from the OS test files for OSTN02
 my %test_input = (
     BLAC           => {lat => 53.77911025694444,  lon => -3.040454906944444,    e =>  331534.552,  n =>  431920.792 },  
     BRIS           => {lat => 51.42754743361111,  lon => -2.544076186111111,    e =>  362269.979,  n =>  169978.688 },  

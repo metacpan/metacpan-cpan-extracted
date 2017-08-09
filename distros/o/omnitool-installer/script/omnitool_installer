@@ -1,0 +1,12 @@
+#!perl
+
+use strict;
+use warnings;
+
+use omnitool::installer;
+
+my $ot_installer = omnitool::installer->new();
+
+$ot_installer->do_the_installation();
+
+exit;

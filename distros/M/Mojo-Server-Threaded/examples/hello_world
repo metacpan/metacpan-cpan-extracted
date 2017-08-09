@@ -1,0 +1,20 @@
+use Mojolicious::Lite;
+
+app->log->path('helloworld.log');
+app->log->level('debug');
+
+plugin Config => {
+  default => {
+    elzar => {
+      upgrade_timeout => 10,
+      inactivity_timeout => 60,
+    }
+  }
+};
+
+get '/' => sub {
+  my $c = shift;
+  $c->render(text => 'Hello World!');
+};
+
+app->start;

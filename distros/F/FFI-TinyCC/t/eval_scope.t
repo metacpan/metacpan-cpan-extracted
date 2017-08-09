@@ -1,7 +1,6 @@
-use strict;
-use warnings;
-use if $] < 5.010, 'Test::More', skip_all => 'eval requires Perl 5.10 or better';
-use Test::More tests => 2;
+use lib 't/lib';
+use Test2::Require::Perl510;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC::Inline qw( tcc_eval );
 
 my $prog = q{
@@ -9,14 +8,11 @@ my $prog = q{
 };
 
 subtest eval => sub {
-  plan tests => 5;
-
   use FFI::TinyCC::Inline options => "-DFOO=1";
   
   is tcc_eval($prog), 1, 'FOO=1';
 
   subtest "one step" => sub {
-    plan tests => 1;
     use FFI::TinyCC::Inline options => "-DFOO=2";
   
     is tcc_eval($prog), 2, 'FOO=2';
@@ -26,7 +22,6 @@ subtest eval => sub {
   is tcc_eval($prog), 1, 'FOO=1';
 
   subtest "two step" => sub {
-    plan tests => 1;
     use FFI::TinyCC::Inline options => "-DFOO=3";
   
     is tcc_eval($prog), 3, 'FOO=3';
@@ -39,3 +34,5 @@ subtest eval => sub {
 eval { tcc_eval($prog) };
 isnt $@, '', 'no FOO';
 note $@ if $@;
+
+done_testing;

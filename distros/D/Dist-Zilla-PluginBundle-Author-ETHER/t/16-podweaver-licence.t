@@ -54,9 +54,12 @@ subtest "expecting $_->{expected_file} from config: " . join(' => ', %{ $_->{con
     my $expected_file = $_->{expected_file};
     my $config = $_->{config};
 
+    my $tempdir = no_git_tempdir();
+
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     {   # merge into root section

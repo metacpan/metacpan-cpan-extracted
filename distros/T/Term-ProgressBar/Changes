@@ -1,5 +1,8 @@
 Revision history for Perl extension Term::ProgressBar
 
+2.21  2017-08-02 MANWAR
+      - Added key 'clean' to Makefile.PL script.
+
 2.20  2017-07-11 MANWAR
       - silent mode avoids uninitialized value messages (GFIREBALL)
 

@@ -6,6 +6,7 @@ examples/tiff2pdf.pl
 examples/tiffinfo.pl
 lib/Graphics/TIFF.pm
 t/1.t
+t/2.t
 t/8_enums.t
 t/90_MANIFEST.t
 t/91_critic.t

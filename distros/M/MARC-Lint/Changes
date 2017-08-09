@@ -1,3 +1,17 @@
+1.52    Wed. Aug. 2, 2017
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Updated Lint::DATA section with Updates No. 22-24 (April 2016-May 2017)
+        - Updated MARC::Lint::CodeData with most recent version.
+
+1.51    Mon. May 9, 2016, 2016
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+		
+        - Fixed 386 tag in Lint::DATA section
+        - Updated Lint::DATA section with Update No. 21 (September 2015)
+
 1.50    Fri. Jan. 15, 2016
 
         [THINGS THAT MAY BREAK YOUR CODE]

@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 15;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC::Inline qw( tcc_inline );
 
 tcc_inline q{
@@ -110,3 +108,5 @@ ok f14(), "f14() = " . f14();
 is f15(f14()), "message3", "f15(f14()) = message3";
 
 is sum("1", "2", "3"), 6, 'sum(1,2,3) = 6';
+
+done_testing;

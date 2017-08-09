@@ -31,6 +31,7 @@
       },
       "develop" : {
          "requires" : {
+            "File::Spec" : "0",
             "FindBin" : "0",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
@@ -48,9 +49,8 @@
          "requires" : {
             "Capture::Tiny" : "0.17",
             "ExtUtils::CBuilder" : "0",
-            "ExtUtils::ParseXS" : "3.21",
+            "ExtUtils::ParseXS" : "3.30",
             "FFI::CheckLib" : "0.11",
-            "File::ShareDir" : "0",
             "File::Which" : "1.10",
             "File::chdir" : "0",
             "JSON::PP" : "0",
@@ -84,7 +84,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.75",
+   "version" : "0.91",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -105,6 +105,6 @@
       "Nicholas Shipp (nshp)",
       "Juan Juli\u00e1n Merelo Guerv\u00f3s (JJ)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

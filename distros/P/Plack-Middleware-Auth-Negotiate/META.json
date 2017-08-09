@@ -1,0 +1,70 @@
+{
+   "abstract" : "Negotiate authentication middleware (SPNEGO)",
+   "author" : [
+      "Adrian Kreher <avuserow@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-Auth-Negotiate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Signature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GSSAPI" : "0",
+            "MIME::Base64" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sophos/Plack-Middleware-Auth-Negotiate/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Plack::Middleware::Auth::Negotiate",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sophos/Plack-Middleware-Auth-Negotiate.git",
+         "web" : "https://github.com/sophos/Plack-Middleware-Auth-Negotiate"
+      }
+   },
+   "version" : "0.172130",
+   "x_contributors" : [
+      "Ioan Rogers <ioan.rogers@sophos.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

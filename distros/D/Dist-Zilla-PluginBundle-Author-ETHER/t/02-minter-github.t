@@ -11,6 +11,7 @@ use Moose::Util 'find_meta';
 use lib 't/lib';
 use NoNetworkHits;
 use NoPrereqChecks;
+use Helper;
 
 # we need the profiles dir to have gone through file munging first (for
 # profile.ini), as well as get installed into a sharedir
@@ -51,14 +52,8 @@ my @expected_files = qw(
     t/01-basic.t
 );
 
-my @found_files;
-$mint_dir->visit(
-    sub { push @found_files, $_->relative($mint_dir)->stringify if -f },
-    { recurse => 1 },
-);
-
 cmp_deeply(
-    \@found_files,
+    [ recursive_child_files($mint_dir) ],
     bag(@expected_files),
     'the correct files are created',
 );

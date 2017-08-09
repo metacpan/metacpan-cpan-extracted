@@ -1,5 +1,8 @@
 Revision history for Statistics-R-IO
 
+1.0002  1 August 2017
+        - Fix failing install with pre-1.001 Class::Tiny (#54)
+
 1.0001  29 May 2016
         - minor bug fix: remove accidentally left-behind uses of Moose
 

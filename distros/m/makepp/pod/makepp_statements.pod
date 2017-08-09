@@ -2,7 +2,7 @@
 
 makepp_statements -- Various statements in a makefile
 
-=for vc $Id: makepp_statements.pod,v 1.45 2012/02/07 22:26:15 pfeiffer Exp $
+=for vc $Id: makepp_statements.pod,v 1.50 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -13,6 +13,7 @@ B<B:>E<nbsp>L<build_cache|/build_cache_path_to_build_cache>,
   L<build_check|/build_check_build_check_method>,E<nbsp>
 B<D:>E<nbsp>L</define>,E<nbsp>
 B<E:>E<nbsp>L<export|/export_var>,E<nbsp>
+B<F:>E<nbsp>L<foreach|/foreach_variable_list>,E<nbsp>
 B<G:>E<nbsp>L<global|/global_var>,E<nbsp>
 B<I:>E<nbsp>L<ifdef|/ifdef_variable>,
   L<ifeq|/ifeq_string1_string2>,
@@ -24,6 +25,7 @@ B<I:>E<nbsp>L<ifdef|/ifdef_variable>,
   L<ifperl|/ifperl_perlcode>,
   L<ifsys|/ifsys_wildcard>,
   L<iftrue|/iftrue_expression>,
+  L<-include|/include_makefile2>,
   L<include|/include_makefile>,
   L<_include|/include_makefile2>,E<nbsp>
 B<L:>E<nbsp>L<load_makefile|/load_makefile_some_directory_somewhere_makefile>,E<nbsp>
@@ -98,6 +100,8 @@ C<else ifxxx>`s.
 
 The C<ifxxx> conditional statements are unique in that they may occur in the
 middle of rule actions, as in the above example, without disrupting the rule.
+As always they are performed before any other parsing takes place.  Hence rule
+specific variables like C<$(output)> are not available.
 
 =over 4
 
@@ -128,19 +132,19 @@ C<ifmakeperl>, C<ifsys> and C<iftrue> are primarily useful when you have
 to build a program under several different conditions.  For example,
 
     BUILD_TYPE := debug    # "debug" or "production"
- 
+
     ifeq ($(BUILD_TYPE), debug)
       CFLAGS := -g
     else
       CFLAGS := -O2
     endif
- 
+
     program : *.o
  	$(CC) $(CFLAGS) $(inputs) -o $(output) $(LIBS)
     ifeq ($(BUILD_TYPE), production)
  	strip $(output)
     endif
- 
+
     %.o : %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
 
@@ -254,6 +258,26 @@ Shell:
 Tests if the expression evaluates to some value other than zero or the empty
 string.
 
+=item foreach I<variable>,I<list>
+
+Such a control flow statement is not yet implemented.  It can be clumsily but
+effectively emulated with the C<$[foreach]> function (using square brackets to
+force L<expansion while parsing|makepp_variables/Variable Substitution>):
+
+    define FOR_EACH
+      $X: $$($X_FILES)
+ 	... $$(output) ... $$(input) # protect the $ from early evaluation
+
+    enddef # preceding empty line is needed for foreach
+
+    $[print $[foreach X, x1 x2 x3, $[call FOR_EACH]]]
+
+The print funtion is only for diagnostics, because it is tricky to understand
+when which expression gets expanded.  The empty line is needed because foreach
+concatenates with one space (instead of a newline, as you may be tempted to
+assume).  The call function is needed so that C<$X> gets evaluated within
+foreach.
+
 =back
 
 
@@ -321,7 +345,7 @@ than makepp's text functions.  For example,
       $CFLAGS = '-O6';
     }
     perl_end
- 
+
     %.o: %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
 
@@ -338,9 +362,9 @@ S<C<perldoc Config>> if you want to see what configuration information
 Perl has available.)
 
     perl_begin
- 
+
     use Config;
- 
+
     $ARCH = $Config{'archname'};    # Use perl's knowledge of the architecture.
     $CC = $Config{'cc'};	    # Use the same C compiler as Perl did.
     $SHARED_OBJ_CFLAGS = $Config{'cccdlflags'};
@@ -349,13 +373,13 @@ Perl has available.)
     $SHARED_OBJ_LDFLAGS = $Config{'ccdlflags'} . " " . $Config{'lddlflags'};
  		      		# Linker flags to make a shared library.
     $SHARED_CC_LINK = $Config{'ld'}; # Command to produce shared libraries.
- 
+
     $SHARED_EXTENSION = $Config{'dlext'}; # Extension of shared libraries.
     perl_end
- 
+
     %.o: %.c
  	$(CC) $(CFLAGS) $(SHARED_OBJ_CFLAGS) -c $(input) -o $(output)
- 
+
     libmylib.$(DLEXT): *.o
  	$(SHARED_CC_LINK) $(inputs) -o $(output) $(SHARED_OBJ_LDFLAGS)
 
@@ -401,12 +425,12 @@ L<C<$(perl)>|makepp_functions/perl_perlcode> function, the return value of
 this block is ignored.
 
     perl { print "passed this point in the makefile\n" }
- 
+
     perl
     {
       print "and this one too\n";
     }
- 
+
     ifdef NOISY
       perl {{
  	print "as well as this one\n"
@@ -452,14 +476,14 @@ done by placing the following into your makefile:
       local $/ = undef;		# Slurp file in one read.
       <$fh>;
     }
- 
+
     ifdef NEWSUB
       makesub f_VAR2
       {{
  	$(VAR) * 2;
       }}
     endif
- 
+
     makesub f_VAR1 { $(VAR) + 1 }
 
 
@@ -597,7 +621,6 @@ instead of something more complicated, like this:
 
     include ../../../standard_definitions.mk  # Is this the right number of ..?
 
-
 You can specify as many files as you want, and variables are allowed:
 
     include file1 file2 file3 $(other_include_files)
@@ -618,12 +641,26 @@ instead of F<standard_rules.mk>.  This way, when you run the makefile
 with GNU make, it loads F<standard_rules.mk>, but with makepp, it loads
 F<standard_rules.mk.makepp>.
 
+Because many legacy files put the rule to generate an include file after the
+include statement, makepp will defer decisions about inexistant or stale
+includes till the end of makefile loading.  That is, unless it is invoked with
+C<--rm-stale>.  For as many times as the situation has improved by then
+(because a rule appeared) makepp will reload the makefile, which may again
+make more such rules appear.  This is obviously an inefficient way to load
+makefiles, so try to avoid that.  Worse, if your makefile loading has
+side-effects (like appending to a global variable or a line like
+C<<< do_it_now := $(shell cat a >>b) >>> or its makepp equivalent
+C<< &cat a -o>>b >>) they will happen as many times as the makefile needs to be
+loaded, so, again, try to avoid that!
+
 =item _include I<makefile>
+
+=item -include I<makefile>
 
 A minor variant on C<include>, the C<_include> statement includes the file if
 it exists but doesn't generate a fatal error if it does not.  The C<_include>
 statement used to be important for include file scanning with GNU make, but is
-seldom useful for makepp.
+less useful for makepp.
 
 =item load_makefile I</some/directory/somewhere/Makefile>
 
@@ -683,7 +720,7 @@ make which makepp does not understand.)  For example,
 
 The above statement will turn off implicit loading for makefiles
 in C<dir1> B<and all of its subdirectories>.  It
-will also turn of implicit makefile loading for all subdirectories
+will also turn off implicit makefile loading for all subdirectories
 of C<dir2> (and all of their subdirectories), but not
 for C<dir2> itself.
 

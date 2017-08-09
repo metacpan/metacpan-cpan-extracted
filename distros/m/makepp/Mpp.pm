@@ -1,4 +1,4 @@
-# $Id: Mpp.pm,v 1.17 2012/06/09 20:36:20 pfeiffer Exp $
+# $Id: Mpp.pm,v 1.28 2016/09/28 20:36:49 pfeiffer Exp $
 
 =head1 NAME
 
@@ -64,14 +64,7 @@ our $n_files_changed = 0;	# Keep track of the number of files that
 				# we actually changed.
 our $n_phony_targets_built = 0;	# Keep track of the number of phony targets
                                 # built, too.
-our $error_found = 0;		# Non-zero if we found an error.  This is used
-				# to stop cleanly when we are doing a parallel
-				# build (unless -k is specified).
 our $failed_count = 0;		# How many targets failed.  TODO: my when moving build et al here
-our $build_cache_hits = 0;	# Number of the files changed that were
-				# imported from a build cache.
-our $rep_hits = 0;		# Number of the files changed that were
-				# imported from a rep.
 our $print_directory = 1;	# Default to printing it.
 our $log_level = 2;		# Default to logging. 1: STDOUT, 2: $logfile
 sub log($@);
@@ -124,10 +117,10 @@ sub log($@);
   @pending_signals{@signals_to_handle} = ( 0 ) x @signals_to_handle;
 
   END {
-    Mpp::log N_REP_HITS => $rep_hits
-      if $log_level && $rep_hits;
-    Mpp::log N_CACHE_HITS => $build_cache_hits
-      if $log_level && $build_cache_hits;
+    Mpp::log N_REP_HITS => $Mpp::Repository::hits
+      if $log_level && $Mpp::Repository::hits;
+    Mpp::log N_CACHE_HITS => $Mpp::BuildCache::hits
+      if $log_level && $Mpp::BuildCache::hits;
     Mpp::log N_FILES => $n_files_changed, $n_phony_targets_built, $failed_count
       if defined $logfh;		    # Don't create log for --help or --version.
     if( exists $Devel::DProf::{VERSION} ) { # Running with profiler?
@@ -144,7 +137,7 @@ sub log($@);
 
 my $invocation = join_with_protection($0, @ARGV);
 
-for( qw(/usr/xpg4/bin/sh /sbin/xpg4/sh /bin/sh) ) {
+for( </{usr/xpg4/bin,sbin/xpg4,bin,usr/bin}/sh> ) {
   if( -x ) {
     $ENV{SHELL} = $_;		# Always use a hopefully Posix shell.
     last;
@@ -153,23 +146,30 @@ for( qw(/usr/xpg4/bin/sh /sbin/xpg4/sh /bin/sh) ) {
 delete $ENV{PWD};		# This is dangerous.
 
 our $indent_level = 0;		# Indentation level in the log output.
-our $keep_going = 0;		# -k specified.
 my $logfile;			# Other than default log file.
 our $parallel_make = 0;		# True if we're in parallel make mode.
 our $profile = 0;		# Log messages about execution times.
 our $verbose;
 our $quiet_flag;		# Default to printing informational messages.
 
+# Arguments to print may be split and get concatenated.  Trailing \n optional.
+# 3 cases:
+# "xxx: ..." probably file:lineno:
+# ": ..." same but file:lineno was not available at call time, add $progname on STDERR
+# any other, add $progname: on STDERR
 $SIG{__WARN__} = sub {
-  my $level = ($_[0] =~ /^(?:error()|info): /s) ? '' : 'warning: ';
-  my $error = defined $1;
+  my( $str, $pos ) = ($_[0], '');
+  $str =~ s/^: //g or		# leading ': '
+    $str =~ /^(?!error:|warning:|info:)\S*: /gc; # GNU style?
+  $pos = pos $str;
+  $str =~ s/\G(?!error: |warning: |info: )/warning: /; # add warning
+  $str =~ s/\A(\S+?:\d+)\((\S+?\))(: (?:error|warning|info): )/$1$3(dir $2 /;
   if( $log_level == 2 ) {
     &Mpp::log() unless defined $logfh; # Only open the file.
-    print $logfh "*** $level$_[0]";
+    print $logfh "*** $str";
   }
-  print STDERR "$progname: $level$_[0]" if $error or $warn_level;
+  print STDERR $pos ? '' : "$progname: ", $str if $warn_level or $str =~ /\berror: /;
 };
-
 
 
 =head2 Mpp::log
@@ -247,7 +247,11 @@ sub log($@) {
       }
     }
     push @close_fhs, $logfh;
-    printf $logfh "3\01%s\nVERSION\01%s\01%vd\01%s\01\n", $invocation, $Mpp::VERSION, $^V, ARCHITECTURE;
+    printf $logfh "3\01%s\nVERSION\01%s\01%vd\01%s\01\nDEBUG\01%s\01\n",
+      $invocation,
+      $Mpp::Text::VERSION, $^V, ARCHITECTURE,
+      Mpp::DEBUG
+	or die "$progname: can't write logfile--$!";
 
     # If we're running with --traditional-recursive-make, then print the directory
     # when we're entering and exiting the program, because we may be running as
@@ -270,7 +274,7 @@ sub log($@) {
 	  join "\02", map {		# Array shall only contain objects.
 	    if( exists $_->{xLOGGED} ) { # Already defined
 	      sprintf '%x', $_;		# The cheapest external representation of a ref.
-	    } elsif( exists $_->{'..'} ) { # not a Mpp::File or similar
+	    } elsif( exists $_->{'..'} ) { # Mpp::File or similar
 	      undef $_->{xLOGGED};
 	      if( exists $_->{'..'}{xLOGGED} ) { # Dir already defined
 		sprintf "%x\03%s\03%x", $_, $_->{NAME}, $_->{'..'};
@@ -287,7 +291,7 @@ sub log($@) {
 # with &reuse_stack semantics.
 	} elsif( exists $_->{xLOGGED} ) { # Already defined
 	  sprintf '%x', $_;		# The cheapest external representation of a ref.
-	} elsif( exists $_->{'..'} ) {	# not a Mpp::File or similar
+	} elsif( exists $_->{'..'} ) {	# Mpp::File or similar
 	  undef $_->{xLOGGED};
 	  if( exists $_->{'..'}{xLOGGED} ) { # Dir already defined
 	    sprintf "%x\03%s\03%x", $_, $_->{NAME}, $_->{'..'};
@@ -299,7 +303,8 @@ sub log($@) {
 	  $_->name;
 	}
       } @_ ),
-      "\n";
+      "\n"
+	or die "$progname: can't write logfile--$!";
   $last_indent_level = $indent_level;
 }
 
@@ -327,46 +332,24 @@ sub print_profile_end {
   print "$progname: End \@" . &$hires_time() . " $_[0]\n";
 }
 
-=head2 print_error
-
-  print_error "message", ...;
-
-Prints an error message, with the program name prefixed.  For any arg which is
-a reference, $arg->name is printed.
-
-If any filename is printed, it should have be quoted as in `filename' or
-`filename:lineno:' at BOL, so that IDEs can parse it.
-
-=cut
-
-sub print_error {
-  my( $log, $stderr ) = $log_level && '*** ';
-  my $str = '';
-  if( $_[0] =~ /^error()/ || $_[0] !~ /^\S+?:/ ) { # No name?
-    $stderr = "$progname: ";
-    $str = 'error: ' unless defined $1;
-  }
-  $str .= ref() ? $_->name : $_
-    for @_;
-  $str .= "\n" if $str !~ /\n\z/;
-  print STDERR $stderr ? $stderr . $str : $str;
-  if( $log_level == 2 ) {
-    &Mpp::log() unless defined $logfh; # Only open the file.
-    print $logfh $log . $str;
-  }
-  &flush_log;
-}
-
 
 sub perform(@) {
-  #my @handles = @_;		# Arguments passed to wait_for.
+  #my @targets = @_;		# Arguments passed to build and then wait_for.
+  our $error_found = 0;		# Non-zero if we found an error.  This is used
+				# to stop cleanly when we are doing a parallel
+				# build (unless -k is specified).
   my $status;
   my $start_pid = $$;
-  my $error_message = $@ || '';
+  print $logfh "\f\n" if $Mpp::loop && &maybe_stop && defined $logfh;
+  my @handles = map {
+    exists $_->{DONT_BUILD} or undef $_->{DONT_BUILD};
+    Mpp::build $_ or ();	# Try to build the file, return handle if necessary.
+  } @_;
+  my $error_message = $@;
   unless( $error_message ) {
-    eval { $status = &wait_for }; # Wait for args to be built.
+    eval { $status = wait_for( @handles ) }; # Wait for args to be built.
 				# Wait for all the children to complete.
-    $error_message .= $@ if $@;	# Record any new error messages.
+    $error_message = $@ if $@;	# Record any new error messages.
   }
   {
     my $orig = '';
@@ -403,21 +386,66 @@ signal propagation.$orig Stopped}
     }
   }
 
-  if( $quiet_flag ) {
-    # Suppress following chatter.
-  } elsif( $n_files_changed || $rep_hits || $build_cache_hits || $n_phony_targets_built || $failed_count ) {
-    print "$progname: $n_files_changed file" . ($n_files_changed == 1 ? '' : 's') . ' updated' .
-      ($rep_hits ? ", $rep_hits repository import" . ($rep_hits == 1 ? '' : 's') : '') .
-      ($build_cache_hits ? ", $build_cache_hits build cache import" . ($build_cache_hits == 1 ? '' : 's') : '') .
-      ($error_found ? ',' : ' and') .
-      " $n_phony_targets_built phony target" . ($n_phony_targets_built == 1 ? '' : 's') . ' built' .
-      ($failed_count ? " and $failed_count target" . ($failed_count == 1 ? '' : 's') . " failed\n" : "\n");
-  } elsif( !$error_message ) {
-    print "$progname: no update necessary\n";
+  unless( $quiet_flag ) {
+    my $found;
+    my $msg = join ', ', map {
+      $found ||= $_->[1];
+      $_->[1] || $_->[2] ?
+	sprintf( $_->[0], $_->[1], $_->[1] == 1 ? '' : 's' ) : # plural?
+	();
+    } ['%d file%s updated', $n_files_changed, 1],
+      ['%d repository import%s', $Mpp::Repository::hits],
+      ['%d build cache import%s', $Mpp::BuildCache::hits],
+      ['%d phony target%s built', $n_phony_targets_built],
+      [($error_message || $status || !MAKEPP ? '%d' : '%d unimportant').' target%s failed', $failed_count];
+				# See FAQ for unimportant.
+    if( $found ) {
+      $msg =~ s/,(?=[^,]+$)/ and/;
+      print "$progname: $msg\n";
+    } elsif( !$error_message ) {
+      print "$progname: no update necessary\n";
+    }
   }
 
   print "$progname: Ending \@" . &$hires_time() . "\n" if $profile;
-  print_error $error_message if $error_message;
+  if( $error_message ) {
+    $error_message =~ s/^(\S+: )?(?!error: )/($1 ? $1 : '') . 'error: '/e;
+    $error_message =~ s/\s*\Z/\n/;
+    warn $error_message;
+  }
+
+  if( $Mpp::loop ) {
+    &Mpp::File::update_build_infos;
+    if( defined $logfh ) {
+      Mpp::log N_REP_HITS => $Mpp::Repository::hits
+	if $log_level && $Mpp::Repository::hits;
+      Mpp::log N_CACHE_HITS => $Mpp::BuildCache::hits
+	if $log_level && $Mpp::BuildCache::hits;
+      Mpp::log N_FILES => $n_files_changed, $n_phony_targets_built, $failed_count;
+    }
+    $n_files_changed = $Mpp::Repository::hits = $Mpp::BuildCache::hits = $n_phony_targets_built =
+      $failed_count = 0;
+    $Mpp::stop = 1;
+    my @dirs = $Mpp::File::root;
+    &touched_filesystem;
+    while( @dirs ) {
+      my $dinfo = pop @dirs;
+      next if exists $dinfo->{xREPOSITORY};
+      for( values %{$dinfo->{DIRCONTENTS}} ) {
+	if( $_->{DIRCONTENTS} ) {
+	  push @dirs, $_ unless Mpp::File::is_symbolic_link( $_ );
+                                # Don't traverse it if it's a symbolic link,
+                                # because then we'll find the same files twice.
+	} else {
+	  may_have_changed $_;
+	  delete $_->{BUILD_HANDLE}; # Also forget we may have already built it.
+	}
+      }
+    }
+
+    goto &perform;		# Start over w/o loading makefiles or repositories again.
+  }
+
   exit 1 if $error_message || $status || !MAKEPP && $failed_count;
 				# 2004_12_06_scancache has a use case for not failing despite $failed_count
   exit 0;
@@ -425,11 +453,11 @@ signal propagation.$orig Stopped}
 
 our @common_opts =
   (
-    ['k', qr/keep[-_]?going/, \$keep_going],
+    ['k', qr/keep[-_]?going/, \our $keep_going],
 
     [undef, qr/log(?:[-_]?file)?/, \$logfile, 1],
 
-    ['n', qr/(?:just[-_]?print|dry[-_]?run|recon)/, \$Mpp::dry_run],
+    ['n', qr/(?:just[-_]?print|dry[-_]?run|recon)/, \our $dry_run],
     [undef, qr/no[-_]?log/, \$log_level, undef, 0], # Turn off logging.
     [undef, qr/no[-_]?print[-_]?directory/, \$print_directory, 0, undef],
     [undef, qr/no[-_]?warn/, \$warn_level, undef, 0],

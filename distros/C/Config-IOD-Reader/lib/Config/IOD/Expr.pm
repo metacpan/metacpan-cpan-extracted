@@ -1,7 +1,7 @@
 package Config::IOD::Expr;
 
-our $DATE = '2017-01-16'; # DATE
-our $VERSION = '0.32'; # VERSION
+our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.33'; # VERSION
 
 use 5.010;
 use strict;
@@ -24,6 +24,7 @@ my $EXPR_RE = qr{
   | (?&STR_SINGLE)
   | (?&STR_DOUBLE)
   | undef
+  | (?&VAR)
   | (?&FUNC)
   | \( \s* ((?&ANSWER)) \s* \)
 )
@@ -33,11 +34,13 @@ my $EXPR_RE = qr{
 (?<NUM>
     (
      -?
-     (?: 0 | [1-9]\d* )
-     (?: \. \d+ )?
-     (?: [eE] [-+]? \d+ )?
+     (?: 0 | [1-9][0-9]* )
+     (?: \. [0-9]+ )?
+     (?: [eE] [-+]? [0-9]+ )?
     )
 )
+
+(?<VAR> \$[A-Za-z_][A-Za-z0-9_]{0,63})
 
 (?<STR_SINGLE>
     (
@@ -74,7 +77,7 @@ sub _parse_expr {
     my $str = shift;
 
     return [400, 'Not a valid expr'] unless $str =~ m{\A$EXPR_RE\z}o;
-    my $res = eval $str;
+    my $res = eval "package Config::IOD::Expr::_Compiled; no strict; no warnings; $str";
     return [500, "Died when evaluating expr: $@"] if $@;
     [200, "OK", $res];
 }
@@ -94,7 +97,11 @@ Config::IOD::Expr - Parse expression
 
 =head1 VERSION
 
-This document describes version 0.32 of Config::IOD::Expr (from Perl distribution Config-IOD-Reader), released on 2017-01-16.
+This document describes version 0.33 of Config::IOD::Expr (from Perl distribution Config-IOD-Reader), released on 2017-08-05.
+
+=head1 SYNOPSIS
+
+See L<Config::IOD::Reader> on how to use expressions in your IOD file.
 
 =head1 HOMEPAGE
 
@@ -118,7 +125,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

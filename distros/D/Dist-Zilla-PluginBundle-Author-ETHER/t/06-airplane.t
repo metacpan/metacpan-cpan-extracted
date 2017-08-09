@@ -8,7 +8,6 @@ use Test::Deep '!any';
 use Test::Fatal;
 use Path::Tiny;
 use List::Util 1.33 'any';
-use PadWalker 'closed_over';
 use Term::ANSIColor 2.01 'colorstrip';
 use Moose::Util 'find_meta';
 
@@ -25,11 +24,14 @@ use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-
 $ENV{FAKE_RELEASE} = 1;
 $ENV{DZIL_ANY_PERL} = 1;
 
+my $tempdir = no_git_tempdir();
+
 my $tzil;
 my @warnings = warnings {
     $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     'GatherDir',
@@ -94,20 +96,24 @@ all_plugins_in_prereqs($tzil,
     exempt => [
         'Dist::Zilla::Plugin::GatherDir',       # used by us here
         'Dist::Zilla::Plugin::FakeRelease',     # ""
-    ],
-    additional => [
-        'Dist::Zilla::Plugin::BlockRelease',    # via airplane option
+        'Dist::Zilla::Plugin::BlockRelease',    # added via airplane option
     ],
 );
 
-my %network_plugins = %{
-    closed_over(\&Dist::Zilla::PluginBundle::Author::ETHER::configure)->{'%network_plugins'}
-};
+my @network_plugins = Dist::Zilla::PluginBundle::Author::ETHER->_network_plugins;
+my %network_plugins;
+@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) } @network_plugins } = () x @network_plugins;
 
 cmp_deeply(
-    [ grep { exists $network_plugins{$_} } $tzil->plugins ],
+    [ grep { exists $network_plugins{$_} } @plugin_classes ],
     [],
     'no network-using plugins were actually loaded',
+);
+
+cmp_deeply(
+    $tzil->distmeta->{prereqs}{develop}{requires},
+    notexists(keys %network_plugins, Dist::Zilla::Util->expand_config_package_name('BlockRelease')),
+    'no network-using plugins, nor BlockRelease, were added to develop prereqs',
 );
 
 like(

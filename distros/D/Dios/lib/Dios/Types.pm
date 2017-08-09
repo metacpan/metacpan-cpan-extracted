@@ -11,6 +11,7 @@ $Carp::CarpInternal{'Dios::Types'}=1;
 
 ### IF KEYWORDS {
 use Keyword::Declare;
+
 ### IF KEYWORDS }
 
 my %exportable = ( validate => 1, validator_for => 1 );
@@ -40,6 +41,14 @@ sub import {
 
 ### IF KEYWORDS {
 
+    keytype TypeSpec is /
+        (?&PerlIdentifier) (?: \[ (?>(?&PPR_balanced_squares)) \])?+
+        (?:
+            (?&PerlOWS) [&|] (?&PerlOWS)
+            (?&PerlIdentifier) (?: \[ (?>(?&PPR_balanced_squares)) \])?+
+        )*+
+    /x;
+
     keytype TypeParams is / \[ (?>(?&PPR_balanced_squares)) \] /x;
 
     # Create a new subtype of a known type, adding a constraint...
@@ -47,23 +56,26 @@ sub import {
                       Ident $new_type,
                  TypeParams $new_type_params = q{},
                         'of',
-                      Ident $known_type,
-                 TypeParams $known_type_params = q{},
+                   TypeSpec $known_type,
                      'where',
                       Block   $constraint
     ) {
-        qq{BEGIN{ Dios::Types::_define_subtype('$new_type', '$new_type_params', '$known_type', '$known_type_params',  sub $constraint) }};
+        my $subtype_defn
+            = qq{Dios::Types::_define_subtype('$new_type', '$new_type_params', 'Is',        '[$known_type]',  sub $constraint) };
+        qq{if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $subtype_defn }; BEGIN{ $subtype_defn }};
     }
+
 
     # Alias a new subtype to a known type...
     keyword subtype (
                       Ident $new_type,
                  TypeParams $new_type_params = q{},
                         'of',
-                      Ident $known_type,
-                 TypeParams $known_type_params = q{},
+                   TypeSpec $known_type,
     ) {
-        qq{BEGIN{ Dios::Types::_define_subtype('$new_type', '$new_type_params', '$known_type', '$known_type_params') }};
+        my $subtype_defn
+            = qq{Dios::Types::_define_subtype('$new_type', '$new_type_params', 'Is', '[$known_type]') };
+        qq{if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $subtype_defn }; BEGIN{ $subtype_defn }};
     }
 
 ### IF KEYWORDS }
@@ -300,18 +312,18 @@ my $KEYED_TYPENAME = q{
 my $TYPENAME_GRAMMAR = qr{
 
     (?<ATOM_TYPENAME>
-                  (?<user>        (?&QUAL_IDENT)           )
-    |   Is    \[  (?<disj>   \s*+ (?&DISJ_TYPENAME)   \s*+ )  \]
-    |   Is    \[  (?<conj>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
-    |   Not   \[  (?<not>    \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
-    |   List  \[  (?<list>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
-    |   Array \[  (?<array>  \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
-    |   Tuple \[  (?<tuple>  \s*+ (?&TUPLE_FORMAT)    \s*+ )  \]
-    |   Hash  \[  (?<hash>   \s*+ (?&CONJ_TYPENAME) (?: \s*+ => \s*+ (?&CONJ_TYPENAME) )?+ \s*+ )  \]
-    |   Dict  \[  (?<dict>   \s*+ (?&DICT_FORMAT)     \s*+ )  \]
-    |   Ref   \[  (?<ref>    \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
-    |   Eq    \[  (?<eq>     \s*+ (?&STR_SPEC)        \s*+ )  \]
-    |   Match \[  (?<match>  \s*+ (?&REGEX_SPEC)      \s*+ )  \]
+                  (?<user>        (?&QUAL_IDENT)              )
+    |   Is    \[  (?<disj>   \s*+ (?&DISJ_TYPENAME_BAR)  \s*+ )  \]
+    |   Is    \[  (?<conj>   \s*+ (?&CONJ_TYPENAME)      \s*+ )  \]
+    |   Not   \[  (?<not>    \s*+ (?&DISJ_TYPENAME)      \s*+ )  \]
+    |   List  \[  (?<list>   \s*+ (?&DISJ_TYPENAME)      \s*+ )  \]
+    |   Array \[  (?<array>  \s*+ (?&DISJ_TYPENAME)      \s*+ )  \]
+    |   Tuple \[  (?<tuple>  \s*+ (?&TUPLE_FORMAT)       \s*+ )  \]
+    |   Hash  \[  (?<hash>   \s*+ (?&DISJ_TYPENAME) (?: \s*+ => \s*+ (?&DISJ_TYPENAME) )?+ \s*+ )  \]
+    |   Dict  \[  (?<dict>   \s*+ (?&DICT_FORMAT)        \s*+ )  \]
+    |   Ref   \[  (?<ref>    \s*+ (?&DISJ_TYPENAME)      \s*+ )  \]
+    |   Eq    \[  (?<eq>     \s*+ (?&STR_SPEC)           \s*+ )  \]
+    |   Match \[  (?<match>  \s*+ (?&REGEX_SPEC)         \s*+ )  \]
     |   Can   \[  (?<can>    \s*+ (?&OPT_QUAL_IDENT) \s*+ (?: , \s*+ (?&OPT_QUAL_IDENT) \s*+ )*+ ) \]
     |   Overloads \[  (?<overloads>  [^]]++ )  \]
     |             (?<basic>       (?&BASIC)                )
@@ -320,16 +332,17 @@ my $TYPENAME_GRAMMAR = qr{
 
     (?(DEFINE)
 
-        (?<CONJ_TYPENAME> (?&DISJ_TYPENAME) (?: \s* [&] \s* (?&DISJ_TYPENAME) )*+ )
-        (?<DISJ_TYPENAME> (?&ATOM_TYPENAME) (?: \s* [|] \s* (?&ATOM_TYPENAME) )*+ )
+        (?<DISJ_TYPENAME_BAR> (?&CONJ_TYPENAME) (?: \s* [|] \s* (?&CONJ_TYPENAME) )++ )
+        (?<DISJ_TYPENAME>     (?&CONJ_TYPENAME) (?: \s* [|] \s* (?&CONJ_TYPENAME) )*+ )
+        (?<CONJ_TYPENAME>     (?&ATOM_TYPENAME) (?: \s* [&] \s* (?&ATOM_TYPENAME) )*+ )
 
         (?<NON_ATOM_TYPENAME>
-                          (?&DISJ_TYPENAME) (?: \s* [&] \s* (?&DISJ_TYPENAME) )++
-                        | (?&ATOM_TYPENAME) (?: \s* [|] \s* (?&ATOM_TYPENAME) )++
+                          (?&CONJ_TYPENAME) (?: \s* [|] \s* (?&CONJ_TYPENAME) )++
+                        | (?&ATOM_TYPENAME) (?: \s* [&] \s* (?&ATOM_TYPENAME) )++
         )
 
         (?<TUPLE_FORMAT>
-            (?&TYPE_LIST) $TYPED_OR_PURE_ETC?
+            (?&TYPE_LIST) (?: \s*+ ,? \s*+ \.\.\. )?
         )
 
         (?<TYPE_LIST>
@@ -380,7 +393,7 @@ sub _build_handler_for {
     my %type_is = %+;
 
     # Conjunction handlers test each component type and fail if any fails...
-    if ( exists $type_is{conj}  ) { my @types = grep {defined} $type_is{conj} =~ m{ ((?&DISJ_TYPENAME))
+    if ( exists $type_is{conj}  ) { my @types = grep {defined} $type_is{conj} =~ m{ ((?&ATOM_TYPENAME))
                                                                                       $FROM_TYPENAME_GRAMMAR
                                                                                   }gxms;
                                         my @handlers = map {_build_handler_for($_)} @types;
@@ -395,7 +408,7 @@ sub _build_handler_for {
                                   }
 
     # Disjunction handlers test each component type and fail if all of them fail...
-    if ( exists $type_is{disj}  ) { my @types = grep {defined} $type_is{disj} =~ m{ ((?&ATOM_TYPENAME))
+    if ( exists $type_is{disj}  ) { my @types = grep {defined} $type_is{disj} =~ m{ ((?&CONJ_TYPENAME))
                                                                                       $FROM_TYPENAME_GRAMMAR
                                                                                   }gxms;
                                     my @handlers = map {_build_handler_for($_)} @types;
@@ -413,9 +426,9 @@ sub _build_handler_for {
     # User defined types match an object of that type...
     if ( exists $type_is{user}  ) { my $typename = $type_is{user};
                                     my $root_name = $typename =~ s{\[.*}{}rxms;
+                                    my $idx = $Dios::Types::lexical_hints->{"Dios::Types subtype=$root_name"};
                                     return sub {
                                         # Is it user-defined???
-                                        my $idx = $Dios::Types::lexical_hints->{"Dios::Types subtype=$root_name"};
                                         if (defined $idx) {
                                             for ($_[0]) {
                                                 return $user_defined_type[$idx]($typename)($_)
@@ -676,7 +689,7 @@ sub _complete_desc {
     my ($desc, $value) = @_;
     $desc //= q{Value (%s)};
     my $value_perl = _perl($value);
-    return $desc =~ s{%s}{$value_perl}gr;
+    return $desc =~ s{(?<!%)%s}{$value_perl}gr =~ s{%%(?=[[:alpha:]])}{%}gr;
 }
 
 sub validate {
@@ -696,6 +709,56 @@ sub validate {
 
     # What's happening in the caller's lexical scope???
     local $Dios::Types::lexical_hints = (caller 0)[10] // {};
+
+    # All but the basic handlers are built late, as needed...
+    if (!exists $handler_for{$typename}) {
+        $handler_for{$typename} = _build_handler_for($typename)
+            or die 'Internal error: unable to build type checker. Please report this as a bug.';
+    }
+
+    # Either the type matches or we die...
+    if (!$handler_for{$typename}($value)) {
+        $value_desc = _complete_desc($value_desc, $value);
+        croak qq{\u$value_desc}
+            . ($value_desc =~ /\s$/ ? q{} : q{ })
+            . qq{is not of type $typename};
+    }
+    return 1 if !@constraints;
+
+    # Either every constraint matches or we die...
+    for my $test (@constraints) {
+        local $@;
+
+        # If it fails to match...
+        if (! eval{ local $SIG{__WARN__} = sub{}; $test->(local $_ = $value) }) {
+            $value_desc = _complete_desc($value_desc, $value);
+            my $constraint_desc = _describe_constraint($value, $value_desc, $test, $@);
+            croak qq{\u$value_desc}
+                . ($value_desc =~ /\s$/ ? q{} : q{ })
+                . qq{did not satisfy the constraint: $constraint_desc\n }
+        }
+    }
+
+    return 1;
+}
+
+sub _up_validate {
+    my ($uplevels, $typename, $value) = splice(@_,0,3);
+    my ($value_desc, @constraints);
+    for my $arg (@_) {
+        # Subs are undescribed constraints...
+        if (ref($arg) eq 'CODE') {
+            push @constraints, $arg;
+        }
+
+        # Anything else is part of the value description...
+        elsif (defined $arg) {
+            $value_desc .= $arg;
+        }
+    }
+
+    # What's happening in the caller's lexical scope???
+    local $Dios::Types::lexical_hints = (caller $uplevels)[10] // {};
 
     # All but the basic handlers are built late, as needed...
     if (!exists $handler_for{$typename}) {
@@ -801,7 +864,7 @@ package Dios::Types::TypedArray {
     sub FETCHSIZE { @{$_[0]} - 1 }
     sub STORESIZE { $#{$_[0]} = $_[1] + 1 }
     sub STORE     { my ($type, $desc, @constraint) = @{$_[0][0]};
-                    Dios::Types::validate($type, $_[2], $desc, @constraint);
+                    Dios::Types::_up_validate(1, $type, $_[2], $desc, @constraint);
                     $_[0]->[$_[1]+1] = $_[2];
                     }
     sub FETCH     { $_[0]->[$_[1]+1] }
@@ -829,7 +892,7 @@ package Dios::Types::TypedHash {
     our @CARP_NOT = ('Dios::Types');
     sub TIEHASH  { bless [$_[1], {}], $_[0] }
     sub STORE    { my ($type, $desc, @constraint) = @{$_[0][0]};
-                   Dios::Types::validate($type, $_[2], $desc, @constraint);
+                   Dios::Types::_up_validate(1, $type, $_[2], $desc, @constraint);
                    $_[0][1]{$_[1]} = $_[2]
                  }
     sub FETCH    { $_[0][1]{$_[1]} }
@@ -856,7 +919,7 @@ sub _set_var_type {
             # Code around more awkward Object::Insideout behaviour...
             no warnings 'redefine';
             local *croak = *confess{CODE};
-            return if eval { validate($type, ${$_[0]}, $value_desc, @constraint) };
+            return if eval { _up_validate(+2, $type, ${$_[0]}, $value_desc, @constraint) };
             die $@ =~ s{\s+at .*}{}r
                    =~ s{[\h\S]*Dios.*}{}gr
                    =~ s{.*\(eval .*}{}gr
@@ -905,7 +968,7 @@ sub _validate_return_type {
         # Validate the return values...
         eval {
             if (@retvals == 1) {
-                validate(
+                _up_validate(+1,
                     $type, $retvals[0], $where,
                     "Return value (" . (_perl(@retvals)=~s/^\(|\)$//gr) . ") of call to $name()\n"
                 );
@@ -916,7 +979,7 @@ sub _validate_return_type {
         }
         //
         eval {
-            validate(
+            _up_validate(+1,
                 $type, \@retvals, $listwhere,
                 "List of return values (" . (_perl(@retvals)=~s/^\(|\)$//gr) . ") of call to $name()\n"
             )
@@ -942,7 +1005,7 @@ sub _validate_return_type {
 
         # Validate the return value...
         eval {
-            validate(
+            _up_validate(+1,
                 $type, $retval, $where,
                 "Scalar return value (" . _perl($retval) . ") of call to $name()\n"
             )
@@ -964,7 +1027,7 @@ sub _validate_return_type {
         warn sprintf
             "Useless call to $name() with explicit return type $type\nin void context at %s line %d\n",
             (caller 1)[1,2]
-                if $void_warning && !eval{ validate($type, undef) };
+                if $void_warning && !eval{ _up_validate(+1, $type, undef) };
 
     }
 }
@@ -1158,8 +1221,8 @@ sub _describe_constraint {
         $constraint_desc = $deparser->coderef2text($constraint);
         $constraint_desc =~ s{\s*+ BEGIN \s*+ \{ (?&CODE) \}
                                 (?(DEFINE) (?<CODE> [^{}]*+ (\{ (?&CODE) \} [^{}]*+ )*+ ))}{}gxms;
-        $constraint_desc =~ s{(?: (?:use|no) \s*+ feature | die \s*+ sprintf ) [^;]* ;}{}gxms;
-        $constraint_desc =~ s{package \s*+ Dios::Types \s*+ ;}{}gxms;
+        $constraint_desc =~ s{(?: (?:use|no) \s*+ (?: feature | warnings | strict ) | die \s*+ sprintf ) [^;]* ;}{}gxms;
+        $constraint_desc =~ s{package \s*+ \S+ \s*+ ;}{}gxms;
         $constraint_desc =~ s{\s++}{ }g;
     }
     return $constraint_desc // "$constraint";
@@ -2029,6 +2092,11 @@ is a shorter and more meaningful way of specifying:
 The optional C<where> constraint must be specified as a block of code,
 which is converted to a subroutine that is automatically passed to
 C<validate()> whenever the subtype is used.
+
+Subtype declarations are restricted to the lexical scope in which they
+are declared. However, if a subtype is declared within a subroutine
+named C<import> or C<unimport>, that subtype will also be exported when
+the corresponding module is loaded.
 
 B<Note:> if you want to use the other features of this module, but
 don't want the compile-time overheads of this keyword, use the

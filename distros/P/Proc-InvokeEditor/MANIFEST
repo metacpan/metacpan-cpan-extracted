@@ -8,6 +8,10 @@ t/01_require.t
 t/02_editor.t
 t/03_pod.t
 t/04_pod_coverage.t
+t/05_kwalitee.t
 examples/example.pl
 examples/example2.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+MYMETA.json
+MYMETA.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

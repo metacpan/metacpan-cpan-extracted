@@ -1,6 +1,6 @@
 package App::calendr;
 
-$App::calendr::VERSION   = '0.18';
+$App::calendr::VERSION   = '0.20';
 $App::calendr::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::calendr - Application to display supported Calendar.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.20
 
 =cut
 
@@ -41,8 +41,8 @@ distribution contains a script C<calendr>, using package L<App::calendr>.
 You can list all command line options by giving C<--help> flag.The C<--name> flag
 is only  mandatory. Rest of all are  optionals. If C<--month> flag is passed then
 the C<--year> flag  becomes  mandatory and vice versa. In case neither of them is
-passed in then it would look for C<--gregorian>/C<--julian> flag  and accordingly
-act on it.In case none C<flag> passed in it would show the current calendar month.
+passed in then it would look for C<--gdate>/C<--jday> flag and accordingly act on
+it. In case none C<flag> passed in it would show the current calendar month.
 
     $ calendr --help
 
@@ -56,7 +56,7 @@ act on it.In case none C<flag> passed in it would show the current calendar mont
             List calendar month names
 
 
-        --gregorian: String
+        --gdate: String
             Gregorian date (YYYY-MM-DD)
 
 
@@ -176,12 +176,12 @@ sub run {
                 $calendar->year($year);
             }
         }
-        elsif (defined $self->gregorian) {
-            my $gregorian = $self->gregorian;
-            die "ERROR: Invalid gregorian date '$gregorian'.\n"
-                unless ($gregorian =~ /^\d{4}\-\d{2}\-\d{2}$/);
+        elsif (defined $self->gdate) {
+            my $gdate = $self->gdate;
+            die "ERROR: Invalid gregorian date '$gdate'.\n"
+                unless ($gdate =~ /^\d{4}\-\d{2}\-\d{2}$/);
 
-            my ($year, $month, $day) = split /\-/, $self->gregorian, 3;
+            my ($year, $month, $day) = split /\-/, $gdate, 3;
             print $calendar->from_gregorian($year, $month, $day) and return;
         }
         elsif (defined $self->jday) {

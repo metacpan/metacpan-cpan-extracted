@@ -1,0 +1,52 @@
+==================================================
+Changes from 2015-08-03 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2017-08-02 04:31:36 +0000
+------------------------------------------
+
+  Change: 8cceab3f56b006583a110493263bcdf0ccd54733
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-08-01 21:30:15 +0000
+
+    Included two utility scripts to demonstrate the API use.
+
+    subsonic_import_ratings.pl - Using an iTunes XML Library export file,
+    import those song ratings into Subsonic as best as possible.
+
+    subsonic_sync_starred.pl - Sync all starred music by artist, album, and
+    song to a folder. Optionally provide a "--local-media-dir" where the music
+    files maybe found, otherwise they'll be downloaded from the subsonic
+    server. 
+
+  Change: d63ee2767ecc0b37d413abc208f87009d65bedc1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-08-01 21:25:30 +0000
+
+    Early release version of the library.
+
+    Only attempt to decode JSON contents when the content-type is set from the
+    server. Otherwise, pass the body back to the client. This allows the
+    download API to work through the api_request() method.
+
+    Add documentation to the all the attributes and methods. 
+
+  Change: 69cdd949a22ef9314ec4bf18cf05e85a3c365073
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-08-01 21:25:04 +0000
+
+    Newly minted WWW::Subsonic
+
+    Update Dist::Zilla configs. Add a .gitignore to the repository. Remove
+    LICENSE file, Dist::Zilla will manage that. 
+
+  Change: beffcbb14dc70ae7ce6c6ee2cef072b93ffa28b3
+  Author: Brad Lhotsky <brad.lhotsky@gmail.com>
+  Date : 2017-07-30 21:21:39 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

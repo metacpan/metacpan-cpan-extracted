@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.1.0';
+$Git::Hooks::CheckFile::VERSION = '2.1.3';
 use 5.010;
 use utf8;
 use strict;
@@ -209,7 +209,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.1.0
+version 2.1.3
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,5 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
+
 use strict;
 use warnings;
 # PODNAME: command-line utility to nopaste
@@ -22,7 +23,7 @@ command-line utility to nopaste
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 DESCRIPTION
 

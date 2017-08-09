@@ -20,23 +20,14 @@ use MariaDB::NonBlocking ':all';
 sub ____run; # predeclare
 
 sub run_multiple_queries {
-    my ($conns, $remaining_sqls, $extras) = @_;
+    my ($conns, $query, $extras, $bind ) = @_;
 
-    $remaining_sqls = [$remaining_sqls] if !is_ref($remaining_sqls);
-
-    if ( is_arrayref($remaining_sqls) ) {
-        my $original     = $remaining_sqls;
-        my $next_sql_idx = 0;
-        $remaining_sqls  = sub { \ $original->[$next_sql_idx++] };
-    }
-
-    my $next_sql = $remaining_sqls->();
     ____run(
         "run_queries",
-        sub { $next_sql && !!$$next_sql },
+        sub { $query },
         sub {
-            my $ret = $_[0]->run_query_start( $$next_sql );
-            $next_sql = $remaining_sqls->();
+            my $ret = $_[0]->run_query_start( $query, $extras, $bind );
+            $query = undef;
             return $ret;
         },
         sub {$_[0]->query_results},
@@ -76,7 +67,7 @@ sub ping {
 # useful if you want to run the same query on multiple connections
 # Think changing per-session settings.
 sub query_once_per_connection {
-    my ($conns, $query, $extras, $per_query_finished_cb) = @_;
+    my ($conns, $query, $extras, $bind, $per_query_finished_cb) = @_;
 
     my %seen;
     ____run(
@@ -84,7 +75,7 @@ sub query_once_per_connection {
         sub { return !$seen{$_[0]} },
         sub {
             $seen{$_[0]}++;
-            $_[0]->run_query_start($query)
+            $_[0]->run_query_start($query, $extras, $bind)
         },
         sub {
             my $res = $_[0]->query_results;

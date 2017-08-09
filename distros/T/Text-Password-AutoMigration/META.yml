@@ -1,0 +1,55 @@
+---
+abstract: 'generate and verify Password with any contexts'
+author:
+  - 'Yuki Yoshida(worthmine) <worthmine!at!gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Password-AutoMigration
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Password::AutoMigration:
+    file: lib/Text/Password/AutoMigration.pm
+    version: '0.05'
+  Text::Password::CoreCrypt:
+    file: lib/Text/Password/CoreCrypt.pm
+    version: '0.05'
+  Text::Password::MD5:
+    file: lib/Text/Password/MD5.pm
+    version: '0.05'
+  Text::Password::SHA:
+    file: lib/Text/Password/SHA.pm
+    version: '0.05'
+requires:
+  Crypt::Passwd::XS: '0.601'
+  Crypt::PasswdMD5: '1.4'
+  Digest::SHA: '0'
+  Moose: '2.2006'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/worthmine/Text-Password-AutoMigration/issues
+  homepage: https://github.com/worthmine/Text-Password-AutoMigration
+  repository: git://github.com/worthmine/Text-Password-AutoMigration.git
+version: '0.05'
+x_authority: cpan:{{WORTHMINE}}
+x_contributors:
+  - 'Yuki Yoshida <worthmine@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

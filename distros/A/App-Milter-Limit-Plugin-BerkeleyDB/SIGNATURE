@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.61.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,24 +12,37 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 4f426c4c922ff2c51e0a3645df7c16eb25d5e3eb Changes
-SHA1 2567ebef08c659e7f40bee2fbd29f69f00c6c863 LICENSE
-SHA1 fa3fd7eafc0f6da9a1f1d4b37ea4ed10796f6342 MANIFEST
-SHA1 9c4e9e9c49b9462f2ae19cfaaa0533978caed0db META.yml
-SHA1 5819f54601923b4eba4381fd0ace969624109f63 Makefile.PL
-SHA1 7a34e99f253f0aa9a6b08008d868b2ec3fe855ec README
-SHA1 a368eb5eb1cbe70d47d988d16cef118086db7d20 dist.ini
-SHA1 a8483c0c3366ebec03af1e731b544db1f4b8abb9 lib/App/Milter/Limit/Plugin/BerkeleyDB.pm
+SHA1 1edefdaa0978db9ad8815507d36399ccf1df8f07 Changes
+SHA1 54dda90b3b1d13d5d5ec34f1f3ec80c21b7ef4ca LICENSE
+SHA1 5a063f42c030c43a698f4cc6fb4ec5741c07b40c MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 95875e5e957537964ebc5c5a2fd009ed82ae613a META.json
+SHA1 a5c496cf1d3a9960f5fafb4522fb170c0b31d2a3 META.yml
+SHA1 e13656c27164a31e13e927c321b7bac62bb35d4a Makefile.PL
+SHA1 f7655280df1b311ff75f77b0453a65569fff96dc README
+SHA1 2ba9c13f0949ffdb9c1c9709ee227ca014863d59 lib/App/Milter/Limit/Plugin/BerkeleyDB.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
 SHA1 4b6988b7d6d7b4842904566574ff5ef7706cc2ab t/compile.t
-SHA1 5da741e4cabd859cbd6a3f2ad1c9901b892da4d0 t/release-pod-coverage.t
-SHA1 946206d2ce9fba0e8fda1d429e01245fb8934622 t/release-pod-syntax.t
-SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
+SHA1 33c475935d36150e2b52fc0d0218925d9b824a46 t/lib/My/Test/Util.pm
+SHA1 d3854dbafcece9534f265aae78987b2021b4fcf7 t/smoke.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+Version: GnuPG v2
 
-iEYEARECAAYFAkuyI0MACgkQ+CqvSzp9LOxjagCgh+hY+MxcpTipqgMpDBvDl72r
-700AoJUX/WnyncKo8FNdkYg6ddjvFC1j
-=wJ+Z
+iQIVAwUBWYTja0QM7y65VM2OAQixTw//YMvQqiYewkDjOIM+yY+T3ITctnpwSht0
+VrxtgtWXaS+CSv0YtNtXcnF0+DWFMNaSxAD6M1BDCzus4yt2rtE1RLtm4XzeSaDD
+xRtFme36ZhK8FFSl+XVH3dbp4Le0JBtz8cDKenkdKjBbD1Ui9XZtscVZJHFSMFhe
+v56QkC19FzcOTuPwTDw6NQD8daP+WbLr8/Kr2vkBhd0Jk6T4Q4z/5aFes6rwJgKP
+ROTzeblHEOfA2BO8jGom4VnyRSUHivLhAGU6KLsiYEFnymHarCcQ+xY6DcucAjoA
+SsK1V+FwCjCMhb0Qgkby37DnSjo1WqkcCzuESDYOnDki4MUxWfkpxbdvvVgyznn/
+eVgdx9krxsYGceFtH7SCranvfUK2+ge4UahlNgBpW1QNzmw/sxzEgagZiSQNwQ8h
+LM1WmgaPebek6ez8BDCoBPf9sdLE+vjkqpnZQmElnTvQZdzvaRMVPN0zwoYw4M0O
+OnaqWib6j5Q8698Co9aEDO02dzciYLynnXPpvQ36xONF+rPihIlSO9qJM4RvUdd/
+k/hpeL91MGfpttF03Sk6WP6UOD7UQVDrMuU+GZhwmel+U1cNzloThpIJLPpTMlLC
+7TPxudRypmNgLMHgUE8kooe/IKiJN2xWNmrA4VF7c2ZYDOlCoF5m0Tk0fbGFTimJ
+qj32AcwXrq4=
+=LRwV
 -----END PGP SIGNATURE-----

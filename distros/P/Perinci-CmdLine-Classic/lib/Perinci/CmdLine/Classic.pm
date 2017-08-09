@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '1.76'; # VERSION
+our $DATE = '2017-07-31'; # DATE
+our $VERSION = '1.770'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -268,7 +268,6 @@ sub BUILD {
 
     $self->{formats} //= $formats;
     $self->{per_arg_json} //= 1;
-    $self->{per_arg_yaml} //= 1;
 
     unless ($ENV{COMP_LINE}) {
         my $ct = $self->{color_theme} // $ENV{PERINCI_CMDLINE_COLOR_THEME};
@@ -755,7 +754,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.76 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-14.
+This document describes version 1.770 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-31.
 
 =head1 SYNOPSIS
 

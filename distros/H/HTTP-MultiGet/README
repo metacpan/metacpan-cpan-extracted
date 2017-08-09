@@ -1,0 +1,13 @@
+
+
+To build
+
+perl Makefile.PL
+make
+
+# if you wish to enable the full http test suite
+RUN_HTTP_TESTS=1 STREAM_URL=http://22.85.210.9:8080/job/Charter-Perl/lastSuccessfulBuild/artifact/charter-perl-5.26.0.0134-5.x86_64.rpm make test
+
+# the wise
+make test
+make install

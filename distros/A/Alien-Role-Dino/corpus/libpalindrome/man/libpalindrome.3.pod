@@ -1,0 +1,9 @@
+=head1 NAME
+
+B<libpalindrome> - functions for determining if a string is a palindrome.
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+=cut

@@ -3,26 +3,27 @@ abstract: 'A Perl client for the Riemann event system'
 author:
   - 'Miquel Ruiz <mruiz@cpan.org>'
 build_requires:
-  String::Random: 0
-  Test::Exception: 0
-  Test::More: 0
-  Test::TCP: 0
+  String::Random: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::TCP: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Riemann-Client
 requires:
-  Google::ProtocolBuffers: 0.08
-  IO::Socket::INET: 0
-  Moo: 0
-  Net::Domain: 0
+  Google::ProtocolBuffers: '0.08'
+  IO::Socket::INET: '0'
+  Moo: '0'
+  Net::Domain: '0'
 resources:
   bugtracker: https://github.com/miquelruiz/Riemann-Client/issues
   homepage: http://metacpan.org/release/Riemann-Client/
   repository: git://github.com/miquelruiz/Riemann-Client.git
-version: 0.03
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

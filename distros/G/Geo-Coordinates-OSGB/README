@@ -3,58 +3,63 @@ Geo::Coordinates::OSGB::Grid
 Geo::Coordinates::OSGB::Maps
 ----------------------------
 
-Routines to convert latitude and longitude coordinates to and from transverse
-Mercator grid references. The routines are designed for use with the British
-national grid.
+Geo::Coordinates::OSGB provides routines to convert latitude and
+longitude coordinates to and from transverse Mercator grid references;
+the routines are designed for use with the British national grid.
 
-The OSGB module provides routines to convert between latitude/longitude
-coordinates in the WGS84 or OSGB36 models and the British National Grid.
-The Grid module includes some useful extra routines to parse and format
-grid references in a variety of popular forms (including which map your
-point appears on). The Maps module provides data for British maps.
+- The OSGB module provides routines to convert between
+  latitude/longitude coordinates in the WGS84 or OSGB36 models and the
+  British National Grid.
 
-Note that due to the nature of this type of conversion, the conversions are 
-only really useful in the vicinity of the British Isles.  If you are elsewhere 
-on the planet you need an implementation designed for your neighbourhood.
+- The Grid module includes some useful extra routines to parse and
+  format grid references in a variety of popular forms (including which
+  map your point appears on). 
+
+- The Maps module provides data for British maps.
+
+Note that due to the nature of this type of conversion, the conversions
+are only really useful in the vicinity of the British Isles.  If you are
+elsewhere on the planet you need an implementation designed for your
+neighbourhood.
 
 CHANGES:  please note that if you are upgrading from V2.09 or earlier
 the semantics and interface have changed slightly.  
 
-- The default lat/lon is now WGS84
+- The default lat/lon model is now WGS84.
 
-- The functions `shift_ll_into_WGS84` and `shift_ll_from_WGS84` are 
-  no longer provided (or needed)
+- The functions `shift_ll_into_WGS84` and `shift_ll_from_WGS84` are no
+  longer provided (or needed).
  
 - The functions formerly provided by OSTN02.pm are integrated into
-  OSGB.pm, so the subroutines `OSGB36_to_ETRS89` and `ETRS89_to_OSGB36` 
-  are no longer provided (or needed)
+  OSGB.pm, so the subroutines `OSGB36_to_ETRS89` and `ETRS89_to_OSGB36`
+  are no longer provided (or needed).
 
-- The functions to parse and format grid references are moved to 
-  OSGB/Grid.pm
+- The functions to parse and format grid references are moved to
+  OSGB/Grid.pm.
 
-- The functions to parse and format lat/lon are removed (since they are
-  better provided by other modules)
+- The functions to parse and format lat/lon are removed, because they
+  are better provided by other modules.
 
 For more details, see the section on "Upgrading" in Background.pod
 
 INSTALLATION
 
-This package installs in the regular Perl way.  You don't need the C compiler
-and as far as I know there are no platform dependencies.  Either use your
-local package tool, or just try
+This package installs in the regular Perl way.  You don't need the C
+compiler and as far as I know there are no platform dependencies.
+Either use your local package tool, or just try
 
   [sudo] perl -MCPAN -e "install Geo::Coordinates::OSGB" 
   
-For the die hards, the package can also be installed by
-hand; just unzip it to some temporary home, then do the usual thing:
+For the die hards, the package can also be installed by hand; just unzip
+it to some temporary home, then do the usual thing:
 
         Perl Makefile.PL
         make
         make test
         [sudo] make install
 
-The full suite of tests takes about 2 seconds on my machine. 
-You may or may not need sudo depending on how you have set up your system.
+The full suite of tests takes about 1 second on my machine.  You may or
+may not need sudo depending on how you have set up your system.
 
 DEPENDENCIES
 
@@ -77,9 +82,8 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 All feedback gratefully received.

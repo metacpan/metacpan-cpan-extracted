@@ -1,6 +1,6 @@
 package Bread::Board::Service::WithConstructor;
 our $AUTHORITY = 'cpan:STEVAN';
-$Bread::Board::Service::WithConstructor::VERSION = '0.34';
+$Bread::Board::Service::WithConstructor::VERSION = '0.35';
 use Moose::Role;
 
 use Try::Tiny;
@@ -17,7 +17,12 @@ has 'constructor_name' => (
 sub _build_constructor_name {
     my $self = shift;
 
-    try { Class::MOP::class_of($self->class)->constructor_name } || 'new';
+    # using Class::MOP::class_of on a Moo 
+    # object causes mayhem, so we take care of that
+    # special case first. See GH#61
+    try { $self->class->isa('Moo::Object') && 'new' }
+    || try { Class::MOP::class_of($self->class)->constructor_name } 
+    || 'new';
 }
 
 no Moose; 1;
@@ -34,7 +39,7 @@ Bread::Board::Service::WithConstructor
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -67,7 +72,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Infinity Interactive.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,6 @@
+name = "Text-Password-AutoMigration"
+# badges = ["travis"]
+authority="cpan:{{WORTHMINE}}"
+
+module_maker="ModuleBuildTiny"
+

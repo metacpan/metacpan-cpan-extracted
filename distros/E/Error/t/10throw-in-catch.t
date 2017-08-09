@@ -20,7 +20,7 @@ catch Error::Simple with {
 $error = $@;
 
 # TEST
-ok (scalar($error =~ /^A-Lovely-Day/), 
+ok (scalar($error =~ /^A-Lovely-Day/),
     "Error thrown in the catch clause is registered"
 );
 
@@ -35,7 +35,7 @@ otherwise {
 $error = $@;
 
 # TEST
-ok (scalar($error =~ /^Had-the-ancient/), 
+ok (scalar($error =~ /^Had-the-ancient/),
     "Error thrown in the otherwise clause is registered"
 );
 

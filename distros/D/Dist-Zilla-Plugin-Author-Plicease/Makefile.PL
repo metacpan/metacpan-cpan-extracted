@@ -1,7 +1,7 @@
 use strict; use warnings;
 BEGIN {
-  unless(eval q{ use 5.008001; 1}) {
-    print "Perl 5.008001 or better required\n";
+  unless(eval q{ use 5.014; 1}) {
+    print "Perl 5.014 or better required\n";
     exit;
   }
 }
@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use 5.008001;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-Author-Plicease",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008001",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Dist::Zilla::Plugin::Author::Plicease",
   "PM" => {
     "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm" => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
@@ -41,6 +41,7 @@ my %WriteMakefileArgs = (
     "lib/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Tests.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Tests.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/TravisInstall.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/TravisInstall.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Upload.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Upload.pm"
   },
   "PREREQ_PM" => {
@@ -59,7 +60,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.94"
   },
-  "VERSION" => "2.20",
+  "VERSION" => "2.21",
   "test" => {
     "TESTS" => "t/*.t"
   }

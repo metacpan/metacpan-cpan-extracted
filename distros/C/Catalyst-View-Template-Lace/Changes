@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Catalyst::View::Template::Lace
 
+0.007   02 August 2017
+        - Use lasted version of Template::Lace
+        - Minor doc tweaks
+
 0.006   16 July 2017
         - Use the $_ variable less
         - Dependency version update to fixed errors

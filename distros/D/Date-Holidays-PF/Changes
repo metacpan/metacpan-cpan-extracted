@@ -1,0 +1,5 @@
+Revision history for Perl extension Date::Holidays::PF.
+
+0.01  Sun Apr 18 20:20:38 2004
+	- original version; created by h2xs 1.23 with options
+		-X Date::Holidays::PF

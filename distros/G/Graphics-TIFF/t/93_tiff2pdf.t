@@ -3,15 +3,15 @@ use strict;
 use English;
 use Test::More;
 use Test::Requires qw( v5.10 );
-use Image::Magick;
 
 #########################
 
-if ( system("which tiff2pdf > /dev/null 2> /dev/null") == 0 ) {
+eval "use Image::Magick";
+if ( not $@ and system("which tiff2pdf > /dev/null 2> /dev/null") == 0 ) {
     plan tests => 4;
 }
 else {
-    plan skip_all => 'tiff2pdf not installed';
+    plan skip_all => 'Image::Magick or tiff2pdf not installed';
     exit;
 }
 

@@ -20,7 +20,7 @@ my %pkgcfg;
 if (
     eval {
         %pkgcfg =
-          ExtUtils::PkgConfig->find( 'libtiff >= ' . $build_reqs{libtiff} );
+          ExtUtils::PkgConfig->find( 'libtiff-4 >= ' . $build_reqs{libtiff} );
     }
   )
 {
@@ -43,7 +43,6 @@ WriteMakefile(
         'Test::More'     => 0,
         'Test::Requires' => 0,
         'Test::Deep'     => 0,
-        'Image::Magick'  => 0,
     },
     clean => { FILES => '$(SOURCE_TIDY)' },
 

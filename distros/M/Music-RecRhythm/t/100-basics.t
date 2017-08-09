@@ -50,4 +50,9 @@ is( $uno->next, $dos );
 is( $uno->prev, undef );
 is( $dos->prev, $uno );
 
-plan tests => 16;
+# typically this would instead be some other object or MIDI track that
+# events are put onto
+$dos->extra("foo");
+is( $dos->extra, "foo" );
+
+plan tests => 17;

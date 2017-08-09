@@ -11,7 +11,7 @@ include base.mk
 ###	1	644	1068846723	1068846482	answers/z
 y
 ###	D	755	1068850460	1068850460	base
-###	9	644	1068848941	1210885918	base/base.mk
+###	9	644	1068848941	1406670915	base/base.mk
 X ?= x
 Y ?= y
 
@@ -20,6 +20,6 @@ x y:
 	&echo $Y -o y
 
 die: x y
-	perl { die }
+	perl { die "Oops\n" }
 ###	1	644	1068771992	1068771967	base/Makeppfile
 include base.mk

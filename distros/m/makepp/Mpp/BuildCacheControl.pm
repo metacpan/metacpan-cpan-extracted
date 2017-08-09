@@ -1,4 +1,4 @@
-# $Id: BuildCacheControl.pm,v 1.33 2012/06/09 20:36:20 pfeiffer Exp $
+# $Id: BuildCacheControl.pm,v 1.35 2016/09/12 20:33:41 pfeiffer Exp $
 
 =head1 NAME
 
@@ -78,7 +78,7 @@ sub group(@) {
     next if exists $bc{sprintf '%x', $dinfo};
     $bc{sprintf '%x', $dinfo} = $dinfo;
 
-    my $opt = "$_/$Mpp::BuildCache::options_file";
+    my $opt = absolute_filename( $dinfo ) . "/$Mpp::BuildCache::options_file";
     unless( -r $opt ) {		# Disk or NFS server  might be down.
       push @unreachable, $_ if $! == ENOENT || $! == ENOTDIR;
       undef $bc{sprintf '%x', $dinfo};	# Note it so we don't warn for it again.
@@ -250,11 +250,7 @@ sub groupfind(&;$) {
 
 sub c_clean {
   local @ARGV = @_;
-  my( $min_atime, $atime, $max_atime,
-      $min_mtime, $mtime, $max_mtime,
-      $min_inc_mtime, $inc_mtime, $max_inc_mtime,
-      $min_ctime, $ctime, $max_ctime,
-      $min_size, $size, $max_size,
+  my( $inc_mtime, $atime, $mtime, $ctime, $size,
       $bi_check, $link_check, $group, $user, $predicate, $weekbase);
   my %unit =
     (s => 1,
@@ -275,59 +271,65 @@ sub c_clean {
       $weekbase -= --$wday * $unit{d} + $hour * $unit{h} + $min * $unit{m};
 				# Count back to monday 0:00.
     }
-    map {
-      if( defined $_->[1] ) {
-	%unit =
-	  ('' => 1,
-	   c => 1,
-	   k => 2 ** 10,
-	   M => 2 ** 20,
-	   G => 2 ** 30) if $_->[3];
+    my @del_opts = map { # transform each to [min, NAME, max]
+      my( $min, $max );
+      if( defined $_->[0] ) {
 	# '+-1' is useful for testing.  We rely on ([-+]?) being ungreedy here.
-	$_->[1] =~ /^([-+]?)(\d+(?:\.\d+)?|-1)([wdhmsckMG]?)/ or
+	$_->[0] =~ /^([-+]?)(\d+(?:\.\d+)?|-1)([wdhmsckMG]?)/ or
 	  die "$0: `$_->[1]' is not a valid specification\n";
         # We unlink the ones that are IN the range, so '+' (unlink older than)
         # means to set the max, and '-' (unlink newer than) means to set the
         # min (except that size is opposite).
-        if($_->[3]) { # size
+	if( $_->[1] == SIZE ) {
+	  %unit =
+	    ('' => 1,
+	     c => 1,
+	     k => 2 ** 10,
+	     M => 2 ** 20,
+	     G => 2 ** 30);
 	  if( $1 eq '-' ) {
-	    ${$_->[2]} = $2 * $unit{$3}; # max
+	    $max = $2 * $unit{$3};
 	  } else {
-	    ${$_->[0]} = $2 * $unit{$3}; # min
-	    ${$_->[2]} = ${$_->[2]} + $unit{$3} if !$1; # range
+	    $min = $2 * $unit{$3};
+	    $max = $min + $unit{$3} if !$1; # range
 	  }
-        } else { # time
+        } else { # xTIME, invert min/max, as older has smaller time stamp
 	  if( $1 eq '-' ) {
-	    ${$_->[0]} = $time - $2 * $unit{$3}; # min
+	    $min = $time - $2 * $unit{$3};
 	  } else {
-	    ${$_->[2]} = $time - $2 * $unit{$3}; # max
-	    ${$_->[0]} = ${$_->[2]} - $unit{$3} if !$1; # range
+	    $max = $time - $2 * $unit{$3};
+	    $min = $max - $unit{$3} if !$1; # range
 	  }
 	  if( defined $weekbase ) {
 	    defined and
 	    $_ -= (int( ($time - $weekbase) / $unit{w} ) - int( ($_ - $weekbase) / $unit{w} )) *
 				# Count both weeks since monday after the epoch.
 	      2 * $unit{d}	# Subtract number of weeks times 2 days.
-	      for ${$_->[0]}, ${$_->[2]};
+	      for $min, $max;
+	  }
+	  if( !$_->[1] ) {
+	    die "$0: minimum incoming mtime not supported\n" if $min;
+	    $inc_mtime = $max || 0;
+	    $max = 0;		# () below
 	  }
         }
       }
-    } [\$min_atime,	$atime,		\$max_atime],
-      [\$min_mtime,	$mtime,		\$max_mtime],
-      [\$min_inc_mtime,	$inc_mtime,	\$max_inc_mtime],
-      [\$min_ctime,	$ctime,		\$max_ctime],
-      [\$min_size,	$size,		\$max_size, 1]; # NOTE: $size must be last!
-    $min_inc_mtime and die "$0: minimum incoming mtime not supported\n";
+      $min || $max ? [$min, $_->[1], $max] : ();
+    } [$inc_mtime, 0],
+      [$atime, ATIME],
+      [$mtime, MTIME],
+      [$ctime, CTIME],
+      [$size,  SIZE]; # $size must be last, because of %unit
 
     # Traverse desired filesystems
     local $clean_empty = 1;
-    local $Mpp::force_bc_copy = 1;
+    local $Mpp::BuildCache::force_copy = 1;
     ARGVgroups {		# Might specify more than one group.
       # Special rule for incoming subdir:
       for( @group ) {
 	my $inc = "$_->{DIRNAME}/$Mpp::BuildCache::incoming_subdir";
 	opendir my( $dh ), $inc or next;
-	-e "$inc/$_" && !-d _ && (stat _)[MTIME] < $max_inc_mtime && unlink "$inc/$_"
+	-e "$inc/$_" && !-d _ && (stat _)[MTIME] < $inc_mtime && unlink "$inc/$_"
 	  for readdir $dh;
       }
 
@@ -433,15 +435,13 @@ sub c_clean {
 	    goto RETAIN if defined $value;
 	  }
 
-	  map {			# Test against deletion options.
-	    goto RETAIN
-	      if defined $_->[0] &&	      $combined_lstat[$_->[1]] < $_->[0]
-	      or defined $_->[2] && $_->[2] < $combined_lstat[$_->[1]]; # Found one that's out of bounds.
-	  } [$min_atime, ATIME, $max_atime],
-	    [$min_mtime, MTIME, $max_mtime],
-	    [$min_ctime, CTIME, $max_ctime],
-	    [$min_size,  SIZE,  $max_size]
-	    if defined $combined_lstat[UID]; # Do we have a real file at all?
+	  if( defined $combined_lstat[UID] ) { # Do we have a real file at all?
+	    for( @del_opts ) { # Test against deletion options.
+	      goto RETAIN
+		if defined $_->[0] &&		$combined_lstat[$_->[1]] < $_->[0]
+		or defined $_->[2] && $_->[2] < $combined_lstat[$_->[1]]; # Found one that's out of bounds.
+	    }
+	  }
 	UNLINK:
 	  for( my $i = 0; $i < @group; $i++ ) {
 	    &$delete( "$_[0][$i]/$_", "$_[0][$i]/$Mpp::File::build_info_subdir/$_.mk" )
@@ -473,7 +473,6 @@ sub c_clean {
      sub { defined( $user = getpwnam $user ) or die "$0: user unknown\n" if $user !~ /^\d+$/ }],
     [qw(w workdays), \$weekbase];
 }
-
 
 #
 # Create the build cache for the first time.

@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Calendar::Indonesia::Holiday - List Indonesian public holidays
 
+VERSION
+    This document describes version 0.31 of Calendar::Indonesia::Holiday
+    (from Perl distribution Calendar-Indonesia-Holiday), released on
+    2017-07-31.
+
+SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
          list_id_holidays
          enum_id_workdays
@@ -67,16 +74,642 @@ SYNOPSIS
      my $res = count_id_workdays();
 
 DESCRIPTION
-
     This module provides functions to list Indonesian holidays.
 
     There is a command-line script interface for this module:
     list-id-holidays.
 
+FUNCTIONS
+  count_id_workdays
+    Usage:
+
+     count_id_workdays(%args) -> [status, msg, result, meta]
+
+    Count working days for a certain period.
+
+    Working day is defined as day that is not Saturday*/Sunday/holiday/joint
+    leave days*. If work_saturdays is set to true, Saturdays are also
+    counted as working days. If observe_joint_leaves is set to false, joint
+    leave days are also counted as working days.
+
+    Contains data from years 2002 to 2018 (joint leave days until 2018).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   end_date => *str*
+
+        End date.
+
+        Defaults to end of current month. Either a string in the form of
+        "YYYY-MM-DD", or a DateTime object, is accepted.
+
+    *   observe_joint_leaves => *bool* (default: 1)
+
+        If set to 0, do not observe joint leave as holidays.
+
+    *   start_date => *str*
+
+        Starting date.
+
+        Defaults to start of current month. Either a string in the form of
+        "YYYY-MM-DD", or a DateTime object, is accepted.
+
+    *   work_saturdays => *bool* (default: 0)
+
+        If set to 1, Saturday is a working day.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  enum_id_workdays
+    Usage:
+
+     enum_id_workdays(%args) -> [status, msg, result, meta]
+
+    Enumerate working days for a certain period.
+
+    Working day is defined as day that is not Saturday*/Sunday/holiday/joint
+    leave days*. If work_saturdays is set to true, Saturdays are also
+    counted as working days. If observe_joint_leaves is set to false, joint
+    leave days are also counted as working days.
+
+    Contains data from years 2002 to 2018 (joint leave days until 2018).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   end_date => *str*
+
+        End date.
+
+        Defaults to end of current month. Either a string in the form of
+        "YYYY-MM-DD", or a DateTime object, is accepted.
+
+    *   observe_joint_leaves => *bool* (default: 1)
+
+        If set to 0, do not observe joint leave as holidays.
+
+    *   start_date => *str*
+
+        Starting date.
+
+        Defaults to start of current month. Either a string in the form of
+        "YYYY-MM-DD", or a DateTime object, is accepted.
+
+    *   work_saturdays => *bool* (default: 0)
+
+        If set to 1, Saturday is a working day.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_id_holidays
+    Usage:
+
+     list_id_holidays(%args) -> [status, msg, result, meta]
+
+    List Indonesian holidays in calendar.
+
+    List holidays and joint leave days ("cuti bersama").
+
+    Contains data from years 2002 to 2018 (joint leave days until 2018).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date => *date*
+
+        Only return records where the 'date' field equals specified value.
+
+    *   date.in => *array[date]*
+
+        Only return records where the 'date' field is in the specified
+        values.
+
+    *   date.is => *date*
+
+        Only return records where the 'date' field equals specified value.
+
+    *   date.isnt => *date*
+
+        Only return records where the 'date' field does not equal specified
+        value.
+
+    *   date.max => *date*
+
+        Only return records where the 'date' field is less than or equal to
+        specified value.
+
+    *   date.min => *date*
+
+        Only return records where the 'date' field is greater than or equal
+        to specified value.
+
+    *   date.not_in => *array[date]*
+
+        Only return records where the 'date' field is not in the specified
+        values.
+
+    *   date.xmax => *date*
+
+        Only return records where the 'date' field is less than specified
+        value.
+
+    *   date.xmin => *date*
+
+        Only return records where the 'date' field is greater than specified
+        value.
+
+    *   day => *int*
+
+        Only return records where the 'day' field equals specified value.
+
+    *   day.in => *array[int]*
+
+        Only return records where the 'day' field is in the specified
+        values.
+
+    *   day.is => *int*
+
+        Only return records where the 'day' field equals specified value.
+
+    *   day.isnt => *int*
+
+        Only return records where the 'day' field does not equal specified
+        value.
+
+    *   day.max => *int*
+
+        Only return records where the 'day' field is less than or equal to
+        specified value.
+
+    *   day.min => *int*
+
+        Only return records where the 'day' field is greater than or equal
+        to specified value.
+
+    *   day.not_in => *array[int]*
+
+        Only return records where the 'day' field is not in the specified
+        values.
+
+    *   day.xmax => *int*
+
+        Only return records where the 'day' field is less than specified
+        value.
+
+    *   day.xmin => *int*
+
+        Only return records where the 'day' field is greater than specified
+        value.
+
+    *   decree_date => *str*
+
+        Only return records where the 'decree_date' field equals specified
+        value.
+
+    *   decree_date.contains => *str*
+
+        Only return records where the 'decree_date' field contains specified
+        text.
+
+    *   decree_date.in => *array[str]*
+
+        Only return records where the 'decree_date' field is in the
+        specified values.
+
+    *   decree_date.is => *str*
+
+        Only return records where the 'decree_date' field equals specified
+        value.
+
+    *   decree_date.isnt => *str*
+
+        Only return records where the 'decree_date' field does not equal
+        specified value.
+
+    *   decree_date.max => *str*
+
+        Only return records where the 'decree_date' field is less than or
+        equal to specified value.
+
+    *   decree_date.min => *str*
+
+        Only return records where the 'decree_date' field is greater than or
+        equal to specified value.
+
+    *   decree_date.not_contains => *str*
+
+        Only return records where the 'decree_date' field does not contain
+        specified text.
+
+    *   decree_date.not_in => *array[str]*
+
+        Only return records where the 'decree_date' field is not in the
+        specified values.
+
+    *   decree_date.xmax => *str*
+
+        Only return records where the 'decree_date' field is less than
+        specified value.
+
+    *   decree_date.xmin => *str*
+
+        Only return records where the 'decree_date' field is greater than
+        specified value.
+
+    *   decree_note => *str*
+
+        Only return records where the 'decree_note' field equals specified
+        value.
+
+    *   decree_note.contains => *str*
+
+        Only return records where the 'decree_note' field contains specified
+        text.
+
+    *   decree_note.in => *array[str]*
+
+        Only return records where the 'decree_note' field is in the
+        specified values.
+
+    *   decree_note.is => *str*
+
+        Only return records where the 'decree_note' field equals specified
+        value.
+
+    *   decree_note.isnt => *str*
+
+        Only return records where the 'decree_note' field does not equal
+        specified value.
+
+    *   decree_note.max => *str*
+
+        Only return records where the 'decree_note' field is less than or
+        equal to specified value.
+
+    *   decree_note.min => *str*
+
+        Only return records where the 'decree_note' field is greater than or
+        equal to specified value.
+
+    *   decree_note.not_contains => *str*
+
+        Only return records where the 'decree_note' field does not contain
+        specified text.
+
+    *   decree_note.not_in => *array[str]*
+
+        Only return records where the 'decree_note' field is not in the
+        specified values.
+
+    *   decree_note.xmax => *str*
+
+        Only return records where the 'decree_note' field is less than
+        specified value.
+
+    *   decree_note.xmin => *str*
+
+        Only return records where the 'decree_note' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   dow => *int*
+
+        Only return records where the 'dow' field equals specified value.
+
+    *   dow.in => *array[int]*
+
+        Only return records where the 'dow' field is in the specified
+        values.
+
+    *   dow.is => *int*
+
+        Only return records where the 'dow' field equals specified value.
+
+    *   dow.isnt => *int*
+
+        Only return records where the 'dow' field does not equal specified
+        value.
+
+    *   dow.max => *int*
+
+        Only return records where the 'dow' field is less than or equal to
+        specified value.
+
+    *   dow.min => *int*
+
+        Only return records where the 'dow' field is greater than or equal
+        to specified value.
+
+    *   dow.not_in => *array[int]*
+
+        Only return records where the 'dow' field is not in the specified
+        values.
+
+    *   dow.xmax => *int*
+
+        Only return records where the 'dow' field is less than specified
+        value.
+
+    *   dow.xmin => *int*
+
+        Only return records where the 'dow' field is greater than specified
+        value.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   is_holiday => *bool*
+
+        Only return records where the 'is_holiday' field equals specified
+        value.
+
+    *   is_holiday.is => *bool*
+
+        Only return records where the 'is_holiday' field equals specified
+        value.
+
+    *   is_holiday.isnt => *bool*
+
+        Only return records where the 'is_holiday' field does not equal
+        specified value.
+
+    *   is_joint_leave => *bool*
+
+        Only return records where the 'is_joint_leave' field equals
+        specified value.
+
+    *   is_joint_leave.is => *bool*
+
+        Only return records where the 'is_joint_leave' field equals
+        specified value.
+
+    *   is_joint_leave.isnt => *bool*
+
+        Only return records where the 'is_joint_leave' field does not equal
+        specified value.
+
+    *   month => *int*
+
+        Only return records where the 'month' field equals specified value.
+
+    *   month.in => *array[int]*
+
+        Only return records where the 'month' field is in the specified
+        values.
+
+    *   month.is => *int*
+
+        Only return records where the 'month' field equals specified value.
+
+    *   month.isnt => *int*
+
+        Only return records where the 'month' field does not equal specified
+        value.
+
+    *   month.max => *int*
+
+        Only return records where the 'month' field is less than or equal to
+        specified value.
+
+    *   month.min => *int*
+
+        Only return records where the 'month' field is greater than or equal
+        to specified value.
+
+    *   month.not_in => *array[int]*
+
+        Only return records where the 'month' field is not in the specified
+        values.
+
+    *   month.xmax => *int*
+
+        Only return records where the 'month' field is less than specified
+        value.
+
+    *   month.xmin => *int*
+
+        Only return records where the 'month' field is greater than
+        specified value.
+
+    *   note => *str*
+
+        Only return records where the 'note' field equals specified value.
+
+    *   note.contains => *str*
+
+        Only return records where the 'note' field contains specified text.
+
+    *   note.in => *array[str]*
+
+        Only return records where the 'note' field is in the specified
+        values.
+
+    *   note.is => *str*
+
+        Only return records where the 'note' field equals specified value.
+
+    *   note.isnt => *str*
+
+        Only return records where the 'note' field does not equal specified
+        value.
+
+    *   note.max => *str*
+
+        Only return records where the 'note' field is less than or equal to
+        specified value.
+
+    *   note.min => *str*
+
+        Only return records where the 'note' field is greater than or equal
+        to specified value.
+
+    *   note.not_contains => *str*
+
+        Only return records where the 'note' field does not contain
+        specified text.
+
+    *   note.not_in => *array[str]*
+
+        Only return records where the 'note' field is not in the specified
+        values.
+
+    *   note.xmax => *str*
+
+        Only return records where the 'note' field is less than specified
+        value.
+
+    *   note.xmin => *str*
+
+        Only return records where the 'note' field is greater than specified
+        value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   tags => *array*
+
+        Only return records where the 'tags' field equals specified value.
+
+    *   tags.has => *array[str]*
+
+        Only return records where the 'tags' field is an array/list which
+        contains specified value.
+
+    *   tags.is => *array*
+
+        Only return records where the 'tags' field equals specified value.
+
+    *   tags.isnt => *array*
+
+        Only return records where the 'tags' field does not equal specified
+        value.
+
+    *   tags.lacks => *array[str]*
+
+        Only return records where the 'tags' field is an array/list which
+        does not contain specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    *   year => *int*
+
+        Only return records where the 'year' field equals specified value.
+
+    *   year.in => *array[int]*
+
+        Only return records where the 'year' field is in the specified
+        values.
+
+    *   year.is => *int*
+
+        Only return records where the 'year' field equals specified value.
+
+    *   year.isnt => *int*
+
+        Only return records where the 'year' field does not equal specified
+        value.
+
+    *   year.max => *int*
+
+        Only return records where the 'year' field is less than or equal to
+        specified value.
+
+    *   year.min => *int*
+
+        Only return records where the 'year' field is greater than or equal
+        to specified value.
+
+    *   year.not_in => *array[int]*
+
+        Only return records where the 'year' field is not in the specified
+        values.
+
+    *   year.xmax => *int*
+
+        Only return records where the 'year' field is less than specified
+        value.
+
+    *   year.xmin => *int*
+
+        Only return records where the 'year' field is greater than specified
+        value.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_id_workdays
+    Usage:
+
+     list_id_workdays(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   end_date => *str*
+
+    *   month => *int*
+
+    *   start_date => *str*
+
+    *   year => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 FAQ
-
- What is "joint leave"?
-
+  What is "joint leave"?
     Workers are normally granted 12 days of paid leave per year. They are
     free to spend it on whichever days they want. The joint leave ("cuti
     bersama") is a government program of recent years (since 2002) to
@@ -87,20 +720,43 @@ FAQ
     is_holiday=0, while the holidays themselves with is_holiday=1, so you
     can differentiate/select both/either one.
 
- Holidays before 2002?
-
+  Holidays before 2002?
     Will be provided if there is demand and data source.
 
- Holidays after (current year)+1?
-
+  Holidays after (current year)+1?
     Some religious holidays, especially Vesakha, are not determined yet.
     Joint leave days are also usually decreed by the government in May/June
     of the preceding year.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-Indonesia-Holiday>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Calendar-Indonesia-Holiday>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Ho
+    liday>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     This API will also be available on GudangAPI, http://gudangapi.com/
 
     Aside from national holidays, some provinces declare their own (e.g.
     governor election day for East Java province, etc).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1597,7 +1597,7 @@ class parser {
  public:
   virtual ~parser() {};
 
-  virtual void parse(tree& t, unsigned beam_size = 0) const = 0;
+  virtual void parse(tree& t, unsigned beam_size = 0, double* cost = nullptr) const = 0;
 
   enum { NO_CACHE = 0, FULL_CACHE = 2147483647};
   static parser* load(const char* file, unsigned cache = 1000);
@@ -1682,8 +1682,8 @@ bool parse_int(string_piece str, const char* value_name, int& value, string& err
 
   // Allow minus
   bool positive = true;
-  if (str.len && str.str[0] == '-') {
-    positive = false;
+  if (str.len && (str.str[0] == '+' || str.str[0] == '-')) {
+    positive = str.str[0] == '+';
     str.str++, str.len--;
   }
 
@@ -1929,6 +1929,38 @@ class model_morphodita_parsito : public model {
   };
   mutable threadsafe_stack<parser_cache> parser_caches;
 
+  bool parse(sentence& s, const string& options, string& error, double* cost) const;
+
+  class joint_with_parsing_tokenizer : public input_format {
+   public:
+    joint_with_parsing_tokenizer(input_format* tokenizer, const model_morphodita_parsito& model,
+                                 int max_sentence_len, double change_boundary_logprob, double sentence_logprob)
+        : tokenizer(tokenizer), model(model), max_sentence_len(max_sentence_len),
+          change_boundary_logprob(change_boundary_logprob), sentence_logprob(sentence_logprob) {}
+
+    virtual bool read_block(istream& is, string& block) const override;
+    virtual void reset_document(string_piece id) override;
+    virtual void set_text(string_piece text, bool make_copy = false) override;
+    virtual bool next_sentence(sentence& s, string& error) override;
+
+   private:
+    bool parse_paragraph(vector<sentence>& paragraph, string& error);
+
+    unique_ptr<input_format> tokenizer;
+    const model_morphodita_parsito& model;
+    int max_sentence_len;
+    double change_boundary_logprob;
+    double sentence_logprob;
+
+    string_piece text;
+    string text_copy;
+    bool new_document = true;
+    string document_id;
+    unsigned sentence_id = 1;
+    vector<sentence> sentences;
+    size_t sentences_index = 0;
+  };
+
   void fill_word_analysis(const morphodita::tagged_lemma& analysis, bool upostag, int lemma, bool xpostag, bool feats, word& word) const;
   const string& normalize_form(string_piece form, string& output) const;
   const string& normalize_lemma(string_piece lemma, string& output) const;
@@ -2054,6 +2086,129 @@ istream& getpara(istream& is, string& para) {
 } // namespace utils
 
 /////////
+// File: utils/parse_double.h
+/////////
+
+// This file is part of UFAL C++ Utils <http://github.com/ufal/cpp_utils/>.
+//
+// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace utils {
+
+//
+// Declarations
+//
+
+// Try to parse an double from given string. If the double cannot be parsed or does
+// not fit doubleo double, false is returned and the error string is filled using the
+// value_name argument.
+inline bool parse_double(string_piece str, const char* value_name, double& value, string& error);
+
+// Try to parse an double from given string. If the double cannot be parsed or does
+// not fit doubleo double, an error is displayed and program exits.
+inline double parse_double(string_piece str, const char* value_name);
+
+//
+// Definitions
+//
+
+bool parse_double(string_piece str, const char* value_name, double& value, string& error) {
+  string_piece original = str;
+
+  // Skip spaces
+  while (str.len && (str.str[0] == ' ' || str.str[0] == '\f' || str.str[0] == '\n' || str.str[0] == '\r' || str.str[0] == '\t' || str.str[0] == '\v'))
+    str.str++, str.len--;
+
+  // Allow plus/minus
+  bool negative = false;
+  if (str.len && (str.str[0] == '+' || str.str[0] == '-')) {
+    negative = str.str[0] == '-';
+    str.str++, str.len--;
+  }
+
+  // Parse value, checking for overflow/underflow
+  if (!str.len) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': empty string."), false;
+  if (!(str.str[0] >= '0' || str.str[0] <= '9')) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': non-digit character found."), false;
+
+  value = 0;
+  while (str.len && str.str[0] >= '0' && str.str[0] <= '9') {
+    value = 10 * value + (str.str[0] - '0');
+    str.str++, str.len--;
+  }
+
+  // If there is a decimal point, parse the rest of the
+  if (str.len && str.str[0] == '.') {
+    double divider = 1;
+
+    str.str++, str.len--;
+    while (str.len && str.str[0] >= '0' && str.str[0] <= '9') {
+      value = 10 * value + (str.str[0] - '0');
+      divider *= 10.;
+      str.str++, str.len--;
+    }
+
+    value /= divider;
+  }
+  if (!isfinite(value)) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': overflow occured."), false;
+
+  // Optionally parse an exponent
+  if (str.len && (str.str[0] == 'e' || str.str[0] == 'E')) {
+    str.str++, str.len--;
+
+    double exponent = 0;
+    bool exponent_negative = false;
+    if (str.len && (str.str[0] == '+' || str.str[0] == '-')) {
+      exponent_negative = str.str[0] == '-';
+      str.str++, str.len--;
+    }
+
+    while (str.len && str.str[0] >= '0' && str.str[0] <= '9') {
+      exponent = 10 * exponent + (str.str[0] - '0');
+      str.str++, str.len--;
+    }
+
+    exponent = pow(10., exponent_negative ? -exponent : exponent);
+    if (!isfinite(exponent)) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': exponent overflow occured."), false;
+    if (exponent == 0) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': exponent underflow occured."), false;
+
+    if (value) {
+      value *= exponent;
+      if (!isfinite(value)) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': overflow occured."), false;
+      if (value == 0) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': underflow occured."), false;
+    }
+  }
+
+  // Apply initial minus
+  if (negative) value *= -1;
+
+  // Skip spaces
+  while (str.len && (str.str[0] == ' ' || str.str[0] == '\f' || str.str[0] == '\n' || str.str[0] == '\r' || str.str[0] == '\t' || str.str[0] == '\v'))
+    str.str++, str.len--;
+
+  // Check for remaining characters
+  if (str.len) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': non-digit character found."), false;
+
+  return true;
+}
+
+double parse_double(string_piece str, const char* value_name) {
+  double result;
+  string error;
+
+  if (!parse_double(str, value_name, result, error))
+    runtime_failure(error);
+
+  return result;
+}
+
+} // namespace utils
+
+/////////
 // File: model/model_morphodita_parsito.cpp
 /////////
 
@@ -2083,8 +2238,30 @@ input_format* model_morphodita_parsito::new_tokenizer(const string& options) con
   bool normalized_spaces = parsed_options.count("normalized_spaces");
   bool token_ranges = parsed_options.count("ranges");
 
-  input_format* result = new morphodita_tokenizer_wrapper(tokenizer_factory->new_tokenizer(), splitter.get(), normalized_spaces, token_ranges);
-  return (parsed_options.count("presegmented") && result) ? input_format::new_presegmented_tokenizer(result) : result;
+  unique_ptr<input_format> result(new morphodita_tokenizer_wrapper(tokenizer_factory->new_tokenizer(), splitter.get(), normalized_spaces, token_ranges));
+
+  // Presegmented
+  if (parsed_options.count("presegmented") && result)
+    result.reset(input_format::new_presegmented_tokenizer(result.release()));
+
+  // Joint with parsing
+  if (parsed_options.count("joint_with_parsing") && result) {
+    int max_sentence_len = 20;
+    if (parsed_options.count("joint_max_sentence_len") && !parse_int(parsed_options["joint_max_sentence_len"], "joint max sentence len", max_sentence_len, parse_error))
+      return nullptr;
+
+    double change_boundary_logprob = -0.5;
+    if (parsed_options.count("joint_change_boundary_logprob") && !parse_double(parsed_options["joint_change_boundary_logprob"], "joint change boundary logprob", change_boundary_logprob, parse_error))
+      return nullptr;
+
+    double sentence_logprob = -0.5;
+    if (parsed_options.count("joint_sentence_logprob") && !parse_double(parsed_options["joint_sentence_logprob"], "joint sentence logprob", sentence_logprob, parse_error))
+      return nullptr;
+
+    result.reset(new joint_with_parsing_tokenizer(result.release(), *this, max_sentence_len, change_boundary_logprob, sentence_logprob));
+  }
+
+  return result.release();
 }
 
 bool model_morphodita_parsito::tag(sentence& s, const string& /*options*/, string& error) const {
@@ -2125,6 +2302,10 @@ bool model_morphodita_parsito::tag(sentence& s, const string& /*options*/, strin
 }
 
 bool model_morphodita_parsito::parse(sentence& s, const string& options, string& error) const {
+  return parse(s, options, error, nullptr);
+}
+
+bool model_morphodita_parsito::parse(sentence& s, const string& options, string& error, double* cost) const {
   error.clear();
 
   if (!parser) return error.assign("No parser defined for the UDPipe model!"), false;
@@ -2152,7 +2333,7 @@ bool model_morphodita_parsito::parse(sentence& s, const string& options, string&
     c->tree.nodes.back().misc.assign(s.words[i].misc);
   }
 
-  parser->parse(c->tree, beam_search);
+  parser->parse(c->tree, beam_search, cost);
   for (size_t i = 1; i < s.words.size(); i++)
     s.set_head(i, c->tree.nodes[i].head, c->tree.nodes[i].deprel);
 
@@ -2204,6 +2385,164 @@ model* model_morphodita_parsito::load(istream& is) {
 }
 
 model_morphodita_parsito::model_morphodita_parsito(unsigned version) : version(version) {}
+
+bool model_morphodita_parsito::joint_with_parsing_tokenizer::read_block(istream& is, string& block) const {
+  block.clear();
+
+  for (string line; getline(is, line); ) {
+    block.append(line);
+    block.push_back('\n');
+  }
+
+  if (is.eof() && !block.empty()) is.clear(istream::eofbit);
+  return bool(is);
+}
+
+void model_morphodita_parsito::joint_with_parsing_tokenizer::reset_document(string_piece id) {
+  new_document = true;
+  document_id.assign(id.str, id.len);
+  sentence_id = 1;
+  set_text("");
+  sentences.clear();
+  sentences_index = 0;
+}
+
+void model_morphodita_parsito::joint_with_parsing_tokenizer::set_text(string_piece text, bool make_copy) {
+  if (make_copy) {
+    text_copy.assign(text.str, text.len);
+    text.str = text_copy.c_str();
+  }
+  this->text = text;
+}
+
+bool model_morphodita_parsito::joint_with_parsing_tokenizer::next_sentence(sentence& s, string& error) {
+  error.clear();
+
+  if (text.len) {
+    sentences.clear();
+    sentences_index = 0;
+
+    tokenizer->set_text(text, false);
+
+    sentence input;
+    vector<sentence> paragraph;
+    while (tokenizer->next_sentence(input, error)) {
+      if (input.get_new_par() && !paragraph.empty()) {
+        if (!parse_paragraph(paragraph, error)) return false;
+        for (auto&& sentence : paragraph)
+          sentences.push_back(sentence);
+        paragraph.clear();
+      }
+      paragraph.push_back(input);
+    }
+    if (!error.empty()) return false;
+
+    if (!paragraph.empty()) {
+      if (!parse_paragraph(paragraph, error)) return false;
+      for (auto&& sentence : paragraph)
+        sentences.push_back(sentence);
+    }
+
+    text.len = 0;
+  }
+
+  if (sentences_index < sentences.size()) {
+    s = sentences[sentences_index++];
+    return true;
+  }
+
+  return false;
+}
+
+bool model_morphodita_parsito::joint_with_parsing_tokenizer::parse_paragraph(vector<sentence>& paragraph, string& error) {
+  sentence all_words;
+  vector<bool> sentence_boundary(1, true);
+  vector<bool> token_boundary(1, true);
+
+  for (auto&& s : paragraph) {
+    unsigned offset = all_words.words.size() - 1;
+    for (unsigned i = 1; i < s.words.size(); i++) {
+      all_words.words.push_back(s.words[i]);
+      all_words.words.back().id += offset;
+      sentence_boundary.push_back(i+1 == s.words.size());
+      token_boundary.push_back(true);
+    }
+
+    for (auto&& mwt : s.multiword_tokens) {
+      all_words.multiword_tokens.push_back(mwt);
+      all_words.multiword_tokens.back().id_first += offset;
+      all_words.multiword_tokens.back().id_last += offset;
+      for (int i = all_words.multiword_tokens.back().id_first; i < all_words.multiword_tokens.back().id_last; i++)
+        token_boundary[i] = false;
+    }
+  }
+
+  vector<double> best_logprob(all_words.words.size(), -numeric_limits<double>::infinity()); best_logprob[0] = 0.;
+  vector<unsigned> best_length(all_words.words.size(), 0);
+  sentence s;
+
+  for (unsigned start = 1; start < all_words.words.size(); start++) {
+    if (!token_boundary[start - 1]) continue;
+    s.clear();
+    for (unsigned end = start + 1; end <= all_words.words.size() && (end - start) <= unsigned(max_sentence_len); end++) {
+      s.words.push_back(all_words.words[end - 1]);
+      s.words.back().id -= start - 1;
+      if (!token_boundary[end - 1]) continue;
+
+      for (unsigned i = 1; i < s.words.size(); i++) {
+        s.words[i].head = -1;
+        s.words[i].children.clear();
+      }
+
+      double cost;
+      if (!model.tag(s, DEFAULT, error)) return false;
+      if (!model.parse(s, DEFAULT, error, &cost)) return false;
+      cost += sentence_logprob + change_boundary_logprob * (2 - int(sentence_boundary[start - 1]) - int(sentence_boundary[end - 1]));
+      if (best_logprob[start - 1] + cost > best_logprob[end - 1]) {
+        best_logprob[end - 1] = best_logprob[start - 1] + cost;
+        best_length[end - 1] = end - start;
+      }
+    }
+  }
+
+  vector<unsigned> sentence_lengths;
+  for (unsigned end = all_words.words.size(); end > 1; end -= best_length[end - 1])
+    sentence_lengths.push_back(best_length[end - 1]);
+
+  paragraph.clear();
+
+  sentence_lengths.push_back(1);
+  reverse(sentence_lengths.begin(), sentence_lengths.end());
+  for (unsigned i = 1; i < sentence_lengths.size(); i++) {
+    sentence_lengths[i] += sentence_lengths[i - 1];
+
+    paragraph.emplace_back();
+    while (!all_words.multiword_tokens.empty() && unsigned(all_words.multiword_tokens.front().id_first) < sentence_lengths[i]) {
+      paragraph.back().multiword_tokens.push_back(all_words.multiword_tokens.front());
+      paragraph.back().multiword_tokens.back().id_first -= sentence_lengths[i-1] - 1;
+      paragraph.back().multiword_tokens.back().id_last -= sentence_lengths[i-1] - 1;
+      all_words.multiword_tokens.erase(all_words.multiword_tokens.begin());
+    }
+
+    for (unsigned word = sentence_lengths[i - 1]; word < sentence_lengths[i]; word++) {
+      paragraph.back().words.push_back(all_words.words[word]);
+      paragraph.back().words.back().id -= sentence_lengths[i-1] - 1;
+      paragraph.back().words.back().head = -1;
+      paragraph.back().words.back().children.clear();
+    }
+  }
+
+  if (!paragraph.empty()) {
+    if (new_document) {
+      paragraph.front().set_new_doc(true, document_id);
+      new_document = false;
+    }
+
+    paragraph.front().set_new_par(true);
+  }
+
+  return true;
+}
 
 void model_morphodita_parsito::fill_word_analysis(const morphodita::tagged_lemma& analysis, bool upostag, int lemma, bool xpostag, bool feats, word& word) const {
   // Lemma
@@ -2408,6 +2747,7 @@ class output_format {
   // Static factory methods
   static output_format* new_output_format(const string& name);
   static output_format* new_conllu_output_format(const string& options = string());
+  static output_format* new_epe_output_format(const string& options = string());
   static output_format* new_matxin_output_format(const string& options = string());
   static output_format* new_horizontal_output_format(const string& options = string());
   static output_format* new_plaintext_output_format(const string& options = string());
@@ -8261,7 +8601,8 @@ void morpho_statistical_guesser::analyze(string_piece form, vector<tagged_lemma>
 
           if (pref_del_len + suff_del_len > form.len ||
               (pref_del_len && !small_memeq(pref_del, form.str, pref_del_len)) ||
-              (suff_del_len && !small_memeq(suff_del, form.str + form.len - suff_del_len, suff_del_len)))
+              (suff_del_len && !small_memeq(suff_del, form.str + form.len - suff_del_len, suff_del_len)) ||
+              (form.len + pref_add_len - pref_del_len + suff_add_len - suff_del_len == 0))
             continue;
 
           string lemma;
@@ -12505,6 +12846,7 @@ gru_tokenizer_network* gru_tokenizer_network::load(binary_decoder& data) {
   switch (data.next_1B()) {
     case 16: return gru_tokenizer_network_implementation<16>::load(data);
     case 24: return gru_tokenizer_network_implementation<24>::load(data);
+    case 64: return gru_tokenizer_network_implementation<64>::load(data);
   }
   return nullptr;
 }
@@ -13048,6 +13390,10 @@ bool gru_tokenizer_trainer::train(unsigned url_email_tokenizer, unsigned segment
                        dropout, initialization_range, early_stopping, data, heldout, enc, error)) return false;
   } else if (dimension == 24) {
     gru_tokenizer_network_trainer<24> network;
+    if (!network.train(url_email_tokenizer, segment, allow_spaces, epochs, batch_size, learning_rate, learning_rate_final,
+                       dropout, initialization_range, early_stopping, data, heldout, enc, error)) return false;
+  } else if (dimension == 64) {
+    gru_tokenizer_network_trainer<64> network;
     if (!network.train(url_email_tokenizer, segment, allow_spaces, epochs, batch_size, learning_rate, learning_rate_final,
                        dropout, initialization_range, early_stopping, data, heldout, enc, error)) return false;
   } else {
@@ -15460,15 +15806,15 @@ class parser_nn : public parser {
  public:
   parser_nn(bool versioned);
 
-  virtual void parse(tree& t, unsigned beam_size = 0) const override;
+  virtual void parse(tree& t, unsigned beam_size = 0, double* cost = nullptr) const override;
 
  protected:
   virtual void load(binary_decoder& data, unsigned cache) override;
 
  private:
   friend class parser_nn_trainer;
-  void parse_greedy(tree& t) const;
-  void parse_beam_search(tree& t, unsigned beam_size) const;
+  void parse_greedy(tree& t, double* cost) const;
+  void parse_beam_search(tree& t, unsigned beam_size, double* cost) const;
 
   bool versioned;
   unsigned version;
@@ -15600,15 +15946,16 @@ namespace parsito {
 
 parser_nn::parser_nn(bool versioned) : versioned(versioned) {}
 
-void parser_nn::parse(tree& t, unsigned beam_size) const {
+void parser_nn::parse(tree& t, unsigned beam_size, double* cost) const {
   if (beam_size > 1)
-    parse_beam_search(t, beam_size);
+    parse_beam_search(t, beam_size, cost);
   else
-    parse_greedy(t);
+    parse_greedy(t, cost);
 }
 
-void parser_nn::parse_greedy(tree& t) const {
+void parser_nn::parse_greedy(tree& t, double* cost) const {
   assert(system);
+  if (cost) *cost = 0.;
 
   // Retrieve or create workspace
   workspace* w = workspaces.pop();
@@ -15628,7 +15975,8 @@ void parser_nn::parse_greedy(tree& t) const {
   }
 
   // Compute which transitions to perform and perform them
-  while (!w->conf.final()) {
+  int transitions = 0;
+  for (; !w->conf.final(); transitions++) {
     // Extract nodes from the configuration
     nodes.extract(w->conf, w->extracted_nodes);
     w->extracted_embeddings.resize(w->extracted_nodes.size());
@@ -15636,7 +15984,7 @@ void parser_nn::parse_greedy(tree& t) const {
       w->extracted_embeddings[i] = w->extracted_nodes[i] >= 0 ? &w->embeddings[w->extracted_nodes[i]] : nullptr;
 
     // Classify using neural network
-    network.propagate(embeddings, w->extracted_embeddings, w->network_buffer, w->outcomes, &embeddings_cache, false);
+    network.propagate(embeddings, w->extracted_embeddings, w->network_buffer, w->outcomes, &embeddings_cache, cost ? true : false);
 
     // Find most probable applicable transition
     int best = -1;
@@ -15646,6 +15994,7 @@ void parser_nn::parse_greedy(tree& t) const {
 
     // Perform the best transition
     int child = system->perform(w->conf, best);
+    if (cost) *cost += log(w->outcomes[best]);
 
     // If a node was linked, recompute its embeddings as deprel has changed
     if (child >= 0)
@@ -15655,11 +16004,14 @@ void parser_nn::parse_greedy(tree& t) const {
       }
   }
 
+  if (cost && transitions)
+    *cost = *cost / transitions * (t.nodes.size() - 1);
+
   // Store workspace
   workspaces.push(w);
 }
 
-void parser_nn::parse_beam_search(tree& t, unsigned beam_size) const {
+void parser_nn::parse_beam_search(tree& t, unsigned beam_size, double* cost) const {
   assert(system);
 
   // Retrieve or create workspace
@@ -15764,6 +16116,8 @@ void parser_nn::parse_beam_search(tree& t, unsigned beam_size) const {
       best = i;
   w->bs_confs[iteration & 1][best].refresh_tree();
 
+  if (cost) *cost = w->bs_confs[iteration & 1][best].cost * (t.nodes.size() - 1);
+
   // Store workspace
   workspaces.push(w);
 }
@@ -15854,101 +16208,6 @@ class parser_nn_trainer {
 };
 
 } // namespace parsito
-
-/////////
-// File: utils/parse_double.h
-/////////
-
-// This file is part of UFAL C++ Utils <http://github.com/ufal/cpp_utils/>.
-//
-// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
-// Mathematics and Physics, Charles University in Prague, Czech Republic.
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-namespace utils {
-
-//
-// Declarations
-//
-
-// Try to parse an double from given string. If the double cannot be parsed or does
-// not fit doubleo double, false is returned and the error string is filled using the
-// value_name argument.
-inline bool parse_double(string_piece str, const char* value_name, double& value, string& error);
-
-// Try to parse an double from given string. If the double cannot be parsed or does
-// not fit doubleo double, an error is displayed and program exits.
-inline double parse_double(string_piece str, const char* value_name);
-
-//
-// Definitions
-//
-
-bool parse_double(string_piece str, const char* value_name, double& value, string& error) {
-  string_piece original = str;
-
-  // Skip spaces
-  while (str.len && (str.str[0] == ' ' || str.str[0] == '\f' || str.str[0] == '\n' || str.str[0] == '\r' || str.str[0] == '\t' || str.str[0] == '\v'))
-    str.str++, str.len--;
-
-  // Allow minus
-  bool negative = false;
-  if (str.len && str.str[0] == '-') {
-    negative = true;
-    str.str++, str.len--;
-  }
-
-  // Parse value, checking for overflow/underflow
-  if (!str.len) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': empty string."), false;
-  if (!(str.str[0] >= '0' || str.str[0] <= '9')) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': non-digit character found."), false;
-
-  value = 0;
-  while (str.len && str.str[0] >= '0' && str.str[0] <= '9') {
-    value = 10 * value + (str.str[0] - '0');
-    str.str++, str.len--;
-  }
-
-  // If there is a decimal point, parse the rest of the
-  if (str.len && str.str[0] == '.') {
-    double divider = 1;
-
-    str.str++, str.len--;
-    while (str.len && str.str[0] >= '0' && str.str[0] <= '9') {
-      value = 10 * value + (str.str[0] - '0');
-      divider *= 10.;
-      str.str++, str.len--;
-    }
-
-    value /= divider;
-  }
-
-  // Apply initial minus
-  if (negative) value *= -1;
-
-  // Skip spaces
-  while (str.len && (str.str[0] == ' ' || str.str[0] == '\f' || str.str[0] == '\n' || str.str[0] == '\r' || str.str[0] == '\t' || str.str[0] == '\v'))
-    str.str++, str.len--;
-
-  // Check for remaining characters
-  if (str.len) return error.assign("Cannot parse ").append(value_name).append(" double value '").append(original.str, original.len).append("': non-digit character found."), false;
-
-  return true;
-}
-
-double parse_double(string_piece str, const char* value_name) {
-  double result;
-  string error;
-
-  if (!parse_double(str, value_name, result, error))
-    runtime_failure(error);
-
-  return result;
-}
-
-} // namespace utils
 
 /////////
 // File: parsito/parser/parser_nn_trainer.cpp
@@ -18371,6 +18630,116 @@ ostream& output_format_conllu::write_with_spaces(ostream& os, const string& str)
   return os;
 }
 
+// EPE output format
+class output_format_epe : public output_format {
+ public:
+  virtual void write_sentence(const sentence& s, ostream& os) override;
+  virtual void finish_document(ostream& os) override;
+
+ private:
+  class json_builder {
+   public:
+    json_builder& object() { comma(); json.push_back('{'); stack.push_back('}'); return *this; }
+    json_builder& array() { comma(); json.push_back('['); stack.push_back(']'); return *this; }
+    json_builder& close() { if (!stack.empty()) { json.push_back(stack.back()); stack.pop_back(); } comma_needed = true; return *this; }
+    json_builder& key(string_piece name) { comma(); string(name); json.push_back(':'); return *this; }
+    json_builder& value(string_piece value) { comma(); string(value); comma_needed=true; return *this; }
+    json_builder& value(size_t value) { comma(); number(value); comma_needed=true; return *this; }
+    json_builder& value_true() { comma(); json.push_back('t'); json.push_back('r'); json.push_back('u'); json.push_back('e'); comma_needed=true; return *this; }
+
+    string_piece current() const { return string_piece(json.data(), json.size()); }
+    void clear() { json.clear(); stack.clear(); comma_needed=false; }
+
+   private:
+    void comma() {
+      if (comma_needed) {
+        json.push_back(',');
+        json.push_back(' ');
+      }
+      comma_needed = false;
+    }
+    void string(string_piece str) {
+      json.push_back('"');
+      for (; str.len; str.str++, str.len--)
+        switch (*str.str) {
+          case '"': json.push_back('\\'); json.push_back('\"'); break;
+          case '\\': json.push_back('\\'); json.push_back('\\'); break;
+          case '\b': json.push_back('\\'); json.push_back('b'); break;
+          case '\f': json.push_back('\\'); json.push_back('f'); break;
+          case '\n': json.push_back('\\'); json.push_back('n'); break;
+          case '\r': json.push_back('\\'); json.push_back('r'); break;
+          case '\t': json.push_back('\\'); json.push_back('t'); break;
+          default:
+            if (((unsigned char)*str.str) < 32) {
+              json.push_back('u'); json.push_back('0'); json.push_back('0'); json.push_back('0' + (*str.str >> 4)); json.push_back("0123456789ABCDEF"[*str.str & 0xF]);
+            } else {
+              json.push_back(*str.str);
+            }
+        }
+      json.push_back('"');
+    }
+    void number(size_t value) {
+      size_t start_size = json.size();
+      for (; value || start_size == json.size(); value /= 10)
+        json.push_back('0' + (value % 10));
+      reverse(json.begin() + start_size, json.end());
+    }
+
+    std::vector<char> json;
+    std::vector<char> stack;
+    bool comma_needed = false;
+  } json;
+
+  vector<string_piece> feats;
+  size_t sentences = 0;
+};
+
+void output_format_epe::write_sentence(const sentence& s, ostream& os) {
+  json.object().key("id").value(++sentences).key("nodes").array();
+
+  for (size_t i = 1; i < s.words.size(); i++) {
+    json.object().key("id").value(i).key("form").value(s.words[i].form);
+
+    size_t start, end;
+    if (s.words[i].get_token_range(start, end))
+      json.key("start").value(start).key("end").value(end);
+    if (s.words[i].head == 0)
+      json.key("top").value_true();
+
+    json.key("properties").object()
+        .key("lemma").value(s.words[i].lemma)
+        .key("upos").value(s.words[i].upostag)
+        .key("xpos").value(s.words[i].xpostag);
+    split(s.words[i].feats, '|', feats);
+    for (auto&& feat : feats) {
+      string_piece key(feat.str, 0);
+      while (key.len < feat.len && key.str[key.len] != '=')
+        key.len++;
+      if (key.len + 1 < feat.len)
+        json.key(key).value(string_piece(key.str + key.len + 1, feat.len - key.len - 1));
+    }
+    json.close();
+
+    if (!s.words[i].children.empty()) {
+      json.key("edges").array();
+      for (auto&& child : s.words[i].children)
+        json.object().key("label").value(s.words[child].deprel).key("target").value(child).close();
+      json.close();
+    }
+
+    json.close();
+  }
+  json.close().close();
+
+  string_piece current = json.current();
+  os.write(current.str, current.len).put('\n');
+  json.clear();
+}
+
+void output_format_epe::finish_document(ostream& /*os*/) {
+  sentences = 0;
+}
+
 // Matxin output format
 class output_format_matxin : public output_format {
  public:
@@ -18536,6 +18905,10 @@ output_format* output_format::new_conllu_output_format(const string& options) {
   return new output_format_conllu(version);
 }
 
+output_format* output_format::new_epe_output_format(const string& /*options*/) {
+  return new output_format_epe();
+}
+
 output_format* output_format::new_matxin_output_format(const string& /*options*/) {
   return new output_format_matxin();
 }
@@ -18573,6 +18946,7 @@ output_format* output_format::new_output_format(const string& name) {
   size_t option_offset = equal != string::npos ? equal + 1 : name.size();
 
   if (name.compare(0, name_len, "conllu") == 0) return new_conllu_output_format(name.substr(option_offset));
+  if (name.compare(0, name_len, "epe") == 0) return new_epe_output_format(name.substr(option_offset));
   if (name.compare(0, name_len, "matxin") == 0) return new_matxin_output_format(name.substr(option_offset));
   if (name.compare(0, name_len, "horizontal") == 0) return new_horizontal_output_format(name.substr(option_offset));
   if (name.compare(0, name_len, "plaintext") == 0) return new_plaintext_output_format(name.substr(option_offset));
@@ -19254,41 +19628,36 @@ bool morphodita_tokenizer_wrapper::next_sentence(sentence& s, string& error) {
           tok.form.push_back(chr);
       }
 
-      // Store SpaceAfter or SpacesAfter/SpacesBefore
-      if (normalized_spaces)
-        tok.set_space_after(!(i+1 < forms.size() && forms[i+1].str == forms[i].str + forms[i].len));
-      else {
-        // Fill SpacesBefore
-        if (i == 0) {
-          if (forms[0].str > text.str)
-            saved_spaces.append(text.str, forms[0].str - text.str);
-          preceeding_newlines += count(saved_spaces.begin(), saved_spaces.end(), '\n');
-          tok.set_spaces_before(saved_spaces);
-          saved_spaces.clear();
-        } else {
-          tok.set_spaces_before("");
-        }
-        // Fill SpacesAfter
-        if (i+1 < forms.size()) {
-          tok.set_spaces_after(string_piece(forms[i].str + forms[i].len, forms[i+1].str - forms[i].str - forms[i].len));
-        } else {
-          text.len -= forms[i].str + forms[i].len - text.str;
-          text.str = forms[i].str + forms[i].len;
-
-          string_piece following;
-          for (char32_t chr; text.len && (following = text, chr = unilib::utf8::decode(following.str, following.len),
-                                          (unilib::unicode::category(chr) & unilib::unicode::Zs) || chr == '\r' || chr == '\n' || chr == '\t'); text = following)
-            saved_spaces.append(text.str, following.str - text.str);
-
-          following_newlines += count(saved_spaces.begin(), saved_spaces.end(), '\n');
-          tok.set_spaces_after(saved_spaces);
-          saved_spaces.clear();
-        }
-
-        // SpacesInToken on every token
-        if (tok.form.size() != forms[i].len)
-          tok.set_spaces_in_token(forms[i]);
+      // Track pre-sentence spaces and store SpacesBefore
+      if (i == 0) {
+        if (forms[0].str > text.str)
+          saved_spaces.append(text.str, forms[0].str - text.str);
+        preceeding_newlines += count(saved_spaces.begin(), saved_spaces.end(), '\n');
       }
+      if (!normalized_spaces) {
+        tok.set_spaces_before(i == 0 ? saved_spaces : "");
+      }
+      saved_spaces.clear();
+
+      // Track post-sentence spaces and store SpaceAfter, SpacesInToken and SpacesAfter
+      if (i+1 == forms.size()) {
+        text.len -= forms[i].str + forms[i].len - text.str;
+        text.str = forms[i].str + forms[i].len;
+
+        string_piece following;
+        for (char32_t chr; text.len && (following = text, chr = unilib::utf8::decode(following.str, following.len),
+                                        (unilib::unicode::category(chr) & unilib::unicode::Zs) || chr == '\r' || chr == '\n' || chr == '\t'); text = following)
+          saved_spaces.append(text.str, following.str - text.str);
+
+        following_newlines += count(saved_spaces.begin(), saved_spaces.end(), '\n');
+      }
+      if (normalized_spaces) {
+        tok.set_space_after(!(i+1 < forms.size() && forms[i+1].str == forms[i].str + forms[i].len));
+      } else {
+        tok.set_spaces_in_token(tok.form.size() != forms[i].len ? forms[i] : "");
+        tok.set_spaces_after(i+1 == forms.size() ? saved_spaces : string_piece(forms[i].str + forms[i].len, forms[i+1].str - forms[i].str - forms[i].len));
+      }
+      saved_spaces.clear();
 
       // Store TokenRange if requested
       if (token_ranges)
@@ -20579,7 +20948,7 @@ bool trainer_morphodita_parsito::train_tokenizer(const vector<sentence>& trainin
         bool tokenize_url = true; if (!option_bool(tokenizer, "tokenize_url", tokenize_url, error)) return false;
         int segment_size = 50; // if (!option_int(tokenizer, "segment_size", segment_size, error)) return false;
         bool allow_spaces = spaces_in_training; if (!option_bool(tokenizer, "allow_spaces", allow_spaces, error)) return false;
-        int dimension = 24; // if (!option_int(tokenizer, "dimension", dimension, error)) return false;
+        int dimension = 24; if (!option_int(tokenizer, "dimension", dimension, error)) return false;
         int epochs = 100; if (!option_int(tokenizer, "epochs", epochs, error)) return false;
         int batch_size = run <= 1 ? 50 : 50 + 50 * hyperparameter_integer(run, 1, 0, 1);
         if (!option_int(tokenizer, "batch_size", batch_size, error)) return false;
@@ -20594,7 +20963,7 @@ bool trainer_morphodita_parsito::train_tokenizer(const vector<sentence>& trainin
                            << ", learning_rate=" << fixed << setprecision(8) << learning_rate << endl;
 
         cerr << "Training tokenizer with the following options: " << "tokenize_url=" << (tokenize_url ? 1 : 0)
-             << ", allow_spaces=" << (allow_spaces ? 1 : 0) << "," << endl
+             << ", allow_spaces=" << (allow_spaces ? 1 : 0) << ", dimension=" << dimension << endl
              << "  epochs=" << epochs << ", batch_size=" << batch_size << ", learning_rate=" << fixed << setprecision(4) << learning_rate
              << ", dropout=" << dropout << ", early_stopping=" << (early_stopping ? 1 : 0) << endl;
 
@@ -20695,19 +21064,21 @@ bool trainer_morphodita_parsito::train_parser(const vector<sentence>& training, 
       int embedding_feats = 20; if (!option_int(parser, "embedding_feats", embedding_feats, error)) return false;
       int embedding_xpostag = 0; if (!option_int(parser, "embedding_xpostag", embedding_xpostag, error)) return false;
       int embedding_form = 50; if (!option_int(parser, "embedding_form", embedding_form, error)) return false;
+      int embedding_form_mincount = 2; if (!option_int(parser, "embedding_form_mincount", embedding_form_mincount, error)) return false;
       int embedding_lemma = 0; if (!option_int(parser, "embedding_lemma", embedding_lemma, error)) return false;
+      int embedding_lemma_mincount = 2; if (!option_int(parser, "embedding_lemma_mincount", embedding_lemma_mincount, error)) return false;
       int embedding_deprel = 20; if (!option_int(parser, "embedding_deprel", embedding_deprel, error)) return false;
       string embeddings;
       if (embedding_upostag) embeddings.append("universal_tag ").append(to_string(embedding_upostag)).append(" 1\n");
       if (embedding_feats) embeddings.append("feats ").append(to_string(embedding_feats)).append(" 1\n");
       if (embedding_xpostag) embeddings.append("tag ").append(to_string(embedding_xpostag)).append(" 1\n");
       if (embedding_form) {
-        embeddings.append("form ").append(to_string(embedding_form)).append(" 2");
+        embeddings.append("form ").append(to_string(embedding_form)).append(" ").append(to_string(embedding_form_mincount));
         if (!option_str(parser, "embedding_form_file").empty()) embeddings.append(" ").append(option_str(parser, "embedding_form_file"));
         embeddings.push_back('\n');
       }
       if (embedding_lemma) {
-        embeddings.append("lemma ").append(to_string(embedding_lemma)).append(" 2");
+        embeddings.append("lemma ").append(to_string(embedding_lemma)).append(" ").append(to_string(embedding_lemma_mincount));
         if (!option_str(parser, "embedding_lemma_file").empty()) embeddings.append(" ").append(option_str(parser, "embedding_lemma_file"));
         embeddings.push_back('\n');
       }
@@ -20804,6 +21175,8 @@ bool trainer_morphodita_parsito::train_parser(const vector<sentence>& training, 
            << "Parser uses lemmas/upos/xpos/feats: " << (tagger ? "automatically generated by tagger" : "from gold data") << endl
            << "Parser embeddings options: upostag=" << embedding_upostag << ", feats=" << embedding_feats << ", xpostag=" << embedding_xpostag
            << ", form=" << embedding_form << ", lemma=" << embedding_lemma << ", deprel=" << embedding_deprel << endl
+           << "  form mincount=" << embedding_form_mincount << ", precomputed form embeddings=" << (parser["embedding_form_file"].empty() ? "none" : parser["embedding_form_file"]) << endl
+           << "  lemma mincount=" << embedding_lemma_mincount << ", precomputed lemma embeddings=" << (parser["embedding_lemma_file"].empty() ? "none" : parser["embedding_lemma_file"]) << endl
            << "Parser network options: iterations=" << iterations << ", hidden_layer=" << hidden_layer << ", batch_size=" << batch_size << "," << endl
            << "  learning_rate=" << fixed << setprecision(4) << learning_rate << ", learning_rate_final=" << learning_rate_final
            << ", l2=" << l2 << ", early_stopping=" << (early_stopping ? 1 : 0) << endl;
@@ -20951,11 +21324,14 @@ bool trainer_morphodita_parsito::train_tagger_model(const vector<sentence>& trai
     } else {
       flat_lemmas.insert("greek.expression");
     }
-    const string& dictionary_data = option_str(tagger, "dictionary", model);
+
+    if (!option_str(tagger, "dictionary", model).empty())
+      return error.assign("The tagger 'dictionary' option is no longer supported, use 'dictionary_file' instead!"), false;
+    const string& dictionary_file = option_str(tagger, "dictionary_file", model);
     int max_form_analyses = 0; if (!option_int(tagger, "dictionary_max_form_analyses", max_form_analyses, error, model)) return false;
 
     cerr << "Tagger model " << model+1 << " dictionary options: " << "max_form_analyses=" << max_form_analyses
-         << ", custom dictionary data given=" << (!dictionary_data.empty() ? "true" : "false") << endl;
+         << ", custom dictionary_file=" << (dictionary_file.empty() ? "none" : dictionary_file) << endl;
 
     // Guesser options
     int guesser_suffix_len = 4; if (!option_int(tagger, "guesser_suffix_len", guesser_suffix_len, error, model)) return false;
@@ -20964,7 +21340,7 @@ bool trainer_morphodita_parsito::train_tagger_model(const vector<sentence>& trai
     int guesser_prefixes_max = provide_lemma ? 4 : 0; if (!option_int(tagger, "guesser_prefixes_max", guesser_prefixes_max, error, model)) return false;
     int guesser_prefix_min_count = 10; if (!option_int(tagger, "guesser_prefix_min_count", guesser_prefix_min_count, error, model)) return false;
     int guesser_enrich_dictionary = run <= 1 ? 6 : 3 + hyperparameter_integer(run, 2, 0, 7);
-    if (!dictionary_data.empty()) guesser_enrich_dictionary = 0;
+    if (!dictionary_file.empty()) guesser_enrich_dictionary = 0;
     if (!option_int(tagger, "guesser_enrich_dictionary", guesser_enrich_dictionary, error, model)) return false;
 
     if (run >= 1) cerr << "Random search run " << run << ", guesser_suffix_rules=" << guesser_suffix_rules
@@ -21021,23 +21397,22 @@ bool trainer_morphodita_parsito::train_tagger_model(const vector<sentence>& trai
     dictionary_special_tags.punctuation_tag = most_frequent_tag(training, "PUNCT", use_xpostag, use_feats, combined_tag);
     dictionary_special_tags.symbol_tag = most_frequent_tag(training, "SYM", use_xpostag, use_feats, combined_tag);
 
-    // Append given dictionary data if available
-    {
+    // Append given dictionary_file if given
+    if (!dictionary_file.empty()) {
+      ifstream is(dictionary_file);
+      if (!is.is_open()) return error.assign("Cannot open dictionary_file '").append(dictionary_file).append("'!"), false;
+
       vector<string_piece> dictionary_parts;
       word entry;
-      string entry_encoded;
-      for (size_t index = 0, line_len; index < dictionary_data.size(); index += line_len + 1) {
+      string entry_encoded, line;
+      while (getline(is, line)) {
         // Skip empty lines
-        while (index < dictionary_data.size() && (dictionary_data[index] == '\r' || dictionary_data[index] == '\n'))
-          index++;
-        for (line_len = 0; index + line_len < dictionary_data.size() && dictionary_data[index + line_len] != '\r' && dictionary_data[index + line_len] != '\n'; )
-          line_len++;
-        if (!line_len) break;
+        if (line.empty()) continue;
 
-        split(string_piece(dictionary_data.c_str() + index, line_len), '\t', dictionary_parts);
+        split(line, '\t', dictionary_parts);
 
         if (dictionary_parts.size() != 5)
-          return error.assign("Dictionary line '").append(dictionary_data, index, line_len).append("' does not contain 5 tab-separated columns!"), false;
+          return error.assign("Dictionary line '").append(line).append("' does not contain 5 tab-separated columns!"), false;
 
         model_normalize_form(dictionary_parts[0], entry.form);
         entry.lemma.assign(dictionary_parts[1].str, dictionary_parts[1].len == 1 && dictionary_parts[1].str[0] == '_' ? 0 : dictionary_parts[1].len);
@@ -26505,7 +26880,7 @@ bool compressor::save(ostream& os, const binary_encoder& enc) {
 
 // Returns current version.
 version version::current() {
-  return {1, 1, 0, ""};
+  return {1, 2, 0, ""};
 }
 
 // Returns multi-line formated version and copyright string.

@@ -20,8 +20,10 @@ WriteMakefile(
     PREREQ_PM => {
         'Mojolicious::Plugin::AssetPack'              => 1.39,
         'HTML::Packer'=> 2.03,
-        'IO::Compress::Gzip '=>2,
+        'IO::Compress::Gzip '=>2.0,
         'CSS::Minifier::XS'	=> 0.09,
+        'CSS::Sass'     =>  3.0,
+        'JavaScript::Minifier::XS'     => 0.1,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojolicious-Plugin-AssetPack-Che-*' },

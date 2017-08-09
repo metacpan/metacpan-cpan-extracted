@@ -1,0 +1,44 @@
+1.07 -
+    * XAO::Utils - added t2hj for javascript translations
+
+1.06 - 11-Jan-2005
+    * XAO::Utils - set_logprint_handler()
+    * XAO::TestUtils - 'use blib' is optional now
+    * XAO::Utils - get_debug() added
+    * XAO::TestUtils - support for package building
+      (xao_mf_check_consistency & xao_mf_fix_permissions)
+    * Changed from SleepyCat based proprietary open source compatible
+      license to the standard "Artistic".
+    * Internal CVS version numbers bumped to >=2.1 and the way VERSION
+      is generated is changed. Otherwise CPAN thinks that 1.13 is
+      smaller than 1.4
+
+1.05 - 12-Nov-2003
+    * XAO::Utils - get_args works as merge_refs on multiple hash refs
+    * XAO::TestUtils - new module, automated testing for XAO packages
+    * XAO::DO::Embeddable - optional base class for embeddable configs
+    * XAO::Utils - fround() function added
+
+1.04 - 9-Aug-2002
+    * XAO::Utils - t2hq() now escapes semicolon
+    * Minor changes to support XAO::Web and XAO::FS improvements
+
+1.03 - 18-Mar-2002
+    * XAO::Cache - generic cache interface (new)
+    * XAO::DO::Cache::Memory - memory cache (new)
+    * XAO::DO::Atom - suggested base class (new)
+    * XAO::Errors - added support for throwing by known class name
+
+1.02 - 3-Jan-2002
+    * minor fixes
+    * line counter in Objects.pm fixed, was off by one line in
+      error messages
+
+1.01 - 4-Dec-2001
+    * fixed SimpleHash->new
+    * added cleanup() method to XAO::DO::Config
+    * fixed XAO::Projects::get_project() method
+    * Config::init() now calls init() on all embedded objects
+
+1.0 - 2-Nov-2001
+    * Initial public release

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-07-22'; # DATE
-our $VERSION = '1.77'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '1.78'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1076,8 +1076,8 @@ sub __gen_iter {
         };
     } else {
         # expect JSON stream for non-simple types
-        require JSON;
-        state $json = JSON->new->allow_nonref;
+        require JSON::MaybeXS;
+        state $json = JSON::MaybeXS->new->allow_nonref;
         my $i = -1;
         return sub {
             state $eof;
@@ -1236,6 +1236,7 @@ sub parse_cmdline_src {
                         __gen_iter($fh, $as, $an) :
                             $is_ary ? [<$fh>] :
                                 do { local $/; ~~<$fh> };
+                    close $fh;
                     $r->{args}{"-cmdline_src_$an"} = 'file';
                     $r->{args}{"-cmdline_srcfilenames_$an"} = [$fname];
                 }
@@ -1297,6 +1298,7 @@ sub select_output_handle {
             }
             last unless $pager; # ENV{PAGER} can be set 0/'' to disable paging
             #log_trace("Paging output using %s", $pager);
+            ## no critic (InputOutput::RequireBriefOpen)
             open $handle, "| $pager";
         }
         $handle //= \*STDOUT;
@@ -1328,8 +1330,8 @@ sub display_result {
                     print "\n" unless $type eq 'buf';
                 }
             } else {
-                require JSON;
-                state $json = JSON->new->allow_nonref;
+                require JSON::MaybeXS;
+                state $json = JSON::MaybeXS->new->allow_nonref;
                 if ($self->use_cleanser) {
                     while (defined(my $rec = $x->())) {
                         print $json->encode(
@@ -1557,7 +1559,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.77 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-22.
+This document describes version 1.78 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-08-04.
 
 =head1 DESCRIPTION
 

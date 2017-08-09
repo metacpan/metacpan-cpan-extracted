@@ -2,7 +2,7 @@
 
 makepp -- Compatible but improved replacement for make
 
-=for vc $Id: makepp.pod,v 1.38 2012/05/15 21:26:30 pfeiffer Exp $
+=for vc $Id: makepp.pod,v 1.40 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 SYNOPSIS
 
@@ -19,9 +19,9 @@ Makepp, a build program which has a number of features that allow for reliable
 builds and simpler build files, is a drop-in replacement for GNU make. It
 supports L<almost all|makepp_incompatibilities> of the syntax that GNU make
 supports, and can be used with makefiles produced by utilities such as
-automake. It is called makepp (or make++) because it was designed with special
+automake. It is called makepp (or B<make++>) because it was designed with special
 support for C++, which has since been extended to other languages like Swig or
-embedded SQL. Also its relationship to make is analogous to C++'s relationship
+embedded SQL. Also its relationship to B<make> is analogous to C++'s relationship
 to C: it is almost 100% backward compatible but adds a number of new features
 and much better ways to write makefiles.
 
@@ -57,7 +57,8 @@ Various tips for making makepp go much faster.
 
 =item L<Perl Performance|perl_performance>
 
-Various tips for making Perl (within your makefiles and elsewhere) go faster.
+Various tips for making Perl programming (within your makefiles and elsewhere)
+go faster.
 
 =back
 
@@ -245,10 +246,10 @@ simply read something like this:
 
     CXX = g++
     CXXFLAGS = -g
- 
+
     %.o : %.c
     	$(CXX) $(CXXFLAGS) -c $(input) -o $(output)
- 
+
     my_program: *.o
     	$(CXX) $(inputs) -o $(output)
 

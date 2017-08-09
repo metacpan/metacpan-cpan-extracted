@@ -1,7 +1,7 @@
 package Config::IOD::Base;
 
-our $DATE = '2017-01-16'; # DATE
-our $VERSION = '0.32'; # VERSION
+our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.33'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,6 +28,7 @@ sub new {
     $attrs{enable_brace}    //= 1;
     $attrs{enable_tilde}    //= 1;
     $attrs{enable_expr}     //= 0;
+    $attrs{expr_vars}       //= {};
     $attrs{ignore_unknown_directive} //= 0;
     # allow_encodings
     # disallow_encodings
@@ -116,7 +117,7 @@ sub _parse_raw_value {
         $val =~ s/!(\w+)(\s+)// or return ("Invalid syntax in encoded value");
         my ($enc, $ws1) = ($1, $2);
 
-        my $res = [
+        my $res; $res = [
             "!$enc", # COL_V_ENCODING
             $ws1, # COL_V_WS1
             $1, # COL_V_VALUE
@@ -219,7 +220,7 @@ sub _parse_raw_value {
                  (\s*)
                  (?: ([;#])(.*) )?
                  \z/x or return ("Invalid syntax in quoted string value");
-        my $res = [
+        my $res; $res = [
             '"', # COL_V_ENCODING
             '', # COL_V_WS1
             $1, # VOL_V_VALUE
@@ -242,7 +243,7 @@ sub _parse_raw_value {
                      ([#;])(.*)
                  )?
                  \z/x or return ("Invalid syntax in bracketed array value");
-        my $res = [
+        my $res; $res = [
             '[', # COL_V_ENCODING
             '', # COL_V_WS1
             $1, # VOL_V_VALUE
@@ -265,7 +266,7 @@ sub _parse_raw_value {
                      ([#;])(.*)
                  )?
                  \z/x or return ("Invalid syntax in braced hash value");
-        my $res = [
+        my $res; $res = [
             '{', # COL_V_ENCODING
             '', # COL_V_WS1
             $1, # VOL_V_VALUE
@@ -284,7 +285,7 @@ sub _parse_raw_value {
                  (\s*)
                  (?: ([;#])(.*) )?
                  \z/x or return ("Invalid syntax in path value");
-        my $res = [
+        my $res; $res = [
             '~', # COL_V_ENCODING
             '', # COL_V_WS1
             $1, # VOL_V_VALUE
@@ -304,7 +305,7 @@ sub _parse_raw_value {
                  (\s*)
                  (?: ([#;])(.*) )?
                  \z/x or return ("Invalid syntax in value"); # shouldn't happen, regex should match any string
-        my $res = [
+        my $res; $res = [
             '', # COL_V_ENCODING
             '', # COL_V_WS1
             $1, # VOL_V_VALUE
@@ -432,7 +433,7 @@ sub _decode_expr {
 
     my ($self, $val) = @_;
     no strict 'refs';
-    local *{"Config::IOD::Expr::val"} = sub {
+    local *{"Config::IOD::Expr::_Compiled::val"} = sub {
         my $arg = shift;
         if ($arg =~ /(.+)\.(.+)/) {
             return $self->{_res}{$1}{$2};
@@ -485,15 +486,27 @@ sub _init_read {
     my $self = shift;
 
     $self->{_include_stack} = [];
+
+    # set expr variables
+    {
+        last unless $self->{enable_expr};
+        no strict 'refs';
+        my $pkg = \%{"Config::IOD::Expr::_Compiled::"};
+        undef ${"Config::IOD::Expr::_Compiled::$_"} for keys %$pkg;
+        my $vars = $self->{expr_vars};
+        ${"Config::IOD::Expr::_Compiled::$_"} = $vars->{$_} for keys %$vars;
+    }
 }
 
 sub _read_file {
     my ($self, $filename) = @_;
     open my $fh, "<", $filename
         or die "Can't open file '$filename': $!";
-    binmode($fh, ":utf8");
+    binmode($fh, ":encoding(utf8)");
     local $/;
-    return scalar <$fh>;
+    my $res = scalar <$fh>;
+    close $fh;
+    $res;
 }
 
 sub read_file {
@@ -529,7 +542,7 @@ Config::IOD::Base - Base class for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.32 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2017-01-16.
+This document describes version 0.33 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2017-08-05.
 
 =head1 EXPRESSION
 
@@ -568,6 +581,7 @@ The supported terms:
  number
  string (double-quoted and single-quoted)
  undef literal
+ simple variable ($abc, no namespace, no array/hash sigil, no special variables)
  function call (only the 'val' function is supported)
  grouping (parenthesis)
 
@@ -582,6 +596,9 @@ The C<val()> function refers to the configuration key. If the argument contains
 ".", it will be assumed as C<SECTIONNAME.KEYNAME>, otherwise it will access the
 current section's key. Since parsing is done in a single pass, you can only
 refer to the already mentioned key.
+
+Code will be compiled using Perl's C<eval()> in the
+C<Config::IOD::Expr::_Compiled> namespace, with C<no strict>, C<no warnings>.
 
 =for END_BLOCK: expression
 
@@ -770,7 +787,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

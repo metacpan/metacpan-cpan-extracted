@@ -3,7 +3,7 @@ package Specio::Constraint::AnyCan;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use B ();
 use List::Util 1.33 ();
@@ -34,8 +34,24 @@ with 'Specio::Constraint::Role::CanType';
         # inside the all block @_ gets redefined and we can no longer get at
         # the value.
         my $v = %s;
-        ( Scalar::Util::blessed($v) || ( !ref($v) ) )
-            && List::Util::all { $v->can($_) } %s;
+        (
+            Scalar::Util::blessed($v) || (
+                   defined($v)
+                && !ref($v)
+                && length($v)
+                && $v !~ /\A
+                          \s*
+                          -?[0-9]+(?:\.[0-9]+)?
+                          (?:[Ee][\-+]?[0-9]+)?
+                          \s*
+                          \z/xs
+
+                # Passing a GLOB from (my $glob = *GLOB) gives us a very weird
+                # scalar. It's not a ref and it has a length but trying to
+                # call ->can on it throws an exception
+                && ref( \$v ) ne 'GLOB'
+            )
+        ) && List::Util::all { $v->can($_) } %s;
         }
     )
 EOF
@@ -43,6 +59,10 @@ EOF
 
     sub _build_inline_generator {$_inline_generator}
 }
+
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _allow_classes {1}
+## use critic
 
 __PACKAGE__->_ooify;
 
@@ -62,7 +82,7 @@ Specio::Constraint::AnyCan - A class for constraints which require a class name 
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 

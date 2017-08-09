@@ -22,13 +22,20 @@ sub task {
     Pask::Task::add(@_);
 }
 
+sub database {
+    if (scalar @_ == 2) {
+        Pask::Container::set_database(@_);
+    } else {
+        Pask::Container::get_database(@_);
+    }
+}
+
 sub say {
     Pask::Storage::say(@_);
 }
 
 # list all tasks
 sub list {
-    use Data::Dumper;
     my $tasks = Pask::Container::get_tasks;
     my $i = 0;
     foreach (sort keys %$tasks) {
@@ -48,6 +55,9 @@ sub init {
     Pask::Storage::init_log_handle;
 
     Pask::Storage::register_all;
+
+    require (Pask::Container::get_user_boot_file) if -e Pask::Container::get_user_boot_file;
+    
     Pask::Task::register_all;
 }
 
@@ -56,7 +66,8 @@ sub fire {
         my $file_handle = Pask::Container::get_log_handle;
         
         my $task = Pask::Container::get_task $_[0];
-        Pask::Storage::error "Task name $_[0] is not exsit!" unless $task;        
+        Pask::Storage::error "Task name $_[0] is not exsit!" unless $task;
+        Pask::Parameter::init;
         print $file_handle "--- Task [", $task->{"name"}, "] Begin ---\n";
         my $timing = time;
 

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+README
+LICENSE
+Makefile.PL
+lib/Centrifugo/Client.pm
+t/01_connect.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

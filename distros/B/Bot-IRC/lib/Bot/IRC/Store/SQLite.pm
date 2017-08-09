@@ -9,7 +9,7 @@ use DBI;
 use DBD::SQLite;
 use JSON::XS;
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -89,7 +89,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.16
+version 1.18
 
 =head1 SYNOPSIS
 

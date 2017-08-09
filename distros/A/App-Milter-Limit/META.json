@@ -1,0 +1,87 @@
+{
+   "abstract" : "Sendmail Milter that limits message rate by sender",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Milter-Limit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Signature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Class::Singleton" : "0",
+            "Config::Tiny" : "0",
+            "Exporter" : "0",
+            "File::Path" : "2.0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Proc::PID::File" : "0",
+            "Sendmail::PMilter" : "0.98",
+            "Sys::Syslog" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Section" : "0",
+            "Fatal" : "0",
+            "Net::Milter" : "0",
+            "Path::Tiny" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0",
+            "Text::Template" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-app-milter-limit at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-Milter-Limit/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/milter-limit.git",
+         "web" : "https://github.com/mschout/milter-limit"
+      }
+   },
+   "version" : "0.53",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,5 @@
+BEGIN:VCARD
+VERSION:4.0
+ADR:;;street;city;region;post_code;country
+ADR:;;another street;city;region;post_code;country
+END:VCARD

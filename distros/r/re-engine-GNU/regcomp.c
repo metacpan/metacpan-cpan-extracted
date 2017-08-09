@@ -3561,13 +3561,13 @@ build_charclass (pTHX_ RE_TRANSLATE_TYPE trans, bitset_t sbcset,
     if (BE (trans != NULL, 0))			\
       {						\
 	for (i = 0; i < SBC_MAX; ++i)		\
-	  if (ctype_func ((char)i))              \
+	  if (ctype_func (i))                    \
 	    bitset_set (aTHX_ sbcset, trans[i]); \
       }						\
     else					\
       {						\
 	for (i = 0; i < SBC_MAX; ++i)		\
-	  if (ctype_func ((char)i))             \
+	  if (ctype_func (i))                   \
 	    bitset_set (aTHX_ sbcset, i);       \
       }						\
   } while (0)

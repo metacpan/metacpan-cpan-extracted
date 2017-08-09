@@ -1,4 +1,4 @@
-# $Id: Glob.pm,v 1.42 2012/05/15 21:26:29 pfeiffer Exp $
+# $Id: Glob.pm,v 1.49 2016/09/28 20:36:49 pfeiffer Exp $
 
 package Mpp::Glob;
 
@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(chdir);	# Force our caller to use our chdir sub that
 				# we inherit from Mpp::File.
-our @EXPORT_OK = qw(zglob zglob_fileinfo $allow_dot_files wildcard_do);
+our @EXPORT_OK = qw(zglob zglob_fileinfo wildcard_do);
 
 use strict;
 
@@ -72,7 +72,7 @@ Mpp::File package for more details.
 
 =cut
 
-$Mpp::Glob::allow_dot_files = 0;	# Don't return any files beginning with '.'.
+our $allow_dot_files = 0;	# Don't return any files beginning with '.'.
 
 sub zglob {
   map relative_filename($_,$_[1]), &zglob_fileinfo;
@@ -97,11 +97,7 @@ sub zglob_fileinfo_atleastone {
 sub zglob_fileinfo {
   local $_ = $_[0];		# Access the filename or wildcard.
   m@^/\*\*@ and die "Refusing to expand /** as wildcard--you don't want to search every directory in the file system\n";
-  my $startdir = $_[1] || $CWD_INFO;
-				# Get the current directory.
-  my $dont_follow_soft = $_[2];
-  my $phony = $_[3] ? 1 : 0;
-  my $stale = $_[4] ? 1 : 0;
+  my( undef, $startdir, $dont_follow_soft, $phony, $stale ) = @_;
 
   my $is_wildcard = 0;		# We haven't seen a wildcard yet.
 
@@ -117,25 +113,25 @@ sub zglob_fileinfo {
 				# strip out the leading /.
   my @pieces = split /\/+/;	# Get the pieces of the filename, and
 				# examine each one of them separately.
-  my @new_candidates = ($startdir); # Directories that are possible.  At first,
+  my @new_candidates = ($startdir || $CWD_INFO); # Directories that are possible.  At first,
 				# there is only the starting directory.
 
-  while ($_ = shift @pieces) {
+  while( $_ = shift @pieces ) {
     my @candidate_dirs = $dont_follow_soft ?
-      grep($_->{DIRCONTENTS} && !Mpp::File::is_symbolic_link( $_ ) ||
-	   is_or_will_be_dir( $_ ),
-	   @new_candidates) :
-      grep($_->{DIRCONTENTS} || is_or_will_be_dir( $_ ), @new_candidates);
+      grep( $_->{DIRCONTENTS} && !Mpp::File::is_symbolic_link( $_ ) ||
+	is_or_will_be_dir( $_ ),
+	@new_candidates ) :
+      grep( $_->{DIRCONTENTS} || is_or_will_be_dir( $_ ), @new_candidates );
 				# Discard everything that isn't a directory,
 				# since we have to look for files in it.
 				# (Note that we will return files that are
 				# in directories that don't exist yet.)
 
-    if ($Mpp::implicitly_load_makefiles) { # Should wildcards trigger loading?
+    if( $Mpp::implicitly_load_makefiles ) { # Should wildcards trigger loading?
 				# We have to do this before scanning the
 				# directory, since loading the makefile
 				# may make extra files appear.
-      Mpp::Makefile::implicitly_load($_) for @candidate_dirs;
+      exists $_->{MAKEINFO} or Mpp::Makefile::implicitly_load( $_ ) for @candidate_dirs;
     }
 
 
@@ -152,33 +148,24 @@ sub zglob_fileinfo {
     }
 
 #
-# The remaining wildcards match only files within these directories.  Convert
-# them to regular expressions:
+# The remaining wildcards match only files within these directories.
 #
-    my $file_regex_or_name = /[[?*]/ ? wild_to_regex($_) : $_;
-				# Convert to a regular expression.
-
-#
-# At this point, $file_regex contains a regular expression that corresponds
-# to the wildcard.  It's possible, however, that there were wildcard characters
-# but they were all preceded by a backslash.
-#
-    my @phony_expr = (@pieces ? () : ($phony, $stale, 1)); # Set $no_last_chance
-    if( ref $file_regex_or_name ) { # Was there actually a wildcard?
-      my $allow_dotfiles = $Mpp::Glob::allow_dot_files || /^\./;
-				# Allow dot files if we're automatically
-				# accepting them, or if they are explicitly
-				# specified.
-      for( @candidate_dirs ) { # Look for the file in each of the possible directories.
-	$_->{READDIR} or Mpp::File::read_directory( $_ ); # Load the list of filenames.
+    my @phony_expr = @pieces ? (0) : ($phony, $stale, 1); # Set $no_last_chance
+    if( /[[?*]/ ) { # Was there actually a wildcard?
+      my $re = wild_to_regex( $_, 3 ); # Convert to a regular expression.
+      my $allow_dotfiles = $allow_dot_files || ord( '.' ) == ord;
+				# Allow dot files if we're automatically accepting
+				# them, or if they are explicitly specified.
+      for my $dir ( @candidate_dirs ) { # Look for the file in each of the possible directories.
+	$dir->{READDIR} or Mpp::File::read_directory $dir; # Load the list of filenames.
 				# This also correctly sets the xEXISTS flag
 	# Sometimes DIRCONTENTS changes inside this loop, which messes up
 	# the 'each' operator.  The fix is to make a static copy:
-	my %dircontents = %{$_->{DIRCONTENTS}};
+	my %dircontents = %{$dir->{DIRCONTENTS}};
 	while( my( $fname, $finfo ) = each %dircontents ) {
-	  next if !$allow_dotfiles and $fname =~ /^\./;
-	  next unless $fname =~ /^$file_regex_or_name$/;
-	  Mpp::File::exists_or_can_be_built( $finfo, @phony_expr ) and # File must exist, or
+	  next unless $allow_dotfiles || ord( $fname ) != ord '.'
+	    and $fname =~ $re;
+	  Mpp::File::exists_or_can_be_built $finfo, @phony_expr and # File "exist"s, as per phony, etc.
 	    push @new_candidates, $finfo;
 	}
       }
@@ -196,17 +183,17 @@ sub zglob_fileinfo {
 	push @new_candidates, $dir;
       }
       else {
-	$dir->{READDIR} or Mpp::File::read_directory( $dir ); # Load the list of filenames.
-	my $finfo = $dir->{DIRCONTENTS}{$file_regex_or_name}; # See if this entry exists.
-	$finfo && Mpp::File::exists_or_can_be_built( $finfo, @phony_expr ) &&
-	  push(@new_candidates, $finfo);
+	$dir->{READDIR} or Mpp::File::read_directory $dir; # Load the list of filenames.
+	my $finfo = $dir->{DIRCONTENTS}{$_}; # See if this entry exists.
+	push @new_candidates, $finfo if
+	  $finfo && Mpp::File::exists_or_can_be_built $finfo, @phony_expr;
       }
     }
 
   }
 
   sort { $a->{NAME} cmp $b->{NAME} ||
-	   absolute_filename( $a ) cmp absolute_filename( $b ) } @new_candidates;
+	   absolute_filename( $a ) cmp absolute_filename $b } @new_candidates;
 				# Return a sorted list of matching files.
 }
 
@@ -288,10 +275,10 @@ sub find_real_subdirs {
   for( values %{$dirinfo->{DIRCONTENTS}} ) {
     if( $_->{LSTAT} && is_dir $_ ) {
       push @subdirs, $_		# Note this directory.
-	unless /^\./ && !$Mpp::Glob::allow_dot_files;
+	if $allow_dot_files || ord( '.' ) != ord;
 				# Skip dot directories.
       --$expected_subdirs;	# We got one of the expected subdirs.
-      return @subdirs if !$expected_subdirs; # We got them all.
+      return @subdirs unless $expected_subdirs; # We got them all.
     }
   }
 
@@ -347,7 +334,7 @@ sub find_real_subdirs {
 				# Look at each file in the directory.
     if( is_dir $finfo ) {
       push @subdirs, $finfo	# Note this directory.
-	unless /^\./ && !$Mpp::Glob::allow_dot_files;
+	if $allow_dot_files || ord( '.' ) != ord;
 				# Skip dot directories.
       --$expected_subdirs;	# We got one of the expected subdirs.
       last if !$expected_subdirs;
@@ -375,7 +362,7 @@ $Mpp::Glob::allow_dot_files is true.
 sub find_all_subdirs_recursively {
   my @subdirs;
 
-  if ($Mpp::Glob::allow_dot_files) {
+  if( $allow_dot_files ) {
     @subdirs = &find_all_subdirs; # Start with the list of our subdirs.
     for (my $subdir_idx = 0; $subdir_idx < @subdirs; ++$subdir_idx) {
 				# Use this kind of loop because we'll be adding
@@ -474,7 +461,7 @@ sub wild_to_regex {
     lc;				# Not case sensitive--switch to lc.
 }
 
-=head2 Mpp::Glob::wildcard_do
+=head2 wildcard_do
 
 You generally should not call this subroutine directly; it's intended to be
 called from the chain of responsibility handled by wildcard_do.
@@ -485,16 +472,17 @@ dependencies.  Usage:
   wildcard_do {
     my( $finfo, $plain ) = @_;
     ...
-  } [\1,] @wildcards;
+  } [\1|\2,] @wildcards;
 
 The block is called once for each file that matches the wildcards.  If at some
 later time, files which match the wildcard are created (or we find rules to
 build them), then the block is called again.  (Internally, this is done by
 Mpp::File::publish, which is called automatically whenever a file which didn't
-used to exist now exists, or whenever a build rule is specified for a file
+use to exist now exists, or whenever a build rule is specified for a file
 which does not currently exist.)
 
-An optional reference as 2nd parameter means this is from a last chance rule.
+An optional reference as 2nd parameter, if it is \1 means this is from a last
+chance rule.  If it is \2 do not return phonies.
 
 You can specify non-wildcards as arguments to wildcard_do.  In this case, the
 block is called once for each of the files explicitly listed, even if they
@@ -539,7 +527,9 @@ this case.
 =cut
 
 sub wildcard_do(&@) {
-  my( $subr, $last_chance ) = splice @_, 0, ref( $_[1] ) ? 2 : 1;
+  my( $subr, $flags ) = splice @_, 0, ref( $_[1] ) ? 2 : 1;
+  my ( $last_chance, $no_phony ) = ($$flags & 1, $$flags & 2 ? 0 : undef)
+    if $flags;
   my $member = $last_chance ? 'LAST_CHANCE' : 'WILDCARD_DO';
 
 #
@@ -586,14 +576,14 @@ sub wildcard_do(&@) {
 # a regular expression that matches:
 #
     my $idx = 0;
-    while ($idx < @file_pieces) {
-      if ($file_pieces[$idx] eq '.') { # Remove useless './' components
-	splice(@file_pieces, $idx, 1); # (since they will mess up the regex).
+    while( $idx < @file_pieces ) {
+      if( $file_pieces[$idx] eq '.' ) { # Remove useless './' components
+	splice @file_pieces, $idx, 1; # (since they will mess up the regex).
 	next;			# Go back to top without incrementing idx.
       }
 
-      if ($file_pieces[$idx] eq '..') { # At least give a warning message
-	warn "$0: .. is not supported after a wildcard
+      if( $file_pieces[$idx] eq '..' ) { # At least give a warning message
+	warn ".. is not supported after a wildcard
   in the wildcard expression \"$filename\".
   This will only match existing files.\n";
 				# Let user know this will not do what he thinks.
@@ -605,7 +595,7 @@ sub wildcard_do(&@) {
     local $_ = join '/', @file_pieces;
     $need_dir ||= 1 if $file_pieces[-1] =~ /\*\*/;
     unless( $last_chance ) {
-      for my $finfo ( zglob_fileinfo $_, $dirinfo, 1 ) {
+      for my $finfo ( zglob_fileinfo $_, $dirinfo, 1, $no_phony ) {
 	next if $need_dir && !Mpp::File::is_or_will_be_dir $finfo;
 	$finfo->{PUBLISHED}=2 if $Mpp::rm_stale_files;
 				# Don't also call $subr later if it looks like

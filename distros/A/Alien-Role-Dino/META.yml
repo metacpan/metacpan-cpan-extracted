@@ -1,0 +1,36 @@
+---
+abstract: 'Experimental support for dynamic share Alien install'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::Mock: '0.000060'
+  Test2::V0: '0.000060'
+  Test::Alien: '0'
+  Test::Alien::Build: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Role-Dino
+requires:
+  Alien::Autotools: '0.99'
+  Alien::Base: '0.74'
+  Alien::Build: '0.74'
+  Alien::Build::Plugin: '0'
+  Class::Method::Modifiers: '0'
+  FFI::CheckLib: '0'
+  Path::Tiny: '0'
+  Role::Tiny: '1.003001'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Alien-Role-Dino/issues
+  homepage: https://metacpan.org/pod/Alien::Role::Dino
+  repository: git://github.com/plicease/Alien-Role-Dino.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

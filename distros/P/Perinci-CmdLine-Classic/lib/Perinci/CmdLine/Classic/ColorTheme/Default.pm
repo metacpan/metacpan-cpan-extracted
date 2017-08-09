@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic::ColorTheme::Default;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '1.76'; # VERSION
+our $DATE = '2017-07-31'; # DATE
+our $VERSION = '1.770'; # VERSION
 
 use 5.010;
 use strict;
@@ -57,7 +57,7 @@ Perinci::CmdLine::Classic::ColorTheme::Default - Default color themes
 
 =head1 VERSION
 
-This document describes version 1.76 of Perinci::CmdLine::Classic::ColorTheme::Default (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-14.
+This document describes version 1.770 of Perinci::CmdLine::Classic::ColorTheme::Default (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-31.
 
 =head1 HOMEPAGE
 

@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+use strict;
+use blib;
+use XAO::Utils;
+use XAO::Cache;
+use Benchmark;
+
+XAO::Utils::set_debug(1);
+
+my $chunk=10000;
+
+my $counter=0;
+my $cache=XAO::Cache->new(
+    retrieve    => sub {
+        my $args=get_args(\@_);
+        return {
+            data    => 'Z' x 200,
+            name    => $args->{name},
+            counter => $counter++,
+        };
+    },
+    expire      => 3600,
+    size        => 100,
+    coords      => 'name',
+);
+
+my %table;
+
+$table{'continous cached'}=timeit($chunk*10,
+    sub {
+        $cache->get(name => 'aaaa');
+    });
+
+my $border=0;
+$table{'filling up'}=timeit($chunk/2,
+    sub {
+        $cache->get(name => $border++);
+    });
+
+sleep(2);
+$table{'random get'}=timeit($chunk*2,
+    sub {
+        $cache->get(name => int(rand(500)));
+    });
+
+print "-" x 79, "\n";
+foreach my $id (sort keys %table) {
+    print "$id:\n",
+          timestr($table{$id}), "\n";
+}
+print "-" x 79, "\n";
+
+exit(0);

@@ -1,5 +1,8 @@
 Revision history for Convert-CookingTimes
 
+0.03    2017-08-02
+        - Bugfix: sort numerically, so we don't fuck up
+
 0.02    2017-03-10
         - Condense multiple steps with same required time into one step.
 

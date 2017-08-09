@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+#
+# Bass grind with cresc.
+
+use 5.14.0;
+use warnings;
+use MIDI;
+use Music::RecRhythm 0.04;
+
+my $midi_filename = shift // 'grind.midi';
+
+my $track1 = Music::RecRhythm->new(
+    set       => [qw/2 2 1 2 2 2 1 2 2 2 1 2 2 1 2 2 1 2 2 2 1/],
+    is_silent => 1
+);
+my $track2 = $track1->rebuild;
+
+$track1->next( Music::RecRhythm->new( set => [qw/1 2/] ) );
+$track1->next->extra(
+    { beat_sum => 0, midi => new_track(), offset => 0, transpose => 0 } );
+
+$track2->next( Music::RecRhythm->new( set => [qw/2 1/] ) );
+$track2->next->extra(
+    { beat_sum => 0, midi => new_track(), offset => 0, transpose => 7 } );
+
+$track1->recurse( \&callback );
+$track2->recurse( \&callback );
+
+my $opus = MIDI::Opus->new(
+    {   ticks  => 384,
+        tracks => [ map { $_->next->extra->{midi} } $track1, $track2 ]
+    }
+);
+$opus->write_to_file($midi_filename);
+
+sub callback {
+    my ( $rset, $param, undef, @beats ) = @_;
+    my $extra = $rset->extra;
+
+    # this complication is from the original code where the beat_sum
+    # increment also happened for the silenced parent track beats
+    if ( $param->{index} == 0 ) {
+        $extra->{beat_sum} = $extra->{parent_sum} += $beats[-2];
+    }
+    $extra->{beat_sum} += $beats[-1];
+
+    my $duration  = $param->{duration} * 128;
+    my $onset_dur = $duration - 16 + int( rand 16 );
+
+    my $pitch = 31 + $extra->{transpose} + ( $extra->{beat_sum} & 1 );
+    my $velo = 42 + $extra->{beat_sum};
+
+    $extra->{midi}->new_event( 'note_on', $extra->{offset}, 0, $pitch, $velo );
+    $extra->{midi}->new_event( 'note_on', $onset_dur,       0, $pitch, 0 );
+
+    $extra->{offset} = $duration - $onset_dur;
+}
+
+sub new_track {
+    my %param = @_;
+    $param{channel} //= 0;
+    $param{patch}   //= 34;
+    $param{tempo}   //= 535000;
+    my $track = MIDI::Track->new;
+    $track->new_event( 'set_tempo', 0, $param{tempo} );
+    $track->new_event( 'patch_change', 0, $param{channel}, $param{patch} );
+    return $track;
+}

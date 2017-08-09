@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.1.0';
+$Git::Hooks::VERSION = '2.1.3';
 use 5.010;
 use strict;
 use warnings;
@@ -44,7 +44,7 @@ sub run_hook {
 
     my $git = Git::Repository->new();
 
-    my $hook_basename = $git->prepare_hook($hook_name, @args);
+    my $hook_basename = $git->prepare_hook($hook_name, \@args);
 
     $git->load_plugins();
 
@@ -107,7 +107,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.1.0
+version 2.1.3
 
 =head1 SYNOPSIS
 

@@ -1,24 +1,20 @@
-use strict;
-use warnings;
+use Test2::V0 -no_srand => 1;
 use FindBin;
-use Test::More tests => 2;
 use FFI::TinyCC;
 use File::chdir;
 use File::Temp qw( tempdir );
 use Archive::Ar 2.02;
 use Config;
-use Path::Class qw( file dir );
+use Path::Tiny qw( path );
 
-my $srcdir = dir($FindBin::Bin, 'c');
-my $libdir = dir(tempdir( CLEANUP => 1 ), 'lib');
+my $srcdir = path($FindBin::Bin, 'c');
+my $libdir = path(tempdir( CLEANUP => 1 ), 'lib');
 mkdir $libdir;
 my $opt = "-I$srcdir";
 
 note "libdir=$libdir";
 
 subtest 'create lib' => sub {
-
-  plan tests => 4;
 
   local $CWD = tempdir( CLEANUP => 1 );
   
@@ -28,14 +24,12 @@ subtest 'create lib' => sub {
   foreach my $name (qw( one two three ))
   {
     subtest "compile $name" => sub {
-      plan tests => 5;
-    
       my $tcc = FFI::TinyCC->new;
       
       eval { $tcc->set_options($opt) };
       is $@, '', "tcc.set_options($opt)";
 
-      my $cfile = file($srcdir, "$name.c");
+      my $cfile = path($srcdir, "$name.c");
       
       eval { $tcc->set_output_type('obj') };
       is $@, '', 'tcc.set_output_type(obj)';
@@ -54,16 +48,13 @@ subtest 'create lib' => sub {
   }
   
   subtest "create libonetwothree.a" => sub {
-    plan tests => 1;
-    my $filename = file($libdir, 'libonetwothree.a');
+    my $filename = path($libdir, 'libonetwothree.a');
     my $r = $ar->write("$filename");
     isnt $r, undef, "ar.write($filename)";
   };
 };
 
 subtest 'use lib' => sub {
-
-  plan tests => 5;
 
   my $tcc = FFI::TinyCC->new;
   
@@ -73,7 +64,7 @@ subtest 'use lib' => sub {
   eval { $tcc->add_library_path($libdir) };
   is $@, '', "tcc.add_library_path($libdir)";
 
-  my $main = file($srcdir, 'main.c');
+  my $main = path($srcdir, 'main.c');
   eval { $tcc->add_file($main) };
   is $@, '', "tcc.add_file($main)";
 
@@ -84,3 +75,5 @@ subtest 'use lib' => sub {
   note $@ if $@;
 
 };
+
+done_testing;

@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ requires:
   File::Path: '2.08'
   File::Which: '0'
   File::chdir: '0'
-  Log::ger: '0.015'
+  Log::ger: '0.019'
   POSIX: '0'
   String::ShellQuote: '0'
   Time::Local: '0'
@@ -35,11 +35,11 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-RsyBak
   homepage: https://metacpan.org/release/File-RsyBak
-  repository: git://github.com/perlancar/perl-File-RsyBak.git
-version: '0.34'
+  repository: git://github.com/sharyanto/perl-File-RsyBak.git
+version: '0.35'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.024000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -53,62 +53,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/@Filter/GatherDir'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/@Filter/PruneCruft'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/@Filter/ManifestSkip'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/@Filter/MetaYAML'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/@Filter/License'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Filter/@Filter/PodCoverageTests'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/@Filter/PodSyntaxTests'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/@Filter/ExtraTests'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/@Filter/ExecDir'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/@Filter/ShareDir'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/@Filter/MakeMaker'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/@Filter/Manifest'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/@Filter/ConfirmRelease'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir script'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
@@ -148,11 +148,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@Filter/Authority'
@@ -180,55 +180,55 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -256,11 +256,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
@@ -272,11 +272,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
-              version: '0.163250'
+              version: '0.121550'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.015'
+              version: '4.013'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
@@ -286,7 +286,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Filter/PruneFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Filter/Pod2Readme'
@@ -318,9 +318,8 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
-          switch: []
       name: '@Filter/Test::Compile'
-      version: '2.056'
+      version: '2.054'
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Filter/Test::Rinci'
@@ -340,11 +339,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
       name: '@Filter/Acme::CPANLists::Blacklist'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Filter/Prereqs::EnsureVersion'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Filter/Prereqs::CheckCircular'
@@ -364,7 +363,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -372,7 +371,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Extras
       name: 'lint-prereqs / assume-provided'
@@ -384,52 +383,52 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.009'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.009'
+      version: '6.008'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.009'
+    version: '6.008'
 x_Dist_Zilla_Plugin_Depak:
   packed_dists:
     Capture-Tiny: 0
@@ -458,6 +457,7 @@ x_Dist_Zilla_Plugin_Depak:
     Data-Sah-Normalize: 0
     Data-Sah-Resolve: 0
     Data-Sah-Util-Type: 0
+    Encode-Locale: 0
     File-Flock-Retry: 0
     File-RsyBak: 0
     File-ShareDir: 0
@@ -468,12 +468,17 @@ x_Dist_Zilla_Plugin_Depak:
     Function-Fallback-CoreOrPP: 0
     Getopt-Long-Negate-EN: 0
     Getopt-Long-Util: 0
+    HTTP-Date: 0
+    HTTP-Message: 0
     HTTP-Tiny: 0
     HTTP-Tiny-UNIX: 0
+    IO-HTML: 0
     IO-Tty: 0
     IPC-Run: 0
     IPC-System-Options: 0
+    JSON: 0
     JSON-PP: 0
+    LWP-MediaTypes: 0
     Lingua-EN-Numbers-Ordinate: 0
     Lingua-EN-PluralToSingular: 0
     Log-ger: 0
@@ -524,18 +529,19 @@ x_Dist_Zilla_Plugin_Depak:
     Text-sprintfn: 0
     Tie-IxHash: 0
     Time-Duration: 0
+    URI: 0
     YAML-Old: 0
     experimental: 0
   packed_modules:
-    Capture::Tiny: '0.46'
-    Class::Inspector: '1.31'
-    Class::Inspector::Functions: '1.31'
-    Clone::PP: 1.07
+    Capture::Tiny: '0.44'
+    Class::Inspector: '1.28'
+    Class::Inspector::Functions: '1.28'
+    Clone::PP: 1.06
     Color::ANSI::Util: '0.15'
     Complete::Bash: '0.31'
     Complete::Common: '0.22'
     Complete::Env: '0.39'
-    Complete::File: '0.42'
+    Complete::File: '0.43'
     Complete::Fish: '0.05'
     Complete::Getopt::Long: '0.46'
     Complete::Path: '0.24'
@@ -545,7 +551,7 @@ x_Dist_Zilla_Plugin_Depak:
     Config::IOD::Base: '0.32'
     Config::IOD::Expr: '0.32'
     Config::IOD::Reader: '0.32'
-    Data::Check::Structure: '0.03'
+    Data::Check::Structure: '0.04'
     Data::Clean: '0.49'
     Data::Clean::FromJSON: '0.38'
     Data::Clean::JSON: '0.38'
@@ -666,9 +672,10 @@ x_Dist_Zilla_Plugin_Depak:
     Data::Sah::Util::Type: '0.46'
     Data::Sah::Util::Type::Date: '0.88'
     Data::Sah::Util::TypeX: '0.88'
+    Encode::Locale: '1.05'
     File::Flock::Retry: '0.62'
-    File::RsyBak: '0.34'
-    File::RsyBak::Packed: '0.34'
+    File::RsyBak: '0.35'
+    File::RsyBak::Packed: '0.35'
     File::ShareDir: '1.102'
     File::ShareDir::Tarball: 0.2.2
     File::Slurper: '0.009'
@@ -677,40 +684,54 @@ x_Dist_Zilla_Plugin_Depak:
     Function::Fallback::CoreOrPP: '0.08'
     Getopt::Long::Negate::EN: '0.05'
     Getopt::Long::Util: '0.88'
-    HTTP::Tiny: '0.070'
+    HTTP::Config: '6.11'
+    HTTP::Date: '6.02'
+    HTTP::Headers: '6.11'
+    HTTP::Headers::Auth: '6.11'
+    HTTP::Headers::ETag: '6.11'
+    HTTP::Headers::Util: '6.11'
+    HTTP::Message: '6.11'
+    HTTP::Request: '6.11'
+    HTTP::Request::Common: '6.11'
+    HTTP::Response: '6.11'
+    HTTP::Status: '6.11'
+    HTTP::Tiny: '0.056'
     HTTP::Tiny::UNIX: '0.04'
+    IO::HTML: '1.001'
     IO::Pty: '1.12'
     IO::Tty: '1.12'
-    IPC::Run: '0.96'
-    IPC::Run::Debug: '0.96'
-    IPC::Run::IO: '0.96'
-    IPC::Run::Timer: '0.96'
-    IPC::Run::Win32Helper: '0.96'
-    IPC::Run::Win32IO: '0.96'
-    IPC::Run::Win32Pump: '0.96'
+    IPC::Run: '0.94'
+    IPC::Run::Debug: '0.90'
+    IPC::Run::IO: '0.90'
+    IPC::Run::Timer: '0.90'
+    IPC::Run::Win32Helper: '0.90'
+    IPC::Run::Win32IO: '0.90'
+    IPC::Run::Win32Pump: '0.90'
     IPC::System::Options: '0.32'
-    JSON::PP: 2.27400_02
+    JSON: '2.90'
+    JSON::PP: '2.27300'
     JSON::PP::Boolean: ~
+    LWP::MediaTypes: '6.02'
     Lingua::EN::Numbers::Ordinate: '1.04'
-    Lingua::EN::PluralToSingular: '0.19'
-    Log::ger: '0.019'
+    Lingua::EN::PluralToSingular: '0.18'
+    Log::ger: '0.020'
     Log::ger::App: '0.003'
-    Log::ger::Format: '0.019'
-    Log::ger::Format::None: '0.019'
-    Log::ger::Heavy: '0.019'
-    Log::ger::Layout: '0.019'
+    Log::ger::Format: '0.020'
+    Log::ger::Format::None: '0.020'
+    Log::ger::Heavy: '0.020'
+    Log::ger::Layout: '0.020'
     Log::ger::Layout::Pattern: '0.001'
-    Log::ger::Output: '0.019'
-    Log::ger::Output::Array: '0.019'
+    Log::ger::Output: '0.020'
+    Log::ger::Output::Array: '0.020'
     Log::ger::Output::Composite: '0.007'
     Log::ger::Output::File: '0.002'
-    Log::ger::Output::Null: '0.019'
+    Log::ger::Output::Null: '0.020'
     Log::ger::Output::Screen: '0.005'
-    Log::ger::Output::String: '0.019'
+    Log::ger::Output::String: '0.020'
     Log::ger::Output::Syslog: '0.001'
-    Log::ger::Plugin: '0.019'
-    Log::ger::Plugin::MultilevelLog: '0.019'
-    Log::ger::Util: '0.019'
+    Log::ger::Plugin: '0.020'
+    Log::ger::Plugin::MultilevelLog: '0.020'
+    Log::ger::Util: '0.020'
     Mo: '0.40'
     Mo::Golf: '0.40'
     Mo::Inline: '0.40'
@@ -737,9 +758,9 @@ x_Dist_Zilla_Plugin_Depak:
     PERLANCAR::Module::List: '0.003005'
     Perinci::Access::Lite: '0.14'
     Perinci::AccessUtil: '0.06'
-    Perinci::CmdLine::Base: '1.76'
-    Perinci::CmdLine::Help: '0.14'
-    Perinci::CmdLine::Lite: '1.76'
+    Perinci::CmdLine::Base: '1.77'
+    Perinci::CmdLine::Help: '0.16'
+    Perinci::CmdLine::Lite: '1.77'
     Perinci::CmdLine::Util::Config: '1.71'
     Perinci::Object: '0.30'
     Perinci::Object::EnvResult: '0.30'
@@ -755,7 +776,7 @@ x_Dist_Zilla_Plugin_Depak:
     Perinci::Sub::ConvertArgs::Argv: '0.10'
     Perinci::Sub::ConvertArgs::Array: '0.08'
     Perinci::Sub::DepChecker: '0.11'
-    Perinci::Sub::GetArgs::Argv: '0.81'
+    Perinci::Sub::GetArgs::Argv: '0.82'
     Perinci::Sub::GetArgs::Array: '0.16'
     Perinci::Sub::Normalize: '0.19'
     Perinci::Sub::To::CLIDocData: '0.28'
@@ -769,8 +790,8 @@ x_Dist_Zilla_Plugin_Depak:
     Progress::Any::Output::Null: '0.20'
     Progress::Any::Output::TermProgressBarColor: '0.23'
     Regexp::Stringify: '0.06'
-    Role::Tiny: '2.000005'
-    Role::Tiny::With: '2.000005'
+    Role::Tiny: '2.000003'
+    Role::Tiny::With: '2.000003'
     Sah::Schema::rinci::function_meta: 1.1.82.2
     Sah::Schema::rinci::meta: 1.1.82.2
     Sah::Schema::rinci::result_meta: 1.1.82.2
@@ -796,7 +817,50 @@ x_Dist_Zilla_Plugin_Depak:
     Text::sprintfn: '0.08'
     Tie::IxHash: '1.23'
     Time::Duration: '1.20'
-    YAML::Old: '1.23'
+    URI: '1.71'
+    URI::Escape: '3.31'
+    URI::Heuristic: '4.20'
+    URI::IRI: '1.71'
+    URI::QueryParam: '1.71'
+    URI::Split: '1.71'
+    URI::URL: '5.04'
+    URI::WithBase: '2.20'
+    URI::data: '1.71'
+    URI::file: '4.21'
+    URI::file::Base: '1.71'
+    URI::file::FAT: '1.71'
+    URI::file::Mac: '1.71'
+    URI::file::OS2: '1.71'
+    URI::file::QNX: '1.71'
+    URI::file::Unix: '1.71'
+    URI::file::Win32: '1.71'
+    URI::ftp: '1.71'
+    URI::gopher: '1.71'
+    URI::http: '1.71'
+    URI::https: '1.71'
+    URI::ldap: '1.71'
+    URI::ldapi: '1.71'
+    URI::ldaps: '1.71'
+    URI::mailto: '1.71'
+    URI::mms: '1.71'
+    URI::news: '1.71'
+    URI::nntp: '1.71'
+    URI::pop: '1.71'
+    URI::rlogin: '1.71'
+    URI::rsync: '1.71'
+    URI::rtsp: '1.71'
+    URI::rtspu: '1.71'
+    URI::sftp: '1.71'
+    URI::sip: '1.71'
+    URI::sips: '1.71'
+    URI::snews: '1.71'
+    URI::ssh: '1.71'
+    URI::telnet: '1.71'
+    URI::tn3270: '1.71'
+    URI::urn: '1.71'
+    URI::urn::isbn: ~
+    URI::urn::oid: '1.71'
+    YAML::Old: '1.07'
     YAML::Old::Dumper: ~
     YAML::Old::Dumper::Base: ~
     YAML::Old::Error: ~
@@ -809,5 +873,5 @@ x_Dist_Zilla_Plugin_Depak:
     YAML::Old::Types: ~
     experimental: '0.016'
 x_authority: cpan:PERLANCAR
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.69'
 x_static_install: 1

@@ -1,4 +1,4 @@
-# $Id: Scanner.pm,v 1.60 2012/10/14 15:16:14 pfeiffer Exp $
+# $Id: Scanner.pm,v 1.65 2015/07/13 20:52:23 pfeiffer Exp $
 
 =head1 NAME
 
@@ -112,8 +112,11 @@ Tags can be anything you want, as long as they are lowercase, for example
 "user" and "sys" for the C double-quote include path and angle-bracket include
 path, respectively.
 
-An undefined $path represents the directory in which
-the file containing the include directive resides.
+An undefined $path represents the directory in which the file containing the
+include directive resides.  A path matching /^in :/ is followed by an
+alternate tag to look in.  A path matching /^in ;?/ is followed by an
+environment variable to look in.  The optional ';' means to split on that
+(even when running under Cygwin).
 
 =cut
 
@@ -130,31 +133,39 @@ sub get_tagname {
 }
 sub add_include_dir {
   my ($self, $tag, $path, $front)=@_;
-  if(defined $path) {
-    my $dirinfo=$self->get_file_info($path);
-    if( is_or_will_be_dir $dirinfo ) {
-      # NOTE: INCLUDE_DIRS can hold dirinfos instead of
-      # directory names because if the directory from which
-      # an include file is picked up changes due to a
-      # retargeted symbolic link, then a re-scan gets forced
-      # (once the retargeting detection logic is added).
-      if($front) {
-	unshift @{$self->{$tag}[INCLUDE_DIRS]}, $dirinfo;
+  if( defined $path ) {
+    if( $path =~ /^in / ) {
+      if( $front ) {
+	unshift @{$self->{$tag}[INCLUDE_DIRS]}, $path;
       } else {
-	push @{$self->{$tag}[INCLUDE_DIRS]}, $dirinfo;
+	push @{$self->{$tag}[INCLUDE_DIRS]}, $path;
       }
+      $self->{RULE}->add_include_dir($self->get_tagname($tag), $path, $front);
     } else {
-      warn 'invalid directory ' . absolute_filename( $dirinfo ) .
-	' mentioned in command `' . $self->{RULE}->source . "'\n"
-        unless $dir_warnings{absolute_filename( $dirinfo )}++;
+      my $dirinfo = $self->get_file_info( $path );
+      if( is_or_will_be_dir $dirinfo ) {
+	# NOTE: INCLUDE_DIRS can hold dirinfos instead of
+	# directory names because if the directory from which
+	# an include file is picked up changes due to a
+	# retargeted symbolic link, then a re-scan gets forced
+	# (once the retargeting detection logic is added).
+	if( $front ) {
+	  unshift @{$self->{$tag}[INCLUDE_DIRS]}, $dirinfo;
+	} else {
+	  push @{$self->{$tag}[INCLUDE_DIRS]}, $dirinfo;
+	}
+      } else {
+	warn $self->{RULE}->source, ': invalid directory `' . absolute_filename( $dirinfo ) . "' mentioned in command\n"
+	  unless $dir_warnings{sprintf '%x', $dirinfo}++;
 				# Don't give the same warning more than
 				# once.
+      }
+      $self->{RULE}->add_include_dir(
+	$self->get_tagname($tag),
+	Mpp::Lexer::relative_path( $self->{DIR}, $path ),
+	$front
+      );
     }
-    $self->{RULE}->add_include_dir(
-      $self->get_tagname($tag),
-      Mpp::Lexer::relative_path( $self->{DIR}, $path ),
-      $front
-    );
   } else {
     if($front) {
       unshift @{$self->{$tag}[INCLUDE_DIRS]}, undef;
@@ -238,9 +249,9 @@ sub info_string {
   $scanner->dont_scan($finfo, $absname);
 
 Returns 1 if the file $finfo should be scanned.
-$absname, if defined, must be $finfo's absolute filename.
+$absname must be $finfo's absolute filename.
 
-Files that shouldn't be scanned typically include the system include files,
+Files that shouldn't be scanned typically are the system include files,
 as well as any files that are in a directory that can't be written by the
 current user.
 It is assumed that such files don't include other files that change between
@@ -251,21 +262,19 @@ makepp.
 =cut
 
 sub dont_scan {
-  my ($self, $finfo, $absname) = @_;
-  unless( Mpp::File::is_writable( $finfo->{'..'} )) {
-    Mpp::log SCAN_NOT_UNWRITABLE => $finfo
-      if $Mpp::log_level;
-    return 1;
-  }
-  $absname ||= absolute_filename( $finfo->{'..'} );
-  if( $absname =~ m@^/usr/(?:X11(?:R.)?/|local/)include\b@ ) {
+  #my( $self, $finfo, $absname ) = @_;
+  my $case = $_[2] =~ m@^/usr/(?:X11(?:R.)?/|local/)include\b@;
 				# Don't scan stuff in the system directories.
 				# This can lead to problems if we build as
 				# a user and then install as root.  This won't
 				# completely solve the problem, but it will
 				# make it much less common.
-    Mpp::log SCAN_NOT_SYS => $finfo
-      if $Mpp::log_level;
+  $case = 2 unless $case || Mpp::File::is_writable( $_[1]{'..'} );
+  if( $case ) {
+    if( Mpp::DEBUG && !exists $_[1]->{xNOSCAN} ) {
+      Mpp::log qw(SCAN_NOT_SYS SCAN_NOT_UNWRITABLE)[$case - 1], $_[1];
+      undef $_[1]{xNOSCAN};
+    }
     return 1;
   }
   0;
@@ -299,8 +308,7 @@ sub scan_file1 {
   # then this is where we would wait for the file to finish
   # building.
   if($self->{DEPTH} <= 0) {
-    warn "Not scanning @{[absolute_filename( $finfo )]} because " .
-	"recursion depth limit exceeded\n";
+    warn 'Not scanning `' . absolute_filename( $finfo ) . "' because recursion depth limit exceeded\n";
     return 1;
   }
   my $cache_includes =
@@ -327,10 +335,10 @@ sub scan_file1 {
   if( $need_to_scan && !is_dir $finfo ) {
     my $absname = absolute_filename( $finfo );
     return 1 if $self->dont_scan($finfo, $absname);
-    if( open my $fh, $absname ) {
+    if( open my $fh, '<', $absname ) {
       print "$Mpp::progname: Scanning `$absname'\n" unless $Mpp::quiet_flag;
       Mpp::log SCAN => $finfo
-	if $Mpp::log_level;
+	if Mpp::DEBUG;
       # NOTE: We get away with having a single INC for the
       # Mpp::Scanner object because when we scan unconditionally,
       # there is only one file being scanned at a time.
@@ -434,35 +442,47 @@ if any, or the source directory Mpp::File.
 my %already_warned_missing;
 
 sub find {
-  my ($self, undef, $tag, $name, $src)=@_;
-  if( $name !~ m@^/@ ) {
+  my( $self, undef, $tag, $name, $src ) = @_;
+  if( ord( $name ) != ord '/' ) {
     return $self->get_file_info($name) unless $tag;
     my( $src_dir, $key );
     local $Mpp::File::read_dir_before_lstat = 1;
-    for my $dir (@{$self->{$tag}[INCLUDE_DIRS]}) {
-      my $base = $dir ||
-	($src_dir ||= defined( $src ) && (is_or_will_be_dir( $src ) ? $src : $src->{'..'}))
+    my @dirs = @{$self->{$tag}[INCLUDE_DIRS]};
+    while( @dirs ) {
+      my $base = shift @dirs;
+      if( $base && $base =~ s/^in ([:;]?)// ) {
+	if( $1 eq ':' ) {
+	  my $finfo = find( $self, undef, $base, $name, $src );
+	  return $finfo if $finfo;
+	} elsif( exists $ENV{$base} ) {
+	  $src_dir ||= defined( $src ) && (is_or_will_be_dir( $src ) ? $src : $src->{'..'});
+	  unshift @dirs, map file_info( $_, $src_dir ), Mpp::Text::split_path 0, 0, $ENV{$base}, $1; # optionally split on ';'
+	}
+	next;
+      }
+      $base ||= $src_dir ||= defined( $src ) && (is_or_will_be_dir( $src ) ? $src : $src->{'..'})
 	or next;
+      my $sc = $base->{SCANNER_CACHE};
       if( $self->{$tag}[INCLUDE_SFXS] and $self->{$tag}[INCLUDE_SFXS][0] ne '/' || $name !~ /\.[^\/]*$/ ) {
 	$key ||= '/' . $self->{$tag}[INCLUDE_SFXS] . '/' . $name;
-	if( exists $base->{SCANNER_CACHE}{$key} ) {
-	  return $base->{SCANNER_CACHE}{$key} if $base->{SCANNER_CACHE}{$key};
+	if( exists $sc->{$key} ) {
+	  return $sc->{$key} if $sc->{$key};
 	  next;
 	}
 	for my $sfx ( @{$self->{$tag}[INCLUDE_SFXS]} ) {
 	  next if $sfx eq '/';
 	  my $finfo = file_info $name.$sfx, $base;
-	  return $base->{SCANNER_CACHE}{$key} = $finfo if Mpp::File::exists_or_can_be_built_or_remove $finfo;
-	  undef $base->{SCANNER_CACHE}{$key};
+	  return $sc->{$key} = $finfo if Mpp::File::exists_or_can_be_built_or_remove $finfo, 0;
+	  undef $sc->{$key};
 	}
       } else {
-	if( exists $base->{SCANNER_CACHE}{$name} ) {
-	  return $base->{SCANNER_CACHE}{$name} if $base->{SCANNER_CACHE}{$name};
+	if( exists $sc->{$name} ) {
+	  return $sc->{$name} if $sc->{$name};
 	  next;
 	}
 	my $finfo = exists $base->{DIRCONTENTS} && $base->{DIRCONTENTS}{$name} || path_file_info $name, $base;
-	return $base->{SCANNER_CACHE}{$name} = $finfo if Mpp::File::exists_or_can_be_built_or_remove $finfo;
-	undef $base->{SCANNER_CACHE}{$name};
+	return $sc->{$name} = $finfo if Mpp::File::exists_or_can_be_built_or_remove $finfo, 0;
+	undef $sc->{$name};
       }
     }
   } elsif( $self->{$tag}[INCLUDE_SFXS] and $self->{$tag}[INCLUDE_SFXS][0] ne '/' || $name !~ /\.[^\/]*$/ ) {
@@ -470,7 +490,7 @@ sub find {
     for my $sfx (@{$self->{$tag}[INCLUDE_SFXS]}) {
       next if $sfx eq '/';
       my $finfo=file_info $name.$sfx;
-      return $finfo if Mpp::File::exists_or_can_be_built_or_remove $finfo;
+      return $finfo if Mpp::File::exists_or_can_be_built_or_remove $finfo, 0;
     }
   } else {
     return file_info $name;
@@ -484,7 +504,7 @@ sub find {
     }
     $path .= join "\n  ", "\nInclude path [$tag] is:",
       map {
-        $_ ? absolute_filename( $_ ) : "[including file's directory]"
+        $_ ? (ref( $_ ) ? absolute_filename( $_ ) : $_) : "[including file's directory]"
       } @{$self->{$tag}[INCLUDE_DIRS]};
     warn "can't locate file $name" .
       ($src ? ', included from `'.absolute_filename( $src )."'" : '') .

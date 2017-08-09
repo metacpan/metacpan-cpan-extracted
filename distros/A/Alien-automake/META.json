@@ -26,6 +26,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::MSYS" : "0.84",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.008001"
          }
@@ -73,7 +74,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

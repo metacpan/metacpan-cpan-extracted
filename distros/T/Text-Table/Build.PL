@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Text-Table",
-  "dist_version" => "1.132",
+  "dist_version" => "1.133",
   "license" => "open_source",
   "module_name" => "Text::Table",
   "recursive_test_files" => 1,

@@ -7,14 +7,14 @@ use base qw(App::RecordStream::Operation);
 use Bio::GFF3::LowLevel qw< gff3_parse_feature >;
 
 sub init {
-    my $this = shift;
+    my $self = shift;
     my $args = shift;
     my $options = {};
-    $this->parse_options($args, $options);  # Ensures we pick up the automatic options
+    $self->parse_options($args, $options);  # Ensures we pick up the automatic options
 }
 
 sub accept_line {
-  my $this = shift;
+  my $self = shift;
   my $line = shift;
 
   # Skip headers, comments, and empty lines
@@ -22,14 +22,14 @@ sub accept_line {
 
   my $feature = gff3_parse_feature($line);
 
-  $this->push_record( App::RecordStream::Record->new($feature) );
+  $self->push_record( App::RecordStream::Record->new($feature) );
   return 1;
 }
 
 sub usage {
-  my $this = shift;
+  my $self = shift;
   my $options = [];
-  my $args_string = $this->options_string($options);
+  my $args_string = $self->options_string($options);
 
   return <<USAGE;
 Usage: recs fromgff3 <args> [<files>]

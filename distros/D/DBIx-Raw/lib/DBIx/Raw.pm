@@ -54,7 +54,7 @@ has 'old_crypt'    => (
 	lazy => 1,
 	default => sub { 
 		my ($self) = @_;
-		return DBIx::Raw::Crypt->new ( { secret => $self->crypt_key });
+		return DBIx::Raw::Crypt->new( { secret => $self->old_crypt_key });
 	},
 );
 
@@ -98,11 +98,11 @@ DBIx::Raw - Maintain control of SQL queries while still having a layer of abstra
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -352,7 +352,7 @@ created with the key L</crypt_key>.
 
 =head2 use_old_crypt
 
-In version 0.15 L<DBIx::Raw> started using L<Crypt::Mode::CBC::Easy> instead of L<DBIx::Raw::Crypt>. Setting this to 1 uses the old encryption instead.
+In version 0.16 L<DBIx::Raw> started using L<Crypt::Mode::CBC::Easy> instead of L<DBIx::Raw::Crypt>. Setting this to 1 uses the old encryption instead.
 Make sure to set L</old_crypt_key> if you previously used L</crypt_key> for encryption.
 
 =head2 old_crypt_key

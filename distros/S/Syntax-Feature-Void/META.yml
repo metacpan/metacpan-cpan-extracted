@@ -9,8 +9,8 @@ configure_requires:
   Module::Build: '0.3614'
   Software::License::CC0_1_0: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
-license: unrestricted
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,7 +18,7 @@ name: Syntax-Feature-Void
 provides:
   Syntax::Feature::Void:
     file: lib/Syntax/Feature/Void.pm
-    version: v1.0.0
+    version: v1.2.0
 requires:
   Devel::CallParser: '0'
   Lexical::Sub: '0'
@@ -29,6 +29,6 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Void
   homepage: http://search.cpan.org/dist/Syntax-Feature-Void/
-  license: http://creativecommons.org/publicdomain/zero/1.0/
   repository: http://github.com/ikegami/perl-Syntax-Feature-Void
-version: v1.0.0
+version: v1.2.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

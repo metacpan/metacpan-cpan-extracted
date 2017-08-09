@@ -3,11 +3,9 @@
 use warnings;
 use strict;
 
-use Test::More tests=>8;
+use Test::More tests => 7;
 
-BEGIN {
-    use_ok( 'Carp::Assert::More' );
-}
+use Carp::Assert::More;
 
 my %foo = (
     name  => 'Andy Lester',

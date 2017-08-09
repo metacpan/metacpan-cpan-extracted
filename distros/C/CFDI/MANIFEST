@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CFDI.t
+lib/CFDI.pm
+lib/CFDI/Constants/Class.pm
+lib/CFDI/Location/XPath.pm
+lib/CFDI/Macros/Excel.pm
+lib/CFDI/Output/CSV.pm
+lib/CFDI/Parser/Path.pm
+lib/CFDI/Parser/XML.pm
+lib/CFDI/Regex/XML.pm
+lib/CFDI/Report/Default.pm
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

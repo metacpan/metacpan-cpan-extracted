@@ -1,5 +1,15 @@
 Revision history for App-Pods2Site
 
+0.011	2017-06-08
+
+	Non-backward compatible changes: new group concept
+	
+	Complete rewrite on how modules are grouped; all controlled by Grep::Query queries.
+	Flags controlling 'modules to skip' no longer present as not needed, instead
+	--group plays a central role.
+	
+	Lots of small and medium touch ups.
+
 0.010	2017-02-01
 
 	Attempt to address some minor Kwalitee issues

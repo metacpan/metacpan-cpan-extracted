@@ -1,6 +1,7 @@
 \B\.git\b
 
 # Avoid Makemaker generated and utility files.
+^MYMETA\.*
 \bMANIFEST\.bak
 \bMakefile$
 \bblib/
@@ -20,4 +21,6 @@
 \bcover_db\b
 
 \.swp$
-.gitignore
+^\.gitignore$
+^\.travis\.yml$
+^dist\.ini$

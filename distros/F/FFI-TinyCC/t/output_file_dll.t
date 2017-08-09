@@ -1,26 +1,20 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 use Config;
 use File::Temp qw( tempdir );
 use File::chdir;
 use FFI::Platypus;
-use Path::Class qw( file dir );
 
-plan skip_all => "unsupported on $^O" if $^O =~ /^(darwin|gnukfreebsd)$/;
-plan skip_all => "unsupported on $^O $Config{archname}" if $^O eq 'linux' && $Config{archname} =~ /^arm/;
-plan tests => 1;
+skip_all "unsupported on $^O" if $^O =~ /^(darwin|gnukfreebsd)$/;
+skip_all "unsupported on $^O $Config{archname}" if $^O eq 'linux' && $Config{archname} =~ /^arm/;
 
 subtest dll => sub {
-
-  plan tests => 4;
 
   local $CWD = tempdir( CLEANUP => 1 );
 
   my $tcc = FFI::TinyCC->new;
   
-  my $dll = file( $CWD, "bar." . FFI::TinyCC::_dlext() );
+  my $dll = "$CWD/bar." . FFI::TinyCC::_dlext();
   
   eval { $tcc->set_output_type('dll') };
   is $@, '', 'tcc.set_output_type(dll)';
@@ -51,3 +45,5 @@ subtest dll => sub {
   is $f->call(), 47, 'f.call';
 
 };
+
+done_testing;

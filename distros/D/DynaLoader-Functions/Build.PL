@@ -22,6 +22,7 @@ Module::Build->new(
 	},
 	requires => {
 		"Carp" => 0,
+		"Config" => 0,
 		"DynaLoader" => 0,
 		"Exporter" => 0,
 		"parent" => 0,
@@ -31,7 +32,18 @@ Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-DynaLoader-Functions".
+					"\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=".
+					"DynaLoader-Functions",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

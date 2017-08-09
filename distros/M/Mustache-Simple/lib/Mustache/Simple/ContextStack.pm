@@ -5,7 +5,7 @@ use warnings;
 use 5.10.1;
 use version;
 
-our $VERSION = version->declare('v1.3.5');
+our $VERSION = version->declare('v1.3.6');
 
 use Scalar::Util qw(blessed reftype);
 use Carp;
@@ -59,10 +59,14 @@ sub search
 	my $context = $self->[$i];
         if (blessed $context)
         {
-            my $meth;
-            return sub { $context->$meth } if $meth = $context->can($element);
+	    if ($context->can($element)) {
+		my @ret = $context->$element(); # array context
+		return @ret if wantarray();
+		return $ret[0]; # first elt will be answer if non-array context
+	    }
         }
 	next unless reftype $context eq 'HASH';
+
 	return $context->{$element} if exists $context->{$element};
     }
     return undef;

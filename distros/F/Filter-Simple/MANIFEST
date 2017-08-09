@@ -36,4 +36,5 @@ t/lib/Filter/Simple/ExportTest.pm
 t/lib/Filter/Simple/FilterOnlyTest.pm
 t/lib/Filter/Simple/FilterTest.pm
 t/lib/Filter/Simple/ImportTest.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

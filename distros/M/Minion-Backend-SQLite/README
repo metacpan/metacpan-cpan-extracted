@@ -11,8 +11,15 @@ SYNOPSIS
       use Minion;
       my $minion = Minion->new(SQLite => 'sqlite:test.db');
     
+      # Mojolicious (via Mojolicious::Plugin::Minion)
+      $self->plugin(Minion => { SQLite => 'sqlite:test.db' });
+    
       # Mojolicious::Lite (via Mojolicious::Plugin::Minion)
       plugin Minion => { SQLite => 'sqlite:test.db' };
+    
+      # Share the database connection cache
+      helper sqlite => sub { state $sqlite = Mojo::SQLite->new('sqlite:test.db') };
+      plugin Minion => { SQLite => app->sqlite };
 
 DESCRIPTION
 
@@ -66,6 +73,12 @@ METHODS
     were empty.
 
     These options are currently available:
+
+    id
+
+        id => '10023'
+
+      Dequeue a specific job.
 
     queues
 
@@ -393,6 +406,12 @@ METHODS
     be retried to change options.
 
     These options are currently available:
+
+    attempts
+
+        attempts => 25
+
+      Number of times performing this job will be attempted.
 
     delay
 

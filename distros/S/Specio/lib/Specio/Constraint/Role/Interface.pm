@@ -3,7 +3,7 @@ package Specio::Constraint::Role::Interface;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use Carp qw( confess );
 use Eval::Closure qw( eval_closure );
@@ -434,21 +434,7 @@ sub _build_subification {
     my $self = shift;
 
     if ( defined &Sub::Quote::quote_sub && $self->can_be_inlined ) {
-        my $inline = $self->inline_check('$_[0]');
-        $inline .= ' or ';
-
-        my %env = (
-            '$message_generator' => \( $self->_message_generator ),
-            '$type'              => \$self,
-        );
-
-        $inline .= $self->_inline_throw_exception(
-            '$_[0]',
-            '$message_generator',
-            '$type',
-        );
-
-        return Sub::Quote::quote_sub( $inline, \%env );
+        return Sub::Quote::quote_sub( $self->inline_assert('$_[0]') );
     }
     else {
         return sub { $self->validate_or_die( $_[0] ) };
@@ -632,7 +618,7 @@ Specio::Constraint::Role::Interface - The interface all type constraints should 
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 DESCRIPTION
 

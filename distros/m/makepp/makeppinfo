@@ -1,5 +1,5 @@
-#!/usr/bin/perl -w
-# $Id: makeppinfo,v 1.18 2012/05/29 21:31:38 pfeiffer Exp $
+#!/usr/bin/env perl
+# $Id: makeppinfo,v 1.24 2016/09/12 20:34:11 pfeiffer Exp $
 
 package Mpp;
 
@@ -23,7 +23,6 @@ END {
 
 our $datadir;
 BEGIN {
-  our $VERSION = '@VERSION@';
 #@@setdatadir
 #
 # Find the location of our data directory that contains the auxiliary files.
@@ -36,7 +35,7 @@ BEGIN {
 				# See if we can find ourselves in the path.
     foreach (split(/:/, $ENV{'PATH'}), '.') {
 				# Add '.' to the path in case the user is
-				# running it with "perl makeppclean" even if
+				# running it with "perl makeppinfo" even if
 				# . is not in his path.
       if( -d "$_/Mpp" ) {	# Found something we need?
 	$datadir = $_;
@@ -44,10 +43,11 @@ BEGIN {
       }
     }
   }
-  $datadir or die "makepp: can't find library files\n";
+  $datadir or die "makeppinfo: can't find library files\n";
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 #@@
   unshift @INC, $datadir;
 }
@@ -98,6 +98,7 @@ sub merge($@) {
   }
 }
 
+my $sep = '';
 @ARGV = '.' unless @ARGV;
 while( @ARGV ) {
   my $finfo = shift;
@@ -120,14 +121,18 @@ while( @ARGV ) {
 
   my $build_info = Mpp::File::load_build_info_file $finfo;
   unless( $build_info ) {
-    warn 'makeppinfo: file `' . relative_filename( $finfo ) . "' not remembered by mpp\n"
-      unless $quiet;
-    next;
+    if( $force ) {
+      $build_info->{unremembered_SIGNATURE} = Mpp::File::signature $finfo;
+    } else {
+      warn 'makeppinfo: file `' . relative_filename( $finfo ) . "' not remembered by mpp\n"
+	unless $quiet;
+      next;
+    }
   }
-  unless( $build_info->{SIGNATURE} ) {
+  unless( $force || $build_info->{SIGNATURE} || $build_info->{unremembered_SIGNATURE} ) {
     warn 'makeppinfo: file `' . relative_filename( $finfo ) . "' modified outside of mpp\n"
       if $exists;
-    next unless $force;
+    next;
   }
 
   if( $traverse ) {
@@ -162,7 +167,8 @@ while( @ARGV ) {
   merge $build_info, qw(DEP_SIGS SORTED_DEPS);
   merge $build_info, qw(ENV_DEPS ENV_VALS);
 
-  print relative_filename( $finfo ) . ":\n" unless $quiet;
+  print $sep . relative_filename( $finfo ) . ":\n" unless $quiet;
+  $sep ||= "\n";
   for my $key ( sort keys %$build_info ) {
     # Check names explicitly, because there may be no ^B, making it look like a 1 level list:
     if( $key =~ /^(?:IMPLICIT_DEPS|INCLUDE_(?:PATHS|SFXS)|META_DEPS)$/ || $build_info->{$key} =~ /\cB/ ) {
@@ -179,7 +185,7 @@ while( @ARGV ) {
     } else {
       $build_info->{$key} =~ s/\n/\n\t/g;
       $build_info->{$key} .= ' -- ' .
-	(file_exists( $finfo ) ? 'now is ' . Mpp::File::signature( $finfo ) : 'file deleted')
+	($exists ? 'now is ' . Mpp::File::signature( $finfo ) : 'file deleted')
 	if $force && $key eq 'invalidated_SIGNATURE';
     }
     if( $decode_date ) {

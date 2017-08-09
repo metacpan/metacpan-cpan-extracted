@@ -1,4 +1,4 @@
-# $Id: Subs.pm,v 1.201 2012/10/25 21:10:27 pfeiffer Exp $
+# $Id: Subs.pm,v 1.213 2016/09/06 19:59:07 pfeiffer Exp $
 
 =head1 NAME
 
@@ -36,12 +36,11 @@ package Mpp::Subs;
 
 use strict qw(vars subs);
 
-use Mpp::Text qw(index_ignoring_quotes split_on_whitespace requote
-		unquote unquote_split_on_whitespace format_exec_args);
+use Mpp::Text qw(find_unquoted split_on_whitespace unquote unquote_split_on_whitespace format_exec_args);
 use Mpp::File;
 use Mpp::FileOpt;
-use Mpp::Event qw(wait_for when_done read_wait);
-use Mpp::Glob qw(zglob zglob_fileinfo);
+use Mpp::Event qw(wait_for when_done);
+use Mpp::Glob qw(zglob zglob_fileinfo wildcard_do);
 use Mpp::CommandParser;
 use Mpp::CommandParser::Gcc;
 
@@ -87,79 +86,35 @@ our $rule;
 #
 # TODO: is $ENV{INCLUDE} a reliable alternative on native Windows?  And if
 # ActiveState is to call MinGW gcc, must makepp translate directory names?
-our @system_include_dirs = grep -d, qw(/usr/local/include /usr/include);
-our @system_lib_dirs = grep -d, qw(/usr/local/lib /usr/lib /lib);
+our @system_include_dirs = grep -d && <$_/*>, qw(/usr/local/include /usr/include);
+our @system_lib_dirs = grep -d && <$_/*>, qw(/usr/local/lib /usr/lib /lib);
 
 sub p_gcc_compilation {
   shift;
   Mpp::CommandParser::Gcc->new( @_ );
 }
-# TODO: remove the deprecated backwards compatibility scanner_ variants.
-*scanner_gcc_compilation = \&p_gcc_compilation;
 
 sub p_c_compilation {
   shift;
   Mpp::CommandParser::Gcc->new_no_gcc( @_ );
 }
-*scanner_c_compilation = \&p_c_compilation;
 
 sub p_esql_compilation {
   shift;
   require Mpp::CommandParser::Esql;
   Mpp::CommandParser::Esql->new( @_ );
 }
-*scanner_esql_compilation = \&p_esql_compilation;
 
 sub p_vcs_compilation {
   shift;
   require Mpp::CommandParser::Vcs;
   Mpp::CommandParser::Vcs->new( @_ );
 }
-*scanner_vcs_compilation = \&p_vcs_compilation;
 
 sub p_swig {
   shift;
   require Mpp::CommandParser::Swig;
   Mpp::CommandParser::Swig->new( @_ );
-}
-*scanner_swig = \&p_swig;
-
-#
-# This parser exists only to allow the user to say ":parser none" to suppress
-# the default parser.
-#
-sub scanner_none {
-  $_[1]{SCANNER_NONE} = 1;
-  shift;
-  Mpp::CommandParser->new( @_ );
-}
-
-#
-# This parser simply moves to the next word that doesn't begin with
-# - and parses again.
-#
-sub scanner_skip_word {
-  #my ($action, $myrule, $dir) = @_;
-  my ($action) = @_;		# Name the arguments.
-
-  $action =~ s/^\s+//;		# Leading whitespace messes up the regular
-				# expression below.
-  while ($action =~ s/^\S+\s+//) { # Strip off another word.
-    $action =~ s/^([\"\'\(])//;	# Strip off leading quotes in case it's
-				# something like sh -c "cc ...".
-    if( defined $1 ) {
-      my $compl = ${{qw!" " ' ' ( \)!}}{$1};
-      $action =~ s/$compl//;
-    }
-    next if $action =~ /^-/;	# Word that doesn't look like an option?
-    local $_[1]{LEXER} if $_[1]{LEXER}; # Don't skip next word on recursion.
-    local $_[1]{LEXER_OBJ} if $_[1]{LEXER_OBJ}; # ditto
-    my $lexer = new Mpp::Lexer;
-    $_[1]{SCANNER_NONE} = 1
-      if Mpp::Lexer::parse_command( $lexer, $action, $_[1], $_[2], $_[1]{MAKEFILE}{ENVIRONMENT} );
-    last;			# Don't go any further.
-  }
-  new Mpp::Lexer;
 }
 
 # These are implemented in Mpp::Lexer::find_command_parser
@@ -408,7 +363,7 @@ sub f_dir_noslash {		# An internal routine that does the same
 }
 
 sub f_error {
-  die "$_[2]: *** ".&arg."\n";	# Throw the text.
+  die $_[2] || 'somewhere', ": *** ".&arg."\n";	# Throw the text.
 }
 
 #
@@ -423,7 +378,7 @@ sub f_error {
 sub f_filesubst {
   my( $src, $dest, $words, $set_stem ) = args $_[0], $_[1], $_[2], 4, 3;
 				# Get the patterns.
-  die "$_[2]: filesubst has extra argument `$set_stem'\n" if defined $set_stem && $set_stem ne '_';
+  die $_[2] || 'somewhere', ": filesubst has extra argument `$set_stem'\n" if defined $set_stem && $set_stem ne '_';
   my $cwd = $_[1]{CWD};
 #
 # First we eat away at the directories on the source until we find the
@@ -458,8 +413,7 @@ sub f_filesubst {
   local $Mpp::Text::set_stem = 1 if $set_stem;
   join ' ', Mpp::Text::pattern_substitution
     case_sensitive_filenames ? $src : lc $src,
-					    $dest,
-    @words;
+    $dest, @words;
 }
 
 sub f_filter {
@@ -530,10 +484,10 @@ sub f_find_program {
   foreach my $name ( split ' ', &arg) {
     if( $name =~ /\// || Mpp::is_windows > 1 && $name =~ /\\/ ) { # Either relative or absolute?
       my $finfo = path_file_info $name, $mkfile->{CWD};
-      my $exists = Mpp::File::exists_or_can_be_built $finfo;
+      my $exists = Mpp::File::exists_or_can_be_built $finfo, 0;
       if( Mpp::is_windows && $name !~ /\.exe$/ ) {
 	my( $exists_exe, $finfo_exe );
-	$exists_exe = Mpp::File::exists_or_can_be_built $finfo_exe = Mpp::File::path_file_info "$name.exe", $mkfile->{CWD}
+	$exists_exe = Mpp::File::exists_or_can_be_built $finfo_exe = Mpp::File::path_file_info( "$name.exe", $mkfile->{CWD} ), 0
 	  if !$exists ||
 	    $_[3] && Mpp::File::stat_exe_separate ? !exists $finfo->{xEXISTS} : !open my $fh, '<', absolute_filename $finfo;
 				# Check for exe, but don't bother returning it, unless full path wanted.
@@ -554,10 +508,10 @@ sub f_find_program {
       }
       next unless $dir;
       my $finfo = file_info $name, $dir;
-      my $exists = Mpp::File::exists_or_can_be_built $finfo, undef, undef, 1;
+      my $exists = Mpp::File::exists_or_can_be_built $finfo, 0, undef, 1;
       if( Mpp::is_windows && $name !~ /\.exe$/ ) {
 	my( $exists_exe, $finfo_exe );
-	$exists_exe = Mpp::File::exists_or_can_be_built $finfo_exe = file_info( "$name.exe", $dir ), undef, undef, 1
+	$exists_exe = Mpp::File::exists_or_can_be_built $finfo_exe = file_info( "$name.exe", $dir ), 0, undef, 1
 	  if !$exists ||
 	    $_[3] && Mpp::File::stat_exe_separate ? !exists $finfo->{xEXISTS} : !open my $fh, '<', absolute_filename $finfo;
 				# Check for exe, but don't bother returning it, unless full path wanted.
@@ -618,11 +572,12 @@ sub f_find_upwards {
     my $dirinfo = $cwd;
     while( 1 ) {
       my $finfo = file_info $_, $dirinfo;
-      if( Mpp::File::exists_or_can_be_built $finfo ) { # Found file in the path?
+      if( Mpp::File::exists_or_can_be_built $finfo, 0 ) { # Found file in the path?
 	$found = 1;
 	push @ret_names, relative_filename $finfo, $cwd;
 	last;			# done searching
       }
+      last if $dirinfo == ($dirinfo->{ROOT} || 0);
       last unless $dirinfo = $dirinfo->{'..'}; # Look in all directories above us.
       last if (stat_array $dirinfo)->[Mpp::File::STAT_DEV] !=
 	($cwd_devid ||= (stat_array $cwd)->[Mpp::File::STAT_DEV]);
@@ -630,7 +585,7 @@ sub f_find_upwards {
 				# intended to avoid trouble with automounters
 				# or dead network file systems.
     }
-    $found or die "find_upwards: cannot find file $_\n";
+    $found or die $_[2] || 'somewhere', ": find_upwards: cannot find file $_\n";
   }
 
   join ' ', @ret_names;
@@ -656,8 +611,9 @@ sub f_find_first_upwards {
       return $_[3] ? $finfo : relative_filename $finfo, $cwd
 	if ref $_[3] ?
 	  file_exists $finfo :
-	  Mpp::File::exists_or_can_be_built $finfo; # Found file in the path?
+	  Mpp::File::exists_or_can_be_built $finfo, 0; # Found file in the path?
     }
+    last if $dirinfo == ($dirinfo->{ROOT} || 0);
     last unless $dirinfo = $dirinfo->{'..'}; # Look in all directories above us.
     last if (stat_array $dirinfo)->[Mpp::File::STAT_DEV] !=
       ($cwd_devid ||= (stat_array $cwd)->[Mpp::File::STAT_DEV]);
@@ -666,7 +622,7 @@ sub f_find_first_upwards {
 				# or dead network file systems.
   }
   return if $_[3];
-  die "find_first_upwards cannot find any of the requested files: @fnames\n";
+  die $_[2] || 'somewhere', ": find_first_upwards cannot find any of the requested files: @fnames\n";
 }
 
 sub f_findstring {
@@ -685,8 +641,8 @@ sub f_firstword {
 # environments.
 #
 sub f_first_available {
-  foreach my $fname (split ' ', &arg) {
-    Mpp::File::exists_or_can_be_built( file_info $fname, $_[1]->{CWD} ) and return $fname;
+  for my $fname ( split ' ', &arg ) {
+    Mpp::File::exists_or_can_be_built file_info( $fname, $_[1]->{CWD} ), 0 and return $fname;
   }
   '';
 }
@@ -744,7 +700,7 @@ sub f_infer_linker {
   }
 
   my $status = wait_for @build_handles;	# Wait for them all to build.
-  $status and die "Error while compiling\n"; # Maybe I'll come up with a better
+  $status and die $mkfile_line || 'somewhere', ": Error while compiling\n"; # Maybe I'll come up with a better
 				# error message later.
 
 #
@@ -770,8 +726,8 @@ sub f_infer_linker {
 #    target : $(infer_objs seed-list, list of possible objs)
 #
 sub f_infer_objects {
-  my ($seed_objs, $candidate_list) = args $_[0], $_[1], $_[2];
-  my (undef, $mkfile, $mkfile_line) = @_; # Name the arguments.
+  my( $seed_objs, $candidate_list ) = args $_[0], $_[1], $_[2];
+  my( undef, $mkfile, $mkfile_line ) = @_; # Name the arguments.
 
   my $build_cwd = $rule ? $rule->build_cwd : $mkfile->{CWD};
 
@@ -779,19 +735,10 @@ sub f_infer_objects {
 # Build up a list of all the possibilities:
 #
   my %candidate_objs;
-  foreach my $candidate_obj (map Mpp::Glob::zglob_fileinfo_atleastone($_, $build_cwd), split ' ', $candidate_list) {
+  for my $candidate_obj (map Mpp::Glob::zglob_fileinfo_atleastone($_, $build_cwd), split ' ', $candidate_list) {
 				# Get a list of all the possible objs.
-    my $objname = $candidate_obj->{NAME};
-    $objname =~ s/\.[^\.]+$//;	# Strip off the extension.
-    if ($candidate_objs{$objname}) { # Already something by this name?
-      ref($candidate_objs{$objname}) eq 'ARRAY' or
-	$candidate_objs{$objname} = [ $candidate_objs{$objname} ];
-				# Make into an array as appropriate.
-      push @{$candidate_objs{$objname}}, $candidate_obj;
-    }
-    else {			# Just one obj?
-      $candidate_objs{$objname} = $candidate_obj;
-    }
+    push @{$candidate_objs{$1}}, $candidate_obj
+      if $candidate_obj->{NAME} =~ /(.+?)(?:\.[^.]+)?$/; # Without the extension.
   }
 #
 # Now look at the list of all the include files.  This is a little tricky
@@ -802,17 +749,15 @@ sub f_infer_objects {
 				# which are look for the corresponding objects.
 
   my @build_handles;		# Where we put the handles for building objects.
-  my @deps = map zglob_fileinfo($_, $build_cwd), split ' ', $seed_objs;
+  my @deps = map zglob_fileinfo($_, $build_cwd), split ' ', $seed_objs
 				# Start with the seed files themselves.
-  @deps or die "infer_objects called with no seed objects that exist or can be built\n";
+    or die $mkfile_line || 'somewhere', ": infer_objects called with seed objects $seed_objs that can't be built\n";
   Mpp::log INFER_SEED => \@deps
     if $Mpp::log_level;
 
-  foreach (@deps) {
-    my $name = $_->{NAME};
-    $name =~ s/\.[^\.]+$//;	# Strip off the extension.
-    $source_names{$name}++;	# Indicate that we already have this as a
-				# source file.
+  for( @deps ) {
+    $_->{NAME} =~ /(.+?)(?:\.[^.]+)?$/; # Without the extension.
+    $source_names{$1} = 1;	# Indicate that we already have this as a source file.
   }
 
 
@@ -827,49 +772,42 @@ sub f_infer_objects {
 # so on.
 #
   for (;;) {
-    while ($dep_idx < @deps) {	# Look at each dependency currently available.
+    while( $dep_idx < @deps ) {	# Look at each dependency currently available.
       my $o_info = $deps[$dep_idx]; # Access the Mpp::File for this object.
       my $bh = prebuild( $o_info, $mkfile, $mkfile_line );
 				# Start building it.
       my $handle = when_done $bh, # Build this dependency.
       sub {			# Called when the build is finished:
-	defined($bh) && $bh->status and return $bh->status;
+	defined $bh && $bh->status and return $bh->status;
 				# Skip if an error occurred.
-	my @this_sources = split /\01/, Mpp::File::build_info_string($o_info,'SORTED_DEPS') || '';
-				# Get the list of source files that went into
-				# it.
-	foreach (@this_sources) {
-	  my $name = $_;	# Make a copy of the file.
-	  $name =~ s@.*/@@;	# Strip off the path.
-	  $name =~ s/\.[^\.]+$//; # Strip off the extension.
-	  unless ($source_names{$name}++) { # Did we already know about that source?
-	    if (ref($candidate_objs{$name}) eq 'Mpp::File') { # Found a file?
-	      Mpp::log INFER_DEP => $candidate_objs{$name}, $_
+	for( split /\01/, Mpp::File::build_info_string($o_info,'SORTED_DEPS') || '' ) {
+				# Get the list of source files that went into it.
+	  my( $name ) = /([^\/]+?)(?:\.[^\/.]+)?$/; # Without the path or extension.
+	  if( $candidate_objs{$name} && !$source_names{$name}++ ) { # Newly found source?
+	    if( $candidate_objs{$name}[1] ) { # More than 1 match?
+	      warn "$mkfile_line: in infer_objects: more than one possible object for include file $_:",
+		  map( "\n  " . absolute_filename( $_ ), @{$candidate_objs{$name}} ), "\n";
+	    } else { # Found a file?
+	      Mpp::log INFER_DEP => $candidate_objs{$name}[0], $_
 		if $Mpp::log_level;
-	      push @deps, $candidate_objs{$name}; # Scan for its dependencies.
-	    }
-	    elsif (ref($candidate_objs{$name}) eq 'ARRAY') { # More than 1 match?
-	      Mpp::print_error('`', $mkfile_line, "' in infer_objects: more than one possible object for include file $_:\n  ",
-			    join("\n  ", map absolute_filename( $_ ), @{$candidate_objs{$name}}),
-			    "\n");
+	      push @deps, $candidate_objs{$name}[0]; # Scan for its dependencies.
 	    }
 	  }
 	}
       };
 
-      if (defined($handle)) {   # Something we need to wait for?
+      if( defined $handle ) {   # Something we need to wait for?
         $handle->{STATUS} && !$Mpp::keep_going and
-          die "$mkfile_line: infer_objects failed because dependencies could not be built\n";
+          die $mkfile_line || 'somewhere', ": infer_objects failed because dependencies could not be built\n";
         push @build_handles, $handle;
       }
       ++$dep_idx;
     }
 
-    last unless @build_handles;	# Quit if nothing to wait for.
-    my $status = wait_for @build_handles; # Wait for them all to build, and
-				# try again.
+    last if			# Quit if nothing to wait for or there was an error.
+      !@build_handles or
+      wait_for @build_handles;	# Wait for them all to build, and try again.
     @build_handles = ();	# We're done with those handles.
-    $status and last;		# Quit if there was an error.
   }
 
 #
@@ -923,7 +861,7 @@ sub f_mktemp {
   my $template = &arg;
   my $mkfile = $_[1];
   $mkfile ||= \%Mpp::Subs::;	# Any old hash for default LAST_TEMP_FILE & CWD
-  return $mkfile->{LAST_TEMP_FILE} || die "No previous call to \$(mktemp)\n" if $template eq '/';
+  return $mkfile->{LAST_TEMP_FILE} || die $_[2] || 'somewhere', ": No previous call to \$(mktemp)\n" if $template eq '/';
   $template ||= 'tmp.';
   my $Xmax = 9;
   $Xmax = length( $1 ) - 1 if $template =~ s/(X+)$//;
@@ -947,7 +885,7 @@ sub f_mktemp {
       return $mkfile->{LAST_TEMP_FILE};
     }
   }
-  die "$_[2]: too many tries necessary to make unique filename for $_[0]\n";
+  die $_[2] || 'somewhere', ": too many tries necessary to make unique filename for $_[0]\n";
 }
 
 #
@@ -966,7 +904,7 @@ sub f_prebuild {
   }
   my $status = wait_for @build_handles; # Wait for them all to complete before
                                 # we continue.
-  $status and die "\$(prebuild $names) failed\n";
+  $status and die $_[2] || 'somewhere', ": \$(prebuild $names) failed\n";
 
   $names;			# Return arguments verbatim now that we have
                                 # built them.
@@ -981,12 +919,12 @@ sub f_notdir {
 # Return only the files in the list that are actually targets of some rule:
 #
 sub f_only_targets {
-  my $phony = $_[3];
+  my $phony = $_[3] || 0;
   my $cwd = $_[1] && $_[1]{CWD};
   my @ret_files;
 
-  foreach (split ' ', &arg) {
-    foreach my $finfo (zglob_fileinfo($_, $cwd, 0, $phony)) {
+  for my $candidate ( split ' ', &arg ) {
+    for my $finfo ( zglob_fileinfo $candidate, $cwd, 0, $phony ) {
       $phony || exists($finfo->{RULE}) and
 	push @ret_files, relative_filename $finfo, $cwd;
     }
@@ -999,7 +937,7 @@ sub f_only_targets {
 # Return only the targets in the list that are phony:
 #
 sub f_only_phony_targets {
-  $_[3] = \1;
+  $_[3] = 1;
   goto &f_only_targets;
 }
 
@@ -1010,9 +948,9 @@ sub f_only_nontargets {
   my $cwd = $_[1] && $_[1]{CWD};
   my @ret_files;
 
-  foreach (split ' ', &arg) {
-    foreach my $finfo (Mpp::Glob::zglob_fileinfo_atleastone($_, $cwd)) {
-      exists($finfo->{RULE}) or
+  for my $candidate ( split ' ', &arg ) {
+    for my $finfo ( Mpp::Glob::zglob_fileinfo_atleastone $candidate, $cwd, undef, 0 ) {
+      exists $finfo->{RULE} or
 	push @ret_files, relative_filename $finfo, $cwd;
     }
   }
@@ -1029,9 +967,9 @@ sub f_only_generated {
   my $cwd = $_[1] && $_[1]{CWD};
   my @ret_files;
 
-  foreach (split ' ', &arg) {
-    foreach my $finfo (Mpp::Glob::zglob_fileinfo_atleastone($_, $cwd, 0,0,1)) {
-      Mpp::File::was_built_by_makepp( $finfo ) and
+  for my $candidate ( split ' ', &arg ) {
+    for my $finfo ( Mpp::Glob::zglob_fileinfo_atleastone $candidate, $cwd, 0, 0, 1 ) {
+      Mpp::File::was_built_by_makepp $finfo and
 	push @ret_files, relative_filename $finfo, $cwd;
     }
   }
@@ -1047,9 +985,9 @@ sub f_only_stale {
   my $cwd = $_[1] && $_[1]{CWD};
   my @ret_files;
 
-  foreach (split ' ', &arg) {
-    foreach my $finfo (Mpp::Glob::zglob_fileinfo_atleastone($_, $cwd, 0,0,1)) {
-      Mpp::File::is_stale( $finfo ) and
+  for my $candidate ( split ' ', &arg ) {
+    for my $finfo ( Mpp::Glob::zglob_fileinfo_atleastone $candidate, $cwd, 0, 0, 1 ) {
+      Mpp::File::is_stale $finfo and
 	push @ret_files, relative_filename $finfo, $cwd;
     }
   }
@@ -1136,7 +1074,7 @@ sub f_relative_filename {
 sub f_relative_to {
   my ($files, $dir, $slash) = args $_[0], $_[1], $_[2], 3, 2;
   my $cwd = $_[1]{CWD};
-  defined $dir or die "wrong number of arguments to \$(relative_to file, dir)\n";
+  defined $dir or die $_[2] || 'somewhere', ": wrong number of arguments to \$(relative_to file, dir)\n";
   $dir =~ s/^\s+//;		# Trim whitespace.
   $dir =~ s/\s+$//;
   my $dirinfo = file_info unquote( $dir ), $cwd;
@@ -1171,7 +1109,7 @@ sub f_shell {
       $shell_output = `@cmd`;
     }
     $? == 0 or
-      warn "shell command `$str' returned `$?' at `$mkfile_line'\n";
+      warn "$mkfile_line: shell command `$str' returned `$?'\n";
   } else {
 #
 # We used to use Perl's backquotes operators but these seem to have trouble,
@@ -1185,18 +1123,18 @@ sub f_shell {
 # (finally) seems to work.  I'm still not 100% clear on why some of the
 # other ones didn't.
 #
-    pipe my $pin, my $pout or die "can't make pipe--$!\n";
+    pipe my $pin, my $pout or die $_[2] || 'somewhere', ": can't make pipe--$!\n";
     my $proc_handle = new Mpp::Event::Process sub { # Wait for process to finish.
       #
       # This is the child process.  Redirect our standard output to the pipe.
       #
       close $pin;		# Don't read from the handle any more.
       close STDOUT;
-      open STDOUT,'>&', $pout or die "can't redirect stdout--$!\n";
+      open STDOUT,'>&', $pout or die $_[2] || 'somewhere', ": can't redirect stdout--$!\n";
       exec format_exec_args $str;
-      die "exec $str failed--$!\n";
+      die $_[2] || 'somewhere', ": exec $str failed--$!\n";
     }, ERROR => sub {
-      warn "shell command `$str' returned `$_[0]' at `$mkfile_line'\n";
+      warn "$mkfile_line: shell command `$str' returned `$_[0]'\n";
     };
 
     close $pout;		# In parent, get rid of the output handle.
@@ -1205,7 +1143,7 @@ sub f_shell {
       my $n_chars = sysread $pin, my( $blk ), 8192; # Try to read.
       unless( defined $n_chars ) { # An error on the read?
 	--$n_errors_remaining > 0 and next; # Probably "Interrupted system call".
-	die "read error--$!\n";
+	die $_[2] || 'somewhere', ": read error--$!\n";
       }
       last if $n_chars == 0;	# No characters read--other process closed pipe.
       $shell_output .= $blk;
@@ -1230,7 +1168,7 @@ sub f_sort {
 
 sub f_stem {
   unless( defined $rule ) {
-    warn "\$(stem) or \$* used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(stem) or \$* used outside of rule\n";
     return '';
   }
   defined $rule->{PATTERN_STEM} and
@@ -1301,7 +1239,7 @@ sub f_words {
 #
 sub f_target {
   unless( defined $rule ) {
-    warn "\$(output), \$(target) or \$\@ used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(output), \$(target) or \$\@ used outside of rule\n";
     return '';
   }
   my $arg = defined $_[0] ? &arg : 0;
@@ -1312,7 +1250,7 @@ sub f_target {
 
 sub f_targets {
   unless( defined $rule ) {
-    warn "\$(outputs) or \$(targets) used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(outputs) or \$(targets) used outside of rule\n";
     return '';
   }
   my $arg = defined $_[0] ? &arg : 0;
@@ -1325,7 +1263,7 @@ sub f_targets {
 
 sub f_dependency {
   unless( defined $rule ) {
-    warn "\$(dependency) or \$(input) or \$< used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(dependency) or \$(input) or \$< used outside of rule\n";
     return '';
   }
   my $arg = defined $_[0] ? &arg : 0;
@@ -1338,7 +1276,7 @@ sub f_dependency {
 
 sub f_dependencies {
   unless( defined $rule ) {
-    warn "\$(dependencies) or \$(inputs) or \$^ used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(dependencies) or \$(inputs) or \$^ used outside of rule\n";
     return '';
   }
   my $arg = defined $_[0] ? &arg : 0;
@@ -1356,7 +1294,7 @@ sub f_dependencies {
 #
 sub f_changed_inputs {
   unless( defined $rule && defined $rule->{EXPLICIT_TARGETS} ) {
-    warn "\$(changed_dependencies) or \$(changed_inputs) or \$? used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(changed_dependencies) or \$(changed_inputs) or \$? used outside of rule\n";
     return '';
   }
   my @changed_dependencies =
@@ -1374,7 +1312,7 @@ sub f_changed_inputs {
 
 sub f_sorted_dependencies {
   unless( defined $rule ) {
-    warn "\$(sorted_dependencies) or \$(sorted_inputs) or \$+ used outside of rule at `$_[2]'\n";
+    warn "$_[2]: \$(sorted_dependencies) or \$(sorted_inputs) or \$+ used outside of rule\n";
     return '';
   }
   Mpp::Subs::f_sort join ' ', relative_filenames $rule->{EXPLICIT_DEPENDENCIES};
@@ -1388,10 +1326,9 @@ sub f_sorted_dependencies {
 # any arguments.
 #
 sub f_foreach {
-  my( undef, $mkfile, $mkfile_line ) = @_; # Name the arguments.
   unless( $_[0] ) {		# No argument?
     defined $rule && defined $rule->{FOREACH} or
-      die "\$(foreach) used outside of rule, or in a rule that has no :foreach clause at `$_[2]'\n";
+      die $_[2] || 'somewhere', ": \$(foreach) used outside of rule, or in a rule that has no :foreach clause at `$_[2]'\n";
     return relative_filename $rule->{FOREACH}, $rule->build_cwd;
   }
 
@@ -1402,6 +1339,7 @@ sub f_foreach {
 # because of some special code in expand_text, VAR,LIST,TEXT has not yet
 # been expanded.
 #
+  my( undef, $mkfile, $mkfile_line ) = @_; # Name the arguments.
   my( $var, $list, $text ) = args $_[0], undef, $_[2], 3, 3, 1;
 				# Get the arguments.
   $var = ref $_[0] ? $mkfile->expand_text( $var, $mkfile_line ) : $var;
@@ -1428,7 +1366,7 @@ sub f_foreach {
 }
 
 sub f_warning {
-  warn &arg." at `$_[2]'\n";	# Print the text.
+  warn "$_[2]: " . &arg ."\n";	# Print the text.
   '';
 }
 
@@ -1521,11 +1459,10 @@ sub s_build_check {#_
   $name = $mkfile->expand_text( $name, $mkfile_line )
     if $mkfile;
   $name =~ s/^\s*(\w+)\s*$/$1/ or
-    die "$mkfile_line: invalid build_check statement\n";
+    die $mkfile_line || 'somewhere', ": invalid build_check statement\n";
   if( $name ne 'default' ) {
-    $$var = eval "use Mpp::BuildCheck::$name; \$Mpp::BuildCheck::${name}::$name" ||
-      eval "use BuildCheck::$name; warn qq!$mkfile_line: name BuildCheck::$name is deprecated, rename to Mpp::BuildCheck::$name\n!; \$BuildCheck::${name}::$name"
-      or die "$mkfile_line: invalid build_check method $name\n";
+    $$var = eval "use Mpp::BuildCheck::$name; \$Mpp::BuildCheck::${name}::$name"
+      or die $mkfile_line || 'somewhere', ": invalid build_check method $name\n";
   } elsif( $global ) {		# Return to the default method?
     $$var = $Mpp::BuildCheck::exact_match::exact_match;
   } else {
@@ -1541,63 +1478,72 @@ sub s_build_check {#_
 sub s_no_implicit_load {
   my ($text_line, $mkfile, $mkfile_line) = @_; # Name the arguments.
 
-  $text_line = $mkfile->expand_text($text_line, $mkfile_line);
   my $cwd = $rule ? $rule->build_cwd : $mkfile->{CWD};
 				# Get the default directory.
 
   local $Mpp::implicitly_load_makefiles; # Temporarily turn off makefile
 				# loading for the expansion of this wildcard.
-
-  my @dirs = map zglob_fileinfo($_, $cwd),
-    split ' ', $mkfile->expand_text($text_line, $mkfile_line);
-				# Get a list of things matching the wildcard.
-  foreach my $dir (@dirs) {
-    undef $dir->{xNO_IMPLICIT_LOAD} if is_or_will_be_dir $dir;
+  wildcard_do {
+    undef $_[0]{xNO_IMPLICIT_LOAD} if is_or_will_be_dir $_[0];
 				# Tag them so they don't load later.
-  }
+  } \2, split ' ', $mkfile->expand_text( $text_line, $mkfile_line );
 }
 
 #
 # Include statement:
 #
-our( $defer_include, @defer_include ); # gmake cludge
 sub s_include {#__
-  my( undef, $mkfile, $mkfile_line, $keyword ) = @_;
-				# Name the arguments.
-  if( $defer_include ) {
-    push @defer_include, $keyword->{ignore} ? \&s__include : \&s_include, @_[0..2];
-    return;
-  }
+  my( undef, $mkfile, $mkfile_line, $keyword ) = @_; # Name the arguments.
 
   for my $file ( split ' ', $mkfile->expand_text( $_[0], $mkfile_line )) { # Get a list of files.
     my $finfo = f_find_first_upwards $Mpp::Makefile::c_preprocess ? $file : "$file.makepp $file",
       $mkfile, $mkfile_line, 1;	# Search for special makepp versions of files as well.
     if( $Mpp::Makefile::c_preprocess ) {
       eval { $mkfile->read_makefile($finfo) };
-      die $@ if
-	$@ and $keyword->{ignore} ? !/^can't read makefile/ : 1;
+      die $mkfile_line || 'somewhere', ": $@\n" if
+	$@ and exists $keyword->{ignore} ? !/^can't read makefile/ : 1;
     } else {
-      $finfo and
-	wait_for prebuild( $finfo, $mkfile, $mkfile_line ) and
+      if( $finfo ) {
+	if( exists $keyword->{check} ) {
+	  next if Mpp::File::is_stale $finfo;
+	  wait_for prebuild( $finfo, @{$mkfile->{REINCLUDE}{$file}}[1,2] ) and
+	    die $mkfile_line || 'somewhere', ": can't build " . absolute_filename( $finfo ) . ", needed at $mkfile->{REINCLUDE}{$file}[2]\n";
+	   return 1 if		# Now that we have a rule, did we actually build the file?
+	    ($mkfile->{REINCLUDE}{$file}[0] || 0) != $finfo ||
+	    ($mkfile->{REINCLUDE}{$file}[3] || 'x') ne Mpp::File::signature $finfo;
+	  delete $mkfile->{REINCLUDE}{$file}; # Previously stale, fine now.
+	  next;
+	} elsif( Mpp::File::is_stale $finfo ) {
+	  $mkfile->{REINCLUDE}{$file} = [$finfo, $mkfile, $mkfile_line, Mpp::File::signature $finfo];
+	} else {
+	  wait_for prebuild( $finfo, $mkfile, $mkfile_line ) and
 				# Build it if necessary, or link it from a repository.
-	die "can't build " . absolute_filename( $finfo ) . ", needed at $mkfile_line\n";
-				# Quit if the build failed.
+	    die $mkfile_line || 'somewhere', ": can't build " . absolute_filename( $finfo ) . "\n";
+	}
+      } else {
 #
 # If it wasn't found anywhere in the directory tree, search the standard
 # include files supplied with makepp.  We don't try to build these files or
 # link them from a repository.
 #
-      unless( $finfo ) { # Not found anywhere in directory tree?
-	foreach (@{$mkfile->{INCLUDE_PATH}}) {
-	  $finfo = file_info($file, $_); # See if it's here.
-	  last if file_exists $finfo;
+	my $found;
+	for my $dir (@{$mkfile->{INCLUDE_PATH}}) {
+	  $finfo = file_info $file, $dir; # See if it's here.
+	  $found = file_exists $finfo and
+	    last;
 	}
-	unless( file_exists $finfo ) {
-	  next if $keyword->{ignore};
-	  die "makepp: can't find include file `$file'\n";
+	unless( $found ) {
+	  if( exists $mkfile->{REINCLUDE} ) {
+	    exists $keyword->{check} or
+	      $mkfile->{REINCLUDE}{$file} = [undef, $mkfile, $mkfile_line, $keyword->{ignore}];
+	  } elsif( !$keyword->{ignore} ) {
+	    die $mkfile_line || 'somewhere', ": $mkfile_line: can't find include file `$file'\n";
+	  }
+	  next;
 	}
       }
 
+      return 1 if exists $keyword->{check};
       Mpp::log LOAD_INCL => $finfo, $mkfile_line
 	if $Mpp::log_level;
       $mkfile->read_makefile($finfo); # Read the file.
@@ -1635,7 +1581,7 @@ sub s_load_makefile {#_
   my @makefiles;
   while (defined($_ = shift @words)) { # Any words left?
     if (/^(\w+)=(.*)/) {	# Found a variable?
-      $command_line_vars{$1} = unquote($2);
+      $command_line_vars{$1} = unquote my $copy = $2;
     }
     elsif (/^-I(\S*)/) {	# Specification of the include path?
       unshift @include_path, ($1 || shift @words);
@@ -1739,7 +1685,7 @@ sub s_prebuild {#__
     # didn't need to be built, but it could also means that there was a
     # dependency loop. We ought to generate an error in the latter case.
     wait_for prebuild( $finfo, $mkfile, $mkfile_line ) and
-      die "failed to prebuild $target\n";
+      die $mkfile_line || 'somewhere', ": failed to prebuild $target\n";
   }
 }
 *s_make = \&s_prebuild;
@@ -1758,7 +1704,7 @@ sub prebuild {
     # which Makefiles were loaded. Note that this warning isn't guaranteed to
     # show up when it's called for, because targets that are built via direct
     # calls to Mpp::build() don't undergo this check.
-    warn 'Attempting to build ' . &absolute_filename . " before its makefile is completely loaded\n"
+    warn $mkfile_line, ': Attempting to build ' . &absolute_filename . " before its makefile is completely loaded\n"
       unless ref( $myrule ) eq 'Mpp::DefaultRule' ||
 	exists $finfo->{BUILD_HANDLE} ||
 	$myrule->makefile == $mkfile ||
@@ -1781,27 +1727,6 @@ sub s_autoload {#__
 }
 
 #
-# Register an action scanner.
-# Usage from the makefile:
-#    register_scanner command_word scanner_subroutine_name
-#
-#
-sub s_register_scanner {#_
-  my( undef, $mkfile, $mkfile_line ) = @_; # Name the arguments.
-  warn "$mkfile_line: register-scanner deprecated, please use register-parser at `$_[2]'\n";
-
-  my( @fields ) = split_on_whitespace $mkfile->expand_text( $_[0], $mkfile_line );
-				# Get the words.
-  @fields == 2 or die "$mkfile_line: register_scanner needs 2 arguments\n";
-  my $command_word = unquote $fields[0]; # Remove quotes, etc.
-  $fields[1] =~ tr/-/_/;
-  my $scanner_sub = $fields[1] =~ /^(?:scanner_)?none$/ ?
-    undef : (*{"$mkfile->{PACKAGE}::$fields[1]"}{CODE} || *{"$mkfile->{PACKAGE}::scanner_$fields[1]"}{CODE});
-				# Get a reference to the subroutine.
-  $mkfile->register_parser($command_word, $scanner_sub);
-}
-
-#
 # Register a command parser. Usage from the makefile:
 #    register_command_parser command_word command_parser_class_name
 #
@@ -1811,14 +1736,14 @@ sub s_register_parser {#_
 
   my( @fields ) = unquote_split_on_whitespace $mkfile->expand_text( $_[0], $mkfile_line );
 				# Get the words.
-  @fields == 2 or die "$mkfile_line: register_command_parser needs 2 arguments at `$_[2]'\n";
+  @fields == 2 or die $mkfile_line || 'somewhere', ": register_command_parser needs 2 arguments at `$_[2]'\n";
   $fields[1] =~ tr/-/_/;
   $fields[1] =
     *{"$mkfile->{PACKAGE}::p_$fields[1]"}{CODE} ||
     *{"$fields[1]::factory"}{CODE} ||
     *{"Mpp::CommandParser::$fields[1]::factory"}{CODE} ||
     *{"$fields[1]::factory"}{CODE} ||
-    die "$mkfile_line: invalid command parser $fields[1]\n";
+    die $mkfile_line || 'somewhere', ": invalid command parser $fields[1]\n";
   $mkfile->register_parser( @fields );
 }
 *s_register_command_parser = \&s_register_parser;
@@ -1857,8 +1782,8 @@ sub s_vpath {#__
 sub s_runtime {#__
   my ($text, $mkfile, $mkfile_line) = @_; # Name the arguments.
 
-  (my $comma = index_ignoring_quotes $text, ',') >= 0 or # Find the command
-    die "$mkfile_line: runtime EXE,LIST called with only one argument\n";
+  (my $comma = find_unquoted $text, ',') >= 0 or # Find the command
+    die $mkfile_line || 'somewhere', ": runtime EXE,LIST called with only one argument\n";
   my $exelist = $mkfile->expand_text(substr($text, 0, $comma), $mkfile_line);
   substr $text, 0, $comma+1, ''; # Get rid of the variable name.
   my @deps = map file_info($_, $mkfile->{CWD}), split_on_whitespace $mkfile->expand_text($text, $mkfile_line);
@@ -1888,23 +1813,7 @@ sub s_signature {#__
       $$name_var = $name;
       $$override_var = $override;
     } else {
-#
-# The signature methods and build check methods used to be the same thing,
-# so for backward compatibility, see if this is actually a build check
-# method.
-#
-      $var = eval "use Mpp::BuildCheck::$name; \$Mpp::BuildCheck::${name}::$name" ||
-	eval "use BuildCheck::$name; warn qq!$mkfile_line: name BuildCheck::$name is deprecated, rename to Mpp::BuildCheck::$name\n!; \$BuildCheck::${name}::$name";
-      if( defined $var ) {
-	warn "$mkfile_line: requesting build check method $name via signature is deprecated.\n";
-	if( $global ) {
-	  $Mpp::BuildCheck::default = $var;
-	} else {
-	  $mkfile->{DEFAULT_BUILD_CHECK_METHOD} = $var;
-	}
-      } else {
-	die "$mkfile_line: invalid signature method $name\n";
-      }
+      die $mkfile_line || 'somewhere', ": invalid signature method $name\n";
     }
   } else {		# Return to the default method?
     undef $$name_var;
@@ -1995,7 +1904,6 @@ sub import() {
     $_[1] ? /^(?:$_[1])/ : /^[fps]_/ or # functions, parsers and statements only
       /^args?$/ or
       /^run/ or
-      /^scanner_/ or
       next;
     my $coderef = *{"Mpp::Subs::$_"}{CODE};
     *{$package . "::$_"} = $coderef if $coderef;

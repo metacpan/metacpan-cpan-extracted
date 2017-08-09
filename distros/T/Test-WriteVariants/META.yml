@@ -31,5 +31,5 @@ resources:
   homepage: https://metacpan.org/release/Test-WriteVariants
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/Test-WriteVariants.git
-version: '0.013'
+version: '0.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

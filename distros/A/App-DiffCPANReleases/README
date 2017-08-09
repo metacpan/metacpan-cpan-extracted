@@ -1,0 +1,78 @@
+NAME
+    App::DiffCPANReleases - Diff contents of two CPAN releases
+
+VERSION
+    This document describes version 0.001 of App::DiffCPANReleases (from
+    Perl distribution App-DiffCPANReleases), released on 2017-08-07.
+
+SYNOPSIS
+    See the included script diff-cpan-releases.
+
+FUNCTIONS
+  diff_cpan_releases
+    Usage:
+
+     diff_cpan_releases(%args) -> [status, msg, result, meta]
+
+    Diff contents of two CPAN releases.
+
+    Examples:
+
+    *   Download two Perl releases and diff them:
+
+         diff_cpan_releases( release1 => "My-Dist\@1.001", release2 => "My-Dist\@1.002");
+
+    *   Compare My-Dist 1.001 vs the latest:
+
+         diff_cpan_releases( release1 => "My-Dist\@1.001", release2 => "My-Dist");
+
+    For the release, you can enter a tarball filename/path (e.g.
+    "Foo-Bar-1.23.tar.gz" or "/tmp/Foo-Bar-4.567.tar.bz2") or just a
+    distname followed by "@" and version number (e.g. "Foo-Bar@1.23") or
+    just a distname (e.g. "Foo-Bar") to mean the latest release of a
+    distribution. The release tarballs will be downloaded (except when you
+    already specify a tarball path) then diff-ed using App::DiffTarballs.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   release1* => *str*
+
+    *   release2* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DiffCPANReleases>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DiffCPANReleases>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffCPANReleases>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

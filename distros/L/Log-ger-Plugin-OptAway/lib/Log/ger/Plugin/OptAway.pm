@@ -1,7 +1,7 @@
 package Log::ger::Plugin::OptAway;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -24,8 +24,9 @@ sub get_hooks {
 
                 for my $r (@{ $args{routines} }) {
                     my ($code, $name, $lnum, $type) = @$r;
-                    next unless $type =~ /\Alog_/;
+                    next unless $type =~ /\A(log|is)_/;
                     my $fullname = "$args{target_arg}\::$name";
+                    #print "D:Current_Level = <$Log::ger::Current_Level>, r->[2] = <$r->[2]>\n";
                     if ($Log::ger::Current_Level < $r->[2]) {
                         #print "D:no-oping $fullname\n";
                         B::CallChecker::cv_set_call_checker(
@@ -55,7 +56,7 @@ Log::ger::Plugin::OptAway - Optimize away higher-level log statements
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

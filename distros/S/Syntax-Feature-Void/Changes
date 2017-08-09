@@ -1,4 +1,7 @@
 Revision history for Syntax-Feature-Void
 
+1.2.0  2017/08/07
+       - Updated to be comaptible with Perl 5.26.
+
 1.0.0  2014/08/17
        - Initial version.

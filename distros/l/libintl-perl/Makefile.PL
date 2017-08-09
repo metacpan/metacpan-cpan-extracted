@@ -18,7 +18,7 @@
 
 # You should have received a copy of the GNU Library General Public
 # License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335,
 # USA.
 
 use 5.004;
@@ -199,7 +199,7 @@ sub tools_other
 	my $fragment = $self->SUPER::tools_other (@_);
 
 	$fragment =~ s/^MOD_INSTALL\s*=\s*(.*?)-MExtUtils::Install
-		/MOD_INSTALL =$1-MMyInstall/msx;
+		/MOD_INSTALL =$1-I. -MMyInstall/msx;
 
 	return $fragment;
 }
@@ -241,8 +241,11 @@ WriteMakefile (
 );
 
 sub MY::postamble {
+        # This is for developers only.
+        return '' if ! -e '.git';
+
         '
-all :: Credits ReleaseNotes
+all :: Credits ReleaseNotes README
 
 # Make search.cpan.org happy but still follow GNU standards:
 # # (Thanks to Graham Barr for the hint)
@@ -251,6 +254,9 @@ Credits: THANKS
 
 ReleaseNotes: NEWS
 	cat NEWS >$@
+
+README: README.md
+	cat README.md >$@
 '
 }
 

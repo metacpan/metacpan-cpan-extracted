@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 dfb78900ee7b0b63fdfa3572aa2c3c6e53a75c4b Changes
+SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
+SHA1 c8f8e1147ccd224b41b4d84c30ec2f6b88a7d536 MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 c1fec0152aa56ee81850677211e8b22da03c77c3 META.json
+SHA1 56c31cc6e2b37542773c4f32f5431912417e8881 META.yml
+SHA1 55e05a51a2bb2df482fcc8bdbcfca455087cc1a1 Makefile.PL
+SHA1 345804729194ab6406718ab53c521ca276347212 README
+SHA1 2d29a5ae48e06378a61015b89e6bfeb81c28ac4d lib/Dist/Zilla/Plugin/AuthorSignatureTest.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 1c42406e2732a73731a93c163dbb439116f9da05 t/smoke.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWX+HJqQl27WkM10aAQjxhA//U+ANYWZcR8uY0LHSOcZOD2Bnozx6QoXT
+GZu+KXH4SR7psi9mFRDp7XviIe1LWNqWmnRVEQWX+LAlNXM2NAmdC6dz0trkvsad
+cFWdmwXwwgpB4VAYUUJYrC0JWvcl9MQl0igum++ATMFHtMHdT6n0XN2eLCDORjCf
+sgMN4Vh6Fm1Eqxm1MlJcnje/sU7/U25+oNqvTIyge7/hife40i8w95aRpo//bJBm
+t7IKpsgVPPV8Lqyh9c7iHGduxLaMaIrnA1/pblYOR8biwa8mVgTbUrF1jLVrQkog
+0xVq5MY7yOcIcv536+MBnfxGHbwUyAGoRiZU3GF3DzxtVIbl1EOq3Hs7cxjPpv6M
+dhDcy/OK44O4bwL0jo4z6iN0URi/q0LUbf2c/4g+9esG//Opb+R4lmBSFWzhPeAO
+Jafvdfd28KrAL2MAtdVWqlbXfK/V6dZfh+Z/l4Z75FcDX+gri4APhPQBE78fZ57s
+9+CnU0FXMQvX4LNFONGFdMmxqyujuegEgcvVbM4cfmRNZ0psb0q2vCbFUFZnEXdl
+al8bTU+ORYtwiwSeSSe7diay7+RfJJNmEziHDKG8DRar0VgBuWJ4+UQy2tAmabA4
+lcz4FaAN1q3E4/XcUUIYGJFTNG/hPHfT7vA/gOR25sLpxUdO8eeC5OB7vqxpc03G
+FIn+F2iBzGo=
+=T0no
+-----END PGP SIGNATURE-----

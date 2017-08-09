@@ -1,0 +1,7 @@
+=head1 NAME
+
+B<palx> - command line interface to libpalindrome
+
+=head1 DESCRIPTION
+
+=cut

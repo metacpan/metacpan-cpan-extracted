@@ -1,5 +1,14 @@
 Revision history for Dist::Zilla::PluginBundle::MSCHOUT
 
+0.35  2017-08-03
+    - remove ArchiveRelease
+
+0.34  2017-07-31
+    - add AuthorSignatureTest
+
+0.33  2017-07-31
+    - Git::Check: allow .travis.yml to be dirty
+
 0.32  2017-07-29
     - add MinimumPerl plugin
     - enable Dist::Zilla::PluginBundle::PluginRemover plugin

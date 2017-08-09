@@ -7,18 +7,19 @@ use 5.014;
 
 package JsonSQL::Query::Query;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Validator;
 
 
 
 sub new {
-    my ( $class, $query_rulesets, $json_schema ) = @_;
+    my ( $class, $query_rulesets, $json_schema, $quote_char ) = @_;
     
-    ## DB specific values can be used in the future, but for now we are setting this to a common default.
+    ## DB specific values can be used in the future, but for now we are setting this to a common (ANSI) default.
+    my $quoteChar = $quote_char || '"';
     my $self = {
-        _quoteChar => "'"
+        _quoteChar => $quoteChar
     };
     
     # Get a JsonSQL::Validator object with the provided $json_schema and $query_rulesets.
@@ -63,7 +64,7 @@ JsonSQL::Query::Query - JSON query base class. Provides the quote_identifier met
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -82,13 +83,14 @@ You can also create your own subclass...
 
 =head1 METHODS
 
-=head2 Constructor new($query_rulesets, $json_schema) -> JsonSQL::Query::Query
+=head2 Constructor new($query_rulesets, $json_schema, $quote_char) -> JsonSQL::Query::Query
 
 Creates a JsonSQL::Validator object using the supplied $query_rulesets and $json_schema and stores a reference to use for future
 validation and whitelist checking purposes. See L<JsonSQL::Validator> for more information.
 
     $query_rulesets     => The whitelist rule sets to be associated with this JsonSQL::Query object.
     $json_schema        => The name of the JSON schema to use for validation of the query.
+    $quote_char         => The character to use for quoting identifiers. Defaults to ANSI double quotes.
 
 =head2 ObjectMethod quote_identifier($identifier) -> quoted $identifier
 
@@ -98,8 +100,8 @@ is used during SQL query construction to quote non-parameterized identifiers.
     $identifier         => The identifier string to quote.
 
     Ex:
-        Column1     => 'Column1'
-        Co'lumn1    => 'Co''lumn1' 
+        Column1     => "Column1"
+        Co"lumn1    => "Co""lumn1"
 
 =head1 AUTHOR
 

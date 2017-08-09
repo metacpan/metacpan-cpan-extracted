@@ -1,27 +1,124 @@
-Prerequistes for installation:
-  You must have Perl 5.8 or newer somewhere on your system.
+Where to download?
+  Makepp is hosted on SourceForge and can be downloaded as a source code
+  tarball or as installation package for Debian .deb based Linuxes or .rpm
+  based Linuxes from http://sourceforge.net/projects/makepp/files/
 
-Installation instructions:
+  Like tons of Perl software, makepp can also be downloaded from CPAN by
+  clicking the Download link on http://search.cpan.org/dist/makepp/
 
-If you want to test makepp out, you can run makepp without installing
-it.  To run the test suite, cd to the makepp directory and type "make
-test".  If you want to run makepp on your own makefiles, either put the
-directory you unpacked it in your path, or else run it explicitly like
-this:
+  Makepp is part of Debian GNU/Linux unstable and testing. This means you
+  can install it directly via "apt-get install makepp" or by choosing it
+  from your preferred package tool like synaptic.
 
-	perl /where/you/unpacked/it/makepp
+  Makepp is part of Gentoo Linux. Note that their 2.0-r1 is not the
+  release candidate 1, but the final released version 2.0.
 
-If you want to install it, then cd to the directory you unpacked the
-distribution into and type:
+Can I try it without installing?
+  Yes, if you want to try makepp on your own makefiles, either put the
+  directory where you unpacked it into your path, or else run it
+  explicitly like this, with an absolute or relative path to makepp:
 
-	perl install.pl
+      perl /where/you/unpacked/it/makepp
 
-This will ask you where you want to put the various pieces, and will then
-install them as requested.
+How to choose perl version?
+  You must have Perl 5.8 or newer somewhere on your system. By default all
+  uninstalled scripts will use the "perl" in your path. But you can run
+  them with an explicit instance of perl. The test runner and installation
+  will run everything with this same instance.
 
-Or you can also do:
+      /path/to/perl /where/you/unpacked/it/makepp
 
-        configure --prefix=/usr/local
-	make install
+  In case some script doesn't properly recognize which "perl" it is being
+  run with, you can help it by telling it the path to the same instance of
+  perl via the "PERL" variable:
 
-which will run the regression tests as well.
+      PERL=/path/to/perl /path/to/perl /where/you/unpacked/it/makepp
+
+  This can also be an instance to be searched in your path:
+
+      PERL=perl5.16.2 perl5.16.2 /where/you/unpacked/it/makepp
+
+How to install?
+  There are two ways to install, which lead to the same result:
+
+  configure (alias config.pl)
+      This allows for traditional style installation:
+
+          ./configure && make test && make install
+
+      The only difference between these two is that "configure" is not a
+      Perl script, so you can't say "perl configure", whereas you can use
+      all the above variants like "perl config.pl". Valid options are:
+
+      -b, --bindir=/path/to/installation/bin
+          Where the binaries go (default: *prefix*/bin). Makepp's binaries
+          are just Perl scripts so they are architecture independent.
+
+      -d, --datadir=/path/to/installation/share/makepp
+          Where to install makepp's library files (default:
+          *prefix*/share/makepp).
+
+      -f, --findbin=relative/path/to/datadir/from/bindir
+          Where to find libraries relative to executables, or 'none' (the
+          default) to find them in *datadir*.
+
+      -h, --htmldir=/path/to/installation/share/html
+          Where the HTML documentation goes (default: *datadir*/html), or
+          'none' if you do not want it installed.
+
+      -m, --mandir=/path/to/man
+          Where the manual pages should reside (default: *prefix*/man), or
+          'none' if you do not want them installed.
+
+      --makefile=/path/to/Makefile
+          Specify location where you can write the Makefile (default: .).
+          Unlike the other options, which are remembered for the following
+          install step, this file is created immediately.
+
+      -p, --prefix=/path/to/installation
+          Specify location where you want to install everything (default:
+          /usr/local). All other paths are by default relative to this
+          one.
+
+      -V
+      --version
+          Print out the version number.
+
+      If you want to do a mockup installation to some destdir for
+      packaging your own distribution, you can give an extra parameter to
+      the last command:
+
+          make DESTDIR=/temporary/destdir install
+
+  install.pl
+      This is the backend that performs the actual installation. You can
+      call it directly:
+
+          ./install.pl bindir datadir mandir htmldir findbin destdir
+
+      The parameters are optional and correspond to the options from the
+      previous section. You are prompted for those you don't supply,
+      except for the last one, which is not normally needed.
+
+  *Makefile.PL*
+      The customary file Makefile.PL is only present for technical
+      reasons. It will not help you to install.
+
+  On some systems whichever "perl" you end up calling may be a symbolic
+  link to some precise version "perl5.m.n". In this case perl sees only
+  that one, and will thus use it to install against. If you don't want
+  that, use the "PERL" variable as described above. If you install with
+  the second variant, i.e. just the name of the executable without
+  slashes, the installed scripts will always search for that one via
+  "/usr/bin/env". This makes them a tiny bit slower to start, for a
+  greater flexibility.
+
+Why does installation say permission denied?
+  If you want to install to a system directory like /usr, /usr/local or
+  /opt, you can only do that if you run the installation as user root. On
+  many Unices you can run a command as root, by prepending "sudo" to it,
+  and depending on the system entering the either the root password, or
+  yours, as prompted for.
+
+  This is not necessary for the preparatory "configure" or "config.pl"
+  step which only writes a Makefile in the current directory.

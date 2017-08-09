@@ -29,7 +29,9 @@ t/10throw-in-catch.t
 t/11rethrow.t
 t/12wrong-error-var.t
 t/13except-arg0.t
+t/14Error-Simple-VERSION.t
 t/lib/MyDie.pm
 t/pod-coverage.t
 t/pod.t
+t/style-trailing-space.t
 META.json

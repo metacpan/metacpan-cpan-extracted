@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,36 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 f8ef3dd392001fc5fe4f1cff3fc5338407e3084d Changes
+SHA1 f5bf51d6d93812106e58f5a6389fb2d618be95aa Changes
 SHA1 54dda90b3b1d13d5d5ec34f1f3ec80c21b7ef4ca LICENSE
-SHA1 76a9caddb882569d3f1fe06775f2f00e9413ff2f MANIFEST
-SHA1 b255a06d31520a21962df3fdef27fb703a5cbc6d META.yml
-SHA1 3c950451f897c42bec770e581419c0ae8f254ea3 Makefile.PL
-SHA1 0c206059ed0f7ace53def7793980acb067aa3b12 Makefile.old
+SHA1 53ede3d43525344ad58319ba554c777832fd2c95 MANIFEST
+SHA1 dfc3b2e64d8af9154ac417d7082892803722040a MANIFEST.SKIP
+SHA1 436edc839a0bdad82e9cfa626e2a760ab61320d6 META.json
+SHA1 1c161959af353848571176dba182ab146e28a9c2 META.yml
+SHA1 7dc6847e50809b2413c99f57f40eac9a06f2d57e Makefile.PL
 SHA1 1f2af066160ee4478aef16bf1a0bf61a7cf4828e README
-SHA1 0238c57484b253a530eb18f46ad3aa7490c955a1 bin/milter-limit
-SHA1 6f7838e7c7a51724643d6d3480eae2d622d38c85 conf/milter-limit.conf
+SHA1 e852e6ed7395c3ad3e72428ddbe26de848e78130 bin/milter-limit
+SHA1 73737c4ec8239d6f5e6dac1b8a04659c4e721841 conf/milter-limit.conf
 SHA1 ddb45e13a1681c06afce9c7e46894f35d9d731a1 contrib/fedora/milter-limit.service
 SHA1 b3b2995ef10ea795d346a6c9446b15fd6331fff1 contrib/freebsd/milter-limit.sh
-SHA1 cd3476d6e1735402dd4b10f700e51dd067fc6ffc dist.ini
-SHA1 14e04bd451558b5bc9d1a214d5d130f0b5ee492d lib/App/Milter/Limit.pm
-SHA1 4c6eebe385730ce94b01f2e3e8fad1cb26b44827 lib/App/Milter/Limit/Config.pm
-SHA1 612f82bc4a403b1ecacee87d8e006cb160a25f7f lib/App/Milter/Limit/Log.pm
-SHA1 51e45eace15a32920dfaa588f53ded0c7a620cf1 lib/App/Milter/Limit/PidFile.pm
-SHA1 e804c3479857b491a4d1719ab92676b108b51ce8 lib/App/Milter/Limit/Plugin.pm
-SHA1 d2be455cbe115d6801a4b105be36a1b8dc1ae8c8 lib/App/Milter/Limit/Util.pm
+SHA1 36da9559d5070f6d20536ad42ea37a007ba62da0 lib/App/Milter/Limit.pm
+SHA1 74b85e789ca9e39300dcf135d1fe0d2d48691e16 lib/App/Milter/Limit/Config.pm
+SHA1 30926c171a0122e06ba7ae48e9491efbcc87a4f7 lib/App/Milter/Limit/Log.pm
+SHA1 078449a9b6c370efa8350b34b00a562e50b0e4c2 lib/App/Milter/Limit/PidFile.pm
+SHA1 eb0be7c2279a265b129601a67ea9141af461ba06 lib/App/Milter/Limit/Plugin.pm
+SHA1 022e354f81878a5667462b0c640b587580d9b152 lib/App/Milter/Limit/Util.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
 SHA1 886c83d1c6818c31244b51a323bb52db523881b5 t/compile.t
-SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
-SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
-SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
-SHA1 dc5577d84d6015589321fed7ab730d17a80d4410 weaver.ini
+SHA1 8c3c22ebf16564abbabc51c0bde0fb5b55dc1725 t/lib/App/Milter/Limit/Plugin/Test.pm
+SHA1 6b464ac1fe8401b5a2489d4e59ce92cc51f9db62 t/lib/My/Test/Util.pm
+SHA1 380116564918a55c73893fff0465d2798577d3cb t/limit-from.t
+SHA1 4688d3419f4affba02ebb05ff4c21b5433eed714 t/smoke.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
-Comment: GPGTools - http://gpgtools.org
+Version: GnuPG v2
 
-iEYEARECAAYFAlO9aSoACgkQ+CqvSzp9LOx5cgCfVAGFrbJRGmSxDhJsmqldcXT1
-rVQAn0j98lNN4BGOZVLWatZsD9Kz7HFx
-=CseI
+iQIVAwUBWYSldqQl27WkM10aAQjCtg//ZGkKOy+CU1cdWicPlJnOu8NYYhC6LfaB
+mrwV67W3RcuTunvmjijDvU5dIJN77OGGTZav4KachmBfEVqdVxJTDASQ8hGsf9kF
+2KoXXtAT8gHsKPv1Wng5HJ5lZB2JJ6QKiderIjrLvEKwgz5Ku0Ff0CZF1GE8mr5w
+S5jqLKapsJUbz4KBft/O0ngsTP+kUaZcM+Zx/x7zURBA9Myuc+HzWHRRhFDmHW0B
+rSmXbPVh59ObvzH6tyB2R8mxqwJ0ioLN/q61+qrYBtIvxL8yV/4S9vQFnOIShjsS
+h16ojGDYKBJNok0o+6IIFkSfJZ6kG8NVfxDUKG4WanoK4wIikfrYBCOKT3vDkM53
+b26Tgao/hSReWiyh0CMYQM1lWrV+B2T6PVoI/8UE6MxIyKzs5qW4GbsBG0byHiFP
+g6q03Q9AIm5rRGSVBVVsClCpyDO/ywHebSUdUJBMTrwalVHZNBh6QWIoM0oAi3kd
+hQyJZ7+H3UE4kRuJ/loTY2sJib9ZGMcjpjtchZuNU73lUmldBm8gb2DpWwvVPhcs
+UEi8kUXIQMtvWVUhaU6jum1F60GppCYCgFeaSjt9xyhlf1O+2t+XtN9HT0/vGtuw
+u5dYdF29VogmIBgauIy7bx78qD2caabTHB8A9Qx3bQjDn8U5nUblnGphfbk2oXJR
+9uKpc8EBCZo=
+=qzrX
 -----END PGP SIGNATURE-----

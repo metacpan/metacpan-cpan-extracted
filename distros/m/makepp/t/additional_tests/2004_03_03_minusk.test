@@ -16,10 +16,10 @@ b: c
 
 c:
 	&echo "OK" -o $@
-	perl { die }
+	perl { die "Oops\n" }
 
 d:
-	perl { -f 'e' or do { open my $fh, '>', 'e'; print $fh "OK\n" }}
+	perl { unless( -f 'e' ) { open my $fh, '>', 'e'; print $fh "OK\n" }}
 	&echo "OK" -o $@
 
 # This tests that an inexistent file marked for dont-build (because outside of

@@ -9,7 +9,7 @@ use MooseX::Types::Moose qw/ArrayRef Str/;
 use Catalyst::Utils;
 use namespace::autoclean;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 has _static_file => ( is => 'rw' );
 has _static_debug_message => ( is => 'rw', isa => ArrayRef[Str] );
@@ -64,7 +64,7 @@ before prepare_action => sub {
     }
 
     # Does the path have an extension?
-    if ( $path =~ /.*\.(\S{1,})$/xms ) {
+    if ( $path =~ /\.([^\/\\]+)$/m ) {
         # and does it exist?
         $c->_locate_static_file( $path );
     }
@@ -322,7 +322,7 @@ properly.
 
 If the plugin can not find the file, the request is dispatched to your
 application instead. This means you are responsible for generating a
-C<404> error if your applicaton can not process the request:
+C<404> error if your application can not process the request:
 
    # handled by static::simple, not dispatched to your application
    /images/exists.png

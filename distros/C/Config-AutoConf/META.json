@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-AutoConf",
    "no_index" : {
@@ -35,6 +35,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::CheckManifest" : "0",
             "Test::Kwalitee" : "0",
+            "Test::PerlTidy" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
@@ -87,6 +88,6 @@
       "x_IRC" : "irc://irc.perl.org/#toolchain",
       "x_MailingList" : "mailto:cpan-workers@perl.org'"
    },
-   "version" : "0.314",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.315",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

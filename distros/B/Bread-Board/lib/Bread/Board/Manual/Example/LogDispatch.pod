@@ -13,7 +13,7 @@ Bread::Board::Manual::Example::LogDispatch - An example of composing a dynamic L
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ This example can be made even more dynamic if you build the
 'Logging' component as a parameterized container whose parameter
 is the 'Outputs' container. Here is what that would look like.
 
-  my $logging = container 'Logging' => [ 'Outputs' ] as {
+  my $logging = container 'Logging' => [ 'Outputs' ] => as {
       service 'Logger' => (
           block => sub {
               my $s       = shift;
@@ -138,7 +138,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Infinity Interactive.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

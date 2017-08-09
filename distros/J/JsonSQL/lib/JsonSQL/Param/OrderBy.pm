@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::OrderBy;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Param::Order;
 use JsonSQL::Error;
@@ -66,7 +66,7 @@ JsonSQL::Param::OrderBy - JsonSQL::Param::OrderBy object. Stores an array of Jso
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

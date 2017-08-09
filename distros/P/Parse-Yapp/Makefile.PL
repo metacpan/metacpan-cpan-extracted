@@ -3,7 +3,8 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'	=> 'Parse::Yapp',
-    'VERSION_FROM' => 'lib/Parse/Yapp/Driver.pm', # finds $VERSION
+    # CORRELATION #py001: $VERSION must be changed in both Parse::Yapp & Parse::Yapp::Driver
+    'VERSION_FROM' => 'lib/Parse/Yapp/Driver.pm',
     'MAN3PODS' => { 'lib/Parse/Yapp.pm' => '$(INST_MAN3DIR)/Parse::Yapp.3' },
     'PM' => {
               'lib/Parse/Yapp.pm' => '$(INST_LIBDIR)/Yapp.pm',

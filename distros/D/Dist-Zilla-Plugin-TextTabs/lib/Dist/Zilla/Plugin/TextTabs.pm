@@ -1,67 +1,71 @@
-package Dist::Zilla::Plugin::TextTabs;
+use strict;
+use warnings;
+use 5.014;
 
-use Moose;
-use Text::Tabs qw( expand unexpand );
+package Dist::Zilla::Plugin::TextTabs 0.04 {
 
-# ABSTRACT: Expand or unexpand tabs in your dist
-our $VERSION = '0.03'; # VERSION
+  use Moose;
+  use Text::Tabs qw( expand unexpand );
+
+  # ABSTRACT: Expand or unexpand tabs in your dist
 
 
-with 'Dist::Zilla::Role::FileMunger',
-     'Dist::Zilla::Role::FileFinderUser' => {
-       default_finders => [ ':InstallModules', ':ExecFiles' ],
-     },
-     'Dist::Zilla::Role::InstallTool',
-;
+  with 'Dist::Zilla::Role::FileMunger',
+       'Dist::Zilla::Role::FileFinderUser' => {
+         default_finders => [ ':InstallModules', ':ExecFiles' ],
+       },
+       'Dist::Zilla::Role::InstallTool',
+  ;
 
-use namespace::autoclean;
+  use namespace::autoclean;
 
-has tabstop => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 8,
-);
+  has tabstop => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 8,
+  );
 
-has unexpand => (
-  is      => 'ro',
-  isa     => 'Bool',
-  default => 0,
-);
+  has unexpand => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,  
+  );
 
-has installer => (
-  is      => 'ro',
-  isa     => 'Bool',
-  default => 0,
-);
+  has installer => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+  );
 
-sub munge_files
-{
-  my($self) = @_;
-  return if $self->installer;
-  $self->munge_file($_) for @{ $self->found_files };
-}
-
-sub munge_file
-{
-  my($self, $file) = @_;
-  $self->log(($self->unexpand ? 'un' : '') . 'expanding ' . $file->name);
-  local $Text::Tabs::tabstop = $self->tabstop;
-  $file->content(join("\n", map { $self->unexpand ? unexpand $_ : expand $_ } split /\n/, $file->content));
-  return;
-}
-
-sub setup_installer
-{
-  my($self) = @_;
-  return unless $self->installer;
-  foreach my $file (@{ $self->zilla->files })
+  sub munge_files
   {
-    next unless $file->name =~ /^(Makefile|Build).PL$/;
-    $self->munge_file($file);
+    my($self) = @_;
+    return if $self->installer;
+    $self->munge_file($_) for @{ $self->found_files };
   }
-}
 
-__PACKAGE__->meta->make_immutable;
+  sub munge_file
+  {
+    my($self, $file) = @_;
+    $self->log(($self->unexpand ? 'un' : '') . 'expanding ' . $file->name);
+    local $Text::Tabs::tabstop = $self->tabstop;
+    $file->content(join("\n", map { $self->unexpand ? unexpand @$_ : expand @$_ } [split /\n/, $file->content]));
+    return;
+  }
+
+  sub setup_installer
+  {
+    my($self) = @_;
+    return unless $self->installer;
+    foreach my $file (@{ $self->zilla->files })
+    {
+      next unless $file->name =~ /^(Makefile|Build).PL$/;
+      $self->munge_file($file);
+    }
+  }
+
+  __PACKAGE__->meta->make_immutable;
+}
 
 1;
 
@@ -77,7 +81,7 @@ Dist::Zilla::Plugin::TextTabs - Expand or unexpand tabs in your dist
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

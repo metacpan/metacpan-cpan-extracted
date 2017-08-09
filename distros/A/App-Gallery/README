@@ -1,0 +1,33 @@
+App-Gallery version 0.001
+=========================
+
+gallery.pl creates basic image galleries. Pass an output directory and
+a list of images to the script. The images will be hard linked into
+the directory (or copied if hard linking fails), then thumbnails will
+be created for the images, and finally an F<index.html> file linking
+to all the images will be created in the directory.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Image::Magick
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

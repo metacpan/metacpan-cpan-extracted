@@ -12,7 +12,7 @@ use File::LibMagic;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our $CLIENT = "Net-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -208,11 +208,14 @@ sub _get_type {
 }
 
 sub Upload {
-  my ($Self, $data, $type) = @_;
+  my ($Self, $data, $type, $accountId) = @_;
 
   my %Headers;
   $Headers{'Content-Type'} = $type || _get_type($data);
 
+  if (defined $accountId) {
+      $Headers{'X-JMAP-AccountId'} = $accountId;
+  }
   if ($Self->{user}) {
     $Headers{'Authorization'} = $Self->auth_header();
   }

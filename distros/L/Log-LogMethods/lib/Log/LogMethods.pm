@@ -6,15 +6,15 @@ use Ref::Util qw(is_plain_hashref is_blessed_hashref);
 use Scalar::Util qw(blessed);
 use B qw(svref_2object);
 use Scalar::Util qw(looks_like_number);
+no warnings 'redefine';
 use Log::Log4perl;
 use Log::Log4perl::Level;
-use Log::Log4perl;
 use Moo::Role;
+
 use Carp qw(croak);
 use namespace::clean;
-no warnings 'redefine';
 
-our $VERSION='1.001';
+our $VERSION='1.003';
 
 # used as a place holder for extended format data
 our $CURRENT_CB;
@@ -148,12 +148,15 @@ If you want to manualy get/set log levels
 
 sub level {
   my ($self,$level)=@_;
-
   
-  if(defined($self->logger) and looks_like_number($level)) {
-    $self->logger->level($level);
+  if(defined($self->logger)) {
+    if(looks_like_number($level)) {
+      $self->logger->level($level);
+    }
+    return $self->logger->level;
+  } else {
+    return;
   }
-  return $self->logger->level;
 }
 
 =head1 OO Methods provided
@@ -478,6 +481,7 @@ sub _attribute_result_common {
     return wantarray ? @{$result} : $result;
   };
   no strict;
+  no warnings 'redefine';
   my $eval="*$method=\$ref";
   eval $eval;
   croak $@ if $@;
@@ -536,6 +540,7 @@ sub _attribute_benchmark_common {
     return wantarray ? @{$result} : $result;
   };
   no strict;
+  no warnings 'redefine';
   my $eval="*$method=\$ref";
   eval $eval;
   croak $@ if $@;
@@ -691,10 +696,13 @@ sub _create_is_check {
   my $code=sub {
     my ($self)=@_;
 
-    return $self->level == $Log::LogMethods::LEVEL_MAP{$name};
+    my $level=$self->level;
+    return 0 unless looks_like_number($level);
+    return $level == $Log::LogMethods::LEVEL_MAP{$name};
   };
 
   no strict;
+  no warnings 'redefine';
   eval "*$method=\$code";
 }
 
@@ -723,11 +731,11 @@ sub _create_logging_methods {
   eval "*$method=\$code";
 }
 
+
 while(my ($name,$level)=each %Log::LogMethods::LEVEL_MAP) {
   __PACKAGE__->_create_is_check($name,$level);
   __PACKAGE__->_create_logging_methods($name,$level);
 }
-
 
 =back 
 

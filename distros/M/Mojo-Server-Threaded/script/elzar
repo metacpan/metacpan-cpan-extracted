@@ -1,0 +1,54 @@
+#!perl
+use Mojo::Base -strict;
+
+use Mojo::Server::Elzar;
+use Mojo::Util qw(extract_usage getopt);
+
+$ENV{MOJO_REUSE} = '';
+
+getopt
+  'c|command=s'  => \$ENV{ELZAR_COMMAND},
+  'f|foreground' => \$ENV{ELZAR_FOREGROUND},
+  'h|help'       => \my $help,
+  's|stop'       => \$ENV{ELZAR_STOP},
+  't|test'       => \$ENV{ELZAR_TEST};
+
+die extract_usage if $help || !(my $app = shift || $ENV{ELZAR_APP});
+Mojo::Server::Elzar->new->run($app);
+
+=encoding utf8
+
+=head1 NAME
+
+elzar - Elzar HTTP and WebSocket server
+
+=head1 SYNOPSIS
+
+  Usage: elzar [OPTIONS] [APPLICATION]
+
+    elzar ./script/my_app
+    elzar ./myapp.pl
+    elzar -f ./myapp.pl
+
+  Options:
+    -c, --command <command>  Send command to running server
+                               available commands:
+                                 "KILL"
+                                 "QUIT"
+                                 "WORKERS <n>"
+                                 "WORKER KILL|QUIT <n>"
+    -f, --foreground   Keep manager process in foreground
+    -h, --help         Show this message
+    -s, --stop         Stop server gracefully
+    -t, --test         Test application and exit
+
+=head1 DESCRIPTION
+
+Start L<Mojolicious> and L<Mojolicious::Lite> applications with the
+L<Elzar|Mojo::Server::Elzar> web server.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+
+=cut

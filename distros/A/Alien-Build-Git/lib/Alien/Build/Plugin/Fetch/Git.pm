@@ -13,7 +13,7 @@ use File::chdir;
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Alien::Build plugin to fetch from git
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub init
@@ -55,7 +55,16 @@ sub init
         $build->system('%{git}', 'clone', "$url");
         die "command failed" if $?;
         my($dir) = path(".")->absolute->children;
-        $build->system('%{git}', -C => "$dir", 'checkout', $tag);
+
+        # mildly prefer the -C version as it will handle spaces in $dir.
+        if(can_minus_c())
+        {
+          $build->system('%{git}', -C => "$dir", 'checkout', $tag);
+        }
+        else
+        {
+          $build->system("cd $dir ; %{git} checkout $tag");
+        }
         die "command failed" if $?;
         return {
           type     => 'file',
@@ -102,6 +111,25 @@ sub init
   );
 }
 
+
+my $can_minus_c;
+sub can_minus_c
+{
+  unless(defined $can_minus_c)
+  {
+    require Alien::git;
+    my $tmp = path(tempdir( CLEANUP => 1));
+    my(undef, $ret) = capture_merged {
+      system(Alien::git->exe, -C => $tmp, 'init');
+      $?;
+    };
+    $can_minus_c = !! $? == 0 && -d $tmp->child('.git');
+    $tmp->remove_tree;
+  }
+  
+  $can_minus_c;
+}
+
 1;
 
 __END__
@@ -116,7 +144,7 @@ Alien::Build::Plugin::Fetch::Git - Alien::Build plugin to fetch from git
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

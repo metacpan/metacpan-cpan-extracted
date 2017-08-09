@@ -8,7 +8,7 @@ use Path::Tiny ();
 
 use Moo;
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 # todo, type checking?
 
@@ -90,7 +90,7 @@ Code::TidyAll::CacheModel - Caching model for Code::TidyAll
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
@@ -111,20 +111,27 @@ CLASS METHODS
     These class methods return an instance of Shell::Guess, which can then
     be interrogated by the instance methods in the next section below.
 
- Shell::Guess->running_shell
+ running_shell
+
+     my $shell = Shell::Guess->running_shell;
 
     Returns an instance of Shell::Guess based on the shell which directly
     started the current Perl script. If the running shell cannot be
     determined, it will return the login shell.
 
- Shell::Guess->login_shell( [ $username ] )
+ login_shell
+
+     my $shell = Shell::Guess->login_shell;
+     my $shell = Shell::Guess->login_shell( $username )
 
     Returns an instance of Shell::Guess for the given user. If no username
     is specified then the current user will be used. If no shell can be
     guessed then a reasonable fallback will be chosen based on your
     platform.
 
- Shell::Guess->bash_shell
+ bash_shell
+
+     my $shell = Shell::Guess->bash_shell;
 
     Returns an instance of Shell::Guess for bash.
 
@@ -142,7 +149,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->bourne_shell
+ bourne_shell
+
+     my $shell = Shell::Guess->bourne_shell;
 
     Returns an instance of Shell::Guess for the bourne shell.
 
@@ -158,7 +167,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->c_shell
+ c_shell
+
+     my $shell = Shell::Guess->c_shell;
 
     Returns an instance of Shell::Guess for c shell.
 
@@ -174,7 +185,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->cmd_shell
+ cmd_shell
+
+     my $shell = Shell::Guess->cmd_shell;
 
     Returns an instance of Shell::Guess for the Windows NT cmd shell
     (cmd.exe).
@@ -191,7 +204,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->command_shell
+ command_shell
+
+     my $shell = Shell::Guess->command_shell;
 
     Returns an instance of Shell::Guess for the Windows 95 command shell
     (command.com).
@@ -208,7 +223,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->dcl_shell
+ dcl_shell
+
+     my $shell = Shell::Guess->dcl_shell;
 
     Returns an instance of Shell::Guess for the OpenVMS dcl shell.
 
@@ -222,7 +239,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->fish_shell
+ fish_shell
+
+     my $shell = Shell::Guess->fish_shell;
 
     Returns an instance of Shell::Guess for the fish shell.
 
@@ -234,7 +253,9 @@ CLASS METHODS
 
       * $shell->is_unix = 1
 
- Shell::Guess->korn_shell
+ korn_shell
+
+     my $shell = Shell::Guess->korn_shell;
 
     Returns an instance of Shell::Guess for the korn shell.
 
@@ -252,7 +273,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->power_shell
+ power_shell
+
+      my $shell = Shell::Guess->power_shell;
 
     Returns an instance of Shell::Guess for Windows PowerShell.
 
@@ -266,7 +289,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->tc_shell
+ tc_shell
+
+     my $shell = Shell::Guess->tc_shell;
 
     Returns an instance of Shell::Guess for tcsh.
 
@@ -284,7 +309,9 @@ CLASS METHODS
 
     All other instance methods will return false
 
- Shell::Guess->z_shell
+ z_shell
+
+     my $shell = Shell::Guess->z_shell
 
     Returns an instance of Shell::Guess for zsh.
 
@@ -314,71 +341,103 @@ INSTANCE METHODS
 
      Shell::Guess->running_shell->is_bourne
 
- $shell->is_bash
+ is_bash
+
+     my $bool = $shell->is_bash;
 
     Returns true if the shell is bash.
 
- $shell->is_bourne
+ is_bourne
+
+     my $bool = $shell->is_bourne;
 
     Returns true if the shell is the bourne shell, or a shell which
     supports bourne syntax (e.g. bash or korn).
 
- $shell->is_c
+ is_c
+
+     my $bool = $shell->is_c;
 
     Returns true if the shell is csh, or a shell which supports csh syntax
     (e.g. tcsh).
 
- $shell->is_cmd
+ is_cmd
+
+     my $bool = $shell->is_cmd;
 
     Returns true if the shell is the Windows command.com shell.
 
- $shell->is_command
+ is_command
+
+     my $bool = $shell->is_command;
 
     Returns true if the shell is the Windows cmd.com shell.
 
- $shell->is_dcl
+ is_dcl
+
+     my $bool = $shell->is_dcl;
 
     Returns true if the shell is the OpenVMS dcl shell.
 
- $shell->is_fish
+ is_fish
+
+     my $bool = $shell->is_fish;
 
     Returns true if the shell is Fish shell.
 
- $shell->is_korn
+ is_korn
+
+     my $bool = $shell->is_korn;
 
     Returns true if the shell is the korn shell.
 
- $shell->is_power
+ is_power
+
+     my $bool = $shell->is_power;
 
     Returns true if the shell is Windows PowerShell.
 
- $shell->is_tc
+ is_tc
+
+     my $bool = $shell->is_tc;
 
     Returns true if the shell is tcsh.
 
- $shell->is_unix
+ is_unix
+
+     my $bool = $shell->is_unix;
 
     Returns true if the shell is traditionally a UNIX shell (e.g. bourne,
     bash, korn)
 
- $shell->is_vms
+ is_vms
+
+     my $bool = $shell->is_vms;
 
     Returns true if the shell is traditionally an OpenVMS shell (e.g. dcl)
 
- $shell->is_win32
+ is_win32
+
+     my $bool = $shell->is_win32;
 
     Returns true if the shell is traditionally a Windows shell
     (command.com, cmd.exe)
 
- $shell->is_z
+ is_z
+
+     my $bool = $shell->is_z;
 
     Returns true if the shell is zsh
 
- $shell->name
+ name
+
+     my $name = $shell->name;
 
     Returns the name of the shell.
 
- $shell->default_location
+ default_location
+
+     my $location = $shell->default_location;
 
     The usual location for this shell, for example /bin/sh for bourne shell
     and /bin/csh for c shell. May not be defined for all shells.
@@ -424,9 +483,9 @@ CAVEATS
 
 AUTHOR
 
-    author: Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
 
-    contributors:
+    Contributors:
 
     Buddy Burden (BAREFOOT)
 

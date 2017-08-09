@@ -4,10 +4,16 @@ probe sub { 'share' };
 
 share {
   requires 'Alien::m4'   => '0.11';
-  requires 'Alien::MSYS' => '0.08' if $^O eq 'MSWin32';
   requires 'Path::Tiny'  => 0;
 
-  meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
+  if($^O eq 'MSWin32')
+  {
+    meta->prop->{env}->{PERL} = '/usr/bin/perl' if meta->prop->{platform}->{system_type} eq 'windows-mingw';
+  }
+  else
+  {
+    meta->prop->{env}->{PERL} = $^X;
+  }
 
   plugin Download => (
     url => 'ftp://ftp.gnu.org/gnu/autoconf',
@@ -16,7 +22,7 @@ share {
   );
   plugin Extract => 'tar.gz',
   
-  plugin 'Build::Autoconf' => ();
+  plugin 'Build::Autoconf' => ( msys_version => '0.08' );
   
   meta->before_hook(
     gather_share => sub {

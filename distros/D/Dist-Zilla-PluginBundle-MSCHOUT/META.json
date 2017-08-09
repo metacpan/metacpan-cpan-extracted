@@ -28,13 +28,14 @@
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Signature" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Dist::Zilla" : "4.102341",
-            "Dist::Zilla::Plugin::ArchiveRelease" : "0",
+            "Dist::Zilla::Plugin::AuthorSignatureTest" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::AutoVersion" : "0",
             "Dist::Zilla::Plugin::Bugtracker" : "0",
@@ -93,7 +94,7 @@
          "web" : "https://github.com/mschout/dist-zilla-pluginbundle-mschout"
       }
    },
-   "version" : "0.32",
+   "version" : "0.35",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

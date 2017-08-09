@@ -1,5 +1,5 @@
 package Mercury::Controller::PushPull;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Push/pull message pattern controller
 
 #pod =head1 SYNOPSIS
@@ -14,7 +14,7 @@ our $VERSION = '0.012';
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This controller enables a L<push/pull pattern|Mercury::Pattern::PushPull> on
+#pod This controller enables a L<pushE<sol>pull pattern|Mercury::Pattern::PushPull> on
 #pod a pair of endpoints (L<push|/push> and L<pull|/pull>.
 #pod
 #pod For more information on the push/pull pattern, see L<Mercury::Pattern::PushPull>.
@@ -124,7 +124,7 @@ Mercury::Controller::PushPull - Push/pull message pattern controller
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ version 0.012
 
 =head1 DESCRIPTION
 
-This controller enables a L<push/pull pattern|Mercury::Pattern::PushPull> on
+This controller enables a L<pushE<sol>pull pattern|Mercury::Pattern::PushPull> on
 a pair of endpoints (L<push|/push> and L<pull|/pull>.
 
 For more information on the push/pull pattern, see L<Mercury::Pattern::PushPull>.

@@ -78,7 +78,7 @@ sub test_tmux {
 
     for my $no (0 .. $#data) {
         my @test = map {'cmd' . ($_ + 1).' '} 0 .. $no;
-        my $ans = App::MultiSsh::tmux(@test);
+        my $ans = App::MultiSsh::tmux({}, @test);
         is_deeply $ans, $data[$no], ($no + 1) . " setup correctly"
             or diag "$no\n", explain $ans, "\n", $data[$no];
     }

@@ -6,6 +6,28 @@ use ExtUtils::MakeMaker;
 
 use Config;
 
+if ($Config{d_cplusplus}) {
+ print STDERR <<'FAILPLUSPLUS';
+Configuration aborted: C++ compilers are not supported
+
+    Your perl has been built with a C++ compiler, which is then handed to
+    XS extensions as if it were a proper C compiler. This extension is
+    written in C, and naturally only supports C compilers, so it cannot be
+    built with your perl.
+
+    Note that building perl with a C++ compiler is only supposed to be done
+    by core developers in order to check that the perl headers can be
+    included from C++ code. Its use in the wild is not supported by the
+    perl5 porters. If your vendor has built its perl binary with a C++
+    compiler, please consider reporting this issue to them.
+
+    This text will be displayed 10 seconds, and then the configuration
+    script will exit.
+FAILPLUSPLUS
+ sleep 10;
+ exit 0;
+}
+
 my @DEFINES;
 my %macro;
 
@@ -39,12 +61,12 @@ print $is_gcc_34 ? "yes\n" : "no\n";
 
 # Threads, Windows and 5.8.x don't seem to be best friends
 if ($^O eq 'MSWin32' && "$]" < 5.009) {
- push @DEFINES, '-DA_MULTIPLICITY=0';
+ push @DEFINES, '-DXSH_MULTIPLICITY=0';
 }
 
 # Fork emulation got "fixed" in 5.10.1
 if ($^O eq 'MSWin32' && "$]" < 5.010_001) {
- push @DEFINES, '-DA_FORKSAFE=0';
+ push @DEFINES, '-DXSH_FORKSAFE=0';
 }
 
 @DEFINES = (DEFINE => join ' ', @DEFINES) if @DEFINES;

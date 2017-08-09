@@ -1,0 +1,90 @@
+==================================================
+Changes from 2016-08-02 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.13 at 2017-08-02 22:13:13 +0000
+-----------------------------------------
+
+  Change: 47013c4753ead27ec613a93b11f1c3279851c357
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-08-03 00:10:05 +0000
+
+    Check for library existance with pkg-config
+
+    Also fix test and remove generated files from the release. 
+
+-----------------------------------------
+version 0.12 at 2017-08-01 01:19:05 +0000
+-----------------------------------------
+
+  Change: aced76db3599e932e2fcad6fc40a99ab5b6a21d0
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-08-01 03:19:05 +0000
+
+    Migrate to Dist::Zilla instead of Module::Build
+
+    Previous code only added Alien::gperf to path when building, not
+    installing. As I don't know how many Module::Build actions I will
+    need to override when subclassing, using alienfile now instead. 
+
+  Change: 8f953071ab28a6fa05e3dcdedcde2d4857506279
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-08-01 02:07:05 +0000
+
+    Add Alien::gperf->bin_dir to PATH properly for ./configure 
+
+  Change: ffea0aef8e7245bf4f79bff6086288f173570105
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-31 22:52:42 +0000
+
+    Make cpanm --installdeps verbose 
+
+  Change: 6473f13e774661ebf85387014d2856c9f9edca8b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-31 22:31:53 +0000
+
+    Readd Travis CI integration 
+
+-----------------------------------------
+version 0.11 at 2017-07-31 20:11:11 +0000
+-----------------------------------------
+
+  Change: 2fa07740bfa34339e6f49709fba4e31b5d6b36b2
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-31 22:11:11 +0000
+
+    Add Alien::gperf and Devel::AssertOS as prereqs
+
+    Also removed unnecessary Alien::Autotools 
+
+  Change: 2d99eccc6b591c952cea38b0e3021f89e3169658
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-30 13:26:33 +0000
+
+    Remove Travis CI integration
+
+    Build fails and I got no time to fix this now and the Build failed
+    button looks ugly. 
+
+  Change: 19f5867de1934c677ae6db55a6eacb8abfb5a14d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-30 13:14:51 +0000
+
+    Add Travis CI integration 
+
+  Change: 38b9e4c0c06268f16f376d9116d03c8c65c0ef31
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2017-07-29 21:09:14 +0000
+
+    use static 
+
+  Change: 3357d0249c86fe369b99c315109a5ed097affc89
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-07 11:41:35 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

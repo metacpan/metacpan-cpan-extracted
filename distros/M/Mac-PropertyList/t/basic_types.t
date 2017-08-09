@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Mac::PropertyList;
 
 my $array = <<'HERE';
@@ -106,4 +106,22 @@ is_deeply(
   Mac::PropertyList::parse_plist($scalar)->as_basic_data,
   59,
   "basic data from a scalar",
+);
+
+my $string = <<'HERE';
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <string>A
+
+  new line</string>
+</plist>
+HERE
+
+is_deeply(
+  Mac::PropertyList::parse_plist($string)->as_basic_data,
+  "A
+
+  new line",
+  "basic data from a string with embedded new lines",
 );

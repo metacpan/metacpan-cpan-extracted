@@ -2,7 +2,7 @@
 
 makepp_builtins -- Builtin commands in makepp
 
-=for vc $Id: makepp_builtins.pod,v 1.52 2012/10/25 21:11:05 pfeiffer Exp $
+=for vc $Id: makepp_builtins.pod,v 1.56 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -14,6 +14,7 @@ B<C:>E<nbsp>L<&cat|/cat_option_filename>,
   L<&chmod|/chmod_option_mode_filename>,
   L<I<chown>|/chgrp>,
   L<&cp|/cp_option_sourcefile_destfile>,
+  L<I<cpp>|/cpp>,
   L<&cut|/cut_option_filename>,E<nbsp>
 B<D:>E<nbsp>L<I<date>|/date>,E<nbsp>
 B<E:>E<nbsp>L<&echo|/echo_option_string>,
@@ -77,9 +78,14 @@ Lists of filenames may be empty, making it safe to call these commands with an
 unchecked list.  Options in their short form may be glued together as in
 C<-ab> instead of C<-a -b>.  In the long form arguments may be given either
 glued on with an C<=> sign or separately.  In the short form they may be given
-either glued on directly or separately.  A few options are common to several
-builtins, though the short form is sometimes hidden by a command's own option
-(as in C<&cut -f>):
+either glued on directly or separately.
+
+
+
+=head2 Standard options
+
+A few options are common to several builtins, though the short form is
+sometimes hidden by a command's own option (as in C<&cut -f>):
 
 =over
 
@@ -194,6 +200,10 @@ is as if you had given it for every single builtin command.
 
 =back
 
+
+
+=head2 Builtin commands
+
 There are two motivations for having builtin commands in makepp.  The first is
 to offer a set of utilities, which, unlike Shell commands, are guaranteed to
 work the same everywhere, like L<C<&echo -n>|/echo_option_string> or
@@ -243,29 +253,13 @@ configuration, but not let makepp notice.
 =over
 
 
-=item awk
-
-Not built in, but L<C<&sed>|/grep_option_perlcode_filename> is comparable.
-
-
 =item &cat I<[option ...] filename ...>
 
 Concatenates all the files into a single one.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force,
 -i, --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O, --outfail,
 -S, --synclines, -v, --verbose>
-
-
-
-=item chgrp
-
-=item chown
-
-These commands are mostly not portable!  They will either quietly do nothing
-or fail, depending on the system.  Generally only root may perform these
-operations, which is why they are only available through the
-L<C<&install>|/install_option_sourcefile_destfile> command.
 
 
 
@@ -273,7 +267,7 @@ L<C<&install>|/install_option_sourcefile_destfile> command.
 
 Sets I<mode> for all given files.  Mode must be an octal string.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
 
 
 
@@ -286,7 +280,7 @@ Standard options: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
 Copy I<sourcefile> to I<destfile>, one I<sourcefile> to current directory or
 multiple I<sourcefile>s to I<destdir> with the same name.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
 --verbose>
 
 =over
@@ -313,13 +307,14 @@ Try to symbolically link the files.  If that fails, copy.
 See the note under L<&ln|/ln_option_sourcefile_destfile>.
 
 
+
 =item &cut I<[option ...] filename ...>
 
 Print selected parts of lines from each file or selected lines, counting
 across all files.  The output is separated by the delimiter which defaults to
 TAB for fields and empty string for characters.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, --force, -i,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, --force, -i,
 --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O, --outfail, -r,
 --record-size=number, --separator=string, -S, --synclines, -v, --verbose>
 
@@ -402,13 +397,6 @@ Print only lines containing delimiters.
     &cut -d: --fields 0,4 --printf='%10s is %s\n' /etc/passwd
 
 
-=item date
-
-Not built in, but either of these partially does the same thing:
-
-    &expr localtime
-    &expr gmtime
-
 
 =item &echo I<[option ...] string ...>
 
@@ -436,7 +424,7 @@ Upcases the following letter.
 
 =item \U
 
-Upcases the rest, or up to the next C<\L> if found.
+Upcases the rest, or up to the next C<\E> or C<\L> if found.
 
 =item \xI<HH>, \x{I<HHHH>}
 
@@ -449,7 +437,7 @@ Unlike Unix C<yes>, C<&yes> is exactly like C<&echo>, except that it repeats
 the output for as long as it can, typically until an C<--output '| I<command>'>
 terminates.  And, if C<&yes> has no arguments, it defaults to C<y>.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
 --output=filename, -O, --outfail, -v, --verbose>
 
 =over
@@ -479,7 +467,7 @@ Perl strings must be quoted twice, unless you want to use barewords.  If the
 value is false, this fails.  Note that -- unlike in Unix C<expr> -- Perl's index
 function starts at 0 (false) and returns -1 (true) for failure.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
 --output=filename, -O, --outfail, -v, --verbose>
 
 =over
@@ -495,31 +483,6 @@ Do not add a newline after the output.
     &expr ($(VAR) - 3) * 2 < 1 && -1 || 1
     &expr "$(VAR) - 3 * 2 < 1 ? 'joy' : 'sorrow'" -o $(output)
     -&expr $(VAR) - 3 * 2 -o >>$(output)
-
-
-
-=item false
-
-Not very constructive and thus not built in, but
-L<C<&expr>|/expr_option_perlcode> with no argument or C<0> is comparable.
-
-
-
-=item fmt
-
-Not built in, but mentioned here since Perl provides a related functionality.
-However I had problems using the C<format> declaration in a makefile.  What
-does work is the underlying C<formline> function.  E.g. to transform a csv file
-consisting of names and prices to a tabular format:
-
-    sub csv2txt {
-      formline "\@<<<<<<<<<<<<<<< ^###########.##\n", split ',';
-      $_ = $^A;
-      $^A = '';
-    }
- 
-    %.txt: %.csv
- 	&sed &csv2txt $(input) -o $(output)
 
 
 
@@ -539,7 +502,7 @@ is available in C<$_>, which may be modified.
 Of these three, only C<&grep> will fail if it outputs nothing.  Note that
 there is no ignore-case option, since you would do that with C</I<regexp>/i>.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -i,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -i,
 --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O, --outfail, -r,
 --record-size=number, -s, --separator=string, -S, --synclines, --verbose>
 
@@ -610,26 +573,9 @@ into the next found public or protected section:
  	$acc = '';
       }
     }
- 
+
     %.cc: %.cc.in		# Use &sed for I/O handling
   	&sed --sync-lines &cxx_accessors $(input) -o $(output)
-
-
-
-=item head
-
-=item tail
-
-These are not provided, but you can achieve the same result with
-L<C<&grep>|/grep_option_perlcode_filename> or L<C<&cut --lines>|/cut_option_filename>:
-
-    &grep 1..10 file		# first ten lines
-    &grep 10..eof file		# all lines from tenth onwards
-    &cut --lines -10..-1 file	# last ten lines
-
-Note that 1..10 in C<&grep> is Perl's line number flip-flop operator, which
-annoyingly starts at 1.  Don't start at 0, or the flip-flop will never become
-true.
 
 
 
@@ -650,7 +596,7 @@ a file of F<.install_log> in that directory, or else to that file in the
 current directory.  You may want to delete the logfile before a series of
 C<&install> invocations.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
 
 =over
 
@@ -743,7 +689,7 @@ files.
 Link I<sourcefile> to I<destfile>, one I<sourcefile> to current directory or
 multiple I<sourcefile>s to I<destdir> with the same name.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
 --verbose>
 
 =over
@@ -804,7 +750,7 @@ of link.
 
 Create the directories.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
 --verbose>
 
 =over
@@ -837,16 +783,8 @@ concurrently by another process).
 Move or rename I<sourcefile> to I<destfile>, one I<sourcefile> to current
 directory or multiple I<sourcefile>s to I<destdir> with the same name.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -v,
 --verbose>
-
-
-
-=item m4
-
-Not built in, but
-L<C<&preprocess>|/preprocess_option_variable_definition_filename> is, and
-L<C<&template>|/template_option_macro_definition_filename> is almost as powerful.
 
 
 
@@ -879,7 +817,7 @@ the next, put C<$()> after it.
     _include some files that might not exist # or -include
     $()include empty expression prevents keyword from being recognized.
     # Comment lines and empty lines get swallowed.
- 
+
     $()# Unless they get masked with an empty expression.
     $()
     Empty expression prevents \$()
@@ -892,11 +830,11 @@ might give:
     lots of slurped in content here...
     include empty expression prevents keyword from being recognized.
     # Unless they get masked with an empty expression.
- 
+
     Empty expression prevents \
     backslash continuation from being recognized.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
 --output=filename, -O, --outfail, -S, --synclines, -v, --verbose>
 
 =over
@@ -930,7 +868,7 @@ Delete files if you have directory write permission.  This is what Unix
 C<rm -f> would delete, since it has a special protection for interactive use
 not needed in a Makefile.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
 
 =over
 
@@ -960,18 +898,12 @@ L<C<makeppclean>|makeppclean> utility that can do this more efficiently.
 
     $(phony cleanold):
  	&rm -fm $(only-stale **/*)
- 
+
     $(phony clean): cleanold
  	&rm -f $(wildcard **/*.[ao])
- 
+
     $(phony distclean): clean
  	&rm -fm $(only-targets **/*)
-
-
-
-=item rmdir
-
-Not built in, but L<C<&rm>|/rm_option_filename> can handle this.
 
 
 
@@ -981,7 +913,7 @@ Sorts all files together in lexicographic order.  This is inefficient for
 rather big files, because it happens completely in memory.  It will fail if
 the combined size of all files exceeds the memory you are entitled to.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -i,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -i,
 --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O, --outfail,
 --record-size=number, -s, --separator=string, -v, --verbose>
 
@@ -1040,10 +972,10 @@ find tips by searching for those names on the web.
 
     # Expensively sort numerical expressions by value ($$ protects $ from makepp expansion)
     &sort --compare 'eval( $$a ) <=> eval( $$b )' $(input) -o >>$(output)
- 
+
     # ST for case insensitive sorting
-    &sort -t '$$_ = [lc, $$_]' -c '$$a->[0] cmp $$b->[0]' -d '$$_->[1]' $(input) -o >>$(output)
- 
+    &sort -t '[lc, $$_]' -c '$$a->[0] cmp $$b->[0]' -d '$$_->[1]' $(input) -o >>$(output)
+
     # GRT using modification functions defined elsewhere in the Makeppfile
     &sort -t &transform -d &detransform $(input) -o >>$(output)
 
@@ -1063,30 +995,97 @@ equivalent.
 
 =item &template I<[option ...] macro=definition ... filename ...>
 
-This is a macro preprocessor, not quite as powerful as C<m4>, but covers more
-than is found in many makefiles.  See L<C<&preprocess>|/preprocess_option_variable_definition_filename> for a
-more powerful alternative.  Any normal text goes through unchanged.  It
-replaces all occurrences of C<@macro@>, C<@macro(arg1,arg2...)@> or everything
-between C<@@macro@@>, C<@@macro(arg1,arg2...)@@> and C<@@> with I<definition>.
-If there are args, they replace C<$1> through C<$9> or C<${I<number>}> in
-I<definition>.  One level of macro nesting is possible in that the args in
-parenthesis may contain plain C<@macro@> invocations, as in C<@f(@x@)@>, where
-@x@ gets expanded before being replaced into the body of C<f>.
+This is a macro preprocessor, not quite as powerful as the C preprocessor or
+C<m4>.  See L<C<&preprocess>|/preprocess_option_variable_definition_filename>
+for a more powerful alternative.  It was inspired by automake's macro
+replacement in F<Makefile.am> and F<Makefile.in>.  But it goes beyond that.
+Any normal text goes through unchanged.  Special constructs are by default
+delimited with C<@>.  They must fit on one line unless you pass one of C<-r,
+--record-size> or C<--separator>.
 
-The simple C<@...@> cases are single line, but may mask a trailing newline if
-the closing C<@> is immediately followed by a backslash.  The multiline
-C<@@...@@> cases must also fit on one line, but the corresponding C<@@> may be
-on a different line.  This is useful if you have a workaround code block in an
-unprocessed script, which is to get replaced with the configured code.
+=over 4
 
-In addition to passing macro definitions on the command line, you can also put
-C<@macro=definition@> or C<@macro?=definition@> into the file.  The latter
-only takes effect if the macro was not defined, presumably on the command
-line.  You can also call C<@{ I<Perlcode> }@> or C<@@{ I<Perlcode> }@@ ... @@>
-in the file.  The Perl variable C<$ARGV> contains the name of the current
-input file.  If you call C<@macro { I<Perlcode> }@>, then you define a new
-macro, the body of which is a Perl sub.  The arguments, if there are any, get
-passed in as C<@_>.
+=item @#I< comment >@
+
+Note that despite borrowing from script C<#> line end comment syntax, this one
+is an inline comment.
+
+=item @I<MACRO>@
+
+This construct is replaced by the value of the I<MACRO>.  Macro names must start
+with a letter or underscore, followed by any number of letters, underscores,
+minuses or dots.  Unlike in makepp names, underscore and minus are not
+equivalent.
+
+=item @I<MACRO>(I<arg1,arg2>...)@
+
+Like the first one, but parametrized.  The args replace C<$1> through C<$9> or
+C<${I<number>}> in the value.  Or, if the value is a Perl function, they are
+passed as normal parameters.  The result then replaces the whole construct.
+One level of macro nesting is possible in that the args in parenthesis may
+contain plain C<@MACRO@> invocations, as in C<@f(@x@)@>, where C<@x@> gets
+expanded before being replaced into the body of C<f>.
+
+=item @include(I<filename>)@
+
+This is the only predefined macro.  It is replaced by the &template-processed
+content of the named file.  Like all macros this can occur in the middle of a
+line.  Alas, because of that, C<-S, --synclines> ignores the file inclusion,
+making everything seem to come from the including file.
+
+=item @I<MACRO>=I<definition>@
+
+=item @I<MACRO>?=I<definition>@
+
+This defines a macro within the file.  This is replaced by nothing.
+The second form only takes effect if the macro was not defined, presumably on
+the command line.
+
+=item @I<MACRO> { I<Perlcode> }@
+
+This also defines a macro, the body of which is a Perl sub.  The arguments, if
+there are any, get passed in as C<@_>.
+
+=item @{ I<Perlcode> }@
+
+This runs the I<Perlcode> immediately and gets replaced by the return value.
+
+=back
+
+So far we have only seen one syntax for embedding special things.  There is
+another multiline syntax, and both allow a variation to suppress a newline.
+These are the builtin syntaxes (which can be configured by options below).
+Here I<SPECIAL> stands for any of the constructs shown above:
+
+=over 4
+
+=item @I<SPECIAL>@
+
+=item @I<SPECIAL>@\
+
+This can appear multiply anywhere on a line.  The variant immediately followed
+by C<\> only works at the end of the line.  It also replaces the following
+line break.
+
+=item @@I<SPECIAL>@@ I<normal text> @@
+
+=item @@I<SPECIAL>@@ I<normal text> @@\
+
+This is like the previous one.  However the I<normal text>, which also gets
+replaced, can span multiple lines.  You can put the special parts on comment
+lines around source code that is only needed in an uninstalled script, to be
+eliminated or replaced during the installation process:
+
+    # @@# the next 2 lines will disappear @@
+    echo You are running the uninstalled version of this script
+    # @@
+    # @@REPLAMCENT@@
+    echo Something else will be here
+    # @@
+
+=back
+
+A meaningless example showing the various possibilities:
 
     @m1=some definition@\
     @m2=foo $1 bar@\
@@ -1102,11 +1101,19 @@ becomes
     foo many lines bar plain text 1 + 2 = 3
 
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force,
--i, --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O, --outfail,
--S, --synclines, -v, --verbose>
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f,
+--force, -i, --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O,
+--outfail, -r, --record-size=number, --separator=string, -S, --synclines, -v,
+--verbose>
 
 =over
+
+=item -d
+
+=item --defined
+
+Replace only instances of macros which are actually defined.  Without this
+option the undefined ones will all be replaced by nothing.
 
 =item -h \\%I<hash>
 
@@ -1123,25 +1130,37 @@ I<Perlcode> }@> definitions.
 
 =item --simple=I</prefix/suffix/>
 
-This replaces C<@> before and after I<var> with I<prefix> and I<suffix>
-respectively.  The first character is the separator and need not be a slash.
+Use I<prefix> and I<suffix> before and after I<SPECIAL> respectively instead
+of C<@>.  The first character is the separator and need not be a slash.  These
+values are Perl regexps.  You must not introduce grouping like C<(...)>, but
+C<(?:...)> is ok.
 
 =item -m I</prefix/suffix/afterprefix/[aftersuffix/]>
 
 =item --multiline=I</prefix/suffix/afterprefix/[aftersuffix/]>
 
-This replaces C<@@> before and after I<var> and at the end of the block with
-I<prefix>, I<suffix> and I<afterprefix> respectively.  If I<aftersuffix> is
-also given, the I<var> name must get repeated before it.  The first character
-is the separator and need not be a slash.  E.g. an XML-ish
+This redefines the alternate multiple line syntax.  Use I<prefix>, I<suffix>
+and I<afterprefix> before and after I<SPECIAL> and at the end of the I<normal
+text> respectively instead of C<@@>.  If I<aftersuffix> is also given, the
+macro name must get repeated before it.  The first character is the separator
+and need not be a slash.  E.g. XML-ish, to which you must add C<--defined> if
+you want to preserve other tags, not defined by you:
 
-    --simple=|<|/>| --multiline=|<|>|</|>|
+    --defined --simple=|<|/>| --multiline=|<|>|</|>|
 
-=item -d
+Or, better, use processing instructions C<< <?...?> >>, intended for such a
+purpose:
 
-=item --defined
+    --defined --simple='_<\?_\?>_'
 
-Replace only instances of macros which are actually defined.
+Or, if you want to combine this with C<&entity;> syntax for the simple macro
+replacements (preserving numeric entities C<&#x263A;> which are not comments):
+
+    --defined --simple='_&(?!#)_;_' --multiline='_<\?_(?=\?>)_\?>_'
+
+This last one is a trick to obtain an alternate simple syntax: I<suffix> looks
+forward to match the same as I<afterprefix>, making I<normal text> be empty.
+I.e. this has the same effect as the simple regexps in the previous example.
 
 =back
 
@@ -1152,7 +1171,7 @@ Replace only instances of macros which are actually defined.
 Updates the modification and access timestamps of each file to now.  If the
 file doesn't exist, it gets created.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -v, --verbose>
 
 
 
@@ -1162,7 +1181,7 @@ Uninstall files previously installed by L<C<&install>|/install_option_sourcefile
 I<filename>s are logfiles written by C<&install>.  If none are given, nor an
 C<--inpipe> option, reads the default logfile of C<&install>.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -i,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -i,
 --inpipe=shellcommand, -I, --infail, -v, --verbose>
 
 
@@ -1171,7 +1190,7 @@ Standard options: C<-A, --args-file, --arguments-file=filename, -i,
 
 Discard all but one of successive equal lines.
 
-Standard options: C<-A, --args-file, --arguments-file=filename, -f, --force, -i,
+L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -i,
 --inpipe=shellcommand, -I, --infail, -o, --output=filename, -O, --outfail, -r,
 --record-size=number, -s, --separator=string, -S, --synclines, -v, --verbose>
 
@@ -1188,11 +1207,106 @@ shall return true if it considers the two lines equal.
 
     &uniq --compare='lc( $$a ) eq lc $$b' $(inputs) -o $(output)
 
+=back
+
+
+
+=head2 Emulatable commands
+
+Various things are not built in, but can be achieved with other commands:
+
+=over
+
+=item awk
+
+Use L<C<&sed>|/grep_option_perlcode_filename>.
+
+
+=item chgrp
+
+=item chown
+
+These commands are mostly not portable!  They will either quietly do nothing
+or fail, depending on the system.  Generally only root may perform these
+operations, which is why they are only available through the
+L<C<&install>|/install_option_sourcefile_destfile> command.
+
+
+
+=item cpp
+
+Use L<C<&preprocess>|/preprocess_option_variable_definition_filename> or
+L<C<&template>|/template_option_macro_definition_filename>.
+
+
+
+=item date
+
+Either of these partially does the same thing:
+
+    &expr localtime
+    &expr gmtime
+
+
+
+=item false
+
+Use L<C<&expr>|/expr_option_perlcode> with no argument or C<0>.
+
+
+
+=item head
+
+=item tail
+
+You can achieve the same result with
+L<C<&grep>|/grep_option_perlcode_filename> or L<C<&cut
+--lines>|/cut_option_filename>:
+
+    &grep 1..10 file		# first ten lines
+    &grep 10..eof file		# all lines from tenth onwards
+    &cut --lines -10..-1 file	# last ten lines
+
+Note that 1..10 in C<&grep> is Perl's line number flip-flop operator, which
+annoyingly starts at 1.  Don't start at 0, or the flip-flop will never become
+true.
+
+
+
+=item fmt
+
+This is mentioned here since Perl provides a related functionality.  However I
+had problems using the C<format> declaration in a makefile.  What does work is
+the underlying C<formline> function.  E.g. to transform a csv file consisting
+of names and prices to a tabular format:
+
+    sub csv2txt {
+      formline "\@<<<<<<<<<<<<<<< ^###########.##\n", split ',';
+      $_ = $^A;
+      $^A = '';
+    }
+
+    %.txt: %.csv
+ 	&sed &csv2txt $(input) -o $(output)
+
+
+
+=item m4
+
+Use L<C<&preprocess>|/preprocess_option_variable_definition_filename> or
+L<C<&template>|/template_option_macro_definition_filename>.
+
+
+
+=item rmdir
+
+Use L<C<&rm>|/rm_option_filename>.
+
 
 
 =item tr
 
-Not built in, but L<C<&sed>|/grep_option_perlcode_filename> can handle this.
+Use L<C<&sed>|/grep_option_perlcode_filename>.
 
 
 =back

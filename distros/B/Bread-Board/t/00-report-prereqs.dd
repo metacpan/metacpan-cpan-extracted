@@ -7,16 +7,15 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
                                       'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'Exporter' => '0',
                                       'Module::Runtime' => '0',
                                       'Moose' => '0',
-                                      'Moose::Exporter' => '2.1200',
                                       'Moose::Role' => '0',
                                       'Moose::Util' => '0',
                                       'Moose::Util::TypeConstraints' => '0',

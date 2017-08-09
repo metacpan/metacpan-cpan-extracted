@@ -13,6 +13,7 @@ lib/Perinci/Access/Simple/Server/Socket.pm
 script/peri-pipe
 script/peri-sockserve
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/pipe.t

@@ -53,8 +53,8 @@ sub collect_all_resolve_or_reject {
 my @queries = (
     [
         "SELECT CONNECTION_ID(), RAND(6959)",
-        "select 12, rand(464)",
-        "select 1, rand(464)",
+        [ "select 12, rand(464)", {want_hashrefs => 1} ],
+        [ "select 1, rand(464), ? as my_param", undef, ["query param"]],
     ],
     [
         "select sleep(1)"

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-TextTabs
 
+0.04      2017-08-03 07:24:26 -0400
+  - Do just one call of expand or unexpand instead of one for each line
+
 0.03      2013-12-13 21:36:35 -0500
   - Support Perl 5.8
 

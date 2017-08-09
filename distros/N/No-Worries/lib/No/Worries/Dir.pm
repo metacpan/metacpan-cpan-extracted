@@ -13,7 +13,7 @@
 package No::Worries::Dir;
 use strict;
 use warnings;
-our $VERSION  = "1.4";
+our $VERSION  = "1.5";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.16 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -237,4 +237,4 @@ L<No::Worries>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2016
+Copyright (C) CERN 2012-2017

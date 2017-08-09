@@ -2,7 +2,7 @@ package Term::ProgressBar::IO;
 use strict;
 use warnings;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 #  This program is free software; you can redistribute it and/or
 #  modify it under the same terms as Perl itself.

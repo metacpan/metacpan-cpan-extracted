@@ -90,7 +90,7 @@ subtest(
         like(
             exception { force_IntC( \'x' ) },
             qr/Validation failed for type named IntC/,
-            'force_IntC(SCALARREEF) throws exception'
+            'force_IntC(SCALARREF) throws exception'
         );
 
     }

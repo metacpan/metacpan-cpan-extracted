@@ -9,7 +9,7 @@ use JSON::PP qw( encode_json );
 use Encode qw( encode_utf8 );
 
 # ABSTRACT: Dist::Zilla initialization tasks for Plicease
-our $VERSION = '2.20'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 with 'Dist::Zilla::Role::AfterMint';
@@ -247,7 +247,7 @@ sub gather_files_tests
 
   my $use_t_file = Dist::Zilla::File::InMemory->new({
     name => 't/01_use.t',
-    content => join("\n", q{use Test2::V0;},
+    content => join("\n", q{use Test2::V0 -no_srand => 1;},
                           q{sub require_ok ($);},
                           q{},
                           q{require_ok '} . $name . q{';},
@@ -279,7 +279,7 @@ sub gather_files_tests
   
   my $main_test = Dist::Zilla::File::InMemory->new({
     name => $test_name,
-    content => join("\n", q{use Test2::V0;},
+    content => join("\n", q{use Test2::V0 -no_srand => 1;},
                           q{use } . $name . q{;},
                           q{},
                           q{ok 1, 'todo';},
@@ -313,7 +313,7 @@ sub gather_file_gitattributes
   
   my $file = Dist::Zilla::File::InMemory->new({
     name    => '.gitattributes',
-    content => "*.pm linguist-language=Perl\n*.h linguist-language=C\n",
+    content => "*.pm linguist-language=Perl\n*.t linguist-language=Perl\n*.h linguist-language=C\n",
   });
   
   $self->add_file($file);
@@ -405,7 +405,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.20
+version 2.21
 
 =head1 DESCRIPTION
 

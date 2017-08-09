@@ -41,12 +41,12 @@ describe 'All' => sub {
 
             is( $task->timeout, 0.01, 'default timeout' );
             is( $task->id, 12345, 'id found' );
-            ok( $task->pid =~ /^\d{2,}$/, 'fork done, pid setted' );
+            ok( $task->pid =~ /^-?\d{2,}$/, 'fork done, pid setted' );
             is( $task->kill_on_exit, 1, 'default kill_on_exit' );
             is( waitpid( $task->pid, WNOHANG ), 0, 'kid is active' );
             undef $task;
             sleep 0.2;
-            ok( waitpid( $pid, WNOHANG ) =~ /^\d{2,}$/, 'kid closed' );
+            ok( waitpid( $pid, WNOHANG ) =~ /^-?\d{1,}$/, 'kid closed' ); # win: -1, linux: pid
         };
 
         it 'init params check' => sub {

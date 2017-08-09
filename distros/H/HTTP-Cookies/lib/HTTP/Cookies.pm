@@ -1,11 +1,11 @@
 package HTTP::Cookies;
-$HTTP::Cookies::VERSION = '6.03';
+
 use strict;
 use HTTP::Date qw(str2time parse_date time2str);
 use HTTP::Headers::Util qw(_split_header_words join_header_words);
 
-use vars qw($VERSION $EPOCH_OFFSET);
-$VERSION = "6.01";
+use vars qw($EPOCH_OFFSET);
+our $VERSION = '6.04';
 
 # Legacy: because "use "HTTP::Cookies" used be the ONLY way
 #  to load the class HTTP::Cookies::Netscape.
@@ -632,7 +632,7 @@ HTTP::Cookies - HTTP cookie jars
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Hash-Merge-Extra
 
+0.02    2017-08-04
+        L_ADDITIVE and R_ADDITIVE behaviors added
+
 0.01    2017-07-22
         Initial release.
 

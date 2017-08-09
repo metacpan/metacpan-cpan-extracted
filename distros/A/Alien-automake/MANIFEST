@@ -13,7 +13,7 @@ dist.ini
 lib/Alien/automake.pm
 t/00_diag.t
 t/01_use.t
-t/run.t
+t/alien_automake.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

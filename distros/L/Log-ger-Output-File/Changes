@@ -1,3 +1,27 @@
+0.006   2017-08-02 (PERLANCAR)
+
+	- Remove debug print, d'oh.
+
+
+0.005   2017-08-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Tweak description.
+
+
+0.004   2017-08-02 (PERLANCAR)
+
+        - Add configuration parameters: lock_mode, lazy, autoflush.
+
+
+0.003   2017-08-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention LGO:FileWriteRotate.
+
+
 0.002   2017-06-23 (PERLANCAR)
 
 	- Adjust to Log::ger 0.005.

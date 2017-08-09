@@ -1,5 +1,12 @@
 Revision history for autovivification
 
+0.17    2017-07-31 17:15 UTC
+        + Chg : A large chunk of boilerplate XS code, which is also used in
+                other XS modules, has been factored out of the main .xs file
+                to a collection of .h files in the xsh subdirectory.
+        + Fix : The new optimization in perl 5.27.3 for scalar(keys(%$hashref))
+                is now correcty supported.
+
 0.16    2015-07-01 14:30 UTC
         + Fix : Broken linkage on Windows.
 

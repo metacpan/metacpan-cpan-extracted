@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-package B::Hooks::OP::Check; # git description: 0.20-3-ga7a5050
+package B::Hooks::OP::Check; # git description: 0.21-5-g968d5ca
 # ABSTRACT: Wrap OP check callbacks
 
 require 5.008001;
 use parent qw/DynaLoader/;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 sub dl_load_flags { 0x01 }
 
@@ -26,7 +26,7 @@ B::Hooks::OP::Check - Wrap OP check callbacks
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

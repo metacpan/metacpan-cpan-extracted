@@ -20,22 +20,26 @@ use Encode 'encode';
 
 use Carp 'croak';
 
-our $VERSION = '0.0234';
+our $VERSION = '0.0240';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
 our %PACKAGE_SYMTABLE;
 our %FIELD_SYMTABLE;
 our %SUB_SYMTABLE;
-our %TYPE_SYMTABLE;
 our $API;
+our @TYPE_NAMES;
+our %TYPE_SYMTABLE;
 
 # Compile SPVM source code just after compile-time of Perl
 CHECK {
   # Compile SPVM source code
   compile();
   
-  # Build resolved type symbol table
+  # Build type names
+  build_type_names();
+
+  # Build type names
   build_type_symtable();
   
   # Build subroutine symbol table
@@ -252,17 +256,14 @@ sub import {
 sub build_spvm_subs {
   for my $abs_name (keys %SUB_SYMTABLE) {
     
-    my $sub;
-    $sub .= "sub SPVM::$abs_name {\n";
-    $sub .= "  SPVM::call_sub(\"$abs_name\", \@_);\n";
-    $sub .= "}";
-    
     # Define SPVM subroutine
-    eval $sub;
-    
-    if ($@) {
-      croak "Can't define SVPM subroutine \"$abs_name\"\n$sub";
-    }
+    no strict 'refs';
+    *{"SPVM::$abs_name"} = sub {
+      my $return_value;
+      eval { $return_value = SPVM::call_sub("$abs_name", @_) };
+      croak $@ if $@;
+      $return_value;
+    };
   }
 }
 
@@ -350,351 +351,46 @@ B<Perlish syntax> - SPVM syntax is very similar to Perl
 
 =item *
 
-B<Perl module> - SPVM function can be called from Perl itself (Not yet implemented).
+B<Perl module> - SPVM function can be called from Perl itself.
 
 =back
 
 SPVM only work on the Perl which support 64 bit integer.
 
-=head1 SPVM SYNTAX
+=head1 DOCUMENT
 
-=head2 Type
+=over 2
 
-=head3 Numeric type
+=item 1
 
-Numeric types are byte, short, int, long, float, double.
+L<SPVM::Document::Tutorial> - SPVM Tutorial
 
-  byte    signed integer          1byte
-  short   signed integer          2byte
-  int     signed integer          4byte
-  long    signed integer          8byte
-  float   floating-point number   4byte
-  double  floating-point number   8byte
+=item 2
 
-Declaration
+L<SPVM::Document::PerlAPI> - API to exchange Perl value to SPVM value.
 
-  my $value : byte;
-  my $value : short;
-  my $value : int;
-  my $value : long;
-  my $value : float;
-  my $value : double;
+=item 3
 
-=head3 String type
-
-String type is string.
-
-This is same as byte[] at internal data structure.
-
-Declaration
-
-  my $string : string;
-
-=head3 Reference type
-
-Reference types are `array` and `object`.
-
-B<Object type>
-
-    PackageName
-
-Declaration
-
-    my $object : PackageName;
-
-B<Array type>
-
-  byte[]   byte array
-  short[]  short array
-  int[]    int array array
-  long[]   long array
-  float[]  float array
-  doube[]  double array
-  PackageName[] object array
-
-Declaration
-
-  my $values : byte[];
-  my $values : short[];
-  my $values : int[];
-  my $values : long[];
-  my $values : float[];
-  my $values : double[];
-  my $values : PackageName[];
-
-B<Multiple array type>
-
-  my $values : byte[][];
-  my $values : short[][];
-  my $values : int[][];
-  my $values : long[][];
-  my $values : float[][];
-  my $values : double[][];
-  my $values : PackageName[][];
-
-  my $values : byte[][][];
-  my $values : short[][][];
-  my $values : int[][][];
-  my $values : long[][][];
-  my $values : float[][][];
-  my $values : double[][][];
-  my $values : PackageName[][][];
-
-=head2 Type inference
-
-If the type of right value is known, the type of left value is automatically decided.
-
-  # Type of $value2 is byte.
-  my $value1 : byte;
-  my $value2 = $value1;
-
-  # Type of $values2 is int[]
-  my $values1 = new int[3];
-  my $values2 = $values1;
-
-  # Type of $object2 is PackageName
-  my $object1 = new PackageName
-  my $object2 = $object1;
-
-=head2 Array
-
-=head3 Create array
-
-Array is created by new. Elements values is not initialized.
-
-  my $nums = new byte[3];
-  my $nums = new short[3];
-  my $nums = new int[3];
-  my $nums = new long[3];
-  my $nums = new float[3];
-  my $nums = new double[3];
-
-=head3 Get array length
-
-  my $len = @$nums;
-  my $len = @{$nums};
-  my $len = len $nums;
-
-=head3 Get and set array element
-
-  # Get
-  my $num = $nums->[0];
-
-  # Set
-  $nums->[0] = 5;
-
-=head2 Condition branch
-
-  if (1) {
-
-  }
-  elsif (2) {
-
-  }
-  else {
-
-  }
-
-=head2 Loop
-
-=head3 for
-
-  my $nums = new int[10];
-  for (my $i = 0; $i < @$nums; $i++) {
-    $nums->[$i] = 0;
-  }
-
-=head3 while
-
-  my $nums = new int[10];
-  my $i = 0;
-  while ($i < @$nums) {
-    $nums->[$i] = 0;
-  }
-
-=head2 Constant
-
-=head3 Constant type
-
-Type of constant default integral value is `int`.
-
-    # int type
-    1;
-    3;
-
-Type of constant default floating-point value is `double`.
-
-    # double
-    1.2
-    5.3
-
-Type of constant is specified by type specifier.
-
-    # long
-    3L
-
-    # float
-    3.2f
-
-    # double
-    3.2d
-
-=head2 Name
-
-=head3 Package name
-
-Package name is a combination of alphabets, numbers, and `::`. Numbers should not appear as the first character. `_` can't be used in class name.
-
-    # OK
-    Foo
-    Foo::Bar
-    Foo1::Bar1
-
-    # Not OK
-    1Foo
-    Foo::2Bar
-    Foo_Bar;
-
-=head3 Subroutine name
-
-Subroutine name is a combination of alphabets, numbers, and `_` separators. Continual `_`(For example `__`) can't be used in subroutine name.
-
-    # OK
-    foo
-    foo1
-    foo_bar
-
-    # Not OK
-    1foo
-    foo__bar
-
-=head3 Field name
-
-Field name is a combination of alphabets, numbers, and `_` separators. Continual `_`(For example `__`) can't be used in field name.
-
-    # OK
-    foo
-    foo1
-    foo_bar
-
-    # Not OK
-    1foo
-    foo__bar
-
-=head3 Absolute name
-
-Absolute name is combination of package name and subroutine name, or package name and field name.
-
-    PackageName1::foo
-    PackageName1::PackageName2::foo_bar
-
-=head2 Limitation
-
-Object can't have object and array of object.
-
-If I have idea to implement weaken reference and implement weaken reference, this limitation is removed.
-
-=head1 FUNCTIONS
-
-=head2 new_byte_array
-
-Create new_byte array
-
-  my $array = SPVM::new_byte_array([1, 2, 3]);
-
-If you get perl values, you can use C<get_elements> methods.
-
-  my $values = $array->get_elements;
-
-=head2 new_short_array
-
-Create short array
-
-  my $array = SPVM::new_short_array([1, 2, 3]);
-
-If you get perl values, you can use C<get_elements> methods.
-
-  my $values = $array->get_elements;
-
-=head2 new_int_array
-
-Create int array
-
-  my $array = SPVM::new_int_array([1, 2, 3]);
-
-If you get perl values, you can use C<get_elements> methods.
-
-  my $values = $array->get_elements;
-
-=head2 new_long_array
-
-Create long array
-
-  my $array = SPVM::new_long_array([1, 2, 3]);
-
-If you get perl values, you can use C<get_elements> methods.
-
-  my $values = $array->get_elements;
-
-=head2 new_float_array
-
-Create float array
-
-  my $array = SPVM::new_float_array([1, 2, 3]);
-
-If you get perl values, you can use C<get_elements> methods.
-
-  my $values = $array->get_elements;
-
-=head2 new_double_array
-
-Create double array
-
-  my $array = SPVM::new_double_array([1, 2, 3]);
-
-If you get perl values, you can use C<get_elements> methods.
-
-  my $values = $array->get_elements;
-
-=head2 new_string_raw
-
-Create byte array from B<not decoded> Perl string.
-This function is faster than C<SPVM::string> because copy is not executed.
-
-  my $array = SPVM::new_string_raw("AGTCAGTC");
-
-=head2 new_string
-
-Create byte array from B<decoded> Perl string.
-
-  my $array = SPVM::new_string("Å†Ç¢Å§Ç¶Å®");
-
-=head2 new_object
-
-Create object.
-
-  my $object = SPVM::new_object("Point");
-
-You can set and get value by C<set> and C<get> method.
-
-  $object->set(x => 1);
-  my $x = $object->get('x');
-
-=head2 FAQ
-
-=over 4
-
-=item * B<Why SPVM don't support 32 bit Perl>
-
-In many 32 bit Perl, 64 bit integer is not supported. This means that Perl can not express 64 bit integers on source code.
-
-See the following code.
-
-    my $value = 9223372036854775807;
-
-In 32 bit Perl, 64bit integer value is converted to double automatically. The double value can't express long value accurately.
+L<SPVM::Document::Specification> - SPVM Specification
 
 =back
+
+=head1 DON'T PANIC!
+
+We are constantly working on new documentation. Follow us on
+L<GitHub|https://github.com/yuki-kimoto/SPVM> or join the official IRC channel C<#perl11>
+on C<irc.perl.org> to get all the latest updates.
+
+=head2 SUPPORT
+
+If you have any questions the documentation might not yet answer, don't
+hesitate to ask on the the official IRC
+channel C<#perl11> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23perl11&server=irc.perl.org>).
+
+You can see #perl11 log.
+
+L<http://irclog.perlgeek.de/perl11/>
 
 =head1 AUTHOR
 

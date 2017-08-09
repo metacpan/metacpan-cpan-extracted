@@ -1,0 +1,8 @@
+This is a toy autohell project intended for testing Perl Alien code.  It 
+is licensed under the same terms as Perl itself.
+
+helpful reading:
+
+http://mij.oltrelinux.com/devel/autoconf-automake/
+
+from libpalindrome git commit  d017079f77e94ff42b3db43f1bb8fe6230f3649b

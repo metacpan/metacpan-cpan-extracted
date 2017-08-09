@@ -32,9 +32,12 @@ SKIP: {
     ok(Devel::CheckBin::can_run('bash'), 'the bash executable is available');
 }
 
+my $tempdir = no_git_tempdir();
+
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {
+        tempdir_root => $tempdir->stringify,
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
                 {   # merge into root section
@@ -139,14 +142,8 @@ push @expected_files, eval { Dist::Zilla::Plugin::Test::NoTabs->VERSION('0.09');
 push @expected_files, 't/00-report-prereqs.dd'
     if Dist::Zilla::Plugin::Test::ReportPrereqs->VERSION >= 0.014;
 
-my @found_files;
-$build_dir->visit(
-    sub { push @found_files, $_->relative($build_dir)->stringify if -f },
-    { recurse => 1 },
-);
-
 cmp_deeply(
-    \@found_files,
+    [ recursive_child_files($build_dir) ],
     bag(@expected_files),
     'the right files are created by the pluginbundle',
 );

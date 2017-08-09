@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.10.5;
+package Pcore::PgSQL v0.10.6;
 
 use Pcore -dist, -class;
 
@@ -52,8 +52,8 @@ sub run ( $self, $cb ) {
     }
 
     # create and prepare unix socket dir
-    P->file->mkdir('/tmp/pgsql.sock/') if !-d '/tmp/pgsql.sock';
-    chown $uid, $uid, '/tmp/pgsql.sock/' or die;
+    P->file->mkdir('/var/run/postgresql/') if !-d '/var/run/postgresql';
+    chown $uid, $uid, '/var/run/postgresql/' or die;
 
     # run server
     P->pm->run_proc(
@@ -86,17 +86,17 @@ Pcore::PgSQL
 
 =head1 DESCRIPTION
 
-    docker create --name pgsql -v pgsql:/var/local/pcore-pgsql/data/ -v /tmp/pgsql.sock/:/tmp/pgsql.sock/ -p 5432:5432/tcp softvisio/pcore-pgsql
+    docker create --name pgsql -v pgsql:/var/local/pcore-pgsql/data/ -v /var/run/postgresql/:/var/run/postgresql/ -p 5432:5432/tcp softvisio/pcore-pgsql
 
     # how to connect with standard client:
     psql -U postgres
-    psql -h /tmp/pgsql.sock -U postgres
+    psql -h /var/run/postgresql -U postgres
 
     # connect via TCP
     my $dbh = P->handle('pgsql://username:password@host:port?db=dbname');
 
     # connect via unix socket
-    my $dbh = P->handle('pgsql://username:password@/tmp/pgsql.sock?db=dbname');
+    my $dbh = P->handle('pgsql://username:password@/var/run/postgresql?db=dbname');
 
 =head1 SEE ALSO
 

@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Forrest Gump
+NICKNAME:Gumpy
+LABEL;TYPE=HOME:123 Main St.\nSpringfield, IL 12345\nUSA
+GEO:39.95;-75.1667
+ORG:Bubba Gump Shrimp Co.
+TITLE:Shrimp Man
+ROLE:Section 9
+CATEGORIES:fisher
+NOTE:It's a note!
+KEY;TYPE=PGP:http://example.com/key.pgp
+END:VCARD

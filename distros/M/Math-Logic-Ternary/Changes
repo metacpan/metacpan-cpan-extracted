@@ -1,0 +1,20 @@
+Revision history for Perl extension Math::Logic::Ternary.
+
+0.004   Thu, 27 Jul 2017 11:55:57 +0200
+        First official release.
+        Fixed some compatibility issues.
+
+0.003   Fri, 16 Jun 2017 22:05:07 +0200
+        Added some more documentation and CPAN packaging stuff.
+
+0.002   Tue, 21 Aug 2012 13:51:36 +0200
+        Refactored into 5 modules.
+        Added an interactive calculator as a demo application.
+        Added first part of TFP_81.pm (documentation).
+
+0.001   Mon, 20 Aug 2007 13:28:08 +0200
+        Initial version.  Not published.
+
+0.000   Tue, 14 Feb 2006 00:40:20 +0100
+        Project start.  Author: Martin Becker (MHASCH at CPAN)
+

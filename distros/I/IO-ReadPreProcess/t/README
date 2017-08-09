@@ -1,7 +1,7 @@
 You MUST not test .exit -- as that will kill the test script
 
 Alain Williams <addw@phcomp.co.uk>
-SCCS: @(#)README	1.3 05/22/17 19:27:16
+SCCS: @(#)README	1.4 08/03/17 15:13:02
 
 
 Overview of testing:
@@ -64,4 +64,11 @@ The keys are:
 	To fork before doing the test
 	This is not fully implemented.
 
+    CheckFn:	string
+	Check that the value sent to output stream 'fun' is the argument
 
+    Out:	string
+	Create an output stream name by this string.
+	Where the output goes to will be testname.want.string, eg: 9_test_1.want.s1
+	This will be checked.
+	This may be given multiple times for multiple output streams.

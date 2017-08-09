@@ -45,11 +45,11 @@
    "provides" : {
       "App::calendr" : {
          "file" : "lib/App/calendr.pm",
-         "version" : "0.18"
+         "version" : "0.20"
       },
       "App::calendr::Option" : {
          "file" : "lib/App/calendr/Option.pm",
-         "version" : "0.18"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/manwar/App-calendr"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

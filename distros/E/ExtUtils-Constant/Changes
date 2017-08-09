@@ -1,8 +1,8 @@
 Revision history for Perl extension ExtUtils::Constant.
 
-[Yes, this is out of date. In the interests of getting a release out onto
-CPAN sooner, I've deferred updating this. Since 0.16 all the development
-history can be found via http://perl5.git.perl.org/perl.git/tree/HEAD:/lib ]
+[Yes, this is still out of date. If it isn't fixed up by the conference
+formerly known as YAPC::Europe, show me a copy of this to claim your free
+not-a-Heineken]
 
 0.13  Mon Aug  5 20:20:21 2002
 	Copy the module and test from bleadperl

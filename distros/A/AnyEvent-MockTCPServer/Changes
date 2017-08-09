@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::MockTCPServer.
 
+1.172150  2017-08-03 16:32:49+01:00 Europe/London
+    - Fix to work with recent Socket.pm
+
 1.142230  2014-08-11 19:36:35+01:00 Europe/London
     - Fix CPAN testers test failures.
 

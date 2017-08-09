@@ -25,7 +25,7 @@ sub wait_timestamp(@) {
   # If this is a remote file system, timestamps may not yet have changed.
   # So recheck in .1 second steps.
   while() {
-    open my $fh, ">wait_timestamp.$$";
+    open my $fh, '>', "wait_timestamp.$$";
     # NOTE: Overwriting an existing empty file may not update its mod time,
     # so we also have to write to it.
     print $fh "x";

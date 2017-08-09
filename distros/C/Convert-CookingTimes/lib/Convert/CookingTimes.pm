@@ -8,7 +8,7 @@ use Lingua::Conjunction;
 use List::Util;
 use Math::Round;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -116,7 +116,7 @@ sub adjust_times {
     my @output;
     @times = sort { $b->{adjusted_time} <=> $a->{adjusted_time} } @times;
 
-    for my $time (reverse sort keys %items_by_time) {
+    for my $time (sort { $b <=> $a } keys %items_by_time) {
         my @items = @{ $items_by_time{$time} };
         my $condensed_item = {
             name => conjunction(map { $_->{name} } @items),
@@ -125,7 +125,9 @@ sub adjust_times {
         
         # Add time_until_next, if there are other items to come - find the next
         # item(s) by looking for the first time that's shorter than this one:
-        my ($next_time) = grep { $_ < $time } reverse sort keys %items_by_time;
+        my ($next_time) = grep { 
+            $_ < $time 
+        } sort { $b <=> $a} keys %items_by_time;
         if ($next_time) {
             $condensed_item->{time_until_next} 
                 = $condensed_item->{adjusted_time}

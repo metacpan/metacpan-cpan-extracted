@@ -1,12 +1,12 @@
 =head1 NAME
 
-IO::ExplicitHandle - detect implicit I/O handles when compiling
+IO::ExplicitHandle - force I/O handles to be explicitly specified
 
 =head1 SYNOPSIS
 
-	use IO::ExplicitHandle;
+    use IO::ExplicitHandle;
 
-	no IO::ExplicitHandle;
+    no IO::ExplicitHandle;
 
 =head1 DESCRIPTION
 
@@ -34,11 +34,11 @@ common list-generating form, so it is not affected by this module.
 package IO::ExplicitHandle;
 
 { use 5.006; }
-use Lexical::SealRequireHints 0.007;
+use Lexical::SealRequireHints 0.008;
 use warnings;
 use strict;
 
-our $VERSION = "0.000";
+our $VERSION = "0.001";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -78,7 +78,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2012, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

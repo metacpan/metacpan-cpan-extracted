@@ -25,7 +25,6 @@ const our $BUILD_STATUS_TEXT => {
     -4 => 'cancelled',
     -1 => 'error',
     0  => 'queued',
-    2  => '???',
     3  => 'building',
     10 => 'success',
 };
@@ -397,7 +396,7 @@ sub get_build_history ( $self, $repo_id, $cb = undef ) {
                 for my $build ( $res->{data}->{results}->@* ) {
                     $data->{ $build->{id} } = $build;
 
-                    $build->{status_text} = $BUILD_STATUS_TEXT->{ $build->{status} };
+                    $build->{status_text} = exists $BUILD_STATUS_TEXT->{ $build->{status} } ? $BUILD_STATUS_TEXT->{ $build->{status} } : $build->{status};
                 }
 
                 $res->{data} = $data;
@@ -617,12 +616,12 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 78, 189, 323, 333,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 350, 378, 382, 417,  |                                                                                                                |
-## |      | 489, 508, 512, 556,  |                                                                                                                |
-## |      | 569                  |                                                                                                                |
+## |    3 | 77, 188, 322, 332,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 349, 377, 381, 416,  |                                                                                                                |
+## |      | 488, 507, 511, 555,  |                                                                                                                |
+## |      | 568                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 167                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 166                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

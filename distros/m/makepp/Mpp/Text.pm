@@ -1,4 +1,4 @@
-# $Id: Text.pm,v 1.61 2012/10/25 21:09:50 pfeiffer Exp $
+# $Id: Text.pm,v 1.72 2017/07/26 22:11:11 pfeiffer Exp $
 
 =head1 NAME
 
@@ -7,28 +7,59 @@ Mpp::Text - Subs for manipulating typical makefile text
 =cut
 
 package Mpp::Text;
+
 require Exporter;
 @ISA = qw(Exporter);
 
-@EXPORT = qw(index_ignoring_quotes max_index_ignoring_quotes
-	     split_on_whitespace join_with_protection split_on_colon
-	     split_commands unquote unquote_split_on_whitespace
-	     requote format_exec_args whitespace_len hash_neq
-	     is_cpp_source_name is_object_or_library_name);
+@EXPORT = qw(find_unquoted rfind_unquoted split_on_whitespace join_with_protection
+	     split_on_colon split_commands unquote unquote_split_on_whitespace
+	     format_exec_args hash_neq is_cpp_source_name is_object_or_library_name);
 
 use Config;
 
+BEGIN {
+  # Keep it here, as this is the common to all mpp* utilities.
+  our $BASEVERSION = 2.1;
+#@@setVERSION
+  our $VERSION = '2.0.98.5.1cvs';
+
+#
+# Not installed, so grep all our sources for the checkin date.  Make a
+# composite version consisting of the three most recent dates (shown as (yy)mmdd,
+# but sorted including year) followed by the count of files checked in that
+# day.
+#
+  $Mpp::datadir ||= (grep -f "$_/Mpp.pm", @INC)[0] or
+    die "Can't find our libraries in \@INC.\n";
+  if( $VERSION =~ tr/a-z//d ) {
+    my %VERSION = qw(0/00/00 0 00/00/00 0); # Default in case all modules change on same day.
+    for( <$Mpp::datadir/makep*[!~] $Mpp::datadir/Mpp{,/*,/*/*}.pm> ) {
+      open my $fh, '<', $_;
+      while( <$fh> ) {
+	if( /\$Id: .+,v [.0-9]+ ([\/0-9]+)/ ) {
+	  $VERSION{$1}++;
+	  last;
+	}
+      }
+    }
+    my $year = '';
+    $VERSION .= join '-', '',
+      grep { s!\d\d(\d+)/(\d+)/(\d+)!($year eq $1 ? '' : ($year = $1))."$2$3:$VERSION{$_}"!e }
+	(reverse sort keys %VERSION)[0..2];
+  }
+#@@
+
 # Centrally provide constants which are needed repeatedly for aliasing, since
 # Perl implements them as subs, and each sub takes about 1.5kb RAM.
-BEGIN {
   our @N = map eval( "sub(){$_}" ), 0..6; # More are defined in Mpp/BuildCacheControl.pm
   *Mpp::is_windows =
     $^O eq 'cygwin' ? sub() { -1 } : # Negative for Unix like
     $^O eq 'msys' ? sub() { -2 } :   # MinGW with sh & coreutils
     $N[$^O =~ /^MSWin/ ? (exists $ENV{SHELL} && $ENV{SHELL} =~ /sh(?:\.exe)?$/i ? 1 : 2) : 0];
+  *Mpp::DEBUG = $N[$ENV{MAKEPP_DEBUG} || 0];
 
   my $perl = $ENV{PERL};
-  if( $perl && -x $perl ) {	# Overridden successfully.
+  if( $perl ) {			# Overridden.
   } elsif( -x $^X ) {		# Use same as ourself.
     $^X =~ tr/\\/\// if Mpp::is_windows() > 0;
     $perl = (Mpp::is_windows() ? $^X =~ /^(?:\w:)?\// : $^X =~ /^\//) ?
@@ -92,72 +123,62 @@ sub pattern_substitution {
 }
 
 # Rather than cascade if( /\Gx/gc ), just look up the action
-our %skip_over = (
-  "'", \&skip_over_squote,
-  '"', \&skip_over_dquote,
-  '$', \&skip_over_make_expression,
-  '\\', sub { ++pos });
+my @skip_over;
+$skip_over[ord "'"] = \&skip_over_squote;
+$skip_over[ord '"'] = \&skip_over_dquote;
+$skip_over[ord '$'] = \&skip_over_make_expression;
+$skip_over[ord '\\'] = sub { ++pos };
 
-=head2 index_ignoring_quotes
+=head2 find_unquoted
 
-  my $index = index_ignoring_quotes($string, 'substr'[, position]);
+  my $index = find_unquoted string, 'char'[, position[, type];
 
-Works like C<index($string, 'substr'[, position])>, except that the substring may not be
-inside quotes or a make expression.
+Works like C<index $string, 'char'[, position]>, except that the char is to be
+found outside quotes or make expressions.
 
-=head2 index_ignoring_single_quotes
+If type is C<1>, char may be inside a make expression (for historical
+reasons opposite to split_on_whitespace).
 
-This is similar, but ignores only the characters in '' and the one after \.
+If type is C<2>, ignores only the characters in C<''> and the one after C<\>,
+i.e. makes the same difference between single and double quotes as does the
+Shell or Perl.
 
 =cut
 
-sub index_ignoring_quotes {
-  my $substr = $_[1];
-  local $_ = $_[0];
-  pos = $_[2] || 0;		# Start at the beginning.
-
-  for (;;) {
-    my $last_pos = pos;
-    if( /\G([^"'\\\$]+)/gc ) {	# Just ordinary characters?
-      my $idx = index $1, $substr; # See if it's in those characters.
-      $idx >= 0 and return $last_pos + $idx;
-    }
-
-    return -1 if length() <= pos; # End of string?  That means no match.
-				# For reasons that I don't understand, testing
-				# for /\G\z/gc doesn't work here.
-
-    # It's one of the standard cases ", ', \ or $.
-    &{$skip_over{substr $_, pos()++, 1}};
+sub find_unquoted {
+  local *_ = \$_[0];
+  my $opos = pos;
+  my $ret = 0;
+  pos = $_[2] || 0;
+  my $char = $_[1];
+  my $re = (qr/["'\\\$$char]/, qr/['\\$char]/, qr/["'\\$char]/)[$_[3] || 0];
+  while( /$re/gc ) {
+    $ret = pos, $_[4] ? next : last if $& eq $char;
+    &{$skip_over[ord $&]};
   }
-}
-sub index_ignoring_single_quotes {
-  local $skip_over{'"'} = local $skip_over{'$'} = $N[0];
-  &index_ignoring_quotes;
+  pos = $opos;
+  $ret - 1;
 }
 
-=head2 max_index_ignoring_quotes
+=head2 rfind_unquoted
 
-Like C<index_ignoring_quotes>, except that it returns the index to the last
+Like C<find_unquoted>, except that it returns the index to the last
 instance rather than the first.
 
 =cut
 
-sub max_index_ignoring_quotes {
-  my $pos = &index_ignoring_quotes;
-  my $opos = -1;
-  $pos = index_ignoring_quotes $_[0], $_[1], 1 + ($opos = $pos)
-    while $pos >= 0;
-  $opos;
+sub rfind_unquoted {
+  $_[4] = 1;
+  &find_unquoted;
 }
 
 =head2 split_on_whitespace
 
-  @pieces = split_on_whitespace($string);
+  @pieces = split_on_whitespace $string[, type];
 
-Works just like
+Works like
 
-  @pieces = split(' ', $string)
+  @pieces = split ' ', $string
 
 except that whitespace inside quoted strings is not counted as whitespace.
 This should be called after expanding all make variables; it does not know
@@ -169,6 +190,9 @@ terminated by a matching double quote that isn't escaped by a backslash.
 Backquoted strings are terminated by a matching backquote that isn't escaped
 by a backslash.
 
+If type is C<1>, doesn't split inside make expressions (for historical reasons
+opposite to find_unquoted).
+
 =cut
 
 sub unquote_split_on_whitespace {
@@ -176,63 +200,55 @@ sub unquote_split_on_whitespace {
   # localizing $_ doesn't localize \G
   map unquote(), &split_on_whitespace;
 }
+my @ws_re = (qr/\s+()|["'\\]/, qr/\s+()|[\$"'\\]/, qr/[;|&()]+(?<![<>]&)()|[\$"'\\`]/);
 sub split_on_whitespace {
   my @pieces;
-  my $cmds = @_ > 1;
-  local $_ = $_[0];
+  my $cmds = $_[1] || 0;
+  local *_ = \$_[0];
+  my $opos = pos;
 
   pos = 0;			# Start at the beginning.
-  $cmds ? /^[;|&]+/gc : /^\s+/gc;			# Skip over leading whitespace.
+  $cmds == 2 ? m/^[;|&]+/gc : /^\s+/gc; # Skip over leading whitespace.
   my $last_pos = pos;
 
-  for (;;) {
-    $cmds ? /\G[^;|&()"'`\\\$]+/gc : /\G[^\s"'\\]+/gc;	# Skip over irrelevant things.
-
-    last if length() <= pos;	# End of string.
-
+  while( m/${ws_re[$cmds]}/gc ) {
     my $cur_pos = pos;		# Remember the current position.
-    if ($cmds && /\G(?<=[<>])&/gc) {	# Skip over redirector, where & is not a separator
-    } elsif ($cmds ? /\G[;|&()]+/gc : /\G\s+/gc) { # Found some whitespace?
-      push(@pieces, substr($_, $last_pos, $cur_pos-$last_pos));
+    my $chr = ord $&;
+    if( defined $1 ) {		# Found some whitespace?
+      push @pieces, substr $_, $last_pos, $cur_pos-$last_pos-length $&;
       $last_pos = pos;		# Beginning of next string is after this space.
-    } elsif (!$cmds and /\G"/gc) { # Double quoted string?
-      while (pos() < length) {
-	next if /\G[^\\"]+/gc;	# Skip everything except quote and \.
-	/\G"/gc and last;	# We've found the end of the string.
-	pos() += 2;		# Skip char after backslash.
-      }
-    } elsif (/\G'[^']*'/gc) {	# Skip until end of single quoted string.
-    } elsif (/\G`/gc) {		# Back quoted string?
-      while (pos() < length) {
-	next if /\G[^\\`]+/gc;	# Skip everything except quote and \.
-	/\G`/gc and last;	# We've found the end of the string.
-	pos() += 2;		# Skip char after backslash.
-      }
+    } elsif( $cmds < 2 and $chr == ord '"' ) { # Double quoted string?
+      ++pos while /[\\"]/gc && $& ne '"'; # Skip char after backslash.
+    } elsif( $chr == ord "'" ) { # Skip until end of single quoted string.
+      /'/gc;
+    } elsif( $chr == ord '`' ) { # Back quoted string?
+      ++pos while /[\\`]/gc && $& ne '`'; # Skip char after backslash.
     } else {			# It's one of the standard cases ", \ or $.
       # $ only gets here in commands, where we use the similarity of make expressions
       # to skip over $(cmd; cmd), $((var|5)), ${var:-foo&bar}.
       # " only gets here in commands, where we need to catch nested things like
       # "$(cmd "foo;bar")"
-      &{$skip_over{substr $_, pos()++, 1}};
+      &{$skip_over[$chr]};
     }
   }
 
-  push @pieces, substr $_, $last_pos
-    if length() > $last_pos;	# Anything left at the end of the string?
+  pos = $opos;
+  return @pieces, substr $_, $last_pos
+    if $last_pos < length;	# Anything left at the end of the string?
 
   @pieces;
 }
 sub split_commands {
-  split_on_whitespace $_[0], 1;
+  split_on_whitespace $_[0], 2;
 }
 
 =head2 join_with_protection
 
   $string = join_with_protection(@pieces);
 
-Works just like
+Works like
 
-  $string = join(' ', @pieces)
+  $string = join ' ', @pieces
 
 except that strings in @pieces that contain shell metacharacters are protected
 from the shell.
@@ -253,13 +269,13 @@ sub join_with_protection {
 
   @pieces = split_on_colon('string');
 
-This subroutine is equivalent to
+Works like
 
-  @pieces = split(/:+/, 'string');
+  @pieces = split /:+/, 'string'
 
 except that colons inside double quoted strings or make expressions are passed
 over.  Also, a semicolon terminates the expression; any colons after a
-semicolon are ignored.	This is to support grokking of this horrible rule:
+semicolon are ignored.	This is to support grokking of this rule:
 
   $(srcdir)/cat-id-tbl.c: stamp-cat-id; @:
 
@@ -267,34 +283,24 @@ semicolon are ignored.	This is to support grokking of this horrible rule:
 
 sub split_on_colon {
   my @pieces;
-
-  local $_ = $_[0];
-  my $last_pos = 0;
-  pos = 0;			# Start at the beginning.
-
-  for (;;) {
-    /\G[^;:"'\\\$]+/gc;		# Skip over irrelevant stuff.
-    last if length() <= pos;	# End of string?
-				# For reasons that I don't understand, testing
-				# for /\G\z/gc doesn't work here.
-
-    if (/\G(:+)/gc) {		# Found our colon?
-      push @pieces, substr $_, $last_pos, pos() - $last_pos - length $1;
-      $last_pos = pos;		# Beginning of next string is after this space.
-    } elsif (/\G;/gc) {		# Found end of the rule?
-      pos = length;		# Don't look for any more colons.
-    } else {			# It's one of the standard cases ", ', \ or $.
-      &{$skip_over{substr $_, pos()++, 1}};
+  local *_ = \$_[0];
+  my $opos = pos;
+  pos = my $last_pos = 0;
+  while( /[;:"'\\\$]/gc ) {
+    last if $& eq ';';
+    if( $& eq ':' ) {
+      push @pieces, substr $_, $last_pos, pos() - $last_pos - 1;
+      /\G:+/gc;
+      $last_pos = pos;
+    } else {
+      &{$skip_over[ord $&]};
     }
   }
-
-  if (length() > $last_pos) {	# Anything left at the end of the string?
-    push @pieces, substr($_, $last_pos);
-  }
-
+  pos = $opos;
+  return @pieces, substr $_, $last_pos
+    if $last_pos < length;	# Anything left at the end of the string?
   @pieces;
 }
-
 
 #
 # This routine splits the PATH according to the current systems syntax.  An
@@ -302,15 +308,16 @@ sub split_on_colon {
 # that is used instead of $ENV{PATH}.  Empty elements are returned as '.'.
 # A second optional argument may be an alternative string to 'PATH'.
 # A third optional argument may be an alternative literal path.
+# A fourth optional argument means split on ';' even though is_windows < 0.
 #
 sub split_path {
   my $var = $_[1] || 'PATH';
   my $path = $_[2] || ($_[0] && $_[0]{$var} || $ENV{$var});
   if( Mpp::is_windows ) {
     map { tr!\\"!/!d; $_ eq '' ? '.' : $_ }
-      Mpp::is_windows > 0 ?
-	split( /;/, "$path;" ) :	# "C:/a b";C:\WINNT;C:\WINNT\system32
-	split_on_colon( "$path:" );	# "C:/a b":"C:/WINNT":/cygdrive/c/bin
+      Mpp::is_windows > 0 || $_[3] ?
+	split /;/, "$path;" :	# "C:/a b";C:\WINNT;C:\WINNT\system32
+	split_on_colon "$path:"; # "C:/a b":"C:/WINNT":/cygdrive/c/bin
   } else {
     map { $_ eq '' ? '.' : $_ } split /:/, "$path:";
   }
@@ -328,45 +335,28 @@ sub split_path {
 # This returns the length of the opening parens, i.e.: $@ = 0; $(VAR) = 1 and
 # $((perl ...)) = 2, or undef if the closing parens don't match.
 #
+# Reuse same mechanism:
+$skip_over[ord '('] = [qr/[)"'\$]|(?=\()/, qr/\)\)|["'\$]/, qr/\)/];
+$skip_over[ord '{'] = [qr/[}"'\$]|(?=\{)/, qr/\}\}|["'\$]/, qr/\}/];
+$skip_over[ord '['] = [qr/[]"'\$]|(?=\[)/, qr/\]\]|["'\$]/, qr/\]/];
 sub skip_over_make_expression {
-  my( $nonre, $endre );
-  if (/\G\(/gc) {		# Does the expression begin with $(?
-    $nonre = qr/[^)"'\$]/;
-    $endre = qr/\)/;
-  } elsif (/\G\{/gc) {		# Does the expression begin with ${?
-    $nonre = qr/[^}"'\$]/;
-    $endre = qr/\}/;
-  } elsif (/\G\[/gc) {		# Does the expression begin with $[?
-    $nonre = qr/[^]"'\$]/;
-    $endre = qr/\]/;
-  } else {
-    ++pos;			# Must be a single character variable.	Just
-				# skip over it.
-    return 0;
-  }
+  /\G[({[]/gc or
+      ++pos, return 0;	# Must be a single character variable to skip over.
+  my $open = ord $&;
+  my $double = /\G[$&]/gc || 0;	# Does the expression begin with $((, ${{ or $[[?;
 
-  my $double = //gc || 0;	# Does the expression begin with $((, ${{ or $[[?
-
+  my $re = $skip_over[$open][$double];
   if( /\G(?:perl|map())\s+/gc ) { # Is there plain Perl code we must skip blindly?
-    if( defined $1 ) {		  # The first arg to map is normal make stuff.
-      /\G[^"'\$,]/gc or &{$skip_over{substr $_, pos()++, 1}}
-	until /\G,/gc;
+    if( defined $1 ) {		# The first arg to map is normal make stuff.
+      &{$skip_over[ord $&]} while /["'\$,]/gc && $& ne ',';
     }
-    $double ? /\G.*?$endre$endre/gc : /\G.*?$endre/gc;
+    $re = $skip_over[$open][2];
+    $double ? /$re$re/gc : /$re/gc;
     return $double + 1;
   }
 
-  for (;;) {
-    /\G$nonre+/gc;		# Skip over irrelevant things.
-    last if length() <= pos;	# Quit if end of string.  (Testing for \z
-				# seems unreliable.)
-    if( /\G$endre/gc ) {
-      return $double + 1 if !$double or //gc; # Quit if closing parens.
-      ++pos;			# A simple ) within $(( )) or } within ${{ }}
-    } else {			# It's one of the standard cases ", ' or $.
-      &{$skip_over{substr $_, pos()++, 1}};
-    }
-  }
+  &{$skip_over[ord $& or ord '$'] or return $double + 1} # 0 means looking at paren, not found must be closing paren
+    while /$re/gc;
   undef;
 }
 
@@ -381,16 +371,7 @@ sub skip_over_make_expression {
 # On return, pos($_) is the first character after the closing quote.
 #
 sub skip_over_dquote {
-  for (;;) {
-    /\G[^"\\\$]+/gc;		# Skip over irrelevant characters.
-
-    last if length() <= pos;	# Quit if end of string.  (Testing for \z
-				# seems unreliable.)
-    /\G"/gc and last;		# Found the closing quote.
-
-    # It's one of the standard cases \ or $.
-    &{$skip_over{substr $_, pos()++, 1}};
-  }
+  &{$skip_over[ord $&]} while /["\\\$]/gc && $& ne '"';
 }
 
 #
@@ -405,21 +386,17 @@ sub skip_over_dquote {
 # On return, pos($_) is the first character after the closing quote.
 #
 sub skip_over_squote {
-  for (;;) {
-    /\G[^'\\\$]+/gc;		# Skip over irrelevant characters.
-
-    last if length() <= pos;	# Quit if end of string.  (Testing for \z
-				# seems unreliable.)
-    /\G'/gc and last;		# Found the closing quote.
-
-    # It's one of the standard cases \ or $.
-    &{$skip_over{substr $_, pos()++, 1}};
-  }
+##################################################################################################
+  &{$skip_over[ord $&]} while /['\$]/gc && $& ne "'";
 }
 
 =head2 unquote
 
   $text = unquote($quoted_text)
+
+or on an implicit C<$_>:
+
+  $text = unquote
 
 Removes quotes and escaping backslashes from a name.  Thus if you give it as
 an argument
@@ -430,73 +407,61 @@ it will return the string
     "a bc"
 
 You must already have expanded all of the make variables in the string.
-unquote() knows nothing about make expressions.
+unquote() knows nothing about make expressions.  In the 1st variant, you may
+not pass anny regextp special vars, because it uses regexps directly on the
+argument.
 
 =cut
 
 sub unquote {
   my $ret_str = '';
 
-  local $_ = $_[0] if @_;
-  pos = 0;			# Start at beginning of string.
+  local *_ = \$_[0] if @_;
+  my $opos = pos;
+  pos = my $last_pos = 0;	# Start at beginning of string.
 
-  for (;;) {
-    /\G([^"'\\]+)/gc and $ret_str .= $1; # Skip over ordinary characters.
-    last if length() <= pos;
+  while( /["'\\]/gc ) {
+    my $len = pos() - $last_pos - 1;
+    $ret_str .= substr $_, $last_pos, $len if $len;
 
-    if (/\G"/gc) {		# Double quoted section of the string?
-      for (;;) {
-	/\G([^"\\]+)/gc and $ret_str .= $1; # Skip over ordinary chars.
-	if( /\G\\/gc ) {	# Handle quoted chars.
-	  if( length() <= pos ) {
-	    die "single backslash at end of string '$_'\n";
-	  } else {		# Other character escaped with backslash.
-	    $ret_str .= substr $_, pos()++, 1; # Put it in verbatim.
-	  }
-	} else {
-	  last if length() <= pos || # End of string w/o matching quote.
-	    ++pos;		# Skip quote.
+    if( $& eq '"' ) {		# Double quoted section of the string?
+      $last_pos = pos;
+      while( /["\\]/gc ) {
+	$len = pos() - $last_pos - 1;
+	$ret_str .= substr $_, $last_pos, $len if $len;
+	if( $& eq '"' ) {	# Ending double quote
+	  $last_pos = pos;
+	  last;
+	} elsif( length() <= pos ) {
+	  die "lone backslash at end of string '$_'\n";
+	} else {		# Other character escaped with backslash.
+	  $last_pos = pos()++;	# Put it in verbatim together with what follows.
 	}
       }
-    } elsif (/\G'/gc) {		# Single quoted string?
-      /\G([^']+)/gc and $ret_str .= $1; # Copy up to terminating quote.
-      last if length() <= pos;	# End of string w/o matching quote.
-      ++pos;			# Or skip quote.
-    } else {
-      ++pos;			# Must be '\', skip it
-      if( length() <= pos ) {
-	die "single backslash at end of string '$_'\n";
-      } elsif (/\G([0-7]{1,3})/gc) { # Octal character code?
-	$ret_str .= chr oct $1;	# Convert the character to binary.
-      } elsif (/\G([*?[\]])/gc) { # Backslashed wildcard char?
-				# Don't weed out backslashed wildcards here,
-				# because they're recognized separately in
+    } elsif( $& eq "'" ) {	# Single quoted string?
+      $last_pos = pos;
+      /'/gc or last;		# End of string w/o matching quote.
+      $len = pos() - $last_pos - 1;
+      $ret_str .= substr $_, $last_pos, $len if $len;
+      $last_pos = pos;
+
+    } elsif( /\G[0-7]{1,3}/gc ) { # Backslash.  Octal character code?
+      $ret_str .= chr oct $&;	# Convert to character.
+      $last_pos = pos;
+    } elsif( /\G[*?[\]]/gc ) {	# Don't weed out backslashed wildcards here,
+      $last_pos = pos() - 2;	# because they're recognized separately in
 				# the wildcard routines.
-	$ret_str .= '\\' . $1;	# Leave the backslash there.
-      } else {			# Other character escaped with backslash.
-	$ret_str .= substr $_, pos()++, 1; # Put it in verbatim.
-      }
+    } elsif( length() <= pos ) {
+      die "lone backslash at end of string '$_'\n";
+    } else {			# Other character escaped with backslash.
+      $last_pos = pos()++;	# Put it in verbatim together with what follows.
     }
   }
 
+  my $len = length() - $last_pos;
+  pos = $opos;
+  return $ret_str . substr $_, $last_pos if $len;
   $ret_str;
-}
-
-=head2 requote
-
-  $quoted_text = requote($unquoted_text);
-
-Puts quotes around the text, and escapes any quotes inside the text, so
-that calling unquote() on $quoted_text will return the same string as
-$unquoted_text.
-
-=cut
-
-sub requote {
-  my( $str ) = @_;		# Get a modifiable copy of the string.
-  $str =~ s/(["\\])/\\$1/g;	# Protect all backslashes and double quotes.
-  $str =~ s{([\0-\037])}{sprintf '\%o', ord $1}eg; # Protect any binary characters.
-  qq["$str"];			# Return the quoted string.
 }
 
 #
@@ -645,7 +610,7 @@ my $args;
 my $argfile =
   ['A', qr/arg(?:ument)?s?[-_]?file/, \$args, 1,
    sub {
-     open my $fh, $args or die "$0: cannot open args-file `$args'--$!\n";
+     open my $fh, '<', $args or die "$0: cannot open args-file `$args'--$!\n";
      local $/;
      unshift @ARGV, unquote_split_on_whitespace <$fh>;
      close $fh;
@@ -719,39 +684,6 @@ sub _getopts_long($) {
   $str;
 }
 
-#@@eliminate
-# Not installed, so grep all our sources for the checkin date.  Make a
-# composite version consisting of the three most recent dates (shown as (yy)mmdd,
-# but sorted including year) followed by the count of files checked in that
-# day.
-#
-BEGIN {
-  $Mpp::datadir ||= (grep -f( "$_/Mpp.pm" ) && -f( "$_/VERSION" ), @INC)[0] or
-    die "Can't find our libraries in \@INC.\n";
-  open my $fh, '<:crlf', "$Mpp::datadir/VERSION" or
-    die "Can't read the file $Mpp::datadir/VERSION--$!.\nThis should be part of the standard distribution.\n";
-  chomp( $Mpp::VERSION		# Hide assignment from CPAN scanner.
-	 = <$fh> );
-  chomp( our $BASEVERSION = <$fh> || $Mpp::VERSION );
-  if( $Mpp::VERSION		# Hide -"-
-      =~ tr/a-z//d ) {
-    my %VERSION = qw(0/00/00 0 00/00/00 0); # Default in case all modules change on same day.
-    for( <$Mpp::datadir/makep*[!~] $Mpp::datadir/Mpp{,/*,/*/*}.pm> ) {
-      open my( $fh ), $_;
-      while( <$fh> ) {
-	if( /\$Id: .+,v [.0-9]+ ([\/0-9]+)/ ) {
-	  $VERSION{$1}++;
-	  last;
-	}
-      }
-    }
-    my $year = '';
-    $Mpp::VERSION .= join '-', '',
-      grep { s!\d\d(\d+)/(\d+)/(\d+)!($year eq $1 ? '' : ($year = $1))."$2$3:$VERSION{$_}"!e }
-	(reverse sort keys %VERSION)[0..2];
-  }
-}
-#@@
 
 sub help {
 #@@eliminate
@@ -785,7 +717,7 @@ For details look";
   $helpend =~ s/\@BASEVERSION\@/$BASEVERSION/;
   our $opts ||= $pod;
   print "\n";
-  open my $fh, "$Mpp::datadir/pod/$opts.pod" or die $!;
+  open my $fh, '<', "$Mpp::datadir/pod/$opts.pod" or die $!;
   my $opt = $/ = '';
   my $found;
   while( <$fh> ) {		# skip to before 1st opt
@@ -821,8 +753,8 @@ For details look";
 our @common_opts =
  ([qr/[h?]/, 'help', undef, undef, \&help],
 
-  [qw(V version), undef, undef, sub { $0 =~ s!.*/!!; my $typ = $Mpp::VERSION =~ /[-:]/ ? 'cvs-version' : $Mpp::VERSION !~ /\.9([89])\./ ? 'version' : $1 == 8 ? 'snapshot' : 'release-candidate'; print <<EOS; exit 0 }]);
-$0 $typ $Mpp::VERSION
+  [qw(V version), undef, undef, sub { $0 =~ s!.*/!!; my $typ = $VERSION =~ /[-:]/ ? 'cvs-version' : $VERSION !~ /\.9([89])\./ ? 'version' : $1 == 8 ? 'snapshot' : 'release-candidate'; print <<EOS; exit 0 }]);
+$0 $typ $VERSION
 Makepp may be copied only under the terms of either the Artistic License or
 the GNU General Public License, either version 2, or (at your option) any
 later version.

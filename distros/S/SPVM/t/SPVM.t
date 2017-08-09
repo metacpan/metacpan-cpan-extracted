@@ -32,14 +32,40 @@ my $DOUBLE_MIN = POSIX::DBL_MIN();
 
 use SPVM::stdout;
 
-# Lookup switch
+# Array initialization
 {
-  ok(SPVM::TestCase::lookup_switch());
+  ok(SPVM::TestCase::array_init_byte());
+  ok(SPVM::TestCase::array_init_short());
+  ok(SPVM::TestCase::array_init_int());
+  ok(SPVM::TestCase::array_init_long());
+  ok(SPVM::TestCase::array_init_float());
+  ok(SPVM::TestCase::array_init_double());
 }
 
-# Table switch
+# Exception
 {
-  ok(SPVM::TestCase::table_switch());
+  eval { SPVM::TestCase::exception_zero_divide_int() }; my $line = __LINE__;
+  like($@, qr|\QOccur 0 division(INT_VALUE / INT_VALUE)|);
+  like($@, qr/SPVM\.t/);
+  like($@, qr/$line/);
+}
+
+# Default return value
+{
+  ok(SPVM::TestCase::default_return_value_byte());
+  ok(SPVM::TestCase::default_return_value_short());
+  ok(SPVM::TestCase::default_return_value_int());
+  ok(SPVM::TestCase::default_return_value_long());
+  ok(SPVM::TestCase::default_return_value_float());
+  ok(SPVM::TestCase::default_return_value_double());
+  ok(SPVM::TestCase::default_return_value_object());
+}
+
+# Switch
+{
+  ok(SPVM::TestCase::switch_nest());
+  ok(SPVM::TestCase::switch_lookup_switch());
+  ok(SPVM::TestCase::switch_table_switch());
 }
 
 {
@@ -72,13 +98,10 @@ is_deeply(
   ok(SPVM::TestCase::get_object_from_freelist());
 }
 
-# Array initialization
-{
-  ok(SPVM::TestCase::array_int());
-}
-
 # Enumeration
 {
+  ok(SPVM::TestCase::enum_byte());
+  ok(SPVM::TestCase::enum_short());
   ok(SPVM::TestCase::enum_int());
   ok(SPVM::TestCase::enum_long());
   ok(SPVM::TestCase::enum_float());
@@ -154,9 +177,6 @@ is_deeply(
     $object->set(x_string => SPVM::new_string_raw("abc"));
     
     ok(SPVM::TestCase::spvm_object_set_object($object));
-    
-    is($object->get('x_int_array')->{type}, "int[]");
-    is($object->get('x_string')->{type}, "string");
   }
   # Create object
   {
@@ -174,8 +194,6 @@ is_deeply(
     is($object->get('x_short'), $SHORT_MAX);
     is($object->get('x_int'), $INT_MAX);
     is($object->get('x_long'), $LONG_MAX);
-    is($object->get('x_int_array')->{type}, "int[]");
-    is($object->get('x_string')->{type}, "string");
   }
   
 }
@@ -609,9 +627,12 @@ is_deeply(
 
 # Number literal
 {
+  ok(SPVM::TestCase::number_literal_underline_hex());
+  ok(SPVM::TestCase::number_literal_underline());
+  ok(SPVM::TestCase::number_literal_hex_specifier());
+  ok(SPVM::TestCase::number_literal_hex_all_number());
   ok(SPVM::TestCase::number_literal_hex_int());
   ok(SPVM::TestCase::number_literal_hex_int_max());
-  ok(SPVM::TestCase::number_literal_hex_long());
   ok(SPVM::TestCase::number_literal_hex_long_max());
 }
 

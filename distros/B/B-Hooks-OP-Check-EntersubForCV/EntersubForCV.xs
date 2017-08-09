@@ -18,6 +18,7 @@ typedef struct userdata_St {
 STATIC OP *
 entersub_cb (pTHX_ OP *op, void *user_data) {
 	OP *kid, *last;
+	GV *gv;
 	CV *cv;
 	userdata_t *ud = (userdata_t *)user_data;
 
@@ -60,7 +61,9 @@ entersub_cb (pTHX_ OP *op, void *user_data) {
 		return op;
 	}
 
-	cv = GvCV (cGVOPx_gv (kid));
+	gv = cGVOPx_gv (kid);
+	cv = SvTYPE (gv) == SVt_PVGV ? GvCV (gv) :
+		SvROK ((SV*)gv) ? (CV*) SvRV ((SV*)gv) : (CV*)NULL;
 
 	if (ud->cv == cv) {
 		op = ud->cb (aTHX_ op, cv, ud->ud);

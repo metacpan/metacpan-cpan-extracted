@@ -3,7 +3,7 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use B ();
 use IO::File;
@@ -12,8 +12,13 @@ use Specio::Library::Builtins;
 use Specio::Library::Numeric;
 use Specio::Library::Perl;
 use Specio::Library::String;
+
+# Loading this will force subification to use Sub::Quote, which can expose
+# some bugs.
+use Sub::Quote;
 use Test::Fatal;
 use Test::More 0.96;
+use Try::Tiny;
 
 use Exporter qw( import );
 
@@ -53,7 +58,7 @@ our $REGEX      = qr/../;
 our $REGEX_OBJ  = bless qr/../, 'BlessedQR';
 our $FAKE_REGEX = bless {}, 'Regexp';
 
-our $OBJECT = bless {}, 'Foo';
+our $OBJECT = bless {}, 'FakeObject';
 
 our $UNDEF = undef;
 
@@ -1170,50 +1175,76 @@ sub test_constraint {
     subtest(
         ( $type->name || '<anon>' ),
         sub {
-            my $not_inlined = $type->_constraint_with_parents;
+            try {
+                my $not_inlined = $type->_constraint_with_parents;
 
-            my $inlined;
-            if ( $type->can_be_inlined ) {
-                $inlined = $type->_generated_inline_sub;
-            }
+                my $inlined;
+                if ( $type->can_be_inlined ) {
+                    $inlined = $type->_generated_inline_sub;
+                }
 
-            for my $accept ( @{ $tests->{accept} || [] } ) {
-                my $described = $describer->($accept);
+                for my $accept ( @{ $tests->{accept} || [] } ) {
+                    my $described = $describer->($accept);
+                    subtest(
+                        "accepts $described",
+                        sub {
+                            ok(
+                                $type->value_is_valid($accept),
+                                'using ->value_is_valid'
+                            );
+                            is(
+                                exception { $type->($accept) },
+                                undef,
+                                'using subref overloading'
+                            );
+                            ok(
+                                $not_inlined->($accept),
+                                'using non-inlined constraint'
+                            );
+                            if ($inlined) {
+                                ok(
+                                    $inlined->($accept),
+                                    'using inlined constraint'
+                                );
+                            }
+                        }
+                    );
+                }
 
-                ok(
-                    $type->value_is_valid($accept),
-                    "accepts $described using ->value_is_valid"
-                );
-                is(
-                    exception { $type->($accept) },
-                    undef,
-                    "accepts $described using subref overloading"
-                );
-                ok(
-                    $not_inlined->($accept),
-                    "accepts $described using non-inlined constraint"
-                );
-                if ($inlined) {
-                    ok(
-                        $inlined->($accept),
-                        "accepts $described using inlined constraint"
+                for my $reject ( @{ $tests->{reject} || [] } ) {
+                    my $described = $describer->($reject);
+                    subtest(
+                        "rejects $described",
+                        sub {
+                            ok(
+                                !$type->value_is_valid($reject),
+                                'using ->value_is_valid'
+                            );
+
+                            # I don't love this test, but there's no way to know the
+                            # exact content of each type's validation failure
+                            # exception. We can, however, reasonably assume (I think)
+                            # that the exception thrown will include a trace starting
+                            # with Specio::Exception.
+                            like(
+                                exception { $type->($reject) },
+                                qr/\QTrace begun at Specio::Exception->new/,
+                                'using subref overloading'
+                            );
+                            if ($inlined) {
+                                ok(
+                                    !$inlined->($reject),
+                                    'using inlined constraint'
+                                );
+                            }
+                        }
                     );
                 }
             }
-
-            for my $reject ( @{ $tests->{reject} || [] } ) {
-                my $described = $describer->($reject);
-                ok(
-                    !$type->value_is_valid($reject),
-                    "rejects $described using ->value_is_valid"
-                );
-                if ($inlined) {
-                    ok(
-                        !$inlined->($reject),
-                        "rejects $described using inlined constraint"
-                    );
-                }
-            }
+            catch {
+                fail('No exception in test_constraint');
+                diag($_);
+            };
         }
     );
 }
@@ -1268,7 +1299,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 

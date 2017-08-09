@@ -7,7 +7,9 @@ use v5.12;
 use App::Sybil -command;
 
 use Capture::Tiny ':all';
+use IO::Prompt::Simple 'prompt';
 use File::Slurp;
+use File::Temp 'tempfile';
 use Net::GitHub;
 
 sub abstract { 'Release your software' }
@@ -18,18 +20,19 @@ sub execute {
   my ($self, $opt, $args) = @_;
 
   my $project = $self->app->project;
-  my $version = $self->app->version;
 
-  unless ($self->app->has_build($version)) {
+  my $current = $self->app->version;
+  (my $suggested = $current) =~ s/^v((?:\d+\.)*)(\d+)-.*/"v$1" . ($2 + 1)/e;
+  my $version = prompt("Next version [$suggested]?") || $suggested;
+
+
+  unless ($self->app->build_all_targets($project, $version)) {
     say STDERR "Incomplete bulid, aborting release";
     return;
   }
 
   # TODO additional checks
 
-  say STDERR "Publishing $project $version to github.";
-
-  # TODO have setup command to get oauth token
   my $token  = $self->app->github_token();
   unless ($token) {
     say STDERR "No github oauth token available, try `sybil auth`";
@@ -52,10 +55,6 @@ sub execute {
   my $repos = $github->repos;
   $repos->set_default_user_repo($1, $2);
 
-  my $commit = capture_stdout {
-    system 'git', 'rev-parse', 'HEAD';
-  };
-
   foreach my $r ($repos->releases()) {
     if ($r->{name} eq $version) {
       say STDERR "There is already a release named $version";
@@ -64,15 +63,26 @@ sub execute {
     }
   }
 
-  my $desc = capture_stdout {
-    system 'git', 'show', '-s', '--format=%B', $version;
-  };
+  my ($fh, $filename) = tempfile();
+  # TODO populate file with commit messages since last release
+  close $fh;
+
+  my $editor = $ENV{EDITOR} // 'vi';
+  system($editor, $filename);
+  my $desc = read_file($filename);
+
+  say STDERR "Tagging and pushing release";
+  system('git', 'tag', '-a', $version, '-F', $filename);
+  system('git', 'push', '--follow-tags');
+
+  say STDERR "Publishing $project $version to github.";
 
   my $release = $repos->create_release({
     tag_name => $version,
     name     => $version,
     body     => $desc,
     draft    => \1,
+    prerelease => \( $version =~ /^v0\./ ? 1 : 0 ),
   });
 
   say STDERR "Created release $version";

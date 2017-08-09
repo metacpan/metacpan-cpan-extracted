@@ -9,10 +9,10 @@ build_requires:
   Test2::V0: '0.000060'
   Test::Alien::Build: '0'
   Test::Script: '0'
-  perl: '5.010'
+  perl: '5.010001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.010001'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -27,11 +27,11 @@ requires:
   Path::Tiny: '0.100'
   Sereal: '3.015'
   URI: '1.71'
-  perl: '5.010'
+  perl: '5.010001'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::Cache
   repository: git://github.com/plicease/Alien-Build-Plugin-Fetch-Cache.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

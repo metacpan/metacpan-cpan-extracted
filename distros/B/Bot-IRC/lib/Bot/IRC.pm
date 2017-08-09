@@ -1,7 +1,7 @@
 package Bot::IRC;
 # ABSTRACT: Yet Another IRC Bot
 
-use 5.012;
+use 5.014;
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ use Date::Format 'time2str';
 use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 sub new {
     my $class = shift;
@@ -321,7 +321,8 @@ sub _on_message {
 
             {
                 when => {
-                    text => qr/^(?<word>hello|greetings|hi|good\s+\w+)\W*$/i,
+                    to_me => 1,
+                    text  => qr/^(?<word>hello|greetings|hi|good\s+\w+)\W*$/i,
                 },
                 code => sub {
                     my ( $bot, $in, $m ) = @_;
@@ -642,7 +643,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.16
+version 1.18
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)

@@ -1,0 +1,150 @@
+# Copyright (c) 2012-2017 Martin Becker, Blaubeuren.  All rights reserved.
+# This package is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+__END__
+=head1 NAME
+
+Math::Logic::Ternary::Calculator::Manual - user manual for tcalc
+
+=head1 VERSION
+
+This documentation refers to version 0.004 of tcalc.
+
+=head1 SYNOPSIS
+
+  tcalc
+  tcalc 81
+  tcalc 27 1
+
+  perl -MMath::Logic::Ternary::Calculator -e 'tcalc(27, 1)'
+
+  tcalc [word_size [arith_mode]]
+
+=head1 DESCRIPTION
+
+The ternary calculator B<tcalc> is an interactive demonstration
+application for the perl library L<Math::Logic::Ternary>.
+
+It reads input line by line and tries to parse each line as
+either a command, an operator with operands, or operands alone.
+
+Results are stored in a dynamically growing list of numbered values that
+can be used in subsequent operations.
+
+=head2 Commands
+
+=over 4
+
+=item C<?>
+
+Help.  A question mark alone displays a list of available commands.
+A question mark followed by a command name or an operator name displays
+help about that particular command or operator.
+
+=item C<?#>
+
+List numbered values of the current session.
+
+=item C<?=>
+
+List named values of the current session.
+
+=item C</ops>
+
+C</ops> lists all operators.
+
+C</ops I<n>> lists all operators of kind I<n>, where I<n> is a small
+integer ranging from 0 to 3.
+
+=item C</license>
+
+C</license> displays a license and copyright notice.
+
+=item C</version>
+
+C</version> displays version information.
+
+=item C</size>
+
+C</size> displays the word size of this session.
+
+=item C</mode>
+
+C</mode> displays the current arithmetic mode.
+
+C</mode I<n>> changes the arithmetic mode to I<n>, where valid modes
+are 0 = balanced, 1 = unbalanced, 2 = baseZ<>(-3).
+
+Note that while in the library arithmetic operators have suffixes denoting
+their type of arithmetic, operator names in the calculator have no suffix.
+The calculator will use the variant matching the current arithmetic mode.
+
+Stored operands keep their trits, but generally not their numeric value
+when the arithmetic mode is changed, as the mode also determines the
+numeral system in use.
+
+=item C</def>
+
+C</def I<name> I<value>> stores a value under a name.
+This makes C<=I<name>> a valid operand.
+
+=item C</reset>
+
+C</reset> discards all stored values.
+
+C</reset 1> discards all numbered values.
+
+C</reset 2> discards all named values.
+
+=item C</range>
+
+C</range> returns two words: the smallest and largest possible integer
+(dependent on word size and arithmetic mode).
+
+=item C</rand>
+
+C</rand> returns a random word.
+
+=item C</abc>
+
+C</abc I<n>> returns I<n> words covering all trit combinations when used
+as operands of tritwise operators.  The word size has to be at least
+3 ** I<n>.  The trit order is affected by the arithmetic mode.
+
+Example: C</abc 2> returns C<@fffnnnttt> and C<@fntfntfnt> when in
+balanced mode.
+
+=item C</quit>
+
+C</quit> closes the session.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Math::Logic::Ternary> - the library.
+
+=item *
+
+L<Math::Logic::Ternary::Calculator> - implementation details.
+
+=back
+
+=head1 AUTHOR
+
+Martin Becker E<lt>becker-cpan-mpE<64>cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2017 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

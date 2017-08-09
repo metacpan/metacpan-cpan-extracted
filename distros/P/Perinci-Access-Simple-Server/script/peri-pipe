@@ -1,13 +1,13 @@
 #!perl
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.26'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.27'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Log::ger::LevelFromEnv;
+use Log::ger::Level::FromEnv;
 use Log::ger::Output 'Screen';
 
 require Perinci::Access::Simple::Server::Pipe;
@@ -30,7 +30,7 @@ peri-pipe - Default Riap::Simple server over pipe
 
 =head1 VERSION
 
-This document describes version 0.26 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-28.
+This document describes version 0.27 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-08-03.
 
 =head1 SYNOPSIS
 

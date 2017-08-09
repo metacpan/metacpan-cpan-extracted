@@ -2,7 +2,7 @@
 
 makepp_variables -- How to use variables in makepp
 
-=for vc $Id: makepp_variables.pod,v 1.48 2012/03/25 18:34:48 pfeiffer Exp $
+=for vc $Id: makepp_variables.pod,v 1.56 2015/07/13 20:54:05 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -10,7 +10,7 @@ makepp_variables -- How to use variables in makepp
 
 B<?:>E<nbsp>L<$*|/stem>,
   L<$+|/sorted_dependencies>,
-  L<$/|/__>,
+  L<$E<sol>|/__>,
   L<$E<lt>|/dependency>,
   L<$?|/changed_dependencies>,
   L<$@|/output>,
@@ -46,16 +46,19 @@ B<M:>E<nbsp>L<MAKE|/make>,
   L<MAKECMDGOALS|/makecmdgoals>,
   L<MAKEFLAGS|/makeflags>,
   L<MAKEINFO|/makeinfo>,
+  L<MAKEPP_DEBUG|/makepp_debug>,
   L<MAKEPPFLAGS|/makeppflags>,
   L<_MAKEPPFLAGS|/_makeppflags>,
   L<MAKEPP_LN_CP|/makepp_ln_cp>,
   L</makepp_percent_subdirs>,
   L</makepp_require_phony>,
+  L<makepp_signature_C_flat|/makepp_signature_c_flat>,
   L</makepp_simple_concatenation>,
   L<MAKEPP_VERSION|/makepp_version>,E<nbsp>
 B<O:>E<nbsp>L</output>,
   L</outputs>,E<nbsp>
-B<P:>E<nbsp>L<PWD|/pwd>,E<nbsp>
+B<P:>E<nbsp>L<PERL|/perl>,
+  L<PWD|/pwd>,E<nbsp>
 B<R:>E<nbsp>L<RM|/rm>,
   L<ROOT|/root>,E<nbsp>
 B<S:>E<nbsp>L<SHELL|/shell>,
@@ -311,6 +314,11 @@ the shell, instead of executing the command directly and more efficiently.
 You also have to put each builtin on a line of its own, meaning that you have
 to switch to the external echo in the semicolon case.
 
+The final newline gets stripped, along with any space before it.  If you need
+the final newline, you must add an empty line.  (See
+L<foreach|makepp_statements/foreach_variable_list> statement emulation for an
+example).
+
 There is one speciality when expanding within C<define>, i.e. C<define X :=>
 or on a variable that was already C<:=>, C<define X &=> and C<define X +=>.
 In this case the C<$(shell command ...)> or builtin C<$(&command ...)> do not
@@ -367,11 +375,11 @@ is in effect I<only> in an action which produces the given target.  This
 is primarily used for things like this:
 
     CFLAGS := -O2
- 
+
     my_prog: file1.o file2.o special_file.o
- 
+
     special_file.o : CFLAGS := -g
- 
+
     %.o: %.c
  	  $(CC) $(CFLAGS) -c $(input) -o $(output)
 
@@ -427,10 +435,9 @@ By default, makepp uses rc-style substitution (so called because it was
 pioneered by the rc shell).  This is best illustrated by an example:
 
     MODULES = a b c d
- 
+
     mylib.a : module_dir/$(MODULES).o $(OTHER_OBJECTS)
  	$(CXX) $(dependencies) -o $(target)
-
 
 The prefix C<module_dir/> is prepended to each word in MODULES, and the suffix
 C<.o> is appended to each word.
@@ -464,6 +471,14 @@ and FILES will contain the string
 
     s1/a.o s1/a.c s1/b.o s1/b.c s1/c.o s1/c.c s2/a.o s2/a.c s2/b.o s2/b.c s2/c.o s2/c.c
 
+Besides white space, rc-style substitution stops at any quote, any round,
+curly or square parentheses, and any of C<, : ; = # @>.  Note that this may be
+surprising, and again need an explicit list.  Say you want to look for headers
+by wildcard in all directories starting with an upper-case letter:
+
+    BAD := [A-Z]*/**/*.$( hpp h)	# [A-Z]*/**/*.hpp */**/*.h
+    GOOD := $( [A-Z]*/**/*.)$( hpp h)	# [A-Z]*/**/*.hpp [A-Z]*/**/*.h
+
 If rc-style substitution gets in the way, or if you need to have leading or
 trailing whitespace in your make variables, then you can turn off rc-style
 substitution by setting the variable C<makepp_simple_concatenation=1>.  You
@@ -483,30 +498,34 @@ just for one target:
 	&echo before_first$(LIST)after_last -o $(output)
 
 Because C<$[VARIABLE]> is evaluated earlier than C<$(VARIABLE)>, combining the
-two in rc-substitution will not give the result you may expect:
+two in rc-substitution will not give the result you may expect, unless you wrap
+it in an explicit list:
 
     A = a b
     N = 1 2
-    X := $(A)$[N]
+    BAD := $(A)$[N]
+    GOOD := $(A)$( $[N])
 
-The last line gets read as
+The last lines get read as
 
-    X := $(A)1 2
-
-which gives C<X> a value of C<a1 b1 2>.
+    BAD := $(A)1 2	# a1 b1 2
+    GOOD := $(A)$( 1 2)	# a1 a2 b1 b2
 
 =head3 Substitution References
 
 A substitution reference has the form C<$(VAR:A=B)>, where A is a pattern to
-match and B is a pattern to replace it with.  For example:
+match and B is a pattern to replace it with.  Substitution references are an
+abbreviation for the C<patsubst> function.  For example:
 
     source_files = a.c b.c c.c d.c
     object_files = $(source_files:%.c=%.o)
 
-
 will set C<$(object_files)> to S<C<a.o b.o c.o d.o>>.  The C<%> is a special
-character matches any arbitrary string.  Substitution references are an
-abbreviation fot the C<patsubst> function.
+character matches any arbitrary string.  If both A and B start with C<%>, a
+common case when replacing suffixes, they can be omitted:
+
+    object_files = $(source_files:.c=.o)
+    object_files = $(source_files:c=o) # same, because . is not special
 
 =head3 Whitespace in variables
 
@@ -540,7 +559,7 @@ syntax.  E.g., sometimes one sees things like this in makefiles:
       null :=
       O := -o $(null)
     endif
- 
+
     %.o : %.c
  	$(COMPILER) $(input) $(O)$(output)
 
@@ -600,7 +619,7 @@ rather than a modern rule that produces all those targets in one go:
 
     a b:			# really: one rule each for a and b
  	touch $@
- 
+
     c d:			# error: mpp complains that this didn't build d
  	touch $(output)
 
@@ -683,7 +702,8 @@ See L<makepp_build_check> for details on C<ignore_action>.)
 Building archives like this is not a good idea because it will make your
 builds less reliable.  The problem with this is that if you build the
 archive, then remove one of the modules from the list of MODULES, the
-modules will still be in the archive and makepp
+modules will still be in the archive but makepp will not have the correct
+metainformation about the archive.
 
 =item stem
 
@@ -718,13 +738,13 @@ that makepp supports.  For example,
     #
     %.c : %.k
  	$(preprocessor) $(input) > $(output)
- 
+
     #
     # Compile .c files into .o files:
     #
     %.o : %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
- 
+
     #
     # Special alternate compilation flags for .c files which are derived
     # from .k files:
@@ -746,6 +766,68 @@ current directory:
 
 For filenames passed as arguments it is not so necessary as Windows can handle
 Unix syntax there.
+
+=back
+
+=head2 Option Variables
+
+You can set these in all the ways explained L<above|/Variable Assignment>
+(except if stated otherwise) to modify the bahaviour of makepp.  By default
+they are all undefined.
+
+=over
+
+=item MAKEPP_DEBUG
+
+If you export this with a true value before calling makepp, you get more
+debugging info.  This is the C<RULE_SOURCE> of files built while this is in
+effect under L<makeppinfo, mppi|makeppinfo> and details about variable
+expansion and rule matching under L<makepplog, mppl|makepplog>.  This will
+also show you if makepp runs out of memory or hangs, because it is endlessly
+expanding the same variables:
+
+    A = $A			# deferred evaluation, need :=
+    B = $C
+    C = $B
+
+=item MAKEPP_LN_CP
+
+See the note under L<&ln|makepp_builtins/ln_option_sourcefile_destfile>.
+
+=item makepp_percent_subdirs
+
+Set this to some true value (like C<1>) to have C<%> in targets or
+dependencies match across more than one directory.
+
+=item makepp_require_phony
+
+Set this to some true value (like C<1>) to prevent implicit phonyness (i.e. if
+a rule succeeds without producing its target).  This variable should be true
+by default, to prevent broken dependency chains, but that would break backward
+compatibility with sloppy makefiles.
+
+=item makepp_signature_C_flat
+
+This is an option to L<signature C|makepp_signatures/c>.  Set this to some
+true value (like C<1>) to treat your sources as flattened, i.e. all newlines
+(except around preprocessor statements) are treated like whitespace and
+C<#line> directives are ignored.
+
+=item makepp_simple_concatenation
+
+Set this to some true value (like C<1>) to prevent L</rc-style substitution>.
+
+=item PERL
+
+You can set this to the exact perl you are using to run the scripts in the
+makepp suite, and export it.  This can help to run sub-scripts with the same
+perl.  This is mostly useful for the test suite, the
+L<installation|makepp_faq/How to choose perl version?> and for L<recursive
+builds|/MAKE>.
+
+=item VPATH
+
+Setting this variable to some value implicitly calls C<vpath % value>.
 
 =back
 
@@ -813,12 +895,13 @@ I<Default:> C<libtool>.
 
 =item MAKE
 
-This variable has two different values, depnding on the presence or not of
+This variable has two different values, depending on the presence or not of
 C<--traditional-recursive-make>.  Makepp recognizes when this variable is used
 and turns off some features, even before the recursion actually takes place.
 This can be undesirable while you are gradually eliminating it, so first
 convert the calls to a makepp specific C<$((MAKE))>, which will not turn off
-features.
+features.  You should not set it because that breaks our smart recursion work
+around.
 
 =item MAKECMDGOALS
 
@@ -855,32 +938,6 @@ The makepp specific options needed for POSIX/gmake compatibility, with which
 makepp was called.  These are in a separate variable so a legacy makefile
 can't break compatibility by unsetting MAKEFLAGS.  This is only set with
 C<--traditional-recursive-make>.
-
-=item MAKEPP_LN_CP
-
-See the note under L<&ln|makepp_builtins/ln_option_sourcefile_destfile>.
-
-=item makepp_percent_subdirs
-
-Set this to some true value (like C<1>) to have C<%> in targets or
-dependencies match across more than one directory.
-
-I<Default:> undefined
-
-=item makepp_require_phony
-
-Set this to some true value (like C<1>) to prevent implicit phonyness (i.e. if
-a rule succeeds without producing its target).  This variable should be true
-by default, to prevent broken dependency chains, but that would break backward
-compatibility with sloppy makefiles.
-
-I<Default:> undefined
-
-=item makepp_simple_concatenation
-
-Set this to some true value (like C<1>) to prevent L</rc-style substitution>.
-
-I<Default:> undefined
 
 =item MAKEPP_VERSION
 
@@ -922,12 +979,6 @@ C</sbin/xpg4/sh> (e.g. Reliant Unix) or C</bin/sh>.
 =item YACC
 
 I<Default:> The first found among C<bison -y> or C<yacc>.
-
-=item VPATH
-
-Setting this variable to some value implicitly calls C<vpath % value>.
-
-I<Default:> undefined
 
 =back
 

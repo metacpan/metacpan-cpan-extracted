@@ -1,0 +1,33 @@
+NAME
+
+    Alien::HIDAPI - Perl distribution for HIDAPI
+
+INSTALL
+
+        cpan Alien::HIDAPI
+
+PLATFORMS
+
+    Same as HIDAPI proper: Linux, FreeBSD, macOS and Windows.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-HIDAPI
+
+SEE ALSO
+
+    HIDAPI <http://github.com/signal11/hidapi>
+
+    Alien
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

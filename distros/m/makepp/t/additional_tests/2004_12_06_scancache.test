@@ -31,7 +31,7 @@ $(phony default): x
 
 x.h:
 ifdef ERROR
-	perl { die }
+	perl { die "Oops\n" }
 else
 	&echo '#undef X\n#define X 1' -o $@
 endif

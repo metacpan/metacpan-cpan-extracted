@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 67fc1851c29791a1fc61a98bc5f470be066b5221 Build.PL
+SHA1 9da2dd1127ea235b26fa721d6705a873776034b1 Changes
+SHA1 14e80d5b77e7997a5feaaf5869ba538f543d5e6c LICENSE
+SHA1 e7858e5dd73d6ba9b08cd0a7dd7919a6a7a163ca MANIFEST
+SHA1 e1241e6062d7e6da3a0d3ecf38b23498fbb6423d META.json
+SHA1 7c6d241bb4bdc2818ef166ebf062a646bf371e3d README.md
+SHA1 f8f4cb5be5ea41d3ef9fa3bcdad1535b50adce33 dist.ini
+SHA1 051d3fef9c95a3f5ea06359f6a428ff38afe1cd9 lib/Plack/Middleware/Auth/Negotiate.pm
+SHA1 62bf96366a498142337f943318f3192c58bdd602 t/00-compile.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 98e92d1164e03b9e2ab49afd3944dac58867bd1c xt/author/signature.t
+SHA1 cbc5b72710fb645c559b78c8ac8b879f62aff326 xt/release/dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEXZeS3ET2PIAToJ5UFogSkAJbkJQFAlmA9GYACgkQFogSkAJb
+kJS9Swf+JnExuizkzqdqfLlSHoSF2QsXRcDnkS9ac5f8qCfxiUxPjkI25BHeXvzB
+UwGF+qqpbG64Q2H4ZoXKZWnZLbDfBaPEIAs2/18OZdVIfz+OqPMVP+tW0yKxmVD0
+OzNe+U+cbACAmiSbf5Bmg9J+6HFZQXgAbDFCa4YJ4CKqVsEXjgntRUKcWmcqIDbh
+ze7+PeSoU/4u58DSzZ99gXD3/iiNlYzfIYvGWbmAPpi6iN3icB31NStvwer5qMNv
+NCMKGly0x3Hy6xRLCiVnBot02ezdL5tOTjWq4r0IStqNQbUpbWkpfwRc5wvle2Zl
+Ybd9lYvJp4mZywA1nDBvfhYz+2hf1Q==
+=g9To
+-----END PGP SIGNATURE-----

@@ -1,3 +1,22 @@
+0.012   2017-08-04 (PERLANCAR)
+
+	- Adjust level benchmark to newest version of Log::ger.
+
+	- Update output module name (ArrayWithLimits renamed to
+	  ArrayRotate).
+
+	- Remove scenario: Startup (already replaced by Overhead).
+
+
+0.011   2017-08-01 (PERLANCAR)
+
+	- NullOutput: Add participants: Log::Contextual+Log4perl,
+          Log::Contextual+SimpleLogger, Log::Dispatchouli.
+
+	- Add scenario: Overhead (WIP moving participants from Startup
+	  because it's nicer with code_startup mode).
+
+
 0.010   2017-07-13 (PERLANCAR)
 
         - Add Log::Any 1.00, Log::ger {0.012,0.013,0.016} to archive/.

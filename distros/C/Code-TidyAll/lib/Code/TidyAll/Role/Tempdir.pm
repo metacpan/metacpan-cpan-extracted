@@ -7,7 +7,7 @@ use Path::Tiny qw(tempdir);
 
 use Moo::Role;
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 has '_tempdir'   => ( is => 'ro', lazy => 1, builder => 1 );
 has 'no_cleanup' => ( is => 'ro', default => 0 );
@@ -37,7 +37,7 @@ classes
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 

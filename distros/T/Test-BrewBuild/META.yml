@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/p5-test-brewbuild/issues
   repository: https://github.com/stevieb9/p5-test-brewbuild.git
-version: '2.18'
+version: '2.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

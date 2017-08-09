@@ -4,7 +4,7 @@ requires "Number::Bytes::Human" => "0";
 requires "Path::Tiny" => "0.100";
 requires "Sereal" => "3.015";
 requires "URI" => "1.71";
-requires "perl" => "5.010";
+requires "perl" => "5.010001";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
@@ -13,12 +13,12 @@ on 'test' => sub {
   requires "Test2::V0" => "0.000060";
   requires "Test::Alien::Build" => "0";
   requires "Test::Script" => "0";
-  requires "perl" => "5.010";
+  requires "perl" => "5.010001";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.010";
+  requires "perl" => "5.010001";
 };
 
 on 'develop' => sub {

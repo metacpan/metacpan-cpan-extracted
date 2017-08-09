@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2017-07-22'; # DATE
-our $VERSION = '1.77'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '1.78'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -296,7 +296,7 @@ sub hook_display_result {
         }
         $utf8 = $self->use_utf8;
     }
-    binmode($handle, ":utf8") if $utf8;
+    binmode($handle, ":encoding(utf8)") if $utf8;
 
     $self->display_result($r);
 }
@@ -499,7 +499,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.77 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-22.
+This document describes version 1.78 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-08-04.
 
 =head1 SYNOPSIS
 

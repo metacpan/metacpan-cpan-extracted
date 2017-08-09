@@ -38,7 +38,7 @@ sub generate_datetime {
     my @now = localtime;
     my ($format, $target) = (shift, shift);
     return undef unless $target;
-    Pask::Storage::error "Date and Time Type can not unsupport function $target!" unless grep /^$target$/, ("now", "yesterday", "tomorrow");
+    Pask::Storage::error "Date and Time Type can not unsupport function $target!" unless grep /^$target$/, ("now", "today", "yesterday", "tomorrow");
     --$now[3] if $target eq "yesterday";
     ++$now[3] if $target eq "tomorrow";
     strftime $format, @now;
@@ -57,9 +57,11 @@ sub add {
 }
 
 sub from {
-    my $argv;
-    GetOptions(shift . "=s" => \$argv);
-    $argv;
+    # my $argv;
+    # my $from = "$_[0]=s";
+    # GetOptions($from, \$argv);
+    # $argv;
+    Pask::Container::get_argument $_[0];
 }
 
 sub is {
@@ -124,6 +126,7 @@ sub cook {
 sub make_recipe {
     my ($recipe, $k, $v) = ({"type" => "string", "exec" => []});
     my ($name, $materials) = (shift, shift);
+    Pask::Storage::error "Parameter name can not be null" unless $name;
     foreach (@$materials) {
         unless (ref $_) {
             $_ = {"argument" => $name} if $_ eq "argument";
@@ -134,6 +137,16 @@ sub make_recipe {
         push @{$recipe->{"exec"}}, {$k => $v} if $k eq "fn" or $k eq "todo";
     }
     $recipe;
+}
+
+sub init {
+    my ($_cmd, @options) = @ARGV;
+    my $option = join " ", @options;
+    my $result = {};
+    # @todo
+    while ($option =~ /--(\w+?)[= ]([\w-]+)/g) {
+        Pask::Container::set_argument $1, $2;
+    }
 }
 
 sub parse {

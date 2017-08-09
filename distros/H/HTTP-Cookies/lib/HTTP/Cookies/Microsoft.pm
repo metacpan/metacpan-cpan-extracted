@@ -1,10 +1,10 @@
 package HTTP::Cookies::Microsoft;
-$HTTP::Cookies::Microsoft::VERSION = '6.03';
+
 use strict;
 
-use vars qw(@ISA $VERSION);
+use vars qw(@ISA);
 
-$VERSION = "6.01";
+our $VERSION = '6.04';
 
 require HTTP::Cookies;
 @ISA=qw(HTTP::Cookies);
@@ -246,7 +246,7 @@ HTTP::Cookies::Microsoft - Access to Microsoft cookies files
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 SYNOPSIS
 

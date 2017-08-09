@@ -83,3 +83,6 @@ Revision history for App-Toodledo
 
 2.17	Require matching versions of latest Moose and MooseX::ClassAttribute
 	to avoid breakage of Moosex::ClassAttribute with latest Moose.
+
+2.18    Update URL from http to https per Toodledo API Notice.
+

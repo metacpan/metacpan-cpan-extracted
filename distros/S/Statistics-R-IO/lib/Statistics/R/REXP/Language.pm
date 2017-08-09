@@ -1,6 +1,6 @@
 package Statistics::R::REXP::Language;
 # ABSTRACT: an R language vector
-$Statistics::R::REXP::Language::VERSION = '1.0001';
+$Statistics::R::REXP::Language::VERSION = '1.0002';
 use 5.010;
 
 use Scalar::Util qw(blessed);
@@ -44,7 +44,7 @@ Statistics::R::REXP::Language - an R language vector
 
 =head1 VERSION
 
-version 1.0001
+version 1.0002
 
 =head1 SYNOPSIS
 
@@ -110,7 +110,7 @@ Davor Cubranic <cubranic@stat.ubc.ca>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by University of British Columbia.
+This software is Copyright (c) 2017 by University of British Columbia.
 
 This is free software, licensed under:
 

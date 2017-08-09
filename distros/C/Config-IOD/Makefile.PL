@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Config::IOD",
   "PREREQ_PM" => {
-    "Config::IOD::Base" => "0.22",
+    "Config::IOD::Base" => "0.33",
     "Exporter" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
@@ -34,12 +34,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "IO::Handle" => 0,
-    "IOD::Examples" => "0.15",
+    "IOD::Examples" => "0.201",
     "IPC::Open3" => 0,
     "Test::Config::IOD::Common" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.33",
+  "VERSION" => "0.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,14 +47,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Config::IOD::Base" => "0.22",
+  "Config::IOD::Base" => "0.33",
   "Exporter" => 0,
   "File::ShareDir::Tarball" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
-  "IOD::Examples" => "0.15",
+  "IOD::Examples" => "0.201",
   "IPC::Open3" => 0,
   "Test::Config::IOD::Common" => 0,
   "Test::Differences" => 0,

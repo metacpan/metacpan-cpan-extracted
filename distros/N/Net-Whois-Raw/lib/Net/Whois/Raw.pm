@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99009';
+$Net::Whois::Raw::VERSION = '2.99010';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -175,7 +175,7 @@ sub recursive_whois {
     foreach (@{$lines}) {
         $registrar ||= /Registrar/ || /Registered through/;
 
-        if ( $registrar && !$norecurse && /Whois Server:\s*([A-Za-z0-9\-_\.]+)/ ) {
+        if ( $registrar && !$norecurse && /whois server:\s*([a-z0-9\-_\.]+)/i ) {
             $newsrv = lc $1;
         }
         elsif ($whois =~ /To single out one record, look it up with \"xxx\",/s) {
@@ -478,7 +478,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99009
+version 2.99010
 
 =head1 SYNOPSIS
 

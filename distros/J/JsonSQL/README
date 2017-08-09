@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution JsonSQL,
-version 0.4:
+version 0.41:
 
   Defines a JSON format to represent SQL queries which can be validated and then used to generate SQL syntax.
 

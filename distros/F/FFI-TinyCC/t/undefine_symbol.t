@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 4;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 
 my $tcc = FFI::TinyCC->new;
@@ -25,3 +23,5 @@ main(int argc, char *argv[])
 is $@, '', 'tcc.compile_string';
 
 is $tcc->run, 0, 'tcc.run';
+
+done_testing;

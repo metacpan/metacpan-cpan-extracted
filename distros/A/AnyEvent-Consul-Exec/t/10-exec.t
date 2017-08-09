@@ -18,16 +18,18 @@ SKIP: {
   skip "consul test environment not available", 5, unless $tc;
 
   my ($submit, $ack, $output, $exit, $done);
+  my $sid;
   
   my $cv = AE::cv;
 
-  my $e = AnyEvent::Consul::Exec->new(
+  my $e; $e = AnyEvent::Consul::Exec->new(
     consul_args => [ port => $tc->port ],
 
     command => 'uptime',
 
     on_submit => sub {
       $submit = 1;
+      $sid = $e->{_sid};
     },
 
     on_ack => sub {
@@ -61,6 +63,14 @@ SKIP: {
   ok $output, "received output";
   ok $exit, "exited";
   ok $done, "job done";
+
+  my $c = Consul->new(port => $tc->port);
+
+  my ($session) = $c->session->info($sid);
+  is $session, undef, "session destroyed";
+
+  my $kv = $c->kv->get_all("_rexec/$sid");
+  is scalar @$kv, 0, "all KVs destroyed";
 }
 
 done_testing;

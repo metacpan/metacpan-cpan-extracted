@@ -30,28 +30,28 @@ no_index:
 provides:
   Unexpected:
     file: lib/Unexpected.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::Functions:
     file: lib/Unexpected/Functions.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::TraitFor::ErrorLeader:
     file: lib/Unexpected/TraitFor/ErrorLeader.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::TraitFor::ExceptionClasses:
     file: lib/Unexpected/TraitFor/ExceptionClasses.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::TraitFor::StringifyingError:
     file: lib/Unexpected/TraitFor/StringifyingError.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::TraitFor::Throwing:
     file: lib/Unexpected/TraitFor/Throwing.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::TraitFor::TracingStacks:
     file: lib/Unexpected/TraitFor/TracingStacks.pm
-    version: v0.46.1
+    version: v1.0.1
   Unexpected::Types:
     file: lib/Unexpected/Types.pm
-    version: v0.46.1
+    version: v1.0.1
 requires:
   Devel::StackTrace: '1.34'
   Exporter::Tiny: '0.042'
@@ -67,7 +67,7 @@ resources:
   homepage: https://metacpan.org/author/PJFL
   license: http://dev.perl.org/licenses/
   repository: git://github.com/pjfl/p5-unexpected.git
-version: 0.46.1
+version: 1.0.1
 x_Dist_Zilla:
   perl:
     version: '5.014004'

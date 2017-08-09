@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "../spvm_compiler.h"
 #include "../spvm_hash.h"
@@ -72,25 +73,22 @@ int main(int argc, char *argv[])
   // Free compiler
   SPVM_COMPILER_free(compiler);
   
-  // Push argument
-  api->push_var_int(api, 2);
+  SPVM_API_VALUE args[1];
+  args[0].int_value = 2;
   
   // Run
-  api->call_sub(api, sub_constant_pool_index);
+  int32_t return_value = api->call_int_sub(api, sub_constant_pool_index, args);
   
 #ifdef DEBUG
-  if (runtime->abort) {
-    void* message_object = runtime->exception;;
+  if (runtime->exception) {
+    void* message_object = runtime->exception;
     int8_t* message = api->get_byte_array_elements(api, message_object);
     
     printf("%s", (char*)message);
     printf("\n");
   }
   else {
-    // Get return value
-    int64_t return_value = api->pop_retval_int(api);
-    
-    printf("TEST return_value: %ld\n", return_value);
+    printf("TEST return_value: %" PRId32 "\n", return_value);
   }
 #endif
   

@@ -11,7 +11,7 @@ use 5.014;
 
 package JsonSQL;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 1;
@@ -28,7 +28,7 @@ JsonSQL - JsonSQL distribution. A collection of modules for generating safe SQL 
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ For example,
 
 Generates:
 
-    $sql = 'SELECT * FROM 'my_table';
+    $sql = SELECT * FROM "my_table";
     $binds = <arrayref of parameterized values, if applicable>
 
 Now you can go ahead and use $sql and $binds directly with the L<DBI> module to do the query.
@@ -248,6 +248,10 @@ Internal Development
 =item I<0.4>
 
 First public release
+
+=item I<0.41>
+
+Minor fix to properly implement ANSI double quotes as the default for quoting identifiers.
 
 =back
 

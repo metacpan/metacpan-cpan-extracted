@@ -1,13 +1,12 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #use strict;			# TODO: explore why this breaks the builtins.
 
-# $Id: makeppbuiltin,v 1.21 2012/05/23 18:30:17 pfeiffer Exp $
+# $Id: makeppbuiltin,v 1.25 2016/09/12 20:34:11 pfeiffer Exp $
 
 package Mpp;
 
 our $datadir;
 BEGIN {
-  our $VERSION = '@VERSION@';
 #@@setdatadir
 #
 # Find the location of our data directory that contains the auxiliary files.
@@ -20,7 +19,7 @@ BEGIN {
 				# See if we can find ourselves in the path.
     foreach( split( /:/, $ENV{'PATH'} ), '.' ) {
 				# Add '.' to the path in case the user is
-				# running it with "perl makepp" even if
+				# running it with "perl makeppbuiltin" even if
 				# . is not in his path.
       if( -d "$_/Mpp" ) {	# Found something we need?
 	$datadir = $_;
@@ -28,10 +27,11 @@ BEGIN {
       }
     }
   }
-  $datadir or die "makepp: can't find library files\n";
+  $datadir or die "makeppbuiltin: can't find library files\n";
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 #@@
   unshift @INC, $datadir;
 }

@@ -4,11 +4,28 @@
 
 #include "ppport.h"
 
+#if PERL_BCDVERSION < 0x5010001
+typedef unsigned Optype;
+#endif /* <5.10.1 */
+
+#ifndef wrap_op_checker
+# define wrap_op_checker(c,n,o) THX_wrap_op_checker(aTHX_ c,n,o)
+static void THX_wrap_op_checker(pTHX_ Optype opcode,
+	Perl_check_t new_checker, Perl_check_t *old_checker_p)
+{
+	if(*old_checker_p) return;
+	OP_REFCNT_LOCK;
+	if(!*old_checker_p) {
+		*old_checker_p = PL_check[opcode];
+		PL_check[opcode] = new_checker;
+	}
+	OP_REFCNT_UNLOCK;
+}
+#endif /* !wrap_op_checker */
+
 #include "hook_op_check.h"
 
-typedef OP *(*orig_check_t) (pTHX_ OP *op);
-
-STATIC orig_check_t orig_PL_check[OP_max];
+STATIC Perl_check_t orig_PL_check[OP_max];
 STATIC AV *check_cbs[OP_max];
 
 #define run_orig_check(type, op) (CALL_FPTR (orig_PL_check[(type)])(aTHX_ op))
@@ -62,8 +79,7 @@ hook_op_check (opcode type, hook_op_check_cb cb, void *user_data) {
 	if (!hooks) {
 		hooks = newAV ();
 		check_cbs[type] = hooks;
-		orig_PL_check[type] = PL_check[type];
-		PL_check[type] = check_cb;
+		wrap_op_checker(type, check_cb, &orig_PL_check[type]);
 	}
 
 	hook = newSVuv (PTR2UV (cb));

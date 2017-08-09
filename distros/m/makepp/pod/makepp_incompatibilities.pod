@@ -2,7 +2,7 @@
 
 makepp_incompatibilities -- Incompatibilities between makepp and GNU make
 
-=for vc $Id: makepp_incompatibilities.pod,v 1.37 2012/03/25 18:34:48 pfeiffer Exp $
+=for vc $Id: makepp_incompatibilities.pod,v 1.40 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -32,9 +32,8 @@ In a nutshell, if it doesn't build out of the box, try:
  	--build-check=target_newer --last-chance-rules --no-remake-makefiles
 
 If that succeeds, you can try to eliminate those arguments one by one.  But if
-that fails, try adding either one or both of:
+that fails, try adding:
 
- 	--defer-include
  	--traditional-recursive-make
 
 If that also fails, the build system needs some tweaking to cooperate with
@@ -66,7 +65,7 @@ which gmake ignores unless being asked to, like:
 
     config.status : configure
  	./config.status --recheck
- 
+
     configure : configure.in aclocal.m4
  	autoconf
 
@@ -190,10 +189,12 @@ variables not surrounded by spaces.  For example,
     INCLUDE_PREFIX := -I/some/include/dir -I
     INCLUDES := $(INCLUDE_PREFIX)/other/include/dir
 
-will set C<INCLUDES> to
-S<C<-I/some/include/dir/other/include/dir -I/other/include/dir>>
-if rc-style substitution is enabled, whereas GNU make would set it
-to S<C<-I/some/include/dir -I/other/include/dir>>.
+will set C<INCLUDES> to S<C<-I/some/include/dir/other/include/dir
+-I/other/include/dir>> if rc-style substitution is enabled, whereas GNU make
+would set it to S<C<-I/some/include/dir -I/other/include/dir>>.  E.g., when
+compiling Redis 2.6.5 it tries to run C<printfgcc>.  Such a funny
+concatenation of two commands is a strong indication that this variable is
+needed to fall back to make semantics.
 
 There is also an incompatibility in the handling of whitespace in a variable:
 
@@ -216,23 +217,6 @@ GNU make sets C<T> to contain C<-o> followed by a space, whereas makepp strips
 out the trailing space anyway.  If you want the trailing space, you must set
 C<makepp_simple_concatenation> and also set C<T> using the technique involving
 a dummy variable such as C<null>, as shown above.
-
-=head2 Workaround option C<--defer-include>
-
-Makepp reads makefiles in a single pass, where GNU make is multipass.  Hence
-this will not work, because F<GIT-VERSION-FILE> must be built to process the
-C<include> statement.  But it depends on something that is unknown at this
-point.  To solve this, the C<.PHONY> declaration must be moved up before the
-C<include> statement:
-
-    GIT-VERSION-FILE: FORCE
- 	@$(SHELL_PATH) ./GIT-VERSION-GEN
-    include GIT-VERSION-FILE
-    .PHONY: FORCE
-
-This option internally reorders the include statements to the end of the makefile.
-That may in turn cause variables to have different values, in which case you
-should set the problematic ones on the command line.
 
 =head2 Workaround option C<--no-remake-makefiles>
 
@@ -640,3 +624,12 @@ This happens automatically.
 =back
 
 Some of these can be easily supported if anyone cares.
+
+=head1 Variable incompatibilities
+
+Makepp looks in C<$PATH> for a matching command to return for variables like
+C<$(CC)> or C<$(CXX)>, while GNU make has static defaults.  Also makepp gives
+preference to C<gcc> and C<g++> while surprisingly GNU make returns C<cc> for
+the former, but the same for the latter.  You can override these in the
+makefile, on the command line or by exporting a variable of the same name
+before invoking makepp.

@@ -27,12 +27,14 @@ $modules{$_} = $_ for qw(
   Dist::Zilla::Plugin::ReadmeAnyFromPod
   Dist::Zilla::Plugin::Run::BeforeBuild
   Dist::Zilla::Util::CurrentCmd
+  File::Glob
   File::ShareDir
   File::chdir
   IPC::System::Simple
   Module::Build
   Moose
   Path::Class
+  Path::Tiny
   PerlX::Maybe
   PerlX::Maybe::XS
   Pod::Markdown

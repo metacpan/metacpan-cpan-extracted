@@ -2,8 +2,8 @@ NAME
     App::perlmv::u - Rename files using Perl code, with undo/redo
 
 VERSION
-    This document describes version 0.001 of App::perlmv::u (from Perl
-    distribution App-perlmv-u), released on 2017-07-28.
+    This document describes version 0.003 of App::perlmv::u (from Perl
+    distribution App-perlmv-u), released on 2017-08-01.
 
 DESCRIPTION
     See included script perlmv-u.
@@ -179,13 +179,15 @@ FUNCTIONS
   undo
     Usage:
 
-     undo() -> [status, msg, result, meta]
+     undo(%args) -> [status, msg, result, meta]
 
     Undo last action.
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   ignore_errors => *bool*
 
     Returns an enveloped result (an array).
 

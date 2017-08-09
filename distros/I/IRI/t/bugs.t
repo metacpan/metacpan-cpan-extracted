@@ -53,4 +53,11 @@ use_ok( 'IRI' );
 	is($i->abs, 'file:///Users/eve/data/bob.rdf');
 }
 
+subtest '#11 - parsing codepoints beyond the basic multilingual plane fails due to typo in the IRI regexen' => sub {
+	my $value	= 'http://hak.dbpedia.org/resource/Hàn_(𨧀)';
+	my $i	= IRI->new( value => $value );
+	isa_ok($i, 'IRI');
+	is($i->abs, $value);
+};
+
 done_testing();

@@ -1,4 +1,4 @@
-# $Id: BuildCache.pm,v 1.49 2012/10/14 15:16:50 pfeiffer Exp $
+# $Id: BuildCache.pm,v 1.53 2016/09/12 20:33:41 pfeiffer Exp $
 #
 # Possible improvements:
 #
@@ -113,8 +113,12 @@ BEGIN {
 }
 
 
+our $force_copy;		# Don't link from BC.
 our $global;			# Build cache specified on command line or with global keyword.
+our $md5check;			# Check the MD5 signature of entries
 our $options_file = 'build_cache_options.pl';
+our $error_hook;
+our $hits = 0;			# Number of the files changed that were imported from a build cache.
 
 =head2 new Mpp::BuildCache("/path/to/cache");
 
@@ -122,15 +126,18 @@ Opens an existing build cache.
 
 =cut
 
+our $used;			# Is a BC in use?
+
 sub new {
   my( $class, $build_cache_dir, $self ) = @_;
 
-  $self ||= do "$build_cache_dir/$options_file";
+  $build_cache_dir = file_info $build_cache_dir;
+  my $absolute_build_cache_dir = absolute_filename $build_cache_dir;
+
+  $self ||= do "$absolute_build_cache_dir/$options_file";
 				# Load the creation options.
   ref $self or
-    die "Build cache $build_cache_dir does not have a valid format\n  $build_cache_dir/$options_file is missing or corrupted\n";
-
-  $build_cache_dir = file_info $build_cache_dir;
+    die "Can't load `$absolute_build_cache_dir/$options_file': $!\n";
 
   @$self{qw(DEV ACCESS_PERMISSIONS)} =
     @{stat_array $build_cache_dir}[Mpp::File::STAT_DEV, Mpp::File::STAT_MODE];
@@ -139,8 +146,9 @@ sub new {
 				# proper mask.
   $self->{MKDIR_OPT} = sprintf '-pm%o', $self->{ACCESS_PERMISSIONS};
 
-  $self->{DIRNAME} = absolute_filename $build_cache_dir;
+  $self->{DIRNAME} = $absolute_build_cache_dir;
 
+  $used = 1;
   bless $self, $class;
 }
 
@@ -174,8 +182,8 @@ our $incoming_subdir = 'incoming.dir';
 # if it returns true.
 sub link_over_nfs {
   # $old has to be a file that nobody else might be touching.
-  my ($old, $new) = @_;
-  link($old, $new) || ((stat $old)[3] || 0) > 1;
+  #my ($old, $new) = @_;
+  link $_[0], $_[1] or ((stat $_[0])[3] || 0) > 1;
 }
 
 my $unique_suffix;
@@ -219,12 +227,12 @@ sub cache_file {
 
   my $build_info_fname = $cache_fname;
   $build_info_fname =~ s@/([^/]+)$@/$Mpp::File::build_info_subdir@;
-  -d $build_info_fname or
-    eval { Mpp::Cmds::c_mkdir $self->{MKDIR_OPT}, $build_info_fname } or do {
-      $$reason = ($! == ENOENT || $! == ESTALE) ? "$@ -- possibly due to aging (OK)" : $@;
-      return undef;
-    };
-				# Make sure .makepp directory and parents exists.
+  unless( -d $build_info_fname or
+    eval { Mpp::Cmds::c_mkdir $self->{MKDIR_OPT}, $build_info_fname } )
+  {
+    $$reason = ($! == ENOENT || $! == ESTALE) ? "$@ -- possibly due to aging (OK)" : $@;
+    return;
+  }				# Make sure .makepp directory and parents exists.
 
   $build_info_fname .= "/$1.mk";
 
@@ -273,7 +281,7 @@ sub cache_file {
   my $result = eval {
     my $linking;
     my $target_prot = $file_prot;
-    if( $dev == $self->{DEV} && !$Mpp::force_bc_copy ) {
+    if( $dev == $self->{DEV} && !$force_copy ) {
       $linking = 1;
       $target_src = $input_filename;
       $target_prot &= ~0222;	# Make it read only, so that no one can
@@ -282,54 +290,51 @@ sub cache_file {
 				# Remember that it's linked to the build
 				# cache, so we need to delete it before
 				# allowing it to be changed.
-      if( $Mpp::md5check_bc ) {
-	# Make sure that $build_info->{MD5_SUM} is set.
-	Mpp::Signature::md5::signature $input_finfo;
-      }
+      Mpp::Signature::md5::signature $input_finfo # Make sure that $build_info->{MD5_SUM} is set.
+	if defined $md5check;
     } else {			# Hard link not possible on different dev
-      my $md5;
-      if($Mpp::md5check_bc && !$build_info->{MD5_SUM}) {
-	$md5 = Digest::MD5->new;
-      }
+      my $md5 = Digest::MD5->new
+	if defined $md5check && !$build_info->{MD5_SUM};
       $target_src = $temp_cache_fname;
       push @files_to_unlink, $temp_cache_fname;
       # Need to unlink first, in case there are other links to it and/or
       # the current permissions don't allow writing.
-      unlink $temp_cache_fname or $! == ENOENT or do {
+      unless( unlink $temp_cache_fname or $! == ENOENT ) {
 	$$reason = "unlink $temp_cache_fname: $!";
-	return undef;
-      };
+	return;
+      }
       unless( ($size) = copy_check_md5($input_filename, $temp_cache_fname, $md5) ) {
 	$$reason = ($! == ESTALE) ? $target_aged : "write $temp_cache_fname: $!";
-	return undef;
+	return;
       }
-      utime $_[4] || time, $mtime, $temp_cache_fname or # Try to copy over mtime.
+      unless( utime $_[4] || time, $mtime, $temp_cache_fname or # Try to copy over mtime.
 	# NOTE: We can't get the mtime of $temp_cache_fname from the stat that
 	# we do on the destination filehandle at the end of the copy, because
 	# that mtime could be based on the local clock instead of the clock of
 	# the machine on which the file is stored.
-	$mtime = (stat $temp_cache_fname)[9] or do {
-	  $$reason = ($! == ENOENT || $! == ESTALE) ? $target_aged : "stat $temp_cache_fname: $!";
-	  return undef;
-	};
+	$mtime = (stat $temp_cache_fname)[9] )
+      {
+	$$reason = ($! == ENOENT || $! == ESTALE) ? $target_aged : "stat $temp_cache_fname: $!";
+	return;
+      }
       $build_info->{MD5_SUM} = $md5->b64digest if $md5;
     }
     $build_info->{SIGNATURE} = $mtime . ',' . $size;
 				  # Be sure we store a signature.
 
     push @files_to_unlink, $temp_build_info_fname;
-    unlink $temp_build_info_fname or $! == ENOENT or do {
+    unless( unlink $temp_build_info_fname or $! == ENOENT ) {
       $$reason = "unlink $temp_build_info_fname: $!";
-      return undef;
-    };
-    Mpp::File::write_build_info_file($temp_build_info_fname, $build_info) or do {
+      return;
+    }
+    unless( Mpp::File::write_build_info_file $temp_build_info_fname, $build_info ) {
       $$reason = ($! == ESTALE) ? $build_info_aged : "write $temp_build_info_fname: $!";
-      return undef;
-    };
-    chmod $file_prot, $temp_build_info_fname or do {
+      return;
+    }
+    unless( chmod $file_prot, $temp_build_info_fname ) {
       $$reason = ($! == ENOENT || $! == ESTALE) ? $build_info_aged : "chmod $temp_build_info_fname: $!";
-      return undef;
-    };
+      return;
+    }
 
     # We can leave garbage in the incoming directory on an interrupt, but we
     # need to make sure that we don't corrupt to the cache entries if we can
@@ -341,52 +346,46 @@ sub cache_file {
       # file, because we don't like to fail to import just because the build
       # info file isn't there yet.  However, this isn't guaranteed over NFS.
       for($cache_fname, $build_info_fname) {
-	unlink $_ or $! == ENOENT or $! == ESTALE or do {
+	unless( unlink $_ or $! == ENOENT or $! == ESTALE ) {
 	  $$reason = "unlink $_: $!";
-	  return undef;
-	};
+	  return;
+	}
       }
 
-      link_over_nfs($temp_build_info_fname, $build_info_fname) or do {
-	if($! == EEXIST) {
-	  $$reason = 'build info file was already there, possibly created by another party (OK)'
-	} elsif($! == ENOENT || $! == ESTALE) {
+      unless( link_over_nfs $temp_build_info_fname, $build_info_fname ) {
+	$$reason =
+	  ($! == EEXIST) ? 'build info file was already there, possibly created by another party (OK)' :
+	  ($! == ENOENT || $! == ESTALE) ? $build_info_aged :
 	  # NOTE: This might instead mean that the parent directory of
 	  # $build_info_fname was aged, so the message is a bit misleading.
-	  $$reason = $build_info_aged;
-	} else {
-	  $$reason = "link $temp_build_info_fname to $build_info_fname: $!";
-	}
-	return undef;
-      };
+	  "link $temp_build_info_fname to $build_info_fname: $!";
+	return;
+      }
       push @files_to_unlink, $build_info_fname;
 
-      chmod $target_prot, $target_src or do {
+      unless( chmod $target_prot, $target_src ) {
 	$$reason = (!$linking && ($! == ENOENT || $! == ESTALE)) ? $target_aged : "chmod $target_src: $!";
-	return undef;
-      };
-      link_over_nfs($target_src, $cache_fname) or do {
-	if($! == EEXIST) {
-	  $$reason = "target file was already there, possibly created by another party after our build info was immediately aged (OK)"
-	} elsif($! == ENOENT || $! == ESTALE) {
+	return;
+      }
+      unless( link_over_nfs $target_src, $cache_fname ) {
+	$$reason =
+	  ($! == EEXIST) ? "target file was already there, possibly created by another party after our build info was immediately aged (OK)" :
+	  ($! == ENOENT || $! == ESTALE) ? $target_aged :
 	  # NOTE: This might instead mean that the parent directory of
 	  # $cache_fname was aged, so the message is a bit misleading.
-	  $$reason = $target_aged;
-	} else {
-	  $$reason = "link $target_src to $cache_fname: $!";
-	}
-	return undef;
-      };
+	  "link $target_src to $cache_fname: $!";
+	return;
+      }
       #push @files_to_unlink, $cache_fname; # Currently redundant
 
       @files_to_unlink = ();	# Commit to leave the entry in the cache
       Mpp::log $linking ? 'BC_LINK' : 'BC_EXPORT' => $input_finfo, $cache_fname
 	if $Mpp::log_level;
-      1
+      1;
     };
     my $error = $@;
     eval { unlink @files_to_unlink }; # Ignore failure here
-    $Mpp::critical_sections--;
+    --$Mpp::critical_sections;
     Mpp::propagate_pending_signals();
     die $error if $error;
     $result
@@ -394,7 +393,7 @@ sub cache_file {
   my $error = $@;
   eval { unlink @files_to_unlink }; # Ignore failure here
   die $error if $error;
-  $result
+  $result;
 }
 
 =head2 lookup_file
@@ -478,43 +477,38 @@ sub copy_check_md5 {
   # file.  The file could have been unlinked and re-created since we opened
   # it for read.
   my ($ino, $mode, $size, $mtime) = do { no warnings; (stat $fin)[1,2,7,9] };
-  defined($size) or return;
+  defined $size or return;
 
-  open(my $fout, '>', $out) or return;
+  open my $fout, '>', $out or return;
 
-  # Stolen from File::Copy:
-  my $bufsize = $size;
-  $bufsize = 1024 if ($bufsize < 512);
-  $bufsize = $Too_Big if ($bufsize > $Too_Big);
+  # Adapted from File::Copy:
+  my $bufsize = $size < 512 ? 1024 : $size > $Too_Big ? $Too_Big : $size;
   my $buf;
   for (;;) {
     my ($r, $w, $t);
-    defined($r = sysread($fin, $buf, $bufsize)) or return;
+    defined( $r = sysread $fin, $buf, $bufsize ) or return;
     last unless $r;
     $md5->add($buf) if $md5;
-    for ($w = 0; $w < $r; $w += $t) {
-      $t = syswrite($fout, $buf, $r - $w, $w) or return;
+    for( $w = 0; $w < $r; $w += $t ) {
+      $t = syswrite $fout, $buf, $r - $w, $w or return;
     }
   }
 
 
   my $size3;
   {
-    local $SIG{__WARN__} = sub {
-      local $_ = $_[0];
-      warn $_ unless /unopened/;	# Ignore "stat() on unopened filehandle"
-    };
+    no warnings 'unopened';
     $size3 = (stat $fout)[7];
   }
-  close($fout) or return;
+  close $fout or return;
 
   # Now, if the file is still there, report if it changed.  This is how
   # we'll know if somebody isn't following the rules.
-  my ($ino2, $size2, $mtime2) = do { no warnings; (stat $fin)[1,7,9] };
+  my( $ino2, $size2, $mtime2 ) = do { no warnings; (stat $fin)[1,7,9] };
   die "$in changed during copying (created non-atomically)"
     if $ino2 && ($ino2 != $ino || $size2 != $size || $mtime2 != $mtime);
 
-  close($fin);
+  close $fin;
 
   # I don't know of any way that this could happen, but we'll check here
   # just so we know for sure that it didn't happen.
@@ -524,6 +518,57 @@ sub copy_check_md5 {
   chmod($mode & 0777, $out) or die "chmod $out: $!" if $setmode;
 
   ($size, $mtime)
+}
+
+sub get {
+  my( $rule, $targets ) = @_;
+  my $rebuild_needed;
+ import_loop:
+  while( @$targets ) {
+    my( $target_src, $target_dst ) = splice @$targets, 0, 2;
+    unless( $target_src->copy_from_cache( $target_dst, $rule, \my $reason )) {
+      my $msg = 'Copy of ' . Mpp::BuildCache::Entry::absolute_filename( $target_src ) . ' into ' .
+	absolute_filename( $target_dst ) . " failed because $reason\n";
+      &$error_hook( $msg ) if $error_hook;
+      if( !$Mpp::stop_on_race && $msg =~ s/ \(OK\)$//m ) {
+	warn "info: ${msg}This might just mean that the build cache file was in an inconsistent state due to concurrent access, so we'll rebuild instead.\n";
+	$rebuild_needed = 1;
+	last import_loop;
+      } else {
+	# If something happens that we can't explain as a transient phenomenon,
+	# then we *don't* want to just fall back to rebuilding, because the user
+	# probably wants to know that the build cache isn't operating normally.
+	die $msg;
+      }
+    }
+
+    Mpp::log BC_COPY => $target_dst, $target_src
+      if $Mpp::log_level;
+    ++$hits;
+    print "$Mpp::progname: Imported `", absolute_filename( $target_dst ), "' from build cache\n";
+  }
+  $rebuild_needed;
+}
+
+# For Mpp::Rule
+
+#
+# Set the build cache for this rule.
+#
+sub set {
+  $_[0]{BUILD_CACHE} = $_[1];
+}
+
+#
+# Return a build cache associated with this rule, if any.
+#
+# A build cache may be specified for each rule, or for a whole makefile,
+# or for all makefiles (on the command line).
+#
+sub Mpp::Rule::build_cache {
+  exists $_[0]{BUILD_CACHE} ? $_[0]{BUILD_CACHE} :
+  exists $_[0]{MAKEFILE}{BUILD_CACHE} ? $_[0]{MAKEFILE}{BUILD_CACHE} :
+  $global;
 }
 
 ###############################################################################
@@ -555,7 +600,7 @@ sub absolute_filename { $_[0]->{FILENAME} }
 Replaces the file in $output_finfo with the file from the cache, and updates
 all the Mpp::File data structures to reflect this change.
 The build info signature is checked against the target file in the cache,
-and if $Mpp::md5check_bc is set, then the MD5 checksum is also verified.
+and if $md5check is set, then the MD5 checksum is also verified.
 
 Returns true if the file was successfully restored from the cache, false if
 not.  (I B<think> the only reason it wouldn't be successfully restored is that
@@ -575,44 +620,42 @@ sub fix_ok {
 # might always nuke files just as they get created.  It's still possible
 # (although unlikely) for a file to be removed immediately after it replaces
 # a file that had been in the cache for a long time, but that's OK.
-  my ($self) = @_;
+  #my ($self) = @_;
   # Re-stat, because this is the last chance we have to notice an update.
-  my $mtime = (stat $self->{FILENAME})[9]; # 9 == real STAT_MTIME
+  my $mtime = (stat $_[0]{FILENAME})[9]; # 9 == real STAT_MTIME
   $mtime && time - $mtime > 600
 }
 
 sub copy_from_cache {
-  my ($self, $output_finfo, $rule, $reason) = @_;
+  my( $self, $output_finfo, $rule, $reason ) = @_;
   $reason || die;
 
-  Mpp::File::unlink( $output_finfo );	    # Get rid of anything that's there currently.
-  my $output_fname = Mpp::File::absolute_filename_nolink $output_finfo;
+  Mpp::File::unlink $output_finfo;	    # Get rid of anything that's there currently.
   my $link_to_build_cache = 0;
 
 #
 # Read in the build info:
 #
-  my $cache_fname = $self->{FILENAME};
-  my $build_info_fname = $cache_fname;
+  my $build_info_fname =
+    my $cache_fname = $self->{FILENAME};
   $build_info_fname =~ s@/([^/]+)$@/$Mpp::File::build_info_subdir/$1.mk@;
-  open my( $fh ), $build_info_fname or do {
+  open my $fh, '<:crlf', $build_info_fname;
+  unless( $fh ) {
     if($! == POSIX::ENOENT || $! == Mpp::BuildCache::ESTALE) {
       $$reason = 'the build info file is missing (OK)';
-      unlink $cache_fname if fix_ok($self);
+      unlink $cache_fname if &fix_ok;
     } else {
       $$reason = "read $build_info_fname: $!";
     }
-    return undef;
-  };
-  my $line;
-  my $build_info=Mpp::File::grok_build_info_file($fh);
-  close $fh;
+    return;
+  }
+  my $build_info = Mpp::File::grok_build_info_file $fh;
 
-  $build_info or do {
-    $$reason='currupt build info file, possibly deleted while reading (OK)';
-    unlink $cache_fname, $build_info_fname if fix_ok($self);
-    return undef;
-  }; # Something's wrong with this file.
+  unless( $build_info ) {
+    $$reason = 'corrupt build info file, possibly deleted while reading (OK)';
+    unlink $cache_fname, $build_info_fname if &fix_ok;
+    return;
+  } # Something's wrong with this file.
 
   # If the target directory doesn't already exist, then we assume that the
   # rule would have created it.
@@ -627,21 +670,21 @@ sub copy_from_cache {
 #
   $Mpp::critical_sections++;
   my $result = eval {
-    my $md5 = Digest::MD5->new if $Mpp::md5check_bc;
+    my $output_fname = Mpp::File::absolute_filename_nolink $output_finfo;
+    my $md5 = Digest::MD5->new if defined $md5check;
     my ($size, $mtime);
     # TBD: Maybe we shouldn't fall back to copying if link fails.  There
     # should be a warning at least.
     if( $self->{DEV} == ((Mpp::File::stat_array $output_finfo->{'..'})->[Mpp::File::STAT_DEV] || 0)
-	&& !$Mpp::force_bc_copy &&
-				  # Same file system?
+	&& !$force_copy && # Same file system?
 	link($self->{FILENAME}, $output_fname)) {
       # Re-stat in case it changed since we looked it up.
       ($size, $mtime) = (stat $output_fname)[7, 9];
       unless( defined $size ) {
 	$$reason = "cached file $self->{FILENAME} became a stale link after we looked it up (OK)";
 	unlink $output_fname;
-	unlink $cache_fname, $build_info_fname if fix_ok($self);
-	return undef;
+	unlink $cache_fname, $build_info_fname if &fix_ok;
+	return;
       }
       if($md5 && open(my $fh, '<', $self->{FILENAME})) {
 	$md5->addfile($fh);
@@ -654,7 +697,7 @@ sub copy_from_cache {
       # this is a real hardware error, then we hope that it also shows up on
       # some other operation where it can't happen legitimately.
       $$reason = ($!==POSIX::ENOENT || $!==Mpp::BuildCache::ESTALE || $!==POSIX::EIO) ? 'file was just deleted (OK)' : "copy $self->{FILENAME} to $output_fname: $!";
-      return undef;
+      return;
     }
     my $signature = $mtime . ',' . $size;
                                     # Form the expected signature.
@@ -663,20 +706,21 @@ sub copy_from_cache {
                                     # File was corrupted in the build cache.
                                     # Get rid of it, and don't import it.
       $$reason = "cached build info file $build_info_sig mismatches cached target file $signature (OK)";
-      unlink $cache_fname, $build_info_fname if fix_ok($self);
-      return undef;
+      unlink $cache_fname, $build_info_fname if &fix_ok;
+      return;
     }
     if($md5) {
       # Digest key and format needs to match Mpp::Signature::md5
-      my $md5sum = $build_info->{MD5_SUM} or do {
+      my $md5sum = $build_info->{MD5_SUM};
+      unless( $md5sum ) {
         $$reason = 'no stored MD5 in cached build info file (OK)';
-        return undef;
-      };
+        return;
+      }
       my $target_md5 = $md5->b64digest;
-      if($target_md5 ne $md5sum) {
+      if( $target_md5 ne $md5sum ) {
 	$$reason = "cached target file $target_md5 mismatches build info MD5_SUM $md5sum (OK)";
-        unlink $cache_fname, $build_info_fname if fix_ok($self);
-	return undef;
+        unlink $cache_fname, $build_info_fname if &fix_ok;
+	return;
       }
     }
 

@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::Order;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use List::Util qw( any );
 
@@ -90,7 +90,7 @@ JsonSQL::Param::Order - JsonSQL::Param::Order object. Stores a Perl representati
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

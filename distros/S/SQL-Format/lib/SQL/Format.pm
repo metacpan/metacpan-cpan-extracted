@@ -2,8 +2,8 @@ package SQL::Format;
 
 use strict;
 use warnings;
-use 5.008_001;
-our $VERSION = '0.18';
+use 5.010_000;
+our $VERSION = '0.19';
 
 use Exporter 'import';
 use Carp qw(croak carp);
@@ -461,7 +461,7 @@ sub _options {
                 $ret .= "$val->{limit}, $val->{offset}";
             }
             else {
-                warn "Unkown LIMIT_DIALECT `$LIMIT_DIALECT`";
+                croak "Unkown LIMIT_DIALECT `$LIMIT_DIALECT`";
                 $ret .= $val->{limit};
             }
         }
@@ -694,6 +694,15 @@ sub select {
     local $NAME_SEP      = $self->{name_sep};
     local $QUOTE_CHAR    = $self->{quote_char};
     local $LIMIT_DIALECT = $self->{limit_dialect};
+
+    if (delete $opts->{for_update}) {
+        if (exists $opts->{suffix}) {
+            croak 'Conflict option `for_update` and `suffix`. `for_update` option is ignored.';
+        }
+        else {
+            $opts->{suffix} = 'FOR UPDATE';
+        }
+    }
 
     my $prefix = delete $opts->{prefix} || 'SELECT';
     my $suffix = delete $opts->{suffix};
@@ -1255,6 +1264,12 @@ Additional value for after the SELECT statement.
   # @bind: ('baz')
 
 Default value is C<< '' >>
+
+=item $opts->{for_update}
+
+Alias for C<$opts->{suffix} = 'FOR UPDATE';>.
+
+This option provides compatibility with L<SQL::Maker>.
 
 =item $opts->{limit}
 

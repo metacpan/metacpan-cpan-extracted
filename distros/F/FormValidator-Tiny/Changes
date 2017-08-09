@@ -1,0 +1,13 @@
+0.003     2017-08-06 14:42:11-05:00 America/Chicago
+
+    * Added new predicate for enumerations, one_of().
+
+0.002     2017-08-03 10:56:32-05:00 America/Chicago
+
+    * Major: Correcting the the way required/optional work.
+    * Adding a way for subroutine validators to shortcircuit validation,
+      which just so happens to be the thing setting optional needed to do.
+
+0.001     2017-08-02 23:07:19-05:00 America/Chicago
+
+    * Initial release.

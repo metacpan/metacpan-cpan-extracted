@@ -2,7 +2,7 @@ package App::Toodledo;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 BEGIN { $PPI::XS_DISABLE = 1 }  # PPI::XS throws deprecation warnings in 5.16
 
@@ -27,7 +27,7 @@ use App::Toodledo::TaskCache;
 use App::Toodledo::Util qw(home arg_encode preferred_date_format);
 
 my $HOST          =  'api.toodledo.com';
-my $ROOT_URL      =  "http://$HOST/2/";
+my $ROOT_URL      =  "https://$HOST/2/";
 
 class_has Info_File_Name  => ( is => 'rw', default => '.toodledorc' );
 class_has Token_File_Name => ( is => 'rw', default => '.toodledo_token' );

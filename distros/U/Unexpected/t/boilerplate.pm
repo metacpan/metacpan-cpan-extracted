@@ -31,13 +31,18 @@ BEGIN {
 
       exists $except->{ $host } and plan skip_all =>
          'Broken smoker '.$except->{ $host };
+
+      for my $key (keys %{ $except }) {
+         $host =~ m{ $key \z }mx and plan skip_all =>
+            'Broken smoker '.$except->{ $key };
+      }
    }
 }
 
 use Test::Requires "${perl_ver}";
 use Test::Requires { version => 0.88 };
 
-use version; our $VERSION = qv( '0.2' );
+use version; our $VERSION = qv( '0.3' );
 
 sub import {
    strict->import;

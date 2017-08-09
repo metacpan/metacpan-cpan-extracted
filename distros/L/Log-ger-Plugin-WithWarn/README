@@ -1,0 +1,34 @@
+NAME
+    Log::ger::Plugin::WithWarn - Add *_warn logging routines
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+     use Log::ger::Plugin 'WithWarn';
+     use Log::ger;
+     my $log = Log::ger->get_logger;
+
+    These subroutines will also become available:
+
+     log_warn_warn("blah!"); # in addition to log, will also warn()
+
+    These logging methods will also become available:
+
+     $log->warn_warn("blah!"); # in addition to log, will also warn()
+
+DESCRIPTION
+SEE ALSO
+    Log::ger::Plugin::WithDie
+
+    Log::ger::Plugin::WithCarp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

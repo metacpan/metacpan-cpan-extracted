@@ -4,21 +4,20 @@ Time::UTC_SLS - UTC with Smoothed Leap Seconds
 
 =head1 SYNOPSIS
 
-	use Time::UTC_SLS qw(utc_to_utcsls utcsls_to_utc);
+    use Time::UTC_SLS qw(utc_to_utcsls utcsls_to_utc);
 
-	$mjd = utc_to_utcsls($day, $secs);
-	($day, $secs) = utcsls_to_day($mjd);
+    $mjd = utc_to_utcsls($day, $secs);
+    ($day, $secs) = utcsls_to_day($mjd);
 
-	use Time::UTC_SLS qw(
-		utc_day_to_mjdn utc_mjdn_to_day
-		utc_day_to_cjdn utc_cjdn_to_day
-	);
+    use Time::UTC_SLS qw(
+	utc_day_to_mjdn utc_mjdn_to_day
+	utc_day_to_cjdn utc_cjdn_to_day);
 
-	$mjdn = utc_day_to_mjdn($day);
-	$day = utc_mjdn_to_day($mjdn);
+    $mjdn = utc_day_to_mjdn($day);
+    $day = utc_mjdn_to_day($mjdn);
 
-	$cjdn = utc_day_to_cjdn($day);
-	$day = utc_cjdn_to_day($cjdn);
+    $cjdn = utc_day_to_cjdn($day);
+    $day = utc_cjdn_to_day($cjdn);
 
 =head1 DESCRIPTION
 
@@ -77,7 +76,7 @@ use Time::UTC 0.007 qw(
 	utc_day_to_cjdn utc_cjdn_to_day
 );
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -201,7 +200,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2009, 2010, 2012
+Copyright (C) 2006, 2007, 2009, 2010, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

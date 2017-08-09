@@ -1,4 +1,4 @@
-# $Id: FileOpt.pm,v 1.117 2012/10/14 15:16:30 pfeiffer Exp $
+# $Id: FileOpt.pm,v 1.125 2014/08/03 21:10:36 pfeiffer Exp $
 
 =head1 NAME
 
@@ -72,7 +72,9 @@ If $no_last_chance is set, then don't consider last chance rules or autoloads.
 sub get_rule {
   return undef if &dont_build;
   my $mdir = $_[0]{'..'};
-  Mpp::Makefile::implicitly_load($mdir); # Make sure we've loaded a makefile for this directory.
+  exists $mdir->{MAKEINFO} or
+    Mpp::Makefile::implicitly_load( $mdir ) # Make sure we've loaded a makefile for this directory.
+    if $Mpp::implicitly_load_makefiles;
   # If we know the rule now, then return it.  Otherwise, try to find a "backwards inference" rule.
   return $_[0]{RULE} if exists $_[0]{RULE};
   if( $n_last_chance_rules && !$_[1] ) {
@@ -95,7 +97,7 @@ sub get_rule {
       $dirinfo = $dirinfo->{'..'};
       undef $leaf;
     }
-    $finfo->{RULE} or do {
+    unless( $finfo->{RULE} ) {
       if( my $minfo = $mdir->{MAKEINFO} ) {
 	while( my $auto = shift @{$minfo->{AUTOLOAD} || []} ) {
 	  Mpp::log AUTOLOAD => $finfo;
@@ -103,7 +105,7 @@ sub get_rule {
 	  last if exists $finfo->{RULE};
 	}
       }
-      $finfo->{RULE}
+      $finfo->{RULE};
     }
   }
 }
@@ -138,13 +140,16 @@ exists_or_can_be_built) are cached in EXISTS_OR_CAN_BE_BUILT.  But, since this
 function used to get called an obscene number of times, they don't themselves
 check the cache, instead providing it to its potential caller.
 
+There can be 3 values for phony: 0 -- no phony targets; 1 -- only phony
+targets; undef -- don't care.
+
 =cut
 
 my %warned_stale;
 sub exists_or_can_be_built_norecurse {
   my ($finfo, $phony, $stale) = @_;
-  return exists $finfo->{xPHONY} && $phony ? $finfo : 0
-    if $phony || exists $finfo->{xPHONY};
+  return exists $finfo->{xPHONY} && $finfo if $phony;
+  return $finfo if !defined $phony and exists $finfo->{xPHONY};
 				# Never return phony targets unless requested.
 
   # lstat and stat calls over NFS take a long time, so if we do the lstat and
@@ -178,7 +183,7 @@ sub exists_or_can_be_built_norecurse {
   undef;
 }
 sub exists_or_can_be_built {
-  # If $phony is set, then return only phony targets, which are otherwise ignored.
+  # If $phony is 0, return no phony targets, if 1, only phony targets, if undef any targets.
   # If $stale is set, then return stale generated files too, even if
   # $Mpp::rm_stale_files is set.
   # If $no_last_chance is set, then don't return generated files if the only
@@ -217,18 +222,15 @@ sub exists_or_can_be_built {
   if( exists $finfo->{ALTERNATE_VERSIONS} ) {
     for( @{$finfo->{ALTERNATE_VERSIONS}} ) {
       $result = exists_or_can_be_built_norecurse $_, $phony, $stale;
-      return $result || undef if defined $result;
+      return $result ? $finfo : undef if defined $result;
     }
   }
   undef;
 }
 sub exists_or_can_be_built_or_remove {
+  return if &dont_build && &lstat_array == $Mpp::File::empty_array;
   my $finfo = $_[0];
-  if( &dont_build ) {
-    &lstat_array;
-    return unless exists $finfo->{xEXISTS};
-  }
-  $warned_stale{sprintf '%x', $finfo} = $finfo if $Mpp::rm_stale_files; # Avoid redundant warning
+  $warned_stale{sprintf '%x', $finfo} = $finfo if $Mpp::rm_stale_files; # Remember for end, avoid redundant warning
   my $result = &exists_or_can_be_built;
   return $result if $result || !$Mpp::rm_stale_files;
   if( exists $finfo->{xEXISTS} || &signature ) {
@@ -240,9 +242,8 @@ sub exists_or_can_be_built_or_remove {
       if $Mpp::log_level;
     # TBD: What if the unlink fails?
     &unlink;
-    # Remove the build info file as well, so that it won't be treated as
-    # a generated file if something other than makepp puts it back with the
-    # same signature.
+    # Remove the build info file as well, so that it won't be treated as a generated
+    # file if something other than makepp puts it back with the same signature.
     CORE::unlink &build_info_fname;
   }
   $result;
@@ -315,46 +316,6 @@ too, so when you're not sure you have a Mpp::File, better use method syntax.
 
 *name = \&absolute_filename;
 
-=head2 set_additional_dependencies
-
-  set_additional_dependencies($finfo,$dependency_string, $makefile, $makefile_line);
-
-Indicates that the list of objects in $dependency_string are extra dependencies
-of the file.  These dependencies are appended to the list of dependencies
-from the rule to build the file.  $makefile and $makefile_line are used only
-when we have to expand the list of dependencies.  We can't do this until we
-actually need to make the file, because we might not be able to expand
-wildcards or other things properly.
-
-=cut
-
-sub set_additional_dependencies {
-  my ($finfo, $dependency_string, $makefile, $makefile_line) = @_;
-
-  push @{$finfo->{ADDITIONAL_DEPENDENCIES}},
-      [$dependency_string, $makefile, $makefile_line];
-				# Store a copy of this information.
-  publish $finfo, $Mpp::rm_stale_files;
-				# For legacy makefiles, sometimes an idiom like
-				# this is used:
-				#   y.tab.c: y.tab.h
-				#   y.tab.h: parse.y
-				#	yacc -d parse.y
-				# in order to indicate that the yacc command
-				# has two targets.  We need to support this
-				# by indicating that files with extra
-				# dependencies are buildable, even if there
-				# isn't an actual rule for them.
-  if( $Mpp::Makefile::rule_include ) {
-    # Via :include we read the compiler generated makefile twice.  If #include statements
-    # have been removed, we must not store those from 1st time we read build info.
-    if( $Mpp::Makefile::rule_include == 1 ) { # Initial lecture of possibly obsolete .d file
-      $finfo->{ADDITIONAL_DEPENDENCIES_TEMP} = $#{$finfo->{ADDITIONAL_DEPENDENCIES}};
-    } elsif( exists $finfo->{ADDITIONAL_DEPENDENCIES_TEMP} ) {
-      splice @{$finfo->{ADDITIONAL_DEPENDENCIES}}, delete $finfo->{ADDITIONAL_DEPENDENCIES_TEMP}, 1;
-    }
-  }
-}
 
 =head2 set_build_info_string
 
@@ -500,7 +461,7 @@ sub set_rule {
   unless( defined $rule ) {	# Are we simply discarding the rule now to
 				# save memory?	(There's no point in keeping
 				# the rule around after we've built the thing.)
-    undef $finfo->{RULE} if exists $finfo->{RULE};
+    undef $finfo->{RULE} if exists $finfo->{RULE} && !$Mpp::loop;
 				# Just keep a marker around that there used
 				# to be a rule.
     return;
@@ -545,45 +506,43 @@ sub set_rule {
 				# Don't give a warning message about a rule
 				# which was replaced, because it's ok in this
 				# case to use a different rule.
-	} elsif( exists $oldrule->{PATTERN_RULES} ) {
-	  #
-	  # Apparently both are pattern rules.	Figure out which one should override.
-	  #
-	  if( $rule->{MAKEFILE} != $oldrule->{MAKEFILE} ) { # Compare the cwds
+	} elsif( exists $rule->{PATTERN_RULES} ) { # New rule is pattern rule?
+	  if( exists $oldrule->{PATTERN_RULES} ) { # Figure out which one should override.
+	    if( $rule->{MAKEFILE} != $oldrule->{MAKEFILE} ) { # Compare the cwds
 				# if they are from different makefiles.
-	    if( relative_filename( $rule->build_cwd, $finfo->{'..'}, 1 ) <
-		relative_filename( $oldrule->build_cwd, $finfo->{'..'}, 1 )) {
-	      Mpp::log RULE_NEARER => $rule
-		if $Mpp::log_level;
-	    } else {
-	      Mpp::log RULE_NEARER_KEPT => $oldrule
-		if $Mpp::log_level;
-	      return;
-	    }
-	  } elsif( !exists $rule->{PATTERN_RULES} || @{$rule->{PATTERN_RULES}} < @{$oldrule->{PATTERN_RULES}} ) {
+	      if( relative_filename( $rule->build_cwd, $finfo->{'..'}, 1 ) <
+		  relative_filename( $oldrule->build_cwd, $finfo->{'..'}, 1 )) {
+		Mpp::log RULE_NEARER => $rule
+		  if $Mpp::log_level;
+	      } else {
+		Mpp::log RULE_NEARER_KEPT => $oldrule
+		  if $Mpp::log_level;
+		return;
+	      }
+	    } elsif( my $cmp = @{$rule->{PATTERN_RULES}} <=> @{$oldrule->{PATTERN_RULES}} ) {
 				# If they're from the same makefile, use the
 				# one that has a shorter chain of inference.
-	    Mpp::log RULE_SHORTER => $rule
-	      if $Mpp::log_level;
-	  } elsif( @{$rule->{PATTERN_RULES}} > @{$oldrule->{PATTERN_RULES}} ) {
-	    Mpp::log RULE_SHORTER => $oldrule
+	      Mpp::log RULE_SHORTER => $cmp == 1 ? $oldrule : $rule
+		if $Mpp::log_level;
+	      return if $cmp == 1;
+	    } else {
+	      warn $rule->source, ': two different ways to produce `', &absolute_filename, "'\n"
+		if $rule->source eq $oldrule->source;
+	    }
+	  } else {
+	    Mpp::log RULE_IGN_PATTERN => $rule
 	      if $Mpp::log_level;
 	    return;
-	  } else {
-	    warn 'rule `', $rule->source, "' produces ", &absolute_filename,
-	      " in two different ways\n"
-		if $rule->source eq $oldrule->source;
 	  }
-	} elsif( exists $rule->{PATTERN_RULES} ) { # New rule is?
-	  Mpp::log RULE_IGN_PATTERN => $rule
+	} elsif( exists $oldrule->{PATTERN_RULES} ) {
+	  Mpp::log RULE_IGN_PATTERN => $oldrule
 	    if $Mpp::log_level;
-	  return;
 	} else {
-	  warn 'conflicting rules `', $rule->source, "' and `", $oldrule->source, "' for target ",
-	    &absolute_filename, "\n"
-	      unless exists($rule->{xMULTIPLE_RULES_OK}) &&
-		exists($oldrule->{xMULTIPLE_RULES_OK}) &&
-		$rule->{COMMAND_STRING} eq $oldrule->{COMMAND_STRING};
+	  warn( $rule->source, ": conflicting rule for target `", &absolute_filename, "'\n" ),
+	  warn( $oldrule->source, ": info: was the previous rule\n" )
+	    unless exists $rule->{xMULTIPLE_RULES_OK} &&
+	      exists $oldrule->{xMULTIPLE_RULES_OK} &&
+	      $rule->{COMMAND_STRING} eq $oldrule->{COMMAND_STRING};
 	  # It's not safe to suppress this warning solely because the
 	  # command string is the same, because it might expand differently
 	  # in different makefiles.  But if the rules are marked to allow
@@ -597,15 +556,15 @@ sub set_rule {
 # If we get here, we have decided that the new rule (in $rule) should override
 # the old one (if there is one).
 #
-#  $Mpp::log_level and
-#    Mpp::print_log(0, $rule, ' applies to target ', $finfo);
+
+  Mpp::log RULE_SET => $finfo, $rule->{DEPENDENCY_STRING}, $rule->{RULE_SOURCE}
+    if Mpp::DEBUG;
 
   undef $finfo->{xPHONY}	# Hack to get past above restriction for xyz -> xyz.exe
     if Mpp::is_windows && $rule_is_builtin && delete $finfo->{_IS_EXE_PHONY_};
 
   if( exists $finfo->{BUILD_HANDLE} && UNIVERSAL::isa $finfo->{RULE}, 'Mpp::Rule' ) {
-    warn 'I became aware of the rule `', $rule->source,
-      "' for target ", &absolute_filename, " after I had already tried to build it\n"
+    warn $rule->source, ': rule discovered for target ', &absolute_filename, " after I had already tried to build it\n"
       unless $rule_is_builtin || exists $rule->{xMULTIPLE_RULES_OK} || UNIVERSAL::isa $rule, 'Mpp::DefaultRule';
   }
 
@@ -739,7 +698,8 @@ sub update_build_infos {
 END {
   &update_build_infos;
   for my $finfo ( values %warned_stale ) {
-    if( is_stale $finfo and file_exists $finfo ) { # After all, it is still stale.
+    if( is_stale $finfo and file_exists $finfo ) {
+      # After all, it is still stale and not hidden from mpp.
       Mpp::log DEL_STALE => $finfo
 	if $Mpp::log_level;
       &unlink( $finfo );
@@ -780,9 +740,11 @@ rule for it is to get it from a repository.
 # Note that load_build_info_file may need to track changes to is_stale.
 sub is_stale {
   (exists $_[0]{xPHONY} ||
-   !exists($_[0]{RULE}) && !$_[0]{ADDITIONAL_DEPENDENCIES}
-  ) && !&dont_build && &was_built_by_makepp &&
-    (defined &Mpp::Repository::no_valid_alt_versions ? &Mpp::Repository::no_valid_alt_versions : 1);
+   !exists $_[0]{RULE} && !$_[0]{ADDITIONAL_DEPENDENCIES})
+  && !&dont_build && &was_built_by_makepp &&
+    (defined &Mpp::Repository::no_valid_alt_versions ? &Mpp::Repository::no_valid_alt_versions : 1)
+  && (exists $_[0]->{LINK_DEREF} || # don't test possibly dangling symlink
+      have_read_permission $_[0]); # hidden by user can't be stale
 }
 
 =head2 assume_unchanged
@@ -840,15 +802,14 @@ BEGIN {
 sub build_info_fname { "$_[0]{'..'}{FULLNAME}/$build_info_subdir/$_[0]{NAME}.mk" }
 
 sub grok_build_info_file {
-  my( $fh ) = @_;
+  local $/;
+  no warnings 'closed';		# How can fh (rarely in bc stress) be closed?
+  my $file = readline( $_[0] ) || '';
+  close $_[0];
   my %build_info;
-  for( <$fh> ) {		# Read another line, localizing $_ (while does not)
-    return unless /(.+?)=(.*)/;	# Check the format.
-    return \%build_info if $1 eq 'END';
-    ($build_info{$1} = $2) =~
-      tr/\cC\r/\n/d;		# Strip out the silly Windows EOLs too.
-  }
-  undef;
+  ($build_info{$1} = $2) =~ tr/\cC/\n/
+    while $file =~ /\G(.+?)=(.*)\n/gc;	# Parse the format.
+  $file =~ /\GEND=/gc ? \%build_info : undef;
 }
 
 #
@@ -860,11 +821,11 @@ sub grok_build_info_file {
 #
 sub load_build_info_file {
   my $build_info_fname = &build_info_fname;
-  open my $fh, $build_info_fname or
+  open my $fh, '<:crlf', $build_info_fname or
     return;
 
   my $build_info = grok_build_info_file $fh;
-  if( defined $build_info ) {
+  if( $build_info ) {
     my( $finfo ) = @_;
     my $sig = &signature || '';	# Calculate the signature for the file, so
 				# we know whether the build info has changed.

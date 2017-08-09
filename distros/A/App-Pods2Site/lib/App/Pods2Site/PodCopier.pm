@@ -77,17 +77,8 @@ sub __copyPods
 		{
 			my $podName = $pod->{name};
 			my $inFile = $pod->{path};
-			my $copyToNames = [ $podName ];
-			
-			# if we see a pod in namespace 'pods::', we also copy to an alias as it seems many links
-			# go to 'perlxxx' rather than 'pods::perlxxx'
-			# 
-			push(@$copyToNames, $1) if ($podName =~ /^pods::(.*)/);
-			
-			my @podFiles = $self->__copy($inFile, $copyToNames, $groupName, $args);
-			
-			$podInfo{$podName} = { podfile => $podFiles[0], htmlfile => undef };
-			
+			my $podFile = $self->__copy($inFile, $podName, $groupName, $args);
+			$podInfo{$podName} = { podfile => $podFile, htmlfile => undef };
 			$spinner->(++$count); 
 		}
 		
@@ -101,41 +92,35 @@ sub __copy
 {
 	my $self = shift;
 	my $infile = shift;
-	my $names = shift;
+	my $name = shift;
 	my $group = shift;
 	my $args = shift;
 
-	# copy every 'name' infile to possibly multiple outfiles
-	# for simplicity, always use the '.pod' extension
+	# copy every 'name' infile to outfile, for simplicity, always use the '.pod' extension
 	#
-	my @podfiles;
-	foreach my $name (@$names)
+	my $podname = $name;
+	$podname =~ s#::#/#g;
+	my $outfile = slashify("$self->{podroot}/$group/$podname.pod");
+
+	# we're copying in a specific order, and it's possible
+	# a pod with the same name might come from two different categories
+	# if so, only copy the first, but make sure the copy retains the mtime
+	# from the infile, so the HTML gen can avoid regenerating
+	#
+	my $mtimeInfile = (stat($infile))[9];
+	if (!-e $outfile)
 	{
-		my $podname = $name;
-		$podname =~ s#::#/#g;
-		my $outfile = slashify("$self->{podroot}/$group/$podname.pod");
-		push(@podfiles, $outfile);
-	
-		# we're copying in a specific order, and it's possible
-		# a pod with the same name might come from two different categories
-		# if so, only copy the first, but make sure the copy retains the mtime
-		# from the infile, so the HTML gen can avoid regenerating
-		#
-		my $mtimeInfile = (stat($infile))[9];
-		if (!-e $outfile)
-		{
-			my $outfileDir = dirname($outfile);
-			(!-d $outfileDir ? make_path($outfileDir) : 1) || die ("Failed to create directory '$outfileDir': $!\n");
-			copy($infile, $outfile) || die("Failed to copy $infile => $outfile: $!\n");
-			utime($mtimeInfile, $mtimeInfile, $outfile);
-		}
-		
-		$self->{count}++;
-		
-		print "Copied '$infile' => '$outfile'\n" if $args->isVerboseLevel(3);
+		my $outfileDir = dirname($outfile);
+		(!-d $outfileDir ? make_path($outfileDir) : 1) || die ("Failed to create directory '$outfileDir': $!\n");
+		copy($infile, $outfile) || die("Failed to copy $infile => $outfile: $!\n");
+		utime($mtimeInfile, $mtimeInfile, $outfile);
 	}
 	
-	return @podfiles;
+	$self->{count}++;
+	
+	print "Copied '$infile' => '$outfile'\n" if $args->isVerboseLevel(3);
+	
+	return $outfile;
 }
 
 1;

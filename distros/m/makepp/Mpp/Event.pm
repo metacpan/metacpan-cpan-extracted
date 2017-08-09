@@ -1,13 +1,13 @@
 # use strict qw(vars subs);
 
-# $Id: Event.pm,v 1.33 2012/10/25 21:10:42 pfeiffer Exp $
+# $Id: Event.pm,v 1.35 2016/09/06 19:59:07 pfeiffer Exp $
 
 package Mpp::Event;
 
 require Exporter;
 our @ISA = 'Exporter';
 
-our @EXPORT_OK = qw(wait_for when_done read_wait);
+our @EXPORT_OK = qw(wait_for when_done);
 
 =head1 NAME
 
@@ -28,10 +28,6 @@ Mpp::Event -- event loop for makepp
   $status = $handle->status;
 
   $status = wait_for $handle1, $handle2, ...;
-
-  read_wait FILEHANDLE, sub { ... };
-				# Called when there is data to be read on
-				# the given file handle.
 
 =head1 DESCRIPTION
 
@@ -63,15 +59,6 @@ our $fork_level = 0;		# How many times we've forked.
 #
 my $child_exited;		# 1 if we've received a SIGCHLD.
 
-my $read_vec;			# Vector of file handles that we are listening
-				# to.
-my @read_handles;		# The file handles or FileHandles or globs
-				# that we're waiting for, indexed by the
-				# fileno (same as index into $read_vec).
-my @read_subs;			# The read subroutines associated with each
-				# of the handles in @read_handles (also
-				# indexed by fileno).
-
 =head2 Mpp::Event::event_loop
 
   &Mpp::Event::event_loop;
@@ -83,66 +70,15 @@ you want Mpp::Event::wait_until.
 =cut
 
 sub event_loop {
-  unless( defined $child_exited ) { # Do not call select() if we already have stuff
+  defined &Recursive ? &Recursive : select undef, undef, undef, 5
+    unless defined $child_exited; # Do not call select() if we already have stuff
 				# to do.  That can cause a hang.
-#
-# Check for file handles which can be read.  We used to use IO::Select but
-# it's buggy (doesn't even bother to call the select function if no
-# handles have been specified--not a friendly interface!).
-#
-    my $r = $read_vec;		# Make a modifiable copy of the list of file
-				# handles to wait for.
-    my $n_handles = select $r, undef, undef, 5;
-				# Supply a 5s timeout, so we do not wait
-				# forever if the signal happened to come
-				# between when we tested select_finished_subs
-				# and when we called select.
-    if( $n_handles > 0 ) {	# Data available on any handles?
-				# Scan backwards to find out which handles it
-				# might have been on, since we are more likely
-				# to be waiting on later file handles.
-      for (my $fileno = @read_handles; $fileno >= 0; --$fileno) {
-	if (vec($r, $fileno, 1)) { # This bit returned on?
-	  my $read_sub = $read_subs[$fileno]; # Get the subroutine.
-	  my $fh = $read_handles[$fileno];
-	  vec($read_vec, $fileno, 1) = 0; # Do not wait for it again (unless it
-	  undef $read_subs[$fileno]; # is requeued).
-	  undef $read_handles[$fileno];
-	  defined $read_sub and &$read_sub($fh); # Call the subroutine.
-	}
-      }
-    }
-  }
 
 #
 # Check for other kinds of interruptions:
 #
   &Mpp::Event::Process::process_reaper
     if defined $child_exited;	# Need to wait() on child processes?
-}
-
-=head2 read_wait
-
-  read_wait FILE_HANDLE, sub { ... };
-
-Queue a subroutine to be activated whenever there is data on the given file
-handle (or IO::Handle object, or anything that can be supplied as an argument
-to IO::Select::new.
-
-This is a one-shot queue.  You must call read_wait again if you want the
-subroutine to be called again.
-
-=cut
-
-sub read_wait {
-  my ($fh, $subr) = @_;		# Name the arguments.
-
-  my $fileno = fileno($fh) || $fh->fileno;
-  $read_vec ||= '';		# Avoid usage of undefined variable errors.
-  defined $fileno or die "internal error";
-  vec($read_vec, $fileno, 1) = 1; # Wait on this file handle.
-  $read_handles[$fileno] = $fh;
-  $read_subs[$fileno] = $subr;
 }
 
 
@@ -519,9 +455,9 @@ sub start {
     my $fh = $self->{PARAMS}[$par_idx]; # Get which file handle this is.
     close $fh;			# Close down whatever it used to be.
     if( defined $self->{PARAMS}[$par_idx+1] ) {
-      unless (open $fh, $self->{PARAMS}[$par_idx+1] ) {
+      unless( open $fh, '<', $self->{PARAMS}[$par_idx+1] ) {
 	my $errorcode = "$!";
-	open my $tty, '>/dev/tty';
+	open my $tty, '>', '/dev/tty';
 	print $tty "could not open $fh as $self->{PARAMS}[$par_idx+1]--$errorcode\n";
 	exit 1;
       }
@@ -572,9 +508,10 @@ sub process_reaper {
 #
 #    next unless WIFEXITED($?); # Make sure it really has exited.
 # The above causes a hang, when the process did not exit normally.
-    push @procs, delete $running_processes{$pid} || die;
-				# Returned a process not started by new Mpp::Event::Process?
-    $procs[-1]{STATUS} ||= $? > 255 ? $? >> 8 : "signal " . ($? & 127)
+    my $proc = delete $running_processes{$pid} or
+      $$ == 1 ? next : die;	# Returned an unknown process? Pid 1 (in Docker) makes us system reaper :-(
+    push @procs, $proc;
+    $proc->{STATUS} ||= $? > 255 ? $? >> 8 : "signal " . ($? & 127)
       if $?;
   }
 
@@ -623,7 +560,7 @@ sub new {
 				# Make the structure for the process.
 }
 
-*status = \&Mpp::Event::ProcessHandle::status;
+*status = \&Mpp::Event::Process::status;
 
 #
 # Start the process running.  This is pretty simple--we just execute the code.

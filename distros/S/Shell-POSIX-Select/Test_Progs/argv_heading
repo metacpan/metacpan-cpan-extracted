@@ -1,10 +1,14 @@
 #! /usr/bin/perl -w
 
-my $VERSION = 1.02;
+my $VERSION = 1.03;
 
 use blib;
 
-use Shell::POSIX::Select qw($Heading);
+use Shell::POSIX::Select(
+'$Heading',
+# debug => 9,
+# logging => 1,
+);
 
 BEGIN { @ARGV or @ARGV=qw(A B C) }
 

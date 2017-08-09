@@ -1,4 +1,11 @@
 Revision history for Perl module SQLite_File
+0.100 2017-08-06
+    - Made default file open mode conform to DB_File
+      (i.e. O_CREAT | O_RDWR); bugs fixed that tended
+      to clobber files
+    - DBM_Filter can now be used with SQLite_File
+      (plus the filters now actually work correctly)
+    - (thanks "Justin Case")
 0.050 2015-10-10
     - added patch from @tokuhirom to prevent BSD system fail
       (thanks tokuhirom and Slaven)

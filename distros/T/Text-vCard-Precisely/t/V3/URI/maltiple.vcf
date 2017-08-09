@@ -1,0 +1,6 @@
+BEGIN:VCARD
+VERSION:3.0
+URL;TYPE=HOME:https://www.example.com
+URL;TYPE=WORK:https://blog.example.com
+SOURCE:https://www.example.com
+END:VCARD

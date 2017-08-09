@@ -158,9 +158,8 @@ __END__
 =encoding UTF-8
 
 =for :stopwords Geoff Richards Randy Stauner ACKNOWLEDGEMENTS ansi html xml DOCTYPE XHTML
-XSL XSLT XSL-FO pdf inline stylesheet filetype unencoded Hinrik Matyukhin
-Sigurðsson Vyacheslav mattn Örn --filetype --unlet --inline
---no-inline-stylesheet text-vimcolor
+XSL XSLT XSL-FO pdf inline stylesheet filetype unencoded --filetype --unlet
+--inline --no-inline-stylesheet text-vimcolor
 
 =head1 NAME
 
@@ -168,7 +167,7 @@ text-vimcolor - Use Text:VimColor from the command line
 
 =head1 VERSION
 
-version 0.26
+version 0.28
 
 =head1 SYNOPSIS
 

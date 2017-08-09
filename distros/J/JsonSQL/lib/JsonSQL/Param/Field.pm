@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::Field;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Error;
 
@@ -114,7 +114,7 @@ JsonSQL::Param::Field - JsonSQL::Param::Field object. Stores a Perl representati
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

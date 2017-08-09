@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 2;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 
 subtest 'define with value' => sub {
@@ -39,3 +37,5 @@ subtest 'define without value' => sub {
   is $tcc->run, 22, 'tcc.run';
 
 };
+
+done_testing;

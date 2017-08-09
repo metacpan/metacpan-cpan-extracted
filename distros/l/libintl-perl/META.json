@@ -4,7 +4,7 @@
       "Guido Flohr <guido.flohr@cantanea.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -47,9 +47,9 @@
       },
       "homepage" : "http://git.guido-flohr.net/projects/libintl-perl/",
       "repository" : {
-         "type" : "git",
          "url" : "git://git.guido-flohr.net/perl/libintl-perl.git"
       }
    },
-   "version" : "1.26"
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

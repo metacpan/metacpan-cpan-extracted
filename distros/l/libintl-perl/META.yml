@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,4 +26,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=libintl-perl
   homepage: http://git.guido-flohr.net/projects/libintl-perl/
   repository: git://git.guido-flohr.net/perl/libintl-perl.git
-version: '1.26'
+version: '1.27'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

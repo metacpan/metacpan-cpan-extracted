@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Log::ger::Output::FileWriteRotate - Log to File::Write::Rotate
 
+VERSION
+    This document describes version 0.002 of
+    Log::ger::Output::FileWriteRotate (from Perl distribution
+    Log-ger-Output-FileWriteRotate), released on 2017-08-02.
+
+SYNOPSIS
      use Log::ger::Output FileWriteRotate => (
          dir          => '/var/log',    # required
          prefix       => 'myapp',       # required
@@ -10,28 +17,50 @@ SYNOPSIS
      );
 
 DESCRIPTION
-
     This output sends logs to File::Write::Rotate object.
 
 CONFIGURATION
-
     These configuration parameters are File::Write::Rotate's.
 
- dir
+  dir
+  prefix
+  suffix
+  size
+  histories
+  buffer_size
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Output-FileWriteRotate>.
 
- prefix
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Output-FileWriteRotate>.
 
- suffix
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-FileWr
+    iteRotate>
 
- size
-
- histories
-
- buffer_size
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::ger
 
     File::Write::Rotate
+
+    Log::ger::Output::SimpleFile
+
+    Log::ger::Output::File
+
+    Log::ger::Output::DirWriteRotate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

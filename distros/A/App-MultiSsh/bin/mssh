@@ -17,7 +17,7 @@ use Path::Tiny;
 use POSIX ":sys_wait_h";
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -53,6 +53,7 @@ sub main {
         'script|s=s',
         'tmux_cmd|tmux-cmd|T=s',
         'tmux|m',
+        'tmux_nested|tmux-nested|n',
         'test|t!',
         'verbose|v+',
         'man',
@@ -155,7 +156,7 @@ mssh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to mssh version 0.19.
+This documentation refers to mssh version 0.20.
 
 =head1 SYNOPSIS
 
@@ -208,6 +209,10 @@ This documentation refers to mssh version 0.19.
   -m --tmux     Create a tmux session with each window pane connecting to a host
      --tmux-cmd[=]str
                 Use str as the C<tmux> program (defaults to tmux found in $PATH)
+  -n --tmux-nested
+                Use this fag when running in an existing tmux session to split up
+                the current tmux window in the same fashion as running a sepperate
+                tmux session.
 
   -v --verbose  Show more detailed option
      --VERSION  Prints the version information

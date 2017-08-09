@@ -4,10 +4,10 @@ Time::TCB - Barycentric Coordinate Time
 
 =head1 SYNOPSIS
 
-	use Time::TCB qw(tcb_instant_to_mjd tcb_mjd_to_instant);
+    use Time::TCB qw(tcb_instant_to_mjd tcb_mjd_to_instant);
 
-	$mjd = tcb_instant_to_mjd($instant);
-	$instant = tcb_mjd_to_instant($mjd);
+    $mjd = tcb_instant_to_mjd($instant);
+    $instant = tcb_mjd_to_instant($mjd);
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ use strict;
 
 use Math::BigRat 0.13;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(tcb_instant_to_mjd tcb_mjd_to_instant);
@@ -99,7 +99,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2010, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2006, 2010, 2012, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

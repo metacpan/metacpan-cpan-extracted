@@ -1,27 +1,35 @@
-SYNOPSIS
+NAME
+    Log::ger::Format::Block - Use formatting using block instead of
+    sprintf-style
 
+VERSION
+    version 0.005
+
+SYNOPSIS
      use Log::ger::Format 'Block';
      use Log::ger;
 
-    After that, you can use your logging routine a la Log::Contextual:
+    After that, you can use your logging routine a la Log::Contextual in the
+    importing package:
 
      # the following block won't run if debug is off
      log_debug { "the new count in the database is " . $rs->count };
 
-    To install only for current package:
-
-     use Log::ger::Format;
-     BEGIN { Log::ger->set_for_current_package('Block') }
-     use Log::ger;
-
 DESCRIPTION
-
     Caveat: you have to do this in the compile-time phase (like shown in
     Synopsis).
 
 SEE ALSO
-
     Log::ger
 
     Log::Contextual
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -9,6 +9,7 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 META.json
+ppport.h
 README.txt
 t/00_load.t
 t/01_basic.t

@@ -1,4 +1,4 @@
-# $Id: C.pm,v 1.30 2012/06/09 20:37:17 pfeiffer Exp $
+# $Id: C.pm,v 1.31 2014/01/15 22:47:33 pfeiffer Exp $
 
 =head1 NAME
 
@@ -119,7 +119,7 @@ sub update_scope {
   @state = (0,0) unless $self->{ACTIVE}; # The scope enclosing the chain is off
   if( $state[ACT] ) {
     my $go = defined($expr) ?
-      &eval_condition($self->expand_defines($expr)) : 1; # '#else' == '#elif 1'
+      eval_condition($self->expand_defines($expr)) : 1; # '#else' == '#elif 1'
     $state[ACT] = $go unless $go==1 && $state[PREV_ACT];
     $state[EXPR] = $line."\"$expr\"" if $go == UNKNOWN;
     die if $state[PREV_ACT] == 1;
@@ -161,7 +161,7 @@ sub expand_macros {
   $visited ||= {};
   local $_ = $expr;
   $expr = '';
-  pos($_) = 0;
+  pos = 0;
 
   # TBD: Deal with macros that have parameters.
 
@@ -169,32 +169,26 @@ sub expand_macros {
     last if length($_) <= pos($_);
     if(/\G(\\.)/sgc) {
       $expr .= $1;
-    }
-    elsif(/\G(\"(?:[^"]*\\\")*[^"]*\")/gc) {
+    } elsif(/\G(\"(?:[^"]*\\\")*[^"]*\")/gc) {
       $expr .= $1;
-    }
-    elsif(/\G'((\\)(?:\d+|.)|.)'/gc) {
+    } elsif(/\G'((\\)(?:\d+|.)|.)'/gc) {
       $expr .= ord( $2 ? eval "\"$1\"" : $1 );
-    }
-    elsif(/\G(\d+(?:\.\d+)?)[luf]?/gic) {
+    } elsif(/\G(\d+(?:\.\d+)?)[luf]?/gic) {
       $expr .= $1;
-    }
-    elsif(my ($prefix, $key_prefix, $key) = $self->get_macro) {
+    } elsif( my( $prefix, $key_prefix, $key ) = $self->get_macro ) {
       $expr .= $prefix;
-      my $x=$self->get_var($key) unless $visited->{$key};
+      my $x = $self->get_var($key) unless $visited->{$key};
       if(defined $x) {
 	my %v=%$visited;
 	$v{$key}=1;
 				# NOTE: pos() isn't preserved by local:
-	my $pos = pos($_);
+	my $pos = pos;
 	$expr .= $self->expand_defines($x, \%v);
-	pos($_) = $pos;
-      }
-      else {
+	pos = $pos;
+      } else {
 	$expr .= $key_prefix . $key;
       }
-    }
-    else {
+    } else {
       /\G([^\w\\"`']+)/igc or die "$_\n";
       $expr .= $1;
     }
@@ -203,10 +197,7 @@ sub expand_macros {
 }
 
 sub get_directive {
-  if(s/^\s*\#\s*(\w+)\s*//) {
-    return $1;
-  }
-  return;
+  s/^\s*\#\s*(\w+)\s*// ? $1 : undef;
 }
 
 #

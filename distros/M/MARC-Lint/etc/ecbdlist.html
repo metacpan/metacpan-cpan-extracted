@@ -36,7 +36,7 @@ Congress</a> &gt;&gt; <a href="//www.loc.gov/marc/">MARC</a>
 <hr>
 
 <div class="edition">1999 Edition<br>
-Update No. 1 (October 2000) through Update No. 21 (September 2015)</div>
+Update No. 1 (October 2000) through Update No. 24 (May 2017)</div>
 
 <hr>
 
@@ -113,6 +113,7 @@ Data</cite></a>.</p>
          a - AACR 2
          c - ISBD punctuation omitted
          i - ISBD punctuation included
+         n - Non-ISBD punctuation omitted
          p - Partial ISBD (BK) [OBSOLETE]
          r - Provisional (VM MP MU) [OBSOLETE]
          u - Unknown
@@ -331,6 +332,7 @@ Data</cite></a>.</p>
          m - Magneto-optical disc
          o - Optical disc
          r - Remote
+         s - Standalone device
          u - Unspecified
          z - Other
          | - No attempt to code
@@ -1051,6 +1053,7 @@ Data</cite></a>.</p>
          g - Sound cartridge
          i - Sound-track film
          q - Roll
+         r - Remote
          s - Sound cassette
          t - Sound-tape reel
          u - Unspecified
@@ -1070,6 +1073,7 @@ Data</cite></a>.</p>
          k - 15/16 ips
          l - 1 7/8 ips
          m - 3 3/4 ips
+         n - Not applicable
          o - 7 1/2 ips
          p - 15 ips
          r - 30 ips
@@ -1147,7 +1151,7 @@ Data</cite></a>.</p>
          r - Paper with lacquer or ferrous oxide
          l - Metal
          m - Plastic with metal
-         n - Not applicable [OBSOLETE]
+         n - Not applicable
          p - Plastic
          s - Shellac
          u - Unknown
@@ -1767,7 +1771,7 @@ Data</cite></a>.</p>
          || - No attempt to code
       20 - Format of music
          a - Full score
-         b - Full score, miniature or study size
+         b - Miniature or study score
          c - Accompaniment reduced for keyboard
          d - Voice score with accompaniment omitted
          e - Condensed score or piano-conductor score
@@ -1779,6 +1783,7 @@ Data</cite></a>.</p>
          l - Score
          m - Multiple score formats
          n - Not applicable
+         p - Piano score
          u - Unknown
          z - Other
          | - No attempt to code
@@ -2462,22 +2467,23 @@ Data</cite></a>.</p>
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
-028 - PUBLISHER NUMBER (R)
+028 - PUBLISHER NUMBER OR DISTRIBUTOR NUMBER (R)
    Indicators
-      First - Type of publisher number
+      First - Type of number
          0 - Issue number
          1 - Matrix number
          2 - Plate number
-         3 - Other music number
-         4 - Videorecording number
+         3 - Other music publisher number
+         4 - Video recording publisher number
          5 - Other publisher number
+         6 - Distributor number
       Second - Note/added entry controller
          0 - No note, no added entry
          1 - Note, added entry
          2 - Note, no added entry
          3 - No note, added entry
    Subfield Codes
-      $a - Publisher number (NR)
+      $a - Publisher or distributor number (NR)
       $b - Source (NR)
       $q - Qualifying information (R)
       $6 - Linkage (NR)
@@ -2796,9 +2802,9 @@ Data</cite></a>.</p>
           s - Single known/probable date
           t - Publication date and copyright dates
           x - Incorrect dates
-      $b - Date 1 (B.C. date) (NR)
+      $b - Date 1 (B.C.E. date) (NR)
       $c - Date 1 (C.E. date) (NR)
-      $d - Date 2 (B.C. date) (NR)
+      $d - Date 2 (B.C.E. date) (NR)
       $e - Date 2 (C.E. date) (NR)
       $j - Date resource modified (NR)
       $k - Beginning or single date created (NR)
@@ -2957,6 +2963,7 @@ Data</cite></a>.</p>
       $a - Classification number (R)
       $b - Item number (NR)
       $d - Supplementary class number (MU) [OBSOLETE]
+      $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -2993,6 +3000,7 @@ Data</cite></a>.</p>
       $b - Geographic classification subarea code (R)
       $c - Subject (MP) [OBSOLETE]
       $d - Populated place name (R)
+      $0 - Authority record control number or standard number (R)
       $2 - Code source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3017,6 +3025,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Classification number (NR)
       $b - Item number (NR)
+      $0 - Authority record control number or standard number (R)
       $2 - Source of call/class number (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3039,6 +3048,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Classification number (R)
       $b - Item number (NR)
+      $0 - Authority record control number or standard number (R)
       $8 - Field link and sequence number (R)
 
 061 - NATIONAL LIBRARY OF MEDICINE COPY STATEMENT (R)
@@ -3072,6 +3082,7 @@ Data</cite></a>.</p>
 070 - NATIONAL AGRICULTURAL LIBRARY CALL NUMBER (R)
    Indicators
       First - Existence in NAL collection
+         # - No information provider
          0 - Item is in NAL
          1 - Item is not in NAL
       Second - Undefined
@@ -3084,6 +3095,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Classification number (R)
       $b - Item number (NR)
+      $0 - Authority record control number or standard number (R)
       $8 - Field link and sequence number (R)
 
 071 - NATIONAL AGRICULTURAL LIBRARY COPY STATEMENT (R)
@@ -3140,6 +3152,7 @@ Data</cite></a>.</p>
       $a - Universal Decimal Classification number (NR)
       $b - Item number (NR)
       $x - Common auxiliary subdivision (R)
+      $0 - Authority record control number or standard number (R)
       $2 - Edition identifier (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3195,6 +3208,7 @@ Data</cite></a>.</p>
       $a - Classification number (R)
       $b - Item number (NR)
       $q - Assigning agency (NR)
+      $0 - Authority record control number or standard number (R)
       $2 - Source of number (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3218,6 +3232,7 @@ Data</cite></a>.</p>
       $w - Table identification-Internal subarrangement or add table (R)
       $y - Table sequence number for internal subarrangement or add table (R)
       $z - Table identification (R)
+      $0 - Authority record control number or standard number (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3234,6 +3249,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Classification number (NR)
       $z - Canceled/invalid classification number (R)
+      $0 - Authority record control number or standard number (R)
       $2 - Number source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3307,7 +3323,7 @@ Data</cite></a>.</p>
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $0 - Authority record control number or standard number (R)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3335,7 +3351,7 @@ Data</cite></a>.</p>
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $0 - Authority record control number or standard number (R)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3365,7 +3381,7 @@ Data</cite></a>.</p>
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $0 - Authority record control number or standard number (R)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3687,6 +3703,7 @@ Data</cite></a>.</p>
          # - Undefined
    Subfield Codes
       $a - Country of producing entity (R)
+      $0 - Authority record control number or standard number (R)
       $2 - Source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3829,7 +3846,7 @@ Data</cite></a>.</p>
       $q - Title of contact person (R)
       $r - Hours (R)
       $z - Public note (R)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -4042,6 +4059,7 @@ Data</cite></a>.</p>
       $d - Information recording technique (R)
       $e - Support (R)
       $f - Production rate/ratio (R)
+      $g - Color content (R)
       $h - Location within medium (R)
       $i - Technical specifications of medium (R)
       $j - Generation (R)
@@ -4391,13 +4409,16 @@ Data</cite></a>.</p>
    Subfield Codes
       $c - Associated country (R)
       $f - Other associated place (R)
-      $g - Place of origin of work (R)
+      $g - Place of origin of work or expression (R)
+      $i - Relationship information
       $s - Start period (NR)
       $t - End period (NR)
       $u - Uniform Resource Identifier (R)
       $v - Source of information (R)
       $0 - Authority record control number or standard number (R)
       $2 - Source of term (NR)
+      $3 - Materials specified (NR)
+      $4 - Relationship (R)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 	  
@@ -4411,6 +4432,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Language code (R)
       $l - Language term (R)
+      $0 - Authority record control number or standard number (R)
       $2 - Source (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
@@ -4457,13 +4479,16 @@ Data</cite></a>.</p>
       $a - Medium of performance (R)
       $b - Soloist (R)
       $d - Doubling instrument (R)
-      $e - Number of ensembles (R)
+      $e - Number of ensembles of the same type (R)
       $n - Number of performers of the same medium (R)
       $p - Alternative medium of performance (R)
+      $r - Total number of individuals performing alongside ensembles (NR)
       $s - Total number of performers (NR)
+      $t - Total number of ensembles (NR)
       $v - Note (R)
       $0 - Record control number (R)
       $2 - Source of term (NR)
+      $3 - Materials specified (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 	  
@@ -4522,11 +4547,13 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Creator/contributor term (R)
       $b - Creator/contributor code (R)
+      $i - Relationship information (R)
       $m - Demographic group term (NR)
       $n - Demographic group code (NR)
       $0 - Authority record control number or standard number (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
+      $4 - Relationship (R)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 
@@ -4575,7 +4602,7 @@ Data</cite></a>.</p>
       $u - Affiliation (NR)
       $v - Volume number/sequential designation  (NR)
       $x - International Standard Serial Number  (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number  (R)
 
@@ -4604,7 +4631,7 @@ Data</cite></a>.</p>
       $u - Affiliation (NR)
       $v - Volume number/sequential designation  (NR)
       $x - International Standard Serial Number (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -4634,7 +4661,7 @@ Data</cite></a>.</p>
       $u - Affiliation (NR)
       $v - Volume number/sequential designation  (NR)
       $x - International Standard Serial Number (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5491,6 +5518,9 @@ Data</cite></a>.</p>
          # - Undefined
    Subfield Codes
       $a - Methodology note (NR)
+      $b - Controlled term (R)
+      $0 - Authority record control number or standard number (R)
+      $2 - Source of term (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5695,7 +5725,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number or standard number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5740,7 +5770,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number or standard number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5784,7 +5814,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number or standard number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5825,8 +5855,36 @@ Data</cite></a>.</p>
       $0 - Authority record control number or standard number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR) 
+      $8 - Field link and sequence number (R)
+
+647 - SUBJECT ADDED ENTRY--NAMED EVENT (R)
+   Indicators
+      First - Undefined
+         # - Undefined
+      Second - Thesaurus
+         0 - Library of Congress Subject Headings
+         1 - LC subject headings for children's literature
+         2 - Medical Subject Headings
+         3 - National Agricultural Library subject authority file
+         4 - Source not specified
+         5 - Canadian Subject Headings
+         6 - R&eacute;pertoire de vedettes-mati&egrave;re
+         7 - Source specified in subfield $2
+   Subfield Codes
+      $a - Named event (NR)
+      $c - Location of named event (R)
+      $d - Date of named event (NR)
+      $g - Miscellaneous information (R)
+      $v - Form subdivision (R)
+      $x - General subdivision (R)
+      $y - Chronological subdivision (R)
+      $z - Geographic subdivision (R)
+      $0 - Authority record control number or standard number (R)
+      $2 - Source of heading or term (NR)
+      $3 - Materials specified (NR)
+      $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
 648 - SUBJECT ADDED ENTRY--CHRONOLOGICAL TERM (R)
@@ -5888,7 +5946,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number or standard number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5917,7 +5975,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number or standard number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -5974,7 +6032,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -6076,7 +6134,7 @@ Data</cite></a>.</p>
       $h - Extraterrestrial area (R)
       $0 - Authority record control number (R)
       $2 - Source of heading or term (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -6121,7 +6179,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -6192,7 +6250,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -6232,7 +6290,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -6276,7 +6334,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Name (NR)
       $e - Relator term (R)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -6348,7 +6406,7 @@ Data</cite></a>.</p>
       $0 - Authority record control number (R)
       $2 - Source of heading or term (NR) 
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -6363,11 +6421,13 @@ Data</cite></a>.</p>
       $b - First-order political jurisdiction (NR)
       $c - Intermediate political jurisdiction (R)
       $d - City (NR)
+      $e - Relator term (R)
       $f - City subsection (R)
       $g - Other nonjurisdictional geographic region and feature (R)
       $h - Extraterrestrial area (R)
       $0 - Authority record control number (R)
       $2 - Source of heading or term (NR)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -6381,6 +6441,8 @@ Data</cite></a>.</p>
       $a - Make and model of machine (NR)
       $b - Programming language (NR)
       $c - Operating system (NR)
+      $0 - Authority record control number or standard number (R)
+      $2 - Source of term (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -6444,7 +6506,7 @@ Data</cite></a>.</p>
       $w - Record control number (R)
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6478,7 +6540,7 @@ Data</cite></a>.</p>
       $w - Record control number (R)
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6516,7 +6578,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6554,7 +6616,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6592,7 +6654,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6631,7 +6693,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Stan dard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6670,7 +6732,7 @@ Data</cite></a>.</p>
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
       $3 - Materials specified (NR)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6707,7 +6769,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6751,7 +6813,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6789,7 +6851,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6824,7 +6886,7 @@ Data</cite></a>.</p>
       $w - Record control number (R)
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6868,7 +6930,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6913,7 +6975,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6953,7 +7015,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -6990,7 +7052,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
       $z - International Standard Book Number (R)
-      $4 - Relationship code (R)
+      $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
          0 - Type of main entry heading
@@ -7035,7 +7097,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
@@ -7075,7 +7137,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
@@ -7113,7 +7175,7 @@ Data</cite></a>.</p>
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
       $3 - Materials specified (NR)
-      $4 - Relator code (R)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
@@ -7386,6 +7448,24 @@ Data</cite></a>.</p>
       $q - Conversion agency (NR)
       $u - Uniform Resource Identifier (R)
 
+885 - MATCHING INFORMATION (R)
+   Indicators
+      First - Undefined
+         # - Undefined
+      Second - Undefined
+         # - Undefined
+   Subfield Codes
+      $a - Matching information (NR)
+      $b - Status of matching and its checking (NR)
+      $c - Confidence value (NR)
+      $d - Generation date (NR)
+      $w - Record control number (R)
+      $x - Nonpublic note (R)
+      $z - Public note (R)
+      $0 - Authority record control number or standard number (R)
+      $2 - Source (NR)
+      $5 - Institution to which field applies (NR)
+
 886 - FOREIGN MARC INFORMATION FIELD (R)
    Indicators
       First - Type of field
@@ -7420,15 +7500,15 @@ Data</cite></a>.</p>
 Congress</a> &gt;&gt; <a href="//www.loc.gov/marc/">MARC</a>
 &gt;&gt; <strong>Bibliographic Field List</strong></div>
 
-(09/22/2015)</td>
-<td align="right"><a href="mailto:ndmso@loc.gov">Contact
+(05/17/2017)</td>
+<td align="right"><a href="/cdn-cgi/l/email-protection#c8a6aca5bba788a4a7abe6afa7be">Contact
 Us</a></td>
 </tr>
 </table>
 
 <script type='text/javascript' src='/global/s_code.js'>
 </script>
-<script type='text/javascript' src='//cdn.loc.gov/js/global/metrics/sc/v25.2/2.0/s_code.js'></script></body>
+<script type='text/javascript' src='//cdn.loc.gov/js/global/metrics/sc/s_code.js'></script><script>/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/\>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script></body>
 </html>
 
 

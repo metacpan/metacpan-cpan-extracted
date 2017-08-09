@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Test::DZil;
 use Dist::Zilla::Plugin::AlienBuild;
 use JSON::PP qw( decode_json );

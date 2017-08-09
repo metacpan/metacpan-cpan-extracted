@@ -4,13 +4,13 @@
       "Orkun Karaduman <orkunkaraduman@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Zabbix-Check",
    "no_index" : {
@@ -35,6 +35,7 @@
             "JSON" : "2.90",
             "Lazy::Utils" : "1.22",
             "Net::NTP" : "1.5",
+            "Time::HiRes" : "1.9732",
             "perl" : "5.010001"
          }
       }
@@ -55,5 +56,5 @@
          "web" : "https://github.com/orkunkaraduman/Zabbix-Check"
       }
    },
-   "version" : "1.11"
+   "version" : "1.12"
 }

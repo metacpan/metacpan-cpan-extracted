@@ -1,0 +1,41 @@
+NAME
+
+    Alien::LibUSB - Perl distribution for LibUSB
+
+INSTALL
+
+        cpan Alien::LibUSB
+
+DESCRIPTION
+
+    libusb-1.0 is a C library that provides generic access to USB devices.
+    It is intended to be used by developers to facilitate the production of
+    applications that communicate with USB hardware.
+
+    This module is based on Alien::LibUSBx by Henrik Brix Andersen, but
+    fetches the source of the latest release on the libusb Github
+    repository <http://github.com/libusb/libusb>.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-LibUSB
+
+SEE ALSO
+
+    LibUSB <http://github.com/libusb/libusb>
+
+    Alien::LibUSB
+
+    Alien
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

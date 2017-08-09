@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.1.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.1.3';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -304,16 +304,15 @@ my %prepare_hook = (
 );
 
 sub prepare_hook {
-    my ($git, @args) = @_;
+    my ($git, $hook_name, $args) = @_;
 
-    $git->{_plugin_githooks}{arguments} = \@args; # for debugging purposes
-    my $hook_name = shift @args;
+    $git->{_plugin_githooks}{arguments} = $args;
     my $basename  = path($hook_name)->basename;
     $git->{_plugin_githooks}{hookname} = $basename;
 
     # Some hooks need some argument munging before we invoke them
     if (my $prepare = $prepare_hook{$basename}) {
-        $prepare->($git, \@args);
+        $prepare->($git, $args);
     }
 
     return $basename;
@@ -853,11 +852,41 @@ sub filter_files_in_index {
 
 sub filter_files_in_range {
     my ($git, $filter, $from, $to) = @_;
-    $from = $git->empty_tree if $from eq $git->undef_commit;
+
+    # If $to is he undefined commit this means that a branch or tag is being
+    # removed. In this situation we return the empty list, bacause no file
+    # has been affected.
+    return if $to eq $git->undef_commit;
+
+    if ($from eq $git->undef_commit) {
+        # If $from is the undefined commit we get the list of commits
+        # reachable from $to and not reachable from $from and all other
+        # references. This list is in chronological order. We want to grok
+        # the files changed from the list's first commit's PARENT commit to
+        # the list's last commit.
+
+        if (my @commits = $git->get_commits($from, $to)) {
+            if (my @parents = $commits[0]->parent()) {
+                $from = $parents[0];
+            } else {
+                # If the list's first commit has no parent (i.e., it's a
+                # root commit) then we return the empty list because
+                # git-diff-tree cannot compare the undefined commit with a
+                # commit.
+                return;
+            }
+        } else {
+            # If @commits is empty we return an empty list because no new
+            # commit was pushed.
+            return;
+        }
+    }
+
     my $output = $git->run(
         qw/diff-tree --name-only --ignore-submodules --no-commit-id -r -z/,
-        "--diff-filter=$filter", $from, $to,
+        "--diff-filter=$filter", $from, $to, '--',
     );
+
     return split /\0/, $output;
 }
 
@@ -1104,7 +1133,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.1.0
+version 2.1.3
 
 =head1 SYNOPSIS
 
@@ -1152,10 +1181,13 @@ The following methods are used by the Git::Hooks framework and are not
 intended to be useful for hook developers. They're described here for
 completeness.
 
-=head2 prepare_hook NAME, ARGS...
+=head2 prepare_hook NAME, ARGS
 
 This is used by Git::Hooks::run_hooks to prepare the environment for
-specific Git hooks before invoking the associated plugins.
+specific Git hooks before invoking the associated plugins. It's invoked with
+the arguments passed by Git to the hook script. NAME is the script name
+(usually the variable $0) and ARGS is a reference to an array containing the
+script positional arguments.
 
 =head2 load_plugins
 
@@ -1448,8 +1480,16 @@ FILTER specifies in which kind of changes you're interested in. Please, read
 about the C<filter_files_in_index> method above.
 
 FROM and TO are revision parameters (see C<git help revisions>) specifying
-two commits. They're passed as arguments to C<git diff-tree> in order to
-compare them and grok the files that differ between them.
+two commits. They're passed as arguments to the C<git diff-tree> command in
+order to compare them and grok the files that differ between them.
+
+A special case occurs when FROM is the undefined commit, which happens when
+we're calculating the commit range in a pre-receive or update hook and a new
+branch or tag has been pushed. In this case we pass FROM and TO to the
+C<get_commits> method to find the list of new commits being pushed and
+calculate the difference between the first commit's parent and TO. When the
+first commit has no parent (in case it's a root commit) we return an empty
+list.
 
 =head2 filter_files_in_commit FILTER, COMMIT
 

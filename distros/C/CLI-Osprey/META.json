@@ -1,0 +1,51 @@
+{
+   "abstract" : "MooX::Options + MooX::Cmd + Sanity",
+   "author" : [
+      "Andrew Rodland <arodland@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CLI-Osprey",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long::Descriptive" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CLI-Osprey@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-Osprey"
+      },
+      "homepage" : "http://metacpan.org/release/CLI-Osprey",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/arodland/CLI-Osprey.git",
+         "web" : "http://github.com/arodland/CLI-Osprey"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:ARODLAND",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

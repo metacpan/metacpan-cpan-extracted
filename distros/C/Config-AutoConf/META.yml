@@ -43,5 +43,5 @@ resources:
   homepage: https://metacpan.org/release/Config-AutoConf
   license: http://dev.perl.org/licenses/
   repository: https://github.com:ambs/Config-AutoConf.git
-version: '0.314'
+version: '0.315'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

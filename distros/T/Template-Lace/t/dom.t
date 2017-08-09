@@ -675,4 +675,45 @@ use Scalar::Util 'refaddr';
   is scalar(@{$inner->find('script[src="/js/common2.js"]')}), 1;
 }
 
+{
+  # DL tag details
+  my $dom = Template::Lace::DOM->new(q[
+    <dl id='hashref'>
+      <dt>Name</dt>
+      <dd id='name'></dd>
+      <dt>Age</dt>
+      <dd id='age'></dd>
+    </dl>
+    <dl id='arrayref'>
+      <dt class='term'></dt>
+      <dd class='value'></dd>
+    </dl>
+  ]);
+
+  $dom->dl('#hashref', +{
+    name=>'John', age=> '48'
+  });
+  $dom->dl('#arrayref', [
+      +{ term=>'Name', value=> 'John'},
+      +{ term=>'Age', value=> 42 },
+      +{ term=>'email', value=> [
+          'jjn1056@gmail.com',
+          'jjn1056@yahoo.com']},
+  ]);
+
+  warn $dom;
+
+  is @{$dom->find('#hashref dd')}, 2;
+  is @{$dom->find('#arrayref dd')}, 4;
+  is $dom->at('#name')->content, 'John';
+  is $dom->at('#age')->content, '48';
+  is $dom->at('#arrayref')->find('dt.term')->[0]->content, 'Name';
+  is $dom->at('#arrayref')->find('dt.term')->[1]->content, 'Age';
+  is $dom->at('#arrayref')->find('dt.term')->[2]->content, 'email';
+  is $dom->at('#arrayref')->find('dd.value')->[0]->content, 'John';
+  is $dom->at('#arrayref')->find('dd.value')->[1]->content, '42';
+  is $dom->at('#arrayref')->find('dd.value')->[2]->[0], 'jjn1056@gmail.com';
+  is $dom->at('#arrayref')->find('dd.value')->[3]->[0], 'jjn1056@yahoo.com';
+}
+
 done_testing;

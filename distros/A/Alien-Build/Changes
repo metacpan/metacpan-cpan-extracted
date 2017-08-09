@@ -1,5 +1,74 @@
 Revision history for Alien-Build
 
+0.91      2017-08-08 05:24:27 -0400
+  - Production release identical to 0.90_01
+
+0.90_01   2017-08-07 15:30:27 -0400
+  - Add alien_download_ok to Test::Alien::Build
+  - Add alien_extract_ok to Test::Alien::Build
+  - Extract now ignores pax_global_header, produced by extracting some
+    tarballs using older tars (including older versions of Archive::Tar).
+  - Fix detection logic for supported compression by tar in Extract::CommandLine
+
+0.89_01   2017-08-07 08:57:48 -0400
+  - Extract negotiator plugin checks for .gz and .bz2 support in
+    Archive::Tar before using ArchiveTar plugin, and will fallback on
+    Extract::CommandLine if it is not available.
+  - Extract::ArchiveTar skips appropriate tests if compression
+    support is not available
+
+0.88_01   2017-08-07 04:50:06 -0400
+  - Diagnostic release
+
+0.87_01   2017-08-05 11:59:43 -0400
+  - Diagnostic release
+
+0.86_01   2017-08-05 11:51:23 -0400
+  - Add alien_build_clean to Test::Alien::Build
+  - Additional MSYS2 fixes
+
+0.85_01   2017-08-04 15:17:52 -0400
+  - Diagnostic release
+
+0.84_01   2017-08-04 15:15:48 -0400
+  - Fix testing failure on msys2/mingw32/64 which has a pkg-config
+    that defaults to rewriting prefix.
+  - Fix skip in test which could cause failure in PkgConfig::PP test
+  - Add msys_version property to Build::Autoconf and Build::MSYS plugins
+  - Add platform.system_type meta property
+
+0.83_01   2017-08-03 19:24:30 -0400
+  - Development release otherwise identical to 0.82
+
+0.82      2017-08-03 16:51:26 -0400
+  - Require ExtUtils::ParseXS 3.30 (gh#28)
+  - Revert regression where PkgConfig.pm would not loaded before use
+
+0.81_01   2017-08-01 15:03:22 -0400
+  - Development release otherwise identical to 0.80
+
+0.80      2017-08-01 14:49:14 -0400
+  - Prefer non-legacy version
+  - Fix PkgConfig::CommandLine bug introduced in 0.79_01
+  - Added Alien::Role documentation
+
+0.79_01   2017-08-01 12:22:15 -0400
+  - Added alien_install_type_is to Test::Alien::Build
+  - PkgConfig::CommandLine plugin supports multiple pkg_names
+  - PkgConfig::PP plugin supports multiple pkg_names
+  - PkgConfig::LibPkgConf is a candidate for removing from core
+  - PkgConfig::LibPkgConf plugin supports multiple pkg_names
+  - PkgConfig::Negotiate plugin supports multiple pkg_names
+
+0.78_01   2017-07-30 12:55:31 -0400
+  - Development release otherwise identical to 0.77
+
+0.77      2017-07-30 12:54:13 -0400
+  - Add options to Probe::CommandLine plugin: match_stderr, version_stderr
+
+0.76_01   2017-07-26 11:31:44 -0400
+  - Development release otherwise identical to 0.75
+
 0.75      2017-07-26 11:30:11 -0400
   - Disable C++ Test::Alien test on production releases
     C++ in Test::Alien is considered experimental and the

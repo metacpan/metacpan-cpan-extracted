@@ -14,10 +14,12 @@
 
 =head1 The Mac::PropertyList module
 
-This is the I<README> for the L<Mac::PropertyList> Perl module. You're probably
-looking at this because you don't know where else to find what you're
-looking for. Read this once and you might never have to read one again
-for any Perl module.
+This is the I<README> for the L<Mac::PropertyList> Perl module. It handles
+the XML and binary property list formats (but not the JSON yet).
+
+You're probably looking at this because you don't know where else to
+find what you're looking for. Read this once and you might never have
+to read one again for any Perl module.
 
 =head2 Documentation
 

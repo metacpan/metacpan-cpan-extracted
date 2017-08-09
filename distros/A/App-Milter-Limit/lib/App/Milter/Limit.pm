@@ -1,8 +1,19 @@
+#
+# This file is part of App-Milter-Limit
+#
+# This software is copyright (c) 2010 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package App::Milter::Limit;
-$App::Milter::Limit::VERSION = '0.52';
+$App::Milter::Limit::VERSION = '0.53';
 # ABSTRACT: Sendmail Milter that limits message rate by sender
 
 use strict;
+use warnings;
+
 use base qw(Class::Accessor Class::Singleton);
 
 use Carp;
@@ -92,8 +103,14 @@ sub register {
 
     my $conf = $self->config->global;
 
-    $milter->auto_setconn($$conf{name})
-        or croak "auto_setconn failed";
+    if ($$conf{connection}) {
+        $milter->setconn($$conf{connection});
+    }
+    else {
+        # figure out the connection from sendmail
+        $milter->auto_setconn($$conf{name})
+            or croak "auto_setconn failed";
+    }
 
     my %callbacks = (
         envfrom => \&_envfrom_callback
@@ -160,6 +177,18 @@ sub main {
 sub _envfrom_callback {
     my ($ctx, $from) = @_;
 
+    my $self = __PACKAGE__->instance();
+
+    my $conf = $self->config->global;
+
+    if (defined $$conf{limit_from}) {
+        my $val = $ctx->getsymval($$conf{limit_from});
+        if (defined $val) {
+            debug("overriding From value with $val");
+            $from = $val;
+        }
+    }
+
     # strip angle brackets
     $from =~ s/(?:^\<)|(?:\>$)//g;
 
@@ -167,10 +196,6 @@ sub _envfrom_callback {
     unless (length $from) {
         return SMFIS_CONTINUE;
     }
-
-    my $self = __PACKAGE__->instance();
-
-    my $conf = $self->config->global;
 
     my $reply = $$conf{reply} || 'reject';
 
@@ -216,7 +241,7 @@ App::Milter::Limit - Sendmail Milter that limits message rate by sender
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -234,7 +259,8 @@ configurable in the configuration file.  Once the limit is reached, messages
 will be rejected from that sender until the time period has elapsed.
 
 This module provides the interface for the milter.  A datastore plugin is also
-required to use this milter.  Datastores are available in the I<App::Milter::Limit::Plugin> namespace.
+required to use this milter.  Datastores are available in the
+I<App::Milter::Limit::Plugin> namespace.
 
 =head1 METHODS
 
@@ -266,7 +292,7 @@ L<App::Milter::Limit::Plugin::SQLite>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/milter-limit>
+The development version is on github at L<https://github.com/mschout/milter-limit>
 and may be cloned from L<git://github.com/mschout/milter-limit.git>
 
 =head1 BUGS

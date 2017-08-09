@@ -227,14 +227,16 @@ sub get_meta_info  { my ($self, $name) = @_; return $self->get_var($name, $Conte
         if (defined $self->{value})
         {
             my $perl_value = $self->quote_values_as_perl($self->{value});
-            push @lines, sprintf('$ENV{%s} = %s;', $name, $perl_value);
+            push @lines, sprintf('BEGIN { $ENV{%s} = %s; }', $name, $perl_value);
             push @lines, sprintf('END { delete $ENV{%s} } # for VMS', $name);
         }
         else
         {
             # we treat undef to mean the ENV var should not exist in %ENV
             push @lines, sprintf('local  $ENV{%s};', $name);    # preserve old value for VMS
+            push @lines, 'BEGIN {';
             push @lines, sprintf('delete $ENV{%s};', $name);    # delete from %ENV
+            push @lines, '}';
         }
         return join "\n", @lines, '';
     }

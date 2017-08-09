@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 
 sub configure {
 	my $self = shift;
@@ -352,6 +352,11 @@ You can use Dist::Zilla to install the distribution's dependencies if you
 haven't already installed them with cpanm:
 
     $ dzil listdeps --missing --develop | cpanm
+
+You can instead combine these two steps into one command by installing
+Dist::Zilla::App::Command::installdeps then running:
+
+    $ dzil installdeps
 
 Once everything is installed, here are some dzil commands you might try:
 

@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Test::More;
 
 use Convert::CookingTimes;
-plan tests => 5;
+plan tests => 7;
 
 diag( "Testing Convert::CookingTimes $Convert::CookingTimes::VERSION, Perl $], $^X" );
 
@@ -61,6 +61,24 @@ is_deeply($steps,
 
     ]
 );
+
+# Sometimes I got items in the wrong order
+@items = (
+    { name => 'One',   time => 18,  temp => 180, },
+    { name => 'Two',   time => 5,   temp => 200, },
+    { name => 'Three', time => 10,  temp => 220, },
+);
+($temp, $steps) = Convert::CookingTimes->adjust_times(@items);
+
+is($temp, 200, "Correct adjusted temperature");
+is_deeply($steps,
+    [
+        { adjusted_time => 16, name => "One",   time_until_next => 5 },
+        { adjusted_time => 11, name => "Three", time_until_next => 6 },
+        { adjusted_time => 5,  name => "Two"                         },
+    ],
+);
+
 
 
 

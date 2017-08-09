@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '0.75'; # VERSION
+our $VERSION = '0.91'; # VERSION
 
 
 has '+format' => 'tar';
@@ -204,7 +204,7 @@ sub init
       }
       elsif($src =~ /\.tar/ || $src =~ /(\.tgz|\.tbz|\.txz|\.taz)$/i)
       {
-        $self->_run($build, $self->tar_cmd, 'xf', $src);
+        $self->_run($build, $self->tar_cmd, '-xf', $src);
       }
       else
       {
@@ -262,7 +262,7 @@ sub _tar_can
   Path::Tiny->new($name)->spew_raw($tars{$name});
 
   my(undef, $exit) = capture_merged {
-    system 'tar', 'xf', $name;
+    system($self->tar_cmd, 'xf', $name);
     $?;
   };
   
@@ -290,7 +290,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 0.75
+version 0.91
 
 =head1 SYNOPSIS
 

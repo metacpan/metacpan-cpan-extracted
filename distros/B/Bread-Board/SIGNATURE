@@ -14,51 +14,50 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 73e737ba78ff769b903231da3aa5deeadd55f5d2 CONTRIBUTORS
-SHA1 5104d8b070a59da54c3ee61b42f0805ee4c53331 Changes
+SHA1 9f5d68d78675b77989cd7c17f987a239a57e1cbc CONTRIBUTORS
+SHA1 73aefe8e79a2a610a5e0af34c476f5c3f1da2b1b Changes
 SHA1 126b3991e8ebf99ecd0bd3934ee1a7765611ed6d INSTALL
-SHA1 cb53b95e0caee4041123331844a0da7140e6e2f8 LICENSE
-SHA1 b42d9850bb1ffca0d70c3b55ec40878e66f81f5c MANIFEST
-SHA1 ffb3a6e501ac160fe9626682a1efaea3cae96e30 META.json
-SHA1 1e89dbcb05b1f764a409030deebe0fa3d0641837 META.yml
-SHA1 1e432fc6d023105cff7a36750aee498807140c43 Makefile.PL
-SHA1 22835e9afa55a2edc33b7d0cf7a3afada7f903aa README
-SHA1 11b258bf02a552405e78e3f4369ef6cdd8302129 README.mkdn
-SHA1 6b5e40503c4bfb421267c119beb71564cef4426c cpanfile
-SHA1 2d07530c4893fab780982f187e8b634d0218179f doap.xml
-SHA1 f810b9e7bfe877cea1d1da1daab375fff732d40f lib/Bread/Board.pm
-SHA1 13fedaa69740a0d3c8924373984853647e282493 lib/Bread/Board/BlockInjection.pm
-SHA1 b3557543f67facf48325c410d8410f969830c1a6 lib/Bread/Board/ConstructorInjection.pm
-SHA1 6c493a9f6e011d57fd89b8c5c280bd863e1a2f4e lib/Bread/Board/Container.pm
-SHA1 97cc611226621d3103aae7fdbce7ec3463b00525 lib/Bread/Board/Container/FromParameterized.pm
-SHA1 c7d2ef23b6a7f1d77be0fe11dfc906f2d95c9422 lib/Bread/Board/Container/Parameterized.pm
-SHA1 d0f523ead764140e5808f46bb68a2e04dbf902d1 lib/Bread/Board/Dependency.pm
-SHA1 b1695f81aec159525ff6421d96849b85fd744083 lib/Bread/Board/Dumper.pm
-SHA1 961070c8c1468556e7a944a3dfe8012a3daf5a10 lib/Bread/Board/LifeCycle.pm
-SHA1 2403d0b9594989267cc7bf02eb5b740afeeee4d7 lib/Bread/Board/LifeCycle/Singleton.pm
-SHA1 816b5eeada90146b39c22a6e83cd8b14702ec502 lib/Bread/Board/LifeCycle/Singleton/WithParameters.pm
-SHA1 fdda9d2096e77accafa54121f61b086b7e5509c9 lib/Bread/Board/Literal.pm
-SHA1 7544d764e628a47e52547c738172608275664f51 lib/Bread/Board/Manual.pod
-SHA1 e5181fd4cb5618a45f09585a639fb8e0762d784d lib/Bread/Board/Manual/Concepts.pod
-SHA1 1016d4d3d5322d86b1d7cbee6fcd771fdbf241f9 lib/Bread/Board/Manual/Concepts/Advanced.pod
-SHA1 bb84bdde14b3670d603a676c4570a388088c3866 lib/Bread/Board/Manual/Concepts/Typemap.pod
-SHA1 75c47ed7c48d8aa80142151fcb19425bc15274bb lib/Bread/Board/Manual/Example.pod
-SHA1 6b4052e3e64eda233f669a2a98f5d8c7bca8584f lib/Bread/Board/Manual/Example/FormSensible.pod
-SHA1 f6910d8625912d00ab36b08c63d77366d059d5b7 lib/Bread/Board/Manual/Example/LogDispatch.pod
-SHA1 6d6cc41f9e8e9c05969fc63cdedb35bcc7ebbb0a lib/Bread/Board/Service.pm
-SHA1 d1d5e6ff19225f6051d598703ce7b44809f5ce3e lib/Bread/Board/Service/Alias.pm
-SHA1 6bb00a1742df17e997cef601f9914fd536a4a095 lib/Bread/Board/Service/Deferred.pm
-SHA1 f12c4efc05123b37f7d77f4a5db18813e64df870 lib/Bread/Board/Service/Deferred/Thunk.pm
-SHA1 859f97c5fa65db83fa5f9b322c5b8ca6f3bf045d lib/Bread/Board/Service/Inferred.pm
-SHA1 89c18f81419f2dae68fb42901b08908668e24989 lib/Bread/Board/Service/WithClass.pm
-SHA1 7abaf0a55344df83ac761f42ae926c558f5da1c5 lib/Bread/Board/Service/WithConstructor.pm
-SHA1 ae1107773b3c374bdf0d6a25616eab82519ba35b lib/Bread/Board/Service/WithDependencies.pm
-SHA1 e0cded189369ea50dc2578dea0f5292d1271b1c5 lib/Bread/Board/Service/WithParameters.pm
-SHA1 0f550a749fee4787277d9ee8ced74016a7d39a5c lib/Bread/Board/SetterInjection.pm
-SHA1 86a491e7487e10bb674859023e83500b3088209f lib/Bread/Board/Traversable.pm
-SHA1 b25ab75e3a66f3f88aa0f03537f5ff16fd568da6 lib/Bread/Board/Types.pm
+SHA1 54e5a5e8625ea4175d48187a32afda6d1b654d1c LICENSE
+SHA1 8539c01b497268ee75bba745daa9b9c06acfc9c3 MANIFEST
+SHA1 d15fe3d7d33e94cc8ed8ced228653a0eaa2c6411 META.json
+SHA1 26c7c706a5b85e3940a50d984638b141e401935a META.yml
+SHA1 d0683ac6e440318fa04bd111cdcc805464d09964 Makefile.PL
+SHA1 35a9a6c7e830278760cb6706256b6c8cc72777c7 README.mkdn
+SHA1 57d125b782f1c3cd2f3148c7a7c1690845e9b72b cpanfile
+SHA1 9c74df1599888b1e9768dcc3d5c8fed9d5f7a91f doap.xml
+SHA1 937cd54d302c5dbf15d1320a3f0ba1b4e44f1d79 lib/Bread/Board.pm
+SHA1 252c7e4fe7a1177d76d47acca1468f1426b4b6e2 lib/Bread/Board/BlockInjection.pm
+SHA1 66636a1a73d7820747ca16a3a5d6dc228e90d70a lib/Bread/Board/ConstructorInjection.pm
+SHA1 bfb54e5dc51b7d1c1d666acf30baee81b08be410 lib/Bread/Board/Container.pm
+SHA1 5d1833f86658832fade33a6f1427c5ad75f49bff lib/Bread/Board/Container/FromParameterized.pm
+SHA1 e911e2e778ff5a682cb4b1427430787cc7f36533 lib/Bread/Board/Container/Parameterized.pm
+SHA1 d8995d7de75e4bdf7c9cd75c3c49ba324edcebfa lib/Bread/Board/Dependency.pm
+SHA1 19da573dec040d4ea0790ee79f8a0bba09bf5bf2 lib/Bread/Board/Dumper.pm
+SHA1 e840789a3a830deaae78e2746260054a3ba76c82 lib/Bread/Board/LifeCycle.pm
+SHA1 62d5f75c2acdf558b4e31ded012f06bd5157171b lib/Bread/Board/LifeCycle/Singleton.pm
+SHA1 969208e4cdf34fc45c6e70e570f9901bf096a9cf lib/Bread/Board/LifeCycle/Singleton/WithParameters.pm
+SHA1 3078a96c1ccccc141caad5c61845fc02401158c6 lib/Bread/Board/Literal.pm
+SHA1 0524f7929d98b2a599c21f0878dfd396a80598f8 lib/Bread/Board/Manual.pod
+SHA1 af5a2f86859202e15b103afd71e0e60e7d60ef18 lib/Bread/Board/Manual/Concepts.pod
+SHA1 74fe9e0591208b7e01c90b725ff232d027e0601c lib/Bread/Board/Manual/Concepts/Advanced.pod
+SHA1 fd5193cd8b971c56adabd19528138b9d03ebfa71 lib/Bread/Board/Manual/Concepts/Typemap.pod
+SHA1 cd58b1b770b61f20c76abe68834b039066547233 lib/Bread/Board/Manual/Example.pod
+SHA1 526a4dbe3d04f307fe97c0553613254739531fcd lib/Bread/Board/Manual/Example/FormSensible.pod
+SHA1 621b930f2405d21151e3cf249959b2f8eef7f866 lib/Bread/Board/Manual/Example/LogDispatch.pod
+SHA1 05538ab290ca570ce540c218dcf2083e0855ccb5 lib/Bread/Board/Service.pm
+SHA1 c91f351c72dc3081f6596621fe0a6a8ae8651fc9 lib/Bread/Board/Service/Alias.pm
+SHA1 6606f626b8860e3d52a8a091a69468a45786533d lib/Bread/Board/Service/Deferred.pm
+SHA1 c481d31188ecd49fd726cd06db731f6ac4c21878 lib/Bread/Board/Service/Deferred/Thunk.pm
+SHA1 03da3775aeb3a5b591d726f700bc5007bfc774fc lib/Bread/Board/Service/Inferred.pm
+SHA1 a552dd648b26ab46b1c20dc00458ade572cd0fc9 lib/Bread/Board/Service/WithClass.pm
+SHA1 1740be62445ff417d7f9dbb221491628ac632814 lib/Bread/Board/Service/WithConstructor.pm
+SHA1 30f18a9a6bd5ba9eb07ba333296a75ec6ea59aca lib/Bread/Board/Service/WithDependencies.pm
+SHA1 e0ae93f8c916c5b465884687054aa0916926c187 lib/Bread/Board/Service/WithParameters.pm
+SHA1 67c64260fbfd7516440e35c15a90bc83049fdb2d lib/Bread/Board/SetterInjection.pm
+SHA1 7a12417c4ee21616e4dc6a314cc50f03ca533ff5 lib/Bread/Board/Traversable.pm
+SHA1 47a3654db614ccd80cbb55bc1c27b892112286c9 lib/Bread/Board/Types.pm
 SHA1 750ff38befd1bf8d67708c96c68e76555a56aeaa t/00-compile.t
-SHA1 4f80769e752613c5118e137eba88694497230046 t/00-report-prereqs.dd
+SHA1 497e88670c3fe84f4e14d83d1f7739747d5f1182 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 751103232b9b8d9eb5918981341b70790fa729bb t/001_constructor_injection.t
 SHA1 1e980d97aa4bdba035ab3c83fa9b7feeae51b0b5 t/002_setter_injection.t
@@ -72,7 +71,7 @@ SHA1 bbdf1958d2c8fcc1608129695fb735b41199901d t/020_sugar.t
 SHA1 a770d2f329c496f727e727a789955ba2e7b4066c t/021_sugar.t
 SHA1 0115e49fd48956e1923f36d598a597f00f98b480 t/022_sugar.t
 SHA1 7383ec6072a7746b1980c2582d9bea50b9d18573 t/023_sugar.t
-SHA1 567ca0895808994504fcaccfd1a5a65d2729d39f t/024_sugar.t
+SHA1 52f923f33dcaae6bac8a36857651f1f4a5632a91 t/024_sugar.t
 SHA1 55c0708edc83699089a91e3d2dd521385d19b2a6 t/025_sugar_w_absolute_path.t
 SHA1 2a540a326de81835d0c6dd9334c71c811d4d5d2e t/026_sugar_remove.t
 SHA1 64188a7ccbdf163cfcaf58a6b3eba8c62571f58d t/027_sugar_w_include.t
@@ -124,16 +123,15 @@ SHA1 c36904adc649abfc2544c3f04fa8cd9a20e2f838 t/300_no_new.t
 SHA1 ed942f8f06034dc7a16b87b6e6dfb0bd598c7aaf t/301_sugar.t
 SHA1 56996a79c526cd7759b153275cc315b7df26dc70 t/302_path_traversal_deprecation.t
 SHA1 df1416e4b62108c5085ce11e8d1a9387a2490952 t/310_literal_keyword.t
+SHA1 d9e2c050ee0bbf915711fad435f2e3608d12b361 t/500-gh61.t
 SHA1 5b22f42755e60f9eae74f624b252f0b5f168f980 t/lib/bad.bb
 SHA1 cd82998b7b796280f4fa50bae8a77c2d6a4ad004 t/lib/false.bb
 SHA1 ec62b218160c4f116cb0d0966d6eef39eae9d701 t/lib/logger.bb
 SHA1 dd10457eebda57a6f9aa89ee9a3d1e67a7298cfc t/lib/my_app.bb
-SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlb5r0QACgkQ34Hwf+GwC4wopQCgrL6t6IckBJYHEzEqkt3KspnK
-q4cAn2mNsb/MsPSK9cHjAu7Z0rpp/gSQ
-=iP1o
+iEYEARECAAYFAll/ymoACgkQ34Hwf+GwC4x9OQCg3cuYzYdcU37cgbTcciBwuajY
+0IgAn0tL/Gw4VzEpUf9MbXXtIC74uE7w
+=6mT/
 -----END PGP SIGNATURE-----

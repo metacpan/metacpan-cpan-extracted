@@ -1,0 +1,60 @@
+NAME
+
+    Graphics::TIFF - Perl extension for the libtiff library
+
+VERSION
+
+    6
+
+SYNOPSIS
+
+    Perl bindings for the libtiff library. This module allows you to access
+    TIFF images in a Perlish and object-oriented way, freeing you from the
+    casting and memory management in C, yet remaining very close in spirit
+    to original API.
+
+    The following snippet can be used to read the image data from a TIFF:
+
+     use Graphics::TIFF ':all';
+     my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+     my $stripsize = $tif->StripSize;
+     for my $stripnum ( 0 .. $tif->NumberOfStrips - 1 ) {
+         my $buffer = $tif->ReadEncodedStrip( $stripnum, $stripsize );
+         # do something with $buffer
+     }
+     $tif->Close;
+
+DESCRIPTION
+
+    The Graphics::TIFF module allows a Perl developer to access TIFF
+    images. Find out more about libtiff at http://www.libtiff.org.
+
+DIAGNOSTICS
+
+CONFIGURATION AND ENVIRONMENT
+
+DEPENDENCIES
+
+INCOMPATIBILITIES
+
+BUGS AND LIMITATIONS
+
+SEE ALSO
+
+    The LIBTIFF Standard Reference http://www.libtiff.org/libtiff.html is a
+    handy companion. The Perl bindings follow the C API very closely, and
+    the C reference documentation should be considered the canonical
+    source.
+
+AUTHOR
+
+    Jeffrey Ratcliffe, <jffry@posteo.net>
+
+LICENSE AND COPYRIGHT
+
+    Copyright (C) 2017 by Jeffrey Ratcliffe
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

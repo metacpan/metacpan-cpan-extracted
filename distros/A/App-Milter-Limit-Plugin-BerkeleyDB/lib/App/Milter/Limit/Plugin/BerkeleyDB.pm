@@ -1,10 +1,20 @@
-package App::Milter::Limit::Plugin::BerkeleyDB;
-our $VERSION = '0.51';
+#
+# This file is part of App-Milter-Limit-Plugin-BerkeleyDB
+#
+# This software is copyright (c) 2010 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
 
+package App::Milter::Limit::Plugin::BerkeleyDB;
+$App::Milter::Limit::Plugin::BerkeleyDB::VERSION = '0.52';
 # ABSTRACT: BerkeleyDB driver for App::Milter::Limit
 
 use strict;
+use warnings;
 use base qw(App::Milter::Limit::Plugin Class::Accessor);
+
 use App::Milter::Limit::Log;
 use BerkeleyDB qw(DB_CREATE DB_INIT_MPOOL DB_INIT_CDB);
 
@@ -82,7 +92,7 @@ sub query {
 
 1;
 
-
+__END__
 
 =pod
 
@@ -92,7 +102,7 @@ App::Milter::Limit::Plugin::BerkeleyDB - BerkeleyDB driver for App::Milter::Limi
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -100,7 +110,7 @@ version 0.51
 
 =head1 DESCRIPTION
 
-This module implements the C<App::Milter::Limit> backend using a BerkeleyDB data
+This module implements the L<App::Milter::Limit> backend using a BerkeleyDB data
 store.
 
 =head1 CONFIGURATION
@@ -109,26 +119,36 @@ The C<[driver]> section of the configuration file must specify the following ite
 
 =over 4
 
-=item home
+=item home [optional]
 
-The directory where the database files should be stored.
+The directory where the database files should be stored (default: C<state_dir> setting).
 
 =item file [optional]
 
-The database filename (default bdb-stats.db)
+The database filename (default: C<bdb-stats.db>)
 
 =item mode [optional]
 
-The file mode for the database files (default 0644).
+The file mode for the database files (default: C<0644>).
 
 =back
 
 =for Pod::Coverage child_init
 init_defaults
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/mschout/milter-limit-plugin-berkeleydb>
+and may be cloned from L<git://github.com/mschout/milter-limit-plugin-berkeleydb.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to bug-app-milter-limit-plugin-berkeleydb@rt.cpan.org or through the web interface at:
+ http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit-Plugin-BerkeleyDB
+
 =head1 AUTHOR
 
-  Michael Schout <mschout@cpan.org>
+Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -138,7 +158,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

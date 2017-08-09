@@ -1,0 +1,37 @@
+{
+   "abstract" : "Read from stdin and write to stdout with additional useful information prefixed to each line.",
+   "author" : [
+      "TTKCIAR <ttk@ciar.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Prefix",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Valet" : "1.01",
+            "Sys::Hostname" : "1.00",
+            "Test::Differences" : "0.60",
+            "Test::Most" : "0.30",
+            "Time::HiRes" : "1.55",
+            "Time::TAI::Simple" : "1.11",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}
+

@@ -72,6 +72,9 @@ typedef struct MariaDB_client {
      */
     bool store_query_result;
 
+    /* Ugh... */
+    bool want_hashrefs;
+
     /* DESTROY has been called, we already freed the memory we allocated */
     bool destroyed;
 } MariaDB_client;
@@ -213,13 +216,12 @@ THX_fetch_password_try_not_to_copy_buffer(pTHX_ MariaDB_client *maria)
 }
 
 int
-THX_add_row_to_results(pTHX_ MariaDB_client *maria, MYSQL_ROW row)
-#define add_row_to_results(a,b) THX_add_row_to_results(aTHX_ a,b)
+THX_add_row_to_results(pTHX_ MariaDB_client *maria, MYSQL_ROW row, bool want_hashref, int field_count, unsigned long *lengths, MYSQL_FIELD *fields)
+#define add_row_to_results(a,b,c) THX_add_row_to_results(aTHX_ a,b,c,0,NULL,NULL)
+#define add_row_to_results_heavy(a,b,c,d,e,f) THX_add_row_to_results(aTHX_ a,b,c,d,e,f)
 {
     AV *query_results;
-    AV *row_results;
-    int field_count;
-    unsigned long *lengths;
+    SV *row_results;
     SSize_t i = 0;
 
     if (!maria->query_results) {
@@ -231,27 +233,67 @@ THX_add_row_to_results(pTHX_ MariaDB_client *maria, MYSQL_ROW row)
 
     query_results = MUTABLE_AV(maria->query_results);
 
-    field_count   = mysql_field_count(maria->mysql);
-    lengths       = mysql_fetch_lengths(maria->res);
+    if ( !field_count )
+        field_count   = mysql_field_count(maria->mysql);
 
-    row_results   = newAV();
+    if ( !fields )
+        fields        = mysql_fetch_fields(maria->res);
+
+    if ( !lengths )
+        lengths       = mysql_fetch_lengths(maria->res);
+
+    /* we know how many columns the row has, so pre-extend row_results */
+    if ( want_hashref ) {
+        row_results = MUTABLE_SV(newHV());
+    }
+    else {
+        row_results = MUTABLE_SV(newAV());
+        av_extend(MUTABLE_AV(row_results), field_count);
+    }
+
     /* do the push now, in case somehow the av_push inside the loop dies
      * since that way we will avoid leaking the row_results AV
      */
-    av_push(query_results, newRV_noinc(MUTABLE_SV(row_results)));
-
-    /* we know how many columns the row has, so pre-extend row_results */
-    av_extend(row_results, field_count);
+    av_push(query_results, newRV_noinc(row_results));
 
     for ( i = 0; i < field_count; i++ ) {
-        /* if the col is a NULL, then that will already be there,
-         * since we pre-extended the array before.  So avoid doing
-         * that store entirely
-         */
-        if ( row[i] ) {
-            SV *col_data = newSVpvn(row[i], (STRLEN)lengths[i]);
-            /* ownership of the col_data refcount goes to row_results */
-            av_store(row_results, i, col_data);
+        SV *col_data;
+
+        if ( !row[i] ) {
+            if ( !want_hashref ) {
+                /* if the col is a NULL, then that will already be there,
+                 * since we pre-extended the array before.  So avoid doing
+                 * that store entirely
+                 */
+                continue;
+            }
+            else {
+                hv_store(
+                    MUTABLE_HV(row_results),
+                    fields[i].name,
+                    fields[i].name_length,
+                    &PL_sv_undef,
+                    0
+                );
+                continue;
+            }
+        }
+
+        /* TODO could do the whole type thing switch here */
+        col_data = newSVpvn(row[i], (STRLEN)lengths[i]);
+
+        /* ownership of the col_data refcount goes to row_results */
+        if ( want_hashref ) {
+            hv_store(
+                MUTABLE_HV(row_results),
+                fields[i].name,
+                fields[i].name_length,
+                col_data,
+                0
+            );
+        }
+        else {
+            av_store(MUTABLE_AV(row_results), i, col_data);
         }
     }
 
@@ -415,24 +457,24 @@ THX_do_work(pTHX_ SV* self, IV event)
                     event = 0;
                 }
                 else {
-                    SV* query_sv   = maria->query_sv;
                     STRLEN query_len;
-                    char* query_pv = SvPV(query_sv, query_len);
+                    char* query_pv = SvPV(maria->query_sv, query_len);
                     status = mysql_real_query_start(
                                 &err,
                                 maria->mysql,
                                 query_pv,
                                 query_len
                              );
-                    /* Release this */
-                    SvREFCNT_dec(query_sv);
-                    maria->query_sv = NULL;
                 }
 
                 if ( err ) {
                     /* Probably should do more here, like resetting the state */
                     maria->is_cont = FALSE;
                     state          = STATE_STANDBY;
+
+                    /* Release this */
+                    SvREFCNT_dec(maria->query_sv);
+                    maria->query_sv = NULL;
 
                     errstring = mysql_error(maria->mysql);
                 }
@@ -442,6 +484,10 @@ THX_do_work(pTHX_ SV* self, IV event)
                 else {
                     /* query finished */
                     maria->is_cont = FALSE; /* hooray! */
+
+                    /* finally, release the query string */
+                    SvREFCNT_dec(maria->query_sv);
+                    maria->query_sv = NULL;
 
                     if ( maria->store_query_result ) {
                         state = STATE_STORE_RESULT;
@@ -503,16 +549,33 @@ THX_do_work(pTHX_ SV* self, IV event)
                         }
                         else {
                             /* query was successful and we have all the results in memory.  Put them in perl! */
+                            MYSQL_FIELD *fields
+                                = mysql_fetch_fields(maria->res);
+
+                            int field_count
+                                = mysql_field_count(maria->mysql);
+
+                            unsigned long *lengths
+                                = mysql_fetch_lengths(maria->res);
+
                             while (1) {
                                 /* this will never block */
                                 MYSQL_ROW row = mysql_fetch_row(maria->res);
                                 if ( !row )
                                     break;
 
-                                add_row_to_results(maria, row);
+                                add_row_to_results_heavy(
+                                    maria,
+                                    row,
+                                    maria->want_hashrefs,
+                                    field_count,
+                                    lengths,
+                                    fields
+                                );
                             }
                         }
                     }
+                    maria->want_hashrefs = FALSE;
                     state = STATE_FREE_RESULT;
                 }
 
@@ -544,7 +607,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                     event  = 0;
                     if (!status) {
                         if ( row ) {
-                            add_row_to_results(maria, row);
+                            add_row_to_results(maria, row, maria->want_hashrefs);
                         }
                         else {
                             if ( mysql_errno(maria->mysql) > 0 ) {
@@ -562,7 +625,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                         status = mysql_fetch_row_start(&row, maria->res);
                         if (!status) {
                             if ( row ) {
-                                add_row_to_results(maria, row);
+                                add_row_to_results(maria, row, maria->want_hashrefs);
                             }
                             else if ( mysql_errno(maria->mysql) > 0 ) {
                                 /* Damn... We got an error while fetching
@@ -584,6 +647,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                          * docs say we could use mysql_free_result
                          * and it should not block, but I'm having none of it.
                          */
+                        maria->want_hashrefs = FALSE;
                         state = STATE_FREE_RESULT;
                     }
                     /*
@@ -651,6 +715,57 @@ THX_do_work(pTHX_ SV* self, IV event)
     maria->last_status   = status;
 
     return status;
+}
+
+SV*
+THX_quote_sv(pTHX_ MariaDB_client* maria, SV* to_be_quoted)
+#define quote_sv(to_be_quoted) THX_quote_sv(aTHX_ maria, to_be_quoted)
+{
+    UV new_length;
+    STRLEN new_len_needed;
+    STRLEN to_be_quoted_len;
+    char * escaped_buffer;
+    const char* to_be_quoted_pv;
+    SV *quoted_sv;
+
+    if ( !SvOK(to_be_quoted) ) {
+        return newSVpvs("NULL");
+    }
+
+    to_be_quoted_pv = SvPV(to_be_quoted, to_be_quoted_len);
+
+    if ( to_be_quoted_len == 0 ) {
+        return newSVpvs("\"\""); /* "", not '', not sure why */
+    }
+    
+    if ( (to_be_quoted_len+3) > (MEM_SIZE_MAX/2) ) {
+        croak("Cannot quote absurdly long string, would cause an overflow");
+    }
+
+    /* mysql_real_escape_string needs len of string*2 plus one byte for the null */
+    /* we mimick DBI behavior and return this with quotes */
+    new_len_needed = to_be_quoted_len * 2 + 3;
+
+    quoted_sv      = newSV(new_len_needed);
+    escaped_buffer = SvPVX_mutable(quoted_sv);
+    escaped_buffer[0] = '\'';
+
+    SvPOK_on(quoted_sv);
+
+    new_length = mysql_real_escape_string(
+        maria->mysql,
+        escaped_buffer+1,
+        to_be_quoted_pv,
+        to_be_quoted_len
+    );
+    escaped_buffer[new_length+1] = '\'';
+
+    escaped_buffer[new_length+2] = '\0';
+    SvCUR_set(quoted_sv, (STRLEN)new_length + 2);
+    if ( SvUTF8(to_be_quoted) )
+        SvUTF8_on(quoted_sv);
+
+    return quoted_sv;
 }
 
 const char*
@@ -994,7 +1109,7 @@ CODE:
 OUTPUT: RETVAL
 
 IV
-run_query_start(SV* self, SV * query)
+run_query_start(SV* self, SV * query, ...)
 CODE:
 {
     dMARIA;
@@ -1014,12 +1129,148 @@ CODE:
         croak("Cannot start running a second query while we are still completing the first!");
     }
 
-    /* See if we can cheat!  We don't need to copy the query's buffer yet --
-     * if we do into the state machine and manage to run mysql_real_query_start,
-     * we won't need to copy this at all!
-     */
-    maria->query_sv = query; /* yeah, sharing the SV, for now.  See the comment above */
-    SvREFCNT_inc(query);
+    maria->want_hashrefs = FALSE;
+    if ( items > 2 && SvOK(ST(2)) ) {
+        /* we were given arguments */
+        SV *arg = ST(2);
+        SV **svp;
+        if ( !SvROK(arg) || SvTYPE(SvRV(ST(2))) != SVt_PVHV ) {
+            croak("Invalid (non-hash, non-undef) argument given to run_query");
+        }
+        svp  = hv_fetchs(MUTABLE_HV(SvRV(arg)), "want_hashrefs", FALSE);
+        if ( svp && *svp ) {
+            maria->want_hashrefs = cBOOL(SvTRUE(*svp));
+        }
+    }
+
+    /* TODO implement prepared statements, then check if we have one here */
+    if ( items > 3 && SvOK(ST(3)) ) {
+        /* we were given query params.  Hm. Need to copy the query sv,
+         * then replace all the placeholders
+         */
+        SV* bind = ST(3);
+        AV* bind_av;
+        bool escaped;
+        SV* query_with_params;
+        bool need_utf8_on               = cBOOL(SvUTF8(query));
+        STRLEN max_size_of_query_string;
+        const char* query_pv            = SvPV(query, max_size_of_query_string);
+        char *d = NULL;
+        IV num_bind_params;
+
+        if ( !SvROK(bind) || SvTYPE(SvRV(bind)) != SVt_PVAV ) {
+            croak("Query bind values should be passed in an arrayref!");
+        }
+        bind_av = MUTABLE_AV(SvRV(bind));
+        num_bind_params = av_len(bind_av) + 1;
+
+        IV i = 0;
+        for ( ; i < num_bind_params; i++ ) {
+            SV* query_param = *av_fetch(bind_av, i, FALSE);
+
+            if ( !SvOK(query_param) ) {
+                /* will add a NULL, so +4 */
+                max_size_of_query_string += 4;
+                continue;
+            }
+
+            if ( SvGMAGICAL(query_param) ) /* get GET magic */
+                mg_get(query_param);
+
+            if ( SvUTF8(query_param) )
+                need_utf8_on = TRUE;
+
+            /* need to account for the increase due to quoting */
+            max_size_of_query_string += sv_len(query_param)*2+1; /* should be +2, but we are replacing a question mark so */
+        }
+
+        query_with_params = newSV(max_size_of_query_string);
+        SvPOK_on(query_with_params);
+        if ( need_utf8_on )
+            SvUTF8_on(query_with_params);
+
+        d = SvPVX(query_with_params);
+        i = 0; /* back to the start */
+        while ( *query_pv ) {
+            if ( *query_pv == '?' && !escaped ) {
+                UV new_length = 0;
+                STRLEN to_be_quoted_len;
+                const char* to_be_quoted_pv;
+                SV *to_be_quoted;
+                bool upgraded = FALSE;
+
+                query_pv++;
+
+                if ( i >= num_bind_params )
+                    croak("Not enough bind params given to run_query");
+
+                to_be_quoted = *av_fetch(bind_av, i++, FALSE);
+
+                if ( !SvOK(to_be_quoted) ) {
+                    *d++ = 'N';
+                    *d++ = 'U';
+                    *d++ = 'L';
+                    *d++ = 'L';
+                    continue;
+                }
+
+                if ( need_utf8_on && !SvUTF8(to_be_quoted) ) {
+                    /* temporarily upgrade to utf8 -- we will downgrade later */
+                    sv_utf8_upgrade_nomg(to_be_quoted);
+                    upgraded = TRUE;
+                }
+
+                to_be_quoted_pv = SvPV(to_be_quoted, to_be_quoted_len);
+
+                if ( to_be_quoted_len == 0 ) {
+                    *d++ = '"';
+                    *d++ = '"';
+                    continue;
+                }
+
+                *d++ = '\'';
+                new_length = mysql_real_escape_string(
+                    maria->mysql,
+                    d,
+                    to_be_quoted_pv,
+                    to_be_quoted_len
+                );
+                d += new_length;
+                *d++ = '\'';
+
+                if ( upgraded ) {
+                    sv_utf8_downgrade(to_be_quoted, 1); /* 1=FAIL_OK */
+                }
+            }
+            else if ( *query_pv == '\\' && !escaped ) {
+                escaped = TRUE;
+                query_pv++;
+            }
+            else {
+                escaped = FALSE;
+                *d++ = *query_pv++;
+            }
+        }
+
+        SvCUR_set(
+            query_with_params,
+            (STRLEN)(d - SvPVX(query_with_params))
+        );
+
+        *d++ = '\0'; /* never hurts to have a NUL terminated string */
+
+        maria->query_sv = query_with_params;
+
+        if ( i != num_bind_params ) {
+            croak("Too many bind params given for query! Got %"IVdf", query needed %"IVdf, num_bind_params, i);
+        }
+    }
+    else {
+        /* we MUST copy this, because mysql_real_query will not -- it will
+         * hold on to the pointer until it is done sending the query
+         * */
+        maria->query_sv = newSVsv(query);
+    }
 
     if ( maria->is_cont ) {
         /*
@@ -1040,18 +1291,6 @@ CODE:
     }
     else {
         RETVAL = do_work(self, 0);
-    }
-
-    if ( maria->query_sv ) {
-        /* Lousy.  We did not manage to go far enough into the state machine.
-         * We now have to copy the query SV -- keeping the original around is
-         * NOT an option since it may be re-used by our caller
-         * XXX TODO: could keep the original while replacing query's internals
-         * to point to a COW string.  That might lead to less copying.
-         */
-        SvREFCNT_dec(query); /* since we increased it before */
-        maria->query_sv = newSVsv(maria->query_sv);
-                         /* ^ the sole refcnt will belong to us */
     }
 }
 OUTPUT: RETVAL
@@ -1123,49 +1362,7 @@ quote(SV* self, SV* to_be_quoted)
 CODE:
 {
     dMARIA;
-
-    if ( !SvOK(to_be_quoted) ) {
-        RETVAL = newSVpvs("NULL");
-    }
-    else {
-    STRLEN to_be_quoted_len;
-    const char* to_be_quoted_pv = SvPV(to_be_quoted, to_be_quoted_len);
-
-    if ( !to_be_quoted_len ) {
-        RETVAL = newSVpvs("\"\"");
-    }
-    else {
-        UV new_length;
-        char * escaped_buffer;
-        STRLEN new_len_needed;
-        
-        if ( (to_be_quoted_len+3) > (MEM_SIZE_MAX/2) ) {
-            croak("Cannot quote absurdly long string, would cause an overflow");
-        }
-
-        /* mysql_real_escape_string needs len of string*2 plus one byte for the null */
-        /* we mimick DBI behavior and return this with quotes */
-        new_len_needed = to_be_quoted_len * 2 + 3;
-
-        RETVAL         = newSV(new_len_needed);
-        escaped_buffer = SvPVX_mutable(RETVAL);
-        escaped_buffer[0] = '\'';
-
-        SvPOK_on(RETVAL);
-
-        new_length = mysql_real_escape_string(
-            maria->mysql,
-            escaped_buffer+1,
-            to_be_quoted_pv,
-            to_be_quoted_len
-        );
-        escaped_buffer[new_length+1] = '\'';
-        escaped_buffer[new_length+2] = '\0';
-        SvCUR_set(RETVAL, (STRLEN)new_length + 2);
-        if ( SvUTF8(to_be_quoted) )
-            SvUTF8_on(RETVAL);
-    }
-    }
+    RETVAL = quote_sv(to_be_quoted);
 }
 OUTPUT: RETVAL
 

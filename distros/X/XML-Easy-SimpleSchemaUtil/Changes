@@ -1,3 +1,12 @@
+version 0.003; 2017-08-07
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
 version 0.002; 2011-10-27
 
   * bugfix: require bugfixed version of XML::Easy::NodeBasics (for lack

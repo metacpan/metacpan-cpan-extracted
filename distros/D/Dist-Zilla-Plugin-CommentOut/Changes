@@ -1,0 +1,12 @@
+Revision history for Dist-Zilla-Plugin-CommentOut
+
+0.03      2017-08-02 11:00:55 -0400
+  - Quote id string in regex
+  - Add begin and end optional properties
+
+0.02      2017-08-02 10:29:19 -0400
+  - Fixed bug where remove would change line numbers
+  - First CPAN release
+
+0.01      2017-08-01 20:57:13 -0400
+  - initial version

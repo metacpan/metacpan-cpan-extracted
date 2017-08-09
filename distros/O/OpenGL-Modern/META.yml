@@ -4,7 +4,7 @@ author:
   - 'Chris Marshall <chm@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  IO::All: '0'
+  IO::All: '0.86'
   Test::InDistDir: '0'
   Test::More: '0.88'
 configure_requires:
@@ -28,7 +28,8 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Import::Into: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/devel-chm/OpenGL-Modern.git
-version: '0.03'
+version: '0.04'

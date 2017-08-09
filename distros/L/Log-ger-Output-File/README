@@ -1,29 +1,75 @@
-SYNOPSIS
+NAME
+    Log::ger::Output::File - Send logs to file
 
+VERSION
+    version 0.006
+
+SYNOPSIS
      use Log::ger::Output 'File' => (
          path => '/path/to/file.log', # or handle => $fh
+         lazy => 1,                   # optional, default 0
      );
      use Log::ger;
-    
+
      log_warn "blah ...";
 
 DESCRIPTION
-
-    This is a simple output to file. File will be opened with append mode.
-    No locking, rotation, or other fancy features (yet). Filehandle will be
-    flushed after each log.
+    This is an output module to file, with some options. File will be opened
+    with append mode. Filehandle will be flushed after each log.
 
 CONFIGURATION
-
- path => filename
-
+  path => filename
     Specify filename to open. File will be opened in append mode.
 
- handle => glob|obj
-
+  handle => glob|obj
     Alternatively, you can provide an already opened filehandle.
 
-SEE ALSO
+  autoflush => bool (default: 1)
+    Can be turned off if you need more speed, but note that under the
+    absence of autoflush, partial log messages might be written.
 
+  lazy => bool (default: 0)
+    If set to true, will only open the file right before we need to log the
+    message (instead of during output initialization). If you have lots of
+    applications that use file logging, this can avoid the proliferation of
+    zero-sized log files. On the other hand, the application bears an
+    additional risk of failing to open a log file in the middle of the run.
+
+  lock_mode => str (none|write|exclusive, default: none)
+    If you set this to "none" (the default), no locking is done. When there
+    are several applications/processes that output log to the same file,
+    messages from applications might get jumbled, e.g. partial message from
+    application 1 is followed by message from application 2 and 3, then
+    continued by the rest of message from application 1, and so on.
+
+    If you set this to "write", an attempt to acquire an exclusive lock to
+    "<PATH>.lck" will be made. If all logger processes use locking, this
+    makes it safe to log to the same file. However, this increases the
+    overhead of writing the log which will become non-negligible once you
+    log to files at the rate of thousands per second. Also, when a locking
+    attempt fails after 60 seconds, this module will die. "autoflush" is
+    automatically turned on under this locking mode.
+
+    If you set this to "exclusive", locking will be attempted only once
+    during the output initialization.
+
+TODO
+    When "lock_mode" is set to "exclusive", and user switches output, we
+    have not released the lock.
+
+SEE ALSO
     Log::ger
+
+    Log::ger::Output::SimpleFile
+
+    Log::ger::Output::FileWriteRotate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

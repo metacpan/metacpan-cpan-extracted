@@ -1,9 +1,9 @@
 package Email::MIME::RFC2047::MailboxList;
-$Email::MIME::RFC2047::MailboxList::VERSION = '0.96';
+$Email::MIME::RFC2047::MailboxList::VERSION = '0.97';
 use strict;
 use warnings;
 
-# ABSTRACT: Handling of MIME encoded mailbox lists
+# ABSTRACT: MIME encoded mailbox lists
 
 use base qw(Email::MIME::RFC2047::AddressList);
 
@@ -27,11 +27,11 @@ __END__
 
 =head1 NAME
 
-Email::MIME::RFC2047::MailboxList - Handling of MIME encoded mailbox lists
+Email::MIME::RFC2047::MailboxList - MIME encoded mailbox lists
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 

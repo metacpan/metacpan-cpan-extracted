@@ -1,8 +1,13 @@
 Revision history for App::Milter::Limit::Plugin::BerkeleyDB
 
+0.52  2017-08-04
+    - use Dist::Zilla generated author-signature test
+    - Kwalitee: enable warnings
+    - include a smoke test
+
 0.51  2010-03-30
     - dzil: use my @MSCHOUT plugin bundle
     - add signature test
 
-0.50      2010-03-29 13:26:50 America/Chicago
+0.50  2010-03-29
     - initial release

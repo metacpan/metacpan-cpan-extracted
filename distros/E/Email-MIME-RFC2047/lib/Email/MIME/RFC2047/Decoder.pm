@@ -1,5 +1,5 @@
 package Email::MIME::RFC2047::Decoder;
-$Email::MIME::RFC2047::Decoder::VERSION = '0.96';
+$Email::MIME::RFC2047::Decoder::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -225,7 +225,7 @@ Email::MIME::RFC2047::Decoder - Decoding of non-ASCII MIME headers
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 

@@ -44,6 +44,6 @@
          "web" : "https://github.com/torbiak/git-autofixup"
       }
    },
-   "version" : 0.002004,
+   "version" : 0.002005,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

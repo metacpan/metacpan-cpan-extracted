@@ -1,5 +1,5 @@
 package Email::MIME::RFC2047::Parser;
-$Email::MIME::RFC2047::Parser::VERSION = '0.96';
+$Email::MIME::RFC2047::Parser::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Email::MIME::RFC2047::Parser - Base class for parsers
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 DESCRIPTION
 

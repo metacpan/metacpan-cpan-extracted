@@ -1,52 +1,39 @@
 ###	SPAR <http://www.cpan.org/scripts/>
 ###	1	644	1329052295	1329052295	is_relevant.pl
 have_cc
-###	47	644	1164351461	1342861894	makepp_test_script.pl
-# This test depends entirely on the builtin rules.
-#
+###	34	644	1356724506	1366573638	makepp_test_script.pl
 # Tests several things about C compilation:
 # 1) Correctly parsing command lines to scan for include files.
 # 2) Correctly calculating checksums so if files change we do not
 #    rebuild, but we always rebuild when necessary.
-# 3) Tests the builtin rules.
+# 3) Iteration 13 does not recompile even though signature would be
+#    different, because file did not change, so it was not recalculated.
+# 4) The builtin rules work.
 #
-# Replace the .c file multiple times and see which replacements trigger a
-# rebuild.
+# Replace the .c file multiple times and see which replacements trigger a rebuild.
 
-use Config;
 my $obj;
-my @exe_dep = is_windows ? '--no-path-exe-dep' : ();
-for $iter ( 0..3 ) {
-  # This is slow and low-tech, but we need to guarantee that the .c has
-  # a timestamp different from its build info, *and* that the .o
-  # timestamp changes between runs, even if the compiler is very fast and
-  # the files are on NFS (so that we cannot rely on calls to time).
-  wait_timestamp( 'compilation_test.c', "compilation_test.$obj" ) if $iter;
+my @args = ('makepp_signature_C_flat=0', is_windows ? '--no-path-exe-dep' : ());
+my $compiled;
+$Mpp::mod_answer = sub { $_[2] =~ s/ 0 / 1 / } if is_windows;
+for $iter ( 0..3, 13, 10 ) {	# 13 & 10 repeat 3 & 0, but with flat option
+  if( $iter == 13 ) { $args[0] =~ tr/0/1/ }
+  else { c_cp 'compilation_test_'.($iter%10).'.c', 'compilation_test.c' }
+  # This is slow and low-tech, but we need to guarantee that the .o timestamp changes
+  # between runs, even if the files are on NFS (so that we cannot rely on calls to time).
+  wait_timestamp "compilation_test.$obj" if $compiled;
   print "**** Iteration $iter\n";
-  c_cp "compilation_test_$iter.c", 'compilation_test.c';
-  makepp @exe_dep, 'CPPFLAGS=-I subdir1 -Isubdir2', 'compilation_test';
+  makepp @args, 'CPPFLAGS=-I subdir1 -Isubdir2', 'compilation_test';
 				# We test both the "-I subdir" and "-Isubdir"
 				# syntax.
-  $obj ||= -f 'compilation_test.o' ? 'o' : 'obj';
-  system '.' . ($^O =~ /^MSWin/ ? '\\' : '/') . "compilation_test > iteration_$iter";
-  my $exitstatus = 2;
-  open my $fh, ".makepp/compilation_test.$obj.mk" or return 0;
-  while ( <$fh> ) {
-    if ( m@subdir1/x2\.h@ ) {
-      $exitstatus = 0; last;
-    }
-  }
-  return 0 if $exitstatus;
-				# Make sure makepp found x2 in subdir1, not
-				# in the main directory.
+  system '.' . (0 < is_windows ? '\\' : '/') . "compilation_test > iteration_$iter";
+  $obj ||= is_windows && -f 'compilation_test.obj' ? 'obj' : 'o';
+  c_grep 'm@subdir1/x2\.h@', ".makepp/compilation_test.$obj.mk" unless $iter;
+				# Make sure makepp found x2 in subdir1, not in the
+				# main directory.  Always same, so just on 1st round.
 
-  n_files "n_files_$iter", sub { die if /warning: can.t locate file/ };
-				# Make sure makepp correctly found all include files.
-}
-if( is_windows ) {
-  for my $n ( 0..3 ) {
-    c_sed 's/ 0 / 1 /', "-o+<answers/n_files_$n"; # Extra phony on each test
-  }
+  $compiled = "0 0 0\n" ne n_files "n_files_$iter",
+    !$iter && sub { die if /warning: can't locate file/ }; # Make sure makepp found all include files.
 }
 1;
 ###	10	644	1067451873	1055627995	compilation_test_0.c
@@ -76,7 +63,7 @@ int main()
 #include "x.h"
 #include "y.h"
 
-/* Line count has changed!  Should recompile. */
+/* Line count has changed!  Should recompile if not flat option. */
 
 int main()
 {
@@ -87,8 +74,8 @@ int main()
 #include <stdio.h>
 #include "x.h"
 #include "y.h"
-  
-   /* Only whitespace has changed.  No recompilation. */ 
+
+   /* Only whitespace has changed.  No recompilation. */
  // This is a C++ comment
 int main()
 {
@@ -125,6 +112,10 @@ y.h:
 9 1 2 4
 ###	1	644	1067451873	1055628041	answers/iteration_3
 9 1 2 4
+###	1	644	1356724506	1356724506	answers/iteration_13
+9 1 2 4
+###	1	644	1356724506	1356724506	answers/iteration_10
+8 1 2 4
 ###	1	644	1067451873	1190053877	answers/n_files_0
 5 0 0
 ###	1	644	1067451873	1190053880	answers/n_files_1
@@ -133,3 +124,7 @@ y.h:
 2 0 0
 ###	1	644	1067451873	1190053887	answers/n_files_3
 0 0 0
+###	1	644	1356724506	1356724506	answers/n_files_13
+0 0 0
+###	1	644	1356724506	1356724506	answers/n_files_10
+2 0 0

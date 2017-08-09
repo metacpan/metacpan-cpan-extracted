@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 3;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 use FFI::Platypus;
 
@@ -15,3 +13,5 @@ ok $ptr, "tcc.get_symbol('foo') == $ptr";
 my $ffi = FFI::Platypus->new;
 $ffi->attach([$ptr => 'foo'] => [] => 'int');
 is foo(), 42, 'foo.call';
+
+done_testing;

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.005;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Log-Dispatch-FileRotate",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.005",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Log::Dispatch::FileRotate",
   "PREREQ_PM" => {
     "Date::Manip" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.29",
+  "VERSION" => "1.30",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,3 +1,15 @@
+0.007   2017-08-03 (PERLANCAR)
+
+        - Colors now can handle custom levels (will pick nearest level when
+          there is no exact match).
+
+
+0.006   2017-08-03 (PERLANCAR)
+
+	- Make %colors package global so it can be accessed/modified from
+	  outside, for later purposes.
+
+
 0.005   2017-06-30 (PERLANCAR)
 
 	- Adjust to Log::ger 0.011.

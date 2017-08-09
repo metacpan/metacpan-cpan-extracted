@@ -1,14 +1,17 @@
 ###	SPAR <http://www.cpan.org/scripts/>
-###	29	644	1161580578	1231322001	makepp_test_script.pl
+###	32	644	1161580578	1406914716	makepp_test_script.pl
 # Test all variants of existing and created symlinks, to existing and created files.
 
 makepp;
-my %warnings;
+my( %warnings, %errors );
 n_files 'n_files1', sub {
   undef $warnings{$1} if
-    /warning:.*?(is a symbolic link|I attempted to build|\w+ is probably also phony|There is no rule to build inexistent.+)/;
+    /warning: (.+?is a symbolic link|I attempted to build.+|.+? is probably also phony)/;
+  undef $errors{$1} if
+    /error: There is no rule to build inexistent(.+)/;
 };
-die if 5 != keys %warnings;
+die if 3 != keys %warnings;
+die if 2 != keys %errors;
 
 unlink qw(a bl f g h);		# Force rebuild of linkee or make link stale.
 wait_timestamp qw(c e);

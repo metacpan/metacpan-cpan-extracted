@@ -5,17 +5,17 @@ package App::RecordStream::Operation::fromsam;
 use base qw(App::RecordStream::Operation);
 
 sub init {
-    my $this = shift;
+    my $self = shift;
     my $args = shift;
     my $options = {
-      'flags'   => \($this->{'DECODE_FLAGS'}),
-      'quals|Q' => \($this->{'DECODE_QUALS'}),
+      'flags'   => \($self->{'DECODE_FLAGS'}),
+      'quals|Q' => \($self->{'DECODE_QUALS'}),
     };
-    $this->parse_options($args, $options);  # Ensures we pick up the automatic options
+    $self->parse_options($args, $options);  # Ensures we pick up the automatic options
 }
 
 sub accept_line {
-  my $this = shift;
+  my $self = shift;
   my $line = shift;
   return 1 if $line =~ /^@/;  # Skip any header
 
@@ -34,9 +34,9 @@ sub accept_line {
   }
 
   $record{quals} = [ map { ord($_) - 33 } split '', $record{qual} eq '*' ? '' : $record{qual} ]
-    if $this->{'DECODE_QUALS'};
+    if $self->{'DECODE_QUALS'};
 
-  if ($this->{'DECODE_FLAGS'}) {
+  if ($self->{'DECODE_FLAGS'}) {
     # Technically the flags to do with pairing and r1/r2 really refer
     # generically to multiple segments and first/last segments, but in practice
     # so far every one talks about pairing and first/second reads.  The SAM
@@ -72,17 +72,17 @@ sub accept_line {
     };
   }
 
-  $this->push_record( App::RecordStream::Record->new(\%record) );
+  $self->push_record( App::RecordStream::Record->new(\%record) );
   return 1;
 }
 
 sub usage {
-  my $this = shift;
+  my $self = shift;
   my $options = [
     ['flags', 'Decode flag bitstring into a "flags" hashref'],
     ['quals', 'Decode qual string into a "quals" array of numeric values'],
   ];
-  my $args_string = $this->options_string($options);
+  my $args_string = $self->options_string($options);
 
   return <<USAGE;
 Usage: recs fromsam <args> [<files>]

@@ -13,10 +13,11 @@ my $strptime = DateTime::Format::Strptime->new(
     on_error => 'croak',
 );
 
-like(
-    exception { $strptime->format_datetime('somestring') },
-    qr/Validation failed for type named DateTime declared in package DateTime::Format::Strptime::Types/,
-    'format_datetime() checks that it received a DateTime object'
+my $e = exception { $strptime->format_datetime('somestring') };
+is(
+    $e->type->name,
+    'DateTime',
+    'got expected type failure when passing a string to format_datetime'
 );
 
 done_testing();

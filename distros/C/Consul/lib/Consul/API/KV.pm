@@ -1,5 +1,5 @@
 package Consul::API::KV;
-$Consul::API::KV::VERSION = '0.021';
+$Consul::API::KV::VERSION = '0.022';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -48,7 +48,7 @@ sub get_all {
             int($_[0]/100) == 2 || int($_[0]) == 404
         },
         sub {
-            return undef unless defined $_[0];
+            return [] unless defined $_[0];
             [ map { Consul::API::KV::Response->new($_) } @{$_[0]} ]
         }
     );
@@ -74,7 +74,7 @@ sub keys {
 }
 
 package Consul::API::KV::Response;
-$Consul::API::KV::Response::VERSION = '0.021';
+$Consul::API::KV::Response::VERSION = '0.022';
 use Convert::Base64 qw(decode_base64);
 
 use Moo;

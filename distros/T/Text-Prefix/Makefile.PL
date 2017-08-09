@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "1.55",
     "Time::TAI::Simple" => "1.11"
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }

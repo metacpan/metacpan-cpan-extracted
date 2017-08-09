@@ -7,7 +7,7 @@ use 5.014;
 
 package JsonSQL::Schemas::select;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use base qw( JsonSQL::Schemas::Schema );
 
@@ -303,7 +303,7 @@ JsonSQL::Schemas::select - JsonSQL 'select' JSON schema.
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

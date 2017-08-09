@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.21      2017-07-31 13:51:38 -0400
+  - Add [Author::Plicease::TravisInstall]
+  - Default to using -no_srand on Test2::V0
+
 2.20      2017-07-12 16:44:10 -0400
   - Migrate minting template tests to use Test2::V0
   - Minting template require Perl 5.8.1

@@ -51,6 +51,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/additional-exports.t',
     't/anon.t',
+    't/any-does-isa.t',
     't/builtins-sanity.t',
     't/builtins.t',
     't/coercion.t',

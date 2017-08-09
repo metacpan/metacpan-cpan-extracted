@@ -1,9 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # This script asks the user the necessary questions for installing
 # makepp and does some heavy HTML massageing.
 #
-# $Id: install.pl,v 1.114 2012/07/05 21:55:13 pfeiffer Exp $
+# $Id: install.pl,v 1.121 2016/09/12 20:33:41 pfeiffer Exp $
 #
 
 package Mpp;
@@ -11,58 +11,116 @@ package Mpp;
 #
 # First make sure this version of Perl is recent enough:
 #
-eval { require 5.008; 1 } or
-  die "I need Perl version 5.8 or newer.  If you have it installed somewhere
-already, run this installation procedure with that perl binary, e.g.,
+BEGIN { eval { require 5.008 } or exec $^X, 'config.pl' } # Dies with nice message.
 
-	perl5.14.1 install.pl ...
+BEGIN {
+#
+# Find the location of our data directory that contains the auxiliary files.
+# This is normally built into the program by install.pl, but if makepp hasn't
+# been installed, then we look in the directory we were run from.
+#
+  my $datadir = $0;		# Assume it's running from the same place that
+				# we're running from.
+  unless( $datadir =~ s@/[^/]+$@@ ) { # No path specified?
+				# See if we can find ourselves in the path.
+    foreach( split(/:/, $ENV{'PATH'}), '.' ) {
+				# Add '.' to the path in case the user is
+				# running it with "perl install.pl" even if
+				# . is not in his path.
+      if( -d "$_/Mpp" ) {	# Found something we need?
+	$datadir = $_;
+	last;
+      }
+    }
+  }
+  $datadir or die "install.pl: can't find library files\n";
 
-If you don't have a recent version of Perl installed (what kind of system are
-you on?), get the latest from www.perl.com and install it.
-";
+  $datadir = eval "use Cwd; cwd . '/$datadir'"
+    if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  unshift @INC, $datadir;
+}
 
 use Config;
+use Mpp::Text ();
 use File::Copy;
 use File::Path;
-use Mpp::Text ();
 use Mpp::File ();		# ensure HOME is set
 
-system $^X, 'makepp', '--version'; # make sure it got a chance to apply workarounds.
+system PERL, 'makepp', '--version'; # make sure it got a chance to apply workarounds.
 
-print 'Using perl in ' . PERL . ".\n";
+print "\nUsing perl in " . PERL . ".\n";
+print "If you want another, please set environment variable PERL to it & reinstall.\n"
+  unless $ENV{PERL};
 
-warn "\nMakepp will be installed with DOS newlines, as you unpacked it.\n\n"
-  if ($_ = <DATA>) =~ tr/\r//d;
+warn "\nMakepp is being installed with DOS newlines, as you unpacked it.\n\n"
+  if ($_ = <DATA>) =~ tr/\r//;
 
 our $eliminate = '';		# So you can say #@@eliminate
 
+our $VERSION = $Mpp::Text::VERSION;
+our $setVERSION = "  our \$VERSION = '$Mpp::Text::VERSION';";
 our $BASEVERSION = $Mpp::Text::BASEVERSION;
 
 #
 # Now figure out where everything goes:
 #
-$prefix = "/usr/local";
+sub ARGV_or_prompt($$) {
+  local $_ = shift @ARGV;
+  return $_ if defined && 0 < length;
 
-$bindir = shift(@ARGV) ||
-  read_with_prompt("
+  local $| = 1;			# Enable autoflush on STDOUT.
+
+  my $default = ref( $_[1] ) ? $_[1]() : $_[1];
+  print "$_[0] [$default]? ";	# Print the prompt.
+  $_ = <STDIN>;			# Read a line.
+  s/^\s+//;
+  s/\s+$//;
+  return $default unless defined && 0 < length;
+#
+# Expand environment variables and home directories.
+#
+  my $orig = $_;
+  s/\$(\w+)/$ENV{$1}/g;		# Expand environment variables.
+  if (s/^~(\w*)//) {		# Is there a ~ expansion to do?
+    if ($1 eq '') {
+      $_ = "$ENV{HOME}$_";
+    } else {
+      my ($name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = getpwnam($1);
+				# Expand from the passwd file.
+      if ($dir) {		# Found it?
+	$_ = "$dir$_";
+      } else {
+	$_ = "~$1";		# Not found.  Just put the ~ back.
+      }
+    }
+  }
+  print "  -> $_\n" if $orig ne $_;
+  $_;
+}
+
+$prefix = '/usr/local';
+
+$bindir = ARGV_or_prompt '
 Makepp needs to know where you want to install it and its data files.
-makepp is written in Perl, but there is no particular reason to install
+Makepp is written in Perl, but there is no particular reason to install
 any part of it in the perl hierarchy; you can treat it as you would a
 compiled binary which is completely independent of perl.
 
-Where should the makepp executable be installed [$prefix/bin]? ") ||
+The questions understand environment variables like $HOME, or ~ syntax.
+
+Where should the makepp executable be installed',
   "$prefix/bin";
 
 $bindir =~ m@^(.*)/bin@ and $prefix = $1;
 				# See if a prefix was specified.
 
-my $datadir = shift @ARGV || read_with_prompt("
+my $datadir = ARGV_or_prompt '
 Makepp has a number of library files that it needs to install somewhere.  Some
-of these are Perl modules, but they can't be used by other Perl programs, so
-there's no point in installing them in the perl modules hierarchy; they are
+of these are Perl modules, but they can\'t be used by other Perl programs, so
+there\'s no point in installing them in the perl modules hierarchy; they are
 simply architecture-independent data that needs to be stored somewhere.
 
-Where should the library files be installed [$prefix/share/makepp]? ") ||
+Where should the library files be installed',
   "$prefix/share/makepp";
 our $setdatadir;
 if ($datadir !~ /^\//) {	# Make a relative path absolute.
@@ -75,46 +133,23 @@ if ($datadir !~ /^\//) {	# Make a relative path absolute.
   $setdatadir = "\$datadir = '$datadir';";
 }
 
-# deprecated prior installation may not have supported .makepp/*.mk files
--r "$datadir/FileInfo_makepp.pm" and
-  (stat "$datadir/FileInfo_makepp.pm")[9] < 1102710870 || # check-in time
-  do {
-    my $found;
-    open F, "$datadir/FileInfo_makepp.pm";
-    while( <F> ) {
-      $found = 1, last if /build_info_subdir.+\.mk/;
-    }
-    !$found;
-  } and
-  print '
-Warning: the names of the metainformation files under .makepp have changed
-with regard to your old installation of makepp.  Every user must issue the
-following command at the tops of their build trees, to prevent the new makepp
-from rebuilding everything.  Or sysadmins installing this version can issue
-the command for the whole machine from the root directory.
-
-  find `find . -name .makepp` -type f | xargs -i mv {} {}.mk
-
-';
-
-$mandir = shift @ARGV || read_with_prompt("
+$mandir = ARGV_or_prompt '
 Where should the manual pages be installed?
 Enter \"none\" if you do not want the manual pages.
-Man directory [$prefix/man]: ") ||
-  "$prefix/man";
+Man directory',
+  sub { my $d = "$prefix/share/man"; -d $d ? $d : "$prefix/man" };
 our $noman = $mandir eq 'none' ? 1 : '';
 
-$htmldir = shift @ARGV || read_with_prompt("
+$htmldir_val = $htmldir = ARGV_or_prompt '
 Where should the HTML documentation be installed?
-Enter \"none\" if you do not want any documentation installed.
-HTML documentation directory [$prefix/share/makepp/html]: ") ||
-  "$prefix/share/makepp/html";
-$htmldir_val = $htmldir;
+Enter "none" if you do not want any documentation installed.
+HTML documentation directory',
+  sub { my $d = "$prefix/share/doc"; -d $d ? "$d/makepp" : "$datadir/html" };
 
-my $findbin = shift @ARGV;
-defined($findbin) or $findbin = read_with_prompt("
+my $findbin = ARGV_or_prompt "
 Where should the library files be sought relative to the executable?
-Enter \"none\" to seek in $datadir [none]: ") || "none";
+Enter \"none\" to seek in $datadir",
+  "none";
 $findbin=0 if $findbin eq "none";
 if($findbin) {
   $setdatadir = "use FindBin;\n" .
@@ -125,6 +160,8 @@ if($findbin) {
 
 my $destdir = shift @ARGV;
 
+my %abbrev;			# which commands have a short form
+
 if( $destdir ) {
   for( $bindir, $datadir, $mandir, $htmldir_val ) {
     s/^/$destdir/o if defined;
@@ -133,39 +170,6 @@ if( $destdir ) {
 
 mkpath "$datadir/$_" for
   qw(Mpp Mpp/ActionParser Mpp/BuildCheck Mpp/CommandParser Mpp/Fixer Mpp/Scanner Mpp/Signature);
-
-our $useoldmodules = '';
-if( $ENV{MAKEPP_INSTALL_OLD_MODULES} ) {
-  warn "MAKEPP_INSTALL_OLD_MODULES is deprecated.\n";
-  my %packages =		# The renamed or multipackage cases.
-   (BuildCache => [qw(BuildCache BuildCache BuildCache::Entry)],
-    FileInfo => ['FileInfo=File'],
-    FileInfo_makepp => [qw(FileInfo_makepp=FileOpt FileInfo_makepp=File)],
-    Makecmds => ['Makecmds=Cmds'],
-    MakeEvent =>
-      [qw(MakeEvent=Event MakeEvent=Event MakeEvent::Process=Event::Process MakeEvent::WaitingSubroutine=Event::WaitingSubroutine)],
-    Makesubs => ['Makesubs=Subs'],
-    Rule => [qw(Rule Rule DefaultRule DefaultRule::BuildCheck)],
-    TextSubs => ['TextSubs=Text']);
-  for $module ( split ' ', $ENV{MAKEPP_INSTALL_OLD_MODULES} ) {
-    $useoldmodules .= "use $module ();\n"
-      if $module =~ s/\+//;
-    $module = $packages{$module} || [$module]; # Create simple cases on the fly.
-    my( $old, $new ) = shift @$module;
-    $new = ($old =~ s/=(.+)//) ? $1 : $old;
-    my $file = $old;
-    if( $file =~ s!(.+)::!$1/! ) {
-      -d "$datadir/$1" or mkpath "$datadir/$1";
-    }
-    open my $fh, '>', "$datadir/$file.pm" or die "can't create $old.pm\n";
-    print $fh "# generated backwards compatibility wrapper\nuse Mpp::$new;\n";
-    for( @$module ? @$module : "$old=$new" ) {
-      $new = (s/=(.+)//) ? $1 : $_;
-      print $fh "%${_}:: = %Mpp::${new}::;\n";
-    }
-    print $fh '1;';
-  }
-}
 
 $ENV{_MAKEPP_INSTALL} = 1;
 substitute_file( $_, $bindir, 0755, 1 ) for
@@ -189,8 +193,6 @@ foreach $module (qw(../Mpp
 
 		    Fixer/Automake Fixer/CMake
 
-		    ActionParser/Legacy ActionParser/Specific
-
 		    Scanner Scanner/C Scanner/Esqlc Scanner/Swig Scanner/Vera
 		    Scanner/Verilog
 
@@ -203,7 +205,7 @@ foreach $module (qw(../Mpp
 
 our $explicit_perl = '';
 {
-  local $SIG{__WARN__}= sub {};
+  local $SIG{__WARN__} = sub {};
   $explicit_perl = "Mpp::PERL . ' ' ."
     if $destdir || system "$bindir/makeppinfo -qknone makepp"; # zero if executable, output nothing
 }
@@ -232,7 +234,7 @@ if( $htmldir_val ne 'none' ) {
     my $absre = is_windows ? qr/^\/|^[a-z]:/i : qr/^\//; # compensate chdir pod above
     $Mpp::html::target_dir = $htmldir_val =~ $absre ? $htmldir_val : "../$htmldir_val";
   }
-  require 'html/html.pl';		# fix what Pod::Html does
+  require './html/html.pl';		# fix what Pod::Html does
   &Mpp::html::pods2html;
 }
 
@@ -240,19 +242,27 @@ if( $htmldir_val ne 'none' ) {
 # Install the man pages:
 #
 if( $mandir ne 'none' ) {
+  my $gzip = </usr/{,local/,gnu/}{,share/}man/**/*.[1-9]*.gz> ? '.gz' : ''; # Does this OS gzip them?
   mkpath "$mandir/man1";
   require Pod::Man;
   my %options = qw(errors pod
 		   center Makepp
 		   lax 1);
   my $parser = Pod::Man->new( %options );
+  $abbrev{makepp_build_cache} = 'mppbcc'; # special case command documented with feature description
   for my $file (@pods) {
     next if $file eq 'makepp_index.pod'; # html only
-    my $manfile = $file;
-    $manfile =~ s/\.pod$/.1/;   # Get the name of the man file.
-    $parser->parse_from_file( $file, "$mandir/man1/$manfile" );
-    chmod 0644, "$mandir/man1/$manfile";
+    my $basename = substr $file, 0, -4;   # Get the name of the man file.
+    my $manfile = "$mandir/man1/$basename.1";
+    $parser->parse_from_file( $file, $manfile );
+    chmod 0644, $manfile;
+    system 'gzip', '-f9', $manfile and $gzip = '' if $gzip;
+    my $abbrev = $abbrev{$basename};
+    link "$mandir/man1/$basename.1$gzip", "$mandir/man1/$abbrev.1$gzip" or
+      symlink "$basename.1$gzip", "$mandir/man1/$abbrev.1$gzip" if $abbrev;
   }
+  link "$mandir/man1/makepp_build_cache.1$gzip", "$mandir/man1/makepp_build_cache_control.1$gzip" or
+    symlink "makepp_build_cache.1$gzip", "$mandir/man1/makepp_build_cache_control.1$gzip";
 }
 
 print "makepp successfully installed.\n";
@@ -260,7 +270,7 @@ print "makepp successfully installed.\n";
 #
 # This subroutine makes a copy of an input file, substituting all occurrences
 # of @xyz@ with the Perl variable $xyz.  It also fixes up the header line
-# "#!/usr/bin/perl" if it sees one.  On Win also create a .bat to call it.
+# "#!/usr/bin/env perl" if it sees one.  On Win also create a .bat to call it.
 #
 # Arguments:
 # a) The input file.
@@ -272,7 +282,7 @@ sub substitute_file {
   my ($infile, $outdir, $prot, $abbrev) = @_;
 
   local *INFILE;
-  open INFILE, $infile or die "$0: can't read file $infile--$!\n";
+  open INFILE, '<', $infile or die "$0: can't read file $infile--$!\n";
   mkpath($outdir);
 
   open OUTFILE, "> $outdir/$infile" or die "$0: can't write to $outdir/$infile--$!\n";
@@ -280,7 +290,7 @@ sub substitute_file {
   local $_;
   my $perl = PERL;
   while( <INFILE> ) {
-    s@^\#!\s*(\S+?)/perl(\s|$)@\#!$perl$2@o	# Handle #!/usr/bin/perl.
+    s@^#!\s*(/usr/bin/env )perl@$perl =~ tr!/!! ? "#!$perl -w" : "#!$1$perl"@oe
        if $. == 1;
     s/\\?\@(\w+)\@/$$1/g;		# Substitute anything containg @xyz@.
     if( /^#\@\@(\w+)/ ) {		# Substitute anything containg #@@xyz ... #@@
@@ -298,7 +308,7 @@ sub substitute_file {
   chmod $prot, "$outdir/$infile";
   if( is_windows > 0 && $prot == 0755 ) {
     open my $outfile, "> $outdir/$infile.bat" or die "$0: can't write to $outdir/$infile.bat--$!\n";
-    print $outfile '@' . PERL . " $outdir/$infile %1 %2 %3 %4 %5 %6 %7 %8 %9\n";
+    print $outfile "\@$perl $outdir/$infile %1 %2 %3 %4 %5 %6 %7 %8 %9\n";
     close $outfile;
   }
   if( $abbrev ) {
@@ -307,8 +317,9 @@ sub substitute_file {
       no warnings 'uninitialized';
       s/makepp(?:_?(.)[^_]+(?:_(.)[^_]+(?:_(.)[^_]+)?)?)?/mpp$1$2$3/;
     }
+    $abbrev{$infile} = $_;
     link "$outdir/$infile", "$outdir/$_"
-      or symlink "$outdir/$infile", "$outdir/$_";
+      or symlink $infile, "$outdir/$_";
     unless( -f "$outdir/$_" ) {
       copy "$outdir/$infile", "$outdir/$_";
       chmod $prot, "$outdir/$_";
@@ -317,30 +328,5 @@ sub substitute_file {
   }
 }
 
-sub read_with_prompt {
-  local $| = 1;			# Enable autoflush on STDOUT.
-
-  print @_;			# Print the prompt.
-  $_ = <STDIN>;			# Read a line.
-  chomp $_;
-#
-# Expand environment variables and home directories.
-#
-  s/\$(\w+)/$ENV{$1}/g;		# Expand environment variables.
-  if (s/^~(\w*)//) {		# Is there a ~ expansion to do?
-    if ($1 eq '') {
-      $_ = "$ENV{HOME}$_";
-    } else {
-      my ($name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = getpwnam($1);
-				# Expand from the passwd file.
-      if ($dir) {		# Found it?
-	$_ = "$dir$_";
-      } else {
-	$_ = "~$1";		# Not found.  Just put the ~ back.
-      }
-    }
-  }
-  $_;
-}
 __DATA__
 Dummy line for newline test.

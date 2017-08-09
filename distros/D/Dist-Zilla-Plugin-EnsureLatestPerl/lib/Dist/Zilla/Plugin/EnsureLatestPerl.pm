@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.004-2-g1e86dfa
+package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.005-2-gffd82be
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ensure the author is releasing using the latest Perl
 # KEYWORDS: plugin release develop author perl version latest
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::EnsureLatestPerl - Ensure the author is releasing using the
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

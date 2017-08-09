@@ -7,7 +7,6 @@ use Test::Deep '!none';
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny 0.062;
-use Module::Runtime 'require_module';
 use List::Util 1.33 'none';
 
 use Test::Needs qw(
@@ -21,10 +20,13 @@ use Helper;
 use NoNetworkHits;
 use NoPrereqChecks;
 
+
 subtest 'installer = MakeMaker' => sub {
+    my $tempdir = no_git_tempdir();
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     'GatherDir',
@@ -64,14 +66,9 @@ subtest 'installer = MakeMaker' => sub {
     );
 
     my $build_dir = path($tzil->tempdir)->child('build');
-    my @found_files;
-    $build_dir->visit(
-        sub { push @found_files, $_->relative($build_dir)->stringify if -f },
-        { recurse => 1 },
-    );
 
     cmp_deeply(
-        \@found_files,
+        [ recursive_child_files($build_dir) ],
         all(
             superbagof('Makefile.PL'),
             code(sub { none { $_ eq 'Build.PL' } @{$_[0]} }),
@@ -96,14 +93,12 @@ subtest 'installer = MakeMaker' => sub {
 };
 
 subtest 'installer = MakeMaker, ModuleBuildTiny' => sub {
-    SKIP: {
-    # MBT is already a prereq of things in our runtime recommends list
-    skip('[ModuleBuildTiny] not installed', 9)
-        if not eval { require_module 'Dist::Zilla::Plugin::ModuleBuildTiny'; 1 };
+    my $tempdir = no_git_tempdir();
 
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     'GatherDir',
@@ -159,18 +154,13 @@ subtest 'installer = MakeMaker, ModuleBuildTiny' => sub {
             methods(default_jobs => 9),
             methods(default_jobs => 9),
         ],
-        'installer configuration settings are properly added to the payload',
+        'installer configuration settings are properly added to both installer payloads',
     );
 
     my $build_dir = path($tzil->tempdir)->child('build');
-    my @found_files;
-    $build_dir->visit(
-        sub { push @found_files, $_->relative($build_dir)->stringify if -f },
-        { recurse => 1 },
-    );
 
     cmp_deeply(
-        \@found_files,
+        [ recursive_child_files($build_dir) ],
         superbagof(qw(
             Makefile.PL
             Build.PL
@@ -192,12 +182,14 @@ subtest 'installer = MakeMaker, ModuleBuildTiny' => sub {
 
     diag 'got log messages: ', explain $tzil->log_messages
         if not Test::Builder->new->is_passing;
-} };
+};
 
 subtest 'installer = none' => sub {
+    my $tempdir = no_git_tempdir();
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     'GatherDir',
@@ -244,14 +236,11 @@ subtest 'installer = none' => sub {
 };
 
 subtest 'installer = ModuleBuildTiny, StaticInstall.mode = off' => sub {
-    SKIP: {
-    # MBT is already a prereq of things in our runtime recommends list
-    skip('[ModuleBuildTiny] not installed', 8)
-        if not eval { require_module 'Dist::Zilla::Plugin::ModuleBuildTiny'; 1 };
-
+    my $tempdir = no_git_tempdir();
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     'GatherDir',
@@ -325,6 +314,117 @@ subtest 'installer = ModuleBuildTiny, StaticInstall.mode = off' => sub {
 
     diag 'got log messages: ', explain $tzil->log_messages
         if not Test::Builder->new->is_passing;
-} };
+};
+
+foreach my $static (undef, 'off', 'on')
+{
+    subtest 'default installer (MakeMaker::Fallback, ModuleBuildTiny::Fallback), StaticInstall.mode = ' . ($static // '<undef>') => sub {
+        my $tempdir = no_git_tempdir();
+        my $tzil = Builder->from_config(
+            { dist_root => 'does-not-exist' },
+            {
+                tempdir_root => $tempdir->stringify,
+                add_files => {
+                    path(qw(source dist.ini)) => simple_ini(
+                        'GatherDir',
+                        [ '@Author::ETHER' => {
+                            '-remove' => \@REMOVED_PLUGINS,
+                            server => 'none',
+                            'RewriteVersion::Transitional.skip_version_provider' => 1,
+                            'Test::MinimumVersion.max_target_perl' => '5.008',
+                            defined $static ? ( 'StaticInstall.mode' => $static ) : (),
+                          },
+                        ],
+                    ),
+                    path(qw(source lib MyDist.pm)) => "package MyDist;\n\n1",
+                    path(qw(source Changes)) => '',
+                },
+            },
+        );
+
+        assert_no_git($tzil);
+
+        $tzil->chrome->logger->set_debug(1);
+        is(
+            exception { $tzil->build },
+            undef,
+            'build proceeds normally',
+        );
+
+        # check that everything we loaded is properly declared as prereqs
+        all_plugins_in_prereqs($tzil,
+            exempt => [ 'Dist::Zilla::Plugin::GatherDir' ],     # used by us here
+            additional => [
+                'Dist::Zilla::Plugin::MakeMaker',               # via installer option
+                'Dist::Zilla::Plugin::MakeMaker::Fallback',     # ""
+                'Dist::Zilla::Plugin::ModuleBuild',             # ""
+                'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback', # ""
+            ],
+        );
+
+        my $meta_static = (!defined $static or $static eq 'on') ? 1 : 0;
+        is($tzil->distmeta->{x_static_install}, $meta_static,
+            'build is marked ' . ($meta_static ? '' : 'in' ) . 'eligible for static install');
+
+        cmp_deeply(
+            [
+                $tzil->plugin_named('@Author::ETHER/MakeMaker::Fallback'),
+                $tzil->plugin_named('@Author::ETHER/ModuleBuildTiny::Fallback'),
+            ],
+            [
+                methods(default_jobs => 9),
+                methods(default_jobs => 9),
+            ],
+            'installer configuration settings are properly added to both installer payloads',
+        );
+
+        cmp_deeply(
+            [
+                ($tzil->plugin_named('@Author::ETHER/ModuleBuildTiny::Fallback')->plugins)[1],  # MBT
+                $tzil->plugin_named('@Author::ETHER/StaticInstall'),
+            ],
+            [
+                methods(static => (
+                                    !defined $static ? 'auto'       # default, when not twiddled by config
+                                  : $static eq 'off' ? 'no'
+                                  : $static eq 'on'  ? 'auto'       # default, when not twiddled by bundle
+                                  : die $static)
+                            ),
+                methods(mode => (
+                                    !defined $static ? 'auto'       # default, when not twiddled by config
+                                  : $static),                       # set by bundle
+                        dry_run => 0,                               # false when authority=ETHER
+                       ),
+            ],
+            'appropriate configurations are passed for static install',
+        );
+
+        my $build_dir = path($tzil->tempdir)->child('build');
+
+        cmp_deeply(
+            [ recursive_child_files($build_dir) ],
+            superbagof(qw(
+                Makefile.PL
+                Build.PL
+            )),
+            'both Makefile.PL and Build.PL were generated by the pluginbundle',
+        );
+
+        my $prereq_reporter = path($build_dir)->child('t', '00-report-prereqs.t')->slurp_utf8;
+        like(
+            $prereq_reporter,
+            qr/^use Module::Metadata;$/m,
+            'Module::Metadata is used as the version extractor for [Test::ReportPrereqs]',
+        );
+        unlike(
+            $prereq_reporter,
+            qr/^use ExtUtils::MakeMaker;$/m,
+            'EUMM is not used as the version extractor for [Test::ReportPrereqs]',
+        );
+
+        diag 'got log messages: ', explain $tzil->log_messages
+            if not Test::Builder->new->is_passing;
+    };
+}
 
 done_testing;

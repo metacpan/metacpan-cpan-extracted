@@ -53,7 +53,7 @@ else {
 
 my $output = read_warnings($warnings_file);
 
-is $output, 'got lock:exiting:got lock:exiting:got lock:exiting';
+is $output, 'got lock:releasing lock:got lock:releasing lock:got lock:releasing lock';
 
 # shim a delay in before logit() so that it will wait for the child process
 # to enter the critical section
@@ -77,8 +77,9 @@ sub run_processes {
         my $msg = shift;
 
         # we only want the "got lock" and "exiting" lines
-        if ($msg =~ /got lock/ or $msg =~ /exiting/) {
-            # strip off pid numbers from front of message
+        if ($msg =~ /got lock/ or $msg =~ /releasing/) {
+            # strip off dates and pid numbers from front of message
+            $msg = substr($msg, 25);
             $msg =~ s/^[0-9]+ //;
 
             # save in the warnings file
@@ -106,8 +107,6 @@ sub run_processes {
             $file->log(level => 'info', message => "parent\n");
         }
     }
-
-    warn "$$ exiting\n";
 
     delete $SIG{__WARN__};
     close $warnfh;

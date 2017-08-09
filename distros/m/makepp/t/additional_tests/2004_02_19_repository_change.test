@@ -1,7 +1,7 @@
 ###	SPAR <http://www.cpan.org/scripts/>
 ###	1	775	1168790726	1329052044	is_relevant.pl
 have_cc and is_windows ? makepp( '-n' ) : 1; # Let makepp test if it uses a symlink capable compiler.
-###	54	644	1159479798	1342866037	makepp_test_script.pl
+###	61	644	1159479798	1381667483	makepp_test_script.pl
 sub sed_17($) {
   # Make sure that the foo.c timestamp changes
   wait_timestamp 'foo.c';
@@ -15,7 +15,7 @@ sub from_rep($) {
   /FROM_REPOSITORY/ and return while <$in>;
 
   open my $out, ">>$_[0]";
-  print $out "Lost repository\n";
+  print $out "No repository\n";
 }
 
 c_cp qw(M foo/Makeppfile);
@@ -28,32 +28,39 @@ c_cp qw(M foo/Makeppfile);
 c_cp qw(foo/f.c foo/foo.c);
 makepp qw(-R foo/bar=foo foo/bar/x);
 
+from_rep 'x0';
+
 sed_17 18;
 makepp qw(-R foo/bar=foo foo/bar/x);
 
-from_rep 'x';
+from_rep 'x1';
 
-c_cp qw(foo/f.c foo/foo.c);
+makepp \'clean', '--only-repository-links', 'foo/bar';
+c_cp qw(foo/f.c foo/foo.c);	# If we had not just cleaned, this would sometimes invalidate foo/bar/foo.c!
+wait_timestamp 'foo/bar/foo';
 makepp 'foo/x';
+
+wait_timestamp 'foo/foo', 'foo/bar/foo';
+# This should pick up x from foo/
+makepp qw(-R foo/bar=foo foo/bar/x);
+
+from_rep 'x2';
+
+sed_17 18;
+# Don't check signatures (\''), because foo/bar/* is out of date
+makepp \'', 'foo/x';
 makepp \'clean', '--only-repository-links', 'foo/bar';
 
 # This should pick up x from foo/
 makepp qw(-R foo/bar=foo foo/bar/x);
 
-sed_17 18;
-makepp 'foo/x';
-makepp \'clean', '--only-repository-links', 'foo/bar';
-
-# This should pick up x from foo/
-makepp qw(-R foo/bar=foo foo/bar/x);
-
-from_rep 'y';
+from_rep 'x3';
 
 sed_17 19;
 # Now it should recompile, but still remember that foo.c comes from a repos
 makepp qw(-R foo/bar=foo foo/bar/x);
 
-from_rep 'z';
+from_rep 'x4';
 
 1;
 ###	5	644	1077141637	1186229250	Makeppfile
@@ -77,9 +84,13 @@ int main() {
 }
 ###	D	755	1077216767	1077216766	foo/bar
 ###	D	755	1077216766	1077216761	answers
-###	1	644	1077144030	1077144018	answers/x
+###	1	644	1077144030	1077144018	answers/x0
+17
+###	1	644	1077144030	1077144018	answers/x1
 18
-###	1	644	1077216767	1077216761	answers/y
+###	1	644	1077216767	1077216761	answers/x2
+17
+###	1	644	1077216767	1077216761	answers/x3
 18
-###	1	644	1077216767	1077216761	answers/z
+###	1	644	1077216767	1077216761	answers/x4
 19

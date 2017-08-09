@@ -7,7 +7,7 @@ use Config;
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '0.75'; # VERSION
+our $VERSION = '0.91'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -46,7 +46,12 @@ sub init
 
   my $plugin = $self->_pick;
   Alien::Build->log("Using PkgConfig plugin: $plugin");
-    
+  
+  if(ref($self->pkg_name) eq 'ARRAY')
+  {
+    $meta->add_requires('configure', 'Alien::Build::Plugin::PkgConfig::Negotiate' => '0.79');
+  }
+  
   $self->subplugin($plugin,
     pkg_name        => $self->pkg_name,
     minimum_version => $self->minimum_version,
@@ -69,7 +74,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 0.75
+version 0.91
 
 =head1 SYNOPSIS
 

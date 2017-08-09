@@ -11,7 +11,9 @@ t/pod-coverage.t
 t/pod.t
 t/01-combine-file-dev.t
 t/02-combine-file-prod.t
+t/03-combine-file-prod-v2.t
 t/app.pl
+t/app-v2.pl
 t/assets
 t/assets/templates
 t/assets/templates/2.html

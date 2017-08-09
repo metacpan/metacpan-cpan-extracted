@@ -1,0 +1,55 @@
+Centrifugo::Client
+
+Centrifugo::Client : A server-side Perl client for centrifugo
+
+https://github.com/Orabig/centrifugo-perl-client
+
+This module can be used to connect to a Centrifugo server with WebSockets.
+
+More info about Centrifugo :
+https://github.com/centrifugal/centrifugo or https://fzambia.gitbooks.io/centrifugal/content/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make install
+	
+or simply use cpanminus:
+
+	cpanm Centrifugo::Client
+	
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Centrifugo::Client
+
+EXAMPLE
+
+Note : To connect to a Centrifugo instance, your program should first ask for a TOKEN. This part is not covered by this module, because it is implementation-dependant.
+
+	use Centrifugo::Client;
+	use AnyEvent;
+
+	my $cclient = Centrifugo::Client->new("$CENTRIFUGO_WS/connection/websocket");
+
+	$cclient->connect(
+		user      => $USER_ID,
+		timestamp => $TIMESTAMP,
+		token     => $TOKEN
+	) -> on('connect', sub{
+		my ($infoRef)=@_;
+		print "Connected to Centrifugo version ".$infoRef->{version};
+		# When connected, connect to some channel
+		$cclient->subscribe( $CHANNEL );
+	})-> on('message', sub{
+		my ($infoRef)=@_;
+		print "Received message : ".encode_json $infoRef->{data};
+	});
+
+	# Now start the event loop to keep the program alive
+	AnyEvent->condvar->recv;

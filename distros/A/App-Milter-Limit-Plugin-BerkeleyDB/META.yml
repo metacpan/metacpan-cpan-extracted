@@ -2,25 +2,40 @@
 abstract: 'BerkeleyDB driver for App::Milter::Limit'
 author:
   - 'Michael Schout <mschout@cpan.org>'
-build_requires: {}
+build_requires:
+  Data::Section: '0'
+  Fatal: '0'
+  Net::Milter: '0'
+  Path::Tiny: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  Text::Template: '0'
+  Time::HiRes: '0'
+  lib: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.11
-generated_by: 'Dist::Zilla version 1.100760'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Milter-Limit-Plugin-BerkeleyDB
 requires:
-  App::Milter::Limit::Log: 0
-  App::Milter::Limit::Plugin: 0
-  BerkeleyDB: 0
-  Class::Accessor: 0
-  Module::Signature: 0
-  Socket: 0
-  Test::More: 0
+  App::Milter::Limit::Log: '0'
+  App::Milter::Limit::Plugin: '0'
+  BerkeleyDB: '0'
+  Class::Accessor: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit-Plugin-BerkeleyDB
   homepage: http://search.cpan.org/dist/App-Milter-Limit-Plugin-BerkeleyDB/
-  repository: http://github.com/mschout/milter-limit-plugin-berkeleydb
-version: 0.51
+  repository: git://github.com/mschout/milter-limit-plugin-berkeleydb.git
+version: '0.52'
+x_serialization_backend: 'YAML::Tiny version 1.69'

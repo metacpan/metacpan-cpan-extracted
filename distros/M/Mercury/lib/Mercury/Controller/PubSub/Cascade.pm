@@ -1,5 +1,5 @@
 package Mercury::Controller::PubSub::Cascade;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Pub/sub controller with a topic heirarchy and cascading
 
 #pod =head1 SYNOPSIS
@@ -14,7 +14,7 @@ our $VERSION = '0.012';
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This controller enables a L<pub/sub pattern|Mercury::Pattern::PubSub> on
+#pod This controller enables a L<pubE<sol>sub pattern|Mercury::Pattern::PubSub> on
 #pod a pair of endpoints (L<publish|/publish> and L<subscribe|/subscribe>.
 #pod
 #pod In this variant, topics are organized into a heirarchy. Subscribers can
@@ -162,7 +162,7 @@ Mercury::Controller::PubSub::Cascade - Pub/sub controller with a topic heirarchy
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ version 0.012
 
 =head1 DESCRIPTION
 
-This controller enables a L<pub/sub pattern|Mercury::Pattern::PubSub> on
+This controller enables a L<pubE<sol>sub pattern|Mercury::Pattern::PubSub> on
 a pair of endpoints (L<publish|/publish> and L<subscribe|/subscribe>.
 
 In this variant, topics are organized into a heirarchy. Subscribers can

@@ -1,4 +1,4 @@
-# $Id: File.pm,v 1.104 2012/06/09 20:36:48 pfeiffer Exp $
+# $Id: File.pm,v 1.108 2014/08/03 21:12:36 pfeiffer Exp $
 
 package Mpp::File;
 require Exporter;
@@ -123,18 +123,11 @@ Mpp::File can be used alone.  Some supplemental routines useful only in the
 context of makepp are found in Mpp/FileOpt.pm, and in fact that file
 overrides some of the routines here.
 
-=cut
+=head2 STAT_MODE, STAT_NLINK, STAT_SIZE, STAT_MTIME, STAT_DEV
 
-#
-# We only store the subset of (l)stat values which makepp needs.  This reduces
-# makepp's memory footprint by 1.5% and execution time by 4% compared to the
-# 13-element array.
-#
-BEGIN {
-  *AS_ROOT = $Mpp::Text::N[$> ? 0 : 1];
-  # These consts correspond to real stat indexes 2, 3, 7, 9, 0 as use in lstat_array
-  (*STAT_MODE, *STAT_NLINK, *STAT_SIZE, *STAT_MTIME, *STAT_DEV) = @Mpp::Text::N;
-}
+We only store the subset of (l)stat values which makepp needs.  This reduces
+makepp's memory footprint by 1.5% and execution time by 4% compared to the
+13-element array.
 
 =head2 case_sensitive_filenames
 
@@ -148,7 +141,7 @@ coming from a case-sensitive file system.
 This routine is just a guess.  We look at the current directory to see if it
 looks case sensitive, and switch makepp into the appropriate mode.
 
-=head2 $stat_exe_separate
+=head2 stat_exe_separate
 
 On Windows this is true if you can't stat 'xyz', when only 'xyz.exe' exists.
 That is ActiveState at least until 5.10.0 and possibly older Cygwin versions.
@@ -156,6 +149,10 @@ That is ActiveState at least until 5.10.0 and possibly older Cygwin versions.
 =cut
 
 BEGIN {
+  *AS_ROOT = $Mpp::Text::N[$> ? 0 : 1];
+  # These consts correspond to real stat indexes 2, 3, 7, 9, 0 as use in lstat_array
+  (*STAT_MODE, *STAT_NLINK, *STAT_SIZE, *STAT_MTIME, *STAT_DEV) = @Mpp::Text::N;
+
   my $done;
   if( exists $ENV{MAKEPP_CASE_SENSITIVE_FILENAMES} ) {
     *case_sensitive_filenames = $Mpp::Text::N[$ENV{MAKEPP_CASE_SENSITIVE_FILENAMES} ? 1 : 0];
@@ -440,7 +437,7 @@ The optional second argument specifies a directory the file name
 should be relative to.	By default, this is the current directory.
 
   foreach (@{dir_contents( $finfo )}) {
-    exists_or_can_be_built( $_ ) or next;	# Skip if file doesn't exist.
+    exists_or_can_be_built( $_, 0 ) or next;	# Skip if file doesn't exist.
 				# (Files which don't exist can have Mpp::File
 				# entries, if you happened to call
 				# file_info on them explicitly.)
@@ -683,7 +680,7 @@ sub is_readable {
   if( S_ISDIR $stat->[STAT_MODE] ) {	# A directory?
     opendir my $fh, &absolute_filename or return undef;
   } else {
-    open my $fh, &absolute_filename or return undef;
+    open my $fh, '<', &absolute_filename or return undef;
   }
 
   $finfo->{IS_READABLE} = 1; # File is readable.
@@ -904,7 +901,7 @@ sub check_for_change {
 				# Get the signature again.  If it hasn't
 				# changed, then don't dump the build info.
     warn '`'.&absolute_filename."' changed without my knowledge\n".
-      "but you got lucky this time because its signature changed\n" if $sig_date_size;
+      "  but you got lucky this time because its signature changed\n" if $sig_date_size;
     delete @{$finfo}{qw(BUILD_INFO xUPDATE_BUILD_INFOS)};
   }
 }
@@ -1102,7 +1099,7 @@ Removes the file and marks it in the cache as non-existent.
 =cut
 
 sub unlink {
-  my $fileinfo = $_[0];		# Get the Mpp::File struct.
+  #my $finfo = $_[0];		# Get the Mpp::File struct.
 
   CORE::unlink &absolute_filename_nolink; # Delete the file.
   delete @{$_[0]}{qw(xEXISTS LSTAT SIGNATURE LINK_DEREF HAVE_READ_PERMISSION IS_READABLE)};
@@ -1127,7 +1124,7 @@ sub unlink {
 sub mark_as_directory {
   return if $_[0] == $root;
   $_[0]{DIRCONTENTS} ||= {}; # Mark as a directory.
-  $_[0]{FULLNAME} = &absolute_filename;
+  $_[0]{FULLNAME} ||= &absolute_filename;
 				# We cache the absolute filename for all
 				# directories for performance reasons.
   my $parent = '..';		# Ensure we cache all upwards paths.
@@ -1155,8 +1152,8 @@ sub mark_as_directory {
 # but a rule for the file was learned.
 #
 sub publish {
-  return if exists $_[0]{xPHONY} # Don't do anything if it's a phony target.
-    or exists $_[0]{PUBLISHED} && $_[0]{PUBLISHED} > ($_[1] || 0);
+  #my( $finfo, $level ) = @_;
+  return if exists $_[0]{PUBLISHED} && $_[0]{PUBLISHED} > ($_[1] || 0);
 				# Don't do anything if we already published
 				# this file.
   my( $finfo ) = @_;
@@ -1203,7 +1200,7 @@ own stack.  This is to make sure that no problem arises if the calling
 function may itself have been called with more arguments.  Therefore functions
 with a variable number of arguments should be called with an explicit
 parameter list.  That way the calling function doesn't inherit the weakness of
-a variable list.  The function name can be evited, calling either
+a varying list.  The function name can be evited, calling either
 absolute_filename or relative_filename with 2 args.
 
 Primary functions, i.e. which call no others as &fn, so extra args are ok,

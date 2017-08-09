@@ -1,7 +1,14 @@
 Revision history for Syntax-Feature-QwComments
 
+1.14.0  2017-08-07
+        - Updated to be compatible with Perl 5.26.
+
 1.12.0  2012-05-19
         - Renamed from feature::qw_comments.
+        - Switched from using the keyword plugin to using cv_set_call_parser
+          and cv_set_call_checker for extra robustness.
+        - Added to MANIFEST a test file that was missing from it so that it
+          now gets included in the distribution.
 
 1.10.0  2011-10-26
         - An improper opcode tree was built for an empty qw().

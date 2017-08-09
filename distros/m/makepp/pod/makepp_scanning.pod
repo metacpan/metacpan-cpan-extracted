@@ -2,7 +2,7 @@
 
 makepp_scanning -- How makepp finds include files and other hidden dependencies
 
-=for vc $Id: makepp_scanning.pod,v 1.21 2012/02/07 22:26:15 pfeiffer Exp $
+=for vc $Id: makepp_scanning.pod,v 1.23 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -354,6 +354,7 @@ makepp include file, which gets automatically created by being included.
 
     include $(wildcard *.qrc)	# .makepp is appended automatically
 
-The drawback is that you begin building while reading the makefile.  So the
-L<--stop-after-loading|makepp_command/stop> command option will not be very
-useful.
+Several variants of this are given in the L<Cookbook|makepp_cookbook/How do I
+convert a file into dependencies?>.  The drawback is that you begin building
+while reading the makefile.  So the L<--loop|makepp_command/loop> command
+option will not be so useful on the first iteration.

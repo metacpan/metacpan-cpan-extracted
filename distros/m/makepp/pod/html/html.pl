@@ -1,11 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # This script does the pod to html generation with some heavy massageing.
 #
-# $Id: html.pl,v 1.11 2012/10/25 21:15:41 pfeiffer Exp $
+# $Id: html.pl,v 1.18 2015/08/09 16:24:51 pfeiffer Exp $
 #
 
-#use Pod::Html ();		# import module as they sometimes break backwards compatibility
+#use Pod::Html ();		# Stole module to have consistent id-attributes.
 BEGIN {package
 # hide from CPAN parser
 Pod::Html;
@@ -161,6 +161,7 @@ sub pod2html {
 	if ($Podfile and $Podfile ne '-') {
 	    open $pod, '<', $Podfile
 		or die "$0: cannot open $Podfile file for input: $!\n";
+	    binmode $pod, ':utf8' if $] > 5.008; # suppress warning
 	} else {
 	    open $pod, '-';
 	}
@@ -222,6 +223,7 @@ sub pod2html {
     if($Htmlfile and $Htmlfile ne '-') {
         open $html, ">", $Htmlfile
             or die "$0: cannot open $Htmlfile file for output: $!\n";
+	binmode $html, ':utf8' if $] > 5.008; # suppress warning
     } else {
         open $html, ">-";
     }
@@ -280,7 +282,7 @@ END_OF_BLOCK
 
     print $html <<END_OF_HEAD;
 <?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>$Title</title>$csslink
@@ -897,7 +899,7 @@ sub emit_item_tag {
 
     print $fh '<strong>';
     if ($Items_Named{$item}++) {
-	print $fh process_text( \$otext );
+	print $fh &process_text( \$otext );
     } else {
         my $name = $item;
         $name = anchorify($name);
@@ -2055,6 +2057,7 @@ my @nav =
       makepp_tutorial
       makepp_tutorial_compilation
       makepp_release_notes
+      makepp_compatibility
       makepp_incompatibilities
       makepp_speedup
       perl_performance)],
@@ -2125,6 +2128,7 @@ sub init {
 &init;
 
 
+our $sitesearch = '/2.1';
 sub frame($$$) {
   my( $file, $tab ) = @_;
   my( $head, $body ) = split "\f", $_[2];
@@ -2132,9 +2136,9 @@ sub frame($$$) {
 
   my $tabs = '';
   for my $meta ( @tabmeta ) {
-    my $on = $tab eq $meta->[1] ? '_on' : '';
+    $tab eq $meta->[1] or
     $tabs .=
-      "<a href='$meta->[2]'><img title='$meta->[0]' id='_$meta->[3]$on' src='${docroot}tabs.png' alt='$meta->[1]'/></a>";
+      "<a href='$meta->[2]'><img title='$meta->[0]' id='_$meta->[3]' src='${docroot}tabs.png' alt='$meta->[1]'/></a>";
   }
 
   my $nav = '';
@@ -2160,8 +2164,8 @@ sub frame($$$) {
       "</ul></li>";
   }
   my $ret;
-  for my $piece ( split /(div id='_main'>|<pre>.*?<\/pre>)/s, "<?xml version='1.0'?>
-<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+  for my $piece ( split /(main>|<pre>.*?<\/pre>)/s, "<?xml version='1.0'?>
+<!DOCTYPE html>
  <html xmlns='http://www.w3.org/1999/xhtml'>
 <head>
   <link rel='stylesheet' href='${docroot}makepp.css' type='text/css'/>
@@ -2177,24 +2181,26 @@ sub frame($$$) {
 </head>
 
 <body>
-<div id='_head'>
+<header>
   <form action='http://www.google.com/search'>
     <p>
-      <input type='hidden' name='as_sitesearch' value='makepp.sourceforge.net/2.1'/>
+      <input type='hidden' name='as_sitesearch' value='makepp.sourceforge.net$sitesearch'/>
       <input type='text' name='as_q'/>
       <input type='submit' value='Go'/>
     </p>
   </form>
   <a title='Makepp Homepage' href='$webroot'><img src='${docroot}makepp.png' alt='Makepp'/></a>
   <div>$tabs</div>
-</div>
+</header>
+<nav>
 <ul>
   <li id='_close'>
     <script type='text/javascript'>r()</script>
-    <span title='Flip side' onclick='lr(this)'>\x{2194}</span><span title='Collapse' onclick='roll(this)'>\x{2013}</span><span title='Expand' onclick='roll(this,1)'>\xa4</span><span title='Close' onclick='nonav(this)'>\xd7</span>
+    <span title='Flip side' onclick='lr()'>\x{2194}</span><span title='Collapse' onclick='roll()'>\x{268a}</span><span title='Expand' onclick='roll(true)'>\x{2752}</span><span title='Close' onclick='nonav()'>\xd7</span>
   </li>$nav
 </ul>
-<div id='_main'>$body</div><div id='_clear'/></body></html>" ) {
+</nav>
+<main>$body</main><div id='_clear'/></body></html>" ) {
     if( !$ret ) {		# compact html
       ($ret = $piece) =~ s/>\s+</></g;
     } else {
@@ -2238,7 +2244,7 @@ sub highlight_keywords() {
 }
 
 sub highlight_variables() {
-  s((\$[\{\(]{1,2})([-\w]+)([\}\)]{0,2})){
+  s((\$[{(]{1,2})([-\w]+)([})]{0,2})){
     my( $prefix, $name, $suffix ) = ($1, $2, $3);
     $name = "<b>$name</b>" if
       $name =~ /absolute[_-]filename|
@@ -2290,7 +2296,6 @@ sub highlight_variables() {
 }
 
 sub simplify($$$) {
-  copy $_[0], "/tmp/p2h.$Pod::Html::VERSION" if $_[1] eq 'makepp_signatures';
   open my( $tmpfile ), $_[0] or die;
   binmode $tmpfile, ':utf8' if $] > 5.008; # suppress warning
   my $base = $_[1];
@@ -2384,7 +2389,8 @@ sub simplify($$$) {
 	# unindent initial whitespace which marks <pre> in pod
 	s/^ {1,7}\t(\t*)(?!#)/$1    / or s/^    ?//;
 
-	if( /^\s+$/ ) {
+	if( s/^  $// ) {	# special case for signature, keep exactly the empty lines
+	} elsif( /^ $/ ) {
 	  $next_tall = '<b class="tall"> </b>';
 	  next;
 	} else {
@@ -2452,6 +2458,7 @@ sub simplify($$$) {
     s!\./\./makepp!makepp!g;
     $contents .= $_;
   }
+  $contents =~ s!</pre>\n<pre>(.*?)(?=\n|</pre>)!\n$1<b class="tall"> </b>!g;
 
   if( $timestamp || $author ) {
     $timestamp = ($author ? '<br/>' : '') .

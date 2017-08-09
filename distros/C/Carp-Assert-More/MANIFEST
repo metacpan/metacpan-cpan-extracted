@@ -3,9 +3,13 @@ INSTALL
 MANIFEST
 Makefile.PL
 More.pm
-README
+README.md
 t/00-load.t
+t/assert_all_keys_in.t
+t/assert_arrayref.t
+t/assert_coderef.t
 t/assert_defined.t
+t/assert_empty.t
 t/assert_exists.t
 t/assert_fail.t
 t/assert_hashref.t
@@ -13,6 +17,7 @@ t/assert_in.t
 t/assert_integer.t
 t/assert_is.t
 t/assert_isa.t
+t/assert_isa_in.t
 t/assert_isnt.t
 t/assert_lacks.t
 t/assert_like.t
@@ -26,6 +31,7 @@ t/assert_nonnegative.t
 t/assert_nonref.t
 t/assert_nonzero_integer.t
 t/assert_nonzero.t
+t/assert_numeric.t
 t/assert_positive_integer.t
 t/assert_positive.t
 t/assert_undefined.t

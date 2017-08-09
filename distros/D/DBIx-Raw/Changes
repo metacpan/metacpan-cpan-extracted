@@ -1,5 +1,8 @@
 Revision history for DBIx-Raw
 
+0.16    July 30, 12:09 San Jose, CA
+        Use old_crypt_key for old_crypt.
+
 0.15    January 6, 00:21 San Jose, CA
         Now use Crypt::Mode::CBC::Easy for encryption
 

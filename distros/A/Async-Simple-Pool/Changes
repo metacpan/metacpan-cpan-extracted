@@ -12,3 +12,4 @@ Revision history for Async-Simple-Pool
 0.10    Critical bugfix. Sorry for that.
 0.11    Tests fix for Win*. MANIFEST fix.
 0.12    Tests fix for Win* and Tests timeoust was corrected.
+0.13    Testfixes. Try to support Windows.

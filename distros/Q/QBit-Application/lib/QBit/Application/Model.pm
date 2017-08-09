@@ -1,5 +1,5 @@
 package QBit::Application::Model;
-$QBit::Application::Model::VERSION = '0.014';
+$QBit::Application::Model::VERSION = '0.015';
 use qbit;
 
 use base qw(QBit::Application::Part);
@@ -56,11 +56,7 @@ sub import {
     {
         no strict 'refs';
         *{"${app_pkg}::$opts{'accessor'}"} = sub {
-            my $self = shift;
-
-            $self->{$opts{'accessor'}} = $package->new(app => $self, accessor => $opts{'accessor'})
-              unless exists($self->{$opts{'accessor'}});
-            return $self->{$opts{'accessor'}};
+            return $_[0]->{$opts{'accessor'}} //= $package->new(app => $_[0], accessor => $opts{'accessor'});
         };
     };
 }

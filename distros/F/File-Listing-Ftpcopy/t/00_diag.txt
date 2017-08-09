@@ -1,6 +1,0 @@
-Config::AutoConf
-Math::Int64
-Module::Build
-POSIX
-Test
-Test::More

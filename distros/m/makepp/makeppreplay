@@ -1,5 +1,5 @@
-#!/usr/bin/perl -w
-# $Id: makeppreplay,v 1.17 2012/05/23 18:30:17 pfeiffer Exp $
+#!/usr/bin/env perl
+# $Id: makeppreplay,v 1.24 2016/09/12 20:34:11 pfeiffer Exp $
 
 package Mpp;
 
@@ -7,8 +7,6 @@ use strict;
 
 our $datadir;
 BEGIN {
-  our $VERSION = '@VERSION@';
-
 #@@setdatadir
 #
 # Find the location of our data directory that contains the auxiliary files.
@@ -21,7 +19,7 @@ BEGIN {
 				# See if we can find ourselves in the path.
     foreach( split( /:/, $ENV{'PATH'} ), '.' ) {
 				# Add '.' to the path in case the user is
-				# running it with "perl makepp" even if
+				# running it with "perl makeppreplay" even if
 				# . is not in his path.
       if( -d "$_/Mpp" ) {	# Found something we need?
 	$datadir = $_;
@@ -33,6 +31,7 @@ BEGIN {
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 #@@
   unshift @INC, $datadir;
 }
@@ -44,9 +43,6 @@ use POSIX ();
 use Mpp;
 
 use Mpp::Event qw(wait_for);
-
-#@@useoldmodules
-#@@
 
 our $progname;
 
@@ -96,7 +92,7 @@ sub load_build_info_file($) {
 @ARGV = '.' unless @ARGV;
 my $nothing_in_dir;
 my $found_in_dir = 0;
-perform eval {
+eval {
   while( @ARGV) {
     Mpp::Text::getopts \%command_line_vars, 1,
       ['c', qr/root(?:[-_]?dir(?:ectory)?)?/, \$tmp, undef, sub {
@@ -211,8 +207,8 @@ perform eval {
 	$rule->{COMMAND_STRING},
 	$rule->{TARGETS},
 	[map file_info( $_, $target->{'..'} ), split ' ', $rule->{DEPENDENCY_STRING}] ) ) {
-      print_error "Failed to build target", (@{$rule->{TARGETS}}>1 ? 's' : ''),
-	map( ' `'.absolute_filename( $_ )."'", @{$rule->{TARGETS}} ), " [$status]";
+      warn 'error: Failed to build target', (@{$rule->{TARGETS}}>1 ? 's' : ''),
+	map( ' `'.absolute_filename( $_ )."'", @{$rule->{TARGETS}} ), " [$status]\n";
       Mpp::log RULE_FAILED => $rule
 	if $Mpp::log_level;
       $Mpp::error_found = $status
@@ -269,6 +265,7 @@ perform eval {
     }
   }
 };
+perform;			# Use function w/o args only for final diagnostic.
 
 __DATA__
 [option ...] [VAR=value ...] target ...

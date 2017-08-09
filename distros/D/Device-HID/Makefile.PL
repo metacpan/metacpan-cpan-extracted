@@ -31,13 +31,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Hexdumper" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::HexString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +51,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Alien::HIDAPI" => 0,
   "Carp" => 0,
-  "Data::Hexdumper" => 0,
   "Device::HID::XS" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

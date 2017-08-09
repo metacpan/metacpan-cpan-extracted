@@ -1,6 +1,9 @@
 Revision history for HTTP-Cookies.  The HTTP::Cookies module used to be bundled
 with the libwww-perl distribution.
 
+6.04      2017-08-03 15:05:22Z
+    - Fix package version numbers
+
 6.03      2017-04-03 11:35:35-04:00 America/Toronto
     - No changes since TRIAL release 6.02
 
@@ -12,6 +15,7 @@ with the libwww-perl distribution.
     - Use GitHub Issues instead of RT
     - Stop using bareword filehandles
     - Various internal distribution management and testing changes
+    - Add get_cookies() method
 
 6.01 2012-02-15
     - Restore 5.8.1 compatiblity.

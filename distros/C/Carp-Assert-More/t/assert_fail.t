@@ -3,9 +3,9 @@
 use warnings;
 use strict;
 
-use Test::More tests=>2;
+use Test::More tests => 1;
 
-BEGIN { use_ok( 'Carp::Assert::More' ); }
+use Carp::Assert::More;
 
 eval {
     assert_fail( "Everything is broken!" );

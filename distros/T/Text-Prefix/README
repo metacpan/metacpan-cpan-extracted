@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Text-Prefix,
-version 1.00:
+version 1.01:
 
   Read from stdin and write to stdout with additional useful information prefixed to each line.
 

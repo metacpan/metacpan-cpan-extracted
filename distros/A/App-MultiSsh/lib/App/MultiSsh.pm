@@ -18,7 +18,7 @@ use Path::Tiny;
 use IO::Handle;
 use POSIX qw/:errno_h/;
 
-our $VERSION     = '0.19';
+our $VERSION     = '0.20';
 our @EXPORT_OK   = qw/hosts_from_map is_host multi_run shell_quote tmux/;
 our %EXPORT_TAGS = ();
 
@@ -83,8 +83,8 @@ sub multi_run {
 
     if ($option->{tmux}) {
         my @cmds = map {"ssh $_ " . shell_quote($remote_cmd)} @$hosts;
-        exec tmux(@cmds) if !$option->{test};
-        print tmux(@cmds) . "\n";
+        exec tmux($option, @cmds) if !$option->{test};
+        print tmux($option, @cmds) . "\n";
         return;
     }
 
@@ -94,7 +94,6 @@ sub multi_run {
     # loop over each host and run the remote command
     for my $host (@$hosts) {
         my $cmd = "ssh $host " . shell_quote($remote_cmd);
-        print "$host -\n" if $option->{verbose};
         print "$cmd\n" if $option->{verbose} > 1 || $option->{test};
         next if $option->{test};
 
@@ -116,6 +115,8 @@ sub multi_run {
             elsif ( defined $child ) {
                 # child code
                 if ( $option->{interleave} ) {
+                    print "$host -\n" if $option->{verbose};
+
                     require IPC::Open3::Callback;
                     my ($pid, $in, $out, $err) = IPC::Open3::Callback::safe_open3($cmd);
 
@@ -132,7 +133,7 @@ sub multi_run {
                 else {
                     my $out = `$cmd 2>&1`;
 
-                    print "\n$cmd\n";
+                    print "$host -\n" if $option->{verbose};
                     print $out;
                 }
                 exit;
@@ -142,6 +143,7 @@ sub multi_run {
             }
         }
         else {
+            print "$host -\n" if $option->{verbose};
             system $cmd;
         }
     }
@@ -180,21 +182,30 @@ sub _read_label_line {
 }
 
 sub tmux {
-    my (@commands) = @_;
+    my ($option, @commands) = @_;
 
-    my $layout = layout(@commands);
-    my $tmux   = '';
-    my $pct    = int( 100 / scalar @commands );
+    confess "No commands for tmux to run!\n" if !@commands;
+
+    my $layout  = layout(@commands);
+    my $tmux    = '';
+    my $final = '';
+    my $pct     = int( 100 / scalar @commands );
 
     for my $ssh (@commands) {
-        my $cmd = !$tmux ? 'new-session' : '\\; split-window -d -p ' . $pct;
+        if ( !$tmux && $option->{tmux_nested} ) {
+            $tmux = ' rename-window mssh';
+            $final = '; bash -c ' . shell_quote($ssh);
+        }
+        else {
+            my $cmd = !$tmux ? 'new-session' : '\\; split-window -d -p ' . $pct;
 
-        $tmux .= " $cmd " . shell_quote($ssh);
+            $tmux .= " $cmd " . shell_quote($ssh);
+        }
     }
 
     $tmux .= ' \\; set-window-option synchronize-panes on' if $commands[0] !~ /\s$/xms;
 
-    return "tmux$tmux \\; select-layout tiled \\; setw synchronize-panes";
+    return "tmux$tmux \\; select-layout tiled \\; setw synchronize-panes$final";
 }
 
 sub layout {
@@ -268,7 +279,7 @@ App::MultiSsh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to App::MultiSsh version 0.19
+This documentation refers to App::MultiSsh version 0.20
 
 =head1 SYNOPSIS
 

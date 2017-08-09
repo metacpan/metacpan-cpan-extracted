@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.280801'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - deprecated
   - exceptions
@@ -19,10 +19,10 @@ name: Error
 provides:
   Error:
     file: lib/Error.pm
-    version: '0.17024'
+    version: '0.17025'
   Error::Simple:
-    file: lib/Error.pm
-    version: '0.17024'
+    file: lib/Error/Simple.pm
+    version: '0.17025'
   Error::WarnDie:
     file: lib/Error.pm
   Error::subs:
@@ -35,4 +35,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/shlomif/perl-error.pm
-version: '0.17024'
+version: '0.17025'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

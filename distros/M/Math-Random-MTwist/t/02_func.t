@@ -12,7 +12,7 @@ ok(srand(1_000_686_894) == 1_000_686_894, 'srand');
 ok(irand32() == 2_390_553_143, 'irand32');
 {
   my $i = irand64();
-  ok(!defined $i || $i == 5_527_845_158, 'irand64');
+  ok(!defined $i || $i eq '5527845158', 'irand64');
 }
 ok(rand()   =~ /^0\.9457734/, 'rand');
 ok(rand32() =~ /^0\.3981395/, 'rand32');

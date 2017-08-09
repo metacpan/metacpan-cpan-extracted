@@ -1,7 +1,7 @@
 package Bread::Board::LifeCycle::Singleton::WithParameters;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: singleton lifecycle role for a parameterized service
-$Bread::Board::LifeCycle::Singleton::WithParameters::VERSION = '0.34';
+$Bread::Board::LifeCycle::Singleton::WithParameters::VERSION = '0.35';
 use Moose::Role;
 
 with 'Bread::Board::LifeCycle';
@@ -61,7 +61,7 @@ Bread::Board::LifeCycle::Singleton::WithParameters - singleton lifecycle role fo
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -109,7 +109,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Infinity Interactive.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

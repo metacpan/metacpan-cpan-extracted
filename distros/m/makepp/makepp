@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # Makepp version @VERSION@.
-# $Id: makepp,v 1.213 2012/08/30 21:05:47 pfeiffer Exp $
+# $Id: makepp,v 1.227 2016/09/06 19:59:07 pfeiffer Exp $
 # See @htmldir@/index.html for user documentation.
 #
 
@@ -13,8 +13,6 @@ use strict;
 use Config;
 our $datadir;
 BEGIN {
-  our $VERSION = '@VERSION@';
-
 #@@setdatadir
 #
 # Find the location of our data directory that contains the auxiliary files.
@@ -39,6 +37,7 @@ BEGIN {
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 
   if( $^O =~ /^MSWin/ && $] < 5.008007 ) { # IDENTICAL AS IN t/run_tests.pl
     # This is a very bad hack!  On earlier Win Active State "lstat 'file'; lstat _ or -l _" is broken.
@@ -78,10 +77,7 @@ use Mpp::Makefile;
 use Mpp::Rule;
 use Mpp::BuildCheck::exact_match;
 use Mpp::Signature::md5;
-use Mpp::Event qw(when_done wait_for read_wait);
-
-#@@useoldmodules
-#@@
+use Mpp::Event qw(when_done wait_for);
 
 our $original_cwd = $CWD_INFO;	# Remember the directory we started from.
 
@@ -91,8 +87,7 @@ our $MAKEPPFLAGS = delete $ENV{MAKEPPFLAGS};
 our %global_ENV = %ENV;		# Make a copy of the environment, because
 				# we're going to change the environment a lot.
 %ENV = %global_ENV;		# Some (only Solaris?) versions hang when changing $0 before %ENV
-our( $assume_unchanged_dir_flag, $dont_build_dir_flag, $dont_read_dir_flag,
-  $sandbox_enabled_flag, $in_sandbox_dir_flag, $sandbox_warn_flag, $virtual_sandbox_flag );
+our( $dont_build_dir_flag, $sandbox_warn_flag, $virtual_sandbox_flag, $warn_undef_var );
 				# This is set if we set ASSUME_UNCHANGED /
 				# DONT_BUILD on any directory. Optimizations
 				# can be made if they aren't set.
@@ -110,31 +105,15 @@ our $environment_override = 0;	# Variables in environment do not override
 our $implicitly_load_makefiles = 1; # Load a makefile from every directory
 				# that contains a dependency or is searched
 				# by a wildcard.
-our $implicit_load_makeppfile_only = 0;
-				# Never implicitly load makefile and Makefile.
-our $force_rescan = 0;		# Don't use cached scanner results
 our $final_rule_only = 0;	# Unconditionally run only the top-level rules
-our $nopopulate_bc = 0;		# Don't populate the build cache
-our $md5check_bc = 0;		# Check the MD5 signature of build cache files
-our $populate_bc_only = 0;	# Don't import from the build cache
-our $force_bc_copy = 0;		# Don't link from BC (for testing)
-our $nocache_scaninfo = 0;	# Don't save scanner results
 our $rm_stale_files = 0;	# Ignore stale files, removing them if
 				# necessary, instead of treating them as
 				# source files.
-our $symlink_in_rep_as_file;	# Treat a symlink in a repository as a file
-				# to be fetched, rather than a link to be
-				# fetched.
-our $no_path_executable_dependencies = 0;
-				# Don't add implicit dependencies on executables
-				# picked up from the command search path.
-our @makepp_include_path = file_info( $datadir, $original_cwd );
+our @makepp_include_path = file_info $datadir, $original_cwd;
 				# The default directories to search for
 				# include files supplied with makepp.
 our $remake_makefiles = 1;	# Default to making the makefiles automatically.
-our $gullible = 0;		# Trust actions not to touch non-targets
 our $stop_on_race = 0;		# Stop if a race is detected.
-our $last_chance_rules;		# Flag allowing target pattern only rules for gmake compatibility.
 
 
 
@@ -159,7 +138,7 @@ sub build {
 				# Don't start a rebuild if we're already
 				# trying to build it, or if we've tried
 				# before.
-  return undef if $error_found;	# If we're quitting because of an error, don't
+  return if $error_found;	# If we're quitting because of an error, don't
 				# start any new builds (but still propagate
 				# errors from existing builds).
 #
@@ -167,18 +146,16 @@ sub build {
 #
   my $oinfo = $_[0];		# Name the arguments.
   if( &Mpp::File::dont_read ) {
-    print_error( "Not building inexistent `" . &absolute_filename . "' because it's marked for dont-read" );
+    warn "error: Not building inexistent `" . &absolute_filename . "' because it's marked for dont-read\n";
     return 1;
   }
   if( &Mpp::File::dont_build ) {
     if( exists $_[0]{xPHONY} || &file_exists ) {
       Mpp::log BUILD_NOT => $oinfo
 	if $log_level;
-    } elsif( &Mpp::File::dont_build == 2 ) { # Outside of ROOT
-      print_error( "Not building inexistent `" . &absolute_filename . "' because it's marked for dont-build" );
-      return 1;
     } else {
-      warn "Not building inexistent `" . &absolute_filename . "' because it's marked for dont-build\n";
+      warn "info: Not building inexistent `" . &absolute_filename . "' because it's marked for dont-build\n";
+      return 1 if &Mpp::File::dont_build == 2;
     }
     return undef $_[0]{BUILD_HANDLE};
   }
@@ -224,15 +201,13 @@ sub build {
   # processed, then just return as if the file were already built and hope
   # for the best.  (This is currently the best we can do with circular
   # dependencies.)
-  return undef if exists $rule->{xSCANNING};
+  return if exists $rule->{xSCANNING};
 
   # If the file still looks stale (now that we've tried to load its rule), and
   # we're not treating stale files as source files, then we need to error out
   # here, because something specifically requested a stale file.
   if( $rm_stale_files && &Mpp::File::is_stale ) {
-    print_error(
-      'Not building ', $oinfo, " because it's a stale generated file"
-    );
+    warn 'error: Not building ', $oinfo, " because it's a stale generated file\n";
     &Mpp::File::unlink;
     ++$Mpp::failed_count;	# Wouldn't get counted, since there's no rule
     return 1;
@@ -266,18 +241,14 @@ sub build {
   # of the rule unless the target is phony.
   my $dont_scan = $final_rule_only && !UNIVERSAL::isa( $rule, 'Mpp::DefaultRule' ) &&
     !exists $oinfo->{xPHONY};
-  warn 'Ignoring dependencies of ', &absolute_filename,
+  warn 'info: Ignoring dependencies of ', &absolute_filename,
     " because --final-rule-only is specified\n"
     if $dont_scan;
 
-  my ($all_targets, $all_dependencies, $command_string, $env) =
-    $rule->find_all_targets_dependencies($oinfo, $dont_scan);
-				# Find out everything that's needed
-				# for this command, and everything that it
-				# changes.
-
-  $all_dependencies = $rule->sorted_dependencies($all_dependencies);
-				# Use sorted list from now on.
+  my( $all_targets, $all_dependencies, $command_string, $env ) =
+    $rule->find_all_targets_dependencies( $oinfo, $dont_scan );
+				# Find out everything that's needed for this
+				# command, and everything that it changes.
 
   Mpp::log DEPEND => $all_targets, $all_dependencies
     if $log_level;
@@ -293,22 +264,19 @@ sub build {
     die unless $rule->{SCAN_FAILED};
     push @build_handles, $rule->{SCAN_FAILED};
     my $reason = '';
-    if(UNIVERSAL::isa($rule->{SCAN_FAILED}, 'Mpp::File')) {
+    if( UNIVERSAL::isa $rule->{SCAN_FAILED}, 'Mpp::File' ) {
       my $finfo = $rule->{SCAN_FAILED};
-      my ($handle, $next);
-      while($handle = $finfo->{BUILD_HANDLE} and
-        exists($handle->{STATUS}) and
+      my( $handle, $next );
+      while( $handle = $finfo->{BUILD_HANDLE} and
+        exists $handle->{STATUS} and
         $next = $handle->{STATUS} and
-        UNIVERSAL::isa($next, 'Mpp::File')
+        UNIVERSAL::isa $next, 'Mpp::File'
       ) {
 	$finfo = $next;
       }
       $reason = ', because ' . absolute_filename( $finfo ) . ' failed to build';
     }
-    print_error(
-      'Not building ' . &absolute_filename .
-      ' because the dependencies could not be computed' . $reason
-    );
+    warn 'error: Not building ' . &absolute_filename . " because the dependencies could not be computed $reason\n";
   }
   my $handle;
   if( @$all_dependencies and $Mpp::keep_going || ! exists $rule->{SCAN_FAILED} ) {
@@ -338,8 +306,8 @@ sub build {
   }
 
   $handle = when_done @build_handles, \&build_dependencies_done,
-    [$oinfo, $all_targets, $all_dependencies, $command_string, $rule, $env, $dont_scan];
-  $handle && exists($handle->{STATUS}) && !$handle->{STATUS} and
+    [$oinfo, $all_targets, $all_dependencies, $command_string, $rule, $env, $dont_scan]
+  and exists $handle->{STATUS} && !$handle->{STATUS} and
     undef $handle;		# If the build operation already succeeded,
 				# don't keep the handle around.
   foreach my $target (@$all_targets) { # Tag all targets with the handle
@@ -369,13 +337,13 @@ sub build {
 # the when_done mechanism.
 #
 sub build_dependencies_done {
-  my ($oinfo, $all_targets, $all_dependencies, $command_string, $rule, $env, $dont_scan) = @_;
+  my( $oinfo, $all_targets, $all_dependencies, $command_string, $rule, $env, $dont_scan ) = @_;
 
 #
 # This routine is only called if no errors were encountered in building the
 # dependencies.
 #
-  return undef if $error_found; # If we're quitting because of an error,
+  return if $error_found; # If we're quitting because of an error,
 				# don't start any new builds.  This can happen
 				# if we're doing a parallel build and we got
 				# an error in a different, unrelated target.
@@ -467,7 +435,7 @@ sub build_dependencies_done {
 	if( exists $target->{ALTERNATE_VERSIONS} ) { # Possibly copy from repository?
 	  my $is_src_file = UNIVERSAL::isa $rule, 'Mpp::DefaultRule';
 	  for( @{$target->{ALTERNATE_VERSIONS}} ) {
-	    if( $rm_stale_files && $is_src_file && Mpp::File::was_built_by_makepp $_  ) {
+	    if( $rm_stale_files && $is_src_file && Mpp::File::was_built_by_makepp $_ ) {
 	      Mpp::log REP_SKIP => $_
 		if $log_level;
 	      next;
@@ -476,13 +444,13 @@ sub build_dependencies_done {
 	      if $log_level;
 	    if( $is_src_file ||
                !$build_check_method->build_check_from_build_info( $_, $all_dependencies, $command_string, $build_cwd, $sig_method, $env )) {
-	      push @targets_to_get_from_repository, $_, $target;
+	      push @targets_to_get_from_repository, $target, $_;
 				# Remember to copy this from repository.
 	      next target_loop; # Move on to next target.
 	    }
 	  }
 	}
-	if( my $build_cache = !$populate_bc_only && $rule->build_cache ) {
+	if( defined $Mpp::BuildCache::used and my $build_cache = !$Mpp::BuildCache::write_only && $rule->build_cache ) {
 				# Do we have a build cache we can look in?
 	  my $bc_key = $build_check_method->
 	    build_cache_key( $target, $all_dependencies, $command_string,
@@ -509,40 +477,14 @@ sub build_dependencies_done {
     }
   }
 
-  unless( $rebuild_needed ) {
+  $rebuild_needed ||= Mpp::BuildCache::get( $rule, \@targets_to_get_from_build_cache )
+    if @targets_to_get_from_build_cache;
     # At this point, it appears that we won't have to run the rule.
     # However, we could have a problem when we attempt to import from
     # the cache, and because there could be concurrent processes operating
     # on the build cache, we can't predict ahead of time whether such a
     # problem will occur.  The solution is to attempt the import first,
     # and if it fails then fall back to rebuilding.
-  import_loop:
-    while( @targets_to_get_from_build_cache ) { # Do the same for the build cache:
-      my( $target_src, $target_dst ) = splice @targets_to_get_from_build_cache, 0, 2;
-      my $reason;
-      $target_src->copy_from_cache($target_dst, $rule, \$reason) or do {
-	my $msg = 'Copy of ' . Mpp::BuildCache::Entry::absolute_filename( $target_src ) . ' into ' .
-	  absolute_filename( $target_dst ) . " failed because $reason\n";
-	&$Mpp::build_cache_error_hook($msg) if $Mpp::build_cache_error_hook;
-	if($reason =~ /\(OK\)$/ && !$stop_on_race) {
-	  warn $msg."This might just mean that the build cache file was in an inconsistent state due to concurrent access, so we'll rebuild instead.\n";
-	  $rebuild_needed = 1;
-	  last import_loop;
-	} else {
-	  # If something happens that we can't explain as a transient
-	  # phenomenon, then we *don't* want to just fall back to
-	  # rebuilding, because the user probably wants to know that the
-	  # build cache isn't operating normally.
-	  die $msg;
-	}
-      };
-
-      Mpp::log BC_COPY => $target_dst, $target_src
-	if $log_level;
-      ++$Mpp::build_cache_hits;
-      print "$progname: Imported `", absolute_filename( $target_dst ), "' from build cache\n";
-    }
-  }
 
   if( $rebuild_needed ) {
     if( $dont_build ) {
@@ -550,11 +492,9 @@ sub build_dependencies_done {
       # if some other target *not* marked for dont-build isn't up to date.
       # This usually isn't a problem in practice, and it appears nontrivial
       # to fix.
-      print_error(
-	'Not building ' . absolute_filename( $oinfo ) .
+      warn 'error: Not building ' . absolute_filename( $oinfo ) .
 	' because ' . absolute_filename( $dont_build ) .
-	' (a target of its rule) was marked for dont-build or out-of-sandbox'
-      );
+	" (a target of its rule) was marked for dont-build or out-of-sandbox\n";
       return 1;
     }
     warn 'Building ', absolute_filename( $out_of_sandbox ), ", which is outside the sandbox\n"
@@ -572,7 +512,7 @@ sub build_dependencies_done {
       # For the targets that are about to be built, flush out any potentially
       # stale stuff (repository links and build info) from the filesystem.
       foreach my $tinfo (@$all_targets) {
-        ++$tinfo->{BUILDING} if $Mpp::virtual_sandbox_flag;
+        ++$tinfo->{BUILDING} if $virtual_sandbox_flag;
 	if( grep $_, Mpp::File::build_info_string $tinfo, qw'FROM_REPOSITORY LINKED_TO_CACHE' or
 	    !exists $tinfo->{xPHONY} && Mpp::File::check_for_change( $tinfo ), exists $tinfo->{xEXISTS} &&
 	    (my $nw = !Mpp::File::is_writable_owner $tinfo) ) { # Compiler can't write?
@@ -599,22 +539,20 @@ sub build_dependencies_done {
     # confused if makepp stops very suddenly (e.g. kernel panic), even if
     # none of the targets' timestamps changed.
     my $execute_handle = $dry_run && !$is_recursive_make ?
-      $rule->print_command($command_string) :
-      $rule->execute($command_string, $all_targets, $all_dependencies);
-				# Start executing the command, or just print
-				# it if -n is enabled (unless it's recursive
-				# make).
+      $rule->print_command( $command_string ) :
+      $rule->execute( $command_string, $all_targets, $all_dependencies );
+				# Start executing the command, or just print it
+				# if -n is enabled (unless it's recursive make).
     shift;
     my $handle = when_done $execute_handle, \&build_target_done, \@_,
       ERROR => sub {
 	$error_found = $_[0]
 	  if $_[0] =~ /^signal (?:$Mpp::int_signo|$Mpp::quit_signo)$/os;
-	$error_found ||= $_[0]	# Remember the error status.  This will
-	  unless $Mpp::keep_going;	# cause us to stop compilation as soon as
-				# possible.
+	$error_found ||= $_[0]	# Remember the error status.  This will cause us
+	  unless $Mpp::keep_going; # to stop compilation as soon as possible.
 	$Mpp::failed_count += @$all_targets;
-	print_error "Failed to build target", (@$all_targets>1 ? 's' : ''),
-	  map( ' `'.absolute_filename( $_ )."'", @$all_targets ), " [$_[0]]";
+	warn 'error: Failed to build target', (@$all_targets>1 ? 's' : ''),
+	  map( ' `'.absolute_filename( $_ )."'", @$all_targets ), " [$_[0]]\n";
 	Mpp::log RULE_FAILED => $rule
 	  if $log_level;	# Sometimes it's hard to tell where the problem
 				# was if -k was specified unless we mark it
@@ -658,13 +596,10 @@ sub build_dependencies_done {
 # We didn't actually need to rebuild anything.	We may have to copy or link
 # a target from the repository, however.
 #
-  while( @targets_to_get_from_repository ) {
-    my( $target_src, $target_dst ) = splice @targets_to_get_from_repository, 0, 2;
-				# Get where we move/link from and to.
-    my $status = Mpp::Repository::get( $target_dst, $target_src );
-				# Move or link the target.
-    $status == 0 or return $status;
-  }
+  Mpp::Repository::get( splice @targets_to_get_from_repository, 0, 2 )
+    and return 1			   # failed
+    while @targets_to_get_from_repository; # Move or link the targets.
+
   Mpp::log UP_TO_DATE => $all_targets
     if $log_level;
 
@@ -676,14 +611,13 @@ sub build_dependencies_done {
     $rule->cache_scaninfo([
       grep {
 	!exists $_->{xPHONY} &&
-	(Mpp::File::build_info_string($_, 'CWD') || '') eq
-	  relative_filename( $build_cwd, $_->{'..'} )
+	(Mpp::File::build_info_string $_, 'CWD' or '') eq relative_filename $build_cwd, $_->{'..'}
       } @$all_targets
     ]);
   }
 
   foreach my $tinfo (@$all_targets) {
-    Mpp::File::set_rule($tinfo, undef);	# Discard the rule to save memory.
+    Mpp::File::set_rule $tinfo, undef;	# Discard the rule to save memory.
   }
   undef;			# Success, and nothing to wait for.
 }
@@ -705,7 +639,7 @@ sub build_dependencies_done {
 #
 #
 sub build_target_done {
-  my ($all_targets, $all_dependencies, $command_string, $rule, $env) = @_;
+  my( $all_targets, $all_dependencies, $command_string, $rule, $env ) = @_;
   my $implicit_phony = 0;
 
   # TBD: We should probably do an eval on a per-target basis, because it's nice
@@ -716,7 +650,7 @@ sub build_target_done {
 				# algorithm we want to use.
     my $build_cwd = $rule->build_cwd;
     my $is_recursive_make = defined $Mpp::Recursive::command && $command_string =~ /\brecursive_makepp\b/;
-    my $build_cache = $rule->build_cache;
+    my $build_cache = defined $Mpp::BuildCache::used && $rule->build_cache;
     my $build_check_method = $rule->build_check_method;
 
     Mpp::log SUCCESS => $rule, $all_targets
@@ -746,7 +680,7 @@ sub build_target_done {
 
     foreach my $tinfo (@$all_targets) {
       next if exists $tinfo->{xPHONY}; # Skip phony targets.
-      if( $include ) {			 # Do this for all targets, as we don't know which one was in the :include .d
+      if( $include ) {		# Do this for all targets, as we don't know which one was in the :include .d
 	$uniq{sprintf '%x', $_} = $_ for $rule->expand_additional_deps( $tinfo );
       }
       may_have_changed $tinfo;	# Invalidate cached info.
@@ -755,12 +689,11 @@ sub build_target_done {
 				# but that doesn't slow things down too much.
       my $deref = dereference $tinfo;
       may_have_changed $deref if $tinfo != $deref;
-				# Since we don't know whether the command
-				# modified the link or its referent or both,
-				# need to invalidate both.
-      push(@built_targets, $tinfo);
+				# Since we don't know whether the command modified the link
+				# or its referent or both, need to invalidate both.
+      push @built_targets, $tinfo;
     }
-    $all_dependencies = $rule->sorted_dependencies( [values %uniq] )
+    $all_dependencies = $rule->sorted_dependencies( values %uniq )
       if keys %uniq;
     $rule->cache_scaninfo(\@built_targets);
     my $sorted_dep_names = join "\cA", map relative_filename( $_, $build_cwd ), @$all_dependencies;
@@ -791,9 +724,9 @@ sub build_target_done {
 	      # Don't use dereference, as that follows a link to a link.
 	      push @extra, 'SYMLINK', $link;
 	    } else {
-	      warn '`' . absolute_filename_nolink( $tinfo ) . "' is a symbolic link to `$link',
-  which is neither a dependency of rule `" . $rule->source . "',
-  nor a target.  That means makepp can't guarantee a correct build of that file.
+	      warn $rule->source, ': `' . absolute_filename_nolink( $tinfo ) . "' is a symbolic link to `$link',
+  which is neither a dependency of this rule   nor a target.
+  That means makepp can't guarantee a correct build of that file.
   Your rule should in essence follow one of these two schemes:
     link: linkee
 	&ln --force --resolve \$(input) \$(output)
@@ -810,22 +743,18 @@ sub build_target_done {
 	    CWD => relative_filename( $build_cwd, $tinfo->{'..'} ),
 	    ARCH => ARCHITECTURE, # Tag the build with the architecture, too.
 	    @extra;
-	  if ($build_cache && !$nopopulate_bc) {     # Store this file in a build cache?
-	    my $bc_key = $build_check_method->
-	      build_cache_key($tinfo, $all_dependencies, $command_string,
-			    $build_cwd, $sig_method, $env);
-	    if ($bc_key) {
-	      my $reason;
-	      # Store the file in cache.
-	      $build_cache->cache_file($tinfo, $bc_key, \$reason) or do {
-		my $msg = 'Exporting of ' . absolute_filename( $tinfo ) . " to the build cache failed because $reason\n";
-		&$Mpp::build_cache_error_hook($msg) if $Mpp::build_cache_error_hook;
-		if($reason =~ /\(OK\)$/ && !$stop_on_race) {
-		    warn $msg, "This might be due to concurrent access, so we'll just skip exporting this target.\n";
-		} else {
-		    die $msg;
-		}
-	      };
+	  if( $build_cache && !$Mpp::BuildCache::read_only and # Store this file in a build cache?
+	      my $bc_key = $build_check_method->
+		build_cache_key( $tinfo, $all_dependencies, $command_string, $build_cwd, $sig_method, $env )) {
+	    # Store the file in cache.
+	    unless( $build_cache->cache_file( $tinfo, $bc_key, \my $reason )) {
+	      my $msg = 'Exporting of ' . absolute_filename( $tinfo ) . " to the build cache failed because $reason\n";
+	      &$Mpp::BuildCache::error_hook( $msg ) if $Mpp::BuildCache::error_hook;
+	      if( !$stop_on_race && $msg =~ s/ \(OK\)$//m ) {
+		warn "info: ${msg}This might be due to concurrent access, so we'll just skip exporting this target.\n";
+	      } else {
+		die $msg;
+	      }
 	    }
 	  }
 	} elsif( !exists $tinfo->{xTEMP} ) {
@@ -833,7 +762,7 @@ sub build_target_done {
 	  if( $mfile && $mfile->expand_variable( 'makepp_require_phony', $rule->source )) {
 	    $implicit_phony++;	# DefaultRule has no MAKEFILE.
 	  } elsif( UNIVERSAL::isa $rule, 'Mpp::DefaultRule' ) {
-	    warn 'There is no rule to build inexistent ' . absolute_filename( $tinfo ) . "\n";
+	    warn 'error: There is no rule to build inexistent ' . absolute_filename( $tinfo ) . "\n";
 	  } elsif( $n_phony_messages++ ) { # Give a shorter message on other instances.
 	    warn 'Target ' . absolute_filename( $tinfo ) . " is probably also phony.\n";
 	  } else {
@@ -886,12 +815,13 @@ sub build_target_done {
 }
 
 
-my $stop;
+our( $stop, $loop );
 sub maybe_stop {
+  $stop = 1 if $loop and !defined $stop;
   if( $stop ) {
-    $stop = 0;
-    print "makepp: Stopped after loading Makeppfiles.  Continue with",
-      -t() ? " one of:\n\n\tbg\n\tfg\n" : ":\n\n",
+    $stop = 0;			# Only stop once per loop (in case of prebuild)
+    print "\nmakepp: Stopped before building anything.  Kill it; or continue with",
+      -t() ? " one of:\n\n\tfg\tbg" : ":\n\n",
       "\tkill -CONT $$\n\n";
     &flush_log;
     kill STOP => $$;
@@ -902,10 +832,11 @@ sub maybe_stop {
 
 # Find .makepprc upwards and add content to @ARGV
 sub makepprc {
+  return if grep /^-(?:[h?V]|-help|-version)$/, @ARGV; # Avoid loading expensive things like huge repository.
   my $finfo = Mpp::Subs::f_find_first_upwards '.makepprc', { CWD => $CWD_INFO }, 'startup', \1;
   return if !$finfo or exists $finfo->{xMAKEPPRC}; # Already read?
   return unless $finfo->{LSTAT}[Mpp::File::STAT_SIZE]; # Empty file is test dir boundary.
-  open my $fh, absolute_filename $finfo or die "$0: cannot open `.makepprc'--$!\n";
+  open my $fh, '<', absolute_filename $finfo or die "$0: cannot open `.makepprc'--$!\n";
   local $/;
   unshift @ARGV, $finfo->{'..'} == $CWD_INFO ?
     unquote_split_on_whitespace <$fh> :
@@ -1021,8 +952,7 @@ sub parse_command_line(\%@) {
 	 &makepprc;
        }],
 
-      [undef, qr/dump[-_]?makep*file/, \$tmp, 1,
-       sub {
+      [undef, qr/dump[-_]?makep*file/, \$tmp, 1, sub {
 	 open my $fh, '>', $tmp or die "Failed to write $tmp--$!";
 	 push @Mpp::close_fhs, $fh;
 	 $CWD_INFO->{DUMP_MAKEFILE} = $fh;
@@ -1067,17 +997,15 @@ sub parse_command_line(\%@) {
 	 $tmp = file_info $tmp;
 	 my $mdir = $tmp;	# Assume it is actually a directory.
 	 Mpp::File::is_or_will_be_dir( $tmp ) or $mdir = $tmp->{'..'};
-				# Default directory is the directory the
-				# makefile is in.
+				# Default directory is the directory the makefile is in.
 	 push @initial_makefiles, [$tmp, $mdir]; # Load the makefile later.
-	 Mpp::File::mkdir( $mdir ); # Make sure the directory exists, so we
-				# can cd into it.
+	 Mpp::File::mkdir( $mdir ); # Make sure the directory exists, so we can cd into it.
        }],
 
       ['o', qr/(?:assume[-_]?old|old[-_]?file)/, \$tmp, 1, sub {
 	 $tmp = file_info $tmp;
 	 $tmp->{ASSUME_UNCHANGED} = 1; # Don't pay any attention to this file.
-	 $assume_unchanged_dir_flag = 1 if is_or_will_be_dir $tmp;
+	 our $assume_unchanged_dir_flag = 1 if is_or_will_be_dir $tmp;
 				# Remember that we have to check parent dirs
        }],
 
@@ -1117,7 +1045,8 @@ sub parse_command_line(\%@) {
       ($flags ? $flags : ()),
       ($Mpp::implicitly_load_makefiles ? () : '--noimplicitload'),
       ($Mpp::log_level ? () : '--nolog'),
-      ($Mpp::print_directory ? () : '--noprintdirectory');
+      ($Mpp::print_directory ? () : '--noprintdirectory'),
+      ($warn_undef_var ? '--warnundef' : ());
 			# TODO: what about -o -W
   }
 
@@ -1136,7 +1065,7 @@ sub parse_command_line(\%@) {
 	    $build_root->{DONT_BUILD} = 1;
 				# Found a do_build within build tree
 				# but not within a dont_build dir.
-	    warn "--do-build not overriding --dont-build implies not building anything else.\n";
+	    warn "info: --do-build not overriding --dont-build implies not building anything else.\n";
 	    @do_build = ();
 	  }
 	  last;
@@ -1174,7 +1103,7 @@ sub parse_command_line(\%@) {
 # 3) If none and no RootMakeppfile, try all the directories containing targets.
 #
   {
-    last if @makefiles;		# last leaves this block
+    last if @makefiles || $CWD_INFO->{MAKEINFO}; # last leaves this block
 
     my $finfo = Mpp::Makefile::find_makefile_in( $CWD_INFO );
 				# Look in the current directory.
@@ -1190,8 +1119,7 @@ sub parse_command_line(\%@) {
     }
 
     @makefiles or @makefiles = [$CWD_INFO, $CWD_INFO];
-				# Load the default makefile if we still haven't
-				# found one.
+				# Load the default makefile if we still haven't found one.
   }
   $Mpp::Recursive::depth =	# Avoid warning.
     $Mpp::Recursive::depth = $command_line_vars{recursive_makepp}
@@ -1202,7 +1130,6 @@ sub parse_command_line(\%@) {
 			\@include_path, $this_ENV); # Load all the makefiles, and store
 				# the makeinfo structure back in @makefiles.
   }
-  &maybe_stop;
 
   @targets or			# No targets specified?
     @targets = ($target_cwd->{MAKEINFO} || $makefiles[0] || $CWD_INFO)->{FIRST_TARGET} ||
@@ -1214,16 +1141,7 @@ sub parse_command_line(\%@) {
     die 'no targets specified and no default target in makefile `' .
       absolute_filename( ($target_cwd->{MAKEINFO} || $makefiles[0])->{MAKEFILE} || $CWD_INFO ) .
       "'\n";
-
-  my @handles;
-  foreach my $target (@targets) {
-    exists $target->{DONT_BUILD} or undef $target->{DONT_BUILD};
-    my $handle = build($target); # Try to build the file.
-    $handle and push @handles, $handle; # If the build actually did
-				# anything, save the handle for it.
-  }
-
-  @handles;
+  @targets;
 }
 
 ###############################################################################
@@ -1267,7 +1185,6 @@ perform eval {
        Mpp::Subs::s_build_check $tmp, undef, $progname, {global => 1};
      }],
 
-    [undef, qr/defer[-_]?include/, \$Mpp::Subs::defer_include],
     [undef, qr/do[-_]?build/, \$tmp, 1, sub {
        $tmp = file_info $tmp;
        undef $tmp->{DONT_BUILD};
@@ -1285,24 +1202,25 @@ perform eval {
     [undef, qr/dont[-_]?read/, \$tmp, 1, sub {
        $tmp = file_info $tmp;
        $tmp->{DONT_READ} = 1;
-       $dont_read_dir_flag = 1 if is_or_will_be_dir $tmp;
+       our $dont_read_dir_flag = 1 if is_or_will_be_dir $tmp;
 				# Remember that we have to check parent dirs
      }],
 
     [undef, qr/final[-_]?rules?[-_]?only/, \$final_rule_only],
-    [undef, qr/force[-_]?copy[-_]?from[-_]?bc/, \$force_bc_copy],
-    [undef, qr/force[-_]?rescan/, \$force_rescan],
+    [undef, qr/force[-_]?copy[-_]?from[-_]?bc/, eval '\$Mpp::BuildCache::force_copy'],
+    [undef, qr/force[-_]?rescan/, \our $force_rescan], # Don't use cached scanner results
 
-    [undef, 'gullible', \$gullible],
+    [undef, 'gullible', \our $gullible], # Trust actions not to touch non-targets
 
     [undef, qr/hybrid(?:[-_]?recurs(?:ion|ive|ive[-_]?make))?/, \$Mpp::Recursive::hybrid],
 
-    [undef, qr/implicit[-_]load[-_]?[Mm]akeppfile[-_]?only/, \$implicit_load_makeppfile_only],
+    [undef, qr/implicit[-_]load[-_]?[Mm]akeppfile[-_]?only/, \our $implicit_load_makeppfile_only],
+				# Never implicitly load makefile and Makefile.
     [undef, qr/(?:in(?:side)?[-_]?)?sand[-_]?box/, \$tmp, 1, sub {
        $tmp = file_info $tmp;
        $tmp->{IN_SANDBOX} = 1;
-       $sandbox_enabled_flag = 1; # default is now out-of-sandbox
-       $in_sandbox_dir_flag = 1 if is_or_will_be_dir $tmp;
+       our $sandbox_enabled_flag = 1; # default is now out-of-sandbox
+       our $in_sandbox_dir_flag = 1 if is_or_will_be_dir $tmp;
 				# Remember that we have to check parent dirs
      }],
 
@@ -1325,7 +1243,8 @@ perform eval {
        }
      }],
 
-    [undef, qr/last[-_]?chance[-_]?rules/, \$last_chance_rules],
+    [undef, qr/last[-_]?chance[-_]?rules/, \our $last_chance_rules],
+		# Flag allowing target pattern only rules for gmake compatibility.
 
     ['m', qr/signature(?:[-_]?method)?/, \$tmp, 1, sub {
        Mpp::Subs::s_signature $tmp, undef, $progname, {global => 1};
@@ -1335,12 +1254,14 @@ perform eval {
        Mpp::Subs::s_signature $tmp, undef, $progname, {global => 1, override => 1};
      }],
 
-    [undef, qr/md5[-_]?(?:check[-_]?)?bc/, \$md5check_bc],
+    [undef, qr/md5[-_]?(?:check[-_]?)?bc/, eval '\$Mpp::BuildCache::md5check'],
 
-    [undef, qr/no[-_]?cache[-_]?scaninfos?/, \$nocache_scaninfo],
+    [undef, qr/no[-_]?cache[-_]?scaninfos?/, \our $nocache_scaninfo], # Don't save scanner results
     [undef, qr/no[-_]?implicit[-_]?load/, \$implicitly_load_makefiles, undef, 0],
-    [undef, qr/no[-_]?path[-_]?exe(?:cutable)?[-_]?dep(?:s|endency|endencies)?/, \$no_path_executable_dependencies],
-    [undef, qr/no[-_]?populate[-_]?bc/, \$nopopulate_bc],
+    [undef, qr/no[-_]?path[-_]?exe(?:cutable)?[-_]?dep(?:s|endency|endencies)?/, \our $no_path_executable_dependencies],
+				# Don't add implicit dependencies on executables
+				# picked up from the command search path.
+    [undef, qr/no[-_]?populate[-_]?bc/, \$Mpp::BuildCache::read_only],
 				# don't populate bc with targets, just read from it
     [undef, qr/no[-_]?remake[-_]?makefiles/, \$remake_makefiles, undef, 0],
 				# Don't remake makefiles automatically?
@@ -1348,22 +1269,24 @@ perform eval {
     [undef, qr/out[-_]?of[-_]?sand[-_]?box/, \$tmp, 1, sub {
        $tmp = file_info $tmp;
        undef $tmp->{IN_SANDBOX};
-       $in_sandbox_dir_flag = 1 if is_or_will_be_dir $tmp;
+       our $in_sandbox_dir_flag = 1 if is_or_will_be_dir $tmp;
 				# Remember that we have to check parent dirs
      }],
 
-    [undef, qr/populate[-_]?bc[-_]?only/, \$populate_bc_only],
+    [undef, qr/populate[-_]?bc[-_]?only/, \$Mpp::BuildCache::write_only],
 
     [undef, qr/re?m(?:ove)?[-_]?stale(?:[-_]?files)?/, \$rm_stale_files],
 
     [undef, qr/sand[-_]?box[-_]?warn(?:ing)?/, \$sandbox_warn_flag],
-    [undef, qr/stop(?:[-_]?after[-_]?load(?:ing|ed)?)?/, \$stop],
+    [undef, qr/loop|stop(?:[-_]?before[-_]?build(?:ing)?|[-_]?after[-_]?load(?:ing|ed)?)?/, \$loop],
     [undef, qr/stop[-_]?(?:on[-_]?)?race/, \$stop_on_race],
-    [undef, qr/symlink[-_]?in[-_]?rep(?:os(?:itory)?)?[-_]?as[-_]?file/, \$symlink_in_rep_as_file],
+    [undef, qr/symlink[-_]?in[-_]?rep(?:os(?:itory)?)?[-_]?as[-_]?file/, eval '\$Mpp::Repository::symlink_as_file'],
 
     [undef, qr/traditional(?:[-_]?recurs(?:ion|ive|ive[-_]?make))?/, \$Mpp::Recursive::traditional],
 
-    [undef, qr/virtual[-_]?sandbox/, \$virtual_sandbox_flag];
+    [undef, qr/virtual[-_]?sandbox/, \$virtual_sandbox_flag],
+
+    [undef, qr/warn[-_]?undef(?:ined)?(?:[-_]?var(?:iables)?)?/, \$warn_undef_var];
 };
 
 __DATA__

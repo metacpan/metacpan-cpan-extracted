@@ -145,4 +145,14 @@ Revision history for Perl extension Filter::Simple
 
     - Swap out base.pm use for parent.pm.
 
+0.94    Thu Aug  3 18:00:00 CET 2017
+
+    - Remove use of deprecated \C regex feature.
+
+    - Filter::Simple was erroneously signalling eof if it encountered a
+      ‘no MyFilter’ right after ‘use’:
+        use MyFilter;
+        no MyFilter;
+      In this case it should simply not filter anything.
+
 

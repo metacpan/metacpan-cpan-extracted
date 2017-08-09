@@ -4,14 +4,13 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/IO/ExplicitHandle.pm
 lib/IO/ExplicitHandle.xs
+t/lib/t/scope_0.pm
 t/pod_cvg.t
 t/pod_syn.t
 t/scope.t
-t/scope_0.pm
 t/stricture.t
 t/threads.t
 SIGNATURE    Added here by Module::Build

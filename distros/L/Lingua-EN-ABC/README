@@ -12,11 +12,11 @@
                        
 
 
-This is the README for Lingua::EN::ABC version 0.06.
+This is the README for Lingua::EN::ABC version 0.07.
 
 Lingua::EN::ABC is a "module" for the Perl computer programming language, a
-library of computer code to install on a computer.  This document contains four
-sections:
+library of computer code to install on a computer.  This document contains
+four sections:
 
 1. About - what the module does
 
@@ -39,15 +39,16 @@ vocabulary of American, British, and Canadian versions of English.
 
 2. DOCUMENTATION
 
-You can read the documentation for the module online at the following websites:
+You can read the documentation for the module online at the following
+websites:
 
     * http://search.cpan.org/perldoc?Lingua::EN::ABC
     * http://metacpan.org/release/Lingua-EN-ABC
 
 (These links go to the latest version of the module.)
 
-After installing the module, you can read the documentation on your computer
-using
+After installing the module, you can read the documentation on your
+computer using
 
     perldoc Lingua::EN::ABC
 
@@ -65,11 +66,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Lingua::EN::ABC
 
-To install the module from the source file, Lingua-EN-ABC-0.06.tar.gz, follow
-this sequence of commands:
+To install the module from the source file, Lingua-EN-ABC-0.07.tar.gz,
+follow this sequence of commands:
 
-    tar xfz Lingua-EN-ABC-0.06.tar.gz
-    cd Lingua-EN-ABC-0.06
+    tar xfz Lingua-EN-ABC-0.07.tar.gz
+    cd Lingua-EN-ABC-0.07
     perl Makefile.PL
     make
     make install
@@ -82,8 +83,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can report a
-bug at 
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
 
 <https://github.com/benkasminbullock/Lingua-EN-ABC/issues>,
 
@@ -94,6 +95,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Aug 31 13:25:07 2016.
+This README was written on Mon Jul 31 12:15:43 2017.
 
 -----------------------------------------------------------------------------

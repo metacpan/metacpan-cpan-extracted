@@ -1,6 +1,13 @@
-use strict;
-use warnings;
-use Test::More tests => 1;
+use Test2::V0 -no_srand => 1;
 use File::Listing::Ftpcopy ();
 
-pass("_size_of_UV = " . File::Listing::Ftpcopy::_size_of_UV());
+ok 1;
+
+diag '';
+diag '';
+diag '';
+diag("_size_of_UV = " . File::Listing::Ftpcopy::_size_of_UV());
+diag '';
+diag '';
+
+done_testing;

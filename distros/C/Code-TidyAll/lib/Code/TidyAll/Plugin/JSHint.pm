@@ -14,7 +14,7 @@ has 'options' => ( is => 'ro', predicate => '_has_options' );
 
 with 'Code::TidyAll::Role::Tempdir';
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 sub _build_cmd {'jshint'}
 
@@ -58,7 +58,7 @@ Code::TidyAll::Plugin::JSHint - Use jshint with tidyall
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 

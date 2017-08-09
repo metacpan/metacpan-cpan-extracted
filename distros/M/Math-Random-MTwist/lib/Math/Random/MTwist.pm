@@ -12,7 +12,7 @@ use constant MT_FASTSEED => \0;
 use constant MT_GOODSEED => \0;
 use constant MT_BESTSEED => \0;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our @ISA = 'Exporter';
 our @EXPORT = qw(MT_TIMESEED MT_FASTSEED MT_GOODSEED MT_BESTSEED);
@@ -298,10 +298,9 @@ Returns a random unsigned 32-bit integer. Calls mtwist's C<mts_lrand()>.
 
 =item B<irand64()>
 
-If your Perl is 64-bit, returns a 64-bit unsigned integer. If your Perl is
-32-bit but your OS knows the C<uint64_t> type, returns a 64-bit unsigned
-integer coerced to a double (so it's the full 64-bit range but with only 52-bit
-precision). Otherwise it returns undef. Calls mtwist's C<mts_llrand()>.
+If your Perl uses 64-bit integers, returns a 64-bit unsigned integer. If your Perl uses
+32-bit integers but your OS knows the C<uint64_t> type, returns a 64-bit unsigned
+integer as a decimal string. Otherwise it returns undef. Calls mtwist's C<mts_llrand()>.
 
 =item B<rand()>, B<rand($bound)>
 

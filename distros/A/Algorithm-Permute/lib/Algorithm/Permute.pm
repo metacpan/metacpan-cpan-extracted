@@ -14,7 +14,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(permute);
 
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;

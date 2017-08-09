@@ -1,0 +1,33 @@
+NAME
+    Log::ger::Level::Like::PythonLogging - Define logging levels like
+    Python's logging facility
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     # load before 'use Log::ger' in any package/target
+     use Log::ger::Level::Like::PythonLogging;
+
+DESCRIPTION
+    This module changes the Log::ger levels to:
+
+        notset => 0,
+        critical => 10,
+        error => 20,
+        warning => 30,
+        info => 40,
+        debug => 50,
+
+SEE ALSO
+    [1] https://docs.python.org/3/library/logging.html
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

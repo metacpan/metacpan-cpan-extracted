@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package App::Nopaste; # git description: 1.008-3-g37fe02a
+package App::Nopaste; # git description: 1.009-3-gb592e97
 # ABSTRACT: Easy access to any pastebin
 # KEYWORDS: application executable paste output pastebin debugging
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 use 5.008003;
 use Module::Pluggable search_path => 'App::Nopaste::Service', sub_name => '_plugins';
@@ -101,7 +101,7 @@ App::Nopaste - Easy access to any pastebin
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,11 @@
+lib/HTTP/MultiGet.pm
+lib/AnyEvent/HTTP/MultiGet.pm
+t/HTTP-MultiGet.t
+t/AnyEvent-HTTP-MultiGet.t
+t/HTTP-MultiGet-stream.t
+MANIFEST
+Changes
+Makefile.PL
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

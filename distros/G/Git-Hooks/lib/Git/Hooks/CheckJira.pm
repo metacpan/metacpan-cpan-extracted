@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.1.0';
+$Git::Hooks::CheckJira::VERSION = '2.1.3';
 use 5.010;
 use utf8;
 use strict;
@@ -188,7 +188,7 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
             my @deprecated;
             foreach my $option (qw/project issuetype status/) {
                 if (my @values = $git->get_config($CFG => $option)) {
-                    push @deprecated, "$option IN (@{[join(',', @values)]})";
+                    push @deprecated, "$option IN ('" . join("','", @values) . "')";
                 }
             }
             push @jqls, join(' AND ', @deprecated) if @deprecated;
@@ -522,7 +522,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.1.0
+version 2.1.3
 
 =head1 DESCRIPTION
 

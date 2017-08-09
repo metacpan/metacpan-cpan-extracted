@@ -22,6 +22,7 @@ sub format_key_line_c ($$@) {
 my %CL_flags = (qw(0 0 1 CAPLOK 4 CAPLOKALTGR SGCap SGCAPS), 5 => 'CAPLOK | CAPLOKALTGR');
 sub translate_key_line_c($$$$) {
   my($prev_vk, $b_len, $in, $LIG) = (shift, shift, shift, shift);
+#  $prev_vk = $$prev_vk;
   $in =~ s(\s+//.*)();
   $in =~ s(^\s+)();
   my($scan, $vk, $flags, @bind, @prefix, $c, $neg1, @O, @LIG) = split /\s+/, $in;
@@ -31,17 +32,30 @@ sub translate_key_line_c($$$$) {
   $_ eq '-1' and $neg1++ for $scan, $vk;
   die "VK=$vk in combination with SC=$scan (I expect -1 -1)" if 1 == ($neg1 || 0);
   $vk =~ s/^([0-9A-Z])$/'$1'/ or $vk = "VK_$vk";
+  my $prev_LIG;
   if ($vk eq 'VK_-1') {
 #    $flags eq 'SGCap' or die "non-SGCap line with VK=-1";
-    defined ($vk = $$prev_vk) or die "SGCap continuation line not preceded by SGCap line";
-    $$prev_vk = undef;
+    defined ($vk = $prev_vk->[0]) or die "SGCap continuation line not preceded by SGCap line";
+    $prev_LIG = $prev_vk->[1];
+    $prev_vk->[0] = undef;
     $#bind = 1 if $#bind > 1;
     $#bind = 0 if '-1' eq ($bind[1] || '-1');
   } else {
-    $$prev_vk = ($flags eq 'SGCap' ? $vk : undef);
+    $prev_vk->[0] = ($flags eq 'SGCap' ? $vk : undef);
   }
+  $#$prev_vk = 0 if $#$prev_vk > 0;
   defined (my $F = $CL_flags{$flags}) or die "Unexpected value in FLAGS: <$flags> in: $in";
   @$LIG = ($vk, grep {$bind[$_] =~ /%%/} 0..$#bind);
+  if (defined $prev_vk->[0]) {
+    $prev_vk->[1] = [map {scalar($bind[$_] =~ /%%/)} 0..$#bind];
+  } elsif ($prev_LIG) {
+    my @conflicts = grep {$bind[$_] =~ /%%/ and $prev_LIG->[$_]} 0..$#bind;
+    warn "Conflicts for CapsLock bindings: positions @conflicts" if @conflicts;
+    my $max = $#bind;
+    $max = $#$prev_LIG if $max < $#$prev_LIG;
+    @$LIG = ($vk, grep {($bind[$_] || '') =~ /%%/ or $prev_LIG->[$_]} 0..$max);
+    warn '<', join('> <', @$LIG), '>' if $vk eq "'T'";
+  }
   push @O, format_key_line_c $vk, $F, map format_ochar_c($_), @bind;
   s/\@$// or $_ = -1 for @prefix;
   push @O, format_key_line_c '0xff', 0, map format_ochar_c($_), @prefix if @prefix;
@@ -52,10 +66,10 @@ sub extract_section ($$;$) {
   my($in, $sec, $strip) = (shift, shift, shift);
   $in =~ s([^\S\n]*//.*)()g;		# remove comments
   $in =~ s([^\S\n]+$)()gm;		# remove trailing whitespace (including \r!)
-  $in =~ s/\A.*?^\s*$sec([ \t]*;[^\n]*)?\n//sm or die "Cannot find LAYOUT inside the KLC file";
+  $in =~ s/\A.*?^\s*$sec([ \t]*;[^\n]*)?\n//sm or die "Cannot find $sec inside the KLC file";
   $in =~ s/^[^\S\n]*(KEYNAME|LIGATURE|COPYRIGHT|COMPANY|LOCALENAME|LOCALEID|VERSION|SHIFTSTATE|LAYOUT|ATTRIBUTES|KEYNAME_EXT|KEYNAME_DEAD|DESCRIPTIONS|LANGUAGENAMES|ENDKBD)\b.*//ms
-     or die "Cannot find end of LAYOUT inside the KLC file";
-  $in =~ s/^\n//gm if $strip;			# remove emtpy lines
+     or die "Cannot find end of $sec inside the KLC file";
+  $in =~ s/^\n//gm if $strip;			# remove empty lines
   $in
 }
 
@@ -101,9 +115,9 @@ if (@ARGV == 1) {
   my $b_len = shift;
   my $layout = do {local $/; <>};
   $layout = extract_section $layout, 'LAYOUT', 'strip';
-  my($prev_vk, @LIG);
+  my(@prev_vk, @LIG);
   for my $in (split /\n/, $layout) {
-    print for translate_key_line_c \$prev_vk, $b_len, $in, \@LIG;
+    print for translate_key_line_c \@prev_vk, $b_len, $in, \@LIG;
   }
   exit;
 }
@@ -116,7 +130,7 @@ if (@ARGV == 4) {
   @ARGV = $src_c;
   my $c_file = do {local $/; <>};
   my $layout = extract_section $klc, 'LAYOUT', 'strip';
-  my (@pass_table, $prev_vk, $skip_m1, %LIG) = ('', '');
+  my (@pass_table, @prev_vk, $skip_m1, %LIG) = ('');
 #  for my $pass (0, 1) {
     for my $in (split /\n/, $layout) {
       my ($vk) = ($in =~ /^\s*\S+\s+(\S+)\b/);
@@ -124,7 +138,7 @@ if (@ARGV == 4) {
       $skip_m1 = 0, next if $skip_m1 and $in =~ /^\s*-1\s+-1\b/;
       $skip_m1 = 0;
       my $pass = ($vk =~ /^((F|NUMPAD)\d+|HOME|UP|PRIOR|DIVIDE|LEFT|CLEAR|RIGHT|MULTIPLY|END|DOWN|NEXT|SUBTRACT|INSERT|DECIMAL|DELETE|ADD|RETURN)$/);
-      $pass_table[$pass] .= join '', translate_key_line_c \$prev_vk, $b_len[$pass], $in, \my @LIG;
+      $pass_table[$pass] .= join '', translate_key_line_c \@prev_vk, $b_len[$pass], $in, \my @LIG;
       my $VK = shift @LIG;
       $LIG{$VK} = \@LIG;
 #warn "DECIMAL --> [@LIG] for: $in" if $VK eq 'VK_DECIMAL';
@@ -156,9 +170,9 @@ exit;
 
 my($IN, $OUT) = <DATA>;
 my $b_len = 8;
-my $prev_vk;
+my @prev_vk;
 for my $in ($IN) {
-  my @O = translate_key_line_c \$prev_vk, $b_len, $in, \my %fake;
+  my @O = translate_key_line_c \@prev_vk, $b_len, $in, \my %fake;
   warn "$OUT" unless $O[0] eq $OUT;
   print for @O;
 }

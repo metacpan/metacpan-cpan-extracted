@@ -1,3 +1,9 @@
+0.002   2017-08-04 (PERLANCAR)
+
+	- Update to latest SPVM (no longer need to use SPVM::int or value()
+	  to get value).
+
+
 0.001   2017-06-21 (PERLANCAR)
 
         - First release.

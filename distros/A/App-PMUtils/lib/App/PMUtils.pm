@@ -1,7 +1,7 @@
 package App::PMUtils;
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.70'; # VERSION
+our $DATE = '2017-07-31'; # DATE
+our $VERSION = '0.71'; # VERSION
 
 use 5.010001;
 
@@ -188,7 +188,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.70 of App::PMUtils (from Perl distribution App-PMUtils), released on 2017-07-08.
+This document describes version 0.71 of App::PMUtils (from Perl distribution App-PMUtils), released on 2017-07-31.
 
 =head1 SYNOPSIS
 
@@ -399,7 +399,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtil
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
+Source repository is at L<https://github.com/sharyanto/perl-App-PMUtils>.
 
 =head1 BUGS
 

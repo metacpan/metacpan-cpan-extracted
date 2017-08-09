@@ -9,10 +9,10 @@ use Log::ger::Util;
 
 BEGIN {
     %Log::ger::Levels = (
-        foo => 1,
-        bar => 2,
-        baz => 3,
-        qux => 4,
+        foo => 10,
+        bar => 20,
+        baz => 30,
+        qux => 40,
     );
 }
 

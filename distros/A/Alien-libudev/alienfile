@@ -1,0 +1,39 @@
+use alienfile;
+use File::Copy qw(copy);
+use Env qw( @PATH );
+$^O eq 'linux' or die "OS unsupported. This is a Linux-only module\n";
+
+plugin 'PkgConfig' => 'libudev';
+
+share {
+    requires 'Alien::autoconf' => '0.03';
+    #requires 'Alien::automake' => '0.05';
+    requires 'Alien::libtool'  => '0.02';
+    requires 'Alien::m4'       => '0.11';
+    requires 'Alien::gperf'    => '0.005';
+
+    plugin Download => (
+        # Archive::Tar chokes on the symlink, even with $Archive::Tar::FOLLOW_SYMLINK=1
+        # So extracting the zip instead.
+        url => 'https://github.com/gentoo/eudev/releases',
+        filter => qr/^v .* \.zip$/x,
+        version => qr/([0-9\.]+)/,
+    );
+
+    patch sub {
+        # README is a symlink and would make autotools fail on filesystems not supporting them
+        unlink 'README';
+        copy qw(README.md README);
+    };
+    plugin Extract => 'zip';
+
+    build [
+        'autoreconf -i',
+        './configure --prefix=%{.install.prefix} --disable-shared',
+        'cd src/shared  && %{make}',
+        'cd src/libudev && %{make}',
+        'cd src/libudev && %{make} install',
+    ];
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

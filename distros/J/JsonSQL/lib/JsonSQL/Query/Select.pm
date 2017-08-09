@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Query::Select;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use base qw( JsonSQL::Query::Query );
 
@@ -30,10 +30,10 @@ use SQL::Maker::Select;
 
 
 sub new {
-    my ( $class, $query_rulesets, $json_query ) = @_;
+    my ( $class, $query_rulesets, $json_query, $quote_char ) = @_;
     
     # Inherit from JsonSQL::Query::Query base class.
-    my $self = $class->SUPER::new($query_rulesets, 'select');
+    my $self = $class->SUPER::new($query_rulesets, 'select', $quote_char);
     if ( eval { $self->is_error } ) {
         return (0, "Could not create JsonSQL SELECT query object: $self->{message}");
     }
@@ -161,7 +161,7 @@ sub new {
 sub get_select {
     my $self = shift;
     
-    my $makerObj = SQL::Maker::Select->new(quote_char => "'");
+    my $makerObj = SQL::Maker::Select->new(quote_char => '"');
     
     for my $field (@{ $self->{_selectFields}->get_fields($self) }) {
         if (ref $field eq 'HASH') {
@@ -249,7 +249,7 @@ JsonSQL::Query::Select - JsonSQL::Query::Select object. Stores a Perl representa
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -351,12 +351,12 @@ Examples of SELECT features supported by this module:
 
 =item fields => [ { table => "table1", column => "column1" }, { table => "table1", column => "column2" } ]
 
-    Generates: 'table1'.'column1', 'table1'.'column2'
+    Generates: "table1"."column1", "table1"."column2"
 See L<JsonSQL::Param::Fields> and L<JsonSQL::Param::Field> for more info.
 
 =item from => [ { schema => "myschema", table = "table1" } ] ( if you are using a JOIN, you can omit the FROM )
 
-    Generates FROM 'myschema'.'table1'
+    Generates FROM "myschema"."table1"
 See L<JsonSQL::Param::Tables> and L<JsonSQL::Param::Table> for more info.
 
 =back
@@ -367,28 +367,28 @@ See L<JsonSQL::Param::Tables> and L<JsonSQL::Param::Table> for more info.
 
 =item joins => [ { jointype => "inner", from => { table => "table1" }, to => { table => "table2" }, on => { eq => { field => { table => "table1", column => "column1" }, value => { table => "table2", column: "column2"}} } } ]
 
-    Generates: FROM 'table1' INNER JOIN 'table2' ON 'table1'.'column1' = 'table2'.'column2'
+    Generates: FROM "table1" INNER JOIN "table2" ON "table1"."column1" = "table2"."column2"
 See L<JsonSQL::Param::Joins> and L<JsonSQL::Param::Join> for more info.
 
 =item where => { eq => { field => { table => "table1", column => "column1" }, value => 32 } }
 
-    Generates: WHERE 'table1'.'column1' = ?
+    Generates: WHERE "table1"."column1" = ?
         Bind: [ 32 ]
 See L<JsonSQL::Param::Condition> and L<JsonSQL::Param::ConditionDispatcher> for more info.
 
 =item orderby => [ { field => { table => "table1", column => "column1" }, order => 'ASC'} ]
 
-    Generates: ORDER BY 'table'.'column1' ASC
+    Generates: ORDER BY "table"."column1" ASC
 See L<JsonSQL::Param::OrderBy> and L<JsonSQL::Param::Order> for more info.
 
 =item groupby => [ { table => "table1", column => "column1" } ]
 
-    Generates: GROUP BY 'table1'.'column1'
+    Generates: GROUP BY "table1"."column1"
 See L<JsonSQL::Param::Fields> and L<JsonSQL::Param::Field> for more info.
 
 =item having => { eq => { field => { table => "table1", column => "column1" }, value => 32 } }
 
-    Generates: HAVING 'table1'.'column1' = ?
+    Generates: HAVING "table1"."column1" = ?
         Bind: [ 32 ]
 See L<JsonSQL::Param::Condition> and L<JsonSQL::Param::ConditionDispatcher> for more info.
 
@@ -427,12 +427,13 @@ A set of whitelisting rules is required to successfully use this module to gener
 
 =head1 METHODS
 
-=head2 Constructor new($query_rulesets, $json_query)
+=head2 Constructor new($query_rulesets, $json_query, $quote_char)
 
 Instantiates and returns a new JsonSQL::Query::Select object.
 
     $query_rulesets      => The whitelisting rules to validate the query with.
     $json_query          => A stringified JSON object representing the query.
+    $quote_char          => Optional: the character to use for quoting identifiers. The SUPER defaults to ANSI double quotes.
 
 Returns (0, <error message>) on failure.
 

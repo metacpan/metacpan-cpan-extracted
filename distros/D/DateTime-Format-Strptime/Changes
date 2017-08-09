@@ -1,3 +1,9 @@
+1.74     2017-08-03
+
+- Fix text to not rely on a very specific exception message from Specio. This
+  was broken in 0.39. Reported by Slaven Rezić. GH #18.
+
+
 1.73     2017-01-31
 
 - The format_datetime now checks that the object it is given isa DateTime

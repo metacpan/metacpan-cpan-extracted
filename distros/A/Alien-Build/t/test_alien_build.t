@@ -189,4 +189,230 @@ subtest alien_build_ok => sub {
 
 };
 
+subtest 'alien_install_type_is' => sub {
+
+
+  my $ret;
+
+  subtest 'no alienfile' => sub {
+
+    eval { alienfile q{ die } };
+    
+    is(
+      intercept { $ret = alien_install_type_is 'system' },
+      array {
+        event Ok => sub {
+          call pass => F();
+          call name => 'alien install type is system';
+        };
+        event Diag => sub {};
+        event Diag => sub {
+          call message => 'no alienfile';
+        };
+        end;
+      },
+      'test for anything',
+    );
+  
+    is $ret, F(), 'return false';
+  };
+  
+  subtest 'is system' => sub {
+  
+    alienfile_ok q{
+      use alienfile;
+      probe sub { 'system' };
+    };
+    
+    is(
+      intercept { $ret = alien_install_type_is 'system', 'some name' },
+      array {
+        event Ok => sub {
+          call pass => T();
+          call name => 'some name';
+        };
+        end;
+      },
+      'check for system',
+    );
+    
+    is $ret, T(), 'return true';
+
+    is(
+      intercept { $ret = alien_install_type_is 'share', 'some name' },
+      array {
+        event Ok => sub {
+          call pass => F();
+          call name => 'some name';
+        };
+        event Diag => sub {};
+        event Diag => sub {
+          call message => 'expected install type of share, but got system';
+        };
+        end;
+      },
+      'check for share',
+    );
+    
+    is $ret, F(), 'return false';
+  
+  };
+
+  subtest 'is share' => sub {
+  
+    alienfile_ok q{
+      use alienfile;
+      probe sub { 'share' };
+    };
+    
+    is(
+      intercept { $ret = alien_install_type_is 'share', 'some other name' },
+      array {
+        event Ok => sub {
+          call pass => T();
+          call name => 'some other name';
+        };
+        end;
+      },
+      'check for share',
+    );
+    
+    is $ret, T(), 'return true';
+
+    is(
+      intercept { $ret = alien_install_type_is 'system', 'some other name' },
+      array {
+        event Ok => sub {
+          call pass => F();
+          call name => 'some other name';
+        };
+        event Diag => sub {};
+        event Diag => sub {
+          call message => 'expected install type of system, but got share';
+        };
+        end;
+      },
+      'check for system',
+    );
+    
+    is $ret, F(), 'return false';
+  
+  };
+  
+};
+
+subtest 'alien_download_ok' => sub {
+
+  subtest 'good download' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      probe sub { 'share' };
+      share {
+        download sub {
+          path('file1')->spew("xx\n");
+        };
+      };
+    };
+    
+    my $file = alien_download_ok;
+    
+    is(
+      path($file)->slurp,
+      "xx\n",
+      'file content matches',
+    );
+
+  };
+
+  subtest 'good download' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      probe sub { 'share' };
+      share {
+        download sub {
+        };
+      };
+    };
+    
+    my $file;
+    
+    is(
+      intercept { $file = alien_download_ok },
+      array {
+        event Ok => sub {
+          call pass => F();
+        };
+        etc;
+      },
+      'test fails',
+    );
+    
+    is($file, U(), 'return value is undef');
+
+  };
+
+};
+
+subtest 'alien_extract_ok' => sub {
+
+  subtest 'good extract' => sub {
+  
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      probe sub { 'share' };
+      share {
+        download sub {
+          path('file1')->touch;
+        };
+        extract sub {
+          path($_)->touch for qw( file2 file3 );
+        };
+      };
+    };
+    
+    my $dir = alien_extract_ok;
+    
+    is(-d $dir, T(), "dir is dir" );
+    is(-f path("$dir/file2"), T(), "has file2" );
+    is(-f path("$dir/file3"), T(), "has file3" );
+  
+  };
+  
+  subtest 'bad extract' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      probe sub { 'share' };
+      share {
+        download sub {
+          path('file1')->touch;
+        };
+        extract sub {
+          ();
+        };
+      };
+    };
+
+    my $dir;    
+    is(
+      intercept { $dir = alien_extract_ok },
+      array {
+        event Ok => sub {
+          call pass => F();
+        };
+        etc;
+      },
+      'test fails',
+    );
+    
+    is( $dir, U(), "dir is undef");
+  };
+  
+};
+
 done_testing;

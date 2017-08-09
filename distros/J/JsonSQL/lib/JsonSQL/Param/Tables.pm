@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::Tables;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Param::Table;
 use JsonSQL::Error;
@@ -64,7 +64,7 @@ JsonSQL::Param::Tables - JsonSQL::Param::Tables object. Stores an array of JsonS
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

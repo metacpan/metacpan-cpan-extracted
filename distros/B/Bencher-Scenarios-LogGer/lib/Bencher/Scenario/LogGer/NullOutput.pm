@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NullOutput;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,13 +10,16 @@ use warnings;
 our $scenario = {
     summary => 'Benchmark Log::ger logging speed with the default/null output',
     modules => {
-        'Log::ger' => {version=>'0.011'},
+        'Log::ger' => {version=>'0.023'},
         'Log::ger::Plugin::MultilevelLog' => {},
         'Log::ger::Plugin::OptAway' => {},
         'Log::Any' => {},
         'Log::Fast' => {},
         'Log::Log4perl' => {},
         'Log::Log4perl::Tiny' => {},
+        'Log::Contextual' => {},
+        'Log::Contextual::SimpleLogger' => {},
+        'Log::Dispatchouli' => {},
     },
     participants => [
         {
@@ -76,6 +79,19 @@ our $scenario = {
             perl_cmdline_template => ['-MLog::Log4perl::Tiny=:easy', '-e', 'for(1..1_000_000) { TRACE "" }'],
         },
 
+        {
+            name => 'Log::Contextual+Log4perl' ,
+            perl_cmdline_template => ['-e', 'use Log::Contextual ":log", "set_logger"; use Log::Log4perl ":easy"; Log::Log4perl->easy_init($DEBUG); my $logger = Log::Log4perl->get_logger; set_logger $logger; for(1..1_000_000) { log_trace {} }'],
+        },
+        {
+            name => 'Log::Contextual+SimpleLogger' ,
+            perl_cmdline_template => ['-MLog::Contextual::SimpleLogger', '-e', 'use Log::Contextual ":log", -logger=>Log::Contextual::SimpleLogger->new({levels=>["debug"]}); for(1..1_000_000) { log_trace {} }'],
+        },
+
+        {
+            name => 'Log::Dispatchouli' ,
+            perl_cmdline_template => ['-MLog::Dispatchouli', '-e', '$logger = Log::Dispatchouli->new({ident=>"ident", facility=>"facility", to_stdout=>1, debug=>0}); for(1..1_000_000) { $logger->log_debug("") }'],
+        },
     ],
     precision => 6,
 };
@@ -95,7 +111,7 @@ Bencher::Scenario::LogGer::NullOutput - Benchmark Log::ger logging speed with th
 
 =head1 VERSION
 
-This document describes version 0.010 of Bencher::Scenario::LogGer::NullOutput (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
+This document describes version 0.012 of Bencher::Scenario::LogGer::NullOutput (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-08-04.
 
 =head1 SYNOPSIS
 
@@ -113,19 +129,25 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::Any> 1.042
+L<Log::Any> 1.049
+
+L<Log::Contextual> 0.007001
+
+L<Log::Contextual::SimpleLogger> 0.007001
+
+L<Log::Dispatchouli> 2.015
 
 L<Log::Fast> v2.0.0
 
-L<Log::Log4perl> 1.47
+L<Log::Log4perl> 1.49
 
 L<Log::Log4perl::Tiny> 1.4.0
 
-L<Log::ger> 0.016
+L<Log::ger> 0.023
 
-L<Log::ger::Plugin::MultilevelLog> 0.016
+L<Log::ger::Plugin::MultilevelLog> 0.023
 
-L<Log::ger::Plugin::OptAway> 0.004
+L<Log::ger::Plugin::OptAway> 0.005
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -235,32 +257,59 @@ Command line:
 
 
 
+=item * Log::Contextual+Log4perl (command)
+
+Command line:
+
+ #TEMPLATE: #perl -e use Log::Contextual ":log", "set_logger"; use Log::Log4perl ":easy"; Log::Log4perl->easy_init($DEBUG); my $logger = Log::Log4perl->get_logger; set_logger $logger; for(1..1_000_000) { log_trace {} }
+
+
+
+=item * Log::Contextual+SimpleLogger (command)
+
+Command line:
+
+ #TEMPLATE: #perl -MLog::Contextual::SimpleLogger -e use Log::Contextual ":log", -logger=>Log::Contextual::SimpleLogger->new({levels=>["debug"]}); for(1..1_000_000) { log_trace {} }
+
+
+
+=item * Log::Dispatchouli (command)
+
+Command line:
+
+ #TEMPLATE: #perl -MLog::Dispatchouli -e $logger = Log::Dispatchouli->new({ident=>"ident", facility=>"facility", to_stdout=>1, debug=>0}); for(1..1_000_000) { $logger->log_debug("") }
+
+
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with default options (C<< bencher -m LogGer::NullOutput >>):
 
  #table1#
- +------------------------------------------+-----------+-----------+------------+---------+---------+
- | participant                              | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +------------------------------------------+-----------+-----------+------------+---------+---------+
- | Log::Log4perl::Tiny-1mil_trace           |     0.792 |      1260 |       1    | 0.00066 |       6 |
- | Log::Any-null_adapter-1mil_log_trace     |     1.3   |       760 |       1.7  | 0.0012  |       6 |
- | Log::Fast-1mil_is_debug                  |     1.9   |       520 |       2.4  | 0.0015  |       6 |
- | Log::Any-no_adapter-1mil_is_trace        |     2     |       500 |       3    | 0.0075  |       6 |
- | Log::Any-null_adapter-1mil_is_trace      |     2.3   |       440 |       2.9  | 0.00099 |       8 |
- | Log::Log4perl-easy-1mil_trace            |     3.1   |       323 |       3.92 | 0.00029 |       6 |
- | Log::Any-no_adapter-1mil_log_trace       |     6.1   |       160 |       7.7  | 0.00057 |       6 |
- | Log::Fast-1mil_DEBUG                     |     6.5   |       150 |       8.2  | 0.00041 |       6 |
- | Log::ger+LGP:MutilevelLog-1mil_log_6     |     8     |       100 |      10    | 0.0013  |       6 |
- | Log::ger+LGP:MutilevelLog-1mil_log_trace |     8.8   |       110 |      11    | 0.001   |       8 |
- | Log::ger-1mil_log_trace                  |    10     |        97 |      13    | 0.00028 |       6 |
- | Log::ger-1mil_log_is_trace               |    11     |        92 |      14    | 0.00028 |       6 |
- | Log::ger+LGP:OptAway-1mil_log_trace      |    21     |        49 |      26    | 0.00032 |       6 |
- +------------------------------------------+-----------+-----------+------------+---------+---------+
+ +------------------------------------------+-----------+-------+------------+-----------+---------+
+ | participant                              | rate (/s) |  time | vs_slowest |  errors   | samples |
+ +------------------------------------------+-----------+-------+------------+-----------+---------+
+ | Log::Contextual+Log4perl                 |     0.17  | 5.89  |       1    |   0.0055  |       6 |
+ | Log::Contextual+SimpleLogger             |     0.176 | 5.7   |       1.03 |   0.001   |       6 |
+ | Log::Log4perl::Tiny-1mil_trace           |     0.84  | 1.2   |       5    |   0.0022  |       6 |
+ | Log::Dispatchouli                        |     1.2   | 0.84  |       7    |   0.0037  |       6 |
+ | Log::Any-null_adapter-1mil_log_trace     |     1.6   | 0.61  |       9.7  |   0.00084 |       6 |
+ | Log::Fast-1mil_is_debug                  |     2.1   | 0.48  |      12    |   0.00058 |       6 |
+ | Log::Any-no_adapter-1mil_is_trace        |     2.4   | 0.41  |      14    |   0.0018  |       6 |
+ | Log::Any-null_adapter-1mil_is_trace      |     2.5   | 0.41  |      14    |   0.0019  |       6 |
+ | Log::Log4perl-easy-1mil_trace            |     3.1   | 0.32  |      18    |   0.00064 |       6 |
+ | Log::Fast-1mil_DEBUG                     |     6.3   | 0.16  |      37    |   0.00038 |       6 |
+ | Log::Any-no_adapter-1mil_log_trace       |     6.4   | 0.16  |      38    |   0.00031 |       6 |
+ | Log::ger+LGP:MutilevelLog-1mil_log_6     |     9.06  | 0.11  |      53.4  | 9.3e-05   |       6 |
+ | Log::ger+LGP:MutilevelLog-1mil_log_trace |     9.12  | 0.11  |      53.7  | 8.4e-05   |       6 |
+ | Log::ger-1mil_log_is_trace               |     9.3   | 0.11  |      55    |   0.00026 |       9 |
+ | Log::ger-1mil_log_trace                  |    10     | 0.098 |      60    |   0.00013 |       6 |
+ | Log::ger+LGP:OptAway-1mil_log_trace      |    22     | 0.046 |     130    |   9e-05   |       6 |
+ +------------------------------------------+-----------+-------+------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

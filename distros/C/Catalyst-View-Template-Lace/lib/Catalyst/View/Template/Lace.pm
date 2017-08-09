@@ -1,6 +1,6 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Module::Runtime;
 use Catalyst::View::Template::Lace::Renderer;
@@ -133,6 +133,22 @@ Used in a controller:
     }
 
     __PACKAGE__->meta->make_immutable;
+
+A Template may also contain components which are reusable blocks of template
+functionality and which refer to other Catalyst Views in your application:
+
+    <view-master title='Homepage'>
+      <view-header navbar_section='home'/>
+        <section>
+          <p>You are doomed to discover you can never recover from the narcolyptic
+          country in which you once stood, where the fires alway burning but there's
+          never enough wood</p>
+        </section>
+      <view-footer copyright='$.copy' />
+    </view-master>
+
+Such components can wrap your main content or even other component, and they can
+accept arguments.  See L<Catalyst::View::Template::Lace::Tutorial> for more details.
 
 =head1 DESCRIPTION
 

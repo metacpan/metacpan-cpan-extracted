@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<title><tmpl_var title></title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+
+<div>
+<tmpl_loop images><div><a href='full/<tmpl_var _>'><img src='thumb/<tmpl_var _>'></a></div>
+</tmpl_loop></div>

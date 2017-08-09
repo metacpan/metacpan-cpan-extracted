@@ -1,5 +1,5 @@
 package Consul::Session;
-$Consul::Session::VERSION = '0.021';
+$Consul::Session::VERSION = '0.022';
 use namespace::autoclean;
 
 use Moo;

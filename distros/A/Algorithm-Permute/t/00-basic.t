@@ -98,22 +98,26 @@ TODO: {
 
 ######################################
 # test eval block inside permute block
-@array = qw/a r s e/;
-$i     = 0;
-permute {
-    eval { goto foo };
-    ++$i
+SKIP: {
+    skip "'goto' test would fail on Perl <= 5.8.8", 2 if ( $] <= 5.008008 );
+
+    @array = qw/a r s e/;
+    $i     = 0;
+    permute {
+        eval { goto foo };
+        ++$i
+    }
+    @array;
+    if ( $@ =~ /^Can't "goto" out/ ) {
+        pass(q{Can't "goto" out});
+    }
+    else {
+      foo:
+        diag($@);
+        fail(q{Can't "goto" out});
+    }
+    is( $i, 24, 'permutations count' );
 }
-@array;
-if ( $@ =~ /^Can't "goto" out/ ) {
-    pass(q{Can't "goto" out});
-}
-else {
-  foo:
-    diag($@);
-    fail(q{Can't "goto" out});
-}
-is( $i, 24, 'permutations count' );
 
 {
     # test r of n permutation

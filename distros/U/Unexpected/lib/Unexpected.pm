@@ -5,7 +5,7 @@ use namespace::autoclean;
 use overload '""'       => sub { $_[ 0 ]->as_string  },
              'bool'     => sub { $_[ 0 ]->as_boolean },
              'fallback' => 1;
-use version; our $VERSION = qv( sprintf '0.46.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '1.0.%d', q$Rev: 1 $ =~ /\d+/gmx );
 
 use Moo;
 

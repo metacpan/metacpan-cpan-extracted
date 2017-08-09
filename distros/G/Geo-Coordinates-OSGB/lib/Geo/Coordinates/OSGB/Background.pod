@@ -6,7 +6,7 @@ Geo::Coordinates::OSGB::Background - Background and extended description
 
 =head1 VERSION
 
-2.18
+2.19
 
 =head1 DESCRIPTION
 
@@ -125,8 +125,7 @@ The functions to parse and format lat/lon have been removed.  They
 were not really a core function of this module.  There are other modules
 on CPAN to deal with latitude and longitude.  I also give an example of
 how to format decimal degrees as degrees, minutes, and seconds in
-C<examples/bng_to_ll.pl>.
-
+C<examples/bngl.pl>.
 
 =back
 
@@ -538,9 +537,24 @@ overestimated.
 
 =head3 How fast are the conversions?
 
-If you can live with a 5 m level of uncertainty, then you will find that
-the Helmert routines are a bit faster at translating from grid to
-latitude and longitude.  A typical bench mark run on my development
+In general the answer to this question is "probably faster than you need", but if
+you have read this far you might be interested in the results of my benchmarking.  
+The slowest part of these routines used to be the loading of the OSTN02 data set but I have 
+put considerable effort into making this faster since about version 2.08 of this module, so that
+now the accurate routines the use the OSTN02 data are pretty much the same as the approximate 
+routines.  
+
+The tests are probably rather generous to my code because of the caching effect.
+In order to speed up the OSTN02 data lookups, the routines keep a cache of the data 
+fetched, so that if you convert a sequence of coordinates in the same square km, the second
+and subsequent lookups will get the data from a local hash instead of having to read the 
+table.  The benchmark test (using the standard Benchmark.pm approach) consists of getting
+Perl to run as many conversions as possible 
+for about 5 CPU seconds, and as a result the cache hit ratio is probably rather exaggerated.
+Nevertheless this might still be reasonably representative if you are converting, say, the steps 
+in a GPX track, where successive steps are highly likely to be the same square km as the one before.
+
+Last year (2016) with version 2.16 of this module, a typical bench mark run on my development
 machine (a Mac Mini server from 2011) using the Apple-supplied Perl 5.16
 gave:
 
@@ -548,31 +562,51 @@ gave:
     ----------------------------------------------
     ll_to_grid                  41677        0.024 
     ll_to_grid_helmert          42145        0.024 
+    
     grid_to_ll                  18131        0.055 
     grid_to_ll_helmert          35793        0.028 
 
 On my newer work machine (a MBP from 2015) using the newer Perl 5.18 supplied
-with macOS Sierra, I got slightly better numbers:
+with macOS Sierra, I got slightly better numbers with V2.16
 
     Subroutine          calls per sec  ms per call
     ----------------------------------------------
     ll_to_grid                  50980        0.020
     ll_to_grid_helmert          68267        0.015
+    
     grid_to_ll                  25831        0.039
     grid_to_ll_helmert          54371        0.018
 
-None of the routines is really slow, since even C<grid_to_ll> averages under 60
-microseconds per call on the older machine, but C<grid_to_ll_helmert> runs
-about twice as fast as C<grid_to_ll>.  Using a locally compiled version of Perl
-5.22, I saw a small improvement on the Helmert routines, but the OSTN02
-routines are about the same.  `Your mileage may vary', of course.
+But after a bit more work to simplify the way that the cache is implemented 
+I get this on the same MBP with the current version of my code:
 
-The routines have been tested with various versions of Perl, including
-recent versions with the C<uselongdouble> option enabled.  On my system,
-long doubles slow everything down by about 10%, and make no difference
-to the round trip precision of the routines. Since the formulae were
-specifically designed for ordinary double precision arithmetic, Perl's
-default arithmetic is more than adequate.  
+    Subroutine          calls per sec  ms per call
+    ----------------------------------------------
+    ll_to_grid                  69099       0.0145
+    ll_to_grid_helmert          66158       0.0151
+
+    grid_to_ll                  29114       0.0343
+    grid_to_ll_helmert          53969       0.0185
+
+In my opinion, this justifies my decision to make the accurate OSTN02
+conversion the default.  The approximate Helmert-based routine is no quicker
+for ll to grid conversions.  
+
+It is always going to be slightly slower converting from grid to ll, due to the
+iterative nature of the algorithm that is built into OSTN02.  So the approximate 
+routine is likely to remain a fair bit faster.  Having said that
+none of the routines is really slow, since even C<grid_to_ll> averages under 60
+microseconds per call on the older machine. 
+`Your mileage may vary', of course.
+
+The routines have been tested with various versions of Perl, including recent
+versions with the C<uselongdouble> option enabled.  Using a locally compiled
+version of Perl 5.22 with ordinary doubles, I saw a small improvement on the
+Helmert routines, but the OSTN02 routines are about the same.  On the same
+system, long doubles slowed everything down by about 10%, and made no
+difference to the round trip precision of the routines. Since the formulae were
+specifically designed for ordinary double precision arithmetic, Perl's default
+arithmetic is more than adequate.  
 
 =head2 Maps 
 

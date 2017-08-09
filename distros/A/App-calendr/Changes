@@ -1,5 +1,12 @@
 Revision history for App::calendr
 
+0.20  Sun Aug 06 04:35:00 2017
+      - Renamed option '--gregorian' to '--gdate', just to make sure
+        it doesn't confuse user with the calendar name 'Gregorian'.
+
+0.19  Tue Aug 01 11:35:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
 0.18  Sat Jul 29 08:40:00 2017
       - Renamed option '--julian' to '--jday', just to make sure
         it doesn't confuse user with the calendar name 'Julian'.

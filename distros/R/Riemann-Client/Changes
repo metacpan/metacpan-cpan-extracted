@@ -1,5 +1,9 @@
 Revision history for Riemann-Client
 
+0.04      2017-07-30 16:11:41+01:00 Europe/London
+    - Thanks to dch: Protocol spec updated
+    - Thanks to dch: Add tag support
+
 0.03      2013-08-18 14:04:37 Europe/Madrid
     - Auto reconnect if the connection is lost
     - Die if no response is received from server

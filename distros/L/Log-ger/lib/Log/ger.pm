@@ -1,7 +1,7 @@
 package Log::ger;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -11,20 +11,20 @@ our $VERSION = '0.020'; # VERSION
 our $re_addr = qr/\(0x([0-9a-f]+)/o;
 
 our %Levels = (
-    fatal   => 1,
-    error   => 2,
-    warn    => 3,
-    info    => 4,
-    debug   => 5,
-    trace   => 6,
+    fatal   => 10,
+    error   => 20,
+    warn    => 30,
+    info    => 40,
+    debug   => 50,
+    trace   => 60,
 );
 
 our %Level_Aliases = (
-    off => 0,
-    warning => 3,
+    off     => 0,
+    warning => 30,
 );
 
-our $Current_Level = 3;
+our $Current_Level = 30;
 
 our $Caller_Depth_Offset = 0;
 
@@ -49,16 +49,7 @@ our %Per_Object_Hooks; # key = object address, value = { phase => hooks, ... }
 
 my $sub0 = sub {0};
 my $sub1 = sub {1};
-my $default_null_routines = [
-    (map {
-        [$sub0, "log_$_", $Levels{$_}, 'log_sub'],
-            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "log_is_$_",
-             $Levels{$_}, 'is_sub'],
-        [$sub0, $_, $Levels{$_}, 'log_method'],
-            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "is_$_",
-             $Levels{$_}, 'is_method'],
-         } keys %Levels),
-];
+my $default_null_routines;
 
 sub install_routines {
     my ($target, $target_arg, $routines) = @_;
@@ -112,6 +103,17 @@ sub add_target {
     }
 }
 
+sub _set_default_null_routines {
+    $default_null_routines ||= [
+        (map {(
+            [$sub0, "log_$_", $Levels{$_}, 'log_sub'],
+            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "log_is_$_", $Levels{$_}, 'is_sub'],
+            [$sub0, $_, $Levels{$_}, 'log_method'],
+            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "is_$_", $Levels{$_}, 'is_method'],
+        )} keys %Levels),
+    ];
+}
+
 sub get_logger {
     my ($package, %args) = @_;
 
@@ -126,6 +128,7 @@ sub get_logger {
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
+        _set_default_null_routines();
         install_routines(object => $obj, $default_null_routines);
     }
     $obj; # XXX add DESTROY to remove from list of targets
@@ -143,6 +146,7 @@ sub import {
     } else {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
+        _set_default_null_routines();
         install_routines(package => $caller, $default_null_routines);
     }
 }
@@ -162,7 +166,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 

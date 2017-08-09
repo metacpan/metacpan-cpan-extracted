@@ -1,5 +1,11 @@
 Revision history for Perl extension OpenGL::Modern.
 
+0.04     2017-08-06 12:06:13-04:00
+        - Add module to allow OpenGL::Image to work with OpenGL::Modern
+        - Add error checking and glpSetAutoCheckErrors to control
+        - Various fixes to make app-shadertoy work with OpenGL::Modern
+        - New tests and perltidy support
+
 0.03     2017-02-25 17:08:07-05:00
         - Use Devel::CheckLib to generate NA for missing libraries
 	- Fix automatic calls for glewInit() and done_glewInit()

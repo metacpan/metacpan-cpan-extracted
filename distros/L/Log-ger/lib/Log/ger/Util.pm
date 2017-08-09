@@ -1,7 +1,7 @@
 package Log::ger::Util;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ require Log::ger::Heavy;
 sub _dump {
     unless ($Log::ger::_dumper) {
         eval {
+            no warnings 'once';
             require Data::Dmp;
             $Data::Dmp::OPT_REMOVE_PRAGMAS = 1;
             1;
@@ -85,6 +86,11 @@ sub _action_on_hooks {
         # XXX remove duplicate key
         # my $key = $hook->[0];
         unshift @$hooks, $hook;
+    } elsif ($action eq 'remove') {
+        my $code = shift;
+        for my $i (reverse 0..$#{$hooks}) {
+            splice @$hooks, $i, 1 if $code->($hooks->[$i]);
+        }
     } elsif ($action eq 'reset') {
         my $saved = [@$hooks];
         splice @$hooks, 0, scalar(@$hooks),
@@ -111,6 +117,16 @@ sub add_hook {
 sub add_per_target_hook {
     my ($target, $target_arg, $phase, $hook) = @_;
     _action_on_hooks('add', $target, $target_arg, $phase, $hook);
+}
+
+sub remove_hook {
+    my ($phase, $code) = @_;
+    _action_on_hooks('remove', '', undef, $phase, $code);
+}
+
+sub remove_per_target_hook {
+    my ($target, $target_arg, $phase, $code) = @_;
+    _action_on_hooks('remove', $target, $target_arg, $phase, $code);
 }
 
 sub reset_hooks {
@@ -195,20 +211,43 @@ sub reinit_all_targets {
 }
 
 sub set_plugin {
-    no strict 'refs';
-
     my %args = @_;
 
     my $hooks;
     if ($args{hooks}) {
         $hooks = $args{hooks};
     } else {
+        no strict 'refs';
         my $prefix = $args{prefix} || 'Log::ger::Plugin::';
         my $mod = $args{name};
         $mod = $prefix . $mod unless index($mod, $prefix) == 0;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
         require $mod_pm;
         $hooks = &{"$mod\::get_hooks"}(%{ $args{conf} || {} });
+    }
+
+    {
+        last unless $args{replace_package_regex};
+        my $all_hooks;
+        if (!$args{target}) {
+            $all_hooks = \%Log::ger::Global_Hooks;
+        } elsif ($args{target} eq 'package') {
+            $all_hooks = $Log::ger::Per_Package_Hooks{ $args{target_arg} };
+        } elsif ($args{target} eq 'object') {
+            my ($addr) = $args{target_arg} =~ $Log::ger::re_addr;
+            $all_hooks = $Log::ger::Per_Object_Hooks{$addr};
+        } elsif ($args{target} eq 'hash') {
+            my ($addr) = $args{target_arg} =~ $Log::ger::re_addr;
+            $all_hooks = $Log::ger::Per_Hash_Hooks{$addr};
+        }
+        last unless $all_hooks;
+        for my $phase (keys %$all_hooks) {
+            my $hooks = $all_hooks->{$phase};
+            for my $i (reverse 0..$#{$hooks}) {
+                splice @$hooks, $i, 1
+                    if $hooks->[$i][0] =~ $args{replace_package_regex};
+            }
+        }
     }
 
     for my $phase (keys %$hooks) {
@@ -247,7 +286,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 DESCRIPTION
 

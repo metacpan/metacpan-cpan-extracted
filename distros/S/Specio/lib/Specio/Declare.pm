@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Exporter';
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use Carp qw( croak );
 use Specio::Coercion;
@@ -131,8 +131,9 @@ sub object_can_type {
 }
 
 sub object_does_type {
-    my $name = shift;
-    my %p    = @_;
+    my $name;
+    $name = shift if @_ % 2;
+    my %p = @_;
 
     my $caller = scalar caller();
 
@@ -149,19 +150,21 @@ sub object_does_type {
     require Specio::Constraint::ObjectDoes;
 
     my $tc = _make_tc(
-        name       => $name,
-        role       => ( defined $p{role} ? $p{role} : $name ),
+        ( defined $name ? ( name => $name ) : () ),
+        role => ( defined $p{role} ? $p{role} : $name ),
         type_class => 'Specio::Constraint::ObjectDoes',
     );
 
-    register( scalar caller(), $name, $tc, 'exportable' );
+    register( scalar caller(), $name, $tc, 'exportable' )
+        if defined $name;
 
     return $tc;
 }
 
 sub object_isa_type {
-    my $name = shift;
-    my %p    = @_;
+    my $name;
+    $name = shift if @_ % 2;
+    my %p = @_;
 
     my $caller = scalar caller();
     unless ( keys %p ) {
@@ -173,12 +176,13 @@ sub object_isa_type {
     require Specio::Constraint::ObjectIsa;
 
     my $tc = _make_tc(
-        name       => $name,
-        class      => ( defined $p{class} ? $p{class} : $name ),
+        ( defined $name ? ( name => $name ) : () ),
+        class => ( defined $p{class} ? $p{class} : $name ),
         type_class => 'Specio::Constraint::ObjectIsa',
     );
 
-    register( $caller, $name, $tc, 'exportable' );
+    register( $caller, $name, $tc, 'exportable' )
+        if defined $name;
 
     return $tc;
 }
@@ -205,8 +209,9 @@ sub any_can_type {
 }
 
 sub any_does_type {
-    my $name = shift;
-    my %p    = @_;
+    my $name;
+    $name = shift if @_ % 2;
+    my %p = @_;
 
     my $caller = scalar caller();
     unless ( keys %p ) {
@@ -218,19 +223,21 @@ sub any_does_type {
     require Specio::Constraint::AnyDoes;
 
     my $tc = _make_tc(
-        name       => $name,
-        role       => ( defined $p{role} ? $p{role} : $name ),
+        ( defined $name ? ( name => $name ) : () ),
+        role => ( defined $p{role} ? $p{role} : $name ),
         type_class => 'Specio::Constraint::AnyDoes',
     );
 
-    register( scalar caller(), $name, $tc, 'exportable' );
+    register( scalar caller(), $name, $tc, 'exportable' )
+        if defined $name;
 
     return $tc;
 }
 
 sub any_isa_type {
-    my $name = shift;
-    my %p    = @_;
+    my $name;
+    $name = shift if @_ % 2;
+    my %p = @_;
 
     my $caller = scalar caller();
     unless ( keys %p ) {
@@ -242,12 +249,13 @@ sub any_isa_type {
     require Specio::Constraint::AnyIsa;
 
     my $tc = _make_tc(
-        name       => $name,
-        class      => ( defined $p{class} ? $p{class} : $name ),
+        ( defined $name ? ( name => $name ) : () ),
+        class => ( defined $p{class} ? $p{class} : $name ),
         type_class => 'Specio::Constraint::AnyIsa',
     );
 
-    register( scalar caller(), $name, $tc, 'exportable' );
+    register( scalar caller(), $name, $tc, 'exportable' )
+        if defined $name;
 
     return $tc;
 }
@@ -337,7 +345,7 @@ Specio::Declare - Specio declaration subroutines
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -563,6 +571,8 @@ These subroutines take a type name as the first argument. The remaining
 arguments are key/value pairs. Currently this is just the C<class> key, which
 should be a class name. This is the class that the type requires.
 
+The type name argument can be omitted to create an anonymous type.
+
 You can also pass just a single argument, in which case that will be used as
 both the type's name and the class for the constraint to check.
 
@@ -578,6 +588,8 @@ should be a role name. This is the class that the type requires.
 
 This should just work (I hope) with roles created by L<Moose>, L<Mouse>, and
 L<Moo> (using L<Role::Tiny>).
+
+The type name argument can be omitted to create an anonymous type.
 
 You can also pass just a single argument, in which case that will be used as
 both the type's name and the role for the constraint to check.

@@ -1,7 +1,7 @@
 package Perinci::CmdLine;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '1.52'; # VERSION
+our $DATE = '2017-07-31'; # DATE
+our $VERSION = '1.77'; # VERSION
 
 sub new {
     die "This module is currently empty, for now please use Perinci::CmdLine::{Lite,Classic,Any} instead. There is also Perinci::CmdLine::Inline.";
@@ -23,7 +23,7 @@ Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.52 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2017-07-07.
+This document describes version 1.77 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
 
 =head1 DESCRIPTION
 

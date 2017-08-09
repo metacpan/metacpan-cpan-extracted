@@ -11,7 +11,7 @@ endif
 ifndef NORULE
  x.x:
  ifdef BROKEN
-	perl { die "FAIL" }
+	perl { die "FAIL\n" }
  else
 	&echo "#define X" -o $@
  endif # BROKEN

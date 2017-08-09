@@ -6,7 +6,7 @@ use Moops;
 
 class MarpaX::Languages::M4::Impl::Regexp {
 
-    our $VERSION = '0.017'; # VERSION
+    our $VERSION = '0.019'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -70,7 +70,7 @@ class MarpaX::Languages::M4::Impl::Regexp {
                 $regexp = qr/$regexpString(?#)/sm;
             }
             else {
-                use re::engine::GNU 0.019;
+                use re::engine::GNU 0.024;
                 $regexp = qr/$regexpString/sm;
                 no re::engine::GNU;
             }
@@ -154,7 +154,7 @@ class MarpaX::Languages::M4::Impl::Regexp {
                 }
             }
             else {
-                use re::engine::GNU 0.019;
+                use re::engine::GNU 0.024;
                 #
                 # Execute re::engine::GNU engine
                 #
@@ -277,7 +277,7 @@ MarpaX::Languages::M4::Impl::Regexp - M4 Regexp generic implementation
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 AUTHOR
 

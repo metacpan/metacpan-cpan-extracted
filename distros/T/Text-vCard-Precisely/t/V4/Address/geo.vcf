@@ -1,0 +1,4 @@
+BEGIN:VCARD
+VERSION:4.0
+ADR;GEO="geo:12.3457,78.910":;;street;city;region;post_code;country
+END:VCARD

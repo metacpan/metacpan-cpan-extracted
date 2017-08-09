@@ -37,4 +37,14 @@ subtest '%o: offset' => sub {
     like $@, qr/offset must be numeric specified/;
 };
 
+subtest 'Unkown LIMIT_DIALECT' => sub {
+    eval {
+        local $SQL::Format::LIMIT_DIALECT = 'Unkown';
+        sqlf '%o', (
+            { limit => 1, offset => 1 },
+        );
+    };
+    like $@, qr/Unkown LIMIT_DIALECT/;
+};
+
 done_testing;

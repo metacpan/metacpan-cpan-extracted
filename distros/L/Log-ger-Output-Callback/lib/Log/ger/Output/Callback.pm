@@ -1,7 +1,7 @@
 package Log::ger::Output::Callback;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ Log::ger::Output::Callback - Send logs to a subroutine
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2017-07-03.
+This document describes version 0.003 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2017-08-05.
 
 =head1 SYNOPSIS
 

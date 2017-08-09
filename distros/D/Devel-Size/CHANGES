@@ -1,5 +1,11 @@
 Revision history for Perl extension Devel::Size.
 
+0.81 2015-08-05 nicholas
+ [no changes]
+
+0.80_50 2017-06-21 nicholas
+  * Attempt to fix strange 1 == 1 failures on some older threaded perls.
+
 0.80 2015-03-31 nicholas
  [no changes]
 

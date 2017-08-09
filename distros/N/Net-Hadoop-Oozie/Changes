@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-Oozie
 
+0.111 2017-08-03 BOOK
+      Avoid a warning when the status code is not 401
+
 0.110 2017-07-18 BURAK
     - Detect secure clusters.
 

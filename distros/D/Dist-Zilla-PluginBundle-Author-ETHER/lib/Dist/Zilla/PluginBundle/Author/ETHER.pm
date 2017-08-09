@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.124-3-gf9b7558
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.126-10-g8008cf7
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.125';
+our $VERSION = '0.127';
 
 use Moose;
 with
@@ -14,7 +14,7 @@ with
     'Dist::Zilla::Role::PluginBundle::Config::Slicer';
 
 use Dist::Zilla::Util;
-use Moose::Util::TypeConstraints qw(enum subtype where);
+use Moose::Util::TypeConstraints qw(enum subtype where class_type);
 use List::Util 1.45 qw(first any uniq);
 use Module::Runtime 'require_module';
 use Devel::CheckBin 'can_run';
@@ -138,18 +138,19 @@ my %extra_args = (
 );
 
 # plugins that use the network when they run
-my @network_plugins = qw(
-    PromptIfStale
-    Test::Pod::LinkCheck
-    Test::Pod::No404s
-    Git::Remote::Check
-    CheckPrereqsIndexed
-    CheckIssues
-    UploadToCPAN
-    Git::Push
-);
-my %network_plugins;
-@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) } @network_plugins } = () x @network_plugins;
+sub _network_plugins
+{
+    qw(
+        PromptIfStale
+        Test::Pod::LinkCheck
+        Test::Pod::No404s
+        Git::Remote::Check
+        CheckPrereqsIndexed
+        CheckIssues
+        UploadToCPAN
+        Git::Push
+    );
+}
 
 has _has_bash => (
     is => 'ro',
@@ -158,12 +159,55 @@ has _has_bash => (
     default => sub { !!can_run('bash') },
 );
 
+# note this is applied to the plugin list in Dist::Zilla::Role::PluginBundle::PluginRemover,
+# but we also need to use it here to be sure we are not adding configs that are only needed
+# by plugins that will be subsequently removed.
+has _removed_plugins => (
+    isa => 'HashRef[Str]',
+    init_arg => undef,
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my $remove = $self->payload->{ $self->plugin_remover_attribute } // [];
+        my %removed; @removed{@$remove} = (!!1) x @$remove;
+        \%removed;
+    },
+    traits => ['Hash'],
+    handles => { _plugin_removed => 'exists' },
+);
+
+# this attribute and its supporting code is a candidate to be extracted out into its own role,
+# for re-use in other bundles
+has _develop_requires => (
+    isa => class_type('CPAN::Meta::Requirements'),
+    lazy => 1,
+    default => sub { CPAN::Meta::Requirements->new },
+    handles => {
+        _add_minimum_develop_requires => 'add_minimum',
+        _develop_requires_as_string_hash => 'as_string_hash',
+    },
+);
+
 # files that might be in the repository that should never be gathered
 my @never_gather = qw(
     Makefile.PL ppport.h README.md README.pod META.json
     cpanfile TODO CONTRIBUTING LICENCE LICENSE INSTALL
     inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
 );
+
+sub BUILD
+{
+    my $self = shift;
+
+    if ($self->airplane)
+    {
+        warn '[@Author::ETHER] ' . colored('building in airplane mode - plugins requiring the network are skipped, and releases are not permitted', 'yellow') . "\n";
+
+        # doing this before running configure means we can be sure we update the removal list before
+        # our _removed_plugins attribute is built.
+        push @{ $self->payload->{ $self->plugin_remover_attribute } }, $self->_network_plugins;
+    }
+}
 
 sub configure
 {
@@ -197,14 +241,13 @@ sub configure
             and (not exists $self->payload->{'Test::MinimumVersion.max_target_perl'}
                  or $self->payload->{'Test::MinimumVersion.max_target_perl'} < '5.008');
 
-    my $remove = $self->payload->{ $self->plugin_remover_attribute } // [];
-    my %removed; @removed{@$remove} = (!!1) x @$remove;
-
     warn '[@Author::ETHER] ', colored('.git is missing and META.json is present -- this looks like a CPAN download rather than a git repository. You should probably run '
             . (-f 'Build.PL' ? 'perl Build.PL; ./Build' : 'perl Makefile.PL; make') . ' instead of using dzil commands!', 'yellow'), "\n"
-        if not -d '.git' and -f 'META.json' and not exists $removed{'Git::GatherDir'};
+        if not -d '.git' and -f 'META.json' and not $self->_plugin_removed('Git::GatherDir');
 
     # only set x_static_install using auto mode for my own distributions
+    # (for all other distributions, set explicitly to on or off)
+    # Note that this is just the default; if a dist.ini changed these values, ConfigSlicer will apply it later
     my $static_install_mode = $self->payload->{'StaticInstall.mode'} // 'auto';
     my $static_install_dry_run = ($static_install_mode eq 'auto'
             and $self->authority ne 'cpan:ETHER') ? 1 : 0;
@@ -266,7 +309,7 @@ sub configure
         [ 'MojibakeTests'       => { ':version' => '0.8' } ],
         [ 'Test::ReportPrereqs' => { ':version' => '0.022', verify_prereqs => 1,
             version_extractor => ( ( any { $_ ne 'MakeMaker' } $self->installer ) ? 'Module::Metadata' : 'ExtUtils::MakeMaker' ),
-            include => [ sort ( qw(autodie JSON::PP Sub::Name YAML), exists $removed{PodCoverageTests} ? () : 'Pod::Coverage' ) ] } ],
+            include => [ sort ( qw(autodie JSON::PP Sub::Name YAML), $self->_plugin_removed('PodCoverageTests') ? () : 'Pod::Coverage' ) ] } ],
         [ 'Test::Portability'   => { ':version' => '2.000007' } ],
         [ 'Test::CleanNamespaces' => { ':version' => '0.006' } ],
 
@@ -320,7 +363,7 @@ sub configure
         # we prefer this to run after other Register Prereqs plugins
         [ 'Git::Contributors'   => { ':version' => '0.029', order_by => 'commits' } ],
 
-        # note that MBT::*'s static tweak is consequently adjusted, later
+        # must appear after installers; also note that MBT::*'s static tweak is consequently adjusted, later
         [ 'StaticInstall'       => { ':version' => '0.005', mode => $static_install_mode, dry_run => $static_install_dry_run } ],
 
         # Test Runners (load after installers to avoid a rebuild)
@@ -339,7 +382,10 @@ sub configure
         [ 'CheckStrictVersion'  => { decimal_only => 1 } ],
         'CheckMetaResources',
         'EnsureLatestPerl',
-        [ 'Git::Check'          => 'initial check' => { allow_dirty => [''] } ],
+
+        # if in airplane mode, allow our uncommitted dist.ini edit which sets 'airplane = 1'
+        [ 'Git::Check'          => 'initial check' => { allow_dirty => [ $self->airplane ? '' : 'dist.ini' ] } ],
+
         'Git::CheckFor::MergeConflicts',
         [ 'Git::CheckFor::CorrectBranch' => { ':version' => '0.004', release_branch => 'master' } ],
         [ 'Git::Remote::Check'  => { branch => 'master', remote_branch => 'master' } ],
@@ -373,7 +419,7 @@ sub configure
 
         [ 'BumpVersionAfterRelease::Transitional' => { ':version' => '0.004', global => 1 } ],
         [ 'NextRelease'         => { ':version' => '5.033', time_zone => 'UTC', format => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T' } ],
-        [ 'Git::Commit'         => 'post-release commit' => { ':version' => '2.020', allow_dirty => [ 'Changes' ], allow_dirty_match => '^lib/.*\.pm$', commit_msg => 'increment $VERSION after %v release' } ],
+        [ 'Git::Commit'         => 'post-release commit' => { ':version' => '2.020', allow_dirty => [ 'Changes' ], allow_dirty_match => [ '^lib/.*\.pm$' ], commit_msg => 'increment $VERSION after %v release' } ],
         'Git::Push',
     );
 
@@ -383,22 +429,8 @@ sub configure
     push @plugins,
         [ 'Run::AfterRelease'   => 'install release' => { ':version' => '0.031', fatal_errors => 0, run => 'cpanm http://' . $username . ':' . $password . '@pause.perl.org/pub/PAUSE/authors/id/' . substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a' } ] if $username and $password;
 
-    if ($self->airplane)
-    {
-        warn '[@Author::ETHER] ' . colored('building in airplane mode - plugins requiring the network are skipped, and releases are not permitted', 'yellow') . "\n";
-        @plugins = grep {
-            my $plugin = Dist::Zilla::Util->expand_config_package_name(
-                !ref($_) ? $_ : ref eq 'ARRAY' ? $_->[0] : die 'wtf'
-            );
-            not exists $network_plugins{$plugin}
-        } @plugins;
-
-        # allow our uncommitted dist.ini edit which sets 'airplane = 1'
-        push @{( first { ref eq 'ARRAY' && $_->[0] eq 'Git::Check' } @plugins )->[-1]{allow_dirty}}, 'dist.ini';
-
-        # halt release after pre-release checks, but before ConfirmRelease
-        push @plugins, 'BlockRelease';
-    }
+    # halt release after pre-release checks, but before ConfirmRelease
+    push @plugins, 'BlockRelease' if $self->airplane;
 
     push @plugins, (
         [ 'Run::AfterRelease'   => 'release complete' => { ':version' => '0.038', quiet => 1, eval => [ qq{print "release complete!\\xa"} ] } ],
@@ -406,10 +438,43 @@ sub configure
         'ConfirmRelease',
     );
 
-    my $plugin_requirements = CPAN::Meta::Requirements->new;
+    # method modifier will also apply default configs, compile develop prereqs
+    $self->add_plugins(@plugins);
+
+    # if ModuleBuildTiny(::*) is being used, disable its static option if
+    # [StaticInstall] is being run with mode=off or dry_run=1
+    if (($static_install_mode eq 'off' or $static_install_dry_run)
+        and any { /^ModuleBuildTiny/ } $self->installer)
+    {
+        my $mbt = Dist::Zilla::Util->expand_config_package_name('ModuleBuildTiny');
+        my $mbt_spec = first { $_->[1] =~ /^$mbt/ } @{ $self->plugins };
+
+        $mbt_spec->[-1]{static} = 'no';
+    }
+
+    # ensure that additional optional plugins are declared in prereqs
+    $self->add_plugins(
+        [ 'Prereqs' => bundle_plugins =>
+        { '-phase' => 'develop', '-relationship' => 'requires',
+          %{ $self->_develop_requires_as_string_hash } } ]
+    );
+
+    # listed last, to be sure we run at the very end of each phase
+    $self->add_plugins(
+        [ 'VerifyPhases' => 'PHASE VERIFICATION' => { ':version' => '0.015' } ]
+    ) if ($ENV{USER} // '') eq 'ether';
+}
+
+# determine develop prereqs, and apply default configs (respecting superclasses, roles)
+around add_plugins => sub
+{
+    my ($orig, $self, @plugins) = @_;
+
     foreach my $plugin_spec (@plugins = map { ref $_ ? $_ : [ $_ ] } @plugins)
     {
-        next if $removed{$plugin_spec->[0]};
+        next if $self->_plugin_removed($plugin_spec->[0])
+            or $plugin_spec->[0] eq 'BlockRelease'
+            or $plugin_spec->[0] eq 'VerifyPhases';
 
         my $plugin = Dist::Zilla::Util->expand_config_package_name($plugin_spec->[0]);
         require_module($plugin);
@@ -417,45 +482,25 @@ sub configure
         push @$plugin_spec, {} if not ref $plugin_spec->[-1];
         my $payload = $plugin_spec->[-1];
 
-        if (my @modules_for_extra_configs = grep { $plugin->isa($_) or $plugin->does($_) } keys %extra_args)
+        foreach my $module (grep { $plugin->isa($_) or $plugin->does($_) } keys %extra_args)
         {
-            # combine all the relevant configs together
-            my %configs = map { %{ $extra_args{$_} } } @modules_for_extra_configs;
-
-            # and add to the payload for this plugin
-            @{$payload}{keys %configs} = values %configs;
+            my %configs = %{ $extra_args{$module} };    # copy, not reference!
 
             # don't keep :version unless it matches the package exactly, but still respect the prereq
-            $plugin_requirements->add_minimum($plugin => delete $configs{':version'})
-                if exists $configs{':version'} and not exists $extra_args{$plugin};
+            $self->_add_minimum_develop_requires($module => delete $configs{':version'})
+                if exists $configs{':version'} and $module ne $plugin;
+
+            # we don't need to worry about overwriting the payload with defaults, as
+            # ConfigSlicer will copy them back over later on.
+            @{$payload}{keys %configs} = values %configs;
         }
 
         # record develop prereq
-        $plugin_requirements->add_minimum($plugin => $payload->{':version'} // 0);
+        $self->_add_minimum_develop_requires($plugin => $payload->{':version'} // 0);
     }
 
-    # if ModuleBuildTiny(::*) is being used, disable its static option if
-    # [StaticInstall] is being run with mode=off or dry_run=1
-    if (($static_install_mode eq 'off' or $static_install_dry_run)
-        and any { /^ModuleBuildTiny/ } $self->installer)
-    {
-        my $mbt_spec = first { $_->[0] =~ /^ModuleBuildTiny/ } @plugins;
-        $mbt_spec->[-1]{static} = 'no';
-    }
-
-    # ensure that additional optional plugins are declared in prereqs
-    unshift @plugins,
-        [ 'Prereqs' => bundle_plugins =>
-            { '-phase' => 'develop', '-relationship' => 'requires',
-              %{ $plugin_requirements->as_string_hash } } ];
-
-    push @plugins, (
-        # listed last, to be sure we run at the very end of each phase
-        [ 'VerifyPhases' => 'PHASE VERIFICATION' => { ':version' => '0.015' } ],
-    ) if ($ENV{USER} // '') eq 'ether';
-
-    $self->add_plugins(@plugins);
-}
+    return $self->$orig(@plugins);
+};
 
 # return username, password from ~/.pause
 sub _pause_config
@@ -484,7 +529,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.125
+version 0.127
 
 =head1 SYNOPSIS
 
@@ -695,6 +740,11 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     -phase = develop
     -relationship = requires
     Dist::Zilla::PluginBundle::Author::ETHER = <version specified in dist.ini>
+
+    [Prereqs / prereqs for @Author::ETHER]
+    -phase = develop
+    -relationship = requires
+    ...all the plugins this bundle uses...
 
     [Prereqs / pluginbundle_version]
     -phase = develop
@@ -1032,16 +1082,18 @@ Available since 0.117.
 
 A string of the form C<cpan:PAUSEID> that references the PAUSE ID of the user who has primary ("first-come")
 authority over the distribution and main module namespace. If not provided, it is extracted from the configuration
-passed through to the <[Authority]|Dist::Zilla::Plugin::Authority> plugin, and finally defaults to C<cpan:ETHER>.
+passed through to the L<[Authority]|Dist::Zilla::Plugin::Authority> plugin, and finally defaults to C<cpan:ETHER>.
 It is presently used for setting C<x_authority> metadata and deciding which spelling is used for the F<LICENCE>
 file (if the C<licence> configuration is not provided).
 
 =head2 fake_release
 
+=for stopwords UploadToCPAN FakeRelease
+
 Available since 0.122.
 
-A boolean option that, when set, removes <[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> from the plugin list
-and replaces it with <[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>.
+A boolean option that, when set, removes L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN> from the plugin list
+and replaces it with L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>.
 Defaults to false; can also be set with the environment variable C<FAKE_RELEASE>.
 
 =for stopwords customizations

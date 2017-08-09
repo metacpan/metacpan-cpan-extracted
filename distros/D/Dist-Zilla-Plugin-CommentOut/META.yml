@@ -1,0 +1,37 @@
+---
+abstract: 'Comment out code in your scripts and modules'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  Test::DZil: '0'
+  perl: '5.014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CommentOut
+no_index:
+  directory:
+    - corpus
+requires:
+  Dist::Zilla: '6.0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-CommentOut/issues
+  homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::CommentOut
+  repository: git://github.com/plicease/Dist-Zilla-Plugin-CommentOut.git
+version: '0.03'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Mohammad S Anwar (MANWAR)'
+x_serialization_backend: 'YAML::Tiny version 1.70'

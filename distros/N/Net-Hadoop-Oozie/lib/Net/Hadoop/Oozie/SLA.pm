@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::SLA;
-$Net::Hadoop::Oozie::SLA::VERSION = '0.110';
+$Net::Hadoop::Oozie::SLA::VERSION = '0.111';
 use 5.010;
 use strict;
 use warnings;
@@ -194,7 +194,7 @@ Net::Hadoop::Oozie::SLA
 
 =head1 VERSION
 
-version 0.110
+version 0.111
 
 =head1 SYNOPSIS
 

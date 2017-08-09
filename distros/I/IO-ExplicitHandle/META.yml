@@ -1,38 +1,40 @@
 ---
-abstract: 'detect implicit I/O handles when compiling'
+abstract: 'force I/O handles to be explicitly specified'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  ExtUtils::CBuilder: 0.15
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  ExtUtils::CBuilder: '0.15'
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 conflicts:
-  B::Hooks::OP::Check: 0
+  B::Hooks::OP::Check: '< 0.19'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-ExplicitHandle
 provides:
   IO::ExplicitHandle:
     file: lib/IO/ExplicitHandle.pm
-    version: 0
+    version: '0.001'
 requires:
-  Lexical::SealRequireHints: 0.007
-  XSLoader: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Lexical::SealRequireHints: '0.008'
+  XSLoader: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ExplicitHandle
   license: http://dev.perl.org/licenses/
-version: 0.000
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

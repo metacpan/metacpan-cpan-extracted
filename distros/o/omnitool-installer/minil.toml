@@ -1,0 +1,4 @@
+name = "omnitool-installer"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

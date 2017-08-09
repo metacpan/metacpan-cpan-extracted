@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::OutputStartup;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,15 +20,16 @@ our %output_modules = (
     String => { string => \$str },
     Array => { array => $ary },
 
-    ArrayWithLimits => { array => $ary },
+    ArrayRotate => { array => $ary },
     File => { path => $fname },
     Screen => {},
     Callback => {},
     FileWriteRotate => { dir => $dname, prefix => 'prefix' },
     DirWriteRotate => { path => $dname },
     LogAny => {},
-    LogDispatchOutput => { output => 'ArrayWithLimits', args => {array => $ary} },
+    #LogDispatchOutput => { output => 'ArrayWithLimits', args => {array => $ary} }, # Log::Dispatch::ArrayWithLimits already removed from CPAN
     Composite => { outputs => {Screen => {conf=>{}}, File => {conf=>{path=>$fname}}} },
+    Syslog => { ident => 'test' },
 );
 
 our $scenario = {
@@ -36,7 +37,7 @@ our $scenario = {
         'Log::ger::Output::Composite' => {version=>'0.005'},
         'Log::ger::Output::File' => {version=>'0.002'},
         'Log::ger::Output::LogAny' => {version=>'0.003'},
-        'Log::ger::Output::Screen' => {version=>'0.004'},
+        'Log::ger::Output::Screen' => {version=>'0.007'},
     },
     participants => [
         {name=>"baseline", perl_cmdline => ["-e1"]},
@@ -74,7 +75,7 @@ Bencher::Scenario::LogGer::OutputStartup
 
 =head1 VERSION
 
-This document describes version 0.010 of Bencher::Scenario::LogGer::OutputStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
+This document describes version 0.012 of Bencher::Scenario::LogGer::OutputStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-08-04.
 
 =head1 SYNOPSIS
 
@@ -96,9 +97,9 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Output::Array> 0.016
+L<Log::ger::Output::Array> 0.023
 
-L<Log::ger::Output::ArrayWithLimits> 0.001
+L<Log::ger::Output::ArrayRotate> 0.001
 
 L<Log::ger::Output::Callback> 0.002
 
@@ -106,19 +107,19 @@ L<Log::ger::Output::Composite> 0.007
 
 L<Log::ger::Output::DirWriteRotate> 0.002
 
-L<Log::ger::Output::File> 0.002
+L<Log::ger::Output::File> 0.006
 
-L<Log::ger::Output::FileWriteRotate> 0.001
+L<Log::ger::Output::FileWriteRotate> 0.002
 
 L<Log::ger::Output::LogAny> 0.006
 
-L<Log::ger::Output::LogDispatchOutput> 0.001
+L<Log::ger::Output::Null> 0.023
 
-L<Log::ger::Output::Null> 0.016
+L<Log::ger::Output::Screen> 0.007
 
-L<Log::ger::Output::Screen> 0.005
+L<Log::ger::Output::String> 0.023
 
-L<Log::ger::Output::String> 0.016
+L<Log::ger::Output::Syslog> 0.001
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -140,15 +141,15 @@ L<Log::ger::Output::Array>
 
 
 
-=item * load-ArrayWithLimits (command)
+=item * load-ArrayRotate (command)
 
-L<Log::ger::Output::ArrayWithLimits>
+L<Log::ger::Output::ArrayRotate>
 
 
 
-=item * init-with-ArrayWithLimits (command)
+=item * init-with-ArrayRotate (command)
 
-L<Log::ger::Output::ArrayWithLimits>
+L<Log::ger::Output::ArrayRotate>
 
 
 
@@ -224,18 +225,6 @@ L<Log::ger::Output::LogAny>
 
 
 
-=item * load-LogDispatchOutput (command)
-
-L<Log::ger::Output::LogDispatchOutput>
-
-
-
-=item * init-with-LogDispatchOutput (command)
-
-L<Log::ger::Output::LogDispatchOutput>
-
-
-
 =item * load-Null (command)
 
 L<Log::ger::Output::Null>
@@ -272,66 +261,78 @@ L<Log::ger::Output::String>
 
 
 
+=item * load-Syslog (command)
+
+L<Log::ger::Output::Syslog>
+
+
+
+=item * init-with-Syslog (command)
+
+L<Log::ger::Output::Syslog>
+
+
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with default options (C<< bencher -m LogGer::OutputStartup >>):
 
  #table1#
- +-----------------------------+-----------+-----------+------------+-----------+---------+
- | participant                 | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
- +-----------------------------+-----------+-----------+------------+-----------+---------+
- | init-with-FileWriteRotate   |        19 |      54   |        1   |   0.00014 |      20 |
- | init-with-LogDispatchOutput |        31 |      32   |        1.7 | 9.1e-05   |      22 |
- | init-with-LogAny            |        46 |      22   |        2.5 | 7.5e-05   |      21 |
- | init-with-Composite         |        48 |      21   |        2.6 | 9.8e-05   |      20 |
- | init-with-DirWriteRotate    |        51 |      19   |        2.8 | 8.4e-05   |      20 |
- | init-with-String            |        66 |      15   |        3.5 | 4.9e-05   |      20 |
- | init-with-Null              |        66 |      15   |        3.6 | 5.3e-05   |      20 |
- | init-with-Screen            |        67 |      15   |        3.6 | 5.1e-05   |      21 |
- | init-with-File              |        67 |      15   |        3.6 | 4.2e-05   |      20 |
- | init-with-Array             |        67 |      15   |        3.6 | 3.3e-05   |      21 |
- | init-with-ArrayWithLimits   |        67 |      15   |        3.6 | 2.2e-05   |      20 |
- | init-with-Callback          |        68 |      15   |        3.7 | 7.3e-05   |      20 |
- | load-Screen                 |        75 |      13   |        4   | 3.7e-05   |      20 |
- | load-LogDispatchOutput      |        76 |      13   |        4.1 | 5.7e-05   |      21 |
- | load-Composite              |        95 |      11   |        5.1 |   3e-05   |      20 |
- | load-Callback               |       100 |       9.8 |        5.5 | 3.9e-05   |      20 |
- | load-DirWriteRotate         |       100 |       9.6 |        5.6 | 2.4e-05   |      20 |
- | load-File                   |       100 |       9.6 |        5.6 | 2.6e-05   |      20 |
- | load-ArrayWithLimits        |       100 |       9.6 |        5.6 | 3.4e-05   |      20 |
- | load-LogAny                 |       110 |       9.5 |        5.7 | 1.4e-05   |      21 |
- | load-FileWriteRotate        |       110 |       9.5 |        5.7 | 1.5e-05   |      20 |
- | load-String                 |       110 |       9.5 |        5.7 | 5.2e-05   |      20 |
- | load-Array                  |       110 |       9.5 |        5.7 | 1.8e-05   |      20 |
- | load-Null                   |       140 |       7.1 |        7.6 | 2.4e-05   |      20 |
- | baseline                    |       150 |       6.7 |        8   | 1.7e-05   |      20 |
- +-----------------------------+-----------+-----------+------------+-----------+---------+
+ +---------------------------+-----------+-----------+------------+-----------+---------+
+ | participant               | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
+ +---------------------------+-----------+-----------+------------+-----------+---------+
+ | init-with-FileWriteRotate |        18 |      57   |        1   |   0.00021 |      20 |
+ | init-with-Syslog          |        26 |      38   |        1.5 | 8.2e-05   |      20 |
+ | init-with-LogAny          |        42 |      24   |        2.4 | 5.3e-05   |      20 |
+ | init-with-Composite       |        47 |      21   |        2.7 | 7.2e-05   |      20 |
+ | init-with-DirWriteRotate  |        51 |      20   |        2.9 | 4.6e-05   |      20 |
+ | init-with-ArrayRotate     |        65 |      15   |        3.7 | 7.4e-05   |      21 |
+ | init-with-Screen          |        65 |      15   |        3.7 | 6.7e-05   |      20 |
+ | init-with-File            |        65 |      15   |        3.7 | 3.8e-05   |      20 |
+ | init-with-String          |        65 |      15   |        3.7 | 1.8e-05   |      20 |
+ | init-with-Null            |        66 |      15   |        3.7 | 6.7e-05   |      20 |
+ | init-with-Array           |        66 |      15   |        3.8 | 3.9e-05   |      20 |
+ | init-with-Callback        |        67 |      15   |        3.8 | 2.5e-05   |      20 |
+ | load-Screen               |        76 |      13   |        4.3 | 5.9e-05   |      20 |
+ | load-Composite            |       100 |       9.8 |        5.8 | 4.7e-05   |      20 |
+ | load-LogAny               |       110 |       9.2 |        6.1 | 7.4e-05   |      20 |
+ | load-Callback             |       110 |       9.2 |        6.2 | 4.4e-05   |      20 |
+ | load-String               |       110 |       9.1 |        6.2 | 5.8e-05   |      20 |
+ | load-Array                |       110 |       9.1 |        6.2 | 5.4e-05   |      20 |
+ | load-ArrayRotate          |       110 |       9.1 |        6.2 | 4.2e-05   |      20 |
+ | load-Syslog               |       110 |       9.1 |        6.2 | 2.3e-05   |      20 |
+ | load-FileWriteRotate      |       110 |       9.1 |        6.2 | 6.8e-05   |      21 |
+ | load-File                 |       110 |       9   |        6.3 | 2.4e-05   |      20 |
+ | load-DirWriteRotate       |       110 |       8.9 |        6.4 | 4.2e-05   |      20 |
+ | load-Null                 |       150 |       6.5 |        8.7 | 3.6e-05   |      20 |
+ | baseline                  |       170 |       6   |        9.4 | 4.4e-05   |      20 |
+ +---------------------------+-----------+-----------+------------+-----------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m LogGer::OutputStartup --module-startup >>):
 
  #table2#
- +-------------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant                         | proc_private_dirty_size (kB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +-------------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Output::Screen            | 864                          | 4.2                | 16             |      14   |                    7.3 |        1   | 6.7e-05 |      20 |
- | Log::ger::Output::LogDispatchOutput | 860                          | 4.2                | 16             |      13   |                    6.3 |        1   | 3.3e-05 |      20 |
- | Log::ger::Output::Composite         | 860                          | 4.1                | 16             |      11   |                    4.3 |        1.3 |   3e-05 |      20 |
- | Log::ger::Output::LogAny            | 1000                         | 4.3                | 16             |       9.7 |                    3   |        1.4 | 2.8e-05 |      20 |
- | Log::ger::Output::File              | 864                          | 4.1                | 16             |       9.7 |                    3   |        1.4 | 3.5e-05 |      20 |
- | Log::ger::Output::String            | 864                          | 4.2                | 16             |       9.6 |                    2.9 |        1.4 | 2.2e-05 |      23 |
- | Log::ger::Output::ArrayWithLimits   | 856                          | 4.2                | 16             |       9.6 |                    2.9 |        1.4 | 2.5e-05 |      20 |
- | Log::ger::Output::Callback          | 856                          | 4.1                | 16             |       9.5 |                    2.8 |        1.4 | 2.6e-05 |      20 |
- | Log::ger::Output::DirWriteRotate    | 868                          | 4.1                | 16             |       9.4 |                    2.7 |        1.4 | 1.5e-05 |      22 |
- | Log::ger::Output::Array             | 860                          | 4.2                | 16             |       9.4 |                    2.7 |        1.4 | 1.2e-05 |      20 |
- | Log::ger::Output::FileWriteRotate   | 1004                         | 4.3                | 16             |       9.3 |                    2.6 |        1.4 | 1.4e-05 |      20 |
- | Log::ger::Output::Null              | 860                          | 4.1                | 16             |       7   |                    0.3 |        1.9 |   1e-05 |      20 |
- | perl -e1 (baseline)                 | 844                          | 4.1                | 16             |       6.7 |                    0   |        2   | 2.5e-05 |      20 |
- +-------------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +-----------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ | participant                       | proc_private_dirty_size (kB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +-----------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ | Log::ger::Output::Screen          | 840                          | 4.2                | 20             |      13   |                    7   |        1   | 2.5e-05 |      20 |
+ | Log::ger::Output::Composite       | 840                          | 4.2                | 20             |       9.9 |                    3.9 |        1.3 | 5.5e-05 |      20 |
+ | Log::ger::Output::String          | 844                          | 4.2                | 20             |       9.3 |                    3.3 |        1.4 | 3.5e-05 |      20 |
+ | Log::ger::Output::ArrayRotate     | 840                          | 4.2                | 20             |       9.3 |                    3.3 |        1.4 | 5.5e-05 |      20 |
+ | Log::ger::Output::Syslog          | 844                          | 4.3                | 20             |       9.2 |                    3.2 |        1.4 | 5.1e-05 |      20 |
+ | Log::ger::Output::Callback        | 844                          | 4.3                | 20             |       9.2 |                    3.2 |        1.4 | 5.7e-05 |      20 |
+ | Log::ger::Output::File            | 840                          | 4.3                | 20             |       9.1 |                    3.1 |        1.4 | 3.2e-05 |      20 |
+ | Log::ger::Output::FileWriteRotate | 936                          | 4.4                | 20             |       9.1 |                    3.1 |        1.4 | 6.1e-05 |      20 |
+ | Log::ger::Output::Array           | 836                          | 4.3                | 20             |       9   |                    3   |        1.4 |   6e-05 |      21 |
+ | Log::ger::Output::LogAny          | 932                          | 4.3                | 20             |       9   |                    3   |        1.4 |   4e-05 |      22 |
+ | Log::ger::Output::DirWriteRotate  | 844                          | 4.2                | 20             |       8.9 |                    2.9 |        1.5 | 3.7e-05 |      22 |
+ | Log::ger::Output::Null            | 840                          | 4                  | 20             |       6   |                    0   |        2   | 7.9e-05 |      21 |
+ | perl -e1 (baseline)               | 572                          | 3.9                | 20             |       6   |                    0   |        2.2 | 5.5e-05 |      21 |
+ +-----------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

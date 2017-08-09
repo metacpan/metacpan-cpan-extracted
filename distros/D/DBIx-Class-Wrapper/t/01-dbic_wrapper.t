@@ -151,5 +151,23 @@ subtest 'find_or_new' => sub {
     is( $result2->in_storage(), 1, 'The result is in storage this time' );
 };
 
+subtest 'update_or_create' => sub {
+    ok( $pf->count() == 0, 'Initially, there are no products' );
+    $pf->update_or_create({
+        id         => 1,
+        name       => 'Cherry Coke',
+        colour     => 'red',
+        builder_id => 1,
+    });
+    ok( $pf->count() == 1, 'update_or_create() made a new row' );
+    $pf->update_or_create({
+        id         => 1,    # deliberate PRIMARY key collision
+        name       => 'Diet Coke',
+        colour     => 'silver',
+        builder_id => 1,
+    });
+    ok( $pf->count() == 1, 'update_or_create() updated an existing row' );
+    ok( $pf->find(1)->colour() eq 'silver', 'updated colour found' );
+};
 
 done_testing();

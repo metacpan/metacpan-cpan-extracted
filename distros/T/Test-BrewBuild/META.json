@@ -63,6 +63,6 @@
          "web" : "https://github.com/stevieb9/p5-test-brewbuild"
       }
    },
-   "version" : "2.18",
+   "version" : "2.19",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

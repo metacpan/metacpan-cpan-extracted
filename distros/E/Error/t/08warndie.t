@@ -200,8 +200,9 @@ run_kid {
     die "An error";
 };
 
+my $WS = ' ';
 ( $linea, $lineb ) = ( $line + 2, $line + 3 );
-like( $s, qr/^My custom death here: 
+like( $s, qr/^My custom death here:$WS
 Unhandled perl error caught at toplevel:
 
   An error

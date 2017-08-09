@@ -1,3 +1,11 @@
+0.002   2017-08-02 (PERLANCAR)
+
+        - No functional changes.
+
+	- [doc] Mention related modules, LGO:SimpleFile, LGO:File,
+          LGO:DirWriteRotate.
+
+
 0.001   2017-06-24 (PERLANCAR)
 
         - First version.

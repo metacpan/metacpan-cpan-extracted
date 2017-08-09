@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # shortcuts
 #  os and distros
@@ -307,6 +307,8 @@ sub mapping {
       [like_debian,
        # but does only work with newer debians (like stretch), because the module wants taglib 1.9.1 (e.g. wheezy has 1.7.2-1)
        [package => ['libtag1-dev', 'g++']]],
+      [like_fedora,
+       [package => 'taglib-devel']], # at least on centos6 does not work: provided taglib is 1.6.1, but module wants 1.11 or greater
       [os_darwin, # ... but does not seem to build
        [package => 'taglib']],
      ],
@@ -571,6 +573,23 @@ sub mapping {
        [linuxdistrocodename => ['squeeze', 'wheezy'],
 	[package => 'libotr2-dev']],
        [package => 'libotr5-dev']]],
+
+     [cpanmod => 'Crypt::secp256k1',
+      [like_debian,
+       [linuxdistrocodename => [qw(squeeze wheezy jessie precise trusty xenial)],
+	[package => []], # not available before stretch
+       ],
+       [package => 'libsecp256k1-dev']],
+     ],
+
+     # XXX may be removed if Crypt::secp256k1 got its first stable release
+     [cpandist => qr{^Crypt-secp256k1-\d},
+      [like_debian,
+       [linuxdistrocodename => [qw(squeeze wheezy jessie precise trusty xenial)],
+	[package => []], # not available before stretch
+       ],
+       [package => 'libsecp256k1-dev']],
+     ],
 
      [cpanmod => 'Crypt::Sodium',
       [os_freebsd,
@@ -1972,6 +1991,8 @@ sub mapping {
       [os_freebsd,
        [package => 'libssh2']],
       [like_debian,
+       [linuxdistrocodename => [qw(precise)],
+	[package => [qw(libssh2-1-dev libgcrypt-dev)]]],
        [package => 'libssh2-1-dev']],
       [like_fedora,
        [package => 'libssh2-devel']],
@@ -2054,6 +2075,21 @@ sub mapping {
       [like_debian,
        # but does not work, lookup into wrong freetype directory
        [package => ['libftgl-dev', 'libfreetype6-dev']]]],
+
+     [cpanmod => 'OpenGL::GLFW',
+      [os_freebsd,
+       [package => 'glfw']],
+      [like_debian,
+       [package => 'libglfw3-dev']],
+     ],
+
+     # XXX may be removed if OpenGL::GLFW got its first stable release
+     [cpandist => qr{^OpenGL-GLFW-\d},
+      [os_freebsd,
+       [package => 'glfw']],
+      [like_debian,
+       [package => 'libglfw3-dev']],
+     ],
 
      [cpanmod => 'OpenGL::Modern',
       [like_fedora,

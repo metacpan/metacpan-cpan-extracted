@@ -1,5 +1,5 @@
 package QBit::Application::_Utils::TmpLocale;
-$QBit::Application::_Utils::TmpLocale::VERSION = '0.014';
+$QBit::Application::_Utils::TmpLocale::VERSION = '0.015';
 use qbit;
 
 use base qw(QBit::Class);

@@ -8,7 +8,7 @@ use B::Hooks::OP::Check 0.19;
 use Scalar::Util qw/refaddr/;
 use B::Utils 0.19 ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub dl_load_flags { 0x01 }
 
@@ -140,6 +140,8 @@ Florian Ragwitz E<lt>rafl@debian.orgE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2008, 2009 Florian Ragwitz
+
+Copyright (c) 2011, 2012, 2017 Andrew Main (Zefram)
 
 This module is free software.
 

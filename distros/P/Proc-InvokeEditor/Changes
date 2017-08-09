@@ -27,3 +27,9 @@ Revision history for Perl extension Proc::InvokeEditor.
 
 1.07 04 Aug 2014
   - Apply patch from Brian Fraser to work on android.
+
+1.08 03 Aug 2017
+  - Patch from Max Maischein for windows support.
+
+1.09 03 Aug 2017
+  - Disable author tests for now.

@@ -1,3 +1,10 @@
+2.003     2017-08-07 16:04:18 EDT
+  - Fix tests for rethrown job exceptions in Minion 7.05.
+
+2.002     2017-08-05 12:01:08 EDT
+  - Add id option to dequeue method to support dequeueing a specific job.
+  - Add attempts option to retry_job method.
+
 2.001     2017-07-20 02:40:46 EDT
   - Bump Mojo::SQLite requirement to 3.000 to support sharing the database
     connection cache with existing Mojo::SQLite objects.

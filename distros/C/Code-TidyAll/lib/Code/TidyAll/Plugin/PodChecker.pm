@@ -9,7 +9,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.63';
+our $VERSION = '0.65';
 
 has 'warnings' => ( is => 'ro' );
 
@@ -43,7 +43,7 @@ Code::TidyAll::Plugin::PodChecker - Use podchecker with tidyall
 
 =head1 VERSION
 
-version 0.63
+version 0.65
 
 =head1 SYNOPSIS
 

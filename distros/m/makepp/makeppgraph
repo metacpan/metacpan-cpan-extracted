@@ -1,5 +1,5 @@
-#!/usr/bin/perl -w
-# $Id: makeppgraph,v 1.28 2012/05/23 18:30:17 pfeiffer Exp $
+#!/usr/bin/env perl
+# $Id: makeppgraph,v 1.32 2016/09/12 20:34:11 pfeiffer Exp $
 
 #TODO: when losing BECAUSE child thru merge, become {SELF}BECAUSE
 
@@ -11,7 +11,6 @@ use POSIX ();
 
 our $datadir;
 BEGIN {
-  our $VERSION = '@VERSION@';
 #@@setdatadir
 #
 # Find the location of our data directory that contains the auxiliary files.
@@ -24,7 +23,7 @@ BEGIN {
 				# See if we can find ourselves in the path.
     foreach( split( /:/, $ENV{'PATH'} ), '.' ) {
 				# Add '.' to the path in case the user is
-				# running it with "perl makepp" even if
+				# running it with "perl makeppgraph" even if
 				# . is not in his path.
       if( -d "$_/Mpp" ) {	# Found something we need?
 	$datadir = $_;
@@ -32,10 +31,11 @@ BEGIN {
       }
     }
   }
-  $datadir or die "makepp: can't find library files\n";
+  $datadir or die "makeppgraph: can't find library files\n";
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 #@@
   unshift @INC, $datadir;
 }
@@ -305,7 +305,7 @@ for( $outfile ) {
 # Digest the contents of the log file.
 my %graph;
 for( @logfiles ) {
-  open my $log, $_ or die "$Mpp::progname: can't open `$_'--$!\n";
+  open my $log, '<', $_ or die "$Mpp::progname: can't open `$_'--$!\n";
 
   <$log>;			# 1st line irrelevant here
 

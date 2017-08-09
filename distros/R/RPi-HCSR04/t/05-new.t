@@ -9,6 +9,11 @@ if (! $ENV{PI_BOARD}){
     exit;
 }
 
+if (! $ENV{RPI_HCSR04}){
+    plan skip_all => "RPI_HCSR04 env var not set, skipping";
+    exit;
+}
+
 my $mod = 'RPi::HCSR04';
 
 {

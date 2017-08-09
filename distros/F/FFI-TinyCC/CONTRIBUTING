@@ -12,10 +12,11 @@ You will need to install these CPAN dists to work on this dist:
  . Alien::TinyCC
  . Archive::Ar 2.02 or better
  . File::chdir
- . Path::Class
- . IPC::System::Simple
+ . Path::Tiny
  . FFI::Platypus
  . FFI::Platypus::Type::StringArray
+ . Test2::API
+ . Test2::Suite
 
 (sorry there is no cpanfile)
 

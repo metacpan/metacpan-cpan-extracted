@@ -1,3 +1,10 @@
+0.035     2017-08-07 12:50:59 EDT
+  - Bump [Test::ReportPrereqs] dependency to 0.027 to prevent
+    t/00-report-prereqs.dd from being pruned
+
+0.034     2017-08-04 21:18:06 EDT
+  - Mention installdeps command in CONTRIBUTING.md
+
 0.033     2017-07-05 17:22:42 EDT
   - Add perl 5.26 to travis config in minting profile
 

@@ -24,6 +24,7 @@
       "file" : [
          "lib/App/Music/ChordPro/Songbook.pm",
          "lib/App/Music/ChordPro/Chords.pm",
+         "lib/App/Music/ChordPro/Version.pm",
          "lib/App/Music/ChordPro/Wx.pm"
       ]
    },
@@ -54,17 +55,20 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "0.82"
+         "version" : "0.84"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "0.82"
+         "version" : "0.84"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://www.chordpro.org"
+      "homepage" : "http://www.chordpro.org",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
    },
-   "version" : "0.82",
+   "version" : "0.84",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

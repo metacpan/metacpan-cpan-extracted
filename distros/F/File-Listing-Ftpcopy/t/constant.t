@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 14;
+use Test2::V0 -no_srand => 1;
 use File::Listing::Ftpcopy qw( :all );
 
 is FORMAT_UNKNOWN, 0, 'FORMAT_UNKNOWN';
@@ -20,3 +18,5 @@ is MTIME_REMOTESECOND, 4, 'MTIME_REMOTESECOND';
 is SIZE_UNKNOWN, 0, 'SIZE_UNKNOWN';
 is SIZE_BINARY, 1, 'SIZE_BINARY';
 is SIZE_ASCII, 2, 'SIZE_ASCII';
+
+done_testing;

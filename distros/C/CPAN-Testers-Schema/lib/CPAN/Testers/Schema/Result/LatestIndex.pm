@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::LatestIndex;
-our $VERSION = '0.015';
+our $VERSION = '0.018';
 # ABSTRACT: A cache of the latest version of a dist by author
 
 #pod =head1 SYNOPSIS
@@ -142,7 +142,7 @@ CPAN::Testers::Schema::Result::LatestIndex - A cache of the latest version of a 
 
 =head1 VERSION
 
-version 0.015
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -236,7 +236,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Oriol Soriano, Doug Bell.
+This software is copyright (c) 2017 by Oriol Soriano, Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

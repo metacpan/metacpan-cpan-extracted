@@ -3,14 +3,13 @@ package Alien::Base;
 use strict;
 use warnings;
 use Carp;
-use File::ShareDir ();
-use File::Spec;
+use Path::Tiny ();
 use Scalar::Util qw/blessed/;
 use Capture::Tiny 0.17 qw/capture_merged/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '0.75'; # VERSION
+our $VERSION = '0.91'; # VERSION
 
 
 sub import {
@@ -64,6 +63,29 @@ sub import {
 }
 
 
+sub _dist_dir ($)
+{
+  my($dist_name) = @_;
+  
+  my @pm = split /-/, $dist_name;
+  $pm[-1] .= ".pm";
+  
+  foreach my $inc (@INC)
+  {
+    my $pm = Path::Tiny->new($inc, @pm);
+    if(-f $pm)
+    {
+      my $share = Path::Tiny->new($inc, qw( auto share dist ), $dist_name );
+      if(-d $share)
+      {
+        return $share->absolute->stringify;
+      }
+      last;
+    }
+  }
+  Carp::croak("unable to find dist share directory for $dist_name");
+}
+
 sub dist_dir {
   my $class = shift;
 
@@ -72,7 +94,7 @@ sub dist_dir {
 
   my $dist_dir = 
     $class->config('finished_installing') 
-      ? File::ShareDir::dist_dir($dist) 
+      ? _dist_dir $dist
       : $class->config('working_directory');
 
   croak "Failed to find share dir for dist '$dist'"
@@ -135,9 +157,13 @@ sub libs_static {
 
 sub version {
   my $self = shift;
-  my $version = $self->config('version');
-  chomp $version;
-  return $version;
+  return $self->runtime_prop
+    ? $self->runtime_prop->{version}
+    : do {
+      my $version = $self->config('version');
+      chomp $version;
+      $version;
+    };
 }
 
 
@@ -303,13 +329,13 @@ sub dynamic_libs {
   } else {
   
     my $dir = $class->dist_dir;
-    my $dynamic = File::Spec->catfile($class->dist_dir, 'dynamic');
+    my $dynamic = Path::Tiny->new($class->dist_dir, 'dynamic');
     
     if(-d $dynamic)
     {
       return FFI::CheckLib::find_lib(
         lib        => '*',
-        libpath    => $dynamic,
+        libpath    => "$dynamic",
         systempath => [],
       );
     }
@@ -335,8 +361,8 @@ sub bin_dir {
   }
   else
   {
-    my $dir = File::Spec->catfile($class->dist_dir, 'bin');
-    return -d $dir ? ($dir) : ();
+    my $dir = Path::Tiny->new($class->dist_dir, 'bin');
+    return -d $dir ? ("$dir") : ();
   }
 }
 
@@ -381,13 +407,11 @@ sub Inline {
     $alien_build_config_cache{$class} ||= do {
       my $dist = ref $class ? ref $class : $class;
       $dist =~ s/::/-/g;
-      my $dist_dir = eval { File::ShareDir::dist_dir($dist) };
+      my $dist_dir = eval { _dist_dir $dist };
       return if $@;
-      my $alien_json = File::Spec->catfile($dist_dir, '_alien', 'alien.json');
+      my $alien_json = Path::Tiny->new($dist_dir, '_alien', 'alien.json');
       return unless -r $alien_json;
-      open my $fh, '<', $alien_json;
-      my $json = do { local $/; <$fh> };
-      close $fh;
+      my $json = $alien_json->slurp;
       require JSON::PP;
       my $config = JSON::PP::decode_json($json);
       $config->{distdir} = $dist_dir;
@@ -408,7 +432,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 0.75
+version 0.91
 
 =head1 SYNOPSIS
 

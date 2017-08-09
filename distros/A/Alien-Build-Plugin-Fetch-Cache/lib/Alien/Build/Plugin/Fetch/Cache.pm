@@ -2,7 +2,7 @@ package Alien::Build::Plugin::Fetch::Cache;
 
 use strict;
 use warnings;
-use 5.010;
+use 5.010001;
 use Alien::Build::Plugin;
 use URI 1.71;
 use Path::Tiny 0.100 ();
@@ -11,7 +11,7 @@ use Digest::MD5;
 use File::Glob qw( bsd_glob );
 
 # ABSTRACT: Alien::Build plugin to cache files downloaded from the internet
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub _local_file
@@ -143,7 +143,7 @@ Alien::Build::Plugin::Fetch::Cache - Alien::Build plugin to cache files download
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,7 @@
+Makefile.old
+MYMETA.*
+Makefile
+R.c
+blib
+*.o
+pm_to_blib

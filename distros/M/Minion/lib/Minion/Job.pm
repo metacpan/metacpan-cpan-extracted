@@ -55,18 +55,26 @@ sub start {
   return $self->emit(spawn => $pid) if $self->{pid} = $pid;
 
   # Child
-  eval {
+  $self->_run;
+  POSIX::_exit(0);
+}
+
+sub stop { kill 'KILL', shift->{pid} }
+
+sub _run {
+  my $self = shift;
+
+  return undef if eval {
 
     # Reset event loop
     Mojo::IOLoop->reset;
     $self->minion->tasks->{$self->emit('start')->task}->($self, @{$self->args});
 
     1;
-  } or $self->fail($@);
-  POSIX::_exit(0);
+  };
+  $self->fail(my $err = $@);
+  return $err;
 }
-
-sub stop { kill 'KILL', shift->{pid} }
 
 1;
 
@@ -396,6 +404,12 @@ retried to change options.
 These options are currently available:
 
 =over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted.
 
 =item delay
 

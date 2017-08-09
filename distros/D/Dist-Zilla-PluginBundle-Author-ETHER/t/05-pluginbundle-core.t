@@ -17,9 +17,11 @@ use NoPrereqChecks;
 # tests the core plugin - with all options disabled
 
 {
+    my $tempdir = no_git_tempdir();
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
+            tempdir_root => $tempdir->stringify,
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     'GatherDir',

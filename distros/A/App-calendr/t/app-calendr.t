@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use 5.006;
 use strict;
@@ -34,7 +34,7 @@ like($@, qr/Invalid year/);
 eval { App::calendr->new({ name => 'bahai', month => 1, year => 0 })->run };
 like($@, qr/Invalid year/);
 
-eval { App::calendr->new({ name => 'bahai', gregorian => "1/2/3" })->run };
+eval { App::calendr->new({ name => 'bahai', gdate => "1/2/3" })->run };
 like($@, qr/ERROR: Invalid gregorian date/);
 
 eval { App::calendr->new({ name => 'bahai', jday => -1 })->run };

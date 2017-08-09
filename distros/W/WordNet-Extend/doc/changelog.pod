@@ -4,6 +4,58 @@ CHANGES - Revision history for WordNet::Extend
 
 =head1 DESCRIPTION
 
+=head2 Version 1.000 (Released 08/06/2017)
+
+=over
+
+=item (1) 
+
+Added bin creation to install to allow word2vecSimilarity.py to be installed and run.
+
+=back
+
+=head2 Version 0.060 (Released 03/19/2017)
+
+=over
+
+=item (1)
+
+Added word2vec method to Locate.
+
+=item (2) 
+
+Major fixes to Insert which were causing QueryData tests to fail.
+
+=item (3) 
+
+Fix to Insert which wasn't allowing capital letter words to be inserted.
+
+=item (4) 
+
+Fix to Insert to allow verbs' frames to be added which were being cut out before.
+
+=item (5)
+
+Added word2vec test in WN-Locate.t
+
+=item (6) 
+
+Updated examples in Extend which were causing errors.
+
+=item (7) 
+
+Added outData directory to store various outData's run on the test data 
+
+=item (8)
+
+Added examplesLocate directory to store various examples on using the Locate method.
+
+=item (9)
+
+Added restorewordnet.pl to main directory to allow easy restoration of WordNet.
+
+=back
+
 =head2 Version 0.051 (Released 01/16/2017)
 
 =over

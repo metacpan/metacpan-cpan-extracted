@@ -18,7 +18,7 @@ my $logfile;
 my $debug;
 my $help;
 
-if (! @ARGV  || $ARGV[0] !~ /(?:start|stop|--fg|-f)/){
+if (! @ARGV  || $ARGV[0] !~ /(?:start|stop|--fg|-f|status)/){
     $help = 1;
 }
 
@@ -45,6 +45,7 @@ if ($help){
 Usage: 
 
 bbtester start [--ip 0.0.0.0] [--port 7800]] [--debug 0-7] [--logfile] [--auto]
+bbtester status
 bbtester stop
 
 bbtester --fg [--ip 0.0.0.0] [--port 7800] [--debug 0-7] [--stdout] [--auto]
@@ -66,6 +67,17 @@ $tester->port($port);
 
 if ($op eq 'stop'){
     $tester->stop;
+    exit;
+}
+if ($op eq 'status'){
+    my $status = $tester->status;
+    if ($status){
+        my $pid = $tester->pid;
+        print "bbtester is running at PID $pid...\n";
+    }
+    else {
+        print "bbtester is not running...\n";
+    }
     exit;
 }
 if ($op eq 'start'){
@@ -95,6 +107,10 @@ Listen using a different IP/Port pair
 Stop the service from running
 
     bbtester stop
+
+Display whether the tester is currently running or not:
+
+    bbtester status
 
 Run the tester in the foreground for testing/debugging/troubleshooting
 purposes.

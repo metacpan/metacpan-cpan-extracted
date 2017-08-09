@@ -4,7 +4,7 @@
       "Shlomi Fish ( http://www.shlomifish.org/ )"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "deprecated",
       "exceptions",
@@ -36,11 +36,11 @@
    "provides" : {
       "Error" : {
          "file" : "lib/Error.pm",
-         "version" : "0.17024"
+         "version" : "0.17025"
       },
       "Error::Simple" : {
-         "file" : "lib/Error.pm",
-         "version" : "0.17024"
+         "file" : "lib/Error/Simple.pm",
+         "version" : "0.17025"
       },
       "Error::WarnDie" : {
          "file" : "lib/Error.pm"
@@ -58,5 +58,6 @@
          "url" : "https://bitbucket.org/shlomif/perl-error.pm"
       }
    },
-   "version" : "0.17024"
+   "version" : "0.17025",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

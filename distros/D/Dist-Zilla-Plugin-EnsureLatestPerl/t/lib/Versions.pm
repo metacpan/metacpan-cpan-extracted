@@ -20,7 +20,7 @@ sub latest_dev_perl { $latest_dev_perl }
 # year, month, day
 sub date_of_mcl_release
 {
-    return Module::CoreList->VERSION =~ /^5\.(\d{4})(\d{2})(\d{2})$/;
+    return Module::CoreList->VERSION =~ /^5\.(\d{4})(\d{2})(\d{2})/;
 }
 
 1;

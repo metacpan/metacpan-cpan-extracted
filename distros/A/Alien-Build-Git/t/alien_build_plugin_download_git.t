@@ -23,8 +23,9 @@ subtest 'latest' => sub {
 
   my $error;
   my $ret;
+  my $out;
 
-  note scalar capture_merged {
+  note $out = scalar capture_merged {
     $ret = eval {
       $build->download;
     };
@@ -32,8 +33,9 @@ subtest 'latest' => sub {
   };
   
   is $error, '';
+  diag $out if $error;
   
-  note scalar capture_merged {
+  note $out = scalar capture_merged {
     $ret = eval {
       $build->extract;
     };
@@ -41,6 +43,7 @@ subtest 'latest' => sub {
   };
   
   is $error, '';
+  diag $out if $error;
 
   my $dir = $ret;
   

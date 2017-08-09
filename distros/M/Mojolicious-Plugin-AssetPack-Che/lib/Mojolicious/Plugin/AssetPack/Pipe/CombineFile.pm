@@ -38,7 +38,11 @@ sub process {
   
   if (@$combine) {
     my $format = $combine->[0]->format;
-    my $checksum = checksum $topic;#$combine->map('url')->join(':');
+    #~ my $checksum = checksum $topic;
+    my $checksum = checksum $topic.($self->config->{version} || '');#$combine->map('url')->join(':');
+    
+    #~ warn "Process CombineFile: ", $self->assetpack->app->dumper($combine), $checksum;
+    
     #~ my $name = checksum $topic;
     return
       unless $self->enabled || $format ~~ ['html', 'json'];
@@ -72,7 +76,7 @@ sub process {
     
     if ($self->config->{gzip} && ($self->config->{gzip}{min_size} || 1000) < $content->size) {
       gzip \($content->to_string) => \(my $gzip), {-Level => 9};
-      my $checksum_gzip = checksum($topic.'.gzip');
+      my $checksum_gzip = checksum($topic.($self->config->{version} || '').'.gzip');
       DEBUG && diag 'GZIP asset topic=[%s] with checksum=[%s] and format=[%s] and rate=[%s/%s].', $topic, $checksum, $format, $content->size, length($gzip);
       $self->assetpack->{by_checksum}{$checksum_gzip} = $self->assetpack->store->save(\$gzip, {key => "combine-file-gzip", url=>$topic.'.gzip', name=>$topic.'.gzip', checksum=>$checksum_gzip, minified=>1, format=>$format,});
       
@@ -89,8 +93,8 @@ sub _cb_route_by_topic {
 return sub {
   my $c  = shift;
   my $topic = $c->stash('topic');
-  $c->stash('name'=>checksum $topic);
-  $c->stash('checksum'=>checksum $topic);
+  $c->stash('name'=>checksum $topic.($self->config->{version} || ''));
+  $c->stash('checksum'=>checksum $topic.($self->config->{version} || ''));
   return $self->serve->($c);
   
    #~ my $assets = $assetpack->processed($topic)

@@ -1,7 +1,7 @@
 package App::IODUtils;
 
-our $VERSION = '0.14'; # VERSION
-our $DATE = '2016-12-28'; # DATE
+our $VERSION = '0.15'; # VERSION
+our $DATE = '2017-08-05'; # DATE
 
 use 5.010001;
 
@@ -85,6 +85,12 @@ our %common_args = (
         default => 0,
         tags    => ['common', 'category:parser'],
     },
+    expr_vars => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'expr_var',
+        schema => ['hash*', of=>'str'],
+        tags    => ['common', 'category:parser'],
+    },
 );
 
 our %inplace_arg = (
@@ -136,6 +142,7 @@ sub _get_parser_options {
         (allow_directives        => $args->{allow_directives})    x !!@{ $args->{allow_directives}    // [] },
         (disallow_directives     => $args->{disallow_directives}) x !!@{ $args->{disallow_directives} // [] },
         enable_expr              => $args->{enable_expr},
+        (expr_vars                => $args->{expr_vars})          x !!(defined $args->{expr_vars}),
         allow_duplicate_key      => $args->{allow_duplicate_key},
         ignore_unknown_directive => $args->{ignore_unknown_directive},
     );
@@ -174,7 +181,7 @@ App::IODUtils - IOD utilities
 
 =head1 VERSION
 
-This document describes version 0.14 of App::IODUtils (from Perl distribution App-IODUtils), released on 2016-12-28.
+This document describes version 0.15 of App::IODUtils (from Perl distribution App-IODUtils), released on 2017-08-05.
 
 =head1 SYNOPSIS
 
@@ -249,7 +256,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

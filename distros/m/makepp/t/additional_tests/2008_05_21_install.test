@@ -3,7 +3,7 @@
 # When testing an already installed version, this test doesn't make sence.
 substr +($Mpp::makepp_dir = $makepp_path), -7, 7, '';
 -f "$Mpp::makepp_dir/install.pl";
-###	29	644	1164353916	1326487680	makepp_test_script.pl
+###	29	644	1164353916	1357678563	makepp_test_script.pl
 my $cwd = cwd;
 
 my $havepod = -d "$Mpp::makepp_dir/pod/"; # complete distro?
@@ -16,7 +16,7 @@ system_intabort \$cmd, PERL, $cmd, "$cwd/instbin", "$cwd/instshare",
     $haveman ? "$cwd/instman" : 'none',
     $haveutf8 ? "$cwd/insthtml" : 'none',
     'none';
-die if $haveman && ! -f "$cwd/instman/man1/makepp.1";
+die if $haveman && ! <$cwd/instman/man1/makepp.?{,.gz}>; # ? makes this a wildcard
 die if $haveutf8 && ! -f "$cwd/insthtml/index.html";
 
 $cmd = "$Mpp::makepp_dir/config.pl";
@@ -24,7 +24,7 @@ system_intabort \$cmd, PERL, $cmd, "--makefile=$cwd/config.mk", '-p', $cwd,
     $haveman ? "-m$cwd/confman" : '-mnone',
     $haveutf8 ? "-h$cwd/confhtml" : '-hnone';
 makepp "-f$cwd/config.mk", '--dont-build=all', 'install';
-die if $haveman && ! -f "$cwd/confman/man1/makepp.1";
+die if $haveman && ! <$cwd/confman/man1/makepp.?{,.gz}>;
 die if $haveutf8 && ! -f "$cwd/confhtml/index.html";
 
 chdir $cwd;

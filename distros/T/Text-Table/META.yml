@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010'
 keywords:
   - art
   - ascii
@@ -33,7 +33,7 @@ name: Text-Table
 provides:
   Text::Table:
     file: lib/Text/Table.pm
-    version: '1.132'
+    version: '1.133'
 requires:
   Carp: '0'
   List::Util: '0'
@@ -44,5 +44,5 @@ requires:
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Table
-  repository: ssh://git@github.com:shlomif/perl-Text-Table.git
-version: '1.132'
+  repository: ssh://git@github.com:shlomif/Text-Table.git
+version: '1.133'

@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Log::ger::Format::Flogger - Use String::Flogger for formatting instead
+    of sprintf
 
+VERSION
+    version 0.002
+
+SYNOPSIS
      use Log::ger::Format 'Flogger';
      use Log::ger;
 
@@ -11,17 +17,20 @@ SYNOPSIS
      log_debug [ 'and we can defer evaluation of %s if we want', sub { 'stuff' } ];
      log_trace sub { 'while avoiding sprintfiness, if needed' };
 
-    To install only for current package:
-
-     use Log::ger::Format;
-     Log::ger::Format->set_for_current_package('Flogger');
-     use Log::ger;
+    Note that this affects the importing package only.
 
 DESCRIPTION
-
 SEE ALSO
-
     Log::ger
 
     String::Flogger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

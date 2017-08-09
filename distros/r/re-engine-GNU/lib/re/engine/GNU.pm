@@ -12,7 +12,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 our @ISA = 'Regexp';
 
 BEGIN {
-    our $VERSION = '0.021'; # VERSION
+    our $VERSION = '0.024'; # VERSION
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -102,7 +102,7 @@ re::engine::GNU - GNU Regular Expression Engine
 
 =head1 VERSION
 
-version 0.021
+version 0.024
 
 =head1 SYNOPSIS
 

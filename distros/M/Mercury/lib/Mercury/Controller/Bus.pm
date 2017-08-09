@@ -1,5 +1,5 @@
 package Mercury::Controller::Bus;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: A messaging pattern where all subscribers share messages
 
 #pod =head1 SYNOPSIS
@@ -32,7 +32,6 @@ use Mercury::Pattern::Bus;
 
 sub connect {
     my ( $c ) = @_;
-    Mojo::IOLoop->stream($c->tx->connection)->timeout(1200);
 
     my $topic = $c->stash( 'topic' );
     my $pattern = $c->_pattern( $topic );
@@ -97,7 +96,7 @@ Mercury::Controller::Bus - A messaging pattern where all subscribers share messa
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 

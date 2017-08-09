@@ -11,13 +11,14 @@ use Test2::API qw( context );
 use Capture::Tiny qw( capture_merged );
 use Alien::Build::Util qw( _mirror );
 
-our @EXPORT = qw( alienfile alienfile_ok alien_build_ok );
+our @EXPORT = qw( alienfile alienfile_ok alien_download_ok alien_extract_ok alien_build_ok alien_build_clean alien_install_type_is );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '0.75'; # VERSION
+our $VERSION = '0.91'; # VERSION
 
 
 my $build;
+my $build_root;
 
 sub alienfile
 {
@@ -66,6 +67,7 @@ sub alienfile
   require Alien::Build;
   
   undef $build;
+  undef $build_root;
   my $out = capture_merged {
     $build = Alien::Build->load($args{filename}, root => $args{root});
     $build->set_stage($args{stage});
@@ -75,7 +77,8 @@ sub alienfile
   my $ctx = context();
   $ctx->note($out) if $out;
   $ctx->release;
-  
+
+  $build_root = $get_temp_root->();
   $build
 }
 
@@ -92,6 +95,155 @@ sub alienfile_ok
   $ctx->release;
   
   $build;
+}
+
+
+sub alien_install_type_is
+{
+  my($type, $name) = @_;
+
+  croak "invalid install type" unless defined $type && $type =~ /^(system|share)$/;  
+  $name ||= "alien install type is $type";
+  
+  my $ok = 0;
+  my @diag;
+  
+  if($build)
+  {
+    my($out, $actual) = capture_merged {
+      $build->load_requires('configure');
+      $build->install_type;
+    };
+    if($type eq $actual)
+    {
+      $ok = 1;
+    }
+    else
+    {
+      push @diag, "expected install type of $type, but got $actual";
+    }
+  }
+  else
+  {
+    push @diag, 'no alienfile'
+  }
+  
+  my $ctx = context();
+  $ctx->ok($ok, $name);
+  $ctx->diag($_) for @diag;
+  $ctx->release;
+
+  $ok;
+}
+
+
+sub alien_download_ok
+{
+  my($name) = @_;
+  
+  $name ||= 'alien download';
+  
+  my $ok;
+  my $file;
+  my @diag;
+  
+  if($build)
+  {
+    my($out, $error) = capture_merged {
+      eval {
+        $build->load_requires('configure');
+        $build->load_requires($build->install_type);
+        $build->download;
+      };
+      $@;
+    };
+    if($error)
+    {
+      $ok = 0;
+      push @diag, $out if defined $out;
+      push @diag, "extract threw exception: $error";
+    }
+    else
+    {
+      $file = $build->install_prop->{download};
+      if(-d $file || -f $file)
+      {
+        $ok = 1;
+      }
+      else
+      {
+        $ok = 0;
+        push @diag, 'no file or directory';
+      }
+    }
+  }
+  else
+  {
+    $ok = 0;
+    push @diag, 'no alienfile';
+  }
+  
+  my $ctx = context();
+  $ctx->ok($ok, $name);
+  $ctx->diag($_) for @diag;
+  $ctx->release;
+
+  $file;
+}
+
+
+sub alien_extract_ok
+{
+  my($archive, $name) = @_;
+  
+  $name ||= $archive ? "alien extraction of $archive" : 'alien extraction';
+  my $ok;
+  my $dir;
+  my @diag;
+  
+  if($build)
+  {
+    my($out, $error);
+    ($out, $dir, $error) = capture_merged {
+      my $dir = eval {
+        $build->load_requires('configure');
+        $build->load_requires($build->install_type);
+        $build->download;
+        $build->extract($archive);
+      };
+      ($dir, $@);
+    };
+    if($error)
+    {
+      $ok = 0;
+      push @diag, $out if defined $out;
+      push @diag, "extract threw exception: $error";
+    }
+    else
+    {
+      if(-d $dir)
+      {
+        $ok = 1;
+      }
+      else
+      {
+        $ok = 0;
+        push @diag, 'no directory';
+      }
+    }
+  }
+  else
+  {
+    $ok = 0;
+    push @diag, 'no alienfile';
+  }
+  
+  my $ctx = context();
+  $ctx->ok($ok, $name);
+  $ctx->diag($_) for @diag;
+  $ctx->release;
+
+  $dir;
 }
 
 
@@ -175,6 +327,26 @@ sub alien_build_ok
   $alien;
 }
 
+
+sub alien_build_clean
+{
+  my $ctx = context();
+  if($build_root)
+  {
+    foreach my $child ($build_root->children)
+    {
+      next if $child->basename eq 'prefix';
+      $ctx->note("clean: rm: $child");
+      $child->remove_tree;
+    }
+  }
+  else
+  {
+    $ctx->note("no build to clean");
+  }
+  $ctx->release;
+}
+
 delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE );
 $ENV{ALIEN_BUILD_RC} = '-';
 
@@ -192,7 +364,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 0.75
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -280,6 +452,32 @@ The install prefix for the build.
 Same as C<alienfile> above, except that it runs as a test, and will not throw an exception
 on failure (it will return undef instead).
 
+=head2 alien_install_type_is
+
+ alien_install_type_is $type;
+ alien_install_type_is $type, $name;
+
+Simple test to see if the install type is what you expect.
+C<$type> should be one of C<system> or C<share>.
+
+=head2 alien_download_ok
+
+ my $file = alien_download_ok;
+ my $file = alien_download_ok $name;
+
+Makes a download attempt and test that a file or directory results.  Returns
+the file or directory if successful.  Returns C<undef> otherwise.
+
+=head2 alien_extract_ok
+
+ my $dir = alien_extract_ok;
+ my $dir = alien_extract_ok $archive;
+ my $dir = alien_extract_ok $archive, $name;
+ my $dir = alien_extract_ok undef, $name;
+
+Makes an extraction attempt and test that a directory results.  Returns
+the directory if successful.  Returns C<undef> otherwise.
+
 =head2 alien_build_ok
 
  my $alien = alien_build_ok;
@@ -301,6 +499,13 @@ The base class to use for your alien.  This is L<Alien::Base> by default.  Shoul
 be a subclass of L<Alien::Base>, or at least adhere to its API.
 
 =back
+
+=head2 alien_build_clean
+
+ alien_build_clean;
+
+Removes all files with the current build, except for the runtime prefix.
+This helps test that the final install won't depend on the build files.
 
 =head1 SEE ALSO
 

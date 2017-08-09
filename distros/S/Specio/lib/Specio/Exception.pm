@@ -7,7 +7,7 @@ use overload
     q{""}    => 'as_string',
     fallback => 1;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use Devel::StackTrace;
 use Scalar::Util qw( blessed );
@@ -81,15 +81,9 @@ Specio::Exception - A Throwable::Error subclass for type constraint failures
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
-=head1 DESCRIPTION
-
-This exception class is thrown by Specio when a type check fails. It emulates
-the L<Throwable::Error> API, but doesn't use that module to avoid adding a
-dependency on L<Moo>.
-
-=head1 DESCRIPTION
+=head1 SYNOPSIS
 
   use Try::Tiny;
 
@@ -103,6 +97,12 @@ dependency on L<Moo>.
           print $_->value, "\n";
       }
   };
+
+=head1 DESCRIPTION
+
+This exception class is thrown by Specio when a type check fails. It emulates
+the L<Throwable::Error> API, but doesn't use that module to avoid adding a
+dependency on L<Moo>.
 
 =for Pod::Coverage BUILD throw
 

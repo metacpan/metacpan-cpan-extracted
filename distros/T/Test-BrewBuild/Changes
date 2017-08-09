@@ -1,5 +1,23 @@
 Revision history for Test-BrewBuild
 
+2.19    2017-08-05
+        - added 'status' command to bbtester, prints to STDOUT whether a tester
+          is currently running or not (closes #214)
+        - added pid() to Tester.pm, returns the running PID, and 0 if a tester
+          is not currently running
+        - Dispatch now has a separation between a finish and a start
+          (closes #215)
+        - moved Dispatch LCD initialization call to within the block its needed.
+          See stevieb9/rpi-wiringpi#41
+        - Tester has been significantly beefed to to properly know when it has
+          been left in an inconsistent state, and properly cleans itself up in
+          all three phases (start, stop and status). (closes #219)
+        - fixed a regression where somehow, the LCD object was being created in
+          loop fashion, crashing when the limit of eight was reached 
+          (closes #221)
+        - --rpi mode for bbdispatch now prints the number of runs completed when
+          in auto mode on the LCD
+
 2.18    2017-06-25
         - logging output modifications (changes and relocations)
         - in Git::listen(), we now make comparisons of the commit checksums, and

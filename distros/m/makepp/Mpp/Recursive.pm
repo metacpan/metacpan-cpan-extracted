@@ -1,4 +1,4 @@
-# $Id: Recursive.pm,v 1.18 2012/03/04 13:56:35 pfeiffer Exp $
+# $Id: Recursive.pm,v 1.23 2016/09/28 20:36:41 pfeiffer Exp $
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ package Mpp::Recursive;
 
 use Mpp::File;
 use Mpp::Text;
-use Mpp::Event qw(wait_for read_wait);
+use Mpp::Event qw(wait_for);
 
 our $traditional;		# 1 if we invoke makepp recursively, undef if
 				# we call the recursive_makepp stub and do
@@ -34,10 +34,74 @@ if( defined $traditional || defined $hybrid ) {
 
 my $_MAKEPPFLAGS;
 
+my $read_vec;			# Vector of file handles that we are listeningto.
+my @read_handles;		# The file handles or FileHandles or globs
+				# that we're waiting for, indexed by the
+				# fileno (same as index into $read_vec).
+my @read_subs;			# The read subroutines associated with each of the
+				# handles in @read_handles (also indexed by fileno).
+
 END {
   local $?;
   defined $traditional || defined $hybrid and $Mpp::Rule::last_build_cwd and $Mpp::print_directory and
     print "$Mpp::progname: Leaving directory `" . absolute_filename( $Mpp::Rule::last_build_cwd ). "'\n";
+}
+
+
+
+# Extra I/O handling for sub-makes.
+sub Mpp::Event::Recursive {
+#
+# Check for file handles which can be read.  We used to use IO::Select but
+# it's buggy (doesn't even bother to call the select function if no
+# handles have been specified--not a friendly interface!).
+#
+  my $r = $read_vec;		# Make a modifiable copy of the list of file
+				# handles to wait for.
+  my $n_handles = select $r, undef, undef, 5;
+				# Supply a 5s timeout, so we do not wait
+				# forever if the signal happened to come
+				# between when we tested select_finished_subs
+				# and when we called select.
+  if( $n_handles > 0 ) {	# Data available on any handles?
+				# Scan backwards to find out which handles it
+				# might have been on, since we are more likely
+				# to be waiting on later file handles.
+    for( my $fileno = @read_handles; $fileno >= 0; --$fileno ) {
+      if( vec $r, $fileno, 1 ) { # This bit returned on?
+	my $read_sub = $read_subs[$fileno]; # Get the subroutine.
+	my $fh = $read_handles[$fileno];
+	vec( $read_vec, $fileno, 1 ) = 0; # Do not wait for it again (unless it
+	undef $read_subs[$fileno]; # is requeued).
+	undef $read_handles[$fileno];
+	defined $read_sub and &$read_sub( $fh ); # Call the subroutine.
+      }
+    }
+  }
+}
+
+=head2 read_wait
+
+  read_wait FILE_HANDLE, sub { ... };
+
+Queue a subroutine to be activated whenever there is data on the given file
+handle (or IO::Handle object, or anything that can be supplied as an argument
+to IO::Select::new.
+
+This is a one-shot queue.  You must call read_wait again if you want the
+subroutine to be called again.
+
+=cut
+
+sub read_wait {
+  my( $fh, $subr ) = @_;		# Name the arguments.
+
+  my $fileno = fileno($fh) || $fh->fileno;
+  $read_vec ||= '';		# Avoid usage of undefined variable errors.
+  defined $fileno or die "internal error";
+  vec($read_vec, $fileno, 1) = 1; # Wait on this file handle.
+  $read_handles[$fileno] = $fh;
+  $read_subs[$fileno] = $subr;
 }
 
 #
@@ -53,7 +117,7 @@ sub setup_socket {
 #
 # Get a temp name that goes away at the end, so we don't clutter up /tmp.
 #
-  $socket_name = Mpp::Subs::f_mktemp '/tmp/makepp.';
+  $socket_name = Mpp::Subs::f_mktemp $Mpp::Rule::tmp;
 				# Name of socket for listening to recursive
 				# make requests.  This is exported to the
 				# environment by Rule::execute.
@@ -122,7 +186,10 @@ sub connection {
 				# run simultaneously.
       my $status = eval {
 	local @ARGV = @words;
-        wait_for Mpp::parse_command_line %this_ENV; # Build all the targets.
+        wait_for grep {
+	  exists $_->{DONT_BUILD} or undef $_->{DONT_BUILD};
+	  Mpp::build $_;			# Try to build the file, return handle if necessary.
+	} Mpp::parse_command_line %this_ENV; # Build all the targets.
       };
       if( $@ ) {		# Have an error code?
 	if( defined $hybrid && $@ =~ /\Aattempt to load two makefiles/ ) {
@@ -150,6 +217,25 @@ sub connection {
   read_wait $_[0], \&connection; # Requeue listening.
 }
 
+=head2 requote
+
+  $quoted_text = requote($unquoted_text);
+
+Puts quotes around the text, and escapes any quotes inside the text, so
+that calling unquote() on $quoted_text will return the same string as
+$unquoted_text.
+
+=cut
+
+sub requote {
+  my( $str ) = @_;		# Get a modifiable copy of the string.
+  $str =~ s/["\\]/\\$&/g;	# Protect all backslashes and double quotes.
+  $str =~ s{[\0-\037]}{sprintf '\%o', ord $&}eg; # Protect any binary characters.
+  qq["$str"];			# Return the quoted string.
+}
+
+
+
 #
 # This is the actual function which overloads the stub.
 #
@@ -166,7 +252,6 @@ sub Mpp::Subs::f_MAKE {
       defined $hybrid ? '--hybrid' : '--traditional',
       $Mpp::BuildCheck::default == $Mpp::BuildCheck::exact_match::exact_match ? () :
 	"--buildcheck=".((ref $Mpp::BuildCheck::default)=~/BuildCheck::(.+)/)[0],
-      $Mpp::Subs::defer_include ? '--deferinclude' : (),
       $Mpp::final_rule_only ? '--finalruleonly' : (),
       $Mpp::gullible ? '--gullible' : (),
       $Mpp::last_chance_rules ? '--lastchancerules' : (),

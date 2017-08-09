@@ -4,7 +4,7 @@
       "Davor Cubranic <cubranic@stat.ubc.ca>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -31,7 +31,7 @@
          "requires" : {
             "Carp" : "0",
             "Class::Method::Modifiers" : "0",
-            "Class::Tiny" : "0",
+            "Class::Tiny" : "1.001",
             "Class::Tiny::Antlers" : "0.023",
             "Math::Complex" : "0",
             "Scalar::Util" : "0",
@@ -62,6 +62,7 @@
          "web" : "https://github.com/cubranic/Statistics-R-IO"
       }
    },
-   "version" : "1.0001"
+   "version" : "1.0002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

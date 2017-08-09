@@ -4,7 +4,7 @@
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Convert::Moji" : "0.10",
             "JSON::Parse" : "0.38",
             "perl" : "5.006001"
          }
@@ -46,6 +48,10 @@
          "url" : "https://github.com/benkasminbullock/Lingua-EN-ABC"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.07",
+   "x_contributors" : [
+      "Nigel Horne <njh@cpan.org>",
+      "Ed Avis <edavis@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

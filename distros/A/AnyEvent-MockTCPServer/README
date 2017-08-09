@@ -1,10 +1,5 @@
-NAME
-    AnyEvent::MockTCPServer - Mock TCP Server using AnyEvent
-
-VERSION
-    version 1.142230
-
 SYNOPSIS
+
       use AnyEvent::MockTCPServer qw/:all/;
       my $cv = AnyEvent->condvar;
       my $server =
@@ -25,113 +20,159 @@ SYNOPSIS
                                     );
 
 DESCRIPTION
+
     This module provides a TCP server with a set of defined behaviours for
     use in testing of TCP clients. It is intended to be use when testing
     AnyEvent TCP client interfaces.
 
-METHODS
-  "new(%parameters)"
     Constructs a new AnyEvent::MockTCPServer object. The parameter hash can
     contain values for the following keys:
 
-    "connections"
-        A list reference containing elements for each expected connection.
-        Each element is another list reference contain action elements. Each
-        action element is a list with an action method name and any
-        arguments to the action method. By convention, the final argument to
-        the action method should be a description. See the action method
-        descriptions for the other arguments.
+    connections
 
-    "host"
-        The host IP that the server should listen on. Default is the IPv4
-        loopback address, 127.0.0.1.
+      A list reference containing elements for each expected connection.
+      Each element is another list reference contain action elements. Each
+      action element is a list with an action method name and any arguments
+      to the action method. By convention, the final argument to the action
+      method should be a description. See the action method descriptions
+      for the other arguments.
 
-    "port"
-        The port that the server should listen on. Default is to pick a free
-        port.
+    host
 
-    "timeout"
-        The timeout for IO operations in seconds. Default is 2 seconds.
+      The host IP that the server should listen on. Default is the IPv4
+      loopback address, 127.0.0.1.
 
-    "on_timeout"
-        The callback to call when a timeout occurs. Default is to die with
-        message "server timeout\n".
+    port
 
-  "listening()"
+      The port that the server should listen on. Default is to pick a free
+      port.
+
+    timeout
+
+      The timeout for IO operations in seconds. Default is 2 seconds.
+
+    on_timeout
+
+      The callback to call when a timeout occurs. Default is to die with
+      message "server timeout\n".
+
     Condvar that is notified when the mock server is ready. The value
     received is an array reference containing the address and port that the
     server is listening on.
 
-  "connect_address()"
     An array reference containing the address and port that the server is
     listening on. This method blocks on the "listening()" condvar until the
     server is listening.
 
-  "connect_host()"
     The address that the server is listening on. This method blocks on the
     "listening()" condvar until the server is listening.
 
-  "connect_port()"
     The port that the server is listening on. This method blocks on the
     "listening()" condvar until the server is listening.
 
-  "connect_string()"
-    A string containing the address and port that the server is listening on
-    separated by a colon, '":"'. This method blocks on the "listening()"
+    A string containing the address and port that the server is listening
+    on separated by a colon, ':'. This method blocks on the "listening()"
     condvar until the server is listening.
 
-  "finished_cv()"
     Condvar that is notified when the mock server has completed processing
     of all the expected connections.
 
-  "next_action($handle, $actions)"
     Internal method called by the action methods when the server should
     proceed with the next action. Must be called by any action methods
     written in subclasses of this class.
 
 ACTION METHOD ARGUMENTS
+
     These methods (and methods added by derived classes) can be used in
-    action lists passed via the constructor "connections" parameter. The
+    action lists passed via the constructor connections parameter. The
     $handle and $actions arguments should be omitted from the action lists
     as they are supplied by the framework.
 
-ACTION METHODS
-  "send($handle, $actions, $send, $desc)"
     Sends the payload, $send, to the client.
 
-  "packsend($handle, $actions, $send, $desc)"
     Sends the payload, $send, to the client after removing whitespace and
     packing it with 'H*'. This method is equivalent to the "send($handle,
     $actions, $send, $desc)" method when passed the packed string but debug
     messages contain the unpacked strings are easier to read.
 
-  "recv($handle, $actions, $expect, $desc)"
     Waits for the data $expect from the client.
 
-  "recvline($handle, $actions, $expect, $desc)"
     Waits for a line of data $expect from the client. See AnyEvent::Handle
     for the definition of 'line'.
 
-  "packrecv($handle, $actions, $expect, $desc)"
-    Removes whitespace and packs the string $expect with 'H*' and then waits
-    for the resulting data from the client. This method is equivalent to the
-    "recv($handle, $actions, $expect, $desc)" method when passed the packed
-    string but debug messages contain the unpacked strings are easier to
-    read.
+    Removes whitespace and packs the string $expect with 'H*' and then
+    waits for the resulting data from the client. This method is equivalent
+    to the "recv($handle, $actions, $expect, $desc)" method when passed the
+    packed string but debug messages contain the unpacked strings are
+    easier to read.
 
-  "sleep($handle, $actions, $interval, $desc)"
     Causes the server to sleep for $interval seconds.
 
-  "code($handle, $actions, $code, $desc)"
     Causes the server to execute the code reference with the client handle
     as the first argument.
 
-AUTHOR
-    Mark Hindess <soft-cpan@temporalanomaly.com>
+POD ERRORS
 
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Mark Hindess.
+    Hey! The above document had some coding errors, which are explained
+    below:
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    Around line 28:
+
+      Unknown directive: =method
+
+    Around line 65:
+
+      Unknown directive: =method
+
+    Around line 71:
+
+      Unknown directive: =method
+
+    Around line 77:
+
+      Unknown directive: =method
+
+    Around line 82:
+
+      Unknown directive: =method
+
+    Around line 87:
+
+      Unknown directive: =method
+
+    Around line 93:
+
+      Unknown directive: =method
+
+    Around line 98:
+
+      Unknown directive: =method
+
+    Around line 111:
+
+      Unknown directive: =action
+
+    Around line 115:
+
+      Unknown directive: =action
+
+    Around line 123:
+
+      Unknown directive: =action
+
+    Around line 127:
+
+      Unknown directive: =action
+
+    Around line 132:
+
+      Unknown directive: =action
+
+    Around line 140:
+
+      Unknown directive: =action
+
+    Around line 144:
+
+      Unknown directive: =action
 

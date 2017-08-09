@@ -3,9 +3,9 @@
 use warnings;
 use strict;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
-BEGIN { use_ok( 'Carp::Assert::More' ); }
+use Carp::Assert::More;
 
 local $@;
 $@ = '';
@@ -41,3 +41,6 @@ eval {
     assert_nonref( $ref );
 };
 like( $@, qr/Assertion.*failed/ );
+
+done_testing();
+exit 0;

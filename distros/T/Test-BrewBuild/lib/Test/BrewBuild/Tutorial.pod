@@ -278,9 +278,10 @@ are the same (ie. no commits have been pushed to remote).
 =head2 Integrate with a Raspberry Pi
 
 We provide the ability to run tests on a Raspberry Pi, and optionally display
-the result information to an LCD screen. First, you need to set up an
-environment variable set to the pins the LCD is connected to (RS, E, D0, D1, D2,
-D3):
+the result information to an LCD screen including date/time, pass/fail status,
+the last commit tested, and the number of runs that have completed. First, you
+need to set up an environment variable set to the pins the LCD is connected to
+(RS, E, D0, D1, D2, D3):
 
     BB_RPI_LCD=5,6,4,17,27,22
 

@@ -68,15 +68,15 @@ To install this module type the following:
 
 =head1 AUTHORS
 
-Ted Pedersen, University of Minnesota Duluth
-tpederse at d.umn.edu
- 
 Jon Rusert, University of Minnesota Duluth
 ruse0008 at d.umn.edu	
 
+Ted Pedersen, University of Minnesota Duluth
+tpederse at d.umn.edu 
+
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2016, Ted Pedersen, Jonathan D Rusert
+Copyright (C) 2016, Jon Rusert, Ted Pedersen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

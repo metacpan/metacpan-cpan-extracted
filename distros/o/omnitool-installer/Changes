@@ -1,0 +1,9 @@
+Revision history for Perl extension omnitool-installer
+
+1.0 2017-08-01T17:56:43Z
+
+    - original version
+
+1.0.1 2017-08-04T03:08:30Z
+
+    - Correct initial permissions on start_omnitool.bash

@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service;
 # ABSTRACT: base class for nopaste services
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 use WWW::Mechanize;
 
@@ -109,7 +109,7 @@ App::Nopaste::Service - base class for nopaste services
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 

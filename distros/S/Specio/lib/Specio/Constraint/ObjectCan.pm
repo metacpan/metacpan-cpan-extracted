@@ -3,7 +3,7 @@ package Specio::Constraint::ObjectCan;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 use B ();
 use List::Util 1.33 ();
@@ -41,6 +41,10 @@ EOF
     sub _build_inline_generator {$_inline_generator}
 }
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _allow_classes {0}
+## use critic
+
 __PACKAGE__->_ooify;
 
 1;
@@ -59,7 +63,7 @@ Specio::Constraint::ObjectCan - A class for constraints which require an object 
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 

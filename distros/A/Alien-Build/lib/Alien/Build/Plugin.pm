@@ -8,7 +8,7 @@ use Carp ();
 our @CARP_NOT = qw( alienfile );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '0.75'; # VERSION
+our $VERSION = '0.91'; # VERSION
 
 
 sub new
@@ -136,7 +136,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 0.75
+version 0.91
 
 =head1 SYNOPSIS
 

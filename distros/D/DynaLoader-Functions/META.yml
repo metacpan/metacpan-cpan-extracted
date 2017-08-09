@@ -3,35 +3,38 @@ abstract: 'deconstructed dynamic C library loading'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DynaLoader-Functions
 provides:
   DynaLoader::Functions:
     file: lib/DynaLoader/Functions.pm
-    version: 0.002
+    version: '0.003'
 requires:
-  Carp: 0
-  DynaLoader: 0
-  Exporter: 0
-  parent: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Config: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DynaLoader-Functions
   license: http://dev.perl.org/licenses/
-version: 0.002
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

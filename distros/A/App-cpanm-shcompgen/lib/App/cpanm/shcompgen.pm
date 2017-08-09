@@ -1,7 +1,7 @@
 package App::cpanm::shcompgen;
 
-our $DATE = '2017-07-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 
@@ -19,7 +19,7 @@ App::cpanm::shcompgen - Install modules from CPAN (and activate shell completion
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cpanm::shcompgen (from Perl distribution App-cpanm-shcompgen), released on 2017-07-08.
+This document describes version 0.002 of App::cpanm::shcompgen (from Perl distribution App-cpanm-shcompgen), released on 2017-08-02.
 
 =head1 DESCRIPTION
 

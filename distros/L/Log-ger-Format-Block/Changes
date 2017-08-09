@@ -1,3 +1,11 @@
+0.005   2017-08-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update example in Synopsis (since Log::ger 0.018, Format
+	  applies formatting locally instead of globally).
+
+
 0.004   2017-06-30 (PERLANCAR)
 
 	- Adjust to Log::ger 0.011.

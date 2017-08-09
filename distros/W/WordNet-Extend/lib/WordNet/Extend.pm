@@ -1,11 +1,11 @@
-# WordNet::Extend version 0.051
-# Updated: 01/16/17
-#
-# Ted Pedersen, University of Minnesota Duluth
-# tpederse at d.umn.edu
+# WordNet::Extend version 1.000
+# Updated: 08/06/17
 #
 # Jon Rusert, University of Minnesota Duluth
 # ruse0008 at d.umn.edu
+#
+# Ted Pedersen, University of Minnesota Duluth             
+# tpederse at d.umn.edu
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ WordNet::Extend - Perl modules for extending your local WordNet.
  @in1 = ("crackberry","noun","withdef.1", "A BlackBerry, a handheld device considered addictive for its networking capability.");    
 
  print "Locating where $in1[0] should be inserted...\n";
- @loc1 = $locate->locate(@in1);   
+ @loc1 = @{$locate->locate(\@in1)};   
  
- print "System found $loc1[0] as the ideal insertion location...\n";
+ print "System found $loc1[1] as the ideal insertion location...\n";
                                     
  if($loc1[2] eq "attach")
  {
@@ -74,5 +74,5 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 @EXPORT = ();
 
-$VERSION = '0.051';
+$VERSION = '1.000';
 

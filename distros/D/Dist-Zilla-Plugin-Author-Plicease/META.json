@@ -28,7 +28,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir::Install" : "0.06",
-            "perl" : "5.008001"
+            "perl" : "5.014"
          }
       },
       "develop" : {
@@ -61,13 +61,13 @@
             "Sub::Exporter::ForMethods" : "0",
             "autodie" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
             "Test::More" : "0.94",
-            "perl" : "5.008001"
+            "perl" : "5.014"
          }
       }
    },
@@ -83,7 +83,7 @@
          "web" : "https://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease"
       }
    },
-   "version" : "2.20",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "2.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

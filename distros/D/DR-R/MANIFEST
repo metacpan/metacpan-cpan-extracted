@@ -1,0 +1,19 @@
+.gitignore
+Changes
+MANIFEST
+Makefile.PL
+R.xs
+lib/DR/R.pm
+matras.c
+rtree.c
+rtree/salad/rtree.c
+rtree/salad/rtree.h
+rtree/small/matras.c
+rtree/small/matras.h
+rtree/small/rb.h
+t/010-ping.t
+t/020-instance-insert.t
+t/030-destructor.t
+t/040-foreach.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

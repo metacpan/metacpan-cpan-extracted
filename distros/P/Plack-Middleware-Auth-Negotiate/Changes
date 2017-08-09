@@ -1,8 +1,12 @@
 Revision history for Plack-Middleware-Auth-Negotiate
 
-0.02    June 02, 2011
-        Removed POD Coverage test, since it is not applicable.
+0.172130 2017-08-01T21:36:30Z
+ - [closes rt#121874] don't ask for unused `$out_mech`, it triggers bug
+   rt#121873 in GSSAPI (Ioan Rogers)
+ - dzillafied (Ioan Rogers)
 
-0.01    May 31, 2011
-        Initial proof of concept release.
+0.02 June 02, 2011
+ - Removed POD Coverage test, since it is not applicable.
 
+0.01 May 31, 2011
+ - Initial proof of concept release.

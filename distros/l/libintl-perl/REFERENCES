@@ -49,3 +49,12 @@
 
 - Git, the stupid content tracker
   http://git-scm.com/
+
+- needrestart checks which daemons need to be restarted after library upgrades
+  https://fiasko-nw.net/~thomas/tag/needrestart.html
+
+- libguestfs is a set of tools for accessing and modifying virtual machine (VM) disk images
+  http://libguestfs.org/
+
+- serienbrief, write serial letters with LaTeX
+  http://nasauber.de/opensource/serienbrief/

@@ -16,6 +16,7 @@ script/format-bencher-result
 script/list-bencher-results
 script/list-bencher-scenario-modules
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-rinci.t

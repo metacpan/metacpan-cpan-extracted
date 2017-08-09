@@ -9,17 +9,17 @@ requires "Path::Class" => "0.26";
 requires "Sub::Exporter::ForMethods" => "0";
 requires "autodie" => "0";
 requires "namespace::autoclean" => "0";
-requires "perl" => "5.008001";
+requires "perl" => "5.014";
 
 on 'test' => sub {
   requires "Test::More" => "0.94";
-  requires "perl" => "5.008001";
+  requires "perl" => "5.014";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::ShareDir::Install" => "0.06";
-  requires "perl" => "5.008001";
+  requires "perl" => "5.014";
 };
 
 on 'develop' => sub {

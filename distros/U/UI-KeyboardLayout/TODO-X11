@@ -1,0 +1,2 @@
+﻿• Emit partial maps: allow filtering (e.g., do not emit [\x21-\x7e] inherited from US-Base).
+

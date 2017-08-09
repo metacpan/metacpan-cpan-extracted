@@ -33,7 +33,8 @@ subtype EmptyAoH of Array[Hash] where {
     like $@, qr{Value (.*) is not of type \QShort[Num]\E}s;
 }
 
-ok !eval{ Dios::Types::validate( 'Short[Int]',         [(1) x 9]   ) };
+ok        Dios::Types::validate( 'Short[Int]',         [(1) x 9]    );
+ok !eval{ Dios::Types::validate( 'Short[Int]',         [(1) x 11]   ) };
 like $@, qr{Value (.*) is not of type \QShort[Int]\E}s;
 
 ok        Dios::Types::validate( 'Nested[Array,Hash]', [{},{},{}]  );

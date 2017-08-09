@@ -1,6 +1,18 @@
 Changelog for re-engine-GNU
 
-0.021 2016-01-22T19:04:23
+0.024 2017-08-01T12:49:20
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Use SvCANCOW() - fixes #5
+
+0.023 2017-07-31T05:48:54Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Switch back to perl 5.10 method to set capture string
+
+0.022 2017-07-31T05:03:44Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Removed offending typecast - closes #4 - RT122641
+
+0.021 2016-01-22T19:04:23Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - dist.ini: Add generated files to clean rule
  - dist.init: Closes #2

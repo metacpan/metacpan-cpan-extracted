@@ -1,7 +1,7 @@
 package Config::IOD;
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.33'; # VERSION
+our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.34'; # VERSION
 
 use 5.010001;
 use strict;
@@ -194,7 +194,7 @@ Config::IOD - Read and write IOD/INI configuration files
 
 =head1 VERSION
 
-This document describes version 0.33 of Config::IOD (from Perl distribution Config-IOD), released on 2016-12-29.
+This document describes version 0.34 of Config::IOD (from Perl distribution Config-IOD), released on 2017-08-05.
 
 =head1 SYNOPSIS
 
@@ -255,6 +255,8 @@ parsed as verbatim. Example:
 With C<enable_encoding> turned off, value will not be undef but will be string
 with the value of (as Perl literal) C<"!json null">.
 
+Turning off this setting will violate IOD.
+
 =head2 enable_quoting => bool (default: 1)
 
 If set to false, then quotes on key value will be ignored and key value will be
@@ -265,6 +267,8 @@ parsed as verbatim. Example:
 With C<enable_quoting> turned off, value will not be a two-line string, but will
 be a one line string with the value of (as Perl literal) C<"line 1\\nline2">.
 
+I<Turning off this setting will violate IOD.>
+
 =head2 enable_bracket => bool (default: 1)
 
 If set to false, then JSON literal array will be parsed as verbatim. Example:
@@ -273,6 +277,8 @@ If set to false, then JSON literal array will be parsed as verbatim. Example:
 
 With C<enable_bracket> turned off, value will not be a three-element array, but
 will be a string with the value of (as Perl literal) C<"[1,2,3]">.
+
+I<Turning off this setting will violate IOD.>
 
 =head2 enable_brace => bool (default: 1)
 
@@ -283,6 +289,22 @@ Example:
 
 With C<enable_brace> turned off, value will not be a hash with two pairs, but
 will be a string with the value of (as Perl literal) C<'{"a":1,"b":2}'>.
+
+I<Turning off this setting will violate IOD.>
+
+=head2 enable_tilde => bool (default: 1)
+
+If set to true (the default), then value that starts with C<~> (tilde) will be
+assumed to use !path encoding, unless an explicit encoding has been otherwise
+specified.
+
+Example:
+
+ log_dir = ~/logs  ; ~ will be resolved to current user's home directory
+
+With C<enable_tilde> turned off, value will still be literally C<~/logs>.
+
+I<Turning off this setting will violate IOD.>
 
 =head2 allow_encodings => array
 
@@ -352,10 +374,14 @@ config file and force user to use JSON encoding or bracket to specify array:
  [section]
  a=[1,2]
 
+I<Turning off this setting will violate IOD.>
+
 =head2 ignore_unknown_directive => bool (default: 0)
 
 If set to true, will not die if an unknown directive is encountered. It will
 simply be ignored as a regular comment.
+
+I<Turning on this setting will violate IOD.>
 
 =head1 METHODS
 
@@ -377,7 +403,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Config-IOD>.
+Source repository is at L<https://github.com/sharyanto/perl-Config-IOD>.
 
 =head1 BUGS
 
@@ -403,7 +429,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

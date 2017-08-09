@@ -1,18 +1,16 @@
 package Shell::POSIX::Select;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
-# Tim Maher, tim@teachmeperl.com, yumpy@cpan.org
-# Fri May  2 10:29:25 PDT 2003
-# Mon May  5 10:51:49 PDT 2003
+# TODO: Portable-ize tput stuff
 
-# TO DO: portable-ize tput stuff
-# dump user's code-block with same line numbers shown in
-# error messages for debugging ease
-# Add option to embolden menu numbers, to distinguish from
+# TODO: Dump user's code-block with same line numbers shown in error
+# messages for debugging ease
+
+# TODO: Add option to embolden menu numbers, to distinguish them from
 # choices that are also numbers
-# See documentation and copyright notice below =pod section below
 
+# See documentation and copyright notice below =pod section below
 
 # Not using Exporter.pm; doing typeglob-based exporting,
 # using adapted code from Damian's Switch.pm
@@ -22,9 +20,16 @@ our ($Reply, $Heading, $Prompt);
 
 our ( $U_WARN, $REPORT, $DEBUG, $DEBUG_default, $_DEBUG,  );
 our ( $U_WARN_default, $_import_called, $U_DEBUG, $DEBUG_FILT );	
-our ( $DIRSEP, $sdump, $cdump, $script );	
+our ( $sdump, $cdump, $script );	
 # 
 our ( @ISA, @EXPORT, $PRODUCTION, $LOGGING, $PKG, $INSTALL_TESTING,$ON,$OFF, $BOLD, $SGR0, $COLS );
+
+# What is the maximum number of columns that the user wants to see
+# on-screen?  By default, no maximum -- the number of columns will be
+# determined by the width of the terminal and the length of the meny
+# item strings.
+our $MaxColumns = 99;
+push @EXPORT_OK, '$MaxColumns';
 
 BEGIN {
 	$PKG  = __PACKAGE__ ;
@@ -47,8 +52,6 @@ BEGIN {
 sub import ;	# advance declaration
 
 use File::Spec::Functions (':ALL');
-use strict;
-# no strict 'refs';	# no problem now
 
 use File::Spec::Functions 0.7;
 use Filter::Simple 0.84;
@@ -57,26 +60,19 @@ use Filter::Simple 0.84;
 # This is the oldest version that I know works pretty well
 use Text::Balanced 1.97 qw(extract_variable extract_bracketed);
 
-# I've done most testing with this as yet unrelased version
-# use Text::Balanced 1.90 qw(extract_variable extract_bracketed);
-
 use Carp;
-
-# Why doesn't File:Spec just hand me the dir-separator char?
-# Sheesh, this should be a lot easier.
-( $DIRSEP = catfile ( 1,2 ) ) =~ s/^1(.*)2$/$1/;
 
 $U_DEBUG=1;
 $U_DEBUG=0;
 
 $DEBUG_FILT=4;
-$DEBUG_FILT=0;
+# $DEBUG_FILT=0;
 
 $DEBUG=1; # force verbosity level for debugging messages
-$DEBUG=0; # force verbosity level for debugging messages
+# $DEBUG=0; # force verbosity level for debugging messages
 
 $REPORT=1; # report subroutines when entered
-$REPORT=0; # report subroutines when entered
+# $REPORT=0; # report subroutines when entered
 
 $DEBUG > 0 and warn "Logging is $LOGGING\n"; 
 
@@ -120,16 +116,17 @@ $LOGGING and log_files();	# open logfiles, depending on DEBUG setting
 
 $DEBUG >2 and warn "Import_called initially set to: $_import_called\n";
 
-FILTER_ONLY code_no_comments => \&filter, all => sub {
-	$LOGGING and print SOURCE;
-};
+FILTER_ONLY
+  code_no_comments => \&filter,
+  all => sub { $LOGGING and print SOURCE };
 
 $DEBUG >2 and warn "Import_called set to: $_import_called\n";
 $DEBUG >2 and $Shell::POSIX::Select::_testmode and warn "testmode is $Shell::POSIX::Select::_testmode";
 
 use re 'eval';
 
-{ # scope for declaration of pre-compiled REs
+# Scope for declaration of pre-compiled REs:
+{
 my $RE_kw1 = qr^
 	(\bselect\b)
 ^x;	# extended-syntax, allowing comments, etc.
@@ -183,13 +180,13 @@ my $RE_kw_and_decl = qr^
 
 		++$::_FILTER_CALLS;
 
-
 		$orig_string ne $_ and die "$_ got trashed";
 
 		#/(..)/ and warn "Matched chars: '$1'\n";	# prime the pos marker
 
-		my $maxloops = 10;	# Probably looping out of control if we get this many
 		my $loopnum;
+                # Probably looping out of control if we get this many:
+		my $maxloops = 25;
 
 		my $first_celador;
 		if ( $last_call = ($_ eq "") ) {
@@ -212,8 +209,8 @@ my $RE_kw_and_decl = qr^
 				$loopnum == 2 and $first_celador=$_;
 
 				$DEBUG > 1 and show_subs("****** LOOKING FOR LOOP ****** #$loopnum\n","");
-				$loopnum > 5 and warn "$subname: Might be stuck in loop\n";
-				$loopnum > 10 and die "$subname: Probably was stuck in loop\n";
+				$loopnum > 25 and warn "$subname: Might be stuck in loop\n";
+				$loopnum > 100 and die "$subname: Probably was stuck in loop\n";
 				$DEBUG > 3 and pos() and warn "pos is currently: ", pos(), "\n";
 				pos()=0;
 				/\S/ or $LOGGING and
@@ -250,7 +247,7 @@ my $RE_kw_and_decl = qr^
 					my $RE = $RE_kw1  ; 	# always restart from the beginning, of incrementally modified program
 					# Same pattern good now, since pos() will have been reset by mod
 					# my $RE = ( $loopnum == 1 ? $RE_kw1 : $RE_kw1 ) ; 	# second version uses \G
-					if ( /$RE/g ) {	# try to match keyword, "select"
+					if ( m/$RE/g ) {	# try to match keyword, "select"
 						++$matched ;
 						$match=$1;
 						$start_match=pos() - length $1;
@@ -325,11 +322,13 @@ my $RE_kw_and_decl = qr^
 						else {
 							_DIE "$PKG: Maximum iterations reached while looking for select loop #$loopnum";
 						}
-					}
+					} # else
 
 					gobble_spaces();
 
+                                        # $DEBUG > 1 and warn " DDD sending to extract_bracketed() ===$_===\n";
 					( $loop_block, @rest ) = extract_bracketed($_, '{}');
+                                        # $DEBUG > 1 and warn " DDD extract_bracketed returned ===$loop_block===\n";
 					if (defined $loop_block and $loop_block ne "") {
 						++$matched;
 						$got_codeblock=1;
@@ -395,7 +394,8 @@ die" Can it ever get here?";
 				# If we got both, the $can_rewrite var shows true now
 				$can_rewrite = $matched >= 2 ? 1 : 0;
 
-				# warn "Calling MATCHES2FIELDS with \$loop_list of $loop_list\n";
+                                        # $DEBUG > 1 and warn "Calling MATCHES2FIELDS with \$loop_list of $loop_list\n";
+                                        # $DEBUG > 1 and warn "Calling MATCHES2FIELDS with \$loop_block of ===$loop_block===\n";
 				if ($can_rewrite) {
 					my $replacer = enloop_codeblock
 							matches2fields ( $loop_decl,
@@ -413,7 +413,7 @@ die" Can it ever get here?";
 				$DEBUG_FILT > 2 and warn "CONTINUING FIND_LOOP\n"	;
 			}
 			#warn "Leaving $subname 1 \n";
-		}
+		} # else
 FILTER_EXIT:
 	# $Shell::POSIX::Select::filter_output="PRE-LOADING DUMP VAR, loopnum was $loopnum";
 	if (
@@ -430,13 +430,15 @@ FILTER_EXIT:
 		else  {
 				$DEBUG >2 and print TTY "LOOP DETECTED: $detect_msg\n"; exit 222;
 		}
-	}
+	} # if 0
 
 	$loopnum > 0 and $Shell::POSIX::Select::filter_output=$_;
+                # Restore original string-like parts of the code:
+                $Shell::POSIX::Select::filter_output =~ s/$Filter::Simple::placeholder/${$Filter::Simple::components[unpack('N',$1)]}/ge;
 		$LOGGING and print USERPROG $_;	# $_ unset 2nd call; label starts below
 		$DEBUG_FILT > 2 and _WARN "Leaving $subname on call #$::_FILTER_CALLS\n";
-	}	# end sub filter
-}	# Scope for declaration of filters' REs
+	} # end sub filter
+} # Scope for declaration of filters' REs
 
 
 sub show_progress {
@@ -449,7 +451,7 @@ sub show_progress {
 	show_subs( "Match so far: ", $match, 0, 99);
 	defined $pos and warn "POS is now $pos\n";
 	show_subs( "Remaining string: ", $string, $pos, 19);
-}
+} # show_progress
 
 sub show_context {
 	my $subname = sub_name();
@@ -461,14 +463,10 @@ sub show_context {
 
 	show_subs( "Left is", $left, -10);
 	show_subs( "Right is", $right, 0, 10);
-}
-
-
-
+} # show_context
 
 # Following sub converts matched elements of users source into the 
 # fields we need: declaration (optional), loop_varname (optional), codeblock
-
 
 sub matches2fields {
 	my $subname = sub_name();
@@ -477,11 +475,6 @@ sub matches2fields {
 
 	my ( $debugging_code, $codeblock2,  );
 	my ( $decl, $loop_var, $values, $codeblock, $fullmatch ) = @_;
-
-	$debugging_code = "";
-
-
-
 
 	$debugging_code = "";
 	if ($U_DEBUG > 3) {
@@ -553,8 +546,8 @@ sub matches2fields {
 	unless ($default_loopvar or $loop_var =~ /^\$::\w+/) {
 		# don't check if I inserted it myself, or is in form $::stuff,
 		# which extract_variable() doesn't properly extract
-			# Now let's see if Damian likes it:
-			$DEBUG > 1 and show_subs ("Pre-extract_variable 3\n");
+          $DEBUG > 1 and warn "Pre-extract_variable 3\n";
+          # Now let's see if Damian likes it:
 		my ( $loop_var2, @rest ) = extract_variable($loop_var);
 		if ( $loop_var2 ne $loop_var ) {
 			$DEBUG > 1 and
@@ -572,14 +565,13 @@ sub matches2fields {
         # okay for this to be empty string; means user wants it global, or
         # declared it before loop
 
-
 	# make version of \$codeblock without curlies at either end
-	( $codeblock2 = $codeblock ) =~ s/^\s*\{|\}\s*$//g;
+	( $codeblock2 = $codeblock ) =~ s/\A\s*\{\s*|\s*\}\s*\z//g;
 
 	defined $decl and $decl eq 'unset' and undef $decl; # pass as undef
-
+        # $DEBUG > 1 and warn " DDD matches2fields() is returning codeblock2 ===$codeblock2===\n";
 	return ( $decl, $loop_var, $values, $codeblock2, $debugging_code );
-}
+} # matches2fields
 
 sub enloop_codeblock {
 	# Wraps code implementing select-loop around user-supplied codeblock
@@ -615,9 +607,9 @@ sub enloop_codeblock {
 			warn "LINE NUMBER FOR START OF USER CODE_BLOCK IS:  ", __LINE__, "\\n";
     _SEL_LOOP$loopnum: { # **** NEW SCOPE FOR SELECTLOOP #$loopnum ****
 	);
-	# warn "LOGGING is now $LOGGING\n";
+	# warn " DDD LOGGING is now $LOGGING\n";
 	$LOGGING and (print PART1 $parts[0] or _DIE "failed to write to PART1\n");
-		$DEBUG > 4 and warn "SETTING $arrayname to $values\n";
+        $DEBUG > 4 and warn "SETTING $arrayname to $values\n";
 
 	push @parts, qq(
 		# critical for values's contents to be resolved in user's scope
@@ -638,11 +630,7 @@ sub enloop_codeblock {
 		warn "\$codestring is: $codestring\n"; 
 		warn "\$dcode is: '$dcode'\n"; 
 		warn "\$arrayname is: $arrayname\n"; 
-
-		warn "Dcode is unset"; 
-		warn "arrayname is unset"; 
-		!defined $Shell::POSIX::Select::_autoprompt and
-			warn "autoprompt is unset"; 
+		!defined $Shell::POSIX::Select::_autoprompt and warn "autoprompt is unset"; 
 		!defined $codestring and warn "codestring is unset"; 
 	};
 
@@ -799,7 +787,7 @@ sub enloop_codeblock {
 # ); push @parts, qq(
 
 	return ( join "", @parts );	# return assembled code, for user to run
-}
+} # enloop_codeblock
 
 sub make_menu {
 	my $subname = sub_name();
@@ -856,6 +844,12 @@ sub make_menu {
 	my $one_label = ( $l_length + 2 ) + $v_length + $l_sep;
 	my $columns = int( $COLS / $one_label );
 	$columns < 1 and $columns = 1;
+        # Do not let the number of columns grow beyond the maximum:
+        if ($MaxColumns < $columns)
+          {
+          $columns = $MaxColumns;
+          } # if
+
 #	$DEBUG > 3 and
 #HERE
 $LOGGING and print LOG "T-Cols, Columns, label: $COLS, $columns, $one_label\n";
@@ -889,7 +883,7 @@ $LOGGING and print LOG "T-Cols, Columns, label: $COLS, $columns, $one_label\n";
 
 	}
 	return ( $prompt, $menu );
-}
+} # make_menu
 
 sub log_files {
 	my $subname = sub_name();
@@ -899,23 +893,22 @@ sub log_files {
 	if ( $LOGGING == 1 ) {	
 		$dir = tmpdir();
 		#
-		# USERPROG shows my changes, with	
-		# control-chars filling in as placeholders	
-		# for some pieces. For debugging purposes, I	
-		# find it helpful to print that out ASAP so	
-		# I have something to look at if the program	
-		# bombs out before SOURCE gets written out,	
-		# which is the same apart from placeholders	
-		# being converted to original data.	
+		# USERPROG shows my changes, with control-chars
+		# filling in as placeholders for some pieces. For
+		# debugging purposes, I find it helpful to print that
+		# out ASAP so I have something to look at if the
+		# program bombs out before SOURCE gets written out,
+		# which is the same apart from placeholders being
+		# converted to original data.
 		#
 		$DEBUG > 1 and $LOGGING > 0 and warn "Opening log files\n";	
-		open LOG,	"> $dir${DIRSEP}SELECT_log" or _DIE "Open LOG failed, $!\n";
-		open SOURCE,	"> $dir${DIRSEP}SELECT_source" or _DIE "Open SOURCE failed, $!\n";	
-		open USERPROG,	"> $dir${DIRSEP}SELECT_user_program" or _DIE "Open USERPROG failed, $!\n";	
-		open PART1,	"> $dir${DIRSEP}SELECT_part1" or _DIE "Open PART1 failed, $!\n";	
-		open PART2,	"> $dir${DIRSEP}SELECT_part2" or _DIE "Open PART2 failed, $!\n";
-		open PART3,	"> $dir${DIRSEP}SELECT_part3" or _DIE "Open PART3 failed, $!\n";	
-		open PART4,	"> $dir${DIRSEP}SELECT_part4" or _DIE "Open PART4 failed, $!\n";
+		open LOG,	'>', catfile($dir, 'SELECT_log') or _DIE "Open LOG failed, $!\n";
+		open SOURCE,	'>', catfile($dir, 'SELECT_source') or _DIE "Open SOURCE failed, $!\n";	
+		open USERPROG,	'>', catfile($dir, 'SELECT_user_program') or _DIE "Open USERPROG failed, $!\n";	
+		open PART1,	'>', catfile($dir, 'SELECT_part1') or _DIE "Open PART1 failed, $!\n";	
+		open PART2,	'>', catfile($dir, 'SELECT_part2') or _DIE "Open PART2 failed, $!\n";
+		open PART3,	'>', catfile($dir, 'SELECT_part3') or _DIE "Open PART3 failed, $!\n";	
+		open PART4,	'>', catfile($dir, 'SELECT_part4') or _DIE "Open PART4 failed, $!\n";
 		$LOGGING++;	# to avoid 2nd invocation
 		$DEBUG > 1 and $LOGGING > 0 and warn "Finished with log files\n";	
 	}	
@@ -925,7 +918,7 @@ sub log_files {
 	else {	
 		$DEBUG > 0 and warn "$subname: Logfiles not opened\n"; 
 	}	
-}
+} # log_files
 
 sub sub_name {
 	my $callers_name = (caller 1)[3] ;
@@ -937,7 +930,7 @@ sub sub_name {
 	$callers_name .= '()'; # sub_name -> sub_name()
 }  
 	return $callers_name;
-}
+} # sub_name
 
 sub _WARN {
 	my $subname = sub_name();
@@ -958,9 +951,6 @@ sub import {
 	my $subname = sub_name();
 	my %import;
 	$_import_called++;
-
-
-
 
 	shift;	# discard package name
 
@@ -1175,11 +1165,18 @@ $DEBUG > 2 and warn "37 Testmode set to $Shell::POSIX::Select::_testmode\n";
 				}
 			#}
 
-			$sdump =
-			($Shell::POSIX::Select::dump_data =~ /[a-z]/i ? # Dir prefix, or nothing
-				$Shell::POSIX::Select::dump_data : '.') . $DIRSEP . "$script.sdump" .
-			($Shell::POSIX::Select::dump_data =~ /[a-z]/i ? # Dir prefix, or nothing
-				'_ref' : '') ;
+                        $sdump = qq/$script.sdump/;
+                        if ($Shell::POSIX::Select::dump_data =~ /[a-z]/i)
+                          {
+                          $sdump = catfile($Shell::POSIX::Select::dump_data, $sdump .'_ref');
+                          }
+                        else
+                          {
+                          # TODO: probably should put it in the same
+                          # folder as the original program being
+                          # analyzed, rather than '.':
+                          $sdump = catfile('.', $sdump);
+                          }
 			($cdump = $sdump) =~ s/$script\.sdump/$script.cdump/;	# make code-dump name too
 
 # HERE next two lines squelch
@@ -1199,7 +1196,7 @@ $DEBUG > 2 and warn "37 Testmode set to $Shell::POSIX::Select::_testmode\n";
 	( $ON , $OFF , $BOLD ,  $SGR0 , $COLS ) =
 		display_control ($Shell::POSIX::Select::dump_data);
 		1;
-}
+} # import
 
 sub export {	# appropriated from Switch.pm
 	my $subname = sub_name();
@@ -1446,12 +1443,13 @@ B<Screen>
 =head2 ship2me2.plx
 
 This variation on the preceding example shows how to use a custom menu-heading and interactive prompt.
+It also presents all menus in one column.
 
-    use Shell::POSIX::Select qw($Heading $Prompt);
+    use Shell::POSIX::Select qw($Heading $Prompt $MaxColumns);
 
-    $Heading='Select a Shipper' ;
-    $Prompt='Enter Vendor Number: ' ;
-
+    $Heading = 'Select a Shipper' ;
+    $Prompt = 'Enter Vendor Number: ' ;
+    $MaxColumns = 1;
     select $shipper ( 'UPS', 'FedEx' ) {
       print "\nYou chose: $shipper\n";
       last;
@@ -1668,6 +1666,7 @@ upon exit from a C<select> loop (see L<"Eof Detection">).
  use Shell::POSIX::Select (
      '$Prompt',      # to customize per-menu prompt
      '$Heading',     # to customize per-menu heading
+     '$MaxColumns',  # to limit visual number of columns of choices
      '$Eof',         # T/F for Eof detection
   # Variables must come first, then key/value options
      prompt   => 'Enter number of choice:',  # or 'whatever:'
@@ -1743,6 +1742,14 @@ Therefore, to make EOF detection as convenient and easy as possible,
 the programmer may import C<$Eof> and check it for a 
 I<TRUE> value after a C<select> loop.
 See L<"lc_filename.plx"> for a programming example.
+
+=head2 Number of Columns
+
+By default, the visual length of each option is examined,
+and the list is spread across as many columns as will reasonably fit in the terminal.
+You can override this behavior by importing and setting C<$MaxColumns>
+to the maximum number of columns you wish to display.
+See Scripts/max_columns_1.plx in the distribution as an example.
 
 =head2 Styles
 
@@ -2252,6 +2259,7 @@ For an example of its use, see L<"menu_ls.plx">.
 
  $Heading
  $Prompt
+ $MaxColumns
  $Eof
 
 See L<"IMPORTS AND OPTIONS"> for details.
@@ -2272,12 +2280,12 @@ See L<"IMPORTS AND OPTIONS"> for details.
 
 =head1 AUTHOR
 
- Tim Maher
+  Tim Maher
 
 =head1 MAINTAINER
 
- Martin Thurn
- mthurn@cpan.org
+  Martin Thurn
+  mthurn@cpan.org
 
 =begin html
 
@@ -2327,7 +2335,7 @@ B<perldoc -f select>, which has nothing to do with this module
 
 =head1 VERSION
 
-This document describes version 0.07.
+This document describes version 0.08.
 
 =head1 LICENSE
 
@@ -2341,3 +2349,9 @@ you can redistribute it and/or modify it under the same terms as Perl itself.
 # vi:ts=2 sw=2:
 
 1;
+
+# Tim Maher, tim@teachmeperl.com, yumpy@cpan.org
+# Fri May  2 10:29:25 PDT 2003
+# Mon May  5 10:51:49 PDT 2003
+
+__END__

@@ -2,7 +2,7 @@ requires "Alien::Base" => "0.038";
 requires "perl" => "5.006";
 
 on 'build' => sub {
-  requires "Alien::Build" => "0.32";
+  requires "Alien::Build" => "0.71";
   requires "Alien::Build::MM" => "0.32";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
@@ -14,7 +14,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "Alien::Build" => "0.32";
-  requires "Alien::Build::MM" => "0.32";
+  requires "Alien::Build::MM" => "0.71";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "perl" => "5.006";
 };

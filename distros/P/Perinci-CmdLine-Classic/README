@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.76 of Perinci::CmdLine::Classic (from
-    Perl distribution Perinci-CmdLine-Classic), released on 2017-07-14.
+    This document describes version 1.770 of Perinci::CmdLine::Classic (from
+    Perl distribution Perinci-CmdLine-Classic), released on 2017-07-31.
 
 SYNOPSIS
     In "gen-random-num" script:

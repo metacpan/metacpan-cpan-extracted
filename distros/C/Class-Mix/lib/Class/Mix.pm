@@ -4,15 +4,15 @@ Class::Mix - dynamic class mixing
 
 =head1 SYNOPSIS
 
-	use Class::Mix qw(mix_class);
+    use Class::Mix qw(mix_class);
 
-	$foobar_object = mix_class("Foo", "Bar")->new;
-	$digest_class = mix_class("Foo", "Bar", {prefix=>"Digest::"});
+    $foobar_object = mix_class("Foo", "Bar")->new;
+    $digest_class = mix_class("Foo", "Bar", {prefix=>"Digest::"});
 
-	use Class::Mix qw(genpkg);
+    use Class::Mix qw(genpkg);
 
-	$package = genpkg;
-	$package = genpkg("Digest::Foo::");
+    $package = genpkg;
+    $package = genpkg("Digest::Foo::");
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ use Carp qw(croak);
 use Params::Classify 0.000 qw(is_undef is_string is_ref);
 use if _DO_MRO, "mro";
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(mix_class genpkg);
@@ -212,7 +212,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2006, 2009, 2010, 2011
+Copyright (C) 2004, 2006, 2009, 2010, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

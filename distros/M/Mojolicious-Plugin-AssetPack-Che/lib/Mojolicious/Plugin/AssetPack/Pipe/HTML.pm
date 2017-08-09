@@ -20,6 +20,8 @@ sub process {
       $attrs->{key}      = 'html-min';
       $attrs->{minified} = 1;
       
+      #~ warn "Process HTML, attrs: ", $self->assetpack->app->dumper($attrs);
+      
       return
        if $asset->format ne 'html' || $asset->minified;
 

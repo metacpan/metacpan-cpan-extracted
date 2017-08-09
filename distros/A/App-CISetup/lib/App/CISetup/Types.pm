@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use MooseX::Getopt::OptionTypeMap ();
 use MooseX::Types::Path::Tiny qw( File Dir );

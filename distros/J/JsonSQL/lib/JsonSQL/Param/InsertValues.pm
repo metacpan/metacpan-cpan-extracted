@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::InsertValues;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Error;
 use Data::Dumper;
@@ -92,7 +92,7 @@ JsonSQL::Param::InsertValues - JsonSQL::Param::InsertValues object. Stores a Per
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/BencherUtils/chart_bencher_result
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# and generated automatically using Perinci::CmdLine::Gen version 0.47
 
-our $DATE = '2017-07-13'; # DATE
+our $DATE = '2017-08-02'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,7 +34,7 @@ chart-bencher-result - Generate chart of bencher result and display it
 
 =head1 VERSION
 
-This document describes version 0.22 of chart-bencher-result (from Perl distribution App-BencherUtils), released on 2017-07-13.
+This document describes version 0.23 of chart-bencher-result (from Perl distribution App-BencherUtils), released on 2017-08-02.
 
 =head1 SYNOPSIS
 

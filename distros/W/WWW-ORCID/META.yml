@@ -1,53 +1,48 @@
 ---
 abstract: 'Module to interface with the ORCID webservice'
 author:
-  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
-  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
-  - 'Simeon Warner <simeon.warner@cornell.edu>'
+  - 'Patrick Hochstenbach C<< <patrick.hochstenbach at ugent.be> >>'
 build_requires:
-  Software::License: 0
-  Test::Exception: 0.31
+  Test::Deep: '0.112'
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build: 0.40
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: WWW-ORCID
-provides:
-  WWW::ORCID:
-    file: lib/WWW/ORCID.pm
-    version: 0.0101
-  WWW::ORCID::API:
-    file: lib/WWW/ORCID/API.pm
-    version: 0
-  WWW::ORCID::API::Common:
-    file: lib/WWW/ORCID/API/Common.pm
-    version: 0
-  WWW::ORCID::API::Pub:
-    file: lib/WWW/ORCID/API/Pub.pm
-    version: 0
-  WWW::ORCID::Transport:
-    file: lib/WWW/ORCID/Transport.pm
-    version: 0
-  WWW::ORCID::Transport::HTTP::Tiny:
-    file: lib/WWW/ORCID/Transport/HTTP/Tiny.pm
-    version: 0
-  WWW::ORCID::Transport::LWP:
-    file: lib/WWW/ORCID/Transport/LWP.pm
-    version: 0
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 recommends:
-  JSON::XS: 2.3
+  JSON::XS: '2.3'
 requires:
-  JSON: 2.51
-  LWP::UserAgent: 0
-  Moo: 1.000008
-  URI: 0
-  XML::Writer: 0
-  namespace::clean: 0.24
+  HTTP::Tiny: '0'
+  JSON: '2.51'
+  LWP::UserAgent: '0'
+  Moo: '1.000008'
+  URI: '0'
+  XML::Writer: '0'
+  namespace::clean: '0.24'
   perl: v5.10.1
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.0101
+  bugtracker: https://github.com/LibreCat/WWW-ORCID/issues
+  homepage: https://github.com/LibreCat/WWW-ORCID
+  repository: https://github.com/LibreCat/WWW-ORCID.git
+version: '0.0201'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

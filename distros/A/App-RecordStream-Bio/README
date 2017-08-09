@@ -39,6 +39,8 @@ TOOLS
 
     recs-tofasta
 
+    recs-togff3
+
     Looking for fromfastq or tofastq? Install the recs-fastq
     <https://github.com/MullinsLab/recs-fastq> package.
 

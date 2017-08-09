@@ -1,4 +1,7 @@
 ###	SPAR <http://www.cpan.org/scripts/>
+###	2	644	1236523730	1237488485	hint
+This tests the old fashioned way of doing multi-directory builds.
+A failure does not imply that the makepp-way of doing things is broken.
 ###	1	755	1067749983	1210350510	is_relevant.pl
 !is_windows || is_windows == -1
 ###	9	755	1293761335	1293819567	makepp_test_script.pl
@@ -18,9 +21,6 @@ perl {
 
 $(foreach): :foreach traditional hybrid smart
 	$(MAKE) -Cdir $(output)
-###	2	644	1236523730	1237488485	hint
-This tests the old fashioned way of doing multi-directory builds.  The failure
-does not imply that the makepp-way of doing things is broken.
 ###	D	755	1236523730	1237488485	dir
 ###	6	644	1293762729	1293819378	dir/Makefile
 $(phony smart):

@@ -1,18 +1,22 @@
 ###	SPAR <http://www.cpan.org/scripts/>
+###	2	644	1236523730	1237488485	hint
+This tests the old fashioned way of doing multi-directory builds.
+A failure does not imply that the makepp-way of doing things is broken.
 ###	1	755	1067749983	1210350510	is_relevant.pl
 !is_windows || is_windows == -1
-###	10	755	1164320211	1190054144	makepp_test_script.pl
+###	11	755	1164320211	1405860108	makepp_test_script.pl
 #
 # A simple test of recursive make.
 #
 # Run the test twice.  We had some obscure bugs where recursive make
 # didn't work the second time around, which this should catch correctly.
 #
-makepp;
+makepp '--warn-undefined-var';
 n_files 'n_files_0';
-makepp;
+c_cp qw(f f1);
+makepp qw(-e --noprintdirectory);
 1;
-###	33	644	1164353230	1291316814	RootMakeppfile
+###	34	644	1164353230	1405860131	RootMakeppfile
 XVAR = 1			# Gets overridden on the command line.
 
 .PHONY: all
@@ -46,9 +50,7 @@ load_makefile subdir2		# Test migration phase with explicit load and $(MAKE)
 f: g
 	X=x $(MAKE) -Csubdir2
 	&cp subdir2/f
-###	2	644	1236523730	1237488485	hint
-This tests the old fashioned way of doing multi-directory builds.  The failure
-does not imply that the makepp-way of doing things is broken.
+	&echo -o >>$@ -- $(MAKEFLAGS) # Check these on a command that will run the 2nd time anyway.
 ###	D	755	1067451878	1078122244	subdir1
 ###	13	644	1067451878	1291316867	subdir1/Makefile
 a:
@@ -65,12 +67,13 @@ b: c
 c:
 	cd .. && $(MAKE) subdir1/$@
 ###	D	755	1291315990	1291315990	subdir2
-###	8	644	1291315990	1291316858	subdir2/Makefile
+###	9	644	1291315990	1405860142	subdir2/Makefile
 perl { $VAR = '' unless defined $VAR } # Ensure initial emptyness
 VAR += foo			       # Reloading used to double this
 
 f:
 	&echo f -o $@
+	&echo "MAKEFLAGS=$(MAKEFLAGS)" -o >>$@
 
 ../g:
 	&echo g $(VAR) -o $@
@@ -83,11 +86,17 @@ c
 b 2
 ###	1	644	1067451878	978378259	answers/e
 e 1
-###	1	644	1291315990	1291316308	answers/f
+###	3	644	1291315990	1405860176	answers/f
 f
+MAKEFLAGS=e --noprintdirectory
+e --noprintdirectory
+###	3	644	1291315990	1405860174	answers/f1
+f
+MAKEFLAGS=--warnundef
+--warnundef
 ###	1	644	1291315990	1291316308	answers/g
 g foo
 ###	1	644	1067451878	1291317183	answers/n_files
-3 1 0
+4 1 0
 ###	1	644	1078122192	1190052203	answers/n_files_0
 11 1 0

@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.010   July 31, 2017 
+        - Update dependencies to take advantage of some performance increases
+        - Corrected handling of the DL helper and fixed documentation
+        
 0.009   July 16, 2017
         - improved the regexp for detecting components so that you can have componenets
           with 'deep' namespacing "aaa-bbb-ccc".

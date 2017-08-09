@@ -1,5 +1,11 @@
 Revision history for App::Milter::Limit::Plugin::SQLite
 
+0.52  2017-08-04
+    - Kwalitee: enable warnings
+    - add a smoke test
+    - don't attempt to chown the database file unless user and group are
+      configured
+
 0.51  2010-03-30
     - dzil: use my @MSCHOUT plugin bundle
     - fix t/compile.t: was loading BerkeleyDB plugin instead

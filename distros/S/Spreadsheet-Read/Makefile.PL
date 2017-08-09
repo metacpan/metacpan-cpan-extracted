@@ -1,6 +1,6 @@
 use strict;
 
-require 5.008;
+require 5.008001;
 
 use ExtUtils::MakeMaker;
 use File::Copy;
@@ -69,6 +69,26 @@ if ($ENV{EXTENDED_TESTING}) { # for CpanCover and masochists
 
 my $rv = WriteMakefile (%wm);
 
+# perlcriticrc uses Config::Tiny, which does not support nesting
+if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
+    open my $fh, ">", ".perlcriticrc";
+    print $fh do {
+	local (@ARGV, $/) = ("$ENV{HOME}/.perlcriticrc"); <> };
+    print $fh join "\n" => "",
+	"[-Bangs::ProhibitDebuggingModules]",
+	"[-BuiltinFunctions::ProhibitBooleanGrep]",
+	"[-BuiltinFunctions::ProhibitStringyEval]",	# Guarded
+	"[-Compatibility::PodMinimumVersion]", # L<File::Temp|https://...] requires 5.12
+	"[-Documentation::ProhibitDuplicateSeeAlso]",
+	"[-Documentation::RequireLinkedURLs]", # L<File::Temp|https://...] requires 5.12
+	"[-Modules::ProhibitMultiplePackages]",
+	"[-Subroutines::ProhibitExplicitReturnUndef]",
+	"[-ValuesAndExpressions::ProhibitCommaSeparatedStatements]", # False positive
+	"[-ValuesAndExpressions::ProhibitVersionStrings]",	# use 5.8.1
+	"";
+    close $fh;
+    }
+
 package MY;
 
 sub postamble {
@@ -85,6 +105,7 @@ sub postamble {
 		    "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')"
 		    $(TEST_FILES) 3>valgrind.log
 		    );
+    my @pc = -f ".perlcriticrc" ? ("\tperlcritic -1 Read.pm") : ();
     join "\n" =>
 	'cover test_cover:',
 	'	ccache -C',
@@ -111,6 +132,7 @@ sub postamble {
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	@pc,
 	'';
     } # postamble
 

@@ -1,7 +1,7 @@
 package Config::IOD::Constants;
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.33'; # VERSION
+our $DATE = '2017-08-05'; # DATE
+our $VERSION = '0.34'; # VERSION
 
 BEGIN {
     our %constants = (
@@ -46,6 +46,7 @@ use Exporter qw(import);
 our @EXPORT_OK = sort keys %constants;
 our %EXPORT_TAGS = (ALL => \@EXPORT_OK);
 
+1;
 # ABSTRACT: Constants used when parsing IOD document
 
 __END__
@@ -60,7 +61,7 @@ Config::IOD::Constants - Constants used when parsing IOD document
 
 =head1 VERSION
 
-This document describes version 0.33 of Config::IOD::Constants (from Perl distribution Config-IOD), released on 2016-12-29.
+This document describes version 0.34 of Config::IOD::Constants (from Perl distribution Config-IOD), released on 2017-08-05.
 
 =head1 HOMEPAGE
 
@@ -68,7 +69,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Config-IOD>.
+Source repository is at L<https://github.com/sharyanto/perl-Config-IOD>.
 
 =head1 BUGS
 
@@ -84,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

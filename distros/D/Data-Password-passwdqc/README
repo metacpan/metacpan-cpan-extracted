@@ -90,13 +90,15 @@ ATTRIBUTES
     *random_bits Int*
         Defaults to 47.
 
-        The size of randomly-generated passphrases in bits (26 to 81), or 0
+        The size of randomly-generated passphrases in bits (24 to 85), or 0
         to disable this feature.
 
 METHODS
     validate_password
           $is_valid = $pwdqc->validate_password('new password');
           $is_valid = $pwdqc->validate_password('new password', 'old password');
+          $is_valid = $pwdqc->validate_password('new password', 'old password', 'username');
+          $is_valid = $pwdqc->validate_password('new password', 'old password', 'username', 'real name');
           print $pwdqc->reason if not $is_valid;
 
         Checks passphrase quality. Returns a true value on success. If the
@@ -113,6 +115,11 @@ AUTHORS
 
     The copy of passwdqc bundled with this module was written by Solar
     Designer and Dmitry V. Levin.
+
+CONTRIBUTORS
+    dhardison: Dylan William Hardison <dhardison@cpan.org>
+
+    srezic: Slaven Rezic <srezic@cpan.org>
 
 LICENSE
     This library is free software; you can redistribute it and/or modify it

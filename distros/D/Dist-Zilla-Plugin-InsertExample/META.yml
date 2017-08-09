@@ -3,13 +3,13 @@ abstract: 'Insert example into your POD from a file'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Test::More: '0.88'
-  perl: '5.008'
+  Test2::V0: '0.000060'
+  perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.008'
+  perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +19,12 @@ no_index:
   directory:
     - corpus
 requires:
-  Dist::Zilla: '5.0'
+  Dist::Zilla: '6.0'
   Moose: '0'
-  Path::Class: '0.26'
-  perl: '5.008'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-InsertExample/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::InsertExample
   repository: git://github.com/plicease/Dist-Zilla-Plugin-InsertExample.git
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'YAML::Tiny version 1.70'

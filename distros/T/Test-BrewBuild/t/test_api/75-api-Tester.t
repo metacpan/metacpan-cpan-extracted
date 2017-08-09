@@ -2,7 +2,9 @@
 use strict;
 use warnings;
 
-use Capture::Tiny qw(capture_stdout);
+use Capture::Tiny qw(capture_stdout capture_merged);
+use File::Copy;
+use Test::BrewBuild;
 use Test::BrewBuild::Tester;
 use Test::More;
 
@@ -10,6 +12,11 @@ if (! $ENV{BBDEV_TESTING}){
     plan skip_all => "developer tests only";
     exit;
 }
+
+copy 't/script/bbtester_kill.pl', Test::BrewBuild::workdir 
+  or die "can't copy bbtester_kill.pl file to the workdir: $!\n";
+
+$SIG{CHLD} = 'IGNORE';
 
 my $mod = 'Test::BrewBuild::Tester';
 
@@ -120,6 +127,124 @@ my $mod = 'Test::BrewBuild::Tester';
         "stopping works",
     );
 }
+{ # bug 219: stop: on crash, pid file doesn't get cleaned up
+
+    my $t = $mod->new;
+
+    is ($t->status, 0, "status returns 0 if tester not running");
+
+    my $start = capture_stdout {
+            $t->start;
+    };
+
+    like (
+        $start,
+        qr/Started .*0\.0\.0\.0 .*7800/,
+        "proper ip/port for default start"
+    );
+
+    is ($t->status, 1, "status returns 1 if tester is running");
+
+    my $stat = `netstat -na`;
+
+    like ($stat, qr/0\.0\.0\.0:7800/, "netstat -na returns ok results");
+
+    # crash the tester
+
+    system "perl bbtester_kill.pl " . $t->pid;
+
+    my $stop = capture_merged {
+        $t->stop;
+    };
+
+    like (
+        $stop,
+        qr/inconsistent state.*not running/sm,
+        "if a bbtester crashes, it's cleaned up ok"
+    );
+
+}
+{ # bug 219: start: on crash, pid file doesn't get cleaned up
+
+    my $t = $mod->new;
+
+    is ($t->status, 0, "status returns 0 if tester not running");
+
+    my $start = capture_stdout {
+            $t->start;
+    };
+
+    like (
+        $start,
+        qr/Started .*0\.0\.0\.0 .*7800/,
+        "proper ip/port for default start"
+    );
+
+    is ($t->status, 1, "status returns 1 if tester is running");
+
+    my $stat = `netstat -na`;
+
+    like ($stat, qr/0\.0\.0\.0:7800/, "netstat -na returns ok results");
+
+    # crash the tester
+
+    system "perl bbtester_kill.pl " . $t->pid;
+
+    my $re_start = capture_merged {
+        $t->start
+    };
+
+    like (
+        $re_start,
+        qr/crashed in a previous run.*Started/sm,
+        "if a bbtester crashes, start() cleans up ok"
+    );
+
+    capture_stdout { $t->stop };
+}
+
+{ # bug 219: status on crash, pid file doesn't get cleaned up
+
+    my $t = $mod->new;
+
+    is ($t->status, 0, "status returns 0 if tester not running");
+
+    my $start = capture_stdout {
+            $t->start;
+    };
+
+    like (
+        $start,
+        qr/Started .*0\.0\.0\.0 .*7800/,
+        "proper ip/port for default start"
+    );
+
+    is ($t->status, 1, "status returns 1 if tester is running");
+
+    my $stat = `netstat -na`;
+
+    like ($stat, qr/0\.0\.0\.0:7800/, "netstat -na returns ok results");
+
+    # crash the tester
+
+    system "perl bbtester_kill.pl " . $t->pid;
+
+    my $status = 1;
+
+    my $status_msg = capture_merged {
+        $status = $t->status;
+    };
+
+    is $status, 0, "status is 0 if the tester crashes ok";
+    like $status_msg, qr/inconsistent/, "after a crash, status warning ok";
+
+    $status_msg = capture_merged {
+        $t->status;
+    };
+}
+
+unlink "bbtester_kill.pl" 
+  or die "couldn't remove bbtester_kill.pl file: $!";
 
 done_testing();
 

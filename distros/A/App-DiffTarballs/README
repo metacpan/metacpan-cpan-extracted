@@ -1,0 +1,80 @@
+NAME
+    App::DiffTarballs - Diff contents of two tarballs
+
+VERSION
+    This document describes version 0.003 of App::DiffTarballs (from Perl
+    distribution App-DiffTarballs), released on 2017-08-07.
+
+SYNOPSIS
+    See the included script diff-tarballs.
+
+FUNCTIONS
+  diff_tarballs
+    Usage:
+
+     diff_tarballs(%args) -> [status, msg, result, meta]
+
+    Diff contents of two tarballs.
+
+    Examples:
+
+    *   Show diff between two Perl releases:
+
+         diff_tarballs(
+           tarball1 => "My-Dist-1.001.tar.gz",
+           tarball2 => "My-Dist-1.002.tar.bz2"
+         );
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   tarball1* => *filename*
+
+    *   tarball2* => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  DEBUG => bool
+    If set to true, will cause temporary directories to not being cleaned up
+    after the program is done.
+
+  DIFF => str
+    Set diff command to use. Defaults to "diff -ruN". For example, you can
+    set it to "diff --color -ruN" ("--color" requires GNU diff 3.4 or
+    later), or "colordiff -ruN".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DiffTarballs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DiffTarballs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffTarballs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,3 +1,28 @@
+version 0.001; 2017-07-30
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for not
+    breaking version-implied features and for require argument context)
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * in error messages, change "Implicit I/O handle" to "Unspecified
+    I/O handle", because the module prevents the handle from being
+    implicitly determined
+
+  * in documentation, put the abstract in a more positive form
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * avoid some compiler warnings that arise on Perl 5.6
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.000; 2012-02-17
 
   * initial released version

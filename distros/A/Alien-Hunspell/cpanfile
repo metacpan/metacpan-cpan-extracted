@@ -1,18 +1,17 @@
 requires "Alien::Base" => "0.038";
-requires "parent" => "0";
 requires "perl" => "5.006";
 
 on 'build' => sub {
   requires "Alien::Build" => "0.51";
   requires "Alien::Build::MM" => "0.40";
-  requires "Config" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
 
 on 'test' => sub {
+  requires "Path::Tiny" => "0";
+  requires "Test2::Require" => "0.000060";
   requires "Test2::V0" => "0.000060";
   requires "Test::Alien" => "0";
-  requires "Test::More" => "0.94";
   requires "perl" => "5.006";
 };
 

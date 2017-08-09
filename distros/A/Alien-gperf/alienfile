@@ -1,0 +1,35 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'gperf',
+  args    => ['--version'],
+  match   => qr/GNU gperf/,
+);
+
+
+share {
+  requires 'Alien::autoconf' => '0.03';
+  requires 'Alien::m4'       => '0.11';
+
+  meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
+
+
+  plugin Download => (
+      url => 'https://ftp.gnu.org/gnu/gperf/',
+      filter => qr/^gperf-.*\.tar\.gz$/,
+      version => qr/([0-9\.]+)/,
+  );
+
+  plugin Extract => 'tar.gz';
+
+  plugin 'Build::MSYS' => ();
+  plugin 'Build::Autoconf' => ();
+
+  build [
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+  ];
+
+  plugin 'Gather::IsolateDynamic' => ();
+};

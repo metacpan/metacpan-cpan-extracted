@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2012-2017 Martin Becker.  All rights reserved.
+# This package is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+use strict;
+use warnings;
+use Math::Logic::Ternary::Calculator qw(tcalc);
+
+tcalc(@ARGV);
+
+__END__
+=head1 NAME
+
+tcalc - interactive ternary calculator
+
+=head1 VERSION
+
+This documentation refers to version 0.004 of tcalc.
+
+=head1 SYNOPSIS
+
+  tcalc 81             # run a calculator with word size 81
+
+  tcalc                # run a calculator with default word size
+
+  perl -MMath::Logic::Ternary::Calculator -e tcalc      # same
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item I<tcalc>
+
+C<tcalc> is a small wrapper script running Math::Logic::Ternary::Calculator.
+This is a ternary calculator application with a command line interface.
+To see the user manual, run:
+
+  perldoc Math::Logic::Ternary::Calculator::Manual
+
+The calculator is a demo application for the Math::Logic::Ternary library.
+For more information on the library, run:
+
+  perldoc Math::Logic::Ternary
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Math::Logic::Ternary::Calculator::Manual> - the manual.
+
+=item *
+
+L<Math::Logic::Ternary::Calculator> - calculator implementation details.
+
+=item *
+
+L<Math::Logic::Ternary> - the library.
+
+=back
+
+=head1 AUTHOR
+
+Martin Becker E<lt>becker-cpan-mpE<64>cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2017 by Martin Becker, Blaubeuren.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

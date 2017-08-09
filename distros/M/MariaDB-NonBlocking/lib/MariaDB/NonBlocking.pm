@@ -10,7 +10,7 @@ MariaDB::NonBlocking - Nonblocking connections to MySQL using libmariadbclient
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
@@ -18,7 +18,7 @@ use Exporter qw(import);
 use XSLoader qw();
 
 BEGIN {
-    our $VERSION = '0.01';
+    our $VERSION = '0.04';
 };
 XSLoader::load(__PACKAGE__);
 

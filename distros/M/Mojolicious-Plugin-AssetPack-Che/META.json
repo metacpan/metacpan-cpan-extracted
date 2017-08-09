@@ -33,13 +33,15 @@
       "runtime" : {
          "requires" : {
             "CSS::Minifier::XS" : "0.09",
+            "CSS::Sass" : "3",
             "HTML::Packer" : "2.03",
+            "JavaScript::Minifier::XS" : "0.1",
             "Mojolicious::Plugin::AssetPack" : "1.39",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.401",
-   "x_serialization_backend" : "JSON::PP version 2.27400_01"
+   "version" : "1.451",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

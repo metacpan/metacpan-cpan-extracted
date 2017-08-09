@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::SPVM::Sum;
 
-our $VERSION = 0.001; # VERSION
+our $VERSION = 0.002; # VERSION
 
 our $results = [
   [
@@ -8,20 +8,20 @@ our $results = [
     "OK",
     [
       {
-        errors => 3.3e-09,
+        errors => 1e-10,
         participant => "SPVM",
-        rate => 330000,
+        rate => 940700,
         samples => 20,
-        time => 3,
+        time => 1063,
         vs_slowest => 1,
       },
       {
-        errors => 8.4e-10,
+        errors => 1.9e-10,
         participant => "Perl",
         rate => 10000000,
-        samples => 20,
-        time => 0.099,
-        vs_slowest => 31,
+        samples => 24,
+        time => 96,
+        vs_slowest => 11,
       },
     ],
     {
@@ -31,6 +31,7 @@ our $results = [
                                             scenario_module => "SPVM::Sum",
                                           },
       "func.bencher_version"           => undef,
+      "func.code_startup"              => undef,
       "func.cpu_info"                  => [
                                             {
                                               address_width                => 64,
@@ -124,7 +125,7 @@ our $results = [
                                               number_of_cores              => 4,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 0,
-                                              speed                        => 3200.386,
+                                              speed                        => 3267.714,
                                               stepping                     => 7,
                                             },
                                             {
@@ -219,7 +220,7 @@ our $results = [
                                               number_of_cores              => 4,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 1,
-                                              speed                        => 3209.468,
+                                              speed                        => 2585.957,
                                               stepping                     => 7,
                                             },
                                             {
@@ -314,7 +315,7 @@ our $results = [
                                               number_of_cores              => 4,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 2,
-                                              speed                        => 3228.964,
+                                              speed                        => 3159.457,
                                               stepping                     => 7,
                                             },
                                             {
@@ -409,19 +410,19 @@ our $results = [
                                               number_of_cores              => 4,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 3,
-                                              speed                        => 3209.468,
+                                              speed                        => 3231.265,
                                               stepping                     => 7,
                                             },
                                           ],
-      "func.elapsed_time"              => 0.0649919509887695,
+      "func.elapsed_time"              => 0.0675568580627441,
       "func.module_startup"            => undef,
       "func.module_versions"           => {
-                                            "__PACKAGE__" => 1.036,
+                                            "__PACKAGE__" => "1.040",
                                             "Bencher::Scenario::SPVM::Sum" => undef,
                                             "Benchmark::Dumb" => 0.111,
                                             "Devel::Platform::Info" => 0.16,
                                             "perl" => "v5.26.0",
-                                            "SPVM" => 0.0201,
+                                            "SPVM" => 0.0238,
                                             "SPVM::Examples" => 0.001,
                                             "Sys::Info" => 0.78,
                                           },
@@ -452,15 +453,15 @@ our $results = [
                                           },
       "func.precision"                 => 0,
       "func.scenario_module"           => "Bencher::Scenario::SPVM::Sum",
-      "func.scenario_module_md5sum"    => "43af08fe0b1882e5b71f89909ebe6d47",
-      "func.scenario_module_mtime"     => 1498013819,
-      "func.scenario_module_sha1sum"   => "a81b9e02eaee6fc499e158e89a968027fe56f683",
-      "func.scenario_module_sha256sum" => "974e633fa5c63ac93a17cb78557f14f74ca69c3cf503ccf947ba2c4bb4e9c8f5",
-      "func.time_end"                  => 1498013854.67041,
-      "func.time_factor"               => 1000000,
-      "func.time_start"                => 1498013854.60542,
+      "func.scenario_module_md5sum"    => "2f38140630e50005e0c0497a76398f9d",
+      "func.scenario_module_mtime"     => 1501839138,
+      "func.scenario_module_sha1sum"   => "442f5a2938eb5d0436a64fc2805ceb0541eb15a9",
+      "func.scenario_module_sha256sum" => "730756e11e1d1f16d22e33eef7d6ba6cae4c47d8c352f9507b6504234e520a2a",
+      "func.time_end"                  => 1501839246.99868,
+      "func.time_factor"               => 1000000000,
+      "func.time_start"                => 1501839246.93113,
       "table.field_aligns"             => ["left", "left", "number", "number", "number", "number", "number"],
-      "table.field_units"              => [undef, undef, "/s", "\x{3BC}s"],
+      "table.field_units"              => [undef, undef, "/s", "ns"],
       "table.fields"                   => [
                                             "participant",
                                             "dataset",

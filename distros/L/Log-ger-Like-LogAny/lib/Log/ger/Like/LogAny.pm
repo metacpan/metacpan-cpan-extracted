@@ -1,12 +1,14 @@
 package Log::ger::Like::LogAny;
 
-our $DATE = '2017-07-12'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 # IFUNBUILT
 # use strict 'subs', 'vars';
 # use warnings;
 # END IFUNBUILT
+
+use Log::ger::Level::Like::LogAny;
 
 sub get_logger {
     my ($package, %args) = @_;
@@ -56,7 +58,7 @@ Log::ger::Like::LogAny - Log like Log::Any
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -74,15 +76,15 @@ The rest of this works in Log::Any as well as under Log::ger::Like::LogAny:
 
  my $log = Log::Any->get_logger(category => 'My::Package');
 
- $log->debug("blah ...", "more blah ...");
+ $log->err("blah ...", "more blah ...");
  $log->tracef("fmt %s %s", "blah ...", {data=>'structure'});
 
  if ($log->is_trace) {
     ...
  }
 
-To set output, use one of the available Log::ger::Output::*. You can send logs
-to Log::Any using L<Log::ger::Output::LogAny>.
+To set output, use one of the available C<Log::ger::Output::*>. You can send
+logs to Log::Any using L<Log::ger::Output::LogAny>.
 
 =head1 DESCRIPTION
 

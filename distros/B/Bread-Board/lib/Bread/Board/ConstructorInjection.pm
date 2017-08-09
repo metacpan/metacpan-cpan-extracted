@@ -1,7 +1,7 @@
 package Bread::Board::ConstructorInjection;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service instantiating objects via a constructor
-$Bread::Board::ConstructorInjection::VERSION = '0.34';
+$Bread::Board::ConstructorInjection::VERSION = '0.35';
 use Moose;
 
 use Try::Tiny;
@@ -37,7 +37,7 @@ Bread::Board::ConstructorInjection - service instantiating objects via a constru
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Infinity Interactive.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2009 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::Condition;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Error;
 
@@ -56,7 +56,7 @@ JsonSQL::Param::Condition - JsonSQL::Param::Condition object. This is a base cla
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,9 @@
 package Number::Phone::Formatter::EPP;
-$Number::Phone::Formatter::EPP::VERSION = '0.03';
+$Number::Phone::Formatter::EPP::VERSION = '0.06';
 # ABSTRACT: An EPP formatter for Number::Phone
+
+use strict;
+use warnings;
 
 
 sub format {
@@ -26,30 +29,30 @@ Number::Phone::Formatter::EPP - An EPP formatter for Number::Phone
 
 =head1 VERSION
 
-version 0.03
+version 0.06
 
 =head1 DESCRIPTION
 
-This is a formatter that will format an E.123 formatted number (from
+This is a formatter that will format an L<E.123|http://www.itu.int/rec/T-REC-E.123> formatted number (from
 L<Number::Phone>) as an EPP phone number.
 
 =head1 METHODS
 
 =head2 format
 
-This is the only method.  It takes an E.123 international format string as its
-only argument and reformats it in EPP (RFC 5753) format.  For example:
+This is the only method.  It takes an L<E.123|http://www.itu.int/rec/T-REC-E.123> international format string as its
+only argument and reformats it in EPP (L<RFC 5733|https://tools.ietf.org/html/rfc5733>) format.  For example:
 
  +44 20 8771 2924 -> +44.2087712924
  +1 212 334 0611  -> +1.2123340611
 
 =head1 SEE ALSO
 
-RFC 5753
+L<RFC 5733|https://tools.ietf.org/html/rfc5733>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/perl-number-phone-formatter-epp>
+The development version is on github at L<https://github.com/mschout/perl-number-phone-formatter-epp>
 and may be cloned from L<git://github.com/mschout/perl-number-phone-formatter-epp.git>
 
 =head1 BUGS

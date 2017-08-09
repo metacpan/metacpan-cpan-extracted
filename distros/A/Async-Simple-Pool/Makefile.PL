@@ -45,20 +45,20 @@ WriteMakefile(
     META_ADD => {
         provides => {
             'Async::Simple::Pool' => {
-                'version' => '0.12',
+                'version' => '0.13',
                 'file'    => 'lib/Async/Simple/Pool.pm'
             },
             'Async::Simple::Task::Fork' => {
                 'file'    => 'lib/Async/Simple/Task/Fork.pm',
-                'version' => '0.12'
+                'version' => '0.13'
             },
             'Async::Simple::Task::ForkTmpFile' => {
                 'file'    => 'lib/Async/Simple/Task/ForkTmpFile.pm',
-                'version' => '0.12'
+                'version' => '0.13'
             },
             'Async::Simple::Task' => {
                 'file'    => 'lib/Async/Simple/Task.pm',
-                'version' => '0.12'
+                'version' => '0.13'
             }
         }
     },

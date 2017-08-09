@@ -1,5 +1,5 @@
 package Mercury;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Main broker application class
 
 #pod =head1 SYNOPSIS
@@ -17,7 +17,7 @@ our $VERSION = '0.012';
 #pod
 #pod To learn how to use this application to broker messages, see L<the main
 #pod Mercury documentation|mercury>. For how to start the broker application,
-#pod see L<the mercury broker command documentation|Mercury::Command::broker>
+#pod see L<the mercury broker command documentation|Mercury::Command::mercury::broker>
 #pod or run C<mercury help broker>.
 #pod
 #pod To learn how to create a custom message broker to integrate authentication,
@@ -26,9 +26,10 @@ our $VERSION = '0.012';
 #pod =cut
 
 use Mojo::Base 'Mojolicious';
-use Scalar::Util qw( refaddr );
+use Scalar::Util qw( weaken refaddr );
 use File::Basename qw( dirname );
 use File::Spec::Functions qw( catdir );
+use Mojo::WebSocket 'WS_PING';
 
 sub startup {
     my ( $app ) = @_;
@@ -55,6 +56,18 @@ sub startup {
             return 1;
         } );
     }
+
+    $app->hook( before_dispatch => sub {
+        my ( $c ) = @_;
+        if ( $c->tx->is_websocket ) {
+            weaken $c;
+            my $id = Mojo::IOLoop->recurring( 300, sub {
+                return unless $c;
+                $c->tx->send([1, 0, 0, 0, WS_PING, 'Still alive!']);
+            } );
+            $c->tx->once( finish => sub { Mojo::IOLoop->remove( $id ) } );
+        }
+    } );
 
     $app->plugin( 'Mercury' );
     $r->websocket( '/push/*topic' )
@@ -105,7 +118,7 @@ Mercury - Main broker application class
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -122,7 +135,7 @@ application that is started when you use C<mercury broker>.
 
 To learn how to use this application to broker messages, see L<the main
 Mercury documentation|mercury>. For how to start the broker application,
-see L<the mercury broker command documentation|Mercury::Command::broker>
+see L<the mercury broker command documentation|Mercury::Command::mercury::broker>
 or run C<mercury help broker>.
 
 To learn how to create a custom message broker to integrate authentication,

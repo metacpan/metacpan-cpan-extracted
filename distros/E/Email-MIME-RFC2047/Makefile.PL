@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Email::MIME::RFC2047",
   "PREREQ_PM" => {},
-  "VERSION" => "0.96",
+  "VERSION" => "0.97",
   "test" => {
     "TESTS" => "t/*.t"
   }

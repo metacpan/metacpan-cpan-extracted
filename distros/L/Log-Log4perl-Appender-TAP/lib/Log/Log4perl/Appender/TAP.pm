@@ -7,7 +7,7 @@ use Test2::API qw( context );
 our @ISA = qw( Log::Log4perl::Appender );
 
 # ABSTRACT: Append to TAP output
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new
@@ -45,11 +45,11 @@ Log::Log4perl::Appender::TAP - Append to TAP output
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
- use Test::More tests => 1;
+ use Test2::V0;
  use Log::Log4perl;
  
  LOG::Log4perl::init(\<<CONF);
@@ -62,14 +62,14 @@ version 0.03
  
  DEBUG "this message doesn't see the light of day";
  ERROR "This gets logged to TAP using diag";
- 
- pass 'okay';
 
 =head1 DESCRIPTION
 
-This very simple appender sends log output to TAP using
-L<Test::Builder>.  It only takes one special argument,
-the method, which can be either C<diag> or C<note>.
+This very simple appender sends log output via L<Test2::API> to TAP
+(or any other format supported by L<Test2::API>).  It also works with
+L<Test::Builder> and L<Test::More> so long as you have L<Test2::API>
+installed.  It only takes one special argument, the method, which can
+be either C<diag> or C<note>.
 
 =head1 AUTHOR
 
@@ -77,7 +77,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,15 +8,14 @@ build_requires:
   Apache::Test: '1.35'
   Apache::TestRequest: '0'
   Apache::TestRunPerl: '0'
-  Module::Signature: '0'
-  Socket: '0'
   Test::More: '0'
   lib: '0'
-  mod_perl: '0'
   mod_perl2: '0'
-  warnings: '0'
+  perl: '5.006'
+configure_requires:
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +25,14 @@ requires:
   Apache: '0'
   Apache2::RequestUtil: '0'
   Apache::Test: '1.35'
-  CGI: '3.12'
   base: '0'
   constant: '0'
+  perl: '5.006'
   strict: '0'
+  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Singleton
   homepage: http://search.cpan.org/dist/Apache-Singleton/
   repository: git://github.com/mschout/apache-singleton.git
-version: '0.16'
+version: '0.17'
+x_serialization_backend: 'YAML::Tiny version 1.69'

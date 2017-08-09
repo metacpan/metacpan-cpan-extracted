@@ -4,15 +4,14 @@ XML::Easy::SimpleSchemaUtil - help with simple kinds of XML schema
 
 =head1 SYNOPSIS
 
-	use XML::Easy::SimpleSchemaUtil qw(
-		xml_s_canonise_chars xml_c_canonise_chars
-		xml_c_subelements xml_c_chardata
-	);
+    use XML::Easy::SimpleSchemaUtil qw(
+	xml_s_canonise_chars xml_c_canonise_chars
+	xml_c_subelements xml_c_chardata);
 
-	$chardata = xml_s_canonise_chars($chardata);
-	$content = xml_c_canonise_chars($content);
-	$subelements = xml_c_subelements($content);
-	$chars = xml_c_chardata($content);
+    $chardata = xml_s_canonise_chars($chardata);
+    $content = xml_c_canonise_chars($content);
+    $subelements = xml_c_subelements($content);
+    $chars = xml_c_chardata($content);
 
 =head1 DESCRIPTION
 
@@ -44,7 +43,7 @@ use XML::Easy::NodeBasics 0.007
 	qw(xml_content_object xml_content_twine xml_c_content_twine);
 use XML::Easy::Syntax 0.000 qw($xml10_s_rx);
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -303,7 +302,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 Copyright (C) 2010 PhotoBox Ltd
 
-Copyright (C) 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2011, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

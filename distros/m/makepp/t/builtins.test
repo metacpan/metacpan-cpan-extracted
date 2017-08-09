@@ -1,5 +1,11 @@
 ###	SPAR <http://www.cpan.org/scripts/>
-###	191	421	1162935563	1217791125	RootMakeppfile
+###	5	644	1236528312	1380446609	hint
+This tests links and symbolic links, among other things.  If your file
+system doesn't support either or both of these, you can try running
+this test with a workaround that consists in setting the environment
+variable MAKEPP_LN_CP to 1, 2 or 3.  If you want to use the &ln builtin
+later on, always set it!
+###	192	421	1162935563	1404420982	RootMakeppfile
 #
 # This file tests the builtin commands.
 #
@@ -140,7 +146,7 @@ else
 	&echo + -o >>$(output)
 	&sort --compare '$$b cmp $$a' $(input) -o >>$(output)
 	&echo + -o >>$(output)
-	&sort -t '$$_ = [lc, $$_]' -c '$$a->[0] cmp $$b->[0]' -d '$$_->[1]' $(input) -o >>$(output)
+	&sort -t '[lc, $$_]' -c '$$a->[0] cmp $$b->[0]' -d '$$_->[1]' $(input) -o >>$(output)
 	&echo + -o >>$(output)
 	&sort -t &transform -d &detransform $(input) -o >>$(output)
 	&echo +++ -o >>$(output)
@@ -148,7 +154,7 @@ else
 	&echo + -o >>$(output)
 	&sort --unique --compare '$$b cmp $$a' $(input) $(input) -o >>$(output)
 	&echo + -o >>$(output)
-	&sort -ut '$$_ = [lc, $$_]' -c '$$a->[0] cmp $$b->[0]' -d '$$_->[1]' $(input) $(input) -o >>$(output)
+	&sort -ut '[lc, $$_]' -c '$$a->[0] cmp $$b->[0]' -d '$$_->[1]' $(input) $(input) -o >>$(output)
 	&echo + -o >>$(output)
 	&sort -urt transform -d detransform $(input) $(input) -o >>$(output)
 	&echo + -o >>$(output)
@@ -158,9 +164,10 @@ endif
 
 # Test &template
 perl { %hash = (aa => 1, aaa => "1\n2", TITLE => 'Test') }
-%.out: title.tmpl %.tmpl
-	&template -v -o $(output) -h\\%hash THIS=foo THAT=bar:$$1: $(inputs)
-	&template -dv --simple=|<|/>| --multiline=|<|>|</|>| -h '+{%hash, bb => 2}' template.xml -o >>$(output)
+%.out: title.tmpl %.tmpl template.xml pi.xml
+	&template -v -o $(output) -h\\%hash THIS=foo THAT=bar:$$1: $(inputs 1 2)
+	&template -dv --simple=|<|/>| --multiline=|<|>|</|>| -h '+{%hash, bb => 2}' $(input 3) -o >>$(output)
+	&template --defined --simple='_&(?!#)_;_' --multiline='_<\?_(?=\?>)_\?>_' $(input 4) -o >>$(output)
 	&template -vS -o >>$(output) -h\\%hash THIS=foo THAT=bar:$$1: $(input 2)
 
 
@@ -184,14 +191,14 @@ install_log:
 	@perl { <dest/*> and die "uninstall failed\n" }
 
 # Test own command with frame and loaded fom a module
-perl { use mymodule }
+perl { do './mymodule.pl'; import mymodule 'c_uc' }
 uc.out: uniq.in
 	&uc -v $(input) -o $(output)
 
 preprocess.out: preprocess.test
 	&preprocess -v v4=foobar e== -h\\%hash preprocess.test -o preprocess.out
 	&preprocess -va v2=xyz e== preprocess.test -o >>preprocess.out
-###	13	644	1141068683	1140901286	mymodule.pm
+###	11	644	1141068683	1473530787	mymodule.pl
 package mymodule;
 require Exporter;
 our @ISA = 'Exporter';
@@ -203,8 +210,6 @@ sub c_uc {
     print "\u\L$_" while <>;
   } qw(f i I o O r s);
 }
-
-1;
 ###	-12	644	1134923188	1134923188	cut.in
   ! " # $ % & ' ( ) * + , - . /
 0 1 2 3 4 5 6 7 8 9 : ; < = > ?
@@ -221,11 +226,9 @@ pqrs	tuvw	xyz{	|}~
 ###	0	644	1107332258	1105783994	dir2
 ###	1	644	1107332258	1107331351	grep.in
 aha,foo,bar,with a,without
-###	4	644	1236528312	1236528312	hint
-This tests links and symbolic links, among other things.  If your file system
-doesn't support either of these, you can try running this test with a
-workaround that consists in setting the environment variable MAKEPP_LN_CP to
-1, 2 or 3.  If you want to use the &ln builtin later on, always set it.
+###	2	644	1404420827	1404420827	pi.xml
+<?STYLE="background-color: #d8d8e8;"?><?# This tests not getting confused about nested ';' and &#n; is not a comment ?>
+<div style=&STYLE;>&#65;</div>
 ###	22	644	1153676973	1313824017	preprocess.test
 
 # empty & comment
@@ -267,13 +270,15 @@ gets replaced. 1 + 2 = @{ 1 + 2 }@
     foo bar
   </aa> <aa no="go"/>
 </doc>
-###	7	644	1107332258	1106067541	title.tmpl
+###	-6	644	1107332258	1402078423	title.tmpl
 @UNDEF@@field=Title@\
 @TITLE?=nothing@\
 @field@\
 @field { ' ' . ($_[0]+1) . " is$_[1]" }@\
 @n=0@\
-@field(@n@,:)@ @TITLE@
+@field(@n@,:)@ @include( dotitle.tmpl )@
+###	2	644	1402078420	1402078420	dotitle.tmpl
+@TITLE@
 --------------------
 ###	5	644	1112771877	1112771877	uniq.in
 aa
@@ -487,7 +492,7 @@ Just a silly test to see if @THIS@ and @aaa@
 all @@THIS@@ and this@@ before here
 foo bar
 goner
-###	20	644	1107332258	1181388408	answers/template.out
+###	22	644	1107332258	1404421060	answers/template.out
 Title 1 is: Test
 --------------------
 Just a silly test to see if foo and 1
@@ -500,6 +505,8 @@ gets replaced. 1 + 2 = 3
   1 2
   3 4 <aa no="go"/>
 </doc>
+
+<div style="background-color: #d8d8e8;">&#65;</div>
 #line 1 "template.tmpl"
 Just a silly test to see if foo and 1
 #line 1

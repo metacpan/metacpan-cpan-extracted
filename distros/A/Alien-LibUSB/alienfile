@@ -1,0 +1,83 @@
+use alienfile;
+use Config;
+use Carp;
+use File::Copy qw(copy);
+
+sub isAtLeastFreeBSDv8 {
+    # FreeBSD 8+ ships with a native libusb-1.0 compatible library
+    return 0 unless $Config{osname} =~ qr/freebsd/i;
+
+    if ($Config{osvers} =~ qr/^(\d+).*/) {
+        croak 'FreeBSD versions below 8.x is not supported' if $1 < 8;
+        return 1
+    }
+
+    carp 'Could not determine FreeBSD major version';
+    0
+}
+
+if (isAtLeastFreeBSDv8) {
+    probe  sub { 1 };
+    gather sub {
+        my ($build) = @_;
+        $build->runtime_prop->{version}     = '1.0.9';
+        $build->runtime_prop->{cflags}      = '-I/usr/include';
+        $build->runtime_prop->{libs}        = '-L/usr/lib -lusb';
+        $build->runtime_prop->{libs_static} = '-L/usr/lib -lusb';
+    };
+}
+
+plugin 'PkgConfig' => 'libusb-1.0';
+
+my ($cppflags, $ldflags) = ('', '');
+
+share {
+    requires 'Alien::autoconf' => '0.03';
+    requires 'Alien::automake' => '0.05';
+    requires 'Alien::libtool'  => '0.02';
+    requires 'Alien::m4'       => '0.11';
+
+    if ($^O eq 'linux') {
+        requires 'Alien::libudev' => '0.1';
+        eval "use Alien::libudev"; die $@ if $@;
+        $cppflags  = Alien::libudev->cflags;
+        $ldflags   = Alien::libudev->libs;
+
+        meta->after_hook(gather_share => sub {
+            my($build) = @_;
+            $build->runtime_prop->{$_} .= ' ' . $ldflags for qw( libs libs_static );
+            $build->runtime_prop->{cflags} .= ' ' . $cppflags;
+        });
+    }
+
+    plugin Download => (
+        # Archive::Tar chokes on the symlink, even with $Archive::Tar::FOLLOW_SYMLINK=1
+        # So extracting the zip instead.
+        url => 'https://github.com/libusb/libusb/releases',
+        filter => qr/^v .* \.zip$/x,
+        version => qr/([0-9\.]+)/,
+    );
+
+    plugin Extract => 'zip';
+
+    patch sub {
+        # README is a symlink and would make autotools fail on filesystems not supporting them
+        unlink 'README';
+        copy qw(README.md README);
+    };
+
+    plugin 'Build::Autoconf' => ();
+
+    $ENV{NOCONFIGURE}  = 1;
+    $ENV{CPPFLAGS}    .= " $cppflags";
+    $ENV{LDFLAGS}     .= " $ldflags";
+
+    build [
+        './autogen.sh',
+        '%{configure}',
+        '%{make}',
+        '%{make} install',
+    ];
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

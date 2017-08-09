@@ -29,5 +29,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Term-ProgressBar
-version: '2.20'
+version: '2.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

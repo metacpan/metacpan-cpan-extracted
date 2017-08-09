@@ -1,5 +1,14 @@
+#
+# This file is part of Dist-Zilla-PluginBundle-MSCHOUT
+#
+# This software is copyright (c) 2017 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package Dist::Zilla::PluginBundle::MSCHOUT;
-$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.32';
+$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.35';
 # ABSTRACT: Use L<Dist::Zilla> like MSCHOUT does
 
 use Moose;
@@ -12,7 +21,7 @@ use Dist::Zilla::PluginBundle::Classic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git 1.101230;
 
-use Dist::Zilla::Plugin::ArchiveRelease;
+use Dist::Zilla::Plugin::AuthorSignatureTest;
 use Dist::Zilla::Plugin::AutoPrereqs;
 use Dist::Zilla::Plugin::AutoVersion;
 use Dist::Zilla::Plugin::Bugtracker;
@@ -77,6 +86,7 @@ sub configure {
     $self->add_plugins(
         qw(
             AutoPrereqs
+            AuthorSignatureTest
             MinimumPerl
             InsertCopyright
             Repository
@@ -85,7 +95,6 @@ sub configure {
             Signature
             Prereqs::AuthorDeps
             MetaJSON
-            ArchiveRelease
         ),
         # update release in Changes file
         [ NextRelease => { format => '%-2v  %{yyyy-MM-dd}d' } ]
@@ -113,10 +122,8 @@ sub configure {
     }
 
     $self->add_plugins(
-        qw(
-            Git::Check
-            Git::Commit
-        ),
+        [ 'Git::Check' => { allow_dirty => [qw(.travis.yml)] } ],
+        'Git::Commit',
         [ 'Git::CommitBuild' => { release_branch => $self->release_branch } ],
         [ 'Git::Tag'         => { branch => $self->release_branch } ],
         [
@@ -201,7 +208,7 @@ Dist::Zilla::PluginBundle::MSCHOUT - Use L<Dist::Zilla> like MSCHOUT does
 
 =head1 VERSION
 
-version 0.32
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -216,6 +223,7 @@ It's equivalent to:
  remove = PodVersion
 
  [AutoPrereqs]
+ [AuthorSignatureTest]
  [MinimumPerl]
  [InsertCopyright]
  [PodWeaver]
@@ -224,10 +232,10 @@ It's equivalent to:
  [Homepage]
  [Signature]
  [MetaJSON]
- [ArchiveRelease]
  [NextRelease]
     format = "%-2v  %{yyyy-MM-dd}d"
  [Git::Check]
+ allow_dirty = .travis.yml
  [Git::Commit]
  [Git::NextVersion]
     first_version = 0.01
@@ -298,7 +306,7 @@ This PluginBundle also supports C<PluginRemover>, so removing a plugin is as sim
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/dist-zilla-pluginbundle-mschout>
+The development version is on github at L<https://github.com/mschout/dist-zilla-pluginbundle-mschout>
 and may be cloned from L<git://github.com/mschout/dist-zilla-pluginbundle-mschout.git>
 
 =head1 BUGS

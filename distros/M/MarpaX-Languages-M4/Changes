@@ -1,6 +1,16 @@
 Changelog for MarpaX-Languages-M4
 
-0.017 2015-05-06T06:00:54
+0.019 2017-08-01T18:09:47
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Implicit dependency from MooX::Options and its autosplit facility -
+   closes #1
+
+0.018 2017-08-01T15:03:09Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - use re::engine::GNU 0.024
+ - use re::engine::GNU 0.022
+
+0.017 2015-05-06T06:00:54Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Impl/Regexp.pm: optim of one of the most central stub
  - Impl/Parser.pm: tiny optimization - non needed sprintf
@@ -749,4 +759,3 @@ Changelog for MarpaX-Languages-M4
  - dzil fixes conted
  - dzil fix
  - Initial commit
-

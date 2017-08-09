@@ -1,4 +1,4 @@
-# $Id: Repository.pm,v 1.12 2012/10/25 21:10:43 pfeiffer Exp $
+# $Id: Repository.pm,v 1.18 2014/08/03 21:10:36 pfeiffer Exp $
 
 =head1 NAME
 
@@ -11,7 +11,10 @@ The actual functionality is also dispersed in makepp and other modules.
 
 =cut
 
-package Mpp::Repository;	# For CPAN scanner.
+package Mpp::Repository;
+
+our $hits = 0;	  		# Number of the files changed that were imported from a rep.
+
 package Mpp::File;		# Use this a lot.
 
 use Mpp::FileOpt;
@@ -125,6 +128,7 @@ sub Mpp::Repository::load {
   my( $dirinfo, $destdirinfo, $prune_code ) = @_; # Name the arguments.
   Mpp::log REP_LOAD => $dirinfo, $destdirinfo
     if $log_level;
+  undef $dirinfo->{xREPOSITORY};
 
   # TBD: Using a repository manifest (in addition to the possibility that
   # it's wrong) is still pretty slow. It would be better to do lazy computation
@@ -183,13 +187,13 @@ sub Mpp::Repository::get {
 
   if( $dest_finfo->{DIRCONTENTS} ) { # Is this a directory?
     if( !$src_finfo->{DIRCONTENTS} ) {
-      Mpp::print_error 'Directory `' . &absolute_filename . "' is in the way of a repository import.";
+      warn 'Directory `' . &absolute_filename . "' is in the way of a repository import.";
       ++$Mpp::failed_count;
       return 1;
     } elsif( &mkdir ) {	# Just make it if inexistent, don't soft link to it.
       return 0;
     } else {
-      Mpp::print_error 'Failed to make directory `' . &absolute_filename . "'--$!.";
+      warn 'Failed to make directory `' . &absolute_filename . "'--$!.";
       ++$Mpp::failed_count;
       return 1;
     }
@@ -197,10 +201,10 @@ sub Mpp::Repository::get {
 
   # Don't link to the repository if the source doesn't exist (even if it
   # can be built, because we'll build it locally instead).
-  return 0 unless exists_or_can_be_built_norecurse $src_finfo, undef, 1;
+  return 0 unless exists_or_can_be_built_norecurse $src_finfo, 0, 1;
 
   if( &dont_read or my $src = dont_read $src_finfo ) {
-    Mpp::print_error 'Cannot link ', $src_finfo, ' to ', $dest_finfo,
+    warn 'Cannot link ', $src_finfo, ' to ', $dest_finfo,
       ' because the ', $src ? 'latter' : 'former', ' is marked for dont-read';
     ++$Mpp::failed_count;
     return 1;			# Indicate failure.
@@ -222,7 +226,7 @@ sub Mpp::Repository::get {
   # the linkee, which might be a local file, and which might have changed,
   # even if the link is still the same.
   my $linkee = readlink absolute_filename $src_finfo
-    if !defined $Mpp::symlink_in_rep_as_file && is_symbolic_link $src_finfo;
+    if !defined $Mpp::Repository::symlink_as_file && is_symbolic_link $src_finfo;
   my $binfo_finfo = $linkee ? file_info $linkee, $dest_finfo->{'..'} : $src_finfo;
   my $binfo = $binfo_finfo->{BUILD_INFO} ||=
     load_build_info_file( $binfo_finfo ) || {};
@@ -265,14 +269,13 @@ sub Mpp::Repository::get {
       eval { &symlink };	# Make the link.
     }
     if ($@) {			# Did something go wrong?
-      Mpp::print_error 'Cannot link ', $src_finfo, ' to ', $dest_finfo, ":\n$@";
+      warn 'Cannot link ', $src_finfo, ' to ', $dest_finfo, ":\n$@";
       ++$Mpp::failed_count;
       return 1;			# Indicate failure.
     }
-    ++$Mpp::rep_hits;
-  } else {
-    Mpp::log 'REP_EXISTING'
-      if $Mpp::log_level;
+    ++$Mpp::Repository::hits;
+  } elsif( Mpp::DEBUG ) {
+    Mpp::log 'REP_EXISTING';
   }
 
   # NOTE: This has to happen *after* the file exists (or else the build info

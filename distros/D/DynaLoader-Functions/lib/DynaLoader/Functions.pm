@@ -4,23 +4,21 @@ DynaLoader::Functions - deconstructed dynamic C library loading
 
 =head1 SYNOPSIS
 
-	use DynaLoader::Functions qw(
-		loadable_for_module
-		linkable_for_loadable linkable_for_module
-	);
+    use DynaLoader::Functions qw(
+	loadable_for_module
+	linkable_for_loadable linkable_for_module);
 
-	$loadable = loadable_for_module("Acme::Widget");
-	@linkable = linkable_for_loadable($loadable);
-	@linkable = linkable_for_module("Acme::Widget");
+    $loadable = loadable_for_module("Acme::Widget");
+    @linkable = linkable_for_loadable($loadable);
+    @linkable = linkable_for_module("Acme::Widget");
 
-	use DynaLoader::Functions
-		qw(dyna_load dyna_resolve dyna_unload);
+    use DynaLoader::Functions qw(dyna_load dyna_resolve dyna_unload);
 
-	$libh = dyna_load($loadable, {
+    $libh = dyna_load($loadable, {
 		require_symbols => ["boot_Acme__Widget"],
-	});
-	my $bootfunc = dyna_resolve($libh, "boot_Acme__Widget");
-	dyna_unload($libh);
+	    });
+    my $bootfunc = dyna_resolve($libh, "boot_Acme__Widget");
+    dyna_unload($libh);
 
 =head1 DESCRIPTION
 
@@ -37,7 +35,7 @@ package DynaLoader::Functions;
 use warnings;
 use strict;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -128,7 +126,8 @@ sub loadable_for_module($) {
 			$modfname)
 		or _croak "Can't locate loadable object ".
 			"for module $modname in \@INC (\@INC contains: @INC)";
-	if(_IS_VMS && $Config::Config{d_vms_case_sensitive_symbols}) {
+	if(_IS_VMS && ((require Config),
+			$Config::Config{d_vms_case_sensitive_symbols})) {
 		$loadlib = uc($loadlib);
 	}
 	return $loadlib;
@@ -156,7 +155,9 @@ additional objects when linking the importing library.
 
 my $linkable_finder = {
 	MSWin32 => sub {
-		if((my $basename = $_[0]) =~ s/\.[Dd][Ll][Ll]\z//) {
+		require Config;
+		if((my $basename = $_[0]) =~
+				s/\.\Q$Config::Config{dlext}\E\z//oi) {
 			foreach my $suffix (qw(.lib .a)) {
 				my $impname = $basename.$suffix;
 				return ($impname) if -e $impname;
@@ -436,7 +437,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011, 2012, 2013 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2011, 2012, 2013, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

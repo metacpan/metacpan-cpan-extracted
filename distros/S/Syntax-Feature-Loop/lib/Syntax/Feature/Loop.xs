@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "../../../ppport.h"
 #include "../../../callparser1.h"
 
 
@@ -9,17 +10,22 @@ STATIC OP* remove_sub_call(pTHX_ OP* entersubop) {
 #define remove_sub_call(a) remove_sub_call(aTHX_ a)
    OP* pushop;
    OP* realop;
+   OP* cvop;
 
    pushop = cUNOPx(entersubop)->op_first;
-   if (!pushop->op_sibling)
+   if (!OpHAS_SIBLING(pushop))
       pushop = cUNOPx(pushop)->op_first;
 
-   realop = pushop->op_sibling;
-   if (!realop || !realop->op_sibling)
+   realop = OpSIBLING(pushop);
+   if (!realop)
       return entersubop;
 
-   pushop->op_sibling = realop->op_sibling;
-   realop->op_sibling = NULL;
+   cvop = OpSIBLING(realop);
+   if (!cvop)
+      return entersubop;
+
+   OpMORESIB_set(pushop, cvop);
+   OpLASTSIB_set(realop, NULL);
    op_free(entersubop);
    return realop;
 }

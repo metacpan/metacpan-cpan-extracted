@@ -3,7 +3,7 @@ use warnings;
 package Device::HID;
 
 # ABSTRACT: Perl Interface to HIDAPI
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Carp;
 use Device::HID::XS qw(:all);

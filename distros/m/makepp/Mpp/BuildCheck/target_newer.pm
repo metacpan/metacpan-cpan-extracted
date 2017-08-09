@@ -1,4 +1,4 @@
-# $Id: target_newer.pm,v 1.12 2011/07/01 19:59:34 pfeiffer Exp $
+# $Id: target_newer.pm,v 1.13 2014/08/03 21:10:35 pfeiffer Exp $
 use strict;
 package Mpp::BuildCheck::target_newer;
 
@@ -75,8 +75,7 @@ sub build_check {
 }
 
 sub build_check_from_build_info {
-  my ($self, $rep_entry, $sorted_dependencies, $build_cwd, undef, $env) =
-    @_;
+  my( undef, $rep_entry, $sorted_dependencies, $build_cwd, undef, $env ) = @_;
 			        # Ignore the arguments we don't need.
 #
 # See if this file is newer than all of the dependencies.  That's all we can
@@ -95,7 +94,7 @@ sub build_check_from_build_info {
 # Return a list of the dependencies that have changed:
 #
 sub changed_dependencies {
-  my ($self, $target, undef, $build_cwd, @dependencies) = @_;
+  my( undef, $target, undef, $build_cwd, @dependencies ) = @_;
   my( @changed, $mtime );
 
   foreach (@dependencies) {

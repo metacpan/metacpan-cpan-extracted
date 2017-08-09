@@ -1,0 +1,36 @@
+{
+   "abstract" : "Perl extension for finding [uniq/intersection/difference] of lines among two files",
+   "author" : [
+      "Kaavannan Karuppaiyah <kaavannaniisc@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-ViewDiff",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::ViewDiff" : {
+         "file" : "lib/File/ViewDiff.pm",
+         "version" : "1.09"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.09"
+}

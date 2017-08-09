@@ -4,13 +4,74 @@ use strict;
 use warnings;
 use v5.12;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use App::Cmd::Setup -app;
 
 use Capture::Tiny ':all';
+use File::Copy;
 use File::Slurp;
 use File::Spec;
+
+sub _build {
+  my ($self, $target, @opts) = @_;
+
+  system 'bazel', 'build', '-c', 'opt', ":$target", @opts;
+
+  if ($? == -1) {
+    say STDERR 'Build failed';
+    return undef;
+  }
+
+  return 1;
+}
+
+sub _build_linux {
+  my ($self, $project, $version) = @_;
+
+  # TODO autodetect build rule
+  my $target = "$project-linux";
+  $self->_build($target) or return undef;
+
+  # TODO improve result name detection
+  my $file = "$project-$version-linux.tgz";
+  unless (copy("bazel-bin/$target.tgz", $file)) {
+    say STDERR "Copy bazel-bin/$target.tgz to $file failed: $!";
+    return undef;
+  }
+
+  say STDERR 'Build complete';
+  return 1;
+}
+
+sub _build_windows {
+  my ($self, $project, $version) = @_;
+
+  my @options =
+    ('--crosstool_top', '@mxebzl//tools/windows:toolchain', '--cpu', 'win64');
+
+  # TODO autodetect build rule
+  my $target = "$project-windows";
+  $self->_build($target, @options) or return undef;
+
+  # TODO improve result name detection
+  my $file = "$project-$version-windows.zip";
+  unless (copy("bazel-bin/$target.zip", $file)) {
+    say STDERR "Copy bazel-bin/$target.zip to $file failed: $!";
+    return undef;
+  }
+
+  say STDERR 'Build complete';
+  return 1;
+}
+
+sub build_all_targets {
+  my ($self, $project, $version) = @_;
+
+  $self->_build_linux($project, $version) or return undef;
+  $self->_build_windows($project, $version) or return undef;
+  return 1;
+}
 
 sub _get_project_from_path {
   my ($self) = @_;
@@ -47,7 +108,7 @@ sub version {
 sub targets {
   my ($self) = @_;
 
-  return qw(linux win32 win64);
+  return qw(linux windows);
 }
 
 sub output_file {

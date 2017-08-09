@@ -1,12 +1,19 @@
-SYNOPSIS
+NAME
+    Getopt::Long::Subcommand - Process command-line options, with
+    subcommands and completion
 
+VERSION
+    This document describes version 0.101 of Getopt::Long::Subcommand (from
+    Perl distribution Getopt-Long-Subcommand), released on 2017-08-01.
+
+SYNOPSIS
      use Getopt::Long::Subcommand; # exports GetOptions
-    
+
      my %opts;
      my $res = GetOptions(
-    
+
          summary => 'Summary about your program ...',
-    
+
          # common options recognized by all subcommands
          options => {
              'help|h|?' => {
@@ -30,7 +37,7 @@ SYNOPSIS
                  handler => \$opts{verbose},
              },
          },
-    
+
          # list your subcommands here
          subcommands => {
              subcmd1 => {
@@ -50,7 +57,7 @@ SYNOPSIS
                  },
              },
          },
-    
+
          # tell how to complete option value and arguments. see
          # Getopt::Long::Complete for more details, the arguments are the same
          # except there is an additional 'subcommand' that gives the subcommand
@@ -59,7 +66,7 @@ SYNOPSIS
              my %args = @_;
              ...
          },
-    
+
      );
      die "GetOptions failed!\n" unless $res->{success};
      say "Running subcommand $res->{subcommand} ...";
@@ -68,48 +75,56 @@ SYNOPSIS
 
      % script
      Missing subcommand
-    
+
      % script --help
      General help message ...
-    
+
      % script subcmd1
      Running subcommand subcmd1 ...
-    
+
      % script subcmd1 --help
      Help message for subcmd1 ...
-    
+
      % script --verbose subcmd2 --baz --bar val
      Running subcommand subcmd2 ...
-    
+
      % script subcmd3
      Unknown subcommand 'subcmd3'
      GetOptions failed!
 
 DESCRIPTION
-
     This module extends Getopt::Long with subcommands and tab completion
     ability.
 
-    How parsing works: First we call Getopt::Long::GetOptions with the
+    How parsing works: First we call "Getopt::Long::GetOptions" with the
     top-level options, passing through unknown options if we have
     subcommands. Then, subcommand name is taken from the first argument. If
     subcommand has options, the process is repeated. So
-    Getopt::Long::GetOptions is called once at every level.
+    "Getopt::Long::GetOptions" is called once at every level.
 
     Completion: Scripts using this module can complete themselves. Just put
-    your script somewhere in your PATH and run something like this in your
-    bash shell: complete -C script-name script-name. See also shcompgen to
+    your script somewhere in your "PATH" and run something like this in your
+    bash shell: "complete -C script-name script-name". See also shcompgen to
     manage completion scripts for multiple applications easily.
 
-    How completion works: Environment variable COMP_LINE or COMMAND_LINE
-    (for tcsh) is first checked. If it exists, we are in completion mode
-    and @ARGV is parsed/formed from it. We then perform parsing to get
+    How completion works: Environment variable "COMP_LINE" or "COMMAND_LINE"
+    (for tcsh) is first checked. If it exists, we are in completion mode and
+    @ARGV is parsed/formed from it. We then perform parsing to get
     subcommand names. Finally we hand it off to Complete::Getopt::Long.
 
+CAVEATS
+  Common options take precedence over subcommand options
+    Common options (e.g. "--help") are parsed and removed from the
+    command-line first. This is done for convenience so you can do something
+    like "cmd subc --help" or "cmd --help subc" to get help. The consequence
+    is you cannot have a subcommand option with the same name as common
+    option.
+
+    Similarly, options for a subcommand takes precedence over its
+    sub-subcommand, and so on.
+
 FUNCTIONS
-
- GetOptions(%cmdspec) => hash
-
+  GetOptions(%cmdspec) => hash
     Exported by default.
 
     Process options and/or subcommand names specified in %cmdspec, and
@@ -117,55 +132,63 @@ FUNCTIONS
     errors. Actual command-line options parsing will be done using
     Getopt::Long.
 
-    Return hash structure, with these keys: success (bool, false if parsing
-    options failed e.g. unknown option/subcommand, illegal option value,
-    etc), subcommand (array of str, subcommand name, if there is any;
-    nested subcommands will be listed in order, e.g. ["sub1", "subsub1"]).
+    Return hash structure, with these keys: "success" (bool, false if
+    parsing options failed e.g. unknown option/subcommand, illegal option
+    value, etc), "subcommand" (array of str, subcommand name, if there is
+    any; nested subcommands will be listed in order, e.g. "["sub1",
+    "subsub1"]").
 
     Arguments:
 
-      * summary => str
+    *   summary => str
 
-      Used by autohelp (not yet implemented).
+        Used by autohelp (not yet implemented).
 
-      * options => hash
+    *   options => hash
 
-      A hash of option names and its specification. The specification is
-      the same as what you would feed to Getopt::Long's GetOptions.
+        A hash of option names and its specification. The specification is
+        the same as what you would feed to Getopt::Long's "GetOptions".
 
-      * subcommands => hash
+    *   subcommands => hash
 
-      A hash of subcommand name and its specification. The specification
-      looks like GetOptions argument, with keys like summary, options,
-      subcommands (for nested subcommands).
+        A hash of subcommand name and its specification. The specification
+        looks like "GetOptions" argument, with keys like "summary",
+        "options", "subcommands" (for nested subcommands).
 
-      * default_subcommand => str
+    *   default_subcommand => str
 
-      Default subcommand to use if no subcommand name is set. Subcommand
-      can be set using the first argument, or your option handler can also
-      set the subcommand using:
+        Default subcommand to use if no subcommand name is set. Subcommand
+        can be set using the first argument, or your option handler can also
+        set the subcommand using:
 
-       $_[2]{subcommand_name} = 'something';
+         $_[2]{subcommand_name} = 'something';
 
-    Differences with Getopt::Long's GetOptions:
+    *   configure => arrayref
 
-      * Accept a command/subcommand specification (%cmdspec) instead of
-      just options specification (%ospec) like in Getopt::Long).
+        Custom Getopt::Long configuration. The default is:
 
-      * This module's function returns hash instead of bool.
+         ['no_ignore_case', 'no_getopt_compat', 'gnu_compat', 'bundling']
 
-      * Coderefs in options will receive an extra argument $res which is
-      the result hash (being built). So the arguments that the coderefs get
-      is:
+        Note that even though you use custom configuration here, the tab
+        completion (performed by Complete::Getopt::Long only supports
+        "no_ignore_case", "gnu_compat", and "no_getopt_compat".
 
-       ($callback, $value, $res)
+    Differences with "Getopt::Long"'s "GetOptions":
+
+    *   Accept a command/subcommand specification (%cmdspec) instead of just
+        options specification (%ospec) like in "Getopt::Long").
+
+    *   This module's function returns hash instead of bool.
+
+    *   Coderefs in "options" will receive an extra argument $res which is
+        the result hash (being built). So the arguments that the coderefs
+        get is:
+
+         ($callback, $value, $res)
 
 FAQ
-
- How to avoid modifying @ARGV? How to process from another array, like
- Getopt::Long's GetOptionsFromArray?
-
-    Instead of adding another function, you can use local.
+  How to avoid modifying @ARGV? How to process from another array, like Getopt::Long's GetOptionsFromArray?
+    Instead of adding another function, you can use "local".
 
      {
          local @ARGV = ['--some', 'value'];
@@ -173,8 +196,23 @@ FAQ
      }
      # the original @ARGV is restored
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Getopt-Long-Subcommand>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Getopt-Long-Subcommand>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Subcomman
+    d>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Getopt::Long
 
     Getopt::Long::Complete
@@ -183,4 +221,13 @@ SEE ALSO
     framework, also with subcommands and completion.
 
     Pod::Weaver::Section::Completion::GetoptLongSubcommand
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

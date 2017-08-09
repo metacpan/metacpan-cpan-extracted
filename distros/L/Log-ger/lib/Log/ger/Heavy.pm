@@ -1,7 +1,7 @@
 package Log::ger::Heavy;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -220,7 +220,7 @@ sub init_target {
         my $mllogger0;
         for my $rn (@rn) {
             my ($rname, $lname, $fmtname) = @$rn;
-            my $lnum = $Levels{$lname} if defined $lname;
+            my $lnum; $lnum = $Levels{$lname} if defined $lname;
             my $routine_name_is_ml = !defined($lname);
             $fmtname = 'default' if !defined($fmtname);
 
@@ -400,7 +400,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 DESCRIPTION
 

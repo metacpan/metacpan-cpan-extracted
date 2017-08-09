@@ -201,8 +201,6 @@ src/ltc/encauth/ocb3/ocb3_encrypt.c
 src/ltc/encauth/ocb3/ocb3_encrypt_authenticate_memory.c
 src/ltc/encauth/ocb3/ocb3_encrypt_last.c
 src/ltc/encauth/ocb3/ocb3_init.c
-src/ltc/encauth/ocb3/ocb3_int_aad_add_block.c
-src/ltc/encauth/ocb3/ocb3_int_calc_offset_zero.c
 src/ltc/encauth/ocb3/ocb3_int_ntz.c
 src/ltc/encauth/ocb3/ocb3_int_xor_blocks.c
 src/ltc/hashes/blake2b.c
@@ -307,6 +305,7 @@ src/ltc/misc/crypt/crypt.c
 src/ltc/misc/crypt/crypt_argchk.c
 src/ltc/misc/crypt/crypt_cipher_descriptor.c
 src/ltc/misc/crypt/crypt_cipher_is_valid.c
+src/ltc/misc/crypt/crypt_constants.c
 src/ltc/misc/crypt/crypt_find_cipher.c
 src/ltc/misc/crypt/crypt_find_cipher_any.c
 src/ltc/misc/crypt/crypt_find_cipher_id.c
@@ -322,9 +321,14 @@ src/ltc/misc/crypt/crypt_inits.c
 src/ltc/misc/crypt/crypt_ltc_mp_descriptor.c
 src/ltc/misc/crypt/crypt_prng_descriptor.c
 src/ltc/misc/crypt/crypt_prng_is_valid.c
+src/ltc/misc/crypt/crypt_prng_rng_descriptor.c
+src/ltc/misc/crypt/crypt_register_all_ciphers.c
+src/ltc/misc/crypt/crypt_register_all_hashes.c
+src/ltc/misc/crypt/crypt_register_all_prngs.c
 src/ltc/misc/crypt/crypt_register_cipher.c
 src/ltc/misc/crypt/crypt_register_hash.c
 src/ltc/misc/crypt/crypt_register_prng.c
+src/ltc/misc/crypt/crypt_sizes.c
 src/ltc/misc/crypt/crypt_unregister_cipher.c
 src/ltc/misc/crypt/crypt_unregister_hash.c
 src/ltc/misc/crypt/crypt_unregister_prng.c
@@ -399,6 +403,7 @@ src/ltc/pk/asn1/der/sequence/der_encode_sequence_multi.c
 src/ltc/pk/asn1/der/sequence/der_encode_subject_public_key_info.c
 src/ltc/pk/asn1/der/sequence/der_length_sequence.c
 src/ltc/pk/asn1/der/sequence/der_sequence_free.c
+src/ltc/pk/asn1/der/sequence/der_sequence_shrink.c
 src/ltc/pk/asn1/der/set/der_encode_set.c
 src/ltc/pk/asn1/der/set/der_encode_setof.c
 src/ltc/pk/asn1/der/short_integer/der_decode_short_integer.c

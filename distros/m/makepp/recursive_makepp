@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # This is a script that runs when make is invoked recursively using the
 # $(MAKE) variable.  It simply reports to the parent make process what
@@ -6,7 +6,7 @@
 # The parent makepp process sets the environment variable MAKEPP_SOCKET
 # to be the name of a file that we're supposed to write information about the
 # cwd and make command.
-# $Id: recursive_makepp,v 1.7 2011/06/21 20:21:10 pfeiffer Exp $
+# $Id: recursive_makepp,v 1.8 2013/02/16 15:11:37 pfeiffer Exp $
 #
 
 use Cwd;

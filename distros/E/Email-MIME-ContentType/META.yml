@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/rjbs/Email-MIME-ContentType/issues
   homepage: https://github.com/rjbs/Email-MIME-ContentType
   repository: https://github.com/rjbs/Email-MIME-ContentType.git
-version: '1.020'
+version: '1.021'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -317,7 +317,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.020'
+          tag: '1.021'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -1,6 +1,6 @@
 t/Log-LogMethods-GeneratedInterfaces.t
-t/Log-LogMethods.t
 t/Log-LogMethods-Log4PerlLogToString.t
+t/Log-LogMethods.t
 lib/Log/LogMethods/Log4perlLogToString.pm
 lib/Log/LogMethods.pm
 Makefile.PL

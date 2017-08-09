@@ -12,8 +12,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,7 +27,8 @@ requires:
   List::Util: '0'
   Moose: '0'
   SVG: '0'
+  perl: '5.010000'
 resources:
   repository: git://github.com/davorg/svg-timeline.git
-version: v0.0.1
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

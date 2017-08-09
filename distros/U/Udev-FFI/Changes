@@ -1,5 +1,9 @@
 Revision history for Perl extension Udev-FFI
 
+0.097003 2017-08-07T12:32:42Z
+    - update depends in cpanfile
+    - add examples to SYNOPSIS
+
 0.097002 2017-07-19T19:54:43Z
     - typo fixes
 

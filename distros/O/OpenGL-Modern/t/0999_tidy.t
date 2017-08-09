@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::InDistDir;
 use Test::More 0.88;
-use IO::All -binary;
+use IO::All 0.86 -binary;
 use lib "t/lib";
 
 plan skip_all => "test requires Capture::Tiny and Perl::Tidy"

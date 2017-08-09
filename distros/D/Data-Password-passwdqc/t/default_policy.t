@@ -13,6 +13,9 @@ ok($pwdqc->validate_password('cheek6mirror_Wheat', ''));
 ok(!$pwdqc->validate_password('joke_river7Pale', '5joke_6river7Pale'));
 is($pwdqc->reason, 'is based on the old one');
 
+ok(!$pwdqc->validate_password('joke_river7Pale', '5joke_6river7Pale', '5joke'));
+is($pwdqc->reason, 'is based on the old one');
+
 ok(!$pwdqc->validate_password('cheek6mirror_Wheat', 'cheek6mirror_Wheat'));
 is($pwdqc->reason, 'is the same as the old one');
 
@@ -33,5 +36,16 @@ is($pwdqc->reason, 'not enough different characters or classes for this length')
 
 ok(!$pwdqc->validate_password('%+whitehat'));
 is($pwdqc->reason, 'not enough different characters or classes for this length');
+
+ok(!$pwdqc->validate_password('hard apple cider bagel', undef, "hard apple"));
+is($pwdqc->reason, 'based on personal login information');
+
+ok(!$pwdqc->validate_password('hard apple cider bagel', undef, undef, "hard apple"));
+is($pwdqc->reason, 'based on personal login information');
+
+ok(!$pwdqc->validate_password('joke_river7Pale', undef, 'joke_river'));
+is($pwdqc->reason, 'based on personal login information');
+ok(!$pwdqc->validate_password('joke_river7Pale', undef, 'jane summon', scalar reverse 'joke_river'));
+is($pwdqc->reason, 'based on personal login information');
 
 done_testing;

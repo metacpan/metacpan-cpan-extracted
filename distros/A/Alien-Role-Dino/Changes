@@ -1,0 +1,13 @@
+Revision history for Alien-Role-Dino
+
+0.03      2017-08-04 15:07:43 -0400
+  - Add missing prereq Class::Method::Modifiers
+
+0.02      2017-08-01 14:31:11 -0400
+  - Renamed Alien-Role-Dino (was Alien-Base-Dino)
+  - Add Alien::Role::Dino
+  - Alien::Base::Dino now simply extends Alien::Base and consumes Alien::Role::Dino
+  - Alien::Base::Dino will be removed in the near future
+
+0.01      2017-07-25 21:59:03 -0400
+  - initial version

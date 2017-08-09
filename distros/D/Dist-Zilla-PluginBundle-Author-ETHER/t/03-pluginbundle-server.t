@@ -66,14 +66,12 @@ subtest "server = $_" => sub {
     SKIP: {
     my $server = $_;
 
-    skip('can only test server=github when in the local git repository', 4)
-        if $server eq 'github' and not (-d '.git' or -d '../../.git' or -d '../../../.git');
-
     my $tzil;
     my @warnings = warnings {
         $tzil = Builder->from_config(
             { dist_root => 'does-not-exist' },
             {
+                # tempdir_root => default
                 add_files => {
                     path(qw(source dist.ini)) => simple_ini(
                         'GatherDir',
@@ -91,6 +89,9 @@ subtest "server = $_" => sub {
             },
         );
     };
+
+    skip('can only test server=github when in the local git repository', 4)
+        if $server eq 'github' and not git_in_path($tzil->tempdir);
 
     if ($server eq 'github' or $server eq 'none')
     {

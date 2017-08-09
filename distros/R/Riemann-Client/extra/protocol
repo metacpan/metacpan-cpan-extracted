@@ -1,3 +1,9 @@
+// https://raw.githubusercontent.com/riemann/riemann-java-client/master/riemann-java-client/src/main/proto/riemann/proto.proto
+option java_package = "io.riemann.riemann";
+option java_outer_classname = "Proto";
+
+// Deprecated; state was used by early versions of the protocol, but not any
+// more.
 message State {
   optional int64 time = 1;
   optional string state = 2;
@@ -19,6 +25,7 @@ message Event {
   optional float ttl = 8;
   repeated Attribute attributes = 9;
 
+  optional int64 time_micros = 10;
   optional sint64 metric_sint64 = 13;
   optional double metric_d = 14;
   optional float metric_f = 15;

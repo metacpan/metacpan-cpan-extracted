@@ -1,7 +1,7 @@
 package App::BencherUtils;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2017-08-02'; # DATE
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -203,12 +203,14 @@ sub list_bencher_results {
     opendir my($dh), $dir or return [500, "Can't read result_dir `$dir`: $!"];
 
     # normalize
+    ## no critic (ControlStructures::ProhibitMutatingListFunctions)
     my $include_scenarios = [
         map {s!/!::!g; $_} @{ $args{include_scenarios} // [] }
     ];
     my $exclude_scenarios = [
         map {s!/!::!g; $_} @{ $args{exclude_scenarios} // [] }
     ];
+    ## use critic
 
     my %latest; # key = module+(module_startup)+cpu, value = latest row
     my @rows;
@@ -612,7 +614,7 @@ _
         },
         codes => {
             'x.name.is_plural' => 1,
-            'x.name.singular' => 'module',
+            'x.name.singular' => 'code',
             schema => ['array*', of=>'str*'],
             req => 1,
             pos => 0,
@@ -674,7 +676,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.22 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2017-07-13.
+This document describes version 0.23 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2017-08-02.
 
 =head1 SYNOPSIS
 

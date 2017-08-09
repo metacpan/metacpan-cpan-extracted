@@ -10,18 +10,19 @@ use 5.10.0;
 use strict;
 use warnings;
 
+use List::Util 1.26 qw(sum0);
 use Math::BigInt ();
 use Moo;
 use namespace::clean;
-use List::Util 1.26 qw(sum0);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-with 'MooX::Rebuild';
+with 'MooX::Rebuild';    # for ->rebuild a.k.a. clone
 
-has _next => ( is => 'rw', );
-has prev => ( is => 'rw', weak_ref => 1 );
+has extra => ( is => 'rw' );
+has _next => ( is => 'rw' );
+has prev  => ( is => 'rw', weak_ref => 1 );
 
 has set => (
     is     => 'rw',
@@ -93,6 +94,7 @@ sub levels {
     return $count;
 }
 
+# TODO could this instead be simplified with a trigger to set prev?
 sub next {
     my ( $self, $next ) = @_;
     if ( defined $next ) {
@@ -189,6 +191,11 @@ attribute I<must> be supplied.
 A read-only count of the beats in the B<set>. Updated when B<set>
 is changed.
 
+=item B<extra>
+
+Use this to stash anything extra you need to associate with an instance,
+e.g. a MIDI track, some other object, etc.
+
 =item B<is_silent>
 
 Boolean as to whether or not the callback function of B<recurse> will be
@@ -234,11 +241,12 @@ B<is_silent>) recursion will take place over. See also B<levels>.
 
 =item B<beatfactor>
 
-Lowest common multiple of the beats and sum of the beats such that the
+Least common multiple of the beats and sum of the beats such that the
 durations at each level of recursion work out to the same overall
 duration. Hopefully. Uses L<Math::BigInt> though downgrades that via
 B<numify>, so integers larger than what perl can handle internally may
-be problematic.
+be problematic. See I<duration> under L</CALLBACK> for how this
+information is exposed during recursion.
 
 =item B<levels>
 
@@ -269,15 +277,24 @@ allowed. Used internally by the B<set> attribute.
 
 =head1 CALLBACK
 
-The I<coderef> called during B<recurse> is passed four or more
-arguments. First, the C<Music::RecRhythm> object, second, a hash
-reference containing various parameters (listed below), third, I<extra>,
-a scalar that can be whatever you want it to be (reference, object,
-whatever) and fourth a list of the durations of the recursion stack
-where the last element of that list is the current C<$param{beat}>.
+The I<coderef> called during B<recurse> (only for not-silenced objects)
+is passed four or more arguments. First, the C<Music::RecRhythm> object,
+second, a hash reference containing various parameters (listed below),
+third, I<extra>, a scalar that can be whatever you want it to be
+(reference, object, whatever) and fourth a list of the durations of the
+recursion stack where the last element of that list is the current
+C<$param{beat}>.
 
-The parameters passed as the second argument (which are read-write
-(though probably should not be changed on the fly)) include:
+    $one->recurse(
+        sub {
+            my ( $rset, $param, $extra, @beats ) = @_;
+            ...
+        },
+        $this_is_passed_as_dollarextra
+    );
+
+The I<param> passed as the second argument (which are read-write (though
+probably should not be changed on the fly)) include:
 
 =over 4
 
@@ -293,8 +310,32 @@ The current beat, a member of the I<set> at the given I<index>.
 =item I<duration>
 
 A calculated duration based on the I<beat> and B<beatfactor> such that
-each B<next> object can be played entirely for each beat of the parent
-object without getting into fractional durations. Hopefully.
+each I<beat> in combination with the others of the set lasts the
+duration of the ancestor set. A fudge factor will likely be necessary to
+change the least common multiples to something suitable for MIDI
+durations:
+
+    $one->recurse(
+        sub {
+            my ( $rset, $param ) = @_;
+            my $duration = $param->{duration} * 128;
+            ...
+        },
+    );
+
+Another option is to multiply the current and ancestor C<@beats>
+together, again with a fudge factor:
+
+    use List::Util qw(reduce);
+    $one->recurse(
+        sub {
+            my ( $rset, $param, undef, @beats ) = @_;
+            my $duration = reduce { $a * $b } @beats, 128;
+            ...
+        },
+    );
+
+though this may produce different results and adds work.
 
 =item I<index>
 
@@ -372,6 +413,9 @@ under this module's distribution for example code.
 
 L<Music::Voss> is a similar if different means of changing a rhythm
 over time.
+
+Various scripts under L<https://github.com/thrig/compositions> use this
+module, in particular "Three Levels of the Standard Pattern".
 
 "The Geometry of Musical Rhythm" by Godfried T. Toussaint.
 

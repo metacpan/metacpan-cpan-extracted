@@ -16,6 +16,7 @@ build_requires:
 configure_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::MSYS: '0.84'
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
@@ -33,5 +34,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-automake/issues
   homepage: https://metacpan.org/pod/Alien::automake
   repository: git://github.com/plicease/Alien-automake.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'YAML::Tiny version 1.70'

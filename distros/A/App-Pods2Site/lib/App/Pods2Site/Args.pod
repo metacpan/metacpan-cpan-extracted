@@ -222,7 +222,7 @@ like paths listed in PERL5LIB etc.
 
 =back
 
-=item B<--group E<lt>name=queryE<gt>>
+=item B<--group E<lt>name[=query]E<gt>>
 
 The pods may be separated into groups. By default a grouping loosely similar to an ActivePerl installation
 will be used, e.g. 'Core', 'Scripts', 'Pragmas' and 'Other modules'.
@@ -234,11 +234,15 @@ Any number of groups can be specified, and the query will be able to use fields 
 
 =item * type
 
-Contains a value of either 'bin' or 'lib', for pods found in the bin directories or lib directories.
+Contains a value of either 'bin', 'lib', for pods found in the bin, lib directories.
+
+Pods found in root or 'pods::' using 'perl' as prefix gets a value of 'corepod'.
 
 =item * name
 
 The package name for the pod.
+
+NOTE: pods::perlxxx will be placed in the root as 'perlxxx'.
 
 =item * path
 
@@ -251,7 +255,8 @@ the queries must implement that (see the default group queries for examples).
 
 A common situation is to add a group with 'favourites', but keep the default grouping. Just place your own group(s)
 first and then add a '--group :std' for automatically filling in all the others. For a bit more control, each of the
-groups in ':std' can be used separately, e.g. as ':std-core'.
+groups in ':std' can be used separately, e.g. as ':std-core'. If this is not sufficient, customize all options with
+help from below.
  
 The groups will maintain the order given.
 
@@ -261,15 +266,15 @@ Available internal groups:
 
 =item * :std-core
 
-Generally the pods named 'perlxxx' (in top and pods:: namespace).
+The pods in the 'pods::' namespace.
 
 Corresponds to the query:
 
-  type.eq(lib) && name.regexp{^(?:pods::)?perl}
+  type.eq(corepod)
 
 =item * :std-scripts
 
-All pods found in the bin directories, plus the 'pp' module.
+All pods found in the bin directories, plus the 'pp' module as it documents the 'pp' script.
 
 Corresponds to the query:
 
@@ -283,11 +288,7 @@ Corresponds to the query:
 
   type.eq(lib) &&
     name.regexp{^[a-z]} &&
-    NOT
-        (
-            name.regexp{^(?:pods::)?perl} ||
-            name.eq(pp)
-        )
+    NOT name.eq(pp)
 
 =item * :std-modules
 
@@ -297,8 +298,8 @@ Corresponds to the query:
 
   NOT
     (
-        type.eq(bin) ||
-        name.regexp{^(?:pods::)?perl} ||
+    	type.eq(bin) ||
+    	type.eq(corepod) ||
         name.eq(pp) ||
         name.regexp{^[a-z]}
     )

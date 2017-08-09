@@ -2,7 +2,7 @@
 
 makepp_perl_performance -- How to make Perl faster
 
-=for vc $Id: perl_performance.pod,v 1.11 2012/06/09 20:36:20 pfeiffer Exp $
+=for vc $Id: perl_performance.pod,v 1.13 2014/07/08 22:37:36 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -14,8 +14,8 @@ has been put into optimizing it.  This documents some general things we have
 found.  Currently the concrete tests leading to these results have mostly been
 discarded, but I plan to gradually add them.
 
-If you are looking at how to speedup makepp (beyond the Perl code you put into
-your makefiles), look at L<makepp_speedup>.  This page is completely
+If you are looking at how to speedup makepp (beyond the Perl programming you
+put into your makefiles), look at L<makepp_speedup>.  This page is completely
 independent of makepp, only intended to make our results available to the Perl
 community.  Some of these measures are common sence, but you sometimes forget
 them.  Others need measuring to believe them, so:
@@ -173,7 +173,7 @@ here:
 
     my $i = 0; our %a = map +($i++, $_), "a".."j"; timethis -10, sub { $b = $a{int rand 10} }
                our @a = "a".."j";                  timethis -10, sub { $b = $a[rand 10] }
- 
+
     my $i = 0;  my %a = map +($i++, $_), "a".."j"; timethis -10, sub { $b = $a{int rand 10} }
                 my @a = "a".."j";                  timethis -10, sub { $b = $a[rand 10] }
 
@@ -230,7 +230,7 @@ can still query it as a boolean.
 
     my %x; $x{$_} = 0   for 0..999_999; system "ps -ovsz $$"
     my %x; undef $x{$_} for 0..999_999; system "ps -ovsz $$"
- 
+
     my @x = (0) x 999_999;     system "ps -ovsz $$"
     my @x = (undef) x 999_999; system "ps -ovsz $$"
 

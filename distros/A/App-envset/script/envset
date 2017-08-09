@@ -1,0 +1,385 @@
+#!perl
+
+our $DATE = '2017-08-06'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+# IFUNBUILT
+# use strict;
+# use warnings;
+# END IFUNBUILT
+
+use Getopt::Long::EvenLess;
+
+my %Opts = (
+    config_dirs      => ["$ENV{HOME}/.config", $ENV{HOME}, "/etc"],
+    config_filenames => [".envsetrc", "envsetrc"],
+    config_paths     => [],
+    action => 'run',
+    variables => {},
+);
+my $Config;
+
+sub get_options {
+    GetOptions(
+        'help|h|?' => sub {
+            print <<'_';
+envset - Run a command with sets of environment variables
+
+Usage:
+  envset [OPTS] <SET-SPEC> <CMD> [CMD_ARGS]...
+  envset --help (-h, -?)
+  envset --version (-v)
+
+Options:
+  --config-path=file, -c   Specify path for ~/.envsetrc (multiple allowed)
+  --list, -l               List available sets
+  --dump, -d               Dump the env variables instead of running command
+
+See documentation for more details.
+_
+                exit 0;
+        },
+        'version|v' => sub {
+# IFUNBUILT
+#             no warnings 'once';
+# END IFUNBUILT
+            print "envset version " . ($main::VERSION || "dev") . "\n";
+            exit 0;
+        },
+        'config-path|c=s' => sub {
+            die "envset: No such configuration file '$_[1]'\n" unless -f $_[1];
+            push @{ $Opts{config_paths} }, $_[1];
+        },
+        'list|l' => sub {
+            $Opts{action} = 'list';
+        },
+        'dump|d' => sub {
+            $Opts{action} = 'dump';
+        },
+        'variable|V=s' => sub {
+            $_[1] =~ /(.+?)=(.*)/ or
+                die "Invalid syntax in --variable (-V), please use VAR=VALUE\n";
+            $Opts{variables}{$1} = $2;
+        },
+    );
+}
+
+sub read_config {
+    require Config::IOD::Reader;
+
+    my @files;
+    my $a_file_found;
+
+    if (@{ $Opts{config_paths} }) {
+        @files = @{ $Opts{config_paths} };
+    } else {
+        for my $dir (@{ $Opts{config_dirs} }) {
+            for my $file (@{ $Opts{config_filenames} }) {
+                push @files, "$dir/$file";
+            }
+        }
+    }
+    my $iod = Config::IOD::Reader->new(
+        enable_expr => 1,
+        expr_vars => $Opts{variables},
+    );
+    for my $file (@files) {
+        next unless -f $file;
+        my $hoh = $iod->read_file($file);
+        $a_file_found++;
+        # merge replace with existing config
+        for my $section (keys %$hoh) {
+            $Config->{$section} ||= {};
+            my $hash = $hoh->{$section};
+            for my $param (keys %$hash) {
+                $Config->{$section}{$param} = $hash->{$param};
+            }
+        }
+    }
+
+    die "No configuration files found, please set ~/.envsetrc first\n"
+        unless $a_file_found;
+}
+
+sub run {
+    read_config();
+    if ($Opts{action} eq 'list') {
+        for (sort keys %$Config) {
+            next if $_ eq 'GLOBAL';
+            print "$_\n";
+        }
+        exit 0;
+    }
+
+    die "envset: Please specify set-spec\n" unless @ARGV;
+    my $spec0 = shift @ARGV;
+
+    my %env;
+    my @spec;
+    while ($spec0 =~ /(\s*\|\s*)?([^|]+)/g) {
+        push @spec, [$1, $2];
+    }
+    @spec or die "envset: Invalid set-spec '$spec0'\n";
+    for my $spec (@spec) {
+        my ($sym, $section) = @$spec;
+        my $envs = $Config->{$section}
+            or die "envset: Unknown set '$section'\n";
+        for my $env (keys %$envs) {
+            my $val = $envs->{$env};
+            if (ref $val eq 'ARRAY') {
+                $env{$env} ||= [];
+                push @{ $env{$env} }, @$val;
+            } else {
+                $env{$env} = $val;
+            }
+        }
+    }
+    # stringify
+    for my $env (keys %env) {
+        if (ref $env{$env} eq 'ARRAY') {
+            $env{$env} = join " ", @{ $env{$env} };
+        }
+    }
+
+    if ($Opts{action} eq 'dump') {
+        no warnings 'uninitialized';
+        for my $env (sort keys %env) {
+            print "$env=$env{$env}\n";
+        }
+        exit 0;
+    }
+
+    die "envset: Please specify command\n" unless @ARGV;
+    for my $env (keys %env) {
+        $ENV{$env} = $env{$env};
+    }
+    exec @ARGV;
+}
+
+### main
+
+get_options();
+run();
+
+# ABSTRACT: Run command with sets of environment variables
+# PODNAME: envset
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+envset - Run command with sets of environment variables
+
+=head1 VERSION
+
+This document describes version 0.002 of envset (from Perl distribution App-envset), released on 2017-08-06.
+
+=head1 SYNOPSIS
+
+First, define sets of environment variables in F<~/.envsetrc>. For example:
+
+ [production]
+ DB_HOST=myapp.example.com
+ DB_NAME=myapp
+ DB_USER=myapp
+ DB_PASS=some-long-pazzword
+
+ [dev]
+ DB_HOST=127.0.0.1
+ DB_NAME=myapp
+ DB_USER=myapp
+ DB_PASS=secret123
+
+ [debug]
+ TRACE=1
+ PERL5OPT=["-d:Confess"] ; enable stack trace
+
+ [lg-cs-firenze]
+ PERL5OPT=["-MLog::ger::Screen::ColorScheme::Firenze"]
+
+ [lg-cs-aspirinc]
+ PERL5OPT=["-MLog::ger::Screen::ColorScheme::AspirinC"]
+
+ [lg-cs-unlike]
+ PERL5OPT=["-MLog::ger::Screen::ColorScheme::Unlike"]
+
+To list available environment variable sets defined in F<~/.envsetrc> (basically
+equivalent to listing all the IOD/INI sections in the configuration file):
+
+ % envset -l
+
+To run a command with the C<production> set:
+
+ % envset production -- myscript.pl --script-opt blah --another-opt
+
+To run a command with a union set of two or more sets:
+
+ % envset 'production|lg-cs-unlike' -- myscript.pl ...
+ % envset 'dev | debug | lg-cs-unlike' -- myscript.pl ...
+
+=head1 DESCRIPTION
+
+The B<envset> utility runs a command with sets of environment variables. The
+environment variable sets are defined in the connfiguration file (by default
+will be searched in F<~/.config/.envsetrc>, F<~/.envsetrc>, and
+F</etc/envsetrc>).
+
+The configuration file is in L<IOD> format, which is INI with a few extra
+features. A set is written as an INI section while environment variable is
+written as an INI parameter:
+
+ [set1]
+ VAR1=value
+ VAR2=another value
+
+IOD allows specifying an array using this syntax:
+
+ [set1]
+ VAR1=first-element-value
+ VAR2=second-element-value
+
+or (better yet) this syntax which uses JSON:
+
+ [set1]
+ VAR1=["first-element-value","second-element-value"]
+
+When setting the actual environment variable, all the elements of the array will
+be joined with a single space:
+
+ VAR1=first-element-value second-element-value
+
+IOD can also merge sections, include of other files, and do a few more tricks. I
+recommend you to read the documentation.
+
+To run a command with a set of environment variables, specify the set name as
+the first argument to B<envset>. The rest of the arguments will be assumed as
+command name to run along with its arguments. To prevent B<envset> from further
+parsing its own options, pass C<--> first after the first argument:
+
+ % envset setname -- cmd arg --options ...
+
+Instead of a single set name, a union of set names is allowed:
+
+ % envset 'set1|set2' ...
+ % envset 'set1 | set2 | set3' ...
+
+Note that you need to quote or escape the pipe (C<|>) character to prevent the
+shell from interpreting it.
+
+=head1 TIPS
+
+If you just want a shortcut for frequently used environment variables, you can
+use shell aliases, e.g.:
+
+ alias pg=PAGE_RESULT=1
+ alias dbg="LOG=1 TRACE=1 PERL5OPT=-MLog::ger::App"
+
+and then:
+
+ % pg lcpan mods -n cpan rel
+ % dbg myapp --arg1 --arg2 val --arg3
+
+is equivalent to:
+
+ % PAGE_RESULT=1 lcpan mods -n cpan rel
+ % LOG=1 TRACE=1 PERLOPT=-MLog::ger::App dbg myapp --arg1 --arg2 val --arg3
+
+L<envset> gives you dedicated configuration files and the ability to
+union sets.
+
+=head1 OPTIONS
+
+=head2 --dump, -d
+
+Instead of running command, dump the environment variables to be set.
+
+=head2 --list, -l
+
+List all available environment variable sets (~ INI sections) in the
+configuration file.
+
+=head2 --variables, -V
+
+Set variable to be used in expression. Expression is a value encoding in L<IOD>
+which allows you to use some simple expressions to calculate the parameter
+value, for example:
+
+ [section]
+ DEBUG=1
+ PERL5OPT=!e "-MLog::ger::Screen::ColorSheme::" . $cs . " -MLog::ger::Output::$out -MSome::Module=debug," . val('DEBUG')
+
+When you run B<envset> with:
+
+ % envset -V cs=AspirinC -V out=Screen section --dump
+
+you'll get:
+
+ DEBUG=1
+ PERL5OPT=-MLog::ger::Screen::ColorScheme::AspirinC -MLog::ger::Output::Screen -MSome::Module=debug,1
+
+To refer to other parameters in the configuration file, use:
+
+ val('DEBUG')
+ val('section2.FOO')
+
+To refer to a variable which will be supplied by C<-V>, use:
+
+ $varname
+
+=head1 FILES
+
+F<~/.config/.envsetrc>
+
+F<~/.envsetrc>
+
+F</etc/envsetrc>
+
+=head1 TODO
+
+Also allow unsetting sets of environment variables (which can also be done, in
+most cases, by C<VAR=>).
+
+Document the syntax to subtract/undefine.
+
+Tab completion.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-envset>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-envset>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-envset>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+A similar npm package L<https://www.npmjs.com/package/envset>. The usage and
+configuration syntax is almost identical with the following differences: 1) our
+startup is a bit better :-) 2) we use L<IOD> for configuration format which is
+INI with some extra features like merging, specifying array/hash, expressions &
+variables; 3) we have options like C<--config-path>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,4 +1,9 @@
 Revision history for InfluxDB-HTTP
 
+0.02    UNRELEASED
+        - Support precision= parameter in write (nicolai.langfeldt@broadnet.no).
+        - Support retention_policy parameter in write.
+        - Expose HTTP::Response in returned results.
+
 0.01    2016-05-27
-        First version, released on an unsuspecting world. Still some rough edges.
+        - First version, released on an unsuspecting world. Still some rough edges.

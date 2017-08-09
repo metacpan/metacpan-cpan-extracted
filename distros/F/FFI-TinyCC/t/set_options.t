@@ -1,11 +1,8 @@
-use strict;
-use warnings;
+use Test2::V0 -no_srand => 1;
 use FindBin;
-use Test::More tests => 3;
 use FFI::TinyCC;
-use Path::Class qw( file dir );
 
-my $inc = dir($FindBin::Bin, 'c');
+my $inc = "$FindBin::Bin/c";
 
 my $options = "-I$inc -L$inc -DFOO=22";
 
@@ -29,3 +26,5 @@ main(int argc, char *argv[])
 is $@, '', 'tcc.compile_string';
 
 is $tcc->run, 22, 'tcc.run';
+
+done_testing;

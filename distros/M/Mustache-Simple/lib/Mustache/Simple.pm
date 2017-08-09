@@ -8,10 +8,10 @@ use experimental qw(switch);
 use version;
 
 # Don't forget to change the version in the pod
-our $VERSION = version->declare('v1.3.5');
+our $VERSION = version->declare('v1.3.6');
 
 use File::Spec;
-use Mustache::Simple::ContextStack v1.3.5;
+use Mustache::Simple::ContextStack v1.3.6;
 use Scalar::Util qw( reftype );
 
 use Carp;
@@ -30,7 +30,7 @@ See L<http://mustache.github.com/>.
 
 =head1 VERSION
 
-This document describes Mustache::Simple version 1.3.5
+This document describes Mustache::Simple version 1.3.6
 
 =head1 SYNOPSIS
 
@@ -91,6 +91,9 @@ the value will be the return from the method call (with no parameters).
 If C<< $object->can(item) >> returns C<undef>, the object will be treated
 as a hash and the value looked up directly. See L</MANAGING OBJECTS> below.
 
+As of version 1.3.6, if a method call on a blessed object returns an array,
+a C<{{#item}}> section will iterate over the array. This also works
+recursively, so a method can return an array of objects.
 
 =head2 Rationale
 
@@ -374,9 +377,17 @@ sub resolve
                     $txt = $self->resolve(undef, @dots);
                 }
                 else {
-                    $txt = $self->find($tag->{txt});    # get the entry from the context
-                }
-                given (reftype $txt)
+		    # wantarray!!!
+		    my @ret = $self->find($tag->{txt});    # get the entry from the context
+		    if (scalar @ret == 0) {
+			$txt = undef;
+		    } elsif (scalar @ret == 1) {
+			$txt = $ret[0];
+		    } else {
+			$txt = \@ret;
+		    }
+		}
+		given (reftype $txt)
                 {
                     when ('ARRAY') {    # an array of hashes (hopefully)
                         $result .= $self->resolve($_, @subtags) foreach @$txt;

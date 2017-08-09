@@ -2,6 +2,16 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/chemistry-elements"><img src="https://travis-ci.org/briandfoy/chemistry-elements.svg?branch=master"></a>
+
+=for HTML <a href="https://ci.appveyor.com/project/briandfoy/chemistry-elements"><img src="https://ci.appveyor.com/api/projects/status/cct1bt7w2peyqcr8/branch/master?svg=true"></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/chemistry-elements?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/chemistry-elements/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/chemistry-elements/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Chemistry::Elements.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Chemistry::Elements"><img src="https://img.shields.io/cpan/v/Chemistry::Elements.svg" /></A>
+
 =head1 The Chemistry::Elements module
 
 This is the I<README> for the L<Chemistry::Elements> Perl module.

@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002004';
+our $VERSION = '0.002007';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -770,8 +770,11 @@ sub _compose_field {
 
     # Is it type-checked???
     my $TYPE_SETUP = q{};
+    my $TYPE_VALIDATOR = q{};
     if ($type) {
-        $TYPE_SETUP = qq[ :Type( sub { state \$check = Dios::Types::validator_for(q{$container_type}, 'Value (%s) for $sigil$name attribute', $constraint ); \$check->(shift); } ) ];
+        state $validator_num = 0; $validator_num++;
+        $TYPE_VALIDATOR = qq[ { no warnings; \$Dios::_internal::attr_validator_$validator_num = Dios::Types::validator_for(q{$container_type}, 'Value (%s) for $sigil$name attribute', $constraint ); } ];
+        $TYPE_SETUP = qq[ :Type( sub{ \$Dios::_internal::attr_validator_$validator_num->(shift) }) ];
     }
 
     # Define accessors...
@@ -830,7 +833,7 @@ sub _compose_field {
     }
 
     # Return the converted syntax...
-    return qq{my \@_Dios__attr_$name : Field $access $delegators $init $TYPE_SETUP; $INIT_FUNC; };
+    return qq{ $TYPE_VALIDATOR my \@_Dios__attr_$name : Field $access $delegators $init $TYPE_SETUP; $INIT_FUNC; };
 }
 
 # Convert a typed lexical variable...
@@ -1252,7 +1255,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002004
+This document describes Dios version 0.002007
 
 
 =head1 SYNOPSIS

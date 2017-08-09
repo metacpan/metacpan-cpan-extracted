@@ -600,6 +600,18 @@ C<spawn $coderef>
 
 =back
 
+=item *
+
+Notes :
+
+=over 8
+
+=item -
+
+C<< exit => 'threads_only' >> is passed to C<< threads->import >>.
+
+=back
+
 =back
 
 =cut
@@ -644,7 +656,9 @@ sub init_threads {
   die "$test_module was loaded too soon" if defined $test_module;
  }
 
- load_or_skip_all 'threads',         $force ? '0' : '1.67', [ ];
+ load_or_skip_all 'threads',         $force ? '0' : '1.67', [
+  exit => 'threads_only',
+ ];
  load_or_skip_all 'threads::shared', $force ? '0' : '1.14', [ ];
 
  diag "Threads testing forced by \$ENV{$force_var}" if $force;

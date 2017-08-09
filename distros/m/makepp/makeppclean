@@ -1,5 +1,5 @@
-#!/usr/bin/perl -w
-# $Id: makeppclean,v 1.22 2012/05/23 18:30:17 pfeiffer Exp $
+#!/usr/bin/env perl
+# $Id: makeppclean,v 1.27 2016/09/12 20:34:11 pfeiffer Exp $
 
 package Mpp;
 
@@ -36,7 +36,7 @@ BEGIN {
 				# See if we can find ourselves in the path.
     foreach( split( /:/, $ENV{'PATH'} ), '.' ) {
 				# Add '.' to the path in case the user is
-				# running it with "perl makepp" even if
+				# running it with "perl makeppclean" even if
 				# . is not in his path.
       if( -d "$_/Mpp" ) {	# Found something we need?
 	$datadir = $_;
@@ -44,10 +44,11 @@ BEGIN {
       }
     }
   }
-  $datadir or die "makepp: can't find library files\n";
+  $datadir or die "makeppclean: can't find library files\n";
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 #@@
   unshift @INC, $datadir;
 }
@@ -68,40 +69,13 @@ sub print_msg {
     print STDERR $str_to_print;
   }
 }
-sub print_error {
-  print STDERR "$Mpp::progname: error: ";
-  &print_msg;
-}
 
-sub print_warning {
-  print STDERR "$Mpp::progname: warning: ";
-  &print_msg;
-}
 sub print_log {
   &print_msg if $verbose;
 }
 
 my $n_files_removed = 0;
 my $recurse;
-
-sub perform(&) {
-  my $code = $_[0];
-  eval { &$code; };
-
-  if ($@) {			# Did we die() somehow?
-    print_error $@;		# Print the error message.
-    close STDOUT; close STDERR;	# Flush these too, or else we'll have problems.
-    exit 1;
-  }
-
-  if( $verbose ) {
-    print "$Mpp::progname: $n_files_removed file" . ($n_files_removed == 1 ? '' : 's') . " removed\n";
-  } elsif( !$n_files_removed ) {
-    print "$Mpp::progname: no files removed\n";
-  }
-
-  exit 0;
-}
 
 my @info_strings;		# Our deletion criteria.
 my @deletable;			# Files must be first remembered for deletion,
@@ -177,7 +151,7 @@ sub remove_contents_if_built {
   }
 }
 
-perform {
+eval {
   Mpp::Text::getopts
     ['b', qr/(?:only[-_]?)?(?:build[-_]?)?cache[-_]?(?:link|file)s/, undef, 0,
      sub { push @info_strings, 'LINKED_TO_CACHE' }],
@@ -199,7 +173,7 @@ perform {
     splice @Mpp::Text::common_opts;
 
   if( $meta && $keep_src_info ) {
-    print_error "-m|--only-meta contradicts -k|--keep-src-info";
+    print_msg "error: -m|--only-meta contradicts -k|--keep-src-info";
     exit 1;
   }
 
@@ -229,6 +203,19 @@ perform {
     rmtree relative_filename $_;
   }
 };
+if ($@) {			# Did we die() somehow?
+  print_msg 'error: ', $@;		# Print the error message.
+  close STDOUT; close STDERR;	# Flush these too, or else we'll have problems.
+  exit 1;
+}
+
+if( $verbose ) {
+  print "$Mpp::progname: $n_files_removed file" . ($n_files_removed == 1 ? '' : 's') . " removed\n";
+} elsif( !$n_files_removed ) {
+  print "$Mpp::progname: no files removed\n";
+}
+
+exit 0;
 
 __DATA__
 [option ...] [path ...]

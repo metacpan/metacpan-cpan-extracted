@@ -53,8 +53,9 @@ sub serve_cb {
     my $c = shift;
     my $checksum = $c->stash('checksum');
     if (($c->req->headers->accept_encoding // '') =~ /gzip/i && (my $asset = $self->{by_checksum}{$checksum})) {
-      #~ warn "GZIP!", $c->dumper($c->req->headers);
-      my $checksum_gzip = checksum($asset->url.'.gzip');
+      #~ warn "serve_cb", $c->dumper($asset);
+      my $cfconfig=$self->config->{CombineFile} || {};
+      my $checksum_gzip = checksum($asset->url.($cfconfig->{version} || '').'.gzip');
       $asset = $self->{by_checksum}{$checksum_gzip}
         and $c->res->headers->content_encoding('gzip')
         and $self->store->serve_asset($c, $asset)
@@ -92,11 +93,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 1.401
+Version 1.451 (test on base Mojolicious::Plugin::AssetPack v1.145)
 
 =cut
 
-our $VERSION = '1.401';
+our $VERSION = '1.451';
 
 
 =head1 SYNOPSIS

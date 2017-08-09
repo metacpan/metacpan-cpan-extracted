@@ -1,5 +1,9 @@
 Revision history for Perl extension Algorithm::Permute.
 
+0.16  Aug 3 2017
+    - Really use ppport.h
+    - Skip 'Can't goto out' test on Perl <= 5.8.8
+
 0.15  Jul 11 2017
     - Fixed RT#122432 
     - C90 compatibility.
@@ -50,19 +54,19 @@ Revision history for Perl extension Algorithm::Permute.
     - test.pl extended with eval and mem leak tests
 
 0.05  May 16 2003
-	- Added -DPERL_EXT to legalise use of perl-5.9.0's cxinc
-	- Uses PAD_SET_CUR macro when defined, this fixes problem with invalid pad in 5.9.0
+    - Added -DPERL_EXT to legalise use of perl-5.9.0's cxinc
+    - Uses PAD_SET_CUR macro when defined, this fixes problem with invalid pad in 5.9.0
 
 0.04  Mar 6 2002
-	- Fixed cross-compiler compatibility problem in the callback hack, by Robin
+    - Fixed cross-compiler compatibility problem in the callback hack, by Robin
 
 0.03  Sep 5 2001
-	- Added callback interface by Robin Houston
-	- Fixed bogus benchmark
+    - Added callback interface by Robin Houston
+    - Fixed bogus benchmark
 
 0.02  Sep 2 2000
-	- Major interface changes. Now object-oriented
+    - Major interface changes. Now object-oriented
 
 0.01  Fri Sep  1 18:05:17 2000
-	- original version; created by h2xs 1.19
+    - original version; created by h2xs 1.19
 

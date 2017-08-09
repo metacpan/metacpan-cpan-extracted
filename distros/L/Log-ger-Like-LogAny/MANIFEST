@@ -11,5 +11,6 @@ lib/Log/ger/Like/LogAny.pm
 lib/Log/ger/Plugin/LogAny.pm
 t/00-compile.t
 t/01-basic.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

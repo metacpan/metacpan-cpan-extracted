@@ -138,6 +138,10 @@ t/Tests/7_condDir_9.input
 t/Tests/7_condDir_9.want
 t/Tests/8_test_1.input
 t/Tests/8_test_1.want
+t/Tests/9_test_1.input
+t/Tests/9_test_1.want
+t/Tests/9_test_1.s1.want
+t/Tests/9_test_1.s2.want
 t/Examples/Hacks
 t/Examples/README
 t/Examples/tam1

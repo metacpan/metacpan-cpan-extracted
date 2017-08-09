@@ -10,13 +10,13 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = ();
 our @EXPORT    = ();
 
-use JSON::XS;
+use JSON::MaybeXS;
 use LWP::UserAgent;
 use Method::Signatures;
 use Object::Result;
 use URI;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 method new ($class: Str :$host = 'localhost', Int :$port = 8086) {
     my $self = {
@@ -43,6 +43,7 @@ method ping {
     if (! $response->is_success()) {
         my $error = $response->message();
         result {
+                raw    { return $response; }
                 error  { return $error; }
                 <STR>  { return "Error pinging InfluxDB: $error"; }
                 <BOOL> { return; }
@@ -51,6 +52,7 @@ method ping {
 
     my $version = $response->header('X-Influxdb-Version');
     result {
+            raw     { return $response; }
             version { return $version; }
             <STR>   { return "Ping successful: InfluxDB version $version"; }
             <BOOL>  { return 1; }
@@ -73,46 +75,59 @@ method query (Str|ArrayRef[Str] $query!, Str :$database, Int :$chunk_size, Str :
 
     my $response = $self->{lwp_user_agent}->post($uri->canonical());
 
+    chomp(my $content = $response->content());
+
+    my $data = decode_json($content);
+
     if (! $response->is_success()) {
-        my $error = $response->message();
         result {
-            error  { return $error; }
-            <STR>  { return "Error executing query: $error"; }
+            raw    { return $response; }
+            error  { return $data; }
+            <STR>  { return "Error executing query: $data->{error}"; }
             <BOOL> { return; }
         }
     }
 
-    my $data = decode_json($response->content());
-
     result {
+        raw         { return $response; }
         data        { return $data; }
         results     { return $data->{results}; }
         request_id  { return $response->header('Request-Id'); }
-        <STR>       { return 'Returned data: '.$response->content(); }
+        <STR>       { return "Returned data: $content"; }
         <BOOL>      { return 1; }
     }
 }
 
-method write (Str|ArrayRef[Str] $measurement!, Str :$database) {
+method write (Str|ArrayRef[Str] $measurement!, Str :$database!, :$precision where { (!$_) || ($_ =~ /^(h|m|s|ms|u|ns)$/) }, Str :$retention_policy) {
     if (ref($measurement) eq 'ARRAY') {
         $measurement = join("\n", @$measurement);
     }
 
     my $uri = $self->_get_influxdb_http_api_uri('write');
-    $uri->query_form(db => $database) if (defined $database);
+
+    $uri->query_form(
+        db => $database,
+        ($precision ? (precision => $precision) : ()),
+        ($retention_policy ? (rp => $retention_policy) : ())
+    );
 
     my $response = $self->{lwp_user_agent}->post($uri->canonical(), Content => $measurement);
 
+    chomp(my $content = $response->content());
+
     if ($response->code() != 204) {
-        my $error = $response->message();
+        my $data = decode_json($content);
+
         result {
-            error  { return $error; }
-            <STR>  { return "Error executing write $error"; }
+            raw    { return $response; }
+            error  { return $data; }
+            <STR>  { return "Error executing write: $data->{error}"; }
             <BOOL> { return; }
         }
     }
 
     result {
+        raw    { return $response; }
         <STR>  { return "Write successful"; }
         <BOOL> { return 1; }
     }
@@ -139,7 +154,7 @@ InfluxDB::HTTP - The Perl way to interact with InfluxDB!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -173,6 +188,9 @@ attribute C<error>:
     my $ping = $influx->ping();
     print $ping->error unless ($ping);
 
+Furthermore, all result objects provide access to the C<HTTP::Response> object that is returned
+by InfluxDB in the attribute C<raw>.
+
 =head2 new host => 'localhost', port => 8086
 
 Passing C<host> and/or C<port> is optional, defaulting to the InfluxDB defaults.
@@ -205,15 +223,20 @@ hash. Additionally the attribute C<request_id> provides the request identifier a
 the HTTP reponse headers by InfluxDB. This can for example be useful for correlating
 requests with log files.
 
-=head2 write measurement, database => "DATABASE"
+=head2 write measurement, database => "DATABASE", precision => "ns", retention_policy => "RP"
 
 Writes data into InfluxDB. The parameter C<measurement> can either be a String or an
 ArrayRef of Strings, where each String contains one valid InfluxDB LineProtocol
 statement. All of those mesaurements are then sent to InfluxDB and the specified
-database.
+database. The returned object evaluates to true if the write was successful, and otherwise
+to false.
 
-The returned object evaluates to true if the write was successful, and otherwise to
-false.
+The optional argument precision can be given if a precsion different than "ns" is used in
+the line protocol. InfluxDB docs suggest that using a coarser precision than ns can save
+space and processing. In many cases "s" or "m" might do.
+
+The optional argument retention_policy can be used to specify a retention policy other than
+the default retention policy of the selected database.
 
 =head2 get_lwp_useragent
 
@@ -222,7 +245,7 @@ Returns the internally used LWP::UserAgent instance for possible modifications
 
 =head1 AUTHOR
 
-Raphael Seebacher, C<< <raphael at seebachers.ch> >>
+Raphael Seebacher, C<< <raphael@seebachers.ch> >>
 
 =head1 BUGS
 
@@ -231,12 +254,26 @@ L<https://github.com/raphaelthomas/InfluxDB-HTTP/issues>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Raphael Seebacher.
+MIT License
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Copyright (c) 2016 Raphael Seebacher
 
-See L<http://dev.perl.org/licenses/> for more information.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut

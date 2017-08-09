@@ -1,5 +1,5 @@
 package Mercury::Controller::PubSub;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Pub/sub message pattern controller
 
 #pod =head1 SYNOPSIS
@@ -14,7 +14,7 @@ our $VERSION = '0.012';
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This controller enables a L<pub/sub pattern|Mercury::Pattern::PubSub> on
+#pod This controller enables a L<pubE<sol>sub pattern|Mercury::Pattern::PubSub> on
 #pod a pair of endpoints (L<publish|/publish> and L<subscribe|/subscribe>.
 #pod
 #pod For more information on the pub/sub pattern, see L<Mercury::Pattern::PubSub>.
@@ -125,7 +125,7 @@ Mercury::Controller::PubSub - Pub/sub message pattern controller
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ version 0.012
 
 =head1 DESCRIPTION
 
-This controller enables a L<pub/sub pattern|Mercury::Pattern::PubSub> on
+This controller enables a L<pubE<sol>sub pattern|Mercury::Pattern::PubSub> on
 a pair of endpoints (L<publish|/publish> and L<subscribe|/subscribe>.
 
 For more information on the pub/sub pattern, see L<Mercury::Pattern::PubSub>.

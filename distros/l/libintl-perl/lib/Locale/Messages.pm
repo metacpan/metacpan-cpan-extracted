@@ -22,12 +22,18 @@ package Locale::Messages;
 
 use strict;
 
+use File::Spec;
+
 use vars qw ($package @EXPORT_OK %EXPORT_TAGS @ISA $VERSION);
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 # Try to load the C version first.
 $package = 'gettext_xs';
+
+# Do not load from current working directory.
+local @INC = grep { File::Spec->file_name_is_absolute($_) } @INC;
+
 eval <<'EOF';
 require Locale::gettext_xs; 
 my $version = Locale::gettext_xs::__gettext_xs_version();

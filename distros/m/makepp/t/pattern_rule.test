@@ -3,7 +3,7 @@
 eval { makepp 'abc.inaa' } and die;
 eval { makepp 'a.xaa' } and die;
 makepp;
-###	92	644	1175559408	1181906278	Makeppfile
+###	92	644	1175559408	1374262865	Makeppfile
 #
 # This makeppfile tests pattern rules.
 #
@@ -35,9 +35,9 @@ a.y b.y :
 	&cat $^ -o>>$@
 
 #
-# A pattern rule that overrides another pattern rule:
+# A pattern rule that overrides another pattern rule and embeds % in a function:
 #
-x%.out2: x%.out
+x%.out2: $(subst X,x,X%.out)
 	&echo $@ -o $@
 	&echo "(File $@ is another exception.)" -o>>$@
 	&cat $^ -o>>$@
@@ -171,3 +171,39 @@ rich, creamy goodness
 29 1 0
 ###	1	444	1175559408	1104356247	answers/xyz.lc
 xyz
+###	35	664	1374263240	1374263240	answers/xyz.out2
+xyz.out2
+(File xyz.out2 is another exception.)
+xyz.out
+(File xyz.out is an exception.)
+xyz
+suba/a.out
+a
+suba/subb/b.out
+b
+subc/c.out
+c
+suba/a.out
+a
+suba/subb/b.out
+b
+subc/c.out
+c
+suba/a.out
+a
+suba/subb/b.out
+b
+subc/c.out
+c
+suba/a.out
+a
+suba/subb/b.out
+b
+subc/c.out
+c
+suba/a.out
+a
+suba/subb/b.out
+b
+subc/c.out
+c

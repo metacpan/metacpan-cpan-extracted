@@ -1,3 +1,9 @@
+v0.12.1 2017-08-06T14:59:14Z
+ - encode json to readable form
+
+v0.12.0 2017-08-01T09:38:27Z
+ - l10n deferred calls updated
+
 v0.11.2 2017-07-14T21:22:02Z
  - No issues on bugtracker were closed since the last release
  - l10n translation search fixed

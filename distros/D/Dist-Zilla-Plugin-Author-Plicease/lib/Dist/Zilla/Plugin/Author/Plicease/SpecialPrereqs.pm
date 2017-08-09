@@ -4,7 +4,7 @@ use 5.008001;
 use Moose;
 
 # ABSTRACT: Special prereq handling
-our $VERSION = '2.20'; # VERSION
+our $VERSION = '2.21'; # VERSION
 
 
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -32,7 +32,6 @@ sub register_prereqs
   my %upgrades = qw(
     Moo                                   2.0
     PerlX::Maybe                          0.003
-    File::HomeDir                         0.91
     AnyEvent::Open3::Simple               0.83
     Path::Class                           0.26
     Mojolicious                           4.31
@@ -236,7 +235,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.20
+version 2.21
 
 =head1 SYNOPSIS
 
@@ -272,10 +271,6 @@ enabled.
 =item PerlX::Maybe
 
 Require 0.003
-
-=item File::HomeDir
-
-Require 0.91 for File::HomeDir::Test
 
 =item AnyEvent::Open3::Simple
 

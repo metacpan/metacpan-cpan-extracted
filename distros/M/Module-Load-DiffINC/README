@@ -1,0 +1,47 @@
+NAME
+    Module::Load::DiffINC - Load a module and show difference in %INC before
+    vs after
+
+VERSION
+    This document describes version 0.001 of Module::Load::DiffINC (from
+    Perl distribution Module-Load-DiffINC), released on 2017-08-02.
+
+SYNOPSIS
+    On the command-line:
+
+     % perl -MModule::Load::DiffINC=Log::ger::Util -e1
+     +Log/ger.pm     /home/ujang/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Log/ger.pm
+     +Log/ger/Heavy.pm       /home/ujang/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Log/ger/Heavy.pm
+     +Log/ger/Util.pm        /home/ujang/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Log/ger/Util.pm
+     +strict.pm      /home/ujang/perl5/perlbrew/perls/perl-5.26.0/lib/5.26.0/strict.pm
+     +warnings.pm    /home/ujang/perl5/perlbrew/perls/perl-5.26.0/lib/5.26.0/warnings.pm
+
+DESCRIPTION
+    This module will record %INC, load (using "require()") all modules
+    specified in the import argument, then compare %INC with the originally
+    recorded before loading the modules.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Load-DiffINC>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Load-DiffINC>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-DiffINC>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

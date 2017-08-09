@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Snitch;
 # ABSTRACT: Service provider for Snitch - http://nopaste.snit.ch/
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 use parent 'App::Nopaste::Service';
 
@@ -29,7 +29,7 @@ App::Nopaste::Service::Snitch - Service provider for Snitch - http://nopaste.sni
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SUPPORT
 

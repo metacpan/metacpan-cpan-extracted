@@ -11,13 +11,13 @@ autovivification - Lexically disable autovivification.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.16';
+ $VERSION = '0.17';
 }
 
 =head1 SYNOPSIS
@@ -144,7 +144,7 @@ When C<@opts> is empty, it defaults to C<< qw<fetch exists delete> >>.
 my %bits = (
  strict => A_HINT_STRICT,
  warn   => A_HINT_WARN,
- fetch  => A_HINT_FETCH,
+ fetch  => A_HINT_FETCH|A_HINT_KEYS|A_HINT_VALUES,
  store  => A_HINT_STORE,
  exists => A_HINT_EXISTS,
  delete => A_HINT_DELETE,
@@ -238,15 +238,13 @@ You can find documentation for this module with the perldoc command.
 
     perldoc autovivification
 
-Tests code coverage report is available at L<http://www.profvince.com/perl/cover/autovivification>.
-
 =head1 ACKNOWLEDGEMENTS
 
 Matt S. Trout asked for it.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009,2010,2011,2012,2013,2014,2015 Vincent Pit, all rights reserved.
+Copyright 2009,2010,2011,2012,2013,2014,2015,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

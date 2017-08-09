@@ -7,8 +7,9 @@ Makefile.PL			Makefile generator
 MyInstall.pm			Workaround file
 NEWS				Latest Changes
 ReleaseNotes			Same as NEWS
-README				Read it
+README				See README.md
 README-oldversions		Where are old versions of this module?
+README.md                       Read it
 README.solaris			Build libintl-perl on Solaris platforms
 README.win32			Build libintl-perl on MS-DOS platforms
 REFERENCES			Who uses libintl-perl?

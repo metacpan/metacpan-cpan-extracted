@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.47 of Perinci::CmdLine::Gen (from Perl
-    distribution Perinci-CmdLine-Gen), released on 2017-07-14.
+    This document describes version 0.480 of Perinci::CmdLine::Gen (from
+    Perl distribution Perinci-CmdLine-Gen), released on 2017-08-06.
 
 FUNCTIONS
   gen_pericmd_script

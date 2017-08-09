@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Config;
 
 eval q{ require Test::More };
@@ -12,7 +12,11 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Acme::Alien::DontPanic
   Alien::Base::ModuleBuild
-  Alien::Libarchive
+  Alien::Libbz2
+  Alien::gzip
+  Alien::xz
+  Archive::Tar
+  Archive::Zip
   Capture::Tiny
   ExtUtils::CBuilder
   ExtUtils::MakeMaker
@@ -21,15 +25,20 @@ $modules{$_} = $_ for qw(
   FFI::Platypus
   File::Listing
   File::Listing::Ftpcopy
-  File::ShareDir
   File::Which
   File::chdir
   HTML::LinkExtor
   HTTP::Tiny
+  IO::Compress::Bzip2
+  IO::Socket::SSL
+  IO::Uncompress::Bunzip2
+  IO::Zlib
   JSON::PP
   LWP
+  LWP::Protocol::https
   Module::Load
   Net::FTP
+  Net::SSLeay
   Path::Tiny
   PkgConfig
   PkgConfig::LibPkgConf

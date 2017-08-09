@@ -1,21 +1,48 @@
-SYNOPSIS
+NAME
+    Log::ger::Output::Callback - Send logs to a subroutine
 
+VERSION
+    This document describes version 0.003 of Log::ger::Output::Callback
+    (from Perl distribution Log-ger-Output-Callback), released on
+    2017-08-05.
+
+SYNOPSIS
      use Log::ger::Output Callback => (
          logging_cb   => sub { my ($ctx, $numlevel, $msg) = @_; ... }, # optional
          detection_cb => sub { my ($numlevel) = @_; ... },             # optional
      );
 
 DESCRIPTION
-
 CONFIGURATION
-
 logging_cb => code
-
 detection_cb => code
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Output-Callback>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Output-Callback>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-Callba
+    ck>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::ger
 
     Modelled after Log::Any::Adapter::Callback
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

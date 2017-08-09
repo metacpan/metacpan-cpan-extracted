@@ -1,0 +1,6 @@
+Revision history for Centrifugo::Client
+
+1.00  First version
+1.01  Added ws_close and ws_error event. Added anonymous=>true to connect(). Fixed tests and MANIFEST
+1.02  Added support for UID and better parameters handling. --- some function signatures were changed ! ---
+1.03  Added implementation of : unsubscribe, presence, history and ping

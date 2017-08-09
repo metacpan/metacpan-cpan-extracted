@@ -1,5 +1,5 @@
 package Mercury::Command::mercury::broker;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Mercury message broker command
 
 #pod =head1 SYNOPSIS
@@ -115,7 +115,7 @@ Mercury::Command::mercury::broker - Mercury message broker command
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 

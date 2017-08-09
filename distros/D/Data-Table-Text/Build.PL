@@ -14,7 +14,7 @@ my $b = Module::Build->new
   dist_abstract => 'Write data in tabular text format',
   license       => 'perl',
   requires      => {Data::Dump=>0,
-                    utf8=>0, Carp=>0, File::Path=>0,
+                    utf8=>0, Carp=>0, File::Path=>0, Test::More=>0,
                     File::Glob=>1.24, POSIX=>0},
   configure_requires => { 'Module::Build' => 0.42 },
   create_readme =>  0,

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,15 +40,14 @@
       "runtime" : {
          "requires" : {
             "Log::Log4perl" : "0",
-            "Test2" : "1.302015",
+            "Test2::API" : "1.302015",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
             "Log::Log4perl" : "0",
-            "Test2::Suite" : "0.000030",
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "perl" : "5.008001"
          }
       }
@@ -58,13 +57,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/Log-Log4perl-Appender-TAP/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Log-Log4perl-Appender-TAP",
+      "homepage" : "https://metacpan.org/pod/Log::Log4perl::Appender::TAP",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/Log-Log4perl-Appender-TAP.git",
          "web" : "https://github.com/plicease/Log-Log4perl-Appender-TAP"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

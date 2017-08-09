@@ -24,4 +24,4 @@ requires:
   perl: '5.006'
 resources:
   homepage: https://github.com/bigpresh/Convert-CookingTimes/
-version: '0.02'
+version: '0.03'

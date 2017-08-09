@@ -1,4 +1,18 @@
 
+7.39  2017-08-03
+  - Removed experimental close_idle_connections method from
+    Mojo::Server::Daemon.
+  - Increased default graceful_timeout from 60 to 120 seconds in
+    Mojo::Server::Prefork.
+  - Improve Mojo::Server::Daemon to log request errors.
+  - Fixed a bug where Mojo::Server::Daemon would close connections too quickly
+    and interrupt requests.
+
+7.38  2017-07-30
+  - Added extra attribute to Mojolicious::Static. (jabberwok)
+  - Improve Mojo::URL performance significantly.
+  - Fixed memory leak in Mojo::URL that was caused by a Perl 5.24 bug.
+
 7.37  2017-07-21
   - Added slugify method to Mojo::ByteStream. (Grinnz)
   - Added slugify function to Mojo::Util. (Grinnz)

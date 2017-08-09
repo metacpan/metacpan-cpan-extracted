@@ -1,7 +1,8 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.008';
+$Test::Consul::VERSION = '0.011';
 # ABSTRACT: Run a consul server for testing
 
+use 5.010;
 use namespace::autoclean;
 
 use File::Which qw(which);
@@ -54,14 +55,6 @@ sub _build_port {
     return _unique_empty_port();
 }
 
-has rpc_port => (
-    is  => 'lazy',
-    isa => PositiveInt,
-);
-sub _build_rpc_port {
-    return _unique_empty_port();
-}
-
 has serf_lan_port => ( 
     is  => 'lazy',
     isa => PositiveInt,
@@ -86,6 +79,16 @@ sub _build_server_port {
     return _unique_empty_port();
 }
 
+has datacenter => (
+    is  => 'lazy',
+    isa => NonEmptySimpleStr,
+);
+sub _build_datacenter {
+    state $dc_num = 0;
+    $dc_num++;
+    return "perl-test-consul-dc$dc_num";
+}
+
 has enable_acls => (
     is  => 'ro',
     isa => Bool,
@@ -101,6 +104,11 @@ has acl_master_token => (
     is      => 'ro',
     isa     => NonEmptySimpleStr,
     default => '01234567-89AB-CDEF-GHIJ-KLMNOPQRSTUV',
+);
+
+has enable_remote_exec => (
+    is      => 'ro',
+    isa     => Bool,
 );
 
 has bin => (
@@ -153,13 +161,12 @@ sub start {
 
     my %config = (
         node_name  => 'perl-test-consul',
-        datacenter => 'perl-test-consul',
+        datacenter => $self->datacenter(),
         bind_addr  => '127.0.0.1',
         ports => {
             dns      => -1,
             http     => $self->port() + 0,
             https    => -1,
-            rpc      => $self->rpc_port() + 0,
             serf_lan => $self->serf_lan_port() + 0,
             serf_wan => $self->serf_wan_port() + 0,
             server   => $self->server_port() + 0,
@@ -176,8 +183,12 @@ sub start {
     if ($self->enable_acls()) {
         $config{acl_master_token} = $self->acl_master_token();
         $config{acl_default_policy} = $self->acl_default_policy();
-        $config{acl_datacenter} = 'perl-test-consul';
+        $config{acl_datacenter} = $self->datacenter();
         $config{acl_token} = $self->acl_master_token();
+    }
+
+    if (defined $self->enable_remote_exec) {
+        $config{disable_remote_exec} = $self->enable_remote_exec ? JSON->false : JSON->true;
     }
 
     my $configpath;
@@ -252,6 +263,19 @@ sub DESTROY {
     goto \&stop;
 }
 
+sub wan_join {
+    my ($self, $other) = @_;
+
+    my $http = HTTP::Tiny->new(timeout => 10);
+    my $port = $self->port;
+    my $other_wan_port = $other->serf_wan_port;
+
+    my $res = $http->get("http://127.0.0.1:$port/v1/agent/join/127.0.0.1:$other_wan_port?wan=1");
+    unless ($res->{success}) {
+        croak "WAN join failed: $res->{status} $res->{reason}"
+    }
+}
+
 my ($bin, $bin_searched_for);
 sub found_bin {
     return $bin if $bin_searched_for;
@@ -313,11 +337,6 @@ It's assumed that you have Consul 0.6.4 installed somewhere.
 The TCP port for HTTP API endpoint.  Consul's default is C<8500>, but
 this defaults to a random unused port.
 
-=head2 rpc_port
-
-The TCP port for the RPC CLI endpoint.  Consul's default is C<8400>, but
-this defaults to a random unused port.
-
 =head2 serf_lan_port
 
 The TCP and UDP port for the Serf LAN.  Consul's default is C<8301>, but
@@ -347,6 +366,10 @@ information.
 
 If L</enable_acls> is true then this token will be used as the master
 token.  By default this will be C<01234567-89AB-CDEF-GHIJ-KLMNOPQRSTUV>.
+
+=head2 enable_acls
+
+Set this to true to enable remote execution (off by default since Consul 0.8.0)
 
 =head2 bin
 
@@ -388,6 +411,15 @@ Kill the Consul instance. Graceful shutdown is attempted first, and if it
 doesn't die within a couple of seconds, the process is killed.
 
 This method is also called if the instance of this class falls out of scope.
+
+=head2 wan_join
+
+    my $tc1 = Test::Consul->start;
+    my $tc2 = Test::Consul->start;
+    $tc1->wan_join($tc2);
+
+Perform a WAN join to another L<Test::Consul> instance. Use this to test Consul
+applications that operate across datacenters.
 
 =head1 CLASS METHODS
 
@@ -439,7 +471,7 @@ L<https://github.com/robn/Consul-Test>
 
 =item *
 
-Robert Norris <rob@eatenbyagrue.org>
+Rob N ★ <robn@robn.io>
 
 =back
 
@@ -455,7 +487,8 @@ Aran Deltac <bluefeet@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Robert Norris.
+This software is copyright (c) (c) 2015 by Rob N ★ and was supported by FastMail
+Pty Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

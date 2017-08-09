@@ -253,6 +253,7 @@ in British English, or "vice" and "vise" in American English.
     | orient            | orientate         | orient            |          |          |         |
     | oriented          | orientated        | oriented          |          |          |         |
     | orthopedic        | orthopaedic       | orthopaedic       |          |          |         |
+    | overly            | over              | overly            |          |          |         |
     | oxidize           | oxidise           | oxidize           |          |          | Y       |
     | pajamas           | pyjamas           | pyjamas           |          |          |         |
     | Paleocene         | Palaeocene        | Paleocene         |          |          |         |

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use autodie;
-use 5.010;
+use 5.010001;
 use Path::Tiny qw( path );
 use Pod::Usage qw( pod2usage );
 use Getopt::Long qw( GetOptions );
@@ -14,7 +14,7 @@ use Number::Bytes::Human qw( format_bytes );
 
 # ABSTRACT: Command line interface to Alien::Build::Plugin::Fetch::Cache
 # PODNAME: abcache
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 my $opt_list;
@@ -121,7 +121,7 @@ abcache - Command line interface to Alien::Build::Plugin::Fetch::Cache
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

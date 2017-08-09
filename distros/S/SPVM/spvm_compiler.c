@@ -63,12 +63,14 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->bufptr = "";
   compiler->types = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->type_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
-  compiler->cur_op_cases = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->cur_line = 0;
   compiler->cur_file = NULL;
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->cur_template_args = NULL;
-  
+
+  compiler->enum_default_value = 0;
+  compiler->enum_default_type_id = SPVM_TYPE_C_ID_INT;
+
   compiler->start_sub_name = NULL;
   
   compiler->fatal_error = 0;

@@ -18,6 +18,7 @@
 #include "spvm_util_allocator.h"
 #include "spvm_value.h"
 #include "spvm_api.h"
+#include "spvm_type.h"
 
 SPVM_RUNTIME* SPVM_RUNTIME_new() {
   
@@ -40,7 +41,6 @@ SPVM_RUNTIME* SPVM_RUNTIME_new() {
   
   runtime->call_stack_base = -1;
   runtime->operand_stack_top = -1;
-  runtime->abort = 0;
   
   // Packages length
   runtime->packages_length = 0;
@@ -67,7 +67,7 @@ SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime) {
   
   SPVM_API* api = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_API));
   
-  // Array functions
+  // Get array
   api->get_array_length = (int32_t (*)(SPVM_API*, SPVM_API_ARRAY*))SPVM_RUNTIME_API_get_array_length;
   api->get_byte_array_elements = (int8_t* (*)(SPVM_API*, SPVM_API_ARRAY*))SPVM_RUNTIME_API_get_byte_array_elements;
   api->get_short_array_elements = (int16_t* (*)(SPVM_API*, SPVM_API_ARRAY*))SPVM_RUNTIME_API_get_short_array_elements;
@@ -77,7 +77,7 @@ SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime) {
   api->get_double_array_elements = (double* (*)(SPVM_API*, SPVM_API_ARRAY*))SPVM_RUNTIME_API_get_double_array_elements;
   api->get_object_array_elements = (SPVM_API_BASE_OBJECT** (*)(SPVM_API*, SPVM_API_ARRAY*))SPVM_RUNTIME_API_get_object_array_elements;
   
-  // Object functions
+  // Get field
   api->get_field_id = (int32_t (*)(SPVM_API*, SPVM_API_OBJECT*, const char*))SPVM_RUNTIME_API_get_field_id;
   api->get_byte_field = (int8_t (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t))SPVM_RUNTIME_API_get_byte_field;
   api->get_short_field = (int16_t (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t))SPVM_RUNTIME_API_get_short_field;
@@ -86,6 +86,8 @@ SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime) {
   api->get_float_field = (float (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t))SPVM_RUNTIME_API_get_float_field;
   api->get_double_field = (double (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t))SPVM_RUNTIME_API_get_double_field;
   api->get_object_field = (SPVM_API_BASE_OBJECT* (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t))SPVM_RUNTIME_API_get_object_field;
+  
+  // Set field
   api->set_byte_field = (void (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t, int8_t))SPVM_RUNTIME_API_set_byte_field;
   api->set_short_field = (void (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t, int16_t))SPVM_RUNTIME_API_set_short_field;
   api->set_int_field = (void (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t, int32_t))SPVM_RUNTIME_API_set_int_field;
@@ -95,50 +97,28 @@ SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime) {
   api->set_object_field = (void (*)(SPVM_API*, SPVM_API_OBJECT*, int32_t, SPVM_API_BASE_OBJECT*))SPVM_RUNTIME_API_set_object_field;
   
   // Call subroutine fucntions
-  api->push_var_byte = (void (*)(SPVM_API*, int8_t))SPVM_RUNTIME_API_push_var_byte;
-  api->push_var_short = (void (*)(SPVM_API*, int16_t))SPVM_RUNTIME_API_push_var_short;
-  api->push_var_int = (void (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_push_var_int;
-  api->push_var_long = (void (*)(SPVM_API*, int64_t))SPVM_RUNTIME_API_push_var_long;
-  api->push_var_float = (void (*)(SPVM_API*, float))SPVM_RUNTIME_API_push_var_float;
-  api->push_var_double = (void (*)(SPVM_API*, double))SPVM_RUNTIME_API_push_var_double;
-  api->push_var_object = (void (*)(SPVM_API*, SPVM_API_BASE_OBJECT*))SPVM_RUNTIME_API_push_var_object;
   api->get_sub_id = (int32_t (*)(SPVM_API*, const char*))SPVM_RUNTIME_API_get_sub_id;
   api->call_sub = (void (*)(SPVM_API*, int32_t))SPVM_RUNTIME_call_sub;
-  api->pop_retval_byte = (int8_t (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_byte;
-  api->pop_retval_short = (int16_t (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_short;
-  api->pop_retval_int = (int32_t (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_int;
-  api->pop_retval_long = (int64_t (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_long;
-  api->pop_retval_float = (float (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_float;
-  api->pop_retval_double = (double (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_double;
-  api->pop_retval_object = (SPVM_API_BASE_OBJECT* (*)(SPVM_API*))SPVM_RUNTIME_API_pop_retval_object;
+  api->call_void_sub = (void (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_void_sub;
+  api->call_byte_sub = (int8_t (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_byte_sub;
+  api->call_short_sub = (int16_t (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_short_sub;
+  api->call_int_sub = (int32_t (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_int_sub;
+  api->call_long_sub = (int64_t (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_long_sub;
+  api->call_float_sub = (float (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_float_sub;
+  api->call_double_sub = (double (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_double_sub;
+  api->call_object_sub = (SPVM_API_BASE_OBJECT* (*)(SPVM_API*, int32_t, SPVM_API_VALUE*))SPVM_RUNTIME_API_call_object_sub;
   
-  // Malloc funtctions
+  // New funtctions
   api->get_package_id = (int32_t (*)(SPVM_API*, const char*))SPVM_RUNTIME_API_get_package_id;
-  api->new_object_noinc = (SPVM_API_OBJECT* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_object_noinc;
-  api->new_byte_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_byte_array_noinc;
-  api->new_short_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_short_array_noinc;
-  api->new_int_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_int_array_noinc;
-  api->new_long_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_long_array_noinc;
-  api->new_float_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_float_array_noinc;
-  api->new_double_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_double_array_noinc;
-  api->new_object_array_noinc = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_object_array_noinc;
+  api->new_object = (SPVM_API_OBJECT* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_object;
+  api->new_byte_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_byte_array;
+  api->new_short_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_short_array;
+  api->new_int_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_int_array;
+  api->new_long_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_long_array;
+  api->new_float_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_float_array;
+  api->new_double_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_double_array;
+  api->new_object_array = (SPVM_API_ARRAY* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_new_object_array;
   
-  // Functions used in subroutine
-  api->get_var_byte = (int8_t (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_byte;
-  api->get_var_short = (int16_t (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_short;
-  api->get_var_int = (int32_t (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_int;
-  api->get_var_long = (int64_t (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_long;
-  api->get_var_float = (float (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_float;
-  api->get_var_double = (double (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_double;
-  api->get_var_object = (SPVM_API_BASE_OBJECT* (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_get_var_object;
-  api->push_retval_byte = (void (*)(SPVM_API*, int8_t))SPVM_RUNTIME_API_push_retval_byte;
-  api->push_retval_short = (void (*)(SPVM_API*, int16_t))SPVM_RUNTIME_API_push_retval_short;
-  api->push_retval_int = (void (*)(SPVM_API*, int32_t))SPVM_RUNTIME_API_push_retval_int;
-  api->push_retval_long = (void (*)(SPVM_API*, int64_t))SPVM_RUNTIME_API_push_retval_long;
-  api->push_retval_float = (void (*)(SPVM_API*, float))SPVM_RUNTIME_API_push_retval_float;
-  api->push_retval_double = (void (*)(SPVM_API*, double))SPVM_RUNTIME_API_push_retval_double;
-  api->push_retval_object = (void (*)(SPVM_API*, SPVM_API_BASE_OBJECT*))SPVM_RUNTIME_API_push_retval_object;
-
   // Exception
   api->set_exception = (void (*)(SPVM_API* api, SPVM_API_ARRAY* exception))SPVM_RUNTIME_API_set_exception;
   api->get_exception = (SPVM_API_ARRAY* (*)(SPVM_API* api))SPVM_RUNTIME_API_get_exception;
@@ -147,6 +127,7 @@ SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime) {
   api->get_ref_count = (int32_t (*)(SPVM_API* api, SPVM_API_BASE_OBJECT* base_object))SPVM_RUNTIME_API_get_ref_count;
   api->dec_ref_count = (void (*)(SPVM_API* api, SPVM_API_BASE_OBJECT* base_object))SPVM_RUNTIME_API_dec_ref_count;
   api->inc_ref_count = (void (*)(SPVM_API* api, SPVM_API_BASE_OBJECT* base_object))SPVM_RUNTIME_API_inc_ref_count;
+  api->inc_dec_ref_count = (void (*)(SPVM_API* api, SPVM_API_BASE_OBJECT* base_object))SPVM_RUNTIME_API_inc_dec_ref_count;
 
   return api;
 }
@@ -481,30 +462,128 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
         runtime->operand_stack_top = operand_stack_top;
         runtime->call_stack_base = call_stack_base;
         
-        // Call native sub
-        void (*native_address)(SPVM_API* api) = constant_pool_sub.native_address;
-        (*native_address)(api);
-        
-        // Get runtimeiromnet
-        operand_stack_top = runtime->operand_stack_top;
-        call_stack_base = runtime->call_stack_base;
-        
-        if (__builtin_expect(runtime->abort, 0)) {
-          goto case_SPVM_BYTECODE_C_CODE_DIE;
-        }
-        else {
-          static const void* return_jump[] = {
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_VOID,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_BYTE,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_SHORT,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_INT,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_LONG,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_FLOAT,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_DOUBLE,
-            &&case_SPVM_BYTECODE_C_CODE_RETURN_OBJECT,
-          };
-          
-          goto *return_jump[constant_pool_sub.return_type_id + 1];
+        // Call native subroutine
+        switch (constant_pool_sub.return_type_id) {
+          case SPVM_TYPE_C_ID_VOID: {
+            void (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            (*native_address)(api, vars);
+            
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_VOID;
+            }
+            
+            break;
+          }
+          case SPVM_TYPE_C_ID_BYTE: {
+            int8_t (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            int8_t return_value = (*native_address)(api, vars);
+
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              runtime->operand_stack_top++;
+              runtime->call_stack[runtime->operand_stack_top].byte_value = return_value;
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_BYTE;
+            }
+            
+            break;
+          }
+          case SPVM_TYPE_C_ID_SHORT: {
+            int16_t (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            int16_t return_value = (*native_address)(api, vars);
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              runtime->operand_stack_top++;
+              runtime->call_stack[runtime->operand_stack_top].short_value = return_value;
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_SHORT;
+            }
+            break;
+          }
+          case SPVM_TYPE_C_ID_INT: {
+            int32_t (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            int32_t return_value = (*native_address)(api, vars);
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              runtime->operand_stack_top++;
+              runtime->call_stack[runtime->operand_stack_top].int_value = return_value;
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_INT;
+            }
+            break;
+          }
+          case SPVM_TYPE_C_ID_FLOAT: {
+            float (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            float return_value = (*native_address)(api, vars);
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              runtime->operand_stack_top++;
+              runtime->call_stack[runtime->operand_stack_top].float_value = return_value;
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_FLOAT;
+            }
+            break;
+          }
+          case SPVM_TYPE_C_ID_DOUBLE: {
+            double (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            double return_value = (*native_address)(api, vars);
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              runtime->operand_stack_top++;
+              runtime->call_stack[runtime->operand_stack_top].double_value = return_value;
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_DOUBLE;
+            }
+            break;
+          }
+          default: {
+            SPVM_BASE_OBJECT* (*native_address)(SPVM_API*, SPVM_VALUE*) = constant_pool_sub.native_address;
+            SPVM_BASE_OBJECT* return_value = (*native_address)(api, vars);
+            SPVM_RUNTIME_API_set_exception(api, NULL);
+            if (__builtin_expect(runtime->exception != NULL, 0)) {
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_DIE;
+            }
+            else {
+              runtime->operand_stack_top++;
+              runtime->call_stack[runtime->operand_stack_top].object_value = return_value;
+              operand_stack_top = runtime->operand_stack_top;
+              call_stack_base = runtime->call_stack_base;
+              goto case_SPVM_BYTECODE_C_CODE_RETURN_OBJECT;
+            }
+          }
         }
       }
       // Call normal sub
@@ -561,7 +640,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     if (__builtin_expect(call_stack_base == call_stack_base_start, 0)) {
       runtime->call_stack_base = call_stack_base;
       runtime->operand_stack_top = operand_stack_top;
-      runtime->abort = 0;
+      SPVM_RUNTIME_API_set_exception(api, NULL);
       return;
     }
     else {
@@ -625,7 +704,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     if (__builtin_expect(call_stack_base == call_stack_base_start, 0)) {
       runtime->call_stack_base = call_stack_base;
       runtime->operand_stack_top = operand_stack_top;
-      runtime->abort = 0;
+      SPVM_RUNTIME_API_set_exception(api, NULL);
       return;
     }
     else {
@@ -672,7 +751,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     if (__builtin_expect(call_stack_base == call_stack_base_start, 0)) {
       runtime->call_stack_base = call_stack_base;
       runtime->operand_stack_top = operand_stack_top;
-      runtime->abort = 0;
+      SPVM_RUNTIME_API_set_exception(api, NULL);
       return;
     }
     else {
@@ -740,7 +819,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     
     // stack trace strings
     const char* from = "\n  from ";
-    const char* at = " at ";
+    const char* at = "() at ";
     
     // Total string length
     int32_t total_length = 0;
@@ -751,7 +830,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     total_length += strlen(file_name);
     
     // Create exception message
-    SPVM_ARRAY* new_array_exception = SPVM_RUNTIME_API_new_byte_array_noinc(api, total_length);
+    SPVM_ARRAY* new_array_exception = SPVM_RUNTIME_API_new_byte_array(api, total_length);
     memcpy(
       (void*)((intptr_t)new_array_exception + sizeof(SPVM_ARRAY)),
       (void*)((intptr_t)runtime->exception + sizeof(SPVM_ARRAY)),
@@ -772,11 +851,9 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     // Set exception
     SPVM_RUNTIME_API_set_exception(api, new_array_exception);
     
-    // Abort
-    runtime->abort = 1;
-    
     // Finish call sub with exception
     if (call_stack_base == call_stack_base_start) {
+      
       runtime->call_stack_base = call_stack_base;
       runtime->operand_stack_top = operand_stack_top;
       return;
@@ -808,17 +885,11 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     pc++;
     goto *jump[*pc];
   case_SPVM_BYTECODE_C_CODE_CONSTANT_SHORT_0:
-    // Currently no used logic
-    assert(0);
-    
     operand_stack_top++;
     call_stack[operand_stack_top].short_value = 0;
     pc++;
     goto *jump[*pc];
   case_SPVM_BYTECODE_C_CODE_CONSTANT_SHORT_1:
-    // Currently no used logic
-    assert(0);
-    
     operand_stack_top++;
     call_stack[operand_stack_top].short_value = 1;
     pc++;
@@ -1239,7 +1310,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
         goto case_SPVM_BYTECODE_C_CODE_DIE;
       }
       else {
-        *(float*)((intptr_t)array + sizeof(SPVM_ARRAY) + sizeof(float) * index) = call_stack[operand_stack_top - 1].float_value;
+        *(float*)((intptr_t)array + sizeof(SPVM_ARRAY) + sizeof(float) * index) = call_stack[operand_stack_top].float_value;
         operand_stack_top -= 3;
         pc++;
         goto *jump[*pc];
@@ -1331,7 +1402,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     goto *jump[*pc];
   case_SPVM_BYTECODE_C_CODE_STORE_OBJECT:
     index = *(pc + 1);
-
+    
     // Decrement reference count
     if (vars[index].object_value != NULL) {
       SPVM_RUNTIME_API_dec_ref_count(api, vars[index].object_value);
@@ -2052,7 +2123,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     // Get subroutine ID
     index = (*(pc + 1) << 24) + (*(pc + 2) << 16) + (*(pc + 3) << 8) + *(pc + 4);
     
-    object = SPVM_RUNTIME_API_new_object_noinc(api, index);
+    object = SPVM_RUNTIME_API_new_object(api, index);
 
     // Memory allocation error
     if (__builtin_expect(!object, 0)) {
@@ -2082,25 +2153,25 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     
     switch(value_type) {
       case SPVM_ARRAY_C_VALUE_TYPE_BYTE:
-        array = SPVM_RUNTIME_API_new_byte_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_byte_array(api, length);
         break;
       case SPVM_ARRAY_C_VALUE_TYPE_SHORT:
-        array = SPVM_RUNTIME_API_new_short_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_short_array(api, length);
         break;
       case SPVM_ARRAY_C_VALUE_TYPE_INT:
-        array = SPVM_RUNTIME_API_new_int_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_int_array(api, length);
         break;
       case SPVM_ARRAY_C_VALUE_TYPE_LONG:
-        array = SPVM_RUNTIME_API_new_long_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_long_array(api, length);
         break;
       case SPVM_ARRAY_C_VALUE_TYPE_FLOAT:
-        array = SPVM_RUNTIME_API_new_float_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_float_array(api, length);
         break;
       case SPVM_ARRAY_C_VALUE_TYPE_DOUBLE:
-        array = SPVM_RUNTIME_API_new_double_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_double_array(api, length);
         break;
       case SPVM_ARRAY_C_VALUE_TYPE_OBJECT:
-        array = SPVM_RUNTIME_API_new_object_array_noinc(api, length);
+        array = SPVM_RUNTIME_API_new_object_array(api, length);
         break;
       default:
         assert(0);
@@ -2275,7 +2346,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     }
     else {
       index = (*(pc + 1) << 8) + *(pc + 2);
-      call_stack[operand_stack_top - 1].float_value
+      call_stack[operand_stack_top].float_value
         = *(float*)((intptr_t)object + sizeof(SPVM_OBJECT) + sizeof(SPVM_VALUE) * index);
       pc += 3;
       goto *jump[*pc];
@@ -2379,7 +2450,7 @@ void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index) {
     else {
       index = (*(pc + 1) << 8) + *(pc + 2);
       *(float*)((intptr_t)object + sizeof(SPVM_OBJECT) + sizeof(SPVM_VALUE) * index)
-        = call_stack[operand_stack_top - 1].float_value;
+        = call_stack[operand_stack_top].float_value;
       operand_stack_top -= 2;
       pc += 3;
       goto *jump[*pc];

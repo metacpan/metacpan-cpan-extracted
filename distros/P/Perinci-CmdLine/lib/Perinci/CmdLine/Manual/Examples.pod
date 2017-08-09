@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual::Examples - Collection of examples
 
 =head1 VERSION
 
-This document describes version 1.52 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2017-07-07.
+This document describes version 1.77 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
 
 =head1 DESCRIPTION
 
@@ -720,7 +720,7 @@ Completion works by the shell invoking our (the same) program with C<COMP_LINE>
 and C<COMP_POINT> environment variables. You can do something like this to see
 debugging information:
 
- % COMP_LINE='myprog --arg x' COMP_POINT=13 PERL5OPT=-MLog::Any::App TRACE=1 myprog --arg x
+ % COMP_LINE='myprog --arg x' COMP_POINT=13 PERL5OPT=-MLog::ger::App TRACE=1 myprog --arg x
 
 You can also use the L<testcomp> utility (included in the L<App::CompleteUtils>
 distribution) to help debug your custom completion:

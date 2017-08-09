@@ -1,5 +1,9 @@
 Revision history for Perl extension Email::MIME::ContentType
 
+1.021     2017-08-02 19:35:56-04:00 America/New_York
+        - reject non-ASCII and control characters in strict mode (thanks, Pali
+          Rohár)
+
 1.020     2017-07-25 12:39:31-04:00 America/New_York
         - unbreak Email::MIME (which violates encapsulation (again))
         - eliminate some @_ / $_ confusion

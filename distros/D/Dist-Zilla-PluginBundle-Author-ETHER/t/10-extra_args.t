@@ -6,6 +6,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny;
+use PadWalker 'closed_over';
 
 use lib 't/lib';
 use Helper;
@@ -18,9 +19,17 @@ plan skip_all => 'need recent [MakeMaker] to test use of default_jobs option'
 
 use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-ETHER' => 'share' } };
 
+# add a :version requirement for a role used by a plugin we will use
+my $extra_args = closed_over(\&Dist::Zilla::PluginBundle::Author::ETHER::configure)->{'%extra_args'};
+$extra_args->{'Dist::Zilla::Role::TestRunner'}{':version'} = '5.014';
+
+
+my $tempdir = no_git_tempdir();
+
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {
+        tempdir_root => $tempdir->stringify,
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
                 'GatherDir',

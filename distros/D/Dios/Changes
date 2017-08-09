@@ -136,3 +136,27 @@ Revision history for Dios
           change, since the inference behaviour was not previously
           documented. (Thanks, Jeff)
 
+
+
+0.002005  Fri Aug  4 16:01:31 2017
+
+        * Fixed lexical scoping bugs for subtypes involving other subtypes
+          (Thanks, Jeff)
+
+        * Allowed subtypes of compound types
+          (Thanks, Jeff)
+
+        * Fixed egregious bug in precedence of & and |
+
+
+0.002006  Sat Aug  5 06:50:30 2017
+
+        * Made subtype definitions export themselves if placed in 
+          an import() or unimport() sub.
+          (Thanks Jeff)
+
+
+0.002007  Sun Aug  6 20:46:46 2017
+
+        * Allowed attributes to be specified with subtype types
+          (Thanks Jeff!)

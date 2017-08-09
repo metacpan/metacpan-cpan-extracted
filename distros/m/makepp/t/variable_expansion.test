@@ -43,7 +43,7 @@ V2_COLON := $(V12)		# Should be equal to 2.
 
 i = 5
 V1_SEMICOLON ;= $(perl 10 + ++$i)
-V1_SEMICOLON += $(perl 100 + ++$i)
+V1_SEMICOLON += $(makeperl (100 + ++$$i)) # Nested parens (don't work with plain perl)
 V1_SEMICOLON &= $(perl ++$i . '$') # Should expand each of these once and remember.
 i = 0
 

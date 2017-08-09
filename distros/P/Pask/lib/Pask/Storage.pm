@@ -1,11 +1,14 @@
 package Pask::Storage;
 
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Term::ANSIColor;
 use Carp;
 
 use Pask::Container;
 
 my $types = {
+    -success => { color => "green on_bright_white", output => ["FILE", "TERM"], note => "Success"},
     -info => { color => "cyan on_bright_white", output => ["FILE", "TERM"], note => "Info" },
     -log => { color => "black on_bright_white", output => ["FILE", "TERM"], note => "Log" },
     -warn => { color => "yellow on_bright_white", output => ["FILE", "TERM"], note => "Warn" },
@@ -79,7 +82,7 @@ sub annotate {
     $is_to_file = ($flag1 eq "FILE" or $flag2 eq "FILE");
     $is_to_term = ($flag1 eq "TERM" or $flag2 eq "TERM");
     do {
-        $note_suffix = "@" . strftime("%Y-%m-%d %H:%M:%S", localtime) if ($this->{"type"} eq "-info" or $this->{"type"} eq "-log" or $this->{"type"} eq "-warn" or $this->{"type"} eq "-debug");
+        $note_suffix = "@" . strftime("%Y-%m-%d %H:%M:%S", localtime) if ($this->{"type"} eq "-info" or $this->{"type"} eq "-log" or $this->{"type"} eq "-warn" or $this->{"type"} eq "-debug" or $this->{"type"} eq "-success");
         print colored [$types->{-system}{"color"}], "[", $types->{$this->{"type"}}{"note"}, $note_suffix, "]";
         print " ";
         print colored [$this->{"color"}], @_;
@@ -87,7 +90,7 @@ sub annotate {
         print "\n";
     } if $is_to_term;
     do {
-        $note_suffix = "@" . strftime("%H:%M:%S", localtime) if ($this->{"type"} eq "-info" or $this->{"type"} eq "-log" or $this->{"type"} eq "-warn" or $this->{"type"} eq "-debug");
+        $note_suffix = "@" . strftime("%H:%M:%S", localtime) if ($this->{"type"} eq "-info" or $this->{"type"} eq "-log" or $this->{"type"} eq "-warn" or $this->{"type"} eq "-debug" or $this->{"type"} eq "-success");
         my $file_handle = Pask::Container::get_log_handle;
         print $file_handle "[", $types->{$this->{"type"}}{"note"}, $note_suffix, "] ", @_, "\n";
     } if $is_to_file;

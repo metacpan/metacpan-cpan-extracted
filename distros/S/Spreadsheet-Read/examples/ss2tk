@@ -1,27 +1,46 @@
 #!/pro/bin/perl
 
 # ss2tk: show SpreadSheet file in Tk::TableMatrix::Spreadsheet (*)
-#	  (m)'17 [2017-05-04] Copyright H.M.Brand 2005-2017
+#	  (m)'17 [2017-07-03] Copyright H.M.Brand 2005-2017
 
 use strict;
 use warnings;
 
-our $VERSION = "2.6";
+our $VERSION = "2.8";
 
 sub usage {
     my $err = shift and select STDERR;
     print
-	"usage: ss2tk [-w <width>] [X11 options] file.xls [<pattern>]\n",
-	"       -w <width> use <width> as column width\n";
+	"usage: ss2tk [options] [X11 options] file.xls [<pattern>]\n",
+	"       -w <width> use <width> as column width\n",
+	"       -L         Add spreadsheet tags to top (A, B, ..Z, AB, ...)\n",
+	"                  and left (1, 2, ...)\n",
+	"       --fs[=7]   Set font size (default 7 if no value)\n",
+	"       --fn=name  Set font Face name (default is DejaVu Sans Mono\n",
+	"                  if font size is given\n";
     exit $err;
     } # usage
 
 use Getopt::Long qw(:config bundling passthrough);
+my $opt_fs;
 GetOptions (
     "help|?"		=> sub { usage (0); },
     "w|width=i"		=> \my $opt_w,
     "L|ss|labels!"	=> \my $opt_L,
     "a|align!"		=> \my $opt_a,
+
+      "fn|font-name=s"	=> \my $opt_fn,
+      "fs|font-size:7"	=> \   $opt_fs,
+      "fs-4"		=> sub { $opt_fs = 4; },
+      "fs-5"		=> sub { $opt_fs = 5; },
+      "fs-6"		=> sub { $opt_fs = 6; },
+      "fs-7"		=> sub { $opt_fs = 7; },
+      "fs-8"		=> sub { $opt_fs = 8; },
+      "fs-9"		=> sub { $opt_fs = 9; },
+
+    # For restarts
+    "G|geometry=s"	=> \my $geometry,
+    "W|column-widths=s"	=> \my $col_widths,
     ) or usage (1);
 
 use Data::Peek;
@@ -45,9 +64,12 @@ $ref->[0]{sheets}			or die "No sheets in $title\n";
 
 fork and exit;
 
+$opt_fn || $opt_fs and $opt_fn = "{".($opt_fn|| "DejaVu Sans Mono")."} ".($opt_fs||7);
+
 my $pat = @ARGV ? qr/$ARGV[0]/i : undef;
 
 my $mw = MainWindow->new (-title => $title);
+$geometry and $mw->geometry ($geometry);
 my $nb = $mw->NoteBook ()->pack (qw(-side top -expand 1 -fill both ));
 my @nb;
 foreach my $sht (1 .. $ref->[0]{sheets}) {
@@ -61,6 +83,7 @@ foreach my $sht (1 .. $ref->[0]{sheets}) {
 	-label	=> $s->{label},
 	-state	=> "normal",
 	-anchor	=> "nw");
+    my @ff = $opt_fn ? (-font => $opt_fn) : ();
     my $ss = $nb[$sht]->Scrolled ('Spreadsheet',
 	-rows		=> $h,	-cols		=> $w,
 	-width		=> 10,	-height		=> 20,
@@ -74,6 +97,7 @@ foreach my $sht (1 .. $ref->[0]{sheets}) {
 	-anchor		=> "w",
 
 	-variable	=> $data,
+	@ff,
 	)->pack (-expand => 1, -fill => "both", -side => "top", -anchor => "nw");
     $ss->Subwidget ("${_}scrollbar")->configure (-width => 6) for qw( x y );
     $ss->tagConfigure ("title",  -bg => "#ffffe0", -justify => "left");
@@ -121,13 +145,24 @@ foreach my $sht (1 .. $ref->[0]{sheets}) {
 
     # Control frame
     my $cf = $nb[$sht]->Frame ()->pack (-side => "right", -expand => 1, -fill => "both");
-    my $ce = $cf->Button (
-	-text     => "Exit",
-	-command  => \&exit,
+    $cf->Button (
+	-text       => "\x{2718}",
+	-foreground => "#8b0000",
+	-command    => \&exit,
 	)->pack (-side => "right", -anchor => "se");
-    my $rf = $cf->Button (
-	-text     => "Reload",
-	-command  => $reload,
+    $cf->Button (
+	-text       => "\x{21f5}",
+	-foreground => "#ffa500",
+	-command    => sub {
+	    my $geo = $mw->geometry;
+	    # Add column widths here
+	    exec $0, "--geometry=$geo";
+	    },
+	)->pack (-side => "right", -anchor => "se");
+    $cf->Button (
+	-text       => "\x{21bb}",
+	-foreground => "#008b00",
+	-command    => $reload,
 	)->pack (-side => "right", -anchor => "se");
 
     my $swss = $ss->Subwidget ("spreadsheet");

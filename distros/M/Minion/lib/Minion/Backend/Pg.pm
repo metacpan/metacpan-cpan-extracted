@@ -180,12 +180,13 @@ sub retry_job {
 
   return !!$self->pg->db->query(
     "update minion_jobs
-     set delayed = (now() + (interval '1 second' * ?)),
+     set attempts = coalesce(?, attempts),
+       delayed = (now() + (interval '1 second' * ?)),
        priority = coalesce(?, priority), queue = coalesce(?, queue),
        retried = now(), retries = retries + 1, state = 'inactive'
      where id = ? and retries = ?
-     returning 1", $options->{delay} // 0, @$options{qw(priority queue)}, $id,
-    $retries
+     returning 1", $options->{attempts}, $options->{delay} // 0,
+    @$options{qw(priority queue)}, $id, $retries
   )->rows;
 }
 
@@ -242,16 +243,17 @@ sub _try {
      set started = now(), state = 'active', worker = ?
      where id = (
        select id from minion_jobs as j
-       where delayed <= now() and (parents = '{}' or not exists (
-         select 1 from minion_jobs
-         where id = any (j.parents)
-           and state in ('inactive', 'active', 'failed')
-       )) and queue = any (?) and state = 'inactive' and task = any (?)
+       where delayed <= now() and id = coalesce(?, id)
+         and (parents = '{}' or not exists (
+           select 1 from minion_jobs
+           where id = any (j.parents)
+             and state in ('inactive', 'active', 'failed')
+         )) and queue = any (?) and state = 'inactive' and task = any (?)
        order by priority desc, id
        limit 1
        for update skip locked
      )
-     returning id, args, retries, task", $id,
+     returning id, args, retries, task", $id, $options->{id},
     $options->{queues} || ['default'], [keys %{$self->minion->tasks}]
   )->expand->hash;
 }
@@ -330,6 +332,12 @@ C<inactive> to C<active> state, or return C<undef> if queues were empty.
 These options are currently available:
 
 =over 2
+
+=item id
+
+  id => '10023'
+
+Dequeue a specific job.
 
 =item queues
 
@@ -688,6 +696,12 @@ retried to change options.
 These options are currently available:
 
 =over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted.
 
 =item delay
 

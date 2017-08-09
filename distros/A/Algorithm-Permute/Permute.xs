@@ -19,30 +19,9 @@ extern "C" {
 #include <stdio.h>
 #include "coollex.h"
 #include "multicall.h"
+#include "ppport.h"
 #ifdef __cplusplus
 }
-#endif
-
-#ifdef TRUE
-    #undef TRUE
-#endif
-
-#ifdef FALSE
-    #undef FALSE
-#endif
-
-#define TRUE  1
-#define FALSE 0
-
-/* For 5.005 compatibility */
-#ifndef aTHX_
-#  define aTHX_
-#endif
-#ifndef aTHX
-#  define aTHX
-#endif
-#ifdef ppaddr
-#  define PL_ppaddr ppaddr
 #endif
 
 /* (Robin) This hack is stolen from Graham Barr's Scalar-List-Utils package.
@@ -55,7 +34,6 @@ extern "C" {
    With any luck, it will enable us to build under ActiveState Perl.
 */
 #if PERL_VERSION < 7/* Not in 5.6.1. */
-#  define SvUOK(sv)           SvIOK_UV(sv)
 #  ifdef cxinc
 #    undef cxinc
 #  endif

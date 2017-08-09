@@ -6,10 +6,12 @@ use strict;
 use warnings;
 
 use Email::Valid;
-use Mail::Send;
 use File::Grep 'fgrep';
+use Date::Parse 'str2time';
+use Date::Format 'time2str';
+use Email::Mailer;
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 sub init {
     my ($bot)       = @_;
@@ -20,12 +22,27 @@ sub init {
     $bot->hook(
         {
             to_me => 1,
-            text  => qr/history\s+(?<search>\S+)\s+(?<email>\S+)/i,
+            text  => qr/
+                ^\s*history\s+(
+                    (?:
+                        (?<type>on)\s+(?<date>.+?)
+                    ) |
+                    (?:
+                        (?<type>from)\s+(?<date>.+?)\s+to\s+(?<date2>.+?)
+                    ) |
+                    (?:
+                        (?<type>matching)\s+(?<string>.+?)
+                    )
+                )\s+(?:to\s+)?(?<email>\S+)\s*$
+            /ix,
         },
         sub {
             my ( $bot, $in, $m ) = @_;
 
-            if ( grep { lc( $in->{forum} ) eq lc($_) } @filter ) {
+            if ( not $in->{forum} ) {
+                $bot->reply_to(q{Ask me from within a specific channel.});
+            }
+            elsif ( grep { lc( $in->{forum} ) eq lc($_) } @filter ) {
                 $bot->reply_to(q{I'm not allowed to return history for this channel.});
             }
             elsif ( not Email::Valid->address( $m->{email} ) ) {
@@ -34,30 +51,77 @@ sub init {
             elsif ( not -f $stdout_file ) {
                 $bot->reply_to(q{Sorry. I can't seem to access a log file right now.});
             }
+            elsif ( $m->{date} and not $m->{time_date} = str2time( $m->{date} ) ) {
+                $bot->reply_to(qq{I don't understand "$m->{date}" as a date or date/time.});
+            }
+            elsif ( $m->{date2} and not $m->{time_date2} = str2time( $m->{date2} ) ) {
+                $bot->reply_to(qq{I don't understand "$m->{date2}" as a date or date/time.});
+            }
             else {
                 $bot->reply_to('Searching history...');
 
-                my @matches = map {
-                    my $matches = $_->{matches};
-                    map { $matches->{$_} } sort { $a <=> $b } keys %$matches;
-                } fgrep {
-                    /^\[[^\]]*\]\s\S+\sPRIVMSG\s$in->{forum}/ and
-                    /$m->{search}/
-                } $stdout_file;
+                my @matches =
+                    map {
+                        my $matches = $_->{matches};
+                        map { $matches->{$_} } sort { $a <=> $b } keys %$matches;
+                    } fgrep {
+                        /^\[[^\]]*\]\s\S+\sPRIVMSG\s$in->{forum}/
+                    } $stdout_file;
+
+                my $subject;
+                if ( lc $m->{type} eq 'on' ) {
+                    my $date = time2str( '%d/%b/%Y', $m->{time_date} );
+                    my $re   = qr/^\[$date/;
+                    @matches = grep { $_ =~ $re } @matches;
+                    $subject = "on date $m->{date}";
+                }
+                elsif ( lc $m->{type} eq 'from' ) {
+                    @matches =
+                        map { $_->{text} }
+                        grep {
+                            $_->{time} >= $m->{time_date} and
+                            $_->{time} <= $m->{time_date2}
+                        }
+                        map {
+                            /^\[([^\]]+)\]\s/;
+                            +{
+                                time => str2time($1),
+                                text => $_,
+                            };
+                        } @matches;
+                    $subject = "from $m->{date} to $m->{date2}";
+                }
+                elsif ( lc $m->{type} eq 'matching' ) {
+                    @matches = grep { /$m->{string}/i } @matches;
+                    $subject = "matching $m->{string}";
+                }
 
                 if ( not @matches ) {
                     $bot->reply_to(q{I didn't find any history matching what you requested.});
                 }
                 else {
-                    my $mail = Mail::Send->new(
-                        Subject => "IRC $in->{forum} history search: $m->{search}",
-                        To      => $m->{email},
-                    );
-                    $mail->set( 'From' => $m->{email} );
+                    my $html = join( "\n", map {
+                        /^\[(?<timestamp>[^\]]+)\]\s(?:\:(?<nick>[^!]+)!)?.*?PRIVMSG\s$in->{forum}\s:(?<text>.+)$/;
+                        my $parts = {%+};
+                        $parts->{nick} //= 'ME';
 
-                    my $fh = $mail->open;
-                    $fh->print( join( '', @matches ) );
-                    $fh->close;
+                        qq{
+                            <p style="text-indent: -3em; margin: 0; margin-left: 3em">
+                                <i>$parts->{timestamp}</i>
+                                <b>$parts->{nick}</b>
+                                $parts->{text}
+                            </p>
+                        };
+                    } @matches );
+
+                    $html =~ s|(\w+://[\w\-\.!@#$%^&*-_+=;:,]+)|<a href="$1">$1</a>|g;
+
+                    Email::Mailer->send(
+                        to      => $m->{email},
+                        from    => $m->{email},
+                        subject => "IRC $in->{forum} history $subject",
+                        html    => $html,
+                    );
 
                     $bot->reply_to(
                         'OK. I just sent ' . $m->{email} . ' an email with ' .
@@ -70,8 +134,7 @@ sub init {
 
     $bot->helps( history =>
         'Dump selected channel history to email. ' .
-        'Usage: "history [DATE] [EMAIL]" or "history [STRING] [EMAIL]". ' .
-        'See also: https://metacpan.org/pod/Bot::IRC::History'
+        'Usage: "history on DATE EMAIL" or "history from DATE to DATE EMAIL" or "history matching STRING EMAIL".'
     );
 }
 
@@ -89,7 +152,7 @@ Bot::IRC::History - Bot::IRC selected channel history dumped to email
 
 =head1 VERSION
 
-version 1.16
+version 1.18
 
 =head1 SYNOPSIS
 
@@ -117,18 +180,9 @@ If you don't like this behavior, don't load this plugin.
 
 To request channel history for the channel you're currently in:
 
-    bot history [DATE] [EMAIL]
-    bot history 01/Dec/2016 gryphon@example.com
-
-The "date" is any partial date or date/time used in the Common Log Format (CLF).
-So to select everything from the hour of 11 AM:
-
-    bot history 01/Dec/2016:11 gryphon@example.com
-
-You can also search for any particular string in the chat history of the
-channel:
-
-    bot history string gryphon@example.com
+    bot history on DATE EMAIL
+    bot history from DATE to DATE EMAIL
+    bot history matching STRING EMAIL
 
 =head2 Filtering Channels
 

@@ -1,7 +1,28 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 30;
 use strict;
+
+# I'm not sure if this is "too hacky to live".
+# It seems that for some newer versions of Test::More on older perls, if the
+# test for total_size(1 == 1) is *after* the load of test more, then the test
+# fails. I infer that something in Test::More is also ending up with PL_sv_yes
+# in a pad temp somewhere, and whatever gets compiled first gets to keep the
+# real one, and everyone afterwards gets forced to have a copy. (For ithreads).
+# And I'm not even sure if this is a bug that was fixed (in the constant code)
+# or a necessary evil that survives, and it's pure chance when it hits.
+sub specials {
+    # Must call direct - avoid all copying:
+    foreach(['undef', total_size(undef)],
+            ['no', total_size(1 == 0)],
+            ['yes', total_size(1 == 1)],
+        ) {
+        my ($name, $size) = @$_;
+        is($size, 0,
+           "PL_sv_$name is interpeter wide, so not counted as part of the structure's size");
+    }
+}
+
+use Test::More tests => 30;
 use Devel::Size qw(size total_size);
 
 can_ok ('Devel::Size', qw/
@@ -10,7 +31,7 @@ can_ok ('Devel::Size', qw/
   /);
 
 die ("Uhoh, test uses an outdated version of Devel::Size")
-    unless is ($Devel::Size::VERSION, '0.80', 'VERSION MATCHES');
+    unless is ($Devel::Size::VERSION, '0.81', 'VERSION MATCHES');
 
 #############################################################################
 # some basic checks:
@@ -99,15 +120,7 @@ cmp_ok (total_size(\&LARGE), '>', 8192,
        'Any intial reference is dereferenced and discarded');
 }
 
-# Must call direct - avoid all copying:
-foreach(['undef', total_size(undef)],
-	['no', total_size(1 == 0)],
-	['yes', total_size(1 == 1)],
-       ) {
-    my ($name, $size) = @$_;
-    is($size, 0,
-       "PL_sv_$name is interpeter wide, so not counted as part of the structure's size");
-}
+specials();
 
 {
     # SvOOK stuff

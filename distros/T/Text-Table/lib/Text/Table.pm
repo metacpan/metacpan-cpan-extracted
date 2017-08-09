@@ -10,7 +10,7 @@ use List::Util qw(sum max);
 
 use Text::Aligner qw(align);
 
-our $VERSION = '1.132';
+our $VERSION = '1.133';
 
 use overload (
     # Don't stringify when only doing boolean tests, since stringification can
@@ -894,7 +894,7 @@ Text::Table - Organize Data in Tables
 
 =head1 VERSION
 
-version 1.132
+version 1.133
 
 =head1 SYNOPSIS
 
@@ -962,7 +962,7 @@ the length of the longest partial line.  The largest number of title
 lines in a column determines how many title lines the table has as a
 whole, including the case that no column has any titles.
 
-On output, Columns are separated by a single blank.  You can control
+On output, columns are separated by a single blank.  You can control
 what goes between columns by specifying separators between (or before,
 or after) columns.  Separators don't contain any data and don't count
 in column indexing.  They also don't accumulate: in a sequence of only
@@ -1113,7 +1113,7 @@ The hash representation of a separator has the format
     }
 
 $title is the separator to be used in the title area and $body
-the one for the body.  If only one is given, the other is used for
+the one for the body.  If only one is given, it will be used for
 both.  If none is given, a blank is used.  If one is shorter than
 the other, it is blank filled on the right.
 
@@ -1498,8 +1498,8 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Table or by email to
-bug-text-table@rt.cpan.org.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Table> or by email to
+L<bug-text-table@rt.cpan.org|mailto:bug-text-table@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1616,9 +1616,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/perl-Text-Table>
+L<https://github.com/shlomif/Text-Table>
 
-  git clone ssh://git@github.com:shlomif/perl-Text-Table.git
+  git clone ssh://git@github.com:shlomif/Text-Table.git
 
 =cut
 

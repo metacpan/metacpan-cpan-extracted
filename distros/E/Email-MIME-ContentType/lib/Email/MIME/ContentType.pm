@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::MIME::ContentType;
 # ABSTRACT: Parse a MIME Content-Type Header
-$Email::MIME::ContentType::VERSION = '1.020';
+$Email::MIME::ContentType::VERSION = '1.021';
 use Carp;
 use Encode 2.87 qw(find_mime_encoding);
 use Exporter 5.57 'import';
@@ -48,14 +48,22 @@ our @EXPORT = qw(parse_content_type);
 
 our $STRICT_PARAMS = 1;
 
-my $tspecials = quotemeta '()<>@,;:\\"/[]?=';
-my $token = qr/[^$tspecials \x01-\x08\x0B\x0C\x0E\x1F]+/;
 my $ct_default = 'text/plain; charset=us-ascii';
-my $extract_quoted =
-    qr/(?:\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\"|\'(?:[^\\\']*(?:\\.[^\\\']*)*)\')/;
+
+my $re_token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/; # US-ASCII except SPACE, CTLs and tspecials ()<>@,;:\\"/[]?=
+my $re_token_non_strict = qr/([\x00-\x08\x0B\x0C\x0E-\x1F\x7E-\xFF]+|$re_token)/; # allow CTLs and above ASCII
+
+my $re_qtext = qr/[\x01-\x08\x0B\x0C\x0E-\x1F\x21\x23-\x5B\x5D-\x7E\x7F]/; # US-ASCII except CR, LF, white space, backslash and quote
+my $re_quoted_pair = qr/\\[\x00-\x7F]/;
+my $re_quoted_string = qr/"((?:[ \t]*(?:$re_qtext|$re_quoted_pair))*[ \t]*)"/;
+
+my $re_qtext_non_strict = qr/[\x80-\xFF]|$re_qtext/;
+my $re_quoted_pair_non_strict = qr/\\[\x00-\xFF]/;
+my $re_quoted_string_non_strict = qr/"((?:[ \t]*(?:$re_qtext_non_strict|$re_quoted_pair_non_strict))*[ \t]*)"/;
+
 my $re_charset = qr/[!"#\$%&'+\-0-9A-Z\\\^_`a-z\{\|\}~]+/;
 my $re_language = qr/[A-Za-z]{1,8}(?:-[0-9A-Za-z]{1,8})*/;
-my $exvalue = qr/($re_charset)?'(?:$re_language)?'(.*)/;
+my $re_exvalue = qr/($re_charset)?'(?:$re_language)?'(.*)/;
 
 sub parse_content_type {
     my $ct = shift;
@@ -63,13 +71,16 @@ sub parse_content_type {
     # If the header isn't there or is empty, give default answer.
     return parse_content_type($ct_default) unless defined $ct and length $ct;
 
+    _unfold_lines($ct);
     _clean_comments($ct);
 
     # It is also recommend (sic.) that this default be assumed when a
     # syntactically invalid Content-Type header field is encountered.
-    unless ($ct =~ s/^($token)\/($token)//) {
-        carp "Invalid Content-Type '$ct'";
-        return parse_content_type($ct_default);
+    unless ($ct =~ s/^($re_token)\/($re_token)//) {
+        unless ($STRICT_PARAMS and $ct =~ s/^($re_token_non_strict)\/($re_token_non_strict)//) {
+            carp "Invalid Content-Type '$ct'";
+            return parse_content_type($ct_default);
+        }
     }
 
     my ($type, $subtype) = (lc $1, lc $2);
@@ -94,6 +105,10 @@ sub parse_content_type {
         discrete   => $type,
         composite  => $subtype,
     };
+}
+
+sub _unfold_lines {
+    $_[0] =~ s/(?:\r\n|[\r\n])(?=[ \t])//g;
 }
 
 sub _clean_comments {
@@ -137,7 +152,7 @@ sub _process_rfc2231 {
     foreach (keys %{$attribs}) {
         next unless $_ =~ m/^(.*)\*$/;
         my $key = $1;
-        next unless $attribs->{$_} =~ m/^$exvalue$/;
+        next unless $attribs->{$_} =~ m/^$re_exvalue$/;
         my ($charset, $value) = ($1, $2);
         $value =~ s/%([0-9A-Fa-f]{2})/pack('C', hex($1))/eg;
         if (length $charset) {
@@ -173,18 +188,22 @@ sub _parse_attributes {
             return $attribs;
         }
         my $attribute;
-        if (s/^($token)=//) {
+        if (s/^($re_token)=//) {
             $attribute = lc $1;
         } else {
             if ($STRICT_PARAMS) {
                 carp "Illegal Content-Type parameter '$_'";
                 return $attribs;
             }
-            unless (s/^([^;=\s]+)\s*=//) {
-                carp "Cannot parse Content-Type parameter '$_'";
-                return $attribs;
+            if (s/^($re_token_non_strict)=//) {
+                $attribute = lc $1;
+            } else {
+                unless (s/^([^;=\s]+)\s*=//) {
+                    carp "Cannot parse Content-Type parameter '$_'";
+                    return $attribs;
+                }
+                $attribute = lc $1;
             }
-            $attribute = lc $1;
         }
         _clean_comments($_);
         my $value = _extract_ct_attribute_value();
@@ -197,18 +216,22 @@ sub _parse_attributes {
 sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
     my $value;
     while (length $_) {
-        if (s/^($token)//) {
+        if (s/^($re_token)//) {
             $value .= $1;
-        } elsif (s/^($extract_quoted)//) {
+        } elsif (s/^$re_quoted_string//) {
             my $sub = $1;
-            $sub =~ s/^["']//;
-            $sub =~ s/["']$//;
             $sub =~ s/\\(.)/$1/g;
             $value .= $sub;
         } elsif ($STRICT_PARAMS) {
             my $char = substr $_, 0, 1;
             carp "Unquoted '$char' not allowed in Content-Type";
             return;
+        } elsif (s/^($re_token_non_strict)//) {
+            $value .= $1;
+        } elsif (s/^$re_quoted_string_non_strict//) {
+            my $sub = $1;
+            $sub =~ s/\\(.)/$1/g;
+            $value .= $sub;
         }
         my $erased = _clean_comments($_);
         last if !length $_ or /^;/;
@@ -219,7 +242,7 @@ sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
         }
         if ($erased) {
             # Sometimes semicolon is missing, so check for = char
-            last if m/^$token=/;
+            last if m/^$re_token_non_strict=/;
             $value .= ' ';
         }
         $value .= substr $_, 0, 1, '';
@@ -269,7 +292,7 @@ Email::MIME::ContentType - Parse a MIME Content-Type Header
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 SYNOPSIS
 

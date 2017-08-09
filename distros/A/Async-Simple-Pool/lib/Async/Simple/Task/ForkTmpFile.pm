@@ -122,7 +122,7 @@ use Data::Serializer;
 use Time::HiRes qw/ alarm sleep /;
 use File::Temp ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 extends 'Async::Simple::Task::Fork';
 

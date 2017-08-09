@@ -2,14 +2,14 @@
 
 makepp_signatures -- How makepp knows when files have changed
 
-=for vc $Id: makepp_signatures.pod,v 1.23 2012/10/14 15:16:31 pfeiffer Exp $
+=for vc $Id: makepp_signatures.pod,v 1.26 2015/07/13 20:54:05 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
 =for genindex '\w+' makepp_signatures.pod
 
-B<C:>E<nbsp>L<C|/c>,
-  L<c_compilation_md5|/c>,E<nbsp>
+B<C:>E<nbsp>L<C|/c_compilation_md5>,
+  L<c_compilation_md5|/c_compilation_md5>,E<nbsp>
 B<M:>E<nbsp>L</md5>,E<nbsp>
 B<P:>E<nbsp>L</plain>,E<nbsp>
 B<S:>E<nbsp>L</shared_object>,E<nbsp>
@@ -74,14 +74,15 @@ this is quite hard to do so it's not a serious danger.  In the future, as more
 filesystems switch to timestamps of under a second, hopefully Perl will give us
 access to this info, making this failsafe.
 
-=item C
-
 =item c_compilation_md5
 
-This is the method for input files to C like compilers.  It checks if a file's name looks
-like C or C++ source code, including things like Corba IDL.  If it does, this
-method applies.  If it doesn't, it falls back to plain signatures for binary
-files (determined by name or else by content) and else to L</md5>.
+=item C
+
+This is the method for input files to C like compilers.  It checks if a file's
+name looks like C or C++ source code, including things like Corba IDL.  If it
+does, this method applies.  If it doesn't, it falls back to L<plain
+signatures|/plain (actually nameless)> for binary files (determined by name or
+else by content) and else to L</md5>.
 
 The idea is to be independent of formatting changes.  This is done by pulling
 everything up as far as possible, and by eliminating insignificant spaces.
@@ -89,13 +90,14 @@ Words are exempt from pulling up, since they might be macros containing
 C<__LINE__>, so they remain on the line where they were.
 
     // ignored comment
-  
+
     #ifdef XYZ
  	#include <xyz.h>
     #endif
-  
+
     int a = 1;
-  
+
+    #line 20
     void f
     (
  	int b
@@ -103,7 +105,7 @@ C<__LINE__>, so they remain on the line where they were.
     {
  	a += b + ++c;
     }
-  
+
  	/* more ignored comment */
 
 is treated as though it were
@@ -111,16 +113,16 @@ is treated as though it were
     #ifdef XYZ
     #include<xyz.h>
     #endif
-  
-  
-  
+
+
+
     int a=1;
-  
+    #line 20
     void f(
-  
+
     int b){
-  
-  
+
+
     a+=b+ ++c;}
 
 That way you can reindent your code or add or change comments without
@@ -167,6 +169,35 @@ written by the preprocessor), so a recompilation was not actually
 necessary.
 
 =back
+
+Actually in practice this saves less recompiles than you'd hope for, because
+mere comment changes often add lines.  In order for logging with C<__LINE__>
+or the debugger to match your source, this requires recompilation.  So this
+signature is specially useless for the C<tangle> family of tools from literate
+programming, where your code resides in some bigger file and even changes to a
+documentation section irrelevant to code will be reflected in the extracted
+source via a C<#line> directive.
+
+If you can live with wrong line numbers during development, you can set the
+variable C<makepp_signature_C_flat> (with an uppercase C) to some true value
+(like C<1>).  Then, whereas the compiler still sees the real file, the above
+example will be flattened for signing as:
+
+    #ifdef XYZ
+    #include<xyz.h>
+    #endif
+    int a=1;void f(int b){a+=b+ ++c;}
+
+Note that signatures are only recalculated when files change.  So you can
+build for everyone in a repository without this option, and those who want the
+option can set it when building in their sandbox.  When they first locally
+change a file, even only trivially, that will cause a recompilation, because
+with this option a totally different signature is calculated.  But then they
+can reformat the file as much as they want without further recompilation.
+
+The opposite is also true: Just omitting this option after it was set and
+recompiling will not fix your line numbers.  So, if line numbers matter, don't
+do a production build in the same sandbox without L<cleaning|makeppclean> first.
 
 =item md5
 

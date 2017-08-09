@@ -1,5 +1,9 @@
 Revision history for MariaDB-NonBlocking
 
+0.02    2017-07-31
+        * ->run_query_start() can now take query params
+        * ->run_query_start() may optionally return an arrayref of hashrefs
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

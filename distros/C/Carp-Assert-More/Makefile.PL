@@ -37,7 +37,7 @@ if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
     $parms{META_MERGE} = {
         resources => {
             bugtracker  => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Assert-More',
-            repository  => 'http://github.com/petdance/carp-assert-more/tree/master',
+            repository  => 'https://github.com/petdance/carp-assert-more/tree/master',
             license     => 'http://www.opensource.org/licenses/artistic-license-2.0.php',
         }
     };

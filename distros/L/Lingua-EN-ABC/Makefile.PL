@@ -14,12 +14,18 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'JSON::Parse' => '0.38',
+	'Carp' => '0',
+	'Convert::Moji' => '0.10',
     },
     META_MERGE => {
         resources => {
             repository => $repo,
             bugtracker => "$repo/issues",
         },
+        x_contributors => [
+	    'Nigel Horne <njh@cpan.org>',
+	    'Ed Avis <edavis@cpan.org>',
+        ],
     },
     EXE_FILES => [
 	'script/econv',

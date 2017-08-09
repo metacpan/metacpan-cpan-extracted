@@ -1,0 +1,50 @@
+{
+   "abstract" : "Order/Unordered stack",
+   "author" : [
+      "Mike Shipper <AKALINUX@CPAN.ORG>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Queue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.42",
+            "Data::Dumper" : "2.167",
+            "Data::Result" : "1.000",
+            "Modern::Perl" : "1.20170117",
+            "Moo" : "2.003002",
+            "MooX::Types::MooseLike::Base" : "0.29",
+            "Test::More" : "1.302073",
+            "namespace::clean" : "0.27",
+            "overload" : "1.28"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

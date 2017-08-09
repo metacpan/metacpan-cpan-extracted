@@ -1,6 +1,24 @@
-------
-$dom->fill_form_fields($item);  
--------
+-- ->fill should do the right thing when the current element is ol, ul, etc.
+-- when doing ->select and there's only one optgroup do the right thing
+-- table helpers ???
+-- review docs especially the form docs.
+-- lace-context, lace-repeat ...?
+-- <$.method> => sub method { $self, $dom, %stuff } ...??
+      <tag lace-call='$.render_user?links=$.links' />
+-- Above would work for components also like
+    <View-Form action=$.action>
+      <View-Form.input name='user' />
+    </View-Form>
+-- <div lace-id='content' lace-id@href='link'>Stuff</div>
+    $dom->lace_data
+      ->content($self->story)
+      ->link($self->uri('info'));
+-- Review all docs and maybe cookbook?
+-- allow <tag lace-component='View-User'>
+        <tag lace-component='View-User?links=$.links' /> ???
+-- ALlow template to assign method on attribute??
+      <tag class=[$.set_class] />  ==> sub { my ($self, $tag_dom) = @_; return 'class' }
+
 
 --
 ## Need to cope with the loop...
@@ -74,37 +92,6 @@ Ok now if we move components to the DOM we can support
 -- fill and smart_content for matching input[name= same as class and id.
   ?this maybe is overloading fill to much perhaps a ->fill_form would be
   better.
-  
-$dom->form('#login',
-  \%attrs, sub {
-    $_->ctx($self->fif, sub {
-      
-    },
-  },
-)
-
-maybe instead some sort of MOP on forms like WWW::Mech
-== END
-
-'ul li' => Repeat {
-  Fill('~', $_),
-  '~@id+' => $_->id,
-  '~@class' => do { $_->completed ? 'completed' : undef },
-  '.update' => $self->uri('/task/update', [$_->todo_id]),
-  'label' => [
-    '~@data_task' => $_->todo_id,
-    '~' => $_->title,
-  'input[name="title"]' => $_->title,
-
-} $self->list,
-
-  $dom->at('label')
-    ->attr('data-task', $_->todo_id)
-    ->content($_->label);
-
-  $dom->'#id'->class("completed")
-
-====
 letting a template 'reach into' a component
 
 <Lace-Status.show>
@@ -342,4 +329,120 @@ sub process_dom {
   my ($self, $dom) = @_;
 }
 
+-------
+<$.fill_user>
+  <dl>
+    <dt>Name</dt>
+    <dd lace='name'>Jo Smith</dd>
+    <dt>Age</dt>
+    <dd lace='age'>24</dd>
+  </dl>
+</$.fill_user>
+
+sub fill_user {
+  my ($self, $data) = @_;
+  $data->name($self->name);
+  $data->age($self->age);
+}
+
+--------
+
+<ul lace-method="$.display_links"
+    class="nav navbar-nav navbar-right">
+  <li><a lace='link_title'
+      lace@href='href'
+      lace@class='is_active'>
+    Link
+  </a></li>
+</ul>
+
+sub display_links {
+  my ($self, $dom) = @_;
+  $dom->repeat(sub {
+    my ($dom, $link, $index) = @_;
+    $dom->data
+      ->link_title($link->title)
+      ->href($link->uri)
+      ->class({'active', $self->active_link eq $link->{id}});
+    return $dom;
+  }, $self->links);
+}
+
+----------
+        
+<ul @repeat="$.links" lace-method="$.display_links"
+    class="nav navbar-nav navbar-right">
+  <li><a lace='link_title'
+      lace@href='href'
+      lace@class='is_active'>
+    Link
+  </a></li>
+</ul>
+
+sub display_links {
+  my ($self, $data) = @_;
+  $data->repeat(sub {
+    my ($datum, $link, $index) = @_;
+    $datum->content($link->title)
+      ->href($link->uri)
+      ->class({'active', $self->active_link eq $link->{id}});
+    return $datum;
+  }, $self->links);
+}
+
+<section lace-render='$.render_links'>
+  <p lace-data='title'></p>
+  <ul>
+    <li lace-data='links'>
+      <a lace-data='description'
+          lace-data@href='link'>
+        Link Link
+      </a>
+    </li>
+  </ul>
+<section>
+
+
+
+sub render_links {
+  my ($self, $dom) = @_;
+  $dom->data
+    ->title('Hello')
+    ->links( sub {
+        my ($self, $dom) = @_;
+        $dom->repeat( sub {
+          my ($li, $link) = @_;
+          $li->data
+            ->description($link->description)
+            ->link($link->url);
+          return $li;
+        }, $self->links);
+      });
+}
+
+  $dom->data
+    ->title('Hello')
+    ->links
+    ->repeat(sub {
+      my ($li, $link) = @_;
+      $li->data
+        ->description($link->description)
+        ->link($link->url);
+        return $li;
+    })
+    
+  $dom->data
+    ->title('Hello')
+    ->links
+    ->repeat($self->curry::render_link)
+    ->then
+    ->more...
+
+sub render_link {
+  my (self, $li, $link) = @_;
+  $li->data
+    ->description($link->description)
+    ->link($link->url);
+  return $li;
+}
 

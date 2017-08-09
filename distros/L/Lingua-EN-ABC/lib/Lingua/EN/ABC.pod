@@ -1,6 +1,7 @@
 
 
 
+
 =encoding UTF-8
 
 =head1 NAME
@@ -22,13 +23,13 @@ produces output
     colour
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-EN-ABC-0.06/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-EN-ABC-0.07/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.06 of Lingua::EN::ABC corresponding to git
-commit 3a3f5f2f6acf9ba9ef39b6978e3dca08d9bb5f04 released on Wed Aug 31 13:24:28 2016 +0900.
+This documents Lingua::EN::ABC version 0.07
+corresponding to git commit L<d68fab88e715c3e89d619f54129fa49bbcefc7d5|https://github.com/benkasminbullock/Lingua-EN-ABC/commit/d68fab88e715c3e89d619f54129fa49bbcefc7d5> released on Mon Jul 31 12:14:58 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -99,25 +100,18 @@ whether to use Oxford spelling (realize rather than realise):
 
 =over
 
-=item L<boolean>
-
-boolean is used for making the JSON. It isn't required to use the
-module, only if you need to edit it. See also L</BUILD PROCESS>.
-
 =item L<Carp>
 
 Carp is used to print errors.
 
-=item L<JSON::Create>
-
-JSON::Create is used for making the JSON. It isn't required to use the
-module, only if you need to edit it. See also L</BUILD PROCESS>.
-
 =item L<JSON::Parse>
 
-JSON::Parse is used to read in the file of spelling data. This file
-isn't intended to be human-edited, please edit F<abc.txt> in the top
-directory of the distribution.
+JSON::Parse is used to read in the file of spelling data.
+
+=item L<Convert::Moji/make_regex>
+
+This is used to make a regular expression which converts the words
+from one form to another.
 
 =back
 
@@ -132,8 +126,9 @@ that it's easy to search and check.
 
 =item respell
 
-L<respell|http://membled.com/work/apps/respell/> is a tool to convert
-English text from one spelling system to another.
+C<respell> is a tool to convert English text from one spelling system
+to another. This used to be at http://membled.com/work/apps/respell,
+but that web site has now disappeared as of Mon Jul 31 12:14:58 2017 +0900.
 
 =back
 
@@ -143,20 +138,15 @@ There is a script called F<econv> in the distribution which runs these
 functions on its command line. Please use C<econv --help> for detailed
 usage instructions.
 
-=head1 BUILD PROCESS
+=head1 DATA FILE
 
-The file containing the spelling variations is F<abc.txt> in the top
-directory of the distribution. The comment at the top of the file
-contains information about the format. If you want to add to this
-module's list of words, please edit the file F<abc.txt> and send a
-pull request on github. Unfortunately the build process uses two
-private modules. One is called Table::Readable and the other one is
-called Perl::Build (this actually predates the module called
-Perl::Build on CPAN by TOKUHIROM), so it's hard to build. However, if
-you are interested in working on this module, but do not want to adopt
-it, please let me know, and I will remove the dependence on these two
-private modules. If you want to adopt the module then please contact
-me at bkb@cpan.org.
+The data file provided with the distribution isn't intended to be
+human-edited. The master file containing the spelling variations is
+L<F<abc.txt>|https://github.com/benkasminbullock/Lingua-EN-ABC/blob/master/abc.txt>
+in the top directory of the distribution. The comment at the top of
+the file contains information about the format. To add to this
+module's list of words, edit the file and send a pull request on
+github.
 
 =head1 BUGS
 
@@ -164,12 +154,20 @@ me at bkb@cpan.org.
 
 =item No handling of ambiguous words like "program".
 
-=item Cannot convert case-insensitively.
+"Program" is used in British English for computer programs, whereas a
+theatre programme uses the -mme spelling.
+
+=item It only converts lower case
+
+For example, L</a2c> will not convert "The Color Purple" or "The World
+Trade Center" into "The Colour Purple" or "The World Trade
+Centre". This is a feature as well as a bug, since proper names like
+movie titles or place names should not be respelt.
 
 =item Word lists are not comprehensive
 
-=item The module's methodology is very far from efficient, so for very
-long texts this module may perform very badly.
+Please feel free to contribute. See L</DATA FILE> for an easy way to
+contribute new items.
 
 =item There are no tests involving the ambiguity data
 
@@ -191,18 +189,10 @@ was used in the preparation of the data. Nigel Horne (NJH) and Ed Avis
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2013-2016
+2013-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

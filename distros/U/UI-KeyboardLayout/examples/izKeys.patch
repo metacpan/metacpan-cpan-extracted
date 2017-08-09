@@ -759,7 +759,7 @@
 -    /*
 -     * Locale-specific special processing
 -     */
--    MAKELONG(KLLF_ALTGR, KBD_VERSION),
+-    MAKELONG(KLLF_LRM_RLM | KLLF_ALTGR, KBD_VERSION),
 -
 -    /*
 -     * Ligatures

@@ -1,3 +1,9 @@
+libqbit-application-perl (0.015) raring; urgency=low
+
+  * speed up accessors and post_run
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 31 Jul 2017 01:04:13 +0300
+
 libqbit-application-perl (0.014) raring; urgency=low
 
   * clear current user rights

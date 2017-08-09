@@ -8,7 +8,7 @@ use 5.014;
 
 package JsonSQL::Param::Joins;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JsonSQL::Param::Join;
 use JsonSQL::Error;
@@ -64,7 +64,7 @@ JsonSQL::Param::Joins - JsonSQL::Param::Joins object. Stores an array of JsonSQL
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

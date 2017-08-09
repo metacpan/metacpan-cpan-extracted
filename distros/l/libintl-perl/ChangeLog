@@ -1,40 +1,386 @@
-commit d26cf9f7c2f32c7c888aa8322f2d7da544c9debe
+commit 2dfd72f7a28ec60ba19cc3e4054f4585763ce015
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Tue Aug 8 11:05:57 2017 +0300
+
+    updated NEWS
+
+commit fa3682f43451ea1b0f3bbc3117235f883a16d59e
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Tue Aug 8 11:00:36 2017 +0300
+
+    updated fsf address
+    
+    Fixes https://rt.cpan.org/Public/Bug/Display.html?id=114731
+
+commit 3b1327beb89e79e8d75c6e06eff380bf7dfb20cc
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Tue Aug 8 11:00:25 2017 +0300
+
+    updated NEWS
+
+commit 74f3a35cc24a54ada3bbef96d79e63a0592b7f18
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Aug 7 17:55:44 2017 +0300
+
+    do not require modules from relative paths
+    
+    Fixes https://security-tracker.debian.org/tracker/CVE-2016-1238
+
+commit d725a0f3c0eec4bb133091f3415c76c4319d562e
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Aug 7 17:42:04 2017 +0300
+
+    updated ChangeLog
+
+commit 40cd90c1fbf91bab1e00080c0cf0e31304f39267
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Aug 7 17:34:40 2017 +0300
+
+    do not generate files in distribution
+    
+    Fixes https://rt.cpan.org/Public/Bug/Display.html?id=119014
+
+commit 7f64897c0613bc6f4cada6da13bad013f3e60eef
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Aug 7 17:29:51 2017 +0300
+
+    bumped version number to 1.27
+
+commit e044dbf297dcb34f267602ecfa44f1b36c36e60f
+Author: Petr Písař <ppisar@redhat.com>
+Date:   Mon Aug 7 17:26:11 2017 +0300
+
+    fix building on Perl without "." in @INC
+    
+    Fixes https://rt.cpan.org/Public/Bug/Display.html?id=120446
+
+commit 1a3b82ed11bce8a87f5fc01c9fc407a669124924
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Nov 25 09:33:57 2016 +0200
+
+    updated
+
+commit 366271f577b648f4c376a33e89e82a018797f8f9
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Nov 25 09:33:40 2016 +0200
+
+    typo
+
+commit 66bf24b57b6ebf033d6078381a65276a5fd1003d
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Jun 13 15:24:59 2016 +0300
+
+    generate README from markdown file
+
+commit 7d8b72a1b8c0b30046c05408595501868db58511
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Jun 13 12:02:31 2016 +0300
+
+    bumped version number to 1.26
+
+commit 14ba4fdbe732ff8d2a7648a6e889f3b7414cb7d1
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Jun 13 11:52:27 2016 +0300
+
+    fixed false negatives
+    
+    Fixes https://rt.cpan.org/Ticket/Display.html?id=115052
+
+commit b6a96cb6b2b498bcb9aba6f56c60938322aad86a
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Jun 13 11:36:07 2016 +0300
+
+    Encode 2.x uses new versioning
+
+commit 5ac9e9f3d0426cb7d34848234bc6a9786c63824f
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 23:04:42 2016 +0300
+
+    clean-up
+
+commit 25041300f9112630b5d62d9484474e74b81e0f1f
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:52:19 2016 +0300
+
+    updated copyright date and contact info
+
+commit dd2e849a5c3ae9b91a6a9627b65ba31f09664ad0
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:35:08 2016 +0300
+
+    changed copyright date
+
+commit e6439887603c28e7b494fcffbbad29669925a2b8
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:29:42 2016 +0300
+
+    bumped version number to 1.25
+
+commit 443af9c148d951dde8b623d587ab4641843cd34b
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:29:09 2016 +0300
+
+    sign distribution
+
+commit 4442a733d91c1135233e17554960d78e091987b9
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:28:49 2016 +0300
+
+    updated THANKS
+
+commit f1b645c3e2d1fcadc9f2524de122f31f6545e108
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:21:48 2016 +0300
+
+    prepared NEWS for 1.25
+
+commit 95dce3cbf8fb62b5f9b1a8557557aed03b8d2151
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 22:18:25 2016 +0300
+
+    skip testing the XS version in unknown environment
+    
+    Fixes https://rt.cpan.org/Ticket/Display.html?id=83980
+
+commit 28d361f32cde67c175caa9bc85b877519e6d7d41
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon May 16 21:54:48 2016 +0300
+
+    check for de_AT locale for these test
+    
+    Fixes https://rt.cpan.org/Ticket/Display.html?id=47968
+
+commit c077863beabeaefc3f7521d3a1e45f69079e33d4
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 09:42:22 2015 +0300
+
+    ignore generated files
+
+commit f6f26bde85d47098f78ff9d92d25d6eb80ce1b4f
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 09:42:03 2015 +0300
+
+    synched version with Locale::TextDomain
+
+commit a2ccdf9863887152a7b622f6629afcc3444a0a7d
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 09:36:06 2015 +0300
+
+    updated NEWS
+
+commit 186f454dee09f455a182bb8e6b631456f0b7705e
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 09:36:01 2015 +0300
+
+    updated
+
+commit e0ef73b256e8215f373caab3bb1777916f5fd440
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 08:13:12 2015 +0300
+
+    disable translation tests on localeless systems
+    
+    See https://rt.cpan.org/Ticket/Display.html?id=98109
+
+commit 166d5c2a9c9dbf21b36dbb87aebba45ec1aefeed
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 08:06:53 2015 +0300
+
+    fall back to gettext_dumb for localeless systems
+    
+    See https://rt.cpan.org/Ticket/Display.html?id=98109
+
+commit 455193adabf2e7b3e6af31e38674fd5b49244a18
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 07:42:49 2015 +0300
+
+    hint for bind_textdomain_filter
+
+commit 2f6bd8ca36aaa33cd918e3b7e54275d98cc2fbbe
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 07:34:35 2015 +0300
+
+    fixed number of planned tests
+
+commit d91073c91ab09abe52f2ddd953f955f16fa112aa
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 07:32:37 2015 +0300
+
+    guard against missing locale, #47968
+
+commit 5083ea106a7a3aa71453f429b19688d68cc908a4
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 07:25:29 2015 +0300
+
+    updated
+
+commit df746bd31053dac5c17f2732e3bd29e7b5d84e21
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Apr 8 07:05:34 2015 +0300
+
+    changed pod, #102288
+
+commit e6b273478ac34cfa160cbbfb836c2a7736f70eb8
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Apr 6 08:32:51 2015 +0300
+
+    deactivate compatibility test by default
+
+commit c8f1bade4f45653432f055871a8d1f5a5a0230de
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Mon Apr 6 08:32:41 2015 +0300
+
+    bumped version number to 1.24
+
+commit efab194564dd3692beba88159ad5533ad9e5ea97
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 16:28:34 2015 +0300
+
+    no longer needed
+
+commit b114fe742299ea61b85b25aad23030793aada319
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 16:23:42 2015 +0300
+
+    prefer setlocale() from Locale::Messages
+    
+    This fixes https://rt.cpan.org/Public/Bug/Display.html?id=83980
+
+commit d9a49c200d039dce50ce0d9e1198292f3c5a0c2c
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 15:55:27 2015 +0300
+
+    regenerated corrupted mo files
+
+commit ef41a6c9a56236aa9b4ddf1bd5438cb324750100
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 15:32:58 2015 +0300
+
+    cleaned MANIFEST
+
+commit edbd3d68a50f201c13223a94a33ad20423585b18
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 09:51:09 2015 +0300
+
+    various updates and clean-ups
+
+commit bedc2fc24b16cbc0c01a60603b291a7e22bdf759
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 09:29:16 2015 +0300
+
+    changed to cantanea
+
+commit 61f629077a132438db65a40aaf1687e0c7dc467e
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 09:21:45 2015 +0300
+
+    changed to cantanea
+
+commit 561da08b2ac802eaffd22214ba4135a94635f578
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 08:45:34 2015 +0300
+
+    changed copyright and date
+
+commit eb51648176d10899d2959e4f2e45ff930ef56195
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 08:42:49 2015 +0300
+
+    Revert "changed copyright"
+    
+    This reverts commit 8732631f2a6bf3a695f401b2ddff9625df827528.
+
+commit 03be37f903ec902b3ad4c80e8f9fa3537b40f716
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 08:39:05 2015 +0300
+
+    changed copyright
+
+commit b0cc05c17e208e4fcc0be314e52c1430655c2ff7
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 08:07:59 2015 +0300
+
+    removed garbage
+
+commit 5e5a1f72b9e90b5c330753f6fea4eb02625fe27b
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 08:07:04 2015 +0300
+
+    changed email address
+
+commit 8b7d7b719321643c30941527663f517c93982e30
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Apr 3 08:02:55 2015 +0300
+
+    added GPL v3
+
+commit ad0c346c5eb7193b2cbec51353f1ed875cf456ed
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Fri Jun 20 13:11:58 2014 +0300
+
+    typo
+    
+    Thanks to Henrik Pauli.
+
+commit c72529c2111f7f462d8f82e2288185089dfa013f
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Oct 2 12:16:47 2013 +0300
+
+    removed MYMETA stuff
+    
+    fixed [rt.cpan.org #89167]
+
+commit 04a37fca1535334ce25313a94ea59d6e549041f3
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Tue May 7 17:23:59 2013 +0300
+
+    Typo
+    
+    This fixes https://rt.cpan.org/Ticket/Display.html?id=84805
+
+commit a1b4fb5cc722285672573cd9f2cee1ee65217852
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Thu Jan 24 17:56:45 2013 +0200
+
+    updated ChangeLog
+
+commit fcb09e23bb1155444794ba60ea6fb63e01872f1d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:56:29 2013 +0200
 
     bumped version number to 1.23
 
-commit 852632efc7022cdf26c77371e687461e86e7f7ec
+commit 08e2e6210200064640db59318c053d8e60170c0f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:50:19 2013 +0200
 
     updated ChangeLog
 
-commit d2392f2178c84035f9168e1cd3ce56bbf37b82aa
+commit a128b2992e1a1d3e375681d28b7c58fc87aba0c9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:49:53 2013 +0200
 
     indirect version number outsmarts PAUSE
 
-commit 64a9105679c7194b49524d7aafddc7609691f2cd
+commit 8bd17b3fdb069a2755d3d48afb25e4e488522a97
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:35:36 2013 +0200
 
     updated ChangeLog
 
-commit 7aafc768315aacf20e679e0a188f1add3154fcd8
+commit e81751cf80b2293b381fdddbb17aa44613ff6204
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:35:17 2013 +0200
 
     updated release date for 1.22 in NEWS
 
-commit f92843cbd45b8a5597398fa9b9b362ee223baec9
+commit 2611d56ac448a6704b3bde5547251a6869e784d8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:34:25 2013 +0200
 
     updated ChangeLog
 
-commit 858750985fee23badf35fc0484e190b7a323e552
+commit d5f06cb373e9a1db7680f436f8488fddb80130ff
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 24 17:33:52 2013 +0200
 
@@ -42,85 +388,85 @@ Date:   Thu Jan 24 17:33:52 2013 +0200
     
     LC_ALL was set before and it has precedence over lang.
 
-commit 2754ea936d3cb144976ad5e9e7e4e13bfc383f4a
+commit 9bb6f7c158e368c8e33ba5b20c457615ecffdef0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 19:00:21 2013 +0200
 
     Locale::gettext_pp needs File::Spec
 
-commit 3d4f31c1db2fece1c3e81ccdb0d298dafe4c41cc
+commit 3aeaf35a5dc5cbdd5a7c1a0ee6f816a7c0814261
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 18:08:18 2013 +0200
 
     updated THANKS
 
-commit f7eda6a60fcd80a78dd02a5956a02101f56c62be
+commit 3cb6babc6e025f5af16a7857719b1428bcc4de1c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 18:02:47 2013 +0200
 
     made tests match PO files
 
-commit fb48568c2744a7a0ce607b344e9f9cb8ce6c78c6
+commit bfbeb8b437aef8159a88b089051263908d735849
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 17:46:21 2013 +0200
 
     bumped version number to 1.22
 
-commit 82eae3716ee218eb9820e90facd8a9b588d5cbb1
+commit 5f3607ac7ec998884f26bc9448b7617c34f10402
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 17:46:08 2013 +0200
 
     remove generated files from scm
 
-commit 6b32e628d4cc69bb87cd2b95cd3c6a2fc70e7ad5
+commit 79c69df390e31a8bdbe1b6573c0ad19ef25471e0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 17:45:39 2013 +0200
 
     updated MANIFEST
 
-commit 5f038a1b98feef745eed543eec66bcd557a09933
+commit ec964ae509903b0c1cfa6e93265abd02289fad1f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 17:45:20 2013 +0200
 
     updated NEWS
 
-commit b2d189b5612aacf426b2ee79e704d5aefafe22aa
+commit 52bbf7bc2af266f147f1e89066e5820dff810677
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 17:45:08 2013 +0200
 
     additional PO data for testing
 
-commit fc13f51b8e4615af3e8fd179caace3aad3fc7994
+commit 3ac83238c6cb8d850894dc844ec63f8476d2fd2c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 17:18:39 2013 +0200
 
     better explanation for Locale::gettext_dumb(3pm)
 
-commit 38bded7c8702f2615b40a5ec637c97b7544709d6
+commit e171c703852544bde36fc5cc9bba5ff03468953c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 16:16:57 2013 +0200
 
     more tests for locale-unaware backend
 
-commit 2721e02e973c1b4a4e4e505ffa2c843fae3c7553
+commit 7dd03914c7dc638ed61a40163365fa89efa86e2f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 23 15:56:15 2013 +0200
 
     do not clobber $ENV{LC_ALL}
 
-commit b81bf45303ad6d60417ea4028f3d78cc2adba793
+commit 550b0d0e0bfeaef74e95b90c1fe5c107b22de0d9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 19:20:50 2013 +0200
 
     honor LC_MESSAGES in locale-unaware implementation
 
-commit 105a728270a762f1778e49e4c4a6f69c454fdf32
+commit f10b6df369e09eb8c07494b822fbb8adeb5a05de
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 19:16:48 2013 +0200
 
     test for locale-unaware textdomain()
 
-commit 8e2f18eb7611dc5e096b274fc67467cd0daef167
+commit 048756927d4ff9368961e6a22ed18af708e4db66
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 19:15:16 2013 +0200
 
@@ -128,13 +474,13 @@ Date:   Tue Jan 22 19:15:16 2013 +0200
     
     Rather export the catalog loader at some time.
 
-commit e590687d7f9d12b75b63d95afa5f340c8c08aa8f
+commit 17481d707c3f8a1132e2910f10ceeccf904031fe
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 19:08:51 2013 +0200
 
     use MSGPATH instead of MESSAGE_CATALOGS in wrapper
 
-commit 5ab8ab07510f8e3bc60f5f88209f21cb05cb4b7c
+commit 6a48a415633143b689218bff8416a1ac6a49b825
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 19:05:32 2013 +0200
 
@@ -147,43 +493,43 @@ Date:   Tue Jan 22 19:05:32 2013 +0200
     
     This commit only contains the test, not the implementation!
 
-commit 25c8d0a19814451005c1366cf7377a9abf591750
+commit e306e120491ea76fa7ff227ac35b3b54b36f62d5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 18:57:34 2013 +0200
 
     test precedence of catalog paths
 
-commit 458565752b0ad0c5288b7d0a5d22c6bfdbb21f18
+commit 6571a31c82a7c73a37b494ccd5efd1ab15be1892
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 18:54:45 2013 +0200
 
     locale-unaware implementation of dcnpgettext()
 
-commit bc8223dd196874ef96e35813117c49e03538aea2
+commit d9a42e7d335ce113cc5766c805a01ea4742f69a1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 18:12:02 2013 +0200
 
     insert a wrapper around dcnpgettext()
 
-commit bf1dd581a2d9fca42be6bc6434b4b9f371afbf2e
+commit caa7f6353908202bb5d3278a8d4145c74483cd68
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 18:07:15 2013 +0200
 
     replaced tabs by spaces
 
-commit dcf755109f7376bff0c86b261ff08a0ec1432b3a
+commit 49f78ed7151ed50402936697b581a85a1b6fd4c6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 18:01:27 2013 +0200
 
     simplified Locale::gettext_pp::__load_domain()
 
-commit 00160cef94b6f22d7dee787f50c13b45351b6060
+commit e350b808f0ea03645ae923223894af9ac8e0b448
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 17:56:45 2013 +0200
 
     more abstractions for Locale::gettext_pp
 
-commit 8175b2423dce3cc0bcfa8b785214263d7dde2c61
+commit 14abb94c3dc84f0c52730a0247928bcd80ef7681
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 17:46:02 2013 +0200
 
@@ -191,7 +537,7 @@ Date:   Tue Jan 22 17:46:02 2013 +0200
     
     So that we can later hook better with our dumb implementation.
 
-commit d65abb71797eadc10523df7d17ef93412a48effb
+commit cba47b469be77713d2ec4cb299b9f4dbdba21646
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 17:37:08 2013 +0200
 
@@ -200,121 +546,121 @@ Date:   Tue Jan 22 17:37:08 2013 +0200
     Otherwise we cannot enforce that the central entry point dcnpgettext()
     will be called in our own package.
 
-commit 6a4f29be97e7776ee02153dc24efb3acb8fe55b3
+commit cfeba5e57739fa451139dc6be2725f22e7a7d324
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 16:58:18 2013 +0200
 
     abstract Locale::Messages to support more backends
 
-commit 5759332780f997edb862bce0940c420e28be8c97
+commit cf15ccade3a47935c35133ae4da8851e361e7fa3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 16:20:16 2013 +0200
 
     override textdomain functions in gettext_dumb
 
-commit 10cf1f896ddd3456588b938f8c51c33ad509b9ed
+commit 274502b41d54157066c574085f326eb2df0ee73e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 22 15:43:54 2013 +0200
 
     dumb backend for message retrieval
 
-commit 841e441974660f898d99b4608d0b36ed75997edd
+commit 843545b0f882202bbd51572987bbf8203ffe37ef
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 17 12:26:27 2013 +0200
 
     0xbeefbabe is not a valid unicode code point
 
-commit b69e9b27f57f2c1d075361c1b2e80bbab0e5aa73
+commit 73fd377305ab0250a301e3fe0786c19421ba3f62
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 17 12:25:29 2013 +0200
 
     do not run gettext tests without locale de_AT
 
-commit 165511ac11d187a78750272ba6cb81c325472c99
+commit 35c70297c8826888ab1a18145bb42099db5a8dbc
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 16 02:11:57 2013 +0200
 
     git uses libintl-perl
 
-commit 3a5578ff47eef257840ee505576ecf7715b0ff08
+commit 3e6759abd700b2d67e6c032e1d590888f27a921e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 16 02:11:43 2013 +0200
 
     updated NEWS
 
-commit 533f50f54bbb3b43ae9f595c12e9d3fcd7a2c3ee
+commit 4246fdda00b58192fc1c977bbb2b07af19ce9914
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 15 14:40:43 2013 +0200
 
     updated ChangeLog
 
-commit e04511866be52da18ee848da933a16ab130a9837
+commit 0dbcca380a98efd5d974af7c3bcaf7b96b44e6fe
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 15 14:29:51 2013 +0200
 
     distcheck tweaks
 
-commit da50f196b5879cd4ac4903b11f265db1854de441
+commit 4fe4d4c693be3406d063d6f107028ae1f75971ac
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 15 14:18:01 2013 +0200
 
     simplified XS version check
 
-commit eb759fbf7b7a39fae79ec3a6517e60e023b024a8
+commit 8990cc12e552ef9eafdb30fbb2740f989e798102
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 15 14:08:59 2013 +0200
 
     updated README for sample application
 
-commit a1fb194032e27dc375b3b38f772d7e37d8407274
+commit 91e39fde9ff591b54e851d3574c614937c39ddee
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jan 15 14:06:19 2013 +0200
 
     standardization tweaks
 
-commit 763af3c2c564db536dea59a5ced9eaaf097c74eb
+commit 1308461c1552c40cb0d0a2bcf834eb7bb648beaa
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 14 18:55:32 2013 +0200
 
     bumped version number to 1.21
 
-commit 92870f0ebd32021d9d8fab91c0bc27720c383d7f
+commit 2396c65cf259c445ae32e791b4e674f4f1b2a32d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 14 18:51:05 2013 +0200
 
     updated copyright date
 
-commit 628d8a1ae8b2781b37d41aea648026b40be4a04e
+commit 71bb83a94bca926e666825762d0ee30721a7a829
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 14 18:48:48 2013 +0200
 
     added czech mo file for sample app
 
-commit 0490ae65a13fa7630f334efc536a562e12109d94
+commit c5795e83382b49f308db1a47dbb2625af0d519e2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 14 18:41:30 2013 +0200
 
     updated MANIFEST
 
-commit 7be831bfbd4b6a5d765050fe8de2404e1603505a
+commit df77bb32beb7ecd8b648f6d6bbbc6f58a37a952d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 14 18:37:45 2013 +0200
 
     updated NEWS
 
-commit acbdb411589c69c52cfb9958dcf6d9f4d0a2dd64
+commit ecf3d5fb684ded59da6600720ee893d050990645
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 14 18:14:36 2013 +0200
 
     use POTFILES, not POTFILES.in
 
-commit 8cf18b092b15955db8058d4797693d7391d15eef
+commit b1fbf9835fbb365ab9c91c8d0049cf1c4201b96b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 18:52:36 2013 +0200
 
     corrected hints for l10n
 
-commit 7dbb97c013bc2de966648352bf51b72fffc488a9
+commit 5910980b6e42409e3ee4d4e6a81d8eabc5298e82
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 18:47:48 2013 +0200
 
@@ -324,25 +670,25 @@ Date:   Fri Jan 11 18:47:48 2013 +0200
     LC_ALL nor LC_MESSAGES are set to a valid locale (not C or POSIX). This fixes
     https://rt.cpan.org/Public/Bug/Display.html?id=81315
 
-commit 2e0519455756fad31676611c1227326e48aabef7
+commit 9045f0837b26f98710bd8b10a32130bceae863c6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 17:58:32 2013 +0200
 
     updated MANIFEST
 
-commit a603074a18a4b4f0be887f3c2c0502a71c7aca7e
+commit 26bc8875421d43bb6474f840c343a4392f15dece
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 17:58:23 2013 +0200
 
     updated ReleaseNotes
 
-commit b59f0cdc125d5702259e5fa516a94f8c042ba28c
+commit cd76417e9b4cf52417d3d857db7cddaed66ca441
 Author: Jan Tomášek <jan@tomasek.cz>
 Date:   Fri Jan 11 17:55:30 2013 +0200
 
     czech translations for simplecal
 
-commit 8699b710274c60f4c840c1f5e4487502f6fca5c3
+commit 42be603214401a1c46f2adfe76bdb9926ffba846
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 17:54:07 2013 +0200
 
@@ -350,19 +696,19 @@ Date:   Fri Jan 11 17:54:07 2013 +0200
     
     See https://rt.cpan.org/Public/Bug/Display.html?id=81315
 
-commit 4df5fc79c237a71646e235d73f9b9b65f2ba0d38
+commit 2b6298eaae75976774bfb73a284b98375e003804
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 17:28:28 2013 +0200
 
     check that LANG works
 
-commit 6c0832236f763eb7e80316695ec3472965984da7
+commit cfe1e2e2db1f49fddbd6396d3af36a62544fe502
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 11 14:18:58 2013 +0200
 
     clean test environment first
 
-commit 6142deaa316177fd92c84e0f4533ea78e67397b6
+commit e2d26ffe387c2c0bfc1de0e9462f29e9acea047c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 10 18:16:40 2013 +0200
 
@@ -373,13 +719,13 @@ Date:   Thu Jan 10 18:16:40 2013 +0200
     one of the LC_ envariables must be set to a valid locale in order to
     have the envariable LANGUAGE be interpreted.
 
-commit c1db0b6d53927ebc603cc1d924b383064efb5787
+commit 4aaff5ab36239d677ce3b3442951df94ea5eee6a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 10 17:32:48 2013 +0200
 
     typo
 
-commit 34b334a0ce5d1b15211142bab46b0f0c3a564297
+commit 853524f4f4e6cfbcbc1119d6b7a925fd3d3a3939
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 10 16:50:52 2013 +0200
 
@@ -387,37 +733,37 @@ Date:   Thu Jan 10 16:50:52 2013 +0200
     
     Will be re-added after the next release.
 
-commit 93212879b7dca042b1990e83b0ea3e9f225723d3
+commit 2f98ac3cdf62de97f56c9b3632c0cb7264a2121b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 10 16:36:55 2013 +0200
 
     temporarily removed premature code for release
 
-commit 7fcb233dd0dc3ed0cf910f23713c6181c52d45ee
+commit 7203dee142e680439d50d65d137082fe602df5c8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 10 15:25:34 2013 +0200
 
     basic test for Locale::Type
 
-commit f6346a154c56a88f565eff36d4ac65f31bd9e2cf
+commit 94969afd3cd7c24ea014daf84d1ec745f40a766f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 4 11:20:05 2012 +0300
 
     Updated POD to reflect latest changes
 
-commit 6b09f16fa9dbce394bfd9ae1e8a9d3595821e46b
+commit 7b0ca77534704b47f450bc561c9fbd664b71cc7a
 Author: David E. Wheeler <david@justatheory.com>
 Date:   Thu Oct 4 11:11:41 2012 +0300
 
     Search both "locale" and "LocaleData"
 
-commit d29291522d0274457ef5add90b6d6e3f3a8a6375
+commit f3e190c472033639867540ce37d173df04d40f4e
 Author: David E. Wheeler <david@justatheory.com>
 Date:   Tue Sep 11 10:01:00 2012 -0700
 
     Add resources to META.* files.
 
-commit eff5eed70d503595cd250af30be7cf45e06dcffc
+commit 6c1391401258ecc32e1b4b92319e6e1ec3ddf856
 Author: David E. Wheeler <david@justatheory.com>
 Date:   Tue Sep 11 09:20:22 2012 -0700
 
@@ -427,7 +773,7 @@ Date:   Tue Sep 11 09:20:22 2012 -0700
     into the standard installer tools. So it makes sense to use it here, if it's
     available.
 
-commit 996aa392bb774ee6628f9fe8b034532420f5ceee
+commit e361f80f1e779a43f2861f53337cf72163d7f11c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 16 12:06:50 2012 +0300
 
@@ -442,7 +788,7 @@ Date:   Mon Jul 16 12:06:50 2012 +0300
     
     This commit fixes https://rt.cpan.org/Public/Bug/Display.html?id=78341
 
-commit 227729165fe63201c4144898784cbecec0dd6e2a
+commit 356f22c39ae41433ad0b3462065165e29c7f93fd
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 11 19:40:12 2012 +0200
 
@@ -451,19 +797,19 @@ Date:   Wed Jan 11 19:40:12 2012 +0200
     This fixes the long-standing bug
     https://rt.cpan.org/Ticket/Display.html?id=49744
 
-commit 9abd7bd5bbb7896b12058712eec25f51249a3b56
+commit cacfd69d1c42e01de9ef15285c371290519ca62d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Dec 16 19:07:20 2011 +0200
 
     Implementation for LC_GLOBAL_LOCALE
 
-commit e1a2f99eb36b15a8e7bbaceda5fe971abb185df6
+commit 3eadcb7ece8e3c72c040e9ca8b23f756f5efb156
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Dec 16 19:01:37 2011 +0200
 
     Test for LC_GLOBAL_LOCALE
 
-commit 51dbbd27824df2cbf50b90c125c676ca8cf35def
+commit f8f1156e35921f823f7bf11919af63f2fd2d4e24
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Dec 16 18:55:49 2011 +0200
 
@@ -473,7 +819,7 @@ Date:   Fri Dec 16 18:55:49 2011 +0200
     Perl user.  Instead, the use counting is done internally and objects
     will be freed as needed.
 
-commit f5240ae83c62d6751785be9e5e092aa1352a5fdb
+commit 2aa885bad4fc4ccd9354ecf52aa170fc6f99b517
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Dec 13 18:58:10 2011 +0200
 
@@ -481,68 +827,68 @@ Date:   Tue Dec 13 18:58:10 2011 +0200
     
     Documentation for xlocale.
 
-commit dd7ca88384bd30db7951e5b5e85f37d1cf98463b
+commit 105f66ff52ad52baf3ae2998f74f8e3f072dd00e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Dec 13 17:38:17 2011 +0200
 
     Check for xlocale API
 
-commit 3b76d4298c6c287c86eb4c37b05064c69168f12a
+commit 10355d00dae7f3263addc019143124d1f2686e8f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 28 12:32:11 2011 +0300
 
     Only search existing directories.
 
-commit 8fb2dce6109ed180907cad413cea29d6a361e769
+commit ae0ac0a7e407dd9f68f4f430df81b9cd3c78c2c1
 Author: Perlover <perlover@perlover.com>
 Date:   Wed Mar 9 18:16:55 2011 +0200
 
     Assume Spain as default country for Spanish.
 
-commit f6c906219ba4eeb26e0d9ba7dcc6185dee1248ec
+commit b1f0adbb68826e09ac0c2b56a77f15f4539d1720
 Author: Иван Бессарабов via RT <BESSARABV@cpan.org>
 Date:   Mon Jan 3 18:11:29 2011 +0100
 
     Fixed format for printf positional parameters in POD example.
 
-commit 1970eef8439cf3da8159c1604ef5c183a5c184c2
+commit f97c1d7d1868ee86d3d4ae9d1a832a921a6a15df
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Feb 1 14:03:40 2010 +0100
 
     Do not use a NULL pointer for the domain parameter of bindtextdomain().
 
-commit 4442578dd08291076a67e3fe634acfed8fe600ef
+commit 302f2cbfb6293a32f4ae1a7514324aaa49c2bcb9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Sep 18 14:59:35 2009 +0300
 
     Removed $Id$ expansion.
 
-commit d34297d4fdfc3f3e49150b89ea32f9537d88204b
+commit 911d966d2567ad899b31e10de78f1cbbb5d823e7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 15:51:28 2009 +0300
 
     Updated.
 
-commit 202467a610f945fde1c920f58e108cfc56485a3b
+commit feb7c4931589f3cbd2fcb947526267afe444429b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 15:18:14 2009 +0300
 
     News for 1.20.
 
-commit 40ad47329f923e552baa8304e256d8ed4c7bbbd0
+commit 9abd111fb7e158da5d2e91809016f04c35a42c08
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 15:17:55 2009 +0300
 
     Copied from THANKS and NEWS.
 
-commit e976259bf0c356e7a73c880845ea9209adf69555
+commit 2a44ff41a511f6adff8d2ea055d507f73357d4d5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 15:17:10 2009 +0300
 
     David Cantrell was very helpful finding the reason for a nasty test
     failure.
 
-commit 8a99207fa9cc26a0cec607d80cde273ac29ca306
+commit 889b3277c072081115e0007b97802c5d0cc183aa
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 14:56:33 2009 +0300
 
@@ -550,13 +896,13 @@ Date:   Mon Jun 29 14:56:33 2009 +0300
     be more flexible, but in fact, most bugs in the XS version can only
     be worked around, not fixed.  Therefore it is not that important.
 
-commit 0c10d64bf490bbf1bfc51238f7efdb336f271a70
+commit 4290db9405fe7fc17b8d15bd6a2fe52db35ebf61
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 14:54:39 2009 +0300
 
     Ignore more files.
 
-commit f5648fb0ff0f3d816a8bce66b6d305acf9d62092
+commit 84ede55121e9769c6d826c161e73659b8eb2d450
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 29 14:53:45 2009 +0300
 
@@ -564,14 +910,14 @@ Date:   Mon Jun 29 14:53:45 2009 +0300
     pops up, I will use the gitlog2changelog script from
     http://github.com/cryos/avogadro/blob/master/scripts/gitlog2changelog.py.
 
-commit 8f22c12d1e4c63bed120bcfd9ee7272ca5e1007c
+commit e88237dbe95614580755890682066dbaa1091ca2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 20:12:55 2009 +0300
 
     Try to get a little bit mroe information about the strange failure of
     the new context functions.
 
-commit 77b84e909154a1ed19282b853af14420204608a8
+commit e3d9a31313a096c811cddbc8266fe221adf60584
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 19:43:54 2009 +0300
 
@@ -579,281 +925,281 @@ Date:   Wed Jun 24 19:43:54 2009 +0300
     - use two-argument version of Test::ok() and Test::skip()
     - correct order of expected and actual value
 
-commit 32b1cba9ac20d2598d2979ca76f35d63ced322c7
+commit befe73d17209a953a6248806c54d31f538f92d8d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 17:49:16 2009 +0300
 
     - Do not skip that many tests.
     - Use two argument form of Test::ok().
 
-commit 370fd8e2e47dedc42fbd8501a91f0b9a6b15ad4d
+commit 4a64c81055b8ef12e640f8092884c0c428a9514c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 17:44:22 2009 +0300
 
     Fixed number of tests.
 
-commit ad4d7b0cfb2215a5dbcd8ab3e037cb165b52f6bf
+commit 5a384beb9082db4fc03f8eac8773a159d8df2003
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 17:43:36 2009 +0300
 
     Better structure for test results.
 
-commit 5df3672dd5b7440db2ad6e44e04a639f2b22004c
+commit b5ff63ad39644a3cea13995d84c584671828afa9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 17:39:37 2009 +0300
 
     Use two argument form of Test::ok().
 
-commit 457c933dca5b13a551c566ebe72a81f92157b8fe
+commit 258547dcf2eef86353cf7fa92bbba0136f4cfef2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 17:36:50 2009 +0300
 
     - do not skip that many tests
     - use two argument form of Test::ok()
 
-commit 09fabdd5c1b86bbf497bfa1c4073196e4a96c1ab
+commit 81077da475adff6c24a457a5ff0871e57ee8b5f7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 24 17:36:19 2009 +0300
 
     Copied from pure Perl version.
 
-commit 6ce629c1b6579ebfab6ffb9301ec02d1d2d27bd9
+commit 4d497917b718407d49d7c85ce04719ed3543026d
 Author: root <root@perl64-dev.imperia.net>
 Date:   Wed Jun 24 12:52:56 2009 +0200
 
     Fixed warning about undefined values in subroutine entry if locale de_AT
     is not installed on the system that runs the test.
 
-commit 28e388d7662541b36389d964faebd2bc1f854153
+commit 889eadbe4632d43bdaa363ffa8d6b0454c743f83
 Author: root <root@perl64-dev.imperia.net>
 Date:   Wed Jun 24 12:29:19 2009 +0200
 
     $Config{libs} may include too many libraries (fixes compile problems on
     broken Debian systems).
 
-commit 4bab1f383f3b7450807172540c5ce2f10d528c38
+commit 9c551c9c3884a63463eeef2c4f67554eebd69e23
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 23 09:49:18 2009 +0300
 
     Version number increased to 1.20.
 
-commit ecff79f368d5e50925044a2448123fc9a2a4190d
+commit 7652625d49f078e049937dc29df3633463084135
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 23 09:48:14 2009 +0300
 
     Undone premature commit.
 
-commit 3ad1c085e4008e6328f8489b580128474d7ca820
+commit bf790d59f383c51f9b29437ffc03ef463c7f7903
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:38:14 2009 +0300
 
     Re-generated.
 
-commit 153fb0c9d9b07cd85ad0c1fdf3da6419f563620b
+commit 157e2e0c0b77a707f37393909f65892671a935f3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:37:30 2009 +0300
 
     Version number 1.19.
 
-commit 768a15d745cb16f9f02c105aa6c4a9dff7ebf06f
+commit 5886baae120d1fbc9949f6c56abb9b970a729a74
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:36:31 2009 +0300
 
     Re-generated.
 
-commit ed55289f026c0121eecbd31abab600fb33f46c64
+commit dc084bd0dd4219280024055d6434d33553b8e442
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:34:39 2009 +0300
 
     Id expansion.
 
-commit fca054f00ecd2112b91f858f5499a05b05b9350a
+commit 30cafa680934972f4180ad07efd98a5ff2e6564d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:33:20 2009 +0300
 
     Id expansion.
 
-commit 75c63fbf4ab5325ff7201ae71dfd4104699e5465
+commit 3106719aa1f244327f092fa7f1cab4e5a29c5d8c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:32:33 2009 +0300
 
     Git files.
 
-commit faaaaf858eae044e74e4ea211c65c9397704a741
+commit 98a95308b5c7ee49521ecc4bba573c816802a637
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:31:30 2009 +0300
 
     Id expansion.
 
-commit 5b87bfa024a5ec75f8baa75e620154ca7bf2b2c1
+commit 0aad2eb35af8c12667541a18dec812dce59e2f4a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:30:42 2009 +0300
 
     Id expansion.
 
-commit fce083a2c718817f74699327b121a902d5998007
+commit 7ebbfefb3ff211c5b3b37e3b298d574277f1cd9d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:29:41 2009 +0300
 
     Updated.
 
-commit 4c94e9591502b9493193133178e65d632f2138dd
+commit 63c2b376e42de6f1921514898b8a90c6c6e7b237
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 19 11:09:48 2009 +0300
 
     LC_MESSAGES is not defined by POSIX.pm.
 
-commit 0ccefe179b97acfe24fba3ebaadb1c24afcfaabb
+commit 5496d129628c96c303bfd3174b74eb93cd551ac2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 15 10:44:53 2009 +0300
 
     Fixed RT bug #46471, noop functions in scalar context.
 
-commit 6e1c47cbb74c2f906f0321aa5cfec469f495d223
+commit b2b160d2409dddbeae242dfd2671e79a2a10b9ed
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Jun 14 22:25:00 2009 +0300
 
     Id expansion.
 
-commit badeadfb090fc425997de533147a02aeb37bb21a
+commit 8f3ebbc561d94d21ea2de384b88846f8cf1fbf39
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sat Jun 13 10:55:11 2009 +0300
 
     Id expanded.
 
-commit 38548adca2ffbea4921ea4a1181ffb548d05f538
+commit 910cd00045b9567fe92d8710242bb0071c9a841d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sat Jun 13 10:52:54 2009 +0300
 
     Expand Id tags.
 
-commit d450757330dabd3a8754a92adcec1b6b2e203cb9
+commit 506819568a00eece11b38ad742921243153f8923
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 12 20:58:02 2009 +0300
 
     Point to libintl-perl homepage.
 
-commit 5d6bbb6c5783ba0c72a56b55072a9aa370210b8e
+commit 254f40c29ccd3dc978874eecb0b135741fac2836
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 12 20:38:38 2009 +0300
 
     Ignore files
 
-commit 7cbaf397fe95d982bc7dcae3ae3ee7587e7d45d0
+commit 718b407f9bd4fc704f880623a1c28ea27b0638a8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri May 29 08:44:08 2009 +0000
 
     Explanation for the __'Hello' problem.
 
-commit f0aa3c4ef3482a2906fbbbc2a03fdeaa57cf2c17
+commit 52cace75f0de5c5271ff2642fcfd15024c5e62de
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed May 27 05:13:28 2009 +0000
 
     Bumped version number to 1.19.
 
-commit 2187501c12b3ab2cbbd6ce15884e8535a26f976c
+commit a33331cf22d5b5d54f0b7c2376723db4120cd7ac
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed May 27 05:13:15 2009 +0000
 
     Fixed extraction of context (thanks to Kevin Ryde).
 
-commit ba3b2440f19bcfaefaf40768c34258e2486ce0d2
+commit a9b66ded88b62644b4444348dc983aafc8a39f40
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 11:23:05 2009 +0000
 
     Added IWL.
 
-commit edf87c6177494d7d565c2c1fd24828a3bf764b8f
+commit 0ca46b4cff37d1c3203f9842d6d2739b170d43d7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 09:38:17 2009 +0000
 
     Re-generated.
 
-commit 6d8c74e7c354bbe6f93547b659934ecb05cfc535
+commit e5ed61c8301a782d6186daa66a1a6156792634ee
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 09:37:55 2009 +0000
 
     Updated.
 
-commit 948d32ef8183d419ee69edf95429d764a3a84073
+commit 29d56badc0d86439f14d0d7983676282015b715b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 09:37:43 2009 +0000
 
     Bumped version number to 1.18.
 
-commit 9a575f8df218666afcf44e53a358d5c88094a6dd
+commit 3d829cd0064c2528aa737a4bf3a6d3835340d28f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 09:20:26 2009 +0000
 
     Re-generated.
 
-commit a8eef67eace6c815c1ab51d2d58762b7a6351b75
+commit 13c7c5c6c042dc3f900605e15c13d6996cfbffc8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 09:20:02 2009 +0000
 
     Updated.
 
-commit fee27518431d803776ce3ed4632b58da0358f7a2
+commit af7284e93af8b79cbf25afa5dc60c4c953821207
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue May 26 09:16:02 2009 +0000
 
     Make PAUSE happy and leave the version number here.
 
-commit 6bfaba08b106819988ed6b26022399ecaf68b577
+commit 1cb6e428398f64af1fc1f1ec46655500c4773c22
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 15:03:27 2009 +0000
 
     Re-generated.
 
-commit ac391c36e481b107745e7889c91383749d222259
+commit ce4449a3afad7d8ac51e2310632d288667b72c22
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 15:03:02 2009 +0000
 
     Added search.cpan.org aliases for well-known GNU standards files.
 
-commit 4100318a1c8d82b9a709bee2de0cc3088f7438da
+commit 10501480c35c99b86d478dbe49dd6b41bbb413a8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 15:02:23 2009 +0000
 
     Create search.cpan.org aliases for well-known GNU standards files.
 
-commit 86d66ca65c37a1ba16e7f42fbb6249d8f76b19b3
+commit 1325a76c5ad955e27460ca12f0f4b7817cefb756
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:59:50 2009 +0000
 
     Aliases for GNU standards files.
 
-commit 41bc5f6e7a8516b533d7b7ec2079c3359bb1beb2
+commit 018a645dd5e8f7c8d11684f643c7769719c6fe15
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:55:58 2009 +0000
 
     Updated.
 
-commit a6bd9bd6c2ccd6003af3f178dd29d484baf6eb32
+commit 5b2c880530e6cc64e919aa4d335ba3ef7167cb93
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:54:37 2009 +0000
 
     Report version of Encode.pm (culprit in most failures).
 
-commit 1726a3afc554a3559d8c9646b2e3fc039b585a40
+commit ffa978c7c5c368aa8473abc3fa0b5dd8e5ce3bf8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:51:32 2009 +0000
 
     Macintosh encoding in Encode.pm is seemingly unstable.
 
-commit e10e0aeed4939e445cb417cce12fb0dc9a39a753
+commit 64f3b740d2aa2f838875a0795cee17d176dbea8a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:33:29 2009 +0000
 
     LGPL 3?
 
-commit bf1b13056cb96bf65903ada6cc4ac991ae77e69f
+commit 907176b3a74b981cf4f4e41954cc241d425c701f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:29:08 2009 +0000
 
     Changed copyright date.
 
-commit 466dc354d2061cf9ce8e1c2cc4c923624f6bd0f2
+commit 95d71b6fc50dd9fb43218968656504cbec438bdc
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:28:19 2009 +0000
 
@@ -861,229 +1207,229 @@ Date:   Mon May 25 14:28:19 2009 +0000
     - Added N__np().
     - Removed N__xpn().
 
-commit 1ace1ec34ef24e2d66127d8238ba946f17a6086b
+commit d20dcc8135e5b7c2b07c33396218626d0987cafd
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:22:27 2009 +0000
 
     Added alpha notice to Locale::Util.
 
-commit 269779d48fce1551fe73b2f49b605b16d65976c1
+commit b57730a57603652072832094558f6845b5ffc690
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:21:51 2009 +0000
 
     Also include contextual strings.
 
-commit c23f57b47e0fad076c73f05c1ff5fd16f803813d
+commit d9668a512855ef02fc679358d5f122488956209f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:12:09 2009 +0000
 
     First release for new functions.
 
-commit 6a6733cf51261a885f573f0a69c32ba66658a358
+commit b3c3b72ba667ae2ac8b20a3430c3a5899e28ddbb
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:09:17 2009 +0000
 
     Added first release for new functions.
 
-commit 1511b8ca2fefc8cb0d5ff77987d044e53fd1ad83
+commit 60dbe55f9fea8f6d3590b872a5b8a5e740211444
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:08:20 2009 +0000
 
     Added alpha notice.
 
-commit 1f3e7d99f61a01e5c1a2ea767e4614171f648eca
+commit 2c95707ce09cdb51b829372cac7e282d0f539da0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:07:41 2009 +0000
 
     Added alpha notice.
 
-commit 704058c5e7b6dbe6d3f614f30a2b4e7c2591d808
+commit acdbae1f753ac0c6af14e64bc123067e593e7f0d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 14:07:16 2009 +0000
 
     Added cover_db.
 
-commit 7d15c54561da67283721dfcd281eacd6e0c7daec
+commit 376aa841b00c2c8bc250fb26bff5178a73fb33c3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:51:53 2009 +0000
 
     Spelling.
 
-commit f007d7a7587567bacda4bed8b0c5054d2c17bcc5
+commit 3ad299b43695f9aecfe43f4cbc586fc2a4e18d8b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:50:37 2009 +0000
 
     Kudos to Joshua for the context functions.
 
-commit 80c3820c24ee28282815d53063ca4d2e5a9108fb
+commit 8db869dbe855889703ab19864050c550d43806c0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:48:41 2009 +0000
 
     Context example.
 
-commit 817636a84f60080f8352a9b52cc2689291fc85e7
+commit 71b551dffc5d046bc7a0f35864ae6617b2af0636
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:46:04 2009 +0000
 
     More context examples.
 
-commit cf0054e50cd65687455755dd722fd8facb0455d8
+commit 32a47f31ff0b46819aa52f7e4064fa5d091bbec5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:36:30 2009 +0000
 
     Avoid n't.
 
-commit 1a799324077e0c4ef08f5d60b187cd22b9b06c55
+commit 762cbd811ad0996fe65667307f49a3762a3dbb55
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:22:31 2009 +0000
 
     Switch language for server applications.
 
-commit 1433b538a8509adeb7a73bd11b9416816501dcbd
+commit 45d43cc66443696a09350a22969755d7572cc316
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon May 25 13:21:27 2009 +0000
 
     Made code parsing the plural formula more robust.
 
-commit 7c773a522f7e831eab4e21edc2883245f01d9dc8
+commit 6773b842ef07f30335aee68fd0d8b879704086ec
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Nov 19 19:25:15 2008 +0000
 
     Fixed German translations.
 
-commit e4416eb0c79427d0a399b67dfda9632059cee202
+commit e2e6fccf44237e5631be89a5cbbf1494a6725c44
 Author: Joshua Miller <unrtst@cpan.com>
 Date:   Wed Nov 19 18:55:51 2008 +0000
 
     Completed support for contextual gettext calls.
 
-commit 4c0334cf7514693c07df3463737e93386e6ea87a
+commit bb704c9a3b9b33a59ff0195707cfd3c91a6f5852
 Author: Joshua Miller <unrtst@cpan.com>
 Date:   Wed Nov 19 18:55:21 2008 +0000
 
     pgettext, dpgettext, dcpgettext, npgettext, dnpgettext, dcnpgettext,
 
-commit d88bd08e8fbd4a4879a832ae0e220ad64e279c28
+commit eee4248252ad31f134eedd3675e61885660da327
 Author: Joshua Miller <unrtst@cpan.com>
 Date:   Wed Nov 19 18:15:37 2008 +0000
 
     Updated with info for unrtst/Joshua Miller
 
-commit 81523d440cc7e04277c0886b101d27adeaccdd04
+commit 4b9db79642c6e28e0b746a7c0ead8c02f2ec205b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jul 18 13:03:37 2008 +0000
 
     select_package() is not a class method (reported by Sergei Vishenski).
 
-commit 9943078cf431beacbd6c7008db3bd69de8aa1474
+commit b2284603e9a450d8ae424e0cd587ba1ef035b05e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed May 28 12:41:17 2008 +0000
 
     We need both libraries, not just one of them.
 
-commit e8e3707f60ce7d2df4680eb0644fd94b4dcc2cdd
+commit f90c4e8de428f8793d389e107ef096d4c22948b4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 3 08:15:45 2007 +0000
 
     Corrected POD.
 
-commit 126a849722d743709c393badde6df28129d24348
+commit 24781d2e6928303ef2e42adce71a03cf8db066fa
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Mar 26 17:18:29 2007 +0000
 
     Don't forget to actually set the cached locale.
 
-commit f4f78e8c83f6b8e7995916700659c93e6267f1f5
+commit 9eec46fac56a94490b76be322e84ed7338fe51e1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Feb 11 16:49:45 2007 +0000
 
     Filter out un-available languages.
 
-commit 939e059af2fc8547dbfd808356a0cc68b7ccaab0
+commit ae47997fae6ea3683368105290ee63f895be21bb
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Feb 11 16:05:25 2007 +0000
 
     Fixed POD error.
 
-commit d23f50e3d767df21a94989cb60d3c899b5b59f0e
+commit 3f2378e95763d8840156ae83825bb8bea4ddd20f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Feb 11 11:53:59 2007 +0000
 
     Restrict set of acceptable languages.
 
-commit 20b18aa9cdf756fbc360e0335c55c26a6c7c2920
+commit e862a774e4d71ee3880008b2b4be6a71c2e6fc2a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Feb 11 11:18:24 2007 +0000
 
     Removed erroneous source.
 
-commit ce3f99c7f5148a65b6c2543c3ff45ede3129a972
+commit f1a09b47bf8eaa4cc55be38bd98408693e23e49c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Feb 11 11:17:43 2007 +0000
 
     Updated default countries for languages.
 
-commit b925b093b27d94bca0b0f540264dd40633af016c
+commit bd0a7635b770e924b3659c2d8c4d71bddb84e56d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Feb 8 09:07:00 2007 +0000
 
     Fixed warnings about undefined values.
 
-commit 831f0176dc7ee03d19a995b65e004b8e70afd4cd
+commit c345ea69b01a472cd248e2093d254c76b664474e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Feb 7 15:40:41 2007 +0000
 
     Aliased loop variable was constant and read-online.
 
-commit f3b5053efdc9b9e96da223e827cd2660dce5a3c0
+commit d078bbb2e1cccd9544879a3e18def7934cdc671c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Feb 7 15:26:28 2007 +0000
 
     Extended search for correct locale required by FreeBSD.
 
-commit f0274d300da5b6d65fdc7a2a1a19fa8b8f3c3d1c
+commit a4e59c933144e335bf102252e07adeada2ec7fea
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Feb 7 09:48:41 2007 +0000
 
     Return information about actually selected locale in set_web_locale().
 
-commit 3d6cc08a80c73d9bff09cbd0908f07f18d6fc2eb
+commit 8aa5c83c2978295cc77e465ccab5e980e2d3927d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 21:56:02 2007 +0000
 
     Strip leading and trailing whitespace on TEXTDOMAIN variable.
 
-commit 6fa39e7bb249b6504d2309dee4fddfd27c27caa0
+commit e6f033cbde23ae73875d23ba3356fc57bca8ebf8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 21:36:10 2007 +0000
 
     New file.
 
-commit ccb33a20e1636ab23c5eae3ab1701fcd875342b6
+commit 4ac8681888194342783b6205223dff34e3f38b3c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 21:35:29 2007 +0000
 
     Remove build_xs in target "clean".
 
-commit 67849b5b7ee817b3718c3e71a2c83a8451055580
+commit 461e35b51daf223a3694d0e3bac3096dc49b0533
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 21:34:25 2007 +0000
 
     updated
 
-commit 2c4297d77e8cb0611a41411407bc44530dfcbf21
+commit 633becd826603ae8efb3abfcd958dd5681969590
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 21:33:27 2007 +0000
 
     New function set_web_locale().
 
-commit 03bef854c000faa7c3c3d2436b1d12b16272028e
+commit f22cbdb17760949e722d240c900fff85f67fa851
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 20:06:46 2007 +0000
 
     Use Locale::Util::set_locale() for more portable locale setting.
 
-commit 78ce31af69f058979b0deb82564e367041f58b24
+commit bf114f60d133c9c420d3ed280b482a198165de93
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 18:43:39 2007 +0000
 
@@ -1091,243 +1437,243 @@ Date:   Tue Feb 6 18:43:39 2007 +0000
     - turned off debugging
     - clean-up
 
-commit 5a1726cfc4b8317576f019d740f1d307e4c8b142
+commit 20d61980cec61aa41011de7eee3b9d0d3e723cbe
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 16:46:17 2007 +0000
 
     docs
 
-commit 5e446a3d0cefcb9e2a6a702e731c0269a844c313
+commit ceb6be4f76eb63764fc20f5c0f6cbef67319b745
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 16:44:43 2007 +0000
 
     - access to the locale cache
     - updated docs
 
-commit 5e6093544cecad3d02aca69200bdfbbc43904b04
+commit 96c2da2c1689f186f314884dcf36f7f977741c8e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 16:14:45 2007 +0000
 
     Support for MS-DOS
 
-commit a98324ae994e478d4a41062791f6f5d6639aaf19
+commit 26f01d15540dd9d1dde86acc56d44cd9c8e70d97
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 13:41:26 2007 +0000
 
     half-implemented Windows version
 
-commit b1673b78f51cc54cb0268109dac982260fba4a98
+commit 81e29f1a2f62bfc8ed60fc9bdcdb5be60d585e2e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 13:21:44 2007 +0000
 
     safe locale setting for Unix
 
-commit 3856ec2d9753c5b1211c991e1b625c0e00ec69b2
+commit 7f14c69ed46cc3cab35aab20ce9f3c75dc2ae149
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 10:55:44 2007 +0000
 
     new
 
-commit 51f390f192f0771bd2a45cfd7bdf8e586b4374e1
+commit 236baf8efddc7916c56400ba47d1b3133c7368ae
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 10:45:49 2007 +0000
 
     work in progress
 
-commit d9b3d08b35c901d76ccd84bba959463b7c740256
+commit f8d686ab630a6331db28fc15130bbc4de68f97da
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Feb 6 10:45:06 2007 +0000
 
     new
 
-commit 7616726fe427dd273c2611b0230d1feb788ece28
+commit 388955f630417315be7b10069032d681a5815def
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Feb 5 10:38:41 2007 +0000
 
     Hint to avoid trailing space
 
-commit dc21877a731e2d278534db19555e01df7b1ade6b
+commit af3d41652b7e90321c22191a95fd5ca99187920c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Feb 5 09:45:51 2007 +0000
 
     interpolate filename and linenumber
 
-commit 4d80c14b9d1fecdfd4a91cd4636195411102c9fb
+commit a86ea79d7d88cdc1168e342f4c9e7bba10a58261
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Feb 2 15:13:07 2007 +0000
 
     avoid warning if textdomain is undef
 
-commit f393d961f9fca199285ad72ff16e7b12e32712d9
+commit dcefe0c7646b19cc431dd45c61ba45035817bf9e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Feb 2 15:12:28 2007 +0000
 
     Try to detect incorrect usage of the tied gettext hash.
 
-commit 4a9f1abd593efe70c923ef698b83e12ff57f32fd
+commit bb985e13d735f2574e8b9e3227ca2d426b0cee7b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 13:45:44 2007 +0000
 
     always make a copy of the list of search directories
 
-commit 9c34ef40c4dc81a3360505a3905615933d953f63
+commit 7987cf31d2cd4cde29582267461d0160a324c7c9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:51:41 2007 +0000
 
     podified FAQ
 
-commit e5a3074c39a29b93ab169614aeec9227e63c9352
+commit 9964dd5375a90930eebd88fe10d961c4ac10c9af
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:51:00 2007 +0000
 
     cvs2cl now expected in $PATH.
 
-commit 92033336f9e4e845ee72e079f99e0d293c9a5d58
+commit e4344bac190a90ae484b545b38109f4772076f57
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:25:46 2007 +0000
 
     podify FAQ
 
-commit 505f752e8e3b54a721bafb915f75eaebc3206cf0
+commit f6f2b6304745c1b85448881fca97c48c1b4f88f4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:10:24 2007 +0000
 
     Updated copyright date
 
-commit caca17b9cfb98130bc5b94c4e184fba15202acb8
+commit f40f864404e6f35694f7f527f6696dac082cd294
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:06:56 2007 +0000
 
     changed name of license file to COPYING.LESSER
 
-commit fe298aa7d8b5647344f52f9106c17f50d10c2cf0
+commit 20184f3ff1c95bfe14216ca9b03f0b1997e9ee4f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:05:32 2007 +0000
 
     updated
 
-commit e0705b495f261ba02c5bc663da869118e6ff882e
+commit bf46afc696720ad1f94bae2727267a25ddf87b48
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:03:55 2007 +0000
 
     Skip test if require Austrian locale is not available (thanks to Pascal
     Terjan for the hint).
 
-commit 50485e2fe6c7d84caf9a7160c3e372ef468ddd19
+commit 9e25b8e3db265cdf5944e96a9fafe529315febf1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jan 24 11:02:07 2007 +0000
 
     added simple hash
 
-commit 54f782e885e7baec2f2a51af92d82207df24c02b
+commit 58613b10cb92d51cda62c4b018844db01147f4be
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 18 10:34:26 2005 +0000
 
     unlink "xs_disabled" with "make clean" (thanks to Peter Eisentraut)
 
-commit 1e82f1773f1f1976a6bfc38ff20a833f292ba3c9
+commit efdd4c85eb717de992440077d90f970eab9eafde
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:41:26 2005 +0000
 
     updated
 
-commit 1155e2f0e2aa584bc1eae3166a1dcf2e1a90109e
+commit 5ef130105bedd708db2746279c21b99506c3cdac
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:33:28 2005 +0000
 
     updated
 
-commit 0822a0a942d15ff1bb534618ff09551a3173ba65
+commit a66adbcbd975d72fe6670babc6ea50277526bfc5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:33:10 2005 +0000
 
     minor revision
 
-commit 94916ec93dfeed975096b753bde0b1162490b4c4
+commit eb4c3711cd5e63eb98d83a53b149d66e0d8e79f6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:29:37 2005 +0000
 
     bumped version number to 1.16
 
-commit 77204847225ac24848851c490ab016ac9b4c0783
+commit 6cb47db30066c1a287f0e481f5ad8ee80eddc494
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:25:40 2005 +0000
 
     allow call to textdomain without argument
 
-commit be7db9db776ec4b3b555286f2155349195c12eea
+commit 35a8c2015aa8f60650c7479be0c79e9ebc756d91
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:16:23 2005 +0000
 
     fixed typo that prevented xs tests from being run
 
-commit 7734da97cbda7d15fe58ac4fd85960288dc7e41f
+commit cbc3794b5e7b4329073fd5908b55a0800d224a84
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 23:11:23 2005 +0000
 
     refactoring: change argument order for callback
 
-commit c4505ed7d2847332ed540a68a9e6bb502c9f0bfa
+commit 1a933c175fcc5fbdeb7622571299dff49a30117f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 21:40:37 2005 +0000
 
     implemented turn_utf_8_on()
 
-commit bbfc9736b0b4e002ac96f6a149a79c7008983326
+commit d294a597f1c5b0937d37729c55341d1bd8d216f5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 18:53:34 2005 +0000
 
     added function bind_textdomain_filter
 
-commit dc09a1dc4c6fab5f45843fc119ee0bf9d206021e
+commit 2578a712f54e7e258b5818849dfce5f63fa7f7d2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 17:13:45 2005 +0000
 
     minor changes
 
-commit 865ab6074a79dbc03762c934d84127a8d50ed344
+commit 93eec8e5762b3ab5d2ef8c3cc249c2520814ebe7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 17:13:34 2005 +0000
 
     grammar
 
-commit 67cfd4dbbafbfd77208541ec534d4502f47f574a
+commit c62eccb6838b717814bcf591d526cd55fc2614f9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 17:12:42 2005 +0000
 
     updated
 
-commit e6f084d85529b10017c87178f412dc49069c349c
+commit 177c23c4e6061b78346bd361a8b0a5ee7481a6b7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Sep 27 15:36:23 2005 +0000
 
     added FAQ
 
-commit a42ee62abc20508b7db083a468dffd977c4a6a8e
+commit 7340f96a5b654a46aed1d4572164ecaba3cdfc37
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 23:23:24 2005 +0000
 
     avoid running tests for obsolete XS versions
 
-commit be318b5657805fd595085a4d4fc5e9d231da44ef
+commit cf3527fe52493fe1f5c46a405297c44af077fe04
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 23:22:39 2005 +0000
 
     updated
 
-commit 98fb924198a4b257e8c6776d2692f86be3c81b01
+commit 20c883e78dd3bc05f25204968ca81e58dc74adaf
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 22:50:37 2005 +0000
 
     updated
 
-commit d9449b19dc36a6967708646538652057f2cf9896
+commit a90cae2c50799ec1d2d3c32f274792f014ad216c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 22:48:39 2005 +0000
 
     bumped version number to 1.15
 
-commit 322feedf5b7448cc970df0b00934a36d60e4e139
+commit 6900de23efca7d0f02324e9b0ae84c4ba6041a2c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 22:47:57 2005 +0000
 
@@ -1335,218 +1681,218 @@ Date:   Wed Aug 31 22:47:57 2005 +0000
       obsolete XS version, although a version mismatch was detected earlier
     - warnings about non-ascii message ids
 
-commit 5e29992c8b208c345a37cc34471532ad4130c1c6
+commit 694faa74376e611d466b0e76a090725b19ef56b3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 22:45:16 2005 +0000
 
     hint for the courageous Solaris user
 
-commit 9ae0d0184ae9bf75329035cc175a33664defcf72
+commit a6227b69ab3452f1e093dcb7d3d26fdaa99fed34
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 22:44:03 2005 +0000
 
     Solaris ...
 
-commit 4c4993a7217b83428642557f7796a7243a166689
+commit c69e0f0df152566b79394ac32c87c00f717ac3f8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 22:41:31 2005 +0000
 
     Life is complicated under the sun, ain't it?
 
-commit db256ddc07ea2153e21dad0a012d00ab9aeff89d
+commit 6c540fca54266f0e311fb4cff082a26221a393be
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 21:21:30 2005 +0000
 
     workaround for misconfigured (Solaris) systems
 
-commit f577142a27741af81adf13eb7873d3a56c0ced6d
+commit b68338bfec49ef550621c520a4b71f0b25381cc3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 31 21:20:13 2005 +0000
 
     updated
 
-commit bcc9454cd1a7f8cb54a2ac9dbdc9f4ba3cffe073
+commit 7dcada1c9c34e344154ac4ea710fae7faf2f4493
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Aug 21 15:39:18 2005 +0000
 
     removed all.pot from sample directory
 
-commit d6cd7f7348d867a1eb60cd0a780966426b71e4b1
+commit 187ae3ee4b938a1574dfa903aeedd0cdd4e245fe
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Aug 21 15:38:30 2005 +0000
 
     bumped version number to 1.15
 
-commit ecf0117aa4456bea51f8e9e300ed46a4b46eb848
+commit cb07a1a430355733307e54473b409031c8429733
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Aug 21 15:35:38 2005 +0000
 
     updated
 
-commit 498cca7e60c1f89f471a6238999cefc6262116fd
+commit 1f0ab1e3538ed79171fb5df798c5edc66c079d69
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Aug 21 14:57:13 2005 +0000
 
     re-generated
 
-commit 3e2e7bef39d6108c0e07f21d85f4eba9ee5d4cc2
+commit 169fdc346dedf22a4affbac6042171ada67af28f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Aug 21 14:55:49 2005 +0000
 
     - updated, Perl support for gettext should now be standard
 
-commit 59dfcddb864df8e7ecdb90b140f0488538fe9d68
+commit 1a4f422957ea641fd601022972812ee49d53757d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Aug 21 14:55:02 2005 +0000
 
     added comment abouut 8 bit message ids
 
-commit 992740a078f92d91d35e0e7b41c1cee7de57c362
+commit 5b5bb471047489656b9926ac782856b9a7c9b519
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 16 15:44:34 2005 +0000
 
     not needed
 
-commit 5aa56bfcee9ab542f840132a7389724dc48ef2c9
+commit a06471d6ff9ad502a93e486123e4786ec852dabd
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 16 15:44:04 2005 +0000
 
     msgid strings now come from libintl-perl, not from Crypt::Twofish_PP
 
-commit 3c7b16132ec5dff6dd69827943510fe846d1ae2c
+commit 3317022d3623c648f88d77ce1935851105c02c3d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 16 15:38:00 2005 +0000
 
     should not be included in CVS
 
-commit f570932a33933a1baddb97333526adf5f898e2c2
+commit 3bdb1fe9093f05b9a976bd8269fc385a27f1d3b6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 16 15:35:00 2005 +0000
 
     Reference the files from the correct package.
 
-commit 50f751e64f37461b3e4c9a80a0f9018aa5ee4335
+commit 41ad69bc031558ac9d578f2da4da9c743f78a9aa
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 16 15:34:15 2005 +0000
 
     new command line parameters for xgettext
 
-commit 405bd46deaef0e0ccd249f7cba1388bcb998fa44
+commit 358a35e65bb7f3f5571cfb93ecd7a625e1932e06
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 11 15:27:46 2005 +0000
 
     re-generated
 
-commit 4d55c023f1ba0ba1823766c34c39ce4e84ffc455
+commit 8baf78e91ff51d46827aef7591f436a0626ad85b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 11 12:27:22 2005 +0000
 
     regenerated
 
-commit f36208df3536056b31af04054c3d06cf5b25e897
+commit d4f58a3bf504461966b8c952e0d3a66ba9ea5b21
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 11 12:25:57 2005 +0000
 
     bumped version number to 1.14
 
-commit 1fde19cf4c8c493983f904b5a2188ae9b6ae2b1a
+commit 0c3fcddc2ffce0b05f9c50049337ab17aa83e082
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 11 08:57:05 2005 +0000
 
     use correct linker flags
 
-commit fa9d31d14d2bd1a4f88a6d7688aadd6a35b20626
+commit 970239e281712c6631e135ac81337d8d553c460d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 11 08:43:33 2005 +0000
 
     updated
 
-commit 7f9cdcd5318bf68099dd543dea46207a7fb41a88
+commit 42daed9f7e02c116bce9bde5cc38e00c8bdf303e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 21:08:17 2005 +0000
 
     bumped version number to 1.12
 
-commit b2815ee57f017ed22c3440b5ec8f1815f0357442
+commit 107802af3d597a45717da295a756b7c70e3ef4ca
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 21:01:46 2005 +0000
 
     added feedback section
 
-commit 5d393a03a91d54c50d237e25e7b717e6a767eaca
+commit 9580dfa7d508fcfa8062d137efd238f5766a2632
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 21:01:30 2005 +0000
 
     updated
 
-commit 3a4f51d516db453deb54ead6c10baea987074679
+commit d7a22ec849a6f54db125cc444af60f864c73b51a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 21:00:48 2005 +0000
 
     updated
 
-commit af37fcb6f22046231f4fe92aa16cac738c470c86
+commit 2534bcd0e8ad2f7775c01afcdda2b36fbc9d856c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 20:20:04 2005 +0000
 
     avoid failures because of missing locale definitions
 
-commit 20ef1b10a67afd1f46722cf36ac7e5f5b4851f5c
+commit f260275adf0d5f55baf9f9c021e535122092e21d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 17:50:41 2005 +0000
 
     allow to switch languages (thanks to Jan Kratochvil for the hint)
 
-commit f1b49b1885ed3f3f17f36b5baea7c4171eb4fda4
+commit 664253d74988c965a370ed36e31cd5b486f72184
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 17:48:37 2005 +0000
 
     regenerated
 
-commit 181f07046f0a676b465a510f83e71938a6be65f0
+commit aada5dc5eeff6bd9f5934638b4335a64d3eac41c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 17:48:13 2005 +0000
 
     Austrians have their own version of February.
 
-commit 2a51cc2648b320b5ebcc802c774f71489b3522df
+commit bfbc53199180ab911873b7adc2204e33a44035c0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 17:47:39 2005 +0000
 
     added plural header
 
-commit 88e965fbf1dd28a2820647fb2a82487159b0a041
+commit 5cea165a6d08a192207e9ed85d595f2c6337ab7a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 17:47:00 2005 +0000
 
     updated
 
-commit 81e380315b45e43e94cec45fffb1ae3516052be3
+commit 9925a2a8b41f288553abd5873fe4f83057ed55e1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Aug 10 13:59:38 2005 +0000
 
     clarifications for changing the language via environment (solves
     issue https://rt.cpan.org/Ticket/Display.html?id=13957)
 
-commit 344f02ecb88f8129eccfd07826014a3c80b46d6f
+commit 02ac4eeb1c5464460e5e70c21b4897988fecbea1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 20 14:31:07 2004 +0000
 
     default textdomain is now determined by Locale::Messages::textdomain().
 
-commit a5ab66861a7b05d485684f9066ba94666946db2e
+commit 75bb69897973b673112592760b80b371240154f1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 11 11:13:37 2004 +0000
 
     bumped version number to 1.11
 
-commit a3d794088c2bbc11c7498f970987f1e087a05bca
+commit e6fffa3f2a5ec6463af404001d15009ee5cad6be
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 11 11:06:09 2004 +0000
 
     added proper headlines for manual pages
 
-commit 98f5963e8b9830722565f3cfb3a741f95a9187a9
+commit 99b4fe97409b6afbf9da152866014c3e2a801b7b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 11 10:54:31 2004 +0000
 
@@ -1556,238 +1902,238 @@ Date:   Fri Jun 11 10:54:31 2004 +0000
     - fixed warning that occured when the import() method is not properly
       called
 
-commit 26eb04839a60d953aaded5412dbc227b408042de
+commit 7fa3a3df0876b6ca4411bb68098880049af0cf7c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Apr 20 16:38:32 2004 +0000
 
     fixed vim line
 
-commit 9faf482ad734c46a360fee8b9d4677d58199b9dd
+commit a024f1c7ac9223c24c3a4cc08bc2c17a99563075
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 15 13:50:47 2004 +0000
 
     Oops...
 
-commit 68c44448609db9e52edff44f99f9eb868c4abb9a
+commit b6ad42ef4032f515f6c8db3a0d5b62ba88ad3392
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:27:53 2004 +0000
 
     removed dynamic_config (not recognized?)
 
-commit a3487c002a66e51eba9358635ab75683a65ea11d
+commit 42f7870ca9e6398bfb189c6154c2b56ef19dd26b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:26:48 2004 +0000
 
     added dynamic_config
 
-commit cc7de769f72df67886e7bbbf1706bc0a663fe5cf
+commit 442b148ae5f2bff53aa8e6273e1a6c2b33a22947
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:09:50 2004 +0000
 
     added statement by Bruno Haible regarding MSVC 7.0
 
-commit 00dfb762c987acfdca6977bf968ea789ace3a12c
+commit ef951cb53b267fcdb461081ea97baaef1be7d439
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:08:14 2004 +0000
 
     added README.win32
 
-commit a693a0b1bf41bd2f0c93ffd6bc7a04ba250f123c
+commit 0477fb4b0ac5e3a6855b528c7210a17b4363412a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:07:41 2004 +0000
 
     new
 
-commit de5efc61842f973d2c525417aba4ab3a30487ca4
+commit 5599ad60d95ac6025765ba290a13b793688c12c4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:04:29 2004 +0000
 
     fixed typo
 
-commit 6c1bfb46ffa20f167a23d5cb48b46f2f874f7d33
+commit a1ad20adf7ddc4984e80f72cc31270bf3e59f7de
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 12:03:42 2004 +0000
 
     bumped version number to 1.10
 
-commit c50ccdb3092b31a9963b62c288e18a2f718b88e9
+commit 61069f6d5bd4fff864e39b4a602045e5cac5ca4d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 11:17:12 2004 +0000
 
     $LANG must be set in environment with $LANGUAGE
 
-commit 1255ff1b1366b776b5dbf75ae57409986df79e51
+commit 8af17ebdcf1f1368f1e2bca08e826d78e8dc7c37
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 11:16:28 2004 +0000
 
     use nl_putenv(), not %ENV
 
-commit 8722d9ca0cb0d4890259de4e8eeeb4a539b56b84
+commit c85e1540378943a21d3f76ad1744d802cfef4d4e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 11:15:43 2004 +0000
 
     - fixed prototype for _nl_putenv
     - use _putenv() instead of putenv() (educated guess)
 
-commit 8e45c0258324514d6824f84f3d1f6ec56eabf054
+commit ad2db1b1046857e70c334f43c2ef3daffa2f6e39
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 11:14:13 2004 +0000
 
     updated
 
-commit 08e57e925e718f8c59bc3d0016743f9ad8ba25df
+commit bb714bfe93bb1eeb39ce61a72552349129d517b5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jan 12 11:13:56 2004 +0000
 
     renamed COPYING.LIB to COPYING.LESSER to prevent deletion for make clean
 
-commit 00950623fa70045def4bd37552fde65ed398c357
+commit 6a913735b991d632cbde693aa7e8facf38a86954
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 19:50:36 2004 +0000
 
     compatibility tweaks for MS-DOS, use nl_putenv instead of %ENV
 
-commit d01abac71b2835fdce00e6fb2acd8f9d5c96c2a3
+commit 5ecb53a21ed8886c21668b5a4652f53f4cdb4d45
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 19:49:23 2004 +0000
 
     fixed another typo
 
-commit d64ce9d2fa5f8230ed64b9a75ee1bdfb134b44e7
+commit 0b97ee460c48861915376b5f12fc5b5e35fe0016
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 19:12:10 2004 +0000
 
     fixed typo
 
-commit 9710388858700f5911159d1422735c9a42af68e9
+commit 7459ac0e3f497814b0ffd08b818f0dbd5d0d0db9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 19:11:44 2004 +0000
 
     File::Spec required again
 
-commit e950f5f52537c42fcfd7f6cd35dd76e6f29e8498
+commit ed4e7b5a0a5f5bd735817735148616031876960b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 18:38:20 2004 +0000
 
     - let bindtextdomain() take care of normalized paths
     - compare normalized paths
 
-commit 005d90374d2e7cb524d319d801fb9ce93d839269
+commit e3ac58ecb5f45591fefdd2352e3c9c6d5f973089
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 18:09:17 2004 +0000
 
     do not use hard-coded locale identifiers in calls to setlocale()
 
-commit 9904ca2a4056d036b2bfdffba8a81e4da24baff4
+commit 9d110fe4a6700b1c35acd511bf336c24303dde34
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:48:58 2004 +0000
 
     set OUTPUT_CHARSET for compatibility
 
-commit 3952cce2b0598958409f667ed2b3f4f7e9f0e9c2
+commit 27efa295b47b04b49cf502c7ad69232fcb3672a3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:48:24 2004 +0000
 
     added META.yml
 
-commit eca09230388485d45e111ae942518222cc367574
+commit e5307015ac5b4d4bc5971ca573073568a1629094
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:39:07 2004 +0000
 
     new
 
-commit fb0b27bb167da74b7bc50698b3c252a8e11cc361
+commit bfe366aef55bfcb8581e5d71ea76defcbad7e121
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:25:57 2004 +0000
 
     Happy New Year!
 
-commit 96aff21b8d489c3a5360f899b974539f456bf997
+commit aea53758224cddf1a3ed901d6b4d3731b0a89182
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:24:22 2004 +0000
 
     File::Spec is required for the XS version
 
-commit bef83e700741297244631b4a65647dd93b155231
+commit 7e44e9317a7b40a50ea87ad74a87d67ab3ee4d0d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:20:11 2004 +0000
 
     new function nl_putenv() for MS-DOS ideosyncrasies
 
-commit e49c26083e1ee949162158b3052970c64b900744
+commit 515e7f1ad65a24c9ad19db0b259246def9ee5026
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 17:14:15 2004 +0000
 
     do not require the variable _nl_domain_bindings for building the XS version
 
-commit d9c26134930b48cd3009ae0b2f1ab9f28af57ac0
+commit 56ff39bf29442f7bdefbca2fc90cc1191fa249e6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jan 8 13:32:48 2004 +0000
 
     convert directory to local convention for Locale::gettext_xs::bindtextdomain
 
-commit fe782c9a491dafa748cf7e571ca32ac657d11bf3
+commit d9ba34889737dcaf7f4e3a823409fff1049d26ea
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 2 18:18:08 2004 +0000
 
     moved tests/locale to tests/LocaleData
 
-commit 529168ee39ffefde2e57804826b3320fbc0977f5
+commit 70862bf397bebf5f44ce49feee761ce638a1a2bb
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 2 18:10:03 2004 +0000
 
     compatibility tweaks
 
-commit 6cc50aa0c92e1cf2b9bfc854ad476da583f8a75a
+commit 3a5e888ab843e70447125534e5210cb43dbf3b15
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jan 2 17:55:15 2004 +0000
 
     moved tests/locale to tests/LocaleData
 
-commit 8d210b1a89ba1ab0e0912dfbf77c95c1f4d241f1
+commit a80799b3bff9173844715839636d2f0b63495bd6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 19:04:11 2003 +0000
 
     updated
 
-commit e8c1de1158b55251fcc586e4ab65ad848d51fddb
+commit df7485f28debf1fc1904f7723edf8d2c7a6d99e6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 19:03:32 2003 +0000
 
     #re-generated
 
-commit 96f3d464850482785064c410bdcc0554e9a2c59a
+commit fe07507d9c4e581ca843a096d0a37d3fa6070846
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 19:02:57 2003 +0000
 
     updated
 
-commit e8bf6a3bd0807fa37a4bc014d8e9ad193c9fd063
+commit c6c88d389ee05f6072d4a4445323185d4f76c4ae
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 19:01:00 2003 +0000
 
     - fixed pod typo
     - bumped version number to 1.09
 
-commit b30d448b0ac915f8dc41e2897f6a20a271b57f3c
+commit e65167544eb63a71e680a19c9667fb16b97095b7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 19:00:19 2003 +0000
 
     use user supplied locale name when guessing character set
 
-commit 650c5bf9e6afc65c6bfb7bfd5596b7f683f2df74
+commit c1ae59f49bc219168db6d095374ec50e0c723e4e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 18:59:33 2003 +0000
 
     check for correct XS version
 
-commit c7dcfd1c58f4d578bed64286cffa050308492865
+commit 9c645bbdd2cec3d8e85e9562915390e91db99a3a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Dec 29 18:53:51 2003 +0000
 
     *** empty log message ***
 
-commit 359dee052afb8b3bb996a476e12e92d2d006e205
+commit 4b51645b931919a57417bfa9e3258610b86a3dc1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Dec 23 15:22:58 2003 +0000
 
@@ -1795,310 +2141,310 @@ Date:   Tue Dec 23 15:22:58 2003 +0000
     - newer Atari versions seem to place the euro sign at 0xde (not 0xee),
       thanks to Jo-Even Skarstein and Gerhard Stoll for the information
 
-commit f8fcd9efc687d3652fa25777882c606da2e78542
+commit e75379970932c29ee2a8eb730313c7846492411d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Dec 23 15:21:58 2003 +0000
 
     various corrections
 
-commit 893ef72fa60a5bd710ad769eeb37f048ad3bd8a5
+commit 4c4a814ff33290eea0fd1ecab523fda97b907de0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Dec 23 15:07:50 2003 +0000
 
     updated to new Makefile logic
 
-commit dd9ed652a7dff19f66ac3b4bcb6c8f758080f70f
+commit 659bd95a05cc392079779c8d1dc4d15e939d4d9f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Nov 30 18:47:39 2003 +0000
 
     #re-generated
 
-commit 41aadaa48717ee8b1705514d49d732f00ef721db
+commit 910a77f1a7fd4030bea28071bb492bca1ed73714
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Nov 30 18:47:20 2003 +0000
 
     deleted reference to unwritten docs on let.imperia.org
 
-commit 671424282b2f7e4d6ca662765ca42c2988225af0
+commit 7acab20f48cd01153cf39a4ec5952f1fbd134f4e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Nov 30 18:45:47 2003 +0000
 
     #re-generated
 
-commit f1a607ba85734f66dbe101117cc4112877f695e4
+commit 99b9949a12ad5c0dfa6d537ac5d189d129caa051
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Nov 30 18:45:15 2003 +0000
 
     bumped version number to 1.08
 
-commit 8eb2d41c5dba3a1cd879e7ba69b6ce2257a40b3b
+commit 4b0b9ed024cc70481dfe55635b895f05aab33a05
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Nov 30 18:44:16 2003 +0000
 
     updated
 
-commit 15a5e90cce1596d6c65f5ddd3d184956e28833e5
+commit 77f70728f752155c0b5e91b0af01d938b1f03312
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Nov 30 18:35:45 2003 +0000
 
     fixed bug #4512 on https://rt.cpan.org/
 
-commit d3efb4df5baf9be1b3ef9042dbcc5ab54033c1e6
+commit 8ed64c10297f4a4cde9d7738fcad0470520a4a50
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:47:53 2003 +0000
 
     # re-generated
 
-commit d053ec4d5b7636f1dff68ee5807331afdd82e6da
+commit 4a8491601fdc0f991ab6ca8edf8a974d0cf82635
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:47:32 2003 +0000
 
     bumped version number to 1.07
 
-commit 3c638d6f18a90de809c93218bb175f04e323cf40
+commit 9042bc943ed8d59e65abbf1a71c7c19c328c357d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:47:09 2003 +0000
 
     removed BUGS (only known bug should be fixed now)
 
-commit 7ef5325f54f609d2eedc3dc4eb9f5b377c84bc66
+commit 11fd4d3144a61b99baa503dbf38064dee511c8e4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:13:59 2003 +0000
 
     updated
 
-commit 9dffdc0e8ed7f0f94f05f5ae2bab01267c36a061
+commit d82359584afafafaed7840d94acd85c78efe7e03
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:09:35 2003 +0000
 
     - only call I18N::Langinfo methods for validated locales
     - allow 'utf8' as an alias for charsets derived from locale ids
 
-commit 6b678aed4ae34a7ac1a3fe88f7ed9e0f473edb53
+commit 909defaaa94dc64d56a748e1228cea15378b501a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:06:23 2003 +0000
 
     redirect configure output to config.log
 
-commit ebad0a4a42b3b9d8a2658c2e1f81bea009213aea
+commit 6c1df8547421fa38b872f2f59c1bd8d750c543d6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:05:56 2003 +0000
 
     export turn_utf_8_off()
 
-commit 5713cb3f8e80ecfe1a63b69c719c4a8e272e9df8
+commit 410ec7734d67623f4c86482da824514ba1b47c79
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Nov 28 16:05:17 2003 +0000
 
     removed debugging noise
 
-commit 6cd2fd4d840fdc190897862ed911595ff9ad0e19
+commit ca96e3b39e1f1560181d39c3f3bdaf687c748b47
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 18:14:43 2003 +0000
 
     updated
 
-commit 6e295d894f295f21fb593b493e35ce39a340e739
+commit 6b324cae6259cc260a9354a4c20b4ea7b878a4c3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 15:32:57 2003 +0000
 
     # re-generated
 
-commit 82b1dcd960cdd6e44707e1a67ca44a799f16c513
+commit af522da98ad30e887a122e1d33c44a689bc16353
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 15:32:22 2003 +0000
 
     bumped version number to 1.06
 
-commit b6304eddd6a8de78c15f7d8e578ffc2ab0648ed2
+commit e9f8f9b75d911b339d6fc37f67f94685a3cb288f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 15:32:01 2003 +0000
 
     added pod
 
-commit 3d453667e0ce5fb73db6cffb01e15037e2ce391e
+commit c90484e311467d360abdd1c9e4feefbdec1e7a8c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 15:31:45 2003 +0000
 
     updated
 
-commit cb5f542294ed9e0b06884ed15a48723e4916de0e
+commit 10d391f8efe6aa0f7029568b06c4cf3e17f6b801
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 13:57:31 2003 +0000
 
     avoid warning without I18N::Langinfo
 
-commit 768e462e68cf0ac11ded8fbbde2973e381f7c67b
+commit a867ad07b7cd90018ea5e3b60202f33d71937cd0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 13:57:06 2003 +0000
 
     updated
 
-commit e364d5cea8988411d722fba8e4a19ef5c4a9011f
+commit 30a65d9162ada1798cf5e454e56fadc02e15887f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 13:32:08 2003 +0000
 
     all package-dependent information now goes into one single file PACKAGE
 
-commit 1b1ae257272061574a876cf237b9e41ab61b94bb
+commit 1782c385e3e7a94a0f0c289a753e00effc569e9c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 13:31:35 2003 +0000
 
     do not include -liconv twice
 
-commit 83afc89979ad580bd72397fef54e49e0e5471f15
+commit 08643d2eccc34d3c0edfff7310e98f0ffb9d5ee9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Nov 24 13:25:07 2003 +0000
 
     put all package-dependent information into single file PACKAGE
 
-commit 9f7ce161d046cf3575a4ffb1871a79974e118cce
+commit dbecd2df444f47793527578b2c4c20bb68c1bfa5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:38:09 2003 +0000
 
     check for version match (do not load stale XS versions at run-time)
 
-commit 57d4868e6df338581cd5acf52255dc9af5efbe13
+commit 5a83888673b7cc5628f1d046472355a4d19229e2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:15:07 2003 +0000
 
     # re-generated
 
-commit c0a190824e3c2f6b0f35ac42995adfd0bb0ff8dd
+commit a1648401d87d008e7c8e142d83c732ea09a48c92
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:14:46 2003 +0000
 
     added
 
-commit cec4989599c6fbc6a1ee7d3c50e9c31545563baf
+commit 9c9a1eb5b24dca8ced20a41a310fc66dd2da9564
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:13:54 2003 +0000
 
     # re-generated
 
-commit 7b532d29745f225f1c43db2b33ccd0b59aaed912
+commit 81c6c7f2b0244084aef7e5ffefb3a9c4546fb7e5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:13:04 2003 +0000
 
     bumped version number to 1.05
 
-commit ef0fac1eaea213c7431528283021d7fc359eb7d6
+commit 8947e71bd98a5324cea50ae4a3bd8c9e79c0738e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:12:43 2003 +0000
 
     removed junk file
 
-commit 40c92cd26258b01bbfb61003d6e4d505375d7312
+commit 585a020d1475bd6eb9cbb48fd9fbdda6eb7286b3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 15:12:14 2003 +0000
 
     fixed compatibility problems with Solaris 8 and above
 
-commit 518dcf13f47275c1765770cd8cb9e118e2e8865b
+commit 28e144a6288b7b74f8e34040c394377e914f0f7e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 13:03:51 2003 +0000
 
     removed Artistic
 
-commit 7e74fc8464b6d1321ece5b66b67cac8b45e88c2e
+commit 2ca1ac9cef4f0ecc75e8e2283e21d001137f7b78
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 10:11:55 2003 +0000
 
     fixed typo
 
-commit 7ce76b243624a7c0c771ebe3ac26c34cf0ddb6df
+commit 467d79c33355c78740c091836ae28e462d5f3da8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Oct 10 10:10:47 2003 +0000
 
     obsolete
 
-commit cebc8fd0efbd150844c443508b17a90829483e5c
+commit 556417657552fff247b576ea121782343a662c35
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 15:06:36 2003 +0000
 
     # regenerated
 
-commit 3e054d33c8e198aeff1c323b3d47ce0eb5a9c6e6
+commit ae1f3dab460f54d0d0ddebd19c4b0c08db0e17d7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 15:05:53 2003 +0000
 
     bumped version number to 1.04
 
-commit a767a6eea5bc809fe757c1167ce46a670597a3cc
+commit 778ca6f61991c315828e4d6d6d2f7bce61e0b965
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 15:05:24 2003 +0000
 
     updated
 
-commit e08f698af8ee7997e808e531677a8d41bb488826
+commit eadd1937be3a304db482a627edbc05b4597a71d2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 11:35:02 2003 +0000
 
     updated
 
-commit 0283847dbf6a57eb226f188b73210464f117a0d7
+commit 2f736f408103f837e4bca464e93c47b91e582b8c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 11:34:48 2003 +0000
 
     - support for language chain syntax in $LANGUAGE
     - performance tweaks
 
-commit a0e20cf2ab383e01bc8d65d09f366adb9c6e83e3
+commit 60b82fea5c2f78972590faaf56af2a8d3119358e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 11:34:20 2003 +0000
 
     clarification
 
-commit 764256e92fc24d775a853b2e4c4bdce7c9eac864
+commit 3cd5c96b1aa5f01fc13d0e790737f89d32dd57b6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Oct 9 11:33:46 2003 +0000
 
     support for language chains in $LANGUAGE
 
-commit 1ad559f4f6b178e6969e5a28b0b130080dc82d2e
+commit e2fd587d541065891db9960437d1ff26877c9acb
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Oct 8 11:13:00 2003 +0000
 
     updated
 
-commit 3fc5262f0ead23db4c94d7ff23f745d0f53fe31b
+commit 61acdce78321ad26d8711f62143c836c9d004102
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Oct 8 11:12:52 2003 +0000
 
     do not use Encode's iso-8859-11 (broken in some Encode versions)
 
-commit 6d8e3b013808aaa686b615c7cf7e8c0f2dbf9185
+commit e2dedb045019cfa15404caf00f3d715c13a32d50
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Wed Sep 24 10:50:18 2003 +0000
 
     localize $@ with checks for availability of
     I18N::Langinfo and POSIX::LC_MESSAGES
 
-commit f0fa2372159719b8c2745a4ccbd81ce1cb32d06c
+commit 5a5e60f767ab31f93cb8de73855a9249abf8c93f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Sep 15 12:14:23 2003 +0000
 
     re-generated
 
-commit fc93d014341a25aa0faacb69ffc664b0fe1e157a
+commit efb157f2ed8c75ab55cb278b0c54da064578cb75
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Sep 15 12:13:53 2003 +0000
 
     bumped version number to 1.03
 
-commit 216fef571dbd8b2c3e4fdf07cfcf72dc4ee8a0b2
+commit 3b5b750195fb8c846806521eac454a6554309e3d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Sep 15 08:21:45 2003 +0000
 
     alternative XS version
 
-commit ff00ea58ab14732727847a83e8a066ea1cfe5439
+commit b570103cc495fc0efc6b00120bdca6fb1fe962a3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Sep 10 18:29:13 2003 +0000
 
     test file for gettext support
 
-commit 8d3d9f71ea1fa6df176455863874ff83074768a3
+commit 30bf5ca6b162f6c71db243b7a671591a2ddf5170
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Sep 10 17:03:33 2003 +0000
 
@@ -2106,390 +2452,390 @@ Date:   Wed Sep 10 17:03:33 2003 +0000
       avoid licensing problems
     - fixed POD
 
-commit 4345e730105c274c19192ecf0640b43e09d2dc9a
+commit 525205390daaf289f3d6a4a93d499d70a9eed4f1
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Sep 10 16:27:22 2003 +0000
 
     workaround for broken Encode versions
 
-commit f3e4106c7675e0ee072ad0d4493eb10d8d77448d
+commit aa984a06348ae8d555138c9f381c2e9c58a936b8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Sep 10 16:26:40 2003 +0000
 
     changed from double license to single license (LGPL)
 
-commit 9d767c894cf06d2700baeb1d33fa31c1db939f47
+commit 10e690a14046f9559532f44fb82e504209c67ab8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:45:32 2003 +0000
 
     removed second block of emacs vars
 
-commit d1871c2fe04f9f9c5d7ed4b3962c52e50df58199
+commit 629107b5cc359f7f5919435f410b6fabb3a7b8b4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:44:56 2003 +0000
 
     pod errors
 
-commit 53e58ef5f57303f3efeb5b84c31e00fd2fb7e593
+commit 18bca22d6cafa424a0036d2227c74e8fec7b2c3b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:44:27 2003 +0000
 
     updated
 
-commit 56c15164c5b2176a430da6221374fefe833fdc1a
+commit 6a34d3ef93905f397afe4766649a6cc69423bdb3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:44:10 2003 +0000
 
     new section on informational files
 
-commit 184dab7477de28b8313bac52582aee519047e313
+commit 54d063c529b0fcdc5cfd00708bf274f63de1f6ec
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:43:44 2003 +0000
 
     new
 
-commit ef6aed6b7842f46f5174de5cdee4ce3a6fed1a5d
+commit 016fee143e5a7ae9e86070880904b4e4784655df
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:43:21 2003 +0000
 
     fixed invocation of xgettext
 
-commit e7b9dc6618a2e0809458de593e5abb41133f8fab
+commit 66e85e94809eaffcbaf0c82b5cc1f77764e3386c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Sep 7 19:42:18 2003 +0000
 
     get rid of dependency on ExtUtils::Command::MM
 
-commit 7c4e46716ca5e34372f1051fdecad36553634d6d
+commit 211e8183e944d242ebc5e47e1a7e9736dd15b8ce
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 16:13:55 2003 +0000
 
     removed double emacs var block
 
-commit 6d6c4af13370483d18c2de4476dd937a67e9c37f
+commit 31bfa6886eaf379c4a843116b0f34a9945d9cb70
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 16:09:13 2003 +0000
 
     # re-generated
 
-commit ec5d609715e823a61c5df3380aef72e5a0c11995
+commit ed6e9116b81d07f65214bfed27f47724a335bb64
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Thu Sep 4 16:05:20 2003 +0000
 
     - removed obsolete line
 
-commit 361a5236a7c24aac888683944a1bee1d18dfdb21
+commit 399ac5a815aa8890b52d268a3082addebb14c504
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 16:00:57 2003 +0000
 
     # re-generated
 
-commit 008d2b8c333c5cbfa76790626d6cedbb4b92de55
+commit 17ea1c8b66ede45c751570037268de2641b479d5
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Thu Sep 4 15:58:26 2003 +0000
 
     - untaint of plural header
     - Perl 5.005 compatibility
 
-commit c4492a553eec9830f3a8379360fae4cf2b1a6c55
+commit e16c823c4dac2c5cb42ecc9bcff3aff59c224b85
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 15:24:31 2003 +0000
 
     # re-generated
 
-commit 7eebc12ce0fb1e96d9a6e46112ed40ffd7b8b295
+commit eb00c54e56535f750af63f125d16a58f0e6c1362
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 15:23:56 2003 +0000
 
     bumped version number to 1.02
 
-commit 6090fd0d21f530751dfe91233c4cc361457779cb
+commit 59d2d04547c8924d05f30b68886e6b632ca5e233
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 15:23:32 2003 +0000
 
     updated
 
-commit 0b03a01030c4ca1d53769e44433a6e35a08383fd
+commit cf1cf5e80a303ab048124c0b0a79c00fb71dc23d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 13:31:25 2003 +0000
 
     added plural rules for de_AT to test catalog
 
-commit df4d16b647c0e3825863896daa45eaa790505b59
+commit 0c9851738153980c3cf6449ddaf1c3be7af37953
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Sep 4 10:48:25 2003 +0000
 
     compatibility with GNU gettext for systems w/o /usr/share/locale
 
-commit 12ef91fca08423bffe54cee30fbeacdeb216b990
+commit 2f233e4418d6b521386fe3e6005a6c66b85f9e58
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 18:49:46 2003 +0000
 
     # updated
 
-commit 5cb0bdee4184a19375e2584dd0dc981514e26ad0
+commit 7955b700cd6205165d957a50e6a00a71cbf800b4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 18:49:10 2003 +0000
 
     bumped version number to 1.01
 
-commit 20d9c39bd2901d78b0a747fdab50bf9d59198990
+commit f0587d0df1393fb8f16219054412af659925b648
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 18:48:49 2003 +0000
 
     deleted reference to README-MSDOS
 
-commit 95179cc5c5873c422a71ed8946bfb77382a43061
+commit 8b42664856282f502091c5dfb6f50da96a5c0516
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 18:44:23 2003 +0000
 
     bug report from cpan-testers
 
-commit 3c20614f7df0cf60c138f4b367e98f44003448c0
+commit bd98f50f5f6d618ff7d01eae16739387b993dd45
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 18:38:29 2003 +0000
 
     requires ExtUtils::Command::MM for test wrapper
 
-commit ea211a277262df634e6f32e3c1dac7224132f434
+commit 4d9e64bc376070a2f767109197ad01af6ff905e2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 18:37:46 2003 +0000
 
     fixed ISO-8859-11 recoding
 
-commit 3b8457d6a514d8db6afffa6282ffaa08e03401d5
+commit a144d0fc04637ff7ac4c8618dea3a7f46734c999
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 17:25:24 2003 +0000
 
     fixed Thai character sets
 
-commit a68d820a33900db3aa48d95b539bc6255cfb1fd2
+commit aa770f91949496a4805db0279de209fad324a9ad
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 16:52:21 2003 +0000
 
     updated/added
 
-commit 1c9283cf3f6797dd7a5bca3e01f3803ed93dfc9b
+commit ed40e23ce3a9678c8c0a5bdf9e2cfb3661645bf9
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 16:49:45 2003 +0000
 
     obsolete
 
-commit 58f83769f7edf49e68b61bda42ff5d4eb9197e63
+commit 5a8443b121573e76f0a1cb2e7fb807678cc22895
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 16:48:52 2003 +0000
 
     workaround for broken or limited shells to allow testing
     (thanks to DH <crazyinsomniac@yahoo.com> for the hint)
 
-commit e60503765995355518e16a3def7cda5c22bb8611
+commit d1afe579a0e24bacf1db8865f014bb42164cecf8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 16:47:09 2003 +0000
 
     - directory t/ moved to tests/
 
-commit ee5414695bbebf2d91050a83d9dd5fb0551b3173
+commit cb9e4ad62af362a39a893b89008f454436a7f5d3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 16:45:01 2003 +0000
 
     moved to directory tests
 
-commit 0c8c59e00b0102215a37a4e82df62a02bdf90c43
+commit b7376e61be48f55a3466a363b4ada1a482a2ef85
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 19 16:43:15 2003 +0000
 
     merged from norma branch
 
-commit adf4ba4f5b6c4004f89d49778314b1bfffd4a6c4
+commit c6135558f7e7be53bb03c48bb4b2fcf484d29202
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Aug 11 09:52:55 2003 +0000
 
     fixed pod typo (reported by Mike Castle <dalgoda@ix.netcom.com>)
 
-commit 96f420fafa5f4d088e4fff432a35a97afe60aab2
+commit 081d354ab06e3c650ff9040728c47919d94ae339
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Thu Aug 7 15:53:33 2003 +0000
 
     _recode must return a true value
     if Encode::from_to returns 0
 
-commit c8f0f3c0074cb71d25229eb4fdf74014201ad224
+commit 0281a8a143d645a424f153811424c7b26a9012de
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 7 10:57:06 2003 +0000
 
     # re-generated
 
-commit a4dba9e4e5f86a1e8fa57c63762fcc170ff223a3
+commit 0dda2028ca48cac8dcdb1e4bd9197e0fab6fdf7c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 7 10:56:21 2003 +0000
 
     renamed variables
 
-commit 68df5cbf6b55fe471658ea27f93db438e99e0f73
+commit b57fb2309c28de5321962de14a5ad2601db781db
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 7 10:54:53 2003 +0000
 
     bumped version number to 1.00
 
-commit b93c5b371a86837d0fbfd9c8eed6491ac316a012
+commit fdb60dfd5575adf48ae0875ba57b6a42a891a492
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 7 10:38:59 2003 +0000
 
     documentation tweaks
 
-commit 3665491a99ca81562a52b862c2c703374835a7ef
+commit 23b2ec967a392d56f4474f6ebc45e81fa28bfdf8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:57:02 2003 +0000
 
     # regenerated
 
-commit 57c4fee411ab325f1ed73b737d3fbcea4ef1d116
+commit 1059261ca1ff962bddc305a8986f25b53a99e638
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:54:03 2003 +0000
 
     bumped version number to 0.14
 
-commit 4d3bdf34bc5ec6559860df1c904cc2053bd37401
+commit f7c241d98573244bd3ccc3e08ad8512866a55639
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:51:55 2003 +0000
 
     fixed web addresses
 
-commit d3e20ac01ced844edbe639ea4e2236b6831ced23
+commit 760f1216e1c0a1ff15eb4e5d95099c28433b3178
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:21:32 2003 +0000
 
     # re-generated
 
-commit 04a15f1f974fca8fc1a370fac108b2e36c266d99
+commit 01ec724cd60d80c441f203a4817299bf1ba795c7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:20:52 2003 +0000
 
     added directory sample with a self-containing example
 
-commit a82f2fcf6af8be61125d20bad2f49d5fd8a6b1c5
+commit 7c7fd9a78e9889499a2b1036eb79d1fb76f66483
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:16:27 2003 +0000
 
     updated
 
-commit a1d24d00b9510a3cedee528572077fb262d5c776
+commit 7a7e1862b031952ceb646fd2504393645419df5a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 28 12:15:36 2003 +0000
 
     # fixed Emacs variables
 
-commit 40a5865da495a90f1d496c1ac4dc3d64861cd62c
+commit eac31148c2eaa6dc888a5eea898f92ebd0d2a295
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 15 12:09:21 2003 +0000
 
     # re-generated
 
-commit d7808e3b6f27b18b8a63737fc9c0794ff08686c2
+commit b7304f7fd7a8f5b3d3e9aedf60564d82b259b1dd
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 15 12:07:43 2003 +0000
 
     updated
 
-commit 9b731aa0c6e1fa61c0e9b61ec5504725bc594d1d
+commit 195caa0556e0bf35c349bdf5ef6030e0631676e4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 15 12:02:02 2003 +0000
 
     - changed placeholder format to {curlies}
     - bumped version number to 0.13
 
-commit 268e42cb12c8d04fdccdc7ade4a99aebcbcc10fa
+commit 524b966be2247e56d9eafa04ddac08e4bc10a5ce
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 14 15:46:57 2003 +0000
 
     # updated
 
-commit b4dcb8940f3fe3d02a14edc41b580a0a62354f7b
+commit 86fff6bf4112ece5851241b43ff6733d90a1b71f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 14 15:36:02 2003 +0000
 
     early exit if no directories for catalogs exist
 
-commit 8d3a99f9f1d910a18886908ce53323295da723f3
+commit 48a9cbfb00b2168dae567d58ab0f81ccafc95094
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 14 15:11:51 2003 +0000
 
     updated
 
-commit 3997b1b574d53fda6dc05f04339fd5fc20a75747
+commit f0299a79dcea60402e77f1dfe50b1b59134d4ebd
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 14 15:11:28 2003 +0000
 
     return converted string in utf8_off
 
-commit 39bada7aa9706e7e4fb48230bf4fcbf241871daf
+commit f32d63f598829f2b38ad123b65bf2b1d4b1db21e
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Mon Jul 14 14:20:51 2003 +0000
 
     syntax errors
 
-commit 88acda2edbfe93d5702249d72b66bcae36aee0fa
+commit bd8423ea0a71b97ada72e9f916f931e35d9f957d
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Mon Jul 14 12:24:57 2003 +0000
 
     performance tweaks
 
-commit 6111f29e4703fef00ac3e7caaac55ae73803f592
+commit d798bc7f6ef5b4509e4558a69ffa280c2f49a2b3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 14 11:02:04 2003 +0000
 
     fixed fatal typo
 
-commit 0a05e4410c5be5e16d9d035728eef6de59a6c738
+commit fc06b2c32ca72277599b4607ff6f77952a2bdc8c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 14 10:46:36 2003 +0000
 
     - use nl_langinfo() if available to determine output charset
     - variable names
 
-commit 2f699ffc87fef6a540cc83b8303c1c033b1cb8e9
+commit 6c8bb470ef753dbd86cc9d6d904149e997b47fb6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 30 19:12:56 2003 +0000
 
     compatibility tweak, (SuSE rpm perl-5.8.0-104!)
 
-commit 306ac291f3083066df40cdbe58631c5ddb6bc8d6
+commit f2b59ee2b4628b0062a22cfc307b5910ddb34475
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Fri Jun 27 10:25:03 2003 +0000
 
     fixed pod error
 
-commit 0a0417c69516c745e649fd5925813794c0250a23
+commit 957517ab27afa8fbd2719e5f417ba3dc0d2f9a0f
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Fri Jun 27 10:24:46 2003 +0000
 
     fixed pod errors
 
-commit 4e1c5ae5d94a830fae074826dac215ca14442d78
+commit da617bc6dcecf90bc2426ebf871a838aa96925c5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 27 10:19:46 2003 +0000
 
     fixed for new conversion interface
 
-commit 6b69d5e2064d5d6f3d87d88e3cd4c0a7ee7a63b0
+commit 41a80e58d0708f05be2b81034c475e8ef98870e0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 23 15:24:36 2003 +0000
 
     ChangeLog
 
-commit 01ed8feeacb54bf603f2717586639d8a599c8c17
+commit 12409815e5cf9c1e92ac327abd4d3e817da07600
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 23 15:20:12 2003 +0000
 
     *** empty log message ***
 
-commit 96d87f2dcb97922b9645bb804b3b69c4ec9a23f0
+commit e7249d8979a560c26b9a50a4385ebee5d40066a8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 23 14:48:32 2003 +0000
 
     # updated
 
-commit 31a8f9c4fa5d8b2f812e24f116e54c571042285d
+commit 88281c87015e15822f05ef1532709632db0035f2
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 23 14:32:55 2003 +0000
 
@@ -2497,100 +2843,100 @@ Date:   Mon Jun 23 14:32:55 2003 +0000
     - renamed internal functions to initial values in order
       to avoid unintended similarities to GNU implementation
 
-commit 69ed45f5f73e54268a8dc4f39bc1cf820d1d587e
+commit 36effab3797feac9ef7d7266af0b470d5a5b8486
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 23 11:34:54 2003 +0000
 
     updated
 
-commit a5c6b2712dd0e9a57c703abb45d3925040cfde95
+commit e936e90da52fe8621afbb174011fd88e176db2b1
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Mon Jun 23 11:30:35 2003 +0000
 
     - use strict;  moved up
     - no bare words after 'use base'
 
-commit cec2e6e87467e151176312fd539dee98ce3b0f9d
+commit 508f2f096062820ad6cc2d042bf2b2dc387b73ac
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Mon Jun 23 11:11:02 2003 +0000
 
     fixed typo in pod
 
-commit 8743705b71f87e68f936fbc76f45a40883c57802
+commit e9e38d3dc31cf04bddb2c03f67d3d6b83b1a2498
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 23 10:14:43 2003 +0000
 
     leave undefined placeholders untouched
 
-commit c203e5e23887106038cadfec4fd951752f19c331
+commit c3a4b3de4b080f372cc91f12371d620249202001
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 15:06:16 2003 +0000
 
     updated
 
-commit 1adc5925e99f305be7407d4c84f4944d36cc095d
+commit 9f73104b6bc33dd3101ff2f87b8f4f5baa881867
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 15:05:46 2003 +0000
 
     bumped version number to 0.11
 
-commit 044853a39a0332d2904114247a23e82350a5bdda
+commit 93aea7a5d0c17e4c70827d07e4bbdbef35bf8521
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 15:04:35 2003 +0000
 
     new
 
-commit 80939fe361be4859d75339f11975c38ddde4b106
+commit ad4029b3dc9fb617f2c011d4a594d03f7fb17fa7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 15:03:46 2003 +0000
 
     - added ChangeLog
     - added KOI8-RU files
 
-commit c731fee3bcf2f0eae541be0d46fabbdfe239b119
+commit 5eb3ee27d63180510195e3ea37cf0598ef84666c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 15:03:11 2003 +0000
 
     also exclude x-shell scripts from distcheck
 
-commit ffeb0650bf5d552d92b01f2e3431f4d814c2dfa2
+commit 7d9ef3da0ec921c50210720fc5deff203e61ebb0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 14:58:30 2003 +0000
 
     always turn utf-8 flag off for messages
 
-commit 7191673caec356ab88b36b450fcdc8f15d63e03c
+commit 1ef5939d9c6db9606f729a0a7d3bb54c27368e9b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 12:06:14 2003 +0000
 
     untaint the plural header code
 
-commit a5b54fe29ab126f600ada8edb7d730e988d718fd
+commit 158592905b1899c3eb640df7613320320a93db1c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 20 10:29:09 2003 +0000
 
     avoid re-loading of message catalogs
 
-commit e7b92e62a7e289c27fdaea20850700d5b223b93f
+commit b7e269ab622402b18b5f757e56f80f917da08bdd
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 12:05:25 2003 +0000
 
     $optional_conversion may *only* contain the preferred MIME names!
 
-commit 50530bcb75b950f5aa8f5c75b9eb629fe71eeb0d
+commit e07e1c21697ef1c0403766151e12282239a85157
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:53:28 2003 +0000
 
     bugfix for Perl without Encode
 
-commit 05f9510c68742099b81456e49506a8d72e99b2cb
+commit 0234997d09c45986fee5e83d21be8d24acf4ab16
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:44:48 2003 +0000
 
     - now replaces with Unicode replacement char 0xfffd
     - fixed test
 
-commit e4755fc26758b71acdc222414077f0bac2f17234
+commit adcd292221c08396b1c1627a58a25b58173a4f9e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:16:48 2003 +0000
 
@@ -2598,73 +2944,73 @@ Date:   Mon Jun 16 11:16:48 2003 +0000
     - added and fixed documentation
     - added MANIFEST.SKIP
 
-commit e076acaba67b7677757dec4dae7a63353340c3e1
+commit 250a1bd7ba23db6ce94697f3eeca53e15f836864
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:16:10 2003 +0000
 
     removed unmaintained benchmark test
 
-commit d7e9a9870aef519f1d5091501f1e883dd004e056
+commit ddd06de73aa9739e33a430e970175202d4e8eff5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:15:08 2003 +0000
 
     general clean-up
 
-commit 00b97adc00f2bd654acace85aedc838a98abe890
+commit 80c0188e07d5a95c5658e52551d0a08a6d895d6c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:14:23 2003 +0000
 
     removed iso-ir-{197,209}
 
-commit a30913d978bb5f48e4a35c765a367f05092245cf
+commit 4f23489e8ef9bcbba617469e897dcee5a8112f4c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:13:48 2003 +0000
 
     utf-8 should now pass all tests, even with Perl 5.8
 
-commit ae7a4fef7ceedba6ae1b3f35ac9a051ac716e512
+commit 65dc096920d058e6dbd345c32a94fad3df492bb4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:11:42 2003 +0000
 
     Mac is now Macintosh
 
-commit b7c6bdb78bd4f5f221d5561083473fc47f03115e
+commit 24912fea944e1c7270e44b9cee3dc8a9e36d9f1f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:10:51 2003 +0000
 
     added KOI8-RU
 
-commit 20a30c0e0096e3178ba9f9ce38a3c1331372601b
+commit ed210d6178338235739358891f2ffd9b06774f59
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:10:06 2003 +0000
 
     NextStep encoding added
 
-commit 6da6f07d7a77f6c51ae8710d6bd2b8f593cc6f65
+commit ccb48475277ae4ec07a3b9cdbee0d5bbffc2974b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:08:50 2003 +0000
 
     Macintosh encodings added
 
-commit f7996def2a56c714a7786a3bf9cbfa27ede7a428
+commit c2b955e32463ac1eb0c4930452072a1b4af7c842
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:07:41 2003 +0000
 
     renamed ASCII to US-ASCII
 
-commit f7ea5a922e569e9906535c661da72e5786be7126
+commit be4e2f6da72cdb05b7cc069bcbf2c067f1c86ad7
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 16 11:05:50 2003 +0000
 
     wrapper around converters realized with Encode(3pm)
 
-commit 41f6e53fc6a3e9cc22e831ba5647710bc47a7392
+commit f746caefcb07b5dc4b3af3fde0647dd5c261f893
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Jun 15 14:50:34 2003 +0000
 
     renamed X-ATARI-ST and X-ATARI-ST-EURO to ATARI-ST and ATARI-ST-EURO
 
-commit ca92baabd0cd69464e6f407da322cc538819cb47
+commit d88fc592b7a02b10281f34fbbf842db0bab5756a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Sun Jun 15 14:35:34 2003 +0000
 
@@ -2674,116 +3020,116 @@ Date:   Sun Jun 15 14:35:34 2003 +0000
     - regenerated conversion tables
     - removed multi-byte encodings
 
-commit 53405b2608a2fac12e890402efa8469094fcc7c0
+commit bac57d0af4a5d602fd70cb0c065a7f0abab4d5cc
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 13 11:40:10 2003 +0000
 
     vim line
 
-commit 9bf7c2df01b2c62e8f29ff5e589d0e589780c459
+commit ac701214e5c3e88e387129b970de37e9c6121ea3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 10 16:31:33 2003 +0000
 
     added README-MSDOS
 
-commit c8d77e3b994753e8a6775d8fa1243844c3569976
+commit 912014db206b9746c1b75c72dd72c51cb855825f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 10 16:06:39 2003 +0000
 
     moved version information to Locale::TextDomain
 
-commit 464afe2ed471e3c7feabf70bf6c1d8d6ad54734d
+commit 5e4530c73a633525f2910f04b48175c507ee0a19
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 10 16:06:05 2003 +0000
 
     truth value
 
-commit 878397695a2e862c2d97a4040199cd0d77d5f699
+commit 12dfd128264d883e515c2b42f21096728941e9e4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 10 16:05:30 2003 +0000
 
     new
 
-commit ee0e87c61cac0a564f66d432db08cd649a433295
+commit a70307db82a1646bae9750395e8ded0aca5dc0cb
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 10 16:05:06 2003 +0000
 
     get version from Locale::TextDomain
 
-commit 1968aeee33620838fb512ef93a41663e592f69c7
+commit adfafd4b0159b8f9e621ea3af30037c8585e8892
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jun 10 16:04:45 2003 +0000
 
     - added Locale/TextDomain.pm
     - t/02ms_kanji.t was forgotten
 
-commit a2a20ccf6991ddf0d00800b2c9beba3b650a6ece
+commit e8958bb3e423c366de1dd8777537798bc394a627
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 6 13:16:03 2003 +0000
 
     special notes for MS-DOS
 
-commit 67a81d3b178fde8a1b9cebf18587cd99da84aceb
+commit c016fac0d49fdb4b2aea21c64db4f9db2031d8ae
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 6 13:02:07 2003 +0000
 
     compatibility tweaks for MS-DOS
 
-commit cade28e9ea5c68dcedfd97fd06b28c173d2b8b2b
+commit 7ac01c3420f0cc0e10bdfcd430b18906edc07c74
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jun 6 11:38:33 2003 +0000
 
     - optimized CJK multi-byte encodings
 
-commit acad1f5789d355f1ccaaa8ddae972aeb1307c734
+commit 24c777fff0a53cc6b8a95af5fabc069fd03d1f8b
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 20:08:39 2003 +0000
 
     fixed EUC-TW and optimized it, attention: U+5344 has three representations
 
-commit a1ead8c0135032023be2c854137a116e0101c85a
+commit dfca4a7c25f7b268f8d674fbc9f27fd743318612
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:28:35 2003 +0000
 
     removed superfluous inner parentheses in conversion re
 
-commit d44bbd002f281e5c6ffe7d850ee94384e61925fc
+commit 16e85c3d95cf88e6e778a7ba3c1ae6555fbbacc8
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:28:00 2003 +0000
 
     optimized conversion
 
-commit 0cb31a84d820e2e14c607e9f58506acdd38e8597
+commit dc62ce9e8dae997f89094329ffc87cc34a39ff1c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:14:18 2003 +0000
 
     optimized conversion
 
-commit 5315514fc8cb21bab5255b2a3a4aef35878a45aa
+commit e343504072ec59d6f162a4772d5abf1853ed0fe5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:13:53 2003 +0000
 
     more optimizations
 
-commit 869709710d5ad48462a36c82dbaca661920ba788
+commit 22a7b61f2adf82ed90cb94a68596ae5de20f190a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:10:01 2003 +0000
 
     compiled regular expression with modifier s
 
-commit 58e6ea25e5dfae1a71a143fa9ec3d4d26a99b0e1
+commit bca64912e88c3b56b3718a3d4b175bf707c28854
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:02:56 2003 +0000
 
     removed debugging code
 
-commit 5390ffe2a29736d25c82d080375b52db4827f6d0
+commit 307b007e59f813090e0d3255c638e5e1de0c55e3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 18:02:32 2003 +0000
 
     optimized conversion
 
-commit d1e3771bd167832d3349031207848f2ace4bba1c
+commit a5585dea382dcb107ad17e3851dac199b5711022
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 17:32:14 2003 +0000
 
@@ -2792,38 +3138,38 @@ Date:   Thu Jun 5 17:32:14 2003 +0000
     - support for Korean CP949 (UHC)
     - support for EUC (JP, KR, and TW)
 
-commit 36ce0e9f988952369c0c89cab03e3435f68cbc01
+commit 21868105e8c3a89ee2d31323ec2e497bb5baa636
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Thu Jun 5 11:39:16 2003 +0000
 
     Perl 5.005 issue (base.pm Bug)
 
-commit 739fce023a60fd18ca7e50d223d3a21eb5b96226
+commit 950efda29619aafec7547f985e23a23e1b941db6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Jun 5 10:40:59 2003 +0000
 
     - support for MS_Kanji (Shift-JIS)
     - support for Big-5 (traditional Chinese)
 
-commit c2662e7c37fd84233983445ba75b1bb18181e371
+commit e7d95178bd17c8391477537dd9885a98e82a9ee0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 4 12:20:02 2003 +0000
 
     updated origin information for ISO-8859-11
 
-commit 1f375bc8906b90307db9d9043628bea6a592ad95
+commit 910a28af64d5466ccd9045223cbbbf548d4e0515
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 4 12:16:44 2003 +0000
 
     support for ISO-8859-11
 
-commit bd618160b93b653e19bc763dac45df40906a4980
+commit 97815525896dbe570eeb3d4f09231aa4abbbedb5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jun 4 12:16:27 2003 +0000
 
     extract version from gettext_pp, not Recode
 
-commit d2da8e1a2c70a1e4394c383a9242cddcc3bf0554
+commit 5eb6c8b8473cf4b625f92c06485b2ed83909f78e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jun 2 11:16:54 2003 +0000
 
@@ -2833,7 +3179,7 @@ Date:   Mon Jun 2 11:16:54 2003 +0000
     - changed copyright statements
     - general update
 
-commit 65f43781c9ebf594361bb862ea1bf4ece0d5f7fa
+commit f6f042c74b1c49ea9e5668096ccffd6f598dead1
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Mon Jan 20 14:10:08 2003 +0000
 
@@ -2842,79 +3188,79 @@ Date:   Mon Jan 20 14:10:08 2003 +0000
     (avoiding calls to Carp and
     avoiding problems with ptkdb step over)
 
-commit 25bc1cbbfed4629006bbec81b4a309d1ab9c3a61
+commit b544a2146eac8ef03d914827d1874a5f28842929
 Author: Oliver Hoos <oliver.hoos@imperia.net>
 Date:   Fri Jan 10 15:55:16 2003 +0000
 
     fixed for new directory structure
 
-commit 3fc04968a83ea4c7b74313887c1511480e6ad2b1
+commit f5bf47e4632e35d9ec653e801eee6a1ec981a28f
 Author: Ingrid Graefen <ingrid.graefen@imperia.net>
 Date:   Tue Oct 22 11:20:44 2002 +0000
 
     no BAREWORD after use base
 
-commit 47f38f484c2eba15acb462fded7c8c081565fde5
+commit 2a15ea972815acee42104ae2524825867a9a8bad
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Aug 16 10:49:20 2002 +0000
 
     unchaos
 
-commit 8dda79a6ed1af6cea207b0afcf40a27bc217950a
+commit 31f34fd79ab5075359d18076ac1f351f5a9c47cb
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Aug 16 10:12:54 2002 +0000
 
     unchaos
 
-commit cadd690554dac17f81d1f38796e4e5872fe25de7
+commit d339eb34150a59ab8a9bff5944a486e26d23d7c5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Aug 16 10:09:39 2002 +0000
 
     moved modules to subdirectory lib
 
-commit 46faed612486eee2a1b14f43c6f4c361b8ffc07c
+commit 03820deb996e301513869bd240c34a6644ae33d0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 1 13:57:32 2002 +0000
 
     updated
 
-commit 192f36f5efd191951d797d4912a41cefd00502ed
+commit 49cbca586ed42a6ac6ad21a771bb027028c62dcf
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 1 13:55:59 2002 +0000
 
     version number to 0.05
 
-commit b00f6ffe7f829f2a2c082efab39fe117a1111946
+commit 1b86fa4b709da0e422898173053691f5253e1eb4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 1 13:55:13 2002 +0000
 
     implemented decoding of UTF-8 for Perl < 5.6.0
 
-commit 70abf795c325868653fd84c3b9a436797775f8d2
+commit 419759d48771adad71982f167635a5eb61a6133c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Thu Aug 1 13:54:15 2002 +0000
 
     forgotten to add
 
-commit 4b6668c30ede4c69b56d88cae2fd0441eae52a9b
+commit ccb40ce985cb8bfe77999679b2d2dd81c199ae1a
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 16 12:53:36 2002 +0000
 
     do not list unsupported charsets in getCharsets().
 
-commit 961f20161e02f583f5709c8400e89371c0e104e6
+commit 2e6896eeeda350c22a67b3e26ae1a38652299f58
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 16 12:52:42 2002 +0000
 
     renamed Iconv to Recode
 
-commit ff28291c69239a3f3648187542de1250386cf913
+commit de3be62e22fe5e89d07486c8d50ec1ef6a2e8b6d
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 11:00:40 2002 +0000
 
     updated
 
-commit 2b1392ba6c82a825cc98a23b4f306e9114f19759
+commit 8ca52e24afef146274d7d94bda3354836532709e
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:59:47 2002 +0000
 
@@ -2923,7 +3269,7 @@ Date:   Mon Jul 15 10:59:47 2002 +0000
     - fixed setlocale() inquiries
     - more Locale::gettext compatibility
 
-commit 0e81e7eb6ae407e08146ea5a8c40e937780915e9
+commit c6a01b6af339b990a821b4abbc70a243bcf5e797
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:58:03 2002 +0000
 
@@ -2931,117 +3277,117 @@ Date:   Mon Jul 15 10:58:03 2002 +0000
     - also require this Locale::gettext version with select_package
     - fixed warning in select_package
 
-commit f16038bae90daff6ee46d4758c8f854eac897295
+commit ed42c602eff2771d55249e8eef1f59d5fd63e7a3
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:56:43 2002 +0000
 
     renamed Iconv to Recode
 
-commit 2886f2c8a534f9b05cab22fd5fd8f3ae9f416921
+commit 843af17b25b5a2775eeaa5bbab4b45a523211c99
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:56:13 2002 +0000
 
     added tests for gettext library
 
-commit 9250e1d90ce2d743becf5f439f4dfdc8f334d50a
+commit fadfdd3d199c66f79c93d0543d3df5f52ff3bd8c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:54:24 2002 +0000
 
     renamed from Iconv to Recode
 
-commit 34291ce70f605500344751b4cc6a046222149cec
+commit 51b39a25941bf3598c43b676c6bd63a1a427cb0c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:53:28 2002 +0000
 
     - added tests for gettext library
     - put numbers in front of file names (ordered tests)
 
-commit 5065010445a7f2c5e9cfdef7ed793d72699bb0d9
+commit ef86855445d9d54c18e64e96fd9106bc311012bc
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 15 10:52:31 2002 +0000
 
     added text for gettext library
 
-commit f3f7503ba6bed53a43abf18809833fced5d1344e
+commit 77ea85f86c3feaa13b0cb21cce72b9bba99a9fa0
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jul 12 18:01:01 2002 +0000
 
     removed reference to my home directory
 
-commit 5b8417b1f581acabe5591bc95c4c082a0b73f54c
+commit b24a0f0c6c131a6f2f3b1d369343ca613aaf6e7f
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Fri Jul 12 18:00:37 2002 +0000
 
     new charsets UTF-8 (requires Perl >= 5.6.0) and ASCII.
 
-commit 259d37b4dc8d143e8a91a3382e365af71d4516a1
+commit 83587d5d7be057da5b5104bef1a0524ca20629f4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jul 10 19:26:08 2002 +0000
 
     - bumped version number to 0.03
 
-commit a27c7517602a7d5a96a425dec020af56fb83bfa1
+commit e324a5b033608541d99db943b6299b28dfcd6711
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jul 10 19:25:39 2002 +0000
 
     - properly check for invalid gettext versions
 
-commit d97d1a8b7f0bb871906cdd25b8bb172b76dd71d9
+commit ac16c57c483a645979bc5c45919d32b1d0a30bfc
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jul 10 19:25:06 2002 +0000
 
     run also against Encode(3pm) in perl 5.8.0
 
-commit d1dfd8200ea1eb91efed39094e9808c20ab801bb
+commit 43804265063d228f214ca92c0a41a453b52d5f06
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jul 10 19:05:05 2002 +0000
 
     - added vim modelines
 
-commit 0f68b5945ecee7b495648059979db7bdd562ecfc
+commit 4b65c0a18bf03867c79c21a5bdbc15315f938dab
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Wed Jul 10 19:04:23 2002 +0000
 
     - (hopefully) optimized _recode()
     - vim modelines
 
-commit fef9134f65d1e54e1182b0903b10ac0be2fe59de
+commit d5e32f6f72a8f1444bcd561bba38807899d1fbd4
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:13:34 2002 +0000
 
     now really removed CVS from MANIFEST
 
-commit f4ddc829da39a32d5afcca15a7c2bfa7a56cf0ef
+commit 6faa22036d0a2cf84d6746f659acad46b8faef0c
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:07:44 2002 +0000
 
     new file
 
-commit 0227dcaf4f0684773e5b5b2401bde921ff0499c4
+commit dd5e1a5296d55024bde727ab16970d0e52f82887
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:04:43 2002 +0000
 
     new files
 
-commit 57f0373d16c0ddf8ea7b030c5a753a9a10d573aa
+commit 16c399274a4755ee959341ac7c68f4a0fac6e714
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:04:10 2002 +0000
 
     unnecessary optimizations from module generation :-(
 
-commit 273694b5d0a43402ecee5e2467d896bf5c4583be
+commit 41f496099961b60a75e2c73017d654337bae88e5
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:03:12 2002 +0000
 
     bumped version number to 0.02
 
-commit e68dfd343c5db95300ccfdd76d841695c9867cf1
+commit f2282fb663b5d6f0ceb4689372367c0201b183e6
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:02:15 2002 +0000
 
     performance optimizations
 
-commit 86bc4834210d64d0516631b154f47224dfd3880b
+commit 22b45de26807fa4a04593744bbd115ef4e4ee740
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Jul 9 19:01:40 2002 +0000
 
@@ -3049,7 +3395,7 @@ Date:   Tue Jul 9 19:01:40 2002 +0000
     - added Locale/Messages.pm and Locale/gettext_pp.pm
     - added test-benchmark
 
-commit 26b9ad8d073614da5fa98457d38efa0a5e92c14b
+commit a888f44c127803f8211a0414b7b4615791828496
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Mon Jul 8 19:19:59 2002 +0000
 

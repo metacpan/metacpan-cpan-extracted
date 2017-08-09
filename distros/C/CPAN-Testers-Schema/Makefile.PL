@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "DBIx::Class" => 0,
     "DBIx::Class::Candy" => 0,
     "DBIx::Class::InflateColumn::Serializer" => "0.09",
+    "Data::UUID" => 0,
     "DateTime" => 0,
     "DateTime::Format::ISO8601" => 0,
     "DateTime::Format::MySQL" => 0,
@@ -56,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.001005",
     "Test::Reporter" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t t/result/*.t t/resultset/*.t"
   }
@@ -70,6 +71,7 @@ my %FallbackPrereqs = (
   "DBIx::Class" => 0,
   "DBIx::Class::Candy" => 0,
   "DBIx::Class::InflateColumn::Serializer" => "0.09",
+  "Data::UUID" => 0,
   "DateTime" => 0,
   "DateTime::Format::ISO8601" => 0,
   "DateTime::Format::MySQL" => 0,

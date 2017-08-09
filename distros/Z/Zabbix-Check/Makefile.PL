@@ -11,6 +11,7 @@ WriteMakefile(
 		'JSON'			=> '2.90',
 		'Net::NTP'		=> '1.5',
 		'Lazy::Utils'	=> '1.22',
+		'Time::HiRes'	=> '1.9732',
 	},
 	EXE_FILES			=> [qw(
 	)],

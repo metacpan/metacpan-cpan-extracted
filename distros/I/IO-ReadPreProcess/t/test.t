@@ -8,7 +8,7 @@
 #	 .
 #	   .
 #
-#	SCCS: %W% %G% %U%
+#	SCCS: @(#)test.t	1.8 08/03/17 15:12:58
 #
 # Test program for the module IO::ReadPreProcess
 # This also serves as a demonstration program on how to use the module.
@@ -146,6 +146,13 @@ sub FindTests {
 	@TestFiles = sort {my ($an, $as) = $a=~ /(\d+)_.*_(\d+)/; my ($bn, $bs) = $b =~ /(\d+)_.*_(\d+)/; $an != $bn ? $an <=> $bn : $as <=> $bs } @T;
 }
 
+# Test output stream to a function:
+my $funValue;
+sub StreamFun {
+	$funValue = shift;
+	chomp $funValue;
+}
+
 # **** Start here ****
 
 # Debug/trace options from the environment:
@@ -248,6 +255,11 @@ for my $test (@TestFiles) {
     my $UnixOnly = 0;		# Only run the test on a *nix box
     my $Enable = 1;		# The test will be run
     my $OutOnError = 0;		# Show output generated on error
+    my $FunOutput;		# Test output sent to function stream
+    my @out = ();		# Output stream names
+    my %OutStreams;		# Output streams
+
+    %OutStreams = ( fun => \&StreamFun );
 
 #    print STDERR "DO test $test\n";
     my $input = $TestDir . '/' . $test . '.input';
@@ -257,6 +269,9 @@ for my $test (@TestFiles) {
 	$NumFails++;
 	next;
     }
+
+    # Reset the value of our called function
+    $funValue = '';
 
     # Look for pseudo comment info lines at the start of file:
     while(<$if>) {
@@ -271,6 +286,8 @@ for my $test (@TestFiles) {
 	$UnixOnly = $1		if(/^\.#\s+UnixOnly:\s*(\S+)\s*$/);
 	$Enable = $1		if(/^\.#\s+Enable:\s*(\S+)\s*$/);
 	$OutOnError = $1	if(/^\.#\s+OutOnError:\s*(\S+)\s*$/);
+	$FunOutput = $1		if(/^\.#\s+CheckFn:\s*(\S+.*)\s*$/);
+	push(@out, $1)		if(/^\.#\s+Out:\s+(\S+.*)\s*$/);
     }
     $fork = 1 if(@require);
 
@@ -295,6 +312,18 @@ for my $test (@TestFiles) {
 	next;
     }
 
+    # Additional output streams:
+    foreach my $f (@out) {
+	my $outoutf = $TestOutDir . '/' . $test . '.' . $f . '.out';
+	my $outs;
+	unless($outs = IO::File->new($outoutf, 'w')) {
+	    ok(0, "$Tests: not ok - $title: - cannot open (write) $outoutf: $!");
+	    $NumFails++;
+	    next ALL_TESTS;
+	}
+	$OutStreams{$f} = $outs;
+    }
+
     # This is what we want: ie what we expect to generate
     my $wantf = $TestDir . '/' . $test . '.want';
     unless($want = IO::File->new($wantf, 'r')) {
@@ -310,7 +339,7 @@ for my $test (@TestFiles) {
 	push(@newopt, 'Fd', $if);
     }
 
-    unless($rc = IO::ReadPreProcess->new(File => $input, @newopt)) {
+    unless($rc = IO::ReadPreProcess->new(File => $input, OutStreams => \%OutStreams, @newopt)) {
 	ok(0, "$Tests: not ok - $title: - cannot open ReadConditionally '$input' as: $!");
 	$NumFails++;
 	next;
@@ -386,6 +415,56 @@ for my $test (@TestFiles) {
 	}
     }
 
+    # Not what should have been sent to the function stream ?
+    if(defined($FunOutput) && $FunOutput ne $funValue) {
+	ok(0, "$Tests: $title: $lfn, function output stream expected '$FunOutput' got '$funValue'");
+	next ALL_TESTS;
+    }
+
+
+    # Check the output streams, if any
+    foreach my $f (@out) {
+	$OutStreams{$f}->close;
+	my $outoutf = $TestOutDir . '/' . $test . '.' . $f . '.out';
+        my ($outs, $wants);
+	unless($outs = IO::File->new($outoutf, 'r')) {
+	    ok(0, "$Tests: not ok - $title: - cannot open (read) $outoutf: $!");
+	    $NumFails++;
+	    next ALL_TESTS;
+	}
+	my $wantoutf = $TestDir . '/' . $test . '.' . $f . '.want';
+	unless($wants = IO::File->new($wantoutf, 'r')) {
+	    ok(0, "$Tests: not ok - $title: - cannot open (read) $wantoutf: $!");
+	    $NumFails++;
+	    next ALL_TESTS;
+	}
+
+	my $outnum = 0;
+
+	# Read/compare both files
+	while(my $outline = <$outs>) {
+	    $outnum++;
+
+	    my $wantline = <$wants>;
+	    unless($wantline) {
+		ok(0, "$Tests: not ok - $title: - generated too much, line $outnum from from ($wantoutf $outoutf) '$outline'");
+		next ALL_TESTS;
+	    }
+
+	    unless($wantline eq $outline) {
+		ok(0, "$Tests: not ok - $title: - generated different, line $outnum from ($wantoutf $outoutf) '$wantline' ne '$outline'");
+		next ALL_TESTS;
+	    }
+	}
+
+	# Is there not enough lines ?
+	my $wantline = <$wants>;
+	if($wantline) {
+	    $outnum++;
+	    ok(0, "$Tests: not ok - $title: - did not generat enough lines, line $outnum from ($wantoutf $outoutf)'$wantline'");
+	    next ALL_TESTS;
+	}
+    }
 
     ok(1, $test);
     warn "ok $Tests $title\n";

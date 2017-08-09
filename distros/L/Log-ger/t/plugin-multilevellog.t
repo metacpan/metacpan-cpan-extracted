@@ -14,8 +14,8 @@ use Log::ger::Plugin 'MultilevelLog';
 use Log::ger;
 
 sub x {
-    log(3, "warnmsg");
-    log(5, "debugmsg");
+    log(30, "warnmsg");
+    log(50, "debugmsg");
 }
 
 package main;

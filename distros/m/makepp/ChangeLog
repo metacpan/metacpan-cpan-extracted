@@ -1,3 +1,296 @@
+2017-08-05  trobador  <occitan@esperanto.org>
+
+	* Mpp/Event.pm: Work around Docker's zombie reaper problem.
+	* Mpp/BuildCacheControl.pm: 5.24 map doesn't localize $_ on goto.
+	* *: Use 3-arg open to cope with funny file-names.
+	* pod/makepp_compatibility.pod: Up to date with Perl versions.
+
+2017-07-27  trobador  <occitan@esperanto.org>
+
+	* t/spar, t/additional_tests/spar_unix.test: Add directory creation
+
+2016-09-28  pfeiffer  <occitan@esperanto.org>
+
+	* Mpp/Text.pm
+	* Mpp/Recursive.pm (requote): Move to here.
+
+2016-09-12  pfeiffer  <occitan@esperanto.org>
+
+	* Mpp/BuildCache.pm
+	* Mpp/BuildCacheControl.pm
+	* pod/makepp_extending.pod
+	* t/run_tests.pl
+	* t/builtins.test
+	* t/log_graph.test
+	* t/makeppreplay.test
+	* t/perl.test
+	* t/additional_tests/2006_02_18_makeppbuiltin.test
+	* config.pl
+	* install.pl: Prepare for optionally missing . in @INC as of 5.26.
+
+2016-09-06  pfeiffer  <occitan@esperanto.org>
+
+	* Mpp/CommandParser/Gcc.pm (xparse_command): Fix -I handling.
+
+	* makepp
+	* Mpp/Subs.pm
+	* Mpp/Event.pm
+	* Mpp/Recursive.pm (Recursive): Move rarely needed Event code to Recursive.
+
+2015-08-09  trobador  <occitan@esperanto.org>
+
+	* pod/makepp_compatibility.pod
+	* pod/html/*: Test Perl 5.22 and use some html5.
+
+2015-07-13  trobador  <occitan@esperanto.org>
+
+	* Mpp/Makefile.pm
+	* Mpp/CommandParser/Gcc.pm
+	* Mpp/Scanner.pm: Pick up paths from env vars.
+
+	* Mpp/Rule.pm: Forgotten symbol rename.
+
+2015-06-14  DP  <occitan@esperanto.org>
+
+	* Mpp/Subs.pm(@system_*_dirs): Only pick up existing dirs.
+	(f_infer_objects): Wrongly terminated regexps.
+
+2015-05-15  DP  <occitan@esperanto.org>
+
+	* Mpp/Makefile.pm: Fix against nested expansion. (Thanks to Max Baker)
+
+2014-09-12  Max Vozeler  <xam@debian.org>
+
+	* pod/makepp_extending.pod:
+	* pod/makepp_variables.pod: Fix occasional problem with ambiguous markup.
+
+2014-08-13  DP  <occitan@esperanto.org>
+
+	* makepp (build_target_done):
+	* Mpp/BuildCache.pm (get): Use "info:" instead of warning with "(OK)"
+
+2014-08-03  DP  <occitan@esperanto.org>
+
+	* *: Harmonize diagnostic printing and switch it to GNU style.
+
+2014-07-20  DP  <occitan@esperanto.org>
+
+	* Mpp.pm
+	* Mpp/Makefile.pm
+	* makepp: Add --warn-undefined-variables.  Combine a few our declarations.
+
+2014-07-08  DP  <occitan@esperanto.org>
+
+	* Mpp/Makefile.pm (grok_rule): Crazy indentation works.
+
+2014-07-03  DP  <occitan@esperanto.org>
+
+	* *: Pattern rules can pick up phony dependencies (gmake compatibility), rule option :no-phony prevents that.
+	(no_implicit_load): Also apply to directories created later.
+
+	* Mpp/Cmds.pm (&template): handle same vs. different syntax beginnings.
+
+2014-06-23  DP  <occitan@esperanto.org>
+
+	* Mpp/Makefile.pm (grok_assignment): Strip only the last newline in define (gmake compatibility).
+	(grok_rule): Debug the found rule.
+
+2014-06-10  DP  <occitan@esperanto.org>
+
+snapshot 2.0.98.5
+
+	* Mpp/Cmds.pm: Eliminate new 5.20 warning, that CPAN counts as failed test.
+	(c_template): New macro @include(filename)@.
+
+	* Mpp/Makefile.pm (read_makefile)
+	* Mpp/Subs.pm: Better show where errors come from.
+
+2014-03-19  DP  <occitan@esperanto.org>
+
+	* Mpp/FileOpt.pm (set_rule): A late found rule for a different dir can override a pattern rule.
+
+2014-01-15  DP  <occitan@esperanto.org>
+
+	* Mpp/CommandParser/Esql.pm
+	* Mpp/CommandParser/Gcc.pm: Treat C_INCLUDE_PATH et al., -static and -l: and optimize.  Few API changes.
+
+	* Mpp/Text.pm (split_path): Extra arg for parsing native vars even on Cygwin.
+
+2013-12-01  DP  <occitan@esperanto.org>
+
+	* Mpp/Text.pm:
+	* Mpp/*.pm: Parens now nest in expressions.
+	Single quotes now ignore \.
+	unquote: no longer works on regexp vars.
+	(r)find_unquoted: rename *index_ignoring_quotes.
+
+2013-10-13  DP  <occitan@esperanto.org>
+
+snapshot 2.0.98.4
+
+	* config.pl
+	* t/run_all.t
+	* t/run_tests.pl
+	* t/**/*test: Improve hinting and always show it, except in --test.  Try harder to get test results.
+
+	* pod/html/html.pl (emit_item_tag): Put Compatibility with Incompatibilities.
+
+2013-08-18  DP  <occitan@esperanto.org>
+
+	* Mpp.pm
+	* Mpp/FileOpt.pm
+	* Mpp/Makefile.pm
+	* Mpp/Repository.pm
+	* Mpp/Rule.pm
+	* Mpp/Scanner.pm
+	* makepplog: New var MAKEPP_DEBUG and show effect of mppl -c
+
+	* makepp_builtin_rules.mk: Evaluate some vars immediately.
+
+2013-07-21  DP  <occitan@esperanto.org>
+
+	* Mpp/Makefile.pm (grok_rule): Allow % to be inside make-expression.
+
+	* Mpp/Text.pm (index_ignoring_single_quotes): Eliminate.
+	(index_ignoring_quotes, split_on_whitespace): New type-option.
+
+2013-07-05  DP  <occitan@esperanto.org>
+
+	* install.pl
+	* config.pl: Installation defaults for html-doc and man have changed slightly.
+
+2013-05-19  DP  <occitan@esperanto.org>
+
+	* pod/makepp_variables.pod: Document the details of rc-style
+	substitution and how to deal with border cases.
+
+	* pod/makepp_builtins.pod: Better structure and sort -t need not modify $_.
+
+2013-05-09  DP  <occitan@esperanto.org>
+
+	* Mpp.pm (perform): Continue --loop after error.
+
+	* Mpp/Glob.pm: Don't fully qualify own $allow_dot_files.
+
+	* Mpp/File.pm (mark_as_directory): Obtain FULLNAME only once.
+
+	* makeppinfo: With --force show unremembered_SIGNATURE instead of warning.
+
+2013-04-22  DP  <occitan@esperanto.org>
+
+	* Mpp/FileOpt.pm (exists_or_can_be_built): Revert and improve, we do need to recurse.
+
+	* t/run_tests.pl
+	* t/**/*.test: Fix globbing for answers.  Check signatures after mpp.  New hook $mod_answer.
+
+	* makepp (parse_command_line): Simpler way to avoid wrong "used once" warning.
+
+	* config.pl: Win doesn't grok prefix export notation.
+
+2013-04-14  DP  <occitan@esperanto.org>
+
+	* makepp: Query build cache only if we use one.  Move some global bc and rep symbols and functions where they belong.
+
+	* Mpp.pm (perform): Use map, to avoid spurious exit code.
+
+	* Mpp/Rule.pm (DefaultRule::execute): Fix returning status.
+
+	* Mpp/DB.pm: New debug module.
+
+2013-03-30  DP  <occitan@esperanto.org>
+
+	* makepp
+	* Mpp/Rule.pm: find_all_targets_dependencies returns them already sorted.  sorted_dependencies wants list, not array.
+
+	* Mpp/Subs.pm (infer_objects): optimize
+
+	* makepp_builtin_rules.mk: Let infer_objects rules respect makepp_percent_subdirs.
+
+	* install.pl
+	* config.pl: Give more help about changing the perl binary.
+
+2013-03-05  DP  <occitan@esperanto.org>
+
+snapshot 2.0.98.3
+
+2013-03-04  DP  <occitan@esperanto.org>
+
+	* Mpp/Rule.pm (load_scaninfo_): Make private, don't force finding
+	remembered deps, which may not be buildable any more
+	(Mpp::DefaultRule::execute): No need for when_done.
+
+	* Mpp/FileOpt.pm (exists_or_can_be_built): Handle repository files
+	differently, since a dep there may not be valid here (hidden by
+	chmod 0).
+	(set_additional_dependencies): Remove and splice into grok_rule.
+
+	* Mpp/Glob.pm: Optimize.
+
+	* LICENSE: Add copyright because Debian wants it.
+
+2013-02-16  DP  <occitan@esperanto.org>
+
+	* *: Consistent and documented handling of perl instance including
+	the possibility to install against /usr/bin/env.
+
+	* Mpp/Rule.pm: Override-variable TMP.
+
+2013-01-31  DP  <occitan@esperanto.org>
+
+	* Mpp/Text.pm
+	* makepp*: Fully move VERSION to Mpp::Text.
+
+	* install.pl
+	* config.pl: Fix help.
+
+2013-01-20  DP  <occitan@esperanto.org>
+
+	* Mpp/Recursive.pm
+	* Mpp/Rule.pm
+	* Mpp.pm: Move actual building to perform and implement --loop.
+
+	* Mpp/Subs.pm (f_find_{first_}upwards): Don't find file above ROOT, if present.
+
+	* additional_tests/2003_10_11_idash.test: Wait for timestamp only if something was built.
+
+2013-01-08  DP  <occitan@esperanto.org>
+
+	* install.pl: Gzip manfiles if local system does that, Debian policy.
+
+2012-12-29  DP  <occitan@esperanto.org>
+
+	* Mpp/Signature/c_compilation_md5.pm
+	* t/md5.test: New option makepp_signature_C_flat.
+
+2012-12-28  DP  <occitan@esperanto.org>
+
+	* makepp
+	* Mpp/Makefile.pm
+	* Mpp/Recursive.pm
+	* Mpp/Rule.pm
+	* Mpp/Subs.pm
+	* t/include.test: Defer decision about inexistant/stale include
+	till end of makefile and reload if needed.
+
+2012-11-12  DP  <occitan@esperanto.org>
+
+	* Mpp/BuildCache.pm
+	* makepp: Rename build_cache_error_hook to Mpp::BuildCache::error_hook.
+	Move build_dependencies_done code to new Mpp::BuildCache::get.  Optimize.
+
+	* Mpp.pm: Rename *hits to $Mpp::{BuildCache,Repository}::hits.
+	Make final print readable.
+
+	* Mpp/FileOpt.pm (grok_build_info_file): Rewrite as parser.
+
+	* Mpp/Rule.pm (execute): Suppress stale rep symlink warning.
+
+2012-11-02  DP  <occitan@esperanto.org>
+
+	* *: All pre-2.0 features which issued deprecated-warnings are
+	eliminated, as are $Mpp::Makefile::legacy_functions and
+	$MAKEPP_INSTALL_OLD_MODULES.
+
 2012-10-25  DP  <occitan@esperanto.org>
 
 snapshot 2.0.98.2

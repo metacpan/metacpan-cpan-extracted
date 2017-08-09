@@ -1,3 +1,8 @@
+0.004   2017-08-03 (PERLANCAR)
+
+	- Use Log::Any::Level::Like::LogAny.
+
+
 0.003   2017-07-12 (PERLANCAR)
 
         - [Bugfix] By default set the LogAny plugin to apply to the log object

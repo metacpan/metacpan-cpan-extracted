@@ -13,7 +13,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in print /;
+like $@, qr/\AUnspecified I\/O handle in print /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -29,7 +29,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in print /;
+like $@, qr/\AUnspecified I\/O handle in print /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -45,7 +45,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in printf /;
+like $@, qr/\AUnspecified I\/O handle in printf /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -61,7 +61,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in printf /;
+like $@, qr/\AUnspecified I\/O handle in printf /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -81,7 +81,7 @@ SKIP: {
 		1;
 	});
 	is $r, undef;
-	like $@, qr/\AImplicit I\/O handle in say /;
+	like $@, qr/\AUnspecified I\/O handle in say /;
 
 	$r = eval(q{
 		use IO::ExplicitHandle;
@@ -99,7 +99,7 @@ SKIP: {
 		1;
 	});
 	is $r, undef;
-	like $@, qr/\AImplicit I\/O handle in say /;
+	like $@, qr/\AUnspecified I\/O handle in say /;
 
 	$r = eval(q{
 		use IO::ExplicitHandle;
@@ -117,7 +117,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in close /;
+like $@, qr/\AUnspecified I\/O handle in close /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -133,7 +133,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in close /;
+like $@, qr/\AUnspecified I\/O handle in close /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -149,7 +149,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in write /;
+like $@, qr/\AUnspecified I\/O handle in write /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -174,7 +174,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in write /;
+like $@, qr/\AUnspecified I\/O handle in write /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -199,7 +199,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in eof /;
+like $@, qr/\AUnspecified I\/O handle in eof /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -231,7 +231,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in tell /;
+like $@, qr/\AUnspecified I\/O handle in tell /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -247,7 +247,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in tell /;
+like $@, qr/\AUnspecified I\/O handle in tell /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -263,7 +263,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\| /;
+like $@, qr/\AUnspecified I\/O handle in \$\| /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -271,7 +271,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\| /;
+like $@, qr/\AUnspecified I\/O handle in \$\| /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -279,7 +279,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\^ /;
+like $@, qr/\AUnspecified I\/O handle in \$\^ /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -287,7 +287,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\^ /;
+like $@, qr/\AUnspecified I\/O handle in \$\^ /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -295,7 +295,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\~ /;
+like $@, qr/\AUnspecified I\/O handle in \$\~ /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -303,7 +303,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\~ /;
+like $@, qr/\AUnspecified I\/O handle in \$\~ /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -311,7 +311,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\= /;
+like $@, qr/\AUnspecified I\/O handle in \$\= /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -319,7 +319,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\= /;
+like $@, qr/\AUnspecified I\/O handle in \$\= /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -327,7 +327,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\- /;
+like $@, qr/\AUnspecified I\/O handle in \$\- /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -335,7 +335,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\- /;
+like $@, qr/\AUnspecified I\/O handle in \$\- /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -343,7 +343,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\% /;
+like $@, qr/\AUnspecified I\/O handle in \$\% /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -351,7 +351,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\% /;
+like $@, qr/\AUnspecified I\/O handle in \$\% /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -359,7 +359,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\. /;
+like $@, qr/\AUnspecified I\/O handle in \$\. /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;
@@ -367,7 +367,7 @@ $r = eval(q{
 	1;
 });
 is $r, undef;
-like $@, qr/\AImplicit I\/O handle in \$\. /;
+like $@, qr/\AUnspecified I\/O handle in \$\. /;
 
 $r = eval(q{
 	use IO::ExplicitHandle;

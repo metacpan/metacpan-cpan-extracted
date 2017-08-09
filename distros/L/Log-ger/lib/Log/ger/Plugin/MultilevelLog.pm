@@ -1,7 +1,7 @@
 package Log::ger::Plugin::MultilevelLog;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ Log::ger::Plugin::MultilevelLog - Create a log($LEVEL, ...) subroutine/method
 
 =head1 VERSION
 
-version 0.020
+version 0.023
 
 =head1 SYNOPSIS
 

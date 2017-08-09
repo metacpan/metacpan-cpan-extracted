@@ -1,3 +1,14 @@
+0.003   2017-08-01 (PERLANCAR)
+
+	- [Bugfix] Don't rename to NAME.1 if name doesn't change.
+
+
+0.002   2017-08-01 (PERLANCAR)
+
+	- Use Sereal instead of JSON for faithful bytes serialization (even
+	  YAML::XS uses utf8 transformation).
+
+
 0.001    2017-07-28 (PERLANCAR)
 
          - First release, without tests.

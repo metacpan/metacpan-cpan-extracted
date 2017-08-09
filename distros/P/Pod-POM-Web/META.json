@@ -53,11 +53,11 @@
    "provides" : {
       "Pod::POM::Web" : {
          "file" : "lib/Pod/POM/Web.pm",
-         "version" : "1.21"
+         "version" : "1.22"
       },
       "Pod::POM::Web::Indexer" : {
          "file" : "lib/Pod/POM/Web/Indexer.pm",
-         "version" : "1.19"
+         "version" : "1.22"
       }
    },
    "release_status" : "stable",
@@ -69,5 +69,5 @@
          "url" : "https://github.com/damil/Pod-POM-Web"
       }
    },
-   "version" : "1.21"
+   "version" : "1.22"
 }

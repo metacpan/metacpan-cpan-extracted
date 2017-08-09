@@ -298,20 +298,34 @@ sub ____run {
 sub run_multiple_queries {
     my ($conns, $remaining_sqls, $extras) = @_;
 
-    $remaining_sqls = [$remaining_sqls] if !is_ref($remaining_sqls);
+    if ( !is_ref($remaining_sqls) ) {
+        # ->run_query("select 1")
+        $remaining_sqls = [ [$remaining_sqls, $extras, $_[3] ] ];
+    }
 
     if ( is_arrayref($remaining_sqls) ) {
+        # ->run_multiple_queries([...])
         my $original     = $remaining_sqls;
         my $next_sql_idx = 0;
-        $remaining_sqls  = sub { \ $original->[$next_sql_idx++] };
+        $remaining_sqls  = sub {
+            my $idx = $next_sql_idx++;
+            $original->[$idx]
+                ?
+                    is_arrayref($original->[$idx])
+                        # ->run_multiple_queries([["select 1"], ["select 2"]])
+                        ? $original->[$idx]
+                        # ->run_multiple_queries(["select 1", "select 2"])
+                        : [ $original->[$idx] ]
+                : $original->[$idx]
+        };
     }
 
     my $next_sql = $remaining_sqls->();
     ____run(
         "run_queries",
-        sub { $next_sql && !!$$next_sql },
+        sub { is_arrayref($next_sql) && @$next_sql },
         sub {
-            my $ret = $_[0]->run_query_start( $$next_sql );
+            my $ret = $_[0]->run_query_start( @$next_sql );
             $next_sql = $remaining_sqls->();
             return $ret;
         },
@@ -352,7 +366,7 @@ sub ping {
 # useful if you want to run the same query on multiple connections
 # Think changing per-session settings.
 sub query_once_per_connection {
-    my ($conns, $query, $extras, $per_query_finished_cb) = @_;
+    my ($conns, $query, $extras, $bind, $per_query_finished_cb) = @_;
 
     my %seen;
     ____run(
@@ -360,7 +374,7 @@ sub query_once_per_connection {
         sub { return !$seen{$_[0]} },
         sub {
             $seen{$_[0]}++;
-            $_[0]->run_query_start($query)
+            $_[0]->run_query_start($query, $extras, $bind)
         },
         sub {
             my $res = $_[0]->query_results;

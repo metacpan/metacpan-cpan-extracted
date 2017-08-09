@@ -12,23 +12,25 @@ with 'WWW::ORCID::API::Common';
 
 sub _build_url {
     my ($self) = @_;
-    $self->sandbox ? 'http://api.sandbox-1.orcid.org'
+    $self->sandbox ? 'http://api.sandbox.orcid.org'
                    : 'http://api.orcid.org';
 }
 
 sub new_access_token {
-    my ($self, $client_id, $client_secret, $scope) = @_;
-    if (!defined $scope) { $scope = '/read-public' }
-    elsif ($scope eq ':read-public')    { $scope = '/read-public' }
-    elsif ($scope eq ':create-profile') { $scope = '/orcid-profile/create' }
+    my ($self, $client_id, $client_secret, %opts) = @_;
+
+    my $grant_type = $opts{grant_type};
+    if (!defined $grant_type) { $grant_type = 'client_credentials' }
+
     my $url = $self->url;
     my $headers = {'Accept' => 'application/json'};
     my $form = {
         client_id => $client_id,
         client_secret => $client_secret,
-        grant_type => 'client_credentials',
-        scope => $scope,
+        grant_type => $grant_type,
     };
+    $form->{scope} = $opts{scope} if defined $opts{scope};
+    $form->{code}  = $opts{code}  if defined $opts{code};
     my ($res_code, $res_headers, $res_body) =
         $self->_t->post_form("$url/oauth/token", $form, $headers);
     decode_json($res_body);
@@ -95,10 +97,10 @@ sub new_profile {
     $xml->xmlDecl;
     $xml->startTag('orcid-message',
             'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
-            'xsi:schemaLocation' => "http://www.orcid.org/ns/orcid http://orcid.github.com/ORCID-Parent/schemas/orcid-message/1.0.14/orcid-message-1.0.14.xsd",
+            'xsi:schemaLocation' => "http://www.orcid.org/ns/orcid https://raw.github.com/ORCID/ORCID-Source/master/orcid-model/src/main/resources/orcid-message-1.1.xsd",
             'xmlns' => "http://www.orcid.org/ns/orcid",
     );
-    $xml->dataElement('orcid-version', '1.0.14');
+    $xml->dataElement('message-version', '1.1');
     $xml->startTag('orcid-profile');
     $xml->startTag('orcid-bio');
     $xml->startTag('personal-details');
@@ -153,32 +155,60 @@ sub new_profile {
         $xml->endTag('keywords');
     }
     $xml->endTag('orcid-bio');
-    $xml->startTag('orcid-activities');
-    if ($profile->{works}) {
-        $xml->startTag('orcid-works');
-        for my $work (@{$profile->{works}}) {
-            if ($work->{visibility}) {
-                $xml->startTag('orcid-work', visibility => $work->{visibility});
-            } else {
-                $xml->startTag('orcid-work');
+    if (($profile->{works} && @{$profile->{works}}) || 
+            ($profile->{affiliations} && @{$profile->{affiliations}})) {
+        $xml->startTag('orcid-activities');
+        if ($profile->{works} && @{$profile->{works}}) {
+            $xml->startTag('orcid-works');
+            for my $work (@{$profile->{works}}) {
+                if ($work->{visibility}) {
+                    $xml->startTag('orcid-work', visibility => $work->{visibility});
+                } else {
+                    $xml->startTag('orcid-work');
+                }
+                $xml->startTag('work-title');
+                $xml->dataElement('title', $work->{title});
+                if ($work->{subtitle}) {
+                    $xml->dataElement('subtitle', $work->{subtitle});
+                }
+                $xml->endTag('work-title');
+                if ($work->{short_description}) {
+                    $xml->dataElement('short-description', $work->{short_description});
+                }
+                if ($work->{type}) {
+                    $xml->dataElement('work-type', $work->{type});
+                }
+                $xml->endTag('orcid-work');
             }
-            $xml->startTag('work-title');
-            $xml->dataElement('title', $work->{title});
-            if ($work->{subtitle}) {
-                $xml->dataElement('subtitle', $work->{subtitle});
-            }
-            $xml->endTag('work-title');
-            if ($work->{short_description}) {
-                $xml->dataElement('short-description', $work->{short_description});
-            }
-            if ($work->{type}) {
-                $xml->dataElement('work-type', $work->{type});
-            }
-            $xml->endTag('orcid-work');
+            $xml->endTag('orcid-works');
         }
-        $xml->endTag('orcid-works');
+        if ($profile->{affiliations} && @{$profile->{affiliations}}) {
+            $xml->startTag('affiliations');
+            for my $aff (@{$profile->{affiliations}}) {
+                $xml->dataElement('type', $aff->{type});
+                if ($aff->{department_name}) {
+                    $xml->dataElement('department-name', $aff->{department_name});
+                }
+                if ($aff->{role_title}) {
+                    $xml->dataElement('role-title', $aff->{role_title});
+                }
+                # TODO start-date
+                $xml->startTag('organization');
+                $xml->dataElement('name', $aff->{name});
+                if (my $addr = $aff->{address}) {
+                    $xml->startTag('address');
+                    $xml->dataElement('city', $addr->{city});
+                    $xml->dataElement('region', $addr->{region}) if exists $addr->{region};
+                    $xml->dataElement('country', $addr->{country});
+                    $xml->endTag('address')
+                }
+                # TODO disambiguated-organization
+                $xml->endTag('organization');
+            }
+            $xml->endTag('affiliations');
+        }
+        $xml->endTag('orcid-activities');
     }
-    $xml->endTag('orcid-activities');
     $xml->endTag('orcid-profile');
     $xml->endTag('orcid-message');
     $xml->end;

@@ -1,5 +1,13 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.30 Thu Aug 03 2017
+    - Docs: fix synopsis usage to "name" (incorrect) instead of filename
+      (correct) (Thanks Emanuele Tomasi)
+    - improve debug() routine so that all debug messages have the same layout
+      (Thanks Emanuele Tomasi)
+    - fix race condition in lockfile-race-condition.t [sic] (Thanks Emanuele
+      Tomasi)
+
 1.29 Fri Jul 28 2017
     - Fix deadlock on Windows due to the fact that stat() on a filehandle vs a
       path doesn't return the same device field on Windows.
@@ -53,8 +61,6 @@ Revision history for Perl extension Log::Dispatch::FileRotate.
       installed and only run if TEST_SIGNATURE=1 is passed to make test)
     - Docs: fix synopsis reference to size parameter to make it clear that
       the size is in bytes, not megabytes.  [#88286]
-    - Docs: fix synopsis usage to "name" (incorrect) instead of filename
-      (correct)
 
 1.21
     [REMOVED] - accidental release, bad dist.

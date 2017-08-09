@@ -6,7 +6,6 @@ Makefile.PL
 README
 autovivification.xs
 lib/autovivification.pm
-ptable.h
 samples/bench.pl
 samples/hash2array.pl
 t/00-load.t
@@ -40,3 +39,12 @@ t/lib/autovivification/TestRequired5/b0.pm
 t/lib/autovivification/TestRequired5/c0.pm
 t/lib/autovivification/TestRequired5/d0.pm
 t/lib/autovivification/TestRequired6.pm
+xsh/caps.h
+xsh/debug.h
+xsh/hints.h
+xsh/mem.h
+xsh/ops.h
+xsh/peep.h
+xsh/ptable.h
+xsh/threads.h
+xsh/util.h

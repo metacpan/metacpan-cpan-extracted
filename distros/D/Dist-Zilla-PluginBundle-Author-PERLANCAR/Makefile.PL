@@ -48,6 +48,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::StaticInstall" => 0,
     "Dist::Zilla::Plugin::TaskWeaver" => 0,
     "Dist::Zilla::Plugin::Test::Compile" => "2.033",
+    "Dist::Zilla::Plugin::Test::Perl::Critic" => 0,
     "Dist::Zilla::Plugin::Test::Rinci" => "0.01",
     "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple" => 0,
     "Dist::Zilla::PluginBundle::Filter" => 0,
@@ -68,7 +69,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.58",
+  "VERSION" => "0.590",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -108,6 +109,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::StaticInstall" => 0,
   "Dist::Zilla::Plugin::TaskWeaver" => 0,
   "Dist::Zilla::Plugin::Test::Compile" => "2.033",
+  "Dist::Zilla::Plugin::Test::Perl::Critic" => 0,
   "Dist::Zilla::Plugin::Test::Rinci" => "0.01",
   "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple" => 0,
   "Dist::Zilla::PluginBundle::Filter" => 0,

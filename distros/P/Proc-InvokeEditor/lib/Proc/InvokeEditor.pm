@@ -33,11 +33,11 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION
 @EXPORT = qw(
 	
 );
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 @DEFAULT_EDITORS = ( $ENV{'VISUAL'}, $ENV{'EDITOR'}, '/usr/bin/vi',
                      '/bin/vi', '/bin/ed',
-                     map({ can_run($_) } qw(vi ed))
+                     map({ can_run($_) } qw(vi ed notepad.exe))
 );
 
 sub new {
@@ -158,7 +158,14 @@ sub first_usable {
   my @path = File::Spec->path;
   EDITORS: foreach my $editor (@editors) {
     next unless defined $editor;
-    my @editor_bits = split /\s+/, $editor;
+    my @editor_bits;
+    if( $^O =~ /mswin/i ) {
+        require Text::ParseWords;
+        $editor =~ s!\\!\\\\!g; # quote path for shellwords
+        @editor_bits = Text::ParseWords::shellwords($editor);
+    } else {
+        @editor_bits = split /\s+/, $editor;
+    };
     next unless defined $editor_bits[0];
     if (File::Spec->file_name_is_absolute($editor_bits[0])
         and -x $editor_bits[0]) {
@@ -373,6 +380,15 @@ A optional second argument is available $suff - example usage:
 This specifies a filename suffix to be used when the editor is launched - this
 can be useful if the data in the file is of a particular type and you want to
 trigger an editor's syntax highlighting mode.
+
+=head1 WINDOWS SUPPORT
+
+On Windows, the parsing is a bit different and uses shell parsing respecting
+double quoted paths as the first item for the editor.
+
+The following might work to use Notepad++ as your editor with this module or C<git>
+
+    set EDITOR="c:\Program Files\Notepad++\notepad++.exe" -multiInst -nosession -notabbar
 
 =head1 TODO
 

@@ -1,5 +1,13 @@
 Revision history for Config-AutoConf
 
+0.315	2017-08-02
+	- add check_builtin
+	- perltidy code and add perltidy test (taken from MooX::Options)
+	- ensure for many check_* methods that externally controlled
+	  ac_av_* environment variables are correctly passed into config.h
+	- fix check_dirent_header to cache proving header and proving
+	  availability of 'DIR *' in such a header separately
+
 0.314	2017-03-30
 	- _get_extra_linker_flags: add library dirs
 

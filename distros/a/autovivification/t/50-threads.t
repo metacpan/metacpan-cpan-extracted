@@ -69,4 +69,4 @@ $_->join for @threads;
 
 pass 'done';
 
-done_testing(scalar(@threads) * $runs * 3 * (1 + 2) + 1);
+done_testing;

@@ -5,7 +5,7 @@
 # gcc is in the path, but maybe the scope of the test should be broadened.
 #
 !system $ENV{CC} || 'gcc', '-I-', '-v' if exists $ENV{CC} ? $ENV{CC} =~ /\bg[^\/]+(?:\.exe)?$/ : 1;
-###	35	644	1164353916	1342871125	makepp_test_script.pl
+###	32	644	1164353916	1366573811	makepp_test_script.pl
 #
 # This test depends entirely on the builtin rules.
 #
@@ -22,24 +22,21 @@
 #
 
 my @exe_dep = is_windows ? '--no-path-exe-dep' : ();
+my $compiled;
 for $iter (0 .. 3) {
   print "**** Iteration $iter\n";
-  wait_timestamp 'compilation.o' if $iter;
+  wait_timestamp 'compilation.o' if $compiled;
   makepp @exe_dep, 'CPPFLAGS=-I subdir1 -I- -Isubdir2', "ITERATION=$iter", 'compilation_test';
   open STDOUT, ">iteration_$iter";
   system '.' . ($^O =~ /^MSWin/ ? '\\' : '/') . 'compilation_test';
                                 # Make sure makepp found x2 in subdir1, not
                                 # in the main directory.
 
-  n_files "n_files_$iter", sub { die if /warning: can.t locate file/ };
+  $compiled = "0 0 0\n" ne n_files "n_files_$iter", sub { die if /warning: can.t locate file/ };
                                 # Make sure makepp correctly found all include files.
   open STDOUT, '>/dev/null';	# placeholder
 }
-if( is_windows ) {
-  for my $n ( '', qw(_0 _1 _2 _3) ) {
-    c_sed 's/ 0 / 1 /', "-o+<answers/n_files$n"; # Extra phony on each test
-  }
-}
+$Mpp::mod_answer = sub { $_[2] =~ s/ 0 / 1 / } if is_windows;
 1;
 ###	10	644	1067451881	1065032055	compilation_test.c
 #include <stdio.h>

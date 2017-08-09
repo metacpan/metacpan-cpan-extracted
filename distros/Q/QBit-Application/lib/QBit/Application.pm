@@ -10,7 +10,7 @@ It union all project models.
 =cut
 
 package QBit::Application;
-$QBit::Application::VERSION = '0.014';
+$QBit::Application::VERSION = '0.015';
 use qbit;
 
 use base qw(QBit::Class);
@@ -665,12 +665,10 @@ sub post_run {
     my ($self) = @_;
 
     foreach (keys(%{$self->get_models()})) {
-        $self->$_->finish()   if exists($self->{$_}) && $self->{$_}->can('finish');
         $self->$_->post_run() if exists($self->{$_}) && $self->{$_}->can('post_run');
     }
 
     $self->timelog->finish();
-
     $self->process_timelog($self->timelog);
 
     if ($self->get_option('find_app_mem_cycle')) {

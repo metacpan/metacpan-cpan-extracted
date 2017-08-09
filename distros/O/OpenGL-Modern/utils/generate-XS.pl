@@ -31,6 +31,8 @@ my %alias;
 my @manual_list = qw(
   glGetString
   glShaderSource_p
+  glpCheckErrors
+  glpSetAutoCheckErrors
 );
 
 my %manual;
@@ -303,13 +305,30 @@ XS
             $decl .= "     $xs_args;\n";
         }
 
+        my $error_check = $name eq "glGetError" ? "" : <<"XS";
+    if ( _auto_check_errors ) {
+        int err = GL_NO_ERROR;
+        int error_count = 0;
+        while ( ( err = glGetError() ) != GL_NO_ERROR ) {
+            /* warn( "OpenGL error: %d", err ); */
+            warn( "$name: OpenGL error: %d %s", err, gl_error_string(err) );
+            error_count++;
+        }
+        if( error_count )
+          croak( "$name: %d OpenGL errors encountered.", error_count );
+    }
+XS
+        chomp $error_check;    # trailing newline needs to be done conditionally
+
         my $res = $decl . <<XS;
 CODE:
     if ( ! _done_glewInit ) {
         glewExperimental = GL_TRUE;
         glewInit() || _done_glewInit++;
     }
+$error_check
 XS
+
         if ( $item->{glewtype} eq 'fun' and $glewImpl ) {
             $res .= <<XS;
     if ( ! $glewImpl ) {
@@ -318,23 +337,23 @@ XS
 XS
         }
 
+        $error_check = "\n$error_check" if $error_check;    # otherwise glGetError gets a stray newline
+
         if ( $no_return_value ) {
             $res .= <<XS;
-    $name($args);
-
+    $name($args);$error_check
 XS
-
         }
         else {
-            $res .= "    RETVAL = $name" . ( ( $item->{glewtype} eq 'var' ) ? ";\n" : "($args);\n" );
+            my $arg_list = $item->{glewtype} eq 'var' ? "" : "($args)";
             $res .= <<XS;
+    RETVAL = $name$arg_list;$error_check
 OUTPUT:
     RETVAL
-
 XS
         }
 
-        $content .= $res;
+        $content .= "$res\n";
     }
     return $content;
 }

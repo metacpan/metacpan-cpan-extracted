@@ -65,13 +65,13 @@ unzip -u %ex%\extra_c.zip
 %ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr iz-la-4s 2>&1 | tee 00cl
 %ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr iz-ru-4s 2>&1 | tee 00cr
 %ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr iz-gr-p4 2>&1 | tee 00cg
-%ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr iz-hb-4s 2>&1 | tee 00ch
+%ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr_r2l iz-hb-4s 2>&1 | tee 00ch
 
 zip -ru iz-la-4s iz-la-4s
 zip -ru iz-ru-4s iz-ru-4s
 zip -ru iz-gr-p4 iz-gr-p4
 zip -ru iz-hb-4s iz-hb-4s
-zip -ju src %src%/ooo-us %src%/ooo-ru %src%/ooo-gr %src%/ooo-hb %ex%\izKeys.kbdd %ex%\build-iz.pl %ex%\compile_link_kbd.cmd %ex%\izKeys.patch %ex%\test-klc-tr.pl %~f0 *.C *.H *.RC *.DEF %ex%\izKeys.pre-convert-fix.patch %ex%\extra_c.zip %src/text-tables
+zip -ju src %src%/ooo-us %src%/ooo-ru %src%/ooo-gr %src%/ooo-hb %ex%\izKeys.kbdd %ex%\build-iz.pl %ex%\compile_link_kbd.cmd %ex%\izKeys.patch %ex%\test-klc-tr.pl %~f0 *.C *.H *.RC *.DEF %ex%\extra_c.zip %src%/text-tables
 copy %src%\izKeys-visual-maps-out.html izKeys-visual-maps.html
 zip -ju html izKeys-visual-maps.html %src%/coverage-1prefix-Cyrillic.html %src%/coverage-1prefix-Latin.html %src%/coverage-1prefix-Hebrew.html %src%/coverage-1prefix-Greek.html %src%/izKeys-front-out.html
 

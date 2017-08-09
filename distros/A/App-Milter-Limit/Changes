@@ -1,5 +1,12 @@
 Revision history for App::Milter::Limit
 
+0.53  2017-08-04
+    - Kwalitee: add META.json, delcare min perl version, use warnings
+    - add "limit_from" configuration value to override the value taht is
+      limited.  You can use this to filter based on the authenticated username
+      for example by using:
+        limit_from = {auth_authen}
+
 0.52  2014-07-09
     - add systemd init script for fedora/RHEL7 [Javier Wilson]
     - add 'reply' global configuration to change the milter response from

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our @EXPORT_OK = qw(%maps %name_for_map_series);
 our %maps;
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 our %name_for_map_series = ( 
   A => 'OS Landranger',
   B => 'OS Explorer',
@@ -1155,7 +1155,7 @@ Geo::Coordinates::OSGB::Maps - Data for OSGB Maps
 
 =head1 VERSION
 
-V2.18
+V2.19
 
 =head1 SUBROUTINES AND METHODS
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.61.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,24 +12,37 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 7e9c8aa21e5ddcb9668c01d553d5fd9291ab1c01 Changes
-SHA1 2567ebef08c659e7f40bee2fbd29f69f00c6c863 LICENSE
-SHA1 7fa21e09cac4e9139366be1d34f7594fc072d24d MANIFEST
-SHA1 b3c95918951ae93714cc30cba9d9bf24683ce7c0 META.yml
-SHA1 abd5ef6a29e704b44e8d346512d789ceeec202c8 Makefile.PL
-SHA1 c4a0646a9ee9eda9415bdfc9519ee754be3cbb30 README
-SHA1 24631a8678b5d821d6777b0fadc3fb75d8101aba dist.ini
-SHA1 1fd2b221ed8d9c80b947011331609b56905dbfc1 lib/App/Milter/Limit/Plugin/SQLite.pm
+SHA1 ae89ef42358feb78cd2b3e5070b5b765401f1af8 Changes
+SHA1 54dda90b3b1d13d5d5ec34f1f3ec80c21b7ef4ca LICENSE
+SHA1 e4219736823f5dd88074d6bc88bc9801ead8d2a9 MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 e5d6b17211972ae128042bf4b4293e0af61ee179 META.json
+SHA1 7bcc169e7d132d839296f93705241a9ed0c36291 META.yml
+SHA1 b8fb0b1d32163dc7272f60800b7771a1d6a7a8ce Makefile.PL
+SHA1 dbc138a915f3d7cf6effa9bfb4066854d18a612d README
+SHA1 1658874bbe0f508e4d9a2c224b1d201fb634e877 lib/App/Milter/Limit/Plugin/SQLite.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
 SHA1 c05bd0bcb60e20050fb59d52c784aa458bba3f12 t/compile.t
-SHA1 5da741e4cabd859cbd6a3f2ad1c9901b892da4d0 t/release-pod-coverage.t
-SHA1 946206d2ce9fba0e8fda1d429e01245fb8934622 t/release-pod-syntax.t
-SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
+SHA1 fe94e2d5fcb5b4889799089d94b1bcaea252a58c t/lib/My/Test/Util.pm
+SHA1 0ec75b5994569482154e5df8b645422a6b2255ff t/smoke.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+Version: GnuPG v2
 
-iEYEARECAAYFAkuyIckACgkQ+CqvSzp9LOx32gCeO7gtdBUACCBD8wghvEqYw8q4
-QNAAn3M5FQUT0JocZb7/BrIsbq6nXt8j
-=yHGp
+iQIVAwUBWYTDVkQM7y65VM2OAQjjQxAAwfDkV9HasD11/nSKoOdmtwuJg1+YuEDL
+nVMd/bNYG6NV+2RpNo094GjtuhlKmyM7YiiSRCOULTu55pgx6f9xzwqAEr6joDeS
+WLP7GGOY15Pjt2/ZBwQgjO/+Gu3163eweMq41fVJ51lyeihbBCKKvUrj1MELjQ9B
+2JolktjdYZ+a2225C+1kNGgliysDyLsNy1B+2uEFq1jWAoviiMcVWfZgq6temYX1
+chBXSOGAq1YPDfuiq4tOI19+Lws0iQVHmo6rDUKBMGtHb12rx8T8c5h5aYsdoPK4
+IZZs27iAdxPPAoCaYqGDgiSZJTXqBB7iB2xD7aTdenETaTDdsBjPBVw4/7rdVPFA
+0kp2wl9yb9VDUstRUrOqNcSn03dBuQNWVsUg3GdL1vFZ8rfspREx2e+VgqmDQPo/
+Guli54nVW050DdZwBBf7DIWi6+SwCELDpUIQbiGLyMOo1LK0SengBW9dmrpuwhLG
+ckVfse+xIJToQxgpoV3JPhZQVLrZPBLAXEIX5A2dmdKcqhyp1KB5WBYXuAG3Cgsr
+uuQtA8lz+s2hs9p4ACL97mDqEm7PbionIvX1ZDKIcVLOy+GH5+ByoMuAbE+c8XOT
+fbxz7kUhsWTlx95RP91HrjnQ27owqlXl3m8w/mfjkA6YSE9NZi34OUIx/Oe6mop1
+82LaaHpK3q0=
+=/H77
 -----END PGP SIGNATURE-----

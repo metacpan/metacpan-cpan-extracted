@@ -1,5 +1,8 @@
 Revision history for Alien-m4
 
+0.14      2017-08-04 10:11:49 -0400
+  - Tweaks to improve MSYS2 support
+
 0.12      2017-07-25 07:48:20 -0400
   - Tweaks to improve Windows support
 

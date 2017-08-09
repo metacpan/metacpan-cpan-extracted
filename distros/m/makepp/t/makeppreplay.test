@@ -1,8 +1,15 @@
 ###	SPAR <http://www.cpan.org/scripts/>
+###	4	644	1327960486	1380446186	hint
+This tests an add-on utility for speeding up your build.  The failure
+likely does not imply a problem with makepp itself.
+Ccache at least up to version 3.1.9 is known to fail this test on `out',
+bug report https://bugzilla.samba.org/show_bug.cgi?id=8728 refers.
 ###	1	644	1329052295	1329052295	is_relevant.pl
 have_cc
-###	36	644	1227216359	1342861520	makepp_test_script.pl
+###	39	644	1227216359	1473703435	makepp_test_script.pl
 # This test creates some files, also in other dirs, messes them up and wants mppr to recreate them.
+
+local $ENV{CCACHE_DISABLE} = 1 if $ENV{AUTOMATED_TESTING}; # Else fail with hint to let user know.
 
 local $ENV{X} = 0;		# Set up a dependency mpp won't know about.
 local $ENV{C} = 1;
@@ -36,12 +43,10 @@ local @ARGV = <.makepp/*.mk dir/.makepp/*.mk>;
 local $/;
 /^RESCAN=/m and $rescan++ while <>;
 die 'rescan' if $rescan != 5;	# a, d, dir/e, dir/f & xreal.c don't need scanning, so they don't lose this flag.
+$Mpp::mod_answer = sub { $_[2] =~ s/ 0 / 2 / } if is_windows;
 
 1;
-###	2	644	1327960486	1327960486	hint
-Ccache at least up to version 3.1.7 is known to fail this test on "out",
-bug report https://bugzilla.samba.org/show_bug.cgi?id=8728 refers.
-###	35	644	1227216620	1229020504	RootMakeppfile.mk
+###	35	644	1227216620	1473534183	RootMakeppfile.mk
 $(phony all): a c cc d dir/$( e f) out
 
 load_makefile dir		# needed for a
@@ -54,7 +59,7 @@ bb cc:
 	&echo bb -o bb
 	&expr $$ENV{C} -o cc	# creates cc but fails depending on C
 
-perl { use mod qw(c_cmd) }
+perl { use lib '.'; use mod qw(c_cmd) }
 
 d: MYVAR=5
 d: dd

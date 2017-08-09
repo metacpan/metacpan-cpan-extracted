@@ -46,7 +46,7 @@ my $thread1 = threads->create(sub {
 		if(0) { print 123; }
 		1;
 	});
-	$@ =~ /\AImplicit I\/O handle in print / or $ok = 0;
+	$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
 	$ok1 = $ok;
 	$done1->up;
 	$exit1->down;
@@ -62,7 +62,7 @@ my $thread2 = threads->create(sub {
 		if(0) { print 123; }
 		1;
 	});
-	$@ =~ /\AImplicit I\/O handle in print / or $ok = 0;
+	$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
 	$ok2 = $ok;
 	$done2->up;
 	$exit2->down;
@@ -75,7 +75,7 @@ eval(q{
 	if(0) { print 123; }
 	1;
 });
-like $@, qr/\AImplicit I\/O handle in print /;
+like $@, qr/\AUnspecified I\/O handle in print /;
 
 my $ok3 :shared;
 my $thread3 = threads->create(sub {
@@ -86,7 +86,7 @@ my $thread3 = threads->create(sub {
 			if(0) { print 123; }
 			1;
 		});
-		$@ =~ /\AImplicit I\/O handle in print / or $ok = 0;
+		$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
 	};
 	$ok3 = $ok;
 	$done3->up;
@@ -104,7 +104,7 @@ my $thread4 = threads->create(sub {
 			if(0) { print 123; }
 			1;
 		});
-		$@ =~ /\AImplicit I\/O handle in print / or $ok = 0;
+		$@ =~ /\AUnspecified I\/O handle in print / or $ok = 0;
 	};
 	$ok4 = $ok;
 	$done4->up;

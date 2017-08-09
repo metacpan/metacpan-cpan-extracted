@@ -1,0 +1,140 @@
+# NAME
+
+WWW::Subsonic - Interface with the Subsonic API
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+This module provides a very simple interface to using the Subsonic API.
+
+    use Path::Tiny;
+    use WWW::Subsonic;
+
+    my $subsonic = WWW::Subsonic->new(
+        username => 'user1',
+        password => 'Assw0rd1P',
+    );
+
+    my $pinged = $subsonic->api_request('ping.view');
+
+    my $starred = $subsonic->api_request('getStarred2');
+
+    foreach my $song (@{ $starred->{song} }) {
+        my $dst = path($song->{path});
+        $dst->parent->mkpath;
+        $dst->spew_raw( $subsonic->api_request(download => { id => $song->{id} }) );
+    }
+
+# ATTRIBUTES
+
+## **protocol**
+
+Subsonic protocol, https (the default) or http.
+
+## **server**
+
+Subsonic server name, defaults to localhost
+
+## **port**
+
+Subsonic server port, default 4000
+
+## **username**
+
+Subsonic username, **required**.
+
+## **password**
+
+Subsonic user's password, **required**.  This is never sent over the wire,
+instead it's hashed using a salt for the server to verify.
+
+## **salt**
+
+Salt for interacting with the server, regenerated each object instantiation.
+Will be randomly generated.
+
+## **token**
+
+Generated from the **salt** and **password**.
+
+## **ua**
+
+UserAgent object used to interface with the Subsonic server.  Needs
+to be an instance of Mojo::UserAgent.
+
+## **api\_version**
+
+The Subsonic API verion to target, currently defaults to the latest, Subsonic
+6.1, API version 1.15.0.
+
+## **client\_id**
+
+The identifier to use for interfacing with the server, defaults to
+perl(WWW::Subsonic).
+
+# METHODS
+
+## **api\_request**
+
+Builds an API request using the parameters.
+
+- 1. API Method
+
+    This is the name of of the method to call, ie, `getStarred`, `download`, etc.
+
+- 2. Hash Reference of Arguments
+
+    Most API calls take one or more named arguments.  Specify those named arguments
+    in this hash reference and they will be encoded properly and joined with the
+    other parameters to form the request.
+
+This method provides the following arguments to all API calls so you don't have
+to: **u** - username, **s** - salt, **t** - token, **v** - API version, **c** -
+client identified, **f** - format (json).
+
+# SEE ALSO
+
+[Subsonic API Docs](http://www.subsonic.org/pages/api.jsp)
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License
+
+# CONTRIBUTOR
+
+Brad Lhotsky <brad.lhotsky@gmail.com>
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [http://metacpan.org/release/WWW-Subsonic](http://metacpan.org/release/WWW-Subsonic)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Subsonic](https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Subsonic)
+
+## Source Code
+
+This module's source code is available by visiting:
+[https://github.com/reyjrar/WWW-Subsonic](https://github.com/reyjrar/WWW-Subsonic)

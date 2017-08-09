@@ -1,4 +1,5 @@
 use Modern::Perl;
+no warnings 'redefine';
 use Test::More qw(no_plan);
 use IO::Scalar;
 use Data::Dumper;
@@ -15,8 +16,15 @@ our @DATA;
 our $LINE=__LINE__;
 our $DEBUG=0;
 
+no warnings 'redefine';
 foreach my $method (qw(tv_interval gettimeofday is_plain_hashref is_blessed_hashref svref_2object looks_like_number freeze thaw)) {
   ok(!Log::LogMethods->can($method),"Log::LogMethods should not expose method: $method");
+}
+
+foreach my $class (qw(test_base test_parent test_header )) {
+
+  my $self=$class->new();
+  ok(!$self->level,'should return false when we try to call a bad logger object for class: '.$class);
 }
 
 foreach my $class (qw(test_base test_parent test_header )) {
@@ -190,7 +198,7 @@ sub log_sample {
   package test_moo;
 
   use Moo;
-  BEGIN {with 'Log::LogMethods' };
+  BEGIN {no warnings 'redefine';with 'Log::LogMethods' };
   sub call_method { my ($self,$method,$msg)=@_; $self->$method($msg);$LINE=__LINE__ }
   sub test_always : BENCHMARK_ALWAYS { shift;@DATA=@_; wantarray ? (1,2) : 31  }
   sub test_error : BENCHMARK_ERROR { shift;@DATA=@_; wantarray ? (1,2) : 31  }

@@ -15,6 +15,20 @@
 	.
 
 
+<http://kasei.us/code/files/IRI-0.008.tar.gz>
+	dcterms:isVersionOf my:project ;
+	dcterms:replaces    <http://kasei.us/code/files/IRI-0.007.tar.gz> ;
+	
+	doap:Version [
+		doap:revision	"0.008" ;
+		doap:created	"2017-XX-XX" ;
+	] ;
+	asc:changes [
+		asc:update		"Fix typo in regex rule causing problems parsing codepoints beyond BMP (#11)." ;
+	] ;
+	.
+
+
 <http://kasei.us/code/files/IRI-0.007.tar.gz>
 	dcterms:isVersionOf my:project ;
 	dcterms:replaces    <http://kasei.us/code/files/IRI-0.006.tar.gz> ;

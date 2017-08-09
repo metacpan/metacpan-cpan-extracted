@@ -2,26 +2,39 @@
 abstract: 'Overrides the time() and sleep() core functions for testing'
 author:
   - 'cho45 <cho45@lowreal.net>'
-build_requires:
-  ExtUtils::MakeMaker: 6.36
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.04'
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-Time
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Time:
+    file: lib/Test/Time.pm
+    version: '0.05'
 requires:
-  Filter::Util::Call: 0
+  Test::More: '0'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/cho45/Test-Time/issues
+  homepage: https://github.com/cho45/Test-Time
   repository: git://github.com/cho45/Test-Time.git
-version: 0.04
+version: '0.05'
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'minimalist <minimalist@lavabit.com>'
+  - 'motemen <motemen@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,5 +1,8 @@
 Revision history for Perl module Regexp::Common::time.
 
+0.14  2017-08-07 MANWAR
+      - Added MIN_PERL_VERSION to Makefile.PL script.
+
 0.13  2017-07-22 MANWAR
       - Added author only test (t/meta-json.t and t/meta-yml.t).
       - Tidied up test (t/1-load.t).

@@ -1,5 +1,5 @@
 package QBit::Application::Model::RBAC;
-$QBit::Application::Model::RBAC::VERSION = '0.014';
+$QBit::Application::Model::RBAC::VERSION = '0.015';
 use qbit;
 
 use base qw(QBit::Application::Model);

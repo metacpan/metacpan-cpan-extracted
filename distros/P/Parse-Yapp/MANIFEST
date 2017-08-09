@@ -1,17 +1,22 @@
+Calc.yp
 Changes
-README
-MANIFEST
-Makefile.PL
+docs/fdesarmenien_20170307-parse_yapp_assignment__email.eml
+docs/fdesarmenien_20170307-parse_yapp_assignment_redacted.png
 lib/Parse/Yapp.pm
-lib/Parse/Yapp/Parse.pm
+lib/Parse/Yapp/Driver.pm
 lib/Parse/Yapp/Grammar.pm
 lib/Parse/Yapp/Lalr.pm
-lib/Parse/Yapp/Output.pm
-lib/Parse/Yapp/Driver.pm
 lib/Parse/Yapp/Options.pm
-YappParse.yp
-yapp
-Calc.yp
+lib/Parse/Yapp/Output.pm
+lib/Parse/Yapp/Parse.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
 t/base.t
 t/calc.t
 t/stress.t
+yapp
+YappParse.yp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

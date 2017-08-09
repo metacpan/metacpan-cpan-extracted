@@ -1,0 +1,36 @@
+---
+abstract: 'A very convenient wrapper around Mojolicious::Validator'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Validate-Util
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '7.38'
+  Mojolicious::Validator: '0'
+  Moo: '2.003'
+  Params::Classify: '0.013'
+  Types::Standard: '1.002001'
+  URI::Find::Schemeless: '20160806'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MojoX-Validate-Util
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/MojoX-Validate-Util.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

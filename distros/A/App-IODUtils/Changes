@@ -1,4 +1,7 @@
-Revision history for App-IODUtils
+0.15    2017-08-05 (PERLANCAR)
+
+	- Add option --expr-vars.
+
 
 0.14    2016-12-28 (PERLANCAR)
 

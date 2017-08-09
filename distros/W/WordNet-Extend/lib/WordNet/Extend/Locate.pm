@@ -1,11 +1,11 @@
-# WordNet::Extend::Locate.pm version 0.031
-# Updated: 01/16/17
+# WordNet::Extend::Locate.pm version 0.041
+# Updated: 08/06/17
 #                                           
-# Ted Pedersen, University of Minnesota Duluth             
-# tpederse at d.umn.edu
-#
 # Jon Rusert, University of Minnesota Duluth
 # ruse0008 at d.umn.edu
+#
+# Ted Pedersen, University of Minnesota Duluth             
+# tpederse at d.umn.edu
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ use WordNet::Extend::Locate;
 
  my $locate = WordNet::Extend::Locate->new();
 
- $locate->stopList('s/\b(the|is|at)\b//');
+ $locate->stopList('(the|is|at)');
 
  $locate->setCleanUp(1);
 
@@ -82,7 +82,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 @EXPORT = ();
 
-$VERSION = '0.031';
+$VERSION = '0.041';
 
 #**************Variables**********************
 $wn = WordNet::QueryData->new; #to be used to access data from wordnet
@@ -99,7 +99,8 @@ $measure = WordNet::Similarity::vector->new ($wn); #used to measure similarity f
 %wnSyns = ();
 %wnFreq = ();
 #our $wikParser = Wiktionary::Parser->new(); #Parses data from wiktionary pages.
-$stopList = "s/\b(the|is|at|which|on|a|an|and|or|up)\b//g"; #default stop list.
+#$stopList = "(the|is|at|which|on|a|an|and|or|up|in|so)"; #default stop list.
+$stopList = "(a|about|above|after|again|against|all|am|an|and|any|are|aren't|as|at|be|because|been|before|being|below|between|both|but|by|can't|cannot|could|couldn't|did|didn't|do|does|doesn't|doing|don't|down|during|each|few|for|from|further|had|hadn't|has|hasn't|have|haven't|having|he|he'd|he'll|he's|her|here|here's|hers|herself|him|himself|his|how|how's|i|i'd|i'll|i'm|i've|if|in|into|is|isn't|it|it's|its|itself|let's|me|more|most|mustn't|my|myself|no|nor|not|of|off|on|once|only|or|other|ought|our|ours|ourselves|out|over|own|same|shan't|she|she'd|she'll|she's|should|shouldn't|so|some|such|than|that|that's|the|their|theirs|them|themselves|then|there|there's|these|they|they'd|they'll|they're|they've|this|those|through|to|too|under|until|up|very|was|wasn't|we|we'd|we'll|we're|we've|were|weren't|what|what's|when|when's|where|where's|which|while|who|who's|whom|why|why's|with|won't|would|wouldn't|you|you'd|you'll|you're|you've|your|yours|yourself|yourselves)";
 $preProcessed = 0; #Flag to determine if preProcessing() has been called.
 $cleanUp = 1; #If cleanUp is on, glosses will be cleanedUp, can be toggled with setCleanUp();
 $userCleanUp = ""; #Cleanup step specified by user in addCleanUp();
@@ -110,9 +111,10 @@ $bonus = 10; #Bonus to be used for lemmas that contain the new lemma. Can be set
 $refineSense = 0; #Toggle for use of refineSense() method, default on.
 $help = 0;
 $scoringMethod = 'baseline';
-@scoringMethods = ('baseline', 'BwS', 'Similarity');
+@scoringMethods = ('baseline', 'BwS', 'Similarity', 'Word2Vec');
 $stemming = 0; #Toggle for stemming on or off.
 $stemmed = 0; #flag for use in BwS
+$cValue = 0; #Confidence value for w2veccompare can be set in setConfidenceValue()
 #*********************************************
 
 GetOptions('help' => \$help);
@@ -212,10 +214,14 @@ sub locateFile()
 	for $tempIn (split("\n")) #processes data line by line.
 	{
 	    @outLemma = @{locate($tempIn)};
-	    
-	    $tempOut = "$outLemma[0]\t$outLemma[1]\t$outLemma[2]\n";
 
-	    print OUTDATA "$tempOut";
+	    if(scalar @outLemma > 0)#only print if ideal lemma found
+	    {
+		$tempOut = "$outLemma[0]\t$outLemma[1]\t$outLemma[2]\n";
+
+		print OUTDATA "$tempOut";
+	    }
+	      
 	}
     }
     close DATA;
@@ -246,9 +252,28 @@ sub locate()
     {
 	preProcessing();
     }
+
+    my @inLemma = ();
+    if(ref($_[$base]) eq 'ARRAY') #distinguishes between lemmas sent in as array vs string in \t format
+    {
+	@inLemma =@{$_[$base]};
+    }
+    else
+    {
+	@inLemma = split("\t", $_[$base]); #stores lemma as formatted above 
+    }
+
+    my @outLemma = ();
+    #word2vec handles all the wordnet words at once, while the other methods handle them one at a time
+    if($scoringMethod eq 'Word2Vec')
+    {
+	@outLemma = @{word2VecCompare(\@inLemma)};
+    }
+    else
+    {
+	@outLemma = @{processLemma(\@inLemma)};
+    }
     
-    my @inLemma = split("\t", $_[$base]); #stores lemma as formatted above
-    my @outLemma = @{processLemma(\@inLemma)};
     return \@outLemma;
     
 }
@@ -257,7 +282,7 @@ sub locate()
 
 Takes in new stop list, in regex form
 
-Parameter:the new stop list in regex substitution form s/.../g?
+Parameter:the new stop list in regex substitution form (w1|w2|...|wn)
 
 Returns: nothing
 
@@ -271,7 +296,7 @@ sub stopList()
 	$base = 1;
     }
     my $tempStopList = $_[$base];
-    if($tempStopList =~ /s\/.*?\/g?/g)
+    if($tempStopList =~ /\(.*(\|.*)?\)/g)
     {
 	$stopList = $tempStopList;
     }
@@ -279,7 +304,7 @@ sub stopList()
     {
 	my $self = shift;
 	$self->{error} = 1;
-	$self->{errorString} = "Proposed stop list not in regex substition form s/.../g?, default remains";
+	$self->{errorString} = "Proposed stop list not in regex substition form (w1|w2|...|wn), default remains";
     }	
 }
 
@@ -391,7 +416,7 @@ sub preProcessing()
 		$tempSenseGloss =~ s/(\(|\)|\.)//g;
 		$tempSenseGloss =~ s/^a-zA-Z//g;
 		$tempSenseGloss = lc $tempSenseGloss; #converts all words to lowercase.
-		$tempSenseGloss =~ $stopList; #remove stop words
+		$tempSenseGloss =~  s/(^|\s)$stopList(\s|$)/ /g; #remove stop words
 	    }
 	    if($userCleanUp ne "\"\"")
 	    {
@@ -439,7 +464,7 @@ sub preProcessing()
 		$tempSenseGloss =~ s/(\(|\)|\.)//g;
 		$tempSenseGloss =~ s/^a-zA-Z//g;
 		$tempSenseGloss = lc $tempSenseGloss; #converts all words to lowercase.
-		$tempSenseGloss =~ s/\b$stopList\b//g; #remove stop words
+		$tempSenseGloss =~  s/(^|\s)$stopList(\s|$)/ /g; #remove stop words
 	    }
 	    if($userCleanUp ne "\"\"")
 	    {
@@ -620,7 +645,7 @@ calculating the bonus.
 
 Returns: nothing
 
-=cut
+=ctu
 
 sub setBonus()
 {
@@ -872,7 +897,138 @@ sub baseline()
     return simpleScoreSense(\@inLemma, $curSense);
     
 }    
+
+=item $obj->word2VecCompare(@inLemma)
+
+Calculates a score for the passed sense by 
+using the gensim Word2Vec model trained on Google
+news vectors.
+
+Parameters: the in lemma in array form
+(lemma, part-of-speech, item-id, definition, def source)
+and the sense that the lemma is being compared to.
+
+Returns: a score of how related the in lemma is to the 
+compareSense.
+
+=cut
+
+sub word2VecCompare()
+{
+    my $base = 0; 
+    if(scalar @_ == 2)#checks if method entered by object.
+    {
+	$base = 1;
+    }
+
+    my @inLemma = @{$_[$base]};
+    my @candidateArray = ();
+
+    my $tempLemmaGloss = $inLemma[3];
     
+    if($cleanUp == 1)
+    {
+	#Clean up the words in the temp lemma gloss.
+	$tempLemmaGloss =~ s/(\(|\)|\.)//g;
+	$tempLemmaGloss =~ s/^a-zA-Z//g;
+	$tempLemmaGloss = lc $tempLemmaGloss;
+	$tempLemmaGloss =~  s/(^|\s)$stopList(\s|$)/ /g; #remove stop words
+    }
+    
+    
+    if($inLemma[1] eq 'noun')
+    {
+	@candidateArray = @wordNetNouns;
+    }
+    else
+    {
+	@candidateArray = @wordNetVerbs;
+    }
+
+    open (WNFILE, '>', "tmpfile") or die $!;
+    print WNFILE "$cValue\n";
+    print WNFILE "$inLemma[0]\n"; #print OOV Lemma first which will be handled by python
+    print WNFILE "$tempLemmaGloss\n";
+    #create a file of all candidate WordNet words to be passed to python word2vec
+    foreach $curW (@candidateArray)
+    {
+	if($curW !~  /(^|\s)$stopList(\s|$)/g)
+	{
+	    print WNFILE "$curW\n";
+	}
+    }
+    close WNFILE;
+    
+    #open(my $ideal, "|-", "python ~/WordNet-Extend/word2vecSimilarity.py tmpfile $inLemma[0]") or die "Cannot run python script: $!";
+
+    $ideal =`python -W ignore ~/bin/word2vecSimilarity.py tmpfile`;
+
+    chomp $ideal;
+    my $attachMerge = "";
+    if($wnFreq{$ideal} == 0)
+    {
+	$attachMerge = "attach";
+    }
+    else
+    {
+	$attachMerge = "merge";
+    }
+    
+    my $pos = "";
+    if($inLemma[1] eq 'noun')
+    {
+	$pos = 'n';
+    }
+    else
+    {
+	$pos = 'v'
+    }
+
+    my @outLemma = ();
+    if($ideal ne "")
+    {
+	@outLemma = ("$inLemma[2]", "$ideal#$pos#1", "$attachMerge");
+    }
+#    else
+#    {
+#	my $self = shift;
+#	$self->{error} = 1;
+#	$self->{errorString} = "No ideal found, consider changing confidence value";
+#    }
+    #unlink 'tmpfile';
+    
+    return \@outLemma;
+    
+}    
+
+=item $obj->setConfidenceValue()
+
+Allows the user to set the confidence value for word2vecCompare().
+The confidence value is the cutoff for the similarity score. If 
+the similarity score is below the confidence value it will be dropped.
+This aims to increase accuracy but will reduce recall.
+
+Parameters: the new confidence value, default is set to 0
+
+Returns: Nothing
+
+=cut
+
+sub setConfidenceValue()
+{
+    my $base = 0;
+
+    if(scalar @_ == 2)#checks if method entered by object
+    {
+	$base = 1;
+    }
+    
+    my $newCValue = $_[$base];
+
+    $cValue = $newCValue;
+    
+}    
+
 
 =item $obj->simpleScoreSense(@inLemma, $compareSense)
 
@@ -919,7 +1075,7 @@ sub simpleScoreSense()
 	$tempLemmaGloss =~ s/(\(|\)|\.)//g;
 	$tempLemmaGloss =~ s/^a-zA-Z//g;
 	$tempLemmaGloss = lc $tempLemmaGloss;
-	$tempLemmaGloss =~ s/\b$stopList\b//g; #remove stop words
+	$tempLemmaGloss =~  s/(^|\s)$stopList(\s|$)/ /g; #remove stop words
     }
     if($userCleanUp ne "\"\"")
     {
@@ -965,9 +1121,9 @@ sub simpleScoreSense()
 	}
 	
     }
-
-
+   
     $score = $overlaps/$glossLength;
+    
     return $score;
 }
 
@@ -975,6 +1131,7 @@ sub simpleScoreSense()
 
 Calculates the extended gloss based on which
 glosses are toggled and returns an array 
+
 which contains the full glosses.
 
 Parameter: the sense which the extended gloss is 
@@ -1121,7 +1278,7 @@ sub refineSense()
 	$tempLemmaGloss =~ s/(\(|\)|\.)//g;
 	$tempLemmaGloss =~ s/^a-zA-Z//g;
 	$tempLemmaGloss = lc $tempLemmaGloss;
-	$tempLemmaGloss =~ $stopList; #remove stop words
+	$tempLemmaGloss =~  s/(^|\s)$stopList(\s|$)/ /g; #remove stop words
     }
     if($userCleanUp ne "\"\"")
     {

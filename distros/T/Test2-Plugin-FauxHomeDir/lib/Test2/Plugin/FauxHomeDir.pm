@@ -10,7 +10,7 @@ use if $^O eq 'cygwin', 'File::Spec::Win32';
 use Test2::API qw( test2_add_callback_post_load test2_stack test2_add_callback_exit );
 
 # ABSTRACT: Setup a faux home directory for tests
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 my $real;
@@ -33,6 +33,10 @@ sub import
       $real = $ENV{HOME};
       $user = $ENV{USER};
     }
+
+    $user = eval { getlogin } unless defined $user;
+    $user = eval { scalar getpwuid($>) } unless defined $user;
+    die "unable to determine username" unless defined $user;
   
     die "unable to determine 'real' home directory"
       unless defined $real && -d $real;
@@ -106,7 +110,7 @@ Test2::Plugin::FauxHomeDir - Setup a faux home directory for tests
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

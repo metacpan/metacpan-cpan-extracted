@@ -1,4 +1,5 @@
 requires "Alien::Build" => "0.32";
+requires "Capture::Tiny" => "0";
 requires "Data::Section" => "0.004";
 requires "Dist::Zilla" => "6.000";
 requires "Moose" => "0";

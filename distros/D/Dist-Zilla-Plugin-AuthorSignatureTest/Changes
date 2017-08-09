@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-AuthorSignatureTest
+
+0.02  2017-07-31
+    - add MANIFEST.SKIP
+
+0.01  2017-07-31
+    - Initial Release

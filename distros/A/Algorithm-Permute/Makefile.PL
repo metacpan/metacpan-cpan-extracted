@@ -10,6 +10,9 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Handy and fast permutation with object oriented interface",
   "AUTHOR" => "Edwin Pratomo <edpratomo\@cpan.org>, Stephan Loyd <sloyd\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Test::More" => "0.88"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -24,9 +27,9 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Test::LeakTrace" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.88"
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +44,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => 0,
   "Test::LeakTrace" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.88",
   "XSLoader" => 0,
   "strict" => 0,
   "warnings" => 0

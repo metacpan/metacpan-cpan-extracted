@@ -1,4 +1,4 @@
-# $Id: Esql.pm,v 1.22 2012/05/15 21:26:30 pfeiffer Exp $
+# $Id: Esql.pm,v 1.24 2014/07/03 21:13:10 pfeiffer Exp $
 
 =head1 NAME
 
@@ -119,7 +119,7 @@ sub parse_arg {
       }
     } elsif( $_[0]{SUFFIXES} && Mpp::is_windows ? /(?:^|[\\\/])[^.]+$/ : /(?:^|\/)[^.]+$/ ) {
       for my $suffix ( @{$_[0]{SUFFIXES}} ) {
-	if( Mpp::File::exists_or_can_be_built file_info "$_$suffix", $_[0]{RULE}{MAKEFILE}{CWD} ) {
+	if( Mpp::File::exists_or_can_be_built file_info( "$_$suffix", $_[0]{RULE}{MAKEFILE}{CWD} ), 0 ) {
 	  push @$files, "$_$suffix";
 	  last;
 	}
@@ -141,14 +141,14 @@ sub tags {
   my $scanner = $_[0]{SCANNER};
   $scanner->should_find( 'user' );
   $scanner->info_string( \%info_string );
-  $scanner->add_include_suffix_list( usersys => $_[1] ? $db2_inc_suffixes : $inc_suffixes );
+  $scanner->add_include_suffix_list( usersys => $_[2] ? $db2_inc_suffixes : $inc_suffixes );
 }
 sub xparse_command {
   my $scanner = $_[0]{SCANNER};
   my( $cmd ) = Mpp::is_windows ? $_[1][0] =~ /(\w+)(?:\.exe)?$/ : $_[1][0] =~ /(\w+)$/;
 
   if( $cmd eq 'db2' ) {		# Special case this unusual syntax
-    $_[0]->tags( 1 );
+    $_[0]->tags( 0, 1 );
     my $file = $_[1][1];
     return 0 if $file !~ s/^pre(?:compile|p)\s*//i; # other subcommand
     if( $file ) {

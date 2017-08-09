@@ -2,6 +2,8 @@ use Test2::V0;
 use Test::Alien;
 use Alien::Hunspell;
 
+skip_all 'Test requires dynamic libraries' unless Alien::Hunspell->dynamic_libs;
+
 alien_ok 'Alien::Hunspell';
 
 note "libs:";

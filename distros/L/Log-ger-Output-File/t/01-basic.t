@@ -50,5 +50,11 @@ subtest "no file/path given -> dies" => sub {
     dies_ok { Log::ger::Output->set('File') };
 };
 
+subtest "opt:lazy=1" => sub {
+    Log::ger::Output->set('File' => path=>"$dir/f3", lazy=>1);
+    ok(!(-e "$dir/f3"), "file not yet created");
+    My::P1::log_warn("warn1");
+    ok( (-e "$dir/f3"), "file created");
+};
 
 done_testing;

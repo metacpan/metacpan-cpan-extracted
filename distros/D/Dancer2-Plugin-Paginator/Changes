@@ -1,0 +1,14 @@
+Revision history for Dancer2::Plugin::Paginator
+
+2.02  2017-08-05 MANWAR
+      - Added missing prereq as reported by CPANTS.
+
+2.01  2017-08-04 MANWAR
+      - Fixed inconsistent version.
+
+2.00  2017-08-04 MANWAR
+      - Upgraded plugin due to recent changes to Dancer2::Plugin.
+      - Fixed unit test to respect the changes.
+
+1.00  2013-03-07 BLABOS
+      - Module Created.

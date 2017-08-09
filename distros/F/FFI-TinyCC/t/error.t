@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 3;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 
 my $tcc = FFI::TinyCC->new;
@@ -21,3 +19,5 @@ isa_ok $error, 'FFI::TinyCC::Exception';
 note "exception=$error";
 isnt $error->errors->[0], '', 'exception has an error';
 note "error=" . $error->errors->[0];
+
+done_testing;

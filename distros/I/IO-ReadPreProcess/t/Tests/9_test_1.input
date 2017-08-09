@@ -1,0 +1,19 @@
+.# Title: Check output streams
+.#
+.# Out:  s1
+.# Out:  s2
+.# CheckFn: Alice in Wonderland
+.#
+Line 1
+.#
+.out s1
+Something for stream s1
+.out s2
+Now for stream s2
+.out
+back to normal output
+.print -o s1 A printed line to s1
+.print -o s2 A printed line to s2
+.print -o fun Alice in Wonderland
+.#
+EOF

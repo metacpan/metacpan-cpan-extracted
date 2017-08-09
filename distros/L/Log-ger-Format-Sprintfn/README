@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Log::ger::Format::Sprintfn - Use Text::sprintfn for formatting instead
+    of sprintf
 
+VERSION
+    version 0.002
+
+SYNOPSIS
      use Log::ger::Format 'Sprintfn';
      use Log::ger;
 
@@ -8,17 +14,20 @@ SYNOPSIS
      log_debug 'user is %(username)s, details are %(detail)s',
          {username=>"Foo", detail=>{...}};
 
-    To install only for current package:
-
-     use Log::ger::Format;
-     Log::ger::Format->set_for_current_package('Sprintfn');
-     use Log::ger;
+    Note that this only has effect in the importing package.
 
 DESCRIPTION
-
 SEE ALSO
-
     Log::ger
 
     Text::sprintfn
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

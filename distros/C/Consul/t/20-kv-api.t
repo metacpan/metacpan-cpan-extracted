@@ -59,4 +59,10 @@ is scalar(@$r), 3, "3 keys returned";
 is_deeply [sort map { $_->key } @$r], [sort qw(foo foo/bar foo/bar/baz)], "return KV keys are correct";
 is_deeply [sort map { $_->value } @$r], [sort qw(1 2 3)], "return KV values are correct";
 
+lives_ok { $r = $kv->delete("foo", recurse => 1) } "KV delete recursive succeeded";
+
+lives_ok { $r = $kv->get_all("foo") } "KV get_all succeeded";
+ok defined($r) && ref($r) eq 'ARRAY', "get_all returned an arrayref";
+is scalar(@$r), 0, "0 keys returned";
+
 done_testing;

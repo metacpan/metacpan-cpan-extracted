@@ -9,7 +9,7 @@ $(phony x):
 iftrue $(filter %cl %cl.exe %bcc32 %bcc32.exe, $(CC))
   perl { die }
 endif
-###	62	644	1160341077	1287952300	RootMakeppfile
+###	57	644	1160341077	1382888684	RootMakeppfile
 #
 # Test various things about the lexer, command parsers and C scanner:
 # 1) Splitting command up into multiple lines;
@@ -35,15 +35,10 @@ all: b.v
 c.v:
 	&touch c.v
 
-perl { $two_more = 1 }
+plus = + 2
 endif
 
-perl {{
-  my $n_files = $two_more ? 8 : 6;
-  $n_files .= Mpp::is_windows ? ' 2' : ' 1';
-  open my $fh, '>answers/n_files' or die;
-  print $fh "$n_files 0\n";
-}}
+&expr '(6 $(plus)) . (Mpp::is_windows ? " 2 0" : " 1 0")' -o answers/n_files
 
 main: LDLIBS = -L. -lxyz
 main: xyz1.o

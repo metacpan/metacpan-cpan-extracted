@@ -1,3 +1,8 @@
+0.005   2017-08-02 (PERLANCAR)
+
+	- Fix parsing PT0S (RT#122682, thanks Pip Cet).
+
+
 0.004   2017-07-20 (PERLANCAR)
 
 	- [Bugfix] Avoid mixing PnYnMnDTnHnMnS and PnW styles according to ISO

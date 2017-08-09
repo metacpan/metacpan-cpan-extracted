@@ -1,25 +1,26 @@
 ---
-abstract: "The Dark Sky API lets you query for short-term \nprecipitation forecast data at geographical points inside\nthe United States."
+abstract: 'provides perl API to DarkSky'
 author:
   - 'Martin-Louis Bright <mlbright@gmail.com>'
 build_requires:
-  Data::Dumper: 0
-  Test::More: 0
-  strict: 0
-  warnings: 0
+  Test::MockModule: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DarkSky-API
 requires:
-  JSON: 0
-  List::MoreUtils: 0
-  Mojo::UserAgent: 0
-  Moose: 0
-  perl: 5.010
-version: 0.05
+  HTTP::Tiny: '0'
+  JSON::XS: '0'
+  Moo: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: http://github.com/mlbright/DarkSky-API
+version: 1.1.4
+x_serialization_backend: 'YAML::Tiny version 1.69'

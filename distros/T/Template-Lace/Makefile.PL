@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "JSON::MaybeXS" => 0,
     "Module::Runtime" => 0,
-    "Mojo::DOM58" => 0,
+    "Mojo::DOM58" => "1.003",
     "Moo" => "2.003000",
     "Scalar::Util" => 0,
     "Storable" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "JSON::MaybeXS" => 0,
   "Module::Runtime" => 0,
-  "Mojo::DOM58" => 0,
+  "Mojo::DOM58" => "1.003",
   "Moo" => "2.003000",
   "Scalar::Util" => 0,
   "Storable" => 0,

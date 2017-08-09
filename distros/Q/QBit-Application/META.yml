@@ -21,4 +21,4 @@ requires:
   qbit: 0
   strict: 0
   warnings: 0
-version: 0.014
+version: 0.015

@@ -1,3 +1,13 @@
+0.002   2017-08-03 (PERLANCAR)
+
+	- [Bugfix] Instantiate Log::Dispatch instead of Log::Dispatch
+	  output object so we can pass newline => 1 etc which is handled at
+	  the Log::Dispatch level.
+
+        - [Optimize] use create_logml_routine so we don't have to instantiate
+	  Log::Dispatch object per logging routine.
+
+
 0.001   2017-06-26 (PERLANCAR)
 
         - First version.

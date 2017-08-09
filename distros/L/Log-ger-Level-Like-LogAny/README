@@ -1,0 +1,47 @@
+NAME
+    Log::ger::Level::Like::LogAny - Define logging levels like Log::Any
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     # load before 'use Log::ger' in any package/target
+     use Log::ger::Level::Like::LogAny;
+
+DESCRIPTION
+    This module changes the Log::ger levels to:
+
+        emergency => 5,
+        alert     => 6,
+        critical  => 10,
+        crit      => 10, # = critical
+        fatal     => 10, # = critical
+        error     => 20,
+        err       => 20, # = error
+        warning   => 30,
+        warn      => 30, # = warning
+        notice    => 35,
+        info      => 40,
+        inform    => 40, # = info
+        debug     => 50,
+        trace     => 60,
+
+    Note that the exact numerical constants differ from definitions in
+    Log::Any::Adapter::Util. The numbers are adjusted so things like
+    Log::ger::Output::Screen can show colors that are more equivalent.
+
+    The aliases names are defined as proper levels too so you get
+    "log_crit", "log_err", and so on.
+
+SEE ALSO
+    Log::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

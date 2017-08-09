@@ -30,8 +30,8 @@ my $simple_insert = '{
     }
 ]}';
 
-my $simple_result1 = "INSERT INTO 'MySchema'.'table1' ('column1','column2') VALUES (?,?)";
-my $simple_result2 = "INSERT INTO 'table2' ('columnA','columnB') VALUES (?,?)";
+my $simple_result1 = qq(INSERT INTO "MySchema"."table1" ("column1","column2") VALUES (?,?));
+my $simple_result2 = qq(INSERT INTO "table2" ("columnA","columnB") VALUES (?,?));
 
 my ( $insert_query, $err ) = JsonSQL::Query::Insert->new($basic_ruleset, $simple_insert);
 ok($insert_query, 'Create a simple INSERT query object');
@@ -53,7 +53,7 @@ my $complex_insert = '{
     }
 ]}';
 
-my $complex_result = "WITH insert_q AS (\nINSERT INTO 'MySchema'.'table1' ('column1','column2') VALUES (?,?)\nRETURNING 'column1' AS 'bestcolumn','column2'\n)\nSELECT * FROM insert_q";
+my $complex_result = qq(WITH insert_q AS (\nINSERT INTO "MySchema"."table1" ("column1","column2") VALUES (?,?)\nRETURNING "column1" AS "bestcolumn","column2"\n)\nSELECT * FROM insert_q);
 
 ( $insert_query, $err ) = JsonSQL::Query::Insert->new($basic_ruleset, $complex_insert);
 ok($insert_query, 'Create a more complicated INSERT query object');
@@ -76,7 +76,7 @@ my $allowed_insert = '{
     }
 ]}';
 
-my $allowed_result = "INSERT INTO 'MySchema'.'AllowedTable' ('column1','column2') VALUES (?,?)";
+my $allowed_result = qq(INSERT INTO "MySchema"."AllowedTable" ("column1","column2") VALUES (?,?));
 
 ( $insert_query, $err ) = JsonSQL::Query::Insert->new($simple_ruleset, $allowed_insert);
 ok($insert_query, 'Create a simple INSERT with whitelisting in effect');

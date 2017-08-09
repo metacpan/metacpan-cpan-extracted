@@ -1,6 +1,16 @@
+Version 1.27 - 7 Aug 2017
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Public/Bug/Display.html?id=120446
+
 Version 1.26 - 13 May 2016
 
 * Fixed more false negatives in tests, no need to upgrade.
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Ticket/Display.html?id=115052
 
 Version 1.25 - 09 May 2016
 

@@ -1,7 +1,10 @@
 Revision history for Syntax-Feature-Loop
 
+1.8.0  2017/08/07
+       - Updated to be compatible with Perl 5.26.
+
 1.6.0  2012/05/18
-       - Didn't work on Perl builds with support for
+       - Fixed problem with Perl builds with support for
          multiple interpreters (such as builds with
          multi-threading support).
 

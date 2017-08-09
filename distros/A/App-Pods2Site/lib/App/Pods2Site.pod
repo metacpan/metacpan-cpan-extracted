@@ -7,12 +7,16 @@ as a simple documentation site for your Perl installation.
 
 =head1 VERSION
 
-Version 0.011
+Version 0.012
 
 =head1 SYNOPSIS
 
   # Normally run 'pods2site' from a shell prompt to create or update:
+  # (place a site in the perl tree)
   #
+  pods2site :std
+
+  # or an explicit site root
   pods2site /path/to/site
 
 =head1 OVERVIEW
@@ -42,8 +46,9 @@ as well as a TOC and tie it all together. Point a browser at F<index.html> and y
 At any time, the command can be run again, and this time it will reuse the same options as before and update the site if any pods
 are new or newer than the corresponding HTML file.
 
-Taking a cue from the ActivePerl way of collecting the pods, pods are divided in 4 categories. The rules for doing this are fairly
-simpleminded and heuristic though, so occasionally you may find a module that doesn't really conform to the categorization. Sorry.
+Taking a cue from the ActivePerl way of collecting the pods, pods are by default divided in 4 categories. The rules for doing this are fairly
+simpleminded and heuristic though, so occasionally you may find a module that doesn't really conform to the categorization. If you're unhappy
+define your own groups from scratch.
 
 Further, you may miss documentation for scripts or modules you know are there - this typically means that they don't contain any POD
 text. Talk to the module author.

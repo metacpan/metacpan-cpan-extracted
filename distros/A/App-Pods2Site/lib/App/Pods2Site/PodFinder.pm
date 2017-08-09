@@ -96,7 +96,17 @@ sub __scan
 	my $lib_n2p = $libSearch->name2path();
 	foreach my $name (keys(%$lib_n2p))
 	{
-		push(@podRecords, { type => 'lib', name => $name, path => $lib_n2p->{$name} });
+		if ($name =~ /^(?:pods::)?(perl.+)/)
+		{
+			# if we see a perlxxx pod in namespace 'pods::', we put it in root level
+			# as links go to 'perlxxx' rather than 'pods::perlxxx'
+			# 
+			push(@podRecords, { type => 'corepod', name => $1, path => $lib_n2p->{$name} });
+		}
+		else
+		{
+			push(@podRecords, { type => 'lib', name => $name, path => $lib_n2p->{$name} });
+		}
 	}
 
 	# use the group queries to separate them

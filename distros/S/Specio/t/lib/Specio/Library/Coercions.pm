@@ -22,7 +22,7 @@ coerce(
 coerce(
     t('IntC'),
     from   => t('HashRef'),
-    inline => sub {"scalar keys \%{ $_[1] }"},
+    inline => sub {"scalar keys %{ $_[1] }"},
 );
 
 1;

@@ -1,9 +1,9 @@
 package Email::MIME::RFC2047::Address;
-$Email::MIME::RFC2047::Address::VERSION = '0.96';
+$Email::MIME::RFC2047::Address::VERSION = '0.97';
 use strict;
 use warnings;
 
-# ABSTRACT: Handling of MIME encoded addresses
+# ABSTRACT: MIME encoded addresses
 
 use base qw(Email::MIME::RFC2047::Parser);
 
@@ -86,11 +86,11 @@ __END__
 
 =head1 NAME
 
-Email::MIME::RFC2047::Address - Handling of MIME encoded addresses
+Email::MIME::RFC2047::Address - MIME encoded addresses
 
 =head1 VERSION
 
-version 0.96
+version 0.97
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,5 @@
+BEGIN:VCARD
+VERSION:4.0
+ADR;TYPE=HOME,WORK:;;long named street;long named city;long named
+  region;post_code;United States of America
+END:VCARD

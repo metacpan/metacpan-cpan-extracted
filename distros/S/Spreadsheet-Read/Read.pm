@@ -32,10 +32,11 @@ package Spreadsheet::Read;
 
 =cut
 
+use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.72";
+our $VERSION = "0.73";
 sub  Version { $VERSION }
 
 use Carp;
@@ -65,12 +66,9 @@ my @parsers = (
     );
 my %can = map {
     my $preset = $ENV{"SPREADSHEET_READ_\U$_->[0]"};
-    if ($preset) {
-	eval "require $preset";
-	if ($@) {
-	    $preset = "!$preset";
-	    }
-	else { # forcing a parser should still check the version
+    if ($preset and $preset =~ m/^[\w:]+$/) {
+	if (eval "require $preset" and not $@) {
+	    # forcing a parser should still check the version
 	    for (grep { $_->[1] eq $preset and $_->[2] } @parsers) {
 		my $ok;
 		my $has = $preset->VERSION;
@@ -88,19 +86,20 @@ my %can = map {
 		$ok or $preset = "!$preset";
 		}
 	    }
+	else {
+	    $preset = "!$preset";
+	    }
 	}
     $_->[0] => $preset || "";
     } @parsers;
 for (@parsers) {
     my ($flag, $mod, $vsn) = @$_;
     $can{$flag} and next;
-    eval "require $mod; \$vsn and ${mod}->VERSION (\$vsn); \$can{\$flag} = '$mod'";
-    #$@ && $@ !~ m{Can't locate} and warn "$mod: $@\n";
+    eval "require $mod; \$vsn and ${mod}->VERSION (\$vsn); \$can{\$flag} = '$mod'" or
+	$_->[0] = "! Cannot use $mod version $vsn: $@";
     }
 $can{sc} = __PACKAGE__;	# SquirelCalc is built-in
 
-$can{xlsx} =~ m/LibXML/     && $] < 5.012 and
-    substr $can{xlsx}, 0, 0, "!"; # This parser requires perl 5.12 or newer
 defined $Spreadsheet::ParseExcel::VERSION && $Spreadsheet::ParseExcel::VERSION < 0.61 and
     *Spreadsheet::ParseExcel::Workbook::get_active_sheet = sub { undef; };
 
@@ -326,8 +325,8 @@ sub _clipsheets {
 	my $ss = $ref->[$sheet];
 
 	# Remove trailing empty columns
-	while ($ss->{maxcol} and not (
-		grep { defined && m/\S/ } @{$ss->{cell}[$ss->{maxcol}]})
+	while ($ss->{maxcol} and not
+		grep { defined && m/\S/ } @{$ss->{cell}[$ss->{maxcol}]}
 		) {
 	    (my $col = cr2cell ($ss->{maxcol}, 1)) =~ s/1$//;
 	    my $recol = qr{^$col(?=[0-9]+)$};
@@ -372,88 +371,6 @@ sub _xls_fill {
     return _xls_color ($bg);
     } # _xls_fill
 
-sub _xlsx_libxml {
-    my $oBook = shift;
-    my @names = @{$oBook->get_worksheet_names};
-    $oBook->{SheetCount} = scalar @names;
-    $oBook->{Worksheet}  = [ ];
-    my %mm;
-    while (my $wks = $oBook->worksheet) {
-	push @{$oBook->{Worksheet}}, $wks;
-	$wks->{Cells}  = [];
-	$wks->{Name}   = shift @names;
-	($wks->{MinRow}, $wks->{MaxRow}) = $wks->row_range;
-	($wks->{MinCol}, $wks->{MaxCol}) = $wks->col_range;
-	$wks->{MinRow} < 0 and $wks->{MinRow} = 0;
-	$wks->{MinCol} < 0 and $wks->{MinCol} = 0;
-	foreach my $r ($wks->{MinRow} .. $wks->{MaxRow}) {
-	    foreach my $c ($wks->{MinCol} .. $wks->{MaxCol}) {
-		my $cell = $wks->get_cell ($r, $c);
-		if (defined $cell and ref $cell) {
-		    $cell->{Val}    = $cell->unformatted;
-		    $cell->{Merged} = $cell->is_merged and
-			$mm{$cell->{cell_merge}}{"$r:$c"} = $cell;
-		    $cell->{Type}   = $cell->type;
-		    $cell->{Hidden} = 0;#$cell->is_hidden; NYI
-		    }
-		else {
-		    $cell = {
-			Val    => undef,
-			Type   => "Undef",
-			Merged => 0,
-			Hidden => 0,
-			};
-		    }
-		$wks->{Cells}[$r][$c] = $cell;
-		}
-	    }
-	# Spreadsheet::XLSX::Reader::LibXML returned all other cells in range as undef
-	foreach my $mm (values %mm) {
-	    my @mr = sort keys %$mm;
-	    foreach my $rc (@mr) {
-		defined $mm->{$rc}{Val} or $mm->{$rc}{Val} = "";
-		}
-	    }
-	}
-    *WorksheetInstance::get_merged_areas = sub {
-	my $wi = shift or return;
-	my $mm = eval { $wi->_get_merge_map } ||
-		 eval { $wi->_merge_map     } or return;
-	# [ undef,
-	#   [ undef,
-	#     undef,
-	#     'B1:C2',
-	#     'B1:C2'
-	#     ],
-	#   [ undef,
-	#     'A2:A3',
-	#     'B1:C2',
-	#     'B1:C2'
-	#     ],
-	#   [ undef,
-	#     'A2:A3'
-	#     ]
-	#   ]
-	# ->
-	# [ [ 1, 0,	# A2:
-	#     2, 0,	#  A3
-	#     ],
-	#   [ 0, 1,	# B1:
-	#     1, 2,	#  C2
-	#     ]
-	#   ]
-	my %r;
-	for (@$mm) { $_ && $r{$_}++ for @$_ }
-	keys %r or return;
-	my @r;
-	foreach my $ma (keys %r) {
-	    my ($ul, $br) = split m/:/ => $ma or return;
-	    push @r, [ reverse map { $_ - 1 } map { cell2cr ($_) } $br, $ul ];
-	    }
-	return \@r;
-	};
-    } # _xlsx_libxml
-
 sub ReadData {
     my $txt = shift	or  return;
 
@@ -479,7 +396,7 @@ sub ReadData {
 		      keys %opt;
 
     my $io_ref = ref ($txt) =~ m/GLOB|IO/ ? $txt : undef;
-    my $io_fil = $io_ref ? 0 : do { no warnings "newline"; -f $txt ? 1 : 0 };
+    my $io_fil = $io_ref ? 0 : $txt !~ m/[\n\r,;]/ && -f $txt ? 1 : 0;
     my $io_txt = $io_ref || $io_fil ? 0 : 1;
 
     $io_fil && ! -s $txt  and return;
@@ -522,6 +439,8 @@ sub ReadData {
 	my ($sep, $quo, $in) = (",", '"');
 	defined $opt{sep}   and $sep = $opt{sep};
 	defined $opt{quote} and $quo = $opt{quote};
+	$debug > 8 and _dump (debug => {
+	    data => \@data, txt => $txt, io_ref => $io_ref, io_fil => $io_fil });
 	if ($io_fil) {
 	    unless (defined $opt{quote} && defined $opt{sep}) {
 		open $in, "<", $txt or return;
@@ -543,7 +462,18 @@ sub ReadData {
 		}
 	    open $in, "<", $txt or return;
 	    }
+	elsif ($io_ref) {
+	    $in = $txt;
+	    }
+	elsif (ref $txt eq "SCALAR") {
+	    open $in, "<", $txt  or croak "Cannot open input: $!";
+	    }
+	elsif ($txt =~ m/[\r\n,;]/) {
+	    open $in, "<", \$txt or croak "Cannot open input: $!";
+	    }
 	else {
+	    warn "Input type ", ref $txt,
+		" might not be supported. Please file a ticket\n";
 	    $in = $txt;	# Now pray ...
 	    }
 	$debug > 1 and print STDERR "CSV sep_char '$sep', quote_char '$quo'\n";
@@ -605,7 +535,6 @@ sub ReadData {
 	my $parse_type = $_parser =~ m/x$/i ? "XLSX" : "XLS";
 	my $parser = $can{lc $parse_type} or
 	    croak "Parser for $parse_type is not installed";
-	my $xlsx_libxml = $parser =~ m/LibXML$/;
 	$debug and print STDERR "Opening $parse_type $txt using $parser-", $can{lc $parse_type}->VERSION, "\n";
 	$opt{passwd} and $parser_opts{Password} = $opt{passwd};
 	my $oBook = eval {
@@ -635,8 +564,6 @@ sub ReadData {
 	# BIFFVersion    Flg1904        Object         Version
 	# _buffer        FmtClass       PkgStr         Worksheet
 	# CellHandler    Font           _previous_info
-
-	$xlsx_libxml and _xlsx_libxml ($oBook);
 
 	my @data = ( {
 	    type	=> lc $parse_type,
@@ -1046,6 +973,7 @@ sub attr {
 	my ($c, $r) = $sheet->cell2cr ($id[0]);
 	return $sheet->{attr}[$c][$r];
 	}
+    undef;
     } # attr
 
 sub maxrow {
@@ -1059,17 +987,17 @@ sub maxcol {
     } # maxrow
 
 sub col2label {
-    my $class = shift;
+    $_[0] =~ m/::/ and shift; # class unused
     return Spreadsheet::Read::col2label (@_);
     } # col2label
 
 sub cr2cell {
-    my $class = shift;
+    $_[0] =~ m/::/ and shift; # class unused
     return Spreadsheet::Read::cr2cell (@_);
     } # cr2cell
 
 sub cell2cr {
-    my $class = shift;
+    $_[0] =~ m/::/ and shift; # class unused
     return Spreadsheet::Read::cell2cr (@_);
     } # cell2cr
 

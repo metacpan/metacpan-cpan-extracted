@@ -3,21 +3,22 @@ requires "DBD::SQLite" => "0";
 requires "DBI" => "0";
 requires "Daemon::Device" => "0";
 requires "Date::Format" => "0";
+requires "Date::Parse" => "0";
 requires "DateTime" => "0";
 requires "DateTime::Format::Human::Duration" => "0";
+requires "Email::Mailer" => "0";
 requires "Email::Valid" => "0";
 requires "Encode" => "0";
 requires "File::Grep" => "0";
 requires "IO::Socket" => "0";
 requires "IO::Socket::SSL" => "0";
 requires "JSON::XS" => "0";
-requires "Mail::Send" => "0";
 requires "Math::Expression" => "0";
 requires "Math::Units" => "0";
 requires "Time::Crontab" => "0";
 requires "Try::Tiny" => "0";
 requires "YAML::XS" => "0";
-requires "perl" => "5.012";
+requires "perl" => "5.014";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -32,12 +33,12 @@ on 'test' => sub {
   requires "Test::Output" => "0";
   requires "blib" => "1.01";
   requires "constant" => "0";
-  requires "perl" => "5.012";
+  requires "perl" => "5.014";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.012";
+  requires "perl" => "5.014";
 };
 
 on 'develop' => sub {

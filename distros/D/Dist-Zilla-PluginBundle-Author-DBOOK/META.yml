@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +32,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::DBOOK:
     file: lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm
-    version: '0.033'
+    version: '0.035'
   Dist::Zilla::PluginBundle::Author::DBOOK:
     file: lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm
-    version: '0.033'
+    version: '0.035'
 requires:
   Data::Section: '0'
   Dist::Zilla: '0'
@@ -81,7 +81,7 @@ requires:
   Dist::Zilla::Plugin::RunExtraTests: '0'
   Dist::Zilla::Plugin::ShareDir: '0'
   Dist::Zilla::Plugin::TemplateModule: '0'
-  Dist::Zilla::Plugin::Test::ReportPrereqs: '0.022'
+  Dist::Zilla::Plugin::Test::ReportPrereqs: '0.027'
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
   Dist::Zilla::Role::MintingProfile::ShareDir: '0'
@@ -97,7 +97,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK/issues
   homepage: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK.git
-version: '0.033'
+version: '0.035'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -139,11 +139,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenerateFile
       name: '@Author::DBOOK/Generate_Contrib'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::DBOOK/MetaConfig'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -152,7 +152,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::DBOOK/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.009'
+              version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -182,11 +182,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Author::DBOOK/MetaResources'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::DBOOK/CheckChangesHasContent'
@@ -223,7 +223,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::DBOOK/NextRelease'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -270,7 +270,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.033
+          tag: v0.035
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -326,7 +326,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::DBOOK/Test::ReportPrereqs'
@@ -368,23 +368,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::DBOOK/PruneCruft'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::DBOOK/ManifestSkip'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::DBOOK/MetaYAML'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::DBOOK/MetaJSON'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::DBOOK/License'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -395,22 +395,22 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::DBOOK/ExecDir'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::DBOOK/ShareDir'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::DBOOK/ScriptDir'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::DBOOK/MakeMaker'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -425,76 +425,76 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::DBOOK/Manifest'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::DBOOK/TestRelease'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::DBOOK/ConfirmRelease'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::DBOOK/UploadToCPAN'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ModuleShareDirs
       name: ModuleShareDirs
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: NoIndexProfiles
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.009'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::DBOOK/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.009'
+      version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.009'
+    version: '6.010'
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'

@@ -2,7 +2,7 @@
 
 makepp_rules -- How to tell makepp to build something
 
-=for vc $Id: makepp_rules.pod,v 1.38 2012/10/14 15:18:44 pfeiffer Exp $
+=for vc $Id: makepp_rules.pod,v 1.41 2014/07/08 22:37:25 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -14,12 +14,15 @@ B<?:>E<nbsp>L<&|/_>,
 B<B:>E<nbsp>L<:build_cache|/build_cache_path_to_build_cache>,
   L<:build_check|/build_check_build_check_method>,E<nbsp>
 B<D:>E<nbsp>L<:dispatch|/dispatch_command>,E<nbsp>
-B<E:>E<nbsp>L<:env|/env_variable>,E<nbsp>
+B<E:>E<nbsp>L<:env|/env_variable>,
+  L<:environment|/env_variable>,E<nbsp>
+B<F:>E<nbsp>L<:foreach|/foreach_file_or_pattern>,E<nbsp>
 B<I:>E<nbsp>L</ignore_error>,
   L<:include|/include_file_or_pattern>,E<nbsp>
 B<L:>E<nbsp>L<:last_chance|/last_chance>,E<nbsp>
 B<M:>E<nbsp>L<makeperl|/perl>,E<nbsp>
-B<N:>E<nbsp>L</noecho>,E<nbsp>
+B<N:>E<nbsp>L</noecho>,
+  L<:no_phony|/no_phony>,E<nbsp>
 B<P:>E<nbsp>L<:parser|/parser_parser>,
   L</perl>,E<nbsp>
 B<S:>E<nbsp>L<:signature|/signature_signature_method>
@@ -409,7 +412,7 @@ to do something different.  You could do something like this:
     # Here's the rule that applies to everything:
     %.o : %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
- 
+
     %.o : %.c : foreach $(SPECIAL_MODULES)
  	$(CC) $(SPECIAL_CFLAGS) -c $(input) -o $(output)
 
@@ -444,11 +447,11 @@ source files.  You could do something like this:
     # Rule for ordinary .c files:
     %.o : %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
- 
+
     # Rule to make .c files from .k files:
     %.c : %.k
  	$(preprocessor) $(input) > $(output)
- 
+
     # Special build rules for .c files which are made from .k files:
     $(foreach:%.k=%.o) : $(foreach:%.c=%.k) : foreach *.k
  	$(CC) $(SPECIAL_CFLAGS) -c $(input) -o $(output)
@@ -483,6 +486,25 @@ which is exactly equivalent to
 
     %.o : %.c
  	$(CC) $(CFLAGS) -c $(input) -o $(output)
+
+=head2 Double-Colon Rules
+
+Double-colon rules are explicit rules written with C<::> instead of C<:> after
+the target names.  Because makepp promises reliable results, they are only
+similar to what gmake does.  They allow you to write a rule in several chunks
+which get appended into one big rule.
+
+    a :: b
+    	&cat $(input) -o $(output)
+
+    a :: c
+    	&cat $(input 2) -o >>$(output)	# Yes, c is the 2nd input.
+
+is taken to be exactly the same as
+
+    a : b c
+    	&cat $(input) -o $(output)
+    	&cat $(input 2) -o >>$(output)	# Yes, c is the 2nd input.
 
 =head2 Conflicting rules
 
@@ -536,10 +558,10 @@ on an example from the Linux kernel):
 
     %.s: %.c
  	$(CC) -s $(input) -o $(output)
- 
+
     %.o: %.s
  	$(AS) $(input) -o $(output)
- 
+
     %.o: %.c
  	$(CC) -c $(input) -o $(output)
 
@@ -559,7 +581,7 @@ For example,
 
     %.o: %.c                            # General compilation rule.
  	action
- 
+
     special_%.o: special_%.c            # Special rule for files with a
  	different action                # "special_" prefix.
 
@@ -614,7 +636,17 @@ rebuilt.  See L<makepp_build_check> for more details.  This overrides the
 effect of the C<build_check> statement or the C<--build-check-method> command line
 option, if any, for this rule.
 
+=item :dispatch I<command ...> X<dispatch>
+
+Enclose each shell action (but not Perl actions nor Perl commands) in a C<sh
+-c '...'> and prefix it with command, but assume that the target doesn't
+depend on command.  This is useful if you want to send actions to a job
+queuing system, but the result is assumed to be independent of the queuing
+parameters, as well as to whether the queuing system is used at all.
+
 =item :env I<VARIABLE ...> X<env>
+
+=item :environment I<VARIABLE ...>
 
 Add a dependency on the values of the named environment variables.  If
 any of them differ from the previous build, then the targets are considered
@@ -627,13 +659,9 @@ from the colon-delimited value of PATH_VARIABLE in which filename exists
 is different from the last build.  This can be used to avoid rebuilding
 the targets when PATH_VARIABLE changes in an irrelevant way.
 
-=item :dispatch I<command ...> X<dispatch>
+=item :foreach I<file_or_pattern>
 
-Enclose each shell action (but not Perl actions nor Perl commands) in a C<sh
--c '...'> and prefix it with command, but assume that the target doesn't
-depend on command.  This is useful if you want to send actions to a job
-queuing system, but the result is assumed to be independent of the queuing
-parameters, as well as to whether the queuing system is used at all.
+Discussed under L</Foreach rules>.
 
 =item :include I<file_or_pattern>
 
@@ -642,11 +670,11 @@ Rule varies depending on compiler:
     %.o : %.c
  	: include %.d : signature C
  	gcc -MD -c ...
- 
+
     %.o : %.c
  	: include %.u : signature C # IBM uses a different suffix
  	xlc -M -c ...
- 
+
     sub dependify {		# Turn Microsoft's chatter into useful format
  	s/\$/\$\$/g;
  	s/(Note: including file: *)?(.+?)\r?\n/$1 ? "'$2' " : "'".f_output()."': "/e;
@@ -714,6 +742,11 @@ when it erroneously relies on a wildcard to match targets from a previous run.
 
 The C<:last_chance> option is intended to call attention to the special
 behavior of the rule with respect to matching wildcards.
+
+=item :no_phony
+
+This limits dependecies of a pattern rule to real files (as was the default
+before makepp V2.1).
 
 =item :parser I<parser>
 
@@ -870,4 +903,3 @@ called F<a>.  This is probably not what you want.
 =head1 AUTHOR
 
 Gary Holt (holt-makepp@gholt.net)
-

@@ -12,7 +12,7 @@ our @EXPORT_OK = qw( tcc_inline tcc_eval );
 our @EXPORT = @EXPORT_OK;
 
 # ABSTRACT: Embed Tiny C code in your Perl program
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 
 my $ffi = FFI::Platypus->new;
@@ -322,7 +322,7 @@ FFI::TinyCC::Inline - Embed Tiny C code in your Perl program
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =head1 SYNOPSIS
 

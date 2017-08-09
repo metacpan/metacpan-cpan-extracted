@@ -16,7 +16,7 @@ subtest "conf:logging_cb" => sub {
     $h->{warn}("a");
     $h->{error}("b");
     $h->{debug}("c");
-    is($str, "3,a\n2,b\n5,c\n");
+    is($str, "30,a\n20,b\n50,c\n");
 };
 
 # XXX test conf:detection_cb

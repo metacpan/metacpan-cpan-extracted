@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,28 +15,29 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
-SHA1 885e8516aad4e845f9854e396b8ab9818836ff12 ChangeLog
+SHA1 0f7d377bc6e14aecb69dc34389ee9468a98b09b7 ChangeLog
 SHA1 05e0ac56fee3246fb8a0a2ad0cabe26458306f9d Credits
 SHA1 ad3c45d276ebd3148c6b598ae9233f3c86cb9782 FAQ
-SHA1 aa08e47386124d0f16180d0f63d639e609124a32 MANIFEST
+SHA1 ffe78e8238c774311e16cd1bbc1fe190eba2983e MANIFEST
 SHA1 7f5626bb4787d10e8e3a500ecd8ecc1f7ebe705a MANIFEST.SKIP
-SHA1 962941c2078222f5555d8b553ed2bbbd9c606069 META.json
-SHA1 2c2a6780426ae9d7a6503e01b681f099261e705c META.yml
-SHA1 df4efdbc06d06c871365c5834186f45623225c25 Makefile.PL
+SHA1 de89a47c1aea2aff10c18a588d47ad3453fd30f6 META.json
+SHA1 db515074fdeed26804092c0908f761509f8cee94 META.yml
+SHA1 e79010c00488a3323714b574ea29da7d3a63dcb3 Makefile.PL
 SHA1 c975c012aa03b8c6d1f9de52abbf965907cc12ad MyInstall.pm
-SHA1 342f7f69ed962356fbfc2864ac0a61d6587b2e32 NEWS
-SHA1 7071930cb73068f19476582c4de083624ee6da52 README
+SHA1 0cf6662c9daa4772229634af95e168e08380cc63 NEWS
+SHA1 fd1a46ec132bbcc3cd66bce86f2dc57211ed94ea README
 SHA1 a87fd1ee2fc58ade00fdb34ea74d105197f8cb18 README-oldversions
+SHA1 fd1a46ec132bbcc3cd66bce86f2dc57211ed94ea README.md
 SHA1 1d7a1690360ac140ea197a5a7cdf55aefc6f40b5 README.solaris
 SHA1 5e425ffe22f0f6f30c4e74359eada8b546286dc9 README.win32
-SHA1 fb302b7ad9a3ea06d5e332e16d43b126f54f31d9 REFERENCES
-SHA1 562edf6eb9a67ec69bca24de279fe54643eb7b38 ReleaseNotes
+SHA1 2ee2a53856fdb02898ffe6780770a3b101a4f01a REFERENCES
+SHA1 708db17cdf6fe20c10fadef12ee0662a775933e0 ReleaseNotes
 SHA1 05e0ac56fee3246fb8a0a2ad0cabe26458306f9d THANKS
 SHA1 d7fe585333ed8730983a11e89ee255247cb16101 TODO
-SHA1 e91fafcc8c06228b258ff52ad3b43440e232f5ea gettext_xs/Makefile.PL
+SHA1 86646560567fdb3af03a5724439147c3bbf7a02e gettext_xs/Makefile.PL
 SHA1 7214c7331142e6970270833eb6152718ed4953b0 gettext_xs/gettext_xs.pm
 SHA1 136c844ccdd04fd6e6f7eec4c93aa3ca26ae7662 gettext_xs/gettext_xs.xs
-SHA1 0d5918e4a140e678d49fa83de706d8c4e2903277 lib/Locale/Messages.pm
+SHA1 5aba23c1214341d571bc07585a7e0d75b9451fe7 lib/Locale/Messages.pm
 SHA1 0481ad8c9ec54306311cf225661466b4140646b1 lib/Locale/Recode.pm
 SHA1 eb0b5983a3eeb2ade389442db3ddeab3c9d0d6a5 lib/Locale/Recode/_Aliases.pm
 SHA1 e741cbf6daf247a1917aa45d2cf6803b49bd33c5 lib/Locale/Recode/_Conversions.pm
@@ -179,15 +180,15 @@ SHA1 4e1f3e87f6eb4aa1b01de02ac7a0fc742d0d14a2 lib/Locale/RecodeData/US_ASCII.pm
 SHA1 695e0a330dd4c61ff38728251b94fa1b914ba95a lib/Locale/RecodeData/UTF_8.pm
 SHA1 639650b773789e6dc0bb32883aebf79e38b9808f lib/Locale/RecodeData/VISCII.pm
 SHA1 cf04a5c943c15bdc6c540308bf42b29b93a40d08 lib/Locale/RecodeData/_Encode.pm
-SHA1 63109cadf398e488e61c70ca3c909313c54a2a13 lib/Locale/TextDomain.pm
+SHA1 6d76c99ef0a32e56c418d73e163395915810aa9d lib/Locale/TextDomain.pm
 SHA1 a3753f6f967fee427f7a9bab52cecab31d04fa0b lib/Locale/Util.pm
 SHA1 92585ddb66dde3c68ea454604630dac7948fc88c lib/Locale/gettext_dumb.pm
 SHA1 659c718b83308261e919d3bcf06ecef0c7205860 lib/Locale/gettext_pp.pm
-SHA1 0651d5aab50a13fb6ffdee3a33c2b9b804007fb9 lib/Locale/gettext_xs.pod
-SHA1 647e61ce1c1129b8ef1da213a67b759538e4cc50 lib/Locale/libintlFAQ.pod
+SHA1 c2fb9ef9d2709c8915414575e21a0cc13e35825d lib/Locale/gettext_xs.pod
+SHA1 ac04334ba9a6dff30a1a084e1af52024ad90ca09 lib/Locale/libintlFAQ.pod
 SHA1 167cd8b21925447925c6aeae7f0f4a93b6dac997 sample/README
 SHA1 4c4d3efeb5ad2b80eeddde426cd2b0eebd9fea15 sample/simplecal/MANIFEST
-SHA1 06385754221bcda32deae87a6ebade602deb476b sample/simplecal/Makefile.PL
+SHA1 9303747cc9e7bab310fd6bfa7dcb285780d6deb2 sample/simplecal/Makefile.PL
 SHA1 7951d635feac4fe4bc9a51f81e78610e46db7c2e sample/simplecal/README-NLS
 SHA1 4b3e82e4eeba33252ba3033a0dd6d565fbd8f628 sample/simplecal/TRANSLATIONS
 SHA1 c7d2ff4767d4834a575502d600158829adcdf69f sample/simplecal/bin/simplecal.pl
@@ -410,9 +411,9 @@ SHA1 9e5e4ed209397bbfa7539076a136bd72e3aa9148 tests/po/existing.de_AT.po
 SHA1 75f164ded24c6a4418c43492a51d685efca2d65c tests/po/existing.xy.po
 SHA1 b855afe7fdba66ec7ec241079309df31f67a1147 tests/po/existing.xy_XY.po
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Version: GnuPG v2
 
-iEYEARECAAYFAldedwUACgkQOo0HNPWNDz2TgQCdGowNvuDrC3QP5KSjmN7M6hvL
-8OQAoOdlaZR+FWbADXTup3fa8zBb2yZY
-=5Uf8
+iEYEARECAAYFAlmJcS8ACgkQOo0HNPWNDz0wKwCeKDJAEQT0Wyt0ljE/LePyibCA
+93YAnjJz73mA2FKvnCZw878zTIYXzerh
+=Rfc9
 -----END PGP SIGNATURE-----

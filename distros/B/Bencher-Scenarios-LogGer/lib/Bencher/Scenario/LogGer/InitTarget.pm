@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::InitTarget;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,7 @@ Bencher::Scenario::LogGer::InitTarget - Benchmark init_target()
 
 =head1 VERSION
 
-This document describes version 0.010 of Bencher::Scenario::LogGer::InitTarget (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
+This document describes version 0.012 of Bencher::Scenario::LogGer::InitTarget (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-08-04.
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ Code template:
 
 Code template:
 
- use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("File", path=>'/tmp/TCg0ZF0yGl'); for(1..1000) { Log::ger::init_target(package => "main") }
+ use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("File", path=>'/tmp/YjnhbWBOx_'); for(1..1000) { Log::ger::init_target(package => "main") }
 
 
 
@@ -119,7 +119,7 @@ Code template:
 
 Code template:
 
- use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{}, File=>{conf=>{path=>'/tmp/TCg0ZF0yGl'}}}); for(1..1000) { Log::ger::init_target(package => "main") }
+ use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{}, File=>{conf=>{path=>'/tmp/YjnhbWBOx_'}}}); for(1..1000) { Log::ger::init_target(package => "main") }
 
 
 
@@ -127,7 +127,7 @@ Code template:
 
 Code template:
 
- use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{layout=>[Pattern=>{format=>"[%d] %m"}]}, File=>{conf=>{path=>'/tmp/TCg0ZF0yGl'}, layout=>[Pattern=>{format=>"[%d] [%P] %m"}]}}); for(1..1000) { Log::ger::init_target(package => "main") }
+ use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{layout=>[Pattern=>{format=>"[%d] %m"}]}, File=>{conf=>{path=>'/tmp/YjnhbWBOx_'}, layout=>[Pattern=>{format=>"[%d] [%P] %m"}]}}); for(1..1000) { Log::ger::init_target(package => "main") }
 
 
 
@@ -135,7 +135,7 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with default options (C<< bencher -m LogGer::InitTarget >>):
 
@@ -143,13 +143,13 @@ Benchmark with default options (C<< bencher -m LogGer::InitTarget >>):
  +----------------------------------------------------+-----------+-----------+------------+---------+---------+
  | participant                                        | rate (/s) | time (ms) | vs_slowest |  errors | samples |
  +----------------------------------------------------+-----------+-----------+------------+---------+---------+
- | with LGO:Composite (Screen+File & pattern layouts) |       2.3 |       440 |        1   | 0.0024  |       7 |
- | default                                            |       2   |       400 |        1   | 0.0063  |       7 |
- | with LGO:Composite (Screen+File)                   |       2.5 |       400 |        1.1 | 0.0023  |       7 |
- | with LGO:Composite (Screen)                        |       3.2 |       310 |        1.4 | 0.0015  |       7 |
- | with LGO:Screen                                    |       7   |       100 |        3   | 0.0018  |       7 |
- | with LGO:Composite (0 outputs)                     |       6.9 |       140 |        3   | 0.00081 |       8 |
- | with LGO:File                                      |       7   |       140 |        3.1 | 0.00021 |       7 |
+ | with LGO:Composite (Screen+File & pattern layouts) |      2.76 |       363 |        1   | 0.00019 |       8 |
+ | default                                            |      2.8  |       350 |        1   | 0.00074 |       8 |
+ | with LGO:Composite (Screen+File)                   |      3    |       340 |        1.1 | 0.0008  |       7 |
+ | with LGO:Composite (Screen)                        |      4    |       250 |        1.4 | 0.00074 |       7 |
+ | with LGO:File                                      |      5    |       200 |        2   | 0.0025  |       7 |
+ | with LGO:Composite (0 outputs)                     |      7.3  |       140 |        2.7 | 0.00028 |       7 |
+ | with LGO:Screen                                    |      7.4  |       140 |        2.7 | 0.00021 |       8 |
  +----------------------------------------------------+-----------+-----------+------------+---------+---------+
 
 

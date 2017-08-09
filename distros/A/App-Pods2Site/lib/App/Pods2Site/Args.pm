@@ -381,10 +381,9 @@ sub __getInternalRawGroupDefs
 		@groupDefs = <<'CORE',
 			Core=
 			/*
-				Select any pods in library locations that are named with prefix 'perl'
-				in the top or in the pods package. 
+				Select any pods in library/pod locations that are named with prefix 'perl'
 			*/
-			type.eq(lib) && name.regexp{^(?:pods::)?perl}
+			type.eq(corepod)
 CORE
 	}
 	elsif ($internal eq ':std-scripts')
@@ -410,11 +409,7 @@ SCRIPTS
 			*/
 			type.eq(lib) &&
 				name.regexp{^[a-z]} &&
-				NOT
-					(
-						name.regexp{^(?:pods::)?perl} ||
-						name.eq(pp)
-					)
+				NOT name.eq(pp)
 PRAGMAS
 	}
 	elsif ($internal eq ':std-modules')
@@ -428,7 +423,7 @@ PRAGMAS
 			NOT
 				(
 					type.eq(bin) ||
-					name.regexp{^(?:pods::)?perl} ||
+					type.eq(corepod) ||
 					name.eq(pp) ||
 					name.regexp{^[a-z]}
 				)

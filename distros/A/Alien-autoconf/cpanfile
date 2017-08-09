@@ -22,6 +22,7 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Alien::Build" => "0.32";
   requires "Alien::Build::MM" => "0.32";
+  requires "Alien::Build::Plugin::Build::MSYS" => "0.84";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "perl" => "5.008001";
 };

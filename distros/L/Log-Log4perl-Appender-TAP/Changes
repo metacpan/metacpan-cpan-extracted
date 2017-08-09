@@ -1,5 +1,11 @@
 Revision history for Log-Log4perl-Appender-TAP
 
+0.04      2017-08-07 20:50:57 -0400
+  - Update documentation to reflect that we are now using
+    Test2::API instead of Test::Builder (although still works
+    with Test::Builder, so long as you have upgraded to
+    Test2::API).
+
 0.03      2016-05-19 08:29:24 -0400
   - Migrate internals and tests to Test2
 

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Overrides the time() and sleep() core functions for testing",
+   "author" : [
+      "cho45 <cho45@lowreal.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Time",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Time" : {
+         "file" : "lib/Test/Time.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cho45/Test-Time/issues"
+      },
+      "homepage" : "https://github.com/cho45/Test-Time",
+      "repository" : {
+         "url" : "git://github.com/cho45/Test-Time.git",
+         "web" : "https://github.com/cho45/Test-Time"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
+      "minimalist <minimalist@lavabit.com>",
+      "motemen <motemen@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

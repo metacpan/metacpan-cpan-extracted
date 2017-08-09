@@ -1,3 +1,4 @@
  -- When $c->view('Foo') and no args, return a
    factory and allow $v->http_ok($args) ??
 -- more stuff under catalyst-*
+-- Auto/Exit  Begin/End and Default templates ?

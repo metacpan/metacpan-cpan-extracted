@@ -5,7 +5,7 @@ Zabbix::Check::Redis - Zabbix check for Redis service
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 
@@ -15,6 +15,7 @@ Zabbix check for Redis service
 use strict;
 use warnings;
 use v5.10.1;
+use Time::HiRes;
 use Lazy::Utils;
 
 use Zabbix::Check;
@@ -23,9 +24,9 @@ use Zabbix::Check;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.11';
+	our $VERSION     = '1.12';
 	our @ISA         = qw(Exporter);
-	our @EXPORT      = qw(_installed _discovery _running _info);
+	our @EXPORT      = qw(_installed _discovery _running _info _resptime);
 	our @EXPORT_OK   = qw();
 }
 
@@ -59,7 +60,7 @@ sub get_info
 	my $result = file_cache("all", 30, sub
 	{
 		my $result = { 'epoch' => time() };
-		my $topic; 
+		my $topic;
 		for (`$redis_cli $redis_cli_args info 2>/dev/null`)
 		{
 			chomp;
@@ -92,7 +93,7 @@ sub _discovery
 	for (`ps -C redis-server -o pid,cmd 2>/dev/null`)
 	{
 		chomp;
-		if (/^(\d*)\s+\Q$redis_server\E\ (\S+)/)
+		if (/^\s*(\d*)\s+\Q$redis_server\E\ (\S+)/)
 		{
 			push @items, { bind => $2 };
 		}
@@ -123,6 +124,21 @@ sub _info
 	my $result = "";
 	my $info = get_info($bind);
 	$result = $info->{$key} if defined($info->{$key});
+	print $result;
+	return $result;
+}
+
+sub _resptime
+{
+	my ($bind) = map(zbx_decode($_), @ARGV);
+	my $key = (caller(0))[3];
+	$key =~ s/\Q::\E/-/g;
+	$key = shellmeta($key, 1);
+	my $redis_cli_args = bind_to_redis_cli_args($bind);
+	my $time = Time::HiRes::time();
+	`$redis_cli $redis_cli_args GET $key 2>/dev/null`;
+	my $result = Time::HiRes::time()-$time;
+	`$redis_cli $redis_cli_args INCR $key 2>/dev/null`;
 	print $result;
 	return $result;
 }

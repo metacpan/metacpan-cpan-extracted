@@ -1,3 +1,13 @@
+0.201   2017-08-05 (PERLANCAR)
+
+	- Forgot to regenerate .json files.
+
+
+0.200   2017-08-05 (PERLANCAR)
+
+	- Add example: expr/encoding-expr-var.iod.
+
+
 0.19    2017-01-13 (PERLANCAR)
 
 	- Add example for !none (IOD 0.9.11).

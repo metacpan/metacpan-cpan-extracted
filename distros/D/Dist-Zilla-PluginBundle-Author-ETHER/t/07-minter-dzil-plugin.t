@@ -11,6 +11,7 @@ use Moose::Util 'find_meta';
 use lib 't/lib';
 use NoNetworkHits;
 use NoPrereqChecks;
+use Helper;
 
 # we need the profiles dir to have gone through file munging first (for
 # profile.ini), as well as get installed into a sharedir

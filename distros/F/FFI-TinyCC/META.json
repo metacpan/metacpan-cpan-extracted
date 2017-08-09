@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,9 +19,8 @@
             "Alien::TinyCC" : "0",
             "Archive::Ar" : "2.02",
             "File::chdir" : "0",
-            "IPC::System::Simple" : "0",
             "Module::Build" : "0.3601",
-            "Path::Class" : "0.26",
+            "Path::Tiny" : "0",
             "autodie" : "0"
          }
       },
@@ -30,9 +29,8 @@
             "Alien::TinyCC" : "0",
             "Archive::Ar" : "2.02",
             "File::chdir" : "0",
-            "IPC::System::Simple" : "0",
             "Module::Build" : "0.3601",
-            "Path::Class" : "0",
+            "Path::Tiny" : "0",
             "autodie" : "0",
             "perl" : "5.008001"
          }
@@ -57,7 +55,7 @@
             "Alien::TinyCC" : "0",
             "FFI::Platypus" : "0.15",
             "FFI::Platypus::Type::StringArray" : "0.01",
-            "File::ShareDir" : "0",
+            "File::ShareDir::Dist" : "0",
             "perl" : "5.008001"
          }
       },
@@ -65,8 +63,9 @@
          "requires" : {
             "Archive::Ar" : "2.02",
             "File::chdir" : "0",
-            "Path::Class" : "0.26",
-            "Test::More" : "0.94",
+            "Path::Tiny" : "0",
+            "Test2::Require" : "0.000060",
+            "Test2::V0" : "0.000060",
             "perl" : "5.008001"
          }
       }
@@ -84,7 +83,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.24",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.26",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "aero",
+      "Dylan Cali (calid)",
+      "pipcet"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

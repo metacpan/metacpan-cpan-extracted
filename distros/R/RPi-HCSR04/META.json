@@ -47,6 +47,6 @@
          "web" : "https://github.com/stevieb9/rpi-hcsr04"
       }
    },
-   "version" : "2.3602",
+   "version" : "2.3604",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

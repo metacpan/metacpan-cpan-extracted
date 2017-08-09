@@ -86,33 +86,42 @@ sub load_domain_locale ( $domain, $locale ) : prototype($$) {
 }
 
 sub l10n ( $msgid, $locale = $DEFAULT_LOCALE, $domain = undef ) : prototype($;$$) {
-    return $msgid if !defined $locale;
+    if ( ref $msgid eq 'Pcore::Core::L10N::_deferred' ) {
+        ( $msgid, $domain ) = ( $msgid->{msgid}, $msgid->{domain} );
+    }
+    else {
+        $domain //= $PACKAGE_DOMAIN->{ caller() };
+    }
 
-    $domain //= $PACKAGE_DOMAIN->{ caller() };
+    return $msgid if !defined $locale;
 
     load_domain_locale $domain, $locale if !exists $MESSAGES->{$domain}->{$locale};
 
     return $MESSAGES->{$domain}->{$locale}->{$msgid}->[0] // $msgid;
 }
 
-sub l10np ( $msgid, $msgid_plural, $num, $locale = $DEFAULT_LOCALE, $domain = undef ) : prototype($$$;$$) {
-    goto ENGLISH if !defined $locale;
+sub l10np ( $msgid, $msgid_plural, $num = undef, $locale = $DEFAULT_LOCALE, $domain = undef ) : prototype($$;$$$) {
+    if ( ref $msgid eq 'Pcore::Core::L10N::_deferred' ) {
+        ( $msgid, $msgid_plural, $num, $locale, $domain ) = ( $msgid->{msgid}, $msgid->{msgid_plural}, $msgid_plural, $num // $DEFAULT_LOCALE, $msgid->{domain} );
+    }
+    else {
+        $domain //= $PACKAGE_DOMAIN->{ caller() };
+    }
 
-    $domain //= $PACKAGE_DOMAIN->{ caller() };
+    $num //= 1;
+
+    goto ENGLISH if !defined $locale;
 
     load_domain_locale $domain, $locale if !exists $MESSAGES->{$domain}->{$locale};
 
     goto ENGLISH if !defined $LOCALE_PLURAL_FORM->{$locale}->{code};
 
-    my $idx = $LOCALE_PLURAL_FORM->{$locale}->{code}->( $num // 1 );
+    my $idx = $LOCALE_PLURAL_FORM->{$locale}->{code}->($num);
 
     return $MESSAGES->{$domain}->{$locale}->{$msgid}->[$idx] if defined $MESSAGES->{$domain}->{$locale}->{$msgid}->[$idx];
 
   ENGLISH:
-    if ( !defined $num ) {
-        return $msgid;
-    }
-    elsif ( $num == 1 ) {
+    if ( $num == 1 ) {
         return $msgid;
     }
     else {
@@ -122,24 +131,21 @@ sub l10np ( $msgid, $msgid_plural, $num, $locale = $DEFAULT_LOCALE, $domain = un
     return;
 }
 
-sub l10n_ ( $msgid, $locale = undef, $domain = undef ) : prototype($;$$) {
+sub l10n_ ( $msgid, $domain = undef ) : prototype($;$) {
     return bless {
         is_plural => 0,
         msgid     => $msgid,
         domain    => $domain // $PACKAGE_DOMAIN->{ caller() },
-        locale    => $locale,
       },
       'Pcore::Core::L10N::_deferred';
 }
 
-sub l10np_ ( $msgid, $msgid_plural, $num, $locale = undef, $domain = undef ) : prototype($$$;$$) {
+sub l10np_ ( $msgid, $msgid_plural, $domain = undef ) : prototype($$;$) {
     return bless {
         is_plural    => 1,
         msgid        => $msgid,
         msgid_plural => $msgid_plural,
-        num          => $num,
         domain       => $domain // $PACKAGE_DOMAIN->{ caller() },
-        locale       => $locale,
       },
       'Pcore::Core::L10N::_deferred';
 }
@@ -148,12 +154,7 @@ package Pcore::Core::L10N::_deferred {
     use Pcore -class;
     use overload    #
       q[""] => sub {
-        if ( $_[0]->{is_plural} ) {
-            return l10np $_[0]->{msgid}, $_[0]->{msgid_plural}, $_[0]->{num}, $_[0]->{locale}, $_[0]->{domain};
-        }
-        else {
-            return l10n $_[0]->{msgid}, $_[0]->{locale}, $_[0]->{domain};
-        }
+        return &Pcore::Core::L10N::l10n( $_[0] );    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
       },
       bool => sub {
         return 1;
@@ -162,31 +163,35 @@ package Pcore::Core::L10N::_deferred {
 
     has is_plural => ( is => 'ro', isa => Bool, required => 1 );
     has msgid     => ( is => 'ro', isa => Str,  required => 1 );
-    has domain    => ( is => 'ro', isa => Str );
-
+    has domain    => ( is => 'ro', isa => Str,  required => 1 );
     has msgid_plural => ( is => 'ro', isa => Maybe [Str] );
-    has num          => ( is => 'ro', isa => Maybe [Int] );
-    has locale       => ( is => 'ro', isa => Maybe [Str] );
-
-    sub l10n ( $self, $locale = undef ) {
-        return Pcore::Core::L10N::l10n $self->{msgid}, $locale // $self->{locale}, $self->{domain};
-    }
-
-    sub l10np ( $self, $num = undef, $locale = undef ) {
-        die q[l10n string has no plural form] if !$self->{is_plural};
-
-        return Pcore::Core::L10N::l10np $self->{msgid}, $self->{msgid_plural}, $num // $self->{num}, $locale // $self->{locale}, $self->{domain};
-    }
 }
 
 package Pcore::Core::L10N::_l10n {
+    use Pcore::Util::Scalar qw[is_plain_arrayref];
 
     sub TIEHASH ( $self, @args ) {
         return bless {}, $self;
     }
 
     sub FETCH {
-        return Pcore::Core::L10N::l10n $_[1], $DEFAULT_LOCALE, $PACKAGE_DOMAIN->{ caller() };
+
+        ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+
+        if ( is_plain_arrayref $_[1] ) {
+            if ( $_[1]->[0]->{is_plural} ) {
+                return &Pcore::Core::L10N::l10np( $_[1]->[0], $_[1]->[1], $_[1]->[2] );
+            }
+            else {
+                return &Pcore::Core::L10N::l10n( $_[1]->[0], $_[1]->[1] );
+            }
+        }
+        elsif ( ref $_[1] eq 'Pcore::Core::L10N::_deferred' ) {
+            return &Pcore::Core::L10N::l10n( $_[1] );
+        }
+        else {
+            return &Pcore::Core::L10N::l10n( $_[1], undef, $PACKAGE_DOMAIN->{ caller() } );
+        }
     }
 }
 
@@ -197,12 +202,12 @@ package Pcore::Core::L10N::_l10n {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 98, 135              | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 103                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 13                   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 91, 101, 129, 141,   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
-## |      | 189                  |                                                                                                                |
+## |    1 | 93, 108, 138, 148,   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |      | 193                  |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -216,5 +221,47 @@ __END__
 Pcore::Core::L10N - localization subsystem.
 
 =head1 SYNOPSIS
+
+    use Pcore -l10n => 'Domain';
+
+    say l10n 'text';
+    say l10n 'text', 'en';
+
+    say l10np 'text', 'text plural', 3;
+    say l10np 'text', 'text plural', 3, 'en';
+
+    my $const = l10n_ 'text';
+    say const;
+    say l10n $const;
+
+    my $const_plural = l10np_ 'text', 'text_plural';
+    say $const_plural;
+    say l10n $const_plural;
+    say l10n $const_plural, 'en';
+    say l10np $const_plural, 3;
+    say l10np $const_plural, 3, 'en';
+
+    say $l10n->{'text'};
+    say $l10n->{$const};
+    say $l10n->{[$const, 'en']};
+
+    say $l10n->{[ $const_plural, 3 ]};
+    say $l10n->{[ $const_plural, 3, 'en' ]};
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+zdm <zdm@softvisio.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by zdm.
 
 =cut

@@ -3,6 +3,7 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+eg/bass-grind
 eg/rhythm2midi
 lib/Music/RecRhythm.pm
 t/00-load.t

@@ -52,6 +52,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Dave Rolsky</foaf:name>
+      <foaf:mbox rdf:resource="mailto:autarch@urth.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Florian Ragwitz</foaf:name>
       <foaf:mbox rdf:resource="mailto:rafl@debian.org" />
     </foaf:Person>
@@ -346,6 +352,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.33</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-04-26</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.34</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-03-28</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

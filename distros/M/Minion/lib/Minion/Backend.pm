@@ -110,6 +110,12 @@ These options are currently available:
 
 =over 2
 
+=item id
+
+  id => '10023'
+
+Dequeue a specific job.
+
 =item queues
 
   queues => ['important']
@@ -467,6 +473,12 @@ retried to change options. Meant to be overloaded in a subclass.
 These options are currently available:
 
 =over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted.
 
 =item delay
 

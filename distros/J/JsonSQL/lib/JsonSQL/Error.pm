@@ -7,7 +7,7 @@ use 5.014;
 
 package JsonSQL::Error;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 
@@ -50,7 +50,7 @@ JsonSQL::Error - Defines an error object to be used at various stages of JSON va
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

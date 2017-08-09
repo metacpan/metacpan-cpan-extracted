@@ -1,0 +1,74 @@
+Math-Logic-Ternary version 0.004
+================================
+
+Ternary or three-valued logic is a logic in which there are three
+truth values indicating true, false and some third value, often
+used to denote uncertainty or indefiniteness.
+
+Ternary logic could be (and has been) implemented in electronic
+hardware.  Some nice mathematical properties make it an interesting
+alternative to binary logic for the design of digital systems.
+
+This library aims to serve as an experimental kit to explore the
+behaviour of basic operations of a ternary computer without having
+to build specialized hardware first.  It also tries to shed light
+on some design considerations related to ternary computing, such
+as word sizes, number systems, or just names.  While it does not
+claim to be authoritative in any of these matters, at least some
+effort has been made to be practicable and consistent.
+
+The interface is mostly object-oriented with a couple of importable
+plain functions provided for convenience.
+
+As of version 0.004, the library is still in beta state.  Feel free to
+send comments, observations and suggestions to the author.  He would
+especially like to hear about features actually implemented in ternary
+digital hardware, whether addressed in this library or not.
+
+This version is the first official beta release of the library.
+Earlier versions should no longer be used.  Upcoming development
+will aim to extend the API without radically changing existent
+functionality, unless of course there is a compelling reason to do
+so.  At the present stage, nothing should be considered final.
+
+INSTALLATION
+
+To install the modules type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This version of Math-Logic-Ternary requires these other modules and
+libraries to run:
+
+  * perl version 5.8.0 or higher
+  * Math::BigInt version 1.78 or higher (usually bundled with perl)
+  * Role::Basic (available on CPAN)
+
+Additional requirements to run the test suite are:
+
+  * Test::More (usually bundled with perl)
+
+Recommended modules for increased functionality are:
+
+  * Math::ModInt (available on CPAN)
+  * Term::ReadLine (available on CPAN)
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2006-2017 by Martin Becker.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+

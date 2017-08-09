@@ -24,7 +24,7 @@ use parent qw(Exporter);
 	'all' => \@EXPORT_OK,
 	);
 
-$VERSION = '1.411';
+$VERSION = '1.412';
 
 =encoding utf8
 
@@ -59,9 +59,10 @@ Mac::PropertyList - work with Mac plists at a low level
 =head1 DESCRIPTION
 
 This module is a low-level interface to the Mac OS X Property List
-(plist) format. You probably shouldn't use this in applications–build
-interfaces on top of this so you don't have to put all the heinous
-multi-level object stuff where people have to look at it.
+(plist) format in either XML or binary. You probably shouldn't use
+this in applications–build interfaces on top of this so you don't have
+to put all the heinous multi-level object stuff where people have to
+look at it.
 
 You can parse a plist file and get back a data structure. You can take
 that data structure and get back the plist as XML. If you want to
@@ -69,6 +70,14 @@ change the structure inbetween that's your business. :)
 
 You don't need to be on Mac OS X to use this. It simply parses and
 manipulates a text format that Mac OS X uses.
+
+If you need to work with the old ASCII or newer JSON formet, you can
+use the B<plutil> tool that comes with MacOS X:
+
+	% plutil -convert xml1 -o ExampleBinary.xml.plist ExampleBinary.plist
+
+Or, you can extend this module to handle those formats (and send a pull
+request).
 
 =head2 The Property List format
 
@@ -160,7 +169,6 @@ my %Readers = (
 	"date"    => \&read_date,
 	"real"    => \&read_real,
 	"integer" => \&read_integer,
-	"string"  => \&read_string,
 	"array"   => \&read_array,
 	"data"    => \&read_data,
 	"true"    => \&read_true,
@@ -374,9 +382,7 @@ sub read_next {
 	while( not defined $value ) {
 		croak "Couldn't read anything!" if $source->eof;
 		$_ .= $source->get_line;
-
-		if( s[^\s* < (string|date|real|integer|data) >
-			   \s*(.*?)\s* </\1> ][]sx ) {
+		if( s[^\s* < (string|date|real|integer|data) > \s*(.*?)\s* </\1> ][]sx ) {
 			$value = $Readers{$1}->( $2 );
 			}
 	    elsif( s[^\s* < (dict|array) > ][]x ) {
@@ -508,13 +514,34 @@ sub eof { (not @{$_[0]->{buffer}}) and $_[0]->source_eof }
 sub get_line {
 	my $self = CORE::shift;
 
+# I'm not particularly happy with what I wrote here, but that's why
+# you shouldn't write your own buffering code! I might have left over
+# text in the buffer. This could be stuff a higher level looked at and
+# put back with put_line. If there's text there, grab that.
+#
+# But here's the tricky part. If that next part of the text looks like
+# a "blank" line, grab the next next thing and append that.
+#
+# And, if there's nothing in the buffer, ask for more text from
+# get_source_line. Follow the same rules. IF you get back something that
+# looks like a blank line, ask for another and append it.
+#
+# This means that a returned line might have come partially from the
+# buffer and partially from a fresh read.
+#
+# At some point you should have something that doesn't look like a
+# blank line and the while() will break out. Return what you do.
+#
+# Previously, I wasn't appending to $_ so newlines were disappearing
+# as each next read replaced the value in $_. Yuck.
+
 	local $_ = '';
 	while (defined $_ && /^[\r\n\s]*$/) {
 		if( @{$self->{buffer}} ) {
-			$_ = shift @{$self->{buffer}};
+			$_ .= shift @{$self->{buffer}};
 			}
 		else {
-			$_ = $self->get_source_line;
+			$_ .= $self->get_source_line;
 			}
 		}
 
@@ -560,8 +587,6 @@ sub value {
 sub type { my $r = ref $_[0] ? ref $_[0] : $_[0]; $r =~ s/.*:://; $r; }
 
 sub new {
-	#print STDERR "Got [@_]\n";
-
 	bless $_[1], $_[0]
 	}
 
@@ -655,8 +680,6 @@ package Mac::PropertyList::dict;
 use base qw(Mac::PropertyList::Container);
 
 sub new {
-	#print STDERR Data::Dumper::Dumper( $_[1] );
-
 	$_[0]->SUPER::new( $_[1] );
 	}
 

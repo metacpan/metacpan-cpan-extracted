@@ -1,5 +1,5 @@
-#!/usr/bin/perl -w
-# $Id: makepplog,v 1.50 2012/10/25 21:10:27 pfeiffer Exp $
+#!/usr/bin/env perl
+# $Id: makepplog,v 1.58 2016/09/12 20:34:11 pfeiffer Exp $
 
 package Mpp;
 
@@ -19,10 +19,10 @@ my %log_msg =
 
   BUILD_ARCH => 'Rebuild %s because last build was on %s and this is on %s',
   BUILD_CHANGED => 'Rebuild %s because %s changed',
-  BUILD_CMD => 'Rebuild %s because last build command ("%s") differs from current command ("%s")',
+  BUILD_CMD => 'Rebuild %s because last build command (%s) differs from current command (%s)',
   BUILD_DEP_ADD => 'Rebuild %s because of added dependencies %s',
   BUILD_DEP_DEL => 'Rebuild %s because of removed dependencies %s',
-  BUILD_ENV => 'Rebuild %s because value of environment variable %s ("%s") differs from previous value ("%s")',
+  BUILD_ENV => 'Rebuild %s because value of environment variable %s (%s) differs from previous value (%s)',
   BUILD_ENV_ADD => 'Rebuild %s because environmental dependency on %s is new',
   BUILD_ENV_DEL => 'Rebuild %s because environmental dependency on %s no longer exists',
   BUILD_FINAL => 'Rebuild %s because --final-rule-only specified',
@@ -37,9 +37,11 @@ my %log_msg =
   CACHED_DEP => 'Building %s as a cached scanned dependency of %s',
 
   DEL_STALE => 'Removing stale generated file or symlink %s',
+  DEBUG => 'Environment var $MAKEPP_DEBUG is %s (1 means extra verbose)',
   DEPEND => ' Targets %s depend on %s',
 
   ERROR => '%s has non-fatal error %s, %s',
+  EXPR => 'Expression %s returns value %s at %s',
 
   IFEQ => 'if(n)eq comparing %s with %s at %s',
   INCL => '%s includes %s',
@@ -60,6 +62,7 @@ my %log_msg =
   LOG => 'Recursive make at %s will log to %s in its destination directory',
 
   MAYBE_STALE => 'Ignoring possibly stale generated file %s',
+
   NOT_FOUND => '%s not found in $PATH at %s',
   NOT_IN_SANDBOX => 'Not updating build info for %s because it\'s not in my sandbox',
   N_CACHE_HITS => '%d files imported from build cache',
@@ -88,11 +91,13 @@ my %log_msg =
   RULE_DISCARD_MAKE => ' Rule %s discarded because it invokes $(MAKE)',
   RULE_EXTEND => 'Add target %s to rule for %s',
   RULE_FAILED => '*** This failed from rule %s',
+  RULE_GROK => '%s rule at %s outputs %s inputs %s actions %s',
   RULE_IGN_MAKE => ' Rule %s ignored because it invokes $(MAKE)',
   RULE_IGN_PATTERN => ' Rule %s ignored because it is a pattern rule',
   RULE_NEARER => ' Rule %s chosen because it is from a nearer makefile',
   RULE_NEARER_KEPT => ' Rule %s kept because it is from a nearer makefile',
   RULE_NEW => 'Recover rule for %s from previous build info',
+  RULE_SET => 'Rule to build %s from %s at %s',
   RULE_SHORTER => ' Rule %s chosen because it has a shorter chain of inference',
 
   SCAN => 'Scanning %s',
@@ -114,6 +119,9 @@ my %log_msg =
   UP_TO_DATE => '%s is up to date',
   USE => ' Using rule %s',
   USE_FAIL => 'Module %s not found',
+
+  VAR => 'Variable %s returns value %s at %s',
+  VAR_EXPAND => 'Variable %s expands value %s at %s',
 
   VERSION => 'Running %s with Perl %s on %s',
  );
@@ -144,7 +152,6 @@ my @obsolete_msg =
 
 our $datadir;
 BEGIN {
-  our $VERSION = '@VERSION@';
 #@@setdatadir
 #
 # Find the location of our data directory that contains the auxiliary files.
@@ -157,7 +164,7 @@ BEGIN {
 				# See if we can find ourselves in the path.
     foreach( split( /:/, $ENV{'PATH'} ), '.' ) {
 				# Add '.' to the path in case the user is
-				# running it with "perl makepp" even if
+				# running it with "perl makepplog" even if
 				# . is not in his path.
       if( -d "$_/Mpp" ) {	# Found something we need?
 	$datadir = $_;
@@ -165,10 +172,11 @@ BEGIN {
       }
     }
   }
-  $datadir or die "makepp: can't find library files\n";
+  $datadir or die "makepplog: can't find library files\n";
 
   $datadir = eval "use Cwd; cwd . '/$datadir'"
     if $datadir =~ /^\./;	# Make it absolute, if it's a relative path.
+  do "$datadir/Mpp/DB.pm" if exists $DB::{sh};
 #@@
   unshift @INC, $datadir;
 }
@@ -190,7 +198,7 @@ my $showkey = '';
     ['C', qr/current[-_]?working[-_]?dir(?:ectory)[-_]?and[-_]?up/, \$cwd, 1],
     ['d', qr/set[-_]?dir(?:ectory)/, \$tmp, 1, sub {
        $CWD_INFO = file_info $tmp;
-       $cwd = 0 unless defined $cwd;
+       $cwd ||= 0;
      }],
     [qw(f follow), \$follow],
     ['i', qr/install(?:ation)?[-_]?dir(?:s|ectory|ectories)/, \$instdir],
@@ -238,13 +246,22 @@ if( $instdir && defined $cwd ) {
 find_logfiles @logfiles;
 open STDOUT, '>', $outfile if $outfile;
 
+if( defined $cwd and defined $keylist ? $keylist !~ /^!-c/ : 1 ) {
+  my $dir = $CWD_INFO;
+  printf "${prefix}Replacing `%s' by `.'\n", absolute_filename $dir;
+  for my $n ( 1..$cwd) {
+    $dir = $dir->{'..'};
+    printf "${prefix}Replacing `%s' by `%s'\n", absolute_filename( $dir ),
+      join '/', ('..') x $n;
+  }
+}
 
 my %want;
 my( %incl, %cached_dep, %scan ); # Redundant message counters for --uniq
 my $warned_corrupt;
 FILE:
 for my $logfile ( @logfiles ) {
-  open my $log, $logfile or die "$0: can't open `$_'--$!\n";
+  open my $log, '<', $logfile or die "$0: can't open `$_'--$!\n";
 
   $_ = <$log>;
   s/^(\d+)\01//;		# Strip log version.

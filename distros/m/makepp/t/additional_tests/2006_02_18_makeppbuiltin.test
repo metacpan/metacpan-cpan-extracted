@@ -33,9 +33,8 @@ rename 'tempdir2' => dir2;
 
 # We don't start a real command, just use this to get our code loaded
 # within the context of makeppbuiltin.
-makepp \'builtin', '-Mworker', 'clonetest';
-###	43	644	1153861432	1140276843	worker.pm
-use mymodule;
+makepp \'builtin', '-I.', '-Mworker', 'clonetest';
+###	42	644	1153861432	1473530808	worker.pm
 # Normally from the command line the commands can inherit nothing from the
 # context of their makefile (since there is none).  But here we rerun tests
 # that do have such a context, so get it from the makefile.
@@ -51,13 +50,13 @@ while( <$mf> ) {
 sub c_clonetest {
   open my $fh, 'commands';
   while( <$fh> ) {
-    next if !/^&/;
+    next if ord != ord '&';
     warn $_;
     chop;
-    my $comment = Mpp::Text::index_ignoring_quotes( $_, '#' );
+    my $comment = Mpp::Text::find_unquoted $_, '#';
     $_ = substr $_, 0, $comment if $comment > -1;
     $0 = 'makeppbuiltin';
-    @ARGV = Mpp::Text::unquote_split_on_whitespace( $_ );
+    @ARGV = Mpp::Text::unquote_split_on_whitespace $_;
     substr( $ARGV[0], 0, 1 ) = ''; # Remove &
     eval { Mpp::doit }; warn $@ if $@;
   }
@@ -79,7 +78,7 @@ sub c_clonetest {
 
 1;
 ###	D	755	1140344139	1140344139	answers
-###	174	644	1153678523	1229044125	answers/help
+###	176	644	1153678523	1402433959	answers/help
 cat options:
   -f, --force
   -i, --inpipe=arg
@@ -227,7 +226,9 @@ template options:
   -m, --multiline=arg
   -o, --output=arg
   -O, --outfail
+  -r, --record-size=arg
   -s, --simple=arg
+      --separator=arg
   -S, --sync-lines
   -v, --verbose
 touch options:

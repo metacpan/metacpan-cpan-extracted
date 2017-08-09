@@ -1,0 +1,10 @@
+---
+todo:
+  - lib/Math/Logic/Ternary/Calculator/Command.pm
+  - lib/Math/Logic/Ternary/Calculator/Mode.pm
+  - lib/Math/Logic/Ternary/Calculator/Parser.pm
+  - lib/Math/Logic/Ternary/Calculator/Session.pm
+  - lib/Math/Logic/Ternary/Calculator/State.pm
+  - lib/Math/Logic/Ternary/Calculator/Version.pm
+  - t/08_mul_div.t
+  - t/25_calculator.t

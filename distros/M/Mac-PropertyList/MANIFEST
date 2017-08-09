@@ -4,8 +4,6 @@ DTDs/PropertyList-1.0.dtd
 examples/convert_to_perl.pl
 examples/plist-visitor.pl
 examples/README
-hacks/plist-timer.pl
-hacks/plist.pl
 INSTALL.SKIP
 lib/Mac/PropertyList.pm
 lib/Mac/PropertyList/ReadBinary.pm

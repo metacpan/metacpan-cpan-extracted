@@ -19,7 +19,7 @@ meta-spec:
 name: Dist-Zilla-PluginBundle-MSCHOUT
 requires:
   Dist::Zilla: '4.102341'
-  Dist::Zilla::Plugin::ArchiveRelease: '0'
+  Dist::Zilla::Plugin::AuthorSignatureTest: '0'
   Dist::Zilla::Plugin::AutoPrereqs: '0'
   Dist::Zilla::Plugin::AutoVersion: '0'
   Dist::Zilla::Plugin::Bugtracker: '0'
@@ -58,5 +58,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MSCHOUT
   homepage: http://search.cpan.org/dist/Dist-Zilla-PluginBundle-MSCHOUT/
   repository: git://github.com/mschout/dist-zilla-pluginbundle-mschout.git
-version: '0.32'
+version: '0.35'
 x_serialization_backend: 'YAML::Tiny version 1.69'

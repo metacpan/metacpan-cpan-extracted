@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/BencherUtils/bencher_module_startup_overhead
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# and generated automatically using Perinci::CmdLine::Gen version 0.47
 
-our $DATE = '2017-07-13'; # DATE
+our $DATE = '2017-08-02'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ bencher-module-startup-overhead - Accept a list of module names and perform star
 
 =head1 VERSION
 
-This document describes version 0.22 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2017-07-13.
+This document describes version 0.23 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2017-08-02.
 
 =head1 SYNOPSIS
 

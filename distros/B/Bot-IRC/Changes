@@ -1,5 +1,14 @@
 Revision history for Bot::IRC
 
+1.18      2017-08-01 16:14:28-07:00 America/Los_Angeles
+        - Set minimum required version to 5.14 because Email::Mailer dependency
+          has that as its minimum required version
+
+1.17      2017-08-01 15:40:40-07:00 America/Los_Angeles
+        - Bot will not respond to "hi" and "good morning" and stuff unless
+          talked directly to
+        - History fetching and returning by email interface enhancements
+
 1.16      2017-07-11 17:05:59-04:00 America/New_York
         - Add Try::Tiny blocks for most evals and include headers in error
           messages to provide a little more context on errors

@@ -3,15 +3,15 @@ use strict;
 use English;
 use Test::More;
 use Test::Requires qw( v5.10 );
-use Image::Magick;
 
 #########################
 
-if ( system("which tiffinfo > /dev/null 2> /dev/null") == 0 ) {
+eval "use Image::Magick";
+if ( not $@ and system("which tiffinfo > /dev/null 2> /dev/null") == 0 ) {
     plan tests => 15;
 }
 else {
-    plan skip_all => 'tiffinfo not installed';
+    plan skip_all => 'Image::Magick or tiffinfo not installed';
     exit;
 }
 

@@ -1,5 +1,11 @@
 Revision history for No-Worries:
 
+1.5	Tue Aug  1 2017
+	* No::Worries::String: added string_bytefmt() to format byte numbers.
+	* No::Worries::String: string_table() can now center columns.
+	* No::Worries::String: string_table() can now handle properly strings
+	  with ANSI Escape sequences.
+
 1.4	Mon Nov 21 2016
 	* No::Worries::File: added a binary option and changed the binmode
 	  option to be transparent wrt binmode().

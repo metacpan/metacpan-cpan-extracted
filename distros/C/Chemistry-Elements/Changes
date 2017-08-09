@@ -1,5 +1,8 @@
 Revision history for Perl module Chemistry::Elements
 
+1.072 2017-08-06T06:08:52Z
+	* Update the new heavy element symbols.
+
 1.071 2016-12-30T20:11:12Z
 	* Version adjustment to be greater than what's on CPAN
 

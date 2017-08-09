@@ -1,17 +1,28 @@
-# stolen unabashedly from Gisle Aas' File::Listing
-use strict;
-use warnings;
-use Test;
-plan tests => 4;
-
+use Test2::V0 -no_srand => 1;
 use File::Listing::Ftpcopy ('parse_dir');
+
+# stolen unabashedly from Gisle Aas' File::Listing
+# later converted to Test2
 
 my $list = parse_dir(*DATA, undef, 'dosftp');
 
-ok @$list, 2;
-ok $list->[0][0], "src.slf";
-ok $list->[0][1], "f";
-ok $list->[1][1], "d";
+is(
+  $list,
+  array {
+    item array {
+      item 'src.slf';
+      item 'f';
+      etc;
+    };
+    item array {
+      item 'sl_util';
+      item 'd';
+      etc;
+    };
+  },
+);
+
+done_testing;
 
 __DATA__
 02-05-96  10:48AM                 1415 src.slf

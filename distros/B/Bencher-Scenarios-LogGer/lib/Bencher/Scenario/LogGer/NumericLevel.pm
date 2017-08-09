@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NumericLevel;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2017-08-04'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,7 +15,7 @@ our $scenario = {
         },
     ],
     datasets => [
-        {args=>{level=>1}},
+        {args=>{level=>10}},
         {args=>{level=>'warn'}},
     ],
 };
@@ -35,7 +35,7 @@ Bencher::Scenario::LogGer::NumericLevel - Benchmark numeric_level()
 
 =head1 VERSION
 
-This document describes version 0.010 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
+This document describes version 0.012 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-08-04.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Util> 0.016
+L<Log::ger::Util> 0.023
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -77,7 +77,7 @@ Function call template:
 
 =over
 
-=item * 1
+=item * 10
 
 =item * warn
 
@@ -85,7 +85,7 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
 
@@ -93,8 +93,8 @@ Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
  +---------+-----------+-----------+------------+---------+---------+
  | dataset | rate (/s) | time (ns) | vs_slowest |  errors | samples |
  +---------+-----------+-----------+------------+---------+---------+
- | warn    |   1955000 |     511.4 |       1    | 1.1e-11 |      20 |
- | 1       |   2330000 |     430   |       1.19 | 3.8e-10 |      28 |
+ | warn    |   2290000 |       436 |       1    | 5.8e-11 |      20 |
+ | 10      |   2480000 |       404 |       1.08 | 2.5e-10 |      22 |
  +---------+-----------+-----------+------------+---------+---------+
 
 
@@ -104,8 +104,8 @@ Benchmark module startup overhead (C<< bencher -m LogGer::NumericLevel --module-
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Util      | 0.82                         | 4.1                | 16             |      13   |                    6.3 |        1   | 3.3e-05 |      20 |
- | perl -e1 (baseline) | 1.4                          | 4.7                | 17             |       6.7 |                    0   |        1.9 | 2.7e-05 |      20 |
+ | Log::ger::Util      | 0.56                         | 4                  | 20             |      12   |                    6.2 |        1   | 2.8e-05 |      20 |
+ | perl -e1 (baseline) | 1.3                          | 4.7                | 20             |       5.8 |                    0   |        2.1 | 4.7e-05 |      22 |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 

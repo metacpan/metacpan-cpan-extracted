@@ -1,5 +1,8 @@
 Revision history for Unexpected
 
+1.0.1     2017-07-31 22:45:46
+          - Toolchain update
+
 0.46.1    2017-02-16 22:29:03
           - Better type error file locations
           - Updated copyright year

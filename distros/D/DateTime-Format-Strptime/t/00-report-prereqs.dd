@@ -9,6 +9,8 @@ do { my $x = {
                       },
        'develop' => {
                     'requires' => {
+                                  'Code::TidyAll' => '0.56',
+                                  'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                   'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                   'Cwd' => '0',
                                   'DateTime::Locale' => '1.03',

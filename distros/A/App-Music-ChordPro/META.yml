@@ -23,19 +23,21 @@ no_index:
   file:
     - lib/App/Music/ChordPro/Songbook.pm
     - lib/App/Music/ChordPro/Chords.pm
+    - lib/App/Music/ChordPro/Version.pm
     - lib/App/Music/ChordPro/Wx.pm
 provides:
   App::Music::ChordPro:
     file: lib/App/Music/ChordPro.pm
-    version: '0.82'
+    version: '0.84'
   chordpro:
     file: script/chordpro
-    version: '0.82'
+    version: '0.84'
 requires:
   App::Packager: '1.42'
   Font::TTF: '1.04'
   PDF::API2: '2.02'
 resources:
   homepage: http://www.chordpro.org
-version: '0.82'
+  license: http://dev.perl.org/licenses/
+version: '0.84'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

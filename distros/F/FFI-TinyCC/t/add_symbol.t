@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 
 my $c_code = <<EOF;
@@ -13,8 +11,6 @@ bar()
 EOF
 
 subtest 'FFI::Platypus' => sub {
-  plan tests => 4;
-
   use FFI::Platypus;
 
   my $tcc = FFI::TinyCC->new;

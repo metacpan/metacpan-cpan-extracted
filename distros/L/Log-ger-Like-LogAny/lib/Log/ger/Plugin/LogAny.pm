@@ -1,7 +1,7 @@
 package Log::ger::Plugin::LogAny;
 
-our $DATE = '2017-07-12'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-08-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -29,10 +29,10 @@ sub get_hooks {
                 my $levels = [keys %Log::ger::Levels];
 
                 return [{
-                    log_subs    => [map { ["log_$_", $_, "join"], ["log_${_}f", $_, "default"] }
+                    log_subs    => [map { (["log_$_", $_, "join"], ["log_${_}f", $_, "default"]) }
                                         @$levels],
                     is_subs     => [map { ["log_is_$_", $_] } @$levels],
-                    log_methods => [map { ["$_", $_, "join"], ["${_}f", $_, "default"] }
+                    log_methods => [map { (["$_", $_, "join"], ["${_}f", $_, "default"]) }
                                         @$levels],
                     is_methods  => [map { ["is_$_", $_] } @$levels],
                 }, 1];
@@ -55,7 +55,7 @@ Log::ger::Plugin::LogAny - Plugin to mimic Log::Any
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

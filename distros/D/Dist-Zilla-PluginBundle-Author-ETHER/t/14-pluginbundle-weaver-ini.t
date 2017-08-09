@@ -15,6 +15,8 @@ use Helper;
 use NoNetworkHits;
 use NoPrereqChecks;
 
+my $tempdir = no_git_tempdir();
+
 my $dist_root;
 $dist_root = pushd('corpus/with_weaver_ini') if Dist::Zilla::Tester->VERSION < '6.003';
 
@@ -22,6 +24,7 @@ my $tzil = Builder->from_config(
     # newer Dist::Zilla::Tester chdirs into source/ so we need to copy the files we need
     { dist_root => Dist::Zilla::Tester->VERSION < '6.003' ? 'does-not-exist' : 'corpus/with_weaver_ini' },
     {
+        tempdir_root => $tempdir->stringify,
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
                 'GatherDir',

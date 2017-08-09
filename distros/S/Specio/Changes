@@ -1,3 +1,28 @@
+0.40     2017-08-03
+
+- Fixed more bugs with {any,object}_{can,does,isa}_type. When passed a glob
+  (not a globref) they would die in their type check. On Perl 5.16 or earlier,
+  passing a number to an any_* type would also die.
+
+- Fixed subification overloading. If Sub::Quote was loaded, this would be
+  used, but any environment variables needed for the closure would not be
+  included. This broke enums, among other things.
+
+
+0.39     2017-08-02
+
+- Many bug fixes and improves to the types created by
+  {any,object}_{can,does,isa}_type. In some cases, an invalid value could
+  cause an exception in type check itself. In other cases, a value which
+  failed a type check would cause an exception when generating a message
+  describing the failure. These cases have all been fixed.
+
+- The messages describing a failure for all of these types have been improved.
+
+- You can now create anonymous *_does and *_isa types using the exports from
+  Specio::Declare.
+
+
 0.38     2017-07-01
 
 - Simplify checks for overloading to not call overload::Overloaded(). Just

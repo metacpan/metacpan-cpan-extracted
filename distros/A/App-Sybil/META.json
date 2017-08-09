@@ -41,6 +41,7 @@
             "Capture::Tiny" : "0.46",
             "File::Slurp" : "9999.19",
             "File::Spec" : "3.62",
+            "File::Temp" : "0.2304",
             "IO::Prompt::Simple" : "0.06",
             "Net::GitHub" : "0.89",
             "perl" : "5.012000"
@@ -64,7 +65,7 @@
          "web" : "https://github.com/bentglasstube/perl-app-sybil"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

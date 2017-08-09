@@ -1,0 +1,15 @@
+Revision history for Perl extension Text-Password-AutoMigration
+
+0.05 2017-08-07T12:16:23Z
+ - add Digest::SHA to cpanfile
+0.04 2017-08-07T00:08:55Z
+ - add Moose.pm to cpanfile
+
+0.03 2017-08-05T02:23:05Z
+ - fix the PODs
+ - add dependencies
+
+0.01 2017-08-01T15:10:34Z
+
+ - original version
+

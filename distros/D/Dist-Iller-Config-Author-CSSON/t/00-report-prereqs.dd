@@ -13,7 +13,7 @@ do { my $x = {
                                       'Badge::Depot::Plugin::Kwalitee' => '0',
                                       'Badge::Depot::Plugin::Perl' => '0',
                                       'Badge::Depot::Plugin::Travis' => '0',
-                                      'Dist::Zilla' => '6.008',
+                                      'Dist::Zilla' => '6.010',
                                       'Dist::Zilla::Plugin::Authority' => '1.009',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.008',
                                       'Dist::Zilla::Plugin::ChangeStats::Dependencies::Git' => '0.0200',
@@ -86,7 +86,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Iller' => '0.1408',
-                                      'Dist::Iller::Config::Author::CSSON' => '0.0316'
+                                      'Dist::Iller::Config::Author::CSSON' => '0.0318'
                                     }
                     },
        'runtime' => {

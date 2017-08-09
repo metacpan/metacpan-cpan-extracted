@@ -104,6 +104,19 @@ $test->(
 );
 
 $test->(
+    desc  => 'for_update',
+    input => [
+        foo => '*',
+        { hoge => 'fuga' },
+        { for_update => 1 },
+    ],
+    expects => {
+        stmt => 'SELECT * FROM `foo` WHERE (`hoge` = ?) FOR UPDATE',
+        bind => [qw/fuga/],
+    },
+);
+
+$test->(
     desc => 'join',
     input => [
         { foo => 'f' },

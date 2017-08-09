@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 4;
+use Test2::V0 -no_srand => 1;
 use FFI::TinyCC;
 
 foreach my $type (qw( memory exe dll obj ))
@@ -14,3 +12,5 @@ foreach my $type (qw( memory exe dll obj ))
   
   };
 }
+
+done_testing;

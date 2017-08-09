@@ -4,6 +4,8 @@ plugin 'PkgConfig' => 'nettle';
 
 share {
 
+  requires 'Alien::m4' => '0.12';
+
   plugin Download => (
     url     => 'https://ftp.gnu.org/gnu/nettle/',
     version => qr/^nettle-([0-9\.]+)\.tar\.gz$/,

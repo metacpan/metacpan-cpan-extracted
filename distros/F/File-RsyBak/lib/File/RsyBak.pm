@@ -1,7 +1,7 @@
 package File::RsyBak;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.34'; # VERSION
+our $DATE = '2017-07-31'; # DATE
+our $VERSION = '0.35'; # VERSION
 
 use 5.010001;
 use strict;
@@ -160,6 +160,7 @@ _
         {
             argv         => ['/home/jajang/mydata','/backup/jajang/mydata'],
             test         => 0,
+            'x.doc.show_result' => 0,
             description  => <<'_',
 
 Backup /home/jajang/mydata to /backup/jajang/mydata using the default number of
@@ -378,7 +379,7 @@ File::RsyBak - Backup files/directories with histories, using rsync
 
 =head1 VERSION
 
-This document describes version 0.34 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-07-14.
+This document describes version 0.35 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-07-31.
 
 =head1 SYNOPSIS
 
@@ -604,15 +605,6 @@ Examples:
 
  backup( source => "/home/jajang/mydata", target => "/backup/jajang/mydata");
 
-Result:
-
- [
-   500,
-   "Error: Can't create target directory : No such file or directory",
-   undef,
-   {},
- ]
-
 Backup /home/jajang/mydata to /backup/jajang/mydata using the default number of
 histories ([-7, 4, 3]).
 
@@ -746,7 +738,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-RsyBa
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-File-RsyBak>.
+Source repository is at L<https://github.com/sharyanto/perl-File-RsyBak>.
 
 =head1 BUGS
 

@@ -1,4 +1,4 @@
-# $Id: Lexer.pm,v 1.50 2012/05/15 21:26:29 pfeiffer Exp $
+# $Id: Lexer.pm,v 1.57 2014/08/03 21:10:36 pfeiffer Exp $
 
 =head1 NAME
 
@@ -142,7 +142,7 @@ sub lex_rule {
 	my $finfo = file_info $cmd, $rule->makefile->{CWD}; # Relative path.
 	$finfo = file_info Mpp::Subs::f_find_program( $cmd, $rule->makefile, $rule->{RULE_SOURCE} ),
 	  $rule->makefile->{CWD}	# Find in $PATH.
-	  if ($cmd !~ /\// || Mpp::is_windows > 1 && $cmd !~ /\\/) && !Mpp::File::exists_or_can_be_built $finfo;
+	  if ($cmd !~ /\// || Mpp::is_windows > 1 && $cmd !~ /\\/) && !Mpp::File::exists_or_can_be_built $finfo, 0;
 	$rule->add_dependency( $finfo );
       }
       next;
@@ -153,8 +153,8 @@ sub lex_rule {
     # Take the backquotes out of parser's way
     my $bq1 = -10;		# pretend initial replacement, length of -backquote
     my $extra = '';
-    while( ($bq1 = Mpp::Text::index_ignoring_single_quotes $action, '`', $bq1 + 10) >= 0 ) {
-      my $bq2 = Mpp::Text::index_ignoring_single_quotes $action, '`', $bq1 + 1; # If not found, this is conveniently -1, eos
+    while( ($bq1 = find_unquoted $action, '`', $bq1 + 10, 1) >= 0 ) {
+      my $bq2 = find_unquoted $action, '`', $bq1 + 1, 1; # If not found, this is conveniently -1, eos
       $extra .= ';' .substr
 	substr( $action, $bq1, $bq2 - $bq1 + 1, '-backquote' ), # Make parser's life easier
 	1, -1;			# append content of backquote, so it will get parsed as normal commands
@@ -166,11 +166,11 @@ sub lex_rule {
     # by '&' or '|', (but do if a ';' precedes the pipeline).
     for $command ( split_commands $action ) {
       while( $command =~ /[<>]/ ) {
-	my $max = max_index_ignoring_quotes $command, '>';
+	my $max = rfind_unquoted $command, '>';
 	my( $expr, $is_in );
 	if( $max > -1 ) {	# have >
 	  $expr = substr $command, $max + 1;
-	  my $lt = max_index_ignoring_quotes $expr, '<';
+	  my $lt = rfind_unquoted $expr, '<';
 	  if( $lt > -1 ) {	# < after >
 	    $max += $lt;
 	    substr $expr, 0, $lt + 1, '';
@@ -180,7 +180,7 @@ sub lex_rule {
 				# Handle '>>' redirectors
 	  }
 	} else {
-	  $max = max_index_ignoring_quotes $command, '<';
+	  $max = rfind_unquoted $command, '<';
 	  if( $max > -1 ) {	# have <
 	    $expr = substr $command, $max + 1;
 	    $is_in = 1;
@@ -211,13 +211,12 @@ sub lex_rule {
       $rule->{MAKEFILE}->setup_environment;
       my %env = %ENV; # copy the set env to isolate command settings
       while ($command =~ s/^\s*(\w+)=//) {
-        my $var=$1;
-                                # Is there an environment variable assignment?
-        my $ix = index_ignoring_quotes $command, ' ';
+        my $var=$1;             # Is there an environment variable assignment?
+        my $ix = find_unquoted $command, ' ';
                                 # Look for the next whitespace.
-        $ix >= 0 or $ix = index_ignoring_quotes $command, "\t";
+        $ix >= 0 or $ix = find_unquoted $command, "\t";
                                 # Oops, it must be a tab.
-        $ix >= 0 or last;       # Can't find the end--something's wrong.
+        $ix >= 0 or last;       # Can't find the end.  It must be a simple assignment.
         $env{$var} = substr $command, 0, $ix, ''; # Chop off the environment variable's value.
         $command =~ s/^\s+//;
       }
@@ -247,17 +246,14 @@ sub lex_rule {
 # C/C++ compilation.  See if this rule looks like it's some sort of a
 # compile:
 #
-  if( $parsers_found == 0 &&	# No parsers found at all?
-      !$rule->{SCANNER_NONE} ) { # From deprecated form of scanner none or skip_word
+  if( $parsers_found == 0 ) {	# No parsers found at all?
     my $tinfo = $rule->{EXPLICIT_TARGETS}[0];
     if( ref($tinfo) eq 'Mpp::File' && # Target is a file?
         $tinfo->{NAME} =~ /\.l?o$/ ) { # And it's an object file?
       my $deps = $rule->{ALL_DEPENDENCIES};
       if( grep { 'Mpp::File' eq ref && $_->{NAME} =~ /\.c(?:|xx|\+\+|c|pp)$/i } values %$deps ) {
                                 # Looks like C source code?
-        warn 'command parser not found for rule at `',
-	  $rule->source,
-	  "'\nalthough it seems to be a compilation command.  This means that makepp will
+        warn $rule->source, ": no command parser found,\nalthough this seems to be a compilation command.  This means that makepp will
 not detect any include files.  To specify a parser for the whole rule,
 add a :parser modifier line to the rule actions, like this:
     : parser gcc-compilation	# Scans source for include files.
@@ -451,11 +447,10 @@ sub add_any_dependency_ {
      relative_filename is_or_will_be_dir( $src ) || $src->{'..'}, $rule->build_cwd),
     $incname,
     $finfo
-  ) and $meta and do {
-    $rule->{SCAN_FAILED} = $finfo if $finfo;
-    die "SCAN_FAILED\n";
-  };
-  $finfo || 1;
+  ) and $meta or
+    return $finfo || 1;
+  $rule->{SCAN_FAILED} = $finfo if $finfo;
+  die "SCAN_FAILED\n";
 }
 
 sub add_dependency {
@@ -466,8 +461,8 @@ sub add_dependency {
 sub add_optional_dependency {
   my ($dir, $dirinfo, $rule, $name, $simple) = @_;
   die if ref $name;
-  my $finfo = file_info($name, $dirinfo);
-  undef $finfo unless Mpp::File::exists_or_can_be_built $finfo;
+  my $finfo = file_info $name, $dirinfo;
+  undef $finfo unless Mpp::File::exists_or_can_be_built $finfo, 0;
   add_any_dependency_(
     $dir, $dirinfo, $rule,
     !$simple,

@@ -2,10 +2,14 @@
 #
 # yapp -- Front end to the Parse::Yapp module
 #
-# (c) Copyright 1998-2001 Francois Desarmenien, all rights reserved.
+# Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+# Copyright © 2017 William N. Braswell, Jr.
+# All Rights Reserved.
 # (see the pod text in Parse::Yapp module for use and distribution rights)
 #
 #
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -60,7 +64,8 @@ class name or whatever-you-call-it) of F<module>.  It defaults to F<grammar>
 
 The compiled output file will be named F<outfile> for your parser module.
 It defaults to F<grammar>.pm or, if you specified the option
-I<-m A::Module::Name> (see below), to F<Name.pm>.
+I<-m A::Module::Name> (see below), to F<Name.pm>, in the current
+working directory.
 
 =item I<-t filename>
 
@@ -106,11 +111,14 @@ None known now :-)
 
 =head1 AUTHOR
 
-Francois Desarmenien <francois@fdesar.net>
+William N. Braswell, Jr. <wbraswell_cpan@NOSPAM.nym.hush.com>
+(Remove "NOSPAM".)
 
 =head1 COPYRIGHT
 
-(c) Copyright 1998-1999 Francois Desarmenien, all rights reserved.
+Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+Copyright © 2017 William N. Braswell, Jr.
+
 See Parse::Yapp(3) for legal use and distribution rights
 
 =head1 SEE ALSO

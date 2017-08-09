@@ -3,6 +3,7 @@
 use Test::More tests => 11;
 use HTTP::Request;
 use HTTP::Response;
+use Module::Metadata;
 
 BEGIN {
 	use_ok( 'Pod::POM::Web' );
@@ -41,9 +42,16 @@ SKIP: {
 
 response_like("/source/HTTP/Request",  qr/HTTP::Request/, "source");
 
-my $regex = qr[HTTP::Request</h1>\s*<small>\(v.\s*$HTTP::Request::VERSION];
-response_like("/HTTP/Request",  $regex, "serve_pod");
+# regex for testing if the generated HTML contains the module title
+# and version number ...  some versions of HTTP::Request don't
+# have a version number
+my $mm = Module::Metadata->new_from_module('HTTP::Request');
+my $http_req_version = $mm && $mm->version;
+my $regex = 'HTTP::Request</h1>\s*<small>';
+$regex   .= '\(v.\s*' . $http_req_version if $http_req_version;
 
+# now the actual test
+response_like("/HTTP/Request",  qr/$regex/, "serve_pod");
 
 sub response_like {
   my ($url, $like, $msg) = @_;

@@ -417,6 +417,13 @@ $minion->once(
         $job->on(failed   => sub { $failed++ });
         $job->on(finished => sub { $finished++ });
         $job->on(spawn    => sub { $pid = pop });
+        $job->on(
+          start => sub {
+            my $job = shift;
+            return unless $job->task eq 'switcheroo';
+            $job->task('add')->args->[-1] += 1;
+          }
+        );
       }
     );
   }
@@ -443,6 +450,11 @@ $job->fail;
 is $err,      "test\n", 'right error';
 is $failed,   1,        'failed event has been emitted once';
 is $finished, 1,        'finished event has been emitted once';
+$minion->add_task(switcheroo => sub { });
+$minion->enqueue(switcheroo => [5, 3]);
+$job = $worker->dequeue(0);
+$job->perform;
+is_deeply $job->info->{result}, {added => 9}, 'right result';
 $worker->unregister;
 
 # Queues
@@ -546,19 +558,29 @@ $job = $worker->register->dequeue(0);
 is $job->id, $id, 'right id';
 is $job->retries, 0, 'job has not been retried';
 $job->perform;
-is $job->info->{attempts}, 2,          'job will be attempted twice';
-is $job->info->{state},    'inactive', 'right state';
-is $job->info->{result}, 'Non-zero exit status (1)', 'right result';
-ok $job->info->{retried} < $job->info->{delayed}, 'delayed timestamp';
+$info = $job->info;
+is $info->{attempts}, 2,                          'job will be attempted twice';
+is $info->{state},    'inactive',                 'right state';
+is $info->{result},   'Non-zero exit status (1)', 'right result';
+ok $info->{retried} < $info->{delayed}, 'delayed timestamp';
 $minion->backend->sqlite->db->query(
   q{update minion_jobs set delayed = datetime('now') where id = ?}, $id);
 $job = $worker->register->dequeue(0);
 is $job->id, $id, 'right id';
 is $job->retries, 1, 'job has been retried once';
 $job->perform;
-is $job->info->{attempts}, 2,        'job will be attempted twice';
-is $job->info->{state},    'failed', 'right state';
-is $job->info->{result}, 'Non-zero exit status (1)', 'right result';
+$info = $job->info;
+is $info->{attempts}, 2,                          'job will be attempted twice';
+is $info->{state},    'failed',                   'right state';
+is $info->{result},   'Non-zero exit status (1)', 'right result';
+ok $job->retry({attempts => 3}), 'job retried';
+$job = $worker->register->dequeue(0);
+is $job->id, $id, 'right id';
+$job->perform;
+$info = $job->info;
+is $info->{attempts}, 3,        'job will be attempted three times';
+is $info->{state},    'failed', 'right state';
+is $info->{result}, 'Non-zero exit status (1)', 'right result';
 $worker->unregister;
 
 # Multiple attempts during maintenance
@@ -641,23 +663,18 @@ is $minion->job($id4)->info->{result}, 'Non-zero exit status (1)',
   'right result';
 $worker->unregister;
 
-SKIP: {
-  skip 'Job stop and pid methods require Minion 6.0', 4
-    unless eval { Minion->VERSION('6.0'); 1 };
-  
-  # Stopping jobs
-  $minion->add_task(long_running => sub { sleep 1000 });
-  $worker = $minion->worker->register;
-  $minion->enqueue('long_running');
-  $job = $worker->dequeue(0);
-  ok $job->start->pid, 'has a process id';
-  ok !$job->is_finished, 'job is not finished';
-  $job->stop;
-  usleep 5000 until $job->is_finished;
-  is $job->info->{state}, 'failed', 'right state';
-  like $job->info->{result}, qr/Non-zero exit status/, 'right result';
-  $worker->unregister;
-}
+# Stopping jobs
+$minion->add_task(long_running => sub { sleep 1000 });
+$worker = $minion->worker->register;
+$minion->enqueue('long_running');
+$job = $worker->dequeue(0);
+ok $job->start->pid, 'has a process id';
+ok !$job->is_finished, 'job is not finished';
+$job->stop;
+usleep 5000 until $job->is_finished;
+is $job->info->{state}, 'failed', 'right state';
+like $job->info->{result}, qr/Non-zero exit status/, 'right result';
+$worker->unregister;
 
 # Job dependencies
 $worker = $minion->remove_after(0)->worker->register;
@@ -698,39 +715,71 @@ is $job->id, $id, 'right id';
 ok $job->finish, 'job finished';
 $worker->unregister;
 
-SKIP: {
-  skip 'Worker process_commands method requires Minion 6.0', 8
-    unless eval { Minion->VERSION('6.0'); 1 };
-  
-  # Worker remote control commands
-  $worker  = $minion->worker->register->process_commands;
-  $worker2 = $minion->worker->register;
-  my @commands;
-  $_->add_command(test_id => sub { push @commands, shift->id })
-    for $worker, $worker2;
-  $worker->add_command(test_args => sub { shift and push @commands, [@_] })
-    ->register;
-  ok $minion->backend->broadcast('test_id', [], [$worker->id]), 'sent command';
-  ok $minion->backend->broadcast('test_id', [], [$worker->id, $worker2->id]),
-    'sent command';
-  $worker->process_commands->register;
-  $worker2->process_commands;
-  is_deeply \@commands, [$worker->id, $worker->id, $worker2->id],
-    'right structure';
-  @commands = ();
-  ok $minion->backend->broadcast('test_id'),       'sent command';
-  ok $minion->backend->broadcast('test_whatever'), 'sent command';
-  ok $minion->backend->broadcast('test_args', [23], []), 'sent command';
-  ok $minion->backend->broadcast('test_args', [1, [2], {3 => 'three'}],
-    [$worker->id]),
-    'sent command';
-  $_->process_commands for $worker, $worker2;
-  is_deeply \@commands,
-    [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id],
-    'right structure';
-  $_->unregister for $worker, $worker2;
-  ok !$minion->backend->broadcast('test_id', []), 'command not sent';
-}
+# Foreground
+$id  = $minion->enqueue(test => [] => {attempts => 2});
+$id2 = $minion->enqueue('test');
+$id3 = $minion->enqueue(test => [] => {parents => [$id, $id2]});
+ok !$minion->foreground($id3 + 1), 'job does not exist';
+ok !$minion->foreground($id3), 'job is not ready yet';
+$info = $minion->job($id)->info;
+is $info->{attempts}, 2,          'job will be attempted twice';
+is $info->{state},    'inactive', 'right state';
+is $info->{queue},    'default',  'right queue';
+ok $minion->foreground($id), 'performed first job';
+$info = $minion->job($id)->info;
+is $info->{attempts}, 1,                   'job will be attempted once';
+is $info->{retries},  1,                   'job has been retried';
+is $info->{state},    'finished',          'right state';
+is $info->{queue},    'minion_foreground', 'right queue';
+ok $minion->foreground($id2), 'performed second job';
+$info = $minion->job($id2)->info;
+is $info->{retries}, 1,                   'job has been retried';
+is $info->{state},   'finished',          'right state';
+is $info->{queue},   'minion_foreground', 'right queue';
+ok $minion->foreground($id3), 'performed third job';
+$info = $minion->job($id3)->info;
+is $info->{retries}, 2,                   'job has been retried twice';
+is $info->{state},   'finished',          'right state';
+is $info->{queue},   'minion_foreground', 'right queue';
+$id = $minion->enqueue('fail');
+eval { $minion->foreground($id) };
+like $@, qr/Intentional failure!/, 'right error';
+$info = $minion->job($id)->info;
+ok $info->{worker}, 'has worker';
+ok !$minion->backend->worker_info($info->{worker}), 'not registered';
+is $info->{retries}, 1,                        'job has been retried';
+is $info->{state},   'failed',                 'right state';
+is $info->{queue},   'minion_foreground',      'right queue';
+is $info->{result},  "Intentional failure!\n", 'right result';
+
+# Worker remote control commands
+$worker  = $minion->worker->register->process_commands;
+$worker2 = $minion->worker->register;
+my @commands;
+$_->add_command(test_id => sub { push @commands, shift->id })
+  for $worker, $worker2;
+$worker->add_command(test_args => sub { shift and push @commands, [@_] })
+  ->register;
+ok $minion->backend->broadcast('test_id', [], [$worker->id]), 'sent command';
+ok $minion->backend->broadcast('test_id', [], [$worker->id, $worker2->id]),
+  'sent command';
+$worker->process_commands->register;
+$worker2->process_commands;
+is_deeply \@commands, [$worker->id, $worker->id, $worker2->id],
+  'right structure';
+@commands = ();
+ok $minion->backend->broadcast('test_id'),       'sent command';
+ok $minion->backend->broadcast('test_whatever'), 'sent command';
+ok $minion->backend->broadcast('test_args', [23], []), 'sent command';
+ok $minion->backend->broadcast('test_args', [1, [2], {3 => 'three'}],
+  [$worker->id]),
+  'sent command';
+$_->process_commands for $worker, $worker2;
+is_deeply \@commands,
+  [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id],
+  'right structure';
+$_->unregister for $worker, $worker2;
+ok !$minion->backend->broadcast('test_id', []), 'command not sent';
 
 $minion->reset;
 

@@ -3,9 +3,9 @@
 makepp;
 
 n_files 'n_files_1';
-c_echo '/* unimportant change */', '-o', $_ for qw(t-db2.sqc t-proc.pc);
+c_echo '/* unimportant change */', "-o>>$_" for qw(t-db2.sqc t-proc.pc);
 
-makepp qw(t-db2.c t-proc.c);
+makepp qw(xt-db2.c xt-proc.c);
 ###	37	644	1103319650	1319890767	Makeppfile
 #
 # Alas all embedded SQL/C precompilers vary wildly in how they work.  Test a few very different types.

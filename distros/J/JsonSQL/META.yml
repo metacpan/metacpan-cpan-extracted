@@ -28,5 +28,5 @@ requires:
   perl: '5.014'
   strict: '0'
   warnings: '0'
-version: '0.4'
+version: '0.41'
 x_serialization_backend: 'YAML::Tiny version 1.69'

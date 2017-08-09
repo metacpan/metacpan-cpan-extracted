@@ -1,8 +1,19 @@
+#
+# This file is part of Apache-Singleton
+#
+# This software is copyright (c) 2009 by Michael Schout.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
 package Apache::Singleton::Process;
-$Apache::Singleton::Process::VERSION = '0.16';
+$Apache::Singleton::Process::VERSION = '0.17';
 # ABSTRACT: One instance per One Process
 
 use strict;
+use warnings;
+
 use base 'Apache::Singleton';
 
 no strict 'refs';
@@ -42,7 +53,7 @@ Apache::Singleton::Process - One instance per One Process
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -59,7 +70,7 @@ L<Apache::Singleton>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/apache-singleton>
+The development version is on github at L<https://github.com/mschout/apache-singleton>
 and may be cloned from L<git://github.com/mschout/apache-singleton.git>
 
 =head1 BUGS

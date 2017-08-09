@@ -1,10 +1,10 @@
-# $Id: Makefile.pm,v 1.165 2012/06/09 20:37:02 pfeiffer Exp $
+# $Id: Makefile.pm,v 1.184 2016/09/28 20:36:49 pfeiffer Exp $
 package Mpp::Makefile;
 
 use Mpp::Glob qw(wildcard_do);
 use Mpp::Event qw(wait_for);
-use Mpp::Text qw(max_index_ignoring_quotes index_ignoring_quotes split_on_whitespace split_on_colon
-		 unquote unquote_split_on_whitespace requote hash_neq);
+use Mpp::Text qw(rfind_unquoted find_unquoted split_on_whitespace split_on_colon
+		 unquote unquote_split_on_whitespace hash_neq);
 use Mpp::Subs;
 use Mpp::Cmds ();
 use Mpp::File;
@@ -252,11 +252,6 @@ sub expand_expression {
       *{"$self->{PACKAGE}::f_$orig"}{CODE};
 				# See if it's a known function.
     if( $code ) {
-      if( $Mpp::Makefile::legacy_functions && !$expanded && !*{"Mpp::Subs::f_$rtn"}{CODE} ) {
-	# deprecated emergency switch to allow functions to work like before.
-	$rest_of_line = expand_text $self, $rest_of_line, $makefile_line;
-	$expanded = 1;
-      }
       $result = eval {		# Evaluate the function.
 	local $_;		# Prevent really strange head-scratching errors.
 	local $Mpp::makefile = $self; # Pass the function a reference to the makefile.
@@ -275,7 +270,7 @@ sub expand_expression {
   $expr = expand_text $self, $expr, $makefile_line unless $expanded;
   if( $expr =~ s/^&(?=.)// ) { # & alone is a silly variable
     my( $cmd, @args ) = unquote_split_on_whitespace $expr;
-    local $Mpp::Subs::rule = { MAKEFILE => $self, RULE_SOURCE => $makefile_line };
+    local $Mpp::Subs::rule = bless { MAKEFILE => $self, RULE_SOURCE => $makefile_line }, 'Mpp::Rule';
     open my $ofh, '>&STDOUT' or die;
     close STDOUT;
     open STDOUT, '>:crlf', \($result = '') or die $!; # \$result gives undef warning in 5.8.1 - 5.10.0
@@ -301,18 +296,20 @@ sub expand_expression {
 				# Substitution reference ('x:%.o=%.c' or 'x:o=c')?
     my $pct = 0 <= index $2, '%'; # Is it the 1st form?
     $result = join ' ',
-      Mpp::Text::pattern_substitution $pct ? ($2, $3) : ("%$2", "%$3"),
+      Mpp::Text::pattern_substitution $pct ? my @copy = ($2, $3) : ("%$2", "%$3"), # copy in case next line recurses here, inner sticks after that
 	split_on_whitespace expand_variable( $self, $1, $makefile_line );
   } else {			# Must be a vanilla variable to expand.
-    $result = expand_variable( $self, $expr, $makefile_line );
+    return expand_variable( $self, $expr, $makefile_line );
   }
 
  done:
-  if( !defined $result ) {
-    warn "expression `$expr' expanded to an undefined value at `$makefile_line'.\n";
-    '';
-  } else {
+  if( defined $result ) {
+    Mpp::log EXPR => $expr, $result, $makefile_line || ''
+      if Mpp::DEBUG;
     $result;
+  } else {
+    warn "$makefile_line: expression `$expr' expanded to an undefined value.\n";
+    '';
   }
 }
 
@@ -343,7 +340,9 @@ our $rule_include; # undef unless reading an :include .d file. 1 before rule exe
 # d) The mode is one of
 #	false	simply expand the variable
 #	1	return (expand_flag, unexpanded_value)
-#	other	return whether the variable is defined
+#	2	return whether the variable is defined
+#	3	skip private vars
+#	4	start private and package vars
 #
 sub expand_variable {
   my( $self, $var, $makefile_line, $mode ) = @_; # Name the arguments.
@@ -361,8 +360,13 @@ sub expand_variable {
 				# mechanism, so we can't just loop through
 				# these:
 
+    if( defined $mode && $mode > 2 ) {
+      undef $mode;		# Do normal var expansion
+      goto "attempt$_[3]";	# $mode we just nuked.
+    }
+
 # 1st attempt:
-    if( $var =~ /^\d+$/ || exists $Mpp::Subs::perl_unfriendly_symbols{$var} ) { # Is it one of the call
+    if( length( $var ) < 3 and $var =~ /^\d+$/ || exists $Mpp::Subs::perl_unfriendly_symbols{$var} ) { # Is it one of the call
 				# or 1-char symbols like '$(11)' or '$@' that conflict with Perl variables?
 				# The call fn may eval more than got passed.  These can't be per target or global.
       if( ref $Mpp::Subs::perl_unfriendly_symbols{$var} ) {
@@ -394,7 +398,7 @@ sub expand_variable {
 	last;
     }
 
-# 3rd attempt:
+  attempt3:
     defined( $result = ${"$self->{PACKAGE}::$var"} ) and
 				# Get it from the makefile.
       $varref = \${"$self->{PACKAGE}::$var"},
@@ -447,14 +451,21 @@ sub expand_variable {
     $reexpand = $reexpand->{VAR_REEXPAND}{$var};
 
   if( !$mode ) {
-    defined $result or $result = ''; # Variable not found--make it defined.
+    unless( defined $result ) {	# Variable not found--make it defined.
+      $result = '';
+      warn $makefile_line || '', ": undefined variable '$var'\n" if $Mpp::warn_undef_var and $var !~ /^makepp_/;
+    }
     if( $reexpand ) {
+      Mpp::log VAR_EXPAND => $var, $result, $makefile_line || ''
+	if Mpp::DEBUG;
       $result = expand_text $self, $result, $makefile_line;
 				# Reexpand any variables inside.
       if( $reexpand == 2 ) {
 	$$varref = $result;
 	$reexpandref->{VAR_REEXPAND}{$var} = 0;
       }
+    } elsif( Mpp::DEBUG ) {
+      Mpp::log VAR => $var, $result, $makefile_line || '';
     }
     $result;
   } elsif( $mode == 1 ) {
@@ -482,7 +493,7 @@ sub find_makefile_in {
   for( @root_makefiles, qw(Makeppfile Makeppfile.mk), $_[1] ? () : qw(makefile Makefile) ) {
     my $trial_makefileinfo = file_info $_, $dir;
     return $trial_makefileinfo
-      if Mpp::File::exists_or_can_be_built $trial_makefileinfo;
+      if Mpp::File::exists_or_can_be_built $trial_makefileinfo, 0;
   }
 }
 
@@ -490,17 +501,13 @@ sub find_makefile_in {
 # This subroutine is called when we have discovered a new directory and we
 # want to load a makefile implicitly from it, if we haven't already.
 #
-# Argument: the Mpp::File structure for the relevant directory.
+# Argument: the Mpp::File structure for the relevant directory.  This
+# directory must not already have a {MAKEINFO} member!
 #
 sub implicitly_load {
-  $Mpp::implicitly_load_makefiles or return;
-				# Don't do anything if we don't implicitly
-				# load makefiles from directories.
-
   my $dirinfo = $_[0];
 
-  exists $dirinfo->{MAKEINFO} and return;
-				# Already tried to load something.
+  $dirinfo->{MAKEINFO} = undef;	# Remember that we tried to load something.
   Mpp::File::is_writable( $dirinfo ) ||	# Directory already exists?
     !exists $dirinfo->{xEXISTS} && is_or_will_be_dir( $dirinfo ) &&
     exists $dirinfo->{ALTERNATE_VERSIONS}
@@ -513,7 +520,7 @@ sub implicitly_load {
 # See if this directory or any of its parents is marked for no implicit
 # loading.
 #
-  for (my $pdirinfo = $dirinfo; $pdirinfo; $pdirinfo = $pdirinfo->{'..'} || '') {
+  for( my $pdirinfo = $dirinfo; $pdirinfo; $pdirinfo = $pdirinfo->{'..'} || '' ) {
     exists $pdirinfo->{xNO_IMPLICIT_LOAD} and return;
   }
 
@@ -524,13 +531,8 @@ sub implicitly_load {
 	      \%Mpp::global_ENV,
 	      $Mpp::implicit_load_makeppfile_only) };
 				# Try to load the makefile.
-  $dirinfo->{MAKEINFO} ||= undef;
-				# Remember that we tried to load something,
-				# even if we failed.
-  if ($@ &&			# Some error?
-      $@ !~ /can\'t find a makefile in directory/) { # Unrecognized error?
-    die $@;			# Resignal the error.
-  }
+  die $@ if			# Resignal unrecognized error.
+    $@ && $@ !~ /can\'t find a makefile in directory/;
 }
 
 =head2 cleanup_vars
@@ -742,7 +744,10 @@ sub load {
       } elsif( $var_changed = hash_neq \%this_ENV, $self->{ENVIRONMENT}, 1 ) {
 	$var_changed .= " old: $self->{ENVIRONMENT}{$var_changed}, new: $this_ENV{$var_changed}";
       } elsif( "@$include_path" ne "@{$self->{INCLUDE_PATH}}" ) {
-	  $var_changed = 'include path';
+	$var_changed = 'include path';
+      } elsif( defined $self->{REINCLUDE} && !ref $self->{REINCLUDE} ) {
+	undef $self->{REINCLUDE};
+	$var_changed .= 'late rules for include statements';
       } else {
 	return $mdinfo->{MAKEINFO}; # No need to reload the makefile--just reuse what we've got.
       }
@@ -803,6 +808,7 @@ sub load {
 		    ENVIRONMENT => \%this_ENV,
 		    LOAD_IDX => 0 # First time this has been loaded.
 		  };		# Allocate our info structure.
+    $Mpp::rm_stale_files or undef $self->{REINCLUDE}; # Allow gmake style include stmt before rule.
   }
   $makepp_simple_concatenation_seen ||= expand_variable $self, 'makepp_simple_concatenation', 'init'; # from env or command?
   $mdinfo->{MAKEINFO} = $self;	# Remember for later what the makefile is.
@@ -816,7 +822,7 @@ sub load {
     *rule = \$Mpp::Subs::rule;	# Also pass in the $rule symbol.
     our $makefile = $self;	# Tell the makefile subroutines about it.
     our $MAKECMDGOALS = $makecmdgoals; # Set up this special variable.
-    our $MAKEPP_VERSION = $Mpp::VERSION;
+    our $MAKEPP_VERSION = $Mpp::Text::VERSION;
   };
   $mpackage .= '::';
 
@@ -894,10 +900,9 @@ sub load {
   undef $self->{xINITIALIZED};
 
 #
-# Now see if the makefile is up to date.  If it's not, we just wipe it out
-# and reload.  This may leave some bogus rules lying around.  Oh well.
-# This must be done after setting up the EXPORTS variables above, because
-# makefile rebuilding might depend on that.
+# Now see if the makefile is up to date.  If it's not, we just wipe it out and reload.
+# This may leave some bogus rules lying around.  Oh well.  This must be done after setting up
+# the EXPORTS variables above, because makefile rebuilding might depend on that.
 #
   if( Mpp::MAKEPP && $Mpp::remake_makefiles && # This often causes problems, so we provide
 				# a way of turning it off.
@@ -909,28 +914,36 @@ sub load {
     if($minfo->{RULE}) {
       require Mpp::BuildCheck::target_newer; # Make sure the method is loaded.
       local $Mpp::BuildCheck::default = $Mpp::BuildCheck::target_newer::target_newer;
-				# Use the target_newer technique for rebuilding
-				# makefiles, since makefiles are often modified
-				# by programs like configure which aren't
-				# under the control of make.
+				# Use the target_newer technique for rebuilding makefiles, since makefiles are
+				# often modified by programs like configure which aren't under the control of make.
       wait_for Mpp::build($minfo) and # Try to rebuild the makefile.
 	die "can't find or build " . absolute_filename( $minfo ) . "\n";
     }
     if ($old_n_files != $Mpp::n_files_changed) {
 				# Did we change anything?
-      $self->{ENVIRONMENT} = { I_rebuilt_it => 'FORCE RELOAD'};
-				# Wipe out the environment, so we force a
-				# reload.
-      local $Mpp::remake_makefiles = 0; # Don't try to keep on remaking the
-				# makefile.
-      return &load;		# Call ourselves with the same arguments to
-				# force rereading the makefile.
+      $self->{ENVIRONMENT} = { I_rebuilt_it => 'FORCE RELOAD' };
+				# Wipe out the environment, so we force a reload.
+      local $Mpp::remake_makefiles = 0; # Don't try to keep on remaking the makefile.
+      return &load;		# Call ourselves with the same arguments to force rereading the makefile.
     }
   }
-  while( @Mpp::Subs::defer_include ) {
-    local $Mpp::Subs::defer_include;
-    my $sub = shift @Mpp::Subs::defer_include;
-    &$sub( splice @Mpp::Subs::defer_include, 0, 3 );
+  if( $self->{REINCLUDE} ) {
+    if( Mpp::Subs::s_include join( ' ', keys %{$self->{REINCLUDE}} ), $self, 'x:1', {check => 1} ) { # Did any become includable?
+      $self->{REINCLUDE} = 1;	# Special reiterate marker
+      return &load;		# Call ourselves with the same arguments to force rereading the makefile.
+    } else {
+      my $warned_stale;
+      while( my( $file, $arr ) = each %{$self->{REINCLUDE}} ) {
+	if( $arr->[0] ) {
+	  warn "`" . absolute_filename( $arr->[0] ) . "' at `$arr->[2]" .
+	    ($warned_stale ? "' is also stale.\n" : $Mpp::Rule::stale_warning);
+	  $warned_stale = 1;
+	} elsif( !$arr->[3] ) {	# ignorable
+	  die "$arr->[2]: can't find include file `$file'\n";
+	}
+      }
+    }
+    # Continue, all missing files were only -include.
   }
   if( my $fh = $self->{CWD}{DUMP_MAKEFILE} ) {
     # Dump the final variables too.
@@ -1004,7 +1017,7 @@ sub assign {
                                 # This allows a user to override buggy
                                 # read-only makefiles.
 
-  warn "MAKE redefined at `$makefile_line', recursive make won't work as expected\n"
+  warn "$makefile_line: MAKE redefined, recursive make won't work as expected\n"
     if $name eq 'MAKE';
 
   if( $type == ord '?' ) {
@@ -1036,7 +1049,7 @@ sub assign {
     }
   }
 
-  if( !$type ) {	# Plain assignment?
+  if( !$type ) {		# Plain assignment?
 
     $$varref = $value;
     $reexpand = 1;		# Remember to expand this variable's contents
@@ -1045,6 +1058,12 @@ sub assign {
   } elsif( $type == ord ':' ) { # Immediate evaluation?
 
     $$varref = expand_text $self, $value, $makefile_line;
+
+  } elsif( $type == ord ';' ) { # Postponed evaluation once?
+
+    $$varref = $value;
+    $reexpand = 2;		# Remember to expand this variable's contents
+				# when it's invoked, and then change to :=.
 
   } elsif( $type == ord '+' ) { # Append?
 
@@ -1060,12 +1079,6 @@ sub assign {
       expand_text $self, $value, $makefile_line;
 				# Expand the RHS if it was set with :=
 				# previously.
-
-  } elsif( $type == ord ';' ) { # Postponed evaluation once?
-
-    $$varref = $value;
-    $reexpand = 2;		# Remember to expand this variable's contents
-				# when it's invoked, and then change to :=.
 
   } elsif( $type == ord '&' ) { # Prepend?
 
@@ -1110,6 +1123,7 @@ sub assign {
 
 #
 # Grok a potential assignment statement.  Arguments:
+# $_ the assignment, which may be modified.
 # a) The makefile.
 # b) The makefile line number (for error messages).
 #  ) $_ is the implicit argument containing the assignment.
@@ -1153,9 +1167,9 @@ sub grok_assignment {
     return unless defined $_[2];
   }
 
+  $keyword->{define} ? s/[ \t]*\n\Z// : s/\s+$//;
   my $var_value = substr $_, $_[2] + 1;
   $var_value =~ s/^\s+//;
-  $var_value =~ s/\s+$//;
 
   my @list;
   if( $var_name =~ /:/ and (@list = split_on_colon $var_name) > 1 ) {
@@ -1170,14 +1184,14 @@ sub grok_assignment {
 # or
 #   target1 target2: VAR += val
 #
-    $var_name = $list[1];
-    $var_name =~ s/^\s+//;	# Strip leading whitespace (again).
+    ($var_name = $list[1])
+      =~ s/^\s+//;		# Strip leading whitespace (again).
     $keyword->{override} = 1 if $var_name =~ s/^override\s+//;
   }
 
   if( @list ) {			# It's a target-specific assignment.
-    my $targets = $list[0];	# Get the targets for which this variable applies.
-    $targets =~ tr/%/*/;	# Convert % wildcard to normal filename wildcard.
+    (my $targets = $list[0])	# Get the targets for which this variable applies.
+      =~ tr/%/*/;		# Convert % wildcard to normal filename wildcard.
     &cd;			# Make sure we're in the right directory to expand the wildcard.
     wildcard_do {		# This block is called for every file that matches the wildcard.
       local $private = $_[0];	# Prior PRIVATE_VARS for +=, and for storing new value.
@@ -1225,7 +1239,7 @@ sub grok_rule {
 # x.o: x.c; @echo this is a stupid syntax
 #	$(CC) $< -o $@
 #
-  my $idx = index_ignoring_quotes $after_colon[-1], ';';
+  my $idx = find_unquoted $after_colon[-1], ';';
   if ($idx >= 0) {
     $action = substr $after_colon[-1], $idx+1;
     substr( $after_colon[-1], $idx ) = '';
@@ -1241,7 +1255,7 @@ sub grok_rule {
   while (defined($_ = read_makefile_line_stripped(1))) {
 				# Get the next line.
     my $whitespace_len = Mpp::Text::strip_indentation;
-    if( /^$/ or /^#/ ) {
+    if( ord == ord '#' or /^$/ ) {
       $last_line_was_blank = 1 if !$whitespace_len or /^$/;
 				# Blank line or comment at right margin?
       next;			# Skip the blank or commented out lines.
@@ -1300,99 +1314,68 @@ sub grok_rule {
 	 $last_line_was_blank) ||
 	($whitespace_len >= 8 &&
 	 $whitespace_len <= $target_whitespace_len)) {
-      substr $_, 0, 0, ' ' x $target_whitespace_len;
-				# Put the whitespace back (in case it's the
-				# next target).
+      substr $_, 0, 0, ' ' x $whitespace_len;
+				# Put the whitespace back (in case it's the next target).
       last;			# We've found the end of this rule.
     }
-    if (/^:\s*((?:build[-_]?c(?:ache|heck)|dispatch|env(?:ironment)?|foreach|multiple[-_]?rules[-_]?ok|parser|s(?:ignature|canner|martscan)|quickscan|last[-_]?chance)\b.*)/ ) {
+    if( /^:\s*((?:build[-_]?c(?:ache|heck)|dispatch|env(?:ironment)?|foreach|multiple[-_]?rules[-_]?ok|parser|s(?:ignature|canner|martscan)|quickscan|last[-_]?chance|no[-_]?phony)\b.*)/ ) {
 				# A colon modifier?
       push @after_colon, $1;
-      if( (my $i = index_ignoring_quotes $after_colon[-1], '#') > 0 ) {
+      if( (my $i = find_unquoted $after_colon[-1], '#') > 0 ) {
 	substr( $after_colon[-1], $i ) = ''
       }
     } else {			# Not a colon modifier?
       $action .= $_;		# Must be an action for the rule.
     }
 
-    $first_action_indent ||= $whitespace_len; # If this was the first line,
-				# remember its indentation.
+    $first_action_indent ||= $whitespace_len; # Remember first line's indentation.
     $last_line_was_blank = 0;	# This line was not blank.
   }
 
   unshift @hold_lines, $_ if $_; # We read too far, so put this line back.
+  Mpp::log RULE_GROK => $skipping ? 'skip' : 'grok', $makefile_line, $target_string, join( ' :', '', @after_colon ), $action
+    if Mpp::DEBUG;
   return if $skipping;
 
 #
 # Pull off the : modifiers.
 #
-  my( $foreach, $signature, $signature_name, $signature_override, $build_check, $build_cache, $have_build_cache );
-  my( $lexer, $parser );
-  my $conditional_scanning;
-  my $multiple_rules_ok;
-  my $last_chance_rule;
-  my $dispatch;
-  my $env_dep_str;
-  my $include;
+  my( $foreach, $signature, $signature_name, $signature_override, $build_check, $build_cache, $lexer, $parser,
+      $conditional_scanning, $multiple_rules_ok, $last_chance_rule, $dispatch, $env_dep_str, $include, @no_phony );
 
-  while (@after_colon > 1) {	# Anything left?
-    if ($after_colon[-1] =~ /^\s*foreach\s+(.*?)\s*$/) {
+  while( @after_colon > 1 ) {	# Anything left?
+    if( $after_colon[-1] =~ /^\s*foreach\s+(.*?)\s*$/ ) {
       $foreach and die "$makefile_line: multiple :foreach clauses\n";
       $foreach = expand_text $self, $1, $makefile_line;
-    } elsif ($after_colon[-1] =~ /^\s*build[-_]?cache\s+(.*?)\s*$/) {
-                                # Specify a local build cache for this rule?
-      $build_cache and die "$makefile_line: multiple :build_cache clauses\n";
-      $build_cache = expand_text $self, $1, $makefile_line;
-      if( $build_cache eq 'none' ) {
-        $build_cache = undef;   # Turn off the build cache mechanism.
+      @no_phony = \2;
+    } elsif( $after_colon[-1] =~ /^\s*build[-_]?c(?:ache|heck())\s+(.*?)\s*$/ ) { # Build cache or check?
+      die "$makefile_line: multiple :build_" . (defined $1 ? 'check' : 'cache') . " clauses\n"
+	if defined $1 ? $build_check : $build_cache;
+      my $name = expand_text $self, $2, $makefile_line;
+      if( defined $1 ) {
+	$build_check = eval "use Mpp::BuildCheck::$name; \$Mpp::BuildCheck::${name}::$name";
+	# Try to load the method.
+	defined $build_check or
+	  die "$makefile_line: invalid build_check method $name\n";
+      } elsif( $name eq 'none' ) {
+	$build_cache = 0;	# Turn off the build cache mechanism.
       } else {
-        require Mpp::BuildCache;
-        $build_cache = new Mpp::BuildCache( absolute_filename file_info $build_cache, $self->{CWD} );
+	require Mpp::BuildCache;
+	$build_cache = new Mpp::BuildCache( absolute_filename file_info $name, $self->{CWD} );
       }
-      $have_build_cache = 1;    # Remember that we have a build cache.
-    } elsif ($after_colon[-1] =~ /^\s*build[-_]?check\s+(.*?)\s*$/) { # Build check class?
-      $build_check and die "$makefile_line: multiple :build_check clauses\n";
-      my $name = expand_text $self, $1, $makefile_line;
-      $build_check = eval "use Mpp::BuildCheck::$name; \$Mpp::BuildCheck::${name}::$name" || # Try to load the method.
-	eval "use BuildCheck::$name; warn qq!$makefile_line: name BuildCheck::$name is deprecated, rename to Mpp::BuildCheck::$name\n!; \$BuildCheck::${name}::$name";
-      defined $build_check or
-        die "$makefile_line: invalid build_check method $name\n";
-    } elsif ($after_colon[-1] =~ /^\s*signature\s+(.*?)\s*$/) { # Specify signature class?
+    } elsif( $after_colon[-1] =~ /^\s*signature\s+(.*?)\s*$/ ) { # Specify signature class?
       $signature and die "$makefile_line: multiple :signature clauses\n";
       my $name = expand_text $self, $1, $makefile_line;
       $signature = Mpp::Signature::get( $name, $makefile_line );
       if( defined $signature ) {
-	  $signature_name = $name;
-	  $signature_override = 1;
+	$signature_name = $name;
+	$signature_override = 1;
       } else {
-# For backward compatibility, accept build check methods as a name to
-# :signature as well.
-        $build_check = eval "use Mpp::BuildCheck::$name; \$Mpp::BuildCheck::${name}::$name" ||
-	  eval "use BuildCheck::$name; warn qq!$makefile_line: name BuildCheck::$name is deprecated, rename to Mpp::BuildCheck::$name\n!; \$BuildCheck::${name}::$name";
-        if( defined $build_check ) {
-	  warn "$makefile_line: requesting build check method $name via :signature is deprecated.\n";
-        } else {
-          die "$makefile_line: invalid signature class $name\n";
-        }
+	die "$makefile_line: invalid signature class $name\n";
       }
-    } elsif ($after_colon[-1] =~ /^\s*scanner\s+([-\w]+)/) { # Specify scanner class?
-      warn "$makefile_line: rule clause :scanner deprecated, please use :parser\n";
-      $lexer and die "$makefile_line: multiple :scanner clauses\n";
-      my $scanner_name = expand_text $self, $1, $makefile_line;
-      $scanner_name =~ tr/-/_/;
-      $lexer = *{"$self->{PACKAGE}::parser_$scanner_name"}{CODE};
-      unless(defined $lexer) {
-        my $scanref = *{"$self->{PACKAGE}::scanner_$scanner_name"}{CODE};
-        defined($scanref) or
-          die "$makefile_line: invalid scanner $scanner_name\n";
-        $lexer = sub {
-          require Mpp::ActionParser::Legacy;
-          Mpp::ActionParser::Legacy->new($scanref);
-        };
-      }
-    } elsif ($after_colon[-1] =~ /\s*(?:smart()|quick)[-_]?scan/) {
+    } elsif( $after_colon[-1] =~ /\s*(?:smart()|quick)[-_]?scan/ ) {
       $conditional_scanning = defined $1;
-    } elsif ($after_colon[-1] =~ /^\s*(?:command[-_]?)?parser\s+(.*?)\s*$/) {
+    } elsif( $after_colon[-1] =~ /^\s*(?:command[-_]?)?parser\s+(.*?)\s*$/ ) {
       $parser and die "$makefile_line: multiple :command-parser clauses\n";
       $parser = unquote expand_text $self, $1, $makefile_line;
       $parser =~ tr/-/_/;
@@ -1401,7 +1384,7 @@ sub grok_rule {
 	*{"$parser\::factory"}{CODE} ||
 	*{"Mpp::CommandParser::$parser\::factory"}{CODE} ||
 	die "$makefile_line: invalid command parser $parser\n";
-    } elsif ($after_colon[-1] =~ /^\s*multiple[-_]?rules[-_]?ok/) {
+    } elsif( $after_colon[-1] =~ /^\s*multiple[-_]?rules[-_]?ok/ ) {
       # This is an ugly hack to solve an unusual problem, and it shouldn't
       # be used by the general public.  The reason for it is that when you
       # have a directory with a makefile that needs to read lots of generated
@@ -1416,17 +1399,19 @@ sub grok_rule {
       # (so that buildable targets can be computed lazily), but that would
       # require a significant re-design of makepp.
       $multiple_rules_ok = 1;
-    } elsif ($after_colon[-1] =~ /^\s*env(?:ironment)?\s+(.*?)\s*$/) {
+    } elsif( $after_colon[-1] =~ /^\s*env(?:ironment)?\s+(.*?)\s*$/ ) {
       if($env_dep_str) {
         $env_dep_str .= " $1";
       } else {
         $env_dep_str = $1;
       }
-    } elsif ($after_colon[-1] =~ /^\s*dispatch\s+(.*?)\s*$/) {
+    } elsif( $after_colon[-1] =~ /^\s*dispatch\s+(.*?)\s*$/ ) {
       $dispatch = $1;
-    } elsif ($after_colon[-1] =~ /^\s*last[-_]?chance/) {
+    } elsif( $after_colon[-1] =~ /^\s*last[-_]?chance/ ) {
       $last_chance_rule = 1;
-    } elsif ($after_colon[-1] =~ /^\s*include\s+(.*?)\s*$/) {
+    } elsif( $after_colon[-1] =~ /^\s*no[-_]?phony/ ) {
+      @no_phony = \2;
+    } elsif( $after_colon[-1] =~ /^\s*include\s+(.*?)\s*$/ ) {
       $include = $1;
     } else {			# Something we don't recognize?
       last;
@@ -1480,18 +1465,18 @@ sub grok_rule {
 #
   if (@after_colon == 2) {
     $foreach and die "$makefile_line: :foreach and GNU static pattern rule are incompatible\n";
-    $foreach = $target_string;
     $after_colon[0] =~ /%/ or die "$makefile_line: no pattern in static pattern rule\n";
 				# Don't check for last chance, because we have finite set of targets
-    (@after_colon) = "\$(filesubst $after_colon[0], $after_colon[1], \$(foreach),_)";
+    $foreach = $target_string;
     $target_string = '$(foreach)';
+    (@after_colon) = "\$(filesubst $after_colon[0], $after_colon[1], \$(foreach),_)";
   }
 
   @after_colon == 1 or die "$makefile_line: extra `:'\n";
 				# At this point, the only thing we haven't
 				# interpreted after the colon should be the
 				# dependency string.
-  my @deps = split_on_whitespace $after_colon[0]; # Separate the dependencies.
+  my @deps = split_on_whitespace $after_colon[0], 1; # Separate the dependencies.
 #
 # Handle GNU make's regular pattern rules.  We convert a rule like
 #   %.o: %.c
@@ -1499,14 +1484,14 @@ sub grok_rule {
 #   $(filesubst %.c, %.o, $(foreach)) : $(foreach) : foreach **/*.c
 #
   my $pattern_dep = 0;
-  my $target_pattern = index_ignoring_quotes( $expanded_target_string, '%' ) >= 0;
+  my $target_pattern = find_unquoted( $expanded_target_string, '%', 0, 2 ) >= 0;
   if( $target_pattern ) { # Pattern rule?
     # find the first element of @deps that contains a pattern character, '%'
     for my $dep ( @deps ) {
-      last if index_ignoring_quotes( $dep, '%' ) >= 0;
+      last if find_unquoted( $dep, '%', 0, 2 ) >= 0;
       ++$pattern_dep;
     }
-    if ($pattern_dep < @deps) {  # does such an element exist?
+    if( $pattern_dep < @deps ) {  # does such an element exist?
       unless ($foreach) { # No foreach explicitly specified?
         $foreach = $deps[$pattern_dep]; # Add one, making wildcard from first pattern dep.
 	expand_variable( $self, 'makepp_percent_subdirs', $makefile_line ) && $foreach =~ s@^%@**/*@ or
@@ -1539,7 +1524,7 @@ sub grok_rule {
     }
   };
 
-  if ($foreach) {		# Is there a foreach clause?
+  if( $foreach ) {		# Is there a foreach clause?
     die "$makefile_line: Combining \":foreach\" and \":last_chance\" is not supported.\n" if $last_chance_rule;
 ###### TODO: This needs to handle rules with no actions here, as well as
 ###### below where there's no :foreach clause.
@@ -1548,25 +1533,22 @@ sub grok_rule {
 # Handle our static pattern rule, with the % modifiers:
 #
     if( $target_pattern ) { # Pattern rule?
-
       $target_string = "\$(filesubst $deps[$pattern_dep], $target_string, \$(foreach),_)";
       for( @deps[$pattern_dep+1..$#deps] ) { # Handle any extra dependencies:
-	index_ignoring_quotes( $_, '%' ) >= 0 and
+	find_unquoted( $_, '%', 0, 2 ) >= 0 and
 	  $_ = "\$(filesubst $deps[$pattern_dep], $_, \$(foreach),_)";
       }
       $include = "\$(filesubst $deps[$pattern_dep], $include, \$(foreach),_)"
-	if $include && index_ignoring_quotes( $include, '%' ) >= 0;
+	if $include && find_unquoted( $include, '%', 0, 2 ) >= 0;
       $deps[$pattern_dep] = '$(foreach)'; # This had better match the wildcard specified
-				# in the foreach clause.  I don't know of
-				# any way to check that.
+				# in the foreach clause.  TODO: this is buggy with resulting multiple %. (limr mail)
       $after_colon[0] = "@deps";
     }
     &cd;			# Make sure we're in the correct directory,
 				# or everything will be all messed up.
 
     wildcard_do { # This block is called once for each file that matches the foreach clause.
-      my( $finfo, $plain ) = @_;
-				# Get the arguments.
+      my( $finfo, $plain ) = @_; # Get the arguments.
 
       return if exists $finfo->{PATTERN_RULES} # Don't keep on applying same rule.
 	and grep $_ eq $makefile_line_dir, @{$finfo->{PATTERN_RULES}};
@@ -1591,7 +1573,7 @@ sub grok_rule {
       local $Mpp::Subs::rule = $rule; # Put it so $(foreach) can properly expand.
       $build_check and $rule->set_build_check_method($build_check);
       $signature and $rule->set_signature_class( $signature_name, 0, $signature, $signature_override );
-      $have_build_cache and $rule->set_build_cache($build_cache);
+      defined $build_cache and Mpp::BuildCache::set( $rule, $build_cache );
       $lexer and $rule->{LEXER} = $lexer;
       $parser and $rule->{PARSER} = $parser;
       defined($conditional_scanning) and
@@ -1601,10 +1583,8 @@ sub grok_rule {
 	[$makefile_line_dir, @{$finfo->{PATTERN_RULES}}] : [$makefile_line_dir]
 	unless $plain;		# Mark it as a pattern rule if it was done with a wildcard.
 
-      my @targets = split_on_whitespace(expand_text($self, $target_string, $makefile_line));
+      foreach( split_on_whitespace expand_text $self, $target_string, $makefile_line ) {
 				# Get the targets for this rule.
-
-      foreach (@targets) {
 	my $tinfo = file_info unquote(), $self->{CWD}; # Access the target object.
 	Mpp::File::set_rule $tinfo, $rule; # Update its rule.  This will be ignored if
 				# it is overriding something we shouldn't override.
@@ -1612,12 +1592,11 @@ sub grok_rule {
 				# a candidate for the first target in the file.
 	  $self->{FIRST_TARGET} ||= $tinfo;
 				# Remember what the first target is, in case
-				# no target was specified on the command
-				# line.
+				# no target was specified on the command line.
       }
       &$handle_include( $rule, $include ) if $include;
-    } unquote_split_on_whitespace expand_text $self, $foreach, $makefile_line; # End block called on every file that
-				# matches the wildcard.
+    } @no_phony,		# End block called on every file that matches the wildcard.
+      unquote_split_on_whitespace expand_text $self, $foreach, $makefile_line;
   } elsif(!defined $foreach) {	# it's not a foreach rule
 #
 # This rule is not a pattern rule.  If there is an action, then it's
@@ -1668,7 +1647,7 @@ sub grok_rule {
         $rule->{ENV_DEPENDENCY_STRING} = $env_dep_str if $env_dep_str;
 	$build_check and $rule->set_build_check_method($build_check);
 	$signature and $rule->set_signature_class( $signature_name, 0, $signature, $signature_override );
-        $have_build_cache and $rule->set_build_cache($build_cache);
+        defined $build_cache and Mpp::BuildCache::set( $rule, $build_cache );
 	$lexer and $rule->{LEXER} = $lexer;
 	$parser and $rule->{PARSER} = $parser;
         defined($conditional_scanning) and
@@ -1682,7 +1661,7 @@ sub grok_rule {
 	    $tinfo->{RULE}->append($rule); # Append the dependency list and the
 				# build commands.
 	  } else {
-	    Mpp::File::set_rule($tinfo, $rule); # Update its rule.
+	    Mpp::File::set_rule $tinfo, $rule; # Update its rule.
 	  }
 	  $self->{FIRST_TARGET} ||= $tinfo;
 				# Remember what the first target is, in case
@@ -1697,13 +1676,13 @@ sub grok_rule {
       	# If it is an open-ended ":last_chance" rule, then we need to
 	# set a trigger to generate the rules on demand.  Otherwise, it's
 	# just a single rule that we can generate now.
-      	if(index_ignoring_quotes($tstring, '%') >= 0) {
+      	if( find_unquoted( $tstring, '%', 0, 2 ) >= 0 ) {
 	  die "Can't use :last_chance and :include together\n" if $include; # TODO: figure out how to handle %.d
 	  my $subdirs = expand_variable $self, 'makepp_percent_subdirs', $makefile_line;
 	  my $pct_re = $subdirs ? '.*' : '[^/]*';
 	  my( @wild_targets, @pattern_re );
 	  foreach (split_on_whitespace($tstring)) {
-	    if( index_ignoring_quotes($_, '%') >= 0 ) {
+	    if( find_unquoted( $_, '%', 0, 2 ) >= 0 ) {
 	      my $wild_target = unquote;
 	      my $re = quotemeta $wild_target;
 	      if( $subdirs ) { $wild_target =~ s!%!**/*!g } else { $wild_target =~ tr!%!*! }
@@ -1771,7 +1750,29 @@ sub grok_rule {
 
       foreach (@targets) {
 	my $tinfo = file_info unquote(), $self->{CWD};
-	Mpp::File::set_additional_dependencies($tinfo, $after_colon[0], $self, $makefile_line);
+	push @{$tinfo->{ADDITIONAL_DEPENDENCIES}},
+	  [$after_colon[0], $self, $makefile_line];
+				# Store a copy of this information.
+	Mpp::File::publish $tinfo, $Mpp::rm_stale_files;
+				# For legacy makefiles, sometimes an idiom like
+				# this is used:
+				#   y.tab.c: y.tab.h
+				#   y.tab.h: parse.y
+				#	yacc -d parse.y
+				# in order to indicate that the yacc command
+				# has two targets.  We need to support this
+				# by indicating that files with extra
+				# dependencies are buildable, even if there
+				# isn't an actual rule for them.
+  if( $rule_include ) {
+    # Via :include we read the compiler generated makefile twice.  If #include statements
+    # have been removed, we must not store those from 1st time we read build info.
+    if( $rule_include == 1 ) { # Initial lecture of possibly obsolete .d file
+      $tinfo->{ADDITIONAL_DEPENDENCIES_TEMP} = $#{$tinfo->{ADDITIONAL_DEPENDENCIES}};
+    } elsif( exists $tinfo->{ADDITIONAL_DEPENDENCIES_TEMP} ) {
+      splice @{$tinfo->{ADDITIONAL_DEPENDENCIES}}, delete $tinfo->{ADDITIONAL_DEPENDENCIES_TEMP}, 1;
+    }
+  }
 	$self->{FIRST_TARGET} ||= $tinfo;
 				# Remember what the first target is, in case
 				# no target was specified on the command line.
@@ -1800,7 +1801,7 @@ sub read_block {
       my $end = $_[2] ? $line =~ s/^$re\s*(.*)//s : $re ? $line =~ /^$re\s*(.*)/s : undef;
       $code .= $line if defined wantarray;
       if( $end ) {		# Stop at a brace at the left margin or re.
-	warn "trailing cruft `" . substr( $1, 0, -1 ) . "' at `$makefile_name:$makefile_lineno'\n"
+	warn "$makefile_name:$makefile_lineno: trailing cruft `" . substr( $1, 0, -1 ) . "'\n"
 	  if $1 !~ /^$|^#/;
 	last;
       }
@@ -1889,7 +1890,7 @@ sub read_makefile {
     if( /^\s*(-?)\s*&(\w+)\s*(.*)/ && !$c_preprocess ) { # &Command at beginning of line?
       my( $ignore_error, $cmd ) = ($1, $2);
       my @args = unquote_split_on_whitespace expand_text( $self, $3, $makefile_line ) if length $3;
-      local $Mpp::Subs::rule = { MAKEFILE => $self, RULE_SOURCE => $makefile_line };
+      local $Mpp::Subs::rule = bless { MAKEFILE => $self, RULE_SOURCE => $makefile_line }, 'Mpp::Rule';
       eval {
 	chdir $self->{CWD};	# Make sure we're in the correct directory
 				# because some commands will expect this.
@@ -1908,9 +1909,9 @@ sub read_makefile {
 	  s/\(eval \d+\)(?:\[.*?\])? line \d+/\`$makefile_line\'/g;
 	  s/^$cmd: //;
 	  if( $ignore_error ) {
-	    print STDERR "makepp: &$cmd: $_";
+	    print STDERR "$makefile_line: &$cmd: $_";
 	  } else {
-	    die "makepp: &$cmd: $_";
+	    die "$makefile_line: &$cmd: $_";
 	  }
 	}
       }
@@ -1925,7 +1926,7 @@ sub read_makefile {
       die "$makefile_line: export and global can not currently be combined\n"
 	if $keyword->{export} && $keyword->{global};
 
-      $equal = /=/ ? index_ignoring_quotes $_, '=' : -1;
+      $equal = /=/ ? find_unquoted $_, '=' : -1;
       if( $keyword->{define} ) {
 	chomp;
 	if( $equal > 0 ) {
@@ -1945,11 +1946,11 @@ sub read_makefile {
     if( /^\s*([-\w]+)\s+(.*)/ ) { # Statement at beginning of line?
       my ($rtn, $rest_of_line) = ($1, $2);
       $rtn =~ tr/-/_/;		# Make routine names more Perl friendly.
-      substr $rtn, 0, 0, "$self->{PACKAGE}::s_";
-      if( defined &$rtn ) {	# Function from makefile?
-	eval { &$rtn( $rest_of_line, $self, $makefile_line, $keyword ) };
+      my $sub = "$self->{PACKAGE}::s_$rtn";
+      if( defined &$sub ) {	# Function from makefile?
+	eval { &$sub( $rest_of_line, $self, $makefile_line, $keyword ) };
 				# Try to call it as a subroutine.
-	die "$makefile_line: error handling $rtn statement\n$@\n" if $@;
+	die "$makefile_line: $rtn statement raised this error:\n$@\n" if $@;
 	die "$makefile_line: $rtn statement doesn't handle ", join( ', ', keys %$keyword ), "\n"
 	  if keys %$keyword;
 	next;
@@ -2085,7 +2086,7 @@ sub _truthval($$) {
   $line =~ s/^\s+//;		# Strip leading whitespace.
 
   my $truthval;
-  my $idx = index_ignoring_quotes $line, '#'; # Find comment.
+  my $idx = find_unquoted $line, '#'; # Find comment.
   if( defined $def ) {			# See whether something is defined?
     substr( $line, $idx ) = '' if 0 <= $idx; # Strip comment.
 
@@ -2096,7 +2097,7 @@ sub _truthval($$) {
     substr( $line, $idx ) = '' if 0 <= $idx; # Strip comment.
     $line =~ s/\s+$//;	# Strip trailing whitespace.
 
-    $idx = index_ignoring_quotes $line, ',';
+    $idx = find_unquoted $line, ',';
     if ($line =~ /^\(/) {	# Parenthesized syntax? need to match make syntax to avoid
 				# ambiguity if strings contain parentheses
       0 <= $idx or die "$file: Comma missing in 'if$cond$line'\n";
@@ -2104,7 +2105,7 @@ sub _truthval($$) {
       $a =~ s/\s+$//;
       $b = substr $line, $idx + 1;
       $b =~ s/^\s+//;
-      0 <= ($idx = max_index_ignoring_quotes $b, ')') or
+      0 <= ($idx = rfind_unquoted $b, ')') or
 	die "$file: Closing paren missing in 'if$cond$line'\n";
       $idx + 1 < length $b and
 	die "$file: Trailing cruft after closing paren in `if$cond$line'\n";
@@ -2168,7 +2169,7 @@ sub _read_makefile_line_stripped_1 {
 				# Strip out leading whitespace from line
 				# continuations.
 
-    next if !$_[0] && $next_line =~ /^#/; # Skip it if it begins with a comment.
+    next unless $_[0] || ord( $next_line ) != ord '#'; # Skip it if it begins with a comment.
 
     $line .= $next_line;	# Append it to the current line.
     my $closedgroup = ($line !~ s/((?:^|[^\$])\$(?:\(\((?!.*\)\))|\{\{(?!.*\}\})|\[\[(?!.*\]\])).*?)\s*$/$1 /s);
@@ -2191,7 +2192,7 @@ sub _read_makefile_line_stripped_1 {
     if( -1 < index substr( $line, 0, -1 ), "\n" ) {
       # TODO: figure out if we are in makeperl, else don't expand after #
       warn "$makefile_name:$makefile_lineno: After # multiline \$[] only comments out 1st line.\n"
-	if -1 < index_ignoring_quotes substr( $line, 0, $bracket ), '#';
+	if -1 < find_unquoted substr( $line, 0, $bracket ), '#';
       unshift_makefile_lines( $line );
       $line = shift @hold_lines;
     }
@@ -2233,7 +2234,7 @@ sub _read_makefile_line_stripped_1 {
 	undef $line;		# line has already been processed
 	last;
       } elsif( $line =~ /^\s*endif\s*(?:#|$)/ ) { # What the heck?
-	warn "empty conditional at `$makefile_name:$last_conditional_start'\n";
+	warn "$makefile_name:$last_conditional_start: empty conditional\n";
 	goto &_read_makefile_line_stripped_1; # Return a new line.
       } else {			# Reached then branch.
 	$totaltruthval ||= $truthval;
@@ -2318,7 +2319,7 @@ sub skip_makefile_until_else_or_endif {
 	substr $rtn, 0, 0, 'Mpp::Subs::s_';
 	next if defined &$rtn;	# Statement?
       }
-      next if ($line =~ /=/ ? index_ignoring_quotes $line, '=' : -1) != -1; # assignment
+      next if ($line =~ /=/ ? find_unquoted $line, '=' : -1) != -1; # assignment
       my @pieces = split_on_colon $line;
       if( @pieces > 1 ) {	# Was there a colon somewhere?
 	local $skipping = 1;

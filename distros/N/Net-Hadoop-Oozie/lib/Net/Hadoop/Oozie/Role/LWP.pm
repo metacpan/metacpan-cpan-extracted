@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Role::LWP;
-$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.110';
+$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.111';
 use 5.010;
 use strict;
 use warnings;
@@ -71,7 +71,7 @@ sub agent_request {
                     ? "$1 "
                     : ''
                     ;
-    my $extramsg;
+    my $extramsg = '';
     if ( $code == 401 ) {
         $extramsg = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
                     ? eval { require LWP::Authen::Negotiate; 1; }
@@ -97,7 +97,7 @@ Net::Hadoop::Oozie::Role::LWP
 
 =head1 VERSION
 
-version 0.110
+version 0.111
 
 =head1 SYNOPSIS
 

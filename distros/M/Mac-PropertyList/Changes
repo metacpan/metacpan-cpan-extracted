@@ -1,5 +1,11 @@
 Revision history for Perl module Mac::PropertyList
 
+1.412 2017-07-30T18:27:33Z
+	* Fix for plist files with comments (bram.stappers@tiobe.com) RT #122466
+	and GitHub #5 (as a pull request)
+	* Note that this module does not handle ASCII or JSON formats (but they
+	are in the wishlist now) (anonymous Yahoo! user)
+
 1.411 2017-07-19T02:10:42Z
 	* Bram Stappers fixed a regression with XML comments
 

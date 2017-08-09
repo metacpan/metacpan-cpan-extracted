@@ -1,5 +1,14 @@
 Revision history for Number-Phone-Formatter-EPP
 
+0.06  2017-08-03
+    - add links to RFCs and ITU standards in POD docs (Thanks Mohammad S Anwar)
+
+0.05  2017-08-03
+    - POD Fix: wrong RFC was referenced in docs
+
+0.04  2017-08-02
+    - Kwalitee: turn on strict + warnings
+
 0.03  2016-08-25
     - bump min Number::Phone version requirement to 3.1 which is where
       format_using() was first added.

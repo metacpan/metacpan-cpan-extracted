@@ -1,3 +1,6 @@
+1.000     2017-08-02 00:12:05 EDT
+  - Fix tests and document that Cpanel::JSON::XS now disallows duplicate keys in non-relaxed mode
+
 0.012     2016-06-30 17:44:11 EDT
   - Enable canonical option for all backends to match Mojo::JSON behavior in Mojolicious 6.58+
 

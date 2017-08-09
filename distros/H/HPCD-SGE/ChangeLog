@@ -1,4 +1,6 @@
-0.49 - added another error text to detect memory overru failure
+0.50 - added another error text to detect memory overrun failure
+
+0.49 - added another error text to detect memory overrun failure
 
 0.48 - log the reason that triggered vmem retry testing
 

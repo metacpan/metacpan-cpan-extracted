@@ -14,7 +14,8 @@ Module::Build->new
       'Module::Build' => 0
      },
     build_requires     => {
-      'Test::More'                  => 0,
+      'DBI'                         => 0,
+      'AnyDBM_File'                 => 0,
       'AnyDBM_File::Importer'       => 0,
       'Module::Build'               => 0
      },

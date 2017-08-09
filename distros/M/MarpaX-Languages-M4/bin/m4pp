@@ -14,7 +14,7 @@ use Try::Tiny;
 
 # ABSTRACT: M4 implementation in Perl
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -235,7 +235,7 @@ m4pp - M4 implementation in Perl
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 AUTHOR
 

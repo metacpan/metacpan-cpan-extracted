@@ -2,7 +2,7 @@
 
 makepp_speedup -- How to make makepp faster
 
-=for vc $Id: makepp_speedup.pod,v 1.15 2012/05/15 21:26:30 pfeiffer Exp $
+=for vc $Id: makepp_speedup.pod,v 1.16 2013/01/20 16:54:22 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -161,11 +161,12 @@ things, you can save quite a bit of formatting and I/O with C<--no-log
 
 =head3 Get a Headstart
 
-The option C<--stop-after-loading> (or just C<--stop>) allows makepp to start
-its work while you are still editing.  It will suspend itself when it gets to
-the point analyzing the dependencies.  You decide when you're ready to let it
-go on.  On our huge project this saves half a minute, and that's only when we
-have a CPU to ourselves.
+The option C<--loop> (or C<--stop-before-building> or C<--stop-after-loading>
+or C<--stop>) allows makepp to start its work while you are still editing.  It
+will repeatedly suspend itself when it gets to the point analyzing the
+dependencies.  You decide when you're ready to let it go on.  On our huge
+project this saves half a minute, and that's only when we have a CPU to
+ourselves.
 
 This method has two potential drawbacks:
 
@@ -194,11 +195,6 @@ was expanded too early.
 =back
 
 In both of these cases you should kill the prestarted makepp and start it anew.
-
-You can do something like the following in your Shell's $ENV file or .profile
-to save typing (csh users replace '=' with ' '):
-
-    alias mpps='makepp --stop'
 
 =head3 Gulliver's Travels
 

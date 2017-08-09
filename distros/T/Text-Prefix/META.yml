@@ -20,4 +20,4 @@ requires:
   Time::HiRes: '1.55'
   Time::TAI::Simple: '1.11'
   perl: '5.008000'
-version: '1.00'
+version: '1.01'

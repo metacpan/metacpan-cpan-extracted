@@ -7,7 +7,7 @@ use 5.014;
 
 package JsonSQL::Validator;
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 use JSON::Validator;
 use JSON::Parse qw( assert_valid_json parse_json );
@@ -191,7 +191,7 @@ JsonSQL::Validator - JSON schema validation module. Returns a JsonSQL::Validator
 
 =head1 VERSION
 
-version 0.4
+version 0.41
 
 =head1 SYNOPSIS
 

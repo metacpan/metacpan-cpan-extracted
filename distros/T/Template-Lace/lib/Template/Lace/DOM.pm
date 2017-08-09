@@ -420,7 +420,22 @@ sub list_helper_by_id {
 sub form { shift->tag_helper_by_id('form', @_) }
 sub ul { shift->list_helper_by_id('ul', @_) }
 sub ol { shift->list_helper_by_id('ol', @_) }
-sub dl { shift->tag_helper_by_id('dl', @_) }
+
+sub dl {
+  my ($self, $id, $proto) = @_;
+  my $target = "dl$id";
+  if(ref($proto) eq 'HASH') {
+    $self->at("dl$id")->fill($proto);
+  } elsif(ref($proto) eq 'ARRAY') {
+    my $dl = $self->at("dl$id");
+    my $collection = $dl->find("dt,dd");
+    my $new = ref($self)
+      ->new($collection->join)
+      ->fill($proto);
+    $dl->content($new);
+  }
+  return $self;
+}
 
 sub select {
   my ($self, $name, $proto) = @_;
@@ -1206,28 +1221,49 @@ Returns:
 this helper will either an arrayref or hashref and attempt to 'do the
 right thing'.  Example:
 
-    my $dom = Template::Lace::DOM->new(q[
-      <section>
-        <dl id='list'>
-          <dt>Name</dt>
-          <dd id='name'></dd>
-          <dt>Age</dt>
-          <dd id='age'></dd>
-        </dl>
-      </section>]);
+  my $dom = Template::Lace::DOM->new(q[
+    <dl id='hashref'>
+      <dt>Name</dt>
+      <dd id='name'></dd>
+      <dt>Age</dt>
+      <dd id='age'></dd>
+    </dl>
+    <dl id='arrayref'>
+      <dt class='term'></dt>
+      <dd class='value'></dd>
+    </dl>
+  ]);
 
-   $dom->ol('#ordered', [qw/11 22 33/]);
+  $dom->dl('#hashref', +{
+    name=>'John',
+    age=> '48'
+  });
 
+  $dom->dl('#arrayref', [
+      +{ term=>'Name', value=> 'John'},
+      +{ term=>'Age', value=> 42 },
+      +{ term=>'email', value=> [
+          'jjn1056@gmail.com',
+          'jjn1056@yahoo.com']},
+  ]);
+ 
 Returns:
 
-    <section>
-      <dl id="list">
-        <dt>Name</dt>
-        <dd id="name">joe</dd>
-        <dt>Age</dt>
-        <dd id="age">32</dd>
-      </dl>
-    </section>
+    <dl id="hashref">
+      <dt>Name</dt>
+       <dd id="name">John</dd>
+      <dt>Age</dt>
+        <dd id="age">48</dd>
+    </dl>
+    <dl id="arrayref">
+      <dt class="term">Name</dt>
+        <dd class="value">John</dd>
+      <dt class="term">Age</dt>
+       <dd class="value">42</dd>
+      <dt class="term">email</dt>
+        <dd class="value">jjn1056@gmail.com</dd>
+        <dd class="value">jjn1056@yahoo.com</dd>
+    </dl>
 
 =head2 select
 

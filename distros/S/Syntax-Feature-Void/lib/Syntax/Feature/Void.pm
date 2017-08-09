@@ -3,7 +3,7 @@ package Syntax::Feature::Void;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.0.0');
+use version; our $VERSION = qv('v1.2.0');
 
 use Devel::CallParser qw( );
 use XSLoader          qw( );
@@ -35,7 +35,7 @@ Syntax::Feature::Void - Provides the C<void> operator to force void context.
 
 =head1 VERSION
 
-Version 1.0.0
+Version 1.2.0
 
 
 =head1 SYNOPSIS

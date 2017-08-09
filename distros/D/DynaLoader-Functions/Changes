@@ -1,3 +1,18 @@
+version 0.003; 2017-07-31
+
+  * update linkable-finding code to handle new Windows builds with
+    variant filename extension for loadable files
+
+  * explicitly load the Config module rather than relying on DynaLoader
+    to do it
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
 version 0.002; 2013-08-17
 
   * in the module used for testing, explicitly export symbols, and

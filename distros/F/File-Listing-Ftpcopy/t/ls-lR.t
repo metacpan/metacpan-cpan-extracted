@@ -1,10 +1,8 @@
-# stolen unabashedly from Gisle Aas' File::Listing
-use strict;
-use warnings;
-use Test;
-plan tests => 9;
-
+use Test2::V0 -no_srand => 1;
 use File::Listing::Ftpcopy;
+
+# stolen unabashedly from Gisle Aas' File::Listing
+# later converted to Test2.
 
 my $dir = <<'EOL';
 total 68
@@ -54,7 +52,7 @@ EOL
 
 my @dir = parse_dir($dir, undef, 'unix');
 
-ok(@dir, 25);
+is(@dir, 25);
 
 for (@dir) {
    my ($name, $type, $size, $mtime, $mode) = @$_;
@@ -68,28 +66,37 @@ for (@dir) {
 # Pick out the Socket.pm line as the sample we check carefully
 my ($name, $type, $size, $mtime, $mode) = @{$dir[9]};
 
-ok($name, "Socket.pm");
-ok($type, "f");
-ok($size, 8817);
+is($name, "Socket.pm");
+is($type, "f");
+is($size, 8817);
 
 # Must be careful when checking the time stamps because we don't know
 # which year if this script lives for a long time.
 my $timestring = scalar(localtime($mtime));
-ok($timestring =~ /Mar\s+15\s+18:05/);
+like($timestring, qr/Mar\s+15\s+18:05/);
 print "# $timestring =~ /Mar\\s+15\\s+18:05/\n";
 
 # File::Listing::Ftpparse does not support file mode
-#ok($mode, 0100644);
+#is($mode, 0100644);
 
 # Apr  8  1994
 @dir = parse_dir(<<'EOT');
 drwxr-xr-x 21 root root 704 Mar 22  2007 dir
 EOT
 
-ok(@dir, 1);
-ok($dir[0][0], "dir");
-ok($dir[0][1], "d");
+is(
+  \@dir,
+  array {
+    item array {
+      item 'dir';
+      item 'd';
+      etc;
+    };
+  },
+);
 
 $timestring = scalar(localtime($dir[0][3]));
 print "# $timestring =~ /^Thu Mar 22/\n";
-ok($timestring =~ /^Thu Mar 22/);
+like($timestring, qr/^Thu Mar 22/);
+
+done_testing;

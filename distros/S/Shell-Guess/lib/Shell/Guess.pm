@@ -7,7 +7,7 @@ use File::Spec;
 # TODO: see where we can use P9Y::ProcessTable
 
 # ABSTRACT: Make an educated guess about the shell in use
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub _win32_getppid
@@ -198,7 +198,7 @@ Shell::Guess - Make an educated guess about the shell in use
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -308,19 +308,26 @@ such shell configurations, and is designed to work with this module.
 These class methods return an instance of Shell::Guess, which can then be 
 interrogated by the instance methods in the next section below.
 
-=head2 Shell::Guess->running_shell
+=head2 running_shell
+
+ my $shell = Shell::Guess->running_shell;
 
 Returns an instance of Shell::Guess based on the shell which directly
 started the current Perl script.  If the running shell cannot be determined,
 it will return the login shell.
 
-=head2 Shell::Guess->login_shell( [ $username ] )
+=head2 login_shell
+
+ my $shell = Shell::Guess->login_shell;
+ my $shell = Shell::Guess->login_shell( $username )
 
 Returns an instance of Shell::Guess for the given user.  If no username is specified then
 the current user will be used.  If no shell can be guessed then a reasonable fallback
 will be chosen based on your platform.
 
-=head2 Shell::Guess-E<gt>bash_shell
+=head2 bash_shell
+
+ my $shell = Shell::Guess->bash_shell;
 
 Returns an instance of Shell::Guess for bash.
 
@@ -342,7 +349,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>bourne_shell
+=head2 bourne_shell
+
+ my $shell = Shell::Guess->bourne_shell;
 
 Returns an instance of Shell::Guess for the bourne shell.
 
@@ -362,7 +371,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>c_shell
+=head2 c_shell
+
+ my $shell = Shell::Guess->c_shell;
 
 Returns an instance of Shell::Guess for c shell.
 
@@ -382,7 +393,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>cmd_shell
+=head2 cmd_shell
+
+ my $shell = Shell::Guess->cmd_shell;
 
 Returns an instance of Shell::Guess for the Windows NT cmd shell (cmd.exe).
 
@@ -402,7 +415,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>command_shell
+=head2 command_shell
+
+ my $shell = Shell::Guess->command_shell;
 
 Returns an instance of Shell::Guess for the Windows 95 command shell (command.com).
 
@@ -422,7 +437,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>dcl_shell
+=head2 dcl_shell
+
+ my $shell = Shell::Guess->dcl_shell;
 
 Returns an instance of Shell::Guess for the OpenVMS dcl shell.
 
@@ -440,7 +457,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>fish_shell
+=head2 fish_shell
+
+ my $shell = Shell::Guess->fish_shell;
 
 Returns an instance of Shell::Guess for the fish shell.
 
@@ -456,7 +475,9 @@ The following instance methods will return:
 
 =back
 
-=head2 Shell::Guess-E<gt>korn_shell
+=head2 korn_shell
+
+ my $shell = Shell::Guess->korn_shell;
 
 Returns an instance of Shell::Guess for the korn shell.
 
@@ -478,7 +499,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>power_shell
+=head2 power_shell
+
+  my $shell = Shell::Guess->power_shell;
 
 Returns an instance of Shell::Guess for Windows PowerShell.
 
@@ -496,7 +519,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>tc_shell
+=head2 tc_shell
+
+ my $shell = Shell::Guess->tc_shell;
 
 Returns an instance of Shell::Guess for tcsh.
 
@@ -518,7 +543,9 @@ The following instance methods will return:
 
 All other instance methods will return false
 
-=head2 Shell::Guess-E<gt>z_shell
+=head2 z_shell
+
+ my $shell = Shell::Guess->z_shell
 
 Returns an instance of Shell::Guess for zsh.
 
@@ -552,67 +579,99 @@ is the same as
 
  Shell::Guess->running_shell->is_bourne
 
-=head2 $shell-E<gt>is_bash
+=head2 is_bash
+
+ my $bool = $shell->is_bash;
 
 Returns true if the shell is bash.
 
-=head2 $shell-E<gt>is_bourne
+=head2 is_bourne
+
+ my $bool = $shell->is_bourne;
 
 Returns true if the shell is the bourne shell, or a shell which supports bourne syntax (e.g. bash or korn).
 
-=head2 $shell-E<gt>is_c
+=head2 is_c
+
+ my $bool = $shell->is_c;
 
 Returns true if the shell is csh, or a shell which supports csh syntax (e.g. tcsh).
 
-=head2 $shell-E<gt>is_cmd
+=head2 is_cmd
+
+ my $bool = $shell->is_cmd;
 
 Returns true if the shell is the Windows command.com shell.
 
-=head2 $shell-E<gt>is_command
+=head2 is_command
+
+ my $bool = $shell->is_command;
 
 Returns true if the shell is the Windows cmd.com shell.
 
-=head2 $shell-E<gt>is_dcl
+=head2 is_dcl
+
+ my $bool = $shell->is_dcl;
 
 Returns true if the shell is the OpenVMS dcl shell.
 
-=head2 $shell-E<gt>is_fish
+=head2 is_fish
+
+ my $bool = $shell->is_fish;
 
 Returns true if the shell is Fish shell.
 
-=head2 $shell-E<gt>is_korn
+=head2 is_korn
+
+ my $bool = $shell->is_korn;
 
 Returns true if the shell is the korn shell.
 
-=head2 $shell-E<gt>is_power
+=head2 is_power
+
+ my $bool = $shell->is_power;
 
 Returns true if the shell is Windows PowerShell.
 
-=head2 $shell-E<gt>is_tc
+=head2 is_tc
+
+ my $bool = $shell->is_tc;
 
 Returns true if the shell is tcsh.
 
-=head2 $shell-E<gt>is_unix
+=head2 is_unix
+
+ my $bool = $shell->is_unix;
 
 Returns true if the shell is traditionally a UNIX shell (e.g. bourne, bash, korn)
 
-=head2 $shell-E<gt>is_vms
+=head2 is_vms
+
+ my $bool = $shell->is_vms;
 
 Returns true if the shell is traditionally an OpenVMS shell (e.g. dcl)
 
-=head2 $shell-E<gt>is_win32
+=head2 is_win32
+
+ my $bool = $shell->is_win32;
 
 Returns true if the shell is traditionally a Windows shell (command.com, cmd.exe)
 
-=head2 $shell-E<gt>is_z
+=head2 is_z
+
+ my $bool = $shell->is_z;
 
 Returns true if the shell is zsh
 
-=head2 $shell-E<gt>name
+=head2 name
+
+ my $name = $shell->name;
 
 Returns the name of the shell.
 
-=head2 $shell-E<gt>default_location
+=head2 default_location
+
+ my $location = $shell->default_location;
 
 The usual location for this shell, for example /bin/sh for bourne shell
 and /bin/csh for c shell.  May not be defined for all shells.
@@ -657,13 +716,11 @@ is not otherwise being directly executed by the shell.
 
 Patches are welcome to make other platforms work more reliably.
 
-=cut
-
 =head1 AUTHOR
 
-author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
-contributors:
+Contributors:
 
 Buddy Burden (BAREFOOT)
 

@@ -14,7 +14,7 @@ dist.ini
 lib/Alien/libtool.pm
 t/00_diag.t
 t/01_use.t
-t/run.t
+t/alien_libtool.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

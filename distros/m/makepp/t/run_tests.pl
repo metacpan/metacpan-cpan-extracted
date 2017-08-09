@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # See bottom of file for documentation.
 #
 
 package Mpp;
 
+use lib '.';			# May have been removed for security.
 use Config;
 use Cwd;
 use File::Path;
@@ -38,7 +39,6 @@ my $archive = $Config{perlpath}; # Temp assignment is work-around for a nasty pe
 our $source_path;
 my $old_cwd;
 my $dot;
-my $hint;
 my $verbose;
 my $test;
 my $keep;
@@ -100,7 +100,7 @@ BEGIN {
 	require Mpp::Text;
 	last;
       }
-      die "Can't locate path to makepp libraries." if $. == 99;
+      die "$0: Can't locate path to makepp libraries." if $. == 99;
     }
   }
 
@@ -124,7 +124,6 @@ BEGIN {
   Mpp::Text::getopts(
     [qw(b basedir), \$basedir, 1],
     [qw(d dots), \$dot],
-    [qw(h hint), \$hint],
     [qw(k keep), \$keep],
     [qw(m makepp), \$makepp_path, 1],
     [qw(n name), \$name, 1],
@@ -137,8 +136,6 @@ run_tests.pl[ options][ tests]
 	Put tdirs into subdir of given dir, to perform tests elsewhere.
     -d, --dots
 	Output only a dot for every successful test.
-    -h, --hint
-	For some tests explain what might be wrong, and give a general hint.
     -k, --keep
 	Keep the tdir even if the test was successful.
     -m, --makepp=PATH_TO_MAKEPP
@@ -148,7 +145,7 @@ run_tests.pl[ options][ tests]
     -s, --subdir
 	Put tdirs into a subdir named [BASEDIR/]perlversion[-NAME].
     -t, --test
-	Output in format expected by Test::Harness.
+	Output in format expected by TAP::Harness.
     -v, --verbose
 	Give some initial info and final statistics.
 
@@ -156,7 +153,6 @@ run_tests.pl[ options][ tests]
 EOF
 
   require Mpp::Utils;
-  require Mpp::Glob;
   require Mpp::Cmds;
   for( keys %Mpp::Cmds:: ) {
     if( /^c_/ and my $coderef = *{"Mpp::Cmds::$_"}{CODE} ) {
@@ -186,9 +182,9 @@ EOF
     $basedir .= "-$perltype" if $perltype;
     $basedir .= "-$name" if $name;
     slow_rmtree $basedir;
-    mkdir $basedir or die "can't mkdir $basedir--$!";
     $basedir .= '/';
   }
+  -d $basedir or c_mkdir( -p => $basedir ) or die "$0: can't mkdir $basedir--$!";
 
   chdir $basedir;
   mkdir 'd';
@@ -198,7 +194,7 @@ EOF
   rmdir 'd';
   unlink 'e' or rmdir 'e';
   eval 'sub no_symlink() {' . ($symlink ? '' : 1) . '}';
-  open my $fh, '>f';		# Use different filename because rmdir may fail on Win
+  open my $fh, '>', 'f';		# Use different filename because rmdir may fail on Win
   close $fh;
   my $link = eval { link 'f', 'g' } &&	# might die somewhere
     ((stat 'f')[1] ?	# Do we have inums?
@@ -210,8 +206,17 @@ EOF
   chdir $old_cwd;
 }
 
-my $have_cc;
+my( $cc_errors, $have_cc, $want_cc ) = 0;
+my $cc_hint1 = 'This test needs a C compiler that accepts options in common order.
+';
+my $cc_hint = $cc_hint1 .
+  ($ENV{CC} ? 'Please check your value of $CC' :
+   'Old makes use CC=cc, but makepp may choose another compiler in $PATH') . ".\n" .
+  ($ENV{CFLAGS} ?
+  'Make sure that your CFLAGS are understood by the chosen compiler!
+' : '');
 sub have_cc() {
+  $want_cc = 1;
   unless( defined $have_cc ) {
     $have_cc =
       $ENV{CC} ||
@@ -268,17 +273,31 @@ my %file;
 my $page_break = '';
 my $log_count = 1;
 sub makepp(@) {
-  my $suffix = '';
-  $suffix = ${shift()} if ref $_[0];
-  print "${page_break}makepp$suffix" . (@_ ? " @_\n" : "\n");
+  my $extra = ref $_[0];
+  my $suffix = $extra ? ${shift()} : '';
+  print $page_break;
   $page_break = "\cL\n";
   if( !$suffix && -f '.makepp/log' ) {
     chdir '.makepp';		# For Win.
-    rename log => 'log' . $log_count++;
+    my $save = 'log' . $log_count++;
+    print "saved log to $save\n"
+      if rename log => $save;
     chdir '..';
   }
+  print "makepp$suffix" . (@_ ? " @_\n" : "\n");
   system_intabort \"makepp$suffix", # "
-    PERL, '-w', exists $file{'makeppextra.pm'} ? '-Mmakeppextra' : (), $makepp_path.$suffix, @_;
+    PERL, '-w', exists $file{'makeppextra.pm'} ? qw(-I. -Mmakeppextra) : (), $makepp_path.$suffix, @_;
+  unless( $extra ) {
+    for my $file ( <{*/*/*/,*/*/,*/,}.makepp/*.mk> ) {
+      open my $fh, '<', $file;
+      $file =~ s!\.makepp/(.+)\.mk$!$1!;
+      -r $file && !-d _ or next;
+      my $binfo = Mpp::File::grok_build_info_file $fh;
+      my $sig = join ',', (stat _)[9,7];
+      warn "$file $binfo->{SIGNATURE} vs. " . $sig
+	if $binfo->{SIGNATURE} ne $sig;
+    }
+  }
   1;				# Command succeeded.
 }
 
@@ -315,7 +334,7 @@ sub un_spar() {
 		-d $name or mkdir $name, 0700 or warn "spar: can't mkdir `$name': $!\n";
 		$mode{$name} = [$atime, $mtime, oct $mode];
 	    } elsif( $kind ne 'L' ) {
-		open F, ">$name" or warn "spar: can't open >`$name': $!\n";
+		open F, '>', $name or warn "spar: can't open >`$name': $!\n";
 		$lines = abs $kind;
 		$nl = ($kind < 0) ? '' : "\n";
 	    }
@@ -382,7 +401,7 @@ sub do_pl($) {
 
 sub n_files(;$$) {
   my( $outf, $code ) = @_;
-  open my $logfh, '.makepp/log' or die ".makepp/log--$!\n";
+  open my $logfh, '<', '.makepp/log' or die ".makepp/log--$!\n";
   seek $logfh, -20, 2 if !$code; # More than enough to find last message.
   open my $outfh, '>', $outf if $outf;
   while( <$logfh> ) {
@@ -398,10 +417,13 @@ sub n_files(;$$) {
 }
 
 my $have_shell = -x '/bin/sh';
+our $mod_answer;
 
 print OSTDOUT '1..'.@ARGV."\n" if $test;
 test_loop:
 foreach $archive (@ARGV) {
+  $want_cc = 0;
+  undef $mod_answer;
   %file = ();
   my $testname = $archive;
   my( $tarcmd, $dirtest, $warned, $tdir, $tdir_failed, $log );
@@ -462,7 +484,7 @@ foreach $archive (@ARGV) {
       system_intabort $tarcmd and # Extract the tar file.
 	die "$0: can't extract testfile $archive\n";
     } elsif( !$dirtest ) {
-      open DATA, $archive or die "$0: can't open $archive--$!\n";
+      open DATA, '<', $archive or die "$0: can't open $archive--$!\n";
       eval { local $SIG{__WARN__} = sub { die @_ if $_[0] !~ /Failed to set/ }; un_spar };
 				# Alas happens a lot on native Windows.
       die +(is_windows && $@ =~ /symlink .* unimplemented/) ? "skipped s\n" :
@@ -471,7 +493,7 @@ foreach $archive (@ARGV) {
     }
     open STDOUT, '>', $log or die "write $log: $!";
     open STDERR, '>&STDOUT' or die $!;
-    open my $fh, '>>.makepprc';	# Don't let tests be confused by a user's file further up.
+    open my $fh, '>>', '.makepprc';	# Don't let tests be confused by a user's file further up.
     close $fh;
     # check for all special files in one go:
     @file{<{is_relevant.pl,makepp_test_script.pl,makepp_test_script,cleanup_script.pl,makeppextra.pm,hint}*>} = ();
@@ -503,9 +525,9 @@ foreach $archive (@ARGV) {
     my @errors;
     {
       local $/;			# Slurp in the whole file at once.
-      for my $name ( Mpp::Glob::zglob 'answers/**/*' ) {
+      for my $name ( <answers/{*/*/*/,*/*/,*/,}*> ) {
 	next if $name =~ /\/n_files$/ # Skip the special file.
-	  or -d $name;	# Skip subdirectories, find recurses.
+	  or -d $name;		# Skip subdirectories.
 	open TFILE, '<:crlf', $name or die "$0: can't open $tdir/$name--$!\n";
 	$tfile_contents = <TFILE>; # Read in the whole thing.
 
@@ -513,7 +535,9 @@ foreach $archive (@ARGV) {
 	$name =~ s!answers/!!;
 	open TFILE, '<:crlf', $name or die "$0: can't open $tdir/$name--$!\n";
 	my $mtfile_contents = <TFILE>; # Read in the whole file.
-	$mtfile_contents eq $tfile_contents or push @errors, $name;
+	&$mod_answer( $name, $mtfile_contents, $tfile_contents ) if $mod_answer;
+	$mtfile_contents eq $tfile_contents
+	  or push @errors, $name;
       }
     }
     close TFILE;
@@ -523,20 +547,18 @@ foreach $archive (@ARGV) {
 #
     if( !defined( my $n_files_updated = n_files )) {
       push @errors, '.makepp/log';
-    } elsif( open my $n_files, 'answers/n_files' ) { # Count of # of files updated?
+    } elsif( open my $n_files, '<', 'answers/n_files' ) { # Count of # of files updated?
       $_ = <$n_files>;
-      $_ eq $n_files_updated or push @errors, 'n_files';
+      &$mod_answer( 'n_files', $n_files_updated, $_ ) if $mod_answer;
+      $_ eq $n_files_updated
+	or push @errors, 'n_files';
     }
-
-# Get rid of the log file so we don't get confused if the next test doesn't
-# make a log file for some reason.  For a failed test it remains, hence the name.
-    rename '.makepp/log' => '.makepp/log.failed';
 
 #
 # Also search through the log file to make sure there are no Perl messages
 # like "uninitialized value" or something like that.
 #
-    if( open my $logfile, $log ) {
+    if( open my $logfile, '<', $log ) {
       while( <$logfile> ) {
 	# Have to control a few warnings before we can unleash this:
 	#/makepp: warning/
@@ -550,7 +572,11 @@ foreach $archive (@ARGV) {
     die 'wrong file' . (@errors > 1 ? 's' : '') . ': ' . join( ', ', @errors) . "\n" if @errors;
   };
 
-  if ($@) {
+  if( $@ ) {
+# Get rid of the log file so we don't get confused if the next test doesn't
+# make a log file for some reason.  For a failed test it remains, hence the name.
+    rename '.makepp/log' => '.makepp/log.failed';
+
     if ($@ =~ /skipped(?: (.))?/) {	# Skip this test?
       chop( my $loc = $@ );
       dot $1 || '-', "$loc $testname\n";
@@ -571,7 +597,24 @@ foreach $archive (@ARGV) {
     }
     ++$n_failures;
     close TFILE;		# or Cygwin will hang
-    c_cat 'hint' if $hint && exists $file{hint};
+    if( exists $file{hint} ) {
+      c_sed 'print "\f\n" if $. == 1', 'hint', "-o>>$log";
+      c_sed 's/^/\t/', 'hint' unless $test;
+    } else {
+      if( $want_cc ) {
+	c_echo '-n', "\f\n$cc_hint", "-o>>$log";
+	unless( $test ) {
+	   (my $hint = ++$cc_errors == 1 ? $cc_hint : $cc_hint1) =~ s/^/\t/gm;
+	   print $hint;
+	}
+      }
+      if( $testname =~ /(build_cache|repository)/ ) {
+	my $hint = "Likely only the useful but not essential $1 feature failed.\n";
+	c_echo '-n', "\f\n$hint", "-o>>$log";
+	$hint =~ s/^/\t/;
+	print $hint unless $test;
+      }
+    }
     chdir $old_cwd;		# Get back to the old directory.
     rename $tdir => $tdir_failed unless $dirtest;
     last if $testname eq 'aaasimple'; # If this one fails something is very wrong
@@ -710,6 +753,12 @@ should use &echo and other builtins for efficiency anyway.
 
 If this file does not exist, then we simply execute the command
 S<C<$PERL makepp>>, so makepp builds all the default targets in the makefile.
+
+If you use the C<.pl> variant, you can set C<$Mpp::mod_answer> to a hook which
+will get called for each answer file, with the filename, the generated content
+and the expected answer.  The hook can then modify either of the last two
+arguments, to make them fit, e.g. on Windows where an extra phony target gets
+counted for each compilation.
 
 =item makeppextra.pm
 

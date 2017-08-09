@@ -35,6 +35,11 @@ is $t->app->static->file('hello.txt')->slurp,
 is $t->app->static->file('does_not_exist.html'), undef, 'no file';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 
+# Remove extra files
+isnt $t->app->static->file('mojo/jquery/jquery.js'), undef, 'found jQuery';
+delete $t->app->static->extra->{'mojo/jquery/jquery.js'};
+is $t->app->static->file('mojo/jquery/jquery.js'), undef, 'no jQuery';
+
 # Default namespaces
 is_deeply $t->app->routes->namespaces,
   ['MojoliciousTest::Controller', 'MojoliciousTest'], 'right namespaces';

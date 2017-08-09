@@ -1,0 +1,84 @@
+---
+abstract: 'Install the OmniTool Web Application Framework'
+author:
+  - 'Eric Chernoff'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: omnitool-installer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  omnitool::installer:
+    file: lib/omnitool/installer.pm
+    version: v1.0.1
+requires:
+  Archive::Zip: '1.58'
+  Benchmark: '1.20'
+  DBD::mysql: '4.043'
+  DBI: '1.636'
+  Date::Format: '2.24'
+  Date::Manip::Date: '6.54'
+  DateTime: '1.43'
+  Devel::Size: '0.80'
+  Email::Stuff: '2.105'
+  Encode: '2.72'
+  Encoding::FixLatin: '1.04'
+  Excel::Writer::XLSX: '0.95'
+  File::Path: '2.12'
+  File::RotateLogs: '0.08'
+  File::Slurp: '9999.19'
+  Gzip::Faster: '0.14'
+  HTML::Strip: '2.10'
+  HTTP::Tiny: '0.058'
+  IO::Prompter: '0.004014'
+  JSON: '2.90'
+  Jemplate: '0.30'
+  LWP::Protocol::https: '6.07'
+  Lingua::EN::Numbers: '2.03'
+  MIME::Parser: '5.507'
+  MIME::Types: '2.13'
+  Net::Domain: '3.05'
+  Net::OpenStack::Swift: '0.11'
+  Number::Range: '0.12'
+  Plack: '1.0044'
+  Plack::Middleware::DBIx::DisconnectAll: '0.02'
+  Plack::Middleware::ReverseProxy: '0.15'
+  Proc::ProcessTable: '0.53'
+  Scalar::Util: '1.45'
+  Server::Starter: '0.33'
+  Spreadsheet::ParseExcel: '0.65'
+  Spreadsheet::XLSX: '0.15'
+  Starlet: '0.31'
+  Template: '2.26'
+  Term::ReadKey: '2.37'
+  Try::Tiny: '0.24'
+  WWW::Mechanize: '1.86'
+  WWW::Scraper::ISBN::GoogleBooks_Driver: '0.30'
+  YAML::Syck: '1.26'
+  perl: '5.022001'
+  utf8: '1.17'
+resources:
+  bugtracker: https://github.com/ericschernoff/omnitool-installer/issues
+  homepage: https://github.com/ericschernoff/omnitool-installer
+  repository: git://github.com/ericschernoff/omnitool-installer.git
+version: 1.0.1
+x_contributors:
+  - 'Eric Chernoff <echernof@cisco.com>'
+  - 'root <root@www.omnitool.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

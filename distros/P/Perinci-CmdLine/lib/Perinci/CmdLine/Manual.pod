@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual - Perinci::CmdLine manual
 
 =head1 VERSION
 
-This document describes version 1.52 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2017-07-07.
+This document describes version 1.77 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
 
 =head1 DESCRIPTION
 
@@ -139,38 +139,15 @@ TODO
 
 =head1 LOGGING
 
-Logging is done with L<Log::Any::IfLOG> (for producing). For displaying logs,
-PC::Classic uses L<Log::Any::App> currently which supports multiple outputs
-(screen, file, etc) while PC::Lite currently uses L<Log::Any::Adapter::Screen>
-which only supports displaying to screen.
+Logging is done with L<Log::ger> (for producing). For displaying logs,
+L<Log::ger::App> is used.
 
-Loading Log::Any adapters adds to startup overhead time, so the framework tries
-to be smart when determining whether or not to do logging output. Here are the
-order of rules being used:
+Initializing logging adds a bit to startup overhead time, so the framework
+defaults to no logging. To turn on logging from the code, set the C<log>
+attribute to true when constructing Perinci::CmdLine object. Or, use something
+like:
 
-=over
-
-=item * If LOG environment is undefined or false, turn off logging
-
-So you need to use LOG=1 to turn on logging.
-
-=item * If running shell completion (C<COMP_LINE> is defined), output is off
-
-Normally, shell completion does not need to show log output.
-
-=item * If subcommand's C<log> setting is defined, use that
-
-This allows you, e.g. to turn off logging by default for subcommands that need
-faster startup time.
-
-=item * [Classic] If action metadata's default_log setting is defined, use that
-
-For example, actions like C<help>, C<list>, and C<version> has C<default_log>
-set to 0, for faster startup time.
-
-=item * Use log attribute setting
-
-=back
+ % PERL5OPT=-MLog::ger::App TRACE=1 yourcli.pl
 
 =head1 [Classic] UTF8 OUTPUT
 

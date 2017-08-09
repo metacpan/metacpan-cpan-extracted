@@ -202,7 +202,12 @@ sub to_js ( $self ) {
         my $method = "EXT_$self->{ctx}->{generator}";
 
         my $l10n = sub ( $msgid, $locale = undef, $domain = undef ) {
-            $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+            if ( ref $msgid eq 'Pcore::Core::L10N::_deferred' ) {
+                ( $msgid, $domain ) = ( $msgid->{msgid}, $msgid->{domain} );
+            }
+            else {
+                $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+            }
 
             $self->{ctx}->{l10n_domain}->{$domain} = undef;
 
@@ -214,8 +219,13 @@ sub to_js ( $self ) {
             );
         };
 
-        my $l10np = sub ( $msgid, $msgid_plural, $num, $locale = undef, $domain = undef ) {
-            $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+        my $l10np = sub ( $msgid, $msgid_plural, $num = undef, $locale = undef, $domain = undef ) {
+            if ( ref $msgid eq 'Pcore::Core::L10N::_deferred' ) {
+                ( $msgid, $msgid_plural, $num, $domain ) = ( $msgid->{msgid}, $msgid->{msgid_plural}, $msgid_plural, $msgid->{domain} );
+            }
+            else {
+                $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+            }
 
             $self->{ctx}->{l10n_domain}->{$domain} = undef;
 
@@ -224,7 +234,7 @@ sub to_js ( $self ) {
                 is_plural    => 1,
                 msgid        => $msgid,
                 msgid_plural => $msgid_plural,
-                num          => $num,
+                num          => $num // 1,
                 domain       => $domain,
             );
         };
@@ -232,14 +242,12 @@ sub to_js ( $self ) {
         no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
         no warnings qw[redefine];
 
-        tie my $l10n_hash->%*, 'Pcore::Ext::Context::_l10n', $l10n;
+        local *{"$self->{ctx}->{namespace}::l10n"} = $l10n;
+
+        local *{"$self->{ctx}->{namespace}::l10np"} = $l10np;
+
+        tie my $l10n_hash->%*, 'Pcore::Ext::Context::_l10n', $l10n, $l10np;
         local ${"$self->{ctx}->{namespace}::l10n"} = $l10n_hash;
-
-        local *{"$self->{ctx}->{namespace}::l10n"}  = $l10n;
-        local *{"$self->{ctx}->{namespace}::l10n_"} = $l10n;
-
-        local *{"$self->{ctx}->{namespace}::l10np"}  = $l10np;
-        local *{"$self->{ctx}->{namespace}::l10np_"} = $l10np;
 
         *{"$self->{ctx}->{namespace}::$method"}->($self);
     };
@@ -283,15 +291,27 @@ package Pcore::Ext::Context::_TiedAttr {
 }
 
 package Pcore::Ext::Context::_l10n {
+    use Pcore::Util::Scalar qw[is_plain_arrayref];
 
-    sub TIEHASH ( $self, $code ) {
-        return bless [$code], $self;
+    sub TIEHASH ( $self, $l10n, $l10np ) {
+        return bless [ $l10n, $l10np ], $self;
     }
 
     sub FETCH {
-        my $domain = $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
-
-        return $_[0]->[0]->( $_[1], undef, $domain );
+        if ( is_plain_arrayref $_[1] ) {
+            if ( $_[1]->[0]->{is_plural} ) {
+                return $_[0]->[1]->( $_[1]->[0], $_[1]->[1] );
+            }
+            else {
+                return $_[0]->[0]->( $_[1]->[0] );
+            }
+        }
+        elsif ( ref $_[1] eq 'Pcore::Core::L10N::_deferred' ) {
+            return $_[0]->[0]->( $_[1] );
+        }
+        else {
+            return $_[0]->[0]->( $_[1], undef, $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() } );
+        }
     }
 }
 
@@ -306,9 +326,9 @@ package Pcore::Ext::Context::_l10n {
 ## |      | 95                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
 ## |      | 108                  | * Private subroutine/method '_ext_api_method' declared but not used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 24, 25, 26, 235      | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 24, 25, 26, 249      | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 205, 218, 292        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 209, 227, 313        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
