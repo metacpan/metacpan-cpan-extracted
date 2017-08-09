@@ -1,7 +1,7 @@
 package Pcore::RPC;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[blessed weaken];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref is_plain_hashref weaken];
 use Pcore::RPC::Proc;
 use Pcore::WebSocket;
 
@@ -104,7 +104,7 @@ sub connect_rpc ( $self, % ) {
     );
 
     # parse connect
-    if ( blessed $self ) {
+    if ( is_blessed_ref $self ) {
         $args{connect} = $self->get_connect;
 
         $args{token} = $self->token;
@@ -112,13 +112,13 @@ sub connect_rpc ( $self, % ) {
     else {
         $self = bless {}, $self;
 
-        if ( ref $args{connect} eq 'HASH' ) {
+        if ( is_plain_hashref $args{connect} ) {
             $args{token} = $args{connect}->{token} if exists $args{connect}->{token};
 
             $args{connect} = $args{connect}->{connect};
         }
 
-        $args{connect} = [ $args{connect} ] if ref $args{connect} ne 'ARRAY';
+        $args{connect} = [ $args{connect} ] if !is_plain_arrayref $args{connect};
     }
 
     die q[No addresses specified] if !$args{connect}->@*;

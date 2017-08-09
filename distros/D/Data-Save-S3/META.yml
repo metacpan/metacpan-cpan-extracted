@@ -15,7 +15,7 @@ name: Data-Save-S3
 provides:
   Data::Save::S3:
     file: lib/Data/Save/S3.pm
-    version: '20170801'
+    version: '20170809'
 requires:
   Carp: '0'
   Data::Table::Text: '0'
@@ -23,4 +23,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170801'
+version: '20170809'

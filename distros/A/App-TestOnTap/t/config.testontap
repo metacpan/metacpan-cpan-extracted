@@ -3,7 +3,7 @@
 #
 id = 11b95bbe-e494-11e6-83e0-fa17184ebad7
 skip = regexp{^(lib|misc|tsuites)/}
-parallelizable = regexp(.*)
+parallelizable = true
 
 [EXECMAP]
 match1 = regexp(\.t$)

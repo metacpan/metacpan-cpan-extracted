@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.034
+Version 0.035
 
 =head1 SYNOPSIS
 
@@ -195,6 +195,37 @@ Example:
   
 This would avoid the 'unfinished_test.pl' file and contents of any '_data' directories at any level of the suite.
  
+=item B<preprocess>
+
+This is optional. If given, it should describe a simple command line for a command that will be run before tests and this command
+can influence how to run the tests or their context. It will be run with the initial environment and be passed the users arguments
+(if any).
+
+At present it supports manipulation of the environment and the arguments that will be passed to the tests.
+Normally, all tests, for better or worse, will be run with the environment active when TestOnTap was started.
+However, occasionally a test suite may want for example, to ensure that some variables aren't present or that
+they only have certain values, or similar. Same goes for the arguments.
+
+If the script runs and wants to set a specific environment/argument list, it must follow a specific protocol by printing the
+desired values enclosed with begin/end lines. Here's an example for the environment:
+
+  # BEGIN ENV
+  SOMEVARIABLE=somedata
+  # END ENV
+
+Note that this uses C<ENV> as the begin/end marker. For the argument list, use C<ARGV>. In both cases it's one variable or argument
+per line.
+
+Note that if an override is made, it must comprise all values as it completely overwrites what was used beforehand!
+For example, given the above, it's likely no other tests would be possible to run, simply because there is no PATH variable in the variables.
+
+Not printing anything at all is permissible - the current environment is not touched. Lines outside BEGIN/END that are not understood
+are bypassed with a warning, but incorrect variable definitions are fatal errors. 
+
+The C<preprocess> value may be in multi-line/part format, which is required if the command contains
+whitespace in the individual parts. A plain string will be split on space in order to separate the command into
+parts.
+
 =item B<parallelizable>
 
 This is optional, but necessary if parallelization using the '--jobs' flag is to be effective (a warning will be generated

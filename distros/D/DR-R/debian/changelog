@@ -1,0 +1,6 @@
+libdr-r-perl (0.02) unstable; urgency=low
+
+  * Init debian package.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 08 Aug 2017 16:40:28 +0300
+

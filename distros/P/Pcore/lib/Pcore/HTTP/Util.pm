@@ -4,7 +4,7 @@ use Pcore -const;
 use Errno qw[];
 use Pcore::AE::Handle2 qw[:PROXY_TYPE];
 use Pcore::AE::Handle;
-use Pcore::Util::Scalar qw[refaddr];
+use Pcore::Util::Scalar qw[refaddr is_plain_coderef];
 use Compress::Raw::Zlib qw[WANT_GZIP_OR_ZLIB Z_OK Z_STREAM_END];
 
 # https://en.wikipedia.org/wiki/HTTP_compression
@@ -290,7 +290,7 @@ sub _write_request ( $args, $runtime ) {
 
     # prepare content related headers
     if ( defined $args->{body} ) {
-        if ( ref $args->{body} eq 'CODE' ) {
+        if ( is_plain_coderef $args->{body} ) {
             delete $args->{headers}->{CONTENT_LENGTH};
 
             $args->{headers}->{TRANSFER_ENCODING} = 'chunked';
@@ -326,7 +326,7 @@ sub _write_request ( $args, $runtime ) {
 
     # send request body
     if ( defined $args->{body} ) {
-        if ( ref $args->{body} eq 'CODE' ) {
+        if ( is_plain_coderef $args->{body} ) {
             while (1) {
                 if ( my $body_part = $args->{body}->() ) {
 

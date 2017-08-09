@@ -3,6 +3,7 @@ package Pcore::Core::CLI::Opt;
 # NOTE http://docopt.org/
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_hashref];
 
 with qw[Pcore::Core::CLI::Type];
 
@@ -54,13 +55,13 @@ sub BUILD ( $self, $args ) {
         }
         else {
             if ( $self->hash ) {
-                die qq[Option "$name", default value must be a hash for hash option] if ref $self->default ne 'HASH';
+                die qq[Option "$name", default value must be a hash for hash option] if !is_plain_hashref $self->default;
             }
             elsif ( $self->is_repeatable ) {
-                die qq[Option "$name", default value must be a array for repeatable option] if ref $self->default ne 'ARRAY';
+                die qq[Option "$name", default value must be a array for repeatable option] if !is_plain_arrayref $self->default;
             }
             else {
-                die qq[Option "$name", default value must be a string for plain option] if ref $self->default;
+                die qq[Option "$name", default value must be a string for plain option] if is_ref $self->default;
             }
         }
     }
@@ -257,10 +258,10 @@ sub validate ( $self, $opt ) {
         elsif ( !ref $opt->{$name} ) {
             $count = 1;
         }
-        elsif ( ref $opt->{$name} eq 'ARRAY' ) {
+        elsif ( is_plain_arrayref $opt->{$name} ) {
             $count = scalar $opt->{$name}->@*;
         }
-        elsif ( ref $opt->{$name} eq 'HASH' ) {
+        elsif ( is_plain_hashref $opt->{$name} ) {
             $count = scalar keys $opt->{$name}->%*;
         }
 
@@ -288,7 +289,7 @@ sub validate ( $self, $opt ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 34                   | Subroutines::ProhibitExcessComplexity - Subroutine "BUILD" with high complexity score (35)                     |
+## |    3 | 35                   | Subroutines::ProhibitExcessComplexity - Subroutine "BUILD" with high complexity score (35)                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

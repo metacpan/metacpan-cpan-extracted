@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PerinciUtils.pm'
 );
 
 my @scripts = (
+    'script/gen-getopt-long-spec-from-meta',
     'script/normalize-rinci-function-metadata',
     'script/peri-access',
     'script/peri-htserve',

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Merge Blessed Objects.",
+   "abstract" : "Merge Blessed Refs.",
    "author" : [
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
@@ -41,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

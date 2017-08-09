@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-08-09'; # DATE
+our $VERSION = '0.110'; # VERSION
 
 use 5.010;
 use strict;
@@ -303,7 +303,7 @@ sub serve {
         load $class;
         $pa = $class->new(
             load => 0,
-            allow_paths => [map {s!::!/!g; "/$_"} @pkgs],
+            allow_paths => [map {(my $url = $_) =~ s!::!/!g; "/$url"} @pkgs],
             %extra_opts,
         );
     }
@@ -435,7 +435,7 @@ peri-htserve - Serve Perl modules over HTTP(S) using Riap::HTTP protocol
 
 =head1 VERSION
 
-This document describes version 0.10 of peri-htserve (from Perl distribution App-PerinciUtils), released on 2017-07-10.
+This document describes version 0.110 of peri-htserve (from Perl distribution App-PerinciUtils), released on 2017-08-09.
 
 =head1 SYNOPSIS
 
@@ -504,7 +504,7 @@ Will be passed to Gepok.
 
 Will be passed to Gepok.
 
-=item B<--gepok-start-servers>=I<i>
+=item B<--gepok-start-servers>=I<s>
 
 Will be passed to Gepok.
 
@@ -587,7 +587,7 @@ Require a Perl module, a la Perl's -m.
 
 Can be specified multiple times.
 
-=item B<--riap-access-log-histories>=I<i>
+=item B<--riap-access-log-histories>=I<s>
 
 Number of old Riap request access log files to keep.
 
@@ -601,7 +601,7 @@ Path for Riap request access log file.
 Default is ~/peri-htserve-riap_access.log
 
 
-=item B<--riap-access-log-size>=I<i>
+=item B<--riap-access-log-size>=I<s>
 
 Maximum size for Riap request access log file.
 
@@ -629,7 +629,7 @@ Currently only Starman or Gepok is supported. Default is Gepok.
 
 Will be passed to Starman.
 
-=item B<--starman-port>=I<i>
+=item B<--starman-port>=I<s>
 
 Will be passed to Starman.
 

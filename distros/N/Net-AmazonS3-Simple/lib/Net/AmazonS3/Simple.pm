@@ -2,7 +2,7 @@ package Net::AmazonS3::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.4';
 
 use AWS::Signature4;
 use LWP::UserAgent;

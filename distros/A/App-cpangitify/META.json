@@ -14,17 +14,12 @@
    },
    "name" : "App-cpangitify",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "Git::Wrapper" : "0",
-            "Module::Build" : "0.28",
             "Sort::Versions" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010001"
          }
       },
       "develop" : {
@@ -58,6 +53,7 @@
             "JSON::PP" : "0",
             "Path::Class" : "0.26",
             "PerlX::Maybe" : "0.003",
+            "Test2::API" : "1.302086",
             "URI" : "0",
             "perl" : "5.010001"
          }
@@ -66,8 +62,9 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "HTTP::Date" : "0",
+            "Test2::API" : "1.302086",
             "Test2::Plugin::FauxHomeDir" : "0",
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "URI::file" : "0",
             "perl" : "5.010001"
          }
@@ -85,11 +82,11 @@
          "web" : "https://github.com/plicease/App-cpangitify"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Mohammad S Anwar (MANWAR)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

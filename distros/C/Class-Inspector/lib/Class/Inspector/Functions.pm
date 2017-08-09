@@ -7,7 +7,7 @@ use Exporter         ();
 use Class::Inspector ();
 
 # ABSTRACT: Get information about a class and its structure
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 BEGIN {
   our @ISA     = 'Exporter';
@@ -58,7 +58,7 @@ Class::Inspector::Functions - Get information about a class and its structure
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -124,6 +124,8 @@ Contributors:
 Tom Wyant
 
 Steffen Müller
+
+Kivanc Yazan (KYZN)
 
 =head1 COPYRIGHT AND LICENSE
 

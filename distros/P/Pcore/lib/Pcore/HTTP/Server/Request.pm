@@ -1,7 +1,7 @@
 package Pcore::HTTP::Server::Request;
 
 use Pcore -class, -const, -result;
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref];
 use Pcore::Util::List qw[pairs];
 use Pcore::Util::Text qw[encode_utf8];
 
@@ -83,7 +83,7 @@ sub _respond ( $self, @ ) {
         # compose headers
         # https://tools.ietf.org/html/rfc7230#section-3.2
         $buf = do {
-            my $status = blessed $_[1] ? $_[1] : result $_[1];
+            my $status = is_blessed_ref $_[1] ? $_[1] : result $_[1];
 
             "HTTP/1.1 $status->{status} $status->{reason}$CRLF";
         };
@@ -118,7 +118,7 @@ sub _respond ( $self, @ ) {
         elsif ( $body_ref eq 'SCALAR' ) {
             $buf .= sprintf( '%x', bytes::length $body->$* ) . $CRLF . encode_utf8( $body->$* ) . $CRLF;
         }
-        elsif ( $body_ref eq 'ARRAY' ) {
+        elsif ( is_plain_arrayref $body_ref ) {
             my $buf1 = join q[], map { encode_utf8 $_} $body->@*;
 
             $buf .= sprintf( '%x', bytes::length $buf1 ) . $CRLF . $buf1 . $CRLF;

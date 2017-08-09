@@ -1,6 +1,7 @@
 package Pcore::Core::CLI::Type;
 
 use Pcore -role, -const;
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 
 const our $TYPE => {
     Str => sub ($val) {
@@ -33,7 +34,7 @@ const our $TYPE => {
 };
 
 sub _validate_isa ( $self, @ ) {
-    my $vals = ref $_[1] eq 'ARRAY' ? $_[1] : ref $_[1] eq 'HASH' ? [ \values $_[1]->%* ] : [ \$_[1] ];
+    my $vals = is_plain_arrayref $_[1] ? $_[1] : is_plain_hashref $_[1] ? [ \values $_[1]->%* ] : [ \$_[1] ];
 
     my $isa_ref = ref $self->isa;
 
@@ -88,7 +89,7 @@ sub _validate_isa ( $self, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 35                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_validate_isa' declared but not     |
+## |    3 | 36                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_validate_isa' declared but not     |
 ## |      |                      | used                                                                                                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

@@ -13,7 +13,7 @@ $two->thing = { c => 'd', array => [{ d => 'f' }, 2] };
 
 use Blessed::Merge;
 
-my $blessed = Blessed::Merge->new({});
+my $blessed = Blessed::Merge->new();
 
 my $new = $blessed->merge($one, $two);
 

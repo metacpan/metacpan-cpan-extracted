@@ -1,17 +1,19 @@
 package Getopt::Long::EvenLess;
 
-our $DATE = '2017-01-11'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-08-09'; # DATE
+our $VERSION = '0.111'; # VERSION
 
-# let's be minimalistic
-#use strict 'subs', 'vars';
-#use warnings;
+# IFUNBUILT
+# # use strict 'subs', 'vars';
+# # use warnings;
+# END IFUNBUILT
 
 our @EXPORT   = qw(GetOptions);
 our @EXPORT_OK = qw(GetOptionsFromArray);
 
 my $config = {
     pass_through => 0,
+    auto_abbrev => 1,
 };
 
 sub Configure {
@@ -27,6 +29,12 @@ sub Configure {
                 $config->{pass_through} = 1;
             } elsif ($_ eq 'no_pass_through') {
                 $config->{pass_through} = 0;
+            } elsif ($_ eq 'auto_abbrev') {
+                $config->{auto_abbrev} = 1;
+            } elsif ($_ eq 'no_auto_abbrev') {
+                $config->{auto_abbrev} = 0;
+            } elsif ($_ =~ /\A(no_ignore_case|no_getopt_compat|gnu_compat|bundling|permute)\z/) {
+                # ignore, already behaves that way
             } else {
                 die "Unknown configuration '$_'";
             }
@@ -56,7 +64,7 @@ sub GetOptionsFromArray {
     my %spec_by_opt_name;
     for (keys %spec) {
         my $orig = $_;
-        s/=[fios]\@?\z//;
+        s/=[fios][@%]?\z//;
         s/\|.+//;
         $spec_by_opt_name{$_} = $orig;
     }
@@ -66,7 +74,7 @@ sub GetOptionsFromArray {
         my @candidates;
       OPT_SPEC:
         for my $spec (keys %spec) {
-            $spec =~ s/=[fios]\@?\z//;
+            $spec =~ s/=[fios][@%]?\z//;
             my @opts = split /\|/, $spec;
             for my $o (@opts) {
                 next if $short_mode && length($o) > 1;
@@ -74,7 +82,7 @@ sub GetOptionsFromArray {
                     # perfect match, we immediately go with this one
                     @candidates = ($opts[0]);
                     last OPT_SPEC;
-                } elsif (index($o, $wanted) == 0) {
+                } elsif ($config->{auto_abbrev} && index($o, $wanted) == 0) {
                     # prefix match, collect candidates first
                     push @candidates, $opts[0];
                     next OPT_SPEC;
@@ -131,7 +139,7 @@ sub GetOptionsFromArray {
 
             my $spec = $spec_by_opt_name{$opt};
             # check whether option requires an argument
-            if ($spec =~ /=[fios]\@?\z/) {
+            if ($spec =~ /=[fios][@%]?\z/) {
                 if (defined $val_in_opt) {
                     # argument is taken after =
                     $code_set_val->($opt, $val_in_opt);
@@ -171,7 +179,7 @@ sub GetOptionsFromArray {
 
                 my $spec = $spec_by_opt_name{$opt};
                 # check whether option requires an argument
-                if ($spec =~ /=[fios]\@?\z/) {
+                if ($spec =~ /=[fios][@%]?\z/) {
                     if (length $str) {
                         # argument is taken from $str
                         $code_set_val->($opt, $str);
@@ -226,7 +234,7 @@ Getopt::Long::EvenLess - Like Getopt::Long::Less, but with even less features
 
 =head1 VERSION
 
-This document describes version 0.10 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2017-01-11.
+This document describes version 0.111 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2017-08-09.
 
 =head1 DESCRIPTION
 
@@ -288,23 +296,23 @@ handler, etc.
 
 B<Startup overhead>. Here's a sample startup overhead benchmark:
 
-                           Rate     load_gl      run_gl load_gl_less run_gl_less run_gl_evenless load_gl_evenless   perl
- load_gl          69.45+-0.11/s          --       -1.9%       -69.1%      -69.9%          -81.5%           -82.5% -89.8%
- run_gl           70.77+-0.19/s  1.9+-0.32%          --       -68.5%      -69.3%          -81.2%           -82.2% -89.7%
- load_gl_less      224.7+-2.1/s   223.6+-3%   217.5+-3%           --       -2.5%          -40.2%           -43.5% -67.1%
- run_gl_less       230.4+-1.8/s 231.8+-2.7% 225.6+-2.7%    2.5+-1.2%          --          -38.6%           -42.0% -66.3%
- run_gl_evenless   375.5+-4.6/s 440.7+-6.6% 430.6+-6.6%   67.1+-2.5%  62.9+-2.4%              --            -5.6% -45.1%
- load_gl_evenless  397.6+-2.2/s 472.5+-3.3% 461.8+-3.5%   76.9+-1.9%  72.6+-1.7%       5.9+-1.4%               -- -41.9%
- perl                684+-5.1/s 884.9+-7.6% 866.5+-7.7%  204.4+-3.6% 196.8+-3.2%      82.2+-2.6%         72+-1.6%     --
+                             Rate        run_gl     load_gl run_gl_evenless load_gl_evenless run_gl_less load_gl_less   perl
+ run_gl           64.096+-0.092/s            --       -0.5%          -68.6%           -69.2%      -70.1%       -70.4% -90.6%
+ load_gl            64.39+-0.16/s   0.46+-0.29%          --          -68.4%           -69.1%      -70.0%       -70.3% -90.5%
+ run_gl_evenless   203.88+-0.74/s   218.1+-1.2% 216.6+-1.4%              --            -2.1%       -4.9%        -5.8% -70.0%
+ load_gl_evenless  208.24+-0.57/s     224.9+-1% 223.4+-1.2%     2.14+-0.46%               --       -2.8%        -3.8% -69.4%
+ run_gl_less       214.28+-0.62/s   234.3+-1.1% 232.8+-1.3%      5.1+-0.49%       2.9+-0.41%          --        -1.0% -68.5%
+ load_gl_less      216.44+-0.45/s 237.68+-0.85% 236.1+-1.1%     6.16+-0.44%      3.94+-0.36% 1.01+-0.36%           -- -68.2%
+ perl                679.7+-3.7/s     960.5+-6% 955.7+-6.4%     233.4+-2.2%        226.4+-2%   217.2+-2%  214.1+-1.8%     --
  
  Average times:
-   perl            :     1.4620ms
-   load_gl_evenless:     2.5151ms
-   run_gl_evenless :     2.6631ms
-   run_gl_less     :     4.3403ms
-   load_gl_less    :     4.4504ms
-   run_gl          :    14.1303ms
-   load_gl         :    14.3988ms
+   perl            :     1.4712ms
+   load_gl_less    :     4.6202ms
+   run_gl_less     :     4.6668ms
+   load_gl_evenless:     4.8022ms
+   run_gl_evenless :     4.9048ms
+   load_gl         :    15.5304ms
+   run_gl          :    15.6016ms
 
 =head1 FUNCTIONS
 
@@ -319,6 +327,20 @@ Set configuration. Known configurations:
 Ignore errors (unknown/ambiguous option) and still make GetOptions return true.
 
 =item * no_pass_through (default)
+
+=item * no_auto_abbrev
+
+=item * auto_abbrev (default)
+
+=item * no_ignore_case
+
+=item * no_getopt_compat
+
+=item * gnu_compat
+
+=item * bundling
+
+=item * permute
 
 =back
 
@@ -370,7 +392,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

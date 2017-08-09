@@ -55,18 +55,11 @@ sub runtests
 	{
 		my $wdmgr = $self->{testontap}->{args}->getWorkDirManager();
 
-		my %e = %ENV;		 
-		local %ENV = %e;
+		local %ENV = %{$self->{testontap}->{args}->getPreprocess()->getEnv()};
 		$ENV{TESTONTAP_SUITE_DIR} = $sr;
 		$ENV{TESTONTAP_TMP_DIR} = $wdmgr->getTmp();
 		$ENV{TESTONTAP_PRIVATE_DIR} = $wdmgr->getPrivate();
 		
-		# as a very special workaround - when running as a packed binary, any PERL5LIB envvar
-		# is cleared, but if it's really needed, any TESTONTAP_PERL5LIB will be used to reinsert
-		# it here for our children
-		# 
-		$ENV{PERL5LIB} = $ENV{TESTONTAP_PERL5LIB} if ($IS_PACKED && $ENV{TESTONTAP_PERL5LIB});
-
 		if ($self->{testontap}->{args}->useHarness())
 		{
 			# the normal case is to run with a 'real' harness that parses

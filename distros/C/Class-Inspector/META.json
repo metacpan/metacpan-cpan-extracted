@@ -5,7 +5,7 @@
       "Adam Kennedy <adamk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,16 @@
          }
       }
    },
+   "provides" : {
+      "Class::Inspector" : {
+         "file" : "lib/Class/Inspector.pm",
+         "version" : "1.32"
+      },
+      "Class::Inspector::Functions" : {
+         "file" : "lib/Class/Inspector/Functions.pm",
+         "version" : "1.32"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -60,7 +70,14 @@
          "web" : "https://github.com/plicease/Class-Inspector"
       }
    },
-   "version" : "1.31",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0218"
+   "version" : "1.32",
+   "x_contributors" : [
+      "Adam Kennedy <adamk@cpan.org>",
+      "Graham Ollis <plicease@cpan.org>",
+      "Tom Wyant",
+      "Steffen M\u00fcller",
+      "Kivanc Yazan (KYZN)"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

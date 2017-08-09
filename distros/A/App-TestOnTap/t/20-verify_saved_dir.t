@@ -16,7 +16,7 @@ my $suitename = TestUtils::suitename_from_script();
 my $tmpdir = tempdir(CLEANUP => 1);
 ok(-d $tmpdir, "Created tmpdir $tmpdir");
 
-my ($ret, $stdout, $stderr) = TestUtils::xeqsuite('--verbose', '--savedirectory', $tmpdir);
+my ($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose', '--savedirectory', $tmpdir]);
 
 is($ret, 0, "Exited with 0");
 like($stderr->[0], qr/^WARNING: No configuration file found, using blank with generated id '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'!$/, "Generated id");

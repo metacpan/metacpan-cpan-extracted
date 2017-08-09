@@ -2,12 +2,14 @@ NAME
     App::PerinciUtils - Some utilities related to Perinci
 
 VERSION
-    This document describes version 0.10 of App::PerinciUtils (from Perl
-    distribution App-PerinciUtils), released on 2017-07-10.
+    This document describes version 0.110 of App::PerinciUtils (from Perl
+    distribution App-PerinciUtils), released on 2017-08-09.
 
 DESCRIPTION
     This distribution includes a few utility scripts related to Perinci::*
     modules family.
+
+    *   gen-getopt-long-spec-from-meta
 
     *   normalize-rinci-function-metadata
 

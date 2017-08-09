@@ -1,6 +1,7 @@
 package Pcore::Core::Env::Share;
 
 use Pcore -class, -const;
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 
 has _temp => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::File::TempDir'], init_arg => undef );
 has _lib         => ( is => 'ro',   isa => HashRef, default => sub { {} }, init_arg => undef );                   # name => [$level, $path]
@@ -73,7 +74,7 @@ sub get_storage ( $self, $storage_name, $lib_name = undef ) {
 
         # cache lib/storage path, if not cached yet
         if ( !exists $lib_storage->{$lib_name}->{$storage_name} ) {
-            if ( -d $lib_path . $storage_name ) {
+            if ( -d "${lib_path}${storage_name}" ) {
                 $lib_storage->{$lib_name}->{$storage_name} = $lib_path . $storage_name;
             }
             else {
@@ -169,20 +170,20 @@ sub store ( $self, $path, $file, $lib_name, @ ) {
     }
 
     # clear storage cache if new storage was created
-    if ( !-d $lib_path . $args{storage} ) {
+    if ( !-d "${lib_path}$args{storage}" ) {
         delete $self->_storage->{ $args{storage} };
 
         delete $self->_lib_storage->{$lib_name}->{ $args{storage} } if exists $self->_lib_storage->{$lib_name};
     }
 
     # create path
-    P->file->mkpath( $lib_path . $args{storage} . $path->dirname ) if !-d $lib_path . $args{storage} . $path->dirname;
+    P->file->mkpath( $lib_path . $args{storage} . $path->dirname ) if !-d "${lib_path}$args{storage}@{[$path->dirname]}";
 
     # create file
     if ( ref $file eq 'SCALAR' ) {
         P->file->write_bin( $lib_path . $args{storage} . $path, $file );
     }
-    elsif ( ref $file eq 'HASH' || ref $file eq 'ARRAY' ) {
+    elsif ( is_plain_arrayref $file || is_plain_hashref $file ) {
         P->cfg->store( $lib_path . $args{storage} . $path, $file, readable => 1 );
     }
     else {
@@ -199,11 +200,9 @@ sub store ( $self, $path, $file, $lib_name, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 76, 172, 179         | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 147                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 146                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 92                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 93                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

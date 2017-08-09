@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Config;
 
 eval q{ require Test::More };
@@ -12,6 +12,7 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::Plugin
+  Capture::Tiny
   ExtUtils::MakeMaker
   Test2::Mock
   Test2::V0

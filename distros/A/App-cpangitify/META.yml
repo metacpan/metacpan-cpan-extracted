@@ -5,16 +5,16 @@ author:
 build_requires:
   Capture::Tiny: '0'
   HTTP::Date: '0'
-  Module::Build: '0.28'
+  Test2::API: '1.302086'
   Test2::Plugin::FauxHomeDir: '0'
-  Test::More: '0.94'
+  Test2::V0: '0.000060'
   URI::file: '0'
   perl: '5.010001'
 configure_requires:
+  ExtUtils::MakeMaker: '0'
   Git::Wrapper: '0'
-  Module::Build: '0.28'
   Sort::Versions: '0'
-  perl: '5.006'
+  perl: '5.010001'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -35,13 +35,14 @@ requires:
   JSON::PP: '0'
   Path::Class: '0.26'
   PerlX::Maybe: '0.003'
+  Test2::API: '1.302086'
   URI: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/plicease/App-cpangitify/issues
   homepage: https://metacpan.org/pod/App::cpangitify
   repository: git://github.com/plicease/App-cpangitify.git
-version: '0.16'
+version: '0.17'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Mohammad S Anwar (MANWAR)'

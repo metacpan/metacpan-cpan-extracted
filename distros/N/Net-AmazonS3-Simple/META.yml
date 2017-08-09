@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Net::AmazonS3::Simple:
     file: lib/Net/AmazonS3/Simple.pm
-    version: v0.1.3
+    version: v0.1.4
   Net::AmazonS3::Simple::HTTP:
     file: lib/Net/AmazonS3/Simple/HTTP.pm
   Net::AmazonS3::Simple::Object:
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/JaSei/Net-AmazonS3-Simple/issues
   homepage: https://github.com/JaSei/Net-AmazonS3-Simple
   repository: git://github.com/JaSei/Net-AmazonS3-Simple.git
-version: 0.1.3
+version: 0.1.4
 x_authority: cpan:JASEI
 x_contributors:
   - 'Jan Seidl <janseidl@volny.cz>'

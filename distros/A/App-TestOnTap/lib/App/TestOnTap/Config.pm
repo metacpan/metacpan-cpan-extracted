@@ -96,6 +96,20 @@ sub __readCfgFile
 	#
 	$self->{orderstrategy} = App::TestOnTap::OrderStrategy->new($blankSection->{order}) if $blankSection->{order};	
 	
+	# read the preprocess (optional) command
+	#
+	my $preprocesscmd = $blankSection->{preprocess};
+	if (defined($preprocesscmd))
+	{
+		$preprocesscmd =
+			(ref($preprocesscmd) eq 'ARRAY')
+				? $preprocesscmd
+				: ($preprocesscmd =~ m#\n#)
+					? [ split("\n", $preprocesscmd) ]
+					: [ split(' ', $preprocesscmd) ];
+	}
+	$self->{preprocesscmd} = $preprocesscmd;
+	
 	# set up the execmap, possibly as a delegate from a user defined one 
 	#
 	# a non-existing section will cause a default execmap
@@ -105,7 +119,6 @@ sub __readCfgFile
 	$self->{execmap} = $execMap; 
 
 	my %depRules;
-
 	if (!$App::TestOnTap::_dbgvars::IGNORE_DEPENDENCIES)
 	{
 		# find all dependency sections
@@ -128,7 +141,6 @@ sub __readCfgFile
 			}
 		}
 	}
-
 	$self->{deprules} = \%depRules;
 }
 
@@ -162,6 +174,13 @@ sub getOrderStrategy
 	my $self = shift;
 	
 	return $self->{orderstrategy};
+}
+
+sub getPreprocessCmd
+{
+	my $self = shift;
+	
+	return $self->{preprocesscmd};
 }
 
 sub hasParallelizableRule

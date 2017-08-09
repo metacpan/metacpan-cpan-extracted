@@ -1,5 +1,15 @@
 Revision history for Grep-Query
 
+1.007	2017-08-09
+
+	No G::Q changes, just fixing version number(s) in files
+
+1.006	2017-07-03
+
+	Only use op if left side (from users list) is defined
+	Disallow using the bracketing delimiters as 'any' delims
+	Beef up testing using various delimiters
+
 1.005	20170605
 		Comments can be used in query using a begin/end style of '/* some comment */'.
 		The operators true/false (case indifferent) can be used for both non-fielded

@@ -5,7 +5,6 @@ use Pcore::App::API qw[:CONST];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::Util::Text qw[encode_utf8];
 
-# TODO tags
 sub _auth_user_password ( $self, $source_app_instance_id, $private_token, $cb ) {
     state $q1 = <<'SQL';
         SELECT
@@ -65,9 +64,10 @@ SQL
                     app_instance_id => undef,
 
                     permissions => {},
-                };
 
-                my $tags = {};
+                    # user_id
+                    depends_on => [ "password-$user->{id}", $user->{id} ],
+                };
 
                 # not a root user
                 if ( !$auth->{is_root} ) {
@@ -78,7 +78,7 @@ SQL
                     }
                 }
 
-                $cb->( result 200, { auth => $auth, tags => $tags } );
+                $cb->( result 200, $auth );
             }
 
             return;
@@ -382,6 +382,10 @@ sub set_user_password ( $self, $user_id, $user_password_bin, $cb ) {
                                 $cb->( result [ 500, 'Error setting user password' ] );
                             }
                             else {
+
+                                # fire AUTH event if user password was changed
+                                P->fire_event( 'AUTH', "password-$user->{data}->{id}" );
+
                                 $cb->( result 200 );
                             }
                         }
@@ -408,9 +412,15 @@ sub set_user_enabled ( $self, $user_id, $enabled, $cb ) {
                 return;
             }
 
-            if ( !!$enabled ^ $user->{data}->{enabled} ) {
-                if ( $self->dbh->do( q[UPDATE OR IGNORE api_user SET enabled = ? WHERE id = ?], [ !!$enabled, $user->{data}->{id} ] ) ) {
-                    $cb->( result 200 );
+            $enabled = 0+ !!$enabled;
+
+            if ( $enabled ^ $user->{data}->{enabled} ) {
+                if ( $self->dbh->do( q[UPDATE OR IGNORE "api_user" SET "enabled" = ? WHERE "id" = ?], [ $enabled, $user->{data}->{id} ] ) ) {
+
+                    # fire AUTH event if user was disabled
+                    P->fire_event( 'AUTH', $user->{data}->{id} ) if !$enabled;
+
+                    $cb->( result 200, { enabled => $enabled } );
                 }
                 else {
                     $cb->( result [ 500, 'Error set user enabled' ] );
@@ -419,7 +429,7 @@ sub set_user_enabled ( $self, $user_id, $enabled, $cb ) {
             else {
 
                 # not modified
-                $cb->( result 304 );
+                $cb->( result 200, { enabled => $enabled } );
             }
 
             return;
@@ -450,6 +460,10 @@ sub remove_user ( $self, $user_id, $cb ) {
 
                 # user removed
                 else {
+
+                    # fire AUTH event, if user was removed
+                    P->fire_event( 'AUTH', $user->{data}->{id} );
+
                     $cb->($user);
                 }
             }
@@ -506,9 +520,9 @@ SQL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 9, 188, 354          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 8, 188, 354          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 9                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_user_password' declared but   |
+## |    3 | 8                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_user_password' declared but   |
 ## |      |                      | not used                                                                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 109                  | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |

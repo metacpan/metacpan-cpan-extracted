@@ -21,7 +21,7 @@ use CPAN::ReleaseHistory;
 use HTTP::Tiny;
 
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 our $ua  = HTTP::Tiny->new;
@@ -126,6 +126,7 @@ sub main
   my @rel;
   while(my $release = $history->next_release)
   {
+    next unless defined $release->distinfo->dist;
     next unless $names{$release->distinfo->dist};
     push @rel, $release;
   }
@@ -173,7 +174,9 @@ sub main
       $cache->{$cpanid} = decode_json($res->{content})
     }
   
-    sprintf "%s <%s>", $cache->{$cpanid}->{name}, $cache->{$cpanid}->{email}->[0];
+    my $email = $cache->{$cpanid}->{email};
+    $email = $email->[0] if ref($email) eq 'ARRAY';
+    sprintf "%s <%s>", $cache->{$cpanid}->{name}, $email;
   }
 
   foreach my $rel (@rel)
@@ -285,7 +288,7 @@ App::cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 DESCRIPTION
 

@@ -23,6 +23,7 @@
          "requires" : {
             "B" : "0",
             "Carp" : "0",
+            "Devel::OverloadInfo" : "0",
             "Scalar::Util" : "0",
             "Sub::Name" : "0",
             "Symbol" : "0",
@@ -50,7 +51,7 @@
          "web" : "https://github.com/stevan/p5-MOP"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
 }
 

@@ -6,7 +6,9 @@ use Config;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build and make available libffi
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
+
+
 
 
 1;
@@ -23,23 +25,42 @@ Alien::FFI - Build and make available libffi
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
-In your C<Build.PL>:
+In your Build.PL:
 
- use Alien::FFI;
  use Module::Build;
- 
- my $build = Module::Build->new(
+ use Alien::FFI;
+ my $builder = Module::Build->new(
    ...
+   configure_requires => {
+     'Alien::FFI' => '0',
+     ...
+   },
    extra_compiler_flags => Alien::FFI->cflags,
    extra_linker_flags   => Alien::FFI->libs,
    ...
  );
  
  $build->create_build_script;
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Config;
+ use Alien::FFI;
+ 
+ WriteMakefile(
+   ...
+   CONFIGURE_REQUIRES => {
+     'Alien::FFI' => '0',
+   },
+   CCFLAGS => Alien::FFI->cflags . " $Config{ccflags}",
+   LIBS    => [ Alien::FFI->libs ],
+   ...
+ );
 
 =head1 DESCRIPTION
 

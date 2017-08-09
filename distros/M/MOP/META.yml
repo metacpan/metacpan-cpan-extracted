@@ -17,6 +17,7 @@ name: MOP
 requires:
   B: '0'
   Carp: '0'
+  Devel::OverloadInfo: '0'
   Scalar::Util: '0'
   Sub::Name: '0'
   Symbol: '0'
@@ -27,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevan/p5-MOP/issues
   repository: https://github.com/stevan/p5-MOP.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'YAML::Tiny version 1.70'

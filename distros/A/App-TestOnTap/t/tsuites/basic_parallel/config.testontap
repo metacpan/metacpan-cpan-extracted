@@ -1,2 +1,2 @@
 id = 029da227-ccfe-11e6-bcbd-e36661a28085
-parallelizable = regexp(.*)
+parallelizable = true

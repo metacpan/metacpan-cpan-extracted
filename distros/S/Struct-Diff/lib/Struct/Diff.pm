@@ -4,26 +4,18 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use parent qw(Exporter);
-use Carp qw(croak);
-use Storable qw(freeze);
+
+use Scalar::Util qw(looks_like_number);
+use Storable 2.05 qw(freeze);
 use Algorithm::Diff qw(sdiff);
 
 our @EXPORT_OK = qw(
     diff
     list_diff
     split_diff
-    dsplit
-    dtraverse
     patch
+    valid_diff
 );
-
-sub _validate_meta($) {
-    croak "Unsupported diff struct passed" if (ref $_[0] ne 'HASH');
-    if (exists $_[0]->{'D'}) {
-        croak "Value for 'D' status must be hash or array"
-            unless (ref $_[0]->{'D'} eq 'HASH' or ref $_[0]->{'D'} eq 'ARRAY');
-    }
-}
 
 =head1 NAME
 
@@ -31,15 +23,15 @@ Struct::Diff - Recursive diff for nested perl structures
 
 =head1 VERSION
 
-Version 0.89
+Version 0.90
 
 =cut
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 =head1 SYNOPSIS
 
-    use Struct::Diff qw(diff list_diff split_diff patch);
+    use Struct::Diff qw(diff list_diff patch split_diff valid_diff);
 
     $a = {x => [7,{y => 4}]};
     $b = {x => [7,{y => 9}],z => 33};
@@ -55,6 +47,8 @@ our $VERSION = '0.89';
     # $splitted->{b} == {x => [{y => 9}],z => 33}
 
     patch($a, $diff); # $a now equal to $b by structure and data
+
+    @errors = valid_diff($diff);
 
 =head1 EXPORT
 
@@ -128,6 +122,7 @@ sub diff($$;@) {
 
     my $d = {};
     local $Storable::canonical = 1; # for equal snapshots for equal by data hashes
+    local $Storable::Deparse = 1;
 
     if (ref $a ne ref $b) {
         $d->{O} = $a unless ($opts{noO});
@@ -196,7 +191,7 @@ sub diff($$;@) {
 
         $d = $alt # return 'D' version of diff
             if (keys %{$d} > 1 or ($sd) = values %{$d} and keys %{$sd} != @keys);
-    } elsif (ref $a ? $a == $b : freeze(\$a) eq freeze(\$b)) {
+    } elsif (ref $a ? $a == $b || freeze($a) eq freeze($b) : freeze(\$a) eq freeze(\$b)) {
         $d->{U} = $a unless ($opts{noU});
     } else {
         $d->{O} = $a unless ($opts{noO});
@@ -205,15 +200,6 @@ sub diff($$;@) {
 
     return $d;
 }
-
-=head2 dsplit
-
-Is an alias for L</split_diff>. Deprecated, will be removed in future
-releases. L</split_diff> should be used instead.
-
-=cut
-
-*dsplit = \&split_diff;
 
 =head2 list_diff
 
@@ -232,8 +218,8 @@ Don't dive deeper than defined number of levels.
 
 =item sort E<lt>sub|true|falseE<gt>
 
-Defines how to traverse hash subdiffs. Keys will be picked randomely (C<keys>
-behavior, default), sorted by provided subroutine (if value is a coderef) or
+Defines how to handle hash subdiffs. Keys will be picked randomely (default
+C<keys> behavior), sorted by provided subroutine (if value is a coderef) or
 lexically sorted if set to some other true value.
 
 =back
@@ -290,7 +276,6 @@ Divide diff to pseudo original structures
 sub split_diff($);
 sub split_diff($) {
     my $d = $_[0];
-    _validate_meta($d);
     my (%out, $sd);
 
     if (exists $d->{D}) {
@@ -321,77 +306,6 @@ sub split_diff($) {
     return \%out;
 }
 
-=head2 dtraverse
-
-Deprecated. L</list_diff> should be used instead.
-
-Traverse through diff invoking callback function for subdiff statuses.
-
-    my $opts = {
-        callback => sub { print "added value:", $_[0], "depth:", @{$_[1]}, "status:", $_[2]; return 1},
-        sortkeys => sub { sort { $a <=> $b } @_ }   # numeric sort for keys under diff
-    };
-    dtraverse($diff, $opts);
-
-=head3 Options
-
-=over 4
-
-=item depth E<lt>intE<gt>
-
-Don't dive deeper than defined number of levels
-
-=item callback E<lt>subE<gt>
-
-Mandatory option, must contain coderef to callback fuction. Four arguments will be passed to provided
-subroutine: value, path, status and ref to subdiff. Function must return some true value on success. Important:
-path (second argument) is actual for callback lifetime and will be immedeately changed afterwards.
-
-=item sortkeys E<lt>subE<gt>
-
-Defines how will be traversed subdiffs for hashes. Keys will be picked randomely (depends on C<keys> behavior,
-default), sorted by provided subroutine (if value is a coderef) or lexically sorted if set to some other true value.
-
-=item statuses E<lt>listE<gt>
-
-Exact list of statuses. Sequence defines invocation priority.
-
-=back
-
-=cut
-
-sub dtraverse($$;$);
-sub dtraverse($$;$) {
-    my ($d, $o, $p) = (shift, shift, shift || []);
-    croak "Callback must be a code reference" unless (ref $o->{'callback'} eq 'CODE');
-    croak "Statuses argument must be an arrayref" if ($o->{'statuses'} and ref $o->{'statuses'} ne 'ARRAY');
-    _validate_meta($d);
-
-    if (exists $d->{'D'} and (not exists $o->{'depth'} or $o->{'depth'} >= @{$p})) {
-        if (ref $d->{'D'} eq 'ARRAY') {
-            for (my $i = 0; $i < @{$d->{'D'}}; $i++) {
-                push @{$p}, [ exists $d->{'D'}->[$i]->{I} ? $d->{'D'}->[$i]->{I} : $i ];
-                dtraverse($d->{'D'}->[$i], $o, $p) or return undef;
-                pop @{$p};
-            }
-        } else { # HASH
-            my @keys = keys %{$d->{'D'}};
-            @keys = ref $o->{'sortkeys'} eq 'CODE' ? $o->{'sortkeys'}(@keys) : sort @keys if ($o->{'sortkeys'});
-            for my $k (@keys) {
-                push @{$p}, { 'keys' => [$k] };
-                dtraverse($d->{'D'}->{$k}, $o, $p) or return undef;
-                pop @{$p};
-            }
-        }
-    } else {
-        for ($o->{'statuses'} ? @{$o->{'statuses'}} : keys %{$d}) {
-            next unless (exists $d->{$_});
-            $o->{'callback'}($d->{$_}, $p, $_, \$d) or return undef;
-        }
-    }
-    return 1;
-}
-
 =head2 patch
 
 Apply diff
@@ -406,7 +320,6 @@ sub patch($$) {
 
     while (@stack) {
         ($s, $d) = splice @stack, 0, 2;
-        _validate_meta($d);
 
         if (exists $d->{D}) {
             if (ref $d->{D} eq 'ARRAY') {
@@ -441,13 +354,71 @@ sub patch($$) {
     }
 }
 
+=head2 valid_diff
+
+Validate diff structure. In scalar context returns C<1> for valid diff, C<undef>
+otherwise. In list context returns list of pairs (path, type) for each error. See
+L<Struct::Path/ADDRESSING SCHEME> for path format specification.
+
+    @errors_list = valid_diff($diff); # list context
+
+or
+
+    $is_valid = valid_diff($diff); # scalar context
+
+=cut
+
+sub valid_diff($) {
+    my @stack = ([], shift); # (path, diff)
+    my ($diff, @errs, $path);
+
+    while (@stack) {
+        ($path, $diff) = splice @stack, 0, 2;
+
+        unless (ref $diff eq 'HASH') {
+            return undef unless wantarray;
+            push @errs, $path, 'BAD_DIFF_TYPE';
+            next;
+        }
+
+        if (exists $diff->{D}) {
+            if (ref $diff->{D} eq 'ARRAY') {
+                map {
+                    unshift @stack, [@{$path}, [$_]], $diff->{D}->[$_]
+                } 0 .. $#{$diff->{D}};
+            } elsif (ref $diff->{D} eq 'HASH') {
+                map {
+                    unshift @stack, [@{$path}, {keys => [$_]}], $diff->{D}->{$_}
+                } sort keys %{$diff->{D}};
+            } else {
+                return undef unless wantarray;
+                unshift @errs, $path, 'BAD_D_TYPE';
+            }
+        }
+
+        if (exists $diff->{I}) {
+            if (!looks_like_number($diff->{I}) or int($diff->{I}) != $diff->{I}) {
+                return undef unless wantarray;
+                unshift @errs, $path, 'BAD_I_TYPE';
+            }
+
+            if (keys %{$diff} < 2) {
+                return undef unless wantarray;
+                unshift @errs, $path, 'LONESOME_I';
+            }
+        }
+    }
+
+    return wantarray ? @errs : 1;
+}
+
 =head1 LIMITATIONS
 
 Struct::Diff fails on structures with loops in references. C<has_circular_ref>
 from L<Data::Structure::Util> can help to detect such structures.
 
-Only scalars, refs to scalars, ref to arrays and ref to hashes correctly traversed.
-All other data types compared by their references.
+Only arrays and hashes traversed. All other data types compared by their
+references or content.
 
 No object oriented interface provided.
 

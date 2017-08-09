@@ -1,5 +1,5 @@
 ---
-abstract: 'Merge Blessed Objects.'
+abstract: 'Merge Blessed Refs.'
 author:
   - 'Robert Acock <thisusedtobeanemail@gmail.com>'
 build_requires:
@@ -23,5 +23,5 @@ requires:
   Combine::Keys: '0.08'
   Scalar::Util: '0'
   perl: '5.006'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

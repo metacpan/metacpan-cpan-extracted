@@ -309,9 +309,6 @@ subtest "hash of scalar (--foo k1=v1 --foo k2=v2)" => sub {
     test_getargs(meta=>$meta, argv=>[qw/--hs 1/],
                  status=>500,
                  name=>"invalid pair syntax");
-    test_getargs(meta=>$meta, argv=>[qw/--hi k1=x/],
-                 status=>500,
-                 name=>"int, type checked");
     test_getargs(meta=>$meta, argv=>[qw/--hi k1=1/],
                  args=>{hi=>{k1=>1}},
                  name=>"int, 1");

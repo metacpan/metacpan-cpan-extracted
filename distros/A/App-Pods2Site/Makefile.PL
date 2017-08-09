@@ -70,7 +70,7 @@ WriteMakefile(
 			'File::Spec' => 0,
 			'File::Temp' => 0,
 			'Getopt::Long' => 0,
-			'Grep::Query' => '1.005',
+			'Grep::Query' => '1.006',
 			'HTML::Entities' => 0,
 			'JSON' => 0,
 			'List::MoreUtils' => 0,

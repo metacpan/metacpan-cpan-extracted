@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.31
+    version 1.32
 
 SYNOPSIS
 
@@ -243,6 +243,8 @@ AUTHOR
     Tom Wyant
 
     Steffen Müller
+
+    Kivanc Yazan (KYZN)
 
 COPYRIGHT AND LICENSE
 

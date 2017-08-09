@@ -2,13 +2,14 @@ package Pcore::Core::Guard;
 
 use Pcore -role;
 use Variable::Magic;
+use Pcore::Util::Scalar qw[is_plain_coderef];
 
 my $WIZ = Variable::Magic::wizard(
     data => sub {
         return $_[1];
     },
     free => sub {
-        if ( ref $_[1] eq 'CODE' ) {
+        if ( is_plain_coderef $_[1] ) {
             $_[1]->( $_[0]->$* );
         }
         else {

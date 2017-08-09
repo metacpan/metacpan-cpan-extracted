@@ -14,6 +14,12 @@
    },
    "name" : "Dancer2-Plugin-Paginator",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -42,7 +48,7 @@
          "web" : "https://github.com/manwar/Dancer2-Plugin-Paginator"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

@@ -1,6 +1,7 @@
 package Pcore::Core::CLI;
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
 use Getopt::Long qw[];
 use Pcore::Core::CLI::Opt;
 use Pcore::Core::CLI::Arg;
@@ -364,16 +365,16 @@ sub _get_class_spec ( $self, $class = undef ) {
     $class //= $self->class;
 
     if ( $class->can('CLI') && ( my $spec = $class->CLI ) ) {
-        if ( !ref $spec ) {
+        if ( !is_ref $spec ) {
             $spec = { class => $spec };
         }
-        elsif ( ref $spec eq 'ARRAY' ) {
+        elsif ( is_plain_arrayref $spec ) {
             $spec = { cmd => $spec };
         }
         else {
-            $spec->{cmd} = [ $spec->{cmd} ] if $spec->{cmd} && !ref $spec->{cmd};
+            $spec->{cmd} = [ $spec->{cmd} ] if $spec->{cmd} && !is_ref $spec->{cmd};
 
-            $spec->{name} = [ $spec->{name} ] if $spec->{name} && !ref $spec->{name};
+            $spec->{name} = [ $spec->{name} ] if $spec->{name} && !is_ref $spec->{name};
         }
 
         return $spec;
@@ -575,13 +576,13 @@ sub help_error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 44                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 45                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 342                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 343                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 507, 535             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
+## |    3 | 508, 536             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 111                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 112                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -4,14 +4,14 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Scalar::Util qw/reftype/;
 use Carp qw/croak/;
 use Combine::Keys qw/combine_keys/;
 
 sub new {
-	my ($pkg, $args) = (shift, reftype $_[0] eq 'HASH' ? $_[0] : {@_});
+	my ($pkg, $args) = (shift, $_[0] && reftype $_[0] eq 'HASH' ? $_[0] : {@_});
 	my $self = bless $args, $pkg;
 	$self->{same} = 1 unless exists $self->{same};
 	return $self;
@@ -21,7 +21,7 @@ sub merge {
 	my ($self, $base_bless, $new) = (shift, ref $_[0], shift);
 	map {
 		if ( $self->{same} ) {
-			croak 'Attempting to merge two differnt classes' unless $base_bless eq ref $_;
+			croak 'Attempting to merge two differnt *packages*' unless $base_bless eq ref $_;
 		}
 		$new = $self->_merge($new, $_);
 	} @_;
@@ -53,11 +53,11 @@ sub _merge {
 
 =head1 NAME
 
-Blessed::Merge - Merge Blessed Objects.
+Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

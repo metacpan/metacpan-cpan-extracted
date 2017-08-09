@@ -16,14 +16,14 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 our $system_path;
-our $os = $ENV{FFI_CHECKLIB_TEST_OS} || $^O;
-our $dyna_loader = 'DynaLoader';
+our $os ||= $^O;
+our $dyna_loader ||= 'DynaLoader';
 
-if($os eq 'MSWin32')
+if($os eq 'MSWin32' || $os eq 'msys')
 {
   $system_path = eval q{
     use Env qw( @PATH );
@@ -257,7 +257,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -282,9 +282,8 @@ directly into L<FFI::Platypus> or L<FFI::Raw>.
 
 Although intended mainly for FFI modules via L<FFI::Platypus> and 
 similar, this module does not actually use any FFI to do its detection 
-and probing.  This modules does not have any non-core dependencies on 
-Perls 5.8-5.18.  On Perl 5.20 and newer it has a configure, build and 
-test dependency on L<Module::Build>.
+and probing.  This module does not have any non-core runtime dependencies.
+The test suite does depend on L<Test2::Suite>.
 
 =head1 FUNCTIONS
 
@@ -415,6 +414,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Bakkiaraj Murugesan (bakkiaraj)
+
+Dan Book (grinnz, DBOOK)
 
 =head1 COPYRIGHT AND LICENSE
 

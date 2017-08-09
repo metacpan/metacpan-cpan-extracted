@@ -3,6 +3,7 @@ package Pcore::Util::Term::Progress::Indicator;
 use Pcore -role;
 use POSIX qw[strftime];
 use Time::HiRes qw[];
+use Pcore::Util::Scalar qw[is_plain_coderef];
 
 requires qw[_draw];
 
@@ -66,7 +67,7 @@ sub BUILD ( $self, $args ) {
 sub _build__format_value ($self) {
     my $value_format = $self->value_format;
 
-    if ( ref $value_format eq 'CODE' ) {
+    if ( is_plain_coderef $value_format ) {
         return $value_format;
     }
     else {
@@ -84,7 +85,7 @@ sub _build__format_value ($self) {
 sub _build__format_total ($self) {
     my $total_format = $self->total_format;
 
-    if ( ref $total_format eq 'CODE' ) {
+    if ( is_plain_coderef $total_format ) {
         return $total_format;
     }
     else {
@@ -102,7 +103,7 @@ sub _build__format_total ($self) {
 sub _build__format_percent ($self) {
     my $percent_format = $self->percent_format;
 
-    if ( ref $percent_format eq 'CODE' ) {
+    if ( is_plain_coderef $percent_format ) {
         return $percent_format;
     }
     else {
@@ -115,7 +116,7 @@ sub _build__format_percent ($self) {
 sub _build__format_speed ($self) {
     my $speed_format = $self->speed_format;
 
-    if ( ref $speed_format eq 'CODE' ) {
+    if ( is_plain_coderef $speed_format ) {
         return $speed_format;
     }
     else {
@@ -133,7 +134,7 @@ sub _build__format_speed ($self) {
 sub _build__format_time ($self) {
     my $time_format = $self->time_format;
 
-    if ( ref $time_format eq 'CODE' ) {
+    if ( is_plain_coderef $time_format ) {
         return $time_format;
     }
     else {
@@ -246,7 +247,7 @@ sub update ( $self, %args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 235                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 236                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,13 +1,14 @@
-#!/usr/bin/perl
+#!perl
 
 use strict;
 use warnings;
 use 5.010001;
+#use lib::findbin '../lib'; # dev-only
 use App::cpangitify;
 
 # PODNAME: cpangitify
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 exit App::cpangitify->main(@ARGV);
@@ -24,7 +25,7 @@ cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

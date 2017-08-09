@@ -5,7 +5,6 @@ use Pcore::App::API qw[:CONST];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::Util::Text qw[encode_utf8];
 
-# TODO tags
 sub _auth_user_token ( $self, $source_app_instance_id, $private_token, $cb ) {
     state $q1 = <<'SQL';
         SELECT
@@ -82,16 +81,17 @@ SQL
                     app_instance_id => undef,
 
                     permissions => {},
-                };
 
-                my $tags = {};
+                    # user_id, user_token_id
+                    depends_on => [ $user_token->{user_id}, $private_token->[1] ],
+                };
 
                 # get permissions
                 if ( my $roles = $self->dbh->selectall( $q1, [ $source_app_instance_id, $private_token->[1] ] ) ) {
                     $auth->{permissions} = { map { $_->{app_role_name} => 1 } $roles->@* };
                 }
 
-                $cb->( result 200, { auth => $auth, tags => $tags } );
+                $cb->( result 200, $auth );
             }
 
             return;
@@ -239,6 +239,10 @@ sub create_user_token ( $self, $user_id, $desc, $permissions, $cb ) {
 
 sub remove_user_token ( $self, $user_token_id, $cb ) {
     if ( $self->dbh->do( q[DELETE OR IGNORE FROM api_user_token WHERE id = ?], [$user_token_id] ) ) {
+
+        # fire AUTH event if user token was removed
+        P->fire_event( 'AUTH', $user_token_id );
+
         $cb->( result 200 );
     }
     else {
@@ -255,9 +259,9 @@ sub remove_user_token ( $self, $user_token_id, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 9, 104               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 8, 104               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 9                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_user_token' declared but not  |
+## |    3 | 8                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_user_token' declared but not  |
 ## |      |                      | used                                                                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 155, 182, 190, 196   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |

@@ -37,7 +37,7 @@ has validator =>
 	required	=> 0,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # -----------------------------------------------
 
@@ -840,7 +840,7 @@ L<MojoX::Validate::Util> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>
 
 My homepage: L<http://savage.net.au/>.
 
-=head1 Copyright
+=head1 Copyright and Licence
 
 Australian copyright (c) 2017, Ron Savage.
 

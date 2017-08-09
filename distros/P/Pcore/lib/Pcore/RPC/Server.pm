@@ -3,6 +3,7 @@ package Pcore::RPC::Server;
 use Pcore;
 use Pcore::HTTP::Server;
 use Pcore::WebSocket;
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 use if $MSWIN, 'Win32API::File';
 
 sub run ( $class, $rpc_boot_args ) {
@@ -71,7 +72,7 @@ sub run ( $class, $rpc_boot_args ) {
         no strict qw[refs];
 
         if ( ${"$class\::RPC_LISTEN_EVENTS"} ) {
-            push $listen_events->@*, ref ${"$class\::RPC_LISTEN_EVENTS"} eq 'ARRAY' ? ${"$class\::RPC_LISTEN_EVENTS"}->@* : ${"$class\::RPC_LISTEN_EVENTS"};
+            push $listen_events->@*, is_plain_arrayref ${"$class\::RPC_LISTEN_EVENTS"} ? ${"$class\::RPC_LISTEN_EVENTS"}->@* : ${"$class\::RPC_LISTEN_EVENTS"};
         }
     }
 
@@ -157,11 +158,11 @@ sub run ( $class, $rpc_boot_args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 8                    | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (27)                       |
+## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (27)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 113                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 114                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 41                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 42                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

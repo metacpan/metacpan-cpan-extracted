@@ -4,6 +4,7 @@ use Pcore -const, -class;
 use Pcore::Util::Text::Table::Column;
 use Pcore::Util::List qw[pairs];
 use Pcore::Util::Text qw[wrap];
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 
 const our $GRID => {
     ascii => [
@@ -199,12 +200,12 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
     for my $col ( $self->cols->@* ) {
         my $val;
 
-        if ( ref $row eq 'ARRAY' ) {
+        if ( is_plain_arrayref $row ) {
 
             # ArrayRef
             $val = $row->[ $col->{idx} ];
         }
-        elsif ( ref $row eq 'HASH' ) {
+        elsif ( is_plain_hashref $row ) {
 
             # HashRef
             $val = $row->{ $col->{id} };
@@ -214,9 +215,7 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
             # Object
             my $id = $col->{id};
 
-            $val = eval { $row->$id };
-
-            $val = $row->{$id} if $@;
+            eval { $val = $row->$id; 1; } or do { $val = $row->{$id} if $@ };
         }
 
         my $align;
@@ -316,7 +315,7 @@ sub _render_line ( $self, $idx ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 178                  | Subroutines::ProhibitExcessComplexity - Subroutine "_render_row" with high complexity score (33)               |
+## |    3 | 179                  | Subroutines::ProhibitExcessComplexity - Subroutine "_render_row" with high complexity score (34)               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

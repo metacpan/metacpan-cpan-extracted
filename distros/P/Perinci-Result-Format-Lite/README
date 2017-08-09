@@ -1,32 +1,58 @@
+NAME
+    Perinci::Result::Format::Lite - Format enveloped result
+
+VERSION
+    This document describes version 0.26 of Perinci::Result::Format::Lite
+    (from Perl distribution Perinci-Result-Format-Lite), released on
+    2017-08-09.
+
 SYNOPSIS
-
 DESCRIPTION
-
 FUNCTIONS
-
- format($res, $format[ , $is_naked=0, $cleanse=1 ]) => str
-
+  format($res, $format[ , $is_naked=0, $cleanse=1 ]) => str
 ENVIRONMENT
-
- FORMAT_PRETTY_TABLE_BACKEND => str
-
+  FORMAT_PRETTY_TABLE_BACKEND => str
     If this is set, will render text table using Text::Table::Any (with
-    backend set to the value of this environment variable) instead of the
+    "backend" set to the value of this environment variable) instead of the
     default Text::Table::Tiny. This is useful if you want to output text
     table in a different format, for example to generate Org tables (make
     sure Text::Table::Org backend is already installed):
 
      % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid
 
- FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
-
-    Set the default of table_column_orders in format_options in result
+  FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
+    Set the default of "table_column_orders" in "format_options" in result
     metadata, similar to what's implemented in Perinci::Result::Format and
     Data::Format::Pretty::Console.
 
-SEE ALSO
+  COLOR => bool
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Result-Format-Lite>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Result-Format-Lite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format
+    -Lite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::Result::Format, a more heavyweight version of this module.
 
     Perinci::CmdLine::Lite uses this module to format enveloped result.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -16,5 +16,8 @@ on 'test' => sub {
 on 'develop' => sub {
     requires 'Module::Build::Tiny';
     requires 'Minilla';
+
+    #release
+    requires 'CPAN::Uploader';
     requires 'Version::Next';
 };

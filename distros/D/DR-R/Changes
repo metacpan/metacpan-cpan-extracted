@@ -4,3 +4,6 @@ Revision history for Perl extension DR::R.
 	- original version; created by h2xs 1.23 with options
 		-Ac DR::R
 
+0.02  Tue Aug  8 16:23:46 MSK 2017
+        - add $tree->select method
+        - add benchmarks

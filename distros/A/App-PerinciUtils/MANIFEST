@@ -8,12 +8,14 @@ Makefile.PL
 README
 dist.ini
 lib/App/PerinciUtils.pm
+script/gen-getopt-long-spec-from-meta
 script/normalize-rinci-function-metadata
 script/peri-access
 script/peri-htserve
 script/peri-run
 script/wrap-with-perinci-sub-wrapper
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-rinci.t

@@ -3,6 +3,7 @@ package Pcore::HTTP::Response;
 use Pcore -class;
 use Pcore::HTTP::Headers;
 use HTTP::Message;    # TODO requires for decode body
+use Pcore::Util::Scalar qw[is_plain_coderef];
 
 with qw[Pcore::Util::Result::Status];
 
@@ -40,7 +41,7 @@ sub _build_decoded_body ($self) {
 
 # TO_PSGI
 sub to_psgi ($self) {
-    if ( $self->has_body && ref $self->body eq 'CODE' ) {
+    if ( $self->has_body && is_plain_coderef $self->body ) {
         return $self->body;
     }
     else {

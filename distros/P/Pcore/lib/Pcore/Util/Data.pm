@@ -18,7 +18,7 @@ use Pcore -const, -export,
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar];
 use Pcore::Util::List qw[pairs];
 use Sort::Naturally qw[nsort];
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref];
 use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 const our $DATA_TYPE_PERL => 1;
@@ -205,7 +205,7 @@ sub encode_data ( $type, $data, @ ) {
     if ( defined $args{secret} ) {
         my $secret;
 
-        if ( ref $args{secret} eq 'ARRAY' ) {
+        if ( is_plain_arrayref $args{secret} ) {
             $secret = $args{secret}->[ $args{secret_index} ];
         }
         else {
@@ -243,7 +243,7 @@ sub encode_data ( $type, $data, @ ) {
 
     # add token
     if ( $args{token} ) {
-        $res->$* .= sprintf( '#%x', ( $args{compress} // 0 ) . ( defined $args{secret} ? $args{cipher} : 0 ) . ( $args{secret_index} // 0 ) . ( $args{encode} // 0 ) . $type ) . sprintf( '#%x', bytes::length $res->$* );
+        $res->$* .= sprintf( '#%x', ( $args{compress} // 0 ) . ( defined $args{secret} ? $args{cipher} : 0 ) . ( $args{secret_index} // 0 ) . ( $args{encode} // 0 ) . $type ) . sprintf '#%x', bytes::length $res->$*;
     }
 
     return $res;
@@ -302,7 +302,7 @@ sub decode_data ( $type, @ ) {
     if ( $args{cipher} && defined $args{secret} ) {
         my $secret;
 
-        if ( ref $args{secret} eq 'ARRAY' ) {
+        if ( is_plain_arrayref $args{secret} ) {
             $secret = $args{secret}->[ $args{secret_index} ];
         }
         else {
@@ -577,11 +577,11 @@ sub from_b85 {
 # URI
 sub to_uri {
     if ( ref $_[0] ) {
-        my $data = blessed $_[0] && $_[0]->isa('Pcore::Util::Hash::Multivalue') ? $_[0]->get_hash : $_[0];
+        my $data = is_blessed_ref $_[0] && $_[0]->isa('Pcore::Util::Hash::Multivalue') ? $_[0]->get_hash : $_[0];
 
         my @res;
 
-        if ( ref $data eq 'ARRAY' ) {
+        if ( is_plain_arrayref $data ) {
             for ( my $i = 0; $i <= $data->$#*; $i += 2 ) {
                 push @res, join q[=], defined $data->[$i] ? URI::Escape::XS::encodeURIComponent( $data->[$i] ) : q[], defined $data->[ $i + 1 ] ? URI::Escape::XS::encodeURIComponent( $data->[ $i + 1 ] ) : ();
             }
@@ -624,9 +624,9 @@ sub from_uri {
 
         $encoding->{ $args{encoding} } //= Encode::find_encoding( $args{encoding} );
 
-        eval { $u = $encoding->{ $args{encoding} }->decode( $u, Encode::FB_CROAK | Encode::LEAVE_SRC ) };
-
-        utf8::upgrade($u) if $@;
+        eval { $u = $encoding->{ $args{encoding} }->decode( $u, Encode::FB_CROAK | Encode::LEAVE_SRC ); 1; } or do {
+            utf8::upgrade($u) if $@;
+        };
     }
 
     if ( defined wantarray ) {
@@ -676,19 +676,15 @@ sub from_uri_query {
         if ($enc) {
 
             # decode key
-            eval {    #
-                $key = $enc->decode( $key, Encode::FB_CROAK | Encode::LEAVE_SRC );
+            eval { $key = $enc->decode( $key, Encode::FB_CROAK | Encode::LEAVE_SRC ); 1; } or do {
+                utf8::upgrade($key) if $@;
             };
-
-            utf8::upgrade($key) if $@;
 
             # decode value
             if ( defined $val ) {
-                eval {    #
-                    $val = $enc->decode( $val, Encode::FB_CROAK | Encode::LEAVE_SRC );
+                eval { $val = $enc->decode( $val, Encode::FB_CROAK | Encode::LEAVE_SRC ); 1; } or do {
+                    utf8::upgrade($val) if $@;
                 };
-
-                utf8::upgrade($val) if $@;
             }
         }
 
@@ -722,9 +718,9 @@ sub to_xor ( $buf, $mask ) {
 
     my $tmp_buf = my $out = q[];
 
-    $out .= $tmp_buf ^ $mask while length( $tmp_buf = substr( $buf, 0, $mlen, q[] ) ) == $mlen;
+    $out .= $tmp_buf ^ $mask while length( $tmp_buf = substr $buf, 0, $mlen, q[] ) == $mlen;
 
-    $out .= $tmp_buf ^ substr( $mask, 0, length $tmp_buf );
+    $out .= $tmp_buf ^ substr $mask, 0, length $tmp_buf;
 
     return $out;
 }
@@ -742,13 +738,9 @@ sub to_xor ( $buf, $mask ) {
 ## |      | 49                   | * Subroutine "encode_data" with high complexity score (35)                                                     |
 ## |      | 254                  | * Subroutine "decode_data" with high complexity score (33)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 627, 679, 687        | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 585                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 725                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 246, 725, 727        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    2 | 721                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

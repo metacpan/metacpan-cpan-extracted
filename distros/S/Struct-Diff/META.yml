@@ -4,7 +4,6 @@ author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
   Data::Dumper: 0
-  Storable: 2.01
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
@@ -21,13 +20,13 @@ no_index:
     - inc
 requires:
   Algorithm::Diff: 1.19
-  Carp: 0
   Exporter: 0
-  Storable: 2.01
+  Scalar::Util: 0
+  Storable: 2.05
   parent: 0
   perl: 5.008
   strict: 0
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Diff.pm
-version: 0.89
+version: 0.90

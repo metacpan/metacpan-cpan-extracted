@@ -10,7 +10,7 @@ use UNIVERSAL::Object::Immutable;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.07';
+our $VERSION   = '0.08';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' }
@@ -35,7 +35,8 @@ sub BUILDARGS {
     Carp::croak('[ARGS] You must specify a slot initializer')
         unless $args->{initializer};
     Carp::croak('[ARGS] The initializer specified must be a CODE reference')
-        unless ref $args->{initializer} eq 'CODE';
+        unless ref $args->{initializer} eq 'CODE'
+            || MOP::Internal::Util::CAN_COERCE_TO_CODE_REF( $args->{initializer} );
 
     return $args;
 }
@@ -60,7 +61,9 @@ sub name {
 
 sub initializer {
     my ($self) = @_;
-    return $self->[1];
+    return MOP::Internal::Util::CAN_COERCE_TO_CODE_REF( $self->[1] )
+        ? \&{ $self->[1] }
+        : $self->[1];
 }
 
 sub origin_stash {
@@ -99,7 +102,7 @@ MOP::Slot - A representation of a class slot
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

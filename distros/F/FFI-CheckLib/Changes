@@ -1,5 +1,8 @@
 Revision history for FFI-CheckLib
 
+0.16      2017-08-08 10:24:49 -0400
+  - Tentative support for msys
+
 0.15      2016-05-05 19:53:32 -0400
   - Add MSYS2 support
 

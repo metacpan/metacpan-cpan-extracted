@@ -14,7 +14,7 @@ our $etag = md5_hex("$content\n");
 my $content_length = length $content;
 
 my $object_file_path = Path::Tiny->tempfile();
-$object_file_path->spew("$content\n");
+$object_file_path->spew_raw("$content\n");
 
 my $obj = Net::AmazonS3::Simple::Object::File->create_from_response(
     validate  => 1,

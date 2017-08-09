@@ -1,4 +1,8 @@
 Revision history for Alien-Libxml2
 
+0.02      2017-08-08 15:17:54 -0400
+  - Require Alien::Build 0.73 for bug fixes
+    related to parallel builds
+
 0.01      2017-03-30 18:05:22 -0400
   - initial version

@@ -30,7 +30,7 @@ requires:
   File::Spec: '0'
   File::Temp: '0'
   Getopt::Long: '0'
-  Grep::Query: '1.005'
+  Grep::Query: '1.006'
   HTML::Entities: '0'
   JSON: '0'
   List::MoreUtils: '0'
@@ -40,5 +40,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-Pods2Site.git
-version: '0.012'
+version: '0.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

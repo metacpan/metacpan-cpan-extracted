@@ -1,0 +1,65 @@
+NAME
+    Text::DumbTemplate - Yet another template system, this one's dumb but
+    fast
+
+VERSION
+    This document describes version 0.001 of Text::DumbTemplate (from Perl
+    distribution Text-DumbTemplate), released on 2017-08-09.
+
+SYNOPSIS
+     use Text::DumbTemplate;
+
+     my $td = Text::DumbTemplate->new(
+     );
+
+     $td->template(<<'_');
+     Hello, good [%= greeting %]!
+     My name is [%= name %].
+     I am [%= age %] year(s) old.
+     Nice to meet you.
+     _
+
+     $td->var(greeting => 'morning');
+     $td->var(name => 'Ujang');
+     $td->var(age => 25);
+
+     print $td->process;
+
+DESCRIPTION
+    EARLY, EXPERIMENTAL, PROOF OF CONCEPT.
+
+    This is a very simple template module. One thing that's unique about
+    this module is: it compiles template to a "sprintf" format instead of
+    Perl subroutines. The upside: it's blazing fast (e.g. several times
+    faster than Template::Compiled for small/simple template).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-DumbTemplate>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-DumbTemplate>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-DumbTemplate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::sprintfn
+
+    Text::Table::Tiny which also harness the power of "sprintfn" to draw
+    text tables.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

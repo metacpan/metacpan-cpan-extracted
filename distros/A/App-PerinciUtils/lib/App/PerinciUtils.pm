@@ -1,7 +1,7 @@
 package App::PerinciUtils;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-08-09'; # DATE
+our $VERSION = '0.110'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::PerinciUtils - Some utilities related to Perinci
 
 =head1 VERSION
 
-This document describes version 0.10 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2017-07-10.
+This document describes version 0.110 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2017-08-09.
 
 =head1 DESCRIPTION
 
@@ -28,6 +28,8 @@ This distribution includes a few utility scripts related to Perinci::* modules
 family.
 
 =over
+
+=item * L<gen-getopt-long-spec-from-meta>
 
 =item * L<normalize-rinci-function-metadata>
 

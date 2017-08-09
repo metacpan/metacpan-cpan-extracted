@@ -2,6 +2,7 @@ package Pcore::App::Controller::API;
 
 use Pcore -role, -result, -const;
 use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor from_uri_query];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::WebSocket;
 
 with qw[Pcore::App::Controller];
@@ -148,8 +149,6 @@ sub run ( $self, $req ) {
 }
 
 sub _http_api_router ( $self, $auth, $data, $cb ) {
-    $data = [$data] if ref $data ne 'ARRAY';
-
     my $response;
 
     my $cv = AE::cv sub {
@@ -160,7 +159,7 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
 
     $cv->begin;
 
-    for my $tx ( $data->@* ) {
+    for my $tx ( is_plain_arrayref $data ? $data->@* : $data ) {
 
         # TODO required only for compatibility with old clients, can be removed
         $tx->{type} ||= $TX_TYPE_RPC;

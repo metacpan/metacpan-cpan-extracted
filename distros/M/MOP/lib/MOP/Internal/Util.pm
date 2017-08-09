@@ -4,13 +4,14 @@ package MOP::Internal::Util;
 use strict;
 use warnings;
 
-use B            (); # nasty stuff, all nasty stuff
-use Carp         (); # errors and stuff
-use Sub::Name    (); # handling some sub stuff
-use Symbol       (); # creating the occasional symbol
-use Scalar::Util (); # I think I use blessed somewhere in here ...
+use B                   (); # nasty stuff, all nasty stuff
+use Carp                (); # errors and stuff
+use Sub::Name           (); # handling some sub stuff
+use Symbol              (); # creating the occasional symbol
+use Scalar::Util        (); # I think I use blessed somewhere in here ...
+use Devel::OverloadInfo (); # Sometimes I need to know about overloading
 
-our $VERSION   = '0.07';
+our $VERSION   = '0.08';
 our $AUTHORITY = 'cpan:STEVAN';
 
 ## ------------------------------------------------------------------
@@ -115,6 +116,13 @@ sub SET_GLOB_SLOT {
 ## ------------------------------------------------------------------
 ## CV/Glob introspection
 ## ------------------------------------------------------------------
+
+sub CAN_COERCE_TO_CODE_REF {
+    my ($object) = @_;
+    return 0 unless $object && Scalar::Util::blessed( $object );
+    return 0 unless Devel::OverloadInfo::is_overloaded( $object );
+    return exists Devel::OverloadInfo::overload_info( $object )->{'&{}'};
+}
 
 sub IS_CV_NULL {
     my ($cv) = @_;
@@ -400,7 +408,7 @@ MOP::Internal::Util - For MOP Internal Use Only
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

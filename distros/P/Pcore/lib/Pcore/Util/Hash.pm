@@ -2,7 +2,7 @@ package Pcore::Util::Hash;
 
 use Pcore;
 use Hash::Util qw[];    ## no critic qw[Modules::ProhibitEvilModules]
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref is_plain_hashref];
 
 sub merge {
     my $res = defined wantarray ? {} : shift;
@@ -18,16 +18,16 @@ sub _merge {
     my $a = shift;
     my $b = shift;
 
-    foreach my $key ( keys $b->%* ) {
-        if ( blessed( $a->{$key} ) && $a->{$key}->can('MERGE') ) {
+    for my $key ( keys $b->%* ) {
+        if ( is_blessed_ref $a->{$key} && $a->{$key}->can('MERGE') ) {
             $a->{$key} = $a->{$key}->MERGE( $b->{$key} );
         }
-        elsif ( ref( $b->{$key} ) eq 'HASH' ) {
-            $a->{$key} = {} unless ( ref( $a->{$key} ) eq 'HASH' );
+        elsif ( is_plain_hashref $b->{$key} ) {
+            $a->{$key} = {} if !is_plain_hashref $a->{$key};
 
             _merge( $a->{$key}, $b->{$key} );
         }
-        elsif ( ref( $b->{$key} ) eq 'ARRAY' ) {
+        elsif ( is_plain_arrayref $b->{$key} ) {
             $a->{$key} = [];
 
             $a->{$key}->@* = $b->{$key}->@*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]

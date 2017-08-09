@@ -1,0 +1,51 @@
+NAME
+    Tie::Handle::LogGer - Filehandle to log to Log::ger
+
+VERSION
+    This document describes version 0.001 of Tie::Handle::LogGer (from Perl
+    distribution Tie-Handle-LogGer), released on 2017-08-08.
+
+SYNOPSIS
+     use Tie::Handle::LogGer;
+     tie *FH, 'Tie::Handle::LogGer',
+         level => 'debug',       # optional, default is 'warn'
+         category => 'Foo::Bar', # optional, default is current package
+     ;
+
+     print FH "this is a debug log message";
+     print FH "this is another debug log message, data=%s", $data;
+
+DESCRIPTION
+    This module ties a filehandle to Log::ger logger object. For sure a
+    silly module, just a proof of concept.
+
+METHODS
+  TIEHANDLE classname, list
+  PRINT list
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tie-Handle-LogGer>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tie-Handle-LogGer>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Handle-LogGer>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

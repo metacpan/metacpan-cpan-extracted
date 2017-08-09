@@ -1,5 +1,11 @@
 Revision history for Perl extension Class-Inspector
 
+1.32      2017-08-08 14:12:42 -0400
+  - The installed method now supports @INC hooks of any type
+    (coderef was supported as of 1.29, now arrayrefs and objects
+    are supported)
+  - Detect probably broken Perl on Cygwin in Makefile.PL (see gh#5)
+
 1.31      2016-11-25 09:33:47 -0500
   - Migrated from Module::Install to Dist::Zilla and ExtUtils::MakeMaker
   - Fixed meta for repository which was pointing to the wrong URL

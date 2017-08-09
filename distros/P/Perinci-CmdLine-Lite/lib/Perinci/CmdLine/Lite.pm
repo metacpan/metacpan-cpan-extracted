@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2017-08-04'; # DATE
-our $VERSION = '1.78'; # VERSION
+our $DATE = '2017-08-09'; # DATE
+our $VERSION = '1.79'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -26,7 +26,7 @@ has validate_args => (
     default => 1,
 );
 
-my $formats = [qw/text text-simple text-pretty json json-pretty csv html html+datatables/];
+my $formats = [qw/text text-simple text-pretty json json-pretty csv html html+datatables perl/];
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -499,7 +499,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.78 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-08-04.
+This document describes version 1.79 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-08-09.
 
 =head1 SYNOPSIS
 

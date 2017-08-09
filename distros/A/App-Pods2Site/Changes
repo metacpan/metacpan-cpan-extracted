@@ -1,5 +1,9 @@
 Revision history for App-Pods2Site
 
+0.012	2017-08-07
+
+	Adjust handling of core pods
+
 0.011	2017-06-08
 
 	Non-backward compatible changes: new group concept

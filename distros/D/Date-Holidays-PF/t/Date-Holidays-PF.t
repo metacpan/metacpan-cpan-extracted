@@ -6,7 +6,7 @@ BEGIN {
 };
 
 ok(!is_pf_holiday(2004, 1, 2));
-ok(!is_pf_holiday(2004, 4, 11));
+ok(!is_pf_holiday(2004, 7, 11));
 ok(!is_pf_holiday(2004, 12, 24));
 
 ok(is_pf_holiday(2004, 4, 12));

@@ -3,7 +3,7 @@ package Pcore::HTTP::Server;
 use Pcore -class, -const, -result;
 use Pcore::AE::Handle;
 use AnyEvent::Socket qw[];
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref];
 use Pcore::HTTP::Server::Request;
 
 # listen:
@@ -259,9 +259,9 @@ sub wait_headers ( $self, $h ) {
                                       'Pcore::HTTP::Server::Request';
 
                                     # evaluate application
-                                    eval { $self->{app}->($req) };
-
-                                    $@->sendlog if $@;
+                                    eval { $self->{app}->($req); 1; } or do {
+                                        $@->sendlog if $@;
+                                    };
                                 }
 
                                 return;
@@ -281,7 +281,7 @@ sub wait_headers ( $self, $h ) {
 }
 
 sub return_xxx ( $self, $h, $status, $use_keepalive = 0 ) {
-    $status = result $status if !blessed $status;
+    $status = result $status if !is_blessed_ref $status;
 
     my $buf = "HTTP/1.1 $status->{status} $status->{reason}\r\nContent-Length:0\r\n";
 
@@ -299,16 +299,6 @@ sub return_xxx ( $self, $h, $status, $use_keepalive = 0 ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 262                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

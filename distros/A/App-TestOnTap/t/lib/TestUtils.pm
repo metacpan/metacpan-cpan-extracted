@@ -14,7 +14,8 @@ use Test::More;
 
 sub xeqsuite
 {
-	my @argv = @_;
+	my $flags = shift || [];
+	my $args = shift || [];
 	
 	my $suitename = suitename_from_script();
 	
@@ -23,7 +24,7 @@ sub xeqsuite
 								my $ret = -1;
 								eval
 								{
-									$ret = App::TestOnTap::main(@argv, "$Bin/tsuites/$suitename");
+									$ret = App::TestOnTap::main(@$flags, "$Bin/tsuites/$suitename", @$args);
 								};
 								if ($@)
 								{

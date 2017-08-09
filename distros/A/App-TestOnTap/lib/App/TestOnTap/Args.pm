@@ -10,6 +10,7 @@ use warnings;
 use App::TestOnTap::Util qw(slashify expandAts $IS_WINDOWS $IS_PACKED $SHELL_ARG_DELIM);
 use App::TestOnTap::ExecMap;
 use App::TestOnTap::Config;
+use App::TestOnTap::Preprocess;
 use App::TestOnTap::WorkDirManager;
 use App::TestOnTap::OrderStrategy; 
 
@@ -25,8 +26,6 @@ use File::Path;
 use File::Temp qw(tempdir);
 use POSIX;
 use UUID::Tiny qw(:std);
-
-BEGIN { $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0 }
 use LWP::UserAgent;
 
 # CTOR
@@ -248,16 +247,16 @@ sub __parseArgv
 		die("Failure setting up the working directory:\n  $@");
 	};
 
-	# keep the rest of the argv as-is
-	#
-	$self->{argv} = \@argv;
-	
 	# final sanity checks
 	#
 	if ($self->{jobs} > 1 && !$self->{config}->hasParallelizableRule())
 	{
 		warn("WARNING: No 'parallelizable' rule found ('--jobs $self->{jobs}' has no effect); all tests will run serially!\n");
 	}
+
+	# run preprocessing
+	#
+	$self->{preprocess} = App::TestOnTap::Preprocess->new($self->{config}->getPreprocessCmd(), $self, { %ENV }, \@argv);
 }
 
 sub getFullArgv
@@ -270,8 +269,8 @@ sub getFullArgv
 sub getArgv
 {
 	my $self = shift;
-	
-	return $self->{argv};
+
+	return $self->{preprocess}->getArgv();
 }
 
 sub getId
@@ -293,6 +292,13 @@ sub getOrderStrategy
 	my $self = shift;
 	
 	return $self->{orderstrategy};
+}
+
+sub getPreprocess
+{
+	my $self = shift;
+	
+	return $self->{preprocess};
 }
 
 sub getTimer
@@ -431,7 +437,9 @@ sub __findSuiteRoot
 			#
 			my $localzip = slashify("$tmpdir/local.zip");
 			print "Attempting to download '$suiteroot' => $localzip...\n" if $self->{v};
-			my $response = LWP::UserAgent->new()->get($suiteroot, ':content_file' => $localzip);
+			my $ua = LWP::UserAgent->new();
+			$ua->ssl_opts(verify_hostname => 0);
+			my $response = $ua->get($suiteroot, ':content_file' => $localzip);
 			if ($response->is_error() || !-f $localzip)
 			{
 				my $rc = $response->code();

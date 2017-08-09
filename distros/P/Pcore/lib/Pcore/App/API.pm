@@ -32,7 +32,7 @@ has permissions => ( is => 'ro', isa => Maybe [ArrayRef], init_arg => undef );  
 has backend => ( is => 'ro', isa => ConsumerOf ['Pcore::App::API::Backend'], init_arg => undef );
 
 has auth_cache => ( is => 'ro', isa => InstanceOf ['Pcore::App::API::Auth::Cache'], init_arg => undef );
-has _auth_cb_cache => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has _auth_cb_queue => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 
 around _build_roles => sub ( $orig, $self ) {
     my $roles = $self->$orig;
@@ -231,13 +231,13 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
         return;
     }
 
-    my ( $token_type, $token_id, $private_token );
+    my ( $token_type, $token_id, $private_token_hash );
 
     # authenticate user password
     if ($user_name_utf8) {
 
-        # generate private token
-        $private_token = eval { sha3_512 encode_utf8($token) . encode_utf8 $user_name_utf8 };
+        # generate private token hash
+        $private_token_hash = eval { sha3_512 encode_utf8($token) . encode_utf8 $user_name_utf8 };
 
         # error decoding token
         if ($@) {
@@ -264,7 +264,7 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
             # unpack token id
             $token_id = create_uuid_from_bin( substr $token_bin, 1, 16 )->str;
 
-            $private_token = sha3_512 $token;
+            $private_token_hash = sha3_512 $token;
         };
 
         # error decoding token
@@ -282,20 +282,15 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
         }
     }
 
-    $self->authenticate_private( [ $token_type, $token_id, $private_token ], $cb );
+    $self->authenticate_private( [ $token_type, $token_id, $private_token_hash ], $cb );
 
     return;
 }
 
-# TODO link tags
 sub authenticate_private ( $self, $private_token, $cb ) {
-    my $auth;
 
-    # get auth_id by private token
-    my $auth_id = $self->{auth_cache}->{private_token}->{ $private_token->[2] };
-
-    # get cached auth, if private token is cached and has associated auth id
-    $auth = $self->{auth_cache}->{auth}->{$auth_id} if $auth_id;
+    # get auth by private token
+    my $auth = $self->{auth_cache}->{private_token}->{ $private_token->[2] };
 
     if ($auth) {
         $cb->($auth);
@@ -303,9 +298,9 @@ sub authenticate_private ( $self, $private_token, $cb ) {
         return;
     }
 
-    push $self->{_auth_cb_cache}->{ $private_token->[2] }->@*, $cb;
+    push $self->{_auth_cb_queue}->{ $private_token->[2] }->@*, $cb;
 
-    return if $self->{_auth_cb_cache}->{ $private_token->[2] }->@* > 1;
+    return if $self->{_auth_cb_queue}->{ $private_token->[2] }->@* > 1;
 
     # authenticate on backend
     $self->{backend}->auth_token(
@@ -313,59 +308,41 @@ sub authenticate_private ( $self, $private_token, $cb ) {
         $private_token,
         sub ( $res ) {
 
-            # get auth_id by private token
-            $auth_id = $self->{auth_cache}->{private_token}->{ $private_token->[2] };
-
             # authentication error
             if ( !$res ) {
 
-                # invalidate auth, if auth id was cached
-                $self->{auth_cache}->remove_auth($auth_id) if $auth_id;
+                # delete private token
+                $self->{auth_cache}->delete_private_token( $private_token->[2] );
 
                 # return new unauthenticated auth object
-                $auth = bless { app => $self->{app} }, 'Pcore::App::API::Auth';
+                $auth = bless {
+                    app              => $self->{app},
+                    is_authenticated => 0,
+                    private_token    => $private_token,
+                  },
+                  'Pcore::App::API::Auth';
             }
 
             # authenticated
             else {
 
-                # generate new auth_id, if auth wasn't cached yet
-                if ( !$auth_id ) {
-                    $auth_id = $self->{auth_cache}->{private_token}->{ $private_token->[2] } = uuid_str;
-                }
+                # create auth
+                $auth = bless $res->{data}, 'Pcore::App::API::Auth';
 
-                # or try to get auth from cache
-                else {
-                    $auth = $self->{auth_cache}->{auth}->{$auth_id};
-                }
+                $auth->{app}              = $self->{app};
+                $auth->{is_authenticated} = 1;
+                $auth->{private_token}    = $private_token;
 
-                # auth is cached
-                if ($auth) {
-
-                    # update auth permissions
-                    $auth->{permissions} = $res->{data}->{auth}->{permisions};
-                }
-
-                # auth wasn't cached
-                else {
-
-                    # create new auth object
-                    $auth = $self->{auth_cache}->{auth}->{$auth_id} = bless $res->{data}->{auth}, 'Pcore::App::API::Auth';
-
-                    $auth->{app} = $self->{app};
-                    $auth->{id}  = $auth_id;
-
-                    # TODO tags
-                    # my $tags = $res->{data}->{tags};
-                }
+                # store in cache
+                $self->{auth_cache}->store($auth);
             }
 
             # call callbacks
-            while ( my $cb = shift $self->{_auth_cb_cache}->{ $private_token->[2] }->@* ) {
+            while ( my $cb = shift $self->{_auth_cb_queue}->{ $private_token->[2] }->@* ) {
                 $cb->($auth);
             }
 
-            delete $self->{_auth_cb_cache}->{ $private_token->[2] };
+            delete $self->{_auth_cb_queue}->{ $private_token->[2] };
 
             return;
         }
@@ -398,13 +375,6 @@ sub remove_app ( $self, $app_id, $cb = undef ) {
     $self->{backend}->remove_app(
         $app_id,
         sub ( $res ) {
-
-            # invalidate app cache on success
-            if ($res) {
-
-                # $self->_invalidate_app_cache($app_id);
-            }
-
             $cb->($res) if $cb;
 
             $blocking_cv->($res) if $blocking_cv;
@@ -440,13 +410,6 @@ sub remove_app_instance ( $self, $app_instance_id, $cb = undef ) {
     $self->{backend}->remove_app_instance(
         $app_instance_id,
         sub ( $res ) {
-
-            # invalidate app instance cache on success
-            if ($res) {
-
-                # $self->_invalidate_app_instance_cache($app_instance_id);
-            }
-
             $cb->($res) if $cb;
 
             $blocking_cv->($res) if $blocking_cv;
@@ -459,6 +422,7 @@ sub remove_app_instance ( $self, $app_instance_id, $cb = undef ) {
 }
 
 # USER
+# TODO rename -> search users;
 sub get_users ( $self, $cb = undef ) {
     my $blocking_cv = defined wantarray ? AE::cv : undef;
 
@@ -520,13 +484,6 @@ sub set_user_password ( $self, $user_id, $user_password_utf8, $cb = undef ) {
         $user_id,
         encode_utf8($user_password_utf8),
         sub ($res) {
-
-            # invalidate user cache on success
-            if ($res) {
-
-                # $self->on_user_password_change($user_id);
-            }
-
             $cb->($res) if $cb;
 
             $blocking_cv->($res) if $blocking_cv;
@@ -572,6 +529,13 @@ sub remove_user ( $self, $user_id, $cb = undef ) {
     return $blocking_cv ? $blocking_cv->recv : ();
 }
 
+# TODO - update user token permissions;
+sub set_user_permissions ($self) {
+    ...;
+
+    return;
+}
+
 # USER TOKEN
 sub create_user_token ( $self, $user_id, $desc, $permissions, $cb = undef ) {
     my $blocking_cv = defined wantarray ? AE::cv : undef;
@@ -597,13 +561,6 @@ sub remove_user_token ( $self, $user_token_id, $cb = undef ) {
     $self->{backend}->remove_user_token(
         $user_token_id,
         sub ( $res ) {
-
-            # invalidate user token cache on success
-            if ($res) {
-
-                # $self->_invalidate_user_token_cache($token_id);
-            }
-
             $cb->($res) if $cb;
 
             $blocking_cv->($res) if $blocking_cv;
@@ -657,9 +614,11 @@ sub remove_user_session ( $self, $user_session_id, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 225, 495, 516, 576   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 225, 459, 480, 540   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 258                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 534                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

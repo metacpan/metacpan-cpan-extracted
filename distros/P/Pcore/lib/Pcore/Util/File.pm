@@ -1,7 +1,7 @@
 package Pcore::Util::File;
 
 use Pcore;
-use Pcore::Util::Scalar qw[is_glob];
+use Pcore::Util::Scalar qw[is_glob is_plain_arrayref is_plain_hashref];
 use Fcntl qw[:DEFAULT];
 use Cwd qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 use Config;
@@ -345,7 +345,7 @@ sub write_bin {
         mode      => 'rw-------',
         umask     => undef,
         autoflush => 1,
-        ( ref $_[0] eq 'HASH' ? %{ shift @_ } : () ),
+        ( is_plain_hashref $_[0] ? %{ shift @_ } : () ),
     );
 
     _write_to_fh( get_fh( $path, O_WRONLY | O_CREAT | O_TRUNC, %args, crlf => 0 ), @_ );
@@ -359,7 +359,7 @@ sub append_bin {
         mode      => 'rw-------',
         umask     => undef,
         autoflush => 1,
-        ( ref $_[0] eq 'HASH' ? %{ shift @_ } : () ),
+        ( is_plain_hashref $_[0] ? %{ shift @_ } : () ),
     );
 
     _write_to_fh( get_fh( $path, O_WRONLY | O_CREAT | O_APPEND, %args, crlf => 0 ), @_ );
@@ -375,7 +375,7 @@ sub write_text {
         autoflush => 1,
         mode      => 'rw-------',
         umask     => undef,
-        ( ref $_[0] eq 'HASH' ? %{ shift @_ } : () ),
+        ( is_plain_hashref $_[0] ? %{ shift @_ } : () ),
     );
 
     _write_to_fh( get_fh( $path, O_WRONLY | O_CREAT | O_TRUNC, %args ), @_ );
@@ -391,7 +391,7 @@ sub append_text {
         autoflush => 1,
         mode      => 'rw-------',
         umask     => undef,
-        ( ref $_[0] eq 'HASH' ? %{ shift @_ } : () ),
+        ( is_plain_hashref $_[0] ? %{ shift @_ } : () ),
     );
 
     _write_to_fh( get_fh( $path, O_WRONLY | O_CREAT | O_APPEND, %args ), @_ );
@@ -457,7 +457,7 @@ sub _write_to_fh {
     my $fh = shift;
 
     for my $str (@_) {
-        if ( ref $str eq 'ARRAY' ) {
+        if ( is_plain_arrayref $str ) {
             for my $line ( $str->@* ) {
                 print {$fh} $line, qq[\n];
             }

@@ -50,10 +50,12 @@ self_fetch_tree(pTHX_ SV *self)
 	return NULL;
 }
 
-inline static void
-_fill_rect(pTHX_ struct rtree *t, struct rtree_rect *r, SV * pref)
+inline static int
+_fill_rect(pTHX_ struct rtree *t, struct rtree_rect *r, SV * pref, int check)
 {
-	if (!(SvROK(pref) && SvTYPE(pref) | SVt_PVAV)) {
+	if (!((SvOK(pref)) && (SvROK(pref)) && (SvTYPE(SvRV(pref)) == SVt_PVAV))) {
+	        if (check)
+	            return 0;
 		croak("$point or $rect must be an ArrayRef[x0[,x1],y0[,y1]...] object");
 	}
 
@@ -64,6 +66,8 @@ _fill_rect(pTHX_ struct rtree *t, struct rtree_rect *r, SV * pref)
 			SV **item = av_fetch(p, i, 0);
 
 			if (!(item && looks_like_number(*item))) {
+			        if (check)
+			            return 0;
 				croak("'%s' is not a number (check point[%d])",
 					 *item,
 					 i
@@ -80,11 +84,14 @@ _fill_rect(pTHX_ struct rtree *t, struct rtree_rect *r, SV * pref)
 			SV **item = av_fetch(p, no, 0);
 
 
-			if (!(item && looks_like_number(*item)))
+			if (!(item && looks_like_number(*item))) {
+			        if (check)
+			            return 0;
 				croak("'%s' is not a number (check rect[%d])",
 					 *item,
 					 no
 				);
+                        }
 			r->coords[i * 2] = SvNV(*item);
 			no++;
 		}
@@ -94,16 +101,21 @@ _fill_rect(pTHX_ struct rtree *t, struct rtree_rect *r, SV * pref)
 			SV **item = av_fetch(p, no, 0);
 
 
-			if (!(item && looks_like_number(*item)))
+			if (!(item && looks_like_number(*item))) {
+			        if (check)
+			            return 0;
 				croak("'%s' is not a number (check rect[%d])",
 					 *item,
 					 no
 				);
+                        }
 			r->coords[i * 2 + 1] = SvNV(*item);
 			no++;
 		}
 		rtree_rect_normalize(r, t->dimension);
 	} else {
+                if (check)
+                    return 0;
 		croak(
 			"I can't understand if the array is point "
 			"or rect (asize=%d, must be %d or %d)",
@@ -121,6 +133,7 @@ _fill_rect(pTHX_ struct rtree *t, struct rtree_rect *r, SV * pref)
 		r->coords[3],
 		av_len(p) + 1);
 	*/
+        return 1;
 }
 
 MODULE = DR::R		PACKAGE = DR::R
@@ -246,7 +259,7 @@ SV * insert(SV *self, SV *point, SV *object)
 			croak("Object has already been destroyed");
 
 		struct rtree_rect rect;
-		_fill_rect(aTHX_ t->tree, &rect, point);
+		_fill_rect(aTHX_ t->tree, &rect, point, 0);
 
 
 		SV *item = newSVsv(object);
@@ -275,7 +288,7 @@ SV * remove(SV *self, SV *point, SV *id)
 			croak("Object has already been destroyed");
 
 		struct rtree_rect rect;
-		_fill_rect(aTHX_ t->tree, &rect, point);
+		_fill_rect(aTHX_ t->tree, &rect, point, 0);
 
 		if (!SvOK(id))
 			croak("Usage: $r->remove($point, $id)");
@@ -304,7 +317,7 @@ SV * foreach(SV *self, SV *type, SV *point, SV *cb)
 		rtree_iterator_init(&iterator);
 
 		struct rtree_rect rect;
-		_fill_rect(aTHX_ t->tree, &rect, point);
+		_fill_rect(aTHX_ t->tree, &rect, point, 0);
 
 		if (SvOK(type)) {
 			stype = SvPV(type, tlen);
@@ -382,6 +395,38 @@ SV * foreach(SV *self, SV *type, SV *point, SV *cb)
 		RETVAL = newSVsv(self);
 	OUTPUT:
 		RETVAL
+
+int is_point_or_rect(SV *self, SV *point)
+        CODE:
+		struct rtree_w_ecount *t = self_fetch_tree(aTHX_ self);
+		if (!t)
+			croak("Object has already been destroyed");
+
+		struct rtree_rect rect;
+		RETVAL = _fill_rect(aTHX_ t->tree, &rect, point, 1);
+	OUTPUT:
+	        RETVAL
+
+SV * iterator_types(SV *class)
+        CODE:
+                static AV *list = NULL;
+
+                if (!list) {
+                    list = newAV();
+                    av_push(list, newSVpvs("ALL"));
+                    av_push(list, newSVpvs("BELONGS!"));
+                    av_push(list, newSVpvs("BELONGS"));
+                    av_push(list, newSVpvs("CONTAINS!"));
+                    av_push(list, newSVpvs("CONTAINS"));
+                    av_push(list, newSVpvs("EQ"));
+                    av_push(list, newSVpvs("NEIGHBOR"));
+                    av_push(list, newSVpvs("OVERLAPS"));
+                }
+
+                RETVAL = newRV((SV *)list);
+                (void)class;
+        OUTPUT:
+                RETVAL
 
 
 SV * _ping()

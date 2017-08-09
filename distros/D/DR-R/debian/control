@@ -1,0 +1,27 @@
+Source: libdr-r-perl
+Section: perl
+Homepage: http://search.cpan.org/dist/DR-R/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 7), cdbs
+Standards-Version: 3.9.6
+Priority: extra
+VCS-Browser: https://github.com/dr-co/r
+
+Package: libdr-r-perl
+Depends: ${perl:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends}
+Architecture: any
+Suggests: tarantool
+Description: RTREE in-memory database for Perl
+ The package contains tarantool's implementation of RTREE index.
+ .
+ It is possible to create 1-n to 20-n RTREE indexes that provide the following
+ search methods:
+  * CONTAINS
+  * BELONGS
+  * OVERLAPS
+  * NEIGHBOR (Knn search)
+  * EQ
+  * ALL
+

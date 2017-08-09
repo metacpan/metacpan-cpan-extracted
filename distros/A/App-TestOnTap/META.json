@@ -47,7 +47,7 @@
             "File::Temp" : "0",
             "FindBin" : "0",
             "Getopt::Long" : "0",
-            "Grep::Query" : "1.002",
+            "Grep::Query" : "1.006",
             "JSON" : "0",
             "LWP::Simple" : "0",
             "List::Util" : "0",
@@ -80,6 +80,6 @@
          "web" : "https://github.com/kenneth-olwing/App-TestOnTap"
       }
    },
-   "version" : "0.034",
+   "version" : "0.035",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -82,8 +82,7 @@ WriteMakefile(
 			'File::Temp'						=>	0,		# initial dev used: 0.2304
 			'FindBin'							=>	0,		# initial dev used: 1.51 
 			'Getopt::Long'						=>	0,		# initial dev used: 2.47
-			'Grep::Query'						=>	0,		# initial dev used: 1.002
-			'Grep::Query'						=>	1.002,
+			'Grep::Query'						=>	1.006,
 			'JSON'								=>	0,		# initial dev used: 2.90
 			'List::Util'						=>	0,		# Core 5.24
 			'LWP::Simple'						=>	0,		# initial dev used: 6.17

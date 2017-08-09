@@ -1,6 +1,7 @@
 package Pcore::Core::CLI::Arg;
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 with qw[Pcore::Core::CLI::Type];
 
@@ -28,7 +29,7 @@ sub BUILD ( $self, $args ) {
         die qq[Argument "$name", default value can be used only for required argument (min > 0)] if $self->min == 0;
 
         if ( $self->is_repeatable ) {
-            die qq[Argument "$name", default value must be a array for repeatable argument] if ref $self->default ne 'ARRAY';
+            die qq[Argument "$name", default value must be a array for repeatable argument] if !is_plain_arrayref $self->default;
         }
         else {
             die qq[Argument "$name", default value must be a string for plain argument] if ref $self->default;

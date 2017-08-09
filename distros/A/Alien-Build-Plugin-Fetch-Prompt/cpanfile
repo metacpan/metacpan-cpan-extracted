@@ -3,6 +3,7 @@ requires "Alien::Build::Plugin" => "0";
 requires "perl" => "5.006";
 
 on 'test' => sub {
+  requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "Test2::Mock" => "0.000060";
   requires "Test2::V0" => "0.000060";

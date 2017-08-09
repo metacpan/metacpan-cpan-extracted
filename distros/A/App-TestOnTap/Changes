@@ -1,5 +1,11 @@
 Revision history for App-TestOnTap
 
+0.034	2017-05-22
+
+	Drop the actual creation of a binary by directly using 'pp'
+	
+	Instead just print a suitable cmd line so user can modify if necessary.
+
 0.033	2017-05-15
 
 	A recent Test::More fix changed a behavior (empty output line removed). 

@@ -48,8 +48,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-GetArgs-Argv
   homepage: https://metacpan.org/release/Perinci-Sub-GetArgs-Argv
-  repository: git://github.com/sharyanto/perl-Perinci-Sub-GetArgs-Argv.git
-version: '0.82'
+  repository: git://github.com/perlancar/perl-Perinci-Sub-GetArgs-Argv.git
+version: '0.83'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -129,7 +129,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.58'
+      version: '0.590'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -342,6 +342,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.054'
     -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::PERLANCAR/Test::Perl::Critic'
+      version: '3.001'
+    -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
       version: '0.03'
@@ -360,11 +364,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
       name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'

@@ -2,7 +2,7 @@ package Pcore::API::Client;
 
 use Pcore -class, -result;
 use Pcore::WebSocket;
-use Pcore::Util::Scalar qw[blessed weaken];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref is_plain_coderef weaken];
 use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::HTTP qw[:TLS_CTX];
@@ -79,7 +79,7 @@ sub api_call ( $self, $method, @args ) {
             $method = "/$self->{api_ver}/$method";
         }
         else {
-            die qq[You need to defined default "api_ver" to use relative methods names];
+            die q[You need to defined default "api_ver" to use relative methods names];
         }
     }
 
@@ -97,7 +97,7 @@ sub _send_http ( $self, $method, @ ) {
     my ( $cb, $data );
 
     # detect callback
-    if ( ref $_[-1] eq 'CODE' or ( blessed $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
+    if ( is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
         $cb = $_[-1];
 
         $data = [ @_[ 2 .. $#_ - 1 ] ] if @_ > 3;
@@ -136,7 +136,7 @@ sub _send_http ( $self, $method, @ ) {
                     $cb->( result [ 500, 'Error decoding response' ] ) if $cb;
                 }
                 elsif ($cb) {
-                    my $tx = ref $msg eq 'ARRAY' ? $msg->[0] : $msg;
+                    my $tx = is_plain_arrayref $msg ? $msg->[0] : $msg;
 
                     if ( $tx->{type} eq 'exception' ) {
                         $cb->( bless $tx->{message}, 'Pcore::Util::Result' );
@@ -155,7 +155,7 @@ sub _send_http ( $self, $method, @ ) {
 }
 
 sub _send_ws ( $self, @args ) {
-    my $cb = ref $_[-1] eq 'CODE' || ( blessed $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? $_[-1] : undef;
+    my $cb = is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? $_[-1] : undef;
 
     $self->_get_ws(
         sub ( $ws, $error ) {
@@ -260,16 +260,6 @@ sub _get_ws ( $self, $cb ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 82                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

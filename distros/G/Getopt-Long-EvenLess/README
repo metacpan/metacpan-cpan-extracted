@@ -1,101 +1,157 @@
-DESCRIPTION
+NAME
+    Getopt::Long::EvenLess - Like Getopt::Long::Less, but with even less
+    features
 
+VERSION
+    This document describes version 0.111 of Getopt::Long::EvenLess (from
+    Perl distribution Getopt-Long-EvenLess), released on 2017-08-09.
+
+DESCRIPTION
     This module (GLEL for short) is a reimplementation of Getopt::Long (GL
-    for short), but with much less features. It's an even more stripped
-    down version of Getopt::Long::Less (GLL for short) and is perhaps less
+    for short), but with much less features. It's an even more stripped down
+    version of Getopt::Long::Less (GLL for short) and is perhaps less
     convenient to use for day-to-day scripting work.
 
-    The main goal is minimum amount of code and small startup overhead.
-    This module is an experiment of how little code I can use to support
-    the stuffs I usually do with GL.
+    The main goal is minimum amount of code and small startup overhead. This
+    module is an experiment of how little code I can use to support the
+    stuffs I usually do with GL.
 
     Compared to GL and GLL, it:
 
-      * has minimum Configure() support
+    *   has minimum Configure() support
 
-      Only these configurations are known: pass_through, no_pass_through
-      (default).
+        Only these configurations are known: pass_through, no_pass_through
+        (default).
 
-      GLEL is equivalent to GL in this mode: bundling, no_ignore_case,
-      no_getopt_compat, gnu_compat, permute.
+        GLEL is equivalent to GL in this mode: bundling, no_ignore_case,
+        no_getopt_compat, gnu_compat, permute.
 
-      No support for configuring via import options e.g.:
+        No support for configuring via import options e.g.:
 
-       use Getopt::Long qw(:config pass_through);
+         use Getopt::Long qw(:config pass_through);
 
-      * does not support increment (foo+)
+    *   does not support increment ("foo+")
 
-      * no type checking (foo=i, foo=f, foo=s all accept any string)
+    *   no type checking ("foo=i", "foo=f", "foo=s" all accept any string)
 
-      * does not support optional value (foo:s), only no value (foo) or
-      required value (foo=s)
+    *   does not support optional value ("foo:s"), only no value ("foo") or
+        required value ("foo=s")
 
-      * does not support desttypes (foo=s@)
+    *   does not support desttypes ("foo=s@")
 
-      * does not support handler other than coderef (so no "foo=s" =>
-      \$scalar, "foo=s" => \@ary, only "foo=s" => sub { ... })
+    *   does not support handler other than coderef (so no ""foo=s" =>
+        \$scalar", ""foo=s" => \@ary", only ""foo=s" => sub { ... }")
 
-      Also, in coderef handler, code will get a simple hash instead of a
-      "callback" object as its first argument.
+        Also, in coderef handler, code will get a simple hash instead of a
+        "callback" object as its first argument.
 
-      * does not support hashref as first argument
+    *   does not support hashref as first argument
 
-      * does not support bool/negation (no foo!, so you have to declare
-      both foo and no-foo manually)
+    *   does not support bool/negation (no "foo!", so you have to declare
+        both "foo" and "no-foo" manually)
 
     The result?
 
     Amount of code. GLEL 0.07 is about 175 lines of code, while GL is about
-    1500. Sure, if you really want to be minimalistic, you can use this
+    1500. Sure, if you *really* want to be minimalistic, you can use this
     single line of code to get options:
 
      @ARGV = grep { /^--([^=]+)(=(.*))?/ ? ($opts{$1} = $2 ? $3 : 1, 0) : 1 } @ARGV;
 
-    and you're already able to extract --flag or --opt=val from @ARGV but
-    you also lose a lot of stuffs like autoabbreviation, --opt val syntax
-    support syntax (which is more common, but requires you specify an
+    and you're already able to extract "--flag" or "--opt=val" from @ARGV
+    but you also lose a lot of stuffs like autoabbreviation, "--opt val"
+    syntax support syntax (which is more common, but requires you specify an
     option spec), custom handler, etc.
 
     Startup overhead. Here's a sample startup overhead benchmark:
 
-    # COMMAND: perl devscripts/bench-startup 2>&1
+                                 Rate        run_gl     load_gl run_gl_evenless load_gl_evenless run_gl_less load_gl_less   perl
+     run_gl           64.096+-0.092/s            --       -0.5%          -68.6%           -69.2%      -70.1%       -70.4% -90.6%
+     load_gl            64.39+-0.16/s   0.46+-0.29%          --          -68.4%           -69.1%      -70.0%       -70.3% -90.5%
+     run_gl_evenless   203.88+-0.74/s   218.1+-1.2% 216.6+-1.4%              --            -2.1%       -4.9%        -5.8% -70.0%
+     load_gl_evenless  208.24+-0.57/s     224.9+-1% 223.4+-1.2%     2.14+-0.46%               --       -2.8%        -3.8% -69.4%
+     run_gl_less       214.28+-0.62/s   234.3+-1.1% 232.8+-1.3%      5.1+-0.49%       2.9+-0.41%          --        -1.0% -68.5%
+     load_gl_less      216.44+-0.45/s 237.68+-0.85% 236.1+-1.1%     6.16+-0.44%      3.94+-0.36% 1.01+-0.36%           -- -68.2%
+     perl                679.7+-3.7/s     960.5+-6% 955.7+-6.4%     233.4+-2.2%        226.4+-2%   217.2+-2%  214.1+-1.8%     --
+ 
+     Average times:
+       perl            :     1.4712ms
+       load_gl_less    :     4.6202ms
+       run_gl_less     :     4.6668ms
+       load_gl_evenless:     4.8022ms
+       run_gl_evenless :     4.9048ms
+       load_gl         :    15.5304ms
+       run_gl          :    15.6016ms
 
 FUNCTIONS
-
- Configure(@configs | \%config) => hash
-
+  Configure(@configs | \%config) => hash
     Set configuration. Known configurations:
 
-      * pass_through
+    *   pass_through
 
-      Ignore errors (unknown/ambiguous option) and still make GetOptions
-      return true.
+        Ignore errors (unknown/ambiguous option) and still make GetOptions
+        return true.
 
-      * no_pass_through (default)
+    *   no_pass_through (default)
 
-    Return old configuration data. To restore old configuration data you
-    can pass it back to Configure(), e.g.:
+    *   no_auto_abbrev
+
+    *   auto_abbrev (default)
+
+    *   no_ignore_case
+
+    *   no_getopt_compat
+
+    *   gnu_compat
+
+    *   bundling
+
+    *   permute
+
+    Return old configuration data. To restore old configuration data you can
+    pass it back to "Configure()", e.g.:
 
      my $orig_conf = Getopt::Long::EvenLess::Configure("pass_through");
      # ...
      Getopt::Long::EvenLess::Configure($orig_conf);
 
- GetOptions(%spec) => bool
-
+  GetOptions(%spec) => bool
     Shortcut for:
 
      GetOptionsFromArray(\@ARGV, %spec)
 
- GetOptionsFromArray(\@ary, %spec) => bool
-
+  GetOptionsFromArray(\@ary, %spec) => bool
     Get (and strip) options from @ary. Return true on success or false on
     failure (unknown option, etc).
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Getopt-Long-EvenLess>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Getopt-Long-EvenLess>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-EvenLess>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Getopt::Long
 
     Getopt::Long::Less
 
-    If you want more features intead of less, try Getopt::Long::More.
+    If you want *more* features intead of less, try Getopt::Long::More.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

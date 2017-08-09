@@ -2,7 +2,7 @@ package Pcore::Util::Promise::Request;
 
 use Pcore -class;
 use Pcore::Util::Result;
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref];
 use overload    #
   q[bool] => sub {
     return $_[0]->{reponse}->{status} >= 200 && $_[0]->{response}->{status} < 300;
@@ -20,7 +20,7 @@ use overload    #
     return [ $_[0]->{response}->{status}, $_[0]->{response}->{reason} ];
   },
   q[&{}] => sub ( $self, @ ) {
-    return sub { return _respond( $self, blessed $_[0] ? $_[0] : &Pcore::Util::Result::result ) };    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    return sub { return _respond( $self, is_blessed_ref $_[0] ? $_[0] : &Pcore::Util::Result::result ) };    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
   },
   fallback => 1;
 
@@ -31,7 +31,7 @@ has _self => ( is => 'ro', isa => Object );
 has response => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Result'], init_arg => undef );
 
 has _then_idx  => ( is => 'ro', isa => PositiveInt, default => 1, init_arg => undef );
-has _responded => ( is => 'ro', isa => Bool,        default => 0, init_arg => undef );                # already responded
+has _responded => ( is => 'ro', isa => Bool,        default => 0, init_arg => undef );                       # already responded
 
 P->init_demolish(__PACKAGE__);
 
@@ -58,7 +58,7 @@ sub done ( $self, @ ) {
 
     $self->{_responded} = 1;
 
-    $self->{_cb}->( blessed $_[1] ? $_[1] : Pcore::Util::Result::result splice @_, 1 );
+    $self->{_cb}->( is_blessed_ref $_[1] ? $_[1] : Pcore::Util::Result::result splice @_, 1 );
 
     return;
 }
@@ -71,17 +71,17 @@ sub _respond ( $self, $res ) {
 
         $self->{_then_idx}++;
 
-        eval { $then->( $self, $self->{_self} // () ) };
+        eval { $then->( $self, $self->{_self} // () ); 1; } or do {
+            if ($@) {
+                $@->sendlog;
 
-        if ($@) {
-            $@->sendlog;
+                if ( !$self->{_responded} ) {
+                    $self->{_responded} = 1;
 
-            if ( !$self->{_responded} ) {
-                $self->{_responded} = 1;
-
-                $self->{_cb}->( Pcore::Util::Result::result 500 );
+                    $self->{_cb}->( Pcore::Util::Result::result 500 );
+                }
             }
-        }
+        };
     }
     else {
         $self->{_responded} = 1;
@@ -93,16 +93,6 @@ sub _respond ( $self, $res ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 74                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

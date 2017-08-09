@@ -262,7 +262,7 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
                         my ( $k, $v ) = split /:\s+/sm, $field, 2;
 
                         if ( exists $changeset->{$k} ) {
-                            if ( ref $changeset->{$k} eq 'ARRAY' ) {
+                            if ( is_plain_arrayref $changeset->{$k} ) {
                                 push $changeset->{$k}->@*, $v;
                             }
                             else {

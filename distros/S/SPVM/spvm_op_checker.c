@@ -168,7 +168,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
               field_type_error = 1;
             }
           }
-          else if (SPVM_TYPE_is_string(compiler, field_type)) {
+          else if (field_type->id == SPVM_TYPE_C_ID_STRING) {
             // Nothing
           }
           else if (!SPVM_TYPE_is_numeric(compiler, field_type)) {
@@ -198,7 +198,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
               return;
             }
           }
-          else if (SPVM_TYPE_is_string(compiler, field_type)) {
+          else if (field_type->id == SPVM_TYPE_C_ID_STRING) {
             // Nothing
           }
           else if (!SPVM_TYPE_is_numeric(compiler, field_type)) {
@@ -391,7 +391,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         );
                         SPVM_SUB* sub = op_sub->uv.sub;
                         
-                        if (sub->op_return_type->code == SPVM_OP_C_CODE_VOID) {
+                        if (sub->op_return_type->uv.type->id == SPVM_TYPE_C_ID_VOID) {
                           op_cur->code = SPVM_OP_C_CODE_NULL;
                         }
                       }
@@ -999,7 +999,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         
                         // Undef
                         if (op_term->code == SPVM_OP_C_CODE_UNDEF) {
-                          if (sub->op_return_type->code == SPVM_OP_C_CODE_VOID) {
+                          if (sub->op_return_type->uv.type->id == SPVM_TYPE_C_ID_VOID) {
                             is_invalid = 1;
                           }
                           else {
@@ -1016,7 +1016,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         }
                         // Empty
                         else {
-                          if (sub->op_return_type->code != SPVM_OP_C_CODE_VOID) {
+                          if (sub->op_return_type->uv.type->id != SPVM_TYPE_C_ID_VOID) {
                             is_invalid = 1;
                           }
                         }
@@ -1419,7 +1419,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* return_type = SPVM_OP_get_type(compiler, found_op_sub->uv.sub->op_return_type);
                       
                       // If CALL_SUB is is not rvalue and return type is object, temparary variable is created, and assinged.
-                      if (!op_cur->rvalue && (return_type && !SPVM_TYPE_is_numeric(compiler, return_type))) {
+                      if (!op_cur->rvalue && (return_type->id != SPVM_TYPE_C_ID_VOID && !SPVM_TYPE_is_numeric(compiler, return_type))) {
                         assert(my_var_length <= SPVM_LIMIT_C_MY_VARS);
                         if (my_var_length == SPVM_LIMIT_C_MY_VARS) {
                           SPVM_yyerror_format(compiler, "too many lexical variables(Temparay variable is created for return value) at %s line %d\n", op_cur->file, op_cur->line);
@@ -1517,7 +1517,10 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       SPVM_OP* op_type = op_cur->last;
                       
                       SPVM_TYPE* term_type = SPVM_OP_get_type(compiler, op_term);
+                      assert(term_type);
+                      
                       SPVM_TYPE* type_type = SPVM_OP_get_type(compiler, op_type);
+                      assert(type_type);
                       
                       _Bool can_convert = 0;
                       // Can convert byte[] to string

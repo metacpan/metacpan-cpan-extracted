@@ -229,7 +229,7 @@ sub request ( @ ) {
         if ( !is_ref $args{on_progress} ) {
             $args{on_progress} = _get_on_progress_cb();
         }
-        elsif ( is_plain_hashref $args{on_progress} eq 'HASH' ) {
+        elsif ( is_plain_hashref $args{on_progress} ) {
             $args{on_progress} = _get_on_progress_cb( $args{on_progress}->%* );
         }
         else {

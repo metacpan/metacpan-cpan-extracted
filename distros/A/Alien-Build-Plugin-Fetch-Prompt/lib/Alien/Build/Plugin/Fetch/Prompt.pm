@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Alien::Build plugin to prompt a user before making external download
-our $VERSION = '0.58'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 
 sub init
@@ -43,7 +43,7 @@ Alien::Build::Plugin::Fetch::Prompt - Alien::Build plugin to prompt a user befor
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

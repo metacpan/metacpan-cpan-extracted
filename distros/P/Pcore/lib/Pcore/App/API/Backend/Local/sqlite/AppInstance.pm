@@ -77,11 +77,9 @@ SQL
                     enabled => $res->{app_enabled} && $res->{app_instance_enabled},
 
                     permissions => {},
-                };
 
-                my $tags = {
-                    app_id          => $res->{app_id},
-                    app_instance_id => $private_token->[1],
+                    # app_id, app_instance_id
+                    depends_on => [ $res->{app_id}, $private_token->[1] ],
                 };
 
                 # get permissions
@@ -91,7 +89,7 @@ SQL
                     }
                 }
 
-                $cb->( result 200, auth => $auth, tags => $tags );
+                $cb->( result 200, $auth );
             }
 
             return;
@@ -219,7 +217,7 @@ sub update_app_instance ( $self, $app_instance_id, $app_instance_version, $cb ) 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 9, 117, 202          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 9, 115, 200          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 9                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_app_instance_token' declared  |
 ## |      |                      | but not used                                                                                                   |

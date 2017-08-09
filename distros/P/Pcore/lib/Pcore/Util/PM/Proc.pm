@@ -3,7 +3,7 @@ package Pcore::Util::PM::Proc;
 use Pcore -class;
 use Config;
 use Pcore::AE::Handle;
-use Pcore::Util::Scalar qw[refcount weaken blessed];
+use Pcore::Util::Scalar qw[refcount weaken is_blessed_ref];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
 use overload    #
@@ -295,11 +295,11 @@ sub _on_exit ( $self, $status ) {
 
     delete $CACHE->{ $self->{pid} };
 
-    if ( $self->{stdout} && blessed $self->{stdout} ) {
+    if ( $self->{stdout} && is_blessed_ref $self->{stdout} ) {
         $self->{stdout} = delete $self->{stdout}->{rbuf};
     }
 
-    if ( $self->{stderr} && blessed $self->{stderr} ) {
+    if ( $self->{stderr} && is_blessed_ref $self->{stderr} ) {
         $self->{stderr} = delete $self->{stderr}->{rbuf};
     }
 

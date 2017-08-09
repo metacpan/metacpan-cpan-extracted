@@ -13,7 +13,7 @@ use MOP::Slot;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.07';
+our $VERSION   = '0.08';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' };
@@ -660,7 +660,7 @@ sub add_slot {
         unless $name;
 
     Carp::croak('[ARGS] You must specify an initializer CODE reference to associate with the slot')
-        unless $initializer && ref $initializer eq 'CODE';
+        unless $initializer && (ref $initializer eq 'CODE' || MOP::Internal::Util::CAN_COERCE_TO_CODE_REF( $initializer ));
 
     my $stash = $self->stash;
     my $class = $self->name;
@@ -752,7 +752,7 @@ sub alias_slot {
         unless $name;
 
     Carp::croak('[ARGS] You must specify an initializer CODE reference to associate with the slot alias')
-        unless $initializer && ref $initializer eq 'CODE';
+        unless $initializer && (ref $initializer eq 'CODE' || MOP::Internal::Util::CAN_COERCE_TO_CODE_REF( $initializer ));
 
     my $stash = $self->stash;
     my $class = $self->name;
@@ -806,7 +806,7 @@ MOP::Role - A representation of a role
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

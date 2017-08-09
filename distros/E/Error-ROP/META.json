@@ -1,0 +1,57 @@
+{
+   "abstract" : "Error-ROP - A simple and lightweight implementation error handling library for Perl,",
+   "author" : [
+      "Pau Cervera i Badia <pau.cervera@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Error-ROP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::Prove::Watch" : "0",
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "Pod::Markdown" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/paudirac/Error-ROP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/paudirac/Error-ROP",
+         "web" : "https://github.com/paudirac/Error-ROP"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

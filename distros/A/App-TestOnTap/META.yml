@@ -36,7 +36,7 @@ requires:
   File::Temp: '0'
   FindBin: '0'
   Getopt::Long: '0'
-  Grep::Query: '1.002'
+  Grep::Query: '1.006'
   JSON: '0'
   LWP::Simple: '0'
   List::Util: '0'
@@ -53,5 +53,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-TestOnTap.git
-version: '0.034'
+version: '0.035'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

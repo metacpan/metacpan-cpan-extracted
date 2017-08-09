@@ -1,3 +1,9 @@
+0.26    2017-08-09 (PERLANCAR)
+
+	- Avoid perl 'once' warning when patch module's config is not
+	  defined.
+
+
 0.25    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

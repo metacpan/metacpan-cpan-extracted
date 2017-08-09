@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-PerinciUtils",
   "EXE_FILES" => [
+    "script/gen-getopt-long-spec-from-meta",
     "script/normalize-rinci-function-metadata",
     "script/peri-access",
     "script/peri-htserve",
@@ -36,13 +37,14 @@ my %WriteMakefileArgs = (
     "Gepok" => 0,
     "Getopt::Long::Complete" => 0,
     "JSON::MaybeXS" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.023",
     "Module::List" => 0,
     "Module::Load" => 0,
     "Perinci::Access" => 0,
     "Perinci::Access::Base::Patch::PeriAHS" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::Gen::ForModule" => 0,
+    "Perinci::Sub::GetArgs::Argv" => "0.83",
     "Perinci::Sub::Normalize" => "0.19",
     "Perinci::Sub::Wrapper" => "0.83",
     "Plack::Builder" => 0,
@@ -61,7 +63,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.110",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,13 +86,14 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.023",
   "Module::List" => 0,
   "Module::Load" => 0,
   "Perinci::Access" => 0,
   "Perinci::Access::Base::Patch::PeriAHS" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::Gen::ForModule" => 0,
+  "Perinci::Sub::GetArgs::Argv" => "0.83",
   "Perinci::Sub::Normalize" => "0.19",
   "Perinci::Sub::Wrapper" => "0.83",
   "Plack::Builder" => 0,

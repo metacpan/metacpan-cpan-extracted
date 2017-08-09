@@ -5,7 +5,7 @@ use 5.010_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -27,7 +27,13 @@ require TAP::Formatter::Console::ParallelSession if 0;
 #
 sub main
 {
-	# parse raw argv
+	# as a very special workaround - when running as a packed binary, any PERL5LIB envvar
+	# is cleared, but if it's really needed, any TESTONTAP_PERL5LIB will be used to reinsert
+	# it here for our children
+	# 
+	$ENV{PERL5LIB} = $ENV{TESTONTAP_PERL5LIB} if $ENV{TESTONTAP_PERL5LIB};
+
+	# parse raw argv and prepare
 	#
 	my $args = App::TestOnTap::Args->new($version, @_);
 

@@ -1,7 +1,7 @@
 package Pcore::Core::Event;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[weaken];
+use Pcore::Util::Scalar qw[weaken is_ref is_plain_arrayref is_plain_coderef];
 use Pcore::Core::Event::Listener;
 use Time::HiRes qw[];
 
@@ -12,7 +12,7 @@ has mask_re   => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg =
 sub listen_events ( $self, $masks, @listeners ) {
     my $guard = defined wantarray ? [] : ();
 
-    $masks = [$masks] if ref $masks ne 'ARRAY';
+    $masks = [$masks] if !is_plain_arrayref $masks;
 
     for my $mask ( $masks->@* ) {
 
@@ -23,14 +23,14 @@ sub listen_events ( $self, $masks, @listeners ) {
         for my $listen (@listeners) {
             my $cb;
 
-            if ( !ref $listen ) {
+            if ( !is_ref $listen ) {
                 my $uri = Pcore->uri($listen);
 
                 my $class = Pcore->class->load( $uri->scheme, ns => 'Pcore::Core::Event::Listener::Pipe' );
 
                 $cb = $class->new( { uri => $uri } );
             }
-            elsif ( ref $listen eq 'ARRAY' ) {
+            elsif ( is_plain_arrayref $listen ) {
                 my ( $uri, %args ) = $listen->@*;
 
                 $args{uri} = Pcore->uri($uri);
@@ -39,7 +39,7 @@ sub listen_events ( $self, $masks, @listeners ) {
 
                 $cb = $class->new( \%args );
             }
-            elsif ( ref $listen eq 'CODE' ) {
+            elsif ( is_plain_coderef $listen ) {
                 $cb = $listen;
             }
             else {

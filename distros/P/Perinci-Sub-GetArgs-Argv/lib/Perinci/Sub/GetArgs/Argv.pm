@@ -1,7 +1,7 @@
 package Perinci::Sub::GetArgs::Argv;
 
-our $DATE = '2017-07-22'; # DATE
-our $VERSION = '0.82'; # VERSION
+our $DATE = '2017-08-09'; # DATE
+our $VERSION = '0.83'; # VERSION
 
 use 5.010001;
 use strict;
@@ -245,7 +245,7 @@ sub _opt2ospec {
                 "$opt-base64=s", {opts=>["$opt-base64"], desttype=>"", type=>"s"}, {is_base64=>1},
             );
         } else {
-            my $t = ($type eq 'int' ? 'i' : $type eq 'float' ? 'f' : 's') .
+            my $t = ($type eq 'int' ? 's' : $type eq 'float' ? 's' : 's') .
                 ($isaos ? '@' : $ishos ? '%' : '');
             push @res, ("$opt=$t", {opts=>[$opt], desttype=>"", type=>$t}, undef);
         }
@@ -1124,7 +1124,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.82 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-07-22.
+This document describes version 0.83 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-08-09.
 
 =head1 SYNOPSIS
 
@@ -1447,7 +1447,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-GetArgs-Argv>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-GetArgs-Argv>.
 
 =head1 BUGS
 

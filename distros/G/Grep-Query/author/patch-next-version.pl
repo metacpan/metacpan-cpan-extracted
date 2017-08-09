@@ -16,8 +16,8 @@ chdir($toplevel) or die("Failed to chdir to $toplevel: $!\n");
 
 my %files = 
 	(
-		'README.md' => 1,
-		'lib/Grep/Query.pm' => 8,
+		'README.md' => [1],
+		'lib/Grep/Query.pm' => [8, 190],
 	);
 
 foreach my $fn (keys(%files))
@@ -60,27 +60,17 @@ my $nextTag = "v$nextVersion";
 
 foreach my $fn (keys(%files))
 {
-	my $line = $files{$fn};
+	my $lines = $files{$fn};
 	$fn = "$toplevel/$fn";
-	
-	my $idx = $line - 1;
-	my @contents = readAll($fn);
-	die("The file '$fn' does not have the current version '$currentVersion' in line $line\n") unless $contents[$idx] =~ /$currentVersionRE/;
-	$contents[$idx] =~ s/$currentVersionRE/$nextVersion/;
-	writeAll($fn, @contents);
+	foreach my $line (@$lines)
+	{
+		my $idx = $line - 1;
+		my @contents = readAll($fn);
+		die("The file '$fn' does not have the current version '$currentVersion' in line $line\n") unless $contents[$idx] =~ /$currentVersionRE/;
+		$contents[$idx] =~ s/$currentVersionRE/$nextVersion/;
+		writeAll($fn, @contents);
+	}
 }
-
-my @mk = qx(perl Makefile.PL 2>&1);
-die("Failed creating makefile:\n@mk") if $?;
-
-my $mkcfg = qx(perl -V:make 2>&1);
-die("Failed finding make config:\n$mkcfg") if $?;
-die("Unexpected mkcfg: '$mkcfg'\n") unless $mkcfg =~ /^make='([^']+)'/; #'
-my $mkcmd = $1;
-
-my $expectedDist = "Grep-Query-$nextVersion.tar.gz";
-system("$mkcmd dist 2>&1");
-die("Failed making dist '$expectedDist'\n") if ($? || !-f $expectedDist);
 
 my @msg = readAll($msgfile);
 my $subj = "Release $nextVersion";
@@ -96,6 +86,18 @@ foreach (@msg)
 }
 splice(@changes, 2, 0, "$nextVersion\t$today", @msg, "");
 writeAll('Changes', @changes);
+
+my @mk = qx(perl Makefile.PL 2>&1);
+die("Failed creating makefile:\n@mk") if $?;
+
+my $mkcfg = qx(perl -V:make 2>&1);
+die("Failed finding make config:\n$mkcfg") if $?;
+die("Unexpected mkcfg: '$mkcfg'\n") unless $mkcfg =~ /^make='([^']+)'/; #'
+my $mkcmd = $1;
+
+my $expectedDist = "Grep-Query-$nextVersion.tar.gz";
+system("$mkcmd dist 2>&1");
+die("Failed making dist '$expectedDist'\n") if ($? || !-f $expectedDist);
 
 print "The current branch is '$br[0]' with next version = '$nextVersion'\n";
 print "Ready to commit => tag => push => upload? ";

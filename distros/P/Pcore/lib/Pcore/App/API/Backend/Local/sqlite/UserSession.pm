@@ -4,7 +4,6 @@ use Pcore -role, -result;
 use Pcore::App::API qw[:CONST];
 use Pcore::Util::Text qw[encode_utf8];
 
-# TODO tags
 sub _auth_user_session ( $self, $source_app_instance_id, $private_token, $cb ) {
     state $q1 = <<'SQL';
         SELECT
@@ -79,16 +78,17 @@ SQL
                     app_instance_id => undef,
 
                     permissions => {},
-                };
 
-                my $tags = {};
+                    # user_id, user_session_id
+                    depends_on => [ $user_session->{user_id}, $private_token->[1] ],
+                };
 
                 # get permissions
                 if ( my $roles = $self->dbh->selectall( $q1, [ $source_app_instance_id, $user_session->{user_id} ] ) ) {
                     $auth->{permissions} = { map { $_->{app_role_name} => 1 } $roles->@* };
                 }
 
-                $cb->( result 200, { auth => $auth, tags => $tags } );
+                $cb->( result 200, $auth );
             }
 
             return;
@@ -163,6 +163,10 @@ sub remove_user_session ( $self, $user_session_id, $cb ) {
     my $removed = $self->dbh->do( q[DELETE FROM api_user_session WHERE id = ?], [$user_session_id] );
 
     if ($removed) {
+
+        # fire AUTH event if user session token was removed
+        P->fire_event( 'AUTH', $user_session_id );
+
         $cb->( result 200 );
     }
     else {
@@ -179,9 +183,9 @@ sub remove_user_session ( $self, $user_session_id, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 8                    | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 7                    | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 8                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_user_session' declared but    |
+## |    3 | 7                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_auth_user_session' declared but    |
 ## |      |                      | not used                                                                                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

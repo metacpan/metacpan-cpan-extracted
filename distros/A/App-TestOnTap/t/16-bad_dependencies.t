@@ -9,7 +9,7 @@ use TestUtils;
 
 use Test::More tests => 2;
 
-my ($ret, $stdout, $stderr) = TestUtils::xeqsuite('--verbose');
+my ($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose']);
 
 is($ret, -1, "Exited with -1");
 like($stderr->[0], qr/^ERROR: Cyclic dependency detected: t.\.pl => t.\.pl => t.\.pl!$/, "Cyclic dep");

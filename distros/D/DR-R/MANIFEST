@@ -3,6 +3,14 @@ Changes
 MANIFEST
 Makefile.PL
 R.xs
+bench/010-random.pl
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/source/options
 lib/DR/R.pm
 matras.c
 rtree.c
@@ -15,5 +23,6 @@ t/010-ping.t
 t/020-instance-insert.t
 t/030-destructor.t
 t/040-foreach.t
+t/050-select.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

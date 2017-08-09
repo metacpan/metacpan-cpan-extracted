@@ -8,7 +8,7 @@ use warnings;
 use File::Spec ();
 
 # ABSTRACT: Get information about a class and its structure
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 # If Unicode is available, enable it so that the
@@ -36,8 +36,21 @@ sub _resolved_inc_handler {
   my $filename = $class->_inc_filename(shift) or return undef;
   
   foreach my $inc ( @INC ) {
-    if(ref $inc eq 'CODE') {
+    my $ref = ref $inc;
+    if($ref eq 'CODE') {
       my @ret = $inc->($inc, $filename);
+      if(@ret) {
+        return 1;
+      }
+    }
+    elsif($ref eq 'ARRAY' && ref($inc->[0]) eq 'CODE') {
+      my @ret = $inc->[0]->($inc, $filename);
+      if(@ret) {
+        return 1;
+      }
+    }
+    elsif($ref && eval { $inc->can('INC') }) {
+      my @ret = $inc->INC($filename);
       if(@ret) {
         return 1;
       }
@@ -391,7 +404,7 @@ Class::Inspector - Get information about a class and its structure
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -630,6 +643,8 @@ Contributors:
 Tom Wyant
 
 Steffen Müller
+
+Kivanc Yazan (KYZN)
 
 =head1 COPYRIGHT AND LICENSE
 

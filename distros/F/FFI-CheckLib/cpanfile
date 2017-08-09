@@ -1,7 +1,9 @@
 requires "perl" => "5.006";
 
 on 'test' => sub {
-  requires "Test::More" => "0.94";
+  requires "Test2::API" => "1.302015";
+  requires "Test2::Require::Module" => "0.000060";
+  requires "Test2::V0" => "0.000060";
   requires "perl" => "5.006";
 };
 
@@ -22,8 +24,4 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0";
   requires "Test::Strict" => "0";
   requires "YAML" => "0";
-};
-
-on 'develop' => sub {
-  recommends "YAML::XS" => "0";
 };

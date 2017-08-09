@@ -1,7 +1,7 @@
 package Pcore::App::API::Auth::Request;
 
 use Pcore -class, -result;
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref];
 
 use overload    #
   q[&{}] => sub ( $self, @ ) {
@@ -30,10 +30,6 @@ sub IS_CALLBACK ($self) {
     return 1;
 }
 
-sub wantarray ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    return !!$self->{_cb};
-}
-
 sub api_can_call ( $self, $method_id, $cb ) {
     $self->{auth}->api_can_call( $method_id, $cb );
 
@@ -55,7 +51,7 @@ sub _respond ( $self, @ ) {
     if ( my $cb = delete $self->{_cb} ) {
 
         # return response, if callback is defined
-        $cb->( blessed $_[1] ? $_[1] : result splice @_, 1 );
+        $cb->( is_blessed_ref $_[1] ? $_[1] : result splice @_, 1 );
     }
 
     return;

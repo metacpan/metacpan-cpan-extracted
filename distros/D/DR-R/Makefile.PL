@@ -18,5 +18,5 @@ WriteMakefile(
     INC               => '-I. -Irtree -Irtree/salad -Irtree/small',
     OBJECT            => '$(O_FILES)', # link all the C files too
 
-    CCFLAGS             => "$cflags -std=gnu99",
+    CCFLAGS             => "$cflags -std=gnu99 -Wunused-variable",
 );

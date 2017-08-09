@@ -1,7 +1,7 @@
 package Module::Patch;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-08-09'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -106,6 +106,7 @@ sub import {
         }
 
         # read patch module's configs
+        no warnings 'once';
         my $pcdata = $pdata->{config} // {};
         my $config = \%{"$self\::config"};
         while (my ($k, $v) = each %$pcdata) {
@@ -278,7 +279,7 @@ Module::Patch - Patch package with a set of patches
 
 =head1 VERSION
 
-This document describes version 0.25 of Module::Patch (from Perl distribution Module-Patch), released on 2017-07-10.
+This document describes version 0.26 of Module::Patch (from Perl distribution Module-Patch), released on 2017-08-09.
 
 =head1 SYNOPSIS
 

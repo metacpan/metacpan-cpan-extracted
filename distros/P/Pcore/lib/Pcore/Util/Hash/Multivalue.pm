@@ -1,7 +1,7 @@
 package Pcore::Util::Hash::Multivalue;
 
 use Pcore;
-use Pcore::Util::Scalar qw[is_arrayref is_hashref];
+use Pcore::Util::Scalar qw[is_arrayref is_hashref is_plain_arrayref];
 use Pcore::Util::List qw[pairkeys];
 use Storable qw[dclone];
 use Tie::Hash;
@@ -22,7 +22,7 @@ sub new {
 }
 
 sub STORE {
-    $_[0]->{ $_[1] } = ref $_[2] eq 'ARRAY' ? $_[2] : [ $_[2] ];
+    $_[0]->{ $_[1] } = is_plain_arrayref $_[2] ? $_[2] : [ $_[2] ];
 
     return;
 }
@@ -61,10 +61,10 @@ sub add {
 
     for ( my $i = 0; $i <= $args->$#*; $i += 2 ) {
         if ( !exists $hash->{ $args->[$i] } ) {
-            $hash->{ $args->[$i] } = ref $args->[ $i + 1 ] eq 'ARRAY' ? $args->[ $i + 1 ] : [ $args->[ $i + 1 ] ];
+            $hash->{ $args->[$i] } = is_plain_arrayref $args->[ $i + 1 ] ? $args->[ $i + 1 ] : [ $args->[ $i + 1 ] ];
         }
         else {
-            push $hash->{ $args->[$i] }->@*, ref $args->[ $i + 1 ] eq 'ARRAY' ? $args->[ $i + 1 ]->@* : $args->[ $i + 1 ];
+            push $hash->{ $args->[$i] }->@*, is_plain_arrayref $args->[ $i + 1 ] ? $args->[ $i + 1 ]->@* : $args->[ $i + 1 ];
         }
     }
 

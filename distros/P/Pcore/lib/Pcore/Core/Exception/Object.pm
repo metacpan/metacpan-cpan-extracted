@@ -35,16 +35,15 @@ has is_logged => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 around new => sub ( $orig, $self, $msg, %args ) {
     $args{skip_frames} //= 0;
 
-    if ( blessed $msg ) {
-        my $ref = ref $msg;
+    if ( my $blessed = blessed $msg ) {
 
         # already cought
-        if ( $ref eq __PACKAGE__ ) {
+        if ( $blessed eq __PACKAGE__ ) {
             return $msg;
         }
 
         # catch TypeTiny exceptions
-        elsif ( $ref eq 'Error::TypeTiny::Assertion' ) {
+        elsif ( $blessed eq 'Error::TypeTiny::Assertion' ) {
             $msg = $msg->message;
 
             # skip frames: Error::TypeTiny::throw
@@ -52,7 +51,7 @@ around new => sub ( $orig, $self, $msg, %args ) {
         }
 
         # catch Moose exceptions
-        elsif ( $ref =~ /\AMoose::Exception/sm ) {
+        elsif ( $blessed =~ /\AMoose::Exception/sm ) {
             $msg = $msg->message;
         }
 

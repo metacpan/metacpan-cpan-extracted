@@ -1,15 +1,13 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1, -no_utf8 => 1;
 use Test2::Mock;
 use Test::Alien::Build;
 use Test::Exit;
 use ExtUtils::MakeMaker;
-use Alien::Build::Plugin::Fetch::PromptBeforeDownload;
+use Alien::Build::Plugin::Fetch::Prompt;
+use Capture::Tiny qw( capture_merged );
 
-$ENV{ALIEN_BUILD_PRELOAD} = 'Fetch::PromptBeforeDownload';
+$ENV{ALIEN_BUILD_PRELOAD} = 'Fetch::Prompt';
 delete $ENV{ALIEN_DOWNLOAD};
-
-BEGIN { *never_exits_ok = \&Test::Exit::never_exits_ok }
-BEGIN { *exit_code = \&Test::Exit::exit_code }
 
 my $build = alienfile_ok q{
   use alienfile;
@@ -86,7 +84,7 @@ subtest 'user says no' => sub {
 
   $mock->override(prompt => sub ($;$) { 'n' });
   
-  is exit_code { $build->fetch }, 2;
+  is exit_code { capture_merged { $build->fetch } }, 2;
 
 };
 

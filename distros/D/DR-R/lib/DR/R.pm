@@ -5,10 +5,44 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.01';
+use Carp;
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('DR::R', $VERSION);
+
+sub select :method {
+    my ($self, $type, $point_or_rect, %opts) = @_;
+
+    my $offset = $opts{offset} || 0;
+    my $limit = $opts{limit};
+    my @result;
+
+    my $type_ok = 0;
+    $type //= '';
+    for (@{ $self->iterator_types }) {
+        if ($type eq $_) {
+            $type_ok = 1;
+            last;
+        }
+    }
+    croak "Unknown iterator type: '$type'" unless $type_ok;
+    unless ($self->is_point_or_rect($point_or_rect)) {
+        croak "Invalid point or rect";
+    }
+
+
+    $self->foreach($type, $point_or_rect, sub {
+        my ($o, $id, $toffset) = @_;
+
+        return if $toffset < $offset;
+        push @result => $o;
+        return unless defined $limit;
+        return if @result < $limit;
+        return 0;
+    });
+    return \@result;
+}
 
 1;
 __END__
@@ -155,13 +189,28 @@ Itearate all records.
 =back
 
 
+=head2 select
+
+    my $array_ref = $tree->select(NEIGHBOR => $point_or_rect,
+                    limit => $limit,
+                    offset => $offset
+                );
+
+Based on L</foreach> select.
+
+Run selected iterator until C<limit> reached, since C<offset> started.
+Default value for C<offset> option is C<0>.
+There is no default value for C<limit> option.
+
+
+
 =head1 AUTHOR
 
 Dmitry E. Oboukhov, E<lt>unera@debian.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Dmitry E. Oboukhov (the perl bindings).
+Copyright (C) 2017 by Dmitry E. Oboukhov (the perl module).
 
 Tarantool is a collective effort, and incorporates
 many contributions from the community.

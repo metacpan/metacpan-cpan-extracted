@@ -64,8 +64,8 @@ $cleanser->clean_in_place($res);
     }
 }
 
-# due to random hash ordering, sometimes 'f=f' is processed first (and thus
-# 'float1=f' becomes CIRCULAR) and sometimes it's the other way around. so we
+# due to random hash ordering, sometimes 'f=s' is processed first (and thus
+# 'float1=s' becomes CIRCULAR) and sometimes it's the other way around. so we
 # just change 'CIRCULAR' to 'CODE' here.
 {
     my $res = $res->[2];
@@ -87,9 +87,9 @@ my $expected_res = [
         'ary-arg1=s@' => 'CODE',
         'ary-arg1-json=s' => 'CODE',
         'ary-arg1-yaml=s' => 'CODE',
-        'f=f' => 'CODE',
-        'float1=f' => 'CODE',
-        'int1=i' => 'CODE',
+        'f=s' => 'CODE',
+        'float1=s' => 'CODE',
+        'int1=s' => 'CODE',
         'bool1' => 'CODE',
         'nobool1' => 'CODE',
         'no-bool1' => 'CODE',
@@ -128,10 +128,10 @@ my $expected_res = [
             'ary-arg1=s@' => {arg=>'ary.arg1', fqarg=>'ary.arg1', parsed=>'PARSED',},
             'ary-arg1-json=s' => {arg=>'ary.arg1', fqarg=>'ary.arg1', is_json=>1, parsed=>'PARSED',},
             'ary-arg1-yaml=s' => {arg=>'ary.arg1', fqarg=>'ary.arg1', is_yaml=>1, parsed=>'PARSED',},
-            'float1=f' => {arg=>'float1', fqarg=>'float1', parsed=>'PARSED', noncode_aliases=>['f=f'],},
-            'f=f' => {is_alias=>1, alias=>'f', alias_for=>'float1=f', is_code=>0, arg=>'float1', fqarg=>'float1', parsed=>'PARSED',},
-            'int1=i' => {arg=>'int1', fqarg=>'int1', parsed=>'PARSED', code_aliases=>['set-zero'],},
-            'set-zero' => {is_alias=>1, alias=>'set_zero', alias_for=>'int1=i', is_code=>1, arg=>'int1', fqarg=>'int1', parsed=>'PARSED',},
+            'float1=s' => {arg=>'float1', fqarg=>'float1', parsed=>'PARSED', noncode_aliases=>['f=s'],},
+            'f=s' => {is_alias=>1, alias=>'f', alias_for=>'float1=s', is_code=>0, arg=>'float1', fqarg=>'float1', parsed=>'PARSED',},
+            'int1=s' => {arg=>'int1', fqarg=>'int1', parsed=>'PARSED', code_aliases=>['set-zero'],},
+            'set-zero' => {is_alias=>1, alias=>'set_zero', alias_for=>'int1=s', is_code=>1, arg=>'int1', fqarg=>'int1', parsed=>'PARSED',},
             'bool1' => {arg=>'bool1', fqarg=>'bool1', parsed=>'PARSED', is_neg=>0, neg_opts=>['no-bool1','nobool1']},
             'nobool1' => {arg=>'bool1', fqarg=>'bool1', parsed=>'PARSED', is_neg=>1, pos_opts=>['bool1']},
             'no-bool1' => {arg=>'bool1', fqarg=>'bool1', parsed=>'PARSED', is_neg=>1, pos_opts=>['bool1']},

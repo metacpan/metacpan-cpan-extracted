@@ -6,7 +6,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 24;
 use Class::Inspector::Functions;
 
 # To make maintaining this a little faster,
@@ -74,7 +74,47 @@ unshift @INC, sub {
   return
 };
 
+unshift @INC, [ sub { 
+  my $arrayref = shift;
+  my $filename = shift;
+
+  die "args wrong" unless
+     ref($arrayref->[0]) eq 'CODE' 
+  && $arrayref->[1] == 1
+  && $arrayref->[2] == 2
+  && $arrayref->[3] == 3;
+
+  if($filename eq 'Foo/Baz.pm') {
+    open my $fh,  '<', __FILE__;
+    return $fh;
+  }
+  return
+}, 1,2,3];
+
+unshift @INC, MyHook->new;
+
 # Check the installed stuff
 ok( installed( CI ), "installed detects installed" );
 ok( ! installed( BAD ), "installed detects not installed" );
 ok( installed( 'Foo::Bar'), "installed detects coderef installed" );
+ok( installed( 'Foo::Baz'), "installed detects arrayref installed" );
+ok( installed( 'Foo::Foo'), "installed detects object installed" );
+
+package
+  MyHook;
+
+sub new {
+  my($class) = @_;
+  bless {}, $class;
+}
+
+sub MyHook::INC {
+  my($self, $filename) = @_;
+  die "self wrong" unless ref $self eq 'MyHook';
+  
+  if($filename eq 'Foo/Foo.pm') {
+    open my $fh, '<', __FILE__;
+    return $fh;
+  }
+  return;
+}

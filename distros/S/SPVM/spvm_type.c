@@ -14,6 +14,7 @@
 #include "spvm_package.h"
 
 const char* const SPVM_TYPE_C_CORE_NAMES[] = {
+  "unknown",
   "byte",
   "short",
   "int",
@@ -27,12 +28,83 @@ const char* const SPVM_TYPE_C_CORE_NAMES[] = {
   "long[]",
   "float[]",
   "double[]",
+  "string[]",
 };
 
 const char* const SPVM_TYPE_C_CODE_NAMES[] = {
   "name",
   "array",
 };
+
+SPVM_TYPE* SPVM_TYPE_get_byte_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_BYTE);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_short_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_SHORT);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_int_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_INT);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_long_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_LONG);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_float_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_FLOAT);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_double_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_DOUBLE);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_string_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_ID_STRING);
+  
+  assert(type);
+  
+  return type;
+}
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler) {
   SPVM_TYPE* type = SPVM_COMPILER_ALLOCATOR_alloc_memory_pool(compiler, compiler->allocator, sizeof(SPVM_TYPE));
@@ -108,7 +180,7 @@ _Bool SPVM_TYPE_resolve_id(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t na
         const char* part_name = SPVM_DYNAMIC_ARRAY_fetch(parts, i);
           
         // Core type or array
-        if (strcmp(part_name, "boolean") == 0 || strcmp(part_name, "byte") == 0 || strcmp(part_name, "short") == 0 || strcmp(part_name, "int") == 0
+        if (strcmp(part_name, "void") == 0 || strcmp(part_name, "boolean") == 0 || strcmp(part_name, "byte") == 0 || strcmp(part_name, "short") == 0 || strcmp(part_name, "int") == 0
           || strcmp(part_name, "long") == 0 || strcmp(part_name, "float") == 0 || strcmp(part_name, "double") == 0
           || strcmp(part_name, "string") == 0 || strcmp(part_name, "[]") == 0)
         {
@@ -199,23 +271,10 @@ _Bool SPVM_TYPE_is_array_numeric(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   }
 }
 
-_Bool SPVM_TYPE_is_string(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
-  (void)compiler;
-  
-  const char* name = type->name;
-  
-  if (strcmp(name, "string") == 0) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
-}
-
 _Bool SPVM_TYPE_is_integral(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   (void)compiler;
   
-  if (type->id <= SPVM_TYPE_C_ID_LONG) {
+  if (type && type->id >= SPVM_TYPE_C_ID_BYTE && type->id <= SPVM_TYPE_C_ID_LONG) {
     return 1;
   }
   else {

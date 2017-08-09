@@ -1,3 +1,9 @@
+0.481   2017-08-09 (PERLANCAR)
+
+	- Bump generated prereq version Perinci::CmdLine::{Base,Lite} 1.76
+	  -> 1.79.
+
+
 0.480   2017-08-06 (PERLANCAR)
 
 	- Produce deps to Log::ger 0.023, not 0.

@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Build::Plugin::Fetch::Prompt );
 
 # ABSTRACT: Backwards compatible plugin name
-our $VERSION = '0.58'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alien::Build::Plugin::Fetch::PromptBeforeDownload - Backwards compatible plugin 
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

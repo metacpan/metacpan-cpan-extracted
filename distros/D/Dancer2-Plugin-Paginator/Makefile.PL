@@ -9,6 +9,10 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Dancer2 plugin for Paginator::Lite.",
   "AUTHOR" => "Blabos de Blebe <blabos\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "HTTP::Request::Common" => 0,
+    "Plack::Test" => 0
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -22,7 +26,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "JSON" => 0
   },
-  "VERSION" => "2.02",
+  "VERSION" => "2.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,8 +35,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Dancer2::Plugin" => "0.159002",
+  "HTTP::Request::Common" => 0,
   "JSON" => 0,
-  "Paginator::Lite" => "2.001003"
+  "Paginator::Lite" => "2.001003",
+  "Plack::Test" => 0
 );
 
 

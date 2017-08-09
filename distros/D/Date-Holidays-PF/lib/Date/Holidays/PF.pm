@@ -8,7 +8,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(is_pf_holiday get_easter get_ascension get_pentecost get_vendredisaint get_lundipaques);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 use utf8;
 
 sub get_easter {

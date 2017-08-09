@@ -1,6 +1,7 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 sub require_ok ($);
 
+require_ok 'Alien::Build::Plugin::Fetch::Prompt';
 require_ok 'Alien::Build::Plugin::Fetch::PromptBeforeDownload';
 
 done_testing;

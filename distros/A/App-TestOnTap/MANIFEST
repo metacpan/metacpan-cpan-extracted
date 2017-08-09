@@ -117,6 +117,7 @@ lib/App/TestOnTap/Dispenser.pm
 lib/App/TestOnTap/ExecMap.pm
 lib/App/TestOnTap/Harness.pm
 lib/App/TestOnTap/OrderStrategy.pm
+lib/App/TestOnTap/Preprocess.pm
 lib/App/TestOnTap/Scheduler.pm
 lib/App/TestOnTap/Util.pm
 lib/App/TestOnTap/WorkDirManager.pm
@@ -138,6 +139,7 @@ t/21-verify_saved_archive.t
 t/30-basic_parallel.t
 t/40-custom_emap.t
 t/50-no-harness.t
+t/60-preprocess.t
 t/config.testontap
 t/lib/TestUtils.pm
 t/misc/weird.execmap
@@ -163,6 +165,9 @@ t/tsuites/ordering/natural_config.testontap
 t/tsuites/ordering/t1.pl
 t/tsuites/ordering/t10.pl
 t/tsuites/ordering/t2.pl
+t/tsuites/preprocess/config.testontap
+t/tsuites/preprocess/preproc.pl
+t/tsuites/preprocess/hasenv.pl
 t/tsuites/simple_multi/one_equals_one.pl
 t/tsuites/simple_multi/three_equals_three.pl
 t/tsuites/simple_multi/two_equals_two.pl

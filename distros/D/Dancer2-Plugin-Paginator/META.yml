@@ -3,7 +3,9 @@ abstract: 'Dancer2 plugin for Paginator::Lite.'
 author:
   - 'Blabos de Blebe <blabos@cpan.org>'
 build_requires:
+  HTTP::Request::Common: 0
   JSON: 0
+  Plack::Test: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
@@ -19,5 +21,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/Dancer2-Plugin-Paginator/issues
   repository: git://github.com/manwar/Dancer2-Plugin-Paginator.git
-version: 2.02
+version: 2.03
 x_serialization_backend: 'YAML::Tiny version 1.56'

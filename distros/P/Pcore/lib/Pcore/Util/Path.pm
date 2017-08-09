@@ -2,7 +2,7 @@ package Pcore::Util::Path;
 
 use Pcore -class;
 use Storable qw[];
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref];
 use Pcore::Util::URI;
 
 use overload    #
@@ -53,7 +53,7 @@ around new => sub ( $orig, $self, $path = q[], @ ) {
         splice @_, 3,
     );
 
-    $self = ref $self if blessed $self;
+    $self = ref $self if is_blessed_ref $self;
 
     my $path_args = {
         path   => $path,
@@ -416,7 +416,7 @@ sub _get_mime_types ($self) {
         for my $suffix ( keys $MIME_TYPES->{suffix}->%* ) {
             my $type;
 
-            if ( ref $MIME_TYPES->{suffix}->{$suffix} eq 'ARRAY' ) {
+            if ( is_plain_arrayref $MIME_TYPES->{suffix}->{$suffix} ) {
                 $type = $MIME_TYPES->{suffix}->{$suffix}->[0];
 
                 $MIME_TYPES->{category}->{$type} = $MIME_TYPES->{suffix}->{$suffix}->[1] if $MIME_TYPES->{suffix}->{$suffix}->[1];

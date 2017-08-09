@@ -1,3 +1,12 @@
+v0.47.0 2017-08-08T16:33:08Z
+ - app API auth events
+ - reauthenticare auth token on api call
+ - various app API improvements
+ - blessed -> is_blessed_ref
+ - ref -> is_plain_arrayref
+ - ref -> is_plain_hashref
+ - ref -> is_plain_coderef
+
 v0.46.1 2017-08-01T09:56:55Z
  - docker build status text improved to display unknown statuses
  - l10n deferred calls updated

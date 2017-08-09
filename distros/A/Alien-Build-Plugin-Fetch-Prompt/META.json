@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "0",
             "Test2::Mock" : "0.000060",
             "Test2::V0" : "0.000060",
@@ -68,7 +69,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.58",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
+   "version" : "0.59",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

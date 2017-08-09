@@ -6,7 +6,7 @@ use CBOR::XS qw[];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::WebSocket::Protocol::pcore::Request;
 use Pcore::Util::Text qw[trim];
-use Pcore::Util::Scalar qw[blessed weaken];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref weaken is_plain_coderef];
 
 has protocol => ( is => 'ro', isa => Str, default => 'pcore', init_arg => undef );
 
@@ -83,7 +83,7 @@ sub rpc_call ( $self, $method, @ ) {
     };
 
     # detect callback
-    if ( ref $_[-1] eq 'CODE' or ( blessed $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
+    if ( is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
         $msg->{data} = [ @_[ 2 .. $#_ - 1 ] ];
 
         $msg->{tid} = uuid_str();
@@ -160,9 +160,7 @@ sub before_connect_server ( $self, $env, $args ) {
     }
 
     if ( $args->{listen_events} ) {
-        my $masks = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
-
-        push $headers->@*, 'Pcore-Listen-Events', join ',', $masks->@*;
+        push $headers->@*, 'Pcore-Listen-Events', join ',', ( is_plain_arrayref $args->{listen_events} ? $args->{listen_events}->@* : $args->{listen_events} );
     }
 
     return $headers;
@@ -180,9 +178,7 @@ sub before_connect_client ( $self, $args ) {
     }
 
     if ( $args->{listen_events} ) {
-        my $masks = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
-
-        push $headers->@*, 'Pcore-Listen-Events:' . join ',', $masks->@*;
+        push $headers->@*, 'Pcore-Listen-Events:' . join ',', ( is_plain_arrayref $args->{listen_events} ? $args->{listen_events}->@* : $args->{listen_events} );
     }
 
     if ( $args->{token} ) {
@@ -246,11 +242,9 @@ sub on_binary ( $self, $data_ref ) {
 }
 
 sub _set_listeners ( $self, $masks ) {
-    $masks = [$masks] if ref $masks ne 'ARRAY';
-
     weaken $self;
 
-    for my $mask ( $masks->@* ) {
+    for my $mask ( is_plain_arrayref $masks ? $masks->@* : $masks ) {
         next if exists $self->{_listeners}->{$mask};
 
         # do not set event listener, if not authorized
@@ -270,9 +264,7 @@ sub _set_listeners ( $self, $masks ) {
 }
 
 sub _on_message ( $self, $msg, $is_json ) {
-    $msg = [$msg] if ref $msg ne 'ARRAY';
-
-    for my $tx ( $msg->@* ) {
+    for my $tx ( is_plain_arrayref $msg ? $msg->@* : $msg ) {
         next if !$tx->{type};
 
         # forward local events to remote peer
@@ -397,9 +389,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 272                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 266                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 322, 344, 359        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 314, 336, 351        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

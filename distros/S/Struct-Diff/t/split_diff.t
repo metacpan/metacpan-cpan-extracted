@@ -4,19 +4,13 @@ use strict;
 use warnings;
 use Storable qw(freeze);
 use Struct::Diff qw(diff split_diff);
-use Test::More tests => 17;
+use Test::More tests => 15;
 
 local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
 
 my ($a, $b, $d, $frozen_d, $s);
 
 ### garbage ###
-eval { split_diff(undef) };
-ok($@ =~ /^Unsupported diff struct passed/);
-
-eval { split_diff({D => 'garbage'}) };
-ok($@ =~ /^Value for 'D' status must be hash or array/);
-
 $s = split_diff({garbage_as_a_status => 'garbage'});
 is_deeply($s, {}, "diff: {garbage_as_a_status => 'garbage'}");
 
