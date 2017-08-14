@@ -4,9 +4,9 @@ IPC::Filter - filter data through an external process
 
 =head1 SYNOPSIS
 
-	use IPC::Filter qw(filter);
+    use IPC::Filter qw(filter);
 
-	$compressed_data = filter($data, "bzip2");
+    $compressed_data = filter($data, "bzip2");
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,7 @@ use IO::Poll 0.01 qw(POLLIN POLLOUT POLLERR POLLHUP);
 use POSIX qw(_exit);
 use Symbol qw(gensym);
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(filter);
@@ -164,7 +164,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2007, 2010, 2011
+Copyright (C) 2004, 2007, 2010, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

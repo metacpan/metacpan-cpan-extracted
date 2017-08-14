@@ -140,6 +140,12 @@ ATTRIBUTES
 
     Where screenshots are saved.
 
+  screenshots
+      $array = $self->screenshots;
+
+    Holds an array ref with paths to all the screenshots taken with
+    "capture_screenshot".
+
   toggle_checked_ok
       $self = $self->toggle_checked_ok("input[name=human]");
 

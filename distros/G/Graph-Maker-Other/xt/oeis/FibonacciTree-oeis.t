@@ -33,9 +33,6 @@ use lib
 use MyGraphs 'Graph_Wiener_index';
 require Graph::Maker::FibonacciTree;
 
-# uncomment this to run the ### lines
-# use Smart::Comments '###';
-
 
 #------------------------------------------------------------------------------
 # series_reduced=>1

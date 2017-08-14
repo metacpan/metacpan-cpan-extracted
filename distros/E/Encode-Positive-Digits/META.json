@@ -22,14 +22,15 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Dump" : "0"
+            "Math::BigInt" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Encode::Positive::Digits" : {
          "file" : "lib/Encode/Positive/Digits.pm",
-         "version" : "2017.302"
+         "version" : "20170811"
       }
    },
    "release_status" : "stable",
@@ -38,5 +39,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.302"
+   "version" : "20170811"
 }

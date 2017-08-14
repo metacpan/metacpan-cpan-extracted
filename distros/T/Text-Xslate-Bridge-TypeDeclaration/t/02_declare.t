@@ -41,6 +41,14 @@ Declaration mismatch for `h`
 i:, h.s:
 EOS
 
+is $xslate->render('structured_type_not_found.tx', { foo => { bar => 1 }}), <<EOS;
+<pre class="type-declaration-mismatch">
+Declaration mismatch for `foo`
+  Reference {&quot;bar&quot; =&gt; 1} did not pass type constraint &quot;Dict[bar=&gt;&quot;SomeCollection[Any]&quot;,slurpy Any]&quot;
+</pre>
+foo.bar:1
+EOS
+
 done_testing;
 
 __DATA__
@@ -50,3 +58,6 @@ __DATA__
 @@ two.tx
 <: declare(i => 'Maybe[Int]', h => { s => 'Maybe[Str]' }) -:>
 i:<: $i :>, h.s:<: $h.s :>
+@@ structured_type_not_found.tx
+<: declare(foo => { bar => 'SomeCollection[Any]' }) -:>
+foo.bar:<: $foo.bar :>

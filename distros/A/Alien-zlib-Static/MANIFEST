@@ -1,0 +1,13 @@
+bin/zlib-env-bash
+bin/zlib-env-perl
+Build.PL
+Changes
+lib/Alien/zlib/Static.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+source/zlib-1.2.11.tar.gz
+t/00-use.t
+t/01-signature.t
+t/author-pod.t

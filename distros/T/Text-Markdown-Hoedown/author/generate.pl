@@ -13,7 +13,7 @@ my $CB_C = <<'...';
 ? for my $cb (@callbacks) {
 <?= $cb->{type} ?> tmh_cb_<?= $cb->{name} ?>(<?= $cb->{params} ?>) {
     dTHX; dSP; bool is_null = 0;
-    SV** rcb = hv_fetchs((HV*)opaque, "<?= $cb->{name} ?>", 0);
+    SV** rcb = hv_fetchs((HV*)data->opaque, "<?= $cb->{name} ?>", 0);
     <? if ($cb->{type} eq 'void') { ?>
     if (!rcb) { return; }
     <? } else { ?>
@@ -93,9 +93,9 @@ sub spew {
 }
 
 sub scan_callbacks {
-    open my $fh, '<', 'hoedown/src/markdown.h';
+    open my $fh, '<', 'hoedown/src/document.h';
     my $content = do { local $/; <$fh> };
-    $content =~ s/struct hoedown_renderer {(.*?)}//sm or die "Invalid markdown.h";
+    $content =~ s/struct hoedown_renderer \{(.*?)\}//sm or die "Invalid document.h";
     my @callbacks;
     for my $line (split /\n/, $1) {
         if ($line =~ /\A\s*(.*?)\s+\(\*(\w+)\)\((.*)\);/) {
@@ -117,8 +117,11 @@ sub scan_callbacks {
                 } elsif ($_ =~ /\Aunsigned int (\w+)\z/) {
                     push @args, "mXPUSHu($1)";
                     push @pp_args, "\$$1:UInt";
-                } elsif ($_ =~ /\Aenum hoedown_autolink type\z/) {
+                } elsif ($_ =~ /\Ahoedown_\w+_type type\z/) {
                     push @args, "mXPUSHi(type)";
+                    push @pp_args, "\$type:Int";
+                } elsif ($_ =~ /\Ahoedown_\w+_flags flags\z/) {
+                    push @args, "mXPUSHi(flags)";
                     push @pp_args, "\$type:Int";
                 } else {
                     die "Unknown: $_";

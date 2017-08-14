@@ -1,12 +1,12 @@
 {
     package WebService::Braintree::AdvancedSearchNodes;
-$WebService::Braintree::AdvancedSearchNodes::VERSION = '0.91';
+$WebService::Braintree::AdvancedSearchNodes::VERSION = '0.92';
 use Moose;
 }
 
 {
     package WebService::Braintree::SearchNode;
-$WebService::Braintree::SearchNode::VERSION = '0.91';
+$WebService::Braintree::SearchNode::VERSION = '0.92';
 use Moose;
 
     has 'searcher' => (is => 'rw');
@@ -34,7 +34,7 @@ use Moose;
 
 {
     package WebService::Braintree::IsNode;
-$WebService::Braintree::IsNode::VERSION = '0.91';
+$WebService::Braintree::IsNode::VERSION = '0.92';
 use Moose;
     extends ("WebService::Braintree::SearchNode");
 
@@ -48,7 +48,7 @@ use Moose;
 
 {
     package WebService::Braintree::EqualityNode;
-$WebService::Braintree::EqualityNode::VERSION = '0.91';
+$WebService::Braintree::EqualityNode::VERSION = '0.92';
 use Moose;
     extends ("WebService::Braintree::IsNode");
 
@@ -62,7 +62,7 @@ use Moose;
 
 {
     package WebService::Braintree::KeyValueNode;
-$WebService::Braintree::KeyValueNode::VERSION = '0.91';
+$WebService::Braintree::KeyValueNode::VERSION = '0.92';
 use Moose;
     extends ("WebService::Braintree::SearchNode");
 
@@ -86,7 +86,7 @@ use Moose;
 
 {
     package WebService::Braintree::PartialMatchNode;
-$WebService::Braintree::PartialMatchNode::VERSION = '0.91';
+$WebService::Braintree::PartialMatchNode::VERSION = '0.92';
 use Moose;
     extends ("WebService::Braintree::EqualityNode");
 
@@ -105,7 +105,7 @@ use Moose;
 
 {
     package WebService::Braintree::TextNode;
-$WebService::Braintree::TextNode::VERSION = '0.91';
+$WebService::Braintree::TextNode::VERSION = '0.92';
 use Moose;
     extends ("WebService::Braintree::PartialMatchNode");
 
@@ -119,7 +119,7 @@ use Moose;
 
 {
     package WebService::Braintree::RangeNode;
-$WebService::Braintree::RangeNode::VERSION = '0.91';
+$WebService::Braintree::RangeNode::VERSION = '0.92';
 use Moose;
     extends ("WebService::Braintree::EqualityNode");
 
@@ -146,7 +146,7 @@ use Moose;
 
 {
     package WebService::Braintree::MultipleValuesNode;
-$WebService::Braintree::MultipleValuesNode::VERSION = '0.91';
+$WebService::Braintree::MultipleValuesNode::VERSION = '0.92';
 use Carp;
     use Moose;
     use WebService::Braintree::Util;

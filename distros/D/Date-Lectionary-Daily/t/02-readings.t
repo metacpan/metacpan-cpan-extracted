@@ -3,7 +3,7 @@ use v5.22;
 
 use strict;
 use warnings;
-use Test::More tests => 50;
+use Test::More tests => 51;
 use Test::Exception;
 
 use Time::Piece;
@@ -455,4 +455,13 @@ is(
     $testReading->readings->{morning}->{2},
     'John 11:1-44',
 	'The second reading for morning prayer on 2019-4-9 should be John 11:1-44'
+);
+
+#Lectionary Week: The Transfiguration -- Day: Tuesday
+$testReading = Date::Lectionary::Daily->new(
+    'date' => Time::Piece->strptime( "2017-8-9", "%Y-%m-%d" ) );
+is(
+    $testReading->readings->{morning}->{2},
+    '2 Corinthians 7:2-end',
+    'The second reading for morning prayer on 2017-8-9 should be 2 Corinthians 7:2-end'
 );

@@ -1,5 +1,5 @@
 package Statocles::Site;
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 # ABSTRACT: An entire, configured website
 
 use Statocles::Base 'Class', 'Emitter';
@@ -832,7 +832,7 @@ Statocles::Site - An entire, configured website
 
 =head1 VERSION
 
-version 0.083
+version 0.084
 
 =head1 SYNOPSIS
 
@@ -1132,12 +1132,20 @@ class|Statocles::Page> they use.
 
 The site object exposes the following events.
 
+=head2 collect_pages
+
+This event is fired after all the pages have been collected, but before they
+have been rendered. This allows you to edit the page's data or add/remove
+pages from the list.
+
+The event will be a
+L<Statocles::Event::Pages|Statocles::Event/Statocles::Event::Pages> object
+containing all the pages built by the apps.
+
 =head2 before_build_write
 
 This event is fired after the pages have been built by the apps, but before
 any page is written to the C<build_store>.
-
-You can use this event to add new pages or edit the pages already created.
 
 The event will be a
 L<Statocles::Event::Pages|Statocles::Event/Statocles::Event::Pages> object

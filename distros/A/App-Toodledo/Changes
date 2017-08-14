@@ -86,3 +86,5 @@ Revision history for App-Toodledo
 
 2.18    Update URL from http to https per Toodledo API Notice.
 
+2.19    Update requirements to prevent Class::MOP::load_class deprecation.
+

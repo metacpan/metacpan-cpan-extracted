@@ -1,7 +1,7 @@
 #
 # This file is part of Dist-Zilla-Plugin-ContributorsFromGit
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package Dist::Zilla::Plugin::ContributorsFromGit;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.016-3-gee7ffea
-$Dist::Zilla::Plugin::ContributorsFromGit::VERSION = '0.017';
+# git description: 0.017-9-ge7df715
+$Dist::Zilla::Plugin::ContributorsFromGit::VERSION = '0.018';
 
 # ABSTRACT: Populate your 'CONTRIBUTORS' POD from the list of git authors
 
@@ -54,7 +54,7 @@ has _contributor_list => (
             grep { [ map { lc } @authors ]->none eq lc   }
             map  { decode_utf8($_)                       }
             map  { chomp; s/^\s*\d+\s*//; $_             }
-            `git shortlog -s -e`
+            `git shortlog -s -e HEAD`
             ;
 
         return [ sort @contributors ];
@@ -168,15 +168,13 @@ __END__
 Golden Graham Greb Knop Mike Miyagawa zilla BeforeBuild metacpan shortlog
 committer mailmap
 
-=for :stopwords Wishlist flattr flattr'ed gittip gittip'ed
-
 =head1 NAME
 
 Dist::Zilla::Plugin::ContributorsFromGit - Populate your 'CONTRIBUTORS' POD from the list of git authors
 
 =head1 VERSION
 
-This document describes version 0.017 of Dist::Zilla::Plugin::ContributorsFromGit - released April 09, 2015 as part of Dist-Zilla-Plugin-ContributorsFromGit.
+This document describes version 0.018 of Dist::Zilla::Plugin::ContributorsFromGit - released August 13, 2017 as part of Dist-Zilla-Plugin-ContributorsFromGit.
 
 =head1 SYNOPSIS
 
@@ -204,7 +202,7 @@ L<Pod::Weaver::Section::Contributors> can find them.
 
 Note that you do not need to have the C<%PodWeaver> stash created; it will be
 added if it is not found.  However, your L<Pod::Weaver> config (aka
-c<weaver.ini>) must include the
+C<weaver.ini>) must include the
 L<Contributors|Pod::Weaver::Section::Contributors> section plugin.
 
 =head2 Dist::Zilla Phase
@@ -257,10 +255,10 @@ This package contains a YAML file containing a mapping of C<@cpan.org> author
 addresses; this list is consulted while building the contributors list, and
 can be used to replace a non-cpan.org address with one.
 
-To add to or modify this mapping, please feel free to fork, add your alternate
-email addresses to C<share/author-emails.yaml>, and submit a pull-request for
-inclusion.  It'll be merged and released; as various authors update their set
-of installed modules and cut new releases, the mapping will appear.
+To add to or modify this mapping, fork, add your alternate email addresses to
+C<share/author-emails.yaml>, and submit a pull-request for inclusion.  It'll
+be merged and released; as various authors update their set of installed
+modules and cut new releases, the mapping will appear.
 
 =head1 SEE ALSO
 
@@ -282,15 +280,10 @@ L<http://www.dagolden.com/index.php/1921/how-im-using-distzilla-to-give-credit-t
 
 =back
 
-=head1 SOURCE
-
-The development version is on github at L<http://https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit>
-and may be cloned from L<git://https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit.git>
-
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/issues
+L<https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -299,25 +292,6 @@ feature.
 =head1 AUTHOR
 
 Chris Weyl <cweyl@alumni.drew.edu>
-
-=head2 I'm a material boy in a material world
-
-=begin html
-
-<a href="https://www.gittip.com/RsrchBoy/"><img src="https://raw.githubusercontent.com/gittip/www.gittip.com/master/www/assets/%25version/logo.png" /></a>
-<a href="http://bit.ly/rsrchboys-wishlist"><img src="http://wps.io/wp-content/uploads/2014/05/amazon_wishlist.resized.png" /></a>
-<a href="https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2FDist-Zilla-Plugin-ContributorsFromGit&title=RsrchBoy's%20CPAN%20Dist-Zilla-Plugin-ContributorsFromGit&tags=%22RsrchBoy's%20Dist-Zilla-Plugin-ContributorsFromGit%20in%20the%20CPAN%22"><img src="http://api.flattr.com/button/flattr-badge-large.png" /></a>
-
-=end html
-
-Please note B<I do not expect to be gittip'ed or flattr'ed for this work>,
-rather B<it is simply a very pleasant surprise>. I largely create and release
-works like this because I need them or I find it enjoyable; however, don't let
-that stop you if you feel like it ;)
-
-L<Flattr this|https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2FDist-Zilla-Plugin-ContributorsFromGit&title=RsrchBoy's%20CPAN%20Dist-Zilla-Plugin-ContributorsFromGit&tags=%22RsrchBoy's%20Dist-Zilla-Plugin-ContributorsFromGit%20in%20the%20CPAN%22>,
-L<gittip me|https://www.gittip.com/RsrchBoy/>, or indulge my
-L<Amazon Wishlist|http://bit.ly/rsrchboys-wishlist>...  If you so desire.
 
 =head1 CONTRIBUTORS
 
@@ -357,7 +331,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Chris Weyl.
+This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 
 This is free software, licensed under:
 

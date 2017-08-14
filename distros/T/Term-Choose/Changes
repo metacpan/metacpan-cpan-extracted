@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.507   2017-08-09
+        - Refactoring `line_fold`.
+
 1.506   2017-04-26
         - Code refactoring.
         - Update year copyright.

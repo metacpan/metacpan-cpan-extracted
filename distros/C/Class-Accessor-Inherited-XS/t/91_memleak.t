@@ -6,7 +6,7 @@ $SIG{__WARN__} = \&CORE::die;
 
 {
     package Jopa;
-    use parent 'Class::Accessor::Inherited::XS';
+    use parent 'Class::Accessor::Inherited::XS::Compat';
 }
 
 Jopa->mk_inherited_accessors('foo');

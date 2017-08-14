@@ -3,29 +3,35 @@
 # Encode a positive integer using the specified digits and vice-versa
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
+# podDocumentation
 
 package Encode::Positive::Digits;
 require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
-use Data::Dump qw(dump);
+use Math::BigInt;
 
-our $VERSION = '2017.302';
+our $VERSION = '20170811';
 
-sub encode($$)
- {my ($n, $digits) = @_;
+#1 Encode and decode
 
-  $n < 2**64 or confess "singleToPair: $n >= 2**64";
-  $n == int($n) or confess "encode: $n is not an integer";
+sub encode($$)                                                                  # Returns a string which expresses a positive integer in decimal notation as a string using the specified digits. The specified digits can be any characters chosen from the Unicode character set.
+ {my ($number, $digits) = @_;                                                   # Decimal integer, encoding digits
 
-  my @b = split //, $digits;
-  my $b = @b;
-  $b > 1 or confess "encode: number of digits too few, must be at least 2";
-  return $b[0] if $n == 0;
+  $number =~ m/\A\d+\Z/s or confess "$number is not a positive decimal integer";# Check the number to be encoded
 
-  my $e = '';
-  for my $position(0..64)
+  my @b = split //, $digits;                                                    # Check the encoding digits
+  my $b = Math::BigInt->new(scalar @b);
+  $b > 1 or confess
+   "number of encoding digits supplied($b) too few, must be at least 2";
+
+  return $b[0] if $number == 0;                                                 # A simple case
+
+  my $n = Math::BigInt->new($number);                                           # Convert to BigInt
+  my $e = '';                                                                   # Encoded version
+
+  for my $position(0..4*length($number))                                        # Encoding in binary would take less than this number of digits
    {my $p = $b ** $position;
     next if $p < $n;
     return $b[1].($b[0] x $position) if $p == $n;
@@ -39,44 +45,33 @@ sub encode($$)
    }
  }
 
-sub decode($$)
- {my ($number, $digits) = @_;
+sub decode($$)                                                                  # Return the integer expressed in decimal notation corresponding to the value of the specified string considered as a number over the specified digits
+ {my ($number, $digits) = @_;                                                   # Number to decode, encoding digits
 
   my @b = split //, $digits;
   my $b = @b;
-  $b > 1 or confess "decode: number of digits too few, must be at least 2";
+  $b > 1 or confess
+   "number of decoding digits supplied($b) too few, must be at least 2";
 
   my @n = split //, $number;
   my $n = @n;
 
-  for(1..$n)                                                                    # Validate digits
+  for(1..$n)                                                                    # Convert each digit to be decoded with its decimal equivalent
    {my $d = $n[$_-1];
     my $i = index($digits, $d);
-    $i < 0 and confess "decode: Invalid digit \"$d\" in number $number at position $_";
+    $i < 0 and confess "Invalid digit \"$d\" in number $number at position $_";
     $n[$_-1] = $i;
    }
 
-  my $p = 1;
-  my $s = 0;
+  my $p = Math::BigInt->new(1);
+  my $s = Math::BigInt->new(0);
   for(reverse @n)                                                               # Decode each digit
    {$s += $p * $_;
     $p *=  $b;
    }
-  $s
+
+  "$s"
  }
-
-#-------------------------------------------------------------------------------
-# Test
-#-------------------------------------------------------------------------------
-
-sub test
- {eval join('', <Encode::Positive::Digits::DATA>) || die $@
- }
-
-test unless caller();
-
-# Documentation
-#extractDocumentation unless caller;
 
 #-------------------------------------------------------------------------------
 # Export
@@ -91,8 +86,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT_OK    = qw();
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
-1;
-
+# podDocumentation
 =pod
 
 =encoding utf-8
@@ -105,22 +99,57 @@ Encode::Positive::Digits - Encode a positive integer using the specified digits 
 
  use Encode::Positive::Digits;
 
- ok 4830138323689 == Encode::Positive::Digits::decode("hello world", " abcdefghlopqrw");
+ ok 101 == Encode::Positive::Digits::encode(  "5", "01");
+ ok   5 == Encode::Positive::Digits::decode("101", "01");
+
  ok "hello world" eq Encode::Positive::Digits::encode(4830138323689, " abcdefghlopqrw");
+ ok 4830138323689 == Encode::Positive::Digits::decode("hello world", " abcdefghlopqrw");
+
+The numbers to be encoded or decoded can be much greater than 2**64 via support
+from L<Math::BigInt>, such numbers should be placed inside strings to avoid
+inadvertent truncation.
+
+  my $n = '1'.('0'x999).'1';
+
+  my $d = Encode::Positive::Digits::decode($n, "01");
+  my $e = Encode::Positive::Digits::encode($d, "01");
+
+  ok $n == $e
+
+  ok length($d) ==  302;
+  ok length($e) == 1001;
+  ok length($n) == 1001;
 
 =head1 Description
 
- Encode::Positive::Digits::encode($number, $digits)
+=head2 Encode and decode
 
-expresses the positive, integer,decimal number $number as a number using the
-digits supplied in $digits.
+=head3 encode
 
- Encode::Positive::Digits::decode($number, $digits)
+Returns a string which expresses a positive integer in decimal notation as a string using the specified digits. The specified digits can be any characters chosen from the Unicode character set.
 
-returns the decimal number corresponding to the value of number $number
-represented with digits $digits.
+  1  $number  Decimal integer
+  2  $digits  Encoding digits
+
+=head3 decode
+
+Return the integer expressed in decimal notation corresponding to the value of the specified string considered as a number over the specified digits
+
+  1  $number  Number to decode
+  2  $digits  Encoding digits
+
+
+=head1 Index
+
+
+L<decode|/decode>
+
+L<encode|/encode>
 
 =head1 Installation
+
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
 
 Standard Module::Build process for building and installing modules:
 
@@ -131,33 +160,70 @@ Standard Module::Build process for building and installing modules:
 
 =head1 Author
 
-philiprbrenan@gmail.com
+L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
 
-http://www.appaapps.com
+L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2017 Philip R Brenan.
+Copyright (c) 2016-2017 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
 
 =cut
 
-__DATA__
-use Test::More tests=>642;
 
-for my $i(0..127)
- {my $b = Encode::Positive::Digits::encode($i, "01");
-  ok $b eq sprintf("%b", $i);
-  ok "$i" eq Encode::Positive::Digits::decode($b, "01");
-  my $x = Encode::Positive::Digits::encode($i, "0123456789abcdef");
-  ok $x eq sprintf("%x", $i);
-  ok "$i" eq Encode::Positive::Digits::decode($x, "0123456789abcdef");
-  ok "$i" eq Encode::Positive::Digits::encode($i, "0123456789");
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
+# podDocumentation
+__DATA__
+use Test::More tests=>649;
+
+if (1)
+ {for my $i(0..127)
+   {my $b = Encode::Positive::Digits::encode($i, "01");
+    ok $b eq sprintf("%b", $i);
+    ok "$i" eq Encode::Positive::Digits::decode($b, "01");
+    my $x = Encode::Positive::Digits::encode($i, "0123456789abcdef");
+    ok $x eq sprintf("%x", $i);
+    ok "$i" eq Encode::Positive::Digits::decode($x, "0123456789abcdef");
+    ok "$i" eq Encode::Positive::Digits::encode($i, "0123456789");
+   }
+ }
+
+if (1)
+ {ok 101 == Encode::Positive::Digits::encode(  "5", "01");
+  ok   5 == Encode::Positive::Digits::decode("101", "01");
  }
 
 if (1)
  {ok 4830138323689 == Encode::Positive::Digits::decode("hello world", " abcdefghlopqrw");
   ok "hello world" eq Encode::Positive::Digits::encode(4830138323689, " abcdefghlopqrw");
+ }
+
+if (1)
+ {my $n = '1'.('0'x999).'1';
+
+  my $d = Encode::Positive::Digits::decode($n, "01");
+  my $e = Encode::Positive::Digits::encode($d, "01");
+
+  ok length($d) ==  302;
+  ok length($e) == 1001;
+  ok length($n) == 1001;
+
+  ok $d == '10715086071862673209484250490600018105614048117055336074437503883703510511249361224931983788156958581275946729175531468251871452856923140435984577574698574803934567774824230985421074605062371141877954182153046474983581941267398767559165543946077062914571196477686542167660429831652624386837205668069377';
+  ok $n == $e
  }

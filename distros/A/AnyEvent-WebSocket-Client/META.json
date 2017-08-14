@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,14 +19,9 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "0",
             "perl" : "5.006"
          }
       },
@@ -69,12 +64,14 @@
             "Devel::Cycle" : "0",
             "EV" : "0",
             "Mojolicious" : "3.0",
-            "Test::Memory::Cycle" : "0",
-            "Test::Warn" : "0"
+            "Test::Memory::Cycle" : "0"
          },
          "requires" : {
             "Protocol::WebSocket" : "0.20",
-            "Test::More" : "0.94",
+            "Test2::API" : "1.302015",
+            "Test2::Require" : "0.000060",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::V0" : "0.000060",
             "perl" : "5.008"
          }
       }
@@ -91,7 +88,7 @@
          "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
       }
    },
-   "version" : "0.39",
+   "version" : "0.41",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Toshio Ito",

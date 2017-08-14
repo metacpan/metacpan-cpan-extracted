@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - math
   - math-utils
@@ -23,11 +23,11 @@ name: Math-Utils
 provides:
   Math::Utils:
     file: lib/Math/Utils.pm
-    version: '1.09'
+    version: '1.11'
 requires:
   perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Math-Utils.git
-version: '1.10'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

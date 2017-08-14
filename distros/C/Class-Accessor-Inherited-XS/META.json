@@ -28,7 +28,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -54,5 +54,5 @@
          "url" : "https://github.com/vovkasm/Class-Accessor-Inherited-XS"
       }
    },
-   "version" : "0.31"
+   "version" : "0.34"
 }

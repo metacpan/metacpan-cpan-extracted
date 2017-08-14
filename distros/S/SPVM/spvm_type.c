@@ -13,8 +13,8 @@
 #include "spvm_limit.h"
 #include "spvm_package.h"
 
-const char* const SPVM_TYPE_C_CORE_NAMES[] = {
-  "unknown",
+const char* const SPVM_TYPE_C_ID_NAMES[] = {
+  "void",
   "byte",
   "short",
   "int",
@@ -31,10 +31,17 @@ const char* const SPVM_TYPE_C_CORE_NAMES[] = {
   "string[]",
 };
 
-const char* const SPVM_TYPE_C_CODE_NAMES[] = {
-  "name",
-  "array",
-};
+SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler) {
+  SPVM_TYPE* type = SPVM_COMPILER_ALLOCATOR_alloc_memory_pool(compiler, compiler->allocator, sizeof(SPVM_TYPE));
+  
+  type->id = SPVM_TYPE_C_ID_UNKNOWN;
+  type->name = NULL;
+  type->dimension = 0;
+  type->base_name = NULL;
+  type->base_id = SPVM_TYPE_C_ID_UNKNOWN;
+  
+  return type;
+}
 
 SPVM_TYPE* SPVM_TYPE_get_byte_type(SPVM_COMPILER* compiler) {
   (void)compiler;
@@ -106,19 +113,8 @@ SPVM_TYPE* SPVM_TYPE_get_string_type(SPVM_COMPILER* compiler) {
   return type;
 }
 
-SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler) {
-  SPVM_TYPE* type = SPVM_COMPILER_ALLOCATOR_alloc_memory_pool(compiler, compiler->allocator, sizeof(SPVM_TYPE));
-  
-  type->code = 0;
-  type->id = -1;
-  type->name = NULL;
-  type->name_length = 0;
-  
-  return type;
-}
-
-// Resolve type and index type
-_Bool SPVM_TYPE_resolve_name(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t name_length) {
+// Resolve type name
+_Bool SPVM_TYPE_resolve_name(SPVM_COMPILER* compiler, SPVM_OP* op_type) {
   
   SPVM_TYPE* type = op_type->uv.type;
   
@@ -126,32 +122,24 @@ _Bool SPVM_TYPE_resolve_name(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t 
     return 1;
   }
   else {
-    SPVM_DYNAMIC_ARRAY* type_part_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+    const char* base_name = op_type->uv.type->base_name;
+    assert(base_name);
+    int32_t base_name_length = strlen(base_name);
     
-    SPVM_DYNAMIC_ARRAY* parts = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-    SPVM_TYPE_build_parts(compiler, type, parts);
-    type->parts = parts;
-    
-    {
-      int32_t i;
-      for (i = 0; i < parts->length; i++) {
-        const char* part_name = SPVM_DYNAMIC_ARRAY_fetch(parts, i);
-        
-        SPVM_DYNAMIC_ARRAY_push(type_part_names, (void*)part_name);
-        
-        name_length += strlen(part_name);
-      }
-    }
+    int32_t name_length = 0;
+    name_length += base_name_length;
+    name_length += type->dimension * 2;
     char* type_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, name_length);
     
     int32_t cur_pos = 0;
+    memcpy(type_name, base_name, base_name_length);
+    cur_pos += base_name_length;
     {
       int32_t i;
-      for (i = 0; i < type_part_names->length; i++) {
-        const char* type_part_name = (const char*) SPVM_DYNAMIC_ARRAY_fetch(type_part_names, i);
-        int32_t type_part_name_length = (int32_t)strlen(type_part_name);
-        memcpy(type_name + cur_pos, type_part_name, type_part_name_length);
-        cur_pos += type_part_name_length;
+      for (i = 0; i < type->dimension; i++) {
+        type_name[cur_pos] = '[';
+        type_name[cur_pos + 1] = ']';
+        cur_pos += 2;
       }
     }
     type_name[cur_pos] = '\0';
@@ -161,8 +149,8 @@ _Bool SPVM_TYPE_resolve_name(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t 
   return 1;
 }
 
-// Resolve type and index type
-_Bool SPVM_TYPE_resolve_id(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t name_length) {
+// Resolve type id
+_Bool SPVM_TYPE_resolve_id(SPVM_COMPILER* compiler, SPVM_OP* op_type) {
   
   SPVM_TYPE* type = op_type->uv.type;
   
@@ -172,33 +160,24 @@ _Bool SPVM_TYPE_resolve_id(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t na
     return 1;
   }
   else {
-    SPVM_DYNAMIC_ARRAY* parts = type->parts;
+    int32_t base_id = op_type->uv.type->base_id;
     
-    {
-      int32_t i;
-      for (i = 0; i < parts->length; i++) {
-        const char* part_name = SPVM_DYNAMIC_ARRAY_fetch(parts, i);
-          
-        // Core type or array
-        if (strcmp(part_name, "void") == 0 || strcmp(part_name, "boolean") == 0 || strcmp(part_name, "byte") == 0 || strcmp(part_name, "short") == 0 || strcmp(part_name, "int") == 0
-          || strcmp(part_name, "long") == 0 || strcmp(part_name, "float") == 0 || strcmp(part_name, "double") == 0
-          || strcmp(part_name, "string") == 0 || strcmp(part_name, "[]") == 0)
-        {
-          // Nothing
-        }
-        else {
-          // Package
-          SPVM_HASH* op_package_symtable = compiler->op_package_symtable;
-          SPVM_OP* op_found_package = SPVM_HASH_search(op_package_symtable, part_name, strlen(part_name));
-          if (op_found_package) {
-            // Nothing
-          }
-          else {
-            SPVM_yyerror_format(compiler, "unknown package \"%s\" at %s line %d\n", part_name, op_type->file, op_type->line);
-            return 0;
-          }
-        }
-        name_length += strlen(part_name);
+    const char* base_name = op_type->uv.type->base_name;
+      
+    // Core type or array
+    if (SPVM_TYPE_is_array(compiler, type) || (base_id >= SPVM_TYPE_C_ID_VOID && base_id <= SPVM_TYPE_C_ID_STRING)) {
+      // Nothing
+    }
+    else {
+      // Package
+      SPVM_HASH* op_package_symtable = compiler->op_package_symtable;
+      SPVM_OP* op_found_package = SPVM_HASH_search(op_package_symtable, base_name, strlen(base_name));
+      if (op_found_package) {
+        // Nothing
+      }
+      else {
+        SPVM_yyerror_format(compiler, "unknown package \"%s\" at %s line %d\n", base_name, op_type->file, op_type->line);
+        return 0;
       }
     }
     
@@ -215,54 +194,31 @@ _Bool SPVM_TYPE_resolve_id(SPVM_COMPILER* compiler, SPVM_OP* op_type, int32_t na
       SPVM_HASH_insert(compiler->type_symtable, type->name, strlen(type->name), new_type);
       
       type->id = new_type->id;
+      type->base_id = new_type->id;
     }
   }
   
   return 1;
 }
 
-void SPVM_TYPE_build_parts(SPVM_COMPILER* compiler, SPVM_TYPE* type, SPVM_DYNAMIC_ARRAY* parts) {
-  
-  if (type->code == SPVM_TYPE_C_CODE_NAME) {
-    const char* part = type->uv.op_name->uv.name;
-    SPVM_DYNAMIC_ARRAY_push(parts, (void*)part);
-  }
-  else if (type->code == SPVM_TYPE_C_CODE_ARRAY) {
-    SPVM_TYPE_build_parts(compiler, type->uv.op_type->uv.type, parts);
-    const char* part = "[]";
-    SPVM_DYNAMIC_ARRAY_push(parts, (void*)part);
-  }
-}
-
 _Bool SPVM_TYPE_is_array(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   (void)compiler;
   
-  int32_t length = (int32_t)strlen(type->name);
-  
-  if (strlen(type->name) >= 2) {
-    char char1 = type->name[length - 2];
-    char char2 = type->name[length - 1];
-    
-    if (char1 == '[' && char2 == ']') {
-      return 1;
-    }
-    else {
-      return 0;
-    }
+  _Bool is_array;
+  if (type->dimension > 0) {
+    is_array = 1;
   }
   else {
-    return 0;
+    is_array = 0;
   }
+  
+  return is_array;
 }
 
 _Bool SPVM_TYPE_is_array_numeric(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   (void)compiler;
   
-  const char* name = type->name;
-  
-  if (strcmp(name, "char[]") == 0 || strcmp(name, "byte[]") == 0 || strcmp(name, "short[]") == 0
-    || strcmp(name, "int[]") == 0 || strcmp(name, "long[]") == 0 || strcmp(name, "float[]") == 0 || strcmp(name, "double[]") == 0
-    || strcmp(name, "string") == 0)
+  if (type && type->id >= SPVM_TYPE_C_ID_BYTE_ARRAY && type->id <= SPVM_TYPE_C_ID_DOUBLE_ARRAY)
   {
     return 1;
   }

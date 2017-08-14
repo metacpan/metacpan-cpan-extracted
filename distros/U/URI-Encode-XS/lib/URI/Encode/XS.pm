@@ -5,8 +5,8 @@ package URI::Encode::XS;
 use XSLoader;
 use Exporter 5.57 'import';
 
-our $VERSION     = '0.09';
-our @EXPORT_OK   = ( qw/uri_encode uri_decode/ );
+our $VERSION     = '0.10';
+our @EXPORT_OK   = ( qw/uri_encode uri_encode_utf8 uri_decode uri_decode_utf8/ );
 
 XSLoader::load('URI::Encode::XS', $VERSION);
 
@@ -18,10 +18,14 @@ URI::Encode::XS - a Perl URI encoder/decoder using C
 
 =head1 SYNOPSIS
 
-  use URI::Encode::XS qw/uri_encode uri_decode/;
+  use URI::Encode::XS qw/uri_encode uri_encode_utf8 uri_decode uri_decode_utf8/;
 
   my $encoded = uri_encode($data);
   my $decoded = uri_decode($encoded);
+
+  # utf8 friendly
+  my $encoded = uri_encode_utf8($data);
+  my $decoded = uri_decode_utf8($encoded);
 
 =head1 DESCRIPTION
 
@@ -29,19 +33,23 @@ This is a Perl URI encoder/decoder written in XS based on L<RFC3986|https://tool
 This module always encodes characters that are not unreserved. When decoding,
 invalid escape sequences are preserved, e.g:
 
+
   uri_decode("foo%20bar%a/"); # foo bar%a/
   uri_decode("foo%20bar%a");  # foo bar%a
   uri_decode("foo%20bar%");   # foo bar%
 
-As of version 0.09, the C<bench> script shows it to be significantly faster
+As of version 0.10, the C<bench> script shows it to be significantly faster
 than C<URI::Escape>:
 
-              Rate escape encode
-  escape  144165/s     --   -98%
-  encode 8239785/s  5616%     --
-                Rate unescape   decode
-  unescape  196870/s       --     -97%
-  decode   6051468/s    2974%       --
+                   Rate      escape encode_utf8      encode
+  escape       140114/s          --        -94%        -98%
+  encode_utf8 2255100/s       1509%          --        -71%
+  encode      7735189/s       5421%        243%          --
+
+                   Rate    unescape decode_utf8      decode
+  unescape     188714/s          --        -95%        -97%
+  decode_utf8 3744638/s       1884%          --        -50%
+  decode      7429263/s       3837%         98%          --
 
 However this is just one string - the fewer encoded/decoded characters are
 in the string, the closer the benchmark is likely to be (see C<bench> for

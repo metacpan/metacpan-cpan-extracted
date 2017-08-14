@@ -6,12 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'MarpaX/ESLIF.pm',
     'MarpaX/ESLIF/Event/Type.pm',
+    'MarpaX/ESLIF/Grammar/Properties.pm',
+    'MarpaX/ESLIF/Grammar/Rule/Properties.pm',
+    'MarpaX/ESLIF/Grammar/Symbol/Properties.pm',
     'MarpaX/ESLIF/Logger/Level.pm',
+    'MarpaX/ESLIF/Rule/PropertyBitSet.pm',
+    'MarpaX/ESLIF/Symbol/PropertyBitSet.pm',
+    'MarpaX/ESLIF/Symbol/Type.pm',
     'MarpaX/ESLIF/Value/Type.pm'
 );
 

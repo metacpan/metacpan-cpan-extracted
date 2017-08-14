@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::AuthorizationFingerprint;
-$WebService::Braintree::ErrorCodes::AuthorizationFingerprint::VERSION = '0.91';
+$WebService::Braintree::ErrorCodes::AuthorizationFingerprint::VERSION = '0.92';
 use strict;
 
 use constant InvalidCreatedAt                  => "93204";

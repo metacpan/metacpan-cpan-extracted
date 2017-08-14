@@ -12,7 +12,7 @@ use constant MT_FASTSEED => \0;
 use constant MT_GOODSEED => \0;
 use constant MT_BESTSEED => \0;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 our @ISA = 'Exporter';
 our @EXPORT = qw(MT_TIMESEED MT_FASTSEED MT_GOODSEED MT_BESTSEED);
@@ -200,23 +200,24 @@ seed.
 =item B<seedfull($seeds)>
 
 Seeds the generator with up to 624 numbers from the I<array reference>
-C<$seeds>. The values are coerced to unsigned 32-bit integers. Missing values
-are taken as zero, excess values are ignored. Calls mtwist's
+C<$seeds>. The values are coerced to unsigned 32-bit integers. Missing or
+undefined values are taken as zero, excess values are ignored. Croaks unless
+you supply at least one non-zero value. Calls mtwist's
 C<mts_seedfull()>. Returns nothing.
 
 =item B<fastseed()>
 
-Seeds the generator with 4 bytes read from C</dev/urandom> if available,
-otherwise from the system time (see details under C<timeseed()>). Calls
-mtwist's C<mts_seed()>. Returns the seed.
+Seeds the generator with 4 bytes read from C</dev/urandom> (preferably via
+getrandom()) if available, otherwise from the system time (see details under
+C<timeseed()>). Calls mtwist's C<mts_seed()>. Returns the seed.
 
 This method is called by C<new(MT_FASTSEED)>.
 
 =item B<goodseed()>
 
-Seeds the generator with 4 bytes read from C</dev/random> if available,
-otherwise from the system time (see details under C<timeseed()>). Calls
-mtwist's C<mts_goodseed()>. Returns the seed.
+Seeds the generator with 4 bytes read from C</dev/random> (preferably via
+getrandom()) if available, otherwise from the system time (see details under
+C<timeseed()>). Calls mtwist's C<mts_goodseed()>. Returns the seed.
 
 This method is called by C<new(MT_GOODSEED)>.
 

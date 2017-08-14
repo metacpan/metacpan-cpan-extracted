@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use Data::Dmp;
+use File::Slurper qw(read_text write_text);
+
+my $path = "$Bin/../lib/Filename/Audio.pm";
+my $content = read_text($path);
+
+my %exts;
+open my $fh, "<", "/etc/mime.types" or die "Can't open /etc/mime.types: $!";
+while (<$fh>) {
+    next if /#/;
+    next unless /\S/;
+    next unless m!^audio/\S+\s+(.+)!;
+    my $exts = $1;
+    while ($exts =~ /(\w+)/g) { $exts{$1}++ }
+}
+
+my $re = join("|", map { quotemeta $_ }
+                  sort { length($b) <=> length($a) || $a cmp $b } keys %exts);
+$re = qr/\.(?:$re)\z/i;
+
+$content =~ s/^.+(# RE)/"our \$RE = ".dmp($re)."; $1"/em
+    or die "Can't replace # RE line";
+
+write_text($path, $content);

@@ -6,17 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/GetoptLongUtils.pm'
 );
 
 my @scripts = (
-    'bin/detect-getopt-long-script',
-    'bin/dump-getopt-long-script',
-    'bin/gen-getopt-long-spec-from-getopt-std-spec',
-    'bin/parse-getopt-long-spec'
+    'script/detect-getopt-long-script',
+    'script/dump-getopt-long-evenless-script',
+    'script/dump-getopt-long-script',
+    'script/gen-getopt-long-spec-from-getopt-std-spec',
+    'script/parse-getopt-long-spec'
 );
 
 # no fake home requested

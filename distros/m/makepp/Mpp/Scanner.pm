@@ -1,4 +1,4 @@
-# $Id: Scanner.pm,v 1.65 2015/07/13 20:52:23 pfeiffer Exp $
+# $Id: Scanner.pm,v 1.66 2017/08/06 21:19:09 pfeiffer Exp $
 
 =head1 NAME
 

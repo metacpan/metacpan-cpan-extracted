@@ -42,6 +42,8 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   
   runtime->subs_length = compiler->subs_length;
   
+  runtime->debug = compiler->debug;
+  
   return runtime;
 }
 
@@ -91,17 +93,23 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
 
   // Entry point sub name
   compiler->entry_point_sub_name = NULL;
+  
+  compiler->debug = 0;
 
   // Add core types
   {
-    int32_t i;
-    for (i = 0; i < SPVM_TYPE_C_CORE_LENGTH; i++) {
+    int32_t type_id;
+    for (type_id = 0; type_id < SPVM_TYPE_C_CORE_LENGTH; type_id++) {
       // Type
       SPVM_TYPE* type = SPVM_TYPE_new(compiler);
-      const char* name = SPVM_TYPE_C_CORE_NAMES[i];
+      const char* name = SPVM_TYPE_C_ID_NAMES[type_id];
       type->name = name;
-      type->name_length = strlen(name);
-      type->id = i;
+      type->id = type_id;
+      if (type_id >= SPVM_TYPE_C_ID_BYTE_ARRAY && type_id <= SPVM_TYPE_C_ID_DOUBLE_ARRAY) {
+        type->dimension++;
+      }
+      type->base_name = name;
+      type->base_id = type_id;
       SPVM_DYNAMIC_ARRAY_push(compiler->types, type);
       SPVM_HASH_insert(compiler->type_symtable, name, strlen(name), type);
     }

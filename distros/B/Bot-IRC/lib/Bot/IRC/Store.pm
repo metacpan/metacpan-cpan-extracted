@@ -7,7 +7,7 @@ use warnings;
 
 use YAML::XS qw( LoadFile DumpFile );
 
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.19'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -64,7 +64,7 @@ Bot::IRC::Store - Bot::IRC persistent data storage with YAML
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use File::Glob qw(:bsd_glob);
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
 
-our $VERSION = '20170806';
+our $VERSION = '20170812';
 
 #1 Time stamps                                                                  # Date and timestamps as used in logs of long running commands
 
@@ -634,6 +634,7 @@ sub extractDocumentation(;$)                                                    
   my %private;                                                                  # Private methods
   my %userFlags;                                                                # User flags
   my @doc = (qq(=head1 Description));                                           # Documentation
+  my @private;                                                                  # Documentation of private methods
   my $level = 0; my $off = 1;                                                   # Header levels
   my @l = split /\n/, readFile($perlModule);                                    # Read the perl module
 
@@ -655,7 +656,7 @@ sub extractDocumentation(;$)                                                    
     elsif ($line =~ /\A#/)                                                      # Switch documentation off
      {$level = 0;
      }
-    elsif ($level and $line =~ /\A\s*sub\s*(.+?)\s*#(\w+)?\s+(.+?)\s*\Z/)       # Documentation for a method
+    elsif ($level and $line =~ /\A\s*sub\s*(.*?)\s*#(\w+)?\s+(.+?)\s*\Z/)       # Documentation for a method
      {my ($sub, $flags, $comment, $example, $produces) =                        # Name from sub, flags, description
          ($1, $2, $3);
 
@@ -693,6 +694,7 @@ sub extractDocumentation(;$)                                                    
 
       my @parameters = split /,\s*/,                                            # Parameter names
         $parmNames =~ s/\A\s*\{my\s*\(//r =~ s/\)\s*=\s*\@_;//r;
+
       @parameters == length($signature) or                                      # Check signature length
         confess "Signature $signature for method: $name".
                 " has wrong number of parameters";
@@ -709,21 +711,35 @@ sub extractDocumentation(;$)                                                    
        {$methodParms{$_} = $name for @{$u->[2]};                                # Generated names array
        }
 
-      push @doc, "\n=head$headLevel $name\n\n$comment\n";                       # Method description
-      push @doc, indentString(formatTable([[qw(Parameter Description)],
+      my   @method;                                                             # Accumulate method documentation
+
+      if (1)                                                                    # Section title
+       {my $h = $private ? 2 : $headLevel;
+        push @method, "\n=head$h $name\n\n$comment\n";                          # Method description
+       }
+
+      push @method, indentString(formatTable([[qw(Parameter Description)],
         map{[$parameters[$_], $parmDescriptions[$_]]} keys @parameters]), '  ')
         if $parmNames and $parmDescriptions and $parmDescriptions !~ /\A#/;     # Add parameter description if present
 
-      push @doc, "\n".$userFlags{$name}[0]."\n" if $userFlags{$name}[0];        # Add user documentation
+      push @method,                                                             # Add user documentation
+       "\n".$userFlags{$name}[0]."\n"          if $userFlags{$name}[0];
 
-      push @doc, "\nExample:\n\n  $example" if $example;
-      push @doc, "\n$produces"              if $produces;
-      push @doc,                                                                # Add a note about the availability of an X method
+      push @method,                                                             # Add example
+       "\nExample:\n\n  $example"              if $example;
+
+      push @method,                                                             # Produces
+       "\n$produces"                           if $produces;
+
+      push @method,                                                             # Add a note about the availability of an X method
        "\nUse B<${name}X> to execute L<$name|/$name> but B<die> '$name'".
-       " instead of returning B<undef>"     if $methodX;
-      push @doc, "\nThis is a static method and so should be invoked as:\n\n".
-                 "  $package::$name\n"           if $static;                    # Document static method
-      push @doc, "\nThis is a private method.\n" if $private;                   # Document private method
+       " instead of returning B<undef>"        if $methodX;
+
+      push @method,                                                             # Static method
+       "\nThis is a static method and so should be invoked as:\n\n".
+       "  $package::$name\n"                   if $static;
+
+      push @{$private ? \@private : \@doc}, @method;                            # Save method documentation in correct section
      }
     elsif ($level and $line =~                                                  # Documentation for a generated lvalue * method = sub name comment
      /\A\s*genLValue(?:\w+?)Methods\s*\(qw\((\w+)\)\);\s*#\s*(.+?)\s*\Z/)
@@ -734,6 +750,8 @@ sub extractDocumentation(;$)                                                    
       push @doc, "\n=head$headLevel $name :lvalue\n\n$description\n";           # Method description
      }
    }
+
+  push @doc, qq(\n\n=head1 Private Methods), @private if @private;              # Private methods in a separate section if there are any
 
   push @doc, "\n\n=head1 Index\n\n";
   for my $s(sort {lc($a) cmp lc($b)} keys %methodParms)                         # Alphabetic listing of methods
@@ -777,7 +795,7 @@ END
   if (keys %methodX)                                                            # Insert X method definitions
    {my @x;
     for my $x(sort keys %methodX)
-     {push @x, ["sub ${x}X", "{&$x", "(\@_) // die '$x'}"];
+     {push @x, ["sub ${x}X", "{&$x", "(\@_) || die '$x'}"];
      }
     push @doc, formatTableBasic(\@x);
    }
@@ -787,6 +805,22 @@ END
      {push @doc, $doc->[1] if $doc->[1];
      }
    }
+
+  push @doc, <<'END';                                                             # Standard test sequence
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+END
 
   join "\n", @doc                                                               # Return documentation
  }
@@ -863,12 +897,7 @@ updatePerlModuleDocumentation writeBinaryFile writeFile
 xxx);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
-#-------------------------------------------------------------------------------
-# Test
-#-------------------------------------------------------------------------------
-
 # podDocumentation
-sub test {eval join('', <Data::Table::Text::DATA>) || die $@} test unless caller();
 
 =pod
 
@@ -1177,72 +1206,6 @@ Tabularize text - basic version
   1  $data       Data to be formatted
   2  $separator  Optional line separator
 
-=head3 formatTableAA
-
-Tabularize an array of arrays
-
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-This is a private method.
-
-
-=head3 formatTableHA
-
-Tabularize a hash of arrays
-
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-This is a private method.
-
-
-=head3 formatTableAH
-
-Tabularize an array of hashes
-
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-This is a private method.
-
-
-=head3 formatTableHH
-
-Tabularize a hash of hashes
-
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-This is a private method.
-
-
-=head3 formatTableA
-
-Tabularize an array
-
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-This is a private method.
-
-
-=head3 formatTableH
-
-Tabularize a hash
-
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-This is a private method.
-
-
 =head3 formatTable
 
 Format various data structures
@@ -1437,20 +1400,56 @@ Parameters:
 
   1  $perlModule  Optional file name with caller's file being the default
 
-=head3 docUserFlags
 
-Generate documentation for a method
+=head1 Private Methods
 
-  1  $flags       Flags
-  2  $perlModule  File containing documentation
-  3  $package     Package containing documentation
-  4  $name        Name of method to be processed
+=head2 formatTableAA
 
-=head3 updatePerlModuleDocumentation
+Tabularize an array of arrays
 
-Update the documentation in a perl file and show said documentation in a web browser
+  1  $data       Data to be formatted
+  2  $title      Optional title
+  3  $separator  Optional line separator
 
-  1  $perlModule  File containing the code of the perl module
+=head2 formatTableHA
+
+Tabularize a hash of arrays
+
+  1  $data       Data to be formatted
+  2  $title      Optional title
+  3  $separator  Optional line separator
+
+=head2 formatTableAH
+
+Tabularize an array of hashes
+
+  1  $data       Data to be formatted
+  2  $title      Optional title
+  3  $separator  Optional line separator
+
+=head2 formatTableHH
+
+Tabularize a hash of hashes
+
+  1  $data       Data to be formatted
+  2  $title      Optional title
+  3  $separator  Optional line separator
+
+=head2 formatTableA
+
+Tabularize an array
+
+  1  $data       Data to be formatted
+  2  $title      Optional title
+  3  $separator  Optional line separator
+
+=head2 formatTableH
+
+Tabularize a hash
+
+  1  $data       Data to be formatted
+  2  $title      Optional title
+  3  $separator  Optional line separator
 
 
 =head1 Index
@@ -1475,8 +1474,6 @@ L<currentDirectoryAbove|/currentDirectoryAbove>
 L<dateStamp|/dateStamp>
 
 L<dateTimeStamp|/dateTimeStamp>
-
-L<docUserFlags|/docUserFlags>
 
 L<extractDocumentation|/extractDocumentation>
 
@@ -1568,8 +1565,6 @@ L<timeStamp|/timeStamp>
 
 L<trim|/trim>
 
-L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation>
-
 L<writeBinaryFile|/writeBinaryFile>
 
 L<writeFile|/writeFile>
@@ -1603,9 +1598,23 @@ under the same terms as Perl itself.
 
 =cut
 
-sub containingPowerOfTwoX  {&containingPowerOfTwo  (@_) // die 'containingPowerOfTwo'}
-sub fileOutOfDateX         {&fileOutOfDate         (@_) // die 'fileOutOfDate'}
-sub powerOfTwoX            {&powerOfTwo            (@_) // die 'powerOfTwo'}
+sub containingPowerOfTwoX  {&containingPowerOfTwo  (@_) || die 'containingPowerOfTwo'}
+sub fileOutOfDateX         {&fileOutOfDate         (@_) || die 'fileOutOfDate'}
+sub powerOfTwoX            {&powerOfTwo            (@_) || die 'powerOfTwo'}
+
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
 
 1;
 # podDocumentation
@@ -1844,12 +1853,16 @@ END
   unlink $f;
  }
 
-ok xxx("echo aaa")       =~ /aaa/;
-ok xxx("a=aaa;echo \$a") =~ /aaa/;
+if ($^O !~ m/\AMSWin32\Z/)                                                      # Ignore windows for this test
+ {ok xxx("echo aaa")       =~ /aaa/;
+  ok xxx("a=aaa;echo \$a") =~ /aaa/;
 
-if (1)
- {eval {xxx "echo aaa", qr(aaa)};
+  eval {xxx "echo aaa", qr(aaa)};
   ok !$@, 'aaa';
+
   eval {xxx "echo aaa", qr(bbb)};
   ok $@ =~ /aaa/, 'bbb';
+ }
+else
+ {ok 1 for 1..4;
  }

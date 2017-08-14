@@ -4,18 +4,19 @@
 %include pegex-atoms
 
 # canonical: https://github.com/facebook/graphql/blob/master/spec/Appendix%20B%20--%20Grammar%20Summary.md
+# IDL RFC: https://github.com/facebook/graphql/pull/90
 # inspiration drawn from the slightly obsolete https://github.com/antlr/grammars-v4/blob/master/graphql/GraphQL.g4
 # string and number from https://github.com/ingydotnet/json-pgx/blob/master/json.pgx
 
 graphql: /-/ definition+
 
-definition: /-/ operationDefinition | /-/ fragmentDefinition
+definition: /-/ (operationDefinition | fragmentDefinition | typeSystemDefinition)
 
 operationDefinition: selectionSet | operationType /-/ name? /-/ variableDefinitions? /-/ directives? /-/ selectionSet
 
 operationType: /(query|mutation|subscription)/
 
-selectionSet: /- LCURLY -/ (selection+ %% /- COMMA? -/) /- RCURLY -/
+selectionSet: /- LCURLY -/ ( (selection+ %% /- COMMA? -/) | `Expected name` ) /- RCURLY -/
 
 selection: field | inlineFragment | fragmentSpread
 
@@ -31,16 +32,17 @@ fragmentSpread: .spread fragmentName /-/ directives?
 
 inlineFragment: .spread typeCondition? /-/ directives? /-/ selectionSet
 
-fragmentDefinition: 'fragment' /-/ fragmentName /-/ typeCondition /-/ directives? /-/ selectionSet
+fragmentDefinition: 'fragment' /-/ fragmentName /-/ (typeCondition | `Expected "on"`) /-/ directives? /-/ selectionSet
 
-# TODO: can't be 'on'
-fragmentName: name
+fragmentName: ('on' `Unexpected Name "on"` | name)
 
 typeCondition: 'on' /-/ namedType
 
 # HERE
 
 value: variable | float | int | string | boolean | null | enumValue | listValue | objectValue
+
+value_const: float | int | string | boolean | null | enumValue | listValue_const | objectValue_const
 
 boolean: /(true|false)/
 
@@ -49,11 +51,17 @@ null: /null/
 # TODO: not true, false, null
 enumValue: name
 
-listValue: LSQUARE (value* % /- COMMA? -/) RSQUARE
+listValue: /- LSQUARE -/ (value* % /- COMMA? -/) /- RSQUARE -/
 
-objectValue: /- LCURLY -/ (objectField+ % /- COMMA? -/) /- RCURLY -/
+listValue_const: /- LSQUARE -/ (value_const* % /- COMMA? -/) /- RSQUARE -/
+
+objectValue: /- LCURLY -/ ( (objectField+ % /- COMMA? -/) | `Expected name` ) /- RCURLY -/
+
+objectValue_const: /- LCURLY -/ ( (objectField_const+ % /- COMMA? -/) | `Expected name or constant` ) /- RCURLY -/
 
 objectField: name /- COLON -/ value
+
+objectField_const: name /- COLON -/ value_const
 
 variableDefinitions: /- LPAREN -/ (variableDefinition+ % /- COMMA? -/) /- RPAREN -/
 
@@ -61,7 +69,7 @@ variableDefinition: variable /- COLON -/ type defaultValue?
 
 variable: /- DOLLAR/ name
 
-defaultValue: /- EQUAL -/ value
+defaultValue: /- EQUAL -/ value_const
 
 type: namedType nonNullType? | listType nonNullType?
 
@@ -123,3 +131,42 @@ spread: /\.{3}/ /-/
 ws: / (: WS | \x{FEFF} | comment ) /
 
 comment: / HASH [^\r\n]* (: EOL | CR !NL | EOS ) / # CR is because MacOS 9
+
+typeSystemDefinition: /-/ (schemaDefinition | typeDefinition | typeExtensionDefinition | directiveDefinition) /-/
+
+schemaDefinition: 'schema' /-/ directives? /- LCURLY -/ operationTypeDefinition+ /- RCURLY -/
+
+operationTypeDefinition: operationType /- COLON -/ namedType /-/
+
+typeDefinition: scalarTypeDefinition | objectTypeDefinition | interfaceTypeDefinition | unionTypeDefinition | enumTypeDefinition | inputObjectTypeDefinition
+
+scalarTypeDefinition: 'scalar' /-/ name /-/ directives?
+
+# fieldDefinition is "*" not "+" because JS implementation test allows
+objectTypeDefinition: 'type' /-/ name /-/ implementsInterfaces? /-/ directives? /- LCURLY -/ fieldDefinition* /- RCURLY -/
+
+implementsInterfaces: 'implements' /-/ (namedType+ % /- COMMA? -/)
+
+fieldDefinition: name /-/ argumentsDefinition? /- COLON -/ type /-/ directives?
+
+argumentsDefinition: /- LPAREN -/ (inputValueDefinition+ % /- COMMA? -/) /- RPAREN -/
+
+inputValueDefinition: name /- COLON -/ type /-/ defaultValue? /-/ directives?
+
+interfaceTypeDefinition: 'interface' /-/ name /-/ directives? /- LCURLY -/ fieldDefinition+ /- RCURLY -/
+
+unionTypeDefinition: 'union' /-/ name /-/ directives? /- EQUAL -/ unionMembers
+
+unionMembers: namedType+ % /- PIPE -/
+
+enumTypeDefinition: 'enum' /-/ name /-/ directives? /- LCURLY -/ (enumValueDefinition+ % /- COMMA? -/) /- RCURLY -/
+
+enumValueDefinition: enumValue /-/ directives?
+
+inputObjectTypeDefinition: 'input' /-/ name /-/ directives? /- LCURLY -/ inputValueDefinition+ /- RCURLY -/
+
+typeExtensionDefinition: 'extend' /-/ objectTypeDefinition
+
+directiveDefinition: 'directive' /- AT -/ name /-/ argumentsDefinition? /-/ 'on' /-/ directiveLocations
+
+directiveLocations: name+ % /- PIPE -/

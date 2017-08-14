@@ -6,10 +6,10 @@ use Carp qw/croak/;
 use XSLoader;
 use Sereal::Path::Iterator;
 
-our $VERSION    = '0.014';
+our $VERSION = '4.002';
 our $XS_VERSION = $VERSION; $VERSION= eval $VERSION;
 
-XSLoader::load(__PACKAGE__, $Sereal::Path::VERSION);
+XSLoader::load(__PACKAGE__, $XS_VERSION);
 
 sub _normalize {
     my ($self, $x) = @_;
@@ -51,9 +51,31 @@ __END__
 
 =head1 NAME
 
-Sereal::Path - XPath or JSONPath for Sereal
+Sereal::Path - set of tools to work with serialized Sereal documents
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
+
+Sereal::Path consists of following tools:
+
+=over 4
+
+=item L<Sereal::Path::Iterator> - a way to iterate over serialized Sereal
+documents and decode them partly. This module is foundation of all others.
+
+=item L<Sereal::Path::Tie> - a tied interface for accessing parts of serialized
+document.
+
+=item L<Sereal::Path> - a query language for Sereal. It's similar to XPath or
+JSONPath.
+
+=back
+
+The result of this documentation describes Sereal::Path module. For others
+please use appropriate link above.
+
+=head1 Sereal::Path
+
+=head2 Synopsis
 
   use Sereal::Path;
   use Sereal::Encoder qw/encode_sereal/;
@@ -67,7 +89,7 @@ Sereal::Path - XPath or JSONPath for Sereal
   # $result1 will contain [ 'bar', 'barbar' ]
   my $result1 = $sp->traverse('$[*][foo]');
 
-=head1 DESCRIPTION
+=head2 Description
 
 Sereal::Path for Sereal is the same as XPath for XML or JSONPath for JSON.
 Sereal::Path can directly work with encoded Sereal document. In other words,
@@ -102,7 +124,7 @@ between XPath, JSONPath and Sereal::Path:
 
 Items which are marked as 'not impl' will be implemented at later stages of the project.
 
-=head1 IMPORTANT
+=head2 Important
 
 Sereal::Path is still under development. It's possible that API will be change at any moment.
 
@@ -130,11 +152,7 @@ Gonzalo Diethem <gonzalo.diethelm@gmail.com>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright 2007 Stefan Goessner.
-
-Copyright 2010-2013 Toby Inkster.
-
-Copyright 2014-2016 Ivan Kruglov.
+Copyright 2014-2017 Ivan Kruglov.
 
 This module is tri-licensed. It is available under the X11 (a.k.a. MIT)
 licence; you can also redistribute it and/or modify it under the same
@@ -159,3 +177,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+=cut

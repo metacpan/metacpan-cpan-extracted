@@ -13,7 +13,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000009';
+our $VERSION = '0.000011';
 use utf8;
 
 # Class for $PPR::ERROR objects...
@@ -105,13 +105,13 @@ our $GRAMMAR = qr{
                     (?: (?>(?&PerlNWS)) (?&PerlPod) )?+
                     (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
                 )
-                (?>(?&PerlOWS)) (?> ; | (?= \} | \s* \z ))
+                (?>(?&PerlOWS)) (?> ; | (?= \} | \s*+ \z ))
             |
                 # Inlined (?&PerlPackageDeclaration)...
                 package
                     (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
                 (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-                    (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \s* \z ))
+                    (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \s*+ \z ))
             |
                 (?&PerlControlBlock)
             |
@@ -125,6 +125,10 @@ our $GRAMMAR = qr{
             |
                 ;
             )
+
+        | # A yada-yada...
+            \.\.\. (?>(?&PerlOWS))
+            (?> ; | (?= \} | \z ))
 
         | # Just a Label...
             (?>(?&PerlLabel)) (?>(?&PerlOWS))
@@ -177,19 +181,19 @@ our $GRAMMAR = qr{
            (?: (?>(?&PerlNWS)) (?&PerlPod) )?+
            (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
        )
-       (?>(?&PerlOWS)) (?> ; | (?= \} | \s* \z ))
+       (?>(?&PerlOWS)) (?> ; | (?= \} | \s*+ \z ))
     ) # End of rule
 
     (?<PerlReturnStatement>
        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
-       (?>(?&PerlOWS)) (?> ; | (?= \} | \s* \z ))
+       (?>(?&PerlOWS)) (?> ; | (?= \} | \s*+ \z ))
     ) # End of rule
 
     (?<PerlPackageDeclaration>
        package
            (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
        (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-           (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \s* \z ))
+           (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \s*+ \z ))
     ) # End of rule
 
     (?<PerlExpression>
@@ -406,9 +410,21 @@ our $GRAMMAR = qr{
     (?<PerlFormat>
         format
         (?: (?>(?&PerlNWS))  (?&PerlQualifiedIdentifier)  )?+
-            (?>(?&PerlOWS))  = [^\n]*+                \n
-        (?:                    [^\n]*+                \n  )*?
-                               \.                     \n
+            (?>(?&PerlOWS))  = [^\n]*+  \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+        (?:
+            (?! \. \n )
+            [^\n\$\@]*+
+            (?:
+                (?>
+                    (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
+                )
+                [^\n\$\@]*+
+            )*+
+            \n (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+        )*+
+        \. \n
     ) # End of rule
 
     (?<PerlStatementModifier>
@@ -576,7 +592,7 @@ our $GRAMMAR = qr{
             (?>(?&PerlOWS))
             (?> \z | [,;\}\])?] | => | : (?! :)        # (
             |   (?&PerlInfixBinaryOperator) | (?&PerlLowPrecedenceInfixOperator)
-            |   for(?:each)?+ | while | if | unless | until | when
+            |   (?= \w) (?> for(?:each)?+ | while | if | unless | until | when )
             )
         )
     ) # End of rule
@@ -586,7 +602,7 @@ our $GRAMMAR = qr{
     ) # End of rule
 
     (?<PerlPrefixUnaryOperator>
-        (?> \+\+  |  --  |  !  |  ~  |  \\  |  \+  |  - (?! (?&PPR_filetest_name) \b ) )
+        (?> [!\\+~] | \+\+  |  --  | - (?! (?&PPR_filetest_name) \b ) )
     ) # End of rule
 
     (?<PerlPostfixUnaryOperator>
@@ -690,6 +706,26 @@ our $GRAMMAR = qr{
         )?+
     ) # End of rule
 
+    (?<PerlArrayAccessNoSpace>
+        (?>(?&PerlVariableArrayNoSpace))
+        (?:
+            (?: -> )?+
+            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+        )*+
+        (?:
+            ->
+            [\@%]
+            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+        )?+
+    ) # End of rule
+
+    (?<PerlArrayAccessNoSpaceNoArrow>
+        (?>(?&PerlVariableArray))
+        (?:
+            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+        )*+
+    ) # End of rule
+
     (?<PerlHashAccess>
         (?>(?&PerlVariableHash))
         (?:
@@ -728,6 +764,37 @@ our $GRAMMAR = qr{
         )?+
     ) # End of rule
 
+    (?<PerlScalarAccessNoSpace>
+        (?>(?&PerlVariableScalarNoSpace))
+        (?:
+            (?:
+                (?:
+                    ->
+                    (?&PerlParenthesesList)
+                |
+                    (?: -> )?+
+                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                )
+                (?:
+                    (?: -> )?+
+                    (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                )*+
+            )?+
+            (?:
+                ->
+                [\@%]
+                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+            )?+
+        )?+
+    ) # End of rule
+
+    (?<PerlScalarAccessNoSpaceNoArrow>
+        (?>(?&PerlVariableScalarNoSpace))
+        (?:
+            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+        )*+
+    ) # End of rule
+
     (?<PerlVariableScalar>
         \$\$
         (?! [\$\{\w] )
@@ -739,6 +806,38 @@ our $GRAMMAR = qr{
                 (?=  (?> [\$^\w\{:+] | - (?! > ) )  )
             )?+
             (?&PerlOWS)
+        )++
+        (?>
+            \d++
+        |
+            \^ [][A-Z^_?\\]
+        |
+            \{ \^ [A-Z_] \w*+ \}
+        |
+            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+        |
+            :: (?&PerlBlock)
+        |
+            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+        |
+            \{ \w++ \}
+        |
+            (?&PerlBlock)
+        )
+    |
+        \$\#
+    ) # End of rule
+
+    (?<PerlVariableScalarNoSpace>
+        \$\$
+        (?! [\$\{\w] )
+    |
+        (?:
+            \$
+            (?:
+                [#]
+                (?=  (?> [\$^\w\{:+] | - (?! > ) )  )
+            )?+
         )++
         (?>
             \d++
@@ -781,6 +880,26 @@ our $GRAMMAR = qr{
         )
     ) # End of rule
 
+    (?<PerlVariableArrayNoSpace>
+        \@
+        (?: \$ )*+
+        (?>
+            \d++
+        |
+            \^ [][A-Z^_?\\]
+        |
+            \{ \^ [A-Z_] \w*+ \}
+        |
+            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+        |
+            :: (?&PerlBlock)
+        |
+            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+        |
+            (?&PerlBlock)
+        )
+    ) # End of rule
+
     (?<PerlVariableHash>
         %      (?>(?&PerlOWS))
         (?: \$    (?&PerlOWS)  )*+
@@ -802,7 +921,7 @@ our $GRAMMAR = qr{
     ) # End of rule
 
     (?<PerlLabel>
-        (?! (?> [msy] | q[wrxq]? | tr ) \b )
+        (?! (?> [msy] | q[wrxq]?+ | tr ) \b )
         (?>(?&PerlIdentifier))
         : (?! : )
     ) # End of rule
@@ -822,7 +941,11 @@ our $GRAMMAR = qr{
         |
             '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
         |
-            qq? \b
+            qq \b
+            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+            (?&PPR_quotelike_body_interpolated)
+        |
+            q \b
             (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
             (?&PPR_quotelike_body)
         |
@@ -853,13 +976,14 @@ our $GRAMMAR = qr{
             (?>
                 "  (?<_heredoc_terminator>  [^"\\]*+  (?: \\. [^"\\]*+ )*+  )  "
             |
-                '  (?<_heredoc_terminator>  [^'\\]*+  (?: \\. [^'\\]*+ )*+  )  '
+                (?<PPR_HD_nointerp> ' )
+                   (?<_heredoc_terminator>  [^'\\]*+  (?: \\. [^'\\]*+ )*+  )  '
             |
                 `  (?<_heredoc_terminator>  [^`\\]*+  (?: \\. [^`\\]*+ )*+  )  `
             )
         |
                    (?<_heredoc_terminator>                                  )
-        )?+
+        )
 
         # Do we need to reset heredoc cache???
         (?{
@@ -871,15 +995,33 @@ our $GRAMMAR = qr{
         })
 
         # Do we need to cache content lookahead for this heredoc???
-        (?(?{ my $look = !$PPR::_heredoc_parsed_to{+pos()}; $PPR::_heredoc_parsed_to{+pos()} = 1; $look; })
+        (?(?{ my $need_to_lookahead = !$PPR::_heredoc_parsed_to{+pos()};
+              $PPR::_heredoc_parsed_to{+pos()} = 1;
+              $need_to_lookahead;
+            })
 
             # Lookahead to detect and remember trailing contents of heredoc
             (?=
-                [^\n]*+ \n                                           # Go to the end of the current line
-                (?{ +pos() })                                        # Remember the start of the contents
-                (??{ $PPR::_heredoc_skip{+pos()} // q{} })           # Skip earlier heredoc contents
-                (?:                                                  # The heredoc contents consist of...
-                    (?: [^\n]*+ \n )*?                               #     A minimal number of lines
+                [^\n]*+ \n                                   # Go to the end of the current line
+                (?{ +pos() })                                # Remember the start of the contents
+                (??{ $PPR::_heredoc_skip{+pos()} // q{} })   # Skip earlier heredoc contents
+                (?:                                          # The heredoc contents consist of...
+
+                    (?(<PPR_HD_nointerp>)
+                        [^\n]*+ \n
+                    |
+                        [^\n\$\@]*+
+                        (?:
+                            (?>
+                                (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
+                            |
+                                (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
+                            )
+                            [^\n\$\@]*+
+                        )*?
+                        \n (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                    )*?                                              #     A minimal number of lines
+
                     (?(?{ $+{_heredoc_indented} }) \h*+ )            #     An indent (if it was a <<~)
                     \g{_heredoc_terminator}                          #     The specified terminator
                     (?: \n | \z )                                    #     Followed by EOL
@@ -910,7 +1052,7 @@ our $GRAMMAR = qr{
         |
             qq \b
             (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body)
+            (?&PPR_quotelike_body_interpolated)
         )
     ) # End of rule
 
@@ -926,9 +1068,13 @@ our $GRAMMAR = qr{
         (?>
             `  [^`]*+  (?: \\. [^`]*+ )*+  `
         |
-            qx \b
-            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body)
+            qx 
+                (?:
+                    (?&PerlOWS) ' (?&PPR_quotelike_body) 
+                |
+                    \b (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                    (?&PPR_quotelike_body_interpolated)
+                )
         )
     ) # End of rule
 
@@ -939,18 +1085,18 @@ our $GRAMMAR = qr{
         (?>
             # Hashed syntax...
             (?= [#] )
-            (?>(?&PPR_quotelike_body_unclosed))
-               (?&PPR_quotelike_body)
+            (?>(?&PPR_quotelike_body_interpolated_unclosed))
+               (?&PPR_quotelike_body_interpolated)
         |
             # Bracketed syntax...
             (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
-            (?>(?&PPR_quotelike_body))
+            (?>(?&PPR_quotelike_body_interpolated))
             (?>(?&PerlOWS))
-               (?&PPR_quotelike_body)
+               (?&PPR_quotelike_body_interpolated)
         |
             # Delimited syntax...
-            (?>(?&PPR_quotelike_body_unclosed))
-               (?&PPR_quotelike_body)
+            (?>(?&PPR_quotelike_body_interpolated_unclosed))
+               (?&PPR_quotelike_body_interpolated)
         )
         [msixpodualgcer]*+
     ) # End of rule
@@ -963,18 +1109,18 @@ our $GRAMMAR = qr{
         (?>
             # Hashed syntax...
             (?= [#] )
-            (?>(?&PPR_quotelike_body_unclosed))
-               (?&PPR_quotelike_body)
+            (?>(?&PPR_quotelike_body_interpolated_unclosed))
+               (?&PPR_quotelike_body_interpolated)
         |
             # Bracketed syntax...
             (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
-            (?>(?&PPR_quotelike_body))
+            (?>(?&PPR_quotelike_body_interpolated))
             (?>(?&PerlOWS))
-               (?&PPR_quotelike_body)
+               (?&PPR_quotelike_body_interpolated)
         |
             # Delimited syntax...
-            (?>(?&PPR_quotelike_body_unclosed))
-               (?&PPR_quotelike_body)
+            (?>(?&PPR_quotelike_body_interpolated_unclosed))
+               (?&PPR_quotelike_body_interpolated)
         )
         [cdsr]*+
     ) # End of rule
@@ -995,7 +1141,7 @@ our $GRAMMAR = qr{
                 |
                     (?= \/ [^/] )
                 )
-                (?&PPR_quotelike_body)
+                (?&PPR_quotelike_body_interpolated)
             )
             [msixpodualgc]*+
         ) # End of rule
@@ -1004,7 +1150,7 @@ our $GRAMMAR = qr{
             (?>(?&PerlOWS))
             (?> \z | [,;\}\])?] | => | : (?! :)
             |   (?&PerlInfixBinaryOperator) | (?&PerlLowPrecedenceInfixOperator)
-            |   for(?:each)?+ | while | if | unless | until | when
+            |   (?= \w) (?> for(?:each)?+ | while | if | unless | until | when )
             )
         )
     ) # End of rule
@@ -1013,7 +1159,7 @@ our $GRAMMAR = qr{
     (?<PerlQuotelikeQR>
         qr \b
         (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-        (?>(?&PPR_quotelike_body))
+        (?>(?&PPR_quotelike_body_interpolated))
         [msixpodual]*+
     ) # End of rule
 
@@ -1124,8 +1270,8 @@ our $GRAMMAR = qr{
     ) # End of rule
 
     (?<PerlBareword>
-        (?! (?> for(?:each)?+ | while | if | unless | until | use | no
-            |   given | when | sub | return
+        (?! (?> (?= \w )
+                (?> for(?:each)?+ | while | if | unless | until | use | no | given | when | sub | return )
             |   (?&PPR_named_op)
             |   __ (?> END | DATA ) __ \n
             ) \b
@@ -1171,11 +1317,11 @@ our $GRAMMAR = qr{
             (?:
                 \h++
             |
+                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+            |
                 [#] [^\n]*+
             |
                 __ (?> END | DATA ) __ \b .*+ \z
-            |
-                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
             )*+
         )
     ) # End of rule
@@ -1196,11 +1342,11 @@ our $GRAMMAR = qr{
             (?:
                 \h++
             |
+                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+            |
                 [#] [^\n]*+
             |
                 __ (?> END | DATA ) __ \b .*+ \z
-            |
-                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
             )++
         )
     ) # End of rule
@@ -1224,7 +1370,7 @@ our $GRAMMAR = qr{
                for(?:each)?+ | while | if | unless | until | given | when | default
             |  sub | format | use | no
             |  (?&PPR_named_op)
-            |  [msy] | q[wrxq]? | tr
+            |  [msy] | q[wrxq]?+ | tr
             |   __ (?> END | DATA ) __ \n
             )
             \b
@@ -1357,6 +1503,196 @@ our $GRAMMAR = qr{
         )
     )
 
+    (?<PPR_quotelike_body_interpolated>
+        (?>(?&PPR_quotelike_body_interpolated_unclosed))
+        \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
+    )
+
+    (?<PPR_balanced_parens_interpolated>
+        [^)(\\\n\$\@]*+
+        (?:
+            (?>
+                \\.
+            |
+                \(  (?>(?&PPR_balanced_parens_interpolated))  \)
+            |
+                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+            |
+                (?= \$ (?! [\s\)] ) )  (?&PerlScalarAccessNoSpace)
+            |
+                (?= \@ (?! [\s\)] ) )  (?&PerlArrayAccessNoSpace)
+            |
+                [\$\@]
+            )
+            [^)(\\\n\$\@]*+
+        )*+
+    )
+
+    (?<PPR_balanced_curlies_interpolated>
+        [^\}\{\\\n\$\@]*+
+        (?:
+            (?>
+                \\.
+            |
+                \{  (?>(?&PPR_balanced_curlies_interpolated))  \}
+            |
+                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+            |
+                (?= \$ (?! [\s\}] ) )  (?&PerlScalarAccessNoSpace)
+            |
+                (?= \@ (?! [\s\}] ) )  (?&PerlArrayAccessNoSpace)
+            |
+                [\$\@]
+            )
+            [^\}\{\\\n\$\@]*+
+        )*+
+    )
+
+    (?<PPR_balanced_squares_interpolated>
+        [^][\\\n\$\@]*+
+        (?:
+            (?>
+                \\.
+            |
+                \[  (?>(?&PPR_balanced_squares_interpolated))  \]
+            |
+                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+            |
+                (?= \$ (?! [\s\]] ) )  (?&PerlScalarAccessNoSpace)
+            |
+                (?= \@ (?! [\s\]] ) )  (?&PerlArrayAccessNoSpace)
+            |
+                [\$\@]
+            )
+            [^][\\\n\$\@]*+
+        )*+
+    )
+
+    (?<PPR_balanced_angles_interpolated>
+        [^><\\\n\$\@]*+
+        (?:
+            (?>
+                \\.
+            |
+                <  (?>(?&PPR_balanced_angles_interpolated))  >
+            |
+                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+            |
+                (?= \$ (?! [\s>] ) )  (?&PerlScalarAccessNoSpace)
+            |
+                (?= \@ (?! [\s>] ) )  (?&PerlArrayAccessNoSpace)
+            |
+                [\$\@]
+            )
+            [^><\\\n\$\@]*+
+        )*+
+    )
+
+    (?<PPR_quotelike_body_interpolated_unclosed>
+        # Start by working out where it actually ends (ignoring interpolations)...
+        (?=
+            (?>
+                [#]
+                [^#\\\n\$\@]*+
+                (?:
+                    (?>
+                        \\.
+                    |
+                        \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                    |
+                        (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
+                    |
+                        (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
+                    |
+                        [\$\@]
+                    )
+                    [^#\\\n\$\@]*+
+                )*+
+                (?= [#] )
+            |
+                (?>(?&PerlOWS))
+                (?>
+                    \{  (?>(?&PPR_balanced_curlies_interpolated))    (?= \} )
+                |
+                    \[  (?>(?&PPR_balanced_squares_interpolated))    (?= \] )
+                |
+                    \(  (?>(?&PPR_balanced_parens_interpolated))     (?= \) )
+                |
+                    <  (?>(?&PPR_balanced_angles_interpolated))     (?=  > )
+                |
+                    \\
+                        [^\\\n\$\@]*+
+                        (?:
+                            (?>
+                                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                            |
+                                (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
+                            |
+                                (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
+                            |
+                                [\$\@]
+                            )
+                            [^\\\n\$\@]*+
+                        )*+
+                    (?= \\ )
+                |
+                    /
+                        [^\\/\n\$\@]*+
+                        (?:
+                            (?>
+                                \\.
+                            |
+                                \n  (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                            |
+                                (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
+                            |
+                                (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
+                            |
+                                [\$\@]
+                            )
+                            [^\\/\n\$\@]*+
+                        )*+
+                    (?= / )
+                |
+                    -
+                        (?:
+                            \\.
+                        |
+                            \n (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                        |
+                            (?:
+                                (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
+                            |
+                                (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
+                            |
+                                [^-]
+                            )
+                        )*+
+                    (?= - )
+                |
+                    (?<PPR_qldel> \S )
+                        (?:
+                            \\.
+                        |
+                            \n (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                        |
+                            (?! \g{PPR_qldel} )
+                            (?:
+                                (?= \$ (?! \g{PPR_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
+                            |
+                                (?= \@ (?! \g{PPR_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
+                            |
+                                .
+                            )
+                        )*+
+                    (?= \g{PPR_qldel} )
+                )
+            )
+        )
+
+        (?&PPR_quotelike_body_unclosed)
+    )
+
     (?<PPR_filetest_name>   [ABCMORSTWXbcdefgkloprstuwxz]          )
 
     (?<PPR_digit_seq>               \d++ (?: _?+         \d++ )*+  )
@@ -1377,7 +1713,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.000009
+This document describes PPR version 0.000011
 
 
 =head1 SYNOPSIS
@@ -1933,12 +2269,56 @@ the C<$#array> syntax, and single-value
 array or hash look-ups.
 
 
+=head3 C<< (?&PerlScalarAccessNoSpace) >>
+
+Matches any kind of variable access beginning with a C<$>, including
+fully qualified package variables, punctuation variables, scalar
+dereferences, the C<$#array> syntax, and single-value array or hash
+look-ups.
+But does not allow spaces between the components of the
+variable access (i.e. imposes the same constraint as within an
+interpolating quotelike).
+
+
+=head3 C<< (?&PerlScalarAccessNoSpaceNoArrow) >>
+
+Matches any kind of variable access beginning with a C<$>, including
+fully qualified package variables, punctuation variables, scalar
+dereferences, the C<$#array> syntax, and single-value array or hash
+look-ups.
+But does not allow spaces or arrows between the components of the
+variable access (i.e. imposes the same constraint as within a
+C<< <...> >>-delimited interpolating quotelike).
+
+
 =head3 C<< (?&PerlArrayAccess) >>
 
 Matches any kind of variable access
 beginning with a C<@>,
 including arrays, array dereferences,
 and list slices of arrays or hashes.
+
+
+=head3 C<< (?&PerlArrayAccessNoSpace) >>
+
+Matches any kind of variable access
+beginning with a C<@>,
+including arrays, array dereferences,
+and list slices of arrays or hashes.
+But does not allow spaces between the components of the
+variable access (i.e. imposes the same constraint as within an
+interpolating quotelike).
+
+
+=head3 C<< (?&PerlArrayAccessNoSpaceNoArrow) >>
+
+Matches any kind of variable access
+beginning with a C<@>,
+including arrays, array dereferences,
+and list slices of arrays or hashes.
+But does not allow spaces or arrows between the components of the
+variable access (i.e. imposes the same constraint as within a
+C<< <...> >>-delimited interpolating quotelike).
 
 
 =head3 C<< (?&PerlHashAccess) >>

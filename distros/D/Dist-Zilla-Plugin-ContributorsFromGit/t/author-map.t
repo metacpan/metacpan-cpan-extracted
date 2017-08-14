@@ -20,6 +20,7 @@ use IPC::System::Simple (); # explicit dep for autodie system
 use Path::Class;
 
 use lib 't/lib';
+use EnsureStdinTty;
 
 plan skip_all => 'git not found'
     unless which 'git';

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Test::Builder ();
 use Prty::Option;
@@ -193,8 +193,8 @@ our @Methods;
 
 =head4 Description
 
-Instantiiere ein Testobjekt und liefere eine Referenz
-auf dieses Objekt zurück.
+Instantiiere ein Testobjekt und liefere eine Referenz auf dieses
+Objekt zurück.
 
 Das Testobjekt kennt die Testmethoden, die zur Klasse $class und
 ihren Basisklassen gehören. Ferner ist es Träger der Attribut/Wert-Paare,
@@ -220,6 +220,13 @@ sub new {
 
     my $builder = Test::Builder->new;
     $builder->exported_to($class);
+
+    # Encoding der Umgebung setzen
+
+    my $encoding = Prty::System->encoding;
+    binmode $builder->output,":encoding($encoding)";
+    binmode $builder->failure_output,":encoding($encoding)";
+    binmode $builder->todo_output,":encoding($encoding)";
 
     # Test::Builder-Objekt, Testmethoden, Testobjekt-Attribute,
     # SkipAll-Meldung, Skip-Meldung
@@ -897,6 +904,33 @@ sub floatIs {
 
 # -----------------------------------------------------------------------------
 
+=head3 isClass() - Prüfe, ob Referenz zur erwarteten Klasse gehört
+
+=head4 Synopsis
+
+    $bool = $test->isClass($ref,$class);
+    $bool = $test->isClass($ref,$class,$text);
+
+=head4 Description
+
+Vergleiche die die Klasse von $ref gegen $class. Der Test ist
+erfolgreich, wenn ref($ref) und $class identisch sind.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isClass {
+    my ($self,$ref,$class,$text) = @_;
+
+    $text ||= "Object is a $class";
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return Test::More::ok($ref->isa($class),$text);    
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 isDeeply() - Prüfe, ob Datenstrukturen identisch sind
 
 =head4 Synopsis
@@ -1078,7 +1112,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

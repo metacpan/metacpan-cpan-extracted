@@ -7,12 +7,9 @@ my $DEBUG = 0;
 
 use Test::More tests => 1;
 
-use Centrifugo::Client;
+use Centrifugo::Client qw!generate_token!;
 
 SKIP: {
-	eval 'use Digest::SHA qw( hmac_sha256_hex )';
-	skip "Digest::SHA not available", 1 if $@;
-	
 	our $condvar = AnyEvent->condvar;
 
 	# This part is aiming to get a valid TOKEN for Centrifugo_demo site.
@@ -21,7 +18,7 @@ SKIP: {
 	my $TIMESTAMP = time();
 	my $SECRET = "secret";
 	
-	my $TOKEN = hmac_sha256_hex( $USER, $TIMESTAMP, $SECRET );
+	my $TOKEN = generate_token( $SECRET, $USER, $TIMESTAMP );
 	
 	my $SUCCESS = 0;
 	
@@ -39,7 +36,8 @@ SKIP: {
 		my ($error)=@_;
 		$condvar->send;
 	})-> on('ws_closed', sub{
-		diag "Received : Websocket connection closed";
+		my ($reason)=@_;
+		diag "Received : Websocket connection closed : $reason";
 		$condvar->send;
 	})->connect(
 		user => $USER,

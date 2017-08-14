@@ -1,5 +1,5 @@
 package WebService::Braintree::PaymentMethodNonceGateway;
-$WebService::Braintree::PaymentMethodNonceGateway::VERSION = '0.91';
+$WebService::Braintree::PaymentMethodNonceGateway::VERSION = '0.92';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

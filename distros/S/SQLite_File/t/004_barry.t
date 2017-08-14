@@ -1,11 +1,15 @@
 # -*-perl-*-
 use lib '../lib';
+use Module::Build;
 use Test::More;
 use File::Spec;
 use SQLite_File qw/O_RDWR/;
 
-my $dir = -d 't' ? 't' : '.';
-my $testdb = File::Spec->catfile($dir,'my.db');
+my $build = Module::Build->current;
+my $testdb;
+unless ($testdb = $build->notes('testdb')) {
+    plan skip_all => 'No testdb found';
+}
 my ($key, $value);
 my %db;
 my $flags = O_RDWR;
@@ -19,5 +23,6 @@ is $db{'candlestick maker'}, 4, "candlesitck maker correct";
 ok $db{'add this key'} = 5, "add this key";
 is $db{'add this key'}, 5, "key added";
 
+unlink $testdb;
 done_testing();
 1;

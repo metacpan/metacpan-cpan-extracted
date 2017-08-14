@@ -1,36 +1,59 @@
-use 5.006;
-use ExtUtils::MakeMaker;
 
-my %args =
-  (
-   NAME	         => 'Net::Server',
-   VERSION_FROM  => 'lib/Net/Server.pm',
-   ABSTRACT_FROM => 'lib/Net/Server.pod',
-   AUTHOR        => 'Paul Seamons <paul@seamons.com> and Rob Brown <bbb@cpan.org>',
-   EXE_FILES     => [ 'bin/net-server' ],
-   PREREQ_PM  => {
-     'IO::Socket' => 0,
-     Socket       => 0,
-     POSIX        => 0,
-     'Time::HiRes' => 0,
-   },
+use strict;
+use warnings;
 
-   dist          => {
-     DIST_DEFAULT => 'all tardist',
-     COMPRESS     => 'gzip -vf',
-     SUFFIX       => '.gz',
-   },
 
-   clean         => {
-     FILES        => '*~',
-   },
 
-   realclean     => {
-     FILES        => '*~',
-   },
+use ExtUtils::MakeMaker 6.30;
 
-   );
 
-WriteMakefile(%args);
 
-1;
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "Extensible Perl internet server",
+  "AUTHOR" => "Paul Seamons <paul\@seamons.com> and Rob Brown <bbb\@cpan.org>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
+  },
+  "DISTNAME" => "Net-Server",
+  "EXE_FILES" => [
+    "bin/net-server"
+  ],
+  "LICENSE" => "perl",
+  "NAME" => "Net::Server",
+  "PREREQ_PM" => {
+    "File::Temp" => 0,
+    "IO::Socket" => 0,
+    "POSIX" => 0,
+    "Socket" => 0,
+    "Time::HiRes" => 0
+  },
+  "TEST_REQUIRES" => {},
+  "VERSION" => "2.009",
+  "test" => {
+    "TESTS" => "t/*.t"
+  }
+);
+
+
+my %FallbackPrereqs = (
+  "IO::Socket" => 0,
+  "POSIX" => 0,
+  "Socket" => 0,
+  "Time::HiRes" => 0
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+

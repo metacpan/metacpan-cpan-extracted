@@ -2,7 +2,6 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF::Value::Type;
-use MarpaX::ESLIF;
 
 # ABSTRACT: ESLIF Value Types
 
@@ -11,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '2.0.14'; # VERSION
+our $VERSION = '2.0.15'; # VERSION
 
 
 # This section should be replaced on-the-fly at build time
@@ -31,9 +30,11 @@ MarpaX::ESLIF::Value::Type - ESLIF Value Types
 
 =head1 VERSION
 
-version 2.0.14
+version 2.0.15
 
 =head1 SYNOPSIS
+
+  use MarpaX::ESLIF;
 
   my $valueType;
   $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_UNDEF;         #  0

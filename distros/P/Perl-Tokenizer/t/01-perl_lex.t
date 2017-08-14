@@ -16,7 +16,7 @@ BEGIN {
       scalar_sigil
       var_name
       horizontal_space
-      operator
+      assignment_operator
       horizontal_space
       number
       semicolon

@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-#-I/home/phil/z/perl/cpan/DataEditXmlLint/lib/ -I/home/phil/z/perl/cpan/DataEditXml/lib -I/home/phil/z/perl/cpan/DataTableText/lib
+#!/usr/bin/perl -I/home/phil/z/perl/cpan/DataEditXmlLint/lib/ -I/home/phil/z/perl/cpan/DataEditXml/lib -I/home/phil/z/perl/cpan/DataTableText/lib
 #-------------------------------------------------------------------------------
 # Create SDL file map from a set of linted xml files
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
@@ -13,7 +12,7 @@ use strict;
 use Carp;
 use Data::Edit::Xml::Lint;
 use Data::Table::Text qw(:all);
-our $VERSION = 20170801;
+our $VERSION = 20170809;
 
 #1 Constructor                                                                  # Construct a new SDL file map creator
 
@@ -23,25 +22,26 @@ sub new                                                                         
 
 #2 Attributes                                                                   # Attributes describing a lint
 
-genLValueScalarMethods(qw(lint));                                               # The lint of the file to be processed
+genLValueScalarMethods(qw(filePathFolder));                                     # Prefix this folder (if supplied) to the filepath
 genLValueScalarMethods(qw(fileType));                                           # The fileType of the file to be processed
+genLValueScalarMethods(qw(folderHasMixedContent));                              # folderHasMixedContent field
+genLValueScalarMethods(qw(ishType));                                            # IshType field
+genLValueScalarMethods(qw(imagePath));                                          # Image path relative to sourcebasepath
 genLValueScalarMethods(qw(language));                                           # The language of the content, defaults to: 'en-US'
-genLValueScalarMethods(qw(targetFolder));                                       # The SDL target folder to be used
-genLValueScalarMethods(qw(version));                                            # Version of the input content
-genLValueScalarMethods(qw(sourcebasepath));                                     # Path to source to be uploaded
+genLValueScalarMethods(qw(lint));                                               # The lint of the file to be processed
 genLValueScalarMethods(qw(sdlVersion));                                         # Version of SDL we are using, defaults to: '12.0.0.0'
 genLValueScalarMethods(qw(section));                                            # Sub folder for file on SDL: maps, topics
-genLValueScalarMethods(qw(ishType));                                            # IshType field
-genLValueScalarMethods(qw(folderHasMixedContent));                              # folderHasMixedContent field
-genLValueScalarMethods(qw(filePathFolder));                                     # Prefix this folder (if supplied) to the filepath
+genLValueScalarMethods(qw(sourcebasepath));                                     # Path to source to be uploaded
+genLValueScalarMethods(qw(targetFolder));                                       # The SDL target folder to be used
+genLValueScalarMethods(qw(version));                                            # Version of the input content
 
 #1 SDL File Map                                                                 # Generate an SDL file map
 
-sub xmlLineOne                                                                  ## Line one of all xml files
+sub xmlLineOne                                                                  #P Line one of all xml files
  {'<?xml version="1.0" encoding="utf-8"?>'
  }
 
-sub getFileMap                                                                  ## File map tag
+sub getFileMap                                                                  #P File map tag
  {my ($sdl) = @_;                                                               # Sdl file map creator
   my $s = $sdl->sourcebasepath;
   my $v = $sdl->sdlVersion;
@@ -50,28 +50,36 @@ sub getFileMap                                                                  
 END
  }
 
-sub getFile                                                                     ## File tag
- {my ($sdl) = @_;                                                               # Sdl file map creator
-  my $targetFolder = $sdl->targetFolder;
-  my $ishType      = $sdl->ishType;
-  my $section      = $sdl->section;
-  my $lint         = $sdl->lint;
-  my $project      = $lint->project;
-  my $guid         = $lint->guid;
-  my $file         = $lint->file;
-  my $mixed        = ucfirst $sdl->folderHasMixedContent;
+sub getFile($$)                                                                 #P File tag
+ {my ($sdl, $images) = @_;                                                      # Sdl file map creator, processing an image file or not
+  my $targetFolder   = $sdl->targetFolder;
+  my $ishType        = $sdl->ishType;
+  my $section        = $sdl->section;
+  my $imagePath      = $sdl->imagePath;
+  my $lint           = $sdl->lint;
+  my $project        = $lint->project;
+  my $guid           = $lint->guid;
+  my $file           = $lint->file;
+  my $mixed          = ucfirst $sdl->folderHasMixedContent;
      $mixed =~ m/\A(True|False)\Z/s or
        confess "FolderhasMixedContent = (True|False) not $mixed";
 
-  my $fpf          = $sdl->filePathFolder;                                      # Normally only used for images
-  my $filePath     = filePath($fpf ? ($fpf) : (), $file);                       # filepath=
+  my $filePrefix = '';                                                          # File name prefix if any
+  if ($images)                                                                  # The image file prefix if we are processing an image
+   {defined($imagePath) or
+      confess "Use SDL->imagePath() to supply a path for images";
+    $filePrefix = filePathDir($imagePath);                                      # The image file prefix if we are processing an image
+    $lint->file =~ s/\.xml\Z//gs;                                               # Remove trailing xml extension on image files
+   }
+
   my (undef, $fileName, $fileExt) = parseFileName($lint->file);                 # Parse file name
+  my $relFile = filePathExt($filePrefix, $fileName, $fileExt);
   <<END
-<file fileextension=".$fileExt" filename="$file" filepath="$filePath" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$project\\$section" title="$fileName">
+<file fileextension=".$fileExt" filename="$relFile" filepath="$relFile" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$project\\$section" title="$fileName">
 END
  }
 
-sub getIshObject                                                                ## IshObject tag
+sub getIshObject                                                                #P IshObject tag
  {my ($sdl) = @_;                                                               # Sdl
   my $ishType = $sdl->ishType;
   my $lint    = $sdl->lint;
@@ -81,7 +89,7 @@ sub getIshObject                                                                
 END
  }
 
-sub getFTitle                                                                   ## FTITLE tag
+sub getFTitle                                                                   #P FTITLE tag
  {my ($sdl) = @_;                                                               # Sdl
   my (undef, $fileName, $fileExt) = parseFileName($sdl->lint->file);            # Parse file name
   <<END
@@ -89,7 +97,7 @@ sub getFTitle                                                                   
 END
  }
 
-sub getVersion                                                                  ## Version tag
+sub getVersion                                                                  #P Version tag
  {my ($sdl) = @_;                                                               # Sdl
   my $v = $sdl->version;
   <<END
@@ -97,7 +105,7 @@ sub getVersion                                                                  
 END
  }
 
-sub getDocLanguage                                                              ## DOC-LANGUAGE tag
+sub getDocLanguage                                                              #P DOC-LANGUAGE tag
  {my ($sdl) = @_;                                                               # Sdl
   my $l = $sdl->language;
   <<END
@@ -105,7 +113,7 @@ sub getDocLanguage                                                              
 END
  }
 
-sub getAuthor                                                                   ## Author tag
+sub getAuthor                                                                   #P Author tag
  {my ($sdl) = @_;                                                               # Sdl
   my $lint  = $sdl->lint;
   my $a     = $lint->author;
@@ -114,10 +122,10 @@ sub getAuthor                                                                   
 END
  }
 
-sub getResolution                                                               ## Resolution
+sub getResolution                                                               #P Resolution
  {my ($sdl) = @_;                                                               # Sdl
   <<END
-<ishfield level="lng" name="FRESOLUTION" xml:space="preserve">Low</ishfield>
+<ishfield level="lng" name="FRESOLUTION" xml:space="preserve">High</ishfield>
 END
  }
 
@@ -175,12 +183,13 @@ END
 END
      }
 
-    elsif ($ditaType =~ m/image/i)
-     {$sdl->ishType = (qq(ISHIllustration));
-      $sdl->section = (qq(images));
-      $sdl->folderHasMixedContent = (qq(false));
+    elsif ($ditaType  =~ m/image/i)
+     {$sdl->ishType   = qq(ISHIllustration);
+      $sdl->section   = qq(images);
+      $sdl->imagePath = qq(images);
+      $sdl->folderHasMixedContent = qq(false);
       push @map,
-        $sdl->getFile,
+        $sdl->getFile(1),
         $sdl->getIshObject, <<END,
 <ishfields>
 END
@@ -205,11 +214,7 @@ END
   join "", @map;
  } # createSDLFileMap
 
-## podDocumentation
-
-sub test{eval join('', <Data::Edit::Xml::SDL::DATA>) or die $@} test unless caller;
-
-1;
+# podDocumentation
 
 =pod
 
@@ -228,6 +233,7 @@ L<Data::Edit::Xml::Lint>
  my $s = Data::Edit::Xml::SDL::new();
     $s->sourcebasepath = 'C:\frame\batch1\out';
     $s->targetFolder   = qq(RyffineImportSGIfm);
+    $s->imagePath      = qq(images);
     $s->version = 1;
 
  say STDERR $s->createSDLFileMap(qw(. xml));
@@ -255,7 +261,7 @@ etc.
 
 Construct a new SDL file map creator
 
-=head3 new
+=head3 new()
 
 Create a new SDL file map creator - call this method statically as in Data::Edit::Xml::Lint::new()
 
@@ -264,9 +270,9 @@ Create a new SDL file map creator - call this method statically as in Data::Edit
 
 Attributes describing a lint
 
-=head4 lint :lvalue
+=head4 filePathFolder :lvalue
 
-The lint of the file to be processed
+Prefix this folder (if supplied) to the filepath
 
 
 =head4 fileType :lvalue
@@ -274,24 +280,29 @@ The lint of the file to be processed
 The fileType of the file to be processed
 
 
+=head4 folderHasMixedContent :lvalue
+
+folderHasMixedContent field
+
+
+=head4 ishType :lvalue
+
+IshType field
+
+
+=head4 imagePath :lvalue
+
+Image path relative to sourcebasepath
+
+
 =head4 language :lvalue
 
 The language of the content, defaults to: 'en-US'
 
 
-=head4 targetFolder :lvalue
+=head4 lint :lvalue
 
-The SDL target folder to be used
-
-
-=head4 version :lvalue
-
-Version of the input content
-
-
-=head4 sourcebasepath :lvalue
-
-Path to source to be uploaded
+The lint of the file to be processed
 
 
 =head4 sdlVersion :lvalue
@@ -304,31 +315,81 @@ Version of SDL we are using, defaults to: '12.0.0.0'
 Sub folder for file on SDL: maps, topics
 
 
-=head4 ishType :lvalue
+=head4 sourcebasepath :lvalue
 
-IshType field
-
-
-=head4 folderHasMixedContent :lvalue
-
-folderHasMixedContent field
+Path to source to be uploaded
 
 
-=head4 filePathFolder :lvalue
+=head4 targetFolder :lvalue
 
-Prefix this folder (if supplied) to the filepath
+The SDL target folder to be used
+
+
+=head4 version :lvalue
+
+Version of the input content
 
 
 =head2 SDL File Map
 
 Generate an SDL file map
 
-=head3 createSDLFileMap
+=head3 createSDLFileMap($@)
 
 Generate an SDL file map for a selected set of files
 
-  1  $sdl                   Sdl                                  
-  2  @foldersAndExtensions  Directory tree search specification  
+  1  $sdl                   Sdl
+  2  @foldersAndExtensions  Directory tree search specification
+
+
+=head1 Private Methods
+
+=head2 xmlLineOne()
+
+Line one of all xml files
+
+
+=head2 getFileMap()
+
+File map tag
+
+
+=head2 getFile($$)
+
+File tag
+
+  1  $sdl     Sdl file map creator
+  2  $images  Processing an image file or not
+
+=head2 getIshObject()
+
+IshObject tag
+
+
+=head2 getFTitle()
+
+FTITLE tag
+
+
+=head2 getVersion()
+
+Version tag
+
+
+=head2 getDocLanguage()
+
+DOC-LANGUAGE tag
+
+
+=head2 getAuthor()
+
+Author tag
+
+
+=head2 getResolution()
+
+Resolution
+
 
 
 =head1 Index
@@ -341,6 +402,24 @@ L<filePathFolder|/filePathFolder>
 L<fileType|/fileType>
 
 L<folderHasMixedContent|/folderHasMixedContent>
+
+L<getAuthor|/getAuthor>
+
+L<getDocLanguage|/getDocLanguage>
+
+L<getFile|/getFile>
+
+L<getFileMap|/getFileMap>
+
+L<getFTitle|/getFTitle>
+
+L<getIshObject|/getIshObject>
+
+L<getResolution|/getResolution>
+
+L<getVersion|/getVersion>
+
+L<imagePath|/imagePath>
 
 L<ishType|/ishType>
 
@@ -360,10 +439,12 @@ L<targetFolder|/targetFolder>
 
 L<version|/version>
 
+L<xmlLineOne|/xmlLineOne>
+
 =head1 Installation
 
-This module is written in 100% Pure Perl and is thus easy to read, use, modify
-and install.
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
 
 Standard Module::Build process for building and installing modules:
 
@@ -387,7 +468,22 @@ under the same terms as Perl itself.
 
 =cut
 
-## podDocumentation
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
+# podDocumentation
 
 __DATA__
 use warnings FATAL=>qw(all);
@@ -417,7 +513,7 @@ sub writeTest($$$)
 unlink for searchDirectoryTreesForMatchingFiles(@search);                       # Confirm removal
 &writeTest(qw(bookmap ditamap), &testBookMap);
 &writeTest(qw(concept1 dita),   &testConcept);
-&writeTest(qw(image1 xml),      &testImage);
+&writeTest(qw(image1.jpg xml),  &testImage);
 
 my $t = $s->createSDLFileMap(@search);
 
@@ -499,13 +595,13 @@ sub expectedOutput{<<'END'}
 </ishfields>
 </ishobject>
 </file>
-<file fileextension=".jpg" filename="image1.jpg" filepath="image1.jpg" filetype="ISHIllustration" folderhasmixedcontent="False" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\images" title="image1">
+<file fileextension=".jpg" filename="images/image1.jpg" filepath="images/image1.jpg" filetype="ISHIllustration" folderhasmixedcontent="False" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\images" title="image1">
 <ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000002" ishtype="ISHIllustration">
 <ishfields>
 <ishfield level="logical" name="FTITLE" xml:space="preserve">image1</ishfield>'
 <ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
 <ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
-<ishfield level="lng" name="FRESOLUTION" xml:space="preserve">Low</ishfield>
+<ishfield level="lng" name="FRESOLUTION" xml:space="preserve">High</ishfield>
 <ishfield name="FAUTHOR" level="lng" xml:space="preserve">bill.gearhart@hpe.com</ishfield>
 </ishfields>
 </ishobject>

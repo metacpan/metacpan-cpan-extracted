@@ -2,7 +2,7 @@ package WebService::ILS;
 
 use Modern::Perl;
 
-our $VERSION = "0.14";
+our $VERSION = "0.16";
 
 =encoding utf-8
 
@@ -146,15 +146,6 @@ sub _get_param_spec {
     return Hash::Merge::merge($p_s || {}, $superclass->_get_param_spec);
 }
 
-sub params_check {
-    my $self = shift;
-    my $params = shift or croak "No params";
-
-    local $Params::Check::WARNINGS_FATAL = 1;
-    Params::Check::check($self->_get_param_spec, $params)
-        or croak "Invalid parameters: ".Params::Check::last_error();
-}
-
 =head1 CONSTRUCTOR
 
 =head2 new (%params_hash or $params_hashref)
@@ -210,11 +201,22 @@ __PACKAGE__->_set_param_spec({
     user_agent_params => { required => 0 },
 });
 
+sub BUILDARGS {
+    my $self = shift;
+    my $params = shift || {};
+    if (!ref( $params )) {
+        $params = {$params, @_};
+    }
+
+    local $Params::Check::WARNINGS_FATAL = 1;
+    $params = Params::Check::check($self->_get_param_spec, $params)
+        or croak "Invalid parameters: ".Params::Check::last_error();
+    return $params;
+}
+
 sub BUILD {
     my $self = shift;
     my $params = shift;
-
-    $self->params_check($params);
 
     my $ua_params = delete $params->{user_agent_params} || {};
     $self->user_agent( LWP::UserAgent->new(%$ua_params) ) unless $self->user_agent;

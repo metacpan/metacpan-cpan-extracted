@@ -10,7 +10,7 @@ use warnings FATAL => qw(all);
 use strict;
 use Data::Table::Text qw(:all);
 use Carp;
-our $VERSION = 2017.117;
+our $VERSION = 20170808;
 
 if (0)                                                                          # Save to S3:- this will not work, unless you're me, or you happen, to know the key
  {my $z = 'DataLayoutBuddySystem.zip';

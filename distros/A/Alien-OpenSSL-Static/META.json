@@ -1,0 +1,53 @@
+{
+   "abstract" : "Alien wrapper for OpenSSL",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-OpenSSL-Static",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.025",
+            "Module::Build" : "0.38",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.025",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::OpenSSL::Static" : {
+         "file" : "lib/Alien/OpenSSL/Static.pm",
+         "version" : "1.000000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ollyg/alien-openssl-static/issues"
+      },
+      "homepage" : "https://github.com/ollyg/alien-openssl-static",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ollyg/alien-openssl-static.git"
+      }
+   },
+   "version" : "1.000000",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

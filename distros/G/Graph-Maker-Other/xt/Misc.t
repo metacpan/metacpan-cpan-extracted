@@ -31,8 +31,6 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 plan tests => 2;
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 #------------------------------------------------------------------------------
 # graphs in MANIFEST same as in Makefile.PL

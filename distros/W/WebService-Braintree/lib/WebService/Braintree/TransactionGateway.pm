@@ -1,5 +1,5 @@
 package WebService::Braintree::TransactionGateway;
-$WebService::Braintree::TransactionGateway::VERSION = '0.91';
+$WebService::Braintree::TransactionGateway::VERSION = '0.92';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 use Carp qw(confess);

@@ -22,11 +22,8 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 
 sub _default_graph_maker {
@@ -180,8 +177,8 @@ graph.
 =head2 Subgraph
 
 C<subgraph =E<gt> 1> gives the subgraph of the Keller graph induced by
-neighbours of vertex 0.  This means the neighbours of vertex 0 (not including
-0 itself) and the edges among those neighbours.
+neighbours of vertex 0.  This means the neighbours of vertex 0 (not
+including 0 itself) and the edges among those neighbours.
 
     subgraph => 1
     N         0  1   2     3      4       5
@@ -223,6 +220,20 @@ C<Graph-E<gt>new()>.
 If the graph is directed (the default) then edges are added both forward and
 backward between vertices.  Option C<undirected =E<gt> 1> creates an
 undirected graph and for it there is a single edge between vertices.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for graphs here include
+
+=over
+
+=item N=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=975> (Clebsch)
+
+=item N=3 subgraph, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22730>
+
+=item N=4 subgraph, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22732>
 
 =back
 

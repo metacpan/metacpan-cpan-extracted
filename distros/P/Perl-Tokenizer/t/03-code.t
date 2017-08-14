@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 90;
+plan tests => 311;
 
 use Perl::Tokenizer qw(perl_tokens);
 
@@ -22,6 +22,79 @@ my @tokens = (
      'tr{}   # comment 1
            //   # comment 2' => ('transliteration', 'horizontal_space', 'comment',)
 
+    ],
+
+    ['1==2' => ('number', 'operator', 'number')],
+    ['1!=2' => ('number', 'operator', 'number')],
+    ['1<=2' => ('number', 'operator', 'number')],
+    ['1>=2' => ('number', 'operator', 'number')],
+    ['1>>2' => ('number', 'operator', 'number')],
+    ['1<<2' => ('number', 'operator', 'number')],
+    ['1%2'  => ('number', 'operator', 'number')],
+    ['1**2' => ('number', 'operator', 'number')],
+    ['1^2'  => ('number', 'operator', 'number')],
+    ['1|2'  => ('number', 'operator', 'number')],
+    ['1||2' => ('number', 'operator', 'number')],
+    ['1&2'  => ('number', 'operator', 'number')],
+    ['1&&2' => ('number', 'operator', 'number')],
+    ['1//2' => ('number', 'operator', 'number')],
+    ['1/2'  => ('number', 'operator', 'number')],
+
+    ['~2'  => ('operator', 'number')],
+    ['++2' => ('operator', 'number')],
+    ['--2' => ('operator', 'number')],
+    ['-2'  => ('operator', 'number')],
+    ['+2'  => ('operator', 'number')],
+    ['!2'  => ('operator', 'number')],
+    ['!!2' => ('operator', 'operator', 'number')],
+    ['+!2' => ('operator', 'operator', 'number')],
+    ['-!2' => ('operator', 'operator', 'number')],
+    ['!-2' => ('operator', 'operator', 'number')],
+    ['!+2' => ('operator', 'operator', 'number')],
+
+    ['"a"."b"'  => ('double_quoted_string', 'operator', 'double_quoted_string')],
+    ['"a"&."b"' => ('double_quoted_string', 'operator', 'double_quoted_string')],
+    ['"a"|."b"' => ('double_quoted_string', 'operator', 'double_quoted_string')],
+    ['"a"^."b"' => ('double_quoted_string', 'operator', 'double_quoted_string')],
+
+    ['~."a"' => ('operator', 'double_quoted_string')],
+
+    ['$x<<=2' => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x>>=2' => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x||=2' => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x|=2'  => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x=2'   => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x-=2'  => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x//=2' => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x**=2' => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x%=2'  => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x.=2'  => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x/=2'  => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+    ['$x^=2'  => ('scalar_sigil', 'var_name', 'assignment_operator', 'number')],
+
+    [
+     '$x / 3 / 4' => (
+                      'scalar_sigil',     'var_name', 'horizontal_space', 'operator', 'horizontal_space', 'number',
+                      'horizontal_space', 'operator', 'horizontal_space', 'number'
+                     )
+    ],
+    [
+     '$x // 3 // 4' => (
+                        'scalar_sigil',     'var_name', 'horizontal_space', 'operator', 'horizontal_space', 'number',
+                        'horizontal_space', 'operator', 'horizontal_space', 'number'
+                       )
+    ],
+    [
+     '$x % 3 / 4' => (
+                      'scalar_sigil',     'var_name', 'horizontal_space', 'operator', 'horizontal_space', 'number',
+                      'horizontal_space', 'operator', 'horizontal_space', 'number'
+                     )
+    ],
+    [
+     '$x / 3 - 4' => (
+                      'scalar_sigil',     'var_name', 'horizontal_space', 'operator', 'horizontal_space', 'number',
+                      'horizontal_space', 'operator', 'horizontal_space', 'number'
+                     )
     ],
 
     [
@@ -90,12 +163,12 @@ EOD
 CODE
 
        => (
-           'keyword',          'horizontal_space',  'array_sigil',      'var_name',
-           'horizontal_space', 'operator',          'horizontal_space', 'parenthesis_open',
-           'heredoc_beg',      'comma',             'heredoc_beg',      'comma',
-           'heredoc_beg',      'parenthesis_close', 'semicolon',        'horizontal_space',
-           'comment',          'vertical_space',    'heredoc',          'vertical_space',
-           'heredoc',          'vertical_space',    'heredoc',          'vertical_space'
+           'keyword',          'horizontal_space',    'array_sigil',      'var_name',
+           'horizontal_space', 'assignment_operator', 'horizontal_space', 'parenthesis_open',
+           'heredoc_beg',      'comma',               'heredoc_beg',      'comma',
+           'heredoc_beg',      'parenthesis_close',   'semicolon',        'horizontal_space',
+           'comment',          'vertical_space',      'heredoc',          'vertical_space',
+           'heredoc',          'vertical_space',      'heredoc',          'vertical_space'
           )
 
     ],

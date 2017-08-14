@@ -11,3 +11,6 @@
   -- Pod clean ups
   -- on_body now gets the HTTP::Request object vs the request_id
   -- Registered AnyEvent::HTTP::MultiGet with log4perl as a wrapper class
+1.005 
+  -- Added a Moo::Role for hybrid blocking nonblocking rest client development
+    -- it works great!! Unfortunatly I am struggling to explain the concepts involved.

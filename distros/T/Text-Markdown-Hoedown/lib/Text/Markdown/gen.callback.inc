@@ -14,13 +14,6 @@ CODE:
     hv_stores(renderer->opaque, "blockquote", newSVsv(code));
 
 void
-blockhtml(SV* self, SV *code)
-CODE:
-    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
-    renderer->blockhtml = tmh_cb_blockhtml;
-    hv_stores(renderer->opaque, "blockhtml", newSVsv(code));
-
-void
 header(SV* self, SV *code)
 CODE:
     hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
@@ -63,6 +56,20 @@ CODE:
     hv_stores(renderer->opaque, "table", newSVsv(code));
 
 void
+table_header(SV* self, SV *code)
+CODE:
+    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
+    renderer->table_header = tmh_cb_table_header;
+    hv_stores(renderer->opaque, "table_header", newSVsv(code));
+
+void
+table_body(SV* self, SV *code)
+CODE:
+    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
+    renderer->table_body = tmh_cb_table_body;
+    hv_stores(renderer->opaque, "table_body", newSVsv(code));
+
+void
 table_row(SV* self, SV *code)
 CODE:
     hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
@@ -89,6 +96,13 @@ CODE:
     hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
     renderer->footnote_def = tmh_cb_footnote_def;
     hv_stores(renderer->opaque, "footnote_def", newSVsv(code));
+
+void
+blockhtml(SV* self, SV *code)
+CODE:
+    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
+    renderer->blockhtml = tmh_cb_blockhtml;
+    hv_stores(renderer->opaque, "blockhtml", newSVsv(code));
 
 void
 autolink(SV* self, SV *code)
@@ -161,13 +175,6 @@ CODE:
     hv_stores(renderer->opaque, "link", newSVsv(code));
 
 void
-raw_html_tag(SV* self, SV *code)
-CODE:
-    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
-    renderer->raw_html_tag = tmh_cb_raw_html_tag;
-    hv_stores(renderer->opaque, "raw_html_tag", newSVsv(code));
-
-void
 triple_emphasis(SV* self, SV *code)
 CODE:
     hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
@@ -194,6 +201,20 @@ CODE:
     hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
     renderer->footnote_ref = tmh_cb_footnote_ref;
     hv_stores(renderer->opaque, "footnote_ref", newSVsv(code));
+
+void
+math(SV* self, SV *code)
+CODE:
+    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
+    renderer->math = tmh_cb_math;
+    hv_stores(renderer->opaque, "math", newSVsv(code));
+
+void
+raw_html(SV* self, SV *code)
+CODE:
+    hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, self);
+    renderer->raw_html = tmh_cb_raw_html;
+    hv_stores(renderer->opaque, "raw_html", newSVsv(code));
 
 void
 entity(SV* self, SV *code)

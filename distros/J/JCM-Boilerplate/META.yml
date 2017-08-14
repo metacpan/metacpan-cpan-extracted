@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,13 +16,14 @@ name: JCM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '1.013'
+    version: '1.014'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
   AnyEvent::Ping: '0.011'
   Bytes::Random::Secure: '0.29'
   CHI: '0.6'
+  CLDR::Number: '0.19'
   Carp: '1.38'
   Crypt::SmbHash: '0.12'
   Cwd: '3.60'
@@ -32,6 +33,7 @@ requires:
   DBI: '1.634'
   Data::Dumper: '2.154'
   Data::Printer: '0.36'
+  Data::Validate::IP: '0.26'
   DateTime: '1.21'
   DateTime::Format::DateParse: '0.05'
   Devel::Size: '0.80'
@@ -42,6 +44,7 @@ requires:
   Dist::Zilla::Plugin::MetaProvides::Package: '2.003001'
   Dist::Zilla::Plugin::OSPrereqs: '0.007'
   Dist::Zilla::Plugin::PodWeaver: '4.006'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.161170'
   EV: '4.22'
   Email::Valid: '1.198'
   English: '1.09'
@@ -55,6 +58,8 @@ requires:
   IO::Prompter: '0.004014'
   IO::Select: '1.22'
   Import::Into: '1.002005'
+  Inline: '0.80'
+  Inline::C: '0.76'
   List::Util: '1.42'
   Log::Log4perl: '1.47'
   MIME::Base64: '3.15'
@@ -70,10 +75,13 @@ requires:
   MooseX::StrictConstructor: '0.19'
   Net::DNS: '1.05'
   Net::LDAP: '0.65'
+  Net::XMPP: '1.05'
   NetAddr::IP: '4.078'
   PAR::Packer: '1.030'
   POSIX: '1.53'
   Parallel::WorkUnit: '1.009'
+  Perl6::Slurp: '0.051005'
+  Perl::Tags: '0.32'
   Privileges::Drop: '1.03'
   Proc::Daemon: '0.22'
   Readonly: '2.00'
@@ -89,6 +97,7 @@ requires:
   Test::Fork: '0.002'
   Test::More: '1.001014'
   Test::Strict: '0.36'
+  Time::HiRes: '1.9739'
   Try::Tiny: '0.24'
   UNIVERSAL: '1.12'
   YAML::Syck: '1.29'
@@ -99,4 +108,5 @@ requires:
   perl: v5.22.0
   strict: '0'
   warnings: '0'
-version: '1.013'
+version: '1.014'
+x_serialization_backend: 'YAML::Tiny version 1.69'

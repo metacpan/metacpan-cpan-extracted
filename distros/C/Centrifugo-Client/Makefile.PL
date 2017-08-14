@@ -10,16 +10,16 @@ WriteMakefile(
     ABSTRACT_FROM      => 'lib/Centrifugo/Client.pm',
     LICENSE            => 'MIT',
     PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.006,
+    MIN_PERL_VERSION   => 5.10.0,
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 0, },
     BUILD_REQUIRES     => { 
-		'Test::More' => 0,
-		'Digest::SHA' => 0,
-		},
+        'Test::More' => 0,
+        },
     PREREQ_PM          => {
-        'AnyEvent::WebSocket::Client'           => 0.12,
-        'JSON'     => 0,
-
+        'AnyEvent::WebSocket::Client' => 0.40,
+        'AnyEvent::HTTP' => 0,
+        'Digest::SHA' => 0,
+        'JSON' => 0,
     },
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean      => { FILES    => 'Centrifugo-*' },

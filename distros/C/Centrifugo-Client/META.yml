@@ -3,7 +3,6 @@ abstract: unknown
 author:
   - 'BenoÃ®t Chauvet <benoit.chauvet@gmail.com>'
 build_requires:
-  Digest::SHA: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -19,9 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  AnyEvent::WebSocket::Client: '0.12'
+  AnyEvent::HTTP: '0'
+  AnyEvent::WebSocket::Client: '0.4'
+  Digest::SHA: '0'
   JSON: '0'
-  perl: '5.006'
+  perl: '5.010000'
 resources:
   repository: https://github.com/Orabig/centrifugo-perl-client.git
-version: '1.03'
+version: '1.05'

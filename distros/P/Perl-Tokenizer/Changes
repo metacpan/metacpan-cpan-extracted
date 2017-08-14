@@ -1,5 +1,18 @@
 Revision history for Perl-Tokenizer
 
+0.06    2017-08-10
+
+        [CHANGES AND IMPROVEMENTS]
+
+        - Added more tests.
+        - Improved documentation.
+        - The only function `perl_tokens` is now exported by default.
+
+        [BUG-FIXES]
+
+        - Fixed the `assignment_operator` token to include only assignment operators.
+        - The assignment operator `=` is now parsed correctly as an `assignment_operator` instead of `operator`.
+
 0.05    2016-11-28
         - Added cache support for regular expressions that are dynamically generated.
         - Added more tests.

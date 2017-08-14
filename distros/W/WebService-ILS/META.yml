@@ -27,25 +27,25 @@ no_index:
 provides:
   WebService::ILS:
     file: lib/WebService/ILS.pm
-    version: '0.14'
+    version: '0.16'
   WebService::ILS::JSON:
     file: lib/WebService/ILS/JSON.pm
-  WebService::ILS::OneClickDigital:
-    file: lib/WebService/ILS/OneClickDigital.pm
-  WebService::ILS::OneClickDigital::Partner:
-    file: lib/WebService/ILS/OneClickDigital/Partner.pm
-  WebService::ILS::OneClickDigital::PartnerBase:
-    file: lib/WebService/ILS/OneClickDigital/PartnerBase.pm
-  WebService::ILS::OneClickDigital::PartnerPatron:
-    file: lib/WebService/ILS/OneClickDigital/PartnerPatron.pm
-  WebService::ILS::OneClickDigital::Patron:
-    file: lib/WebService/ILS/OneClickDigital/Patron.pm
   WebService::ILS::OverDrive:
     file: lib/WebService/ILS/OverDrive.pm
   WebService::ILS::OverDrive::Library:
     file: lib/WebService/ILS/OverDrive/Library.pm
   WebService::ILS::OverDrive::Patron:
     file: lib/WebService/ILS/OverDrive/Patron.pm
+  WebService::ILS::RecordedBooks:
+    file: lib/WebService/ILS/RecordedBooks.pm
+  WebService::ILS::RecordedBooks::Partner:
+    file: lib/WebService/ILS/RecordedBooks/Partner.pm
+  WebService::ILS::RecordedBooks::PartnerBase:
+    file: lib/WebService/ILS/RecordedBooks/PartnerBase.pm
+  WebService::ILS::RecordedBooks::PartnerPatron:
+    file: lib/WebService/ILS/RecordedBooks/PartnerPatron.pm
+  WebService::ILS::RecordedBooks::Patron:
+    file: lib/WebService/ILS/RecordedBooks/Patron.pm
   WebService::ILS::XML:
     file: lib/WebService/ILS/XML.pm
 recommends:
@@ -63,5 +63,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: git+ssh://git.catalyst.net.nz/git/private/webservice-ils.git
-version: '0.14'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

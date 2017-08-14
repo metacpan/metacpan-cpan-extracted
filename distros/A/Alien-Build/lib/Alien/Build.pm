@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.91'; # VERSION
+our $VERSION = '0.95'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -114,7 +114,6 @@ sub load
 
   unless(-r $alienfile)
   {
-    require Carp;
     Carp::croak "Unable to read alienfile: $alienfile";
   }
 
@@ -960,7 +959,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.91
+version 0.95
 
 =head1 SYNOPSIS
 

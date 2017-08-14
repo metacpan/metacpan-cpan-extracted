@@ -1,10 +1,38 @@
-DESCRIPTION
+NAME
+    App::errno - List/show errno
 
+VERSION
+    This document describes version 0.06 of App::errno (from Perl
+    distribution App-errno), released on 2017-08-10.
+
+DESCRIPTION
     This distribution includes a CLI script errno to list/show errno.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-errno>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-errnos>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-errno>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     errno
 
-    $! (a.k.a. $ERRNO a.k.a. $OS_ERROR) in perldata
+    $! (a.k.a. $ERRNO a.k.a. $OS_ERROR) in "perldata"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

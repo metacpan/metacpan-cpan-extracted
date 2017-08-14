@@ -2,13 +2,9 @@
 #
 #  Net::Server::PreFork - Net::Server personality
 #
-#  $Id$
+#  Copyright (C) 2001-2017
 #
-#  Copyright (C) 2001-2012
-#
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License
@@ -255,17 +251,20 @@ sub run_parent {
 
     @{ $prop }{qw(last_checked_for_dead last_checked_for_waiting last_checked_for_dequeue last_process last_kill)} = (time) x 5;
 
+    my $reaper = sub {
+        while ( defined( my $chld = waitpid( -1, WNOHANG ) ) ) {
+            last unless $chld > 0;
+            $self->{'reaped_children'}->{$chld} = $?
+                ; # We'll deal with this in coordinate_children to avoid a race
+        }
+    };
+
     register_sig(
         PIPE => 'IGNORE',
         INT  => sub { $self->server_close() },
         TERM => sub { $self->server_close() },
         HUP  => sub { $self->sig_hup() },
-        CHLD => sub {
-            while (defined(my $chld = waitpid(-1, WNOHANG))) {
-                last unless $chld > 0;
-                $self->{'reaped_children'}->{$chld} = 1; # We'll deal with this in coordinate_children to avoid a race
-            }
-        },
+        CHLD => $reaper,
         QUIT => sub { $self->{'server'}->{'kind_quit'} = 1; $self->server_close() },
         TTIN => sub { $self->{'server'}->{$_}++ for qw(min_servers max_servers); $self->log(3, "Increasing server count ($self->{'server'}->{'max_servers'})") },
         TTOU => sub { $self->{'server'}->{$_}-- for qw(min_servers max_servers); $self->log(3, "Decreasing server count ($self->{'server'}->{'max_servers'})") },
@@ -274,10 +273,7 @@ sub run_parent {
     $self->register_sig_pass;
 
     if ($ENV{'HUP_CHILDREN'}) {
-        while (defined(my $chld = waitpid(-1, WNOHANG))) {
-            last unless $chld > 0;
-            $self->{'reaped_children'}->{$chld} = 1;
-        }
+        $reaper->();
     }
 
     while (1) {
@@ -338,6 +334,8 @@ sub run_dequeue {
     $self->{'server'}->{'tally'}->{'dequeue'}++;
 }
 
+sub cleanup_dead_child_hook { return; }
+
 sub coordinate_children {
     my $self = shift;
     my $prop = $self->{'server'};
@@ -345,9 +343,9 @@ sub coordinate_children {
 
     # deleted SIG{'CHLD'} reaped children
     foreach my $pid (keys %{ $self->{'reaped_children'} }) {
-        delete $self->{'reaped_children'}->{$pid}; # delete each pid one by one to avoid another race
+        my $exit = delete $self->{'reaped_children'}->{$pid}; # delete each pid one by one to avoid another race
         next if ! $prop->{'children'}->{$pid};
-        $self->delete_child($pid);
+        $self->delete_child($pid, $exit);
     }
 
     # re-tally the possible types (only twice a minute)
@@ -406,7 +404,10 @@ sub coordinate_children {
     if ($time - $prop->{'last_checked_for_dead'} > $prop->{'check_for_dead'}) {
         $prop->{'last_checked_for_dead'} = $time;
         foreach my $pid (keys %{ $prop->{'children'} }) {
-            kill(0, $pid) || $self->delete_child($pid);
+            if( ! kill(0, $pid) ) {
+              $self->cleanup_dead_child_hook( $prop->{'children'}->{$pid} );
+              $self->delete_child($pid);
+            }
         }
     }
 
@@ -431,7 +432,7 @@ sub coordinate_children {
 
 ### delete_child and other modifications contributed by Rob Mueller
 sub delete_child {
-    my ($self, $pid) = @_;
+    my ($self, $pid, $exit) = @_;
     my $prop = $self->{'server'};
 
     my $child = $prop->{'children'}->{$pid};
@@ -441,6 +442,18 @@ sub delete_child {
     }
 
     return if ! exists $prop->{'children'}->{$pid}; # Already gone?
+
+    # This means there was some sort of abnormal exit for the child, like a
+    # segfault.
+    if ($exit) {
+        my $status  = $exit >> 8;
+        my $signal  = $exit & 127;
+        my $message = "Child process $pid exited with status $status";
+        $message .= " - signal was $signal"
+            if $signal;
+
+        $self->log(1, $message);
+    }
 
     my $status = $child->{'status'}    || $self->log(2, "No status for $pid when deleting child");
     --$prop->{'tally'}->{$status} >= 0 || $self->log(2, "Tally for $status < 0 deleting pid $pid");
@@ -512,7 +525,7 @@ You really should also see L<Net::Server::PreForkSimple>.
     serialize           (flock|semaphore
                          |pipe|none)            undef
     # serialize defaults to flock on multi_port or on Solaris
-    lock_file           "filename"              File::Temp::tempfile or POSIX::tmpnam
+    lock_file           "filename"              File::Temp->new
 
     check_for_dead      \d+                     30
     check_for_waiting   \d+                     10
@@ -659,6 +672,12 @@ This hook is called in every pass through the main process wait loop,
 every C<check_for_waiting> seconds.  The first argument is a reference
 to an array of file descriptors that can be read at the moment.
 
+=item C<$self-E<gt>cleanup_dead_child_hook( $child )>
+
+This hook is called when a dead child is detected.
+A child is considered dead when the pid does no longer exist.
+This hook could be used to cleanup possible temporary files
+or locks left over by a dead child.
 =back
 
 =head1 HOT DEPLOY

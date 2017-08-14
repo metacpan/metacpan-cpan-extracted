@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Transaction;
-$WebService::Braintree::ErrorCodes::Transaction::VERSION = '0.91';
+$WebService::Braintree::ErrorCodes::Transaction::VERSION = '0.92';
 use strict;
 
 use constant AmountCannotBeNegative                            => "81501";

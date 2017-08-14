@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use LWP::UserAgent ();
 use Prty::Option;
 use Prty::Confluence::Markup;
 use JSON ();
 use Prty::Confluence::Page;
+use HTTP::Request::Common ();
 
 # -----------------------------------------------------------------------------
 
@@ -443,6 +444,54 @@ sub updatePage {
 
 # -----------------------------------------------------------------------------
 
+=head3 createAttachment() - Füge Attachment zu Confluence-Seite hinzu
+
+=head4 Synopsis
+
+    $pag = $cli->createAttachment($parentId,$file);
+
+=head4 Description
+
+Füge Datei $file als Attachment zur Confluence-Seite mit der
+Seiten-Id $pageId hinzu.
+
+=head4 Arguments
+
+=over 4
+
+=item parentId => $pageId
+
+Die Page-Id der übergeordneten Seite.
+
+=item $file
+
+Pfad zur Attchment-Datei.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createAttachment {
+    my ($self,$parentId,$path) = @_;
+
+    $self->send(
+        POST => "rest/api/content/$parentId/child/attachment",
+        'form-data',[
+            file => [$path],
+        ],
+    );
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Hilfsmethoden
 
 Die folgenden Methoden bilden die Grundlage für die Kommunikation
@@ -504,15 +553,30 @@ sub send {
     my ($ua,$user,$password,$verbose) =
         $self->get(qw/ua user password verbose/);
 
-    my $req = HTTP::Request->new(
-        $method => $self->url($path),
-    );
-    $req->authorization_basic($user,$password);
-    if ($contentType) {
-        $req->header('Content-Type' => "$contentType; charset=utf-8");
-        # $req->header('Content-Type' => $contentType);
-        $req->content($content) ;
+    my $req;
+    if ($method eq 'POST' && $contentType eq 'form-data') {
+        # Attachments. Bei dieser POST-Funktion kann $content
+        # eine Array-Referenz mit mehreren Inhalten sein, die
+        # per multipart/form-data gepostet werden.
+
+        $req = HTTP::Request::Common::POST(
+            $self->url($path),
+            'X-Atlassian-Token' => 'nocheck',
+            Content_Type => $contentType,
+            Content => $content,
+        );
     }
+    else {
+        $req = HTTP::Request->new(
+            $method => $self->url($path),
+        );
+        if ($contentType) {
+            $req->header('Content-Type' => "$contentType; charset=utf-8");
+            $req->content($content) ;
+        }
+    }
+    $req->authorization_basic($user,$password);
+
     if ($verbose) {
         warn sprintf "---REQUEST---\n%s",$req->as_string;
     }
@@ -595,7 +659,7 @@ sub url {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

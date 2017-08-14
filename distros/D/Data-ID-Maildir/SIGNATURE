@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,21 +15,20 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 789f443d1a313476ca9bc457b33f9cf4cef5332d .gitignore
-SHA1 36a9669fef6f53debbd9bb382d51a91d3e68b11a Build.PL
-SHA1 f56f48ec2b45671e58dd43a9e17ba5087ba560dc Changes
-SHA1 8e0afae2bb5d91ad039855574a0cee6967333219 MANIFEST
-SHA1 f7ae9ba1695675c2b60fc9a270a9682862bd0edf META.json
-SHA1 eaa014b2ea00c177126193581bc0d4460315ba7e META.yml
-SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
-SHA1 f1b4b6f4cf91abc3c3b7e09348bcf997e97fd75a README
-SHA1 e1a2c7b5578f80fcad505df12c2c14f094df1ba1 lib/Data/ID/Maildir.pm
+SHA1 ce4c9e3c3e104d64b5a36a1435bdaba2e3fe813e Build.PL
+SHA1 1ca6341a0b334d57d1e5a27db87b8ab0e8d2605a Changes
+SHA1 baab1322ac654fea7bb45d5da5ea14b552b3cb22 MANIFEST
+SHA1 7859b55a3cd0edf1f8e1a62bd04ac716f0babc07 META.json
+SHA1 5108171e959932f6ccf76e61f271825ccd8f446e META.yml
+SHA1 bdb506aa6d1f0a43496e5bf98a428f95e43724fe README
+SHA1 0298a12086915e0bff1ce8499b3c06971656acbd lib/Data/ID/Maildir.pm
 SHA1 80f15b0b5c1e8be8eb8d200d994559fedeec699e t/id.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk7H6FcACgkQOV9mt2VyAVHQiQCgqUy4P9BHWQ+bYSJUrk/Yu7NG
-cLYAn1RYzowoD2+RnlPv3LM69SKuMvhA
-=LMbm
+iEYEARECAAYFAlmMjowACgkQOV9mt2VyAVG8bgCgkjDRCfjeRajnLabdQIqpGi75
+HbkAn1eprEc9VJyEOOSzmSk9nuuj0byp
+=LJn8
 -----END PGP SIGNATURE-----

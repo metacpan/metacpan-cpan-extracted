@@ -1,0 +1,33 @@
+---
+abstract: 'Make plugin for Alien::Build'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Path::Tiny: '0'
+  Test2::V0: '0.000060'
+  Test::Alien::Build: '0'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Build-Plugin-Build-Make
+requires:
+  Alien::Build: '0.95'
+  Alien::Build::Plugin: '0'
+  Capture::Tiny: '0'
+  Carp: '0'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Alien-Build-Plugin-Build-Make/issues
+  homepage: https://metacpan.org/pod/Alien::Build::Plugin::Build::Make
+  repository: git://github.com/plicease/Alien-Build-Plugin-Build-Make.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

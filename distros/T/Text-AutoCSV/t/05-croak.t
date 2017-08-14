@@ -180,16 +180,16 @@ local $SIG{__WARN__} = sub { $warning_count++; };
 
 my $csv = Text::AutoCSV->new(in_file => "t/${ww}e1.csv", sep_char => ',');
 my $pc = $csv->get_pass_count();
-is($pc, 2, "PA01 - t/e1.csv: check pass_count before reading");
+is($pc, 3, "PA01 - t/e1.csv: check pass_count before reading");
 is($warning_count, 0, "PA02             check warning count");
 $pc = $csv->read()->get_pass_count();
-is($pc, 3, "PA03 - t/e1.csv: check pass_count after one complete reading");
+is($pc, 4, "PA03 - t/e1.csv: check pass_count after one complete reading");
 is($warning_count, 0, "PA04             check warning count");
 $pc = $csv->read()->get_pass_count();
-is($pc, 4, "PA05 - t/e1.csv: check pass_count after one more complete reading");
+is($pc, 5, "PA05 - t/e1.csv: check pass_count after one more complete reading");
 is($warning_count, 0, "PA06             check warning count");
 $pc = $csv->_read_all_in_mem()->read()->get_pass_count();
-is($pc, 6, "PA07 - t/e1.csv: check pass_count after one more (again) complete reading");
+is($pc, 7, "PA07 - t/e1.csv: check pass_count after one more (again) complete reading");
 is($warning_count, 1, "PA08             check warning count");
 
 delete $SIG{__WARN__};
@@ -199,24 +199,24 @@ my $tmpf = &get_non_existent_temp_file_name();
 $csv = Text::AutoCSV->new(in_file => "t/${ww}e1.csv", sep_char => ',', out_file => $tmpf,
 	quiet => 1)->write();
 $pc = $csv->get_pass_count();
-is($pc, 3, "PA09 - t/e1.csv: check pass_count after write");
+is($pc, 4, "PA09 - t/e1.csv: check pass_count after write");
 $pc = $csv->read()->get_pass_count();
-is($pc, 4, "PA10 - t/e1.csv: check pass_count after write+read");
+is($pc, 5, "PA10 - t/e1.csv: check pass_count after write+read");
 $pc = $csv->write()->write()->write()->get_pass_count();
-is($pc, 7, "PA11 - t/e1.csv: check pass_count after write+read then 3 write");
+is($pc, 8, "PA11 - t/e1.csv: check pass_count after write+read then 3 write");
 $pc = $csv->read()->_read_all_in_mem()->read()->get_pass_count();
-is($pc, 10, "PA12 - t/e1.csv: check pass_count after above + 3 more read");
+is($pc, 11, "PA12 - t/e1.csv: check pass_count after above + 3 more read");
 
 $csv = Text::AutoCSV->new(in_file => "t/${ww}e1.csv", sep_char => ',', out_file => $tmpf,
 	quiet => 1)->_read_all_in_mem()->write();
 $pc = $csv->get_pass_count();
-is($pc, 3, "PA13 - t/e1.csv: check pass_count after readall+write");
+is($pc, 4, "PA13 - t/e1.csv: check pass_count after readall+write");
 $pc = $csv->write()->get_pass_count();
-is($pc, 3, "PA14 - t/e1.csv: check pass_count after readall+write+write");
+is($pc, 4, "PA14 - t/e1.csv: check pass_count after readall+write+write");
 $pc = $csv->write()->write()->write()->get_pass_count();
-is($pc, 3, "PA15 - t/e1.csv: check pass_count after above + 3 write");
+is($pc, 4, "PA15 - t/e1.csv: check pass_count after above + 3 write");
 $pc = $csv->read()->_read_all_in_mem()->write()->write()->write()->get_pass_count();
-is($pc, 5, "PA16 - t/e1.csv: check pass_count after above + several r/w");
+is($pc, 6, "PA16 - t/e1.csv: check pass_count after above + several r/w");
 
 unlink $tmpf;
 

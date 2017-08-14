@@ -14,7 +14,7 @@ MarpaX::ESLIF::Grammar - MarpaX::ESLIF's grammar
 
 =head1 VERSION
 
-version 2.0.14
+version 2.0.15
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ Encoding will always be guessed if not given.
 
   printf "Number of sub-grammars: %d\n", $eslifGrammar->ngrammar;
 
-Return the number of sub-grammars.
+Returns the number of sub-grammars.
 
 A grammar can have multiple I<sub-grammars>, identified by a level. Internally this is a I<sparse> array of grammars, and it is legal that a level is not defined.
 
@@ -105,25 +105,25 @@ A grammar can have multiple I<sub-grammars>, identified by a level. Internally t
 
   printf "Current indice: %d\n", $eslifGrammar->currentLevel;
 
-Return the current level, which is always the first indice that have a defined sub-grammar.
+Returns the current level, which is always the first indice that have a defined sub-grammar.
 
 =head2 $eslifGrammar->currentDescription()
 
   printf "Current description: %s\n", $eslifGrammar->currentDescription;
 
-Return the description of the current level, with the same encoding as found in the grammar. This correspong to the C<:desc> meta-symbol in a grammar.
+Returns the description of the current level, with the same encoding as found in the grammar. This correspong to the C<:desc> meta-symbol in a grammar.
 
 =head2 $eslifGrammar->descriptionByLevel($level)
 
   printf "Level 1 description: %s\n", $eslifGrammar->descriptionByLevel(1);
 
-Return the description of the grammar at indice C<$level>, with the same encoding as found in the grammar.
+Returns the description of the grammar at indice C<$level>, with the same encoding as found in the grammar.
 
 =head2 $eslifGrammar->currentRuleIds
 
   printf "Current Rule Ids: %s\n", join(' ', @{$eslifGrammar->currentRuleIds});
 
-Return the list of rule identifiers of the current grammar, as a reference to an array of integers.
+Returns the list of rule identifiers of the current grammar, as a reference to an array of integers.
 
 I<Rule identifiers are integers that uniquely identify a rule>.
 
@@ -131,43 +131,103 @@ I<Rule identifiers are integers that uniquely identify a rule>.
 
   printf "Level 1 Rule Ids: %s\n", join(' ', @{$eslifGrammar->ruleIdsByLevel(1)});
 
-Return the list of rule identifiers at indice C<$level>, as a reference to an array of integers.
+Returns the list of rule identifiers at indice C<$level>, as a reference to an array of integers.
+
+=head2 $eslifGrammar->currentSymbolIds
+
+  printf "Current Symbol Ids: %s\n", join(' ', @{$eslifGrammar->currentSymbolIds});
+
+Returns the list of symbol identifiers at current level, as a reference to an array of integers.
+
+=head2 $eslifGrammar->symbolIdsByLevel($level)
+
+  printf "Level 1 Symbol Ids: %s\n", join(' ', @{$eslifGrammar->symbolIdsByLevel(1)});
+
+Returns the list of symbol identifiers at indice C<$level>, as a reference to an array of integers.
+
+=head2 $eslifGrammar->currentProperties
+
+  use Data::Dumper; printf "Current Properties: %s\n", Dumper($eslifGrammar->currentProperties);
+
+Returns the current grammar properties as an instance of <MarpaX::ESLIF::Grammar::Properties>.
+
+=head2 $eslifGrammar->propertiesByLevel($level)
+
+  use Data::Dumper; printf "Properties at level %d: %s\n", $level, Dumper($eslifGrammar->propertiesByLevel($level));
+
+Returns the grammar properties at level C<$level> as an instance of <MarpaX::ESLIF::Grammar::Properties>.
+
+=head2 $eslifGrammar->currentRuleProperties($ruleId)
+
+  use Data::Dumper; printf "Current Rule Properties: %s\n", Dumper($eslifGrammar->currentRuleProperties($ruleId));
+
+Returns the rule number C<$ruleId> properties as an instance of C<MarpaX::ESLIF::Grammar::Rule::Properties>.
+
+=head2 $eslifGrammar->rulePropertiesByLevel($level, $ruleId)
+
+  use Data::Dumper; printf "Rule Properties at level %d: %s\n", $level, Dumper($eslifGrammar->currentRuleProperties($ruleId));
+
+Returns the rule number C<$ruleId> properties at grammar level C<$level> as an instance of C<MarpaX::ESLIF::Grammar::Rule::Properties>.
+
+=head2 $eslifGrammar->currentSymbolProperties($symbolId)
+
+  use Data::Dumper; printf "Current Symbol Properties: %s\n", Dumper($eslifGrammar->currentSymbolProperties($symbolId));
+
+Returns the symbol number C<$symbolId> properties as an instance of C<MarpaX::ESLIF::Grammar::Symbol::Properties>.
+
+=head2 $eslifGrammar->symbolPropertiesByLevel($level, $symbolId)
+
+  use Data::Dumper; printf "Symbol Properties at level %d: %s\n", $level, Dumper($eslifGrammar->currentSymbolProperties($symbolId));
+
+Returns the symbol number C<$symbolId> properties at grammar level C<$level> as an instance of C<MarpaX::ESLIF::Grammar::Symbol::Properties>.
 
 =head2 $eslifGrammar->ruleDisplay($ruleId)
 
-  printf "Rules names:\n\t%s\n", join("\n\t", map { $eslifGrammar->ruleDisplay($_) } @{$eslifGrammar->currentRuleIds});
+  printf "Rules display:\n\t%s\n", join("\n\t", map { $eslifGrammar->ruleDisplay($_) } @{$eslifGrammar->currentRuleIds});
 
-Return the name of a rule identified by its rule ID C<$ruleId>.
+Returns the name of a rule identified by its rule ID C<$ruleId>.
+
+=head2 $eslifGrammar->symbolDisplay($symbolId)
+
+  printf "Symbols display:\n\t%s\n", join("\n\t", map { $eslifGrammar->symbolDisplay($_) } @{$eslifGrammar->currentSymbolIds});
+
+Returns the name of a rule identified by its rule ID C<$ruleId>.
 
 =head2 $eslifGrammar->ruleShow($ruleId)
 
   printf "Rules shows:\n\t%s\n", join("\n\t", map { $eslifGrammar->ruleShow($_) } @{$eslifGrammar->currentRuleIds});
 
-Return the description of a rule identified by its rule ID C<$ruleId>.
+Returns the description of a rule identified by its rule ID C<$ruleId>.
 
 =head2 $eslifGrammar->ruleDisplayByLevel($level, $ruleId)
 
-  printf "Level 1 Rule names 1:\n\t%s\n", join("\n\t", map { $eslifGrammar->ruleDisplayByLevel(1, $_) } @{$eslifGrammar->ruleIdsByLevel(1)});
+  printf "Level 1 Rule display:\n\t%s\n", join("\n\t", map { $eslifGrammar->ruleDisplayByLevel(1, $_) } @{$eslifGrammar->ruleIdsByLevel(1)});
 
-Return the name of a rule at a specificed indice C<$level> identified by its rule ID C<$ruleId>. This correspond to the C<name> adverb, if present, else a default naming applies.
+Returns the name of a rule at a specificed indice C<$level> identified by its rule ID C<$ruleId>. This correspond to the C<name> adverb, if present, else a default naming applies.
+
+=head2 $eslifGrammar->symbolDisplayByLevel($level, $symbolId)
+
+  printf "Level 1 Symbol display:\n\t%s\n", join("\n\t", map { $eslifGrammar->symbolDisplayByLevel(1, $_) } @{$eslifGrammar->symbolIdsByLevel(1)});
+
+Returns the name of a symbol at a specificed indice C<$level> identified by its symbol ID C<$symbolId>. This correspond to the C<name> adverb, if present, else a default naming applies.
 
 =head2 $eslifGrammar->ruleShowByLevel($level, $ruleId)
 
   printf "Level 1 Rules shows:\n\t%s\n", join("\n\t", map { $eslifGrammar->ruleShowByLevel(1, $_) } @{$eslifGrammar->ruleIdsByLevel(1)});
 
-Return the description of a rule at a specified indice C<$level>, identified by its rule ID C<$ruleId>.
+Returns the description of a rule at a specified indice C<$level>, identified by its rule ID C<$ruleId>.
 
 =head2 $eslifGrammar->show()
 
   printf "Description of current grammar: %s\n", $eslifGrammar->show();
 
-Return the description of current grammar.
+Returns the description of current grammar.
 
 =head2 $eslifGrammar->showByLevel($level)
 
   printf "Level 1 grammar description: %s\n", $eslifGrammar->showByLevel(1);
 
-Return the description of the grammar at indice C<$level>.
+Returns the description of the grammar at indice C<$level>.
 
 =head2 $eslifGrammar->parse($recognizerInterface, $valueInterface)
 
@@ -183,7 +243,7 @@ Please refer to L<MarpaX::ESLIF::Recognizer::Interface> and L<MarpaX::ESLIF::Val
 
 =head1 SEE ALSO
 
-L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Value::Interface>
+L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Value::Interface>, L<MarpaX::ESLIF::Grammar::Properties>, L<MarpaX::ESLIF::Grammar::Rule::Properties>, L<MarpaX::ESLIF::Grammar::Symbol::Properties>
 
 =head1 AUTHOR
 

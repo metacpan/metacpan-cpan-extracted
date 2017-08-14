@@ -29,16 +29,13 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 plan tests => 92;
 
 require Graph::Maker::Beineke;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Maker::Beineke::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Beineke->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Beineke->VERSION($want_version); 1 }, 1,

@@ -8,7 +8,7 @@
 #
 
 #
-# Test script for Text::AutoCSV: hash locks
+# Test script for Text::AutoCSV: inputs without a header line
 #
 
 use strict;

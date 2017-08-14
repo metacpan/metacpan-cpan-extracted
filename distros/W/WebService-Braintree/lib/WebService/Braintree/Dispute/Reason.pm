@@ -1,5 +1,5 @@
 package WebService::Braintree::Dispute::Reason;
-$WebService::Braintree::Dispute::Reason::VERSION = '0.91';
+$WebService::Braintree::Dispute::Reason::VERSION = '0.92';
 use strict;
 
 use constant CancelledRecurringTransaction => "cancelled_recurring_transaction";

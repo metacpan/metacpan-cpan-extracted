@@ -1,0 +1,116 @@
+#!perl
+
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+);
+
+sub parse_cmdline {
+    GetOptions(
+        'help|h|?' => sub {
+            no warnings 'once';
+            print "Usage:\n";
+            print "  diff ... | diffwc-filter-u [OPTS]\n\n";
+            print "  diffwc-filter-u --help (or -h, -?)\n";
+            print "  diffwc-filter-u --version (or -v)\n";
+            print "\n";
+            print "For more details, see the documentation.\n";
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            print "diffwc-filter-u version ", $main::VERSION || 'dev', "\n";
+            exit 0;
+        },
+    );
+}
+
+sub run {
+    require App::diffwc;
+
+    App::diffwc::postprocess(\*STDIN);
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: diff + /w/ord highlighting + /c/olor (filter)
+# PODNAME: diffwc-filter-u
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+diffwc-filter-u - diff + /w/ord highlighting + /c/olor (filter)
+
+=head1 VERSION
+
+This document describes version 0.002 of diffwc-filter-u (from Perl distribution App-diffwc), released on 2017-08-12.
+
+=head1 SYNOPSIS
+
+ % diff ... | diffwc-filter-u
+ % git diff ... | diffwc-filter-u
+
+ % diffwc-filter-u --help (or -h, -?)
+
+ % diffwc-filter-u --version (or -v)
+
+To install as git pager:
+
+ % git config --global pager.diff diffwc-filter-u
+ % git config --global pager.diff diffwc-filter-u
+
+=head1 DESCRIPTION
+
+This utility accepts output of diff (-u or unified format only) and adds word
+highlighting and colors to it.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-diffwc>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-diffwc>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffwc>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<https://github.com/walles/riff>, a similar Ruby-based utility from which this
+utility is inspired by.
+
+L<diffwc> from the same package, in the form of B<diff> wrapper.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

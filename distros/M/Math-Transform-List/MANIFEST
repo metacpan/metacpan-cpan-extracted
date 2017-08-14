@@ -1,10 +1,8 @@
-lib/Math/Transform/List.pm
 Build.PL
-MANIFEST
-META.yml
-README
-CHANGES
+lib/Math/Transform/List.pm
+MANIFEST			This list of files
 t/even.t
 t/symmetric.t
 t/test.t
+META.yml
 META.json

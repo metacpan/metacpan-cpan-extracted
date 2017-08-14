@@ -3,7 +3,7 @@ package Prty::Stacktrace;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 # -----------------------------------------------------------------------------
 
@@ -189,7 +189,7 @@ sub asString {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

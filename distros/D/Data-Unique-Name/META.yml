@@ -15,9 +15,10 @@ name: Data-Unique-Name
 provides:
   Data::Unique::Name:
     file: lib/Data/Unique/Name.pm
-    version: '2017.324'
+    version: '20170810'
 requires:
   Carp: '0'
+  Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2017.324'
+version: '20170810'

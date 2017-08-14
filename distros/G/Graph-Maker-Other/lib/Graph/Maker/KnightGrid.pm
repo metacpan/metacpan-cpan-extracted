@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -220,6 +220,18 @@ dimensions
 
 =for GP-Test  vector(6,D, max_degree(D)) == 8*[0,1,3,6,10,15]
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for graphs here include
+
+=over
+
+=item 3x3, cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6607> (Paley 9)
+
+=item 3x4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21067>
+
+=back
+
 =head1 OEIS
 
 A few of the entries in Sloane's Online Encyclopedia of Integer Sequences
@@ -232,9 +244,10 @@ L<http://oeis.org/A035008> (etc)
 =back
 
     A033996    max vertex degree in a D dimensional grid
-
-    A035008    number of edges in an NxN grid
-    A180413    number of edges in an NxNxN grid
+    A035008    number of edges in NxN grid
+    A180413    number of edges in NxNxN grid
+    A006075    domination number of NxN
+    A006076,A103315  count of ways domination number attained
 
 =head1 SEE ALSO
 

@@ -33,7 +33,7 @@
    "provides" : {
       "Data::Edit::Xml::SDL" : {
          "file" : "lib/Data/Edit/Xml/SDL.pm",
-         "version" : "20170801"
+         "version" : "20170809"
       }
    },
    "release_status" : "stable",
@@ -42,5 +42,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170801"
+   "version" : "20170809"
 }

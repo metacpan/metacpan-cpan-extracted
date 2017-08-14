@@ -1,23 +1,22 @@
 package MarpaX::Languages::SVG::Parser;
 
 use strict;
-use utf8;
 use warnings;
-use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
-use File::Slurp; # For read_file().
+use Encode; # For decode() and encode().
 
 use Log::Handler;
 
-use MarpaX::Languages::SVG::Parser::SAXHandler;
+use MarpaX::Languages::SVG::Parser::XMLHandler;
 
 use Moo;
 
-use Text::CSV::Encoded;
+use Path::Tiny; # For path().
+
+use Text::CSV;
 
 use Types::Standard qw/Any Int Str/;
-
-use XML::SAX::ParserFactory;
 
 has attribute =>
 (
@@ -25,14 +24,6 @@ has attribute =>
 	is       => 'rw',
 	isa      => Str,
 	required => 0,
-);
-
-has encoding =>
-(
-	default  => sub{return ''},
-	is       => 'rw',
-	isa      => Str,
-	required => 1,
 );
 
 has input_file_name =>
@@ -91,7 +82,7 @@ has output_file_name =>
 	required => 0,
 );
 
-our $VERSION = '1.06';
+our $VERSION = '1.09';
 
 # ------------------------------------------------
 
@@ -117,17 +108,6 @@ sub BUILD
 	$self -> log(debug => 'Input file: ' . $self -> input_file_name);
 
 } # End of BUILD.
-
-# --------------------------------------------------
-
-sub get_encoding
-{
-	my($self, %args) = @_;
-	my($encoding)    = $args{encoding} || $self -> encoding;
-
-	return $encoding ? ":encoding($encoding)" : '';
-
-} # End of get_encoding.
 
 # --------------------------------------------------
 
@@ -169,7 +149,7 @@ sub report
 
 	for my $item ($self -> items -> print)
 	{
-		$self -> log(info => sprintf($format, $$item{count}, $$item{type}, $$item{name}, $$item{value}) );
+		$self -> log(info => sprintf($format, $$item{count}, $$item{type}, $$item{name}, decode('utf-8', $$item{value}) ) );
 	}
 
 } # End of report.
@@ -179,11 +159,12 @@ sub report
 sub run
 {
 	my($self, %args) = @_;
-	my($handler)  = MarpaX::Languages::SVG::Parser::SAXHandler -> new(logger => $self -> logger);
-	my($parser)	  = XML::SAX::ParserFactory -> parser(Handler => $handler);
-	my $xml       = read_file($self -> input_file_name, binmode => $self -> get_encoding(%args) );
+	my($handler) = MarpaX::Languages::SVG::Parser::XMLHandler -> new
+	(
+		logger          => $self -> logger,
+		input_file_name => $self -> input_file_name,
+	);
 
-	$parser -> parse_string($xml);
 	$self -> items -> push(@{$handler -> items -> print});
 	$self -> save;
 	$self -> report;
@@ -203,18 +184,18 @@ sub save
 
 	if ($output_file_name)
 	{
-		my($csv) = Text::CSV::Encoded -> new({eol => $/});
+		my($csv) = Text::CSV -> new({binary => 1, eol => $/});
 
-		open(my $out, '>', $output_file_name) || die "Can't open(> $output_file_name): $!";
+		open(my $fh, '>', $output_file_name);
 
-		$csv -> print($out, ['Count', 'Type', 'Name', 'Value']);
+		$csv -> print($fh, ['Count', 'Type', 'Name', 'Value']);
 
 		for my $item ($self -> items -> print)
 		{
-			$csv -> print($out, [$$item{count}, $$item{type}, $$item{name}, $$item{value}]);
+			$csv -> print($fh, [$$item{count}, $$item{type}, $$item{name}, decode('utf-8', $$item{value})]);
 		}
 
-		close($out);
+		close $fh;
 
 		$self -> log(debug => "Wrote $output_file_name");
 	}
@@ -229,13 +210,11 @@ sub test
 
 	# Remove comment lines.
 
-	my(@data)    = grep{! /#/} read_file($self -> input_file_name, binmode => $self -> get_encoding(%args) );
-	my($handler) = MarpaX::Languages::SVG::Parser::SAXHandler -> new(logger => $self -> logger);
-
-	# The start_document() call emulates XML input, in order to partially initialize to action class.
-	# I say partially because the other part takes place in the handler's method init_marpa().
-
-	$handler -> start_document;
+	my(@data)    = grep{! /^#/} path($self -> input_file_name) -> lines_utf8;
+	my($handler) = MarpaX::Languages::SVG::Parser::XMLHandler -> new
+	(
+		logger => $self -> logger,
+	);
 	$handler -> run_marpa($self -> attribute, join('', @data) );
 	$self -> items -> push(@{$handler -> items -> print});
 	$self -> report;
@@ -337,26 +316,9 @@ C<new()> is called as C<< my($parser) = MarpaX::Languages::SVG::Parser -> new(k1
 It returns a new object of type C<MarpaX::Languages::SVG::Parser>.
 
 Key-value pairs accepted in the parameter list (see also the corresponding methods
-[e.g. L</encoding([$encoding])>]):
+[e.g. L</input_file_name([$string])>]):
 
 =over 4
-
-=item o encoding => $string
-
-$string takes values such as 'utf-8', and the code converts this into '<:encoding(utf-8)'.
-
-L<File::Slurp>'s C<read_file()> is used to read the SVG file specified by the I<input_file_name> option.
-
-C<read_file()'s> C<binmode> option can be used to set the encoding used with this option.
-However, that will rarely be necessary.
-
-See data/ellipse.01.svg and data/utf8.01.svg for sample data. They are both processed by scripts/parse.file.pl
-without needing to change the default encoding (which is the empty string).
-
-	shell> perl -Ilib scripts/parse.file.pl -i data/ellipse.01.svg
-	shell> perl -Ilib scripts/parse.file.pl -i data/utf8.01.svg
-
-Default: ''.
 
 =item o input_file_name => $string
 
@@ -417,9 +379,6 @@ Note: This name is only used when calling L</run(%args)>. It is of course ignore
 
 If not set, nothing is written.
 
-The C<encoding> option is not used if you choose to create a CSV file with the C<output_file_name> option,
-because L<Text::CSV::Encoded> C<just works>.
-
 See data/circle.01.csv and data/utf8.01.csv, which were created by running:
 
 	shell> perl -Ilib scripts/parse.file.pl -i data/circle.01.svg -o data/circle.01.csv
@@ -441,48 +400,6 @@ It is needed because the test files, data/*.dat, do not contain tag/attribute na
 to be told explicitly which attribute it is parsing.
 
 Note: C<attribute> is a parameter to new().
-
-=head2 encoding([$encoding])
-
-Here, the [] indicate an optional parameter.
-
-Get or set the encoding to be used by L<File::Slurp's> C<binmode> option.
-
-See L</get_encoding(%args)>.
-
-Note: C<encoding> is a parameter to new().
-
-=head2 get_encoding(%args)
-
-Allows L</run(%args)> and L</test(%args)> to accept the encoding in various ways.
-
-C<%args> is a hash with this optional (key => value) pair:
-
-=over 4
-
-=item o encoding => $x
-
-If not specified, it falls back to calling $self -> encoding().
-
-=back
-
-So, the parser object can be set up via any of these:
-
-=over 4
-
-=item o new(encoding => $x)
-
-=item o new() and $obj -> encoding($x)
-
-=item o run(encoding => $x)
-
-=item o test(encoding => $x)
-
-=back
-
-Used internally.
-
-See L</encoding([$encoding])>.
 
 =head2 input_file_name([$string])
 
@@ -578,15 +495,7 @@ Prints a nicely-formatted report of the C<items> array via the logger.
 
 The method which does all the work.
 
-C<%args> is a hash with this optional (key => value) pair:
-
-=over 4
-
-=item o encoding => $x
-
-If not specified, it falls back to calling $self -> encoding().
-
-=back
+C<%args> is a hash which is currently not used.
 
 Returns 0 for a successful parse and 1 for failure.
 
@@ -603,15 +512,7 @@ or to L</output_file_name([$string])>.
 
 This method is used by scripts/test.fileset.pl, since that calls scripts/test.file.pl, to run tests.
 
-C<%args> is a hash with this optional (key => value) pair:
-
-=over 4
-
-=item o encoding => $x
-
-If not specified, it falls back to calling $self -> encoding().
-
-=back
+C<%args> is a hash which is currently not used.
 
 Returns 0 for a successful parse and 1 for failure.
 
@@ -1229,8 +1130,7 @@ by the opening of that tag. This adds yet more complexity.
 
 =head2 How are file encodings handled?
 
-See L</Constructor and Initialization> for a discussion of setting the encoding for the input file.
-Normally this is not necessary. Both iso-8859-1 and utf-8 encoded test files  C<just work>.
+I let L<File::Slurper> choose the encoding.
 
 For output, scripts/parse.file.pl uses the pragma:
 

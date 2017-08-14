@@ -16,7 +16,7 @@ lib/Alien/Build/Git.pm
 lib/Alien/Build/Plugin/Download/Git.pm
 lib/Alien/Build/Plugin/Fetch/Git.pm
 lib/Alien/git.pm
-maint/travis-install-alienbuild
+maint/travis-install-mods
 maint/update-corpus.pl
 t/00_diag.t
 t/01_use.t

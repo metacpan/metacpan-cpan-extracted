@@ -5,7 +5,11 @@
 #-------------------------------------------------------------------------------
 
 package UnicodeOperators;
+require v5.16.0;
+use warnings FATAL => qw(all);
+use strict;
 use Filter::Util::Call;
+our $VERSION = '20170808';                                                      # Started: Monday 19 September 2016
 
 sub import
  {my ($type) = @_;
@@ -24,7 +28,6 @@ sub filter
   $status
  }
 
-$VERSION = '1.002'; # Monday 19 September 2016
 
 1;
 
@@ -69,3 +72,16 @@ This module is free software. It may be used, redistributed and/or
 modified under the same terms as Perl itself.
 
 =cut
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;

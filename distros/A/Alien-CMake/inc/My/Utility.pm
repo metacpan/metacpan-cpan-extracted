@@ -19,28 +19,28 @@ our $cc = $Config{cc};
 
 my $prebuilt_binaries = [
     {
-      title    => "Binaries Win/32bit CMake-3.3.0",
-      url      => 'http://www.cmake.org/files/v3.3/cmake-3.3.0-win32-x86.zip',
-      version  => '3.3.0',
-      sha1sum  => '8e6493601704bf34bfda4f5796d2362bc0091bcc',
-      arch_re  => qr/^MSWin32-x(86|64)-multi-thread(-64int)?$/,
-      os_re    => qr/^MSWin32$/
+      title     => "Binaries Win/32bit CMake-3.9.1",
+      url       => 'https://cmake.org/files/v3.9/cmake-3.9.1-win32-x86.zip',
+      version   => '3.9.1',
+      sha256sum => 'e0d9501bd34e3100e925dcb2e07f5f0ce8980bdbe5fce0ae950b21368d54c1a1',
+      arch_re   => qr/^MSWin32-x(86|64)-multi-thread(-64int)?$/,
+      os_re     => qr/^MSWin32$/
     },
     {
-      title    => "Binaries Linux/x86_64 CMake-3.3.0",
-      url      => 'http://cmake.org/files/v3.3/cmake-3.3.0-Linux-x86_64.tar.gz',
-      version  => '3.3.0',
-      sha1sum  => '46efa5e3921c1956477121e1531e023292325c31',
-      arch_re  => qr/^x86_64-/,
-      os_re    => qr/^linux$/
+      title     => "Binaries Linux/x86_64 CMake-3.9.1",
+      url       => 'https://cmake.org/files/v3.9/cmake-3.9.1-Linux-x86_64.tar.gz',
+      version   => '3.9.1',
+      sha256sum => 'ecbaf72981ccd09d9dade6d580cf1213eef15ef95a675dd9d4f0d693f134644f',
+      arch_re   => qr/^x86_64-/,
+      os_re     => qr/^linux$/
     },
     {
-      title    => "Binaries Linux/i386 CMake-3.3.0",
-      url      => 'http://www.cmake.org/files/v3.3/cmake-3.3.0-Linux-i386.tar.gz',
-      version  => '3.3.0',
-      sha1sum  => '0fff21ec9b62b54c206c63b141b568983cb07ea4',
-      arch_re  => qr/(86.*linux|linux.*86)/,
-      os_re    => qr/^linux$/
+      title     => "Binaries Linux/i386 CMake-3.6.3",
+      url       => 'https://cmake.org/files/v3.6/cmake-3.6.3-Linux-i386.tar.gz',
+      version   => '3.6.3',
+      sha256sum => '65e8341738086b2973d33e3a5688f87b5bb4de0267822d057c8dbe4c3eadcf2c',
+      arch_re   => qr/(86.*linux|linux.*86)/,
+      os_re     => qr/^linux$/
     },
     {
       title    => "Binaries FreeBSD/i386 CMake-2.6.4",

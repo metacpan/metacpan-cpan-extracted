@@ -9,6 +9,7 @@ lib/SPVM/Array/Long.pm
 lib/SPVM/Array/Object.pm
 lib/SPVM/Array/Short.pm
 lib/SPVM/BaseObject.pm
+lib/SPVM/Debug.pm
 lib/SPVM/Document/FAQ.pod
 lib/SPVM/Document/PerlAPI.pod
 lib/SPVM/Document/Spec.pod
@@ -121,7 +122,7 @@ spvm_yacc.h
 spvm_yacc_util.c
 spvm_yacc_util.h
 t/lib/SPVM/TestCase.spvm
-t/SPVM.t
+t/spvm.t
 yacc/bison.sh
 yacc/spvm_yacc.y
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -47,16 +47,7 @@ Added handler for C< blockquote >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
-
-
-=item C<< $cb->blockhtml($code: CodeRef) >>
-
-Added handler for C< blockhtml >.
-
-Callback function's signature is following:
-
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->header($code: CodeRef) >>
@@ -65,7 +56,7 @@ Added handler for C< header >.
 
 Callback function's signature is following:
 
-    $code->($text:Str, $level:Int)
+    $code->($content:Str, $level:Int)
 
 
 =item C<< $cb->hrule($code: CodeRef) >>
@@ -83,7 +74,7 @@ Added handler for C< list >.
 
 Callback function's signature is following:
 
-    $code->($text:Str, $flags:Int)
+    $code->($content:Str, $type:Int)
 
 
 =item C<< $cb->listitem($code: CodeRef) >>
@@ -92,7 +83,7 @@ Added handler for C< listitem >.
 
 Callback function's signature is following:
 
-    $code->($text:Str, $flags:Int)
+    $code->($content:Str, $type:Int)
 
 
 =item C<< $cb->paragraph($code: CodeRef) >>
@@ -101,7 +92,7 @@ Added handler for C< paragraph >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->table($code: CodeRef) >>
@@ -110,7 +101,25 @@ Added handler for C< table >.
 
 Callback function's signature is following:
 
-    $code->($header:Str, $body:Str)
+    $code->($content:Str)
+
+
+=item C<< $cb->table_header($code: CodeRef) >>
+
+Added handler for C< table_header >.
+
+Callback function's signature is following:
+
+    $code->($content:Str)
+
+
+=item C<< $cb->table_body($code: CodeRef) >>
+
+Added handler for C< table_body >.
+
+Callback function's signature is following:
+
+    $code->($content:Str)
 
 
 =item C<< $cb->table_row($code: CodeRef) >>
@@ -119,7 +128,7 @@ Added handler for C< table_row >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->table_cell($code: CodeRef) >>
@@ -128,7 +137,7 @@ Added handler for C< table_cell >.
 
 Callback function's signature is following:
 
-    $code->($text:Str, $flags:Int)
+    $code->($content:Str, $type:Int)
 
 
 =item C<< $cb->footnotes($code: CodeRef) >>
@@ -137,7 +146,7 @@ Added handler for C< footnotes >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->footnote_def($code: CodeRef) >>
@@ -146,7 +155,16 @@ Added handler for C< footnote_def >.
 
 Callback function's signature is following:
 
-    $code->($text:Str, $num:UInt)
+    $code->($content:Str, $num:UInt)
+
+
+=item C<< $cb->blockhtml($code: CodeRef) >>
+
+Added handler for C< blockhtml >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
 
 
 =item C<< $cb->autolink($code: CodeRef) >>
@@ -173,7 +191,7 @@ Added handler for C< double_emphasis >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->emphasis($code: CodeRef) >>
@@ -182,7 +200,7 @@ Added handler for C< emphasis >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->underline($code: CodeRef) >>
@@ -191,7 +209,7 @@ Added handler for C< underline >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->highlight($code: CodeRef) >>
@@ -200,7 +218,7 @@ Added handler for C< highlight >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->quote($code: CodeRef) >>
@@ -209,7 +227,7 @@ Added handler for C< quote >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->image($code: CodeRef) >>
@@ -236,16 +254,7 @@ Added handler for C< link >.
 
 Callback function's signature is following:
 
-    $code->($link:Str, $title:Str, $content:Str)
-
-
-=item C<< $cb->raw_html_tag($code: CodeRef) >>
-
-Added handler for C< raw_html_tag >.
-
-Callback function's signature is following:
-
-    $code->($tag:Str)
+    $code->($content:Str, $link:Str, $title:Str)
 
 
 =item C<< $cb->triple_emphasis($code: CodeRef) >>
@@ -254,7 +263,7 @@ Added handler for C< triple_emphasis >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->strikethrough($code: CodeRef) >>
@@ -263,7 +272,7 @@ Added handler for C< strikethrough >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->superscript($code: CodeRef) >>
@@ -272,7 +281,7 @@ Added handler for C< superscript >.
 
 Callback function's signature is following:
 
-    $code->($text:Str)
+    $code->($content:Str)
 
 
 =item C<< $cb->footnote_ref($code: CodeRef) >>
@@ -284,13 +293,31 @@ Callback function's signature is following:
     $code->($num:UInt)
 
 
+=item C<< $cb->math($code: CodeRef) >>
+
+Added handler for C< math >.
+
+Callback function's signature is following:
+
+    $code->($text:Str, $displaymode:Int)
+
+
+=item C<< $cb->raw_html($code: CodeRef) >>
+
+Added handler for C< raw_html >.
+
+Callback function's signature is following:
+
+    $code->($text:Str)
+
+
 =item C<< $cb->entity($code: CodeRef) >>
 
 Added handler for C< entity >.
 
 Callback function's signature is following:
 
-    $code->($entity:Str)
+    $code->($text:Str)
 
 
 =item C<< $cb->normal_text($code: CodeRef) >>
@@ -308,7 +335,7 @@ Added handler for C< doc_header >.
 
 Callback function's signature is following:
 
-    $code->()
+    $code->($inline_render:Int)
 
 
 =item C<< $cb->doc_footer($code: CodeRef) >>
@@ -317,7 +344,7 @@ Added handler for C< doc_footer >.
 
 Callback function's signature is following:
 
-    $code->()
+    $code->($inline_render:Int)
 
 
 =back

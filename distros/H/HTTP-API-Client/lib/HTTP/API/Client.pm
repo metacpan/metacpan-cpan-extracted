@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '0.05';
+$HTTP::API::Client::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -12,8 +12,8 @@ HTTP::API::Client - API Client
  use HTTP::API::Client;
 
  my $ua1 = HTTP::API::Client->new;
- my $ua2 = HTTP::API::Client->new(base_url => URI->new( $url ) );
- my $ua3 = HTTP::API::Client->new(base_url => URI->new( $url ) );
+ my $ua2 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_deinfed_headers => { X_COMPANY => 'ABC LTD' } );
+ my $ua3 = HTTP::API::Client->new(base_url => URI->new( $url ), pre_defined_data => { api_key => 123 } );
 
  $ua->send( $method, $url, \%data, \%header );
 
@@ -68,13 +68,14 @@ RETRY VARIABLES
 
 =cut
 
-use URI;
-use Mouse;
-use JSON::XS;
-use Try::Tiny;
-use HTTP::Request;
+use Encode;
 use HTTP::Headers;
+use HTTP::Request;
+use JSON::XS;
 use LWP::UserAgent;
+use Mouse;
+use Try::Tiny;
+use URI;
 
 has username => (
     is         => "rw",
@@ -241,6 +242,16 @@ sub _build_debug_flags {
     };
 }
 
+has pre_defined_data => (
+    is  => "rw",
+    isa => "HashRef",
+);
+
+has pre_defined_headers => (
+    is  => "rw",
+    isa => "HashRef",
+);
+
 no Mouse;
 
 sub get {
@@ -282,6 +293,13 @@ sub send {
     my %retry_status = %{ $self->retry->{status} || {} };
     my $retry_delay  = _smart_or( $self->retry->{delay}, 5 );
     my %debug        = %{ $self->debug_flags || {} };
+
+    if ( my $pd = $self->pre_defined_data ) {
+        %$data = ( %$pd, %$data );
+    }
+    if ( my $ph = $self->pre_defined_headers ) {
+        %$headers = ( %$ph, %$headers );
+    }
 
     my $response;
 

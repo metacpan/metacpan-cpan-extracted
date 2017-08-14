@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #-------------------------------------------------------------------------------
-# Test Math::Number::Triangulate
-# Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
+# Test Encode::Positive::Pairs
+# Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
 
 use warnings FATAL => qw(all);

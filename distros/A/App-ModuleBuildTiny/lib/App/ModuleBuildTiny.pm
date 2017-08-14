@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -27,23 +27,6 @@ use Text::Template;
 use App::ModuleBuildTiny::Dist;
 
 use Env qw/$AUTHOR_TESTING $RELEASE_TESTING $AUTOMATED_TESTING $SHELL $HOME $USERPROFILE/;
-
-sub find {
-	my ($re, @dir) = @_;
-	my $ret;
-	File::Find::find(sub { $ret++ if /$re/ }, @dir);
-	return $ret;
-}
-
-sub mbt_version {
-	if (find(qr/\.PL$/, 'lib')) {
-		return '0.039';
-	}
-	elsif (find(qr/\.xs$/, 'lib')) {
-		return '0.036';
-	}
-	return '0.034';
-}
 
 Getopt::Long::Configure(qw/require_order pass_through gnu_compat/);
 
@@ -299,7 +282,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 

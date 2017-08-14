@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Deep" : "0.112",
+            "Test::Exception" : "0.32",
+            "Test::MockObject" : "1.20140408",
+            "Test::Most" : "0.31"
          }
       },
       "configure" : {
@@ -44,14 +48,6 @@
             "Types::Standard" : "1.000005",
             "perl" : "5.010001"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::Deep" : "0.112",
-            "Test::Exception" : "0.32",
-            "Test::MockObject" : "1.20140408",
-            "Test::Most" : "0.31"
-         }
       }
    },
    "release_status" : "stable",
@@ -67,11 +63,10 @@
          "url" : "https://github.com/leejo/business-monzo"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_repository" : {
       "type" : "git",
       "url" : "https://github.com/leejo/business-monzo.git",
       "web" : "https://github.com/leejo/business-monzo"
-   },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   }
 }

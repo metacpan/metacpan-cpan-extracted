@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.39'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 has handle => (
@@ -34,6 +34,21 @@ has subprotocol => (
 
 has max_payload_size => (
   is => 'ro',
+);
+
+
+has close_code => (
+  is => 'rw',
+);
+
+
+has close_reason => (
+  is => 'rw',
+);
+
+
+has close_error => (
+  is => 'rw',
 );
 
 foreach my $type (qw( each_message next_message finish parse_error ))
@@ -69,6 +84,7 @@ sub BUILD
   my $are_callbacks_supposed_to_be_ready = 0;
   
   my $finish = sub {
+    my(undef, undef, $message) = @_;
     my $strong_self = $self; # preserve $self because otherwise $self can be destroyed in the callbacks.
     return if $self->_is_finished;
     eval
@@ -80,7 +96,8 @@ sub BUILD
     $self->handle->push_shutdown;
     $self->_is_read_open(0);
     $self->_is_write_open(0);
-    $_->($self) for @{ $self->_finish_cb };
+    $self->close_error($message) if defined $message;
+    $_->($self, $message) for @{ $self->_finish_cb };
   };
   $self->handle->on_error($finish);
   $self->handle->on_eof($finish);
@@ -171,6 +188,13 @@ sub _process_message
   }
   elsif($received_message->is_close)
   {
+    my $body = $received_message->body;
+    if($body)
+    {
+      my($code, $reason) = unpack 'na*', $body;
+      $self->close_code($code);
+      $self->close_reason(Encode::decode('UTF-8', $reason));
+    }
     $self->_is_read_open(0);
     $self->close();
   }
@@ -255,6 +279,21 @@ sub close
   $self;
 }
 
+if($] < 5.010)
+{
+  # This is a workaround for GH#19
+  # https://github.com/plicease/AnyEvent-WebSocket-Client/issues/19
+  # I am not 100% sure about this, but maybe as a trade off it isn't
+  # too bad?  The previous workaround was to downgrade to AE 6.x
+  # something.  Unfortunately, we now require AE 7.x something for
+  # SSL bug fixes.
+  *DEMOLISH = sub
+  {
+    my($self) = @_;
+    eval { $self->handle->push_shutdown } if $self->_is_write_open;
+  };
+}
+
 1;
 
 __END__
@@ -269,7 +308,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.39
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -337,6 +376,20 @@ may be C<undef>.
 The maximum payload size for received frames.  Currently defaults to whatever
 L<Protocol::WebSocket> defaults to.
 
+=head2 close_code
+
+If provided by the other side, the code that was provided when the 
+connection was closed.
+
+=head2 close_reason
+
+If provided by the other side, the reason for closing the connection.
+
+=head2 close_error
+
+If the connection is closed due to a network error, this will hold the
+message.
+
 =head1 METHODS
 
 =head2 send
@@ -381,9 +434,11 @@ payload which is larger that C<max_payload_size>.
 
 =head3 finish
 
- $cb->($connection)
+ $cb->($connection, $message)
 
-Called when the connection is terminated
+Called when the connection is terminated.  If the connection is terminated
+due to an error, the message will be provided as the second argument.
+On a cleanly closed connection this will be `undef`.
 
 =head2 close
 

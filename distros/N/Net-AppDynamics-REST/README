@@ -1,0 +1,9 @@
+
+Appdynamics Rest client..  Currently under heavy development.
+
+
+To install:
+  perl Makefile.PL
+  make
+  make test
+  make install

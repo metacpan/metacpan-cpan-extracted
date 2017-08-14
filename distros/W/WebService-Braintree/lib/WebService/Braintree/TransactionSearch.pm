@@ -1,5 +1,5 @@
 package WebService::Braintree::TransactionSearch;
-$WebService::Braintree::TransactionSearch::VERSION = '0.91';
+$WebService::Braintree::TransactionSearch::VERSION = '0.92';
 use Moose;
 use WebService::Braintree::AdvancedSearch;
 

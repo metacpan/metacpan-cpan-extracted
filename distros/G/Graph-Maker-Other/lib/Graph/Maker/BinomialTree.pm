@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -91,14 +91,14 @@ Graph::Maker::BinomialTree - create binomial tree graph
 
 =head1 DESCRIPTION
 
-C<Graph::Maker::BinomialTree> creates a C<Graph.pm> graph of a Binomial tree
+C<Graph::Maker::BinomialTree> creates a C<Graph.pm> graph of a binomial tree
 with N vertices.  Vertices are numbered from 0 at the root through to N-1.
 
-The parent of a given vertex is its number n with the lowest 1-bit cleared
-to 0.  Conversely the children of a vertex n=xx1000 are xx1001, xx1010,
-xx1100, so each trailing 0 bit changed to a 1 provided that does not exceed
-the maximum N-1.  At the root the children are single bit powers-of-2 up to
-the high bit of the maximum N-1.
+The parent of vertex n is that n with its lowest 1-bit cleared to 0.
+Conversely the children of a vertex n=xx1000 are xx1001, xx1010, xx1100, so
+each trailing 0 bit changed to a 1, provided that does not exceed the
+maximum N-1.  At the root the children are single bit powers-of-2 up to the
+high bit of the maximum N-1.
 
           __0___
          /  |   \        N => 8
@@ -126,10 +126,13 @@ The N=8 example above is order=3 and the number of vertices at each depth is
 
 =for GP-Test  binomial(3,3) == 1
 
-As from the bit-definition above, an order k tree is two copies of k-1.  One
-of them is at the root and the other is a child of that root.  In the N=8
-order=3 example above 0-3 is an order=2 and 4-7 is another, starting as a
-child of the root 0.
+A top-down definition is order k tree is two copies of k-1, one at the root
+and the other a child of that root.  In the N=8 order=3 example above, 0-3
+is an order=2 and 4-7 is another, with 4 starting as a child of the root 0.
+
+A bottom-up definition is order k tree as order k-1 with a new leaf vertex
+added to each existing vertex.  The vertices of k-1 with an extra low 0-bit
+become the evens of k.  An extra low 1-bit is the new leaves.
 
 Binomial tree order=5 appears on the cover of Knuth "The Art of Computer
 Programming", volume 1, "Fundamental Algorithms", second edition.
@@ -240,6 +243,39 @@ diameter is then
 #
 
 =pod
+
+=head2 Independence and Domination
+
+From the bottom-up definition above, a tree of even N has a perfect
+matching, being each odd n which is a leaf and its even attachment.  An odd
+N has a near-perfect matching (one vertex left over).
+
+The independence number is found by starting with each leaf in an
+independent set and its attachment vertex not.  Per the bottom-up definition
+this is all vertices.  If N odd then the unpaired existing even vertex can
+be included too, for independence number ceil(N/2).
+
+The domination number similarly, by starting each leaf not in the dominating
+set and its attachment vertex in the set.  Again this is all vertices so
+domination number floor(N/2), except N=1 domination number 1.
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the trees here include
+
+=over
+
+=item order=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+
+=item order=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+
+=item order=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+
+=item order=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=700>
+
+=item order=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21088>
+
+=back
 
 =head1 OEIS
 

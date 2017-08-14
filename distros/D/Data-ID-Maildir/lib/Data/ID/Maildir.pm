@@ -4,9 +4,9 @@ Data::ID::Maildir - generate maildir-style unique IDs
 
 =head1 SYNOPSIS
 
-	use Data::ID::Maildir qw(maildir_id);
+    use Data::ID::Maildir qw(maildir_id);
 
-	$id = maildir_id;
+    $id = maildir_id;
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,7 @@ use strict;
 use Sys::Hostname qw(hostname);
 use Time::HiRes 1.00 qw(gettimeofday);
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(maildir_id);
@@ -75,7 +75,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2007, 2010, 2011
+Copyright (C) 2004, 2007, 2010, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

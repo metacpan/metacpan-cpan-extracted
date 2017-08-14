@@ -1,0 +1,51 @@
+---
+abstract: 'AppDynamics AnyEvent Friendly REST Client'
+author:
+  - 'Mike Shipper <AKALINUX@CPAN.ORG>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-AppDynamics-REST
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '7.14'
+  AnyEvent::HTTP::Request: '0.302'
+  AnyEvent::HTTP::Response: '0.302'
+  AnyEvent::Loop: '0'
+  B: '1.68'
+  Carp: '1.42'
+  Data::Dumper: '2.167'
+  Data::Queue: '1.0001'
+  Data::Result: '1.0001'
+  Exporter: '5.72'
+  HTTP::Headers: '6.13'
+  HTTP::MultiGet: '1.005'
+  HTTP::Request: '6.13'
+  HTTP::Response: '6.13'
+  IO::Scalar: '2.111'
+  JSON: '2.94'
+  Log::Dispatch::Handle: '2.65'
+  Log::Log4perl: '1.49'
+  Log::LogMethods: '1.0001'
+  Modern::Perl: '1.20170117'
+  Moo: '2.003002'
+  MooX::Types::MooseLike::Base: '0.29'
+  Ref::Util: '0.203'
+  Scalar::Util: '1.48'
+  Test::More: '1.302073'
+  Time::HiRes: '1.9741'
+  URI::Escape: '3.31'
+  namespace::clean: '0.27'
+  overload: '1.28'
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

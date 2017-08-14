@@ -6,15 +6,15 @@ NAME
  FORK
 
     This is a fork of the original vendor-issued Net::Braintree. While the
-    original is depreacted, it continues to work. However, it contains a
+    original is deprecated, it continues to work. However, it contains a
     number of code-style and maintainability problems. This fork was
     produced to address some of those problems and to provide a community
     driven basis for going forward.
 
  DOCUMENTATION
 
-    The module is sparesly documented at best. The public facing API is
-    very similar to the ruby libraries which are documented at
+    The module is sparsely documented, at best. The public facing API is
+    very similar to the Ruby libraries which are documented at
     https://developers.braintreepayments.com/ruby/sdk/server/overview.
 
     You can also look over the test suite for guidance of usage, especially
@@ -24,12 +24,204 @@ NAME
     same sandbox tests that fail in this module also fail for
     Net::Braintree, and in the same manner.
 
+ GENERAL STYLE
+
+    In general, clients of this library will not instantiate any objects.
+    Every call you make will be a class method. Some methods will return
+    objects. In those cases, those objects will be documented for you.
+
+ CONFIGURATION
+
+    You will need to set some configuration.
+
+        use WebService::Braintree;
+    
+        my $conf = WebService::Braintree->configuration;
+        $conf->environment( 'sandbox' );
+        $conf->merchant_id( 'use_your_merchant_id' );
+        $conf->public_key( 'use_your_public_key' );
+        $conf->private_key( 'use_your_private_key' );
+
+    Please see "" in WebService::Braintree::Configuration for more
+    information.
+
+  Client Tokens
+
+    In general, your server code (that uses this library) will be
+    interacting with a client-side SDK (such as for Mobile or Javascript).
+    That library will need a client token in order to interact with
+    Braintree. This token will be all the client-side needs, regardless of
+    whether your server is pointing at the sandbox or to production.
+
+    This token is created with "generate" in
+    WebService::Braintree::ClientToken.
+
+ INTERFACE
+
+    There are twelve classes that you will interface with. Please see their
+    respective documentation for more detail on how to use them.
+
+  WebService::Braintree::Address
+
+    Create, update, delete, and find addresses.
+
+  WebService::Braintree::ClientToken
+
+    Generate client tokens. These are used for client-side SDKs to take
+    actions.
+
+  WebService::Braintree::CreditCard
+
+    Create, update, delete, and find credit cards.
+
+  WebService::Braintree::CreditCardVerification
+
+    Find and list credit card verifications.
+
+  WebService::Braintree::Customer
+
+    Create, update, delete, and find customers.
+
+  WebService::Braintree::MerchantAccount
+
+    Create, update, and find merchant accounts.
+
+  WebService::Braintree::PaymentMethod
+
+    Create, update, delete, and find payment methods.
+
+  WebService::Braintree::PaymentMethodNonce
+
+    Create and find payment method nonces.
+
+  WebService::Braintree::PayPalAccount
+
+    Find and update PayPal accounts.
+
+  WebService::Braintree::SettlementBatchSummary
+
+    Generate settlement batch summaries.
+
+  WebService::Braintree::Subscription
+
+    Create, update, cancel, find, and handle charges for subscriptions.
+
+  WebService::Braintree::Transaction
+
+    Create, manage, and search for transactions. This is the workhorse
+    class and it has many methods.
+
+  WebService::Braintree::TransparentRedirect
+
+    Manage the transparent redirection of ????.
+
+    NOTE: This class needs significant help in documentation.
+
+ SEARCHING
+
+    Several of the class interfaces provide a search() method. This method
+    is unique in that it takes a subroutine reference (subref) instead of a
+    hashref or other parameters.
+
+    Documentation for this is forthcoming.
+
  ISSUES
 
     The bugtracker is at
     https://github.com/singingfish/braintree_perl/issues.
 
     Patches welcome!
+
+ CONTRIBUTING
+
+    Contributions are welcome. The process:
+
+    Submissions
+
+      Please fork this repository on Github, create a branch, then submit a
+      pull request from that branch to the master of this repository. All
+      other submissions will be summarily rejected.
+
+    Developer Environment
+
+      We use Docker to encapsulate the developer environment. There is a
+      Bash script in the root called run_tests that provides an entrypoint
+      to how this project uses Docker. The sequence is:
+
+      run_tests build [ command ]
+
+      run_tests test [ command ]
+
+      run_tests integration [ command ]
+
+      run_tests cover
+
+      You can optionally select a Perl version or versions (5.10 through
+      5.24) to run the command against by setting the PERL_VERSIONS
+      environment variable. Use a space to separate multiple versions.
+
+      This Bash script has been tested to work in Linux, OSX, and GitBash
+      on Windows.
+
+    Running the tests in xt/
+
+      The tests in t/ are unit tests. The tests in xt/ are E2E tests that
+      run against Braintree's sandbox / integration environment. To run
+      them, you will need to have a Braintree sandbox account linked to
+      Paypal.
+
+      Signup
+
+	Navigate to https://www.braintreepayments.com/sandbox. Enter your
+	first name, last name, Comany name of "WebService::Braintree", your
+	country, and your email address.
+
+      Activate your account
+
+	You will receive an email to the address you provided which will
+	contain a link. Click on it and you'll sent to a page where you
+	will be asked for a password.
+
+      Create a sandbox_config.json
+
+	On the dashboard page of your new sandbox account, three are three
+	values you will need to put into a sandbox_config.json. The format
+	of the file must be:
+
+            {
+              "merchant_id": "<< value 1 >>",
+              "public_key": "<< value 2 >>",
+              "private_key": "<< value 3 >>"
+            }
+
+	replacing what's in the double-quotes with the appropriate values
+	from your Braintree sandbox's dashboard.
+
+      Link your Paypal Sandbox Account
+
+	You'll need to follow the instructions at
+	https://developers.braintreepayments.com/guides/paypal/testing-go-live/ruby#linked-paypal-testing.
+	This is required for some of the integration tests to pass.
+
+	Within Setting > Processing, select "Link your sandbox" within the
+	PayPal section.
+
+	Once at the Paypal Developer Dashboard:
+
+	  * My Apps & Credentials
+
+	  * Rest Apps
+
+	  * Create new App
+
+	  * Give it a name
+
+	  * Copy the information requested back to Braintree
+
+      Run the tests
+
+	You can now run the integration tests with run_tests integration.
+	These tests will take between 5 and 20 minutes.
 
  TODO/WISHLIST/ROADMAP
 
@@ -82,6 +274,8 @@ NAME
 
     Thanks to the staff at Braintree for endorsing this fork.
 
+    Thanks to ziprecruiter for sponsoring improvements to the forked code.
+
  LICENSE AND COPYRIGHT
 
     Copyright 2017 Kieren Diment <zarquon@cpan.org>
@@ -93,4 +287,9 @@ NAME
     by the Free Software Foundation; or the Artistic License.
 
     See http://dev.perl.org/licenses/ for more information.
+
+ AUTHORS
+
+    Braintree Staff Kieren Diment <zarquon@cpan.org> Rob Kinyon
+    <rob.kinyon@gmail.com>
 

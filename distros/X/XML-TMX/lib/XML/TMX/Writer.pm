@@ -6,7 +6,7 @@ use strict;
 use Exporter ();
 use vars qw($VERSION @ISA @EXPORT_OK);
 
-$VERSION = '0.31';
+$VERSION = '0.32';
 @ISA = 'Exporter';
 @EXPORT_OK = qw();
 
@@ -518,6 +518,7 @@ sub _characters {
     $text =~ s/&/&amp;/g;
     $text =~ s/</&lt;/g;
     $text =~ s/>/&gt;/g;
+    $text =~ s!&lt;(b|emph)&gt;(.+?)&lt;/\1&gt;!<$1>$2</$1>!gs;
 
     $self->_write($text);
 }

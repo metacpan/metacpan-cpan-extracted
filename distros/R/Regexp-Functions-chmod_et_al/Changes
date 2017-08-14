@@ -1,0 +1,9 @@
+Revision history for Perl module Regexp::Functions::chmod_et_al
+
+0.02 Sat Aug 12 18:51:34 EDT 2017
+    - Pod and metadata corrections only.
+
+0.01 Sat Aug 12 10:54:01 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+
+

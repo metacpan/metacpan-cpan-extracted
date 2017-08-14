@@ -24,16 +24,16 @@ This example converts an SVG into a PNG:
 <p>
 This renders the following image:
 </p>
-<img width="451.271" height="187.542" src='https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/locust.png'>
+<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.08/examples/locust.png'>
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/synopsis.pl> in the distribution. The L<input|https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/locust.svg> and L<output files|https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/locust.png> are also included.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.08/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.08/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.08/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents version 0.07 of Image::CairoSVG corresponding to git
-commit 2c5151c9cbc6492190a2c7f8722e7f04bc09ba79 released on Thu Dec 15 11:16:22 2016 +0900.
+This documents Image::CairoSVG version 0.08
+corresponding to git commit L<8a1a43a62d43974ff62f93a9e803fa068e386307|https://github.com/benkasminbullock/image-cairosvg/commit/8a1a43a62d43974ff62f93a9e803fa068e386307> released on Mon Aug 14 14:30:58 2017 +0900. 
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,11 @@ attributes, or the width and height specified in the C<viewBox>
 attribute. If the user supplied a context with L</new>, the return
 value should be ignored. If the user supplied a surface with L</new>,
 the return value is just that surface.
+
+If the call value is a scalar containing what looks like XML, it is
+parsed from the scalar instead.
+
+Calling with a scalar containing XML was added in version 0.08.
 
 =head1 DRAWING METHODS
 
@@ -202,7 +207,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2014-2016
+2014-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

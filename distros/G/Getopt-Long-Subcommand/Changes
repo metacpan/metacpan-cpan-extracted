@@ -1,3 +1,10 @@
+0.102   2017-08-12 (PERLANCAR)
+
+	- Comment-out Log::ger because we broke
+	  Perinci::CmdLine::Inline-based scripts which do not expect us to
+	  use Log::ger.
+
+
 0.101   2017-08-01 (PERLANCAR)
 
 	- [Bugfix] Catch a couple more constant-in-grep bugs (thanks

@@ -67,11 +67,9 @@ $|=1;
   #     *   *   *
   #         |
   #         *
-  # n=13
+  # n=13  4 of 
   # tree mean 2.666 of diam 0.666 W=208 num_pairs=78 diameter=4
-  # tree mean 2.666 of diam 0.666 W=208 num_pairs=78 diameter=4
-  # tree mean 2.666 of diam 0.666 W=208 num_pairs=78 diameter=4
-  # hog not all 3
+  # hog not any
   # -----
   # all graphs, mean = 2/3 diameter
   # n=3 path
@@ -97,7 +95,8 @@ $|=1;
   #      tree mean 2.25 of diam 0.75 W=270 num_pairs=120 diameter=3
   #      hog not
   # n=17 bi-star 11,6
-  #      any others?
+  #      no others
+  # clusters of stars up to n=25 ...
 
   # -----
   # all graphs, mean = 5/6 diameter
@@ -113,8 +112,8 @@ $|=1;
   # tree, mean = 6/7 diameter
   # n=7  7-star W=36 num_pairs=21(7) diameter=2
 
-  my $num = 3;
-  my $den = 4;
+  my $num = 2;
+  my $den = 3;
   my $tree = 1;
   my $terminal = 0;
 
@@ -122,8 +121,9 @@ $|=1;
   require MyGraphs;
   my @values;
   my @graphs;
-  foreach my $num_vertices (# 2..5,
-                             17,
+  foreach my $num_vertices (13,
+                            # 2 .. 6,
+                            # 17,
                            ) {
     print "n=$num_vertices\n";
 
@@ -144,8 +144,8 @@ $|=1;
                                : $num_vertices);
       my $num_pairs = $num_path_vertices * ($num_path_vertices-1) / 2;
       my $divisor = $diameter * $num_pairs;
-      my $mean_dist = $W / $num_pairs;
-      my $mean_of_diam = $W / $divisor;
+      my $mean_dist = ($num_pairs==0 ? -1 : $W / $num_pairs);
+      my $mean_of_diam = ($divisor==0 ? -1 : $W / $divisor);
       my $equal = ($den*$W == $num*$divisor);  # W/divisor = num/den
       if ($equal && ($num_vertices <= 7 || @graphs < 6)) {
         my $cyclic = $graph->is_cyclic ? "cyclic" : "tree";

@@ -17,7 +17,7 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-my $File = Prty::Test::Class->testPath('prty/test/data/db/person.tab');
+my $File = Prty::Test::Class->testPath('t/data/db/person.tab');
 my @Titles;
 my $NumOfRows;
 

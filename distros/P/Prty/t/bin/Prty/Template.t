@@ -19,7 +19,7 @@ sub test_unitTest : Test(3) {
 
     # Instantiiere Objekt
 
-    my $file1 = $self->testPath('prty/test/data/html/simple1.html');
+    my $file1 = $self->testPath('t/data/html/simple1.html');
     my $tpl = Prty::Template->new('html',$file1);
     $self->is(ref($tpl),'Prty::Template');
 
@@ -35,7 +35,7 @@ sub test_unitTest : Test(3) {
         __BODY__=>'Hello World!',
     );
 
-    my $file2 = $self->testPath('prty/test/data/html/simple2.html');
+    my $file2 = $self->testPath('t/data/html/simple2.html');
     my $data = Prty::Path->read($file2);
     chomp $data;
     $self->is($tpl->asString,$data);

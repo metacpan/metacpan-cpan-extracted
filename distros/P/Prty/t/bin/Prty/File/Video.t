@@ -25,7 +25,7 @@ sub test_unitTest : Test(10) {
     }
 
     my $file = $self->testPath(
-        'prty/test/data/video/fluch-von-novgorod.mp4');
+        't/data/video/fluch-von-novgorod.mp4');
 
     my $vid = Prty::File::Video->new($file);
     $self->is(ref($vid),'Prty::File::Video');

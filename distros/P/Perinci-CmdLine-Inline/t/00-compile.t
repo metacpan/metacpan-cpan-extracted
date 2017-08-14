@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/gen-inline-pericmd-script'
+    'script/gen-inline-pericmd-script'
 );
 
 # no fake home requested

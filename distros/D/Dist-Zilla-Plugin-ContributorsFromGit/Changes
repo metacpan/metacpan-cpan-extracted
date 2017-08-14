@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ContributorsFromGit
 
+0.018     2017-08-13 21:07:22 CDT-0500
+	* Fix tests for non-pty STDIN
+
 0.017     2015-04-09 22:14:03 PDT-0700
 	* Stop using Test::TempDir/Directory::Scratch; switch to
 	  Test::TempDir::Tiny

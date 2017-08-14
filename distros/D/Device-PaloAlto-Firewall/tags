@@ -1,0 +1,29 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BUILD	lib/Device/PaloAlto/Firewall.pm	/^sub BUILD {$/;"	s
+Device::PaloAlto::Firewall	lib/Device/PaloAlto/Firewall.pm	/^package Device::PaloAlto::Firewall;$/;"	p
+Device::PaloAlto::Firewall::Test	lib/Device/PaloAlto/Firewall/Test.pm	/^package Device::PaloAlto::Firewall::Test;$/;"	p
+_api_error_to_string	lib/Device/PaloAlto/Firewall.pm	/^sub _api_error_to_string {$/;"	s
+_debug_print	lib/Device/PaloAlto/Firewall.pm	/^sub _debug_print {$/;"	s
+_get_and_filter_interfaces	lib/Device/PaloAlto/Firewall/Test.pm	/^sub _get_and_filter_interfaces {$/;"	s
+_half_duplex_search	lib/Device/PaloAlto/Firewall/Test.pm	/^sub _half_duplex_search {$/;"	s
+_send_request	lib/Device/PaloAlto/Firewall.pm	/^sub _send_request {$/;"	s
+_validate_and_return_response	lib/Device/PaloAlto/Firewall.pm	/^sub _validate_and_return_response {$/;"	s
+bgp_peers	lib/Device/PaloAlto/Firewall.pm	/^sub bgp_peers {$/;"	s
+bgp_peers_up	lib/Device/PaloAlto/Firewall/Test.pm	/^sub bgp_peers_up {$/;"	s
+high_availability	lib/Device/PaloAlto/Firewall.pm	/^sub high_availability {$/;"	s
+interfaces	lib/Device/PaloAlto/Firewall.pm	/^sub interfaces {$/;"	s
+interfaces_duplex	lib/Device/PaloAlto/Firewall/Test.pm	/^sub interfaces_duplex {$/;"	s
+interfaces_up	lib/Device/PaloAlto/Firewall/Test.pm	/^sub interfaces_up {$/;"	s
+ntp	lib/Device/PaloAlto/Firewall.pm	/^sub ntp {$/;"	s
+optimise	lib/Device/PaloAlto/Firewall.pm	/^sub optimise {$/;"	s
+panorama_status	lib/Device/PaloAlto/Firewall.pm	/^sub panorama_status {$/;"	s
+routes_exist	lib/Device/PaloAlto/Firewall/Test.pm	/^sub routes_exist {$/;"	s
+routing_table	lib/Device/PaloAlto/Firewall.pm	/^sub routing_table {$/;"	s
+system_info	lib/Device/PaloAlto/Firewall.pm	/^sub system_info {$/;"	s
+tester	lib/Device/PaloAlto/Firewall.pm	/^sub tester {$/;"	s
+verify_hostname	lib/Device/PaloAlto/Firewall.pm	/^sub verify_hostname {$/;"	s

@@ -16,12 +16,12 @@ has devel => ( is => 'ro', isa => Bool, default => 0 );
 has listen => ( is => 'ro', isa => Str, required => 1 );
 has keepalive_timeout => ( is => 'ro', isa => PositiveOrZeroInt, default => 60 );
 
-has cfg_path => ( is => 'lazy', isa => Str,     init_arg => undef );    # app instance local config path
-has cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );    # app instance local config
+has instance_auth_path => ( is => 'lazy', isa => Str,     init_arg => undef );    # app instance local config path
+has instance_auth      => ( is => 'lazy', isa => HashRef, init_arg => undef );    # app instance local config
 
-has id             => ( is => 'ro', isa => Str, init_arg => undef );    # app id
-has instance_id    => ( is => 'ro', isa => Str, init_arg => undef );    # app instance id
-has instance_token => ( is => 'ro', isa => Str, init_arg => undef );    # app instance token
+has id             => ( is => 'ro', isa => Str, init_arg => undef );              # app id
+has instance_id    => ( is => 'ro', isa => Str, init_arg => undef );              # app instance id
+has instance_token => ( is => 'ro', isa => Str, init_arg => undef );              # app instance token
 
 has version => ( is => 'lazy', isa => InstanceOf ['version'],            init_arg => undef );    # app instance version
 has router  => ( is => 'ro',   isa => InstanceOf ['Pcore::App::Router'], init_arg => undef );
@@ -45,13 +45,13 @@ sub _build_desc ($self) {
     return 'test application';
 }
 
-sub _build_cfg_path ($self) {
+sub _build_instance_auth_path ($self) {
     return ( $ENV->{DATA_DIR} // q[] ) . ( $self->name =~ s/::/-/smgr ) . '.json';
 }
 
-sub _build_cfg ($self) {
-    if ( -f $self->cfg_path ) {
-        return P->cfg->load( $self->cfg_path );
+sub _build_instance_auth ($self) {
+    if ( -f $self->instance_auth_path ) {
+        return P->cfg->load( $self->instance_auth_path );
     }
     else {
         return {};
@@ -145,8 +145,8 @@ sub run ($self) {
     return;
 }
 
-sub store_cfg ($self) {
-    P->cfg->store( $self->cfg_path, $self->cfg );
+sub store_instance_auth ($self) {
+    P->cfg->store( $self->instance_auth_path, $self->instance_auth );
 
     return;
 }

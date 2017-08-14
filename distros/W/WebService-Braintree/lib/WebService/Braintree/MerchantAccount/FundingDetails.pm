@@ -1,5 +1,5 @@
 package WebService::Braintree::MerchantAccount::FundingDetails;
-$WebService::Braintree::MerchantAccount::FundingDetails::VERSION = '0.91';
+$WebService::Braintree::MerchantAccount::FundingDetails::VERSION = '0.92';
 
 use Moose;
 extends "WebService::Braintree::ResultObject";

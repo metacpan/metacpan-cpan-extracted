@@ -2,16 +2,12 @@
 #
 #  Net::Server::Daemonize - Daemonization utilities.
 #
-#  $Id$
-#
-#  Copyright (C) 2001-2012
+#  Copyright (C) 2001-2017
 #
 #    Jeremy Howard
 #    j+daemonize@howard.fm
 #
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License

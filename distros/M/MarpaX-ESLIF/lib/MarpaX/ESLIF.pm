@@ -10,11 +10,22 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 use vars qw/$VERSION/;
 
 BEGIN {
-    our $VERSION = '2.0.14'; # VERSION
+    our $VERSION = '2.0.15'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
 }
+
+# Load our explicit sub-modules
+use MarpaX::ESLIF::Event::Type;
+use MarpaX::ESLIF::Grammar::Properties;
+use MarpaX::ESLIF::Grammar::Rule::Properties;
+use MarpaX::ESLIF::Grammar::Symbol::Properties;
+use MarpaX::ESLIF::Logger::Level;
+use MarpaX::ESLIF::Symbol::PropertyBitSet;
+use MarpaX::ESLIF::Symbol::Type;
+use MarpaX::ESLIF::Value::Type;
+use MarpaX::ESLIF::Rule::PropertyBitSet;
 
 
 1;
@@ -31,7 +42,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 2.0.14
+version 2.0.15
 
 =head1 SYNOPSIS
 

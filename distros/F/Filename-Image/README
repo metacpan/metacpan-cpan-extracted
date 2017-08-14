@@ -1,0 +1,50 @@
+NAME
+    Filename::Image - Check whether filename indicates being an image file
+
+VERSION
+    This document describes version 0.001 of Filename::Image (from Perl
+    distribution Filename-Image), released on 2017-08-12.
+
+SYNOPSIS
+     use Filename::Image qw(check_image_filename);
+     my $res = check_image_filename(filename => "foo.jpg");
+     if ($res) {
+         printf "File is image";
+     } else {
+         print "File is not image\n";
+     }
+
+DESCRIPTION
+FUNCTIONS
+  check_image_filename
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Filename-Image>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Filename-Image>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Image>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Filename::Audio
+
+    Filename::Video
+
+    Filename::Media
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

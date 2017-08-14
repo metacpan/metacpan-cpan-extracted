@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Perl;
 
@@ -259,7 +259,7 @@ sub rgb {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

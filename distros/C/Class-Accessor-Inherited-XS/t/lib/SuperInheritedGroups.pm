@@ -1,6 +1,6 @@
 package SuperInheritedGroups;
 use strict;
 use warnings;
-use base 'BaseInheritedGroups';
+use parent 'BaseInheritedGroups';
 
 1;

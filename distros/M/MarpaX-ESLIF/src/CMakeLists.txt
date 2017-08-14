@@ -2,7 +2,11 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (marpaESLIF 2 0 14)
+#
+# Usually the version here correspong to the NEXT version - it is git tagged
+# when we do make marpaESLIFPerlRelease
+#
+MYPACKAGESTART (marpaESLIF 2 0 15)
 
 ###########
 # Library #
@@ -122,14 +126,16 @@ IF (PERL_FOUND)
     # This is fatal for at least CTest.
     #
     # So let's remain independant on configuration, environment, etc... by using explicitly THIS
-    # perl that wew have found and nothing else
+    # perl that we have found and nothing else
     #
     MESSAGE(STATUS "")
+    MESSAGE(STATUS "PERL Executable located at ${PERL_EXECUTABLE}")
     MESSAGE(STATUS "PERL Packaging will be done with Dist::Zilla::App package")
     MESSAGE(STATUS "Asking for Dist::Zilla version said: ${PERL_OUTPUT_VARIABLE}")
     ADD_SUBDIRECTORY(src/bindings/perl)
   ELSE ()
     MESSAGE(STATUS "")
+    MESSAGE(STATUS "PERL Executable located at ${PERL_EXECUTABLE}")
     MESSAGE(STATUS "PERL Packaging cannot be done without the Dist::Zilla package")
     MESSAGE(STATUS "Asking for Dist::Zilla version said: ${PERL_ERROR_VARIABLE}")
   ENDIF ()

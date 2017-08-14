@@ -1,0 +1,20 @@
+<response status="success"><result>
+  <power-supply>
+    <Slot1>
+      <entry>
+        <slot>1</slot>
+        <alarm>False</alarm>
+        <Inserted>True</Inserted>
+        <description>Power Supply #1 (left)</description>
+        <min>True</min>
+      </entry>
+      <entry>
+        <slot>1</slot>
+        <alarm>False</alarm>
+        <Inserted>True</Inserted>
+        <description>Power Supply #2 (right)</description>
+        <min>True</min>
+      </entry>
+    </Slot1>
+  </power-supply>
+</result></response>

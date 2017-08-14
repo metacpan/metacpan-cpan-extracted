@@ -1,6 +1,6 @@
 use strict;
 use Test::More;
-use parent 'Class::Accessor::Inherited::XS';
+use parent 'Class::Accessor::Inherited::XS::Compat';
 
 BEGIN {
     is Class::Accessor::Inherited::XS::is_type_registered('sone'), '';

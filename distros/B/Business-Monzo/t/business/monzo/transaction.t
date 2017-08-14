@@ -54,7 +54,6 @@ can_ok(
     /,
 );
 
-is( $Transaction->pagination,1,'->pagination' );
 is( $Transaction->url,'https://api.monzo.com/transactions/1','url' );
 
 no warnings 'redefine';

@@ -4,6 +4,7 @@ use warnings;
 use Path::Tiny;
 use MIME::Base64;
 use URI;
+use List::Util qw(first);
 
 use lib qw(./lib);
 use Text::vCard::Precisely::V3;
@@ -90,26 +91,44 @@ SKIP: {
 
     my $raw = $gd->png;
 
+    my @expected = ();
     $in_file = path( 't', 'V3', 'Image', 'gd.vcf' );
-    $expected_content = $in_file->slurp_utf8;
+    push @expected, $in_file->slurp_utf8;
+    $in_file = path( 't', 'V3', 'Image', 'gd2.vcf' );
+    push @expected, $in_file->slurp_utf8;
 
     $vc->photo($raw);
     $vc->logo($raw);
-    is $vc->as_string, $expected_content, 'photo(raw)';                 # 6
+    my $got = $vc->as_string;
+    if ( first{ $got eq $_ } @expected ){                                # 6
+        pass 'photo(raw)';
+    }else{
+        # this will fail, to have $got & $expect printed out for diagnostics
+        is $got, $expected[1], 'photo(raw)';
+    }
 
     my $red = $gd->colorAllocate( 255, 0, 0 );
     $gd->fill( 50, 50, $red );
     my $raw2 = $gd->jpeg;
 
+    @expected = ();
     $in_file = path( 't', 'V3', 'Image', 'maltiple_gd.vcf' );
-    $expected_content = $in_file->slurp_utf8;
+    push @expected, $in_file->slurp_utf8;
+    $in_file = path( 't', 'V3', 'Image', 'maltiple_gd2.vcf' );
+    push @expected, $in_file->slurp_utf8;
 
     $vc->photo([
         { media_type => 'image/png',  content => $raw },
         { media_type => 'image/jpeg', content => $raw2 },
     ]);
     $vc->logo( { media_type => 'image/png', content => $raw } );
-    is $vc->as_string, $expected_content, 'photo(ArrayRef of Hashref of raw)';  # 7
+    $got = $vc->as_string;
+    if ( first{ $got eq $_ } @expected ){                                # 7
+        pass 'photo(ArrayRef of Hashref of raw)';
+    }else{
+        # this will fail, to have $got & $expect printed out for diagnostics
+        is $got, $expected[1], 'photo(ArrayRef of Hashref of raw)';
+    }
 }
 
 done_testing;

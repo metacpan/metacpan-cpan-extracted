@@ -2,13 +2,9 @@
 #
 #  Net::Server::PSGI - Extensible Perl HTTP PSGI base server
 #
-#  $Id$
+#  Copyright (C) 2011-2017
 #
-#  Copyright (C) 2011-2012
-#
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License

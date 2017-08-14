@@ -20,11 +20,11 @@ connection_test.pl - Test UDP/TCP/UNIX/UNIX_DGRAM connections
 
     # or
 
-    perl connection_test.pl UNIX
+    perl connection_test.pl UNIX <UNIX socket directory>
 
     # or
 
-    perl connection_test.pl UNIX_DGRAM
+    perl connection_test.pl UNIX_DGRAM <UNIX socket directory>
 
 =cut
 
@@ -34,7 +34,8 @@ use strict;
 use warnings;
 use base qw(Net::Server);
 use IO::Socket ();
-use POSIX qw(tmpnam);
+use File::Temp qw(tempdir);
+use File::Spec::Functions qw(catdir);
 use Socket qw(SOCK_DGRAM SOCK_STREAM);
 
 sub post_bind_hook {
@@ -44,13 +45,14 @@ sub post_bind_hook {
   }
 }
 
-my $socket_file  = tmpnam();
-$socket_file =~ s|/[^/]+$|/mysocket.file|;
-my $socket_file2 = $socket_file ."2";
+my $socket_dir  = $ARGV[1] || tempdir(CLEANUP => 1);
+my $socket_file = catdir($socket_dir, 'mysocket.file');
+my $socket_file2 = catdir($socket_dir, 'mysocket.file2');
 my $udp_port    = 20204;
 my $tcp_port    = 20204;
 
 print "\$Net::Server::VERSION = $Net::Server::VERSION\n";
+print "UNIX socket directory = $socket_dir\n";
 
 if( @ARGV ){
   if( uc($ARGV[0]) eq 'UDP' ){

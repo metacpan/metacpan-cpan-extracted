@@ -110,7 +110,7 @@ sub Permute                                                                     
  }
 
 # Export details
- 
+
 require 5;
 require Exporter;
 
@@ -118,12 +118,12 @@ use vars qw(@ISA @EXPORT $VERSION);
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(permute);
-$VERSION = '1.001';
+$VERSION = '20170808';
 
 =head1 Description
 
 Generate all the permutations of zero or more nested lists using the standard
-Perl metaphor. 
+Perl metaphor.
 
 C<permute()> returns the number of permutations in both scalar and array
 context.

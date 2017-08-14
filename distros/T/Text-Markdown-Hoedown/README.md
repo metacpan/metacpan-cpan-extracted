@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tokuhirom/Text-Markdown-Hoedown.png?branch=master)](https://travis-ci.org/tokuhirom/Text-Markdown-Hoedown)
+[![Build Status](https://travis-ci.org/tokuhirom/Text-Markdown-Hoedown.svg?branch=master)](https://travis-ci.org/tokuhirom/Text-Markdown-Hoedown)
 # NAME
 
 Text::Markdown::Hoedown - hoedown for Perl5
@@ -41,40 +41,82 @@ hoedown is a forking project from sundown.
         This is bit flag.  You can use the flags by '|' operator.
         Values are following:
 
-            enum hoedown_extensions {
-                HOEDOWN_EXT_NO_INTRA_EMPHASIS = (1 << 0),
-                HOEDOWN_EXT_TABLES = (1 << 1),
-                HOEDOWN_EXT_FENCED_CODE = (1 << 2),
-                HOEDOWN_EXT_AUTOLINK = (1 << 3),
-                HOEDOWN_EXT_STRIKETHROUGH = (1 << 4),
-                HOEDOWN_EXT_UNDERLINE = (1 << 5),
-                HOEDOWN_EXT_SPACE_HEADERS = (1 << 6),
-                HOEDOWN_EXT_SUPERSCRIPT = (1 << 7),
-                HOEDOWN_EXT_LAX_SPACING = (1 << 8),
-                HOEDOWN_EXT_DISABLE_INDENTED_CODE = (1 << 9),
-                HOEDOWN_EXT_HIGHLIGHT = (1 << 10),
-                HOEDOWN_EXT_FOOTNOTES = (1 << 11),
-                HOEDOWN_EXT_QUOTE = (1 << 12)
-            };
+        - HOEDOWN\_EXT\_TABLES
+
+            Parse PHP-Markdown style tables.
+
+        - HOEDOWN\_EXT\_FENCED\_CODE
+
+            Parse fenced code blocks.
+
+        - HOEDOWN\_EXT\_FOOTNOTES
+
+            Parse footnotes.
+
+        - HOEDOWN\_EXT\_AUTOLINK
+
+            Automatically turn safe URLs into links.
+
+        - HOEDOWN\_EXT\_STRIKETHROUGH
+
+            Parse ~~stikethrough~~ spans.
+
+        - HOEDOWN\_EXT\_UNDERLINE
+
+            Parse \_underline\_ instead of emphasis.
+
+        - HOEDOWN\_EXT\_HIGHLIGHT
+
+            Parse ==highlight== spans.
+
+        - HOEDOWN\_EXT\_QUOTE
+
+            Render "quotes" as &lt;q>quotes&lt;/q>.
+
+        - HOEDOWN\_EXT\_SUPERSCRIPT
+
+            Parse super^script.
+
+        - HOEDOWN\_EXT\_MATH
+
+            Parse TeX $$math$$ syntax, Kramdown style.
+
+        - HOEDOWN\_EXT\_NO\_INTRA\_EMPHASIS
+
+            Disable emphasis\_between\_words.
+
+        - HOEDOWN\_EXT\_SPACE\_HEADERS
+
+            Require a space after '#' in headers.
+
+        - HOEDOWN\_EXT\_MATH\_EXPLICIT
+
+            Instead of guessing by context, parse $inline math$ and $$always block math$$ (requires HOEDOWN\_EXT\_MATH).
+
+        - HOEDOWN\_EXT\_DISABLE\_INDENTED\_CODE
+
+            Don't parse indented code blocks.
 
     - html\_options
 
         This is bit flag.  You can use the flags by '|' operator.
         Values are following:
 
-            typedef enum {
-                HOEDOWN_HTML_SKIP_HTML = (1 << 0),
-                HOEDOWN_HTML_SKIP_STYLE = (1 << 1),
-                HOEDOWN_HTML_SKIP_IMAGES = (1 << 2),
-                HOEDOWN_HTML_SKIP_LINKS = (1 << 3),
-                HOEDOWN_HTML_EXPAND_TABS = (1 << 4),
-                HOEDOWN_HTML_SAFELINK = (1 << 5),
-                HOEDOWN_HTML_TOC = (1 << 6),
-                HOEDOWN_HTML_HARD_WRAP = (1 << 7),
-                HOEDOWN_HTML_USE_XHTML = (1 << 8),
-                HOEDOWN_HTML_ESCAPE = (1 << 9),
-                HOEDOWN_HTML_PRETTIFY = (1 << 10)
-            } hoedown_html_render_mode;
+        - HOEDOWN\_HTML\_SKIP\_HTML
+
+            Strip all HTML tags.
+
+        - HOEDOWN\_HTML\_ESCAPE
+
+            Escape all HTML.
+
+        - HOEDOWN\_HTML\_HARD\_WRAP
+
+            Render each linebreak as &lt;br>.
+
+        - HOEDOWN\_HTML\_USE\_XHTML
+
+            Render XHTML.
 
     - max\_nesting
 

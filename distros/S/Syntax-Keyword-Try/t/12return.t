@@ -24,6 +24,17 @@ use Syntax::Keyword::Try;
    ok( !$after, 'code after try{return} is not invoked' );
 }
 
+# return LIST from try
+{
+   is_deeply(
+      [ sub {
+         try { return qw( A B C ) } catch {}
+      }->() ],
+      [qw( A B C )],
+      'return LIST in try yields correct values'
+   );
+}
+
 # return from two nested try{}s
 {
    my $after;
@@ -58,6 +69,21 @@ use Syntax::Keyword::Try;
       } )->(),
       2,
       'return in eval{} inside try{} behaves as expected'
+   );
+}
+
+# return inside try{} inside eval{}
+{
+   is(
+      ( sub {
+         my $ret = eval {
+            try { return "part"; }
+            catch {}
+         };
+         return "($ret)";
+      } )->(),
+      "(part)",
+      'return in try{} inside eval{}'
    );
 }
 

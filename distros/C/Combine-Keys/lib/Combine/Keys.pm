@@ -5,12 +5,12 @@ use warnings;
 
 use base 'Import::Export';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 require XSLoader;
 XSLoader::load('Combine::Keys', $VERSION);
 
 our %EX= (
-    ckeys		=> [qw/all xs/], 
+    ckeys		=> [qw/all xs/],
     combine_keys	=> [qw/all perl/],
 );
 
@@ -24,7 +24,7 @@ Combine::Keys - keys on multiple hash references
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -34,9 +34,9 @@ Quick summary of what the module does.
 
     use Combine::Keys qw/combine_keys/;
 
-    for ( combine_keys($hash1, \%hash2, { e => 'f' }) ) {  
+    for ( combine_keys($hash1, \%hash2, { e => 'f' }) ) {
         .... magic ---
-    } 
+    }
 
 =head1 EXPORT
 

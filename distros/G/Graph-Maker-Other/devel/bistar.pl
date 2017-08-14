@@ -31,6 +31,123 @@ $|=1;
 use Smart::Comments;
 
 
+{
+  # subdivision of bi-star minimal dominating sets
+  require Graph::Maker::BiStar;
+  my @graphs;
+  foreach my $args ([N=>5,M=>5],
+                    [N=>6,M=>4],
+                    [N=>4,M=>6],
+                   ) {
+    my $graph = Graph::Maker->new('bi_star', undirected=>1, @$args);
+    MyGraphs::Graph_subdivide($graph);
+    push @graphs, $graph;
+    print $graph->get_graph_attribute('name'),
+      "  ", MyGraphs::Graph_tree_minimal_domsets_count($graph),"\n";
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # HOG bistars
+
+  # 2,2 https://hog.grinvin.org/ViewGraphInfo.action?id=594   path-4
+  # 3,2 https://hog.grinvin.org/ViewGraphInfo.action?id=30    fork
+  # 4,2 https://hog.grinvin.org/ViewGraphInfo.action?id=208   cross
+  # 3,3 https://hog.grinvin.org/ViewGraphInfo.action?id=334   H graph
+  # 4,3 https://hog.grinvin.org/ViewGraphInfo.action?id=452
+  # 4,4 https://hog.grinvin.org/ViewGraphInfo.action?id=586   Ethane
+  # 5,2 https://hog.grinvin.org/ViewGraphInfo.action?id=266
+  # 5,3 not
+  # 5,4 https://hog.grinvin.org/ViewGraphInfo.action?id=634
+  # 5,5 https://hog.grinvin.org/ViewGraphInfo.action?id=112
+  #
+  # 6,2 https://hog.grinvin.org/ViewGraphInfo.action?id=332
+  # 6,3 not
+  # 6,4 not
+  # 6,5 https://hog.grinvin.org/ViewGraphInfo.action?id=650
+  # 6,6 https://hog.grinvin.org/ViewGraphInfo.action?id=36
+  #
+  # 7,2 https://hog.grinvin.org/ViewGraphInfo.action?id=366
+  # 7,3 not
+  # 7,4 not
+  # 7,5 not
+  # 7,6 https://hog.grinvin.org/ViewGraphInfo.action?id=38
+  # 7,7 https://hog.grinvin.org/ViewGraphInfo.action?id=166
+  #
+  # 8,2 https://hog.grinvin.org/ViewGraphInfo.action?id=436
+  # 8,3 not
+  # 8,4 not
+  # 8,5 not
+  # 8,6 not
+  # 8,7 https://hog.grinvin.org/ViewGraphInfo.action?id=168
+  # 8,8 not
+  #
+  # 9,2 https://hog.grinvin.org/ViewGraphInfo.action?id=316
+  # 9,3 not
+  # 9,4 not
+  # 9,5 not
+  # 9,6 not
+  # 9,7 not
+  # 9,8 not
+  # 9,9 not
+  #
+  # 10,2 https://hog.grinvin.org/ViewGraphInfo.action?id=320
+  # 10,3 not
+  # 10,4 not
+  # 10,5 not
+  # 10,6 https://hog.grinvin.org/ViewGraphInfo.action?id=27414  (me)
+  # 10,7 not
+  # 10,8 not
+  # 10,9 not
+  # 10,10 not
+
+  require Graph::Maker::BiStar;
+  my @graphs;
+  foreach my $n (8 .. 10) {
+    foreach my $m (# 2,
+                   3 .. $n,
+                  ) {
+      my $graph = Graph::Maker->new('bi_star', N=>$n, M=>$m, undirected=>1);
+      push @graphs, $graph;
+    }
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # HOG subdivision of bi-star, extra vertex in each edge
+
+  # 3,3 https://hog.grinvin.org/ViewGraphInfo.action?id=25170  toothpick
+  # 4,3 not
+  # 4,4 not
+  # 5,3 not
+  # 5,4 not
+  # 5,5 not https://hog.grinvin.org/ViewGraphInfo.action?id=28220
+  # 6,3 not
+  # 6,4 not https://hog.grinvin.org/ViewGraphInfo.action?id=28222
+  # 6,5 not
+  # 6,6 not
+
+  require Graph::Maker::BiStar;
+  my @graphs;
+  foreach my $n (3 .. 6) {
+    foreach my $m (3 .. $n) {
+      my $graph = Graph::Maker->new('bi_star', N=>$n, M=>$m, undirected=>1);
+      MyGraphs::Graph_subdivide($graph);
+      push @graphs, $graph;
+    }
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+
+
+
+
 # GP-DEFINE  bistar_W(n,m) = (n+m)*(n+m-3) + n*m + 2 \
 # GP-DEFINE                  + if(m==0,n-1) \
 # GP-DEFINE                  + if(n==0,m-1);

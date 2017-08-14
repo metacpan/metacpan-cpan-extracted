@@ -45,6 +45,7 @@ WriteMakefile(
         'Moose'            => 2.0801,
         'MooseX::Method::Signatures' => 0.37,
 	'MooseX::ClassAttribute'     => 0.27,
+        'Parse::Method::Signatures'  => 1.003016,
         'JSON'           => 0,
 	'LWP::UserAgent' => 0,
 	'URI::Encode'    => 0,

@@ -1,0 +1,660 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
+# and generated automatically using Perinci::CmdLine::Gen version 0.482
+
+our $DATE = '2017-08-12'; # DATE
+our $DIST = 'Perinci-CmdLine-Inline'; # DIST
+our $VERSION = '0.540'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Lite;
+
+Perinci::CmdLine::Lite->new(
+    url => "/Perinci/CmdLine/Inline/gen_inline_pericmd_script",
+    program_name => "gen-inline-pericmd-script",
+    log => 1,
+)->run;
+
+# ABSTRACT: Generate inline Perinci::CmdLine CLI script
+# PODNAME: gen-inline-pericmd-script
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
+
+=head1 VERSION
+
+This document describes version 0.540 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2017-08-12.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % gen-inline-pericmd-script [options] [url]
+
+=head1 DESCRIPTION
+
+The goal of this module is to let you create a CLI script from a Riap
+function/metadata. This is like what L<Perinci::CmdLine::Lite> or
+L<Perinci::CmdLine::Classic> does, except that the generated CLI script will have
+the functionalities inlined so it only need core Perl modules and not any of the
+C<Perinci::CmdLine::*> or other modules to run (excluding what modules the Riap
+function itself requires).
+
+It's useful if you want a CLI script that is even more lightweight (in terms of
+startup overhead or dependencies) than the one using L<Perinci::CmdLine::Lite>.
+
+So to reiterate, the goal of this module is to create a Perinci::CmdLine-based
+script which only requires core modules, and has as little startup overhead as
+possible.
+
+Currently it only supports a subset of features compared to other
+C<Perinci::CmdLine::*> implementations:
+
+=over
+
+=item * Only support local Riap URL (e.g. C</Foo/bar>, not
+CLL<http://example.org/Foo/bar>);
+
+=back
+
+As an alternative to this module, if you are looking to reduce dependencies, you
+might also want to try using C<depak> to fatpack/datapack your
+L<Perinci::CmdLine::Lite>-based script.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--allow-prereq-json>=I<s>
+
+A list of modules that can be depended upon (JSON-encoded).
+
+See C<--allow-prereq>.
+
+=item B<--allow-prereq>=I<s@>
+
+A list of modules that can be depended upon.
+
+By default, Perinci::CmdLine::Inline will strive to make the script freestanding
+and require core modules. A dependency to a non-core module will cause failure
+(unless `pack_deps` option is set to false). However, you can pass a list of
+modules that is allowed here.
+
+
+Can be specified multiple times.
+
+=item B<--config-dir>=I<s@>
+
+Where to search for configuration files.
+
+Can be specified multiple times.
+
+=item B<--config-dirs-json>=I<s>
+
+Where to search for configuration files (JSON-encoded).
+
+See C<--config-dir>.
+
+=item B<--config-filename-json>=I<s>
+
+Configuration file name(s) (JSON-encoded).
+
+See C<--config-filename>.
+
+=item B<--config-filename>=I<s>
+
+Configuration file name(s).
+
+=item B<--env-name>=I<s>
+
+Name of environment variable name that sets default options.
+
+=item B<--include-json>=I<modulename>, B<-I>
+
+Include extra modules (JSON-encoded).
+
+See C<--include>.
+
+=item B<--include>=I<modulename>
+
+Include an extra module.
+
+Can be specified multiple times.
+
+=item B<--log>
+
+Whether to enable logging.
+
+=item B<--no-pack-deps>
+
+By default, Perinci::CmdLine::Inline will use datapacking technique (i.e. embed
+dependencies into DATA section and load it on-demand using require() hook) to
+make the script freestanding. However, in some situation this is unwanted, e.g.
+when we want to produce a script that can be packaged as a Debian package
+(Debian policy forbids embedding convenience copy of code,
+https://www.debian.org/doc/debian-policy/ch-source.html#s-embeddedfiles ).
+
+
+=item B<--no-pod>
+
+=item B<--no-read-config>
+
+=item B<--no-validate-args>
+
+=item B<--read-env>
+
+Whether CLI script should read environment variable that sets default options.
+
+=item B<--shebang>=I<s>
+
+Set shebang line.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Debugging options
+
+=over
+
+=item B<--with-debug>
+
+Generate script with debugging outputs.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Extra code options
+
+=over
+
+=item B<--code-after-end>=I<s>
+
+=item B<--code-after-shebang>=I<s>
+
+=item B<--code-before-parse-cmdline-options>=I<s>
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--default-subcommand>=I<s>
+
+=item B<--meta-is-normalized>
+
+=item B<--meta-json>=I<s>
+
+An alternative to specifying `url` (JSON-encoded).
+
+See C<--meta>.
+
+=item B<--meta>=I<s>
+
+An alternative to specifying `url`.
+
+=item B<--sub-name>=I<s>
+
+=item B<--subcommands-json>=I<s>
+
+See C<--subcommands>.
+
+=item B<--subcommands>=I<s>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--output-file>=I<filename>, B<-o>
+
+Set output file, defaults to stdout.
+
+=item B<--overwrite>
+
+=back
+
+=head2 Pericmd attribute options
+
+=over
+
+=item B<--actions-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--actions>.
+
+=item B<--actions>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--common-opts-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--common-opts>.
+
+=item B<--common-opts>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--completion-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--completion>.
+
+=item B<--completion>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--default-format-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--default-format>.
+
+=item B<--default-format>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--description-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--description>.
+
+=item B<--description>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--exit-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--exit>.
+
+=item B<--exit>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--extra-urls-for-version-json>=I<riap_url>
+
+More URLs to show version for --version (JSON-encoded).
+
+See C<--extra-urls-for-version>.
+
+=item B<--extra-urls-for-version>=I<riap_url>
+
+More URLs to show version for --version.
+
+Currently not implemented in Perinci::CmdLine::Inline.
+
+
+Can be specified multiple times.
+
+=item B<--formats-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--formats>.
+
+=item B<--formats>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--get-subcommand-from-arg-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--get-subcommand-from-arg>.
+
+=item B<--get-subcommand-from-arg>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--no-use-cleanser>
+
+When a function returns result, and the user wants to display the result as
+JSON, the result might need to be cleansed first (e.g. using <pm:Data::Clean>)
+before it can be encoded to JSON, for example it might contain Perl objects or
+scalar references or other stuffs. If you are sure that your function does not
+produce those kinds of data, you can set this to false to produce a more
+lightweight script.
+
+
+=item B<--pass-cmdline-object>
+
+Whether to pass Perinci::CmdLine::Inline object.
+
+=item B<--riap-client-args-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--riap-client-args>.
+
+=item B<--riap-client-args>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--riap-client-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--riap-client>.
+
+=item B<--riap-client>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--riap-version-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--riap-version>.
+
+=item B<--riap-version>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--script-name>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--script-summary>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--script-version-from-main-version>
+
+Use script's $main::VERSION for the version.
+
+=item B<--script-version>=I<s>
+
+Script version (otherwise will use version from url metadata).
+
+=item B<--skip-format>
+
+Assume that function returns raw text that need no formatting, do not offer --format, --json, --naked-res.
+
+=item B<--tags-json>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base (JSON-encoded).
+
+See C<--tags>.
+
+=item B<--tags>=I<s>
+
+Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
+
+=item B<--url>=I<s>
+
+Program URL.
+
+=item B<--use-utf8>
+
+Whether to set utf8 flag on output.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C gen-inline-pericmd-script gen-inline-pericmd-script
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete gen-inline-pericmd-script 'p/*/`gen-inline-pericmd-script`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gen-inline-pericmd-script.conf>, F<~/gen-inline-pericmd-script.conf>, or F</etc/gen-inline-pericmd-script.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ actions (see --actions)
+ allow_prereq (see --allow-prereq)
+ code_after_end (see --code-after-end)
+ code_after_shebang (see --code-after-shebang)
+ code_before_parse_cmdline_options (see --code-before-parse-cmdline-options)
+ common_opts (see --common-opts)
+ completion (see --completion)
+ config_dirs (see --config-dir)
+ config_filename (see --config-filename)
+ default_format (see --default-format)
+ default_subcommand (see --default-subcommand)
+ description (see --description)
+ env_name (see --env-name)
+ exit (see --exit)
+ extra_urls_for_version (see --extra-urls-for-version)
+ format (see --format)
+ formats (see --formats)
+ get_subcommand_from_arg (see --get-subcommand-from-arg)
+ include (see --include)
+ log (see --log)
+ log_level (see --log-level)
+ meta (see --meta)
+ meta_is_normalized (see --meta-is-normalized)
+ naked_res (see --naked-res)
+ output_file (see --output-file)
+ overwrite (see --overwrite)
+ pack_deps (see --no-pack-deps)
+ pass_cmdline_object (see --pass-cmdline-object)
+ pod (see --no-pod)
+ read_config (see --no-read-config)
+ read_env (see --read-env)
+ riap_client (see --riap-client)
+ riap_client_args (see --riap-client-args)
+ riap_version (see --riap-version)
+ script_name (see --script-name)
+ script_summary (see --script-summary)
+ script_version (see --script-version)
+ script_version_from_main_version (see --script-version-from-main-version)
+ shebang (see --shebang)
+ skip_format (see --skip-format)
+ sub_name (see --sub-name)
+ subcommands (see --subcommands)
+ tags (see --tags)
+ url (see --url)
+ use_cleanser (see --no-use-cleanser)
+ use_utf8 (see --use-utf8)
+ validate_args (see --no-validate-args)
+ with_debug (see --with-debug)
+
+=head1 ENVIRONMENT
+
+=head2 GEN_INLINE_PERICMD_SCRIPT_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/gen-inline-pericmd-script.conf>
+
+F<~/gen-inline-pericmd-script.conf>
+
+F</etc/gen-inline-pericmd-script.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine-Inline>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Inline>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inline>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

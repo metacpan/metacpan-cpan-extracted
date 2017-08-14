@@ -25,6 +25,13 @@ done_testing();
 
 __DATA__
 # THESE SHOULD MATCH...
+    m{^$DRIVE_RX[\\/]}o
+####
+    m/[@#]_
+    /
+####
+    m{^(.*)::(.*)$}
+####
     s(a){b}
 ####
     s (a)
@@ -137,6 +144,8 @@ EOHERE
 ####
     s/'/\\'/g
 ####
+    s;';\\t#\$d#;
+####
     tr/x/y/
 ####
     y/x/y/
@@ -146,5 +155,13 @@ EOHERE
 ####
     s-$self->{pap}-$self->{sub}-       # CAN'T HANDLE '-' in '->'
 ####
-    s<$self->{pat}>{$self->{sub}}      # CAN'T HANDLE '>' in '->'
+    q<$self->{pat}>
+####
+    qq<$self->{pat}>
+####
+    qr<$self->{pat}>
+####
+    qx<$self->{pat}>
+####
+    s<$self->{pat}>{$self->{sub}}
 ####

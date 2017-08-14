@@ -3,36 +3,37 @@ abstract: 'force default handling of a signal'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
-distribution_type: module
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.3607'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IPC-Signal-Force
 provides:
   IPC::Signal::Force:
     file: lib/IPC/Signal/Force.pm
-    version: 0.003
+    version: '0.004'
 requires:
-  Exporter: 0
-  IPC::Signal: 1.00
-  POSIX: 0
-  parent: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Exporter: '0'
+  IPC::Signal: '1.00'
+  POSIX: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-Signal-Force
   license: http://dev.perl.org/licenses/
-version: 0.003
+version: '0.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

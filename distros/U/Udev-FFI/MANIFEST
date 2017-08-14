@@ -4,7 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
-examples/block_partition_monitor.pl
+examples/block_devices_monitor.pl
 examples/device_get_parent.pl
 examples/device_scalar_n_list.pl
 examples/enumerate_scalar_n_list.pl

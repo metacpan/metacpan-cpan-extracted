@@ -6,11 +6,13 @@ with qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
     return {
-        abstract => 'remove tag',
+        abstract => 'remove tags',
+        name     => 'rm',
         arg      => [
             tag => {
                 desc => 'tag',
                 isa  => 'Str',
+                max  => 0,
             },
         ],
     };

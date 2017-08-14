@@ -37,7 +37,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 =head2 SYNOPSIS
 
  my $vc = Text::vCard::Precisely->new();
- # or now you can write like bellow if you want to use 4.0:
+ # or now you can write like below if you want to use 4.0:
  #my $vc = Text::vCard::Precisely->new( version => '4.0' );
 
  $vc->n([ 'Gump', 'Forrest', , 'Mr', '' ]);
@@ -102,7 +102,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 A vCard is a digital business card. vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
 provide an API for parsing vCards
 This module is forked from L<Text::vCard|https://github.com/ranguard/text-vcard>
-because some reason bellow:
+because some reason below:
 
 =over
 
@@ -257,7 +257,7 @@ Accepts/returns an ArrayRef that looks like:
     { type => ['home'], content => 'bbanner@timewarner.com', pref => 1 },
  ]
 
-or accept the string as email like bellow
+or accept the string as email like below
 
  'bbanner@timewarner.com'
 
@@ -270,7 +270,7 @@ Accepts/returns an ArrayRef that looks like:
     { content => 'https://github.com/worthmine' },
  ]
 
-or accept the string as URL like bellow
+or accept the string as URL like below
 
  'https://github.com/worthmine'
 
@@ -448,6 +448,14 @@ L<RFC 6350|https://tools.ietf.org/html/rfc6350>
 =item
 
 L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
+
+=item
+
+L<Text::vCard::Precisely on CPAN|http://search.cpan.org/~worthmine/Text-vCard-Precisely-0.04/lib/Text/vCard/Precisely.pm>
+
+=item
+
+L<Text::vCard::Precisely on GitHub|https://github.com/worthmine/Text-vCard-Precisely>
 
 =back
 

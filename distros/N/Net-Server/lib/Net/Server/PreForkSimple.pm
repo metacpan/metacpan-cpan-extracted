@@ -2,13 +2,9 @@
 #
 #  Net::Server::PreForkSimple - Net::Server personality
 #
-#  $Id$
+#  Copyright (C) 2001-2017
 #
-#  Copyright (C) 2001-2012
-#
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License
@@ -23,6 +19,7 @@ package Net::Server::PreForkSimple;
 
 use strict;
 use base qw(Net::Server);
+use File::Temp qw(tempfile);
 use Net::Server::SIG qw(register_sig check_sigs);
 use POSIX qw(WNOHANG EINTR);
 use Fcntl ();
@@ -81,7 +78,10 @@ sub post_bind {
         if (defined $prop->{'lock_file'}) {
             $prop->{'lock_file_unlink'} = undef;
         } else {
-            $prop->{'lock_file'} = eval { require File::Temp } ? File::Temp::tmpnam() : POSIX::tmpnam();
+            (my $fh, $prop->{'lock_file'}) = tempfile();
+            # We don't need to keep the file handle open in the parent;
+            # each child opens it separately to avoid sharing the lock
+            close $fh or die "Cannot close lock file $prop->{'lock_file'}: $!";
             $prop->{'lock_file_unlink'} = 1;
         }
 
@@ -407,7 +407,7 @@ parameters.
     serialize         (flock|semaphore
                        |pipe|none)  undef
     # serialize defaults to flock on multi_port or on Solaris
-    lock_file         "filename"              File::Temp::tempfile or POSIX::tmpnam
+    lock_file         "filename"              File::Temp->new
 
     check_for_dead    \d+                     30
 

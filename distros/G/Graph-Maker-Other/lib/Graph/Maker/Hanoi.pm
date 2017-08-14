@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -444,6 +444,26 @@ C<Graph-E<gt>new()>.
 If the graph is directed (the default) then edges are added both forward and
 backward between vertices.  Option C<undirected =E<gt> 1> creates an
 undirected graph and for it there is a single edge between vertices.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for graphs here include
+
+=over
+
+=item discs=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21136>
+
+=item discs=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22740>
+
+=item discs=2, spindles=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22742>
+
+=item discs=2, spindles=4, cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25141>
+
+=item discs=2, spindles=4, linear, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25143>
+
+=item discs=2, spindles=4, star, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21152>
 
 =back
 

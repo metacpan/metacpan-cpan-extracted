@@ -155,7 +155,7 @@ package SQLite_File;
 use base qw/Tie::Hash Tie::Array Exporter/;
 use strict;
 use warnings;
-our $VERSION = '0.1000';
+our $VERSION = '0.1002';
 
 use vars qw( $AUTOLOAD ) ;
 

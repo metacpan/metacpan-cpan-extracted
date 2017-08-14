@@ -16,7 +16,7 @@ require	Exporter;
 use vars qw($VERSION @EXPORT @ISA %intervals);
 @ISA 		= qw(Exporter);
 @EXPORT		= qw(&parseInterval &convertInterval &getInterval &coalesce);
-$VERSION	= 1.233;
+$VERSION	= 1.234;
 #what everything is worth in seconds
 %intervals 	= (
 	'days'		=> ((60**2) * 24),
@@ -42,7 +42,7 @@ sub getInterval {
 			return (undef);
 		};
 	}
-	
+
 	my %args = ( seconds => abs($date1 - $date2) );
 	if ($string =~/^small/i){
 		$args{'Small'} = 1;
@@ -70,10 +70,10 @@ sub convertInterval {
 	#convert everything to seconds
 	my $seconds = 0;
 	foreach ("days","hours","minutes","seconds"){
-		
+
 		#new 1.233 hotness: quantize seconds.
 		if ($_ eq "seconds"){ $p{$_} = int($p{$_}); }
-		
+
 		#as it were
 		if (exists($p{$_})){ $seconds += ($intervals{$_} * $p{$_}); }
 	}
@@ -91,10 +91,10 @@ sub parseInterval {
 	my %p = @_;
 	#convert everything to seconds
 	my $seconds = convertInterval(%p);
-	
+
 	#new 1.233 hotness: quantize seconds.
 	$seconds = int($seconds);
-	
+
 	#do the thang
 	my %time = (
 		'days'		=> 0,
@@ -137,7 +137,7 @@ sub parseInterval {
 	}else{
 		#return a data structure
 		return (\%time);
-	}	
+	}
 }
 
 
@@ -148,17 +148,17 @@ sub coalesce {
 	my $intervals = shift() || [];
 	my %epoch_map = ();
 	my ($flag, $repeat) = (0,1);
-	
+
 	#convert each start / end to an epoch pair and stash 'em in epoch_map
 	foreach my $int (@{$intervals}) {
 		foreach (@{$int}){
-			
+
 			## only convert if it's not already epoch time
 			my $epoch = "";
 			if ($_ =~/^(\d{10})$/){
 				$epoch = $1;
 			}else{
-				my $epoch = Date::Parse::str2time($_);
+				$epoch = Date::Parse::str2time($_);
 			}
 			$epoch_map{$epoch} = $_;
 			$_ = $epoch;
@@ -167,13 +167,13 @@ sub coalesce {
 
 	#sort 'em by start time
 	@{$intervals} = sort { $a->[0] <=> $b->[0] } @{$intervals};
-	
+
 	#flatten 'em
 	while ($repeat == 1) {
 		@{$intervals} = sort {
 			#if it's not an array ref, it's been destructo'd
 			if ( (ref($a) eq "ARRAY") && (ref($b) eq "ARRAY") ){
-			
+
 				#if b is inside a
 				if (($b->[0] >= $a->[0]) && ($b->[0] <= $a->[1])){
 					#if b's end time is greater than a's, update a's end time
@@ -193,36 +193,36 @@ sub coalesce {
 				}else{
 					return (0);
 				}
-		
+
 			}else{
 				return (1);
 			}
-	
+
 		} @{$intervals};
-	
+
 		#weed out null elements
 		my $i = 0;
 		foreach (@{$intervals}){
 			if ( ref($_) ne "ARRAY" ){ splice (@{$intervals}, $i, 1); }
 			$i ++;
 		}
-		
+
 		#decide wether or not to repeat
-		if ($flag == 1){ 
-			$repeat = 1;  
+		if ($flag == 1){
+			$repeat = 1;
 			$flag = 0;
-		}else{ 
+		}else{
 			$repeat = 0;
 		}
 	}
-	
+
 	#replace the epoch's with their time string equivalents
 	foreach my $pair (@{$intervals}){
 		if ( ref($pair) eq "ARRAY"){
 			foreach (@{$pair}){ $_ = $epoch_map{$_}; }
 		}
 	}
-	
+
 	#weed out any remaining bum elements
 	my $i = 0;
 	foreach (@{$intervals}){

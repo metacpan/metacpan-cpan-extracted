@@ -1,3 +1,56 @@
+version 0.012; 2017-08-09
+
+  * bugfix: fix handling of the demanding-accuracy parameter on Perl 5.6,
+    where it could be interpreted as the wrong value in either direction
+    and could erroneously warn about non-numeric values
+
+  * bugfix: fix compilability of Win32 GetSystemTimeAsFileTime() code
+    by properly defining the U64 type
+
+  * bugfix: where ntp_adjtime() doesn't supply the actual time, properly
+    handle finding the larger magnitude of the two offset values seen
+    when the offset is negative
+
+  * bugfix: when loading modules from XS, generate NV form of required
+    version number through Perl's own Atof() conversion function, rather
+    than casting from a C double that might suffer rounding error or
+    might otherwise produce different results from the Perl conversions
+    against which it must be compared
+
+  * support clock_gettime(CLOCK_REALTIME), the POSIX replacement for
+    gettimeofday() which provides nanosecond resolution
+
+  * support clock_gettime(CLOCK_UTC), Markus Kuhn's proposed POSIX-like
+    interface for leap-second-correct UTC with a fixed inaccuracy bound
+
+  * check sub-second field values yielded by ntp_adjtime(), ntp_gettime(),
+    and gettimeofday(), rejecting those that are out of range, such as
+    the out of range values from ntp_gettime() resulting from a FreeBSD
+    kernel bug that confuses microsecond and nanosecond resolution
+
+  * be more careful to avoid and handle arithmetic overflows when
+    computing the inaccuracy bound supplied by ntp_adjtime()
+
+  * in documentation, describe the FreeBSD kernel bug that confuses
+    microsecond and nanosecond resolution
+
+  * in documentation, note that Linux now has the configurable-resolution
+    version of ntp_adjtime()
+
+  * in documentation, no longer describe the FreeBSD
+    configurable-resolution ntp_adjtime() code as experimental
+
+  * in documentation, no longer describe the Windows
+    GetSystemTimeAsFileTime() code as experimental
+
+  * in documentation, note adjtimex() as another name for ntp_adjtime()
+
+  * in documentation, clarify that the mechanisms are listed in preference
+    order
+
+  * new test script that displays the results of all available mechanisms,
+    to get that into test reports as a porting/debugging aid
+
 version 0.011; 2017-07-29
 
   * update automatic configuration to not rely on . in @INC, which is

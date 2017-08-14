@@ -61,6 +61,8 @@ sub process_components {
     next unless $constructed_components{$id};
     my $processed_component = $constructed_components{$id}->get_processed_dom;
 
+=head1 comment
+
     # Move all the scripts, styles and links to the head area
     # TODO this probably doesn't work if the stuff is in a component
     # inside a component.
@@ -74,10 +76,15 @@ sub process_components {
         $_->remove;
     });
     $processed_component->find('script:not(head script)')->each(sub {
-        my $content = $_->content || '';
-        $dom->append_script_uniquely($_);
+        my ($e, $num) = @_;
+        my $content = $dom->content || '';
+                warn "moving $e to $dom";
+
+        $dom->append_script_uniquely($e);
         $_->remove;
     });
+
+=cut
 
     $dom->at("[uuid='$id']")->replace($processed_component);
   }

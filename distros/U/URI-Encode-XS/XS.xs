@@ -3,6 +3,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+#include "utf8_valid.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -103,6 +104,87 @@ size_t uri_decode (const char *src, const size_t len, char *dst)
   return j;
 }
 
+static const char * const kHex = "0123456789ABCDEF";
+
+static void THX_assert_wellformed_utf8(pTHX_ const char *src, size_t len)
+{
+  size_t cursor;
+
+  if (!utf8_check(src, len, &cursor))
+  {
+    char sequence[sizeof("\\xHH \\xHH \\xHH")];
+    char *d;
+
+    src += cursor;
+    len  = utf8_maximal_subpart(src, len);
+
+    for (d = sequence; len > 0; len--)
+    {
+      const unsigned char c = (unsigned char)*src++;
+      *d++ = kHex[c >> 4];
+      *d++ = kHex[c & 15];
+      if (len > 1)
+        *d++ = ' ';
+    }
+    *d = 0;
+    croak("Can't decode ill-formed UTF-8 octet sequence <%s>\n", sequence);
+  }
+}
+
+static void THX_assert_wellformed_unicode(pTHX_ const char *src, size_t len)
+{
+  size_t cursor;
+
+  if (!utf8_check(src, len, &cursor))
+  {
+    const U32 flags = (UTF8_ALLOW_ANYUV|UTF8_CHECK_ONLY) & ~UTF8_ALLOW_LONG;
+    const unsigned char *cur = (const unsigned char *)src;
+    UV ord;
+
+    cur += cursor;
+    len -= cursor;
+
+    ord = utf8n_to_uvuni(cur, len, &cursor, flags);
+    if (cursor != (STRLEN) -1)
+    {
+      const char *fmt;
+
+      if ((ord & 0xF800) == 0xD800)
+        fmt = "Can't represent surrogate code point U+%"UVXf" in UTF-8 encoding";
+      else
+        fmt = "Can't represent super code point \\x{%"UVXf"} in UTF-8 encoding";
+
+      croak(fmt, ord);
+    }
+    else
+    {
+      char sequence[UTF8_MAXBYTES * 3];
+      char *d;
+
+      cursor = 1;
+      if (UTF8_IS_START(*cur))
+      {
+        size_t skip = UTF8SKIP(cur);
+        if (skip > len)
+          skip = len;
+        while (cursor < skip && UTF8_IS_CONTINUATION(cur[cursor]))
+          cursor++;
+      }
+
+      for (d = sequence; cursor > 0; cursor--)
+      {
+        const unsigned char c = *cur++;
+        *d++ = kHex[c >> 4];
+        *d++ = kHex[c & 15];
+        if (cursor > 1)
+          *d++ = ' ';
+      }
+      *d = 0;
+      croak("Can't decode ill-formed UTF-X octet sequence <%s>\n", sequence);
+    }
+  }
+}
+
 static void THX_uri_encode_dsv (pTHX_ const char *src, size_t len, SV *dsv)
 {
   char *dst;
@@ -150,6 +232,13 @@ static void THX_uri_decode_dsv (pTHX_ const char *src, size_t len, SV *dsv)
 #define uri_decode_dsv(src, len, dsv) \
   THX_uri_decode_dsv(aTHX_ src, len, dsv)
 
+
+#define assert_wellformed_utf8(src, len) \
+  THX_assert_wellformed_utf8(aTHX_ src, len)
+
+#define assert_wellformed_unicode(src, len) \
+  THX_assert_wellformed_unicode(aTHX_ src, len)
+
 MODULE = URI::Encode::XS      PACKAGE = URI::Encode::XS
 
 PROTOTYPES: ENABLED
@@ -196,7 +285,37 @@ uri_encode(SV *uri)
     PUSHTARG;
 
 void
+uri_encode_utf8(SV *uri)
+  PREINIT:
+    dXSTARG;
+    const char *src;
+    size_t len;
+  PPCODE:
+    SvGETMAGIC(uri);
+
+    if (!SvOK(uri))
+    {
+      croak("uri_encode_utf8() requires a scalar argument to encode!");
+    }
+
+    src = SvPV_nomg_const(uri, len);
+    if (!SvUTF8(uri))
+    {
+      uri = sv_2mortal(newSVpvn(src, len));
+      sv_utf8_encode(uri);
+      src = SvPV_const(uri, len);
+    }
+
+    assert_wellformed_unicode(src, len);
+    uri_encode_dsv(src, len, TARG);
+
+    PUSHTARG;
+
+void
 uri_decode(SV *uri)
+  ALIAS:
+    URI::Encode::XS::uri_decode      = 0
+    URI::Encode::XS::uri_decode_utf8 = 1
   PREINIT:
     /* declare TARG */
     dXSTARG;
@@ -209,7 +328,8 @@ uri_decode(SV *uri)
     /* check for undef */
     if (!SvOK(uri))
     {
-      croak("uri_decode() requires a scalar argument to decode!");
+      croak("%s() requires a scalar argument to decode!",
+        ix == 0 ? "uri_decode" : "uri_decode_utf8");
     }
 
     /* copy the sv without the magic struct */
@@ -233,6 +353,12 @@ uri_decode(SV *uri)
     }
     uri_decode_dsv(src, len, TARG);
 
+    if (ix == 1)
+    {
+      src = SvPV_const(TARG, len);
+      assert_wellformed_utf8(src, len);
+      SvUTF8_on(TARG);
+    }
     /* push TARG into return stack */
     PUSHTARG;
 

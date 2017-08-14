@@ -1,6 +1,6 @@
 Build.PL
 lib/UnicodeOperators.pm
-MANIFEST      This list of files
-README
+MANIFEST			This list of files
+test.pl
 META.yml
 META.json

@@ -10,6 +10,7 @@ use File::Spec;
 use File::Path;
 use Carp;
 use version;
+use Module::Runtime qw( require_module );
 
 package TestParseFile;
 
@@ -1327,7 +1328,7 @@ sub rstr_module {
     while ($str[0] =~ /^\d+/) {
         $str[0] =~ s/^\d+//;
         shift @str unless ($str[0]);
-        return &rstr_module unless (@str);
+        return rstr_module() unless (@str);
     }
     
     return join('::', @str);
@@ -1373,11 +1374,9 @@ my @licenses = keys %$Module::Starter::Simple::LICENSES;
 foreach my $builder (qw(ExtUtils::MakeMaker Module::Build Module::Install)) {
 subtest "builder = $builder" => sub {
     $builder = $builder; # 5.8 scoping issue (GH#57)
-    undef $@;
-    eval "require $builder";  # require hates string class names; must use eval string instead of block
-    plan ($@ ? 
-        (skip_all => $builder.' not installed') : 
-        (tests => scalar @licenses)
+    plan (eval { require_module $builder; 1 } ?
+        (tests => scalar @licenses) :
+        (skip_all => $builder.' not installed')
     );
 
     foreach my $license (@licenses) {

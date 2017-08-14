@@ -1,12 +1,12 @@
 package Getopt::Long::Subcommand;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.101'; # VERSION
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.102'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::ger;
+#use Log::ger;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -64,8 +64,8 @@ sub _gl_getoptions {
     } else {
         @configure = grep { $_ ne 'pass_through' } @configure;
     }
-    log_trace('[comp][glsubc] Performing Getopt::Long::GetOptions (configure: %s)',
-              $pass_through, \@configure);
+    #log_trace('[comp][glsubc] Performing Getopt::Long::GetOptions (configure: %s)',
+    #          $pass_through, \@configure);
 
     my $old_conf = Getopt::Long::Configure(@configure);
     local $SIG{__WARN__} = sub {} if $pass_through;
@@ -77,15 +77,15 @@ sub _gl_getoptions {
     # passed as the third argument to the handler.
     local $res->{_non_options_argv} = [];
 
-    log_trace('[comp][glsubc] @ARGV before Getopt::Long::GetOptions: %s', \@ARGV);
-    log_trace('[comp][glsubc] spec for Getopt::Long::GetOptions: %s', $ospec);
+    #log_trace('[comp][glsubc] @ARGV before Getopt::Long::GetOptions: %s', \@ARGV);
+    #log_trace('[comp][glsubc] spec for Getopt::Long::GetOptions: %s', $ospec);
     my $gl_res = Getopt::Long::GetOptions(
         %$ospec,
         '<>' => sub { push @{ $res->{_non_options_argv} }, $_[0] },
     );
     @ARGV = @{ $res->{_non_options_argv} };
 
-    log_trace('[comp][glsubc] @ARGV after Getopt::Long::GetOptions: %s', \@ARGV);
+    #log_trace('[comp][glsubc] @ARGV after Getopt::Long::GetOptions: %s', \@ARGV);
     Getopt::Long::Configure($old_conf);
     $gl_res;
 }
@@ -101,7 +101,7 @@ sub _GetOptions {
 
     # check command spec
     {
-        log_trace("[comp][glsubc] Checking cmdspec keys: %s", [keys %$cmdspec]);
+        #log_trace("[comp][glsubc] Checking cmdspec keys: %s", [keys %$cmdspec]);
         for my $k (keys %$cmdspec) {
             (grep { $_ eq $k } @known_cmdspec_keys)
                 or die "Unknown command specification key '$k'" .
@@ -177,7 +177,7 @@ sub _GetOptions {
     }
     $res->{success} //= 1;
 
-    log_trace('[comp][glsubc] Final @ARGV: %s', \@ARGV) unless $stash->{path};
+    #log_trace('[comp][glsubc] Final @ARGV: %s', \@ARGV) unless $stash->{path};
     #log_trace('[comp][glsubc] TMP: stash=%s', $stash);
     #log_trace('[comp][glsubc] TMP: res=%s', $res);
     $res;
@@ -294,7 +294,7 @@ Getopt::Long::Subcommand - Process command-line options, with subcommands and co
 
 =head1 VERSION
 
-This document describes version 0.101 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2017-08-01.
+This document describes version 0.102 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2017-08-12.
 
 =head1 SYNOPSIS
 

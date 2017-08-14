@@ -4,9 +4,15 @@ Data::ID::Exim - generate Exim message IDs
 
 DESCRIPTION
 
-This module supplies a function which generates IDs using the algorithm
-that the Exim MTA uses to generate message IDs.  It also supplies
-functions to manipulate such IDs, and the base 62 encoding in isolation.
+This module supplies functions which generate IDs using the algorithms
+that the Exim MTA uses to generate message IDs, and functions to
+manipulate such IDs.  Exim has two schemes for message IDs, one using
+base 62 to compactly represent numeric components and one using base
+36.  Base 62 is the preferred system, and is used where filenames are
+case-sensitive.  Base 36, which yields monocase (specifically uppercase)
+message IDs, is used where filenames are case-insensitive.  Apart from
+the radix the two schemes are very similar.  This module supplies separate
+functions for the two schemes.
 
 INSTALLATION
 
@@ -21,7 +27,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 COPYRIGHT
 
-Copyright (C) 2004, 2006, 2007, 2009, 2010, 2011
+Copyright (C) 2004, 2006, 2007, 2009, 2010, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 LICENSE

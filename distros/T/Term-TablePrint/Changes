@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.054   2017-08-09
+        - Code refactoring
+        - Fix option "grid"
+
 0.053   2017-04-21
         - New option "grid".
         - Update documentation.

@@ -1,5 +1,10 @@
 The following logs changes for the CPAN distribution Catalyst::View::Template::Lace
 
+0.008   11 August 2017
+        - Use lasted version of Template::Lace
+        - More documentation on the URL role
+        - when using URI role the action now defaults to the current action
+
 0.007   02 August 2017
         - Use lasted version of Template::Lace
         - Minor doc tweaks

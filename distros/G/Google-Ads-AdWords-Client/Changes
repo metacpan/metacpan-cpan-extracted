@@ -1,3 +1,8 @@
+4.16.0
+- Added support and examples for v201708.
+- Updated the add_responsive_display_ad.pl example to demonstrate
+  new features.
+
 4.15.0
 - Removed examples and support for v201607. For future sunset dates, see
 https://developers.google.com/adwords/api/docs/sunset-dates

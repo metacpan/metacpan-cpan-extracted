@@ -14,4 +14,7 @@ t/now.t
 t/pod_cvg.t
 t/pod_syn.t
 t/threads.t
+t/try_all.t
+t/warn.t
+typemap
 SIGNATURE    Added here by Module::Build

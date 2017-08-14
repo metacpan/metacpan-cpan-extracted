@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -16,7 +16,7 @@ name: Perl-Tokenizer
 provides:
   Perl::Tokenizer:
     file: lib/Perl/Tokenizer.pm
-    version: '0.05'
+    version: '0.06'
 recommends:
   Getopt::Std: '0'
   HTML::Entities: '0'
@@ -26,9 +26,12 @@ requires:
   Exporter: '0'
   perl: v5.18.0
   strict: '0'
+  utf8: '0'
   warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/trizen/Perl-Tokenizer/issues
+  homepage: https://github.com/trizen/Perl-Tokenizer
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Perl-Tokenizer
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

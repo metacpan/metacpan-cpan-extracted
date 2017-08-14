@@ -4,7 +4,6 @@ LICENSE
 META.json
 README.md
 cpanfile
-cpanfile.snapshot
 lib/Text/Xslate/Bridge/TypeDeclaration.pm
 lib/Text/Xslate/Bridge/TypeDeclaration/Registry.pm
 minil.toml

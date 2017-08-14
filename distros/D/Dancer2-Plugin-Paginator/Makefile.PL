@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dancer2-Plugin-Paginator",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Dancer2::Plugin::Paginator",
   "PREREQ_PM" => {
     "Dancer2::Plugin" => "0.159002",
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "JSON" => 0
   },
-  "VERSION" => "2.03",
+  "VERSION" => "2.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -21,4 +21,4 @@ requires:
   Date::Manip: '6.52'
   File::Slurp: '9999.19'
   Text::CSV: '1.33'
-version: '0.05'
+version: '0.06'

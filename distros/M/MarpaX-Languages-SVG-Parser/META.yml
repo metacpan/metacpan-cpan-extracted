@@ -1,44 +1,37 @@
 ---
 abstract: 'An SVG parser'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: '0.94'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.48'
 configure_requires:
-  Module::Build: '0.38'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MarpaX-Languages-SVG-Parser
-provides:
-  MarpaX::Languages::SVG::Parser:
-    file: lib/MarpaX/Languages/SVG/Parser.pm
-    version: '1.06'
-  MarpaX::Languages::SVG::Parser::Actions:
-    file: lib/MarpaX/Languages/SVG/Parser/Actions.pm
-    version: '1.06'
-  MarpaX::Languages::SVG::Parser::Config:
-    file: lib/MarpaX/Languages/SVG/Parser/Config.pm
-    version: '1.06'
-  MarpaX::Languages::SVG::Parser::SAXHandler:
-    file: lib/MarpaX/Languages/SVG/Parser/SAXHandler.pm
-    version: '1.06'
-  MarpaX::Languages::SVG::Parser::Utils:
-    file: lib/MarpaX/Languages/SVG/Parser/Utils.pm
-    version: '1.06'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Capture::Tiny: '0.22'
+  Config: '0'
   Config::Tiny: '2.19'
   Data::Section::Simple: '0.05'
   Date::Simple: '3.03'
+  Encode: '0'
   File::Basename: '2.82'
   File::Copy: '2.21'
   File::HomeDir: '1'
-  File::Slurp: '9999.19'
+  File::Slurper: '0.009'
   File::Spec: '3.4'
+  File::Temp: '0.2304'
   Getopt::Long: '2.41'
   Log::Handler: '0.79'
   Marpa::R2: '2.082'
@@ -46,16 +39,17 @@ requires:
   Path::Tiny: '0.034'
   Pod::Usage: '1.63'
   Set::Array: '0.3'
-  Text::CSV::Encoded: '0.22'
+  Text::CSV: '0'
   Text::Xslate: '1.6002'
   Types::Standard: '0.026'
-  XML::SAX::Base: '1.08'
-  XML::SAX::ParserFactory: '1.01'
+  XML::Parser: '2.44'
   open: '0'
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: https://github.com/ronsavage/MarpaX-Languages-SVG-Parser
-version: '1.06'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-SVG-Parser
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/MarpaX-Languages-SVG-Parser.git
+version: '1.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

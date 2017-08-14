@@ -66,8 +66,8 @@ JS
             <<'JS'
                 var urls = [];
 
-                var chartsBaseUrl = '/static/amcharts/v3.21.2/';
-                var mapBaseUrl = '/static/ammap/v3.21.2/';
+                var chartsBaseUrl = '/static/amcharts/v3.21.4/';
+                var mapBaseUrl = '/static/ammap/v3.21.4/';
 
                 if (typeof AmCharts == 'undefined') {
                     urls.push( chartsBaseUrl + 'amcharts.js');

@@ -4,7 +4,7 @@ Centrifugo::Client : A server-side Perl client for centrifugo
 
 https://github.com/Orabig/centrifugo-perl-client
 
-This module can be used to connect to a Centrifugo server with WebSockets.
+This module can be used to connect to a Centrifugo server with WebSockets. (Note: it does not provide access to the HTTP API of Centrifugo)
 
 More info about Centrifugo :
 https://github.com/centrifugal/centrifugo or https://fzambia.gitbooks.io/centrifugal/content/
@@ -30,8 +30,6 @@ perldoc command.
 
 EXAMPLE
 
-Note : To connect to a Centrifugo instance, your program should first ask for a TOKEN. This part is not covered by this module, because it is implementation-dependant.
-
 	use Centrifugo::Client;
 	use AnyEvent;
 
@@ -44,12 +42,23 @@ Note : To connect to a Centrifugo instance, your program should first ask for a 
 	) -> on('connect', sub{
 		my ($infoRef)=@_;
 		print "Connected to Centrifugo version ".$infoRef->{version};
-		# When connected, connect to some channel
-		$cclient->subscribe( $CHANNEL );
 	})-> on('message', sub{
 		my ($infoRef)=@_;
 		print "Received message : ".encode_json $infoRef->{data};
 	});
+	
+	# Subscription to channels are delayed until connection
+	$cclient->subscribe( channel=>'my-channel&' );
+	$cclient->subscribe( channel=>'public-channel' );
+	$cclient->subscribe( channel=>'$private' );
 
 	# Now start the event loop to keep the program alive
 	AnyEvent->condvar->recv;
+	
+Note : To connect to a Centrifugo instance, your program should first ask for a TOKEN. In production this must only be done on backend side and you should never show secret to client! 
+
+    use Centrifugo::Client qw!generate_token!;
+	my $SECRET = "secret";
+	my $USER = "someUser";
+	my $TIMESTAMP = time();
+    my $TOKEN = generate_token( $SECRET, $USER, $TIMESTAMP );

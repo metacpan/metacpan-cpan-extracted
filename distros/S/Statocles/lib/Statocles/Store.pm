@@ -1,5 +1,5 @@
 package Statocles::Store;
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 # ABSTRACT: The source for data documents and files
 
 use Statocles::Base 'Class';
@@ -324,6 +324,22 @@ sub has_file {
     return $self->path->child( $path )->is_file;
 }
 
+#pod =method files
+#pod
+#pod     my $iter = $store->files
+#pod
+#pod Returns an iterator which iterates over I<all> files in the store,
+#pod regardless of type of file.  The iterator returns a L<Path::Tiny>
+#pod object or undef if no files remain.  It is used by L<find_files>.
+#pod
+#pod =cut
+
+sub files {
+    my ( $self ) = @_;
+    return $self->path->iterator({ recurse => 1 });
+}
+
+
 #pod =method find_files
 #pod
 #pod     my $iter = $store->find_files( %opt )
@@ -339,12 +355,14 @@ sub has_file {
 #pod     include_documents      - If true, will include files that look like documents.
 #pod                              Defaults to false.
 #pod
+#pod It obtains its list of files from L<files>.
+#pod
 #pod =cut
 
 sub find_files {
     my ( $self, %opt ) = @_;
     $self->_check_exists;
-    my $iter = $self->path->iterator({ recurse => 1 });
+    my $iter = $self->files;
     return sub {
         my $path;
         while ( $path = $iter->() ) {
@@ -436,7 +454,7 @@ Statocles::Store - The source for data documents and files
 
 =head1 VERSION
 
-version 0.083
+version 0.084
 
 =head1 DESCRIPTION
 
@@ -533,6 +551,14 @@ Returns true if a file exists with the given C<path>.
 NOTE: This should not be used to check for directories, as not all stores have
 directories.
 
+=head2 files
+
+    my $iter = $store->files
+
+Returns an iterator which iterates over I<all> files in the store,
+regardless of type of file.  The iterator returns a L<Path::Tiny>
+object or undef if no files remain.  It is used by L<find_files>.
+
 =head2 find_files
 
     my $iter = $store->find_files( %opt )
@@ -547,6 +573,8 @@ Available options are:
 
     include_documents      - If true, will include files that look like documents.
                              Defaults to false.
+
+It obtains its list of files from L<files>.
 
 =head2 open_file
 

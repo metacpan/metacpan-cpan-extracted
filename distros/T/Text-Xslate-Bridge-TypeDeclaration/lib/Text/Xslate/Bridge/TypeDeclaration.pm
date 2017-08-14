@@ -4,7 +4,8 @@ use warnings;
 use parent qw(Text::Xslate::Bridge);
 
 use Carp qw(croak);
-use List::Util qw(all);
+use Data::Dumper;
+use List::MoreUtils qw(all);
 use Scalar::Util qw(blessed);
 use Text::Xslate qw(mark_raw);
 use Text::Xslate::Bridge::TypeDeclaration::Registry;
@@ -12,7 +13,7 @@ use Type::Registry ();
 use Type::Tiny qw();
 use Types::Standard qw(Any Dict slurpy);
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 # Set truthy value to skip validation for local scope.
 our $DISABLE_VALIDATION = 0;
@@ -70,11 +71,19 @@ sub _declare_func {
 
 # This treats unknown types as a declaration error.
 sub _get_invalid_type {
-    my ($name) = @_;
+    my ($name_or_struct) = @_;
 
+    local $Data::Dumper::Indent   = 0;
+    local $Data::Dumper::Maxdepth = 2;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Terse    = 1;
+    local $Data::Dumper::Useqq    = 1;
+
+    my $name = Dumper($name_or_struct);
     return Type::Tiny->new(
-        constraint => sub { },
-        message    => sub { "\"$name\" is not a known type" },
+        display_name => $name,
+        constraint   => sub { },
+        message      => sub { "$name is not a known type" },
     );
 }
 

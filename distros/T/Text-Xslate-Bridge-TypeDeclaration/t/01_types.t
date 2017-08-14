@@ -51,10 +51,22 @@ subtest 'undef' => sub {
 subtest 'invaid' => sub {
     ok !validate('', undef);
     ok !validate(undef, undef);
+};
 
-    my $type = Text::Xslate::Bridge::TypeDeclaration::_get_invalid_type('InvalidTypeName');
+subtest 'get_invalid_type' => sub {
+    my $type;
+
+    $type = Text::Xslate::Bridge::TypeDeclaration::_get_invalid_type('InvalidTypeName');
     ok !$type->check('');
     is $type->get_message(''), '"InvalidTypeName" is not a known type';
+
+    $type = Text::Xslate::Bridge::TypeDeclaration::_get_invalid_type('ArrayRef[Int]');
+    ok !$type->check('');
+    is $type->get_message(''), '"ArrayRef[Int]" is not a known type';
+
+    $type = Text::Xslate::Bridge::TypeDeclaration::_get_invalid_type(['Int', 'Str']);
+    ok !$type->check('');
+    is $type->get_message(''), '["Int","Str"] is not a known type';
 };
 
 done_testing;

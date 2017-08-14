@@ -16,6 +16,25 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_line : Test(1) {
+    my $self = shift;
+
+    my $js1 = "
+        var s = this.form.mea_id;
+        for (var i = 0; i < s.options.length; i++)
+            s.options[i].selected = this.checked;
+    ";
+
+    my $js2 = "var s = this.form.mea_id;".
+        " for (var i = 0; i < s.options.length; i++)".
+        " s.options[i].selected = this.checked;";
+
+    my $val = Prty::JavaScript->line($js1);
+    $self->is($val,$js2);
+}
+
+# -----------------------------------------------------------------------------
+
 my $scriptTag1 = <<'__CODE__';
 <script type="text/javascript" src="https://host.domain/script.js"></script>
 __CODE__

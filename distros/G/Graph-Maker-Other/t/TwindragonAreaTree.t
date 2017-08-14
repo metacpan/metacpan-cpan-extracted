@@ -29,9 +29,6 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 plan tests => 16;
 
 
@@ -40,7 +37,7 @@ require Graph::Maker::TwindragonAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Maker::TwindragonAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwindragonAreaTree->VERSION,  $want_version,

@@ -21,7 +21,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/peri-doc'
+    'script/peri-doc'
 );
 
 # no fake home requested

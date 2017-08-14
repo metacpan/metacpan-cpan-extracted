@@ -4,7 +4,7 @@ use base qw/Prty::Html::Widget/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Html::Widget::RadioButton;
 
@@ -197,7 +197,7 @@ sub html {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

@@ -3,6 +3,7 @@ package Module::Starter;
 use warnings;
 use strict;
 use Carp qw( croak );
+use Module::Runtime qw( require_module );
 
 =head1 NAME
 
@@ -10,11 +11,11 @@ Module::Starter - a simple starter kit for any module
 
 =head1 VERSION
 
-Version 1.72
+Version 1.73
 
 =cut
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 =head1 SYNOPSIS
 
@@ -91,9 +92,7 @@ sub import {
     my $parent;
 
     while (my $child = shift @plugins) {
-        eval "require $child";
-
-        croak "couldn't load plugin $child: $@" if $@;
+        require_module $child;
 
         ## no critic
         no strict 'refs'; #Violates ProhibitNoStrict

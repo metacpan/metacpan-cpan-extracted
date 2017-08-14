@@ -1,3 +1,7 @@
+2017-08-10 - v0.06
+    + You can pre defined parameters during object construction
+    + You can pre defined headers during object construction
+
 2015-01-20 - v0.04
     + Update POD
     + Remove unwanted perltidy message

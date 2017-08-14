@@ -1,11 +1,12 @@
 requires 'perl', '5.008001';
 
 requires 'Carp';
-requires 'List::Util';
+requires 'Data::Dumper', '>= 2.154';
+requires 'List::MoreUtils';
 requires 'Scalar::Util';
 requires 'Text::Xslate';
 requires 'Text::Xslate::Bridge';
-requires 'Type::Tiny';
+requires 'Type::Tiny', '>= 1.002';
 requires 'Type::Tiny::XS';
 
 on 'test' => sub {

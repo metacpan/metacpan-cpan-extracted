@@ -19,7 +19,7 @@ scripts/tmx-explode
 scripts/tmx-tokenize
 scripts/tmx-POStagger
 
-examples/xpdf-tmx
+examples/tmx2pdf-prince
 examples/po2tmx
 
 t/01_main.t

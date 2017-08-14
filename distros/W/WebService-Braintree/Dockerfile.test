@@ -1,0 +1,31 @@
+FROM perl:{{version}}
+MAINTAINER Rob Kinyon rob.kinyon@gmail.com
+
+RUN apt-get update && apt-get install -y sudo
+
+RUN curl -L http://cpanmin.us | perl - App::cpanminus
+RUN cpanm \
+  Carton \
+  CPAN::Uploader \
+  Dist::Zilla \
+  Dist::Zilla::Plugin::ReadmeAnyFromPod \
+  Dist::Zilla::Plugin::GitHub::Meta \
+  Dist::Zilla::App::Command::cover
+
+ENV app /app
+# We need to have /app open to everyone because we don't know what user we
+# will be when we run.
+RUN mkdir -p $app && chmod 777 /app
+WORKDIR $app
+
+COPY "devops/MyConfig.pm" "/root/.cpan/CPAN/MyConfig.pm"
+COPY "dist.ini" "/app/dist.ini"
+COPY "lib" "/app/lib"
+
+RUN cpanm $(dzil listdeps) \
+  && cpanm $(dzil authordeps)
+
+COPY "devops/within_container" "/usr/local/bin/within_container"
+
+ENTRYPOINT [ "/usr/local/bin/within_container" ]
+CMD [ "prove", "-lrs" ]

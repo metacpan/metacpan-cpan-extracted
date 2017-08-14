@@ -172,9 +172,9 @@ sub connect_api ( $self, $cb ) {
             };
 
             # get app instance credentials from local config
-            $self->app->{id}             = $self->app->cfg->{auth}->{ $self->{backend}->host }->[0];
-            $self->app->{instance_id}    = $self->app->cfg->{auth}->{ $self->{backend}->host }->[1];
-            $self->app->{instance_token} = $self->app->cfg->{auth}->{ $self->{backend}->host }->[2];
+            $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0];
+            $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1];
+            $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2];
 
             # sending app instance registration request
             if ( !$self->app->{instance_token} ) {
@@ -194,11 +194,11 @@ sub connect_api ( $self, $cb ) {
 
                         # store app instance credentials
                         {
-                            $self->app->{id}             = $self->app->cfg->{auth}->{ $self->{backend}->host }->[0] = $res->{app_id};
-                            $self->app->{instance_id}    = $self->app->cfg->{auth}->{ $self->{backend}->host }->[1] = $res->{app_instance_id};
-                            $self->app->{instance_token} = $self->app->cfg->{auth}->{ $self->{backend}->host }->[2] = $res->{app_instance_token};
+                            $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0] = $res->{app_id};
+                            $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1] = $res->{app_instance_id};
+                            $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2] = $res->{app_instance_token};
 
-                            $self->app->store_cfg;
+                            $self->app->store_instance_auth;
                         }
 
                         # connect app instance

@@ -18,9 +18,10 @@ WriteMakefile(
         'ExtUtils::Command'            => '0',
         'File::Spec'                   => '0',
         'Getopt::Long'                 => '0',
+        'Module::Runtime'              => '0',
         'Pod::Usage'                   => '1.21',
         'parent'                       => '0',
-        'version'                      => '0',
+        'version'                      => '0.77',
     },
     (! eval { ExtUtils::MakeMaker->VERSION('6.46') } ? () :
         (META_MERGE => {
@@ -39,7 +40,7 @@ WriteMakefile(
         })
     ),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Module-Release-*' },
+    clean               => { FILES => 'Module-Starter-*' },
 );
 
 sub MY::postamble {

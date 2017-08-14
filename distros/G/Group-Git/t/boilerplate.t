@@ -62,6 +62,7 @@ module_boilerplate_ok('bin/group-git');
 module_boilerplate_ok('lib/Group/Git.pm');
 module_boilerplate_ok('lib/Group/Git/Bitbucket.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Branch.pm');
+module_boilerplate_ok('lib/Group/Git/Cmd/Grep.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Help.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/List.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Pull.pm');

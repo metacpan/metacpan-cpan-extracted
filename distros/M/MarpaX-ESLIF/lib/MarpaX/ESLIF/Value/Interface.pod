@@ -14,7 +14,7 @@ MarpaX::ESLIF::Value::Interface - MarpaX::ESLIF's value interface
 
 =head1 VERSION
 
-version 2.0.14
+version 2.0.15
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,60 @@ When valuation is successful, marpaESLIF is using this callback.
 Returns the parsing result.
 
 marpaESLIF is not using this method per-se, but it is nevertheless required to ensure the interface coherency v.s. the C<getResult()> required method.
+
+=back
+
+=head1 LOCALIZED VARIABLES
+
+At each symbol or rule callback, the following values are localized:
+
+=over
+
+=item C<$MarpaX::ESLIF::Context::symbolName>
+
+Symbol name in case of a symbol callback, C<undef> otherwise.
+
+=item C<$MarpaX::ESLIF::Context::symbolNumber>
+
+Symbol number in case of a symbol callback, C<undef> otherwise.
+
+=item C<$MarpaX::ESLIF::Context::ruleName>
+
+Rule name in case of a rule callback, C<undef> otherwise.
+
+=item C<$MarpaX::ESLIF::Context::ruleNumber>
+
+Rule number in case of a rule callback, C<undef> otherwise.
+
+=item C<$MarpaX::ESLIF::Context::grammar>
+
+Grammar instance.
+
+=back
+
+=head1 OPTIONAL METHODS SINCE VERSION 2.0.15
+
+=over
+
+=item $valueInterface->setSymbolName($symbolName)
+
+Stores symbol name. Always set in case of a symbol callback, C<undef> otherwise.
+
+=item $valueInterface->setSymbolNumber($symbolNumber)
+
+Stores symbol number. Always set in case of a symbol callback, C<undef> otherwise.
+
+=item $valueInterface->setRuleName($ruleName)
+
+Stores rule name. Always set in case of a rule callback, C<undef> otherwise.
+
+=item $valueInterface->setRuleNumber($ruleNumber)
+
+Stores rule number. Always set in case of a rule callback, C<undef> otherwise.
+
+=item $valueInterface->setGrammar($grammar)
+
+Stores grammar instance.
 
 =back
 

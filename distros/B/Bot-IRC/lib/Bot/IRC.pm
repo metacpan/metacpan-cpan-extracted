@@ -14,7 +14,7 @@ use Date::Format 'time2str';
 use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.19'; # VERSION
 
 sub new {
     my $class = shift;
@@ -643,7 +643,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)

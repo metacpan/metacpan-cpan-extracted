@@ -8,7 +8,8 @@ plan tests => 1;
 
 use PPR;
 
-my $selfgol = q{
+my $selfgol = <<'END_SELFGOL';
+
 #!/usr/bin/perl -s
 $;=$/;seek+DATA,undef$/,!$s;$_=<DATA>;$s&&print||(*{q;::\;
 ;}=sub{$d=$d-1?$d:$0;s;';\t#$d#;,$_})&&$g&&do{$y=($x||=20)*($y||8);sub
@@ -30,7 +31,8 @@ q<#!/usr/bin/perl -sw
 !$s?do{>.(s$%$%%$g,y=[====y=]==||&d,$_).q<}:do{@s=(q[%s],q[%s])x2;%s}
 ])x2;printf+pop@s,@s}
 >
-};
+
+END_SELFGOL
 
 ok $selfgol =~ m{ \A (?&PerlOWS) (?&PerlDocument) (?&PerlOWS) \Z  $PPR::GRAMMAR }xms  => 'matched selfgol';
 

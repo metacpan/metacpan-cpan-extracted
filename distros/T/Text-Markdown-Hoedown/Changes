@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Markdown-Hoedown
 
+1.02 2017-08-12T03:04:42Z
+
+    - updaete to hoedown3(Taeril)
+
 1.01 2013-11-24T10:17:40Z
 
     - Fixed memory allocation related bug.

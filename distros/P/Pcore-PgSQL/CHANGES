@@ -1,3 +1,9 @@
+v0.10.8 2017-08-11T00:52:17Z
+ - unlimited backlog
+
+v0.10.7 2017-08-10T18:49:43Z
+ - dockerfile updated
+
 v0.10.6 2017-08-01T18:05:17Z
  - set permisisons for /var/run/postgresql
  - POD fixed

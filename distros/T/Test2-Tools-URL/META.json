@@ -67,7 +67,7 @@
          "web" : "https://github.com/plicease/Test2-Tools-URL"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

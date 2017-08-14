@@ -1,0 +1,139 @@
+#!perl
+
+our $DATE = '2017-08-10'; # DATE
+our $VERSION = '0.06'; # VERSION
+
+# IFUNBUILT
+# use strict;
+# use warnings;
+# END IFUNBUILT
+
+use Getopt::Long::EvenLess;
+
+sub _help {
+        print <<'_';
+Usage:
+  errno <num>
+  errno <search string>
+  errno --list (-l)
+  errno --help (-h, -?)
+  errno --version (-v)
+_
+}
+
+my @errnos; # [name, numeric code, message]
+{
+    require Errno;
+    no strict 'refs';
+    for (sort @Errno::EXPORT_OK) {
+        my $num = &{"Errno::$_"};
+        local $! = $num;
+        push @errnos, [$_, $num, "$!"];
+    }
+    @errnos = sort { $a->[1] <=> $b->[1] } @errnos;
+}
+
+GetOptions(
+    'help|h|?' => sub {
+        _help();
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "errno version $main::VERSION\n";
+        exit 0;
+    },
+    'list|l' => sub {
+        for (@errnos) { print "$_->[0]\t$_->[1]\t$_->[2]\n" }
+        exit 0;
+    },
+);
+
+if (@ARGV != 1) {
+    _help();
+    exit 1;
+}
+
+if ($ARGV[0] =~ /\A\d+\z/) {
+    local $! = +$ARGV[0];
+    my $str = "$!";
+    print $str, "\n";
+    exit $str =~ /unknown error/i ? 1:0;
+} else {
+    my $search = lc($ARGV[0]);
+    my $found;
+    for (@errnos) {
+        if (index(lc($_->[0]), $search) >= 0 ||
+                index(lc($_->[2]), $search) >= 0) {
+            print "$_->[0]\t$_->[1]\t$_->[2]\n";
+            $found++;
+        }
+    }
+    exit $found ? 0 : 1;
+}
+
+# ABSTRACT: List/show errno
+# PODNAME: errno
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+errno - List/show errno
+
+=head1 VERSION
+
+This document describes version 0.06 of errno (from Perl distribution App-errno), released on 2017-08-10.
+
+=head1 SYNOPSIS
+
+Show the error message string for a certain errno code:
+
+ % errno 23
+
+Search error message string:
+
+ % errno file
+ % errno ENOT
+
+List all known errno's on your system:
+
+ % errno -l
+
+=head1 DESCRIPTION
+
+This script can be used to show the error message of a particular C<errno>, or
+list all available errno's on your system.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-errno>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-errnos>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-errno>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

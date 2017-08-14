@@ -1,5 +1,8 @@
 Revision history for MooseX-RelatedClasses
 
+0.012     2017-08-13 20:01:22 CDT-0500
+	* Fix tests for Perl v5.26.
+
 0.011     2017-04-03 20:39:14 CDT-0500
 	* Prevent our exported sugar from becoming role methods
 

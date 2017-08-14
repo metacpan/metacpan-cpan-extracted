@@ -1,5 +1,5 @@
 package WebService::Braintree::UnknownPaymentMethod;
-$WebService::Braintree::UnknownPaymentMethod::VERSION = '0.91';
+$WebService::Braintree::UnknownPaymentMethod::VERSION = '0.92';
 use Moose;
 extends 'WebService::Braintree::PaymentMethod';
 

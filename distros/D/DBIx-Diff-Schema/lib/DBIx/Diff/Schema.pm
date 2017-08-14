@@ -1,7 +1,7 @@
 package DBIx::Diff::Schema;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-08-13'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use strict;
@@ -353,7 +353,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.08 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2017-07-10.
+This document describes version 0.090 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2017-08-13.
 
 =head1 SYNOPSIS
 
@@ -570,6 +570,9 @@ feature.
 =head1 SEE ALSO
 
 L<DBIx::Compare> to compare database contents.
+
+L<diffdb> from L<App::diffdb> which can compare two database (schema as well as
+content) and display the result as the familiar colored unified-style diff.
 
 =head1 AUTHOR
 

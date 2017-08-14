@@ -4,7 +4,6 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Array/Base.pm
 lib/Array/Base.xs
@@ -13,10 +12,11 @@ t/aelem.t
 t/akeys.t
 t/aslice.t
 t/av2arylen.t
+t/kvaslice.t
+t/lib/t/scope_0.pm
 t/lslice.t
 t/pod_cvg.t
 t/pod_syn.t
 t/scope.t
-t/scope_0.pm
 t/splice.t
 SIGNATURE    Added here by Module::Build

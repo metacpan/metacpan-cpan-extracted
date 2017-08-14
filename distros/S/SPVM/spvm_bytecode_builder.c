@@ -227,6 +227,34 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
             }
             else {
               while (1) {
+                if (compiler->debug) {
+                  _Bool is_operation;
+                  switch (op_cur->code) {
+                    case SPVM_OP_C_CODE_NULL:
+                    case SPVM_OP_C_CODE_STAB:
+                    case SPVM_OP_C_CODE_PUSHMARK:
+                    case SPVM_OP_C_CODE_LIST:
+                    case SPVM_OP_C_CODE_BLOCK:
+                    case SPVM_OP_C_CODE_NAME:
+                    case SPVM_OP_C_CODE_MY:
+                    case SPVM_OP_C_CODE_ASSIGN_PROCESS:
+                    case SPVM_OP_C_CODE_TYPE:
+                    case SPVM_OP_C_CODE_POP:
+                      is_operation = 0;
+                      break;
+                    default:
+                      is_operation = 1;
+                  }
+                  
+                  if (is_operation) {
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CURRENT_LINE);
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (op_cur->line >> 24) & 0xFF);
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (op_cur->line >> 16) & 0xFF);
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (op_cur->line >> 8) & 0xFF);
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, op_cur->line & 0xFF);
+                  }
+                }
+                
                 // [START]Postorder traversal position
                 switch (op_cur->code) {
                   case SPVM_OP_C_CODE_SWITCH_CONDITION: {
@@ -562,6 +590,14 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant_pool_index >> 16) & 0xFF);
                     SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant_pool_index >> 8) & 0xFF);
                     SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, constant_pool_index & 0xFF);
+                    
+                    if (compiler->debug) {
+                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CURRENT_LINE);
+                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (op_cur->line >> 24) & 0xFF);
+                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (op_cur->line >> 16) & 0xFF);
+                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (op_cur->line >> 8) & 0xFF);
+                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, op_cur->line & 0xFF);
+                    }
                     
                     //  Goto exception handler
                     if (eval_stack->length > 0) {
@@ -1057,37 +1093,34 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                       
                       if (SPVM_TYPE_is_array(compiler, type)) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_NEW_ARRAY);
-                        if (SPVM_TYPE_is_array_numeric(compiler, type)) {
-                          if (strcmp(type->name, "byte[]") == 0) {
+                        
+                        switch (type->id) {
+                          case SPVM_TYPE_C_ID_BYTE_ARRAY:
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_BYTE);
-                          }
-                          else if (strcmp(type->name, "short[]") == 0) {
+                            break;
+                          case SPVM_TYPE_C_ID_SHORT_ARRAY:
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_SHORT);
-                          }
-                          else if (strcmp(type->name, "int[]") == 0) {
+                            break;
+                          case SPVM_TYPE_C_ID_INT_ARRAY:
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_INT);
-                          }
-                          else if (strcmp(type->name, "long[]") == 0) {
+                            break;
+                          case SPVM_TYPE_C_ID_LONG_ARRAY:
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_LONG);
-                          }
-                          else if (strcmp(type->name, "float[]") == 0) {
+                            break;
+                          case SPVM_TYPE_C_ID_FLOAT_ARRAY:
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_FLOAT);
-                          }
-                          else if (strcmp(type->name, "double[]") == 0) {
+                            break;
+                          case SPVM_TYPE_C_ID_DOUBLE_ARRAY:
                             SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_DOUBLE);
-                          }
-                          else {
-                            assert(0);
-                          }
-                        }
-                        else {
-                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_OBJECT);
+                            break;
+                          default:
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_OBJECT);
                         }
                       }
                       else {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_NEW_OBJECT);
                         
-                        const char* package_name = op_cur->first->uv.type->name;
+                        const char* package_name = op_cur->first->uv.type->base_name;
                         
                         SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
                         SPVM_PACKAGE* package = op_package->uv.package;

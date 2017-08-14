@@ -1,0 +1,274 @@
+#!/usr/bin/perl -w
+use strict; #$Id: mtoken 43 2017-07-31 13:04:58Z minus $
+
+=head1 NAME
+
+mtoken - tool for initializing Token Devices
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    mtoken [options] [commands [args]]
+
+    mtoken [-dv] [ init [NAME] ]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-c CONFIG_FILE, --config=CONFIG_FILE>
+
+Use CONFIG_FILE as configuration file
+
+=item B<--datadir=DIR, --workdir=DIR>
+
+Use DIR as DataDir directory
+
+=item B<-d, --debug>
+
+Print debug information on STDOUT
+
+=item B<-D /foo/bar/baz, --DIRECTORY=/foo/bar/baz>
+
+Sets directory for initializing files structure
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-v, --verbose>
+
+Verbose option. Include Verbose debug data in the STDOUT and to error-log output
+
+=item B<-V, --version>
+
+Print the version number of the program and quit
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<test>
+
+Test of the project. Temporarily unavailable
+
+    mtoken test
+
+=item B<void>
+
+The program runs and does nothing.
+
+    mtoken void
+
+=item B<init>
+
+Initialize the Token device. Creates file structure in specifies directory
+See --directory option
+
+=back
+
+=head1 DESCRIPTION
+
+Tool for initializing Token Devices. This tool provides first steps to working with Token Devices.
+
+See C<README> file
+
+=head1 HISTORY
+
+=over 8
+
+=item B<1.00 / Mon Jun 26 10:24:17 2017 GMT>
+
+Init version
+
+=back
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<CTK>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+Coming soon
+
+=head1 SEE ALSO
+
+C<perl>, L<CTK>
+
+=head1 DIAGNOSTICS
+
+The usual warnings if it can't read or write the files involved.
+
+=head1 AUTHOR
+
+Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is distributed under the GNU GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See C<LICENSE> file
+
+=cut
+
+use constant {
+    PIDFILE   => 'mtoken.pid',
+    LOGFILE   => 'mtoken.log',
+
+    CMDDEFAULT => 'init', # 'void',
+    CMD => {
+        void => {
+            pidcheck => 0, # 0 - OFF, 1 - ON
+        },
+        test => {
+            pidcheck => 1, # 0 - OFF, 1 - ON
+            foo      => 'qwerty',
+            bar      => [],
+            baz      => {},
+        },
+        init => {
+            pidcheck => 1,
+        },
+    },
+};
+
+use Getopt::Long;
+use Pod::Usage;
+
+# CTK Packages
+use base qw/MToken/;
+use CTK;
+use CTKx;
+use CTK::FilePid;
+
+Getopt::Long::Configure ("bundling");
+GetOptions(\%OPT,
+
+    #
+    # NoUsed keys map:
+    #
+    # a A b B   C     e E
+    # f F g G     i I j J
+    # k K l L m M n N o O
+    # p P q Q r R s S t T
+    # u U     w W x X y Y
+    # z Z
+    #
+
+    # Help
+    "help|usage|h|?",       # Show short help page
+    "longhelp|H",           # Show long help page
+    "version|ver|V",        # Show VERSION
+
+    # Debugging
+    "debug|d",              # Debug mode
+    "verbose|v",            # Verbose mode. Default: Silent mode
+
+    # CTK
+    "cfgfile|config|c=s",   # CfgFile
+    "datadir|workdir=s",    # DataDir
+
+    # Application
+    "directory|dir|D=s",    # Destination Directory
+    #"bar|b=i",              # BAR
+    #"baz|z=s",              # BAZ
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
+pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
+say(MToken->VERSION) && exit(0) if $OPT{version};
+
+# VARS
+my %cmddata;
+
+# Commands
+my $command   = @ARGV ? shift @ARGV : CMDDEFAULT;
+my @arguments = @ARGV ? @ARGV : ();
+my @commands  = keys %{sub{CMD}->()};
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
+    if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
+
+# Singleton object
+my $c = defined($OPT{cfgfile})
+        ? new CTK(
+                cfgfile => $OPT{cfgfile},
+                logdir  => '.',
+                datadir  => '.'
+            )
+        : new CTK( syspaths => 1 );
+$c->datadir($OPT{datadir}) if defined($OPT{datadir});
+my $ctkx = CTKx->instance( c => $c );
+
+unlink( $LOGFILE ) if( $OPT{logclear} && -e $LOGFILE ); # Remove unnesessary log
+
+START:  debug "-"x16, " START ", (testmode() ? 'IN TEST MODE ' : ''), tms," ","-"x16;
+#########################
+### START
+#########################
+my $pidfile;
+my $code = __PACKAGE__->can(uc($command)) || __PACKAGE__->can($command);
+if ($code && ref($code) eq 'CODE') {
+    %cmddata = %{CMD->{$command}};
+    $cmddata{arguments} = [@arguments];
+
+    CTK::preparedir({ datadir => $c->datadir() });
+
+    # PID File define
+    $pidfile = new CTK::FilePid({ file => CTK::catfile($c->datadir(), $cmddata{pidfile} || PIDFILE) });
+    my $pidstat = $pidfile->running || 0;
+
+    debug "==== START COMMAND: ".uc($command)." ($$) ====";
+
+    if ($cmddata{pidcheck}) {
+        exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
+        $pidfile->write;
+    }
+
+    &{$code}(%cmddata);
+
+    if ($cmddata{pidcheck}) {
+        $pidfile->remove;
+    }
+
+    debug "==== FINISH COMMAND: ".uc($command)." ($$) ====";
+} else {
+    exception("Sub \"".uc($command)."\" undefined");
+}
+
+#########################
+### FINISH
+#########################
+FINISH: debug "-"x16, " FINISH ", (testmode() ? 'IN TEST MODE ' : '') ,tms," ","-"x16;
+exit(0);
+
+1;
+__END__

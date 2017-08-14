@@ -48,7 +48,7 @@ sub transform(&$@)
       return 1
      }
    }
-  my ($N1, $N) = (scalar(@$L)-1, scalar(@$L));     
+  my ($N1, $N) = (scalar(@$L)-1, scalar(@$L));
 
 
 # Transformations - check
@@ -57,11 +57,11 @@ sub transform(&$@)
    {my @p = @{$_[$_]};
     my $p = grep {ref($_)} @{$_[$_]};
     $p == 0 or $p == @p or die "Transform, transformation(@p) must be all references to cycles or one cycle";
-   }           
+   }
 
-   
+
 # Transformations - load
-   
+
   my $T;
   for(0..$#_)
    {ref($_[$_]) or die "transform(".(3+$_).") ".($_[$_])." not a reference";
@@ -80,7 +80,7 @@ sub transform(&$@)
            }
          }
         $T->[$_][$Q[-1]-1] = $Q[0]-1;
-       }       
+       }
       else
        {("$p" =~ /\A\d+\Z/ and $p > 0 and $p <= $N) or die "transform(".($_+3)."->$P): $p not a number between 1 and $N";
         if ($P)
@@ -89,30 +89,30 @@ sub transform(&$@)
           $T->[$_][$p1-1] = $p-1;
          }
        }
-     }           
+     }
     $T->[$_][$P[-1]-1] = $P[0]-1;
-   }           
+   }
 
 
 # Set unset transforms
 
   for   my $a(0..$#_)
    {for my $b(0..$N1)
-     {$T->[$a][$b] = $b unless defined $T->[$a][$b]; 
+     {$T->[$a][$b] = $b unless defined $T->[$a][$b];
      }
-   }               
+   }
 
 
 # Initialize transformer
 
   my @T = ([0..$N1]);  # Transforms stack
-  my $S;               # Transforms already processed 
+  my $S;               # Transforms already processed
 
 
 # Generate transformations
 
   my $n = 0;
-  for(;@T;)            
+  for(;@T;)
    {my $a = pop @T;
     for my $b(@$T)
      {my @C = map {$b->[$a->[$_]]} 0..$N1;
@@ -121,37 +121,37 @@ sub transform(&$@)
        {push @T, [@C];
         &$s(map {$L->[$C[$_]]} 0..$N1);
         $n++;
-       }    
+       }
      }
    }
 
- 
-  $n                   # Number of transformations 
+
+  $n                   # Number of transformations
  }
 
 
 # Export details
- 
-require 5;
+
+require 5.16.0;
 require Exporter;
 
 use vars qw(@ISA @EXPORT $VERSION);
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(transform);
-$VERSION = '1.005'; # Monday 26 Jan 2015
+$VERSION = 20170808;                                                            # Monday 26 Jan 2015
 
 =head1 Description
 
-Generate and process all the all the transformations of a list using the 
-standard Perl metaphor. 
+Generate and process all the all the transformations of a list using the
+standard Perl metaphor.
 
-C<transform()> returns the number of transformations in both scalar and 
+C<transform()> returns the number of transformations in both scalar and
 array context.
 
 C<transform()> is easy to use and fast. It is written in 100% Pure Perl.
 
-Please note that the order in which the transformations are generated is not 
+Please note that the order in which the transformations are generated is not
 guaranteed, so please do not rely on it.
 
 The parameters to C<transform()> are:
@@ -162,27 +162,27 @@ The parameters to C<transform()> are:
 as specified by the transformations. Each transformation of the list is
 handed to the code supplied in parameter 1 to be processed.
 
-3: One or more transformations to be applied to the list. The 
-transformations are applied repeatedly in all orders until no new 
-transformations of the list are generated. Each new transformation of the 
+3: One or more transformations to be applied to the list. The
+transformations are applied repeatedly in all orders until no new
+transformations of the list are generated. Each new transformation of the
 list is handed to the code supplied in parameter 1 for processing.
 
-Transformations are represented as permutations in cyclic format based from 
+Transformations are represented as permutations in cyclic format based from
 1 not 0. Two representations can be used to specify transformations.
 
 3a: Single cycle.
- 
+
   [1,2,3]
 
-The first element of the list will be replaced by the second, the second by 
-the third, and the third by the first. 
+The first element of the list will be replaced by the second, the second by
+the third, and the third by the first.
 
 3a: Multi cycle.
- 
+
   [[1,3], [2,4]]
 
-The first element of the list will be replaced by the third and vice versa, 
-while simultaneously the second element is replaced by the fourth and vice 
+The first element of the list will be replaced by the third and vice versa,
+while simultaneously the second element is replaced by the fourth and vice
 versa.
 
   transform {say "@_"} [qw(a b c d)], [[1, 3], [2, 4]];
@@ -190,8 +190,8 @@ versa.
   #  a b c d
   #  c d a b
 
-If you want to produce all possible transformations of a list you should 
-consider L<Math::Permute::List> as it is faster and easier to use than the 
+If you want to produce all possible transformations of a list you should
+consider L<Math::Permute::List> as it is faster and easier to use than the
 equivalent:
 
   transform {} [1..$n], [1,2], [1..$n];
@@ -209,7 +209,7 @@ Standard Module::Build process for building and installing modules:
   ./Build test
   ./Build install
 
-Or, if you're on a platform (like DOS or Windows) that doesn't require the 
+Or, if you're on a platform (like DOS or Windows) that doesn't require the
 "./" notation, you can do this:
 
   perl Build.PL
@@ -225,7 +225,7 @@ http://www.appaapps.com
 
 =head1 Acknowledgements
 
-With much help and good natured advice from Philipp Rumpf to whom I am 
+With much help and good natured advice from Philipp Rumpf to whom I am
 indebted.
 
 =head1 See Also
@@ -246,7 +246,7 @@ indebted.
 
 Copyright (c) 2009 Philip R Brenan.
 
-This module is free software. It may be used, redistributed and/or modified 
+This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
 
 =cut

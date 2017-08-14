@@ -26,6 +26,7 @@ t/13-accents.t
 t/14-export.t
 t/15-lock.t
 t/16-outhh.t
+t/17-misc.t
 t/acct-l1.csv
 t/acct-l2.csv
 t/acct-u.csv
@@ -51,6 +52,7 @@ t/bugfixrc.csv
 t/dates1-0.csv
 t/dates1-1.csv
 t/dates1-2.csv
+t/dates1-3.csv
 t/dates2-99.csv
 t/dirpeople.csv
 t/dt1.csv
@@ -81,6 +83,9 @@ t/l01b.csv
 t/l01c.csv
 t/lock01.csv
 t/logins.csv
+t/misc1.csv
+t/misc2.csv
+t/misc3.csv
 t/pers.csv
 t/pp1.csv
 t/pp2.csv
@@ -119,6 +124,7 @@ t/wwbugfixrc.csv
 t/wwdates1-0.csv
 t/wwdates1-1.csv
 t/wwdates1-2.csv
+t/wwdates1-3.csv
 t/wwdates2-99.csv
 t/wwdirpeople.csv
 t/wwdt1.csv
@@ -149,6 +155,9 @@ t/wwl01b.csv
 t/wwl01c.csv
 t/wwlock01.csv
 t/wwlogins.csv
+t/wwmisc1.csv
+t/wwmisc2.csv
+t/wwmisc3.csv
 t/wwpers.csv
 t/wwpp1.csv
 t/wwpp2.csv

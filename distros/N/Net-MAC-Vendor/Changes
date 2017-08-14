@@ -1,5 +1,9 @@
 Revision history for Perl module Net::MAC::Vendor
 
+1.262 2017-08-10T06:45:18Z
+	* Fix docs for load_cache (GitHub #23, Matt W.). Mojo::UserAgent
+	doesn't handle file://
+
 1.261 2017-07-18T18:54:10Z
 	* Pete Houston (openstrike) improved fetch_oui_from_custom
 

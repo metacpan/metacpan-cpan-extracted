@@ -9,12 +9,13 @@ Module::Starter::App - the code behind the command line program
 use warnings;
 use strict;
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 use File::Spec;
 use Getopt::Long;
 use Pod::Usage;
 use Carp qw( croak );
+use Module::Runtime qw( require_module );
 
 sub _config_file {
     my $self      = shift;
@@ -32,16 +33,16 @@ sub _config_read {
     my $self = shift;
 
     my $filename = $self->_config_file;
-    return unless -e $filename;
+    return () unless -e $filename;
     
     open( my $config_file, '<', $filename )
         or die "couldn't open config file $filename: $!\n";
 
     my %config;
-    while (<$config_file>) {
-        chomp;
-        next if /\A\s*\Z/sm;
-        if (/\A(\w+):\s*(.+)\Z/sm) { $config{$1} = $2; }
+    while (my $line = <$config_file>) {
+        chomp $line;
+        next if $line =~ /\A\s*\Z/sm;
+        if ($line =~ /\A(\w+):\s*(.+)\Z/sm) { $config{$1} = $2; }
     }
     
     return $self->_config_multi_process(%config);
@@ -124,8 +125,7 @@ sub run {
     %config = $self->_process_command_line(%config);
     %config = $self->_config_multi_process(%config);
 
-    eval "require $config{class};";
-    croak "Could not load starter class $config{class}: $@" if $@;
+    require_module $config{class};
     $config{class}->import( @{ $config{'plugins'} } );
 
     my $starter = $config{class}->new( %config );

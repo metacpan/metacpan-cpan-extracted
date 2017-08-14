@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Hash;
 use Scalar::Util ();
@@ -506,7 +506,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

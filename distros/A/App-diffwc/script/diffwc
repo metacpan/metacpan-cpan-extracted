@@ -1,0 +1,217 @@
+#!perl
+
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long::Complete;
+
+my %Opts = (
+    postprocess => 1,
+    format => 'context',
+    color => $ENV{COLOR} // (-t STDOUT),
+);
+
+sub sanity_check {
+    require File::Which;
+    File::Which::which("diff") or die "diffwc: Can't find diff in PATH\n";
+}
+
+sub parse_cmdline {
+    local @ARGV = @ARGV;
+    # updated to diff 3.3 + color
+    GetOptions(
+        normal => sub {},
+        'brief|q' => sub {},
+        'report-identical-files|s' => sub {},
+        'c' => sub { $Opts{format} = 'context' },
+        'context|C' => sub { $Opts{format} = 'context' }, # XXX should've been context|C:i, but currently not supported by GLC
+        'u' => sub { $Opts{format} = 'unified' },
+        'unified|U' => sub { $Opts{format} = 'unified' }, # XXX should've been unified|U:i, but currently not supported by GLC
+        'ed|e' => sub {},
+        'rcs|n' => sub {},
+        'side-by-side|y' => sub { $Opts{format} = 'side-by-side' },
+        'width|W=i' => sub {},
+        'left-column' => sub {},
+        'suppress-common-lines' => sub {},
+        'show-c-function|p' => sub {},
+        'show-function-line|F=s' => sub {},
+        'label=s' => sub {},
+        'expand-tabs|t' => sub {},
+        'initial-tab|T' => sub {},
+        'tabsize=i' => sub {},
+        'suppress-blank-empty' => sub {},
+        'paginate|l' => sub {},
+        'recursive|r' => sub {},
+        'new-file|N' => sub {},
+        'unidirectional-new-file' => sub {},
+        'ignore-file-name-case!' => sub {},
+        'exclude|x=s' => sub {},
+        'exclude-from|X=s' => sub {}, # filename
+        'starting-file|S' => sub {}, # filename
+        'from-file=s' => sub {}, # filename
+        'to-file=s' => sub {}, # filename
+        'ignore-case|i' => sub {},
+        'ignore-tab-expansion|E' => sub {},
+        'ignore-trailing-space|Z' => sub {},
+        'ignore-space-change|b' => sub {},
+        'ignore-all-space|w' => sub {},
+        'ignore-blank-lines|B' => sub {},
+        'ignore-matching-lines|I=s' => sub {},
+        'text|a' => sub {},
+        'strip-trailing-cr' => sub {},
+        'ifdef|D=s' => sub {},
+        'GTYPE-group-format=s' => sub {},
+        'line-format=s' => sub {},
+        'LTYPE-line-format=s' => sub {},
+        'minimal|d' => sub {},
+        'horizon-lines=i' => sub {},
+        'speed-large-files' => sub {},
+        'help' => sub {},
+        'version|v' => sub {},
+
+        # user asks for diff's --color, let's skip post-processing then
+        'color' => sub { $Opts{postprocess} = 0 },
+    );
+}
+
+sub run {
+    require App::diffwc;
+    require ShellQuote::Any::Tiny;
+
+    $Opts{postprocess} = 0 unless $Opts{format} eq 'unified';
+    $Opts{postprocess} = 0 unless $Opts{color};
+    unless ($Opts{postprocess}) {
+        exec "diff", @ARGV;
+    }
+
+    my $cmd = "diff" . (@ARGV ? " " : "") .
+        join(" ", map { ShellQuote::Any::Tiny::shell_quote($_) } @ARGV);
+    open my $diff, "$cmd |" or die "diffwc: Can't run diff: $!\n";
+
+    App::diffwc::postprocess($diff);
+
+    close $diff;
+
+    # XXX return original diff's exit code
+}
+
+# MAIN
+
+sanity_check();
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: diff + /w/ord highlighting + /c/olor
+# PODNAME: diffwc
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+diffwc - diff + /w/ord highlighting + /c/olor
+
+=head1 VERSION
+
+This document describes version 0.002 of diffwc (from Perl distribution App-diffwc), released on 2017-08-12.
+
+=head1 SYNOPSIS
+
+Use as you would use B<diff> (the coloring and word highlighting currently will
+only be shown if you use the unified format):
+
+ % diffwc -u file1 file2
+ % diffwc -ruN My-Dist-0.001 My-Dist-0.002
+
+To alias B<diff> to B<diffwc>, in your shell startup file:
+
+ alias diff=diffwc
+
+=head1 DESCRIPTION
+
+This is a wrapper for the GNU command-line utility B<diff>. It adds word
+highlighting and colors (note that GNU diff 3.4 or later supports C<--color>
+already).
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C diffwc diffwc
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete diffwc 'p/*/`diffwc`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-diffwc>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-diffwc>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffwc>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<https://github.com/walles/riff>, a Ruby-based utility by which this utility is
+inspired. B<riff> is more git-oriented: it uses the same color scheme from git
+while B<diffwc> comes with its own color schemes. B<riff> comes only as a
+filter, while this package offers a B<diff> wrapper (B<diffwc>) as well as
+filter (L<diffwc-filter-u>). B<riff> currently has problems dealing with
+non-unified outputs or multiline word highlighting, and also it does not feel
+like a typical Unix utility to me (no manpages, for example), so I made
+B<diffwc> instead.
+
+L<diffwc-filter-u> from the same package, in the form of B<diff> output filter.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

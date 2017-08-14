@@ -4,10 +4,26 @@ use URI::Escape;
 use URI::Encode::XS;
 
 cmpthese(-10, {
-    escape => sub { URI::Escape::uri_escape('https://stackoverflow.com/questions/3629212/how can perls xsub die') },
-    encode => sub { URI::Encode::XS::uri_encode('https://stackoverflow.com/questions/3629212/how can perls xsub die') },
+    escape      => sub { URI::Escape::uri_escape('https://stackoverflow.com/questions/3629212/how can perls xsub die') },
+    encode      => sub { URI::Encode::XS::uri_encode('https://stackoverflow.com/questions/3629212/how can perls xsub die') },
+    encode_utf8 => sub { URI::Encode::XS::uri_encode_utf8('https://stackoverflow.com/questions/3629212/how can perls xsub die') },
   });
 cmpthese(-10, {
-    unescape => sub { URI::Escape::uri_unescape('https%3A%2F%2Fstackoverflow.com%2Fquestions%2F3629212%2Fhow%20can%20perls%20xsub%20die') },
-    decode   => sub { URI::Encode::XS::uri_decode('https%3A%2F%2Fstackoverflow.com%2Fquestions%2F3629212%2Fhow%20can%20perls%20xsub%20die') },
+    unescape    => sub { URI::Escape::uri_unescape('https%3A%2F%2Fstackoverflow.com%2Fquestions%2F3629212%2Fhow%20can%20perls%20xsub%20die') },
+    decode      => sub { URI::Encode::XS::uri_decode('https%3A%2F%2Fstackoverflow.com%2Fquestions%2F3629212%2Fhow%20can%20perls%20xsub%20die') },
+    decode_utf8 => sub { URI::Encode::XS::uri_decode_utf8('https%3A%2F%2Fstackoverflow.com%2Fquestions%2F3629212%2Fhow%20can%20perls%20xsub%20die') },
   });
+__END__
+=head1 RESULTS
+
+                   Rate      escape encode_utf8      encode
+  escape       140114/s          --        -94%        -98%
+  encode_utf8 2255100/s       1509%          --        -71%
+  encode      7735189/s       5421%        243%          --
+
+                   Rate    unescape decode_utf8      decode
+  unescape     188714/s          --        -95%        -97%
+  decode_utf8 3744638/s       1884%          --        -50%
+  decode      7429263/s       3837%         98%          --
+
+=cut

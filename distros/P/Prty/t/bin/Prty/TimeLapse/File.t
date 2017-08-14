@@ -22,7 +22,7 @@ sub test_new : Test(5) {
 
     my $testDir = $self->testDir;
     my $file = $self->testPath(
-        'prty/test/data/image/A/img/000047-640x360.jpg');
+        't/data/image/A/img/000047-640x360.jpg');
 
     my $img = Prty::TimeLapse::File->new($file);
     $self->is(ref($img),'Prty::TimeLapse::File');

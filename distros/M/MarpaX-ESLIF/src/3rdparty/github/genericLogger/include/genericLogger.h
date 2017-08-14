@@ -52,8 +52,8 @@ typedef void (*genericLoggerCallback_t)(void *userDatavp, genericLoggerLevel_t l
 #define GENERICLOGGER_CUSTOM(logCallbackp, userDatavp, genericLoggerLeveli) genericLogger_newp((logCallbackp), (userDatavp), (genericLoggerLeveli))
 #define GENERICLOGGER_CLONE(genericLoggerp)                                 genericLogger_clonep(genericLoggerp)
 
-#define GENERICLOGGER_LOG(genericLoggerp, logLeveli, msgs)                  genericLogger_logv((genericLoggerp), (logLeveli), (msgs))
 #define GENERICLOGGER_LOGF(genericLoggerp, logLeveli, fmts, ...)            genericLogger_logv((genericLoggerp), (logLeveli), (fmts), __VA_ARGS__)
+#define GENERICLOGGER_LOG(genericLoggerp, logLeveli, msgs)                  GENERICLOGGER_LOGF((genericLoggerp), (logLeveli), "%s", msgs)
 #define GENERICLOGGER_LOGAP(genericLoggerp, logLeveli, fmts, ap)            genericLogger_logapv((genericLoggerp), (logLeveli), (fmts), (ap))
 
 #define GENERICLOGGER_TRACE(genericLoggerp, msgs)                           GENERICLOGGER_LOG ((genericLoggerp), GENERICLOGGER_LOGLEVEL_TRACE, (msgs))

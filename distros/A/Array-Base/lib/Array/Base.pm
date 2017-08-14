@@ -4,9 +4,9 @@ Array::Base - array index offseting
 
 =head1 SYNOPSIS
 
-	use Array::Base +1;
+    use Array::Base +1;
 
-	no Array::Base;
+    no Array::Base;
 
 =head1 DESCRIPTION
 
@@ -51,6 +51,10 @@ array indexing (C<$a[3]>)
 =item *
 
 array slicing (C<@a[3..5]>)
+
+=item *
+
+array pair slicing (C<%a[3..5]>)
 
 =item *
 
@@ -120,11 +124,11 @@ where the operator appears.
 package Array::Base;
 
 { use 5.008001; }
-use Lexical::SealRequireHints 0.006;
+use Lexical::SealRequireHints 0.008;
 use warnings;
 use strict;
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -175,7 +179,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011, 2012
+Copyright (C) 2009, 2010, 2011, 2012, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

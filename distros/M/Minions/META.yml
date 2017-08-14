@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Minions:
     file: lib/Minions.pm
-    version: '1.000000'
+    version: '1.000001'
   Minions::Implementation:
     file: lib/Minions/Implementation.pm
   Minions::Role:
@@ -45,6 +45,7 @@ resources:
   bugtracker: https://github.com/arunbear/Minions/issues
   homepage: https://github.com/arunbear/Minions
   repository: git://github.com/arunbear/Minions.git
-version: '1.000000'
+version: '1.000001'
 x_contributors:
   - 'Arun Prasaad <arunbear@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

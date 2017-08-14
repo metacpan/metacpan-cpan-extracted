@@ -12,7 +12,7 @@
                                            
 
 
-This is the README for Image::CairoSVG version 0.07.
+This is the README for Image::CairoSVG version 0.08.
 
 Image::CairoSVG is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -66,11 +66,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::CairoSVG
 
-To install the module from the source file, Image-CairoSVG-0.07.tar.gz,
+To install the module from the source file, Image-CairoSVG-0.08.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Image-CairoSVG-0.07.tar.gz
-    cd Image-CairoSVG-0.07
+    tar xfz Image-CairoSVG-0.08.tar.gz
+    cd Image-CairoSVG-0.08
     perl Makefile.PL
     make
     make install
@@ -95,6 +95,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Dec 15 11:16:50 2016.
+This README was written on Mon Aug 14 14:31:23 2017.
 
 -----------------------------------------------------------------------------

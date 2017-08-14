@@ -37,9 +37,6 @@ use MyGraphs;
 
 plan tests => 1;
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 
 #------------------------------------------------------------------------------
 # Kneser 5,2 is Petersen

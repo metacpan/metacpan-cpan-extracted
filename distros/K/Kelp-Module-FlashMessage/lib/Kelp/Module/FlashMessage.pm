@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Kelp::Module::FlashMessage;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 use parent 'Kelp::Module';
 

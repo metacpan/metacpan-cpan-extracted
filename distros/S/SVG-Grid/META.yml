@@ -6,8 +6,8 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::Temp: '0'
+  Test::More: '1.001002'
   Test::Pod: '1.51'
-  Test::Simple: '1.302052'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -29,10 +29,11 @@ requires:
   SVG: '2.64'
   Types::Standard: '1.000005'
   strict: '0'
+  utf8: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SVG-Grid
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/SVG-Grid.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

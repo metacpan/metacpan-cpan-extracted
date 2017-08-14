@@ -1,11 +1,5 @@
-NAME
-    DBIx::Class::ResultSet::Void - improve DBIx::Class::ResultSet with void
-    context
-
-VERSION
-    version 0.06
-
 SYNOPSIS
+
         my $rs = $schema->resultset('CD');
         $rs->find_or_create( {
             artist => 'Massive Attack',
@@ -27,68 +21,61 @@ SYNOPSIS
         use base 'DBIx::Class::ResultSet::Void';
 
 DESCRIPTION
+
     The API is the same as DBIx::Class::ResultSet.
 
-    use "exists" instead of "find" unless defined wantarray.
+    use exists instead of find unless defined wantarray.
 
-    (Thank ribasushi to tell me "count" is bad)
+    (Thank ribasushi to tell me count is bad)
 
-  METHODS
-    *   exists
+ METHODS
 
-            $rs->exists( { id => 1 } );
+      * exists
 
-        It works like:
+          $rs->exists( { id => 1 } );
 
-            $rs->search( { id => 1 }, { rows => 1, select => [1] } )->single;
+      It works like:
 
-        It is a little faster than "count" if you don't care the real count.
+          $rs->search( { id => 1 }, { rows => 1, select => [1] } )->single;
 
-    *   find_or_create
+      It is a little faster than count if you don't care the real count.
 
-        "find_or_create" in DBIx::Class::ResultSet:
+      * find_or_create
 
-            $rs->find_or_create( { id => 1, name => 'A' } );
+      "find_or_create" in DBIx::Class::ResultSet:
 
-        produces SQLs like:
+          $rs->find_or_create( { id => 1, name => 'A' } );
 
-            # SELECT me.id, me.name FROM item me WHERE ( me.id = ? ): '1'
-            # INSERT INTO item ( id, name) VALUES ( ?, ? ): '1', 'A'
+      produces SQLs like:
 
-        but indeed "SELECT 1 ... LIMIT 1" is performing a little better than
-        me.id, me.name
+          # SELECT me.id, me.name FROM item me WHERE ( me.id = ? ): '1'
+          # INSERT INTO item ( id, name) VALUES ( ?, ? ): '1', 'A'
 
-        this module DBIx::Class::ResultSet::Void produces SQLs like:
+      but indeed SELECT 1 ... LIMIT 1 is performing a little better than
+      me.id, me.name
 
-            # SELECT 1 FROM item me WHERE ( me.id = ? ) LIMIT 1: '1'
-            # INSERT INTO item ( id, name) VALUES ( ?, ? ): '1', 'A'
+      this module DBIx::Class::ResultSet::Void produces SQLs like:
 
-        we would delegate it DBIx::Class::ResultSet under context like:
+          # SELECT 1 FROM item me WHERE ( me.id = ? ) LIMIT 1: '1'
+          # INSERT INTO item ( id, name) VALUES ( ?, ? ): '1', 'A'
 
-            my $row = $rs->find_or_create( { id => 1, name => 'A' } );
+      we would delegate it DBIx::Class::ResultSet under context like:
 
-    *   update_or_create
+          my $row = $rs->find_or_create( { id => 1, name => 'A' } );
 
-        "update_or_create" in DBIx::Class::ResultSet:
+      * update_or_create
 
-            $rs->update_or_create( { id => 1, name => 'B' } );
+      "update_or_create" in DBIx::Class::ResultSet:
 
-        produces SQLs like:
+          $rs->update_or_create( { id => 1, name => 'B' } );
 
-            # SELECT me.id, me.name FROM item me WHERE ( me.id = ? ): '1'
-            # UPDATE item SET name = ? WHERE ( id = ? ): 'B', '1'
+      produces SQLs like:
 
-        this module:
+          # SELECT me.id, me.name FROM item me WHERE ( me.id = ? ): '1'
+          # UPDATE item SET name = ? WHERE ( id = ? ): 'B', '1'
 
-            # SELECT 1 FROM item me WHERE ( me.id = ? ) LIMIT 1: '1'
-            # UPDATE item SET name = ? WHERE ( id = ? ): 'B', '1'
+      this module:
 
-AUTHOR
-      Fayland Lam <fayland@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2009 by Fayland Lam.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as perl itself.
+          # SELECT 1 FROM item me WHERE ( me.id = ? ) LIMIT 1: '1'
+          # UPDATE item SET name = ? WHERE ( id = ? ): 'B', '1'
 

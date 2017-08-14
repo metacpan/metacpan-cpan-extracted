@@ -47,7 +47,7 @@ is(markdown_toc($src), <<'...');
 </ul>
 ...
 
-is(markdown($src, html_options => HOEDOWN_HTML_TOC), <<'...');
+is(markdown($src, toc_nesting_lvl => 99), <<'...');
 <h1 id="toc_0">1</h1>
 
 <h2 id="toc_1">1.1</h2>
@@ -61,6 +61,22 @@ is(markdown($src, html_options => HOEDOWN_HTML_TOC), <<'...');
 <h1 id="toc_5">2</h1>
 
 <h2 id="toc_6">2.2</h2>
+...
+
+is(markdown($src, toc_nesting_lvl => 0), <<'...');
+<h1>1</h1>
+
+<h2>1.1</h2>
+
+<h3>1.1.1</h3>
+
+<h2>1.2</h2>
+
+<h3>1.2.1</h3>
+
+<h1>2</h1>
+
+<h2>2.2</h2>
 ...
 
 done_testing;

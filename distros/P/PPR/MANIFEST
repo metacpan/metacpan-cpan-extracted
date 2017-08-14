@@ -60,5 +60,8 @@ t/heredoc_and_quotelike.t
 t/heredoc_null_then_shift.t
 t/heredoc_same_terminator.t
 t/PPR_GRAMMAR_placement.t
+t/yadayadayada.t
+t/heredoc_and_format.t
+t/merijn_is_evil.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

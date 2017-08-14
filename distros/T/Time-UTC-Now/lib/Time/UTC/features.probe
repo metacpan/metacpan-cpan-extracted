@@ -84,6 +84,12 @@ sub {
 			return ntv.time_state;
 		}, 0) and $defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE} = 1;
 	}
+	$compile_ok->($builder, ["time.h"], q{
+		struct timespec ts;
+		int st;
+		st = clock_gettime(0, &ts);
+		return st;
+	}, 1) and $defs{QHAVE_CLOCK_GETTIME} = 1;
 	$compile_ok->($builder, ["windows.h"], q{
 		FILETIME ft;
 		GetSystemTimeAsFileTime(&ft);

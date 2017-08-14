@@ -1,0 +1,82 @@
+NAME
+    ExtUtils::CXX - support C++ XS files
+
+SYNOPSIS
+     use ExtUtils::CXX;
+     use ExtUtils::MakeMaker;
+
+     # wrap calls to WriteMakefile or MakeMaker that are supposed to use
+     # C++ XS files into extutils_cxx blocks:
+
+     extutils_cxx {
+        WriteMakefile (
+           ...  put your normal args here
+        );
+     };
+
+DESCRIPTION
+    This module enables XS extensions written in C++. It is meant to be
+    useful for the users and installers of c++ modules, rather than the
+    authors, by having a single central place where to patch things, rather
+    than to have to patch every single module that overrides CC manually.
+    That is, in the worst case, you need to patch this module for your
+    environment before being able to CPAN-install further C++ modules;
+    commonly, only setting a few ENV variables is enough; and in the best
+    case, it just works out of the box.
+
+    (Comments on what to do and suggestions on how to achieve these things
+    better are welcome).
+
+    At the moment, it works by changing the values in %Config::Config
+    temporarily. It does the following things:
+
+    1. It tries to change $Config{cc} and $Config{ld} into a C++ compiler.
+        If the environment variable $CXX is set, then it's value will be
+        used to replace both (except if $PERL_CXXLD is set, then that will
+        be used for $Config{ld}.
+
+        (There is also a $PERL_CXX which takes precedence over $CXX).
+
+        The important thing is that the chosen C++ compiler compiles files
+        with a .c ending as C++ - a generic compiler wrapper such as gcc
+        that detects the lafguage by the file extension will *not* work.
+
+        In the absence of these variables, it will do the following
+        transformations on what it guesses will be the compiler name:
+
+           gcc   => g++
+           clang => clang++
+           xlc   => xlC
+           cc    => g++
+           c89   => g++
+
+    extutils_cxx BLOCK;
+        This function temporarily does hideous things so you can call
+        "WriteMakefile" or similar functions in the BLOCK normally. See the
+        description, above, for more details.
+
+  WHAT YOU HAVE TO DO
+    This module only makes your .xs files compile as C++. It does not
+    provide magic C++ support for objects and typemaps, and does not help
+    with portability or writing your .xs file. All of these you have to do -
+    google is your friend.
+
+  LIMITATIONS
+    Combining C++ and C is an art form in itself, and there is simply no
+    portable way to make it work - the platform might have a C compiler, but
+    no C++ compiler. The C++ compiler might be binary incompatible to the C
+    compiler, or might not run for other reasons, and in the end, C++ is
+    more of a moving target than C.
+
+  SEE ALSO
+    There is a module called "ExtUtils::XSpp" that says it gives you C++ in
+    XS, by changing XS in some ways. I don't know what exactly it's purpose
+    is, but it might be a useful addition for C++ Xs development for you, so
+    you might want to look at it. It doesn't have "ExtUtils::MakeMaker"
+    support, and there is a companion module that only supports the obsolete
+    (and very broken) "Module::Build", sour YMMV.
+
+AUTHOR/CONTACT
+     Marc Lehmann <schmorp@schmorp.de>
+     http://software.schmorp.de/pkg/extutils-cxx.html
+

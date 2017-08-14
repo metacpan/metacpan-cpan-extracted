@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -48,7 +48,6 @@ use Smart::Comments;
   # spindles=4, star
   #   discs=2  https://hog.grinvin.org/ViewGraphInfo.action?id=21152
   #
-  require Graph::Maker::Hanoi;
   my @graphs;
   foreach my $N (0 .. 4) {
     my $graph = Graph::Maker->new('hanoi',
@@ -274,7 +273,6 @@ use Smart::Comments;
   #   -2,-3           3,-2
   # -4,-3 -2,-3     2,-3 4,-3
 
-  require Graph::Maker::Hanoi;
   my $discs = 3;
   my $graph = Graph::Maker->new('hanoi', discs => $discs, undirected => 1);
   print $graph->get_graph_attribute('name'),"\n";
@@ -336,7 +334,6 @@ use Smart::Comments;
 {
   # ascii print rows downwards from 0
 
-  require Graph::Maker::Hanoi;
   my $discs = 3;
   my $graph = Graph::Maker->new('hanoi', discs => $discs, undirected => 1);
   print $graph->get_graph_attribute('name'),"\n";

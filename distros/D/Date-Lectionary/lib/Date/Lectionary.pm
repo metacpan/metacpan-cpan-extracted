@@ -22,11 +22,11 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20161227
+Version 1.20170809
 
 =cut
 
-our $VERSION = '1.20161227';
+our $VERSION = '1.20170809';
 
 =head1 SYNOPSIS
 
@@ -305,7 +305,7 @@ Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Michael Wayne Arnold.
+Copyright 2017 Michael Wayne Arnold.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

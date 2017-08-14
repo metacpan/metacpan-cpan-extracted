@@ -1,5 +1,8 @@
 Revision history for perl distribution Test-Mojo-Role-Selenium
 
+0.10 2017-08-10T13:17:23+0200
+ - Add screenshots() attribute
+
 0.09 2017-04-26T16:10:23+0200
  - Add wait_for()
 

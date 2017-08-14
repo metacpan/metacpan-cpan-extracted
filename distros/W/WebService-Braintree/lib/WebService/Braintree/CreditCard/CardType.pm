@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard::CardType;
-$WebService::Braintree::CreditCard::CardType::VERSION = '0.91';
+$WebService::Braintree::CreditCard::CardType::VERSION = '0.92';
 use strict;
 
 use constant AmericanExpress => "American Express";

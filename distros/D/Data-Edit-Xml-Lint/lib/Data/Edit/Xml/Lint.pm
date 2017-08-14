@@ -4,7 +4,8 @@
 # Lint xml files in parallel using xmllint and report the failure rate
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
 #-------------------------------------------------------------------------------
-# Report should allow the integration of other statistics into its summery besides the one it produces itself
+# Report should allow the integration of other statistics into its summary besides the one it produces itself
+# Record reused in other project
 # podDocumentation
 
 package Data::Edit::Xml::Lint;
@@ -15,7 +16,7 @@ use Carp;
 use Data::Table::Text qw(:all);
 use Digest::SHA qw(sha256_hex);
 use Encode;
-our $VERSION = 20170801;
+our $VERSION = 20170802;
 
 #1 Constructor                                                                  # Construct a new linter
 
@@ -31,7 +32,7 @@ genLValueScalarMethods(qw(ditaType));                                           
 genLValueScalarMethods(qw(docType));                                            # The second line: the document type extracted from the L<source|/source>
 genLValueScalarMethods(qw(dtds));                                               # Optional directory containing the DTDs used to validate the xml
 genLValueScalarMethods(qw(errors));                                             # Number of lint errors detected by xmllint
-genLValueScalarMethods(qw(file));                                               # File that the xml will be written to and read from by L<lint|/lint> or L<read|/read>
+genLValueScalarMethods(qw(file));                                               # File that the xml will be written to and read from by L<lint|/lint>, L<read|/read> or L<relint|/relint>
 genLValueScalarMethods(qw(guid));                                               # Guid for outermost tag - only required if you want to generate an SD file map
 genLValueScalarMethods(qw(header));                                             # The first line: the xml header extracted from L<source|/source>
 genLValueScalarMethods(qw(idDefs));                                             # {id} = count - the number of times this id is defined in the xml contained in this L<file|/file>
@@ -40,6 +41,7 @@ genLValueScalarMethods(qw(labels));                                             
 genLValueScalarMethods(qw(linted));                                             # Date the lint was performed by L<lint|/lint>
 genLValueScalarMethods(qw(processes));                                          # Maximum number of xmllint processes to run in parallel - 8 by default
 genLValueScalarMethods(qw(project));                                            # Optional L<project|/project> name to allow error counts to be aggregated by L<project|/project> and to allow L<id and labels|Data::Edit::Xml/Labels> to be scoped to the L<files|/file> contained in each L<project|/project>
+genLValueArrayMethods(qw(reusedInProject));                                     # List of projects in which this file is reused
 genLValueScalarMethods(qw(sha256));                                             # Sha256 hash of the string containing the xml processed by L<lint|/lint> or L<read|/read>
 genLValueScalarMethods(qw(source));                                             # The source Xml to be linted
 genLValueScalarMethods(qw(title));                                              # Optional title of the xml - only needed if you want to generate an SDL file map
@@ -58,7 +60,7 @@ sub lintNOP($@)                                                                 
   &lintOP(0, @_);
  }
 
-sub lintOP($$@)                                                                 ## Store some xml in a L<files|/file>, apply xmllint in parallel or single and update the source file with the results
+sub lintOP($$@)                                                                 #P Store some xml in a L<files|/file>, apply xmllint in parallel or single and update the source file with the results
  {my ($inParallel, $lint, %attributes) = @_;                                    # In parallel or not, Linter, attributes to be recorded as xml comments
 
   $lint->source or confess "Use the source() method to provide the source xml"; # Check that we have some source
@@ -81,9 +83,7 @@ sub lintOP($$@)                                                                 
 
   for(qw(author catalog ditaType dtds file guid project title))                 # Map parameters to attributes
    {my $a = $lint->$_;
-    next unless $a;
-    confess "Attribute $_=>'$a' contains --" if $a =~ m/--/s;                   # Complain if the attribute value contains -- as it will cause problems when the attribute is stored as a label definition in an xml comment
-    $attributes{$_} = $a
+    $attributes{$_} = $a if $a;
    }
 
   $attributes{docType} = $lines[1];                                             # Source details
@@ -164,7 +164,7 @@ sub nolint($@)                                                                  
   writeFile($file, "\n$time\n$attr");                                           # Write attributes to file
  } # nolint
 
-sub formatAttributes(%)                                                         ## Format the attributes section of the output file
+sub formatAttributes(%)                                                         #P Format the attributes section of the output file
  {my ($attributes) = @_;                                                        # Hash of attributes
   my @s;
   for(sort keys %$attributes)
@@ -186,8 +186,8 @@ sub read($)                                                                     
   my $l = {};                                                                   # Reconstructed labels
   for(@a)                                                                       # Each source line
    {if (/<!--labels:\s+(.+?)\s+-->/gs)                                          # Labels line
-     {my @w = split /\s+/, $1;                                                  # id labels
-      $l->{$_} = $w[0] for @w;                                                  # Associate each id and label with the id
+     {my ($w) = my @w = split /\s+/, $1;                                        # Id, labels
+      $l->{$_} = $w for @w;                                                     # Associate each id and label with the id
      }
    }
 
@@ -199,9 +199,16 @@ sub read($)                                                                     
      }
    }
 
+  my $r = {};                                                                   # Reused in project
+  for(@a)                                                                       # Each source line
+   {if (/<!--reusedInProject:\s+(.+?)\s+-->/gs)                                 # Definition
+     {$r->{$1}++;                                                               # Record definition
+     }
+   }
+
   my $S = $s =~ s/\s+<!--linted:.+\Z//sr;                                       # Remove generated comments at end
   my $lint = bless {%a, source=>$S, header=>$a[0], docType=>$a[1],              # Create a matching linter
-     idDefs=>$d, labelDefs=>$l};
+     idDefs=>$d, labelDefs=>$l, reusedInProject=>[sort keys %$r]};
 
   $lint->errors //= 0;
   $lint                                                                         # Return a matching linter
@@ -211,7 +218,7 @@ sub waitAllProcesses                                                            
  {waitpid(shift @pids, 0) while @pids;                                          # Wait until sub processes have completed
  } # wait
 
-sub waitProcessing($)                                                           ## Wait for a processor to become available
+sub waitProcessing($)                                                           #P Wait for a processor to become available
  {my ($processes) = @_;                                                         # Maximum number of processes
   waitpid(shift @pids, 0) while @pids > $processes;                             # Wait until enough sub processes have completed
  }
@@ -245,9 +252,12 @@ sub relint($$$@)                                                                
 
     if (my $p = $lint->project)                                                 # Save location of labels and ids in all files by L<project|/project>
      {if (my $l = $lint->labelDefs)                                             # Labels and ids defined in this file
-       {my $L = $links->{$p} //= {};                                            # Links by L<project|/project>
-        for my $label(keys %$l)                                                 # Each label or id defined in this file
-         {push @{$L->{$label}}, [$file, $l->{$label}];                          # Construct a hash of array refs which tell us the locations = [file, id] of every label and id over all the input files in the L<project|/project>
+       {for my $label(keys %$l)                                                 # Each label or id defined in this file
+         {my $target = [$file, $l->{$label}];                                   # [File, leading label == id] for this label
+          push @{$links->{$p}{$label}}, $target;                                # Construct a hash of array refs which tell us the locations = [file, id] of every label and id over all the input files in the L<project|/project>
+          for my $r(@{$lint->reusedInProject})                                  # Each project that this link is reused in
+           {push @{$links->{$r}{$label}}, $target;                              # Copy targets into reused project
+           }
          }
        }
      }
@@ -307,6 +317,14 @@ sub resolveUniqueLink($$)                                                       
   return () if @$l != 1;                                                        # Too many definitions
   @{$l->[0]}                                                                    # (file, leading id)
  } # resolveUniqueLink
+
+
+sub countLinkTargets($$)                                                        # Count the number of targets this link resolves to.
+ {my ($linkMap, $link) = @_;                                                    # Link map, label
+  my $l = $linkMap->{$link};                                                    # Attempt to resolve link
+  return 0 unless $l;                                                           # No definition
+  scalar @$l;                                                                   # Definition count
+ } # countLinkTargets
 
 sub resolveFileToGuid($$)                                                       # Return the unique definition of the specified link in the link map or undef if no such definition exists
  {my ($fileToGuids, $file) = @_;                                                # File to guids map, file
@@ -382,8 +400,8 @@ sub singleLabelDefsReport($)                                                    
 
 #1 Report                                                                       # Methods for L<reporting|Data::Edit::Xml::Lint/report> the results of L<linting|/lint> several L<files|/file>
 
-sub p4($$)                                                                      ## Format a fraction as a percentage to 4 decimal places
- {my ($p, $f) = @_;
+sub p4($$)                                                                      #P Format a fraction as a percentage to 4 decimal places
+ {my ($p, $f) = @_;                                                             # Pass, fail
   my $n = $p + $f;
   $n > 0 or confess "Division by zero";
   my $r = sprintf("%3.4f", 100 * $p / $n);
@@ -495,10 +513,6 @@ if (1)
  }
 
 # podDocumentation
-
-sub test{eval join('', <Data::Edit::Xml::Lint::DATA>) or die $@} test unless caller;
-
-1;
 
 =pod
 
@@ -631,7 +645,7 @@ originating L<file|/file> thus fixing the changes
 
 Construct a new linter
 
-=head3 new
+=head3 new()
 
 Create a new xml linter - call this method statically as in L<Data::Edit::Xml::Lint|/new>
 
@@ -672,7 +686,7 @@ Number of lint errors detected by xmllint
 
 =head4 file :lvalue
 
-File that the xml will be written to and read from by L<lint|/lint> or L<read|/read>
+File that the xml will be written to and read from by L<lint|/lint>, L<read|/read> or L<relint|/relint>
 
 
 =head4 guid :lvalue
@@ -715,6 +729,11 @@ Maximum number of xmllint processes to run in parallel - 8 by default
 Optional L<project|/project> name to allow error counts to be aggregated by L<project|/project> and to allow L<id and labels|Data::Edit::Xml/Labels> to be scoped to the L<files|/file> contained in each L<project|/project>
 
 
+=head4 reusedInProject :lvalue
+
+List of projects in which this file is reused
+
+
 =head4 sha256 :lvalue
 
 Sha256 hash of the string containing the xml processed by L<lint|/lint> or L<read|/read>
@@ -734,63 +753,63 @@ Optional title of the xml - only needed if you want to generate an SDL file map
 
 Lint xml L<files|/file> in parallel
 
-=head3 lint
+=head3 lint($@)
 
 Store some xml in a L<files|/file>, apply xmllint in parallel and update the source file with the results
 
-  1  $lint        Linter                                     
-  2  %attributes  Attributes to be recorded as xml comments  
+  1  $lint        Linter
+  2  %attributes  Attributes to be recorded as xml comments
 
-=head3 lintNOP
+=head3 lintNOP($@)
 
 Store some xml in a L<files|/file>, apply xmllint in single and update the source file with the results
 
-  1  $lint        Linter                                     
-  2  %attributes  Attributes to be recorded as xml comments  
+  1  $lint        Linter
+  2  %attributes  Attributes to be recorded as xml comments
 
-=head3 nolint
+=head3 nolint($@)
 
 Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
 
-  1  $lint        Linter                                     
-  2  %attributes  Attributes to be recorded as xml comments  
+  1  $lint        Linter
+  2  %attributes  Attributes to be recorded as xml comments
 
-=head3 read
+=head3 read($)
 
 Reread a linted xml L<file|/file> and extract the L<attributes|/Attributes> associated with the L<lint|/lint>
 
-  1  $file  File containing xml  
+  1  $file  File containing xml
 
-=head3 waitAllProcesses
+=head3 waitAllProcesses()
 
 Wait for all L<lints|/lint> to finish - this is a static method, call as Data::Edit::Xml::Lint::wait
 
 
-=head3 clear
+=head3 clear(@)
 
 Clear the results of a prior run
 
-  1  @foldersAndExtensions  Directories to clear and extensions of files to remove  
+  1  @foldersAndExtensions  Directories to clear and extensions of files to remove
 
-=head3 relint
+=head3 relint($$$@)
 
 Locate all the L<labels or id|Data::Edit::Xml/Labels> in the specified L<files|/file>, analyze the map of labels and ids with B<analysisSub> parse each L<file|/file>, process each parse with B<processSub>, then L<lint/lint> the reprocessed xml back to the original L<file|/file> - this allows you to reprocess the contents of each L<file|/file> with knowledge of where L<labels or id|Data::Edit::Xml/Labels> are located in the other L<files|/file> associated with a L<project|/project>. The B<analysisSub>(linkmap = {project}{labels or id>}=[file, id]) should return true if the processing of each file is to be performed subsequently. The B<processSub>(parse tree representation of a file, id and label mapping, reloaded linter) should return true if a L<lint|/lint> is required to save the results after each L<file|/file> has been processed else false, L<files|/file> to reprocess
 
-  1  $processes             Maximum number of processes to use                
-  2  $analysisSub           Analysis 𝘀𝘂𝗯                                      
-  3  $processSub            Process 𝘀𝘂𝗯                                       
-  4  @foldersAndExtensions  Folder containing files to process (recursively)  
+  1  $processes             Maximum number of processes to use
+  2  $analysisSub           Analysis 𝘀𝘂𝗯
+  3  $processSub            Process 𝘀𝘂𝗯
+  4  @foldersAndExtensions  Folder containing files to process (recursively)
 
 =head2 Report
 
 Methods for L<reporting|Data::Edit::Xml::Lint/report> the results of L<linting|/lint> several L<files|/file>
 
-=head3 report
+=head3 report($@)
 
 Analyse the results of prior L<lints|/lint> and return a hash reporting various statistics and a L<printable|/print> report
 
-  1  $outputDirectory  Directory to clear         
-  2  @fileExtensions   Types of files to analyze  
+  1  $outputDirectory  Directory to clear
+  2  @fileExtensions   Types of files to analyze
 
 =head3 Attributes
 
@@ -830,6 +849,36 @@ A printable L<report|/report> of the above
 
 
 
+=head1 Private Methods
+
+=head2 lintOP($$@)
+
+Store some xml in a L<files|/file>, apply xmllint in parallel or single and update the source file with the results
+
+  1  $inParallel  In parallel or not
+  2  $lint        Linter
+  3  %attributes  Attributes to be recorded as xml comments
+
+=head2 formatAttributes(%)
+
+Format the attributes section of the output file
+
+  1  $attributes  Hash of attributes
+
+=head2 waitProcessing($)
+
+Wait for a processor to become available
+
+  1  $processes  Maximum number of processes
+
+=head2 p4($$)
+
+Format a fraction as a percentage to 4 decimal places
+
+  1  $p  Pass
+  2  $f  Fail
+
+
 =head1 Index
 
 
@@ -851,6 +900,8 @@ L<failingFiles|/failingFiles>
 
 L<file|/file>
 
+L<formatAttributes|/formatAttributes>
+
 L<guid|/guid>
 
 L<header|/header>
@@ -867,6 +918,8 @@ L<linted|/linted>
 
 L<lintNOP|/lintNOP>
 
+L<lintOP|/lintOP>
+
 L<new|/new>
 
 L<nolint|/nolint>
@@ -874,6 +927,8 @@ L<nolint|/nolint>
 L<numberOfFiles|/numberOfFiles>
 
 L<numberOfProjects|/numberOfProjects>
+
+L<p4|/p4>
 
 L<passRatePercent|/passRatePercent>
 
@@ -891,6 +946,8 @@ L<relint|/relint>
 
 L<report|/report>
 
+L<reusedInProject|/reusedInProject>
+
 L<sha256|/sha256>
 
 L<source|/source>
@@ -901,10 +958,12 @@ L<title|/title>
 
 L<waitAllProcesses|/waitAllProcesses>
 
+L<waitProcessing|/waitProcessing>
+
 =head1 Installation
 
-This module is written in 100% Pure Perl and is thus easy to read, use, modify
-and install.
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
 
 Standard Module::Build process for building and installing modules:
 
@@ -928,6 +987,21 @@ under the same terms as Perl itself.
 
 =cut
 
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
 # podDocumentation
 
 __DATA__
@@ -1330,6 +1404,7 @@ sub expectedRead
                 },
   labels     => "bbb concept1 concept2",
   project    => "bbb",
+  reusedInProject=>[],
   sha256     => "b00cdebf2e1837fa15140d25315e5558ed59eb735b5fad4bade23969babf9531",
   source     => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE concept PUBLIC \"-//HPE//DTD HPE DITA Concept//EN\" \"concept.dtd\" []>\n<concept >\n <title>Project bbb</title>\n <conbody >\n   <p>Body of bbb \xF0\x9D\x9D\xB0</p>\n   <p>See: <xref href=\"#c4\"/></p>\n </conbody>\n</concept>",
   title      => "Concept 1",

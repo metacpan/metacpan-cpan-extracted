@@ -2,7 +2,6 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF::Logger::Level;
-use MarpaX::ESLIF;
 
 # ABSTRACT: ESLIF Logger levels
 
@@ -11,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '2.0.14'; # VERSION
+our $VERSION = '2.0.15'; # VERSION
 
 # This section should be replaced on-the-fly at build time
 # AUTOLOAD
@@ -30,9 +29,11 @@ MarpaX::ESLIF::Logger::Level - ESLIF Logger levels
 
 =head1 VERSION
 
-version 2.0.14
+version 2.0.15
 
 =head1 SYNOPSIS
+
+  use MarpaX::ESLIF;
 
   my $loggerLevelType;
   $loggerLevelType = MarpaX::ESLIF::Logger::Level->GENERICLOGGER_LOGLEVEL_TRACE;      #  0

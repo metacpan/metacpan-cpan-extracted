@@ -14,7 +14,7 @@ use constant DEBUG => $ENV{MOJO_SELENIUM_DEBUG} || 0;
 $ENV{TEST_SELENIUM} //= '0';
 $ENV{MOJO_SELENIUM_BASE_URL} ||= $ENV{TEST_SELENIUM} =~ /^http/ ? $ENV{TEST_SELENIUM} : '';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $SCRIPT_NAME = File::Basename::basename($0);
 my $SCREENSHOT  = 1;
@@ -35,6 +35,7 @@ has driver => sub {
 
 has driver_args          => sub { +{} };
 has screenshot_directory => sub { File::Spec->tmpdir };
+has screenshots          => sub { +[] };
 
 has _live_base => sub {
   my $self = shift;
@@ -80,6 +81,7 @@ sub capture_screenshot {
   $path = File::Spec->catfile($self->screenshot_directory, $path);
   Test::More::diag("Saving screenshot to $path");
   $self->driver->capture_screenshot($path);
+  push @{$self->screenshots}, $path;
   return $self;
 }
 
@@ -226,6 +228,7 @@ sub send_keys_ok {
   my $el = $selector ? $self->_proxy(find_element => $selector) : $self->driver->get_active_element;
 
   $selector ||= 'active element';
+  $keys = [ref $keys ? $keys : split //, $keys] unless ref $keys eq 'ARRAY';
 
   for (@$keys) {
     my $key = ref $_ ? Selenium::Remote::WDKeys::KEYS()->{$$_} : $_;
@@ -583,6 +586,13 @@ override the driver class.
   $self = $self->screenshot_directory(File::Spec->tmpdir);
 
 Where screenshots are saved.
+
+=head2 screenshots
+
+  $array = $self->screenshots;
+
+Holds an array ref with paths to all the screenshots taken with
+L</capture_screenshot>.
 
 =head2 toggle_checked_ok
 

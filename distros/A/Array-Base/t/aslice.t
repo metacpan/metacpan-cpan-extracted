@@ -19,8 +19,11 @@ is_deeply [ scalar @{$r}[@i4] ], [ qw(c) ];
 is_deeply [ @{$r}[@i4] ], [ qw(a c a c) ];
 
 SKIP: {
-	skip "no lexical \$_", 8 unless eval q{my $_; 1};
+	skip "no lexical \$_ on this perl", 8
+		if "$]" < 5.009001 || "$]" >= 5.023004;
 	eval q{
+		no warnings "$]" >= 5.017009 ? "experimental" :
+						"deprecated";
 		my $_;
 		is_deeply [ scalar @t[3,4] ], [ qw(b) ];
 		is_deeply [ @t[3,4,8,9] ], [ qw(a b f), undef ];

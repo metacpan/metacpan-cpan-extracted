@@ -1,0 +1,55 @@
+---
+abstract: 'Moo but with less typing'
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mu
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Mu:
+    file: lib/Mu.pm
+    version: '1.172231'
+  Mu::Role:
+    file: lib/Mu/Role.pm
+    version: '1.172231'
+requires:
+  Import::Into: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::ShortHas: '0'
+  perl: '5.006'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/wchristian/Mu/issues
+  homepage: https://github.com/wchristian/Mu
+  repository: https://github.com/wchristian/Mu.git
+version: '1.172231'
+x_contributors:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

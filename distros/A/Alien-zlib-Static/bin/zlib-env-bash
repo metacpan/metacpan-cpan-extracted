@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Alien::zlib::Static;
+use Text::ParseWords qw( shellwords );
+
+my $cflags  = Alien::zlib::Static->cflags;
+my $ldflags = Alien::zlib::Static->libs;
+
+my $cpath = join ':', map {s/^-I//; $_} shellwords( $cflags );
+my $librarypath = join ':', map {s/^-L//; $_} grep {m/^-L/} shellwords( $ldflags );
+
+exec(qq{$ENV{SHELL} -c 'export CFLAGS="$cflags \$CFLAGS" LDFLAGS="$ldflags \$LDFLAGS" CPATH="$cpath:\$CPATH" LIBRARY_PATH="$librarypath:\$LIBRARY_PATH";\$SHELL'});

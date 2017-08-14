@@ -1,5 +1,5 @@
 package WebService::Braintree::AdvancedSearchFields;
-$WebService::Braintree::AdvancedSearchFields::VERSION = '0.91';
+$WebService::Braintree::AdvancedSearchFields::VERSION = '0.92';
 use Carp;
 use Moose;
 

@@ -1,10 +1,6 @@
 Build.PL
-CHANGES
 lib/Math/Permute/Lists.pm
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/a00.t
 t/d03.t
 t/die.t
@@ -17,3 +13,5 @@ t/t04.t
 t/t05.t
 t/t10.t
 t/z00.t
+META.yml
+META.json

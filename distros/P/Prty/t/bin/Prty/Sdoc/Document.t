@@ -20,7 +20,7 @@ sub test_loadClass : Init(1) {
 sub test_unitTest : Test(1) {
     my $self = shift;
 
-    my $file = $self->testPath('prty/test/data/sdoc/test.sdoc');
+    my $file = $self->testPath('t/data/sdoc/test.sdoc');
     my $tree = Prty::Sdoc::Document->new($file,-utf8=>1);
     $self->is(ref($tree),'Prty::Sdoc::Document','Klasse');
     # warn "---DEBUG\n";
@@ -38,7 +38,7 @@ sub test_unitTest : Test(1) {
 sub test_unitTest_anchor : Test(9) {
     my $self = shift;
 
-    my $file = $self->testPath('prty/test/data/sdoc/test_anchor.sdoc');
+    my $file = $self->testPath('t/data/sdoc/test_anchor.sdoc');
     my $tree = Prty::Sdoc::Document->new($file);
     my $str = $tree->dump('html');
 

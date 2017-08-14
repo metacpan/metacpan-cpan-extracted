@@ -1,5 +1,5 @@
 package WebService::Braintree::Dispute::Status;
-$WebService::Braintree::Dispute::Status::VERSION = '0.91';
+$WebService::Braintree::Dispute::Status::VERSION = '0.92';
 use strict;
 
 use constant Open => 'open';

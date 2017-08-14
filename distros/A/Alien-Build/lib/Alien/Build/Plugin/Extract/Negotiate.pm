@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '0.91'; # VERSION
+our $VERSION = '0.95'; # VERSION
 
 
 has '+format' => 'tar';
@@ -45,7 +45,7 @@ sub _pick
   }
   elsif($format eq 'tar.bz2')
   {
-    if(eval q{ require Archive::Tar; Archive::Tar->has_bzip2_support })
+    if(eval q{ require Alien::Build::Plugin::Extract::ArchiveTar; Alien::Build::Plugin::Extract::ArchiveTar->_can_bz2 })
     {
       return 'ArchiveTar';
     }
@@ -56,7 +56,23 @@ sub _pick
   }
   elsif($format eq 'zip')
   {
-    return 'ArchiveZip';
+    # Archive::Zip is not that reliable.  But if it is already installed it is probably working
+    if(eval q{ require Archive::Zip; 1 })
+    {
+      return 'ArchiveZip';
+    }
+    
+    # if we don't have Archive::Zip, check if we have the unzip command
+    elsif(eval { require Alien::Build::Plugin::Extract::CommandLine; Alien::Build::Plugin::Extract::CommandLine->new->unzip_cmd })
+    {
+      return 'Extract::CommandLine';
+    }
+    
+    # okay fine.  I will try to install Archive::Zip :(
+    else
+    {
+      return 'ArchiveZip';
+    }
   }
   elsif($format eq 'tar.xz' || $format eq 'tar.Z')
   {
@@ -96,7 +112,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 0.91
+version 0.95
 
 =head1 SYNOPSIS
 

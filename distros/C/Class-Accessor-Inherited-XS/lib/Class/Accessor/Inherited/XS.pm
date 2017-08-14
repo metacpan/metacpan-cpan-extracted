@@ -3,9 +3,11 @@ use 5.010001;
 use strict;
 use warnings;
 
+use Class::Accessor::Inherited::XS::Compat qw/mk_type_accessors mk_inherited_accessors mk_class_accessors mk_varclass_accessors mk_object_accessors/;
+
 use Carp ();
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 our $PREFIX  = '__cag_';
 
 require XSLoader;
@@ -35,8 +37,7 @@ sub import {
 
     for my $type (keys %opts) {
         my $accessors = $opts{$type};
-        my $installer = _type_installer($type);
-        my $clone_arg = $REGISTERED_TYPES->{$type}{clone_arg};
+        my ($installer, $clone_arg) = $pkg->_type_installer($type);
 
         if (ref($accessors) eq 'HASH') {
             $installer->($class, $_, $accessors->{$_}) for keys %$accessors;
@@ -49,42 +50,6 @@ sub import {
 
         } else {
             Carp::confess("Can't understand format for '$type' accessors initializer");
-        }
-    }
-}
-
-sub mk_inherited_accessors {
-    my $class = shift;
-    mk_type_accessors($class, 'inherited', @_);
-}
-
-sub mk_class_accessors {
-    my $class = shift;
-    mk_type_accessors($class, 'class', @_);
-}
-
-sub mk_varclass_accessors {
-    my $class = shift;
-    mk_type_accessors($class, 'varclass', @_);
-}
-
-sub mk_object_accessors {
-    my $class = shift;
-    mk_type_accessors($class, 'object', @_);
-}
-
-sub mk_type_accessors {
-    my ($class, $type) = (shift, shift);
-
-    my $installer = _type_installer($type);
-    my $clone_arg = $REGISTERED_TYPES->{$type}{clone_arg};
-
-    for my $entry (@_) {
-        if (ref($entry) eq 'ARRAY') {
-            $installer->($class, @$entry);
-
-        } else {
-            $installer->($class, $entry, $clone_arg && $entry);
         }
     }
 }
@@ -111,7 +76,7 @@ sub register_type {
         };
     }
 
-    $args->{clone_arg} = 1 unless exists $args->{clone_arg};
+    $args->{clone_arg} = 1 unless exists $args->{clone_arg}; # for cb-types
     $REGISTERED_TYPES->{$type} = $args;
 }
 
@@ -120,10 +85,10 @@ sub register_type {
 #
 
 sub _type_installer {
-    my $type = shift;
+    my (undef, $type) = @_;
 
     my $type_info = $REGISTERED_TYPES->{$type} or Carp::confess("Don't know how to install '$type' accessors");
-    return $type_info->{installer};
+    return ($type_info->{installer}, $type_info->{clone_arg});
 }
 
 sub _mk_inherited_accessor {
@@ -179,9 +144,9 @@ Class::Accessor::Inherited::XS - Fast XS inherited, object and class accessors
       getters   => ['foo'],             # alias for 'object_ro'
   };
 
-  # or at run time, in a Class::Accessor::Grouped-like fashion
-  # this is unrecommended style and it provides very limited interface
-  use parent 'Class::Accessor::Inherited::XS';
+  # Or if you prefer a Class::Accessor::Grouped-like interface, you can do it
+  # at run time. Note that this is not recommended and provides limited feature set.
+  use parent 'Class::Accessor::Inherited::XS::Compat';
 
   __PACKAGE__->mk_inherited_accessors('foo', [bar => 'bar_key']);
   __PACKAGE__->mk_class_accessors('foo');
@@ -280,9 +245,6 @@ class_caix       31300776/s          13286%   2960%   2303%        391%         
         inherited    => ['foo'],
         inherited_cb => ['bar'],
     };
-
-    #or in a Class::Accessor::Grouped-like fashion
-    __PACKAGE__->mk_type_accessors(inherited_cb => 'foo', 'bar');
 
 You can register new inherited accessor types with associated read/write callbacks. Unlike
 L<Class::Accessor::Grouped>, only a single callback can be set for a type, without per-class

@@ -3,29 +3,29 @@ abstract: 'JSON pointer-like and Perl union for flexible perlish structures vali
 author:
   - 'Ivan Baidakou <dmol@gmx.com>'
 build_requires:
-  File::Spec: 0
-  File::Temp: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::More: 0.98
-  Test::Warnings: 0.013
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.98'
+  Test::Warnings: '0.013'
 configure_requires:
-  ExtUtils::MakeMaker: 6.72
+  ExtUtils::MakeMaker: '6.72'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-DynamicValidator
 requires:
-  Devel::LexAlias: 0.05
-  Eval::Closure: 0.11
-  List::MoreUtils: 0.33
-  PadWalker: 1.98
-  Try::Tiny: 0.18
-  aliased: 0.31
-  perl: 5.012
+  Devel::LexAlias: '0.05'
+  Eval::Closure: '0.11'
+  PadWalker: '1.98'
+  Try::Tiny: '0.18'
+  aliased: '0.31'
+  perl: '5.012'
 resources:
   repository: https://github.com/basiliscos/p5-Data-DynamicValidator.git
-version: 0.03
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.69'

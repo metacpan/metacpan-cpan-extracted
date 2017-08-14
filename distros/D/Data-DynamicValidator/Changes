@@ -1,3 +1,7 @@
+0.05      2017-08-10 20:20:03+03:00 Europe/Minsk
+    - Auto generate META.json using dzil plugin [MetaJSON].
+    - Fix tests, drop List::MoreUtil dependency
+
 0.03      2014-02-15 16:00:10 Europe/Minsk
     - Allow rebase, i.e. apply rules relative to some other base (prefix) route
 

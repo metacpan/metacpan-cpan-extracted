@@ -17,7 +17,7 @@ sub test_loadClass : Init(1) {
 sub test_unitTest_file : Test(5) {
     my $self = shift;
 
-    my $file = $self->testPath('prty/test/data/etc/test1.conf');
+    my $file = $self->testPath('t/data/etc/test1.conf');
     my $cfg = Prty::Config->new($file);
     $self->is(ref($cfg),'Prty::Config');
 
@@ -49,7 +49,7 @@ sub test_get : Test(3) {
     my $self = shift;
 
     my $conf = Prty::Config->new($self->testPath(
-        'prty/test/data/etc/test2.conf'));
+        't/data/etc/test2.conf'));
 
     my $val = $conf->get('SpoolDir');
     $self->is($val,'/var/opt/myapp/spool');

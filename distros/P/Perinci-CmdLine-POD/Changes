@@ -1,3 +1,8 @@
+0.015   2017-08-12 (PERLANCAR)
+
+	- Use description.alt.env.cmdline before description.
+
+
 0.014   2017-07-07 (PERLANCAR)
 
 	- Replace recommendation that mentions DZP:GenShellCompletion with

@@ -1,74 +1,82 @@
  Count  Type        Name                  Value
-     1  tag         svg                   open
-     2  attribute   height                4cm
-     3  attribute   version               1.1
-     4  raw         viewBox               0 0 1200 400
-     5  integer     1                     0
-     6  integer     2                     0
-     7  float       3                     1200
-     8  float       4                     400
-     9  attribute   width                 12cm
-    10  attribute   xmlns                 http://www.w3.org/2000/svg
-    11  tag         desc                  open
-    12  content     desc                  Example polygon01 - star and hexagon
-    13  tag         desc                  close
-    14  tag         rect                  open
-    15  attribute   fill                  none
-    16  attribute   height                398
-    17  attribute   stroke                blue
-    18  attribute   stroke-width          2
-    19  attribute   width                 1198
-    20  attribute   x                     1
-    21  attribute   y                     1
-    22  content     rect                  
-    23  tag         rect                  close
-    24  tag         polygon               open
-    25  attribute   fill                  red
-    26  raw         points                350,75  379,161 469,161 397,215                     423,301 350,250 277,301 303,215                     231,161 321,161
-    27  float       1                     350
-    28  float       2                     75
-    29  float       3                     379
-    30  float       4                     161
-    31  float       5                     469
-    32  float       6                     161
-    33  float       7                     397
-    34  float       8                     215
-    35  float       9                     423
-    36  float       10                    301
-    37  float       11                    350
-    38  float       12                    250
-    39  float       13                    277
-    40  float       14                    301
-    41  float       15                    303
-    42  float       16                    215
-    43  float       17                    231
-    44  float       18                    161
-    45  float       19                    321
-    46  float       20                    161
-    47  attribute   stroke                blue
-    48  attribute   stroke-width          10
-    49  content     polygon               
-    50  tag         polygon               close
-    51  tag         polygon               open
-    52  attribute   fill                  lime
-    53  raw         points                850,75  958,137.5 958,262.5                     850,325 742,262.6 742,137.5
-    54  float       1                     850
-    55  float       2                     75
-    56  float       3                     958
-    57  float       4                     137.5
-    58  float       5                     958
-    59  float       6                     262.5
-    60  float       7                     850
-    61  float       8                     325
-    62  float       9                     742
-    63  float       10                    262.6
-    64  float       11                    742
-    65  float       12                    137.5
-    66  attribute   stroke                blue
-    67  attribute   stroke-width          10
-    68  content     polygon               
-    69  tag         polygon               close
-    70  content     svg                   
+     1  XMLDecl     xml                   -
+     2  attribute   version               1.0
+     3  attribute   standalone            
+     4  Doctype     doctype               -
+     5  attribute   name                  svg
+     6  attribute   sysid                 http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd
+     7  attribute   pubid                 -//W3C//DTD SVG 1.1//EN
+     8  attribute   internal              
+     9  tag         svg                   open
+    10  attribute   height                4cm
+    11  attribute   version               1.1
+    12  raw         viewBox               0 0 1200 400
+    13  integer     1                     0
+    14  integer     2                     0
+    15  float       3                     1200
+    16  float       4                     400
+    17  attribute   width                 12cm
+    18  attribute   xmlns                 http://www.w3.org/2000/svg
+    19  tag         desc                  open
+    20  content     desc                  Example polygon01 - star and hexagon
+    21  tag         desc                  close
+    22  tag         rect                  open
+    23  attribute   fill                  none
+    24  attribute   height                398
+    25  attribute   stroke                blue
+    26  attribute   stroke-width          2
+    27  attribute   width                 1198
+    28  attribute   x                     1
+    29  attribute   y                     1
+    30  content     rect                  
+    31  tag         rect                  close
+    32  tag         polygon               open
+    33  attribute   fill                  red
+    34  raw         points                350,75  379,161 469,161 397,215                     423,301 350,250 277,301 303,215                     231,161 321,161
+    35  float       1                     350
+    36  float       2                     75
+    37  float       3                     379
+    38  float       4                     161
+    39  float       5                     469
+    40  float       6                     161
+    41  float       7                     397
+    42  float       8                     215
+    43  float       9                     423
+    44  float       10                    301
+    45  float       11                    350
+    46  float       12                    250
+    47  float       13                    277
+    48  float       14                    301
+    49  float       15                    303
+    50  float       16                    215
+    51  float       17                    231
+    52  float       18                    161
+    53  float       19                    321
+    54  float       20                    161
+    55  attribute   stroke                blue
+    56  attribute   stroke-width          10
+    57  content     polygon               
+    58  tag         polygon               close
+    59  tag         polygon               open
+    60  attribute   fill                  lime
+    61  raw         points                850,75  958,137.5 958,262.5                     850,325 742,262.6 742,137.5
+    62  float       1                     850
+    63  float       2                     75
+    64  float       3                     958
+    65  float       4                     137.5
+    66  float       5                     958
+    67  float       6                     262.5
+    68  float       7                     850
+    69  float       8                     325
+    70  float       9                     742
+    71  float       10                    262.6
+    72  float       11                    742
+    73  float       12                    137.5
+    74  attribute   stroke                blue
+    75  attribute   stroke-width          10
+    76  content     polygon               
+    77  tag         polygon               close
+    78  content     svg                   
   
 
   
@@ -76,4 +84,4 @@
 
   
   
-    71  tag         svg                   close
+    79  tag         svg                   close

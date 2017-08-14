@@ -1,3 +1,8 @@
+0.170   2017-08-12 (PERLANCAR)
+
+	- Search description.alt.env.cmdline before description in meta.
+
+
 0.16    2017-07-24 (PERLANCAR)
 
 	- [ux] When there is no summary, skip producing the whole line

@@ -289,4 +289,16 @@ subtest 'url_base' => sub {
 
 };
 
+subtest 'windows absolute' => sub {
+  skip_all 'windows only' unless $^O eq 'MSWin32';
+
+  is(
+    'file://localhost/C:/foo',
+    url {
+      url_component path => 'C:/foo';
+    },
+  );
+
+};
+
 done_testing

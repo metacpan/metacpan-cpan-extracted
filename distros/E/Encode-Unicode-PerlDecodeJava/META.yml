@@ -15,9 +15,10 @@ name: Encode-Unicode-PerlDecodeJava
 provides:
   Encode::Unicode::PerlDecodeJava:
     file: lib/Encode/Unicode/PerlDecodeJava.pm
-    version: '2017.302'
+    version: '20170808'
 requires:
   Carp: '0'
+  Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2017.302'
+version: '20170808'

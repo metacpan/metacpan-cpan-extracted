@@ -23,11 +23,8 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 
 sub _default_graph_maker {

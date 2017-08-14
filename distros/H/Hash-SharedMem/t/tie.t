@@ -43,7 +43,7 @@ sub try_scalar_success($) {
 		skip "tied hash in scalar context not supported on this Perl", 1
 			unless ("$]" >= 5.008003 && "$]" < 5.009000) ||
 				"$]" >= 5.009001;
-		is scalar(%sh), $_[0];
+		is scalar(%sh), "$]" >= 5.025003 ? $_[0] : !!$_[0];
 	}
 }
 
@@ -70,7 +70,7 @@ ok tied(%sh) == $sh;
 
 ok !exists($sh{a100});
 is $sh{a100}, undef;
-try_scalar_success !!0;
+try_scalar_success 0;
 is scalar(keys(%sh)), 0;
 is scalar(values(%sh)), 0;
 is_deeply [keys_via_scalar_each()], [];
@@ -98,7 +98,7 @@ ok exists($sh{a120});
 is $sh{a120}, "b120";
 ok !exists($sh{a130});
 is $sh{a130}, undef;
-try_scalar_success !!1;
+try_scalar_success 3;
 is scalar(keys(%sh)), 3;
 is scalar(values(%sh)), 3;
 is_deeply [keys_via_scalar_each()], [qw(a100 a110 a120)];
@@ -130,7 +130,7 @@ ok exists($sh{a120});
 is $sh{a120}, "b120";
 ok !exists($sh{a130});
 is $sh{a130}, undef;
-try_scalar_success !!1;
+try_scalar_success 3;
 is scalar(keys(%sh)), 3;
 is scalar(values(%sh)), 3;
 is_deeply [keys_via_scalar_each()], [qw(a100 a105 a120)];
@@ -147,7 +147,7 @@ ok !exists($sh{a115});
 is $sh{a115}, undef;
 ok !exists($sh{a120});
 is $sh{a120}, undef;
-try_scalar_success !!1;
+try_scalar_success 2;
 $sh{a120} = "b120";
 
 $sh = undef;
@@ -170,7 +170,7 @@ ok exists($sh{a120});
 is $sh{a120}, "b120";
 ok !exists($sh{a130});
 is $sh{a130}, undef;
-try_scalar_success !!1;
+try_scalar_success 3;
 is scalar(keys(%sh)), 3;
 is scalar(values(%sh)), 3;
 is_deeply [keys_via_scalar_each()], [qw(a100 a105 a120)];
@@ -187,7 +187,7 @@ is $@, "";
 
 ok exists($sh{a120});
 is $sh{a120}, "b120";
-try_scalar_success !!1;
+try_scalar_success 3;
 eval { $sh{a100} = "b100" };
 like $@, qr#\Acan't\ write\ shared\ hash\ \Q$tmpdir\E/t0:
 		\ shared\ hash\ was\ opened\ in\ unwritable\ mode\ #x;

@@ -101,6 +101,7 @@ lib/Mojolicious/Guides/FAQ.pod
 lib/Mojolicious/Guides/Growing.pod
 lib/Mojolicious/Guides/Rendering.pod
 lib/Mojolicious/Guides/Routing.pod
+lib/Mojolicious/Guides/Testing.pod
 lib/Mojolicious/Guides/Tutorial.pod
 lib/Mojolicious/Lite.pm
 lib/Mojolicious/Plugin.pm
@@ -154,6 +155,7 @@ script/mojo
 script/morbo
 t/mojo/asset.t
 t/mojo/base.t
+t/mojo/base_roles.t
 t/mojo/bytestream.t
 t/mojo/cache.t
 t/mojo/certs/bad.crt

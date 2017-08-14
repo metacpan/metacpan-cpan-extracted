@@ -1,13 +1,5 @@
 use Module::Build;
 
-unlink $_ for
- qw(
-/home/phil/z/perl/cpan/DataTableText/zzz.html
-/home/phil/z/perl/cpan/DataTableText/pod2htmd.tmp
-/home/phil/z/perl/cpan/DataTableText/lib/Data/Edit/doc.data
-/home/phil/z/perl/cpan/DataTableText/lib/Data/Edit/methods.data
-);
-
 my $b = Module::Build->new
  (module_name   => 'Data::Table::Text',
   dist_author   => 'philiprbrenan@gmail.com',

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Perl;
 use Prty::Process;
@@ -248,7 +248,7 @@ sub try {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

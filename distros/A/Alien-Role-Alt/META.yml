@@ -25,8 +25,9 @@ requires:
   Role::Tiny: '1.003001'
   perl: '5.008001'
 resources:
+  IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-Role-Alt/issues
   homepage: https://metacpan.org/pod/Alien::Role::Alt
   repository: git://github.com/plicease/Alien-Role-Alt.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -122,6 +122,20 @@ C<Graph-E<gt>new()>.
 If the graph is directed (the default) then edges are added both forward and
 backward between vertices.  Option C<undirected =E<gt> 1> creates an
 undirected graph and for it there is a single edge between vertices.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the graphs here include
+
+=over
+
+=item N=4, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=484>
+
+=item N=5, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=660>  (Petersen, odd 3)
+
+=item N=6, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19271>
 
 =back
 

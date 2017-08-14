@@ -3,7 +3,7 @@ NAME
     <http://cmake.org/>
 
 VERSION
-    Version 0.08
+    Version 0.09
 
 SYNOPSIS
     Alien::CMake during its installation does one of the following:
@@ -38,6 +38,13 @@ SYNOPSIS
     'Any::CMake::Module'.
 
 DESCRIPTION
+    Please consider using Alien::cmake3 instead. It uses newer Alien
+    technology and is more reliable. In particular, this module will
+    download very old binaries for some platforms (some from the 2.x
+    series). In addition Alien::cmake3 will build from source if binaries
+    are not available for your platform. Also Alien::cmake3 integrates more
+    naturally with alienfile and ALien::Build.
+
     In short "Alien::CMake" can be used to detect and get configuration
     settings from an already installed CMake. It offers also an option to
     download CMake source codes and build binaries from scratch.

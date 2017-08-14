@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Makepp version @VERSION@.
-# $Id: makepp,v 1.227 2016/09/06 19:59:07 pfeiffer Exp $
+# $Id: makepp,v 1.228 2017/08/06 21:19:08 pfeiffer Exp $
 # See @htmldir@/index.html for user documentation.
 #
 

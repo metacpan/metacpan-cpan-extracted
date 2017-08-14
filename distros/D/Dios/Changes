@@ -160,3 +160,9 @@ Revision history for Dios
 
         * Allowed attributes to be specified with subtype types
           (Thanks Jeff!)
+
+
+0.002008  Wed Aug  9 21:24:44 2017
+
+        * Fixed the behaviour of is req/is required
+          (Thanks Jeff)

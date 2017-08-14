@@ -6,7 +6,7 @@ sub dewarn {
   /warning:/ or return 1;
   tr/\02//d;
   s!(at `?).*/!$1!;		# Remove path, which varies
-  s!\*{3} /.*/!*** !;
+  s!\*{3} (?:[a-z]:)?/.*/!*** !i;
   0;
 }
 

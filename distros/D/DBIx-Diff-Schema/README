@@ -2,8 +2,8 @@ NAME
     DBIx::Diff::Schema - Compare schema of two DBI databases
 
 VERSION
-    This document describes version 0.08 of DBIx::Diff::Schema (from Perl
-    distribution DBIx-Diff-Schema), released on 2017-07-10.
+    This document describes version 0.090 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2017-08-13.
 
 SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
@@ -194,6 +194,10 @@ BUGS
 
 SEE ALSO
     DBIx::Compare to compare database contents.
+
+    diffdb from App::diffdb which can compare two database (schema as well
+    as content) and display the result as the familiar colored unified-style
+    diff.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

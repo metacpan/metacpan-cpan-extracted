@@ -3,8 +3,8 @@ NAME
     Perinci::CmdLine-based app
 
 VERSION
-    This document describes version 0.16 of Perinci::CmdLine::Help (from
-    Perl distribution Perinci-CmdLine-Help), released on 2017-07-24.
+    This document describes version 0.170 of Perinci::CmdLine::Help (from
+    Perl distribution Perinci-CmdLine-Help), released on 2017-08-12.
 
 DESCRIPTION
     Currently used by Perinci::CmdLine::Lite and App::riap. Eventually I

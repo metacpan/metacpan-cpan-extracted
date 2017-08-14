@@ -36,14 +36,15 @@ my(%params) =
 		'strict'			=> 0,
 		'SVG'				=> 2.64,
 		'Types::Standard'	=> 1.000005,
+		'utf8'				=> 0,
 		'warnings'			=> 0,
 	},
 	TEST_REQUIRES =>
 	{
-		'File::Spec'		=> 0,
-		'File::Temp'		=> 0,
-		'Test::Pod'			=> 1.51,
-		'Test::Simple'		=> 1.302052, # For Test::More.
+		'File::Spec'	=> 0,
+		'File::Temp'	=> 0,
+		'Test::More'	=> 1.001002,
+		'Test::Pod'		=> 1.51,
 	},
 	VERSION_FROM => 'lib/SVG/Grid.pm',
 );

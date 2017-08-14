@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use File::Slurp; # For read_file(), write_file().
+use File::Slurper qw/read_dir write_binary/;
 use File::Spec;
 
 use MarpaX::Languages::SVG::Parser::Utils;
@@ -12,14 +12,16 @@ use MarpaX::Languages::SVG::Parser::Utils;
 
 my($data_dir_name) = 'data';
 
+my($in_file_name);
 my($out_file_name);
 my(@params);
 my(@result);
 
-for my $in_file_name (MarpaX::Languages::SVG::Parser::Utils -> new -> get_files($data_dir_name, 'svg') )
+for my $file_name (sort grep{/svg$/} read_dir($data_dir_name) )
 {
-	$out_file_name  = $in_file_name;
-	$out_file_name  =~ s/svg$/log/;
+	$in_file_name	= File::Spec -> catfile($data_dir_name, $file_name);
+	$out_file_name	= $in_file_name;
+	$out_file_name	=~ s/svg$/log/;
 
 	print "$in_file_name => $out_file_name. \n";
 
@@ -35,5 +37,5 @@ for my $in_file_name (MarpaX::Languages::SVG::Parser::Utils -> new -> get_files(
 
 	@result  = `$^X @params`;
 
-	write_file($out_file_name, {binmode => ':raw'}, @result);
+	write_binary($out_file_name, join('', @result) );
 }

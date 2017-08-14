@@ -24,20 +24,17 @@ if($monitor->start()) {
     #now insert you usb ethernet adapter
 
     for(;;) {
-        if(defined(my $device = $monitor->poll())) {
-            my $action = $device->get_action();
+        my $device = $monitor->poll(); #blocking read
+        my $action = $device->get_action();
 
-            print 'ACTION: '.$action, "\n";
-            print 'DEVPATH: '.$device->get_devpath(), "\n";
-            print 'SYSNAME: '.$device->get_sysname(), "\n";
+        print 'ACTION: '.$action, "\n";
+        print 'DEVPATH: '.$device->get_devpath(), "\n";
+        print 'SYSNAME: '.$device->get_sysname(), "\n";
 
-            if($action ne 'remove') {
-                print 'MACADDR: '.$device->get_sysattr_value('address'), "\n";
-            }
-
-            print "\n\n";
+        if($action ne 'remove') {
+            print 'MACADDR: '.$device->get_sysattr_value('address'), "\n";
         }
 
-        sleep 1;
+        print "\n\n";
     }
 }

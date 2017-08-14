@@ -53,7 +53,7 @@ Minions - Simplifies the creation of loosely coupled object oriented code.
 
 # STATUS
 
-This is an early release available for testing and feedback and as such is subject to change.
+This module is now deprecated. Please use [Mic](https://metacpan.org/pod/Mic) instead. 
 
 # DESCRIPTION
 

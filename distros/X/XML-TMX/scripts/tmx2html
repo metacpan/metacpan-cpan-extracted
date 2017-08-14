@@ -10,7 +10,31 @@ our ($icons);
 
 my $tmx = shift;
 my $tmx_obj = XML::TMX::Reader->new($tmx);
-print $tmx_obj->to_html(icons => $icons);
+
+binmode(STDOUT,":utf8");
+
+print qq{
+<html>
+<head>
+  <style>
+tr {
+    background-color: #e0e0e0;
+    vertical-align: top;
+} 
+ </style>
+  <title>    </title>
+  <meta charset="UTF-8"/>
+</head>
+<body>
+},
+ $tmx_obj->to_html(),
+
+qq{</body>
+</html>
+};
+
+
+#print $tmx_obj->to_html(icons => $icons);
 
 =encoding UTF-8
 

@@ -29,9 +29,6 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 plan tests => 44;
 
 
@@ -51,7 +48,7 @@ sub stringize_sorted {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Maker::Hanoi::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Hanoi->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Hanoi->VERSION($want_version); 1 }, 1,

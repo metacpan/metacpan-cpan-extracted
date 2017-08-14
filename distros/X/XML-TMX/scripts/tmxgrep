@@ -3,7 +3,20 @@
 ## use utf8::all;
 use Data::Dumper;
 
-our ($all,$w,$max,$pdf, $o, $n, $a,$debug);
+our ($all,$w,$max,$pdf, $o, $n, $a,$debug, $i);
+
+my ($ab,$ae); ## emphatise marker
+if($a){
+  if($a eq "1"){
+    $ab="=(";
+    $ae=")=";
+  }
+  elsif($a){
+    $ab="<$a>";
+    $ae="</$a>";
+  }
+}
+
 
 $max //= 500;
 $max = 1000000000 if ($max == 0 or $all);
@@ -13,16 +26,19 @@ use warnings;
 
 my $p = shift;
 
-$p = qr{\b$p\b} if $w;
+if($i and $w){ $p = qr{(?i)\b$p\b} }
+elsif($i)    { $p = qr{(?i)$p} }
+elsif($w)    { $p = qr{\b$p\b} }
 
 use XML::TMX;
 use XML::TMX::Reader;
+
+$o //= "__.tmx" if $pdf;
 
 our ($icons);
 
 my $tmx = shift;
 my $tmx_obj = XML::TMX::Reader->new($tmx);
-
 
  $tmx_obj->for_tu( 
     { patt => $p, 
@@ -30,12 +46,12 @@ my $tmx_obj = XML::TMX::Reader->new($tmx);
       n => $n || 0,
       output => $o || undef }, #### "__tmxgrep.tmx" 
     sub { my($tu,$at) = @_;
-         print STDERR  Dumper($tu,$at) if $main::debug; 
+          print STDERR  Dumper($tu,$at) if $main::debug; 
 #         print STDERR  "."; 
           if($main::a){
             for my $k(keys %$tu){
               for(keys %{$tu->{$k}}){
-                $tu->{$k}{$_} =~ s!($p)!=($1)=!g;
+                $tu->{$k}{$_} =~ s!($p)!$ab$1$ae!g;
               }
             }
           }
@@ -43,7 +59,7 @@ my $tmx_obj = XML::TMX::Reader->new($tmx);
     }
  );
 
-if($pdf){ system("xpdf-tmx __.tmx");}
+if($pdf){ system("tmx2pdf-prince -v  $o");}
 
 
 __END__
@@ -60,15 +76,15 @@ tmxgrep - grep translation units in a TMX file
    -max=300    -- extract up to 300 TU (def=500)
    -max=0      -- all matches
    -all        -- all matches
-   -a          -- annotate matches with '==(...)'
+   -a          -- annotate matches with '=(...)='
    -o=out.tmx  -- define output file (defaut= STDOUT)
    -n          -- print original TU number (eg: <tu n="35">)
+   -i          -- ignore case
 
 =head1 DESCRIPTION
 
-Creates a TMX file with the tranlation units tha macth the provided
+Creates a TMX file with the translation units that macth the provided
 regular expression.
-
 
 =head1 AUTHOR
 

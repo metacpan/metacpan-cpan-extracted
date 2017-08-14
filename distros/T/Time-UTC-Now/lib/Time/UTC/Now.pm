@@ -58,7 +58,7 @@ package Time::UTC::Now;
 use warnings;
 use strict;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -205,11 +205,12 @@ sub utc_day_to_cjdn($) {
 
 There are several interfaces available to determine the time on a
 computer, and most of them suck.  This module will attempt to use the
-best interface available when it runs.  It knows about the following:
+best interface available when it runs.  It knows about the following,
+in descending order of preference:
 
 =over
 
-=item ntp_adjtime(), ntp_gettime()
+=item ntp_adjtime(), ntp_gettime(), adjtimex()
 
 These interfaces were devised for Unix systems using the Mills timekeeping
 model, which is intended for clocks that are synchronised via NTP
@@ -220,6 +221,25 @@ These interfaces gives some leap second indications, and an inaccuracy
 bound on the time returned.  Both are faulty in their raw form, but they
 are corrected by this module.  (Those interested in the gory details are
 invited to read the source.)  Resolution 1 us, or on some systems 1 ns.
+
+=item clock_gettime(CLOCK_UTC)
+
+This is a proposed interface for relatively simple (simpler than the
+NTP interface) acquisition of precise real time.  It is defined by
+L<http://www.cl.cam.ac.uk/~mgk25/posix-clocks.html>.
+
+This interface gives an explicit leap second indication, and so permits
+this module to correctly tick through leap seconds.  It also provides
+a limited kind of inaccuracy bound: it will only provide a reading at
+all if it is thought to be accurate to within a second.  No tighter
+inaccuracy bound can be given.  Resolution 1 ns.
+
+=item clock_gettime(CLOCK_REALTIME)
+
+This is a POSIX interface.
+
+Misbehaves around leap seconds, and does not give an inaccuracy bound.
+Resolution 1 ns.
 
 =item GetSystemTimeAsFileTime()
 
@@ -255,25 +275,41 @@ non-Unix operating systems.
 
 =head1 OS-SPECIFIC NOTES
 
-The author would appreciate reports of experiences with this module
-under OSes not listed in this section.
+The author would appreciate any new information for this section,
+especially reports of experiences with this module under OSes not listed
+in this section.
 
 =head2 Cygwin
 
-Uses gettimeofday(), which gives resolution 1 us but no uncertainty
+Expected to use clock_gettime(CLOCK_REALTIME) now that support for it has
+been added to this module, which gives resolution 1 ns but no uncertainty
+bound and is discontinuous at leap seconds.  Formerly used gettimeofday(),
+which gives resolution 1 us but no uncertainty
 bound and is discontinuous at leap seconds.  There is no interface that
 supplies an uncertainty bound or correct leap second handling.
 
 =head2 FreeBSD
 
-Experimental code (new in version 0.005) uses the FreeBSD variation of
-ntp_gettime(), which gives resolution 1 us or 1 ns (depending on system
-configuration) and uncertainty bound.  Please report experiences with
-this code to the author.
+Uses ntp_gettime(), which gives resolution 1 us or 1 ns (depending on
+system configuration) and uncertainty bound.
+
+Kernel bug #42089 causes ntp_gettime() on affected systems to denominate
+time in nanoseconds regardless of the configured resolution.  Outside
+the first millisecond of each second, this provides an out-of-range
+microseconds count, which this module detects and rejects, falling
+back to clock_gettime(CLOCK_REALTIME) or gettimeofday() (thus getting
+no uncertainty bound and discontinuities at leap seconds).  Inside the
+first millisecond of each second, ntp_gettime()'s response looks correct
+and is accepted, yielding incorrect time (ranging over the whole second)
+with an uncertainty bound that is insufficient to cover this inaccuracy.
+It is infeasible for this module to detect that the time is affected by
+this bug.  The bug can be avoided on any particular host by configuring
+it for nanosecond resolution.
 
 =head2 Linux
 
-Uses ntp_adjtime(), which gives resolution 1 us and uncertainty bound.
+Uses ntp_adjtime(), which gives resolution 1 us or 1 ns (depending on
+system configuration) and uncertainty bound.
 
 =head2 Solaris
 
@@ -281,7 +317,7 @@ Uses ntp_gettime(), which gives resolution 1 us and uncertainty bound.
 
 =head2 Windows
 
-Experimental code (new in version 0.007) uses the native
+Uses the native
 GetSystemTimeAsFileTime().  Observed clock resolution is 10 ms, but
 lower-order digits are supplied (filled with noise) down to the API
 resolution of 100 ns.  There is no uncertainty bound, and there are

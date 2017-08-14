@@ -13,8 +13,9 @@ typedef struct srl_iterator_stack   * srl_iterator_stack_ptr;
 struct srl_iterator_stack {
     U32 idx;        // index of current object [0..length)
     U32 length;     // number of child objects
-    UV offset;      // offset to first element
-    UV prev_depth;  // offset at previous depth
+    UV first;       // offset to first element
+    UV end;         // offset to end of this stack (i.e. offset after last
+                    // element. Not always set. Used only in REFP/ALIAS case
     U8 tag;
 };
 
@@ -53,25 +54,35 @@ void srl_iterator_next(pTHX_ srl_iterator_t *iter, UV n);
 void srl_iterator_step_in(pTHX_ srl_iterator_t *iter, UV n);
 /* run until elements at current depth ends and go one level down; do this n times */
 void srl_iterator_step_out(pTHX_ srl_iterator_t *iter, UV n);
-/* run until depth and idx reached */
-void srl_iterator_until(pTHX_ srl_iterator_t *iter, UV depth, U32 idx);
 /* if n == 0, go to first element, otherwise pop stack n times and go to first element */
 void srl_iterator_rewind(pTHX_ srl_iterator_t *iter, UV n);
 
-UV srl_iterator_offset(pTHX_ srl_iterator_t *iter);
 UV srl_iterator_eof(pTHX_ srl_iterator_t *iter);
 
 /* expose stack status */
-srl_iterator_stack_ptr srl_iterator_stack(pTHX_ srl_iterator_t *iter);
-IV srl_iterator_stack_depth(pTHX_ srl_iterator_t *iter);
-UV srl_iterator_stack_index(pTHX_ srl_iterator_t *iter);
-UV srl_iterator_stack_info(pTHX_ srl_iterator_t *iter, UV *length_ptr);
+SRL_STATIC_INLINE IV
+srl_iterator_stack_depth(pTHX_ srl_iterator_t *iter)
+{
+    return SRL_STACK_DEPTH(iter->pstack);
+}
+
+SRL_STATIC_INLINE U32
+srl_iterator_stack_length(pTHX_ srl_iterator_t *iter)
+{
+    return iter->stack.ptr->length;
+}
+
+SRL_STATIC_INLINE U32
+srl_iterator_stack_index(pTHX_ srl_iterator_t *iter)
+{
+    return iter->stack.ptr->idx;
+}
 
 /* information about current object */
-UV srl_iterator_object_info(pTHX_ srl_iterator_t *iter, UV *length_ptr);
+U32 srl_iterator_info(pTHX_ srl_iterator_t *iter, UV *length_out, const char **classname_out, STRLEN *classname_lenght_out);
 
 /* array parsing */
-IV srl_iterator_array_goto(pTHX_ srl_iterator_t *iter, I32 idx);
+void srl_iterator_array_goto(pTHX_ srl_iterator_t *iter, I32 idx);
 IV srl_iterator_array_exists(pTHX_ srl_iterator_t *iter, I32 idx);
 
 SRL_STATIC_INLINE I32
@@ -81,18 +92,22 @@ srl_iterator_normalize_idx(pTHX_ I32 idx, UV length)
 }
 
 /* hash parsing */
-const char * srl_iterator_hash_key(pTHX_ srl_iterator_t *iter, STRLEN *len_out);
-SV * srl_iterator_hash_key_sv(pTHX_ srl_iterator_t *iter); // return mortalized SV
+void srl_iterator_hash_key(pTHX_ srl_iterator_t *iter, const char **keyname, STRLEN *keyname_length_out);
 IV srl_iterator_hash_exists(pTHX_ srl_iterator_t *iter, const char *name, STRLEN name_len);
-IV srl_iterator_hash_exists_sv(pTHX_ srl_iterator_t *iter, SV *name);
 
 SV * srl_iterator_decode(pTHX_ srl_iterator_t *iter); // return mortalized SV
+SV * srl_iterator_decode_and_next(pTHX_ srl_iterator_t *iter); // return mortalized SV
 
 #define SRL_ITER_NOT_FOUND (-1)
 
-#define SRL_ITERATOR_OBJ_IS_SCALAR  (1 << 1)
-#define SRL_ITERATOR_OBJ_IS_ARRAY   (1 << 2)
-#define SRL_ITERATOR_OBJ_IS_HASH    (1 << 3)
-#define SRL_ITERATOR_OBJ_IS_ROOT    (1 << 4)
+#define SRL_ITERATOR_INFO_TAG_MASK  (0xFF)
+#define SRL_ITERATOR_INFO_ROOT      (1  << 8)
+#define SRL_ITERATOR_INFO_REF       (2  << 8)
+#define SRL_ITERATOR_INFO_HASH      (4  << 8)
+#define SRL_ITERATOR_INFO_ARRAY     (8  << 8)
+#define SRL_ITERATOR_INFO_REGEXP    (16 << 8)
+#define SRL_ITERATOR_INFO_SCALAR    (32 << 8)
+#define SRL_ITERATOR_INFO_BLESSED   (1  << 16)
+#define SRL_ITERATOR_INFO_REF_TO    (2  << 16)
 
 #endif

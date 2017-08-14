@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -157,6 +157,20 @@ should be working:
     }
  }
 
+ async sub wobble
+ {
+    foreach my $var ( THINGs ) {
+       await func();
+    }
+ }
+
+ async sub splat
+ {
+    eval {
+       await func();
+    };
+ }
+
 Plain lexical variables are preserved across an C<await> deferral:
 
  async sub quux
@@ -168,16 +182,6 @@ Plain lexical variables are preserved across an C<await> deferral:
 
 =head2 Things That Don't Yet Work
 
-Any code that attempts to C<await> from inside any sort of C<foreach> loop
-does not currently work:
-
- async sub wobble
- {
-    foreach ( THINGs ) {
-       await func();
-    }
- }
-
 C<local> variable assignments inside an C<async> function will confuse the
 suspend mechanism:
 
@@ -187,6 +191,19 @@ suspend mechanism:
  {
     local $DEBUG = 1;
     await func();
+ }
+
+Since C<foreach> loops on non-lexical iterator variables (usually package
+variables) effectively imply a C<local>-like behaviour, these are also
+disallowed.
+
+ our $VAR;
+
+ async sub splurt
+ {
+    foreach $VAR ( LIST ) {
+       await ...
+    }
  }
 
 Additionally, complications with the savestack appear to be affecting some
@@ -225,18 +242,48 @@ sub import_into
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
+=head1 WITH OTHER MODULES
+
+=head2 Syntax::Keyword::Try
+
+At the time of writing (C<Future::AsyncAwait> version 0.09,
+L<Syntax::Keyword::Try> version 0.06) a basic C<try/catch> block inside an
+C<async sub> works fine, provided that neither C<try> nor C<catch> blocks
+attempt to C<return>.
+
+Attempting to C<return> from inside a C<try> or C<catch> will fail - see
+L<RT122795|https://rt.cpan.org/Ticket/Display.html?id=122795>.
+
+Attempting to use a C<finally> block will fail - see
+L<RT122796|https://rt.cpan.org/Ticket/Display.html?id=122796>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+"Awaiting The Future" - TPC in Amsterdam 2017
+
+L<(slides)|https://docs.google.com/presentation/d/13x5l8Rohv_RjWJ0OTvbsWMXKoNEWREZ4GfKHVykqUvc/edit#slide=id.p>
+
+=back
+
 =head1 TODO
 
 =over 4
 
 =item *
 
-Suspend and resume over C<foreach> loops, in all their various flavours.
-
-=item *
-
 Suspend and resume with some consideration for the savestack; i.e. the area
-used to implement C<local> and similar:
+used to implement C<local> and similar. While in general C<local> support has
+awkward questions about semantics, there are certain situations and cases
+where internally-implied localisation of variables would still be useful and
+can be supported without the semantic ambiguities of generic C<local>.
+
+Some notes on what makes the problem hard can be found at
+
+L<https://rt.cpan.org/Ticket/Display.html?id=122793>
 
 =item *
 

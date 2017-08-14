@@ -207,6 +207,7 @@ lib/Pcore/WebSocket/Protocol/pcore/Request.pm
 lib/Pcore/WebSocket/Protocol/raw.pm
 lib/common/header.pm
 script/pcore
+script/pcore-vim-rpc
 script/src
 script/update-pcore-share.pl
 share/data/ca_file.pem

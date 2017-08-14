@@ -1,0 +1,100 @@
+#!perl
+
+our $DATE = '2017-08-11'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+use Module::CPANfile::FromDistINI;
+
+my $res = Module::CPANfile::FromDistINI::distini_cpanfile();
+unless ($res->[0] == 200) {
+    warn "distini-cpanfile: $res->[1]\n";
+    exit 1;
+}
+
+print $res->[2];
+
+# ABSTRACT: Dump cpanfile out of dist.ini
+# PODNAME: distini-cpanfile
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+distini-cpanfile - Dump cpanfile out of dist.ini
+
+=head1 VERSION
+
+This document describes version 0.001 of distini-cpanfile (from Perl distribution Module-CPANfile-FromDistINI), released on 2017-08-11.
+
+=head1 SYNOPSIS
+
+ % distini-cpanfile > cpanfile
+
+=head1 DESCRIPTION
+
+This script dumps prerequisites information in L<Dist::Zilla>'s F<dist.ini>. It
+gives a simple way to install a Dist::Zilla-based distribution from a source
+repository along with its dependencies. You don't have to install Dist::Zilla
+and do a C<dzil build> first. When a source repository only contains F<dist.ini>
+and no F<Makefile.PL> or F<Build.PL> or F<cpanfile>, you still cannot use
+C<cpanm git://repo-url/Dist.git>, but at least now you can C<git clone>, C<cd>
+to the source directory, run this script, and install the module using C<cpanm
+--installdeps>.
+
+This script is not perfect, because: 1) in Dist::Zilla prerequisites can be
+specified dynamically or from other sources (including a F<cpanfile> :-), this
+script only parses C<[Prereqs/*]> sections; 2) installing from source repository
+does not always work because source repository != built version, but in simple
+cases it can work.
+
+As an alternative to installing from a source repository, to test things often
+you can also use:
+
+ % prove -l
+ % perl -I/path/to/source/repo/lib your-app.pl
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Module-CPANfile-FromDistINI>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Module-CPANfile-FromDistINI>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CPANfile-FromDistINI>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::CPANFile> can build F<cpanfile> more properly, but this
+requires installing Dist::Zilla.
+
+L<Module::CPANFile> which contains scripts like L<mymeta-cpanfile>.
+
+L<scan-prereqs-cpanfile> from L<App::scan_prereqs_cpanfile>.
+
+L<http://blogs.perl.org/users/piotr_roszatycki/2014/01/i-hate-distzilla-and-missing-makefilepl.html>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

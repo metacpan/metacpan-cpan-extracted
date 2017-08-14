@@ -3,7 +3,7 @@ package Prty::JavaScript;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Path;
 use Scalar::Util ();
@@ -19,6 +19,95 @@ Prty::JavaScript - Generierung von JavaScript-Code
 =head1 METHODS
 
 =head2 Klassenmethoden
+
+=head3 line() - Mache JavaScript-Code einzeilig
+
+=head4 Synopsis
+
+    $line = $class->line($code);
+
+=head4 Description
+
+Wandele mehrzeiligen JavaScript-Code in einzeiligen JavaScript-Code
+und liefere diesen zurück. Die Methode ist nützlich, wenn formatierter,
+mehrzeiliger JavaScript-Code in ein HTML Tag-Attribut (JavaScript-Handler
+wie onclick="..." oder onchange="...") eingesetzt werden soll.
+
+=head4 Arguments
+
+=over 4
+
+=item $code
+
+Mehrzeiliger JavaScript-Code (String)
+
+=back
+
+=head4 Returns
+
+JavaScript-Code einzeilig (String)
+
+=head4 Example
+
+Aus
+
+    var s = '';
+    for (var i = 0; i < 10; i++)
+        s += 'x';
+
+wird
+
+    var s = ''; for (var i = 0; i < 10; i++) s += 'x';
+
+=head4 Details
+
+Die Regeln der Umwandlung:
+
+=over 2
+
+=item *
+
+Leerzeilen und Zeilen nur aus Whitespace werden entfernt
+
+=item *
+
+Whitespace (einschl. Zeilenumbruch) am Anfang und am Ende
+jeder Zeile wird entfernt
+
+=item *
+
+alle Zeilen werden mit einem Leerzeichen als Trenner konkateniert
+
+=back
+
+Damit dies sicher funktioniert, muss jede JavaScript-Anweisung
+mit einem Semikolon am Zeilenende beendet werden und darf nicht,
+wie JavaScipt es auch erlaubt, weggelassen werden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub line {
+    my ($self,$code) = @_;
+
+    my $line = '';
+    open my $fh,'<',\$code or $self->throw;
+    while (<$fh>) {
+        s/^\s+//;
+        s/\s+$//;
+        next if $_ eq '';
+
+        if ($line ne '') {
+            $line .= ' ';
+        }
+        $line .= $_;
+    }
+
+    return $line;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 script() - Generiere einen oder mehrere <script>-Tags
 
@@ -165,7 +254,7 @@ sub script {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

@@ -23,11 +23,8 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 
 sub _default_graph_maker {
@@ -161,6 +158,54 @@ particular desired mean distance can be found by solving for N,M in
     Wiener(N,M) = Pairs(N,M) * mean
 
 which becomes a binary quadratic form.
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the graphs here include
+
+=over
+
+=item 2,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+
+=item 3,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=30>  (fork)
+
+=item 3,3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=334>  (H graph)
+
+=item 4,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=208>  (cross)
+
+=item 4,3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=452>
+
+=item 4,4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=586>  (Ethane)
+
+=item 5,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=266>
+
+=item 5,4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=634>
+
+=item 5,5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=112>
+
+=item 6,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=332>
+
+=item 6,5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=650>
+
+=item 6,6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=36>
+
+=item 7,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=366>
+
+=item 7,6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=38>
+
+=item 7,7, L<https://hog.grinvin.org/ViewGraphInfo.action?id=166>
+
+=item 8,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=436>
+
+=item 8,7, L<https://hog.grinvin.org/ViewGraphInfo.action?id=168>
+
+=item 9,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=316>
+
+=item 10,2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=320>
+
+=item 10,6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27414>
+
+=back
 
 =head1 SEE ALSO
 

@@ -70,59 +70,67 @@ WriteMakefile
      # Graph::Maker::Other gets the dist name, no actual module of that name
      provides =>
      { 'Graph::Maker::Other' => { file => 'META.yml',
-                                  version => 6,
+                                  version => 7,
                                 },
        'Graph::Maker::Beineke' =>
        { file => 'lib/Graph/Maker/Beineke.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::BinaryBeanstalk' =>
        { file => 'lib/Graph/Maker/BinaryBeanstalk.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::BinomialTree' =>
        { file => 'lib/Graph/Maker/BinomialTree.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::BiStar' =>
        { file => 'lib/Graph/Maker/BiStar.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::FibonacciTree' =>
        { file => 'lib/Graph/Maker/FibonacciTree.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::Hanoi' =>
        { file => 'lib/Graph/Maker/Hanoi.pm',
-         version => 6,
+         version => 7,
+       },
+       'Graph::Maker::HexGrid' =>
+       { file => 'lib/Graph/Maker/HexGrid.pm',
+         version => 7,
        },
        'Graph::Maker::Johnson' =>
        { file => 'lib/Graph/Maker/Johnson.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::Keller' =>
        { file => 'lib/Graph/Maker/Keller.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::Kneser' =>
        { file => 'lib/Graph/Maker/Kneser.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::KnightGrid' =>
        { file => 'lib/Graph/Maker/KnightGrid.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::NoughtsAndCrosses' =>
        { file => 'lib/Graph/Maker/NoughtsAndCrosses.pm',
-         version => 6,
+         version => 7,
+       },
+       'Graph::Maker::Petersen' =>
+       { file => 'lib/Graph/Maker/Petersen.pm',
+         version => 7,
        },
        'Graph::Maker::TwinAlternateAreaTree' =>
        { file => 'lib/Graph/Maker/TwinAlternateAreaTree.pm',
-         version => 6,
+         version => 7,
        },
        'Graph::Maker::TwindragonAreaTree' =>
        { file => 'lib/Graph/Maker/TwindragonAreaTree.pm',
-         version => 6,
+         version => 7,
        },
      },
    },

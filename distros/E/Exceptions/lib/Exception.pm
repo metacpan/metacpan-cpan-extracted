@@ -1,5 +1,5 @@
 package Exception;
-$Exception::VERSION = '0.100';
+$Exception::VERSION = '0.101';
 use strict;
 use warnings;
 

@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use Carp qw/croak/;
 use Config;
@@ -20,6 +20,23 @@ use Env qw/@PERL5LIB @PATH/;
 
 my $Build = $^O eq 'MSWin32' ? 'Build' : './Build';
 
+sub find {
+	my ($re, @dir) = @_;
+	my $ret;
+	File::Find::find(sub { $ret++ if /$re/ }, @dir);
+	return $ret;
+}
+
+sub mbt_version {
+	if (find(qr/\.PL$/, 'lib')) {
+		return '0.039';
+	}
+	elsif (find(qr/\.xs$/, 'lib')) {
+		return '0.036';
+	}
+	return '0.034';
+}
+
 sub prereqs_for {
 	my ($meta, $phase, $type, $module, $default) = @_;
 	return $meta->effective_prereqs->requirements_for($phase, $type)->requirements_for_module($module) || $default || 0;
@@ -29,14 +46,19 @@ sub uptodate {
 	my ($destination, @source) = @_;
 	return if not -e $destination;
 	for my $source (grep { defined && -e } @source) {
-		return if -M $destination < -M $source;
+		return if -M $destination > -M $source;
 	}
 	return 1;
 }
 
+sub distfilename {
+	my $distname = shift;
+	return catfile('lib', split /-/, $distname) . '.pm';
+}
+
 sub generate_readme {
 	my $distname = shift;
-	(my $filename = "lib/$distname.pm") =~ s{-}{/};
+	my $filename = distfilename($distname);
 	croak "Main module file $filename doesn't exist" if not -f $filename;
 	my $parser = Pod::Simple::Text->new;
 	$parser->output_string( \my $content );
@@ -85,7 +107,15 @@ sub checkchanges {
 	open my $changes, '<:raw', 'Changes' or die "Couldn't open Changes file";
 	my (undef, @content) = grep { / ^ $version (?:-TRIAL)? (?:\s+|$) /x ... /^\S/ } <$changes>;
 	pop @content while @content && $content[-1] =~ / ^ (?: \S | \s* $ ) /x;
-	warn "Changes appears to be empty\n" if not @content
+	die "Changes appears to be empty\n" if not @content
+}
+
+sub checkmeta {
+	my $self = shift;
+	(my $module_name = $self->{meta}->name) =~ s/-/::/g;
+	my $meta_version = $self->{meta}->version;
+	my $detected_version = $self->{data}->version($module_name);
+	die sprintf "Version mismatch between module and meta, did you forgot to run regenerate? (%s versus %s)", $detected_version, $meta_version if $detected_version != $meta_version;
 }
 
 sub new {
@@ -93,7 +123,7 @@ sub new {
 	my $mergefile = $opts{mergefile} || (grep { -f } qw/metamerge.json metamerge.yml/)[0];
 	my $mergedata = load_mergedata($mergefile) || {};
 	my $distname = distname($mergedata);
-	my $filename = catfile('lib', split /-/, $distname) . '.pm';
+	my $filename = distfilename($distname);
 
 	require Module::Metadata; Module::Metadata->VERSION('1.000009');
 	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1) or die "Couldn't analyse $filename: $!";
@@ -159,7 +189,8 @@ sub new {
 	return bless {
 		files => \%files,
 		meta  => $meta,
-		license => $license
+		license => $license,
+		data => $data,
 	}, $class
 }
 
@@ -184,6 +215,7 @@ sub write_tarball {
 	require Archive::Tar;
 	my $arch = Archive::Tar->new;
 	checkchanges($self->meta->version);
+	$self->checkmeta();
 	for my $filename ($self->files) {
 		$arch->add_data($filename, $self->get_file($filename), { mode => oct '0644'} );
 	}

@@ -23,8 +23,11 @@ is_deeply [ scalar keys @t ], [ 6 ];
 is_deeply [ keys @t ], [ 3, 4, 5, 6, 7, 8 ];
 
 SKIP: {
-	skip "no lexical \$_", 4 unless eval q{my $_; 1};
+	skip "no lexical \$_ on this perl", 4
+		if "$]" < 5.009001 || "$]" >= 5.023004;
 	eval q{
+		no warnings "$]" >= 5.017009 ? "experimental" :
+						"deprecated";
 		my $_;
 
 		@t = ();

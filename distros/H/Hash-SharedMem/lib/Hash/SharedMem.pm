@@ -4,76 +4,73 @@ Hash::SharedMem - efficient shared mutable hash
 
 =head1 SYNOPSIS
 
-	use Hash::SharedMem qw(shash_referential_handle);
+    use Hash::SharedMem qw(shash_referential_handle);
 
-	if(shash_referential_handle) { ...
+    if(shash_referential_handle) { ...
 
-	use Hash::SharedMem qw(is_shash check_shash);
+    use Hash::SharedMem qw(is_shash check_shash);
 
-	if(is_shash($arg)) { ...
-	check_shash($arg);
+    if(is_shash($arg)) { ...
+    check_shash($arg);
 
-	use Hash::SharedMem qw(shash_open);
+    use Hash::SharedMem qw(shash_open);
 
-	$shash = shash_open($filename, "rwc");
+    $shash = shash_open($filename, "rwc");
 
-	use Hash::SharedMem
-		qw(shash_is_readable shash_is_writable shash_mode);
+    use Hash::SharedMem qw(
+	shash_is_readable shash_is_writable shash_mode);
 
-	if(shash_is_readable($shash)) { ...
-	if(shash_is_writable($shash)) { ...
-	$mode = shash_mode($shash);
+    if(shash_is_readable($shash)) { ...
+    if(shash_is_writable($shash)) { ...
+    $mode = shash_mode($shash);
 
-	use Hash::SharedMem qw(
-		shash_exists shash_length shash_get
-		shash_set shash_gset shash_cset
-	);
+    use Hash::SharedMem qw(
+	shash_exists shash_length shash_get
+	shash_set shash_gset shash_cset);
 
-	if(shash_exists($shash, $key)) { ...
-	$length = shash_length($shash, $key);
-	$value = shash_get($shash, $key);
-	shash_set($shash, $key, $newvalue);
-	$oldvalue = shash_gset($shash, $key, $newvalue);
-	if(shash_cset($shash, $key, $chkvalue, $newvalue)) { ...
+    if(shash_exists($shash, $key)) { ...
+    $length = shash_length($shash, $key);
+    $value = shash_get($shash, $key);
+    shash_set($shash, $key, $newvalue);
+    $oldvalue = shash_gset($shash, $key, $newvalue);
+    if(shash_cset($shash, $key, $chkvalue, $newvalue)) { ...
 
-	use Hash::SharedMem qw(
-		shash_occupied shash_count shash_size
-		shash_key_min shash_key_max
-		shash_key_ge shash_key_gt shash_key_le shash_key_lt
-		shash_keys_array shash_keys_hash
-		shash_group_get_hash
-	);
+    use Hash::SharedMem qw(
+	shash_occupied shash_count shash_size
+	shash_key_min shash_key_max
+	shash_key_ge shash_key_gt shash_key_le shash_key_lt
+	shash_keys_array shash_keys_hash
+	shash_group_get_hash);
 
-	if(shash_occupied($shash)) { ...
-	$count = shash_count($shash);
-	$size = shash_size($shash);
-	$key = shash_key_min($shash);
-	$key = shash_key_max($shash);
-	$key = shash_key_ge($shash, $key);
-	$key = shash_key_gt($shash, $key);
-	$key = shash_key_le($shash, $key);
-	$key = shash_key_lt($shash, $key);
-	$keys = shash_keys_array($shash);
-	$keys = shash_keys_hash($shash);
-	$group = shash_group_get_hash($shash);
+    if(shash_occupied($shash)) { ...
+    $count = shash_count($shash);
+    $size = shash_size($shash);
+    $key = shash_key_min($shash);
+    $key = shash_key_max($shash);
+    $key = shash_key_ge($shash, $key);
+    $key = shash_key_gt($shash, $key);
+    $key = shash_key_le($shash, $key);
+    $key = shash_key_lt($shash, $key);
+    $keys = shash_keys_array($shash);
+    $keys = shash_keys_hash($shash);
+    $group = shash_group_get_hash($shash);
 
-	use Hash::SharedMem qw(shash_snapshot shash_is_snapshot);
+    use Hash::SharedMem qw(shash_snapshot shash_is_snapshot);
 
-	$snap_shash = shash_snapshot($shash);
-	if(shash_is_snapshot($shash)) { ...
+    $snap_shash = shash_snapshot($shash);
+    if(shash_is_snapshot($shash)) { ...
 
-	use Hash::SharedMem qw(shash_idle shash_tidy);
+    use Hash::SharedMem qw(shash_idle shash_tidy);
 
-	shash_idle($shash);
-	shash_tidy($shash);
+    shash_idle($shash);
+    shash_tidy($shash);
 
-	use Hash::SharedMem qw(
-		shash_tally_get shash_tally_zero shash_tally_gzero
-	);
+    use Hash::SharedMem qw(
+	shash_tally_get shash_tally_zero shash_tally_gzero);
 
-	$tally = shash_tally_get($shash);
-	shash_tally_zero($shash);
-	$tally = shash_tally_gzero($shash);
+    $tally = shash_tally_get($shash);
+    shash_tally_zero($shash);
+    $tally = shash_tally_gzero($shash);
 
 =head1 DESCRIPTION
 
@@ -349,7 +346,7 @@ package Hash::SharedMem;
 use warnings;
 use strict;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -447,7 +444,7 @@ string.  This gives inconsistent behaviour for the same character sequence
 represented in the two different ways that Perl uses internally.  This is
 consistent with the treatment of filenames in Perl's built-in operators
 such as L<open|perlfunc/open>; see L<perlunicode/"When Unicode Does
-Not Happen">.  This may change in future versions of Perl (beyond 5.20).
+Not Happen">.  This may change in future versions of Perl (beyond 5.26).
 
 I<MODE> is a string controlling how the shared hash will be used.
 It can contain these characters:
@@ -595,10 +592,10 @@ This function can be used as a core on which to build arbitrarily
 complex kinds of atomic operation (on a single key).  For example,
 an atomic increment can be implemented as
 
-	do {
-		$ov = shash_get($shash, $key);
-		$nv = $ov + 1;
-	} until shash_cset($shash, $key, $ov, $nv);
+    do {
+	$ov = shash_get($shash, $key);
+	$nv = $ov + 1;
+    } until shash_cset($shash, $key, $ov, $nv);
 
 =back
 
@@ -914,7 +911,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 Copyright (C) 2014, 2015 PhotoBox Ltd
 
-Copyright (C) 2014, 2015 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2014, 2015, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

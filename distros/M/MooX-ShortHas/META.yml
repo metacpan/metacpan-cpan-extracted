@@ -1,0 +1,51 @@
+---
+abstract: 'shortcuts for common Moo has attribute configurations'
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moo: '0'
+  Test::Fatal: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-ShortHas
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  MooX::ShortHas:
+    file: lib/MooX/ShortHas.pm
+    version: '1.172251'
+requires:
+  Moo::_Utils: '0'
+  perl: '5.006'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/wchristian/MooX-ShortHas/issues
+  homepage: https://github.com/wchristian/MooX-ShortHas
+  repository: https://github.com/wchristian/MooX-ShortHas.git
+version: '1.172251'
+x_contributors:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,16 @@
+Revision history for Perl extension ExtUtils::CXX
+
+0.03  Mon Aug 14 07:26:13 CEST 2017
+	- oh, yeah, left bloody test code inside.
+	- CONFIGURE_REQUIRES should have been PREREQ_PM.
+        - cool, ExtUtils::MakeMaker uses the same dirty tricks as we do,
+          so they don't really work (solution:
+          also patch ExtUtils::MakeMaker::Config).
+        - this version is actuallly tested (marginally).
+
+0.02  Mon Aug 14 06:28:34 CEST 2017
+	- first CPAN release. Also: eris came back. Also: completely untested.
+
+0.01  Mon Aug 14 03:49:44 CEST 2017
+	- cloned from Convert-Scalar as template.
+

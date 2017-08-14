@@ -8,7 +8,6 @@ META.json
 META.yml
 Makefile.PL
 README
-bin/peri-doc
 dist.ini
 lib/Perinci/Sub/To/FuncBase.pm
 lib/Perinci/Sub/To/POD.pm
@@ -22,9 +21,11 @@ lib/Perinci/To/Text.pm
 po/Perinci-To-Doc.pot
 po/fr.po
 po/id.po
+script/peri-doc
 share/LocaleData/fr/LC_MESSAGES/Perinci-To-Doc.mo
 share/LocaleData/id/LC_MESSAGES/Perinci-To-Doc.mo
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-rinci.t

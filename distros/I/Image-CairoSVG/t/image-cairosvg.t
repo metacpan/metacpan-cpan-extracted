@@ -29,6 +29,16 @@ for my $f (qw/Technical_college Church/) {
     ok (-f $tempout);
 };
 
+my $svg = '';
+my $f = "$Bin/Church.svg";
+open my $in, "<:encoding(utf8)", $f or die $!;
+while (<$in>) {
+    $svg .= $_;
+}
+close $in or die $!;
+my $surface_from_scalar = $cairosvg2->render ($svg);
+ok ($surface_from_scalar);
+
 done_testing ();
 
 # Local variables:

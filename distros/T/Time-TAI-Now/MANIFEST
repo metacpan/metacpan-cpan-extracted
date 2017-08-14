@@ -1,12 +1,14 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
+META.json
 META.yml
-Makefile.PL
 README
 lib/Time/TAI/Now.pm
+t/now.at
 t/pod_cvg.t
 t/pod_syn.t
 t/use.t
+t/warn.at
 SIGNATURE    Added here by Module::Build

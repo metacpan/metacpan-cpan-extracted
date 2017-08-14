@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu choose_multi
                      insert_sep length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -30,6 +30,8 @@ sub choose_multi {
     settings_menu( @_ );
 }
 
+
+sub stringify_array { join( ', ', map { "\"$_\"" } @_ ) }
 
 sub choose_dirs {
     my ( $opt ) = @_;
@@ -57,21 +59,25 @@ sub choose_dirs {
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
-        my $len_key;
+
         my $prompt;
         $prompt .= $o->{prompt} . "\n" if $o->{prompt};
+        my $len_key;
         if ( defined $o->{current} ) {
-            $len_key = 7;
-            $prompt .= sprintf "%*s: %s\n",   $len_key, 'Current', join ', ', map { "\"$_\"" } @{$o->{current}};
-            $prompt .= sprintf "%*s: %s\n\n", $len_key, 'New',     join ', ', map { "\"$_\"" } @$new;
+            $len_key = 9;
+            $prompt .= sprintf "Current: %s\n",   stringify_array( @{$o->{current}} );
+            $prompt .= sprintf "    New: %s\n", stringify_array( @$new );
         }
         else {
-            $len_key = 3;
-            $prompt .= sprintf "%*s: %s\n\n", $len_key, 'New', join ', ', map { "\"$_\"" } @$new;
+            $len_key = 5;
+            $prompt .= sprintf "New: %s\n", stringify_array( @$new );
         }
-        my $key_cwd = 'pwd: ';
+        my $key_cwd = '>';
         $prompt  = line_fold( $prompt,                                     term_width(), '' , ' ' x $len_key );
+        $prompt .= "\n";
         $prompt .= line_fold( $key_cwd . decode( 'locale_fs', $previous ), term_width(), '' , ' ' x length $key_cwd );
+        $prompt .= "\n";
+        $prompt .= $o->{prompt} if $o->{prompt}; ####
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $prompt, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
@@ -142,6 +148,10 @@ sub _prepare_opt_choose_path {
     return $o, $dir;
 }
 
+
+sub prepare_string { '"' . decode( 'locale_fs', shift ) . '"' }
+
+
 sub choose_a_dir {
     my ( $opt ) = @_;
     return _choose_a_path( $opt, 0 );
@@ -159,6 +169,7 @@ sub _choose_a_path {
     my $default_idx = $o->{enchanted}  ? 2 : 0;
     my $curr     = encode 'locale_fs', $o->{current};
     my $previous = $dir;
+    my $wildcard = '*';
 
     while ( 1 ) {
         my ( $dh, @dirs );
@@ -177,15 +188,26 @@ sub _choose_a_path {
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
-        my $prompt;
-        $prompt .= $o->{prompt} . "\n" if $o->{prompt};
-        if ( $a_file || ! $curr ) {
-            $prompt .= 'Dir: ' . decode 'locale_fs', $dir;
+        my $prompt = '';
+        if ( $a_file ) {
+            if ( $curr ) {
+                $prompt .= sprintf "Current file: %s\n", prepare_string( $curr );
+                $prompt .= sprintf "    New file: %s\n", prepare_string( catfile $dir, $wildcard );
+            }
+            else {
+                $prompt .= sprintf "New file: %s\n", prepare_string( catfile $dir, $wildcard );
+            }
         }
         else {
-            $prompt  = sprintf "%11s: \"%s\"\n", 'Current dir', decode( 'locale_fs', $curr );
-            $prompt .= sprintf "%11s: \"%s\"\n\n",   'New dir', decode( 'locale_fs', $dir );
+            if ( $curr ) {
+                $prompt .= sprintf "Current dir: %s\n", prepare_string( $curr );
+                $prompt .= sprintf "    New dir: %s\n", prepare_string( $dir );
+            }
+            else {
+                $prompt .= sprintf "New dir: %s\n", prepare_string( $dir );
+            }
         }
+        $prompt .= $o->{prompt} if $o->{prompt};
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $prompt, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
@@ -199,7 +221,7 @@ sub _choose_a_path {
             return $previous;
         }
         elsif ( $choice eq $o->{file} ) {
-            my $file = _a_file( $o, $dir );
+            my $file = _a_file( $o, $dir, $curr, $wildcard );
             next if ! length $file;
             return decode 'locale_fs', $file if $o->{decoded};
             return $file;
@@ -222,30 +244,56 @@ sub _choose_a_path {
 }
 
 sub _a_file {
-    my ( $o, $dir ) = @_;
-    my ( $dh, @files );
-    if ( ! eval {
-        opendir( $dh, $dir ) or die $!;
-        1 }
-    ) {
-        print "$@";
-        choose( [ 'Press Enter:' ], { prompt => '' } );
-        return;
+    my ( $o, $dir, $curr, $wildcard ) = @_;
+    my $previous;
+
+    while ( 1 ) {
+        my ( $dh, @files );
+        if ( ! eval {
+            opendir( $dh, $dir ) or die $!;
+            1 }
+        ) {
+            print "$@";
+            choose( [ 'Press Enter:' ], { prompt => '' } );
+            return;
+        }
+        while ( my $file = readdir $dh ) {
+            next if $file =~ /^\.\.?\z/;
+            next if $file =~ /^\./ && ! $o->{show_hidden};
+            push @files, decode( 'locale_fs', $file ) if -f catdir $dir, $file;
+        }
+        closedir $dh;
+        if ( ! @files ) {
+            my $prompt =  sprintf "No files in %s.", prepare_string( $dir );
+            choose( [ ' < ' ], { prompt => $prompt } );
+            return;
+        }
+        my $prompt = '';
+        if ( $curr ) {
+            $prompt .= sprintf "Current file: %s\n", prepare_string( $curr );
+            $prompt .= sprintf "    New file: %s\n", prepare_string( catfile $dir, $previous // $wildcard );
+        }
+        else {
+            $prompt .= sprintf "New file: %s\n", prepare_string( catfile $dir, $previous // $wildcard );
+        }
+        $prompt .= "\n" . $o->{prompt} if $o->{prompt};
+        my @pre = ( undef, $o->{confirm} );
+        my $choice = choose(
+            [ @pre, sort( @files ) ],
+            { prompt => $prompt, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
+            layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
+        );
+        if ( ! length $choice ) {
+            return;
+        }
+        elsif ( $choice eq $o->{confirm} ) {
+            return if ! length $previous;
+            return catfile $dir, encode 'locale_fs', $previous;
+        }
+        else {
+            $previous = $choice;
+        }
     }
-    while ( my $file = readdir $dh ) {
-        next if $file =~ /^\.\.?\z/;
-        next if $file =~ /^\./ && ! $o->{show_hidden};
-        push @files, decode( 'locale_fs', $file ) if -f catdir $dir, $file;
-    }
-    closedir $dh;
-    my $prompt = sprintf 'Files in %s:', decode( 'locale_fs', $dir );
-    my $choice = choose(
-        [ undef, sort( @files ) ],
-        { prompt => $prompt, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
-          layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
-    );
-    return if ! length $choice;
-    return catfile $dir, encode 'locale_fs', $choice;
 }
 
 
@@ -622,7 +670,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.051
+Version 0.052
 
 =cut
 
@@ -752,7 +800,7 @@ Values: 0,[1].
     $chosen_file = choose_a_file( { layout => 1, ... } )
 
 Browse the directory tree the same way as described for C<choose_a_dir>. Select "C<E<gt>F>" to get the files of the
-current directory; than the chosen file is returned.
+current directory. To return the chosen file select "=".
 
 The options are passed as a reference to a hash. See L</choose_a_dir> for the different options. C<choose_a_file> has no
 option I<current>.

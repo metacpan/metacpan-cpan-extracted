@@ -1,0 +1,18 @@
+Revision history for Business-RO-TaxDeduction
+
+0.010   2016-06-05
+        Add year attribute, now it can make calculations for 2005 -:-
+        2015 using the formulas from OMFP 1016/2005 and for 2016 using
+        formular from OMFP 52/2016.
+
+0.007   2016-04-21
+        Update for 2016 - OMFP52/2016
+
+0.006   2015-10-28
+        Refactor round to tens method, add PODs.
+
+0.005   2015-06-13
+        Build with dzil.
+
+0.002   2015-06-05
+        First version, released on an unsuspecting world.

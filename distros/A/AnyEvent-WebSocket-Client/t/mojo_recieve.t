@@ -1,21 +1,21 @@
-use strict;
-use warnings;
 use utf8;
+use lib 't/lib';
+use Test2::Require::NotWindows;
+use Test2::Require::Module 'EV';
+use Test2::Require::Module 'Mojolicious' => '3.0';
+use Test2::Require::Module 'Mojolicious::Lite';
+use Test2::Plugin::AnyEvent::Timeout;
+use Test2::V0 -no_srand => 1;
+use Test2::Tools::WebSocket::Mojo qw( start_mojo );
 use AnyEvent::WebSocket::Client;
-use Test::More;
-BEGIN { plan skip_all => 'Requires EV' unless eval q{ use EV; 1 } }
-BEGIN { plan skip_all => 'Requires Mojolicious 3.0' unless eval q{ use Mojolicious 3.0; 1 } }
-BEGIN { plan skip_all => 'Requires Mojolicious::Lite' unless eval q{ use Mojolicious::Lite; 1 } }
+use Mojolicious::Lite;
 use Protocol::WebSocket;
-use FindBin;
-use lib $FindBin::Bin;
-use testlib::Mojo;
 use Encode qw(encode);
-use testlib::Server;
 
-plan tests => 3;
-
-testlib::Server->set_timeout;
+# NOTE: The mojo_* tests are to test interoperability with a really
+# good implementation that is also written in Perl.  Mojolicious
+# tests should not be written for new features and to test bugs,
+# unless they are also accompanied by a non-Mojolicious test as well!
 
 my @test_cases = (
   { send => { binary => "hoge"}, recv_exp => ["hoge", "is_binary"] },
@@ -34,7 +34,7 @@ websocket '/data' => sub {
   });
 };
 
-my ($server, $port) =  testlib::Mojo->start_mojo(app => app());
+my ($server, $port) =  start_mojo(app => app());
 
 my $client = AnyEvent::WebSocket::Client->new;
 
@@ -74,3 +74,5 @@ subtest 'on_each_data' => sub {
   }
   is($cb_count, scalar(@test_cases), "callback count OK");
 };
+
+done_testing;

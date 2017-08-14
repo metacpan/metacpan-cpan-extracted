@@ -1,10 +1,56 @@
 ==================================================
-Changes from 2016-01-23 00:00:00 +0000 to present.
+Changes from 2016-08-11 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2017-01-22 11:50:15 +0000
+version 0.011 at 2017-08-11 20:30:37 +0000
 ------------------------------------------
+
+  Change: e1aa0afe260e5669a922f295b452a465ca80ea51
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-08-11 14:29:30 +0000
+
+    Merge pull request #10 from QBitFramework/speed_up_add_multi
+
+    Speed up add multi 
+
+  Change: 8770b90cf658c748ed2a6c41c0734e7f08ee7a63
+  Author: blizzard <blizzard@yandex-team.ru>
+  Date : 2017-08-11 13:24:11 +0000
+
+    Merge branch 'master' of
+    https://github.com/QBitFramework/QBit-Application-Model-DB-mysql into
+    speed_up_add_multi 
+
+  Change: 384f060a279b7a96946dd016897e30708624f42c
+  Author: blizzard <blizzard@yandex-team.ru>
+  Date : 2017-08-11 13:23:25 +0000
+
+    speed up 
+
+  Change: 85af81ea74c3509801a2b5039f9394ee64f2d37c
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-08-09 02:53:14 +0000
+
+    Merge pull request #9 from QBitFramework/speed_up_add_multi
+
+    speed up add_multi, added class for index, added sub get_dbh 
+
+  Change: d7234586e67d0ddb08f26a785dc74ed9f52ce141
+  Author: blizzard <blizzard@yandex-team.ru>
+  Date : 2017-08-09 01:27:44 +0000
+
+    speed up add_multi, added class for index, added sub get_dbh 
+
+------------------------------------------
+version 0.010 at 2017-01-22 11:50:33 +0000
+------------------------------------------
+
+  Change: bf125d8502b2d849cb29d16a0bb5218fde79a872
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-01-22 14:50:33 +0000
+
+    Version 0.010 
 
   Change: 6f5186d0571bbdf81df7022b1d6771214aa40d40
   Author: Igor <igor-sverdlov@mail.ru>
@@ -75,5 +121,5 @@ version 0.008 at 2016-09-04 19:16:05 +0000
     added pod documentation and upload to cpan 
 
 ================================================
-Plus 7 releases after 2016-01-23 00:00:00 +0000.
+Plus 7 releases after 2016-08-11 00:00:00 +0000.
 ================================================

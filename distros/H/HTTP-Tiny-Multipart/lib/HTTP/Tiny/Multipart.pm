@@ -10,7 +10,7 @@ use File::Basename;
 use Carp;
 use MIME::Base64;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 sub _get_boundary {
     my ($headers, $content) = @_;
@@ -136,7 +136,7 @@ HTTP::Tiny::Multipart - Add post_multipart to HTTP::Tiny
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -170,9 +170,10 @@ creates this request
   --go7DX--
 
 And
+
     use HTTP::Tiny;
     use HTTP::Tiny::Multipart;
-
+  
     my $http = HTTP::Tiny->new;
   
     my $content = "This is a test";
@@ -212,6 +213,12 @@ creates
 
 =item * Stephen Thirlwall
 
+=item * Markvy
+
+=item * Infinoid
+
+=item * Mohammad S Anwar
+
 =back
 
 =head1 AUTHOR
@@ -220,7 +227,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Renee Baecker.
+This software is Copyright (c) 2017 by Renee Baecker.
 
 This is free software, licensed under:
 

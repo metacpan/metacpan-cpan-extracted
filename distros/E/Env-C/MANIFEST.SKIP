@@ -64,6 +64,7 @@
 ^MYMETA\.
 #!end inlcude_default 
 
+^\.travis\.yml$
 .git
 .gitignore
 C.c

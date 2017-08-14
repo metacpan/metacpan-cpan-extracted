@@ -61,3 +61,27 @@ Revision history for PPR
       on the numbering of positional captures within the main regex.
 
     * Fixed test files to allow testing under 5.10+, rather than 5.14+
+
+
+0.000010  Fri Jul 14 07:36:47 2017
+
+    * Added yada-yada (...) statement
+      (Thanks, MST!)
+
+
+0.000011  Fri Aug 11 17:52:14 2017
+
+    * Further optimized parsing of heredocs
+
+    * Eliminated even more repetition backtracking
+      (bringing the grammar ever closer to DFA-osity)
+
+    * Micro-optimization: Reordered PerlOWS and PerlNWS components to
+      reflect that \n whitespace is more common that # comments or
+      __END__ blocks
+
+    * Made formats and heredocs play nice together by adding a potential
+      heredoc skip at the end of the first line of a format.
+      (Sincere thanks to Merijn)
+
+    * Made interpolating quotelikes work (more) correctly.

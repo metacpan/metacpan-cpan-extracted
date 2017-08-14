@@ -10,15 +10,12 @@ use Alien::Build::Plugin::Fetch::LWP;
 use Alien::Build::Plugin::Decode::HTML;
 
 # ABSTRACT: Alien::Build plugin to rewrite network requests to local resources
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub init
 {
   my($self, $meta) = @_;
-  # this just lets people know that we have loaded
-  # this plugin.
-  Alien::Build->log("init");
 
   unless($meta->prop->{start_url})
   {
@@ -65,7 +62,7 @@ Alien::Build::Plugin::Fetch::Rewrite - Alien::Build plugin to rewrite network re
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -76,6 +73,7 @@ In your ~/.alienbuild/rc.pl:
  sub rewrite {
    my($build, $uri) = @_;
    
+   # $build isa Alien::Build
    # $uri isa URI
    
    if($uri->host eq 'ftp.gnu.org')
@@ -88,6 +86,8 @@ In your ~/.alienbuild/rc.pl:
      $uri->host('/ftp.gnu.org' . $uri->path);
    }
  }
+ 
+ 1;
 
 =head1 DESCRIPTION
 

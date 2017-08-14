@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Slurp" : "0",
+            "HTML::Template::Compiled" : "0",
             "Image::Magick" : "0",
             "perl" : "5.014000"
          }
@@ -43,6 +45,6 @@
          "url" : "https://git.ieval.ro/?p=app-gallery.git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.001001",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

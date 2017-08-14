@@ -43,6 +43,7 @@
             "MooseX::Log::Log4perl" : "0",
             "MooseX::Method::Signatures" : "0.37",
             "Package::Stash" : "0.31",
+            "Parse::Method::Signatures" : "1.003016",
             "Test::Exception" : "0",
             "Test::MockModule" : "0",
             "Test::MockObject" : "1.20110612",
@@ -55,6 +56,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.18",
+   "version" : "2.19",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,13 +1,5 @@
 use Module::Build;
 
-unlink $_ for
- qw(
-/home/phil/z/perl/cpan/DataEditXmlLint/zzz.html
-/home/phil/z/perl/cpan/DataEditXmlLint/pod2htmd.tmp
-/home/phil/z/perl/cpan/DataEditXmlLint/lib/Data/Edit/Xml/doc.data
-/home/phil/z/perl/cpan/DataEditXmlLint/lib/Data/Edit/Xml/methods.data
-);
-
 my $b = Module::Build->new
  (module_name   => 'Data::Edit::Xml::Lint',
   create_readme =>  0,

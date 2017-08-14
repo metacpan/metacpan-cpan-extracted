@@ -316,7 +316,12 @@ sub test_shash_ops($$$) {
 		$v = eval { scalar(%sh) };
 		if($iomode =~ /r/) {
 			is $@, "";
-			is $v, !!$occupied;
+			if("$]" >= 5.025003) {
+				like $v, $occupied ? qr/\A[1-9][0-9]*\z/ :
+						qr/\A0\z/;
+			} else {
+				is $v, !!$occupied;
+			}
 		} else {
 			like $@, qr#\Acan't\ read\ shared\ hash\ \Q$name\E:
 					\ shared\ hash\ was\ opened
@@ -622,7 +627,12 @@ sub test_shash_ops($$$) {
 		$v = eval { scalar(%sh) };
 		if($iomode =~ /r/) {
 			is $@, "";
-			is $v, !!$occupied;
+			if("$]" >= 5.025003) {
+				like $v, $occupied ? qr/\A[1-9][0-9]*\z/ :
+						qr/\A0\z/;
+			} else {
+				is $v, !!$occupied;
+			}
 		} else {
 			like $@, qr#\Acan't\ read\ shared\ hash\ \Q$name\E:
 					\ shared\ hash\ was\ opened

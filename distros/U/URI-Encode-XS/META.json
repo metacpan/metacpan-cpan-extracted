@@ -1,10 +1,11 @@
 {
    "abstract" : "a Perl URI encoder/decoder using C",
    "author" : [
-      "David Farrell"
+      "David Farrell",
+      "Christian Hansen"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
@@ -45,6 +46,6 @@
          "web" : "https://github.com/dnmfarrell/URI-Encode-XS"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

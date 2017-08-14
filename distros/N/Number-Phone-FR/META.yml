@@ -21,7 +21,7 @@ provides:
     version: '0.09'
   Number::Phone::FR::Full:
     file: lib/Number/Phone/FR/Full.pm
-    version: '0.0917109'
+    version: '0.0917215'
   Number::Phone::FR::Simple:
     file: lib/Number/Phone/FR.pm
 requires:
@@ -34,5 +34,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Phone-FR
   homepage: https://github.com/dolmen/p5-Number-Phone-FR
   repository: https://github.com/dolmen/p5-Number-Phone-FR.git
-version: '0.0917109'
+version: '0.0917215'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

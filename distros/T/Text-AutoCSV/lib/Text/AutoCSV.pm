@@ -12,7 +12,7 @@
 #
 
 package Text::AutoCSV;
-$Text::AutoCSV::VERSION = '1.1.8';
+$Text::AutoCSV::VERSION = '1.1.9';
 my $PKG = "Text::AutoCSV";
 
 use strict;
@@ -135,7 +135,8 @@ struct ColData => {
 	header_text => '$',
 	description => '$',
 	dt_format => '$',
-	dt_locale => '$'
+	dt_locale => '$',
+    multiline => '$'
 };
 
 	#
@@ -427,66 +428,72 @@ sub _mygetline {
 	return $csvobj->getline($fh);
 }
 
-sub _detect_escape_char {
-	my ($self, $quote_char, $sep_char, $ref_escape_char, $ref_is_always_quoted) = @_;
+sub _detect_meta {
+	my ($self, $quote_char, $sep_char) = @_;
 
 	my $in_file = $self->{in_file};
 	my $_debug = $self->{_debug};
 	my $_debugh = $self->{_debugh};
 
-	$$ref_escape_char = $DEFAULT_ESCAPE_CHAR;
-	$$ref_is_always_quoted = undef;
+	return if $self->{_int_one_pass};
+	return if $self->{_detect_meta_done}; # Sans jeu de mot...
 
-	if ($self->{_int_one_pass}) {
-		return;
-	}
+    if (!defined($self->{escape_char})) {
+		$self->_register_pass("detect escape character");
 
-	$self->_register_pass("detect escape character");
+        my $flag = 0;
+        my $inh = $self->_reopen_input();
+        if (defined($inh)) {
+            while (my $l = <$inh>) {
+                chomp $l;
 
-	my $qesc = 0;
-	my $inh = $self->_reopen_input();
-	if (defined($inh)) {
-		while (my $l = <$inh>) {
-			chomp $l;
+                    # Very heuristic criteria...
+                    # Tant pis.
+    #            $flag = 1 if $l =~ m/(?<!$sep_char)$quote_char$quote_char(?!$sep_char)/;
+    #            $flag = 1 if $l =~ m/(\\$quote_char|\\\\)/;
+                $flag = 1 if $l =~ m/(\\$quote_char)/;
 
-				# Very heuristic criteria...
-				# Tant pis.
-			$qesc = 1 if $l =~ m/(?<!$sep_char)$quote_char$quote_char(?!$sep_char)/;
+            }
+            close $inh;
+        }
+        $self->{escape_char} = ($flag ? '\\' : '"');
+		print($_debugh "  detected escape_char: '$self->{escape_char}'\n") if $_debug;
+    }
 
-		}
-		close $inh;
-	}
-	if ($qesc) {
-		$$ref_escape_char = '"';
-	} else {
-		$$ref_escape_char = '\\' ;
-	}
+	print($_debugh "  using escape_char: '$self->{escape_char}' " .
+		"to further examine input (is_always_quoted, multiline)\n") if $_debug;
 
 	my $is_always_quoted = 0;
-	$inh = $self->_reopen_input();
+	my $inh = $self->_reopen_input();
+    my @multiline;
 	if (defined($inh)) {
+		$self->_register_pass("detect is_always_quoted and multiline");
 		my $csv = Text::CSV->new({sep_char => $sep_char,
 			allow_whitespace => 1, binary => 1, auto_diag => 0,
-			quote_char => $quote_char, escape_char => $$ref_escape_char,
+			quote_char => $quote_char, escape_char => $self->{escape_char},
 			keep_meta_info => 1,
 			allow_loose_escapes => 1});
+		my $nb_rows = 0;
 		$is_always_quoted = 1;
 		while (my $ar = _mygetline($csv, $inh)) {
+            $nb_rows++;
+
 			my @a = @{$ar};
 			my $e = $#a;
 			for my $i (0..$e) {
 				$is_always_quoted = 0 unless $csv->is_quoted($i);
+                $multiline[$i] = 1 if $a[$i] =~ m/\n/;
 			}
-			last unless $is_always_quoted;
 		}
-		my $is_ok = ($csv->eof() ? 1 : 0);
+		$self->{_nb_rows} = $nb_rows;
 		close $inh;
 	}
+    $self->{_multiline} = [ @multiline ];
 
 	print($_debugh "  is_always_quoted: $is_always_quoted\n") if $_debug;
-	$$ref_is_always_quoted = $is_always_quoted;
+	$self->{_is_always_quoted} = $is_always_quoted;
 
-	return;
+	$self->{_detect_meta_done} = 1;
 }
 
 sub _register_pass {
@@ -749,6 +756,7 @@ sub new {
 			write_filter_hr => {type => CODEREF, optional => 1},
 			out_filter => {type => CODEREF, optional => 1},
 			write_fields => {type => ARRAYREF, optional => 1},
+			out_orderby => {type => ARRAYREF, optional => 1},
 			out_fields => {type => ARRAYREF, optional => 1},
 			out_file => {type => SCALAR, optional => 1},
 			out_always_quote => {type => BOOLEAN, optional => 1},
@@ -765,6 +773,7 @@ sub new {
 			no_undef => {type => BOOLEAN, optional => 1},
 			fields_dates => {type => ARRAYREF, optional => 1},
 			fields_dates_auto => {type => BOOLEAN, optional => 1},
+			fields_dates_auto_optimize => {type => BOOLEAN, optional => 1},
 			dates_formats_to_try => {type => ARRAYREF, optional => 1},
 			dates_formats_to_try_supp => {type => ARRAYREF, optional => 1},
 			dates_ignore_trailing_chars => {type => BOOLEAN, optional => 1},
@@ -966,18 +975,13 @@ sub _S1_init_input {
 				$self->{sep_char} = $sep_char;
 			}
 		}
-		print($_debugh ($sep_char eq "\t" ? '\t' : $sep_char) . "\"\n") if $_debug;
+		print($_debugh _render($sep_char) . "\"\n") if $_debug;
 
-		my $is_always_quoted;
-		unless (defined($self->{escape_char})) {
-			$self->_detect_escape_char($quote_char, $sep_char, \$escape_char, \$is_always_quoted);
-			$self->{escape_char} = $escape_char;
-			$self->{_is_always_quoted} = $is_always_quoted;
-		}
+        $self->_detect_meta($quote_char, $sep_char);
 
 		$self->{_in_csvobj} = Text::CSV->new({sep_char => $sep_char,
 			allow_whitespace => 1, binary => 1, auto_diag => 0,
-			quote_char => $quote_char, escape_char => $escape_char,
+			quote_char => $quote_char, escape_char => $self->{escape_char},
 			allow_loose_escapes => 1});
 		unless (defined($self->{_in_csvobj})) {
 			$self->_print_error("error creating input Text::CSV object");
@@ -1099,7 +1103,8 @@ sub get_coldata {
 			$_->header_text,
 			$_->description,
 			$_->dt_format,
-			$_->dt_locale];
+			$_->dt_locale,
+            $_->multiline];
 	}
 
 	return @ret;
@@ -1112,6 +1117,14 @@ sub get_stats {
 
 	return () unless defined($self->{_stats});
 	return %{$self->{_stats}};
+}
+
+sub get_nb_rows {
+	my $self = shift;
+
+	validate_pos(@_);
+
+	return $self->{_nb_rows};
 }
 
 sub _debug_show_members {
@@ -1772,6 +1785,7 @@ sub _detect_dates_formats {
 
 			$self->{_line_after_which_recording_can_start} = $record_number;
 			last unless $self->{fields_dates_auto};
+			last if $self->{fields_dates_auto_optimize};
 		}
 	}
 
@@ -2156,6 +2170,8 @@ sub _S3_init_fields_extra {
 	my @extra_fields_definitions_list = @{$self->{_extra_fields}} if exists $self->{_extra_fields};
 	my %extra_fields_definitions;
 
+    my @multiline = @{$self->{_multiline}} if defined($self->{_multiline});
+
 	my @coldata;
 	for my $i (0..$#columns) {
 		my $col = $columns[$i];
@@ -2163,7 +2179,8 @@ sub _S3_init_fields_extra {
 		push @coldata, ColData->new(
 			field_name => $col,
 			header_text => $h,
-			description => ''
+			description => '',
+            multiline => ($multiline[$i] ? 'm' : '1')
 		);
 	}
 
@@ -2228,7 +2245,8 @@ sub _S3_init_fields_extra {
 			push @coldata, ColData->new(
 				field_name => $e1->self_name,
 				header_text => $e1->self_name,
-				description => $e1->description
+				description => $e1->description,
+                multiline => '?'
 			);
 		}
 
@@ -2578,6 +2596,8 @@ sub _close_read {
 			$self->_printf("   %7d %s\n", $self->{_stats}->{$k}, $k);
 		}
 	}
+
+	$self->{_nb_rows} = $self->{_row_read};
 }
 
 	# Return 0 if error, 1 if all good
@@ -2977,13 +2997,30 @@ sub _read_all_in_mem {
 	return $self;
 }
 
+sub _render {
+	my $v = $_[0];
+
+	if (length($v) == 1 and ord($v) < 32) {
+		my $n = ord($v);
+		return '\n' if $n == 10;
+		return '\r' if $n == 13;
+		return '\t' if $n == 9;
+		return '\f' if $n == 12;
+		return '\b' if $n == 8;
+		return '\a' if $n == 7;
+		return '\e' if $n == 27;
+		return '\0' . oct($n);
+	}
+	return $v;
+}
+
 sub print_id {
 	my $self = shift;
 
 	$self->_printf("-- " . $self->get_in_file_disp() . ":\n");
-	$self->_printf("sep_char:         " . $self->get_sep_char() . "\n");
-	$self->_printf("escape_char:      " . $self->get_escape_char() . "\n");
-	$self->_printf("in_encoding:      " . $self->get_in_encoding() . "\n");
+	$self->_printf("sep_char:         " . _render($self->get_sep_char()) . "\n");
+	$self->_printf("escape_char:      " . _render($self->get_escape_char()) . "\n");
+	$self->_printf("in_encoding:      " . _render($self->get_in_encoding()) . "\n");
 	$self->_printf("is_always_quoted: " . ($self->get_is_always_quoted() ? 'yes' : 'no') . "\n");
 
 	my @coldata = $self->get_coldata();
@@ -3193,7 +3230,21 @@ sub write {
 			# The content is available in-memory: we write from what we have in-memory then...
 			#
 
-		for my $k ($self->get_keys()) {
+		my @keys = $self->get_keys();
+		my @ordered_keys = @keys;
+		if (exists $self->{'out_orderby'}) {
+			my @orderby = @{$self->{'out_orderby'}};
+			@ordered_keys = sort {
+				for my $f (@orderby) {
+					my $cmp = $self->get_cell($a, $f) cmp $self->get_cell($b, $f);
+					return $cmp if $cmp;
+				}
+				return 0;
+			} @keys;
+		}
+
+#        for my $k ($self->get_keys()) {
+		for my $k (@ordered_keys) {
 			my $hr = $self->get_row_hr($k);
 			if (defined($write_filter_hr)) {
 				next unless $write_filter_hr->($hr);
@@ -3578,7 +3629,7 @@ Text::AutoCSV - helper module to automate the use of Text::CSV
 
 =head1 VERSION
 
-version 1.1.8
+version 1.1.9
 
 =head1 SYNOPSIS
 
@@ -4288,10 +4339,26 @@ the array, and so on. Fields not listed in B<out_fields> are not written in outp
 
 You can use empty field names to have empty columns in output.
 
+Value by default: none, meaning, all fields are output in their natural order. What is natural
+order? It is the input order for fields that were read from input, and the order in which they got
+created for created fields.
+
 Example:
 
 	Text::AutoCSV->new(in_file => 'allinfos.csv', out_file => 'only-addresses.csv',
 		out_fields => [ 'NAME', 'ADDRESS' ] )->write();
+
+=item out_orderby
+
+Array reference to a list of fields to sort output with.
+
+At the moment this feature is a bit of a hack (no option to make sort descending or ascending,
+numeric or text, and it is not part of test plan).
+
+Example:
+
+	Text::AutoCSV->new(in_file => 'names.csv', out_file => 'sortednames.csv',
+		out_orderby => [ 'LASTNAME', 'FIRSTNAME']);
 
 =item search_case
 
@@ -4415,6 +4482,26 @@ Value by default: 0
 Example:
 
 	my $csv = Text::AutoCSV->new(in_file => 'logins.csv', fields_dates_auto => 1);
+
+=item fields_dates_auto_optimize
+
+Relevant only if L</fields_dates_auto> is set.
+
+Normally when L</fields_dates_auto> is set, the input is read completely to make sure auto-detection
+produces a reliable result. If C<fields_dates_auto_optimize> is set, this reading pass will stop as
+soon as there is no ambiguity left. That is, for every fields in input, the date format (or the fact
+that no date format is suitable) is known.
+
+Using this option is a bit risky because it could trigger a date format detection that later in the
+input, would turn out to be wrong. Should that be the case, strange errors will occur, that are not
+easy to understand. Use it at your own risk.
+
+Value by default: 0
+
+Example:
+
+	my $csv = Text::AutoCSV->new(in_file => 'logins.csv', fields_dates_auto => 1,
+		fields_dates_auto_optimize => 1);
 
 =item dates_formats_to_try
 
@@ -5141,6 +5228,7 @@ Each element of the array is itself an array ref that contains 5 elements:
 	2: Column content type, shows some meta-data of fields created with field_add_* functions
 	3: Datetime format detected, if ever, in the format Strptime
 	4: Locale of DateTime format detected, if ever
+	5: Multiline field: '1' if not, 'm' if newlines encountered in the field
 
 =head2 get_pass_count
 
@@ -5195,6 +5283,22 @@ B<IMPORTANT>
 As opposed to most functions that trigger input reading automatically (search functions and other
 get_* functions), C<get_stats> just returns you the stats as it is, regardless of whether some
 execution already occured.
+
+=head2 get_nb_rows
+
+	my $nb_rows = $csv->get_nb_rows();
+
+Gives the number of rows of the input. Does not trigger any reading - just provides the number of
+rows as known at the moment of the call. If unknown, return undef. Typically, the number of rows is
+known after doing the initial detection of CSV options (escape character, etc.), or, after doing one
+complete reading.
+
+The header line counts for one row.
+
+B<IMPORTANT>
+
+As some fields can contain new lines, this number is not necessarily identical to the number of
+lines.
 
 =head2 set_walker_ar
 

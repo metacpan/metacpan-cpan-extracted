@@ -1,10 +1,15 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2017-07-04'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.540'; # VERSION
+
+# line 820, don't know how to turn off this warning?
+## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
+# false positive? perlcritic gives line 2333 which is way more than the number of lines of this script
+## no critic (InputOutput::RequireBriefOpen)
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
@@ -635,8 +640,6 @@ sub _gen_get_args {
 
     } else {
 
-        _add_module($cd, "Getopt::Long::EvenLess");
-        push @l, "require Getopt::Long::EvenLess;\n";
         my $meta = $cd->{metas}{''};
         # stage 1 is catching common options only (--help, etc)
         for my $stage (1, 2) {
@@ -670,6 +673,8 @@ sub _gen_get_args {
                             push @l, 'if ($mentioned_args{\'', $specmeta->{arg}, '\'}++) { push @{ $_pci_args{\'', $specmeta->{arg}, '\'} }, $_[1] } else { $_pci_args{\'', $specmeta->{arg}, '\'} = [$_[1]] }';
                         } elsif ($specmeta->{is_json}) {
                             push @l, '$_pci_args{\'', $specmeta->{arg}, '\'} = _pci_json()->decode($_[1]);';
+                        } elsif ($specmeta->{is_neg}) {
+                            push @l, '$_pci_args{\'', $specmeta->{arg}, '\'} = 0;';
                         } else {
                             push @l, '$_pci_args{\'', $specmeta->{arg}, '\'} = $_[1];';
                         }
@@ -1092,8 +1097,6 @@ sub gen_inline_pericmd_script {
 
   GEN_SCRIPT:
     {
-        no strict 'refs';
-
         my @l;
 
         {
@@ -1472,8 +1475,12 @@ _
             "package main;\n",
             "use 5.010001;\n",
             "use strict;\n",
-            "#use warnings;\n",
+            "#use warnings;\n\n",
+
+            "# modules\n",
             (map {"require $_;\n"} sort keys %{$cd->{req_modules}}),
+            "\n",
+
             "\n",
 
             $args{log} ? _gen_enable_log($cd) : '',
@@ -1549,7 +1556,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.53 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2017-07-04.
+This document describes version 0.540 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2017-08-12.
 
 =head1 SYNOPSIS
 

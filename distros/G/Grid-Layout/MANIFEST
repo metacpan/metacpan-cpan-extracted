@@ -1,0 +1,18 @@
+Changes
+ignore.txt
+lib/Grid/Layout.pm
+lib/Grid/Layout/Area.pm
+lib/Grid/Layout/Cell.pm
+lib/Grid/Layout/Line.pm
+lib/Grid/Layout/LineSection.pm
+lib/Grid/Layout/Render.pm
+lib/Grid/Layout/Track.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/01-load.t
+t/02-create-grid.t
+t/02-grid-expected.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

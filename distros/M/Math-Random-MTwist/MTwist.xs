@@ -9,6 +9,15 @@
 #include "mtwist/mtwist.c"
 #include "mtwist/randistrs.c"
 
+#if defined __GLIBC__ && defined __linux__
+#  ifndef _GNU_SOURCE
+#    define _GNU_SOURCE
+#  endif
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <linux/random.h>
+#endif
+
 typedef union {
   double dbl;
   char str[8];
@@ -20,19 +29,59 @@ typedef union {
 
 #define I2D_SIZE sizeof(int2dbl)
 
-static unsigned int fmt_uint64(char* dest, uint64_t u) {
-  register unsigned int i, len;
-  register uint64_t tmp;
+#if IVSIZE < 8 && defined(UINT64_MAX)
+/* based on libowfat */
+static inline U8 fmt_uint64(char* dest, uint64_t u) {
+  U8 len, len2;
+  uint64_t tmp;
 
   /* count digits */
-  for (len = 1, tmp = u; tmp > 9; ++len)
-    tmp /= 10;
+  for(len = 1, tmp = u; tmp > 9; tmp /= 10)
+    len++;
 
-  for (i = len, dest[i] = '\0'; i; u /= 10)
-    dest[--i] = (u%10) + '0';
+  if (dest) {
+    dest += len;
+    *dest = '\0';
+    len2 = len - 1;
+    do {
+      *--dest = (char)((u%10) + '0');
+      u /= 10;
+    } while (len2--);
+  }
 
   return len;
 }
+
+/* newSVpvf doesn't handle "%llu" correctly. */
+static SV* svpv_uint64(uint64_t u) {
+  SV* retval;
+  char* buf;
+  size_t bufsize, length;
+
+  dTHX;
+
+  bufsize = PERL_STRLEN_ROUNDUP(21); /* 21 = 20 digits + terminal NUL byte */
+  Newxc(buf, bufsize, char, char);
+  if (!buf)
+    return NULL;
+
+  retval = newSV(0);
+  if (!retval) {
+    Safefree(buf);
+    return NULL;
+  }
+
+  length = fmt_uint64(buf, u);
+
+  sv_upgrade(retval, SVt_PV);
+  SvCUR_set(retval, length);
+  SvLEN_set(retval, bufsize);
+  SvPV_set(retval, buf);
+  SvPOK_only(retval);
+
+  return retval;
+}
+#endif
 
 /*
  * We copy the seeds from an array reference to a buffer so that mtwist can
@@ -99,11 +148,39 @@ static uint32_t timeseed(mt_state* state) {
   return usecs;
 }
 
+#ifdef SYS_getrandom
+static inline int mrmt_getrandom(void *buf, size_t buflen, unsigned flags) {
+#if defined(__GLIBC__) && ( __GLIBC__ > 2 || __GLIBC_MINOR__ > 24 )
+  return getrandom(buf, buflen, flags);
+#else
+  return syscall(SYS_getrandom, buf, buflen, flags);
+#endif
+}
+#endif
+
+static inline uint32_t devseed(mt_state* state, bool want_goodseed) {
+#ifdef SYS_getrandom
+  uint32_t seed;
+  unsigned flags = want_goodseed ? GRND_RANDOM : 0;
+  while (mrmt_getrandom(&seed, sizeof(seed), flags) < 0) {}
+  if (state)
+    mts_seed32new(state, seed);
+  else
+    mt_seed32new(seed);
+  return seed;
+#else
+  if (want_goodseed)
+    return state ? mts_goodseed(state) : mt_goodseed();
+  else
+    return state ? mts_seed(state) : mt_seed();
+#endif
+}
+
 static inline uint32_t fastseed(mt_state* state) {
 #ifdef WIN32
   return timeseed(state);
 #else
-  return state ? mts_seed(state) : mt_seed();
+  return devseed(state, 0);
 #endif
 }
 
@@ -111,7 +188,7 @@ static inline uint32_t goodseed(mt_state* state) {
 #ifdef WIN32
   return timeseed(state);
 #else
-  return state ? mts_goodseed(state) : mt_goodseed();
+  return devseed(state, 1);
 #endif
 }
 
@@ -124,7 +201,7 @@ static inline void bestseed(mt_state* state) {
 }
 
 static inline void seedfull(mt_state* state, AV* seeds) {
-  uint32_t mt_seeds[MT_STATE_SIZE] = { 0 };
+  uint32_t mt_seeds[MT_STATE_SIZE] = {0};
 
   get_seeds_from_av(seeds, mt_seeds);
 
@@ -139,9 +216,9 @@ static inline uint32_t srand50c(mt_state* state, uint32_t* seed) {
     return fastseed(state);
 
   if (state)
-    mts_seed32new(state, *seed);
+    mts_seed32new(state, (uint32_t)*seed);
   else
-    mt_seed32new(*seed);
+    mt_seed32new((uint32_t)*seed);
 
   return *seed;
 }
@@ -166,8 +243,8 @@ static inline int2dbl rd_double(mt_state* state) {
 }
 
 static SV* randstr(mt_state* state, size_t length) {
-  size_t bufsize;
-  int2dbl *randbuf;
+  size_t bufsize, i;
+  int2dbl* buf;
   SV* retval;
 
   dTHX;
@@ -175,33 +252,32 @@ static SV* randstr(mt_state* state, size_t length) {
   if (length == 0)
     return newSVpvn("", 0);
 
-  /* Make bufsize an integer multiple of I2D_SIZE so that, if it's not, we
-     don't need and extra memcpy() after the rd_double() loop. */
+  /* Make bufsize an integer multiple of I2D_SIZE */
   bufsize = length + ((-length) % I2D_SIZE);
   if (bufsize < length)
     return NULL;
 
-  Newxc(randbuf, bufsize, char, int2dbl);
-  if (!randbuf)
+  Newxc(buf, bufsize, char, int2dbl);
+  if (!buf)
     return NULL;
+
+  i = bufsize / I2D_SIZE;
+  buf += i;
+  do {
+    *--buf = rd_double(state);
+  } while (--i);
 
   retval = newSV(0);
   if (!retval) {
-    Safefree(randbuf);
+    Safefree(buf);
     return NULL;
   }
 
-  SvUPGRADE(retval, SVt_PV);
+  sv_upgrade(retval, SVt_PV);
   SvCUR_set(retval, length);
   SvLEN_set(retval, bufsize);
-  SvPV_set(retval, (char*)randbuf);
+  SvPV_set(retval, (char*)buf);
   SvPOK_only(retval);
-
-  /* Loads of preparatory code just for this tiny little loop! This sucks! */
-  while (bufsize) {
-    *(randbuf++) = rd_double(state);
-    bufsize -= I2D_SIZE;
-  }
 
   return retval;
 }
@@ -389,7 +465,7 @@ _seedfull(AV* seeds)
     seedfull(NULL, seeds);
 
 
-#if IVSIZE >= 8 || defined(HAS_LONG_LONG)
+#if IVSIZE >= 8 || defined(UINT64_MAX)
 SV*
 irand(mt_state* state);
   ALIAS:
@@ -399,13 +475,7 @@ irand(mt_state* state);
 #if IVSIZE >= 8
     RETVAL = newSVuv(mts_llrand(state));
 #else
-    char* randbuf;
-    unsigned int buflen;
-    Newxc(randbuf, 21, char, char);
-    buflen = fmt_uint64(randbuf, mts_llrand(state));
-    RETVAL = newSVpvn(randbuf, buflen);
-    Safefree(randbuf);
-//    RETVAL = newSVpvf("%llu", (unsigned long long)mts_llrand(state));
+    RETVAL = svpv_uint64(mts_llrand(state));
 #endif
   OUTPUT:
     RETVAL
@@ -419,41 +489,31 @@ _irand();
 #if IVSIZE >= 8
     RETVAL = newSVuv(mt_llrand());
 #else
-    char* randbuf;
-    unsigned int buflen;
-    Newxc(randbuf, 21, char, char);
-    buflen = fmt_uint64(randbuf, mt_llrand());
-    RETVAL = newSVpvn(randbuf, buflen);
-    Safefree(randbuf);
-//    RETVAL = newSVpvf("%llu", (unsigned long long)mt_llrand());
+    RETVAL = svpv_uint64(mt_llrand());
 #endif
   OUTPUT:
     RETVAL
 
 #else
-SV*
+void
 irand(mt_state* state);
   ALIAS:
     irand64 = 1
-  CODE:
+  PPCODE:
     if (ix == 0)
-      RETVAL = newSVuv(mts_lrand(state));
+      XSRETURN_UV(mts_lrand(state));
     else
       XSRETURN_UNDEF;
-  OUTPUT:
-    RETVAL
 
-SV*
+void
 _irand();
   ALIAS:
     _irand64 = 1
-  CODE:
+  PPCODE:
     if (ix == 0)
-      RETVAL = newSVuv(mt_lrand());
+      XSRETURN_UV(mt_lrand());
     else
       XSRETURN_UNDEF;
-  OUTPUT:
-    RETVAL
 
 #endif
 

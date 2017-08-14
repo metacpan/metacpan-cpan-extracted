@@ -14,6 +14,88 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_compare : Test(12) {
+    my $self = shift;
+
+    my $arr1 = Prty::Array->new;
+    my $arr2 = Prty::Array->new;
+    my $arr1_res = [];
+    my $arr2_res = [];
+    my $arr_res = [];
+
+    my ($a1,$a2,$a) = $arr1->compare($arr2);
+    # warn "\n@$a1\n@$a2\n@$a\n";
+
+    $self->ok($a1->eq($arr1_res));
+    $self->ok($a2->eq($arr2_res));
+    $self->ok($a->eq($arr_res));
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    $arr1 = Prty::Array->new;
+    $arr2 = Prty::Array->new([qw/a b c/]);
+    $arr1_res = [];
+    $arr2_res = [qw/a b c/];
+    $arr_res = [];
+
+    ($a1,$a2,$a) = $arr1->compare($arr2);
+    # warn "\n@$a1\n@$a2\n@$a\n";
+
+    $self->ok($a1->eq($arr1_res));
+    $self->ok($a2->eq($arr2_res));
+    $self->ok($a->eq($arr_res));
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    $arr1 = Prty::Array->new([qw/a b c d/]);
+    $arr2 = Prty::Array->new([qw/e b d f g/]);
+    $arr1_res = [qw/a c/];
+    $arr2_res = [qw/e f g/];
+    $arr_res = [qw/b d/];
+
+    ($a1,$a2,$a) = $arr1->compare($arr2);
+    # warn "\n@$a1\n@$a2\n@$a\n";
+
+    $self->ok($a1->eq($arr1_res));
+    $self->ok($a2->eq($arr2_res));
+    $self->ok($a->eq($arr_res));
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Aufruf als Klassenmethode
+
+    ($a1,$a2,$a) = Prty::Array->compare($arr1,$arr2);
+
+    $self->ok($a1->eq($arr1_res));
+    $self->ok($a2->eq($arr2_res));
+    $self->ok($a->eq($arr_res));
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_exists : Test(5) {
+    my $self = shift;
+
+    my $obj = Prty::Array->new([qw/p e r l m o n g e r s/]);
+
+    my $bool = $obj->exists('p');
+    $self->is($bool,1,'erstes Element');
+
+    $bool = $obj->exists('r');
+    $self->is($bool,1,'Element mehrfach');
+
+    $bool = Prty::Array->exists($obj,'r');
+    $self->is($bool,1,'Element mehrfach (Klassenmethode)');
+
+    $bool = $obj->exists('s');
+    $self->is($bool,1,'letztes Element');
+
+    $bool = $obj->exists('z');
+    $self->is($bool,0,'nicht gefunden');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_extractKeyVal : Test(2) {
     my $self = shift;
 
@@ -23,6 +105,30 @@ sub test_extractKeyVal : Test(2) {
     $self->is($val,2);
     $self->isDeeply(\@arr,[a=>1,c=>3]);
 
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_eq : Test(4) {
+    my $self = shift;
+
+    my $arr = Prty::Array->new([qw/a b c/]);
+    my @arr = qw/a b/;
+    my $bool = $arr->eq(\@arr);
+    $self->ok(!$bool);
+
+    $arr = Prty::Array->new([qw/a b c/]);
+    @arr = qw/a b c d/;
+    $bool = $arr->eq(\@arr);
+    $self->ok(!$bool);
+
+    $arr = Prty::Array->new([qw/a b c/]);
+    @arr = qw/a b c/;
+    $bool = $arr->eq(\@arr);
+    $self->ok($bool);
+
+    $bool = Prty::Array->eq($arr,\@arr);
+    $self->ok($bool);
 }
 
 # -----------------------------------------------------------------------------
@@ -99,6 +205,34 @@ sub test_maxLength : Test(3) {
 
     $l = Prty::Array->maxLength(\@arr);
     $self->is($l,7);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_pick : Test(6) {
+    my $self = shift;
+
+    my $arr = Prty::Array->new;
+
+    my $arr2 = $arr->pick(2);
+    $self->isDeeply($arr2,[],'leer');
+
+    $arr2 = Prty::Array->pick($arr,2);
+    $self->isDeeply($arr2,[],'leer');
+
+    $arr = Prty::Array->new([qw/x a t q c c d/]);
+
+    $arr2 = $arr->pick(2);
+    $self->isDeeply($arr2,[qw/x t c d/],'pick 2');
+
+    $arr2 = Prty::Array->pick($arr,2);
+    $self->isDeeply($arr2,[qw/x t c d/],'pick 2');
+
+    $arr2 = $arr->pick(2,1);
+    $self->isDeeply($arr2,[qw/a q c/],'pick 2,1');
+
+    $arr2 = Prty::Array->pick($arr,2,1);
+    $self->isDeeply($arr2,[qw/a q c/],'pick 2,1');
 }
 
 # -----------------------------------------------------------------------------

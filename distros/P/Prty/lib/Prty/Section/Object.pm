@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Path;
 
@@ -1094,6 +1094,39 @@ sub setDefault {
 
 # -----------------------------------------------------------------------------
 
+=head3 add() - Füge Schlüssel und Wert hinzu
+
+=head4 Synopsis
+
+    $sec->add(@keyVal);
+
+=head4 Arguments
+
+=over 4
+
+=item @keyVal
+
+Schlüssel/Wert-Paare, die gesetzt werden.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub add {
+    my $self = shift;
+    # @_: @keyVal
+    $self->[3]->add(@_);
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 push() - Füge Element zu Arraykomponente hinzu
 
 =head4 Synopsis
@@ -1398,7 +1431,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

@@ -28,7 +28,26 @@ const char* SPVM_XS_UTIL_get_type_name(int32_t type_id) {
   return type_name;
 }
 
-int32_t SPVM_XS_UTIL_get_type_id(SV* sv_object) {
+int32_t SPVM_XS_UTIL_get_type_id(const char* type_name) {
+  
+  // Type information
+  HV* hv_type_symtable = get_hv("SPVM::TYPE_SYMTABLE", 0);
+  SV** sv_type_info_ptr = hv_fetch(hv_type_symtable, type_name, strlen(type_name), 0);
+  if (!sv_type_info_ptr) {
+    return -1;
+  }
+  
+  // Type id
+  SV* sv_type_info = *sv_type_info_ptr;
+  HV* hv_type_info = (HV*)SvRV(sv_type_info);
+  SV** sv_type_id_ptr = hv_fetch(hv_type_info, "id", strlen("id"), 0);
+  SV* sv_type_id = *sv_type_id_ptr;
+  int32_t type_id = SvIV(sv_type_id);
+  
+  return type_id;
+}
+
+int32_t SPVM_XS_UTIL_get_sv_object_type_id(SV* sv_object) {
   HV* hv_object = (HV*)SvRV(sv_object);
   SV** sv_type_id_ptr = hv_fetch(hv_object, "type_id", strlen("type_id"), 0);
   SV* sv_type_id = sv_type_id_ptr ? *sv_type_id_ptr : &PL_sv_undef;
@@ -241,7 +260,7 @@ SV* SPVM_XS_UTIL_new_sv_float_array(SPVM_API_ARRAY* array) {
   hv_store(hv_array, "content", strlen("content"), SvREFCNT_inc(sv_content), 0);
   
   // Set type id
-  SV* sv_type_id = sv_2mortal(newSViv(SPVM_TYPE_C_ID_ARRAY_FLOAT));
+  SV* sv_type_id = sv_2mortal(newSViv(SPVM_TYPE_C_ID_FLOAT_ARRAY));
   hv_store(hv_array, "type_id", strlen("type_id"), SvREFCNT_inc(sv_type_id), 0);
   
   return sv_array;
@@ -312,7 +331,7 @@ SV* SPVM_XS_UTIL_new_sv_object(int32_t type_id, SPVM_API_OBJECT* object) {
   // Set type id
   SV* sv_type_id = sv_2mortal(newSViv(type_id));
   hv_store(hv_object, "type_id", strlen("type_id"), SvREFCNT_inc(sv_type_id), 0);
-
+  
   return sv_object;
 }
 

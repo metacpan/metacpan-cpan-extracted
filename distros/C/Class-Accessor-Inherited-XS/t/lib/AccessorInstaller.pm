@@ -1,6 +1,6 @@
 package AccessorInstaller;
 use strict;
 use warnings;
-use base qw/Class::Accessor::Inherited::XS/;
+use parent 'Class::Accessor::Inherited::XS::Compat';
 
 1;

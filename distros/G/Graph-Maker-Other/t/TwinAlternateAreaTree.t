@@ -29,9 +29,6 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 plan tests => 35;
 
 require Graph::Maker::TwinAlternateAreaTree;
@@ -39,7 +36,7 @@ require Graph::Maker::TwinAlternateAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Maker::TwinAlternateAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwinAlternateAreaTree->VERSION,  $want_version,

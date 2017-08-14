@@ -21,6 +21,7 @@ use Test::File::ShareDir -share => {
 
 
 use lib 't/lib';
+use EnsureStdinTty;
 
 plan skip_all => 'git not found'
     unless which 'git';

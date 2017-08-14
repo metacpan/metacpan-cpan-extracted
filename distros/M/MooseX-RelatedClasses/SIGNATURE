@@ -12,52 +12,56 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
-SHA1 7b454112aa7e571cc74bf7086051aa44b23a5161 Changes
-SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
-SHA1 e8d07bd9008a57442bace8fc298ac2e7c3e08ee4 MANIFEST
-SHA1 66069329e37f4f02b4e6c186b0f65302ba9803c6 META.json
-SHA1 221d95770c8ab5ee6d999894c49cda18ed3aa5c2 META.yml
-SHA1 d207e331e8209aeb28d075bd3ed4abd7603edb1c Makefile.PL
-SHA1 f9aae909b6e486c67c0fd1d6adc283921ce90469 README
+SHA1 a76fa1dfc018a4cfd8b958516756622f64348161 .travis.yml
+SHA1 33be287acd86bfdcf09bb68cec272a84e1a37cf9 Changes
+SHA1 59b608e58614b56b5c1c5d0cf1736ee3aa7867d5 LICENSE
+SHA1 98a38c6d1da014e324f25c71ec57c69986d61371 MANIFEST
+SHA1 7589dd36a7da629e9779513e872ca46e4137116f META.json
+SHA1 7f8c280fb3ffc0d1cc24a6a8a208b07a053a3f27 META.yml
+SHA1 689dd6d38d2d2e2c887c4cb913de0df4e653d625 Makefile.PL
+SHA1 603d98e3fd21df9f4f0371e2ef01ce76b4e6dd8c README
 SHA1 8fb0e39389ad0d4d74bdfc0178cb84197ed03d55 cpanfile
 SHA1 bfaccc82e7866ef298b051eaa3989547eb322823 dist.ini
-SHA1 ad2df26edaefa392c16d89e7e2c9349efd48a40c lib/MooseX/RelatedClasses.pm
+SHA1 74152a535d72e0da297758d6d357a5049e0271d8 lib/MooseX/RelatedClasses.pm
 SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
 SHA1 472b9efe8802a2de4ccdbac012cc7f847c0fbe9f t/00-compile.t
 SHA1 4330b17723f7c00560159080b1f7d90c7a0df680 t/00-report-prereqs.dd
-SHA1 b51f692a5745d119b1b22f72f819220715b919d4 t/00-report-prereqs.t
+SHA1 140cb2030a7a6eded9aa88c87f7389a7b16c673a t/00-report-prereqs.t
 SHA1 2547e8b514fa5afa01b2627aa92c7c80d3c825bc t/all_in_namespace.t
 SHA1 ea26c6491f2d2ab9bb416e978c987ca034a99fa1 t/basic.t
-SHA1 1507cf87525357c4626b3e8210ff8bb1cbd14d07 t/blank_namespace.t
+SHA1 28feed1ab816ddeeda73516503d8111cd9d0a32e t/blank_namespace.t
 SHA1 f792061318a88c2c9dff4b13e05b3ac166b63e3f t/custom-decamelization.t
 SHA1 6a21995767ace00df6e3f6f937529fa4d3903b7c t/desnaking-with-doublecolon.t
-SHA1 79b726e41948bef1031804a5548022fa170f8d38 t/funcs.pm
-SHA1 42b4acc20b21397436b51701876d37739371431d t/lib/Test/Class/__WONKY__.pm
-SHA1 e91923100a02492a4d68a537203491203b7532b2 t/lib/Test/Class/__WONKY__/One.pm
-SHA1 5b9d8a5daa536e028df22c77b551452de88c00ba t/lib/Test/Class/__WONKY__/Sub/One.pm
+SHA1 3c789ba061410906e0b01c30551d976280722157 t/lib/Test/Class/__WONKY__.pm
+SHA1 2da9ce795d05a9bc3f097a1e146c5ea08a5375dc t/lib/Test/Class/__WONKY__/One.pm
+SHA1 b4b4dda380be70cd68e429600134dcff7b2771d4 t/lib/Test/Class/__WONKY__/Sub/One.pm
 SHA1 1f8b4552feccf71011fa4207e0e9c56917d820ef t/multiple.t
 SHA1 1d286ae8ae2330424ce68d032b2291c1c640a1ae t/sugar.t
-SHA1 07811791d0076be500d4a3ca9041da62b5da3852 xt/author/eol.t
-SHA1 2d34ff6b1a1b62027add79057e9d6cd81ac59202 xt/author/no-tabs.t
-SHA1 184aadd09e300c87d2ebe7a2e2ba22dba0339a35 xt/author/pod-coverage.t
+SHA1 90c29c84c3c8bbbe5000e8d17c76a5e0b1939034 xt/author/eol.t
+SHA1 f92ea95e9b69d67c06f3eac3b1e992deac2f5453 xt/author/no-tabs.t
+SHA1 5b358972c8085fa93f9f15acfe9e9191be77e6a8 xt/author/pod-coverage.t
+SHA1 8dba1c241546aa55f56fa2579872e410f64b2e21 xt/author/pod-linkcheck.t
 SHA1 2e65cf323759188996cfe2916e3d51c9a58ae569 xt/author/pod-spell.t
-SHA1 8d7d589b1244b7e68e9a0e63c04c925b53d5f0af xt/author/pod-syntax.t
+SHA1 9da3c69acbec6daee824f126fe2b507333441187 xt/author/pod-syntax.t
 SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
-SHA1 ed951395b425827b105c0d265d059f8030f818f5 xt/release/has-version.t
-SHA1 45c5650c155fd2dc063487eddc21fdf1e58db399 xt/release/minimum-version.t
-SHA1 44e5dae45796132e11cedeb0611a3501c59eee4d xt/release/no-smart-comments.t
-SHA1 bd6361539c978171abd8de5763690a7ea1d9c7b1 xt/release/pod-linkcheck.t
+SHA1 4a0ec03e30729f2193d2a37408aa6dc8345369b0 xt/release/has-version.t
+SHA1 388466320b912c648bfc6a559269a43eb3878a47 xt/release/minimum-version.t
+SHA1 d144e58b69fd7ebd88bb632dfc660fe895a154eb xt/release/no-smart-comments.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJY4vlHAAoJEJP6zjPp4XX4t9QIAKGmgQLjbdJo48fy86ffttWW
-LEpAvEnuLo2jgfyTzZjk2eC6xrK3Hr1KtUEMuilz7o347H7dZ4ictml3EgKFPqCy
-U3POU0q5atFw0uun825R/RCPJKwPs2g71ppzO1JY3JC5BtiDBMk8WG/+/dFepqb4
-mne/Y+DJ+wUjiI/zBB8Md3AtKA+LXeKUkDrqG5eyFkRf2PphcMkxEYtgg4pHC/z5
-H7zofYHMYGcR0RXep6VcpMAj7C1possgWJVewwSAE87DbuhUSQ0clAiLntNh9bFZ
-obBUq2fRbXsKmOgcLWjym2x3usmF23zMYrog1azUuqT3oZwjYROhIdYP3BFfxrY=
-=zmge
+iQIzBAEBCgAdFiEEqvAjTK4OlkLFh465K77AqDC8C58FAlmQ9mcACgkQK77AqDC8
+C59Fiw//QYUye9Z3mYN0sWiF5DwzSaPe+8YOy9h2kblXgJ+Z4GgmktxuNLnU3OV9
+GpvE99k/1jmdqfyervbBjA4ETI9Luke9r0v3FLlpIlWNXX6VMhehWIJSyO7/7z9q
+v0lw8e4elXd12txsptkyt8XjgmcQaZYFRURVA6qn+lSPrds0JoCOxaNEWiPBTN+6
+gA8Kvx757fjwWeQieewLtxwX/qBD9JA7XCinkFATRyGvA1NSH0iHunve12rxlFb/
+HDPy8d5IHGvE3wFJwuh83kZuSDG+MAb/+J4bnfAca+G+tVHC0LnoEhFMCnNCJXs2
+iateHnSYx+tpwi3cR5xJy1Kbw9/P1mKmAKpyN7eNHp6qEvBRB/Xg7L6BJgX4uZRZ
+iHWDl1A15HK/rGHwfLlhbp6NvTCIksAXrNCHTHgGWZbIzQftkI8ewjxk5s17EPk1
+8Rt6DfcctVz18W6yItRmzzDK6er42J40/keTdm0QZHB8PxMcDB79HfRp6ExEnedc
+IBgXb5gLZaRusxa7tsFBYOGpkOhGBQ84jERF10hN6Bvn2+o2fpJ24emH0zIOTnt0
+mkOgXf7WVp/SmMQmnFWlD2WduIckhZc4BgGgWGcX9jo3ivp9zfBQCpQ+faSxJ/rh
+rDHq36dptb+tLOIyXX6oa2nA0rdDq6mtFwTD4lh0jezvs45e/Uk=
+=74LP
 -----END PGP SIGNATURE-----

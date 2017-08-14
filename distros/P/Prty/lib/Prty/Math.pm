@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Formatter;
 use POSIX ();
@@ -197,6 +197,42 @@ sub gcd {
 
 # -----------------------------------------------------------------------------
 
+=head2 Bogenmaß
+
+=head3 degreeToRad() - Wandele Grad in Bogenmaß (rad)
+
+=head4 Synopsis
+
+    $rad = $class->degreeToRad($degree);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub degreeToRad {
+    my ($class,$degree) = @_;
+    return $degree*$class->pi/180;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 radToDegree() - Wandele Bogenmaß (rad) in Grad
+
+=head4 Synopsis
+
+    $degree = $class->radToDegree($rad);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub radToDegree {
+    my ($class,$rad) = @_;
+    return 180/$class->pi*$rad;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Geo-Koordinaten
 
 =head3 geoMidpoint() - Mittelpunkt von Geo-Postionen
@@ -271,40 +307,6 @@ sub geoMidpoint {
     }
                     
     return ($midLatitude,$midLongitude);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 degreeToRad() - Wandele Grad in Bogenmaß (rad)
-
-=head4 Synopsis
-
-    $rad = $class->degreeToRad($degree);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub degreeToRad {
-    my ($class,$degree) = @_;
-    return $degree*$class->pi/180;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 radToDegree() - Wandele Bogenmaß (rad) in Grad
-
-=head4 Synopsis
-
-    $degree = $class->radToDegree($rad);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub radToDegree {
-    my ($class,$rad) = @_;
-    return 180/$class->pi*$rad;
 }
 
 # -----------------------------------------------------------------------------
@@ -454,7 +456,7 @@ sub latitudeDistance {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

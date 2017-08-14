@@ -4,7 +4,7 @@
       "L<Yuki Yoshida(worthmine)|https://github.com/worthmine>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.11",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -139,10 +139,10 @@
          "web" : "https://github.com/worthmine/Text-vCard-Precisely"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
-      "Yuki Yoshida <worthmine@users.noreply.github.com>",
-      "Yuki Yoshida <worthmine@gmail.com>"
+      "Yuki Yoshida <worthmine@gmail.com>",
+      "Yuki Yoshida <worthmine@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

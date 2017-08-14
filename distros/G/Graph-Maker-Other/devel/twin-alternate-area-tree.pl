@@ -32,13 +32,16 @@ use Graph::Maker::TwinAlternateAreaTree;
 {
   # HOG graphs
 
-  # k=0 to 3  paths 1,2,4,8
+  # k=0  https://hog.grinvin.org/ViewGraphInfo.action?id=1310    single vertex
+  # k=1  https://hog.grinvin.org/ViewGraphInfo.action?id=19655   path-2
+  # k=2  https://hog.grinvin.org/ViewGraphInfo.action?id=594     path-4
+  # k=3  https://hog.grinvin.org/ViewGraphInfo.action?id=260
   # k=4  https://hog.grinvin.org/ViewGraphInfo.action?id=27042
   # k=5  https://hog.grinvin.org/ViewGraphInfo.action?id=27044
   # k=6  https://hog.grinvin.org/ViewGraphInfo.action?id=27046
   require MyGraphs;
   my @graphs;
-  foreach my $level (4 .. 6) {
+  foreach my $level (3) {
     my $graph = Graph::Maker->new ('twin_alternate_area_tree',
                                    level => $level,
                                    undirected => 1,

@@ -2,7 +2,7 @@
 #
 # This file is part of Dist-Zilla-Plugin-ContributorsFromGit
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -18,7 +18,13 @@ eval "use Test::NoSmartComments";
 plan skip_all => 'Test::NoSmartComments required for checking comment IQ'
     if $@;
 
-no_smart_comments_in_all();
-no_smart_comments_in_tests();
+no_smart_comments_in("lib/Dist/Zilla/Plugin/ContributorsFromGit.pm");
+no_smart_comments_in("t/00-compile.t");
+no_smart_comments_in("t/00-report-prereqs.dd");
+no_smart_comments_in("t/00-report-prereqs.t");
+no_smart_comments_in("t/author-map.t");
+no_smart_comments_in("t/basic.t");
+no_smart_comments_in("t/lib/EnsureStdinTty.pm");
+no_smart_comments_in("t/validate-public-interface.t");
 
 done_testing();

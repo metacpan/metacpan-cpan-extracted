@@ -1,0 +1,52 @@
+NAME
+    Text::WordDiff::Unified::ANSIColor - Generate unified-style word-base
+    ANSIColor diffs
+
+VERSION
+    This document describes version 0.002 of
+    Text::WordDiff::Unified::ANSIColor (from Perl distribution
+    Text-WordDiff-Unified-ANSIColor), released on 2017-08-12.
+
+SYNOPSIS
+     use Text::WordDiff::Unified::ANSIColor;
+
+     say word_diff "line 1", "line 2";
+
+    Sample output (color shown using <*color*> and <*/color*>):
+
+     <red>-line <reverse>1</reverse></red>
+     <green>+line <reverse>2</reverse></green>
+
+DESCRIPTION
+FUNCTIONS
+  word_diff
+    Usage: word_diff($str1, $str2) => str
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-WordDiff-Unified-ANSIColor>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-WordDiff-Unified-ANSIColor>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-WordDiff-Unified
+    -ANSIColor>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::WordDiff
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

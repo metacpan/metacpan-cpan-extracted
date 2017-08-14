@@ -42,6 +42,20 @@ subtest 'filter-in-hashrefs' => sub {
     is $values->{values}->[0], "bbb", "/c value is 'bbb'";
 };
 
+subtest 'complex-key-filter-in-hashrefs' => sub {
+    my $data = {
+        aa => 1,
+        bb => 2,
+        cc => {
+            d => 3,
+            e => 4,
+        },
+    };
+    my ($r, $values) = validator($data)->_apply('/`*[key =~ /(aa)|(bb)/`]' => sub { 1 });
+    ok $r;
+    is @{ $values->{routes} }, 2;
+};
+
 
 subtest 'filter-in-arrays' => sub {
     my ($r, $values);

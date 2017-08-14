@@ -49,6 +49,6 @@
          "url" : "https://github.com/jhthorsen/test-mojo-role-selenium.git"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

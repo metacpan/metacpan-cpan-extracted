@@ -21,22 +21,31 @@ struct SuspendedFrame {
   I32 *marks;
 
   /* items from the save stack */
-  /* For now the only thing we can save from the savestack are PADOFFSETs
-   * denoting SAVEt_CLEARSV operations
-   */
   U32 savedlen;
-  struct SavedClearPad {
-    PADOFFSET padix;
-    U32 count;
+  struct Saved {
+    U8 type;
+    union {
+      struct {
+        PADOFFSET padix;
+        U32 count;
+      } clearpad; /* for SAVEt_CLEARSV and SAVEt_CLEARPADRANGE */
+      struct {
+        void (*func)(pTHX_ void *data);
+        void *data;
+      } dx;       /* for SAVEt_DESTRUCTOR_X */
+      struct {
+        GV *gv;
+        SV *curval;   /* the current value of *var that we should restore to */
+        SV *savedval; /* the saved value we should push to the savestack on restore */
+      } sv;       /* for SAVEt_SV */
+    } u;
   } *saved;
 
   union {
     struct {
       OP *retop;
     } eval;
-    struct {
-      LOOP *loopop;
-    } loop;
+    struct block_loop loop;
   };
 };
 
@@ -139,7 +148,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
    */
   I32 savedlen = PL_savestack_ix - old_saveix;
   if(savedlen)
-    Newx(frame->saved, savedlen, struct SavedClearPad);
+    Newx(frame->saved, savedlen, struct Saved);
   else
     frame->saved = NULL;
   frame->savedlen = 0; /* we increment it as we fill it */
@@ -153,33 +162,79 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     UV uv = PL_savestack[PL_savestack_ix-1].any_uv;
     U8 type = (U8)uv & SAVE_MASK;
 
+    struct Saved *saved = &frame->saved[frame->savedlen];
+
     switch(type) {
       case SAVEt_CLEARPADRANGE: {
         UV padix = uv >> (OPpPADRANGE_COUNTSHIFT + SAVE_TIGHT_SHIFT);
         I32 count = (uv >> SAVE_TIGHT_SHIFT) & OPpPADRANGE_COUNTMASK;
-
-        frame->saved[frame->savedlen].padix = padix;
-        frame->saved[frame->savedlen].count = count;
-        frame->savedlen++;
-
         PL_savestack_ix--;
+
+        saved->type = SAVEt_CLEARPADRANGE;
+        saved->u.clearpad.padix = padix;
+        saved->u.clearpad.count = count;
+
         break;
       }
 
       case SAVEt_CLEARSV: {
         UV padix = (uv >> SAVE_TIGHT_SHIFT);
-
-        frame->saved[frame->savedlen].padix = padix;
-        frame->saved[frame->savedlen].count = 1;
-        frame->savedlen++;
-
         PL_savestack_ix--;
+
+        saved->type = SAVEt_CLEARPADRANGE;
+        saved->u.clearpad.padix = padix;
+        saved->u.clearpad.count = 1;
+
+        break;
+      }
+
+      case SAVEt_DESTRUCTOR_X: {
+        /* This is only known to be used by Syntax::Keyword::Try to implement
+         * finally blocks. It may be found elsewhere for which this code is
+         * unsafe, but detecting such cases is generally impossible. Good luck.
+         */
+        PL_savestack_ix -= 3;
+        void (*func)(pTHX_ void *) = PL_savestack[PL_savestack_ix].any_dxptr;
+        void *data                 = PL_savestack[PL_savestack_ix+1].any_ptr;
+
+        saved->type = SAVEt_DESTRUCTOR_X;
+        saved->u.dx.func = func;
+        saved->u.dx.data = data;
+
+        break;
+      }
+
+      case SAVEt_SV: {
+        PL_savestack_ix -= 3;
+        /* despite being called SAVEt_SV, the first field actually points at
+         * the GV containing the local'ised SV
+         */
+        GV *gv  = PL_savestack[PL_savestack_ix  ].any_ptr;
+        SV *val = PL_savestack[PL_savestack_ix+1].any_ptr;
+
+        /* In general we don't want to support local $VAR. However, a special
+         * case of  local $@  is allowable
+         * See also  https://rt.cpan.org/Ticket/Display.html?id=122793
+         */
+        if(gv != PL_errgv)
+          croak("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv");
+
+        saved->type = SAVEt_SV;
+        saved->u.sv.gv       = gv;
+        saved->u.sv.curval   = GvSV(gv); /* steal ownership */
+        saved->u.sv.savedval = val;      /* steal ownership */
+
+        /* restore it for now */
+        GvSV(gv) = SvREFCNT_inc(val);
+
         break;
       }
 
       default:
         croak("TODO: Unsure how to handle savestack entry of %d", type);
     }
+
+    frame->savedlen++;
   }
 
   if(cx->blk_oldsaveix != PL_savestack_ix)
@@ -213,16 +268,37 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
     /* ref:
      *   https://perl5.git.perl.org/perl.git/blob/HEAD:/cop.h
      */
-    switch(CxTYPE(cx)) {
+    U8 type = CxTYPE(cx);
+    switch(type) {
       case CXt_BLOCK:
         frame->type = CXt_BLOCK;
         frame->gimme = cx->blk_gimme;
         /* nothing else special */
         continue;
 
-      case CXt_LOOP_PLAIN: {
-        frame->type = CXt_LOOP_PLAIN;
-        frame->loop.loopop = cx->blk_loop.my_op;
+      case CXt_LOOP_PLAIN:
+      case CXt_LOOP_ARY:
+      case CXt_LOOP_LIST:
+      case CXt_LOOP_LAZYSV:
+      case CXt_LOOP_LAZYIV:
+      {
+        frame->type = type;
+        frame->loop = cx->blk_loop;
+        frame->gimme = cx->blk_gimme;
+
+        if(cx->cx_type & (CXp_FOR_GV|CXp_FOR_LVREF))
+          /* non-lexical foreach will effectively work like 'local' and we
+           * can't really support local
+           */
+          croak("Cannot suspend a foreach loop on non-lexical iterator");
+
+        if(type == CXt_LOOP_LAZYSV) {
+          /* these two fields are refcounted, so we need to save them from
+           * dounwind() throwing them away
+           */
+          SvREFCNT_inc(frame->loop.state_u.lazysv.cur);
+          SvREFCNT_inc(frame->loop.state_u.lazysv.end);
+        }
 
         continue;
       }
@@ -310,10 +386,30 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
   }
 
   for(i = frame->savedlen - 1; i >= 0; i--) {
-    if(frame->saved[i].count == 1)
-      save_clearsv(PL_curpad + frame->saved[i].padix);
-    else
-      save_clearpadrange(frame->saved[i].padix, frame->saved[i].count);
+    struct Saved *saved = &frame->saved[i];
+
+    switch(saved->type) {
+      case SAVEt_CLEARPADRANGE:
+        if(saved->u.clearpad.count == 1)
+          save_clearsv(PL_curpad + saved->u.clearpad.padix);
+        else
+          save_clearpadrange(saved->u.clearpad.padix, saved->u.clearpad.count);
+        break;
+
+      case SAVEt_DESTRUCTOR_X:
+        save_pushptrptr(saved->u.dx.func, saved->u.dx.data, saved->type);
+        break;
+
+      case SAVEt_SV:
+        save_pushptrptr(saved->u.sv.gv, saved->u.sv.savedval, SAVEt_SV);
+
+        SvREFCNT_dec(GvSV(saved->u.sv.gv));
+        GvSV(saved->u.sv.gv) = saved->u.sv.curval;
+        break;
+
+      default:
+        croak("TODO: Unsure how to restore a %d savestack entry\n", saved->type);
+    }
   }
 
   if(frame->saved)
@@ -336,9 +432,13 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
         break;
 
       case CXt_LOOP_PLAIN:
-        cx = cx_pushblock(CXt_LOOP_PLAIN, frame->gimme, PL_stack_sp, PL_savestack_ix);
+      case CXt_LOOP_ARY:
+      case CXt_LOOP_LIST:
+      case CXt_LOOP_LAZYSV:
+      case CXt_LOOP_LAZYIV:
+        cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
         /* don't call cx_pushloop_plain() because it will get this wrong */
-        cx->blk_loop.my_op = frame->loop.loopop;
+        cx->blk_loop = frame->loop;
         break;
 
       case CXt_EVAL:

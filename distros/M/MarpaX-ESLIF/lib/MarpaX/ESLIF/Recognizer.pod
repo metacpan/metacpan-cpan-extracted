@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 2.0.14
+version 2.0.15
 
 =head1 SYNOPSIS
 
@@ -214,7 +214,7 @@ Returns the absolute length in bytes.
 
 =head2 $eslifRecognizer->lastCompletedLocation($name)
 
-Returns an array containing at indices 0 and 1 the values of C<$eslifRecognizer->lastCompletedOffset($name)> and C<$eslifRecognizer->lastCompletedLocation($name)>, respectively.
+Returns an array containing at indices 0 and 1 the values of C<$eslifRecognizer->lastCompletedOffset($name)> and C<$eslifRecognizer->lastCompletedLength($name)>, respectively.
 
 =head2 $eslifRecognizer->line()
 

@@ -139,6 +139,20 @@ EARLY-VERSION WARNING
            await func();
         }
      }
+    
+     async sub wobble
+     {
+        foreach my $var ( THINGs ) {
+           await func();
+        }
+     }
+    
+     async sub splat
+     {
+        eval {
+           await func();
+        };
+     }
 
     Plain lexical variables are preserved across an await deferral:
 
@@ -151,16 +165,6 @@ EARLY-VERSION WARNING
 
  Things That Don't Yet Work
 
-    Any code that attempts to await from inside any sort of foreach loop
-    does not currently work:
-
-     async sub wobble
-     {
-        foreach ( THINGs ) {
-           await func();
-        }
-     }
-
     local variable assignments inside an async function will confuse the
     suspend mechanism:
 
@@ -170,6 +174,19 @@ EARLY-VERSION WARNING
      {
         local $DEBUG = 1;
         await func();
+     }
+
+    Since foreach loops on non-lexical iterator variables (usually package
+    variables) effectively imply a local-like behaviour, these are also
+    disallowed.
+
+     our $VAR;
+    
+     async sub splurt
+     {
+        foreach $VAR ( LIST ) {
+           await ...
+        }
      }
 
     Additionally, complications with the savestack appear to be affecting
@@ -185,13 +202,40 @@ EARLY-VERSION WARNING
 
     See also the "TODO" list for further things.
 
+WITH OTHER MODULES
+
+ Syntax::Keyword::Try
+
+    At the time of writing (Future::AsyncAwait version 0.09,
+    Syntax::Keyword::Try version 0.06) a basic try/catch block inside an
+    async sub works fine, provided that neither try nor catch blocks
+    attempt to return.
+
+    Attempting to return from inside a try or catch will fail - see
+    RT122795 <https://rt.cpan.org/Ticket/Display.html?id=122795>.
+
+    Attempting to use a finally block will fail - see RT122796
+    <https://rt.cpan.org/Ticket/Display.html?id=122796>.
+
+SEE ALSO
+
+      * "Awaiting The Future" - TPC in Amsterdam 2017
+
+      (slides)
+      <https://docs.google.com/presentation/d/13x5l8Rohv_RjWJ0OTvbsWMXKoNEWREZ4GfKHVykqUvc/edit#slide=id.p>
+
 TODO
 
-      * Suspend and resume over foreach loops, in all their various
-      flavours.
-
       * Suspend and resume with some consideration for the savestack; i.e.
-      the area used to implement local and similar:
+      the area used to implement local and similar. While in general local
+      support has awkward questions about semantics, there are certain
+      situations and cases where internally-implied localisation of
+      variables would still be useful and can be supported without the
+      semantic ambiguities of generic local.
+
+      Some notes on what makes the problem hard can be found at
+
+      https://rt.cpan.org/Ticket/Display.html?id=122793
 
       * Clean up the implementation; check for and fix memory leaks.
 

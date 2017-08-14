@@ -1,59 +1,67 @@
  Count  Type        Name                  Value
-     1  tag         svg                   open
-     2  attribute   height                4cm
-     3  attribute   version               1.1
-     4  raw         viewBox               0 0 1200 400
-     5  integer     1                     0
-     6  integer     2                     0
-     7  float       3                     1200
-     8  float       4                     400
-     9  attribute   width                 12cm
-    10  attribute   xmlns                 http://www.w3.org/2000/svg
-    11  tag         desc                  open
-    12  content     desc                  Example rect02 - rounded rectangles
-    13  tag         desc                  close
-    14  tag         rect                  open
-    15  attribute   fill                  none
-    16  attribute   height                398
-    17  attribute   stroke                blue
-    18  attribute   stroke-width          2
-    19  attribute   width                 1198
-    20  attribute   x                     1
-    21  attribute   y                     1
-    22  content     rect                  
-    23  tag         rect                  close
-    24  tag         rect                  open
-    25  attribute   fill                  green
-    26  attribute   height                200
-    27  attribute   rx                    50
-    28  attribute   width                 400
-    29  attribute   x                     100
-    30  attribute   y                     100
-    31  content     rect                  
-    32  tag         rect                  close
-    33  tag         g                     open
-    34  raw         transform             translate(700 210) rotate(-30)
-    35  command     translate             -
-    36  float       1                     700
-    37  float       2                     210
-    38  command     rotate                -
-    39  float       1                     -30
-    40  tag         rect                  open
-    41  attribute   fill                  none
-    42  attribute   height                200
-    43  attribute   rx                    50
-    44  attribute   stroke                purple
-    45  attribute   stroke-width          30
-    46  attribute   width                 400
-    47  attribute   x                     0
-    48  attribute   y                     0
-    49  content     rect                  
-    50  tag         rect                  close
-    51  content     g                     
+     1  XMLDecl     xml                   -
+     2  attribute   version               1.0
+     3  attribute   standalone            
+     4  Doctype     doctype               -
+     5  attribute   name                  svg
+     6  attribute   sysid                 http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd
+     7  attribute   pubid                 -//W3C//DTD SVG 1.1//EN
+     8  attribute   internal              
+     9  tag         svg                   open
+    10  attribute   height                4cm
+    11  attribute   version               1.1
+    12  raw         viewBox               0 0 1200 400
+    13  integer     1                     0
+    14  integer     2                     0
+    15  float       3                     1200
+    16  float       4                     400
+    17  attribute   width                 12cm
+    18  attribute   xmlns                 http://www.w3.org/2000/svg
+    19  tag         desc                  open
+    20  content     desc                  Example rect02 - rounded rectangles
+    21  tag         desc                  close
+    22  tag         rect                  open
+    23  attribute   fill                  none
+    24  attribute   height                398
+    25  attribute   stroke                blue
+    26  attribute   stroke-width          2
+    27  attribute   width                 1198
+    28  attribute   x                     1
+    29  attribute   y                     1
+    30  content     rect                  
+    31  tag         rect                  close
+    32  tag         rect                  open
+    33  attribute   fill                  green
+    34  attribute   height                200
+    35  attribute   rx                    50
+    36  attribute   width                 400
+    37  attribute   x                     100
+    38  attribute   y                     100
+    39  content     rect                  
+    40  tag         rect                  close
+    41  tag         g                     open
+    42  raw         transform             translate(700 210) rotate(-30)
+    43  command     translate             -
+    44  float       1                     700
+    45  float       2                     210
+    46  command     rotate                -
+    47  float       1                     -30
+    48  tag         rect                  open
+    49  attribute   fill                  none
+    50  attribute   height                200
+    51  attribute   rx                    50
+    52  attribute   stroke                purple
+    53  attribute   stroke-width          30
+    54  attribute   width                 400
+    55  attribute   x                     0
+    56  attribute   y                     0
+    57  content     rect                  
+    58  tag         rect                  close
+    59  content     g                     
     
   
-    52  tag         g                     close
-    53  content     svg                   
+    60  tag         g                     close
+    61  content     svg                   
   
 
   
@@ -62,4 +70,4 @@
   
 
   
-    54  tag         svg                   close
+    62  tag         svg                   close

@@ -43,7 +43,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     printf("%s", SPVM_OP_C_CODE_NAMES[code]);
     if (op_cur->code == SPVM_OP_C_CODE_CONSTANT) {
       SPVM_CONSTANT* constant = op_cur->uv.constant;
-      printf(" %s", SPVM_TYPE_C_CORE_NAMES[constant->type->id]);
+      printf(" %s", SPVM_TYPE_C_ID_NAMES[constant->type->id]);
       switch (constant->type->id) {
         case SPVM_TYPE_C_ID_BYTE:
           printf(" %" PRId8, constant->value.byte_value);
@@ -333,6 +333,7 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_LOAD_CONSTANT2:
         case SPVM_BYTECODE_C_CODE_NEW_STRING:
         case SPVM_BYTECODE_C_CODE_NEW_OBJECT:
+        case SPVM_BYTECODE_C_CODE_CURRENT_LINE:
         {
           i++;
           bytecode = bytecode_array->values[i];

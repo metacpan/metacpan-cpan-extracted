@@ -1,7 +1,7 @@
 #
 # This file is part of MooseX-RelatedClasses
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package MooseX::RelatedClasses;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.010-9-gcb11396
-$MooseX::RelatedClasses::VERSION = '0.011';
+# git description: 0.011-2-g61ae6c8
+$MooseX::RelatedClasses::VERSION = '0.012';
 
 # ABSTRACT: Parameterized role for related class attributes
 
@@ -36,8 +36,8 @@ use Moose::Exporter;
 {
     package MooseX::RelatedClasses::Exports;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.010-9-gcb11396
-$MooseX::RelatedClasses::Exports::VERSION = '0.011';
+# git description: 0.011-2-g61ae6c8
+$MooseX::RelatedClasses::Exports::VERSION = '0.012';
 
     # This is a little awkward, but it resolves the unpleasantness of having
     # these functions become part of the role (!!!)
@@ -239,7 +239,7 @@ MooseX::RelatedClasses - Parameterized role for related class attributes
 
 =head1 VERSION
 
-This document describes version 0.011 of MooseX::RelatedClasses - released April 03, 2017 as part of MooseX-RelatedClasses.
+This document describes version 0.012 of MooseX::RelatedClasses - released August 13, 2017 as part of MooseX-RelatedClasses.
 
 =head1 SYNOPSIS
 
@@ -507,7 +507,7 @@ Kulag <g.kulag@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Chris Weyl.
+This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 
 This is free software, licensed under:
 

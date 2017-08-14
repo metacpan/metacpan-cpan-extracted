@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Alien::zlib::Static;
+use Text::ParseWords qw( shellwords );
+
+my %stash = ();
+
+$stash{CFLAGS} = Alien::zlib::Static->cflags;
+$stash{LDFLAGS} = Alien::zlib::Static->libs;
+
+$stash{CPATH} = join ':', map {s/^-I//; $_} shellwords( $stash{CFLAGS} );
+$stash{LIBRARY_PATH} = join ':', map {s/^-L//; $_}
+                                 grep {m/^-L/} shellwords( $stash{LDFLAGS} );
+
+exit 1 unless scalar @ARGV and $ARGV[0];
+my $key = $ARGV[0];
+
+if ($key eq 'KEYS') {
+  print join ' ', keys %stash;
+  exit 0;
+}
+else {
+  exit 1 if !exists $stash{$key};
+  if ($key =~ m/PATH/) {
+    print join ':', grep {defined} ($stash{$key}, $ENV{$key});
+  }
+  else {
+    print join ' ', grep {defined} ($stash{$key}, $ENV{$key});
+  }
+  exit 0;
+}

@@ -6,9 +6,9 @@ my $combined = ckeys([{ one => 'two' }, { three => 'four' }, { five => 'six' }])
 
 is_deeply($combined, [qw/five one three/]); 
 
-my $combined = ckeys([{ 123 => 'two' }, { 456 => 'four' }, { 789 => 'six' }]);
+my $combine = ckeys([{ 123 => 'two' }, { 456 => 'four' }, { 789 => 'six' }]);
 
-is_deeply($combined, [qw/123 456 789/]);
+is_deeply($combine, [qw/123 456 789/]);
 
 my @combined = combine_keys({ 123 => 'two' }, { 456 => 'four' }, { 789 => 'six' });
 

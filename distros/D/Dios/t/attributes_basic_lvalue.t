@@ -6,7 +6,7 @@ BEGIN {
 
 use Dios { accessors => 'lval' };
 
-plan tests => 19;
+plan tests => 25;
 
 my $NAME  = 'Damian';
 my @NUMS  = (1,2,3);
@@ -53,6 +53,13 @@ class Demo is Base1 is Base2 {
         return 1;
     }
 }
+
+::ok !eval { Demo->new({ count => \%COUNT, nums => \@NUMS   }); } => 'Missing required name';
+::like $@, qr/mandatory/ => '...with correct error message';
+::ok !eval { Demo->new({ name => $NAME,    nums => \@NUMS   }); } => 'Missing required count';
+::like $@, qr/mandatory/ => '...with correct error message';
+::ok !eval { Demo->new({ name => $NAME,    count => \%COUNT }); } => 'Missing required nums';
+::like $@, qr/mandatory/ => '...with correct error message';
 
 my $obj = Demo->new({ name => $NAME, count => \%COUNT, nums => \@NUMS });
 

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Date::Holidays::GB - Determine British holidays - Current UK public and bank holiday dates up to 2016
+Date::Holidays::GB - Determine British holidays - Current UK public and bank holiday dates up to 2018
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Michael Jemmeson <mjemmeson@cpan.org>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2013-2016 by Michael Jemmeson.
+This software is copyright (c) 2013-2017 by Michael Jemmeson.
 
 =head1 LICENSE
 

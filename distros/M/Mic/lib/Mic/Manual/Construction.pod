@@ -1,0 +1,213 @@
+=head1 The Default constructor
+
+Classes created using Mic are provided with a generated constructor.
+
+This default constructor supports two forms of usage described below.
+
+=head2 Keyword Parameters
+
+For objects constructed using keyword parameters, the constructor should be passed a hashref containing the the keyword parameters.
+
+Imagine a counter that starts from a user supplied value, so we can use it this way
+
+    use Test::More tests => 3;
+    use Example::Construction::Counter;
+
+    my $counter = Example::Construction::Counter->new({start => 10});
+
+    is $counter->next => 10;
+    is $counter->next => 11;
+    is $counter->next => 12;
+
+The class and implementation:
+
+    package Example::Construction::Counter;
+
+    use Mic::Class
+        interface => {
+            object => {
+                next => {},
+            },
+            class => { new => {} }
+        },
+
+        implementation => 'Example::Construction::Acme::Counter';
+
+    1;
+
+    package Example::Construction::Acme::Counter;
+
+    use Mic::Impl
+        has  => {
+            COUNT => { init_arg => 'start' },
+        },
+    ;
+
+    sub next {
+        my ($self) = @_;
+
+        $self->[ $COUNT ]++;
+    }
+
+    1;
+
+Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration.
+
+=head2 Positional parameters
+
+For objects constructed using positional parameters, the constructor should be passed a list of positional parameters. These parameters will be passed to the BUILD special method (described in the next section) as an array ref.
+
+As an example, consider a set object that we'd create by passing a list of items.
+
+    use Test::More tests => 3;
+    use Example::Construction::Set_v1;
+
+    my $set = Example::Construction::Set_v1->new(1 .. 4);
+
+    ok $set->has(1);
+    ok ! $set->has(5);
+    $set->add(5);
+    ok $set->has(5);
+
+This can be acheieved using the BUILD special method.
+
+    package Example::Construction::Set_v2;
+
+    use Mic::Class
+
+        interface => {
+            object => {
+                add => {},
+                has => {},
+                size => {},
+            },
+            class => { new => {} }
+        },
+
+        implementation => 'Example::Construction::Acme::Set_v2',
+    ;
+
+    1;
+
+In the implementation, we convert the argument array to a hash
+
+    package Example::Construction::Acme::Set_v2;
+
+    use Mic::ArrayImpl
+        has => {
+            SET => {
+                default => sub { {} },
+            }
+        },
+    ;
+
+    sub BUILD {
+        my ($self, $args) = @_;
+
+        $self->[$SET] = { map { $_ => 1 } @{ $args } };
+    }
+
+    sub has {
+        my ($self, $e) = @_;
+
+        exists $self->[$SET]{$e};
+    }
+
+    sub add {
+        my ($self, $e) = @_;
+
+        ++$self->[$SET]{$e};
+    }
+
+    sub size {
+        my ($self) = @_;
+        scalar(keys %{ $self->[$SET] });
+    }
+
+    1;
+
+
+=head2 BUILD
+
+If this subroutine is defined, it will be called by the default constructor and
+will receive the newly created object and either a hashref of named parameters or an arrayref of positional parameters depending on whether the constructor was passed a hashref or list respectiively.
+
+This is useful for carrying out any post-construction logic e.g. object validation.
+
+It can also be used to process constructor arguments, e.g. the counter implementation
+above can also be written using BUILD instead of init_arg (though init_arg
+is preferable due to being more concise).
+
+    package Example::Construction::Acme::Counter_v2;
+
+    use Mic::Implementation
+        has  => {
+            COUNT => { },
+        },
+    ;
+
+    sub BUILD {
+        my ($self, $arg) = @_;
+
+        $self->{$COUNT} = $arg->{start};
+    }
+
+    sub next {
+        my ($self) = @_;
+
+        $self->{$COUNT}++;
+    }
+
+    1;
+
+=head1 Writing your own constructor
+
+If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of builders.
+
+=head2 Builders
+
+Each class has a corresponding Builder. Within a class method, the Builder
+is obtained by calling the C<builder_for> routine (see example below).
+
+A builder has the following construction related methods
+
+=head3 new_object([HASHREF])
+
+This creates a new instance, in which attributes with declared defaults are populated with those defaults,
+and all others are populated with undef. A hashref can also be supplied, in which case it is used to populate the attributes.
+
+=head3 build
+
+This can be used in a class method to invoke the BUILD method for an object after the object
+is created.
+
+=head2 Examples
+
+We'll rewrite the counter example above providing a C<new> method:
+
+    package Example::Construction::Acme::CounterWithNew;
+
+    use Mic::Impl
+        has  => {
+            COUNT => { },
+        },
+        classmethod => ['new'],
+    ;
+
+    sub next {
+        my ($self) = @_;
+
+        $self->[ $COUNT ]++;
+    }
+
+    sub new {
+        my ($class, $start) = @_;
+
+        my $builder = Mic::builder_for($class);
+        my $obj = $builder->new_object({COUNT => $start});
+        return $obj;
+    };
+
+    1;
+
+Note that C<new> must be tagged as a 'classmethod' for this to work.

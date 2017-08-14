@@ -15,10 +15,11 @@ name: Encode-Positive-Pairs
 provides:
   Encode::Positive::Pairs:
     file: lib/Encode/Positive/Pairs.pm
-    version: '2017.302'
+    version: '20170812'
 requires:
   Carp: '0'
-  Data::Dump: '0'
+  Math::BigInt: '0'
+  Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2017.302'
+version: '20170812'

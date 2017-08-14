@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -28,7 +28,7 @@ Klasse laden:
 
     use Prty::Hash;
 
-Objekt-Instantiierung:
+Hash-Objekt instantiieren:
 
     my $h = Prty::Hash->new(a=>1,b=>1,c=>3);
 
@@ -49,18 +49,18 @@ Erlaubte Zugriffe;
 
 =head1 DESCRIPTION
 
-Ein Objekt dieser Klasse repräsentiert einen I<Zugriffssicheren Hash>,
+Ein Objekt dieser Klasse repräsentiert einen I<zugriffssicheren> Hash,
 d.h. einen Hash, dessen Schlüsselvorrat bei der Instantiierung
 festgelegt wird. Ein lesender oder schreibender Zugriff mit einem
-Schlüssel, der nicht zu dem Schlüsselvorrat gehört, ist nicht erlaubt
+Schlüssel, der nicht zum Schlüsselvorrat gehört, ist nicht erlaubt
 und führt zu einer Exception.
 
 Der Zugriffsschutz beruht auf der Funktionalität des
 L<Restricted Hash|http://perldoc.perl.org/Hash/Util.html#Restricted-hash>.
 
-Abgesehen vom Zugriffsschutz verhält sich ein Hash-Objekt dieser
-Klasse wie einer normaler Hash und kann auch so angesprochen werden.
-Bei den Methoden ist der entsprechende konventionelle Zugriff als
+Abgesehen vom Zugriffsschutz verhält sich ein Hash-Objekt der
+Klasse wie einer normaler Perl-Hash und kann auch so angesprochen
+werden.  Bei den Methoden ist der konventionelle Zugriff als
 C<Alternative Formulierung> angegeben.
 
 =cut
@@ -1321,7 +1321,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

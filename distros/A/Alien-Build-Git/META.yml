@@ -5,7 +5,7 @@ author:
 build_requires:
   Archive::Tar: '0'
   Exporter: '0'
-  Test2::Tools::URL: '0'
+  Test2::Tools::URL: '0.02'
   Test2::V0: '0.000060'
   Test::Alien: '0'
   Test::Alien::Build: '0'
@@ -40,8 +40,9 @@ requires:
   URI::git: '0'
   perl: '5.008001'
 resources:
+  IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-Build-Git/issues
   homepage: https://metacpan.org/pod/Alien::Build::Git
   repository: git://github.com/plicease/Alien-Build-Git.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -10,13 +10,15 @@ sub action_for { shift->ctx->controller->action_for(@_) }
 sub uri {
   my ($self, $action_proto, @args) = @_;
 
+  $action_proto = $self->ctx->action unless $action_proto;
+
   # If its already an action object just use it.
   return $self->ctx->uri_for($action_proto, @args)
     if Scalar::Util::blessed($action_proto); 
 
   my $controller = $self->ctx->controller;
   my $action;
-
+  
   # Otherwise its a string which is a full or relative path
   # to the private name of an action.  Resolve it.
   # Starts with '/' means its a full absolute private name
@@ -63,7 +65,7 @@ Catalyst::View::Template::Lace::Role::URI - Shortcut to create a URI on the curr
     sub process_dom {
       my ($self, $dom) = @_;
       $dom->at('a')
-       ->href($self->uri('../display));
+       ->href($self->uri('../display'));
     }
 
 =head1 DESCRIPTION
@@ -72,6 +74,11 @@ A role that gives your model object a C<uri> method.  This method works
 similarly to "$c->uri_for" except that it only takes an action object or
 a string that is an absolute or relative (to the current controller) private
 name.
+
+B<NOTE> Since this role uses "$c->controller" to determine the 'last controller
+executed' you must take care to use "$c->go" rather than "$c->detach", since the
+latter will leave "$c->controller" to the value of the controller detached from
+rather then the actual last controller executed.
 
 =head1 METHOD
 
@@ -86,6 +93,8 @@ This role defines the following methods
 
 First argument is an action object or a string.  If a string it must be either
 an absolute private name to an action or a relative one
+
+If you want to build a L<URI> from the current action you can just pass C<undef>.
 
 =head1 SEE ALSO
  

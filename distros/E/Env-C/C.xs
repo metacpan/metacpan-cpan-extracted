@@ -48,28 +48,8 @@
 # endif
 #endif
 
-MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
-
-char *
-env_c_getenv(key)
-    char *key
-
-    CODE:
-    RETVAL = getenv(key);
-
-    OUTPUT:
-    RETVAL
-
-MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
-
-int
-env_c_setenv(key, val, override=1)
-    char *key
-    char *val
-    int override;
-
-
-    CODE:
+inline int __setenv(const char *key, const char *val, int override) {
+    int RETVAL;
 #if !HAVE_SETENV
     if (override || getenv(key) == NULL) {
         char *old_env = getenv( key ); 
@@ -99,17 +79,11 @@ env_c_setenv(key, val, override=1)
 # endif
     RETVAL = setenv(key, val, override);
 #endif
+    return RETVAL;
+}
 
-    OUTPUT:
-    RETVAL
+inline void __unsetenv(const char *key) {
 
-MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
-
-void
-env_c_unsetenv(key)
-    char *key
-
-    PREINIT:
 #ifdef WIN32
     char *buff;
 #endif
@@ -119,7 +93,6 @@ env_c_unsetenv(key)
     char **envp;
 #endif
 
-    CODE:
 #ifdef WIN32
     buff = malloc(strlen(key) + 2);
     sprintf(buff, "%s=", key);
@@ -142,6 +115,42 @@ env_c_unsetenv(key)
     }
 #endif
 #endif
+}
+
+MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
+
+char *
+env_c_getenv(key)
+    char *key
+
+    CODE:
+    RETVAL = getenv(key);
+
+    OUTPUT:
+    RETVAL
+
+MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
+
+int
+env_c_setenv(key, val, override=1)
+    char *key
+    char *val
+    int override;
+
+    CODE:
+    RETVAL = __setenv(key, val, override);
+
+    OUTPUT:
+    RETVAL
+
+MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
+
+void
+env_c_unsetenv(key)
+    char *key
+
+    CODE:
+    __unsetenv(key);
 
 MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
 
@@ -150,8 +159,6 @@ env_c_getallenv()
 
     PREINIT:
     int i = 0;
-    char *p;
-    AV *av = Nullav;
 #ifndef __BORLANDC__
     extern char **environ;
 #endif
@@ -159,12 +166,36 @@ env_c_getallenv()
     CODE:
     RETVAL = newAV();
 
-    while ((char*)environ[i] != '\0') {
+    while ((char*)environ[i] != NULL) {
         Perl_av_push(aTHX_ RETVAL, newSVpv((char*)environ[i++], 0));
     }
 
     OUTPUT:
     RETVAL
+
+MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
+
+void
+env_c_setenv_multi(...)
+    PPCODE:
+    int i;
+    if (items % 3)
+        croak("Usage: setenv_multi(var1, value1, override1, var2, value2, override2, ...)");
+    for (i=0; i<items; i+=3)
+        __setenv(SvPV_nolen(ST(i)), SvPV_nolen(ST(i+1)), SvIV(ST(i+2)));
+    XSRETURN(0);
+
+
+MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
+
+void
+env_c_unsetenv_multi(...)
+    PPCODE:
+    int i;
+    for (i=0; i<items; i++)
+        __unsetenv(SvPV_nolen(ST(i)));
+    XSRETURN(0);
+
 
 MODULE = Env::C        PACKAGE = Env::C  PREFIX = env_c_
 

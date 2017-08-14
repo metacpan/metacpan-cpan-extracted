@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
@@ -16,6 +16,7 @@ SYNOPSIS
      sub rewrite {
        my($build, $uri) = @_;
        
+       # $build isa Alien::Build
        # $uri isa URI
        
        if($uri->host eq 'ftp.gnu.org')
@@ -28,6 +29,8 @@ SYNOPSIS
          $uri->host('/ftp.gnu.org' . $uri->path);
        }
      }
+     
+     1;
 
 DESCRIPTION
 

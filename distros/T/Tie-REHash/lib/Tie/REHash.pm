@@ -3,7 +3,7 @@ package Tie::REHash;
 use 5.006; 
 
 use strict qw[vars subs];
-$Tie::REHash::VERSION = '1.05'; 
+$Tie::REHash::VERSION = '1.07'; 
 
 no warnings; 
 
@@ -1486,58 +1486,6 @@ The autodelete_limit() different from default value can be set for all rehashes 
 	tied(  %rehash)->autodelete_limit(  $autodelete_limit);
 
 The optimal value of autodelete_limit() is approximated by the number of plain key hits expected to happen after regexp key is assigned. The more plain key hits are expected to happen, the higher optimal autodelete_limit() value is. For optimal performance it may be necessary to adjust autodelete_limit() before storing new regexp key to hash with large number of plain keys.
-
-=head1 Usage and Applications
-
-Since Tie::REHash allows easily defining synonymous (aliased) keys, it is potentially useful for various dictionary and linguistic applications to define synonyms and patterns of word formation (morphology). However, its use for natural language processing is limited by relatively high cost of sequential regexp matching during rehash lookup in case many regexps are stored in rehash, and for natural languages number of regexps may be measured by 10000s. However, use of cache can improve performance, especially if rehash is made persistent using serialization or otherwise (since filling cache is costly, cache should be reused as much as possible).
-
-Tie::REHash is ideal for processing artificial technical mini-languages, like those used in configuration files, etc. In particular, rehash is often used to categorize various file extensions, and a like simple tasks.
-
-Occasional use of rehash competes with using this (or a like) simple routine:
-
-	sub hash {
-			my ($key) = @_;
-			return 'foo_value' if $key =~ /foo/;
-			return 'bar_value' if $key =~ /bar/;
-			return undef
-	}
-
-or with plain keys and cache:
-
-	my %hash;
-	sub hash {
-			my (         $key,   $value) = @_;
-			return $hash{$key} = $value if @_ > 1;
-
-			return    $hash{$key} 
-			if exists $hash{$key};
-
-			return $hash{$key} = 'foo_value' if $key =~ /foo/;
-			return $hash{$key} = 'bar_value' if $key =~ /bar/;
-			return undef
-	}
-
-The advantages of subroutine solution vs. using Tie::REHash are:
-
-1) No extra module dependency
-2) Faster to compile (at least if single hash is needed) and execute
-
-The Tie::REHash alternative to above subroutines is:
-
-	use              Tie::REHash do_cache => 1;
-	tie my %rehash, 'Tie::REHash';
-	%rehash = (
-		qr/foo/ => 'foo_value',
-		qr/bar/ => 'bar_value',
-	);
-
-Advantages of Tie::REHash are:
-
-1) Full-blown standard hash API: exists(), delete(), keys(), etc. (far beyond what simple routine can provide).
-2) Allows to freely add/manipulate regexps at run time (i.e. dynamic object vs static subroutine).
-3) Ergonomics: No need to remember and type lots of (error prone and boring) same code again and again. 
-4) Constructed hash can be serialized, dumped and restored.
-5) Scales better in case many rehashes are required.
 
 =head1 BUGS
 

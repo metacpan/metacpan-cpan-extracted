@@ -1,7 +1,7 @@
 package Perinci::To::Text;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.85'; # VERSION
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.860'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -106,7 +106,7 @@ Perinci::To::Text - Generate text documentation for a package from Rinci metadat
 
 =head1 VERSION
 
-This document describes version 0.85 of Perinci::To::Text (from Perl distribution Perinci-To-Doc), released on 2017-07-03.
+This document describes version 0.860 of Perinci::To::Text (from Perl distribution Perinci-To-Doc), released on 2017-08-12.
 
 =head1 SYNOPSIS
 

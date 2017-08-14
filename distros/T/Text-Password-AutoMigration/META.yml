@@ -26,16 +26,16 @@ no_index:
 provides:
   Text::Password::AutoMigration:
     file: lib/Text/Password/AutoMigration.pm
-    version: '0.05'
+    version: '0.06'
   Text::Password::CoreCrypt:
     file: lib/Text/Password/CoreCrypt.pm
-    version: '0.05'
+    version: '0.06'
   Text::Password::MD5:
     file: lib/Text/Password/MD5.pm
-    version: '0.05'
+    version: '0.06'
   Text::Password::SHA:
     file: lib/Text/Password/SHA.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Crypt::Passwd::XS: '0.601'
   Crypt::PasswdMD5: '1.4'
@@ -46,10 +46,10 @@ resources:
   bugtracker: https://github.com/worthmine/Text-Password-AutoMigration/issues
   homepage: https://github.com/worthmine/Text-Password-AutoMigration
   repository: git://github.com/worthmine/Text-Password-AutoMigration.git
-version: '0.05'
+version: '0.06'
 x_authority: cpan:{{WORTHMINE}}
 x_contributors:
-  - 'Yuki Yoshida <worthmine@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
+  - 'Yuki Yoshida <worthmine@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

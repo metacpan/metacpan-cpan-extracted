@@ -7,7 +7,7 @@ use strict;
 
 use parent 'Exporter';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 our @ISA = 'Exporter';
 our @EXPORT_OK = qw();
 
@@ -35,7 +35,7 @@ L<XML::Writer(3)>, TMX Specification L<https://www.gala-global.org/oscarStandard
 
 =head1 AUTHOR
 
-Alberto Simões, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
+Alberto Simoes, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
 
 Paulo Jorge Jesus Silva, E<lt>paulojjs@bragatel.ptE<gt>
 

@@ -5,9 +5,8 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
-use Prty::Object;
 use Prty::Perl;
 use Prty::Math;
 
@@ -26,6 +25,18 @@ L<Prty::Object>
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert ein Array.
+
+Jede der Methoden kann sowohl auf ein Objekt der Klasse
+als auch per Aufruf als Klassenmethode auf ein "normales"
+Perl-Array angewendet werden.
+
+Aufruf als Objektmethode:
+
+    $arr->$meth(...);
+
+Aufruf als Klassenmethode:
+
+    $class->$meth(\@arr, ...);
 
 =head1 METHODS
 
@@ -56,19 +67,140 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head2 Objekt- und Klassenmethoden
+=head2 Operationen
 
-Jede der folgenden Methode kann sowohl auf ein Objekt der Klasse
-als auch per Aufruf als Klassenmethode auf ein "normales"
-Perl-Array angewendet werden.
+=head3 compare() - Vergleiche Array gegen Array
 
-Aufruf als Objektmethode:
+=head4 Synopsis
 
-    $arr->$meth(...);
+    ($only1A,$only2A,$bothA) = $arr1->compare(\@arr2);
+    ($only1A,$only2A,$bothA) = $class->compare(\@arr1,\@arr2);
 
-Aufruf als Klassenmethode:
+=head4 Description
 
-    $class->$meth(\@arr, ...);
+Vergleiche die Elemente der Arrays @$arr1 und @arr2 und liefere
+Referenzen auf drei Arrays (Mengen) zurück:
+
+=over 4
+
+=item $only1A:
+
+Referenz auf die Liste der Elemente, die nur in @arr1
+enthalten sind.
+
+=item $only2A:
+
+Referenz auf die Liste der Elemente, die nur in @arr2
+enthalten sind.
+
+=item $bothA:
+
+Referenz auf die Liste der Elemente, die sowohl in @arr1
+als auch in @arr2 enthalten sind.
+
+=back
+
+Die drei Ergebnislisten sind als Mengen zu sehen: Jedes Element taucht
+in einer der drei Listen höchstens einmal auf, auch wenn es in den
+Eingangslisten mehrfach vorkommt.
+
+=head4 Example
+
+=over 2
+
+=item *
+
+Verwalte Objekte auf Datenbank
+
+Die Funktion ist nützlich, wenn eine Menge von Objekten
+auf einer Datenbank identisch zu einer Menge von Elementen
+einer Benutzerauswahl gehalten werden soll. Die Objekte werden
+durch ihre Objekt-Id identifiziert. Die Liste der
+Datenbankobjekte sei @idsDb und die Liste der Objekte der
+Benutzerauswahl sei @idsUser. Dann liefert der Aufruf
+
+    ($idsNew,$idsDel) = $idsUserA->compare(\@idsDb);
+
+mit @$idsNew die Liste der zur Datenbank hinzuzufügenden Objekte und
+mit @$idsDel die Liste der von der Datenbank zu entfernenden Objekte.
+Die Liste der identischen Objekte wird hier nicht benötigt.
+
+=item *
+
+Prüfe, ob zwei Arrays die gleichen Elemente enthalten
+
+Prüfe, ob zwei Arrays die gleichen Elemente enthalten, aber nicht
+unbedingt in der gleichen Reihenfolge:
+
+    ($only1,$only2) = $arr1->compare(\@arr2);
+    if (!@$only1 && !@$only2) {
+        # @$arr1 und @$arr2 enthalten die gleichen Elemente
+    }
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub compare {
+    my $arr1 = CORE::shift;
+    $arr1 = CORE::shift if !ref $arr1; # Klassenmethode
+    my $arr2 = CORE::shift;
+            
+    # Hash mit den Elementen von @$arr1
+
+    my (%arr1,%arr2);
+    @arr1{@$arr1} = (1) x @$arr1;
+    @arr2{@$arr2} = (1) x @$arr2;
+
+    my (%seen,@arr1,@arr2,@arr);
+    for my $e (@$arr1,@$arr2) {
+        next if $seen{$e}++;
+        push @{$arr1{$e}? $arr2{$e}? \@arr: \@arr1: \@arr2},$e;
+    }
+
+    my $class = ref $arr1;
+
+    return (
+        bless(\@arr1,$class),
+        bless(\@arr2,$class),
+        bless(\@arr,$class),
+    );
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 exists() - Teste, ob Element existiert
+
+=head4 Synopsis
+
+    $bool = $arr->exists($str);
+    $bool = $class->exists(\@arr,$str);
+
+=head4 Description
+
+Durchsuche $arr nach Element $str. Kommt $str in $arr vor,
+liefere "wahr", sonst "falsch". Vergleichsoperator ist eq.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub exists {
+    my $arr = ref $_[0]? CORE::shift: CORE::splice @_,0,2;
+    my $str = CORE::shift;
+
+    for (my $i = 0; $i < @$arr; $i++) {
+        if ($arr->[$i] eq $str) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 extractKeyVal() - Extrahiere Paar, liefere Wert
 
@@ -76,6 +208,10 @@ Aufruf als Klassenmethode:
 
     $val = $arr->extractKeyVal($key);
     $val = $class->extractKeyVal(\@arr,$key);
+
+=head4 Alias
+
+extractPair()
 
 =head4 Description
 
@@ -99,6 +235,56 @@ sub extractKeyVal {
     }
 
     return undef;
+}
+
+{
+    no warnings 'once';
+    *extractPair = \&extractKeyVal;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 eq() - Vergleiche Arrays per eq
+
+=head4 Synopsis
+
+    $bool = $arr->eq(\@arr);
+    $bool = $class->eq(\@arr1,\@arr2);
+
+=head4 Description
+
+Vergleiche @arr1 und @arr2 elementweise per eq. Liefere "wahr",
+wenn alle Elemente identisch sind, andernfalls "falsch".
+
+Sind zwei Elemente undef, gelten sie als identisch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub eq {
+    my $arr1 = ref $_[0]? CORE::shift: CORE::splice @_,0,2;
+    my $arr2 = CORE::shift;
+
+    return 0 if $#$arr1 != $#$arr2;
+
+    my $l = @$arr1;
+    for (my $i = 0; $i < $l; $i++) {
+        my $val1 = $arr1->[$i];
+        my $val2 = $arr2->[$i];
+
+        # Wenn einer der Werte undefiniert ist,
+        # können wir nicht mit den normalen
+        # Operatoren vergleichen
+
+        if (!defined $val1 || !defined $val2) {
+            return 0 if defined $val1 || defined $val2;
+            next;
+        }
+        return 0 if $val1 ne $val2;
+    }
+
+    return 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -219,6 +405,45 @@ sub maxLength {
 
 # -----------------------------------------------------------------------------
 
+=head3 pick() - Liefere Elemente nach Position heraus
+
+=head4 Synopsis
+
+    $arr2 | @arr = $class->pick(\@arr,$n,$m);
+    $arr2 | @arr = $class->pick(\@arr,$n);
+    $arr2 | @arr = $arr->pick($n,$m);
+    $arr2 | @arr = $arr->pick($n);
+
+=head4 Description
+
+Picke jedes $n-te Array-Element ab Positon $m heraus, bilde aus diesen
+Elementen ein neues Array und liefere dieses zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pick {
+    my $arr = ref $_[0]? CORE::shift: CORE::splice @_,0,2;
+    my $n = CORE::shift;
+    my $m = CORE::shift || 0;
+
+    my @arr;
+    for (my $i = $m; $i < @$arr; $i += $n) {
+        CORE::push @arr,$arr->[$i];
+    }
+    if (wantarray) {
+       return @arr;
+    }
+    if (my $class = ref $arr) {
+       return bless \@arr,$class;
+    }
+
+    return \@arr;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 push() - Füge Element am Ende hinzu
 
 =head4 Synopsis
@@ -274,7 +499,7 @@ Subroutine muss einen boolschen Wert liefern.
 # -----------------------------------------------------------------------------
 
 sub select {
-    my ($class,$arr) = Prty::Object->this(CORE::shift);
+    my ($class,$arr) = Prty::Object->this(CORE::shift); # Wir brauchen $class
     $arr ||= CORE::shift;
     my $test = CORE::shift;
 
@@ -553,7 +778,7 @@ $arr keine Elemente, liefere undef.
 # -----------------------------------------------------------------------------
 
 sub standardDeviation {
-    my ($class,$arr) = Prty::Object->this(CORE::shift);
+    my ($class,$arr) = Prty::Object->this(CORE::shift); # Wir brauchen $class
     $arr ||= CORE::shift;
 
     return undef if !@$arr;
@@ -579,7 +804,7 @@ keine Elemente, liefere undef.
 # -----------------------------------------------------------------------------
 
 sub variance {
-    my ($class,$arr) = Prty::Object->this(CORE::shift);
+    my ($class,$arr) = Prty::Object->this(CORE::shift); # Wir brauchen $class
     $arr ||= CORE::shift;
 
     return undef if !@$arr;
@@ -741,7 +966,7 @@ sub restore {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

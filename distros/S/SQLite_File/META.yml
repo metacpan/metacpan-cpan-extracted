@@ -6,9 +6,11 @@ build_requires:
   AnyDBM_File: '0'
   AnyDBM_File::Importer: '0'
   DBI: '0'
-  Module::Build: '0'
+  File::Temp: '0'
+  Module::Build: '0.30'
+  TAP::Harness: '0'
 configure_requires:
-  Module::Build: '0'
+  Module::Build: '0.30'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,7 +21,7 @@ name: SQLite_File
 provides:
   SQLite_File:
     file: lib/SQLite_File.pm
-    version: '0.1000'
+    version: '0.1002'
 recommends:
   AnyDBM_File::Importer: '0'
 requires:
@@ -29,5 +31,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SQLite_File
   license: http://dev.perl.org/licenses/
   repository: http://github.com/majensen/sqlite_file.git
-version: '0.1000'
+version: '0.1002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

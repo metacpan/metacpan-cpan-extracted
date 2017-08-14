@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
+use utf8;
 use warnings;
 
 use SVG::Grid;
@@ -46,6 +47,7 @@ $svg -> image_link
 	href	=> 'http://savage.net.au/Flowers/Chorizema.cordatum.html',
 	image	=> 'http://savage.net.au/Flowers/images/Chorizema.cordatum.0.jpg',
 	target	=> 'new_window',
+	title	=> 'MouseOver® an image',
 	x		=> 1, # Cell co-ord.
 	y		=> 2, # Cell co-ord.
 );
@@ -53,6 +55,7 @@ $svg -> rectangle_link
 (
 	href	=> 'http://savage.net.au/Flowers/Alyogyne.huegelii.html',
 	target	=> 'new_window',
+	title	=> 'MouseOver™ a rectangle',
 	x		=> 2, # Cell co-ord.
 	y		=> 3, # Cell co-ord.
 );
@@ -62,6 +65,7 @@ $svg -> text_link
 	stroke	=> 'rgb(255, 0, 0)',
 	target	=> 'new_window',
 	text	=> '3,1',
+	title	=> 'MouseOvér some text',
 	x		=> 3, # Cell co-ord.
 	y		=> 1, # Cell co-ord.
 );

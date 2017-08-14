@@ -58,19 +58,19 @@
    "provides" : {
       "Text::Password::AutoMigration" : {
          "file" : "lib/Text/Password/AutoMigration.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Text::Password::CoreCrypt" : {
          "file" : "lib/Text/Password/CoreCrypt.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Text::Password::MD5" : {
          "file" : "lib/Text/Password/MD5.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Text::Password::SHA" : {
          "file" : "lib/Text/Password/SHA.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -84,12 +84,12 @@
          "web" : "https://github.com/worthmine/Text-Password-AutoMigration"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:{{WORTHMINE}}",
    "x_contributors" : [
-      "Yuki Yoshida <worthmine@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Yuki Yoshida <worthmine@users.noreply.github.com>"
+      "Yuki Yoshida <worthmine@users.noreply.github.com>",
+      "Yuki Yoshida <worthmine@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

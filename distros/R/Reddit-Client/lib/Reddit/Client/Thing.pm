@@ -69,9 +69,7 @@ Reddit::Client::Thing
 
 =head1 DESCRIPTION
 
-A "Thing" is the base class of all Reddit objects. Do not blame the author
-for this. This is specified by the API documentation. The author just
-perpetuated it.
+A "Thing" is the base class of all Reddit objects. 
 
 Generally, consumers of the Reddit::Client module do not instantiate these
 objects directly. Things offer a bit of syntactic sugar around the data
@@ -107,9 +105,7 @@ by reddit's servers.
 
 =head1 AUTHOR
 
-<mailto:earth-tone@ubwg.net>
-
-Jeff Ober L<mailto:jeffober@gmail.com>
+L<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

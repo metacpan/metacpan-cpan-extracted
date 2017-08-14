@@ -58,7 +58,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.39';
+our $VERSION  = '7.40';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -908,6 +908,8 @@ Dmitry Konstantinov
 Dominik Jarmulowicz
 
 Dominique Dumont
+
+Dotan Dimet
 
 Douglas Christopher Wilson
 

@@ -10,6 +10,8 @@ README
 scripts/generate.images.sh
 scripts/pod2html.sh
 scripts/synopsis.pl
+t/00.versions.t
+t/00.versions.tx
 t/test.t
 xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

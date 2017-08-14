@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Help;
 
-our $DATE = '2017-07-24'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.170'; # VERSION
 
 use 5.010001;
 use strict;
@@ -147,7 +147,9 @@ sub gen_help {
 
     # description
     {
-        my $desc = $args{program_description} // $meta->{description};
+        # XXX use proper alt. search
+        my $desc = $args{program_description} //
+            $meta->{'description.alt.env.cmdline'} // $meta->{description};
         last unless $desc;
         $desc =~ s/\A\n+//;
         $desc =~ s/\n+\z//;
@@ -254,7 +256,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.16 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2017-07-24.
+This document describes version 0.170 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2017-08-12.
 
 =head1 DESCRIPTION
 

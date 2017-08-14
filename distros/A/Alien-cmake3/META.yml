@@ -1,0 +1,35 @@
+---
+abstract: 'Find or download or build cmake 3 or better'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::V0: '0.000060'
+  Test::Alien: '0.92'
+  perl: '5.008001'
+configure_requires:
+  Alien::Build: '0.92'
+  Alien::Build::MM: '0.32'
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '6.52'
+  File::Which: '0'
+  Path::Tiny: '0'
+  perl: '5.008001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-cmake3
+requires:
+  Alien::Base: '0.92'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Alien-cmake3/issues
+  homepage: https://metacpan.org/pod/Alien::cmake3
+  repository: git://github.com/plicease/Alien-cmake3.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

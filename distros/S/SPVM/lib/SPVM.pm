@@ -20,7 +20,7 @@ use Encode 'encode';
 
 use Carp 'croak';
 
-our $VERSION = '0.0241';
+our $VERSION = '0.0243';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
@@ -219,6 +219,14 @@ sub new_double_array_len {
   my $length = shift;
   
   my $array = SPVM::Array::Double->new($length);
+  
+  return $array;
+}
+
+sub new_object_array_len {
+  my ($type_name, $length) = @_;
+  
+  my $array = SPVM::Array::Object->new($type_name, $length);
   
   return $array;
 }

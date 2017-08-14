@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql::Field;
-$QBit::Application::Model::DB::mysql::Field::VERSION = '0.010';
+$QBit::Application::Model::DB::mysql::Field::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Field);
@@ -35,6 +35,7 @@ our %DATA_TYPES = (
     LONGTEXT   => 'TEXT',
     ENUM       => 'ENUM',
     SET        => 'ENUM',
+    JSON       => 'BLOB',
 );
 
 our %FIELD2STR = (
@@ -58,7 +59,7 @@ our %FIELD2STR = (
     },
     FLOAT => sub {
         return
-            $_->quote_identifier($_->name) . ' ' 
+            $_->quote_identifier($_->name) . ' '
           . uc($_->type)
           . (
             $_->{'length'}
@@ -171,19 +172,19 @@ __END__
 =encoding utf8
 
 =head1 Name
- 
+
 QBit::Application::Model::DB::mysql::Field - Class for MySQL fields.
- 
+
 =head1 Description
- 
+
 Implements work with MySQL fields.
 
 =head1 Package methods
- 
+
 =head2 create_sql
 
 Generate and returns a sql for field.
- 
+
 B<No arguments.>
 
 B<Return values:>
@@ -199,7 +200,7 @@ B<$sql> - string
 =head2 init_check
 
 Check options for field.
- 
+
 B<No arguments.>
 
 =cut

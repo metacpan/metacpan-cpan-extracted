@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -44,7 +44,7 @@ sub __validate_options {
         tab_width       => '[ 0-9 ]+',
         add_header      => '[ 0 1 ]',
         binary_filter   => '[ 0 1 ]',
-        grid            => '[ 0 1 ]',       # pod
+        grid            => '[ 0 1 ]',
         keep_header     => '[ 0 1 ]',
         choose_columns  => '[ 0 1 2 ]',
         table_expand    => '[ 0 1 2 ]',
@@ -224,6 +224,27 @@ sub __inner_print_tbl {
         }
         push @$list, unicode_sprintf( $reached_limit, $len, 0 );
     }
+    my $header_sep = '';
+    if ( $self->{grid} ) {
+        my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
+        for my $i ( 0 .. $#$width_cols ) {
+            $header_sep .= '-' x $width_cols->[$i];
+            $header_sep .= $tab if $i != $#$width_cols;
+        }
+    }
+    my @header;
+    if ( length $self->{prompt} ) {
+        @header = ( $self->{prompt} );
+    }
+    if ( $self->{keep_header} ) {
+        my $col_names = shift @$list;
+        push @header, $col_names;
+        push @header, $header_sep if $self->{grid};
+    }
+    else {
+        splice( @$list, 1, 0, $header_sep );
+    }
+    my $prompt = join( "\n", @header );
     my $old_row = 0;
     my $auto_jumped_to_first_row = 2;
     my $expanded = 0;
@@ -233,16 +254,6 @@ sub __inner_print_tbl {
             ( $width ) = term_size();
             $self->__inner_print_tbl( $a_ref );
             return;
-        }
-        my @header = ();
-        my $header_size = $self->{grid} ? 2 : 1;
-        if ( $self->{keep_header} && @$list > $header_size ) {
-            @header = splice( @$list, 0, $header_size );
-        }
-        my $prompt = $self->{prompt};
-        if ( @header ) {
-            $prompt .= "\n" if length $prompt;
-            $prompt .= join( "\n", @header );
         }
         # Choose
         my $row = choose(
@@ -255,9 +266,6 @@ sub __inner_print_tbl {
         }
         elsif ( $row == -1 ) {
             next;
-        }
-        if ( @header ) {
-            unshift @$list, @header;
         }
         if ( ! $self->{table_expand} ) {
             return if $row == 0;
@@ -532,8 +540,7 @@ sub __trunk_col_to_avail_width {
             count => $total,                  #
             remove => 1 } );                  #
         $progress->minor( 0 );                #
-    }                                         #
-    my $list = [];
+    }
     my $tab;
     if ( $self->{grid} ) {
         $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
@@ -541,18 +548,9 @@ sub __trunk_col_to_avail_width {
     else {
         $tab = ' ' x $self->{tab_w};
     }
+    my $list = [];
     for my $row ( @$a_ref ) {
         my $str = '';
-        if ( $self->{grid} && @$list == 1 ) {
-            my $header_sep = '';
-            for my $i ( 0 .. $#$width_cols ) {
-                $header_sep .= '-' x $width_cols->[$i];
-                ( my $t = $tab ) =~ s/\s/-/g;
-                $header_sep .= $t if $i != $#$width_cols;
-            }
-            push @$list, $header_sep;
-        }
-
         for my $i ( 0 .. $#$width_cols ) {
             $str .= unicode_sprintf(
                 $self-> __sanitize_string( $row->[$i] ),
@@ -589,7 +587,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.053
+Version 0.054
 
 =cut
 

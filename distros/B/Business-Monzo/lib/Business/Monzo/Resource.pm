@@ -19,7 +19,6 @@ use Carp qw/ confess carp /;
 use Mojo::JSON qw/ encode_json /;
 use Scalar::Util qw/ blessed /;
 use Try::Tiny;
-use Types::Standard qw/ :all /;
 
 =head1 ATTRIBUTES
 
@@ -62,12 +61,6 @@ has [ qw/ url_no_id / ] => (
             lc( ( split( ':',ref( $self ) ) )[-1] ) . 's',
         );
     },
-);
-
-has 'pagination' => (
-    is      => 'ro',
-    isa     => Bool,
-    default => sub { 0 },
 );
 
 =head1 METHODS

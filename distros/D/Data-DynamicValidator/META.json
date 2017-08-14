@@ -1,0 +1,54 @@
+{
+   "abstract" : "JSON pointer-like and Perl union for flexible perlish structures validation",
+   "author" : [
+      "Ivan Baidakou <dmol@gmx.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-DynamicValidator",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.72"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::LexAlias" : "0.05",
+            "Eval::Closure" : "0.11",
+            "PadWalker" : "1.98",
+            "Try::Tiny" : "0.18",
+            "aliased" : "0.31",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.98",
+            "Test::Warnings" : "0.013"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/basiliscos/p5-Data-DynamicValidator.git",
+         "web" : "https://github.com/basiliscos/p5-Data-DynamicValidator"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

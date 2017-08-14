@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -43,7 +43,7 @@ use Graph::Maker::Twindragon;
     my $graph = Graph::Maker->new('twindragon', level=>$k, arms=>1,
                                   undirected=>1);
 
-    # print "strip hanging cycles " . Graph_strip_hanging_cycles($graph) . "\n";
+    # print "strip hanging cycles " . Graph_delete_hanging_cycles($graph) . "\n";
 
     # next if $graph->vertices == 0;
     last if $graph->vertices > 200;

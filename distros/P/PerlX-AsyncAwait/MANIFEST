@@ -1,0 +1,25 @@
+Changes
+examples/aa.out
+examples/AA.pm
+examples/AA.pmc
+examples/foo.out
+examples/Foo.pm
+examples/Foo.pmc
+examples/lexical_context_poc.pl
+lib/Lexical/Context.pm
+lib/PerlX/AsyncAwait.pm
+lib/PerlX/AsyncAwait/AsyncSub.pm
+lib/PerlX/AsyncAwait/Compiler.pm
+lib/PerlX/AsyncAwait/Invocation.pm
+lib/PerlX/AsyncAwait/Runtime.pm
+lib/PerlX/Generator/Compiler.pm
+lib/PerlX/Generator/Invocation.pm
+lib/PerlX/Generator/Object.pm
+lib/PerlX/Generator/Runtime.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/generator_runtime.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

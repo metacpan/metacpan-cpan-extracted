@@ -1,5 +1,27 @@
 Revision history for Math-Derivative
 
+1.00
+	9 Aug 2017
+	- Add tests, more POD clean-up, send to CPAN.
+	18 Jul 2017
+	- Add references for the central and forward difference
+	  methods.
+	- Have not been able to find a reference for the second
+	  derivative difference method, annoyingly.
+	- Minimum perl version set to 5.10.1.
+	17 Jul 2017
+	- Added a forward difference approximation method (bug was filed
+	  for this as user Maitraya Baliyan was expecting it instead of
+	  the central difference approximation method that Derivative1()
+	  used).
+	- Added names forwarddiff() and centraldiff() for export.
+	  Derivative1() is aliased to centraldiff(), so as not to break
+	  old code.
+	- Likewise, seconddx() is now the exported name of the second
+	  derivative difference method, with Derivative2() aliased to it.
+	- There is now an EXPORT tag, ':all'.
+	- POD is more descriptive, has more examples, and uses the
+	  new names.
 0.04
 	13 Jul 2015
 	- Whitespace and POD clean up. Functions are described

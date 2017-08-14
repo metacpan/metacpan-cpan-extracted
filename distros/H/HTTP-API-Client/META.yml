@@ -1,5 +1,5 @@
 ---
-abstract: 'HTTP API Client'
+abstract: 'API Client'
 author:
   - 'Michael Vu <email@michael.vu>'
 build_requires:
@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: restrictive
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,15 +20,11 @@ meta-spec:
 name: HTTP-API-Client
 requires:
   Encode: '0'
-  File::Slurp: '0'
-  HTTP::Headers: '0'
-  HTTP::Request: '0'
-  INI::ReadPath: '0'
   JSON::XS: '0'
-  LWP::Protocol::http: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   Mouse: '0'
   Try::Tiny: '0'
   URI: '0'
-version: '0.05'
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.70'

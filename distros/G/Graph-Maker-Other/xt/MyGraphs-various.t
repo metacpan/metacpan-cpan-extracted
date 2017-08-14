@@ -31,16 +31,125 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use lib
   'devel/lib';
-use MyGraphs;
+use MyGraphs 'make_tree_iterator_edge_aref','edge_aref_to_Graph',
+  'Graph_tree_domnum',
+  'Graph_is_domset',         'Graph_tree_domsets_count',
+  'Graph_is_minimal_domset', 'Graph_tree_minimal_domsets_count';
 
-plan tests => 40;
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+plan tests => 55;
 
 #------------------------------------------------------------------------------
-# Graph_terminal_Wiener_index()
+### Graph_is_hanging_cycle() ...
+
+{
+  my $graph = Graph->new (undirected => 1);
+  $graph->add_path (1,2,3,4,5,3,6);
+  ok (MyGraphs::Graph_is_hanging_cycle($graph,1), undef);
+  my $aref = MyGraphs::Graph_is_hanging_cycle($graph,4);
+  if ($aref) { @$aref = sort {$a<=>$b} @$aref; }
+  ok (join(',',@$aref), '4,5');
+
+  MyGraphs::Graph_delete_hanging_cycles($graph);
+  ok ("$graph", "1=2,2=3,3=6");
+}
+
+#------------------------------------------------------------------------------
+### Graph_tree_domnum_count() of path ...
+
+{
+  require Graph::Maker::Linear;
+  foreach my $n (1 .. 10) {
+    my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
+    if ($n) { $graph->add_vertex(1); }  # bug in Graph::Maker on N=0
+    my $by_tree    = Graph_tree_domnum($graph);
+    my $by_formula = int(($n+2) / 3);
+    ok ($by_tree, $by_formula, "path $n domnum  tree=$by_tree formula=$by_formula");
+  }
+}
+
+#------------------------------------------------------------------------------
+### Graph_tree_minimal_domsets_count() of path ...
+
+{
+  require Graph::Maker::Linear;
+  foreach my $n (1 .. 10) {
+    my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
+    if ($n) { $graph->add_vertex(1); }  # bug in Graph::Maker on N=0
+    my $by_prods = Graph_tree_minimal_domsets_count($graph);
+    my $by_pred = MyGraphs::Graph_minimal_domsets_count_by_pred($graph);
+    ok ($by_prods, $by_pred, "path $n minimal_domsets_count");
+  }
+}
+
+#------------------------------------------------------------------------------
+### Graph_tree_minimal_domsets_count() of all trees ...
+
+{
+  my $count = 0;
+  my $bad = 0;
+ NUM_VERTICES: foreach my $num_vertices (0 .. 7) {
+    my $iterator_func = make_tree_iterator_edge_aref
+      (num_vertices => $num_vertices);
+
+    while (my $edge_aref = $iterator_func->()) {
+      my $graph = edge_aref_to_Graph($edge_aref);
+      my $by_prods = Graph_tree_minimal_domsets_count($graph);
+      my $by_pred = MyGraphs::Graph_minimal_domsets_count_by_pred($graph);
+
+      $count++;
+      if ($by_prods != $by_pred) {
+        last NUM_VERTICES if ++$bad > 10;
+      }
+    }
+  }
+  MyTestHelpers::diag("minimal_domsets_count tests $count");
+  ok ($bad, 0);
+}
+
+
+#------------------------------------------------------------------------------
+### Graph_tree_domsets_count() of all trees ...
+
+{
+  my $count = 0;
+  my $bad = 0;
+ NUM_VERTICES: foreach my $num_vertices (0 .. 7) {
+    my $iterator_func = make_tree_iterator_edge_aref
+      (num_vertices => $num_vertices);
+
+    while (my $edge_aref = $iterator_func->()) {
+      my $graph = edge_aref_to_Graph($edge_aref);
+      my $by_prods = Graph_tree_domsets_count($graph);
+
+      my $by_pred = 0;
+      my @vertices = sort $graph->vertices;
+      my $it = Algorithm::ChooseSubsets->new(\@vertices);
+      while (my $aref = $it->next) {
+        if (Graph_is_domset($graph,$aref)) {
+          $by_pred++;
+        }
+      }
+
+      $count++;
+      if ($by_prods != $by_pred) {
+        last NUM_VERTICES if ++$bad > 10;
+      }
+    }
+  }
+  MyTestHelpers::diag("domsets_count tests $count");
+  ok ($bad, 0);
+}
+
+
+#------------------------------------------------------------------------------
+### Graph_terminal_Wiener_index() of star ...
 
 # formula in Gutman,Furtula,Petrovic
 require Graph::Maker::Star;
-foreach my $n (1 .. 20) {
+foreach my $n (1 .. 15) {
   my $graph = Graph::Maker->new('star', N => $n, undirected => 1);
   my $got = MyGraphs::Graph_terminal_Wiener_index($graph);
   # n<3 is a path
@@ -48,9 +157,11 @@ foreach my $n (1 .. 20) {
   ok ($got, $want, "star n=$n got $got want $want");
 }
 
+### Graph_terminal_Wiener_index() of path ...
+
 # formula in Gutman,Furtula,Petrovic
 require Graph::Maker::Linear;
-foreach my $n (1 .. 20) {
+foreach my $n (1 .. 15) {
   my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
   my $got = MyGraphs::Graph_terminal_Wiener_index($graph);
   my $want = $n-1;

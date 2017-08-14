@@ -1,0 +1,14 @@
+Revision history for MooX-ShortHas
+
+1.172251  2017-08-13 15:51:39+02:00 Europe/Berlin
+    - tests now accept various Moo error message styles
+
+1.172250  2017-08-13 15:41:36+02:00 Europe/Berlin
+    - throw error when attempting use in a non-Mooish class
+    - prevent $caller from being parsed wrongly
+
+1.172231  2017-08-11 15:20:49+02:00 Europe/Berlin
+    - some docs polish
+
+1.172230  2017-08-11 14:09:32+02:00 Europe/Berlin
+    - first release

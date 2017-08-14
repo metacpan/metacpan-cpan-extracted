@@ -24,7 +24,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{polynomial} },
 );
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 =head1 NAME
 
@@ -810,13 +810,9 @@ To J. A. R. Williams who got the ball rolling with L<Math::Fortran>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 by John M. Gamble
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
+Copyright (c) 2017 John M. Gamble. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
 
 =cut
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,24 +15,23 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 2d603cf779cb1efd3d876c131913251168fe0512 .gitignore
-SHA1 b2cad2c987deb26fb4fb2bb40542ad0597a69ed3 Build.PL
-SHA1 4aaf7e154c54edd03ec31061aa9b4fed838144a6 Changes
-SHA1 69774f35136efa6d359d8c6f0e6177cf63e10b4d MANIFEST
-SHA1 2d9164c71e6c99b88566b12a341ea666b78185ea META.json
-SHA1 5763a0f16cb502b0b951c820f75d92e794e0157e META.yml
-SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
-SHA1 511fd1d030ace1249cf998d67474816937a0c1b1 README
-SHA1 4759fe0969ee012059b309b519a2949d2b241fc2 lib/Data/ID/Exim.pm
-SHA1 7280120a44809378c65ccdc17d3ded1b4efb23fc t/base62.t
-SHA1 a492bfbd265eac6ceb18c27f122fe27f86e807d1 t/id.t
+SHA1 0e44d8208b48dbcf7b3c7c3c4f9105edd01a5b98 Build.PL
+SHA1 d125c7677af66ab5d8a873a23dcf9e0fe4cb47eb Changes
+SHA1 b474546a8bae02bc4aec720855e73b05e1346d92 MANIFEST
+SHA1 1cc2f22ca3e054b93172ea16543ec5d1f181918d META.json
+SHA1 4aae4297fcd636c76451c4f68b879ae9cd715f4c META.yml
+SHA1 d034ef5d49ed1867104dd2d8a02ab9cfc8d4efa1 README
+SHA1 71437170e113a9df43ff9b64cc4752691f2d6746 lib/Data/ID/Exim.pm
+SHA1 f2b5f4c271e0ca45edf434d5452def1b956b9e36 t/base.t
+SHA1 7e7d377148a706e9b1f5185e620a296684cd00ae t/id.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
-SHA1 69d069e1729261a8567cb0542953dea0fe01d8f2 t/read.t
-SHA1 0b14657a385d530607942f44a45309f1300608a2 t/time.t
+SHA1 a9f0d99c170b5ac7b1b0623ae22e69447c0b096b t/read.t
+SHA1 31eb5270f963021a502cd304f217ea26d60a4dda t/time.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAk7H6gAACgkQOV9mt2VyAVF5oQCfdXgFamQ+D01KgwpG1MI8ZViJ
-JSgAn1wgegNhC1aCUUIbphakDcvOn/zD
-=fOUG
+iEYEARECAAYFAlmMoToACgkQOV9mt2VyAVEpzQCfV5PCyCW/rGK8w5lSnsVc5bOp
+LzgAn1EgkEDykFOhOSTfF7vsyWcy3MVp
+=VHJN
 -----END PGP SIGNATURE-----

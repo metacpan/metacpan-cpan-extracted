@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -24,13 +24,59 @@ use MyGraphs;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use Graph::Maker::Keller;
+use Graph::Maker::GosperIsland;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 {
-  # hog paths
+  # level 2 points
+  my @graphs;
+  my $k = 2;
+  my $graph = Graph::Maker->new('Gosper_island', undirected => 1, level => $k);
+
+  require Image::Base::Text;
+  my $image = Image::Base::Text->new (-width => 80, -height => 24);
+  my $offset_x = 18;
+  my $offset_y = 10;
+
+  foreach my $v ($graph->vertices) {
+    my ($x,$y) = split /,/, $v;
+    $x += $offset_x;
+    $y += $offset_y;
+    $image->xy($x,$y, '*');
+  }
+  $image->save('/dev/stdout');
+  exit 0;
+}
+{
+  # level 1 picture
+  my @graphs;
+  my $k = 1;
+  my $graph = Graph::Maker->new('Gosper_island', undirected => 1, level => $k);
+  MyGraphs::Graph_xy_print($graph);
+  exit 0;
+}
+{
+  # diameter 3, 7, 19
+  my @graphs;
+  foreach my $level (0 .. 3) {
+    my $graph = Graph::Maker->new('Gosper_island', undirected => 1,
+                                  level => $level);
+    if (0) { MyGraphs::Graph_view($graph); }
+    my $num_vertices = $graph->vertices;
+    my $num_edges    = $graph->edges;
+    print "k=$level  vertices $num_vertices edges $num_edges\n";
+    my $diameter     = $graph->diameter;
+    print "  diameter $diameter\n";
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # HOG by planepath
 
   my @graphs;
   for (my $k = 0; ; $k++) {

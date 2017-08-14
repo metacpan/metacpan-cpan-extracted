@@ -21,12 +21,988 @@ use 5.005;
 use strict;
 use FindBin;
 use MyGraphs;
-use List::Util 'sum';
+use List::Util 'min';
 
 use lib 'devel/lib';
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+
+{
+  # path-4 plus middle leaf
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=496
+
+  require Graph::Maker::Linear;
+  my $graph = Graph::Maker->new('linear', N=>5, undirected=>1);
+  $graph->add_edge(3,6);
+  MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+
+{
+  # 5-cycle
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=340
+
+  require Graph::Maker::Cycle;
+  my $graph = Graph::Maker->new('cycle', N=>5, undirected=>1);
+  MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+
+{
+  # bicentral and bicentroidal  disjoint
+
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=28234
+  # 3  2
+  #   \|
+  # 4--1--7--8--9--10--11--12
+  #   /|
+  # 5  6
+
+  require Graph::Maker::Star;
+  my $graph = Graph::Maker->new('star', N=>7, undirected=>1);
+  $graph->add_path(7,8,9,10,11,12);
+  MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+{
+  # centre and centroid disjoint
+
+  my @graphs;
+  {
+    # https://hog.grinvin.org/ViewGraphInfo.action?id=792
+    # file:///so/hog/graphs/792.html
+    #             *
+    #             |
+    # *---*---C---G---*
+    #             |
+    #             *
+    my $graph = Graph->new (undirected=>1);
+    $graph->add_path(1,2,3,4,5);
+    $graph->add_path(6,4,7);
+    push @graphs, $graph;
+  }
+  {
+    # https://hog.grinvin.org/ViewGraphInfo.action?id=28225
+    #           *   *
+    #            \ /
+    # *---*---C---G---*
+    #             |
+    #             *
+    my $graph = Graph->new (undirected=>1);
+    $graph->add_path(1,2,3,4,5);
+    $graph->add_path(6,4,7);
+    $graph->add_path(4,8);
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # n=8 cyclic domnum=4
+  #
+  # triangle with 3x1 and 1x2 hanging
+  # hog not
+  #    *---*---*---*  
+  #        | \
+  #    *---*---*---*
+  #
+  # square with extra vertex each
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=48
+  # file:///so/hog/graphs/48.html
+  #    *---*---*---*  
+  #        |   |
+  #    *---*---*---*
+  #
+  # square with cross edge and extra vertex each
+  # hog not
+  #    *---*---*---*  
+  #        | / |
+  #    *---*---*---*
+  #
+  # tetrahedral (complete-4) with extra vertex each
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=228
+  # file:///so/hog/graphs/228.html
+  #    *---*---*---*  
+  #        | X |
+  #    *---*---*---*
+
+  my @graphs;
+  foreach my $g6 ('>>graph6<<G?`DEc',
+                  '>>graph6<<G?`FE_',
+                  '>>graph6<<G?`FEc',
+                  '>>graph6<<G?bDKk',
+                 ) {
+    push @graphs, $g6;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # Jou and Lin, "Independence Numbers in Trees", Open Journal of Discrete
+  # Mathematics, volume 5, 2015, pages 27-31,
+  # http://dx.doi.org/10.4236/ojdm.2015.53003
+
+  # no duplicated leaf
+
+  # GP-Test  my(k=4,n=3*k);   2*k-1 == 7 && n==12
+  # GP-Test  my(k=4,n=3*k+1); 2*k   == 8 && n==13
+  # GP-Test  my(k=4,n=3*k+2); 2*k+1 == 9 && n==14
+
+  # n=15 indnum 9
+
+  foreach my $n (# 12 .. 14,
+                 15,
+                ) {
+    my $graph = make_extremal_nodupicated_leaf_indnum($n);
+    MyGraphs::Graph_view($graph);
+    my $indnum = MyGraphs::Graph_tree_indnum($graph);
+    my $formula = int((2*$n-1)/3);
+    print "n=$n  indnum $indnum formula $formula\n";
+    $graph->vertices == $n or die;
+  }
+  exit 0;
+
+  sub make_extremal_nodupicated_leaf_indnum {
+    my ($n) = @_;
+    my $graph = Graph->new (undirected=>1);
+    $graph->set_graph_attribute (name => "n=$n");
+    my $upto = 1;   # next prospective vertex number
+    $graph->add_vertex($upto++);
+    while ($upto <= $n) {
+      ### $upto
+      my $more = min(3, $n-$upto+1);
+      $graph->add_path(1, $upto .. $upto+$more-1);
+      $upto += $more;
+    }
+    return $graph;
+  }
+}
+
+
+{
+  # maximum induced claws
+
+  # star-7
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=622
+  #
+  # bipartite 5,2
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=866
+
+  # bipartite 5,2 with edge between 2
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=580
+
+  my @graphs;
+  foreach my $g6 ('>>graph6<<F??Fw',  # star-7
+                  '>>graph6<<F?B~o',  # bipartite 5,2
+                  '>>graph6<<F?B~w',  # bipartite 5,2 with edge between 2
+                 ) {
+    push @graphs, $g6;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+{
+  # bipartite claw count
+
+  # star-n < complete bipartite n-2,2 for n>=8
+
+  # complete n,3
+  # star_claws(n) = binomial(n-1,3);  \\ (n-1)(n-2)(n-3)/6
+  # complete_bipartite_claws(n,m) = n*binomial(m,3) + m*binomial(n,3);
+  # complete_bipartite_claws(0,3)
+  # vector(10,n, star_claws(n))
+  # vector(10,n, (n-1)*(n-2)*(n-3)/6)
+  # vector(10,n, complete_bipartite_claws(n-1,1))
+  # vector(10,n, complete_bipartite_claws(n-2,2))
+  # vector(10,n, (n-2)*(n-3)*(n-4)/3)
+  # vector(10,n, complete_bipartite_claws(floor(n/2),ceil(n/2)))
+
+  # vector(10,n, (n-2)*(n-3)*(n-4)/3) - vector(10,n, (n-1)*(n-2)*(n-3)/6)
+  # vector(10,n, (n-2)*(n-3)*(n-7)/6)
+  # my(n=7); (n-2)*(n-3)*(n-7)/6
+  # my(n=8); (n-2)*(n-3)*(n-7)/6
+
+  # read("vpar.gp");
+  # matrix(5,5,n,m,n++;m++; vpar_claw_count(vpar_make_bistar(n,m)))
+
+  use Graph::Maker::CompleteBipartite;
+  foreach my $n (2 .. 8) {
+    foreach my $m (2 .. 8) {
+      my $graph = Graph::Maker->new('complete_bipartite', N1 => $n, N2 => $m,
+                                    undirected => 1);
+      # if ($n == $m && $n == 4) {
+      #   MyGraphs::Graph_view($graph);
+      # }
+      printf "%4d", MyGraphs::Graph_claw_count($graph);
+    }
+    print "\n";
+  }
+
+  foreach my $n (2 .. 6) {
+    foreach my $m (2 .. 6) {
+      my $graph = Graph::Maker->new('complete_bipartite', N1 => $n, N2 => $m,
+                                    undirected => 1);
+      my $count = $n*binomial($m,3) + $m*binomial($n,3);
+      printf "%4d", $count;
+    }
+    print "\n";
+  }
+  print "\n";
+
+  foreach my $n (2 .. 6) {
+    foreach my $m (2 .. 6) {
+      my $count = binomial($n+$m,3);
+      printf "%4d", $count;
+    }
+    print "\n";
+  }
+  exit 0;
+
+  # seq1 => [($m)x$n],
+  # seq2 => [($n)x$m],
+
+  sub binomial {
+    my ($n, $m) = @_;
+    my $ret = 1;
+    foreach my $i ($n-$m+1 .. $n) {
+      $ret *= $i;
+    }
+    foreach my $i (1 .. $m) {
+      $ret /= $i;
+    }
+    return $ret;
+  }
+}
+
+{
+  # claw-free graphs
+  require Graph;
+  require Graph::Writer::Sparse6;
+  foreach my $num_vertices (5) {
+
+    my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
+      (num_vertices_min => $num_vertices,
+       num_vertices_max => $num_vertices,
+       connected => 1,
+      );
+    my @graphs;
+    while (my $edge_aref = $iterator_func->()) {
+      my $graph = MyGraphs::Graph_from_edge_aref($edge_aref,
+                                                 num_vertices => $num_vertices);
+      my $has_claw = MyGraphs::Graph_has_claw($graph);
+      if ($has_claw) {
+        Graph::Writer::Sparse6->new->write_graph($graph,\*STDOUT);
+        MyGraphs::Graph_view($graph);
+      } else {
+        push @graphs, $graph;
+      }
+    }
+    my $num_graphs = scalar(@graphs);
+    print "N=$num_vertices [$num_graphs] ";
+  }
+  exit 0;
+}
+{
+  # cycle maximal independent sets
+
+  require Graph::Maker::Cycle;
+  require MyGraphs;
+  my @values;
+  foreach my $n (3 .. 10) {
+    my $graph = Graph::Maker->new('cycle', N => $n, undirected => 1);
+    MyGraphs::Graph_view($graph);
+    # my $count = MyGraphs::Graph_tree_maximal_indsets_count($graph);
+    # push @values, $count;
+  }
+  # require Math::OEIS::Grep;
+  # Math::OEIS::Grep->search(array => \@values, verbose=>1);
+  exit 0;
+}
+{
+  # try Graph_tree_minimal_domsets_count()
+
+  # 81 pairs 19,20  1649265868801
+  # 12161^3      == 1798489329281
+
+  require Graph;
+  require Math::BigInt;
+  Math::BigInt->import(try=>'GMP');
+  require Math::BigFloat;
+  my $base;
+  foreach my $k (1 .. 5) {
+    my $graph = make_T1 (6,6,$k);
+    my $num_vertices = $graph->vertices;
+    # MyGraphs::Graph_view($graph);
+    my $count = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "k=$k  count $count  n=$num_vertices\n";
+
+    if ($k==1) { $base = $count; }
+    else {
+      my $pow = $base ** $k;
+      print "           $pow\n";
+      my $two = Math::BigFloat->new(2)**(($num_vertices)/2);
+      print "   2^(n/2) $two\n";
+    }
+  }
+
+  my $graph = make_T1 (19,20);
+  my $minimal_domsets_count
+    = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+  my $num_vertices = $graph->vertices;
+  print "$num_vertices   count $minimal_domsets_count\n";
+  exit 0;
+}
+{
+  # n=27 minimal_domsets_count max
+
+  # non maximum, arms length 4
+  # my $graph = MyGraphs::Graph_from_graph6_str(':Z_`abc`e`g`i`k_mnopmrmtmvmx');
+
+  # maximum, 6,6
+  my $graph = MyGraphs::Graph_from_graph6_str(':Z_`a`c`e`g`i`k_mnmpmrmtmvmx');
+
+  # MyGraphs::Graph_view($graph);
+  foreach (1 .. 20) {
+    my $minimal_domsets_count
+      = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "count $minimal_domsets_count\n";
+  }
+  exit 0;
+}
+{
+  # n=12
+
+  #    / *--*              2
+  #   *--*--*--*--*        4
+  #    \ *--*--*--*--*     5
+  #              1 2 3 4 5 6 7 8 9 10 11 12
+  # vpar  n=12   0 1 2 3 4 5 2 7 1  9 10 11
+
+  require Graph;
+  require Algorithm::ChooseSubsets;
+  my $graph = Graph->new (undirected=>1);
+
+  $graph->add_path('01','02','03','04','05','06');
+  $graph->add_path(     '02','07','08');
+  $graph->add_path('01','09','10','11','12');
+
+  # $graph->add_path('01','02','03','04','05','12');
+  # $graph->add_path('06','07','08','09',     '12');
+  # $graph->add_path('10','11',               '12');
+
+  # MyGraphs::Graph_view($graph);
+  print "by pred ", MyGraphs::Graph_minimal_domsets_count_by_pred($graph),"\n";
+  mindomset_parts_show($graph, '01', print=>1);
+
+  foreach (1 .. 20) {
+    my $minimal_domsets_count
+      = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "count $minimal_domsets_count\n";
+  }
+  exit 0;
+
+  sub is_domset_without_dom_notsole {
+    my ($graph, $aref, $v) = @_;
+    if (grep {$_==$v} @$aref) { return 0; }
+    $graph = $graph->copy;
+    my $extra = 'is_domset_without_sole';
+    $graph->add_edge ($v, $extra);
+    return MyGraphs::Graph_is_minimal_domset($graph, [$extra,@$aref]);
+  }
+
+  sub is_domset_with_notmin_unless_undom_above {
+    my ($graph, $aref, $v) = @_;
+    if (! grep {$_==$v} @$aref) { return 0; }
+    if (MyGraphs::Graph_is_minimal_domset($graph,$aref)) { return 0; }
+    $graph = $graph->copy;
+    my $extra = 'is_domset_with_notmin_unless_undom_above';
+    $graph->add_edge ($v, $extra);
+    return MyGraphs::Graph_is_minimal_domset($graph, $aref);
+  }
+
+  sub mindomset_parts_show {
+    my ($graph, $root, %options) = @_;
+    my $total = 0;
+    my $with        = 0;
+    my $without_dom = 0;
+    my $without_dom_notsole = 0;
+    my $with_notmin_unless_undom_above = 0;
+    my @vertices = sort $graph->vertices;
+    my $it = Algorithm::ChooseSubsets->new(\@vertices);
+    while (my $aref = $it->next) {
+      if (is_domset_with_notmin_unless_undom_above($graph,$aref,$root)) {
+        $with_notmin_unless_undom_above++;
+      }
+
+      if (MyGraphs::Graph_is_minimal_domset($graph,$aref)) {
+        my $contains = sub {
+          my ($v) = @_;
+          return !! (grep {$_==$v} @$aref);
+        };
+
+        $total++;
+        my $is_with = $contains->($root);
+        my $is_without_dom = ! $is_with;
+        my $is_without_dom_notsole = $is_without_dom
+          && is_domset_without_dom_notsole($graph,$aref,$root);
+        my $is_without_dom_sole = $is_without_dom
+          && ! $is_without_dom_notsole;
+        $with                += $is_with;
+        $without_dom         += $is_without_dom;
+        $without_dom_notsole += $is_without_dom_notsole;
+
+        #       /-7--8            2
+        #   1--2--3--4--5--6      6
+        #    \-9-10-11-12         4
+
+        my $show = sub {
+          my ($v) = @_;
+          return $contains->($v) ? '*' : '.';
+        };
+        if ($options{'print'}) {
+          print "    /-",$show->('07'),"--",$show->('08'),"    ",$is_without_dom_sole?' sole':'',"\n";
+          print $show->('01'),"--",$show->('02'),"--",$show->('03'),"--",$show->('04'),"--",$show->('05'),"--",$show->('06'),"\n";
+          print " \\-",$show->('09'),"--",$show->('10'),"--",$show->('11'),"--",$show->('12'),"\n";
+          print "\n";
+        }
+      }
+    }
+    my $without_dom_sole = $without_dom - $without_dom_notsole;
+    ### $with_notmin_unless_undom_above
+    ### $with
+    ### $without_dom
+    ### $without_dom_sole
+    ### $without_dom_notsole
+    ### $total
+  }
+}
+{
+  # try Graph_tree_minimal_domsets_count()
+
+  # 81 pairs 19,20  1649265868801
+  # 12161^3      == 1798489329281
+  # k=3  count      1798489329281
+
+  require Graph;
+  require Math::BigInt;
+  Math::BigInt->import(try=>'GMP');
+  # for (my $n = 9; $n <= 55; $n += 2) {
+  foreach my $n (3*27) {
+    my $max_count = 0;
+    my $max_L_pairs = 0;
+    my $max_R_pairs = 0;
+    my $pairs = ($n-3)/2;
+    foreach my $L_pairs (0 .. int($pairs/2)) {
+      my $R_pairs = $pairs - $L_pairs;
+      my $graph = make_T1 ($L_pairs, $R_pairs);
+      my $minimal_domsets_count
+        = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+      print "n=$n pairs $L_pairs+$R_pairs = $pairs  count $minimal_domsets_count\n";
+
+      if ($max_count < $minimal_domsets_count) {
+        $max_count = $minimal_domsets_count;
+        $max_L_pairs = $L_pairs;
+        $max_R_pairs = $R_pairs;
+      }
+    }
+    print "max L_pairs $max_L_pairs R_pairs $max_R_pairs  count $max_count\n";
+    print "\n";
+  }
+  exit 0;
+
+  sub make_T1 {
+    my ($L_pairs, $R_pairs, $k) = @_;
+    $k ||= 1;
+    my @pairs = shift; push @pairs, shift;
+    my $graph = Graph->new (undirected => 1);
+    my $from;
+    foreach my $kk (1 .. $k) {
+      foreach my $side (0,1) {
+        my $side_name = ($side == 0 ? 'L' : 'R');
+        foreach my $i (1 .. $pairs[$side]) {
+          $graph->add_path ("${side_name}_leaf_${i}_k$kk",
+                            "${side_name}_mid_${i}_k$kk",
+                            "${side_name}_k$kk");
+        }
+      }
+      $graph->add_path ("L_k$kk","T_k$kk","R_k$kk");
+      if (defined $from) {
+        my $to = "L_mid_1_k$kk";
+        $graph->add_edge ($from, $to);
+      }
+      $from = "R_mid_1_k$kk",
+    }
+    return $graph;
+  }
+}
+{
+  # path minimal domsets parts
+  # 2+4+5 + 1 == 12
+
+  # p1      with_notmin_unless_undom_above_gross => 6
+  #         without_undom => 2
+  #         with_notmin_unless_undom_above = 4
+  # path-4  without_undom => 1
+  #
+  # p1      without_undom => 2
+  # path-4  with_notmin_unless_undom_above_gross => 1
+  #         without_undom => 1
+  #         with_notmin_unless_undom_above = 0
+
+
+  require Algorithm::ChooseSubsets;
+  require Graph::Maker::Linear;
+  my @path_graphs;
+  my @data;
+  foreach my $n (0 .. 7) {
+    my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
+    my $data = MyGraphs::Graph_tree_minimal_domsets_count_data($graph);
+    printf "n=%2d   %s  %2s-%2s  %2s-%s  %s  notmin %s\n",
+      $n,
+      $data->{'with_req_notbelow'},
+      $data->{'with_req_below_gross'}, $data->{'with_req_below_sub'},
+      $data->{'without_dom_notsole_gross'}, $data->{'without_undom'},
+      $data->{'without_dom_sole'},
+      $data->{'with_notmin_unless_undom_above_gross'};
+    $data[$n] = $data;
+    $path_graphs[$n] = $graph;
+  }
+
+  # n= 2   0   1- 0   1-0  0
+  # n= 4   1   2- 1   2-1  1
+  # n= 5   0   2- 0   2-0  0
+
+  #       /-*--*            2
+  #   *--*--*--*--*--*      6
+  #    \-*--*--*--*         4
+
+  ### path-2 ...
+  ### data: $data[2]
+
+  ### path-4 ...
+  ### data: $data[4]
+
+  my $p1 = MyGraphs::tree_minimal_domsets_count_data_product($data[4],$data[2]);
+  ### $p1
+  ### p1 with_notmin_unless_undom_above: $p1->{'with_notmin_unless_undom_above_gross'} - $p1->{'without_undom'}
+  ### p1 without_dom_sole   : $p1->{'without_dom_sole'}
+  ### p1 without_dom_notsole: $p1->{'without_dom_notsole_gross'} - $p1->{'without_undom'}
+  ### p1 without_dom        : $p1->{'without_dom_notsole_gross'} - $p1->{'without_undom'} + $p1->{'without_dom_sole'}
+  my $p1_ret    = MyGraphs::tree_minimal_domsets_count_data_ret($p1);
+  my $path7_ret = MyGraphs::tree_minimal_domsets_count_data_ret($data[7]);
+  ### p1        : "$p1_ret"
+  ### cf path-7 : "$path7_ret"
+
+  ### p1 ...
+  mindomset_parts_show($path_graphs[7], '3', print=>0);
+
+  ### path-4: $data[4]
+
+  my $r = MyGraphs::tree_minimal_domsets_count_data_product($p1, $data[4]);
+  ### $r
+  ### r with       : $r->{'with_req_notbelow'} + $r->{'with_req_below_gross'} - $r->{'with_req_below_sub'}
+  ### r without dom: $r->{'without_dom_notsole_gross'} - $r->{'without_undom'} + $r->{'without_dom_sole'}
+  ### r without dom sole   : $r->{'without_dom_sole'}
+  ### r without dom notsole: $r->{'without_dom_notsole_gross'} - $r->{'without_undom'}
+
+  my $minimal_domsets_count = MyGraphs::tree_minimal_domsets_count_data_ret($r);
+  ### $minimal_domsets_count
+
+  exit 0;
+}
+
+
+{
+  # try Graph_tree_minimal_domsets_count()
+
+  require Graph::Maker::BalancedTree;
+  require Graph::Maker::Linear;
+  my $num_children = 2;
+  foreach my $n (1 .. 6) {
+    my $graph = Graph::Maker->new('balanced_tree',
+                                  fan_out => $num_children, height => $n,
+                                  undirected => 1,
+                                 );
+    # my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
+
+    my $minimal_domsets_count
+      = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "n=$n  $minimal_domsets_count\n";
+  }
+  exit 0;
+}
+
+{
+  # v_mindomsets = v_with + v_without_dom
+  #
+  # v_with =   prod(c_with_req_below + c_without)
+  #          - prod(c_with_req_below)
+  # at least one c_without
+  #
+  # v_without_dom =   prod(c_without_dom + c_with)
+  #                 - prod(c_without_dom)
+  # at least one c_with
+  #
+  # v_without_dom += exactly_one_notmin
+  # exactly_one_notmin = exactly_one_notmin * c_without_dom
+  #                    + prod_c_without_dom * c_with_notmin_unless_undom_above
+  # prod_c_without_dom *= c_without_dom
+
+  #           0 1 2 3 4 5 6 7  8  9 10
+  # want path 1,1,2,2,4,4,7,9,13,18,25,36,49,70,97,137,191,268,376,526,738,
+
+  #             0 1 2 3 4
+  # want binary 1,2,4,41,1438
+
+  # leaf
+  my $v_with_req_notbelow       = 1;
+  my $v_with_req_below      = 0;
+  my $v_with_notmin_unless_undom_above = 0;
+  my $v_without_dom_sole    = 0;
+  my $v_without_dom_notsole = 0;
+  my $v_without_undom       = 1;
+  my $fan = 1;
+
+  {
+    my $n = 1;
+    my $v_mindomsets = $v_with_req_notbelow + $v_with_req_below
+      + $v_without_dom_sole + $v_without_dom_notsole;
+    print "n=$n mindomsets $v_mindomsets  with $v_with_req_notbelow+$v_with_req_below  without $v_without_dom_sole+$v_without_dom_notsole+$v_without_undom    req below $v_with_req_below notmin unless $v_with_notmin_unless_undom_above\n";
+  }
+
+  foreach my $n (2 .. 8) {
+    my $c_without_dom_sole    = $v_without_dom_sole;
+    my $c_without_dom_notsole = $v_without_dom_notsole;
+    my $c_without_undom       = $v_without_undom;
+    my $c_with_req_notbelow       = $v_with_req_notbelow;
+    my $c_with_req_below      = $v_with_req_below;
+    my $c_with                = $c_with_req_notbelow + $c_with_req_below;
+    my $c_with_notmin_unless_undom_above = $v_with_notmin_unless_undom_above;
+    my $c_without_dom = $c_without_dom_sole + $c_without_dom_notsole;
+
+    ### $n
+    ### $c_with_req_notbelow
+    ### $c_with_req_below
+    ### $c_with
+    ### $c_with_notmin_unless_undom_above
+    ### $c_without_dom_sole
+    ### $c_without_dom_notsole
+    ### $c_without_undom
+
+    #----
+
+    # =0 child undom
+    $v_with_req_notbelow = ($c_without_dom_notsole)**$fan;
+
+    # >=1 child undom
+    $v_with_req_below
+      = ($c_with_req_below + $c_without_dom_notsole + $c_without_undom)**$fan
+      - ($c_with_req_below + $c_without_dom_notsole                   )**$fan;
+
+
+    # =1 child with notmin unless undom above,
+    # this v without cannot be re-dominated above
+    $v_without_dom_sole
+      = $fan* $c_without_dom**($fan-1) * $c_with_notmin_unless_undom_above;
+
+    # =0 child with
+    $v_without_undom = $c_without_dom**$fan;
+
+    # >=1 child with
+    $v_without_dom_notsole
+      = ($c_with           + $c_without_dom)**$fan
+      - $v_without_undom;
+    # - (                    $c_without_dom)**$fan;
+
+    # at least one c_with
+    $v_with_notmin_unless_undom_above
+      = ($c_with_req_below + $c_without_dom)**$fan
+      - $v_without_undom;
+    #   (                    $c_without_dom)**$fan;
+
+    my $v_with        = $v_with_req_notbelow + $v_with_req_below;
+    my $v_without_dom = $v_without_dom_sole + $v_without_dom_notsole;
+    my $v_mindomsets = $v_with + $v_without_dom;
+
+    print "n=$n mindomsets $v_mindomsets  with $v_with  without $v_without_dom_sole + $v_without_dom_notsole + $v_without_undom  req below $v_with_req_below notmin unless $v_with_notmin_unless_undom_above\n";
+  }
+
+  # with = (1 + 3) - 1 = 3
+  # 1,3,5
+  # 2,3,5 <-- not minimal
+  #  2, 5
+
+  exit 0;
+}
+{
+  # counts of minimal dominating sets
+
+  # h=2 complete binary tree
+  # 1              1 1,0 plus 1      with
+  # 2,3            1 0,1 plus 0      without notsole
+  # none without undom
+
+  # h=3 complete binary tree
+  # 1,4,5,6,7      1 1,0 plus 1      with, and is req below
+  # 2,3            1 0,1 plus 0      without notsole
+  # 2,6,7          1 0,1 plus 0      without notsole
+  # 3,4,5          1 0,1 plus 0      without notsole
+  # 4,5,6,7                          without undom
+  # 1,2,3          0 0,0 plus 1
+  # 1,2,6,7        0 0,0 plus 1
+  # 1,3,4,5        0 0,0 plus 1
+  #
+  #  with req   without   undom
+  # (    1    +   1     +  0)^2 = 4    - 1^2 = 3
+  # 1,4,5,3    not minimal, as 1 covered
+  # 1,2,6,7    not minimal, as 1 covered
+
+  # n=4 path
+  # 1,4            1 1,0 plus 1      with
+  # 2,4            1 0,1 plus 0      with
+  # 1,3            1 1,0 plus 1      without dom notsole
+  # 2,3            1 0,1 plus 0      without dom sole
+  #  2                               without undom
+
+  # n=5 path with 2, without 2
+  # 1,3,5          1 1,0 plus 1      with
+  # 2,5            1 0,1 plus 0      with
+  # 1,4            1 1,0 plus 1      without dom notsole
+  # 2,4            1 0,1 plus 0      without dom notsole
+  #  1,3                             without undom   from 4 without dom notsole
+  #  2,3                             without undom   from 4 without dom sole
+  # 1,2,5          0 0,0 plus 1
+  # minimal domsets         4
+  # minimal domsets with    2
+  # minimal domsets without 2
+
+  # n=6 path
+  # 1,4,6          1 1,0 plus 1      with   from 5 dom notsole
+  # 2,4,6          1 0,1 plus 0      with   from 5 dom notsole
+  # 1,3,6          1 1,0 plus 1      with   from 5 undom
+  # 2,3,6          1 0,1 plus 0      with   from 5 undom
+  # 2,5            1 0,1 plus 0      without notsole
+  # 1,3,5          1 1,0 plus 1      without notsole
+  # 1,4,5          1 1,0 plus 1      without sole
+  # 1,2,5          0 0,0 plus 1      without undom
+
+
+  require Algorithm::ChooseSubsets;
+  require Graph::Maker::BalancedTree;
+  require Graph::Maker::Linear;
+  my $num_children = 2;
+  my $n = 2;
+  my $graph = Graph::Maker->new('balanced_tree',
+                                fan_out => $num_children, height => $n,
+                                undirected => 1,
+                               );
+  # my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
+
+  my $root = 1;
+  my $graph_plus = $graph->copy;
+  $graph_plus->add_edge ($root,'extra');
+
+  # MyGraphs::Graph_view($graph);
+  print "graph $graph\n";
+  print "graph_plus $graph_plus\n";
+
+  my @vertices = sort {$a<=>$b} $graph->vertices;
+  my $it = Algorithm::ChooseSubsets->new(\@vertices);
+  my $count_domsets = 0;
+  my $count_minimal_domsets = 0;
+  my $count_minimal_domsets_with = 0;
+  my $count_minimal_domsets_without = 0;
+  while (my $aref = $it->next) {
+    my $any = 0;
+
+    my $is_domset = MyGraphs::Graph_is_domset($graph,$aref) ? 1 : 0;
+    # $any ||= $is_domset;
+    $count_domsets += $is_domset;
+
+    my $is_minimal_domset = MyGraphs::Graph_is_minimal_domset($graph,$aref)?1:0;
+    $any ||= $is_minimal_domset;
+    $count_minimal_domsets += $is_minimal_domset;
+
+    my $includes_root = grep {$_ eq $root} @$aref;
+    my $is_minimal_domset_with    =  $includes_root & $is_minimal_domset;
+    my $is_minimal_domset_without = !$includes_root & $is_minimal_domset;
+
+    $count_minimal_domsets_with    += $is_minimal_domset_with;
+    $count_minimal_domsets_without += $is_minimal_domset_without;
+
+    my $plus_is_minimal_domset = MyGraphs::Graph_is_minimal_domset($graph_plus,$aref)?1:0;
+    $any ||= $plus_is_minimal_domset;
+
+    if ($any) {
+      my $aref_str = join(',',@$aref);
+      printf "%-14s %d %d %d,%d plus %d\n",
+        $aref_str, $is_domset,
+        $is_minimal_domset, $is_minimal_domset_with,$is_minimal_domset_without,
+        $plus_is_minimal_domset;
+    }
+  }
+  print "domsets $count_domsets\n";
+  print "minimal domsets         $count_minimal_domsets\n";
+  print "minimal domsets with    $count_minimal_domsets_with\n";
+  print "minimal domsets without $count_minimal_domsets_without\n";
+  exit 0;
+}
+
+
+{
+  #     *---*
+  #     |   |
+  # *---*---*---*
+  #     |   |
+  #     *   *
+  # hog not
+
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  $graph->add_cycle (1,2,3,4);
+  $graph->add_edge('1a',1);
+  $graph->add_edge('1b',1);
+  $graph->add_edge('2a',2);
+  $graph->add_edge('2b',2);
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+{
+  # T1
+  # hog not
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  foreach my $side ('L','R') {
+    foreach my $i (1 .. 6) {
+      $graph->add_path ("${side}t$i","${side}s$i",$side);
+    }
+  }
+  $graph->add_path ('L','T','R');
+  # MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+
+{
+  # path minimals 1,1,2,2,4,4,7,9,13,18,25,36,49
+
+  require Graph::Maker::BalancedTree;
+  require Graph::Maker::Linear;
+  my $num_children = 2;
+  foreach my $n (5) {
+    # my $graph = Graph::Maker->new('balanced_tree',
+    #                               fan_out => $num_children, height => $n,
+    #                               undirected => 1,
+    #                              );
+    my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
+    MyGraphs::Graph_tree_domsets_count($graph);
+    my $count = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "n=$n  domsets count $count\n";
+  }
+  exit 0;
+}
+
+{
+  require Graph::Maker::BalancedTree;
+  my $num_children = 2;
+  foreach my $h (0 .. 10) {
+    my $graph = Graph::Maker->new('balanced_tree',
+                                  fan_out => $num_children, height => $h,
+                                  undirected => 1,
+                                 );
+    my $domnum = MyGraphs::Graph_tree_domnum($graph);
+    print "h=$h  domnum $domnum\n";
+  }
+  exit 0;
+}
+
+{
+  # cubefree substring relations
+  # 11,19,31,49,77,117
+  # v = apply(n->2*n+1,[11,19,31,49,77,117])
+  # vector(#v-1,i,v[i+1]-v[i]) \\ A028445 cubefrees
+
+  my $max_len = 3;
+  my $delta1 = 1;
+  my $prefix = 1;
+
+  my @cubefrees = ('');
+  {
+    my @pending = ('');
+    foreach my $len (1 .. $max_len) {
+      my @new_pending;
+      foreach my $str (@pending) {
+        foreach my $ext ('0','1') {
+          my $new_str = $str.$ext;
+          if (is_cubefree($new_str)) {
+            push @new_pending, $new_str;
+          }
+        }
+      }
+      @pending = @new_pending;
+      push @cubefrees, @pending;
+    }
+  }
+  my $num_vertices = scalar(@cubefrees);
+  print "num_vertices = $num_vertices\n";
+
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  $graph->set_graph_attribute
+    (name => "Cubefree Substring Relations, Max Length $max_len");
+  $graph->set_graph_attribute (root => "!");
+  foreach my $from_i (0 .. $#cubefrees) {
+    my $from_str = $cubefrees[$from_i];
+    foreach my $to_i (0 .. $from_i-1) {
+      my $to_str = $cubefrees[$to_i];
+      if ($delta1) {
+        next unless length($from_str) - length($to_str) == 1;
+      }
+      my $pos = index($from_str,$to_str);
+      if ($prefix) {
+        next unless $pos==0;
+      }
+      if ($pos >= 0) {
+        my $from_str = (length($from_str) ? $from_str : '!');
+        my $to_str = (length($to_str) ? $to_str : '!');
+        $graph->add_edge($from_str, $to_str);
+      }
+    }
+  }
+
+  MyGraphs::Graph_view($graph);
+  print "tree\n";
+  MyGraphs::Graph_tree_print($graph, cmp => \&MyGraphs::cmp_alphabetic);
+  # Graph_print_tikz($graph);
+  # MyGraphs::hog_searches_html($graph);
+  exit 0;
+
+  sub find_cube {
+    my ($str) = @_;
+    foreach my $c (1 .. int(length($str)/3)) {
+      my $re = '('.('.' x $c).')\\1\\1';
+      ### $re
+      if ($str =~ $re) {
+        ### $str
+        ### cube: $1
+        return $1;
+      }
+    }
+    return undef;
+  }
+  sub is_cubefree {
+    my ($str) = @_;
+    return ! defined find_cube($str);
+  }
+}
 
 {
   # subgraph relations among all graphs to N vertices -- graph drawing
@@ -47,14 +1023,13 @@ use lib 'devel/lib';
   #   all graphs, delta 1 = path-4
   #   connected graphs    = path-2
 
-  $|=1;
   my $num_vertices = 4;
   my $connected = 0;
   my $delta1 = 0;
   my $complement = 1;
 
   require Graph;
-  my $iterator_func = make_graph_iterator_edge_aref
+  my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
     (num_vertices_min => $num_vertices,
      num_vertices_max => $num_vertices,
      connected => $connected,
@@ -202,7 +1177,6 @@ use lib 'devel/lib';
   #     total count, n*(n-1)/2 of A001349 num conn graphs 1,1,1,2,6,21,112,853,
   #   apply(n->n*(n-1)/2,[1,1,1,2,6,21,112,853])==[0,0,0,1,15,210,6216,363378]
 
-  $|=1;
   require Graph;
   my @num_graphs;
   my @count;
@@ -211,7 +1185,7 @@ use lib 'devel/lib';
   my @total_count;
   foreach my $num_vertices (1 .. 6) {
 
-    my $iterator_func = make_graph_iterator_edge_aref
+    my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
       (num_vertices_min => $num_vertices,
        num_vertices_max => $num_vertices,
        connected => 1,
@@ -275,7 +1249,6 @@ use lib 'devel/lib';
   my $graph = Graph->new (undirected=>1);
   $graph->add_cycle (0,1,2,3);
   $graph->add_path (2,4,5);
-  $|=1;
 
   # search_induced_paths($graph,
   #                      sub {
@@ -535,7 +1508,7 @@ use lib 'devel/lib';
 
     # my $iterator_func = make_tree_iterator_edge_aref
     #   (num_vertices => $num_vertices);
-    my $iterator_func = make_graph_iterator_edge_aref
+    my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
       (num_vertices => $num_vertices);
   GRAPH: while (my $edge_aref = $iterator_func->()) {
       my $graph = Graph_from_edge_aref($edge_aref);

@@ -87,38 +87,6 @@ sub test_gcd : Test(2) {
 
 # -----------------------------------------------------------------------------
 
-sub test_geoMidpoint_with_weight : Test(2) {
-    my $self = shift;
-
-    my ($latitude,$longitude) = Prty::Math->geoMidpoint([
-        [40.7143528,-74.0059731,1095.75],
-        [41.8781136,-87.6297982,730.5],
-        [33.7489954,-84.3879824,365.25],
-    ]);
-
-    # Fix: CPAN Testers
-    $self->floatIs($latitude,40.1156886102644);
-    $self->floatIs($longitude,-80.2996028062865);
-}
-
-# -----------------------------------------------------------------------------
-
-sub test_geoMidpoint_without_weight : Test(2) {
-    my $self = shift;
-
-    my ($latitude,$longitude) = Prty::Math->geoMidpoint([
-        [40.7143528,-74.0059731],
-        [41.8781136,-87.6297982],
-        [33.7489954,-84.3879824],
-    ]);
-
-    # Fix: CPAN Testers
-    $self->floatIs($latitude,38.9224184710314);
-    $self->floatIs($longitude,-82.0561504698106);
-}
-
-# -----------------------------------------------------------------------------
-
 sub test_degreeToRad : Test(6) {
     my $self = shift;
 
@@ -154,6 +122,38 @@ sub test_radToDegree : Test(1) {
 
     my $grad = sprintf '%.8f',Prty::Math->radToDegree(1);
     $self->is($grad,57.29577951);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_geoMidpoint_with_weight : Test(2) {
+    my $self = shift;
+
+    my ($latitude,$longitude) = Prty::Math->geoMidpoint([
+        [40.7143528,-74.0059731,1095.75],
+        [41.8781136,-87.6297982,730.5],
+        [33.7489954,-84.3879824,365.25],
+    ]);
+
+    # Fix: CPAN Testers
+    $self->floatIs($latitude,40.1156886102644);
+    $self->floatIs($longitude,-80.2996028062865);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_geoMidpoint_without_weight : Test(2) {
+    my $self = shift;
+
+    my ($latitude,$longitude) = Prty::Math->geoMidpoint([
+        [40.7143528,-74.0059731],
+        [41.8781136,-87.6297982],
+        [33.7489954,-84.3879824],
+    ]);
+
+    # Fix: CPAN Testers
+    $self->floatIs($latitude,38.9224184710314);
+    $self->floatIs($longitude,-82.0561504698106);
 }
 
 # -----------------------------------------------------------------------------

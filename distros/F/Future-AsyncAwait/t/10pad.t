@@ -63,4 +63,43 @@ use List::Util qw( sum );
    is( scalar $fret->get, "outer", '$fret now ready after done for closure' );
 }
 
+# captured variables of nested subs
+{
+   async sub with_inner_subs
+   {
+      my @F = @_;
+
+      my $captured = "A";
+      my $subB = sub {
+         $captured .= "B";
+      };
+
+      await $F[0];
+
+      $subB->();
+
+      $captured .= "C";
+
+      my $subD = sub {
+         $captured .= "D";
+      };
+
+      await $F[1];
+
+      $subD->();
+
+      $captured .= "E";
+
+      return $captured;
+   }
+
+   my $f1 = Future->new;
+   my $f2 = Future->new;
+   my $fret = with_inner_subs( $f1, $f2 );
+
+   $f1->done;
+   $f2->done;
+   is( scalar $fret->get, "ABCDE", '$fret now ready after done for inner subs' );
+}
+
 done_testing;

@@ -24,11 +24,11 @@ Date::Lectionary::Day - Determines the Day in the Christian Liturgical Year
 
 =head1 VERSION
 
-Version 1.20161227
+Version 1.20170809
 
 =cut
 
-our $VERSION = '1.20161227';
+our $VERSION = '1.20170809';
 
 =head1 SYNOPSIS
 
@@ -39,6 +39,7 @@ A helper object for Date::Lectionary to determine the liturgical name(s) and typ
 enum 'DayType',        [qw(fixedFeast moveableFeast Sunday noLect)];
 enum 'LectionaryType', [qw(acna rcl)];
 enum 'MultiLect',      [qw(yes no)];
+enum 'IncludeFeasts',  [qw(yes no)];
 no Moose::Util::TypeConstraints;
 
 =head1 SUBROUTINES/METHODS/ATTRIBUTES
@@ -72,6 +73,12 @@ Returns 'yes' if the day has multiple services with readings associated with it.
 =head3 subLects
 
 An ArrayRef of the names of the multiple services that occur on a multiLect day.
+
+=head3 includeFeasts
+
+If this is set to 'yes' --- the default value --- the module will include fixed and moveable feasts in its determination of which liturgical Sunday it is.
+
+If set to 'no', it will exclude fixed and moveable feasts.  Excluding feasts is useful when using Date::Lectionary::Day in combination with a daily lectionary such as Date::Lectioary::Daily where a fixed feast such as The Transfiguration can conflict with determining the Sunday to use for the daily lectionary.
 
 =cut
 
@@ -131,6 +138,12 @@ has 'subLects' => (
     init_arg => undef,
 );
 
+has 'includeFeasts' => (
+    is      => 'ro', 
+    isa     => 'IncludeFeasts', 
+    default => 'yes', 
+);
+
 =head2 BUILD
 
 Constructor for the Date::Lectionary object.  Takes a Time::Piect object, C<date>, to create the object.
@@ -144,7 +157,7 @@ sub BUILD {
     my $easter = _determineEaster( $advent->firstSunday->year + 1 );
 
     my %commonNameInfo =
-      _determineDay( $self->date, $self->lectionary, $advent, $easter );
+      _determineDay( $self->date, $self->lectionary, $self->includeFeasts, $advent, $easter );
     $self->_setCommonName( $commonNameInfo{commonName} );
     $self->_setDisplayName(
         _determineDisplayName( $self->lectionary, $commonNameInfo{commonName} )
@@ -1122,6 +1135,7 @@ Private method that takes the Time::Piece data given at construction and, using 
 sub _determineDay {
     my $date       = shift;
     my $lectionary = shift;
+    my $includeFeasts = shift;
 
     my $advent = shift;
     my $easter = shift;
@@ -1182,9 +1196,11 @@ sub _determineDay {
     }
 
     #Feast Day Celebrations
-    my %feastDay = _determineFeasts( $date, $lectionary );
-    if ( $feastDay{commonName} ) {
-        return ( commonName => $feastDay{commonName}, type => $feastDay{type} );
+    if($includeFeasts eq 'yes'){
+        my %feastDay = _determineFeasts( $date, $lectionary );
+        if ( $feastDay{commonName} ) {
+            return ( commonName => $feastDay{commonName}, type => $feastDay{type} );
+        }   
     }
 
     #If the date isn't a Sunday and we've determined it is not a fixed holiday
@@ -1275,7 +1291,7 @@ Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Michael Wayne Arnold.
+Copyright 2017 Michael Wayne Arnold.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Dist::Zilla::PluginBundle::MITHALDU;
-our $VERSION = '1.151340'; # VERSION
+our $VERSION = '1.172230'; # VERSION
 
 # Dependencies
 use autodie 2.00;
@@ -190,7 +190,7 @@ sub configure {
     source => "Dist::Zilla::PluginBundle::MITHALDU::Templates",
   );
 
-  my ( $old_version, $old_github ) = $self->old_meta;
+  my ( $old_version, $old_github, $meta ) = $self->old_meta;
 
   my $version_provider = ['StaticVersion' => { version => $old_version } ];
 
@@ -199,6 +199,7 @@ sub configure {
 
   my @generated_files = qw( META.json Makefile.PL cpanfile README.pod );
   my @on_release_files = ( qw/dist.ini Changes/, @generated_files );
+  my @exclude_match = ( '^' . $meta->{name} . '-', @{$self->exclude_match} );
 
   my @plugins = (
 
@@ -208,13 +209,14 @@ sub configure {
   # gather and prune
     [ GatherDir => {
       exclude_filename => [@generated_files],
-      ( (scalar @{$self->exclude_match}) ? ('exclude_match' => $self->exclude_match) : () )}
+      exclude_match => \@exclude_match}
     ], # core
     ['PruneCruft', { except => $self->prune_except }], # core
     'ManifestSkip',       # core
 
   # file munging
     'OurPkgVersion',
+    'Git::Contributors',
     'InsertCopyright',
     ( $self->is_task
       ?  'TaskWeaver'
@@ -246,14 +248,13 @@ sub configure {
     'MinimumPerl',
     ( $self->auto_prereq ? ['AutoPrereqs' => (scalar @{$self->skip_prereq}) ? ({ skip => $self->skip_prereq }) : ()] : () ),
     'CPANFile',
-    [ GithubMeta => { remote => $self->git_remote, ( $is_release ? () : @{$old_github} ) } ],
+    [ GithubMeta => { remote => $self->git_remote, ( $is_release ? () : @{$old_github} ), issues => 1 } ],
     [ MetaNoIndex => {
         directory => [qw/t xt examples corpus/],
         'package' => [qw/DB/]
       }
     ],
     ['MetaProvides::Package' => { meta_noindex => 1 } ], # AFTER MetaNoIndex
-    ['Bugtracker'],
     'MetaYAML',           # core
     'MetaJSON',           # core
 
@@ -335,7 +336,7 @@ Dist::Zilla::PluginBundle::MITHALDU - Dist::Zilla configuration the way MITHALDU
 
 =head1 VERSION
 
-version 1.151340
+version 1.172230
 
 =head1 SYNOPSIS
 
@@ -557,7 +558,7 @@ L<Dist::Zilla::Plugin::TaskWeaver>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MITHALDU>.
+at L<https://github.com/wchristian/dist-zilla-pluginbundle-mithaldu/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -569,19 +570,15 @@ L<https://github.com/wchristian/dist-zilla-pluginbundle-mithaldu>
 
   git clone https://github.com/wchristian/dist-zilla-pluginbundle-mithaldu.git
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
+Christian Walde <walde.christian@gmail.com>
 
-=item *
+=head1 CONTRIBUTOR
+
+=for stopwords David Golden
 
 David Golden <dagolden@cpan.org>
-
-=item *
-
-Christian Walde <mithaldu@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,4 +1,4 @@
-# $Id: Rule.pm,v 1.137 2015/07/13 20:53:58 pfeiffer Exp $
+# $Id: Rule.pm,v 1.138 2017/08/06 21:19:08 pfeiffer Exp $
 use strict qw(vars subs);
 
 package Mpp::Rule;

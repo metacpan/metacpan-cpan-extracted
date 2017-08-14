@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Warn;
+use Test::Exception;
 use XML::Twig;
 
 use Data::Dumper;
 
 use Device::PaloAlto::Firewall;
 
-plan tests => 6;
+plan tests => 9;
 
 my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', username => 'test', password => 'test');
 
@@ -19,7 +20,18 @@ $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse
 
 my $test = $fw->tester();
 
-ok( $test->routes_exist(), 'No routes specified' );
+# Test for exceptions
+dies_ok { $fw->routes() } 'routes(): Not specifying \'routes =>\' should die';
+dies_ok { $test->routes_exist() } 'routes_exist(): Not specifying \'routes =>\' should die';
+warning_is { $test->routes_exist(routes => []) } "Empty routes ARRAYREF specified - test will still return true", "Empty routes warns";
+{ 
+    # Supress the warning output
+    no warnings 'redefine';
+    local *Device::PaloAlto::Firewall::Test::carp = sub { };
+	ok( $test->routes_exist(routes => []), 'Empty routes returns true' );
+}
+
+# Test general usage
 ok( $test->routes_exist(routes => ['0.0.0.0/0']), 'Single route exists' );
 ok( $test->routes_exist(routes => ['0.0.0.0/0', '192.168.122.0/24']), 'Multiple routes exist' );
 
@@ -27,6 +39,8 @@ ok( !$test->routes_exist(routes => ['1.2.3.4/32']), 'Single route does not exist
 ok( !$test->routes_exist(routes => ['1.2.3.4/32', '2.3.4.5/32']), 'Multiple routes do not exist' );
 ok( !$test->routes_exist(routes => ['1.2.3.4/32', '0.0.0.0/0']), 'One route is present, one route is not present' );
 
+
+# Mocked responses
 sub static_vm_response {
     return  <<'END';
 <response status="success"><result>

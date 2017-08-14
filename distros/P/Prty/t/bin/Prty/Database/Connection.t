@@ -31,7 +31,7 @@ sub initMethod : Init(1) {
 sub udls : Foreach {
     my $self = shift;
 
-    my $file = $self->testPath('prty/test/data/db/test-databases.conf');
+    my $file = $self->testPath('t/data/db/test-databases.conf');
     my @arr = split /\n/,Prty::Path->read($file);
     @arr = grep { !/^#/ } @arr; # Kommentarzeichen überlesen
 

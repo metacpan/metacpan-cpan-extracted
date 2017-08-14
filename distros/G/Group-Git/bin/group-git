@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.6.3');
+our $VERSION = version->new('0.6.4');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -45,6 +45,7 @@ sub main {
             conf_prefix   => '',
             default       => {
                 max      => 10,
+                runtime  => 600,
                 page     => 1,
                 separate => 1,
                 %{ $conf },
@@ -54,6 +55,7 @@ sub main {
             'skip|s=s',
             'match|m=s',
             'max|M=i',
+            'runtime|max-runtime|R=i',
             'local|l!',
             'recurse|r!',
             'page|p!',
@@ -118,6 +120,7 @@ sub main {
 
             push @threads, {
                 project => $project,
+                start   => time,
                 thread  => threads->new(
                     sub {
                         local $CWD = $cwd;
@@ -131,6 +134,19 @@ sub main {
                 $check = ($check + 1) % $opt->max;
                 if ( $threads[$check]{thread}->is_running ) {
                     warn "Sleeping on $threads[$check]{project} ---------\n" if $opt->verbose;
+
+                    if ( $opt->runtime && time > $threads[$check]{start} + $opt->runtime ) {
+                        warn "Abandoning $threads[$check]{project} as it's taking too long!\n";
+
+                        # abandon thread
+                        threads->detach( $threads[$check]{thread} );
+                        @threads = (
+                            @threads[ 0 .. $check - 1 ],
+                            @threads[ $check + 1 .. @threads - 1 ]
+                        );
+                        next;
+                    }
+
                     sleep 1;
                 }
                 else {
@@ -301,7 +317,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.6.3.
+This documentation refers to group-git version 0.6.4.
 
 =head1 SYNOPSIS
 
@@ -340,6 +356,10 @@ This documentation refers to group-git version 0.6.3.
   -M --max[=]int
                 Limit the number of symultanious threads running at once.
                 Default 10 threads
+  -R --max-runtime[=]seconds
+                If a commands on a repository takes longer than this number
+                of seconds group-git will no longer wait for it to finish
+                (Default 600s or 10 minutes)
      --VERSION  Prints the version information
      --help     Prints this help information
      --man      Prints the full documentation for group-git

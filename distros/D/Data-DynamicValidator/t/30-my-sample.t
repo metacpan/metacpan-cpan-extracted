@@ -5,7 +5,6 @@ use Test::More;
 use Test::Warnings;
 
 use Data::DynamicValidator qw/validator/;
-use List::MoreUtils qw/all any/;
 use Net::hostent;
 use Scalar::Util qw/looks_like_number/;
 
@@ -112,7 +111,7 @@ subtest 'my-demo-test' => sub {
             my $port = $_->();
             shift->(
                 on      => "//*[key eq $port]",
-                should  => sub { @_ == 1 && any { $_[0] eq $_ } (qw/tcp udp/)  },
+                should  => sub { @_ == 1 && $_[0] =~ /(tcp)|(udp)/ },
                 because => "The port $port should be declated at top-level as tcp or udp",
             )
         }

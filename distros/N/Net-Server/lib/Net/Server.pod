@@ -1627,6 +1627,9 @@ Paul Seamons <paul at seamons.com>
 
 =head1 THANKS
 
+As we move to a github flow, please be sure to add yourself to the
+credits as patches are passed along (if you'd like to be mentioned).
+
 Thanks to Rob Brown (bbb at cpan.org) for help with miscellaneous
 concepts such as tracking down the serialized select via flock ala
 Apache and the reference to IO::Select making multiport servers

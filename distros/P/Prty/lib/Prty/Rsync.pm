@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Option;
 use File::Rsync ();
@@ -202,7 +202,7 @@ sub exec {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

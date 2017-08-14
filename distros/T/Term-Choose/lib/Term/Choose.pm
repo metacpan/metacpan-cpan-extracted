@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.506';
+our $VERSION = '1.507';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -271,9 +271,9 @@ sub __choose {
         next GET_KEY if $key == NEXT_get_key;
         next GET_KEY if $key == KEY_Tilde;
 
-        # $self->{rc2idx} holds the new list (AoA) formated in "__size_and_layout" appropirate to the chosen layout.
-        # $self->{rc2idx} does not hold the values dircetly but the respective list indexes from the original list.
-        # If the original list would be ( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ) and the new formated list should be
+        # $self->{rc2idx} holds the new list (AoA) formatted in "__size_and_layout" appropriate to the chosen layout.
+        # $self->{rc2idx} does not hold the values directly but the respective list indexes from the original list.
+        # If the original list would be ( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ) and the new formatted list should be
         #     a d g
         #     b e h
         #     c f
@@ -833,19 +833,17 @@ sub __size_and_layout {
 
 sub __set_default_cell {
     my ( $self ) = @_;
-    my $tmp_pos = [ 0, 0 ];
     LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
         for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
             if ( $self->{default} == $self->{rc2idx}[$i][$j] ) {
-                $tmp_pos = [ $i, $j ];
+                $self->{pos} = [ $i, $j ];
                 last LOOP;
             }
         }
     }
-    $self->{p_begin} = $self->{avail_height} * int( $tmp_pos->[ROW] / $self->{avail_height} );
+    $self->{p_begin} = $self->{avail_height} * int( $self->{pos}[ROW] / $self->{avail_height} );
     $self->{p_end} = $self->{p_begin} + $self->{avail_height} - 1;
     $self->{p_end} = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
-    $self->{pos} = $tmp_pos;
 }
 
 
@@ -1044,9 +1042,9 @@ sub __mouse_info_to_key {
         return NEXT_get_key;
     }
     if ( $row != $self->{pos}[ROW] || $matched_col != $self->{pos}[COL] ) {
-        my $tmp = $self->{pos};
+        my $not_pos = $self->{pos};
         $self->{pos} = [ $row, $matched_col ];
-        $self->__wr_cell( $tmp->[0], $tmp->[1] );
+        $self->__wr_cell( $not_pos->[0], $not_pos->[1] );
         $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
     }
     return $return_char;
@@ -1069,7 +1067,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.506
+Version 1.507
 
 =cut
 
@@ -1275,8 +1273,7 @@ If the length of an element is greater than the width of the screen the element 
 
     $element = substr( $element, 0, $allowed_length - 3 ) . '...';*
 
-* C<Term::Choose> uses its own function to cut strings which uses C<columns> from L<Unicode::GCString> to determine the
-string length.
+* It is used a function to cut strings which uses C<columns> from L<Unicode::GCString> to determine the string length.
 
 =back
 

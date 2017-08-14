@@ -1,4 +1,7 @@
 Revision history for Perl extension App::Gallery.
 
+0.002 2017-08-12T17:20+08:00
+ - Fix PREREQ_PM
+
 0.001 2017-07-31T22:10+08:00
  - Initial release

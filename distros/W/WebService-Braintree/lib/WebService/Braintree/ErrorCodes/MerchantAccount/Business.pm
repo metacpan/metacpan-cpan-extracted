@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::Business;
-$WebService::Braintree::ErrorCodes::MerchantAccount::Business::VERSION = '0.91';
+$WebService::Braintree::ErrorCodes::MerchantAccount::Business::VERSION = '0.92';
 use strict;
 
 use constant DbaNameIsInvalid             => "82646";

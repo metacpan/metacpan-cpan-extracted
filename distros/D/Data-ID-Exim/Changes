@@ -1,3 +1,16 @@
+version 0.009; 2017-08-10
+
+  * new functions to support the base-36 version of Exim message IDs
+
+  * small wording improvement in documentation
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
 version 0.008; 2011-11-19
 
   * avoid latent bug of passing magic variables $1 et al into functions

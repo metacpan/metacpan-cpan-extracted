@@ -278,7 +278,7 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 #  define NTV_SUBSEC NTPTIMEVAL_SUBSEC
 	struct timex txx;
 # endif /* !QHAVE_STRUCT_TIMEX_TIME */
-	long maxerr, offset, err_s, err_ns;
+	unsigned long maxerr, offset, err_s, err_ns;
 	PERL_UNUSED_THX();
 # if defined(QHAVE_STRUCT_TIMEX_TIME) ? \
 	defined(QHAVE_STRUCT_TIMEX_TIME_STATE) : \
@@ -290,6 +290,9 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 #ifdef QHAVE_STRUCT_TIMEX_TIME
 	Zero(&tx, 1, struct timex);
 	state = ntp_adjtime(&tx);
+	if(state == -1 || tx.tolerance < 0) return GOT_NOTHING;
+	offset = tx.offset < 0 ? -(unsigned long)tx.offset :
+		(unsigned long)tx.offset;
 #else /* !QHAVE_STRUCT_TIMEX_TIME */
 	/*
 	 * ntp_adjtime() doesn't give us the actual current time, only the
@@ -328,15 +331,26 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 		if(ntp_adjtime(&tx) == -1)
 			return GOT_NOTHING;
 		state = ntp_gettime(&ntv);
+		if(state == -1) return GOT_NOTHING;
 		if(ntp_adjtime(&txx) == -1)
 			return GOT_NOTHING;
 	} while((tx.status & STA_NANO) != (txx.status & STA_NANO));
-	if(txx.offset > tx.offset)
-		tx.offset = txx.offset;
+	if(tx.tolerance < 0 || txx.tolerance < 0) return GOT_NOTHING;
 	if(txx.tolerance > tx.tolerance)
 		tx.tolerance = txx.tolerance;
+	{
+		unsigned long o0 = tx.offset < 0 ? -(unsigned long)tx.offset :
+					(unsigned long)tx.offset;
+		unsigned long o1 = txx.offset < 0 ? -(unsigned long)txx.offset :
+					(unsigned long)txx.offset;
+		offset = o0 > o1 ? o0 : o1;
+	}
 #endif /* !QHAVE_STRUCT_TIMEX_TIME */
-	if(state == -1 || ntv.time.tv_sec < 0) return GOT_NOTHING;
+	if(ntv.time.tv_sec < 0 || ntv.time.NTV_SUBSEC < 0 ||
+			ntv.time.NTV_SUBSEC >= ((tx.status & STA_NANO) ?
+						1000000000 : 1000000) ||
+			ntv.maxerror < 0)
+		return GOT_NOTHING;
 	dayno = UNIX_EPOCH_DAYNO + ntv.time.tv_sec / 86400;
 	secs = ntv.time.tv_sec % 86400;
 	switch(leap_state) {
@@ -382,17 +396,17 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 			ntv.time.NTV_SUBSEC :
 			ntv.time.NTV_SUBSEC * 1000;
 	if(leap_state == TIME_ERROR) return GOT_TIME;
-	maxerr = ntv.maxerror + (tx.tolerance >> SHIFT_USEC) + 1;
-	offset = tx.offset < 0 ? -tx.offset : tx.offset;
+	maxerr = ((unsigned long)ntv.maxerror) +
+		((unsigned long)(tx.tolerance >> SHIFT_USEC)) + 1;
 	err_s = maxerr / 1000000;
 	maxerr -= err_s * 1000000;
 	if(tx.status & STA_NANO) {
-		long offset_s = offset / 1000000000;
+		unsigned long offset_s = offset / 1000000000;
 		offset -= offset_s * 1000000000;
 		err_s += offset_s;
 		err_ns = offset + maxerr*1000;
 	} else {
-		long offset_s = offset / 1000000;
+		unsigned long offset_s = offset / 1000000;
 		offset -= offset_s * 1000000;
 		err_s += offset_s;
 		err_ns = (offset + maxerr) * 1000;
@@ -401,8 +415,9 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 		err_s++;
 		err_ns -= 1000000000;
 	}
-	nt->bound_s = err_s;
-	nt->bound_ns = err_ns;
+	if(err_s > 0x7fffffff) return GOT_TIME;
+	nt->bound_s = (I32)err_s;
+	nt->bound_ns = (I32)err_ns;
 	return GOT_BOUND;
 }
 
@@ -411,6 +426,77 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 #else /* !QHAVE_NTP_ADJTIME */
 # define MECH_NTPADJTIME
 #endif /* !QHAVE_NTP_ADJTIME */
+
+#ifdef QHAVE_CLOCK_GETTIME
+# include <time.h>
+#endif /* QHAVE_CLOCK_GETTIME */
+
+/*
+ * use of clock_gettime(CLOCK_UTC)
+ *
+ * This represents a leap second by the use of an out-of-radix tv_nsec.
+ * An error bound is implied: it is only allowed to return a time at
+ * all if it is accurate to within a second.  No tighter bound can
+ * be indicated.
+ */
+
+#if defined(QHAVE_CLOCK_GETTIME) && defined(CLOCK_UTC)
+
+static int THX_try_clockgettime_utc(pTHX_ struct nowtime *nt)
+{
+	struct timespec ts;
+	PERL_UNUSED_THX();
+	if(-1 == clock_gettime(CLOCK_UTC, &ts) || ts.tv_sec < 0 ||
+			ts.tv_nsec < 0 || ts.tv_nsec >= 2000000000)
+		return GOT_NOTHING;
+	nt->dayno = UNIX_EPOCH_DAYNO + ts.tv_sec / 86400;
+	nt->tod_s = ts.tv_sec % 86400;
+	if(ts.tv_nsec >= 1000000000) {
+		if(nt->tod_s != 86399) return GOT_NOTHING;
+		nt->tod_s = 86400;
+		ts.tv_nsec -= 1000000000;
+	}
+	nt->tod_ns = ts.tv_nsec;
+	nt->bound_s = 1;
+	nt->bound_ns = 0;
+	return GOT_BOUND;
+}
+
+# define MECH_CLOCKGETTIME_UTC \
+	{ "clock_gettime(CLOCK_UTC)", THX_try_clockgettime_utc, GOT_BOUND },
+
+#else /* !(QHAVE_CLOCK_GETTIME && CLOCK_UTC) */
+# define MECH_CLOCKGETTIME_UTC
+#endif /* !(QHAVE_CLOCK_GETTIME && CLOCK_UTC) */
+
+/*
+ * use of clock_gettime(CLOCK_REALTIME)
+ *
+ * There is no leap second handling or error bound here.
+ */
+
+#if defined(QHAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)
+
+static int THX_try_clockgettime_realtime(pTHX_ struct nowtime *nt)
+{
+	struct timespec ts;
+	PERL_UNUSED_THX();
+	if(-1 == clock_gettime(CLOCK_REALTIME, &ts) || ts.tv_sec < 0 ||
+			ts.tv_nsec < 0 || ts.tv_nsec >= 1000000000)
+		return GOT_NOTHING;
+	nt->dayno = UNIX_EPOCH_DAYNO + ts.tv_sec / 86400;
+	nt->tod_s = ts.tv_sec % 86400;
+	nt->tod_ns = ts.tv_nsec;
+	return GOT_TIME;
+}
+
+# define MECH_CLOCKGETTIME_REALTIME \
+	{ "clock_gettime(CLOCK_REALTIME)", THX_try_clockgettime_realtime, \
+		GOT_TIME },
+
+#else /* !(QHAVE_CLOCK_GETTIME && CLOCK_REALTIME) */
+# define MECH_CLOCKGETTIME_REALTIME
+#endif /* !(QHAVE_CLOCK_GETTIME && CLOCK_REALTIME) */
 
 /*
  * use of GetSystemTimeAsFileTime()
@@ -428,7 +514,9 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 # define WINDOWS_EPOCH_MJD (-94187)
 # define WINDOWS_EPOCH_DAYNO (WINDOWS_EPOCH_MJD - TAI_EPOCH_MJD)
 
-# if !(defined(HAS_QUAD) && defined(UINT64_C))
+# if defined(HAS_QUAD) && defined(UINT64_C)
+typedef U64TYPE U64;
+# else /* !(HAS_QUAD && UINT64_C) */
 static U16 div_u64_u16(U32 *hi_p, U32 *lo_p, U16 d)
 {
 	U32 hq = *hi_p / d;
@@ -510,7 +598,8 @@ static int THX_try_gettimeofday(pTHX_ struct nowtime *nt)
 {
 	struct timeval tv;
 	PERL_UNUSED_THX();
-	if(-1 == gettimeofday(&tv, NULL) || tv.tv_sec < 0)
+	if(-1 == gettimeofday(&tv, NULL) || tv.tv_sec < 0 ||
+			tv.tv_usec < 0 || tv.tv_usec >= 1000000)
 		return GOT_NOTHING;
 	nt->dayno = UNIX_EPOCH_DAYNO + tv.tv_sec / 86400;
 	nt->tod_s = tv.tv_sec % 86400;
@@ -539,7 +628,7 @@ static int THX_try_timeunixtime(pTHX_ struct nowtime *nt)
 	IV secs;
 	if(!MY_CXT.loaded_time_unix) {
 		load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Time::Unix"),
-			newSVnv((NV)1.02));
+			newSVnv(Atof("1.02")));
 		MY_CXT.loaded_time_unix = 1;
 	}
 	{
@@ -587,6 +676,8 @@ static int THX_try_timeunixtime(pTHX_ struct nowtime *nt)
 
 static struct mechanism const mechanisms[] = {
 	MECH_NTPADJTIME
+	MECH_CLOCKGETTIME_UTC
+	MECH_CLOCKGETTIME_REALTIME
 	MECH_GETSYSTEMTIMEASFILETIME
 	MECH_GETTIMEOFDAY
 	MECH_TIMEUNIXTIME
@@ -637,7 +728,7 @@ static SV *THX_build_rat(pTHX_ I32 unit, I32 nano)
 	SV *ref;
 	if(!MY_CXT.loaded_math_bigrat) {
 		load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Math::BigRat"),
-			newSVnv((NV)0.13));
+			newSVnv(Atof("0.13")));
 		MY_CXT.loaded_math_bigrat = 1;
 	}
 	{

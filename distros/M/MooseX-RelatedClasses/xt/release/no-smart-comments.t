@@ -2,7 +2,7 @@
 #
 # This file is part of MooseX-RelatedClasses
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -27,7 +27,6 @@ no_smart_comments_in("t/basic.t");
 no_smart_comments_in("t/blank_namespace.t");
 no_smart_comments_in("t/custom-decamelization.t");
 no_smart_comments_in("t/desnaking-with-doublecolon.t");
-no_smart_comments_in("t/funcs.pm");
 no_smart_comments_in("t/lib/Test/Class/__WONKY__.pm");
 no_smart_comments_in("t/lib/Test/Class/__WONKY__/One.pm");
 no_smart_comments_in("t/lib/Test/Class/__WONKY__/Sub/One.pm");

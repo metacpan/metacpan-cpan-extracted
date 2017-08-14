@@ -1,0 +1,241 @@
+# PODNAME: Device::PaloAlto:Firewall::Return
+# ABSTRACT: Return values for Device::PaloAlto::Firewall methods.
+ 
+__END__
+ 
+
+=pod
+ 
+=encoding UTF-8
+ 
+=head1 NAME
+
+Device::PaloAlto:Firewall::Return - Return values for Device::PaloAlto::Firewall methods.
+ 
+=head1 VERSION
+ 
+# VERSION  
+
+=head1 DESCRIPTION
+
+The L<Device::PaloAlto::Firewall> package has methods which make API calls against the firewall.
+The return values from these methods are either hash or array references where appropriate.
+
+Apart from some data structure re-organisation and/or simplification, the values returned are verbatim
+what was receveied from the firewall in the API response.
+
+Both the hash keys and example values are documented for each method to provide more context.
+ 
+=head1 RETURN VALUES
+
+=head2 system_info()
+
+    {
+      'global-protect-datafile-release-date' => 'unknown',
+      'uptime' => '0 days, 0:14:08',
+      'wf-private-release-date' => 'unknown',
+      'threat-release-date' => 'unknown',
+      'global-protect-datafile-version' => '0',
+      'threat-version' => '0',
+      'logdb-version' => '7.0.9',
+      'ipv6-address' => 'unknown',
+      'wildfire-version' => '0',
+      'av-release-date' => 'unknown',
+      'family' => 'vm',
+      'vm-license' => 'none',
+      'app-release-date' => 'unknown',
+      'vm-uuid' => 'unknown',
+      'hostname' => 'PA-VM',
+      'multi-vsys' => 'off',
+      'vm-cpuid' => 'C1060200FDFB8B07',
+      'app-version' => '497-2688',
+      'model' => 'PA-VM',
+      'wildfire-release-date' => 'unknown',
+      'ipv6-default-gateway' => {},
+      'operational-mode' => 'normal',
+      'time' => 'Tue Aug  8 21:06:42 2017\n',
+      'vm-mac-base' => 'BA:DB:EE:FB:AD:00',
+      'mac-address' => '52:54:00:22:b2:e4',
+      'vm-mac-count' => '255',
+      'av-version' => '0',
+      'vpn-disable-mode' => 'off',
+      'global-protect-client-package-version' => '0.0.0',
+      'ipv6-link-local-address' => 'fe80::5054:ff:fe22:b2e4/64',
+      'platform-family' => 'vm',
+      'default-gateway' => '192.168.122.1',
+      'devicename' => 'PA-VM',
+      'sw-version' => '7.0.0',
+      'serial' => 'unknown',
+      'netmask' => '255.255.255.0',
+      'url-db' => 'paloaltonetworks',
+      'url-filtering-version' => '0000.00.00.000',
+      'ip-address' => '192.168.122.21',
+      'wf-private-version' => '0'
+    };
+
+=head2 interfaces()
+
+    {
+    'hw' => {
+            'entry' => [
+                       {
+                         'mac' => '52:54:00:39:74:c1',
+                         'duplex' => 'auto',
+                         'type' => '0',
+                         'id' => '16',
+                         'mode' => '(autoneg)',
+                         'state' => 'up',
+                         'st' => 'auto/auto/up',
+                         'speed' => 'auto',
+                         'name' => 'ethernet1/1'
+                       },
+                       {
+                         'id' => '17',
+                         'mode' => '(autoneg)',
+                         'duplex' => 'auto',
+                         'mac' => '52:54:00:dd:0c:f3',
+                         'type' => '0',
+                         'speed' => 'auto',
+                         'name' => 'ethernet1/2',
+                         'st' => 'auto/auto/up',
+                         'state' => 'up'
+                       },
+                     ]
+          },
+    'ifnet' => {
+               'entry' => [
+                          {
+                            'vsys' => '1',
+                            'dyn-addr' => {},
+                            'name' => 'ethernet1/1',
+                            'zone' => 'outside',
+                            'ip' => '192.168.122.19/24',
+                            'tag' => '0',
+                            'addr' => {},
+                            'fwd' => 'vr:default',
+                            'addr6' => {},
+                            'id' => '16'
+                          },
+                          {
+                            'dyn-addr' => {},
+                            'vsys' => '1',
+                            'tag' => '0',
+                            'zone' => 'inside',
+                            'ip' => '192.168.124.19/24',
+                            'name' => 'ethernet1/2',
+                            'fwd' => 'vr:default',
+                            'addr' => {},
+                            'id' => '17',
+                            'addr6' => {}
+                          },
+                        ]
+             }
+    };
+
+=head2 high_availability
+
+=head2 ntp
+
+{
+ 'synched' => 'LOCAL'
+};
+
+=head2 routing_table
+
+    [
+     {
+       'virtual-router' => 'default',
+       'age' => {},
+       'destination' => '0.0.0.0/0',
+       'flags' => 'A S  ',
+       'metric' => '10',
+       'interface' => 'ethernet1/1',
+       'nexthop' => '192.168.122.1'
+     },
+     {
+       'metric' => '0',
+       'interface' => {},
+       'nexthop' => '0.0.0.0',
+       'virtual-router' => 'default',
+       'age' => {},
+       'destination' => '1.1.1.0/32',
+       'flags' => 'A H  '
+     },
+    ]
+
+
+=head2 bgp_peers
+
+If no BGP peers are configured, the function returns an empty ARRAYREF.
+
+If BGP peers are configured, it returns an ARRAYREF of HASHREFs, with each HASHREF a specific BGP peer.
+
+    [
+     {
+       'nexthop-thirdparty' => 'yes',
+       'passive' => 'no',
+       'status-flap-counts' => '1',
+       'prefix-counter' => {
+                           'entry' => {
+                                      'afi-safi' => 'bgpAfiIpv4-unicast',
+                                      'incoming-total' => '1',
+                                      'outgoing-total' => '0',
+                                      'incoming-rejected' => '0',
+                                      'outgoing-advertised' => '0',
+                                      'incoming-accepted' => '1'
+                                    }
+                         },
+       'msg-total-out' => '89',
+       'msg-update-out' => '1',
+       'keepalive' => '30',
+       'open-delay' => '0',
+       'remote-as' => '65002',
+       'aggregate-confed-as' => 'no',
+       'config' => {
+                   'remove-private-as' => 'no'
+                 },
+       'holdtime-config' => '90',
+       'nexthop-peer' => 'no',
+       'holdtime' => '90',
+       'peer-capability' => {
+                            'list' => [
+                                      {
+                                        'capability' => 'Multiprotocol Extensions(1)'
+                                      },
+                                      {
+                                        'capability' => 'Route Refresh(2)'
+                                      },
+                                      {
+                                        'capability' => 'Graceful Restart(64)'
+                                      },
+                                      {
+                                        'capability' => 'Route Refresh (Cisco)(128)'
+                                      }
+                                    ]
+                          },
+       'keepalive-config' => '30',
+       'idle-hold' => '15',
+       'peer-address' => '1.1.1.1:179',
+       'peer-router-id' => '1.1.1.1',
+       'prefix-limit' => '5000',
+       'vr' => 'default',
+       'ORF-entry-received' => '0',
+       'established-counts' => '1',
+       'nexthop-self' => 'no',
+       'local-address' => '1.1.1.0:60401',
+       'msg-total-in' => '90',
+       'last-error' => {},
+       'connect-retry-interval' => '120',
+       'password-set' => 'no',
+       'multi-hop-ttl' => '2',
+       'last-update-age' => '10',
+       'peering-type' => 'Unspecified',
+       'reflector-client' => 'not-client',
+       'msg-update-in' => '2',
+       'peer' => 'default_to_inside_vr',
+       'same-confederation' => 'no',
+       'status-duration' => '2249',
+       'status' => 'Established',
+       'peer-group' => 'Internal_VR'
+     },
+    ];

@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -235,6 +235,22 @@ Like C<Graph::Maker::BalancedTree>, if the graph is directed (the default)
 then edges are added in both directions between nodes.  Option C<undirected
 =E<gt> 1> creates an undirected graph and for it there is a single edge
 between vertices.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for twindragon area trees include
+
+=over
+
+=item level=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+
+=item level=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+
+=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+
+=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=700>
 
 =back
 

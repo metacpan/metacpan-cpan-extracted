@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -213,7 +213,7 @@ Level=0 is a single vertex 0 and no edges.
 Level=1 is two vertices 0 and 1 and an edge between them by the horizontal
 toggle low bit rule.
 
-    0---1          level => 1
+            0---1          level => 1
 
 Level=2 has the vertical rule connecting vertices 0 = 00 binary and 3 = 11
 binary.  These are 11 with no trailing 0s, connected to 00 with no trailing
@@ -245,7 +245,7 @@ Vertices are degree 1, 2 or 3.  Vertex 0 can be considered as the root.
 Level k+1 is formed by taking level k and extending with a second copy of
 level k connected by a middle edge.  This is between bit patterns 0011..11
 in the first copy and 1100..00 in the second, per the level=4 above.  In the
-big level=6 example above it is vertices 15 to 48.
+big level=6 example above this is vertices 15 to 48.
 
 =for GP-Test  binary(15) == [    1,1,1,1]
 
@@ -303,6 +303,28 @@ between vertices.
 
 =back
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the graphs here include
+
+=over
+
+=item level=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+
+=item level=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+
+=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+
+=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=260>  (path-8)
+
+=item level=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27042>
+
+=item level=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27044>
+
+=item level=6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27046>
+
+=back
+
 =head1 OEIS
 
 Entries in Sloane's Online Encyclopedia of Integer Sequences related to
@@ -317,9 +339,9 @@ L<http://oeis.org/A053599> (etc)
     A053599    diameter
     A077866    height
     A001196    vertices of vertical spine
-    A053754    vertices of vertical spine and branching from it,
+    A053754    vertices of vertical spine and branches from it,
                  being N binary even length
-    A053738    vertices of NW spine and branching from it,
+    A053738    vertices of NW spine and branches from it,
                  being N binary odd length
 
 =head1 SEE ALSO

@@ -66,6 +66,20 @@ has user_agent => (
     }
 );
 
+has _ua => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_ua',
+);
+
+sub _build_ua {
+    my $self = shift;
+    my $ua = Mojo::UserAgent->new;
+    $ua->transactor->name( $self->user_agent );
+    $ua->proxy->detect;
+    return $ua;
+}
+
 sub _get_transaction {
     my ( $self,$params ) = @_;
 
@@ -144,9 +158,6 @@ sub _api_request {
     carp( "$method -> $path" )
         if $ENV{MONZO_DEBUG};
 
-    my $ua = Mojo::UserAgent->new;
-    $ua->transactor->name( $self->user_agent );
-
     $path = $self->_add_query_params( $path,$params )
         if $method =~ /GET/;
 
@@ -167,9 +178,9 @@ sub _api_request {
     );
 
     if ( $method =~ /POST|PUT|PATCH/i ) {
-        $tx = $ua->$method( $path => { %headers } => form => $params );
+        $tx = $self->_ua->$method( $path => { %headers } => form => $params );
     } else {
-        $tx = $ua->$method( $path => { %headers } );
+        $tx = $self->_ua->$method( $path => { %headers } );
     }
 
     if ( $tx->success ) {

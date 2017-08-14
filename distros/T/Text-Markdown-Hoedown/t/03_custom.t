@@ -44,7 +44,7 @@ $cb->underline(sub {
     my ($text) = @_;
     qq{<u>$text</u>};
 });
-$cb->raw_html_tag(sub {
+$cb->raw_html(sub {
     my ($text) = @_;
     $text;
 });
@@ -57,7 +57,7 @@ $cb->image(sub {
     }
 });
 $cb->link(sub {
-    my ($link, $title, $content) = @_;
+    my ($content, $link, $title) = @_;
     if (defined $title) {
         qq!<a title="$title" href="$link">$content</a>!;
     } else {
@@ -104,7 +104,7 @@ I get 10 times more traffic from [Google] [1] than from
 <code>hoge()</code>
 
 <b>bold</b>
-_under_
+<u>under</u>
 <img title="Optional title" alt="Alt text" src="/path/to/img.jpg">
 <img alt="Alt text" src="/path/to/img.jpg"></p>
 <p>This is <a title="Title" href="http://example.com/">an example</a> inline link.</p>

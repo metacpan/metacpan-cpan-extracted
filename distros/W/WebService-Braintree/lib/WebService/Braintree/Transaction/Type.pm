@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction::Type;
-$WebService::Braintree::Transaction::Type::VERSION = '0.91';
+$WebService::Braintree::Transaction::Type::VERSION = '0.92';
 use strict;
 
 use constant Sale => "sale";

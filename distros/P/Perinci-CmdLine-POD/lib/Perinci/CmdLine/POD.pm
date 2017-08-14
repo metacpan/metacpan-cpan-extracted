@@ -1,7 +1,7 @@
 package Perinci::CmdLine::POD;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2017-08-12'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -512,13 +512,16 @@ sub gen_pod_for_pericmd_script {
     # section: DESCRIPTION
     {
         my $k = defined $gen_sc ? $gen_sc : '';
-        last unless $metas{$k}{description};
+        # XXX proper .alt search
+        my $desc = $metas{$k}{'description.alt.env.cmdline'} //
+            $metas{$k}{description};
+        last unless $desc;
 
         require Markdown::To::POD;
 
         my @sectpod;
         push @sectpod,
-            Markdown::To::POD::markdown_to_pod($metas{$k}{description});
+            Markdown::To::POD::markdown_to_pod($desc);
         push @sectpod, "\n\n";
 
         push @{ $resmeta->{'func.sections'} }, {name=>'DESCRIPTION', content=>join("", @sectpod), ignore=>1};
@@ -978,7 +981,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.014 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-07-07.
+This document describes version 0.015 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-08-12.
 
 =head1 SYNOPSIS
 

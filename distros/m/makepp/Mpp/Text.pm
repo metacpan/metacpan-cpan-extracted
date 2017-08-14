@@ -1,4 +1,4 @@
-# $Id: Text.pm,v 1.72 2017/07/26 22:11:11 pfeiffer Exp $
+# $Id: Text.pm,v 1.73 2017/08/06 21:19:09 pfeiffer Exp $
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ BEGIN {
   # Keep it here, as this is the common to all mpp* utilities.
   our $BASEVERSION = 2.1;
 #@@setVERSION
-  our $VERSION = '2.0.98.5.1cvs';
+  our $VERSION = '2.0.99.1';
 
 #
 # Not installed, so grep all our sources for the checkin date.  Make a

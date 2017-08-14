@@ -34,11 +34,13 @@ inc::Sereal::BuildTools::WriteMakefile(
     },
     TEST_REQUIRES => {
         'Test::More' => 0.88,
-        'Test::Deep' => '0',
+        'Test::Deep' => 0,
+        'Test::Exception' => 0.38,
+        'Test::Differences' => 0,
         'Scalar::Util' => 0,
-        'Data::Dumper' => '0',
-        'Sereal::Encoder' => '3.00',
-        'Sereal::Decoder' => '3.00',
+        'Data::Dumper' => 0,
+        'Sereal::Encoder' => 3.015,
+        'Sereal::Decoder' => 3.015,
     },
     BUILD_REQUIRES => {
         'File::Find' => 0,

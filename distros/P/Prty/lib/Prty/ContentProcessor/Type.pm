@@ -4,7 +4,7 @@ use base qw/Prty::ContentProcessor::BaseType/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 # -----------------------------------------------------------------------------
 
@@ -655,7 +655,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

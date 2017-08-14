@@ -2,13 +2,9 @@
 #
 #  Net::Server::Proto::UNIX - Net::Server Protocol module
 #
-#  $Id$
+#  Copyright (C) 2001-2017
 #
-#  Copyright (C) 2001-2012
-#
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License
@@ -96,6 +92,26 @@ sub hup_string {
 sub show {
     my $sock = shift;
     return "Ref = \"".ref($sock). "\" (".$sock->hup_string.")\n";
+}
+
+###----------------------------------------------------------------###
+
+sub read_until { # only sips the data - but it allows for compatibility with SSLEAY
+    my ($client, $bytes, $end_qr) = @_;
+    die "One of bytes or end_qr should be defined for UNIX read_until\n" if !defined($bytes) && !defined($end_qr);
+    my $content = '';
+    my $ok = 0;
+    while (1) {
+        $client->read($content, 1, length($content));
+        if (defined($bytes) && length($content) >= $bytes) {
+            $ok = 2;
+            last;
+        } elsif (defined($end_qr) && $content =~ $end_qr) {
+            $ok = 1;
+            last;
+        }
+    }
+    return wantarray ? ($ok, $content) : $content;
 }
 
 1;

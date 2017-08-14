@@ -1,0 +1,13 @@
+bin/openssl-env-bash
+bin/openssl-env-perl
+Build.PL
+Changes
+lib/Alien/OpenSSL/Static.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+source/openssl-1.1.0f.tar.gz
+t/00-use.t
+t/01-signature.t
+t/author-pod.t

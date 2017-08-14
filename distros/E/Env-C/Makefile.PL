@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.005;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Env-C",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.005",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Env::C",
   "PREREQ_PM" => {
     "DynaLoader" => 0,
@@ -22,10 +22,10 @@ my %WriteMakefileArgs = (
     "strict" => 0
   },
   "TEST_REQUIRES" => {
-    "Socket" => 0,
-    "Test::More" => "0.88"
+    "Test::More" => "0.88",
+    "warnings" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,9 +34,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DynaLoader" => 0,
-  "Socket" => 0,
   "Test::More" => "0.88",
-  "strict" => 0
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

@@ -62,9 +62,7 @@ Wraps C<Reddit::Client::submit_text>, providing the subreddit parameter implicit
 
 =head1 AUTHOR
 
-<mailto:earth-tone@ubwg.net>
-
-Jeff Ober L<mailto:jeffober@gmail.com>
+L<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

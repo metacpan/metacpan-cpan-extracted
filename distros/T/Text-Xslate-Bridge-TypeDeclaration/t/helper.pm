@@ -23,4 +23,14 @@ sub path {
     sub new { bless +{}, $_[0] };
 }
 
+{
+    package t::OneModel;
+    sub new { bless +{}, $_[0] };
+}
+
+{
+    package t::AnotherModel;
+    sub new { bless +{}, $_[0] };
+}
+
 1;

@@ -1,5 +1,5 @@
 package Env::C;
-$Env::C::VERSION = '0.14';
+$Env::C::VERSION = '0.15';
 # ABSTRACT: Get/Set/Unset Environment Variables on the C level
 
 require 5.005;
@@ -24,7 +24,7 @@ Env::C - Get/Set/Unset Environment Variables on the C level
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -41,10 +41,19 @@ version 0.14
   my $ar_env = Env::C::getallenv();
   print join "\n", @$ar_env;
 
+  Env::C::setenv_multi(
+      "VAR1", "value1", 1,
+      "VAR2", "value2", 0
+  );
+
+  Env::C::unsetenv_multi("VAR1", "VAR2");
+
 =head1 DESCRIPTION
 
 This module provides a Perl API for getenv(3), setenv(3) and
 unsetenv(3). It also can return all the C<environ> variables.
+You also can use C<setenv_multi> and C<getenv_multi> for bulk
+operations with environment.
 
 Sometimes Perl invokes modules with underlaying C APIs which rely on
 certain environment variables to be set. If these variables are set in
@@ -71,6 +80,14 @@ is not changed.
 
 The unsetenv() function deletes the variable C<$key> from the
 environment.
+
+=head2 setenv_multi($key1, $value1, $override1, $key2, $value2, $override2, ...)
+
+Similar to C<setenv>, but works with several variables at once.
+
+=head2 unsetenv_multi(@keys)
+
+Similar to C<unsetenv>, but works with several variables at once.
 
 =head2 getallenv()
 
@@ -117,7 +134,7 @@ Stas Bekman E<lt>stas@stason.orgE<gt>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/env-c>
+The development version is on github at L<https://github.com/mschout/env-c>
 and may be cloned from L<git://github.com/mschout/env-c.git>
 
 =head1 BUGS

@@ -25,4 +25,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Hash-Merge-Extra.pm
-version: 0.02
+version: 0.03

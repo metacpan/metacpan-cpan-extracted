@@ -1,9 +1,6 @@
 package Data::DynamicValidator;
-{
-  $Data::DynamicValidator::VERSION = '0.03';
-}
 #ABSTRACT: JPointer-like and Perl union for flexible perl data structures validation
-
+$Data::DynamicValidator::VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -72,8 +69,15 @@ sub validate {
         my $current_base = $self->current_base;
         my $selector = $self->_rebase_selector($on);
         ($success, $selection_results) = $self->_apply($selector, $should);
-        $self->report_error($because, $selector)
-            unless $success;
+        if (!$success) {
+            # if we met an error, and there is only 1 error path
+            # we report with expanded path, istead of unexpanded
+            my $error_routes = $selection_results->{routes};
+            my $reported_error_path = $error_routes && @$error_routes == 1
+                ? $error_routes->[0]
+                : $selector;
+            $self->report_error($because, $reported_error_path);
+        }
     }
     # OK, now going to child rules if there is no errors
     if ( !@$errors && $each  ) {
@@ -326,7 +330,7 @@ Data::DynamicValidator - JPointer-like and Perl union for flexible perl data str
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -670,7 +674,7 @@ Ivan Baidakou <dmol@gmx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ivan Baidakou.
+This software is copyright (c) 2017 by Ivan Baidakou.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

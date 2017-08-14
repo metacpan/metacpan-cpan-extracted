@@ -3,10 +3,12 @@ abstract: 'Get/Set/Unset Environment Variables on the C level'
 author:
   - 'Michael Schout <mschout@cpan.org>'
 build_requires:
-  Socket: '0'
   Test::More: '0.88'
+  perl: '5.006'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.005'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -17,11 +19,11 @@ name: Env-C
 requires:
   DynaLoader: '0'
   Test::More: '0.88'
-  perl: '5.005'
+  perl: '5.006'
   strict: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Env-C
   homepage: http://search.cpan.org/dist/Env-C/
   repository: git://github.com/mschout/env-c.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.69'

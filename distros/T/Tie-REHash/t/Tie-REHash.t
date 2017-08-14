@@ -49,10 +49,7 @@ is($hash{hash} = 'vocabulary', 'vocabulary');
 is($hash{hash}, 'vocabulary'); 
 my $ref2hash_element = \$hash{hash}; 
 $$ref2hash_element = 'map'; 
-is($hash{hash}, 'map'); 
-like($pre_v5_8_3 ? tied(%hash)->scalar : scalar(%hash), qr{\d+/\d+}, 'Standard hash: buckets allocated in scalar context')
-or diag('scalar %hash: ' 
-. $pre_v5_8_3 ? tied(%hash)->scalar : scalar(%hash));
+is($hash{hash}, 'map');
 is(delete $hash{hash}, 'map'); 
 ok(!exists $hash{hash}); 
 ok(!%hash);

@@ -2,6 +2,68 @@ use Test::Most;
 use Template::Lace::DOM;
 use Scalar::Util 'refaddr';
 
+{ #options, one optgroup
+  ok my $dom = Template::Lace::DOM->new(q[
+    <form>
+      <select name='states'>
+        <optgroup id='usa_states' label='USA States'>
+          <option class="state">Example</option>
+        </optgroup>       
+      </select>
+    </form>
+  ]);
+
+  $dom->optgroup('#usa_states')->fill({
+      state => [
+        +{ value=>'ny', content=>'New York' },
+        +{ value=>'tx', content=>'Texas' },
+      ]
+    });
+
+  is $dom->find('option')->size, 2;
+}
+
+# optgroup with ids
+
+{
+  # nested ol
+  ok my $dom = Template::Lace::DOM->new(q[
+    <section>
+      <ul id='outer'>
+        <li>
+          <ul class='inner'>
+            <li>
+              Hello 
+              <span class='name'>NAME</span>
+              , you are 
+              <span data-lace-id='age'>AGE</span>
+            </li>
+          </ul>
+      </ul>
+    </section>
+  ]);
+
+  $dom->for('#outer', [
+      'bbbb',
+      +{
+        'inner' => [
+          sub { shift->content('stuff') },
+          +{ name=>'john', age=>42 },
+        ],
+      },
+      sub {
+        my $dom = shift;
+        $dom->content('aaa');
+      },
+    ]
+  );
+  
+  is $dom->find('#outer li')->[0]->content, 'bbbb';
+  is $dom->find('.inner li')->[0]->content, 'stuff';
+  is $dom->find('.inner li')->[1]->at('.name')->[0]->content, 'john';
+  is $dom->find('.inner li')->[1]->find('span')->[1]->content, 42;
+  is $dom->find('#outer li')->[4]->content, 'aaa';
+}
 
 # General Helpers
 {
@@ -565,7 +627,7 @@ use Scalar::Util 'refaddr';
 
   {
     my $localdom = $dom->clone;
-    $localdom->at('html')->fill(+{
+    $localdom->for('html', +{
         login => +{
           user => 'Hi User',
           uid => 111,
@@ -700,8 +762,6 @@ use Scalar::Util 'refaddr';
           'jjn1056@gmail.com',
           'jjn1056@yahoo.com']},
   ]);
-
-  warn $dom;
 
   is @{$dom->find('#hashref dd')}, 2;
   is @{$dom->find('#arrayref dd')}, 4;

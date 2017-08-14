@@ -1,11 +1,14 @@
-# -*-perl-*-
 use lib '../lib';
+use Module::Build;
 use Test::More;
-use File::Spec;
+use File::Temp;
 use SQLite_File;
 
-my $dir = -d 't' ? 't' : '.';
-my $testdb = File::Spec->catfile($dir,'my.db');
+my $build = Module::Build->current();
+
+my $testdb_h = File::Temp->new(UNLINK => 0, EXLOCK => 0);
+my $testdb = $testdb_h->filename;
+$build->notes('testdb' => $testdb);
 my ($key, $value);
 my %db;
 my $flags = O_CREAT | O_RDWR;

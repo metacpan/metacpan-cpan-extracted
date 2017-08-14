@@ -1,3 +1,11 @@
+libqbit-application-model-db-mysql-perl (0.011) raring; urgency=low
+
+  * speed up
+
+  * speed up add_multi, added class for index, added sub get_dbh
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Fri, 11 Aug 2017 23:30:38 +0300
+
 libqbit-application-model-db-mysql-perl (0.010) raring; urgency=low
 
   * added collate, engine and length for text column in index

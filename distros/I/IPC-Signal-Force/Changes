@@ -1,3 +1,20 @@
+version 0.004; 2017-08-12
+
+  * document problem with signals under threads
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
 version 0.003; 2010-07-23
 
   * use simpler "parent" pragma in place of "base"

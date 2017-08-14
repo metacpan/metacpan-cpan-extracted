@@ -22,7 +22,7 @@ Text::vCard::Precisely::V3 - Read, Write and Edit B<just ONLY vCards 3.0> precis
 =head2 SYNOPSIS
 
  my $vc = Text::vCard::Precisely->new( version => '3.0' );
- # Or you can write like bellow if you want to be expressly using 3.0:
+ # Or you can write like below if you want to be expressly using 3.0:
  #my $vc = Text::vCard::Precisely::V3->new();
 
  $vc->n([ 'Gump', 'Forrest', , 'Mr', '' ]);
@@ -59,7 +59,7 @@ Text::vCard::Precisely::V3 - Read, Write and Edit B<just ONLY vCards 3.0> precis
 
  $vc->url({ content => 'https://twitter.com/worthmine', types => ['twitter'] }); # for URL param
 
-And you can use X-SOCIALPROFILE type if you want like bellow:
+And you can use X-SOCIALPROFILE type if you want like below:
 
  use Facebook::Graph;
  use Encode;
@@ -88,7 +88,7 @@ And you can use X-SOCIALPROFILE type if you want like bellow:
 
 A vCard is a digital business card. vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata> provide an API for parsing vCards.
 
-This module is forked from L<Text::vCard|https://github.com/ranguard/text-vcard> because some reason bellow:
+This module is forked from L<Text::vCard|https://github.com/ranguard/text-vcard> because some reason below:
 
 =over
 
@@ -507,7 +507,7 @@ Accepts/returns an ArrayRef that looks like:
     { type => ['home'], content => 'bbanner@timewarner.com', pref => 1 },
  ]
 
-or accept the string as email like bellow
+or accept the string as email like below
 
  'bbanner@timewarner.com'
 
@@ -534,7 +534,7 @@ Accepts/returns an ArrayRef that looks like:
     { content => 'https://github.com/worthmine' },
  ]
 
-or accept the string as URL like bellow
+or accept the string as URL like below
 
  'https://github.com/worthmine'
 
@@ -803,7 +803,7 @@ sub timezone {
 
 =head2 aroud UTF-8
 
-if you want to send precisely the vCard3.0 with UTF-8 characters to the B<Android4.4.x or before>, you have to set Charset param for each values like bellow:
+if you want to send precisely the vCard3.0 with UTF-8 characters to the B<Android4.4.x or before>, you have to set Charset param for each values like below:
 
  ADR;CHARSET=UTF-8:201号室;マンション;通り;市;都道府県;郵便番号;日本
 
@@ -830,8 +830,12 @@ L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
 
 =item
 
-L<Text::vCard::Precisely::V4|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V4.pm>
+L<Text::vCard::Precisely::V4 on GitHub|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V4.pm>
 
+=item
+
+L<Text::vCard::Precisely::V4 on CPAN|http://search.cpan.org/~worthmine/Text-vCard-Precisely-0.04/lib/Text/vCard/Precisely/V4.pm>
+ 
 =back
 
 =head2 AUTHOR

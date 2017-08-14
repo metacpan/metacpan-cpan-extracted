@@ -17,7 +17,7 @@ use JSON qw/decode_json/;
 use WWW::Mechanize;
 use Path::Tiny;
 
-our $VERSION = version->new('0.6.3');
+our $VERSION = version->new('0.6.4');
 
 extends 'Group::Git';
 
@@ -68,6 +68,10 @@ sub _repos {
                 git  => $conf->{clone_type} && $conf->{clone_type} eq 'http' ? $clone{http} : $clone{ssh},
             );
             push @{ $conf->{tags}{$project} }, "$dir";
+
+            if ( $repo->{project}{owner} ) {
+                push @{ $conf->{tags}{personal} }, "$dir";
+            }
         }
         $more  = !$response->{isLastPage};
         $start = $response->{nextPageStart};
@@ -86,7 +90,7 @@ Group::Git::Stash - Adds reading all repositories you have access to on your loc
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Stash version 0.6.3.
+This documentation refers to Group::Git::Stash version 0.6.4.
 
 =head1 SYNOPSIS
 

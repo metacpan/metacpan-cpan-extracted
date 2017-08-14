@@ -82,26 +82,11 @@ step_out(iter, n = NULL)
     srl_iterator_step_out(aTHX_ iter, n ? SvUV(n) : 1);
 
 void
-until(iter, depth, idx)
-    srl_iterator_t *iter;
-    UV depth;
-    U32 idx;
-  CODE:
-    srl_iterator_until(aTHX_ iter, depth, idx);
-
-void
 rewind(iter, n = NULL)
     srl_iterator_t *iter;
     SV *n;
   CODE:
-    srl_iterator_rewind(aTHX_ iter, n ? SvUV(n) : 1);
-
-UV
-offset(iter)
-    srl_iterator_t *iter;
-  CODE:
-    RETVAL = srl_iterator_offset(aTHX_ iter);
-  OUTPUT: RETVAL
+    srl_iterator_rewind(aTHX_ iter, n ? SvUV(n) : 0);
 
 void
 info(iter)
@@ -109,28 +94,18 @@ info(iter)
   PREINIT:
     UV type;
     UV length;
-    SV *str_type;
+    int blessed;
+    const char *classname;
+    STRLEN classname_length;
+
   PPCODE:
-    switch (srl_iterator_object_info(aTHX_ iter, &length)) {
-        case SRL_ITERATOR_OBJ_IS_ARRAY:
-            str_type = newSVpv("ARRAY", 5);
-            break;
+    type = srl_iterator_info(aTHX_ iter, &length, &classname, &classname_length);
+    blessed = (type & SRL_ITERATOR_INFO_BLESSED) == SRL_ITERATOR_INFO_BLESSED;
 
-        case SRL_ITERATOR_OBJ_IS_HASH:
-            str_type = newSVpv("HASH", 4);
-            break;
-
-        case SRL_ITERATOR_OBJ_IS_SCALAR:
-            str_type = newSVpv("SCALAR", 6);
-            break;
-
-        default:
-            croak("should not be here");
-    }
-
-    EXTEND(SP, 2);
-    PUSHs(sv_2mortal(str_type));
+    EXTEND(SP, blessed ? 3 : 2);
+    PUSHs(sv_2mortal(newSVuv(type)));
     PUSHs(sv_2mortal(newSVuv(length)));
+    if (blessed) PUSHs(sv_2mortal(newSVpvn(classname, classname_length)));
 
 IV
 stack_depth(iter)
@@ -146,30 +121,12 @@ stack_index(iter)
     RETVAL = srl_iterator_stack_index(aTHX_ iter);
   OUTPUT: RETVAL
 
-void
-stack_info(iter)
+UV
+stack_length(iter)
     srl_iterator_t *iter;
-  PREINIT:
-    UV type;
-    UV length;
-    SV *str_type;
-  PPCODE:
-    switch (srl_iterator_stack_info(aTHX_ iter, &length)) {
-        case SRL_ITERATOR_OBJ_IS_ARRAY:
-            str_type = newSVpv("ARRAY", 5);
-            break;
-
-        case SRL_ITERATOR_OBJ_IS_HASH:
-            str_type = newSVpv("HASH", 4);
-            break;
-
-        default:
-            croak("should not be here");
-    }
-
-    EXTEND(SP, 2);
-    PUSHs(sv_2mortal(str_type));
-    PUSHs(sv_2mortal(newSVuv(length)));
+  CODE:
+    RETVAL = srl_iterator_stack_length(aTHX_ iter);
+  OUTPUT: RETVAL
 
 void
 array_goto(iter, idx)
@@ -179,19 +136,34 @@ array_goto(iter, idx)
     srl_iterator_array_goto(aTHX_ iter, idx);
 
 IV
+array_exists(iter, idx)
+    srl_iterator_t *iter;
+    IV idx;
+  CODE:
+    RETVAL = srl_iterator_array_exists(aTHX_ iter, idx) == SRL_ITER_NOT_FOUND ? 0 : 1;
+  OUTPUT: RETVAL
+
+IV
 hash_exists(iter, name)
     srl_iterator_t *iter;
     SV *name;
+  PREINIT:
+    const char *keyname;
+    STRLEN keyname_lenght;
   CODE:
-    RETVAL = srl_iterator_hash_exists_sv(aTHX_ iter, name);
+    keyname = (const char*) SvPV(name, keyname_lenght);
+    RETVAL = srl_iterator_hash_exists(aTHX_ iter, keyname, keyname_lenght) == SRL_ITER_NOT_FOUND ? 0 : 1;
   OUTPUT: RETVAL
 
 SV *
 hash_key(iter)
     srl_iterator_t *iter;
+  PREINIT:
+    const char *keyname;
+    STRLEN keyname_length;
   CODE:
-    RETVAL = srl_iterator_hash_key_sv(aTHX_ iter);
-    SvREFCNT_inc(RETVAL);
+    srl_iterator_hash_key(aTHX_ iter, &keyname, &keyname_length);
+    RETVAL = newSVpvn(keyname, keyname_length);
   OUTPUT: RETVAL
 
 SV *
@@ -199,5 +171,13 @@ decode(iter)
     srl_iterator_t *iter;
   CODE:
     RETVAL = srl_iterator_decode(aTHX_ iter);
+    SvREFCNT_inc(RETVAL);
+  OUTPUT: RETVAL
+
+SV *
+decode_and_next(iter)
+    srl_iterator_t *iter;
+  CODE:
+    RETVAL = srl_iterator_decode_and_next(aTHX_ iter);
     SvREFCNT_inc(RETVAL);
   OUTPUT: RETVAL

@@ -4,11 +4,12 @@ author:
   - 'J. A. R. Williams'
   - 'John M. Gamble <jgamble@cpan.org>'
 build_requires:
+  Math::Utils: '1.06'
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +20,8 @@ provides:
     file: lib/Math/Derivative.pm
     version: '0.04'
 requires:
-  perl: v5.8.3
+  perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

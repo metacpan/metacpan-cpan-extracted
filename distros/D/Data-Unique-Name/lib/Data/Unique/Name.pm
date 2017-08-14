@@ -3,6 +3,7 @@
 # Generate a unique but stable name from a string
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
 #-------------------------------------------------------------------------------
+# podDocumentation
 
 package Data::Unique::Name;
 require v5.16.0;
@@ -10,11 +11,11 @@ use warnings FATAL => qw(all);
 use strict;
 use Carp;
 
-our $VERSION = '2017.324';
+our $VERSION = '20170810';
 
 #1 Constructor
 sub new($)                                                                      # Construct a new set of unique names
- {my ($length) = @_;                                                            # Maximum length of generated names                                                              # File name to be used on S3
+ {my ($length) = @_;                                                            # Maximum length of generated names
   bless {length=>$length, count=>{}}
  }
 
@@ -32,18 +33,7 @@ sub generateUniqueName($$)                                                      
   $s
  }
 
-#-------------------------------------------------------------------------------
-# Test
-#-------------------------------------------------------------------------------
-
-sub test
- {eval join('', <Data::Unique::Name::DATA>) || die $@
- }
-
-test unless caller();
-
-# Documentation
-#extractDocumentation unless caller;
+# podDocumentation
 
 #-------------------------------------------------------------------------------
 # Export
@@ -57,8 +47,6 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT       = qw();
 @EXPORT_OK    = qw();
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
-
-1;
 
 =encoding utf-8
 
@@ -85,27 +73,35 @@ Data::Unique::Name - Generate a unique but stable name from a string
 
 =head1 Description
 
-=head2 new($length)
+=head2 Constructor
+
+=head3 new
 
 Construct a new set of unique names
 
-     Parameter  Description
-  1  $length    Maximum length of generated names                                                              # File name to be used on S3
+  1  $length  Maximum length of generated names                                                              # File name to be used on S3
 
-=head2 generateUniqueName($set, $string)
+=head2 Methods
+
+=head3 generateUniqueName
 
 Generate a unique name corresponding to a string
 
-     Parameter  Description
-  1  $set       Set of unique strings
-  2  $string    string
+  1  $set     Set of unique strings
+  2  $string  String
+
 
 =head1 Index
 
-L</generateUniqueName($set, $string)>
-L</new($length)>
+
+L<generateUniqueName|/generateUniqueName>
+
+L<new|/new>
 
 =head1 Installation
+
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
 
 Standard Module::Build process for building and installing modules:
 
@@ -116,19 +112,34 @@ Standard Module::Build process for building and installing modules:
 
 =head1 Author
 
-philiprbrenan@gmail.com
+L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
 
-http://www.appaapps.com
+L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016 Philip R Brenan.
+Copyright (c) 2016-2017 Philip R Brenan.
 
-This module is free software. It may be used, redistributed and/or
-modified under the same terms as Perl itself.
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
 
 =cut
 
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
 __DATA__
 use Test::More tests => 10;
 

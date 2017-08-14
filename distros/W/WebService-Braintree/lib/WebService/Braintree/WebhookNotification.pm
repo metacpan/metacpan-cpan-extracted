@@ -1,19 +1,134 @@
 package WebService::Braintree::WebhookNotification;
-$WebService::Braintree::WebhookNotification::VERSION = '0.91';
+$WebService::Braintree::WebhookNotification::VERSION = '0.92';
+=head1 NAME
+
+WebService::Braintree::WebhookNotification
+
+=head1 PURPOSE
+
+This class parses and verifies webhook notifications.
+
+=head1 NOTES
+
+Unlike all other classes, this class does B<NOT> interact with a REST API.
+Instead, this takes data you provide it and either parses it into a usable
+object or provides a verification of it.
+
+=cut
 
 use WebService::Braintree::WebhookNotification::Kind;
-use Moose;
 
+use Moose;
 extends 'WebService::Braintree::ResultObject';
 
-has  subscription => (is => 'rw');
-has  merchant_account => (is => 'rw');
-has  disbursement => (is => 'rw');
-has  transaction => (is => 'rw');
-has  partner_merchant => (is => 'rw');
-has  dispute => (is => 'rw');
-has  errors => (is => 'rw');
-has  message => (is => 'rw');
+=head1 CLASS METHODS
+
+=head2 parse()
+
+This takes a signature and a payload and returns a parsing of the notification
+within that payload. The payload is validated against the signature before
+parsing.
+
+The return is an object of this class.
+
+=cut
+
+sub parse {
+    my ($class, $signature, $payload) = @_;
+    $class->gateway->webhook_notification->parse($signature, $payload);
+}
+
+=head2 verify()
+
+This takes a challenge and returns a proper response.
+
+=cut
+
+sub verify {
+    my ($class, $challenge) = @_;
+    $class->gateway->webhook_notification->verify($challenge);
+}
+
+sub gateway {
+    return WebService::Braintree->configuration->gateway;
+}
+
+=head1 OBJECT METHODS
+
+In addition to the methods provided by the keys returned from Braintree, this
+class provides the following methods:
+
+=head2 subscription()
+
+This returns the subscription associated with this notification (if any). This
+will be an object of type L<WebService::Braintree::Subscription/>.
+
+=cut
+
+has subscription => (is => 'rw');
+
+=head2 merchant_account()
+
+This returns the merchant account associated with this notification (if any).
+This will be an object of type L<WebService::Braintree::MerchantAccount/>.
+
+=cut
+
+has merchant_account => (is => 'rw');
+
+=head2 disbursement()
+
+This returns the disbursement associated with this notification (if any). This
+will be an object of type L<WebService::Braintree::Disbursement/>.
+
+=cut
+
+has disbursement => (is => 'rw');
+
+=head2 transaction()
+
+This returns the stransaction associated with this notification (if any). This
+will be an object of type L<WebService::Braintree::Transaction/>.
+
+=cut
+
+has transaction => (is => 'rw');
+
+=head2 partner_merchant()
+
+This returns the partner merchant associated with this notification (if any).
+This will be an object of type L<WebService::Braintree::PartnerMerchant/>.
+
+=cut
+
+has partner_merchant => (is => 'rw');
+
+=head2 dispute()
+
+This returns the dispute associated with this notification (if any). This
+will be an object of type L<WebService::Braintree::Dispute/>.
+
+=cut
+
+has dispute => (is => 'rw');
+
+=head2 errors()
+
+This returns the errors associated with this notification (if any). This
+will be an object of type L<WebService::Braintree::ValidationErrorCollection/>.
+
+=cut
+
+has errors => (is => 'rw');
+
+=head2 message()
+
+This returns the message associated with this notification (if any). This will
+be a string.
+
+=cut
+
+has message => (is => 'rw');
 
 
 sub BUILD {
@@ -64,19 +179,21 @@ sub BUILD {
     $self->set_attributes_from_hash($self, $attributes);
 }
 
-sub parse {
-    my ($class, $signature, $payload) = @_;
-    $class->gateway->webhook_notification->parse($signature, $payload);
-}
-
-sub verify {
-    my ($class, $params) = @_;
-    $class->gateway->webhook_notification->verify($params);
-}
-
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
 __PACKAGE__->meta->make_immutable;
+
 1;
+__END__
+
+=head1 TODO
+
+=over 4
+
+=item Need to document the keys and values that are returned
+
+=item Need to document the required and optional input parameters
+
+=item Need to document the possible errors/exceptions
+
+=back
+
+=cut

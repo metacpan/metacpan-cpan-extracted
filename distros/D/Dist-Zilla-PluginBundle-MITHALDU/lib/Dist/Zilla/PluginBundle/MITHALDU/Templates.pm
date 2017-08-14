@@ -1,7 +1,7 @@
 use strictures;
 
 package Dist::Zilla::PluginBundle::MITHALDU::Templates;
-our $VERSION = '1.151340'; # VERSION
+our $VERSION = '1.172230'; # VERSION
 
 # ABSTRACT: some templates for MITHALDU's dzil pluginbundle
 
@@ -37,7 +37,7 @@ Dist::Zilla::PluginBundle::MITHALDU::Templates - some templates for MITHALDU's d
 
 =head1 VERSION
 
-version 1.151340
+version 1.172230
 
 =head1 METHODS
 
@@ -46,19 +46,9 @@ version 1.151340
 Returns the contents of a template stored in the DATA section of this module.
 The single scalar parameter specifies the name of the template to be retrieved.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
-
-=item *
-
-David Golden <dagolden@cpan.org>
-
-=item *
-
-Christian Walde <mithaldu@cpan.org>
-
-=back
+Christian Walde <walde.christian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -156,3 +146,7 @@ You can learn more about Dist::Zilla at http://dzil.org/
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = strictures
+
+[-OTRS::RequireCamelCase]
+[-OTRS::RequireParensWithMethods]
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]

@@ -2,13 +2,9 @@
 #
 #  Net::Server::MultiType - Net::Server personality
 #
-#  $Id$
+#  Copyright (C) 2001-2017
 #
-#  Copyright (C) 2001-2012
-#
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License

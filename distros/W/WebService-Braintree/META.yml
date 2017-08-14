@@ -21,6 +21,7 @@ requires:
   Data::GUID: '0'
   DateTime: '0'
   DateTime::Format::Atom: '0'
+  DateTime::Format::RFC3339: '0'
   DateTime::Format::Strptime: '0'
   Digest: '0'
   Digest::HMAC_SHA1: '0'
@@ -43,5 +44,5 @@ resources:
   bugtracker: https://github.com/singingfish/braintree_perl/issues
   homepage: https://www.braintreepayments.com
   repository: git://github.com/singingfish/braintree_perl.git
-version: '0.91'
+version: '0.92'
 x_serialization_backend: 'YAML::Tiny version 1.69'

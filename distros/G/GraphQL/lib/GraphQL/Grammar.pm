@@ -6,9 +6,30 @@ use warnings;
 use base 'Pegex::Grammar';
 use constant file => './graphql.pgx';
 
+our $VERSION = '0.02';
+
 =head1 NAME
 
-GraphQL - Perl implementation
+GraphQL::Grammar - GraphQL grammar
+
+=head1 SYNOPSIS
+
+  use Pegex::Parser;
+  use GraphQL::Grammar;
+  use Pegex::Tree::Wrap;
+  use Pegex::Input;
+
+  my $parser = Pegex::Parser->new(
+    grammar => GraphQL::Grammar->new,
+    receiver => Pegex::Tree::Wrap->new,
+  );
+  my $text = 'query q { foo(name: "hi") { id } }';
+  my $input = Pegex::Input->new(string => $text);
+  my $got = $parser->parse($input);
+
+=head1 DESCRIPTION
+
+This is a subclass of L<Pegex::Grammar>, with the GraphQL grammar.
 
 =head1 METHODS
 
@@ -89,6 +110,35 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'argumentsDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\((?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.all' => [
+            {
+              '.ref' => 'inputValueDefinition'
+            },
+            {
+              '+min' => 0,
+              '-flat' => 1,
+              '.all' => [
+                {
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                },
+                {
+                  '.ref' => 'inputValueDefinition'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\)(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
     'boolean' => {
       '.rgx' => qr/\G(true|false)/
     },
@@ -98,29 +148,25 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
           '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*=(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         },
         {
-          '.ref' => 'value'
+          '.ref' => 'value_const'
         }
       ]
     },
     'definition' => {
-      '.any' => [
+      '.all' => [
         {
-          '.all' => [
-            {
-              '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
-            },
-            {
-              '.ref' => 'operationDefinition'
-            }
-          ]
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         },
         {
-          '.all' => [
+          '.any' => [
             {
-              '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+              '.ref' => 'operationDefinition'
             },
             {
               '.ref' => 'fragmentDefinition'
+            },
+            {
+              '.ref' => 'typeSystemDefinition'
             }
           ]
         }
@@ -140,12 +186,122 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'directiveDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gdirective/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\@(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'argumentsDefinition'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.rgx' => qr/\Gon/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'directiveLocations'
+        }
+      ]
+    },
+    'directiveLocations' => {
+      '.all' => [
+        {
+          '.ref' => 'name'
+        },
+        {
+          '+min' => 0,
+          '-flat' => 1,
+          '.all' => [
+            {
+              '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\|(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+            },
+            {
+              '.ref' => 'name'
+            }
+          ]
+        }
+      ]
+    },
     'directives' => {
       '+min' => 1,
       '.ref' => 'directive'
     },
+    'enumTypeDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Genum/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.all' => [
+            {
+              '.ref' => 'enumValueDefinition'
+            },
+            {
+              '+min' => 0,
+              '-flat' => 1,
+              '.all' => [
+                {
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                },
+                {
+                  '.ref' => 'enumValueDefinition'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
     'enumValue' => {
       '.ref' => 'name'
+    },
+    'enumValueDefinition' => {
+      '.all' => [
+        {
+          '.ref' => 'enumValue'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        }
+      ]
     },
     'field' => {
       '.all' => [
@@ -176,6 +332,33 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'fieldDefinition' => {
+      '.all' => [
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'argumentsDefinition'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*:(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'type'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        }
+      ]
+    },
     'float' => {
       '.rgx' => qr/\G(\-?(?:0|[1-9][0-9]*)(?:(?:\.[0-9]+)(?:[eE][\-\+]?[0-9]+)|(?:\.[0-9]+)|(?:[eE][\-\+]?[0-9]+)))/
     },
@@ -194,7 +377,14 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
           '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         },
         {
-          '.ref' => 'typeCondition'
+          '.any' => [
+            {
+              '.ref' => 'typeCondition'
+            },
+            {
+              '.err' => 'Expected "on"'
+            }
+          ]
         },
         {
           '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
@@ -212,7 +402,21 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
       ]
     },
     'fragmentName' => {
-      '.ref' => 'name'
+      '.any' => [
+        {
+          '.all' => [
+            {
+              '.rgx' => qr/\Gon/
+            },
+            {
+              '.err' => 'Unexpected Name "on"'
+            }
+          ]
+        },
+        {
+          '.ref' => 'name'
+        }
+      ]
     },
     'fragmentSpread' => {
       '.all' => [
@@ -243,6 +447,35 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'implementsInterfaces' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gimplements/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.all' => [
+            {
+              '.ref' => 'namedType'
+            },
+            {
+              '+min' => 0,
+              '-flat' => 1,
+              '.all' => [
+                {
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                },
+                {
+                  '.ref' => 'namedType'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     'inlineFragment' => {
       '.all' => [
         {
@@ -268,8 +501,95 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'inputObjectTypeDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Ginput/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+min' => 1,
+          '.ref' => 'inputValueDefinition'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
+    'inputValueDefinition' => {
+      '.all' => [
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*:(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'type'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'defaultValue'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        }
+      ]
+    },
     'int' => {
       '.rgx' => qr/\G(\-?(?:0|[1-9][0-9]*))/
+    },
+    'interfaceTypeDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Ginterface/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+min' => 1,
+          '.ref' => 'fieldDefinition'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
     },
     'listType' => {
       '.all' => [
@@ -287,7 +607,7 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
     'listValue' => {
       '.all' => [
         {
-          '.ref' => 'LSQUARE'
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\[(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         },
         {
           '+max' => 1,
@@ -310,7 +630,37 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
           ]
         },
         {
-          '.ref' => 'RSQUARE'
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\](?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
+    'listValue_const' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\[(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.all' => [
+            {
+              '.ref' => 'value_const'
+            },
+            {
+              '+min' => 0,
+              '-flat' => 1,
+              '.all' => [
+                {
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                },
+                {
+                  '.ref' => 'value_const'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\](?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         }
       ]
     },
@@ -339,27 +689,120 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'objectField_const' => {
+      '.all' => [
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*:(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'value_const'
+        }
+      ]
+    },
+    'objectTypeDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gtype/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'implementsInterfaces'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+min' => 0,
+          '.ref' => 'fieldDefinition'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
     'objectValue' => {
       '.all' => [
         {
           '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         },
         {
-          '.all' => [
+          '.any' => [
             {
-              '.ref' => 'objectField'
-            },
-            {
-              '+min' => 0,
-              '-flat' => 1,
               '.all' => [
                 {
-                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                  '.ref' => 'objectField'
                 },
                 {
-                  '.ref' => 'objectField'
+                  '+min' => 0,
+                  '-flat' => 1,
+                  '.all' => [
+                    {
+                      '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                    },
+                    {
+                      '.ref' => 'objectField'
+                    }
+                  ]
                 }
               ]
+            },
+            {
+              '.err' => 'Expected name'
+            }
+          ]
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
+    'objectValue_const' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.any' => [
+            {
+              '.all' => [
+                {
+                  '.ref' => 'objectField_const'
+                },
+                {
+                  '+min' => 0,
+                  '-flat' => 1,
+                  '.all' => [
+                    {
+                      '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                    },
+                    {
+                      '.ref' => 'objectField_const'
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              '.err' => 'Expected name or constant'
             }
           ]
         },
@@ -412,6 +855,66 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
     'operationType' => {
       '.rgx' => qr/\G(query|mutation|subscription)/
     },
+    'operationTypeDefinition' => {
+      '.all' => [
+        {
+          '.ref' => 'operationType'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*:(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'namedType'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
+    'scalarTypeDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gscalar/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        }
+      ]
+    },
+    'schemaDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gschema/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+min' => 1,
+          '.ref' => 'operationTypeDefinition'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
     'selection' => {
       '.any' => [
         {
@@ -431,25 +934,32 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
           '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\{(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
         },
         {
-          '.all' => [
+          '.any' => [
             {
-              '.ref' => 'selection'
-            },
-            {
-              '+min' => 0,
-              '-flat' => 1,
               '.all' => [
                 {
-                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                  '.ref' => 'selection'
                 },
                 {
-                  '.ref' => 'selection'
+                  '+min' => 0,
+                  '-flat' => 1,
+                  '.all' => [
+                    {
+                      '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+                    },
+                    {
+                      '.ref' => 'selection'
+                    }
+                  ]
+                },
+                {
+                  '+max' => 1,
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
                 }
               ]
             },
             {
-              '+max' => 1,
-              '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*,?(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+              '.err' => 'Expected name'
             }
           ]
         },
@@ -510,6 +1020,112 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         }
       ]
     },
+    'typeDefinition' => {
+      '.any' => [
+        {
+          '.ref' => 'scalarTypeDefinition'
+        },
+        {
+          '.ref' => 'objectTypeDefinition'
+        },
+        {
+          '.ref' => 'interfaceTypeDefinition'
+        },
+        {
+          '.ref' => 'unionTypeDefinition'
+        },
+        {
+          '.ref' => 'enumTypeDefinition'
+        },
+        {
+          '.ref' => 'inputObjectTypeDefinition'
+        }
+      ]
+    },
+    'typeExtensionDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gextend/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'objectTypeDefinition'
+        }
+      ]
+    },
+    'typeSystemDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.any' => [
+            {
+              '.ref' => 'schemaDefinition'
+            },
+            {
+              '.ref' => 'typeDefinition'
+            },
+            {
+              '.ref' => 'typeExtensionDefinition'
+            },
+            {
+              '.ref' => 'directiveDefinition'
+            }
+          ]
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        }
+      ]
+    },
+    'unionMembers' => {
+      '.all' => [
+        {
+          '.ref' => 'namedType'
+        },
+        {
+          '+min' => 0,
+          '-flat' => 1,
+          '.all' => [
+            {
+              '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*\|(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+            },
+            {
+              '.ref' => 'namedType'
+            }
+          ]
+        }
+      ]
+    },
+    'unionTypeDefinition' => {
+      '.all' => [
+        {
+          '.rgx' => qr/\Gunion/
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'name'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '+max' => 1,
+          '.ref' => 'directives'
+        },
+        {
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*=(?:\s|\x{FEFF}|\#[^\r\n]*(?:\r?\n|\r!NL|\z))*/u
+        },
+        {
+          '.ref' => 'unionMembers'
+        }
+      ]
+    },
     'value' => {
       '.any' => [
         {
@@ -538,6 +1154,34 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
         },
         {
           '.ref' => 'objectValue'
+        }
+      ]
+    },
+    'value_const' => {
+      '.any' => [
+        {
+          '.ref' => 'float'
+        },
+        {
+          '.ref' => 'int'
+        },
+        {
+          '.ref' => 'string'
+        },
+        {
+          '.ref' => 'boolean'
+        },
+        {
+          '.ref' => 'null'
+        },
+        {
+          '.ref' => 'enumValue'
+        },
+        {
+          '.ref' => 'listValue_const'
+        },
+        {
+          '.ref' => 'objectValue_const'
         }
       ]
     },
@@ -599,23 +1243,5 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.60)
     }
   }
 }
-
-=head1 NAME
-
-GraphQL::Grammar - GraphQL Pegex grammar class
-
-=cut
-
-our $VERSION = '0.02';
-
-=head1 SYNOPSIS
-
-=head1 METHODS
-
-=head2 parse
-
-  GraphQL::Language->parse($source, $noLocation);
-
-=cut
 
 1;

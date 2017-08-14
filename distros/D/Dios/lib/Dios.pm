@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002007';
+our $VERSION = '0.002008';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -755,7 +755,7 @@ sub _compose_field {
 
     # Read-only or readwrite???
     my $rw       = $traits =~ /\brw\b/ ? 'rw' : 'ro';
-    my $required = $traits =~ /\brequired\b/;
+    my $required = $traits =~ /\breq(?:uired)?\b/;
 
     # Did the user specify a particular kind of accessor generation???
     my $accessor_type = $^H{'Dios accessor_type'};
@@ -1197,7 +1197,7 @@ sub import {
                              )
                           }x;
     keytype Var        is / [\$\@%] [.!]?+ (?&PerlIdentifier) /x;
-    keytype Traits     is / (?: (?&PerlOWS) is (?&PerlOWS) (?: ro | rw | req | required ) )++ /x;
+    keytype Traits     is / (?: (?&PerlOWS) is (?&PerlOWS) (?: ro | rw | req(?:uired)? ) )++ /x;
     keytype Handles    is / (?: (?&PerlOWS) handles (?&PerlOWS)
                                 (?: (?&PerlIdentifier) | :(?&PerlIdentifier)<(?&PerlIdentifier)> )
                             )++ /x;
@@ -1255,7 +1255,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002007
+This document describes Dios version 0.002008
 
 
 =head1 SYNOPSIS

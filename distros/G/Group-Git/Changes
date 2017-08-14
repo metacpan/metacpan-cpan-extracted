@@ -1,5 +1,17 @@
 Revision history for Group-Git
 
+0.6.4   2017-08-13
+        Updating for release of version 0.6.4
+        Added new default test for new module (Ivan Wills)
+        Added new module to manifest (Ivan Wills)
+        Added documentation for grep_start method (Ivan Wills)
+        Fixed badly quoting shell variables (Ivan Wills)
+        Fixed quoting "+" (Ivan Wills)
+        Tagging personal stash repositories as such (Ivan Wills)
+        Fixed not concatinating correctly (Ivan Wills)
+        Adding a timeout for commands on a repository that take too long (Ivan Wills)
+        Adding grep command to allow funkey things like search accross branches (Ivan Wills)
+
 0.6.3   2017-07-03
         Updating for release of version 0.6.3
         Using new cmd() method (Ivan Wills)

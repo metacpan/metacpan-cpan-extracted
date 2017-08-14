@@ -1,0 +1,143 @@
+#!/bin/bash
+
+set -e
+
+ME="${BASH_SOURCE[0]}"
+mydir=$(cd $(dirname $ME) && pwd)
+cd $mydir
+
+container="robkinyon/webservice-braintree-test"
+# Broken: 5.12
+all_versions="5.10 5.14 5.16 5.18 5.20 5.22 5.24"
+
+# This is to handle GitBash's auto-mangling of path names when interacting
+# with Docker. Without this, Docker cannot mount volumes properly.
+export MSYS_NO_PATHCONV=1
+
+# In Linux, files written within a container into a mounted volume are written
+# as the root user, specifically id=0. This causes issues because those files
+# have to be "sudo rm" to be removed.
+# q.v. https://denibertovic.com/posts/handling-permissions-with-docker-volumes/
+# for a deeper explanation and q.v. http://disq.us/p/1gy6ysh for how the
+# following answer works.
+# TODO: Make this work on OSX and Windows.
+fix_for_root_user_in_container="
+  -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro
+  -u $(id -u):$(id -g)
+"
+
+versions=${PERL_VERSIONS:-${all_versions}}
+if [[ "$1" == "pull" ]]; then
+  shift
+  for version in ${versions}; do
+    docker pull perl:${version}
+  done
+elif [[ "$1" == "build" ]]; then
+  shift
+  mkdir -p build_log
+  for version in ${versions}; do
+    echo "Running build for perl-${version}"
+    set +e
+    (
+      cat Dockerfile.test | sed "s/{{version}}/${version}/" \
+        > Dockerfile.${version}
+      docker build -t ${container}:${version} -f Dockerfile.${version} .
+      rm Dockerfile.${version}
+    ) #&>build_log/${version}.log
+    set -e
+  done
+elif [[ "$1" == "test" ]]; then
+  shift
+  test_command="${@:-""}"
+  for version in ${versions}; do
+    echo "Running tests against perl-${version}"
+    MSYS_NO_PATHCONV=1 \
+    docker run \
+      --rm \
+      $fix_for_root_user_in_container \
+      -v $(pwd)/lib:/app/lib \
+      -v $(pwd)/t:/app/t \
+      ${container}:${version} \
+        $test_command
+  done
+elif [[ "$1" == "integration" ]]; then
+  shift
+  if [[ ! -s sandbox_config.json ]]; then
+    >&2 echo "You must have setup your sandbox_config.json file"
+    exit 1
+  fi
+
+  test_command="${@:-"prove -lrs xt/"}"
+  for version in ${versions}; do
+    echo "Running integration tests against perl-${version}"
+    # We have to add volumes for xt/ and sandbox_config.json
+    MSYS_NO_PATHCONV=1 \
+    docker run \
+      --rm \
+      $fix_for_root_user_in_container \
+      -v $(pwd)/lib:/app/lib \
+      -v $(pwd)/t:/app/t \
+      -v $(pwd)/xt:/app/xt \
+      -v $(pwd)/sandbox_config.json:/app/sandbox_config.json \
+      ${container}:${version} \
+        $test_command
+  done
+elif [[ "$1" == "cover" ]]; then
+  shift
+  for version in ${versions}; do
+    echo "Running test coverage against perl-${version}"
+
+    rm -rf cover_db cover_db_${version}
+    mkdir cover_db
+
+    MSYS_NO_PATHCONV=1 \
+    docker run \
+      --rm \
+      $fix_for_root_user_in_container \
+      -v $(pwd)/lib:/app/lib \
+      -v $(pwd)/t:/app/t \
+      -v $(pwd)/cover_db:/app/cover_db \
+      ${container}:${version} \
+        cover
+
+    mv cover_db cover_db_${version}
+  done
+elif [[ "$1" == "release" ]]; then
+  shift
+
+  if [[ ! -f ~/.pause ]]; then
+    >&2 echo "No ~/.pause file found."
+    exit 1
+  fi
+
+  # Because of an interaction between Docker-toolbox and Git-bash, we have to
+  # copy the .pause here out of $HOME.
+  cp ~/.pause .
+
+  tag=5.24
+  if [[ -z $(docker images -q ${container}:${tag}) ]]; then
+    $ME build ${tag}
+  fi
+
+  files_dirs_to_map=(
+    lib t
+    Changes LICENSE
+    Makefile.PL inc
+    MANIFEST MANIFEST.SKIP
+  )
+
+  volumes=(-v $(pwd)/.pause:/root/.pause)
+  for item in ${files_dirs_to_map[@]}; do
+    volumes+=(-v $(pwd)/$item:/app/$item)
+  done
+
+  docker run \
+    --rm \
+    "${volumes[@]}" \
+    --entrypoint bash \
+    ${container}:${tag} \
+      -c "carton exec perl Makefile.PL && make dist && cpan-upload *.tar.gz"
+else
+  >&2 echo "${ME}: <pull | build | test | cover | release> [command]"
+  exit 1
+fi

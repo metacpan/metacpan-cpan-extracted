@@ -1,0 +1,8 @@
+lib/Net/AppDynamics/REST.pm
+t/Net-AppDynamics-REST.t
+Makefile.PL
+MANIFEST
+README
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Statistics::Diversity::Shannon",
   "PREREQ_PM" => {
-    "List::Util" => 0,
+    "List::Util" => "1.30",
     "Moo" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.0101",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.30",
   "Moo" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

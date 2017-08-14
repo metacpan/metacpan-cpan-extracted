@@ -4,61 +4,66 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930001",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IPC-Filter",
    "prereqs" : {
       "build" : {
          "requires" : {
             "Module::Build" : "0.2808",
-            "Test::More" : 0,
+            "Test::More" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : 0,
+            "Module::Build" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Errno" : "1.00",
-            "Exporter" : 0,
+            "Exporter" : "0",
             "IO::Handle" : "1.12",
             "IO::Poll" : "0.01",
             "IPC::Open3" : "1.01",
             "IPC::Signal" : "1.00",
-            "POSIX" : 0,
-            "Symbol" : 0,
-            "parent" : 0,
+            "POSIX" : "0",
+            "Symbol" : "0",
+            "parent" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "IPC::Filter" : {
          "file" : "lib/IPC/Filter.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-IPC-Filter@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-Filter"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.004"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

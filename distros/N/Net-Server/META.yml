@@ -1,25 +1,26 @@
 ---
-abstract: 'Extensible, general Perl server engine'
+abstract: 'Extensible Perl internet server'
 author:
   - 'Paul Seamons <paul@seamons.com> and Rob Brown <bbb@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: 0
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Server
 no_index:
   directory:
     - t
     - inc
 requires:
-  IO::Socket: 0
-  POSIX: 0
-  Socket: 0
-  Time::HiRes: 0
-version: 2.008
+  File::Temp: '0'
+  IO::Socket: '0'
+  POSIX: '0'
+  Socket: '0'
+  Time::HiRes: '0'
+version: '2.009'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

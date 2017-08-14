@@ -30,8 +30,8 @@ ok unlink(File::Spec->catfile($t->screenshot_directory, 'foo.png')), 'deleted fo
 
 $t->capture_screenshot;
 my $script = File::Basename::basename($0);
-ok unlink(File::Spec->catfile($t->screenshot_directory, "$script-$^T-0001.png")),
-  "deleted $script-$^T-0001.png screenshot";
+like $t->screenshots->[-1], qr{$script-$^T-0001\.png$}, 'got screenshot';
+ok unlink(@{$t->screenshots}), 'deleted captured screenshots';
 
 done_testing;
 

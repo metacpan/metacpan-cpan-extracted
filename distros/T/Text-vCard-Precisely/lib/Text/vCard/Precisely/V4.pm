@@ -21,7 +21,7 @@ Text::vCard::Precisely::V4 - Read, Write and Edit B<vCards 4.0>
 You can unlock types that will be available in vCard 4.0
 
  my $vc = Text::vCard::Precisely->new( version => '4.0' );
- # Or you can write like bellow:
+ # Or you can write like below:
  #my $vc = Text::vCard::Precisely::V4->new();
 
 The Usage is same with L<Text::vCard::Precisely::V3|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V3.pm>
@@ -30,7 +30,7 @@ The Usage is same with L<Text::vCard::Precisely::V3|https://github.com/worthmine
 
 This module is an additional version for reading/writing for vCard 4.0. it's just a wrapper of L<Text::vCard::Precisely::V3|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V3.pm> with Moose.
 
-B<Caution!> It's NOT be recommended because some reasons bellow:
+B<Caution!> It's NOT be recommended because some reasons below:
 
 =over
 
@@ -558,15 +558,19 @@ And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't sup
 
 =item
 
-L<Text::vCard::Precisely::V3|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V3.pm>
-
-=item
-
 L<RFC 6350|https://tools.ietf.org/html/rfc6350>
- 
+
 =item
 
-L<Wikipedia|https://en.wikipedia.org/wiki/VCard>
+L<Text::vCard::Precisely::V3 on GitHub|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V3.pm>
+
+=item
+
+L<Text::vCard::Precisely::V3 on CPAN|http://search.cpan.org/~worthmine/Text-vCard-Precisely-0.04/lib/Text/vCard/Precisely/V3.pm>
+
+=item
+
+L<vCard on Wikipedia|https://en.wikipedia.org/wiki/VCard>
  
 =back
  

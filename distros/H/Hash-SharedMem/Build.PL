@@ -8,6 +8,12 @@ Module::Build->subclass(code => q{
 	unless(__PACKAGE__->can("cbuilder")) {
 		*cbuilder = sub { $_[0]->_cbuilder or die "no C support" };
 	}
+	sub compile_xs {
+		my($self, $file, %args) = @_;
+		require ExtUtils::ParseXS;
+		ExtUtils::ParseXS->VERSION(3.30);
+		return $self->SUPER::compile_xs($file, %args);
+	}
 	sub probed_info {
 		my($self) = @_;
 		my $feat_file = $self->localize_file_path("lib/Hash/features");
@@ -16,7 +22,7 @@ Module::Build->subclass(code => q{
 		unless($self->up_to_date($probe_file, $feat_file)) {
 			require IO::File;
 			require Data::Dumper;
-			my $probe = do($probe_file) or
+			my $probe = do("./$probe_file") or
 				die $@ || "can't read $probe_file: $!";
 			my $feat_defs = $probe->($self);
 			$self->add_to_cleanup($feat_file);
@@ -26,7 +32,7 @@ Module::Build->subclass(code => q{
 			$feat_fh->printflush(Data::Dumper::Dumper($feat_defs))
 				or die "can't write $feat_file: $!";
 		}
-		my $probed_info = do($feat_file) or
+		my $probed_info = do("./$feat_file") or
 			die $@ || "can't read $feat_file: $!";
 		return ($probed_info, $feat_file);
 	}
@@ -107,6 +113,7 @@ Module::Build->subclass(code => q{
 		"Data::Dumper" => 0,
 		"Errno" => "1.00",
 		"ExtUtils::CBuilder" => "0.15",
+		"ExtUtils::ParseXS" => "3.30",
 		"File::Temp" => "0.22",
 		"IO::File" => 0,
 		"Module::Build" => 0,
@@ -136,7 +143,16 @@ Module::Build->subclass(code => q{
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Hash-SharedMem\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Hash-SharedMem",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

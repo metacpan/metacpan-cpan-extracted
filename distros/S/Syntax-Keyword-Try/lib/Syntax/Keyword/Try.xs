@@ -29,6 +29,21 @@
 #define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
 #endif
 
+/* borrowed from ZEFRAM/Scope-Escape-0.005/lib/Scope/Escape.xs */
+#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#define PERL_DECIMAL_VERSION \
+        PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_GE(r,v,s) \
+        (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
+#if PERL_VERSION_GE(5,19,4)
+typedef SSize_t array_ix_t;
+#else /* <5.19.4 */
+typedef I32 array_ix_t;
+#endif /* <5.19.4 */
+
+static OP *pp_entertrycatch(pTHX);
+
 /*
  * A modified version of pp_return for returning from inside a try block.
  * To do this, we unwind the context stack to just past the CXt_EVAL and then
@@ -37,14 +52,93 @@
 static OP *pp_returnintry(pTHX)
 {
   I32 cxix;
+  I32 gimme;
+  SV *retval;
+
   for (cxix = cxstack_ix; cxix; cxix--) {
     if(CxTYPE(&cxstack[cxix]) == CXt_SUB)
       break;
+
+    if(CxTYPE(&cxstack[cxix]) == CXt_EVAL && CxTRYBLOCK(&cxstack[cxix])) {
+      /* If this CXt_EVAL frame came from our own ENTERTRYCATCH, then the
+       * retop should point at an OP_OR and its first grand-child will be our
+       * custom modified ENTERTRY. We can skip over it and continue in this
+       * case.
+       */
+      OP *retop = cxstack[cxix].blk_eval.retop;
+      OP *leave, *enter;
+      if(retop->op_type == OP_OR &&
+         (leave = cLOGOPx(retop)->op_first) && leave->op_type == OP_LEAVETRY &&
+         (enter = cLOGOPx(leave)->op_first) && enter->op_type == OP_ENTERTRY &&
+         enter->op_ppaddr == &pp_entertrycatch) {
+        continue;
+      }
+      /* We have to stop at any other kind of CXt_EVAL */
+      break;
+    }
   }
   if(!cxix)
     croak("Unable to find an CXt_SUB to pop back to");
 
+  /* Before we unwind the stack we must preserve the value(s) being returned */
+  /* chunks of this code inspired by
+   *   ZEFRAM/Scope-Escape-0.005/lib/Scope/Escape.xs
+   */
+  switch(gimme = cxstack[cxix].blk_gimme) {
+    case G_VOID:
+      break;
+
+    case G_SCALAR: {
+      dSP;
+      retval = TOPs;
+      SvREFCNT_inc(retval);
+      sv_2mortal(retval);
+      break;
+    }
+
+    case G_ARRAY: {
+      dSP;
+      dMARK;
+      SV **retvals = MARK+1;
+      array_ix_t retcount = SP-MARK;
+      array_ix_t i;
+      AV *retav = newAV();
+      retval = (SV *)retav;
+      sv_2mortal(retval);
+      av_fill(retav, retcount-1);
+      Copy(retvals, AvARRAY(retav), retcount, SV *);
+      for(i = 0; i < retcount; i++)
+        SvREFCNT_inc(retvals[i]);
+      break;
+    }
+  }
+
   dounwind(cxix);
+
+  /* Now put the value back */
+  switch(gimme) {
+    case G_VOID:
+      break;
+
+    case G_SCALAR: {
+      dSP;
+      XPUSHs(retval);
+      PUTBACK;
+      break;
+    }
+
+    case G_ARRAY: {
+      dSP;
+      PUSHMARK(SP);
+      AV *retav = (AV *)retval;
+      array_ix_t retcount = av_len(retav) + 1; /* because av_len means top index */
+      EXTEND(SP, retcount);
+      Copy(AvARRAY(retav), SP+1, retcount, SV *);
+      SP += retcount;
+      PUTBACK;
+      break;
+    }
+  }
 
   return PL_ppaddr[OP_RETURN](aTHX);
 }
@@ -60,17 +154,21 @@ static void invoke_finally(pTHX_ void *arg)
   CV *finally = arg;
   dSP;
 
-  if(CvCLONE(finally))
-    /* finally is a closure protosub; we have to clone it into a real sub */
-    finally = (CV *)sv_2mortal((SV *)cv_clone(finally));
-
   PUSHMARK(SP);
   call_sv((SV *)finally, G_DISCARD|G_EVAL|G_KEEPERR);
+
+  SvREFCNT_dec(finally);
 }
 
 static OP *pp_pushfinally(pTHX)
 {
-  SAVEDESTRUCTOR_X(&invoke_finally, cSVOP->op_sv);
+  CV *finally = (CV *)cSVOP->op_sv;
+
+  /* finally is a closure protosub; we have to clone it into a real sub.
+   * If we do this now then captured lexicals still work even around
+   * Future::AsyncAwait (see RT122796)
+   * */
+  SAVEDESTRUCTOR_X(&invoke_finally, (SV *)cv_clone(finally));
   return PL_op->op_next;
 }
 
@@ -225,6 +323,43 @@ static void MY_walk_optree_try_in_eval(pTHX_ OP **op_ptr, OP *root)
   }
 }
 
+/* We call this op entertrycatch to distinguish it from core perl's entertry.
+ * It doesn't actually implement the catch behaviour
+ */
+static OP *pp_entertrycatch(pTHX)
+{
+  return PL_ppaddr[OP_ENTERTRY](aTHX);
+}
+
+#define newENTERTRYCATCHOP(try, catch)  MY_newENTERTRYCATCHOP(aTHX_ try, catch)
+static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
+{
+  OP *enter;
+
+  /* Walk the block for OP_RETURN ops, so we can apply a hack to them to
+   * make
+   *   try { return }
+   * return from the containing sub, not just the eval block
+   */
+  walk_optree_try_in_eval(&try, try);
+
+  enter = newUNOP(OP_ENTERTRY, 0,
+    op_append_elem(OP_LINESEQ,
+      try,
+      newSVOP(OP_CONST, 0, &PL_sv_yes)
+    )
+  );
+  /* despite calling newUNOP(OP_ENTERTRY,...) the returned root node is the
+   * OP_LEAVETRY, whose first child is the ENTERTRY we wanted
+   */
+  ((UNOP *)enter)->op_first->op_ppaddr = &pp_entertrycatch;
+
+  return newLOGOP(OP_OR, 0,
+    enter,
+    newLISTOP(OP_SCOPE, 0, catch, NULL)
+  );
+}
+
 static int try_keyword(pTHX_ OP **op)
 {
   OP *try = NULL, *catch = NULL;
@@ -276,22 +411,7 @@ static int try_keyword(pTHX_ OP **op)
    */
 
   if(catch) {
-    /* Walk the block for OP_RETURN ops, so we can apply a hack to them to
-     * make
-     *   try { return }
-     * return from the containing sub, not just the eval block
-     */
-    walk_optree_try_in_eval(&try, try);
-
-    ret = newLOGOP(OP_OR, 0,
-      newUNOP(OP_ENTERTRY, 0,
-        op_append_elem(OP_LINESEQ,
-          try,
-          newSVOP(OP_CONST, 0, &PL_sv_yes)
-        )
-      ),
-      newLISTOP(OP_SCOPE, 0, catch, NULL)
-    );
+    ret = newENTERTRYCATCHOP(try, catch);
 
     /* localise $@ beforehand */
     ret = op_prepend_elem(OP_LINESEQ, newLOCALISEOP(PL_errgv), ret);

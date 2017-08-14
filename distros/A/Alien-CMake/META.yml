@@ -26,7 +26,7 @@ configure_requires:
   File::Which: '0'
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,14 +35,16 @@ name: Alien-CMake
 provides:
   Alien::CMake:
     file: lib/Alien/CMake.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   File::ShareDir: '1.00'
   File::Spec: '0'
   File::Which: '0'
 resources:
+  IRC: irc://irc.perl.org/#native
+  MailingList: https://groups.google.com/forum/#!forum/perl5-alien
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-CMake
   license: http://dev.perl.org/licenses/
   repository: http://github.com/PerlGameDev/Alien-CMake
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

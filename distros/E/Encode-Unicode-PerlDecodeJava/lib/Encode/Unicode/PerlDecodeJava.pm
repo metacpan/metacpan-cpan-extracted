@@ -11,7 +11,7 @@ use strict;
 use Carp;
 use utf8;
 
-our $VERSION = '2017.302';
+our $VERSION = '20170808';
 
 sub encode93($)                                                                 # Encode a string
  {my ($i) = @_;
@@ -101,8 +101,8 @@ using decode93() or in Java by using the code reproduced further below.
 
 takes an $input string encoded by encode93() and returns the decoded string.
 
-The following Java code takes a string encoded by encode93() and returns the
-decoded string to Java:
+The following Java code takes a string encoded by encode93() and (inefficiently)
+returns the decoded string to Java:
 
   String decode93(String input)                                                 // Decode string encoded by encode93()
    {final StringBuilder s = new StringBuilder();

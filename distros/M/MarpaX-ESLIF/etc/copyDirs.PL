@@ -243,6 +243,7 @@ sub _dircopy {
         next if $_ eq 'pcre2-10.23';
         next if $_ eq 'pcre2-10.23.patchdir';
         next if $_ eq 'pcre2-10.23.tar.gz';
+        next if $_ =~ /~$/;
 
         my $mode = $stats->{$_}->[2];
 

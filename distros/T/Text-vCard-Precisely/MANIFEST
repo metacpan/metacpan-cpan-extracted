@@ -3,7 +3,6 @@ Changes
 LICENSE
 META.json
 cpanfile
-dist.ini
 lib/Text/vCard/Precisely.pm
 lib/Text/vCard/Precisely/V3.pm
 lib/Text/vCard/Precisely/V3/Node.pm
@@ -33,10 +32,12 @@ t/V3/Email/base.vcf
 t/V3/Email/maltiple.vcf
 t/V3/Image/base.vcf
 t/V3/Image/gd.vcf
+t/V3/Image/gd2.vcf
 t/V3/Image/hash.vcf
 t/V3/Image/maltiple.vcf
 t/V3/Image/maltiple_base64.vcf
 t/V3/Image/maltiple_gd.vcf
+t/V3/Image/maltiple_gd2.vcf
 t/V3/Image/uri.vcf
 t/V3/Name/base.vcf
 t/V3/Name/no_suffixes.vcf
@@ -81,10 +82,12 @@ t/V4/Clientpidmap/base.vcf
 t/V4/Clientpidmap/multiple.vcf
 t/V4/Image/base.vcf
 t/V4/Image/gd.vcf
+t/V4/Image/gd2.vcf
 t/V4/Image/hash.vcf
 t/V4/Image/maltiple.vcf
 t/V4/Image/maltiple_base64.vcf
 t/V4/Image/maltiple_gd.vcf
+t/V4/Image/maltiple_gd2.vcf
 t/V4/Image/uri.vcf
 t/V4/Node/base.vcf
 t/V4/Node/hash.vcf

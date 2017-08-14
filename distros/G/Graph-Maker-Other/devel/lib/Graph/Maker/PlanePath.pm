@@ -24,7 +24,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -40,6 +40,7 @@ my @dir6_to_dy = (0, 1, 1, 0, -1,-1);
 
 my %neighbours = (4 => [ [1,0], [0,1], [-1,0], [0,-1] ],
                   6 => [ [2,0], [1,1], [-1,1], [-2,0], [-1,-1], [1,-1] ],
+                  3 => [ [2,0],        [-1,1],         [-1,-1],        ],
                  );
 
 sub init {

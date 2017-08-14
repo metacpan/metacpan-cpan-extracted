@@ -11,7 +11,9 @@ WriteMakefile(
 	LICENSE           => 'perl',
 	SIGN              => 1,
 	PREREQ_PM         => {
-		qw/Image::Magick 0/,
+		qw/File::Slurp              0
+		   HTML::Template::Compiled 0
+		   Image::Magick            0/,
 	},
 	META_ADD         => {
 		dynamic_config => 0,

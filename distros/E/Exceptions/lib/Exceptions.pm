@@ -1,5 +1,5 @@
 package Exceptions;
-$Exceptions::VERSION = '0.100';
+$Exceptions::VERSION = '0.101';
 use strict;
 use warnings;
 
@@ -23,6 +23,10 @@ usable in any fashion since then. Many other alternatives have cropped up over
 the years to make exception handling much easier. If you want to skip the
 explanations below, then you should look directly at some of the modules that
 make exception handling dead simple.
+
+L<Syntax::Keyword::Try> - Catch exceptions in a familiar C<try> and C<catch>
+way. If you look no further, make use of this module or L<Try::Tiny>! This
+module requires Perl v5.14 or better as it uses pluggable keywords.
 
 L<Try::Tiny> - Catch exceptions in a familiar C<try> and C<catch> way. If you
 look no further, make use of this module!
@@ -154,30 +158,63 @@ Don't let that scare you away from Perl, though. Keep reading and be happy!
 =head1 THE SOLUTION
 
 Lucky for us, Perl is an awesome language where the community provides many
-solutions to common tasks for us. One such solution is L<Try::Tiny>.
+solutions to common tasks for us. One such solution is L<Syntax::Keyword::Try>.
 
-If you get nothing else out of this document, let it be that using L<Try::Tiny>
-will save you time and heartache.
+If you get nothing else out of this document, let it be that using
+L<Syntax::Keyword::Try> will save you time and heartache.
 
     #!/usr/bin/env perl
     use strict;
     use warnings;
-    use Try::Tiny qw(try catch);
+    use Syntax::Keyword::Try;
+    # since 5.14 is required, let's use those features
+    use feature ':5.14';
 
-    print "0 plus 1 = ", try { increment(0) } catch { "error" };
-    print "\n"; # 1
+    # 1
+    try { say "0 plus 1 = ", increment(0); }
+    catch { say "0 plus 1 = error"; }
 
-    print "zero plus 1 = ", try { increment('zero') } catch { "error" };
-    print "\n"; # error
+    # error
+    try { say "zero plus 1 = ", increment('zero'); }
+    catch { say "zero plus 1 = error"; }
 
-    print "0 plus 1 = ", try { increment(0) } catch { "error" };
-    print "\n"; # 1
+    # 1
+    try { say "0 plus 1 = ", increment(0); }
+    catch { say "0 plus 1 = error"; }
 
     sub increment {
         my $int = shift;
         die "That's not an int!" unless defined $int && $int =~ /^[0-9]+\z/;
         return $int+1;
     }
+
+
+If you can't use L<Syntax::Keyword::Try>, you can use the pure-Perl L<Try::Tiny>
+instead:
+
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Try::Tiny qw(try catch);
+
+    # 1
+    try { print "0 plus 1 = ", increment(0), "\n"; }
+    catch { print "0 plus 1 = error\n"; };
+
+    # error
+    try { print "zero plus 1 = ", increment('zero'), "\n"; }
+    catch { print "zero plus 1 = error\n"; };
+
+    # 1
+    try { print "0 plus 1 = ", increment(0), "\n"; }
+    catch { print "0 plus 1 = error\n"; };
+
+    sub increment {
+        my $int = shift;
+        die "That's not an int!" unless defined $int && $int =~ /^[0-9]+\z/;
+        return $int+1;
+    }
+
 
 =head1 AUTHOR
 

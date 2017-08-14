@@ -103,7 +103,7 @@ has y_offset =>
 	required	=> 0,
 );
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # ------------------------------------------------
 
@@ -312,13 +312,15 @@ sub image_link
 {
 	my($self, %options)	= @_;
 	my($image_id)		= "image_$options{x}_$options{y}"; # Try to make it unique.
-
-	$self -> svg -> anchor
+	my(%anchor_options)	=
 	(
-		-href   => $options{href},
-		id      => "anchor_$options{x}_$options{y}", # Try to make it unique.
-		target	=> $options{target} || '',
-	) -> image
+		-href	=> $options{href},
+		id		=> "anchor_$options{x}_$options{y}", # Try to make it unique.
+		-target	=> $options{target} || '',
+	);
+	$anchor_options{-title} = $options{title} if ($options{title} && (length($options{title}) > 0) );
+
+	$self -> svg -> anchor(%anchor_options) -> image
 	(
 		-href	=> $options{image},
 		id		=> $image_id,
@@ -351,14 +353,16 @@ sub rectangle_link
 {
 	my($self, %options) = @_;
 	my($defaults)		= $self -> _get_defaults(%options);
-	my($rectangle_id)	= "rectangle_$options{x}_$options{y}"; # Try to make it unique.
-
-	$self -> svg -> anchor
+	my(%anchor_options)	=
 	(
-		-href   => $options{href},
-		id      => "anchor_$options{x}_$options{y}", # Try to make it unique.
-		target	=> $options{target} || '',
-	) -> rectangle
+		-href	=> $options{href},
+		id		=> "anchor_$options{x}_$options{y}", # Try to make it unique.
+		-target	=> $options{target} || '',
+	);
+	$anchor_options{-title} = $options{title} if ($options{title} && (length($options{title}) > 0) );
+	my($rectangle_id)		= "rectangle_$options{x}_$options{y}"; # Try to make it unique.
+
+	$self -> svg -> anchor(%anchor_options) -> rectangle
 	(
 		fill			=> $$defaults{fill},
 		'fill-opacity'	=> $$defaults{fill_opacity} || 0.5, # We use 0.5 since the default is 0.
@@ -406,14 +410,16 @@ sub text_link
 	my($self, %options)	= @_;
 	my($defaults)		= $self -> _get_defaults(%options);
 	my($half_font)		= int($$defaults{font_size} / 2);
-	my($text_id)		= "text_$options{x}_$options{y}"; # Try to make it unique.
-
-	$self -> svg -> anchor
+	my(%anchor_options)	=
 	(
-		-href   => $options{href},
-		id      => "anchor_$options{x}_$options{y}", # Try to make it unique.
-		target	=> $options{target} || '',
-	) -> text
+		-href	=> $options{href},
+		id		=> "anchor_$options{x}_$options{y}", # Try to make it unique.
+		-target	=> $options{target} || '',
+	);
+	$anchor_options{-title} = $options{title} if ($options{title} && (length($options{title}) > 0) );
+	my($text_id)			= "text_$options{x}_$options{y}"; # Try to make it unique.
+
+	$self -> svg -> anchor(%anchor_options) -> text
 	(
 		id		=> $text_id,
 		x		=> $self -> x_offset + $self -> cell_width * $options{x} + $$defaults{font_size} - $half_font,
@@ -441,7 +447,7 @@ sub write
 	my($self, %options)	= @_;
 	my($file_name)		= $options{output_file_name} || $self -> output_file_name;
 
-	open(my $fh, '>', $file_name);
+	open(my $fh, '>:encoding(UTF-8)', $file_name);
 	print $fh  $self -> svg -> xmlify;
 	close $fh;
 
@@ -452,6 +458,8 @@ sub write
 1;
 
 =pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -464,6 +472,7 @@ This is scripts/synopsis.pl:
 	#!/usr/bin/env perl
 
 	use strict;
+	use utf8;
 	use warnings;
 
 	use SVG::Grid;
@@ -509,6 +518,7 @@ This is scripts/synopsis.pl:
 		href   => 'http://savage.net.au/Flowers/Chorizema.cordatum.html',
 		image  => 'http://savage.net.au/Flowers/images/Chorizema.cordatum.0.jpg',
 		target => 'new_window',
+		title  => 'MouseOver® an image',
 		x      => 1, # Cell co-ord.
 		y      => 2, # Cell co-ord.
 	);
@@ -516,6 +526,7 @@ This is scripts/synopsis.pl:
 	(
 		href   => 'http://savage.net.au/Flowers/Alyogyne.huegelii.html',
 		target => 'new_window',
+		title  => 'MouseOver™ a rectangle',
 		x      => 2, # Cell co-ord.
 		y      => 3, # Cell co-ord.
 	);
@@ -525,6 +536,7 @@ This is scripts/synopsis.pl:
 		stroke => 'rgb(255, 0, 0)',
 		target => 'new_window',
 		text   => '3,1',
+		title  => 'MouseOvér some text',
 		x      => 3, # Cell co-ord.
 		y      => 1, # Cell co-ord.
 	);
@@ -765,7 +777,15 @@ image => 'http://savage.net.au/Flowers/images/Chorizema.cordatum.0.jpg'
 This string, if empty, makes the link (C<href>) open in the current tab. If non-empty, the link
 opens in a new tab. Sample:
 
+Note: The parameter passed to L<SVG> is actually called C<-target>.
+
 target => 'new_window'
+
+=item o title => $string.
+
+This string, if not empty, is passed to L<SVG> as the value of the C<-title> parameter.
+
+The effect is to activate a tooltip when you MouseOver the image.
 
 =item o x => $integer
 
@@ -811,16 +831,24 @@ This is the link you are taken to if you click in the rectangle specified by (x,
 
 href => 'http://savage.net.au/Flowers/Alyogyne.huegelii.html'
 
+=item o stroke
+
+Default: 'rgb(105, 105, 105)' aka dimgray.
+
 =item o target => $string
 
 This string, if empty, makes the link (C<href>) open in the current tab. If non-empty, the link
 opens in a new tab. Sample:
 
+Note: The parameter passed to L<SVG> is actually called C<-target>.
+
 target => 'new_window'
 
-=item o stroke
+=item o title => $string.
 
-Default: 'rgb(105, 105, 105)' aka dimgray.
+This string, if not empty, is passed to L<SVG> as the value of the C<-title> parameter.
+
+The effect is to activate a tooltip when you MouseOver the rectangle.
 
 =item o x => $integer
 
@@ -917,17 +945,6 @@ Sample:
 
 href => 'http://savage.net.au/Flowers/Aquilegia.McKana.html'
 
-=item o target => $string
-
-This string, if empty, makes the link (C<href>) open in the current tab. If non-empty, the link
-opens in a new tab. Sample:
-
-target => 'new_window'
-
-=item o text => $string
-
-This is the text which will be written into the cell and made clickable.
-
 =item o stroke
 
 Default: 'rgb(105, 105, 105)' aka dimgray.
@@ -935,6 +952,25 @@ Default: 'rgb(105, 105, 105)' aka dimgray.
 =item o stroke-width
 
 Default: 1.
+
+=item o target => $string
+
+This string, if empty, makes the link (C<href>) open in the current tab. If non-empty, the link
+opens in a new tab. Sample:
+
+Note: The parameter passed to L<SVG> is actually called C<-target>.
+
+target => 'new_window'
+
+=item o text => $string
+
+This is the text which will be written into the cell and made clickable.
+
+=item o title => $string.
+
+This string, if not empty, is passed to L<SVG> as the value of the C<-title> parameter.
+
+The effect is to activate a tooltip when you MouseOver the rectangle.
 
 =item o x => $integer
 
@@ -954,7 +990,7 @@ Cell co-ordinates are numbered 1 .. N.
 
 Returns the calculated width, in pixels, of the SVG.
 
-=head2 write([$output_file_name])
+=head2 write(%options)
 
 Writes the SVG to the file name passed to L</new(%options)> or passed to C<write()>. The latter
 value has priority.
@@ -984,6 +1020,16 @@ Gets the vertical gap between the edges of the SVG and the grid.
 C<y_offset> is a parameter to L</new()>.
 
 =head1 FAQ
+
+=head2 Does this module support Unicode?
+
+Yes. The L</write(%options)> method uses an encoding of UTF-8 on the output file handle.
+
+Note: To use Unicode, you must include 'use utf8;' in your programs. See scripts/synopsis.pl.
+
+=head2 Does this module support tootips via MouseOver?
+
+Yes. Just search this document for 'MouseOver'.
 
 =head2 Does this module use the SVG 'g' element?
 

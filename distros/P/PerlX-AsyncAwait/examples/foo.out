@@ -1,0 +1,11 @@
+Generator started at Foo.pm line 8.
+5 at Foo.pm line 20.
+Entering loop at Foo.pm line 10.
+4 at Foo.pm line 21.
+Received foo at Foo.pm line 13.
+3 at Foo.pm line 22.
+2 at Foo.pm line 23.
+1 at Foo.pm line 24.
+0 at Foo.pm line 25.
+Generator exiting at Foo.pm line 15.
+Use of uninitialized value in warn at Foo.pm line 26.

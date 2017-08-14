@@ -26,7 +26,10 @@ do { my $x = {
                                       'Mojolicious::Command' => '0',
                                       'Mojolicious::Commands' => '0',
                                       'Mojolicious::Plugin' => '0',
-                                      'constant' => '0'
+                                      'Text::Yeti::Table' => '0',
+                                      'Time::HiRes' => '0',
+                                      'constant' => '0',
+                                      'perl' => 'v5.10.1'
                                     }
                     },
        'test' => {

@@ -22,7 +22,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Digest::SHA" : "0",
             "Test::More" : "0"
          }
       },
@@ -33,9 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "AnyEvent::WebSocket::Client" : "0.12",
+            "AnyEvent::HTTP" : "0",
+            "AnyEvent::WebSocket::Client" : "0.4",
+            "Digest::SHA" : "0",
             "JSON" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010000"
          }
       }
    },
@@ -47,5 +48,5 @@
          "web" : "https://github.com/Orabig/centrifugo-perl-client"
       }
    },
-   "version" : "1.03"
+   "version" : "1.05"
 }

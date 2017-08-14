@@ -3,7 +3,7 @@ use strict;
 
 {
     package Jopa;
-    use base qw/Class::Accessor::Inherited::XS/;
+    use parent 'Class::Accessor::Inherited::XS::Compat';
     use Class::Accessor::Inherited::XS class => ['foo'];
     use Class::Accessor::Inherited::XS class => {'baz' => 90};
     __PACKAGE__->mk_class_accessors('bar');

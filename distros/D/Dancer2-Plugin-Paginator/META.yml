@@ -18,8 +18,9 @@ name: Dancer2-Plugin-Paginator
 requires:
   Dancer2::Plugin: 0.159002
   Paginator::Lite: 2.001003
+  perl: 5.008
 resources:
   bugtracker: https://github.com/manwar/Dancer2-Plugin-Paginator/issues
   repository: git://github.com/manwar/Dancer2-Plugin-Paginator.git
-version: 2.03
+version: 2.04
 x_serialization_backend: 'YAML::Tiny version 1.56'

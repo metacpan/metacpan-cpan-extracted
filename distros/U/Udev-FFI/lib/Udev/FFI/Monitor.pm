@@ -130,7 +130,7 @@ sub start {
 
 sub poll {
     my $self = shift;
-    my $timeout = shift || 0;
+    my $timeout = shift;
 
     unless($self->{_is_started}) {
         die "udev monitor is not running";

@@ -1,10 +1,13 @@
 use strict;
 use warnings;
+use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use File::Basename; # For basename().
-use File::Slurp; # For read_file(), write_file().
+use File::Slurper 'read_text';
 use File::Spec;
 use File::Temp;
+
+use Path::Tiny; # For slurp_utf8.
 
 use Test::More;
 
@@ -34,13 +37,13 @@ sub process
 
 	my(@result)  = `$^X @params`;
 
-	write_file($out_file_name, {binmode => ':raw'}, @result);
+	path($out_file_name) -> spew(@result);
 
 	is
 	(
-		read_file("$out_file_name", {binmode => ':raw:encoding(utf-8)'}),
-		read_file("$log_file_name", {binmode => ':raw:encoding(utf-8)'}),
-		"Parsing $in_file_name matches shipped log"
+		read_text($out_file_name),
+		read_text($log_file_name),
+		"Parsing $in_file_name"
 	);
 
 } # End of process.
@@ -50,9 +53,9 @@ sub process
 my($count)         = 0;
 my($data_dir_name) = 'data';
 
-for my $file_name (sort grep{/svg$/} read_dir('data', {prefix => 1}) )
+for my $file_name (sort grep{/svg$/} path('data') -> children)
 {
-	process($data_dir_name, $file_name);
+	process($data_dir_name, File::Spec -> catfile('data', $file_name) );
 	$count++;
 }
 

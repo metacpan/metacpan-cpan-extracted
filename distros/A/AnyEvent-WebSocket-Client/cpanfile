@@ -11,13 +11,12 @@ recommends "Math::Random::Secure" => "0";
 recommends "Net::SSLeay" => "0";
 recommends "PerlX::Maybe::XS" => "0";
 
-on 'build' => sub {
-  requires "Module::Build" => "0.28";
-};
-
 on 'test' => sub {
   requires "Protocol::WebSocket" => "0.20";
-  requires "Test::More" => "0.94";
+  requires "Test2::API" => "1.302015";
+  requires "Test2::Require" => "0.000060";
+  requires "Test2::Require::Module" => "0.000060";
+  requires "Test2::V0" => "0.000060";
   requires "perl" => "5.008";
 };
 
@@ -26,11 +25,10 @@ on 'test' => sub {
   recommends "EV" => "0";
   recommends "Mojolicious" => "3.0";
   recommends "Test::Memory::Cycle" => "0";
-  recommends "Test::Warn" => "0";
 };
 
 on 'configure' => sub {
-  requires "Module::Build" => "0.28";
+  requires "ExtUtils::MakeMaker" => "0";
   requires "perl" => "5.006";
 };
 

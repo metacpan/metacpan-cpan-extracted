@@ -15,7 +15,7 @@ name: Data-Edit-Xml-SDL
 provides:
   Data::Edit::Xml::SDL:
     file: lib/Data/Edit/Xml/SDL.pm
-    version: '20170801'
+    version: '20170809'
 requires:
   Carp: '0'
   Data::Edit::Xml::Lint: '0'
@@ -25,4 +25,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170801'
+version: '20170809'

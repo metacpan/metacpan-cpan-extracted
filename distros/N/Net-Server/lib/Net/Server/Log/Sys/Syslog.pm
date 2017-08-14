@@ -2,12 +2,9 @@
 #
 #  Net::Server::Log::Sys::Syslog - Net::Server Logging module
 #
-#  $Id$
+#  Copyright (C) 2012-2017
 #
-#  Copyright (C) 2012
-#
-#    Paul Seamons
-#    paul@seamons.com
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License

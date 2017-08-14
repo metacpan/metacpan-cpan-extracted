@@ -35,7 +35,8 @@ L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently
 discourage adding non-optional ones in favor of a faster and more painless
 installation process. And we do in fact already use several optional CPAN
 modules such as L<EV>, L<IO::Socket::Socks>, L<IO::Socket::SSL>,
-L<Net::DNS::Native> and L<Plack> to provide advanced functionality if possible.
+L<Net::DNS::Native>, L<Plack> and L<Role::Tiny> to provide advanced
+functionality if possible.
 
 =head2 Why reinvent wheels?
 
@@ -236,8 +237,8 @@ automatically for you.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
-more documentation and examples by many different authors.
+L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot more
+documentation and examples by many different authors.
 
 =head1 SUPPORT
 

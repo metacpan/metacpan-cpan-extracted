@@ -1,98 +1,106 @@
  Count  Type        Name                  Value
-     1  tag         svg                   open
-     2  attribute   height                300px
-     3  attribute   version               1.1
-     4  attribute   width                 450px
-     5  attribute   xmlns                 http://www.w3.org/2000/svg
-     6  tag         desc                  open
-     7  content     desc                  Example PreserveAspectRatio - illustrates preserveAspectRatio attribute
-     8  tag         desc                  close
-     9  tag         rect                  open
-    10  attribute   fill                  none
-    11  attribute   height                298
-    12  attribute   stroke                blue
-    13  attribute   width                 448
-    14  attribute   x                     1
-    15  attribute   y                     1
-    16  content     rect                  
-    17  tag         rect                  close
-    18  tag         g                     open
-    19  attribute   font-size             9
-    20  tag         g                     open
-    21  attribute   id                    meet-group-1
-    22  raw         transform             translate(100, 60)
-    23  command     translate             -
-    24  float       1                     100
-    25  float       2                     60
+     1  XMLDecl     xml                   -
+     2  attribute   version               1.0
+     3  attribute   encoding              UTF-8
+     4  Doctype     doctype               -
+     5  attribute   name                  svg
+     6  attribute   sysid                 http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd
+     7  attribute   pubid                 -//W3C//DTD SVG 1.1//EN
+     8  attribute   internal              
+     9  tag         svg                   open
+    10  attribute   height                300px
+    11  attribute   version               1.1
+    12  attribute   width                 450px
+    13  attribute   xmlns                 http://www.w3.org/2000/svg
+    14  tag         desc                  open
+    15  content     desc                  Example PreserveAspectRatio - illustrates preserveAspectRatio attribute
+    16  tag         desc                  close
+    17  tag         rect                  open
+    18  attribute   fill                  none
+    19  attribute   height                298
+    20  attribute   stroke                blue
+    21  attribute   width                 448
+    22  attribute   x                     1
+    23  attribute   y                     1
+    24  content     rect                  
+    25  tag         rect                  close
     26  tag         g                     open
-    27  tag         text                  open
-    28  attribute   y                     -10
-    29  content     text                  xMin*
+    27  attribute   font-size             9
+    28  tag         g                     open
+    29  attribute   id                    meet-group-1
+    30  raw         transform             translate(100, 60)
+    31  command     translate             -
+    32  float       1                     100
+    33  float       2                     60
+    34  tag         g                     open
+    35  tag         text                  open
+    36  attribute   y                     -10
+    37  content     text                  xMin*
 				
-    30  tag         text                  close
-    31  tag         svg                   open
-    32  attribute   height                30
-    33  raw         preserveAspectRatio   xMinYMin meet
-    34  string      1                     xMinYMin
-    35  string      2                     meet
-    36  raw         viewBox               0 0 30 40
-    37  integer     1                     0
-    38  integer     2                     0
-    39  float       3                     30
-    40  float       4                     40
-    41  attribute   width                 50
-    42  content     svg                   
+    38  tag         text                  close
+    39  tag         svg                   open
+    40  attribute   height                30
+    41  raw         preserveAspectRatio   xMinYMin meet
+    42  string      1                     xMinYMin
+    43  string      2                     meet
+    44  raw         viewBox               0 0 30 40
+    45  integer     1                     0
+    46  integer     2                     0
+    47  float       3                     30
+    48  float       4                     40
+    49  attribute   width                 50
+    50  content     svg                   
 					Smile
 				
-    43  tag         svg                   close
-    44  content     g                     
+    51  tag         svg                   close
+    52  content     g                     
 				
 				Viewport1
 				
 			
-    45  tag         g                     close
-    46  tag         g                     open
-    47  raw         transform             translate(70,0)
-    48  command     translate             -
-    49  float       1                     70
-    50  integer     2                     0
-    51  tag         text                  open
-    52  attribute   y                     -10
-    53  content     text                  xMid*
+    53  tag         g                     close
+    54  tag         g                     open
+    55  raw         transform             translate(70,0)
+    56  command     translate             -
+    57  float       1                     70
+    58  integer     2                     0
+    59  tag         text                  open
+    60  attribute   y                     -10
+    61  content     text                  xMid*
 				
-    54  tag         text                  close
-    55  tag         svg                   open
-    56  attribute   height                30
-    57  raw         preserveAspectRatio   xMidYMid meet
-    58  string      1                     xMidYMid
-    59  string      2                     meet
-    60  raw         viewBox               0 0 30 40
-    61  integer     1                     0
-    62  integer     2                     0
-    63  float       3                     30
-    64  float       4                     40
-    65  attribute   width                 50
-    66  content     svg                   
+    62  tag         text                  close
+    63  tag         svg                   open
+    64  attribute   height                30
+    65  raw         preserveAspectRatio   xMidYMid meet
+    66  string      1                     xMidYMid
+    67  string      2                     meet
+    68  raw         viewBox               0 0 30 40
+    69  integer     1                     0
+    70  integer     2                     0
+    71  float       3                     30
+    72  float       4                     40
+    73  attribute   width                 50
+    74  content     svg                   
 					Smile
 				
-    67  tag         svg                   close
-    68  content     g                     
+    75  tag         svg                   close
+    76  content     g                     
 				
 				Viewport1
 				
 			
-    69  tag         g                     close
-    70  content     g                     
+    77  tag         g                     close
+    78  content     g                     
 			
 			
 		
-    71  tag         g                     close
-    72  content     g                     
+    79  tag         g                     close
+    80  content     g                     
 	    
 	
-    73  tag         g                     close
-    74  content     svg                   
+    81  tag         g                     close
+    82  content     svg                   
 	
 	
 	
-    75  tag         svg                   close
+    83  tag         svg                   close

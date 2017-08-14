@@ -4,54 +4,54 @@ Hash::SharedMem::Handle - handle for efficient shared mutable hash
 
 =head1 SYNOPSIS
 
-	use Hash::SharedMem::Handle;
+    use Hash::SharedMem::Handle;
 
-	if(Hash::SharedMem::Handle->referential_handle) { ...
+    if(Hash::SharedMem::Handle->referential_handle) { ...
 
-	$shash = Hash::SharedMem::Handle->open($filename, "rwc");
+    $shash = Hash::SharedMem::Handle->open($filename, "rwc");
 
-	if($shash->is_readable) { ...
-	if($shash->is_writable) { ...
-	$mode = $shash->mode;
+    if($shash->is_readable) { ...
+    if($shash->is_writable) { ...
+    $mode = $shash->mode;
 
-	if($shash->exists($key)) { ...
-	$length = $shash->length($key);
-	$value = $shash->get($key);
-	$shash->set($key, $newvalue);
-	$oldvalue = $shash->gset($key, $newvalue);
-	if($shash->cset($key, $chkvalue, $newvalue)) { ...
+    if($shash->exists($key)) { ...
+    $length = $shash->length($key);
+    $value = $shash->get($key);
+    $shash->set($key, $newvalue);
+    $oldvalue = $shash->gset($key, $newvalue);
+    if($shash->cset($key, $chkvalue, $newvalue)) { ...
 
-	if($shash->occupied) { ...
-	$count = $shash->count;
-	$size = $shash->size;
-	$key = $shash->key_min;
-	$key = $shash->key_max;
-	$key = $shash->key_ge($key);
-	$key = $shash->key_gt($key);
-	$key = $shash->key_le($key);
-	$key = $shash->key_lt($key);
-	$keys = $shash->keys_array;
-	$keys = $shash->keys_hash;
-	$group = $shash->group_get_hash;
+    if($shash->occupied) { ...
+    $count = $shash->count;
+    $size = $shash->size;
+    $key = $shash->key_min;
+    $key = $shash->key_max;
+    $key = $shash->key_ge($key);
+    $key = $shash->key_gt($key);
+    $key = $shash->key_le($key);
+    $key = $shash->key_lt($key);
+    $keys = $shash->keys_array;
+    $keys = $shash->keys_hash;
+    $group = $shash->group_get_hash;
 
-	$snap_shash = $shash->snapshot;
-	if($shash->is_snapshot) { ...
+    $snap_shash = $shash->snapshot;
+    if($shash->is_snapshot) { ...
 
-	$shash->idle;
-	$shash->tidy;
+    $shash->idle;
+    $shash->tidy;
 
-	$tally = $shash->tally_get;
-	$shash->tally_zero;
-	$tally = $shash->tally_gzero;
+    $tally = $shash->tally_get;
+    $shash->tally_zero;
+    $tally = $shash->tally_gzero;
 
-	tie %shash, "Hash::SharedMem::Handle", $shash;
-	tie %shash, "Hash::SharedMem::Handle", $filename, "rwc";
+    tie %shash, "Hash::SharedMem::Handle", $shash;
+    tie %shash, "Hash::SharedMem::Handle", $filename, "rwc";
 
-	$shash = tied(%shash);
-	if(exists($shash{$key})) { ...
-	$value = $shash{$key};
-	$shash{$key} = $newvalue;
-	$oldvalue = delete($shash{$key});
+    $shash = tied(%shash);
+    if(exists($shash{$key})) { ...
+    $value = $shash{$key};
+    $shash{$key} = $newvalue;
+    $oldvalue = delete($shash{$key});
 
 =head1 DESCRIPTION
 
@@ -82,7 +82,7 @@ use strict;
 
 use Hash::SharedMem ();
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 =head1 CLASS METHODS
 
@@ -238,11 +238,23 @@ if the key was already absent.  This swap is performed atomically.
 
 =item scalar(%SHASH)
 
-From Perl 5.8.3 onwards, returns a truth value indicating whether
+From Perl 5.25.3 onwards, returns the number of items that are currently
+in the shared hash.  This matches the behaviour of untied hashes on
+these Perl versions.  Prior to Perl 5.25.3, from Perl 5.8.3 onwards,
+returns a truth value indicating whether
 there are currently any items in the shared hash.  Does not supply any
 additional information corresponding to the hash bucket usage information
 that untied hashes supply in this situation.  Prior to Perl 5.8.3,
 returns a meaningless value, due to a limitation of the tying system.
+
+If the hash is evaluated in a truth value context, with the expectation of
+this testing whether the shared hash is occupied, there is a performance
+concern.  Prior to Perl 5.25.3 only the truth value would be determined,
+quite cheaply.  From Perl 5.25.3 onwards, a more expensive operation is
+performed, counting all the keys.  If this is a problem, one can evaluate
+C<< tied(%SHASH)->occupied >> to explicitly invoke the truth-value-only
+operation.  However, if performance is a concern then the tied interface
+is best entirely avoided.
 
 =item scalar(keys(%SHASH))
 
@@ -327,7 +339,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 Copyright (C) 2014, 2015 PhotoBox Ltd
 
-Copyright (C) 2014, 2015 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2014, 2015, 2017 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

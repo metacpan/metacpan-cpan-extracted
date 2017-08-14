@@ -29,9 +29,6 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 plan tests => 28;
 
 require Graph::Maker::Keller;
@@ -39,7 +36,7 @@ require Graph::Maker::Keller;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Maker::Keller::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Keller->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Keller->VERSION($want_version); 1 }, 1,

@@ -28,7 +28,8 @@
       "runtime" : {
          "requires" : {
             "Dancer2::Plugin" : "0.159002",
-            "Paginator::Lite" : "2.001003"
+            "Paginator::Lite" : "2.001003",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -48,7 +49,7 @@
          "web" : "https://github.com/manwar/Dancer2-Plugin-Paginator"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

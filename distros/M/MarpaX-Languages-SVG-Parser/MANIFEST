@@ -1,4 +1,3 @@
-Build.PL
 Changelog.ini
 Changes
 config/.htmarpax.languages.svg.parser.conf
@@ -89,15 +88,13 @@ html/viewBox.svg
 lib/MarpaX/Languages/SVG/Parser.pm
 lib/MarpaX/Languages/SVG/Parser/Actions.pm
 lib/MarpaX/Languages/SVG/Parser/Config.pm
-lib/MarpaX/Languages/SVG/Parser/SAXHandler.pm
 lib/MarpaX/Languages/SVG/Parser/Utils.pm
+lib/MarpaX/Languages/SVG/Parser/XMLHandler.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
-scripts/bnf2graph.pl
 scripts/copy.config.pl
 scripts/find.config.pl
 scripts/float.pl
@@ -110,6 +107,10 @@ scripts/svg2log.pl
 scripts/synopsis.pl
 scripts/test.file.pl
 scripts/test.fileset.pl
+t/00.versions.t
+t/00.versions.tx
 t/test.fake.data.t
 t/test.real.data.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

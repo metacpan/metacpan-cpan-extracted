@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Perl;
 use Prty::Http::Cookie;
@@ -137,11 +137,11 @@ charset => $charset
 
 =item *
 
-contentLength => $n -or- -1
+contentLength => $n | -1
 
 =item *
 
-expires => $date -or- 'now' -or- 0
+expires => $date | 'now' | 0
 
 =item *
 
@@ -977,7 +977,7 @@ sub asString {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

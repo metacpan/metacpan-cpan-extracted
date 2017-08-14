@@ -11,5 +11,5 @@ mkdir -p /dev/shm/html/Perl-modules/html/$NAME
 pod2html.pl -i lib/$NAME.pm            -o /dev/shm/html/Perl-modules/html/$NAME.html
 pod2html.pl -i lib/$NAME/Actions.pm    -o /dev/shm/html/Perl-modules/html/$NAME/Actions.html
 pod2html.pl -i lib/$NAME/Config.pm     -o /dev/shm/html/Perl-modules/html/$NAME/Config.html
-pod2html.pl -i lib/$NAME/SAXHandler.pm -o /dev/shm/html/Perl-modules/html/$NAME/SAXHandler.html
+pod2html.pl -i lib/$NAME/XMLHandler.pm -o /dev/shm/html/Perl-modules/html/$NAME/XMLHandler.html
 pod2html.pl -i lib/$NAME/Utils.pm      -o /dev/shm/html/Perl-modules/html/$NAME/Utils.html

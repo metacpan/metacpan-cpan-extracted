@@ -1,9 +1,9 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
+META.json
 META.yml
-Makefile.PL
 README
 lib/IPC/Signal/Force.pm
 t/pod_cvg.t

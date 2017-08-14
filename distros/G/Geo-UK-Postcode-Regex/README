@@ -12,7 +12,7 @@ SYNOPSIS
         ## REGULAR EXPRESSIONS
     
         my $lax_re    = Geo::UK::Postcode::Regex->regex;
-        my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
+        my $strict_re = Geo::UK::Postcode::Regex->strict_regex;
         my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
     
         # matching only
@@ -143,9 +143,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Parsing UK postcodes with regular expressions. This package has been
-    separated from Geo::UK::Postcode so it can be installed and used with
-    fewer dependencies.
+    Parsing UK postcodes with regular expressions (aka Regexp). This
+    package has been separated from Geo::UK::Postcode so it can be
+    installed and used with fewer dependencies.
 
     Can handle partial postcodes (just the outcode or sector) and can test
     against valid characters and currently valid outcodes.
@@ -294,7 +294,7 @@ LOOKUP METHODS
 
 SEE ALSO
 
-      * Geo::UK::Postcode
+      * Geo::UK::Postcode - companion package, provides Postcode objects
 
       * Geo::Address::Mail::UK
 
@@ -329,7 +329,7 @@ AUTHOR
 
 COPYRIGHT
 
-    Copyright 2015- Michael Jemmeson
+    Copyright 2015-2017 Michael Jemmeson
 
 LICENSE
 

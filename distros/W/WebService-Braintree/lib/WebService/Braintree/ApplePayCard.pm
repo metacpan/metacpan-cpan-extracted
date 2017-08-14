@@ -1,5 +1,5 @@
 package WebService::Braintree::ApplePayCard;
-$WebService::Braintree::ApplePayCard::VERSION = '0.91';
+$WebService::Braintree::ApplePayCard::VERSION = '0.92';
 use WebService::Braintree::ApplePayCard::CardType;
 
 use Moose;

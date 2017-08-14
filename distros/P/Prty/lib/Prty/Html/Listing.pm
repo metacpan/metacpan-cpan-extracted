@@ -4,7 +4,7 @@ use base qw/Prty::Html::Base/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::FileHandle;
 
@@ -398,7 +398,7 @@ PREFIX ist der cssPrefix (L<siehe Basisklasse|R1::Misc-Html.html#cssprefix>)
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

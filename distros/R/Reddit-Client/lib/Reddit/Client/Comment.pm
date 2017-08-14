@@ -85,9 +85,7 @@ with no replies return an empty array for C<replies>.
 
 =head1 AUTHOR
 
-<mailto:earth-tone@ubwg.net>
-
-Jeff Ober L<mailto:jeffober@gmail.com>
+<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

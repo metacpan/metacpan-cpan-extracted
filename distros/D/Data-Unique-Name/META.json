@@ -21,14 +21,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0"
+            "Carp" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Data::Unique::Name" : {
          "file" : "lib/Data/Unique/Name.pm",
-         "version" : "2017.324"
+         "version" : "20170810"
       }
    },
    "release_status" : "stable",
@@ -37,5 +38,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.324"
+   "version" : "20170810"
 }

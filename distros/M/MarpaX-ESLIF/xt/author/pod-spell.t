@@ -24,7 +24,11 @@ Kegler
 Level
 Logger
 MarpaX
+Properties
+PropertyBitSet
 Recognizer
+Rule
+Symbol
 Tutorial
 Type
 Value

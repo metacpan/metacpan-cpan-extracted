@@ -18,9 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  File::Slurp: '0'
+  HTML::Template::Compiled: '0'
   Image::Magick: '0'
   perl: '5.014000'
 resources:
   repository: https://git.ieval.ro/?p=app-gallery.git
-version: '0.001'
+version: '0.001001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

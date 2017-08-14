@@ -1,12 +1,12 @@
 {
-   "abstract" : "Extensible, general Perl server engine",
+   "abstract" : "Extensible Perl internet server",
    "author" : [
       "Paul Seamons <paul@seamons.com> and Rob Brown <bbb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,17 +21,16 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.30"
          }
       },
       "runtime" : {
          "requires" : {
+            "File::Temp" : "0",
             "IO::Socket" : "0",
             "POSIX" : "0",
             "Socket" : "0",
@@ -40,5 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.008"
+   "version" : "2.009",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -59,7 +59,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.097003"
+         "version" : "0.098000"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -88,7 +88,7 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.097003",
+   "version" : "0.098000",
    "x_contributors" : [
       "Ilya <ilya@orz1e1.mydomain>",
       "Ilya Pavlov <iluxz@mail.ru>"

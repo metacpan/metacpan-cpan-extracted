@@ -1,6 +1,10 @@
 Revision history for Bot::IRC::X::Message
 
+1.03      2017-08-12 08:58:29-07:00 America/Los_Angeles
+        - Make messaging more flexible (by stephenhoward)
+
 1.02      2016-11-10 18:42:01-08:00 America/Los_Angeles
+        - Oops. Forgot a changes history message here.
 
 1.01      2016-11-10 18:36:14-08:00 America/Los_Angeles
         - First version, released on an unsuspecting world

@@ -21,7 +21,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20170703
+Version 1.20170809
 
 =cut
 
@@ -39,7 +39,7 @@ Date::Lectionary::Daily takes a Time::Piece date and returns ACNA readings for m
 
 =cut
 
-our $VERSION = '1.20170703';
+our $VERSION = '1.20170809';
 
 enum 'LectionaryType', [qw(acna)];
 no Moose::Util::TypeConstraints;
@@ -106,7 +106,8 @@ sub BUILD {
     $self->_setWeek(
         Date::Lectionary::Day->new(
             'date'       => $sunday,
-            'lectionary' => $self->lectionary
+            'lectionary' => $self->lectionary, 
+            'includeFeasts' => 'no', 
         )->name
     );
 

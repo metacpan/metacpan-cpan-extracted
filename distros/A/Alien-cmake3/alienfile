@@ -1,0 +1,146 @@
+use alienfile;
+use Config;
+use File::Which qw( which );
+use Path::Tiny qw( path );
+use Capture::Tiny qw( capture );
+use File::Spec;
+
+# NOTE: you can set ALIEN_CMAKE_FROM_SOURCE to force a build from source
+# even on platforms which have binary versions of cmake available.  Normally
+# you should only need this for testing the build from source capability of
+# this alienfile.
+
+configure {
+  requires 'Alien::Build' => '0.92';
+  requires 'File::Which';
+  requires 'Path::Tiny';
+  requires 'Capture::Tiny';
+};
+
+probe sub {
+  my($build) = @_;
+  my $old_cmake = $build->install_prop->{my_old_cmake} = which 'cmake';
+  
+  if($old_cmake)
+  {
+    $build->log("found existing cmake: $old_cmake");
+    my $old_cmake_version = $build->install_prop->{my_old_cmake_version} = do {
+      my($out, undef, $old_cmake) = capture { system $old_cmake, '--version' };
+      $out =~ /cmake version ([0-9\.]+)/
+        ? $1
+        : undef;
+    };
+    if($old_cmake_version)
+    {
+      my($major) = $old_cmake_version =~ /^([0-9])\./;
+      if($major >= 3)
+      {
+        $build->install_prop->{my_old_cmake_use} = 1;
+        $build->log("GOOD found cmake version $old_cmake_version");
+        return 'system' unless $ENV{ALIEN_CMAKE_FROM_SOURCE};
+      }
+      else
+      {
+        $build->log("TOO OLD found cmake version $old_cmake_version");
+      }
+    }
+    else
+    {
+      $build->log("BAD unable to determine cmake version");
+    }
+  }
+  else
+  {
+    $build->log("no existing cmake found");
+  }
+  
+  'share';
+};
+
+my $binary_release_name;
+my $binary_format;
+
+# use binary release on Linux, Windws 32/64 bit
+# do not use binary release on OS X as it comes as a .app bundle
+if($^O eq 'linux' && $Config{archname} =~ /^x86_64/)
+{
+  $binary_release_name = 'Linux-x86_64';
+  $binary_format       = 'tar.gz';
+}
+elsif($^O eq 'MSWin32' && $Config{ptrsize} == 4)
+{
+  $binary_release_name = 'win32-x86';
+  $binary_format       = 'zip';
+}
+elsif($^O eq 'MSWin32' && $Config{ptrsize} == 8)
+{
+  $binary_release_name = 'win64-x64';
+  $binary_format       = 'zip';
+}
+
+share {
+
+  # For platforms where there is a binary release, use that:
+  if($binary_release_name && !$ENV{ALIEN_CMAKE_FROM_SOURCE})
+  {
+    plugin Download => (
+      url     => 'https://cmake.org/download/',
+      filter  => qr/^cmake-[0-9\.]+-\Q$binary_release_name\E\.\Q$binary_format\E$/,
+      version => qr/([0-9\.]+)/,
+    );
+    plugin Extract => $binary_format;
+    if($^O eq 'MSWin32')
+    {
+      build sub {
+        my($build) = @_;
+        # This is a rare case where we actually want the borked windows
+        # type paths with backslashes
+        my $stage = File::Spec->catdir($build->install_prop->{stage});
+        path($stage)->mkpath unless -d $stage;
+        $build->system("xcopy . $stage /E");
+      };
+    }
+    else
+    {
+      build [
+        'cp -ar * %{.install.stage}',
+      ];
+    }
+  }
+  
+  # For platforms without a (recent) binary release, build it from source
+  else
+  {
+    plugin Download => (
+      url     => 'https://cmake.org/download/',
+      filter  => qr/^cmake-[0-9\.]+\.tar.gz$/,
+      version => qr/([0-9\.]+)/,
+    );
+    plugin Extract => 'tar.gz';
+
+    # CONSIDER: in the case where there is an older version of cmake
+    # found in the probe step above (stored in my_old_cmake), using
+    # the older version of cmake to build cmake instead of using the
+    # autoconf compat script.
+    plugin 'Build::Autoconf' => ( with_pic => 0 );
+    build [
+      '%{configure}',
+      '%{make}',
+      '%{make} install',
+    ];
+  }
+  
+  gather sub {
+    my($build) = @_;
+    $build->runtime_prop->{command} = 'cmake';
+  };
+
+};
+
+sys {
+  gather sub {
+    my($build) = @_;
+    $build->runtime_prop->{version} = $build->install_prop->{my_old_cmake_version};
+    $build->runtime_prop->{command} = $build->install_prop->{my_old_cmake};
+  };
+};

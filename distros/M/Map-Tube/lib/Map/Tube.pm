@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.32';
+$Map::Tube::VERSION   = '3.34';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Core library as Role (Moo) to process map data.
 
 =head1 VERSION
 
-Version 3.32
+Version 3.34
 
 =cut
 
@@ -39,6 +39,7 @@ use Map::Tube::Exception::DuplicateStationName;
 use Map::Tube::Exception::MissingPluginGraph;
 use Map::Tube::Exception::MissingPluginFormatter;
 use Map::Tube::Exception::MissingPluginFuzzyFind;
+use Map::Tube::Exception::MalformedMapData;
 use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_valid_color);
 use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap);
 
@@ -421,14 +422,29 @@ sub get_stations {
 sub get_map_data {
     my ($self, $caller, $method) = @_;
 
+    my $data;
     my $xml = $self->xml;
     if ($xml ne '') {
-        return XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0);
+        eval { $data = XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0); };
+        return $data unless ($@);
+
+        Map::Tube::Exception::MalformedMapData->throw({
+            method      => $method,
+            message     => "ERROR: Malformed Map Data ($xml).",
+            filename    => $caller->[1],
+            line_number => $caller->[2] });
     }
     else {
         my $json = $self->json;
         if ($json ne '') {
-            return to_perl($json);
+            eval { $data = to_perl($json) };
+            return $data unless ($@);
+
+            Map::Tube::Exception::MalformedMapData->throw({
+                method      => $method,
+                message     => "ERROR: Malformed Map Data ($json).",
+                filename    => $caller->[1],
+                line_number => $caller->[2] });
         }
         else {
             if (!defined $caller) {

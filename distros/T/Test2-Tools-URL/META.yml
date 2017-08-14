@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/plicease/Test2-Tools-URL/issues
   homepage: https://metacpan.org/pod/Test2::Tools::URL
   repository: git://github.com/plicease/Test2-Tools-URL.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

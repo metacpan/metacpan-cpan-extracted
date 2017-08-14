@@ -1,6 +1,6 @@
 package Reddit::Client;
 
-our $VERSION = '1.086'; 
+our $VERSION = '1.0901'; 
 $VERSION = eval $VERSION;
 
 use strict;
@@ -92,6 +92,10 @@ use constant API_USER                => 22;
 use constant API_SELECTFLAIR         => 23;
 use constant API_FLAIROPTS           => 24;
 use constant API_EDITWIKI            => 25;
+use constant API_CREATEMULTI         => 26;
+use constant API_DELETEMULTI         => 27;
+use constant API_GETMULTI            => 28;
+use constant API_EDITMULTI           => 29;
 
 #===============================================================================
 # Parameters
@@ -105,32 +109,36 @@ use constant LINK_URL => 'https://www.reddit.com';
 our $UA               = sprintf 'Reddit::Client/%f', $VERSION;
 
 our @API;
-$API[API_ME            ] = ['GET',  '/api/v1/me'            ];
-$API[API_INFO          ] = ['GET',  '/api/info'             ];
-$API[API_SEARCH        ] = ['GET',  '/subreddits/search'    ];
-$API[API_LOGIN         ] = ['POST', '/api/login/%s'         ];
-$API[API_SUBMIT        ] = ['POST', '/api/submit'           ];
-$API[API_COMMENT       ] = ['POST', '/api/comment'          ];
-$API[API_VOTE          ] = ['POST', '/api/vote'             ];
-$API[API_SAVE          ] = ['POST', '/api/save'             ];
-$API[API_UNSAVE        ] = ['POST', '/api/unsave'           ];
-$API[API_HIDE          ] = ['POST', '/api/hide'             ];
-$API[API_UNHIDE        ] = ['POST', '/api/unhide'           ];
-$API[API_SUBREDDITS    ] = ['GET',  '/subreddits/%s'        ];
-$API[API_MY_SUBREDDITS ] = ['GET',  '/subreddits/mine/%s'   ];
-$API[API_LINKS_OTHER   ] = ['GET',  '/%s'                   ];
-$API[API_LINKS_FRONT   ] = ['GET',  '/r/%s/%s'              ];
-$API[API_DEL           ] = ['POST', '/api/del'              ];
-$API[API_MESSAGE       ] = ['POST', '/api/compose'          ];
-$API[API_COMMENTS      ] = ['GET',  '/r/%s/comments'        ];
-$API[API_COMMENTS_FRONT] = ['GET',  '/comments'             ];
-$API[API_MESSAGES      ] = ['GET',  '/message/%s'           ];
-$API[API_MARK_READ     ] = ['POST', '/api/read_message'     ];
-$API[API_MARKALL       ] = ['POST', '/api/read_all_messages'];
-$API[API_USER          ] = ['GET',  '/user/%s/%s'           ];
-$API[API_SELECTFLAIR   ] = ['POST', '/r/%s/api/selectflair' ];
-$API[API_FLAIROPTS     ] = ['POST', '/r/%s/api/flairselector'];
-$API[API_EDITWIKI      ] = ['POST', '/r/%s/api/wiki/edit'   ];
+$API[API_ME            ] = ['GET',  '/api/v1/me'              ];
+$API[API_INFO          ] = ['GET',  '/api/info'               ];
+$API[API_SEARCH        ] = ['GET',  '/subreddits/search'      ];
+$API[API_LOGIN         ] = ['POST', '/api/login/%s'           ];
+$API[API_SUBMIT        ] = ['POST', '/api/submit'             ];
+$API[API_COMMENT       ] = ['POST', '/api/comment'            ];
+$API[API_VOTE          ] = ['POST', '/api/vote'               ];
+$API[API_SAVE          ] = ['POST', '/api/save'               ];
+$API[API_UNSAVE        ] = ['POST', '/api/unsave'             ];
+$API[API_HIDE          ] = ['POST', '/api/hide'               ];
+$API[API_UNHIDE        ] = ['POST', '/api/unhide'             ];
+$API[API_SUBREDDITS    ] = ['GET',  '/subreddits/%s'          ];
+$API[API_MY_SUBREDDITS ] = ['GET',  '/subreddits/mine/%s'     ];
+$API[API_LINKS_OTHER   ] = ['GET',  '/%s'                     ];
+$API[API_LINKS_FRONT   ] = ['GET',  '/r/%s/%s'                ];
+$API[API_DEL           ] = ['POST', '/api/del'                ];
+$API[API_MESSAGE       ] = ['POST', '/api/compose'            ];
+$API[API_COMMENTS      ] = ['GET',  '/r/%s/comments'          ];
+$API[API_COMMENTS_FRONT] = ['GET',  '/comments'               ];
+$API[API_MESSAGES      ] = ['GET',  '/message/%s'             ];
+$API[API_MARK_READ     ] = ['POST', '/api/read_message'       ];
+$API[API_MARKALL       ] = ['POST', '/api/read_all_messages'  ];
+$API[API_USER          ] = ['GET',  '/user/%s/%s'             ];
+$API[API_SELECTFLAIR   ] = ['POST', '/r/%s/api/selectflair'   ];
+$API[API_FLAIROPTS     ] = ['POST', '/r/%s/api/flairselector' ];
+$API[API_EDITWIKI      ] = ['POST', '/r/%s/api/wiki/edit'     ];
+$API[API_CREATEMULTI   ] = ['POST', '/api/multi/user/%s/m/%s' ];
+$API[API_GETMULTI      ] = ['GET', '/api/multi/user/%s/m/%s%s'];
+$API[API_DELETEMULTI   ] = ['DELETE','/api/multi/user/%s/m/%s'];
+$API[API_EDITMULTI     ] = ['PUT',  '/api/multi/user/%s/m/%s' ];
 #===============================================================================
 # Package routines
 #===============================================================================
@@ -275,9 +283,7 @@ sub json_request {
     }
 
     my $response = $self->request($method, $path, $query, $post_data);
-	#use Data::Dump::Color;
-	#dd $response;
-    my $json     = JSON::from_json($response);
+    my $json     = JSON::from_json($response) if $response;
 
     if (ref $json eq 'HASH' && $json->{json}) {
         my $result = $json->{json};
@@ -311,7 +317,7 @@ sub api_json_request {
     $path = sprintf $path, @$args;
 
     my ($query, $post_data);
-    if ($method eq 'GET') {
+    if ($method eq 'GET' or $method eq 'DELETE') {
         $query = $data;
     } else {
         $post_data = $data;
@@ -380,9 +386,10 @@ sub list_subreddits {
 	args => [$type],
 	data => $query,
     );
-    return [
-        map {Reddit::Client::SubReddit->new($self, $_->{data})} @{$result->{data}{children}}
-    ];
+
+    	return [
+        	map {Reddit::Client::SubReddit->new($self, $_->{data})} @{$result->{data}{children}}
+    	];
 }
 
 sub contrib_subreddits { 
@@ -539,8 +546,7 @@ sub fetch_links {
     ];
 }
 
-# alias for fetch_links to make naming convention consistent
-sub get_links {
+sub get_links { # alias for fetch_links to make naming convention consistent
     	my ($self, %param) = @_;
 	return $self->fetch_links(%param);
 }
@@ -631,11 +637,11 @@ sub get_user {
 		@{$result->{data}{children}} 
 	];
 }
+
 #===============================================================================
-# Deleting stories or comments
+# Delete posts or comments
 #===============================================================================
 
-# TODO unit test
 sub delete {
     my ($self, $name) = @_;
     croak 'Expected $fullname' if !$name;
@@ -665,12 +671,12 @@ sub submit_link {
     $subreddit = subreddit($subreddit);
 
     my $result = $self->api_json_request(api => API_SUBMIT, data => {
-        title    => $title,
-        url      => $url,
-        sr       => $subreddit,
-        kind     => SUBMIT_LINK,
-	sendreplies=>$replies,
-	resubmit => $repost,
+        title       => $title,
+        url         => $url,
+        sr          => $subreddit,
+        kind        => SUBMIT_LINK,
+	sendreplies => $replies,
+	resubmit    => $repost,
     });
 
     return $result->{data}{name};
@@ -916,8 +922,107 @@ sub unhide {
     $self->api_json_request(api => API_UNHIDE, data => { id => $name });
 }
 
+#==============================================================================
+# Multireddits
+#==============================================================================
 
+sub edit_multi {
+        my ($self, %param) = @_;
+	$param{edit} = 1;
+	$self->create_multi(%param);
+}
+sub create_multi {
+        my ($self, %param) = @_;
+	my $data 	= {};
+        my $model 	= {};
+
+        $model->{display_name}  = $param{name} || croak "Expected 'name'.";
+        if (length($model->{display_name}) > 50) { croak "max length of 'name' is 50."; }
+
+        $model->{description_md} = $param{description} if $param{description};
+
+        if ($param{icon_name}) {
+		$model->{icon_name} = $param{icon_name};
+		my @iconnames = ('art and design', 'ask', 'books', 'business', 'cars', 'comics', 'cute animals', 'diy', 'entertainment', 'food and drink', 'funny', 'games', 'grooming', 'health', 'life advice', 'military', 'models pinup', 'music', 'news', 'philosophy', 'pictures and gifs', 'science', 'shopping', 'sports', 'style', 'tech', 'travel', 'unusual stories', 'video', '', 'None');
+		my $match = 0;
+		foreach my $i (@iconnames) {
+			$match = 1 if $i eq $model->{icon_name};
+		}
+		my $iconstr = join ", ", @iconnames;
+		if (!$match) {croak "if 'icon_name' is provided, it must be one of the following values: $iconstr. Note that the purpose of icon_str is unclear and you should not use it unless you know what you're doing."; }
+        }
+
+        if ($param{key_color}) {
+        	$model->{key_color} = "#".$param{key_color};
+		if (length($model->{key_color}) != 7) { croak "'key_color' must be a 6-character color code"; }
+	}
+
+        if ($param{visibility}) {
+		    $model->{visibility} = $param{visibility};
+        	if ($model->{visibility} ne 'private' and
+ 	   	    $model->{visibility} ne 'public'  and
+                    $model->{visibility} ne 'hidden') {
+                	croak "if provided, 'visibility' must be either 'public', 'private', or 'hidden'.";
+        	}
+	}
+
+        if ($param{weighting_scheme}) {
+		$model->{weighting_scheme} = $param{weighting_scheme};
+		if ($model->{weighting_scheme} ne 'classic' and $model->{weighting_scheme} ne 'fresh') { croak "if 'weighting_scheme' is provided, it must be either 'classic' or 'fresh'"; }
+	}
+		
+	if ($param{subreddits} or $param{subs}) {
+		$param{subreddits} = $param{subs} || $param{subreddits};
+        	if (ref $param{subreddits} ne 'ARRAY') { croak "'subreddits' must be an array reference."; }
+
+		$model->{subreddits} = [ map { { name=> $_ } } @{$param{subreddits}} ];
+	}
+
+	# Put a ribbon on it
+	$data->{model} = JSON::encode_json($model); 
+	$data->{multipath} = "/user/$self->{username}/m/$model->{display_name}";
+
+	my $result = $self->api_json_request( 
+		api => $param{edit} ? API_EDITMULTI : API_CREATEMULTI, 
+		args => [$self->{username}, $model->{display_name}],
+		data => $data,
+	);
+
+	return $result->{data};
+}
+
+sub get_multi {
+	my ($self, %param) = @_;
+	my $name	= $param{name} || croak "expected 'name'";
+	my $username 	= $param{user} || $self->{username};
+	my $expand	= $param{expand} ? '?expand_srs=true' : '';
+
+	my $result = $self->api_json_request( 
+		api => API_GETMULTI, 
+		args => [$username, $name, $expand],
+	);
+
+	# The result looks like a Subreddit object, but is not.
+	# By returning just the data we lose the 'kind' key,
+	# which is just the string "LabeledMulti"
+	return $result->{data};
+	return $result;
+}
+
+sub delete_multi {
+	my $self = shift;
+	my $name = shift || croak "expected arg 1 (name)";
+
+	my $result = $self->api_json_request( 
+		api => API_DELETEMULTI,
+		args => [$self->{username}, $name],
+	);
+	return $result->{data};
+}
+
+#==============================================================================
 # Internal
+#==============================================================================
 
 sub ispost {
 	my ($self, $name) = @_;
@@ -941,7 +1046,7 @@ __END__
 
 Reddit::Client - A Perl wrapper for the Reddit API.
 
-B<The official documentation can be found at> L<http://redditclient.readthedocs.org/en/latest/>. What follows below might not be wrong but is not guaranteed to be right.
+Up to date, nicely-formatted documentation can be found at L<http://redditclient.readthedocs.org/en/latest/>. 
 
 =head1 SYNOPSIS
 
@@ -1090,16 +1195,52 @@ This function is an alias for C<submit_comment>, and is equivalent to
 
     submit_comment ( parent_id => $fullname, text => $text )
 
+=item create_multi
+
+    create_multi ( name => $multi_name, [ description => $description, ] [ visibility => $visibility, ]
+                 [ subreddits => [ subreddits ], ] [ icon_name => $icon_name, ] [ key_color => $hex_code, ]
+                 [ weighting_scheme => $weighting_scheme, ] )
+
+Create a multireddit. The only required argument is the name. A multi can also be created with C<edit_multi>, the only difference being that C<create_multi> will fail with a HTTP 409 error if a multi with that name already exists.
+
+Returns a hash of information about the newly created multireddit.
+
+I<name> The name of the multireddit. Maximum 50 characters. Only letters, numbers and underscores are allowed. Required.
+
+I<description> Description of the multi. This can contain markdown.
+
+I<visibility> One of 'private', 'public', or 'hidden'. Default 'private'.
+
+I<subreddits> or I<subs>: An array reference.
+
+The remaining arguments don't currently do anything. It seems like at least some of them are intended for future mobile updates.
+
+I<icon_name> If provided, must be one of the following values: 'art and design', 'ask', 'books', 'business', 'cars', 'comics', 'cute animals', 'diy', 'entertainment', 'food and drink', 'funny', 'games', 'grooming', 'health', 'life advice', 'military', 'models pinup', 'music', 'news', 'philosophy', 'pictures and gifs', 'science', 'shopping', 'sports', 'style', 'tech', 'travel', 'unusual stories', 'video', '', 'None'.
+
+I<weighting_scheme> If provided, must be either 'classic' or 'fresh'.
+
+I<key_color> A 6-character hex code. Defaults to CEE3F8.
+
 =item delete 
 
     delete ( $fullname )
 
 Delete a post or comment.
 
+=item delete_multi
+
+    delete_multi ( $multireddit_name )
+	
+Delete a multireddit.
+
+=item edit_multi
+
+Edit a multireddit. Will create a new multireddit if one with that name doesn't exist. The arguments are identical to C<create_multi>.
+
 =item edit_wiki
 
     edit_wiki ( subreddit => $subreddit, page => $page, content => $content,
-	            [ previous => $previous_version_number,] [ reason => $edit_reason, ] )
+              [ previous => $previous_version_number,] [ reason => $edit_reason, ] )
 	
 I<page> is the page being edited.
 
@@ -1112,7 +1253,7 @@ I<previous> is the ID of the intended previous version of the page; if provided,
 =item find_subreddits
 
     find_subreddits ( q => $query, [ sort => 'relevance' ,] 
-                      [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )
+                    [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )
 
 Returns a list of Subreddit objects matching the search string I<$query>. Optionally sort them by I<sort>, which can be "relevance" or "activity".
 
@@ -1161,6 +1302,14 @@ I<subreddit> can be a subreddit or multi (ex: "pics+science"). If omitted, resul
 I<view> is a feed type constant-- i.e. VIEW_HOT, VIEW_NEW, etc.
 		
 fetch_links is an alias for get_links.
+
+=item get_multi
+
+    get_multi ( name => $multi_name, [ user => $username, ] [ expand => 0, ] )
+	
+Get a hash of information about a multireddit. I<$username> defaults to your username.
+
+If I<expand> is true, returns more detailed information about the subreddits in the multi. This can be quite a bit of information, comparable to the amount of information contained in a Subreddit object, however it's not I<exactly> the same, and if you try to create a Subreddit object out of it you'll fail.
 
 =item get_permalink
 
@@ -1298,9 +1447,9 @@ Submit a comment under I<$fullname>, which must be a post or comment. Returns fu
 
 =item submit_link 
 
-    submit_link ( subreddit => $subreddit, title => $title, url => $url, [ inbox_replies => 1 ] )
+    submit_link ( subreddit => $subreddit, title => $title, url => $url, [ inbox_replies => 1, [repost => 0] )
 
-Submit a link. Returns the fullname of the new post. If I<inbox_replies> is defined and is false, disable inbox replies for that post.
+Submit a link. Returns the fullname of the new post. If I<inbox_replies> is defined and is false, disable inbox replies for that post. If I<repost> is true, the link is allowed to be a repost. (Otherwise, if it is a repost, the request will fail with the error "That link has already been submitted".)
 
 =item submit_text 
 
@@ -1336,7 +1485,7 @@ Vote on a post or comment. Direction must be 1, 0, or -1 (0 to clear votes).
 
 =head1 AUTHOR
 
-L<mailto:earth-tone@ubwg.net>
+L<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

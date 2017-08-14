@@ -13,11 +13,11 @@ SQL::Template - A new way to organize your database code
 
 =head1 VERSION
 
-Version 0.2.2
+Version 0.2.4
 
 =cut
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.2.4';
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,8 @@ our $VERSION = '0.2.2';
 =cut
 
 =head1 DESCRIPTION
+
+Write SQL sentences in external files and use them from Perl.
 
 Imagine this situation: you know DBI and you like it, because you can make use of
 your SQL knowledge. But you are not happy having the SQL code into the Perl code.

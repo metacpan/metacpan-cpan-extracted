@@ -1,5 +1,12 @@
 Revision history for Perl extension WebService-ILS
 
+0.16 2017-08-14T04:12:46Z
+    - Bugfix: Moved Params::Check::check() to BUILDARGS in 0.15 broke new(%params)
+
+0.15 2017-08-14T02:19:05Z
+    - Moved Params::Check::check() to BUILDARGS
+    - OneClickDigital -> RecordedBooks
+
 0.14 2017-06-07T01:19:26Z
     - OneClickDigital bugfix: item_metadata() and item description
 

@@ -12,7 +12,7 @@ use File::Spec::Functions qw/catdir catfile/;
 use HTML::Template::Compiled;
 use Image::Magick;
 
-our $VERSION = '0.001';
+our $VERSION = '0.001001';
 
 my $default_template;
 my %default_args = (tmpl => '', title => 'Gallery', width => 600, height => 600);

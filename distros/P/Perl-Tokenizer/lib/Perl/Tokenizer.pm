@@ -1,5 +1,6 @@
 package Perl::Tokenizer;
 
+use utf8;
 use 5.018;
 use strict;
 use warnings;
@@ -7,10 +8,10 @@ use warnings;
 no warnings "experimental::smartmatch";
 
 require Exporter;
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(perl_tokens);
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(perl_tokens);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =encoding utf8
 
@@ -20,7 +21,7 @@ Perl::Tokenizer - A tiny Perl code tokenizer.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -154,13 +155,13 @@ my $match_flags          = qr{[mnsixpogcdual]*};
 my $substitution_flags   = qr{[mnsixpogcerdual]*};
 my $compiled_regex_flags = qr{[mnsixpodual]*};
 
-my @postfix_operators  = qw( ++ -- );
-my @prec_operators     = qw ( ... .. -> ++ -- =~ <=> \\ ? ~~ ~. ~ : );
-my @asigment_operators = qw( && || // ** ! % ^. ^ &. & |. | * + - = / . << >> < > );
+my @postfix_operators    = qw( ++ -- );
+my @prec_operators       = qw ( ... .. -> ++ -- =~ <=> \\ ? ~~ ~. ~ : >> >= > << <= < == != ! );
+my @assignment_operators = qw( && || // ** % ^. ^ &. & |. | * + - = / . << >> );
 
 my $operators = do {
     local $" = '|';
-    qr{@{[map{quotemeta} @prec_operators, @asigment_operators]}};
+    qr{@{[map{quotemeta} @prec_operators, @assignment_operators]}};
 };
 
 my $postfix_operators = do {
@@ -168,9 +169,9 @@ my $postfix_operators = do {
     qr{@{[map{quotemeta} @postfix_operators]}};
 };
 
-my $asigment_operators = do {
+my $assignment_operators = do {
     local $" = '|';
-    qr{@{[map{"\Q$_=\E"} @asigment_operators]}};
+    qr{@{[map{($_ eq '=') ? '=(?!=)' : "\Q$_=\E"} @assignment_operators]}};
 };
 
 my @special_var_names = (qw( \\ | + / ~ ! @ $ % ^ & * ( ) } < > : ; " ` ' ? = - [ ] . ), '#', ',');
@@ -563,7 +564,7 @@ sub perl_tokens(&$) {
                 $canpod = 0;
                 redo;
             }
-            when (m{\G$asigment_operators}gco) {
+            when (m{\G$assignment_operators}gco) {
                 $callback->('assignment_operator', $-[0], $+[0]);
                 $regex  = 1;
                 $canpod = 0;
@@ -647,7 +648,7 @@ sub perl_tokens(&$) {
 
 =head1 SYNOPSIS
 
-    use Perl::Tokenizer qw(perl_tokens);
+    use Perl::Tokenizer;
     my $code = 'my $num = 42;';
     perl_tokens { print "@_\n" } $code;
 
@@ -674,222 +675,63 @@ The positions are absolute to the string.
 
 =head2 EXPORT
 
-Nothing is exported by default.
-Only the function B<perl_tokens()> is exportable.
+The function B<perl_tokens> is exported by default. This is the only function provided by this module.
 
 =head1 TOKENS
 
-=over 4
-
-=item format
-
-Format text.
-
-=item heredoc_beg
-
-The beginning of a here-document.
-
-=item heredoc
-
-The content of a here-document.
-
-=item pod
-
-POD content.
-
-=item horizontal_space
-
-Horizontal whitespace.
-
-=item vertical_space
-
-Vertical whitespace.
-
-=item other_space
-
-Other whitespace.
-
-=item var_name
-
-Variable name.
-
-=item special_var_name
-
-Special variable name.
-
-=item sub_name
-
-Subroutine name.
-
-=item sub_proto
-
-Prototype of a subroutine.
-
-=item comment
-
-Comment.
-
-=item scalar_sigil
-
-Scalar sigil. (C<$>)
-
-=item array_sigil
-
-Array sigil. (C<@>)
-
-=item hash_sigil
-
-Hash sigil. (C<%>)
-
-=item glob_sigil
-
-Glob sigil. (C<*>)
-
-=item ampersand_sigil
-
-Ampersand sigil. (C<&>)
-
-=item parenthesis_open
-
-Open parenthesis. (C<(>)
-
-=item parenthesis_close
-
-Closed parenthesis. (C<)>)
-
-=item curly_bracket_open
-
-Open curly backet. (C<{>)
-
-=item curly_bracket_close
-
-Closed curly bracket. (C<}>)
-
-=item right_bracket_open
-
-Open right bracket. (C<[>)
-
-=item right_bracket_close
-
-Closed right bracket. (C<]>)
-
-=item keyword
-
-Perl keyword.
-
-=item substitution
-
-Regex substitution. (C<s///>)
-
-=item transliteration
-
-Transliteration. (C<tr///>)
-
-=item match_regex
-
-Match regex. (C<m//>)
-
-=item compiled_regex
-
-Compiled regex. (C<qr//>)
-
-=item q_string
-
-Single quoted string. (C<q//>)
-
-=item qq_string
-
-Double quoted string. (C<qq//>)
-
-=item qw_string
-
-Word quoted string. (C<qw//>)
-
-=item qx_string
-
-Backtick quoted string. (C<qx//>)
-
-=item double_quoted_string
-
-Double quoted string. (C<"">)
-
-=item single_quoted_string
-
-Single quoted string. (C<''>)
-
-=item backtick
-
-Backtick quoted string. (C<``>)
-
-=item bare_word
-
-Unquoted string.
-
-=item semicolon
-
-End of statement. (C<;>)
-
-=item comma
-
-Comma. (C<,>)
-
-=item fat_comma
-
-Fat comma. (C<=E<gt>>)
-
-=item v_string
-
-Version string. (C<vX> or C<X.X.X>)
-
-=item file_test
-
-File test operator. (C<-X>)
-
-=item data
-
-DATA/END content.
-
-=item special_keyword
-
-Special keyword, such as C<__PACKAGE__>, C<__FILE__>, etc.
-
-=item glob_readline
-
-Glob/readline angle brackets. (C<E<lt>...E<gt>>)
-
-=item operator
-
-Primitive operator, such as C<+>, C<||>, etc.
-
-=item assignment_operator
-
-Assignment operator, such as C<+=>, C<||=>, etc.
-
-=item dereference_operator
-
-The arrow dereference operator. (C<-E<gt>>)
-
-=item hex_number
-
-Hex number. (C<0x...>)
-
-=item binary_number
-
-Binary number. (C<0b...>)
-
-=item number
-
-Decimal number, such as C<42>, C<3.14>, etc.
-
-=item special_fh
-
-Special file-handle, such as C<STDIN>, C<STDOUT>, etc.
-
-=item unknown_char
-
-An unknown unexpected character.
-
-=back
+The standard token names that are available are:
+
+       format .................. Format text
+       heredoc_beg ............. The beginning of a here-document ('<<"EOT"')
+       heredoc ................. The content of a here-document
+       pod ..................... An inline POD document, until '=cut' or end of the file
+       horizontal_space ........ Horizontal whitespace (matched by /\h/)
+       vertical_space .......... Vertical whitespace (matched by /\v/)
+       other_space ............. Whitespace that is neither vertical nor horizontal (matched by /\s/)
+       var_name ................ Alphanumeric name of a variable (excluding the sigil)
+       special_var_name ........ Non-alphanumeric name of a variable, such as $/ or $^H (excluding the sigil)
+       sub_name ................ Subroutine name
+       sub_proto ............... Subroutine prototype
+       comment ................. A #-to-newline comment (excluding the newline)
+       scalar_sigil ............ The sigil of a scalar variable: '$'
+       array_sigil ............. The sigil of an array variable: '@'
+       hash_sigil .............. The sigil of a hash variable: '%'
+       glob_sigil .............. The sigil of a glob symbol: '*'
+       ampersand_sigil ......... The sigil of a subroutine call: '&'
+       parenthesis_open ........ Open parenthesis: '('
+       parenthesis_close ....... Closed parenthesis: ')'
+       right_bracket_open ...... Open right bracket: '['
+       right_bracket_close ..... Closed right bracket: ']'
+       curly_bracket_open ...... Open curly bracket: '{'
+       curly_bracket_close ..... Closed curly bracket: '}'
+       substitution ............ Regex substitution: s/.../.../
+       transliteration.......... Transliteration: tr/.../.../' or y/.../.../
+       match_regex ............. A regex in matching context: m/.../
+       compiled_regex .......... A quoted 'compiled' regex: qr/.../
+       q_string ................ A single quoted string: q/.../
+       qq_string ............... A double quoted string: qq/.../
+       qw_string ............... A list of quoted strings: qw/.../
+       qx_string ............... A system command quoted string: qx/.../
+       backtick ................ A backtick system command quoted string: `...`
+       single_quoted_string .... A single quoted string, as: '...'
+       double_quoted_string .... A double quoted string, as: "..."
+       bare_word ............... An unquoted string
+       glob_readline ........... A <readline> or <shell glob>
+       v_string ................ A version string: "vX" or "X.X.X"
+       file_test ............... A file test operator (-X), such as: "-d", "-e", etc...
+       data .................... The content of `__DATA__` or `__END__` sections
+       keyword ................. A regular Perl keyword, such as: `if`, `else`, etc...
+       special_keyword ......... A special Perl keyword, such as: `__PACKAGE__`, `__FILE__`, etc...
+       comma ................... A comma: ','
+       fat_comma ............... A fat comma: '=>'
+       operator ................ A primitive operator, such as: '+', '||', etc...
+       assignment_operator ..... A '=' or any operator assignment: '+=', '||=', etc...
+       dereference_operator .... The arrow dereference operator: '->'
+       hex_number .............. An hexadecimal literal number: 0x...
+       binary_number ........... An binary literal number: 0b...
+       number .................. An decimal literal number, such as 42, 3.1e4, etc...
+       special_fh .............. A special file-handle name, such as 'STDIN', 'STDOUT', etc...
+       unknown_char ............ An unknown or unexpected character
 
 =head1 EXAMPLE
 
@@ -899,14 +741,14 @@ For this code:
 
 it generates the following tokens:
 
-      #  TOKEN                    POS
-      ( keyword              => (0, 2) )
-      ( horizontal_space     => (2, 3) )
-      ( scalar_sigil         => (3, 4) )
-      ( var_name             => (4, 7) )
-      ( horizontal_space     => (7, 8) )
-      ( operator             => (8, 9) )
-      ( horizontal_space     => (9, 10) )
+      #  TOKEN                     POS
+      ( keyword              => ( 0,  2) )
+      ( horizontal_space     => ( 2,  3) )
+      ( scalar_sigil         => ( 3,  4) )
+      ( var_name             => ( 4,  7) )
+      ( horizontal_space     => ( 7,  8) )
+      ( assignment_operator  => ( 8,  9) )
+      ( horizontal_space     => ( 9, 10) )
       ( number               => (10, 12) )
       ( semicolon            => (12, 13) )
 
@@ -920,7 +762,7 @@ Daniel "Trizen" Șuteu, E<lt>trizenx@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2016
+Copyright (C) 2013-2017
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

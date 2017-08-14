@@ -14,7 +14,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 20;
 #use Test::More qw(no_plan);
 
 my $OS_IS_PLAIN_WINDOWS = !! ($^O =~ /mswin/i);
@@ -158,6 +158,32 @@ is_deeply($s,
 	"SU05 - t/dates1-2.csv': new format '%Y%m%d%H%M%S'"
 );
 
+
+note("");
+note("[OP]timization (fields_dates_auto_optimize)");
+
+my $csv = Text::AutoCSV->new(in_file => "t/${ww}dates1-3.csv", fields_dates_auto => 1,
+	fields_dates_auto_optimize => 1);
+my $d = $csv->_dds();
+is_deeply($d,
+	{'.' => 1, 'D' => '%d/%m/%Y', 'E' => 'N', 'F' => 'N'},
+	"OP01 - identifies format if fields_dates_auto_optimize is set"
+);
+
+my $csv2 = Text::AutoCSV->new(in_file => "t/${ww}dates1-3.csv", fields_dates_auto => 1,
+	fields_dates_auto_optimize => 0);
+my $d2 = $csv2->_dds();
+is_deeply($d2,
+	{'.' => 1, 'D' => 'N', 'E' => 'N', 'F' => 'N'},
+	"OP02 - identifies format if fields_dates_auto_optimize is unset"
+);
+
+$csv2 = Text::AutoCSV->new(in_file => "t/${ww}dates1-3.csv", fields_dates_auto => 1);
+$d2 = $csv2->_dds();
+is_deeply($d2,
+	{'.' => 1, 'D' => 'N', 'E' => 'N', 'F' => 'N'},
+	"OP03 - identifies format (default)"
+);
 
 done_testing();
 

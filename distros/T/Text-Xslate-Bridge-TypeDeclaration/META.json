@@ -43,11 +43,12 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "List::Util" : "0",
+            "Data::Dumper" : "2.154",
+            "List::MoreUtils" : "0",
             "Scalar::Util" : "0",
             "Text::Xslate" : "0",
             "Text::Xslate::Bridge" : "0",
-            "Type::Tiny" : "0",
+            "Type::Tiny" : "1.002",
             "Type::Tiny::XS" : "0",
             "perl" : "5.008001"
          }
@@ -67,7 +68,7 @@
    "provides" : {
       "Text::Xslate::Bridge::TypeDeclaration" : {
          "file" : "lib/Text/Xslate/Bridge/TypeDeclaration.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       },
       "Text::Xslate::Bridge::TypeDeclaration::Registry" : {
          "file" : "lib/Text/Xslate/Bridge/TypeDeclaration/Registry.pm"
@@ -84,7 +85,7 @@
          "web" : "https://github.com/pokutuna/p5-Text-Xslate-Bridge-TypeDeclaration"
       }
    },
-   "version" : "0.11",
+   "version" : "0.13",
    "x_authority" : "cpan:POKUTUNA",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

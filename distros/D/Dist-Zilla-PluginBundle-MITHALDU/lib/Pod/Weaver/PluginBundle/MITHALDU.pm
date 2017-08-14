@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Pod::Weaver::PluginBundle::MITHALDU;
-our $VERSION = '1.151340'; # VERSION
+our $VERSION = '1.172230'; # VERSION
 
 use Pod::Weaver::Config::Assembler;
 
@@ -9,6 +9,7 @@ use Pod::Weaver::Config::Assembler;
 use Pod::Weaver::Plugin::WikiDoc ();
 use Pod::Elemental::Transformer::List 0.101620 ();
 use Pod::Weaver::Section::Support 1.001 ();
+use Pod::Weaver::Section::Contributors ();
 
 sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
 
@@ -62,6 +63,7 @@ sub mvp_bundle_config {
       }
     ],
     [ '@MITHALDU/Authors',   _exp('Authors'),   {} ],
+    [ '@MITHALDU/Contributors', _exp('Contributors'), {} ],
     [ '@MITHALDU/Legal',     _exp('Legal'),     {} ],
     [ '@MITHALDU/List',      _exp('-Transformer'), { 'transformer' => 'List' } ],
   );
@@ -95,7 +97,7 @@ Pod::Weaver::PluginBundle::MITHALDU - MITHALDU's default Pod::Weaver config
 
 =head1 VERSION
 
-version 1.151340
+version 1.172230
 
 =head1 DESCRIPTION
 
@@ -146,19 +148,9 @@ L<Dist::Zilla::Plugin::PodWeaver>
 
 =back
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
-
-=item *
-
-David Golden <dagolden@cpan.org>
-
-=item *
-
-Christian Walde <mithaldu@cpan.org>
-
-=back
+Christian Walde <walde.christian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

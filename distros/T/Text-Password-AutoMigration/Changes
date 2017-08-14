@@ -1,7 +1,12 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.06 2017-08-09T13:49:20Z
+ - made verify() to return regenerated hash or undef
+ - fixed the English in PODs
+
 0.05 2017-08-07T12:16:23Z
  - add Digest::SHA to cpanfile
+
 0.04 2017-08-07T00:08:55Z
  - add Moose.pm to cpanfile
 

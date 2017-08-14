@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.011   August 11, 2017
+        - New list helper for optgroup
+        - New helper 'for' that combines 'fill' with a match specification.
+        - disabled how a component moves its scripts and styles to the HEAD of
+          the parent DOM.  This feature needs more thinking.
+
 0.010   July 31, 2017 
         - Update dependencies to take advantage of some performance increases
         - Corrected handling of the DL helper and fixed documentation

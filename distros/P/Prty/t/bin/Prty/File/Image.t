@@ -17,7 +17,7 @@ sub test_loadClass : Init(1) {
 sub test_unitTest : Test(7) {
     my $self = shift;
 
-    my $file = $self->testPath('prty/test/data/image/test001.jpg');
+    my $file = $self->testPath('t/data/image/test001.jpg');
     my $img = Prty::File::Image->new($file);
     $self->is(ref($img),'Prty::File::Image');
 
@@ -43,7 +43,7 @@ sub test_unitTest : Test(7) {
 sub test_property : Test(4) {
     my $self = shift;
 
-    my $file = $self->testPath('prty/test/data/image/test001.jpg');
+    my $file = $self->testPath('t/data/image/test001.jpg');
     my $img = Prty::File::Image->new($file);
     $self->is(ref($img),'Prty::File::Image');
 

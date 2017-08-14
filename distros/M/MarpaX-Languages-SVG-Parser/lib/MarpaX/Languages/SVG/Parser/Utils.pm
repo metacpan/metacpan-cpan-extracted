@@ -1,7 +1,6 @@
 package MarpaX::Languages::SVG::Parser::Utils;
 
 use strict;
-use utf8;
 use warnings;
 use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
 
@@ -10,6 +9,7 @@ use Config;
 use Date::Simple;
 
 use File::Basename; # For basename().
+use File::Slurper 'read_dir';
 use File::Spec;
 
 use MarpaX::Languages::SVG::Parser::Config;
@@ -28,7 +28,7 @@ has config =>
 	required => 0,
 );
 
-our $VERSION = '1.06';
+our $VERSION = '1.09';
 
 # ------------------------------------------------
 
@@ -38,21 +38,32 @@ sub generate_demo
 
 	# Generate html/*.svg.
 
-	`$^X -Ilib scripts/bnf2graph.pl`;
-
 	my($basename);
 	my(%data_file);
-	my($image);
+	my($in_file_name);
+	my($out_file_name);
+	my(@params);
 
-	for my $file (MarpaX::Languages::SVG::Parser::Utils -> new -> get_files('data', 'bnf') )
+	for my $file (sort grep{/bnf$/} read_dir('data') )
 	{
-		$basename             = basename($file);
-		$image                = $basename =~ s/bnf$/svg/r;
+		$basename             = basename($file, '.bnf');
+		$in_file_name         = "data/$basename.bnf";
+		$out_file_name        = "html/$basename.svg";
 		$data_file{$basename} =
 		{
 			bnf   => $file,
-			image => $image,
+			image => "$basename.svg",
 		};
+
+		print "$in_file_name => $out_file_name. \n";
+
+		push @params, '../MarpaX-Grammar-GraphViz2/scripts/bnf2graph.pl';
+		push @params, '-legend', '1';
+		push @params, '-marpa', '../MarpaX-Grammar-GraphViz2/share/metag.bnf';
+		push @params, '-out', $out_file_name;
+		push @params, '-user', $in_file_name;
+
+		system($^X, @params);
 	}
 
 	my($config)    = $self -> config;
@@ -85,9 +96,9 @@ sub generate_demo
 	);
 	my($file_name) = File::Spec -> catfile('html', 'index.html');
 
-	open(OUT, '>', $file_name);
-	print OUT $index;
-	close OUT;
+	open(my $fh, '>', $file_name);
+	print $fh $index;
+	close $fh;
 
 	print "Wrote $file_name\n";
 

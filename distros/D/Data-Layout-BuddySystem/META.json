@@ -23,7 +23,8 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "0",
+            "Data::Table::Text" : "20170808",
+            "Test::More" : "0",
             "utf8" : "0"
          }
       }
@@ -31,7 +32,7 @@
    "provides" : {
       "Data::Layout::BuddySystem" : {
          "file" : "lib/Data/Layout/BuddySystem.pm",
-         "version" : "2017.117"
+         "version" : "20170808"
       }
    },
    "release_status" : "stable",
@@ -40,5 +41,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.117"
+   "version" : "20170808"
 }

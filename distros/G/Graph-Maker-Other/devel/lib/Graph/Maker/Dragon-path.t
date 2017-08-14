@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016 Kevin Ryde
+# Copyright 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -28,9 +28,6 @@ use Graph;
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 plan tests => 257;
 

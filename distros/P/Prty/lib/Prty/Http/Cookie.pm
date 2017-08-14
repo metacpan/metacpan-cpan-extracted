@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Time::RFC822;
 
@@ -187,7 +187,7 @@ ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 SEE ALSO
 

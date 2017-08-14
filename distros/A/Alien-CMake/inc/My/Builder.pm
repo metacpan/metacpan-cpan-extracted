@@ -106,13 +106,13 @@ sub fetch_file {
 sub fetch_binaries {
   my ($self, $download) = @_;
   my $bp = $self->notes('build_params');
-  $self->fetch_file($bp->{url}, $bp->{sha1sum}, $download);
+  $self->fetch_file($bp->{url}, $bp->{sha1sum}||$bp->{sha256sum}, $download);
 }
 
 sub fetch_sources {
   my ($self, $download) = @_;
   my $bp = $self->notes('build_params');
-  $self->fetch_file($bp->{url}, $bp->{sha1sum}, $download);
+  $self->fetch_file($bp->{url}, $bp->{sha1sum}||$b->{sha256sum}, $download);
 }
 
 sub extract_binaries {
@@ -227,7 +227,8 @@ sub clean_build_done_marker {
 
 sub check_sha1sum {
   my( $self, $file, $sha1sum ) = @_;
-  my $sha1 = Digest::SHA->new;
+  my $alg = length $sha1sum == 64 ? 'SHA-256' : 'SHA-1';
+  my $sha1 = Digest::SHA->new($alg);
   my $fh;
   open($fh, $file) or die "###ERROR## Cannot check checksum for '$file'\n";
   binmode($fh);

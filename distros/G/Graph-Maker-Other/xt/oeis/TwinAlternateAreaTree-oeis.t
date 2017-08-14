@@ -30,9 +30,6 @@ use MyOEIS;
 
 require Graph::Maker::TwinAlternateAreaTree;
 
-# uncomment this to run the ### lines
-# use Smart::Comments '###';
-
 
 #------------------------------------------------------------------------------
 # A053754 even binary length, vertical spine and attached vertices

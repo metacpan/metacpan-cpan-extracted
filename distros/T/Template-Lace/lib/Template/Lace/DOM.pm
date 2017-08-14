@@ -80,7 +80,7 @@ sub smart_content {
       $self->attr(value=>$data);
       $self->content(escape_html($data));
     }
-  } elsif($self->tag eq 'optgroup') {
+  } elsif($self->tag eq 'optgroup' and (ref($data) eq 'HASH')) {
     $self->attr(label=>escape_html($data->{label}));
     if(my $option_dom = $self->at('option')) {
       $option_dom->fill($data->{options});
@@ -95,12 +95,15 @@ sub smart_content {
 
 sub fill {
   my ($self, $data, $is_loop, $is_form) = @_;
+  $is_form = 1 if ($self->tag||'') eq 'form';
   if(ref \$data eq 'SCALAR') {
     $self->smart_content($data);
   } elsif(ref $data eq 'CODE') {
     local $_ = $self;
-    $data->($self);
+    $data->($self, $data);
   } elsif(ref $data eq 'ARRAY') {
+    ## Probably should handle the other spcial
+    ## tags helpers like DL, FORM, etc.
     if(
         (($self->tag||'') eq 'ol')
         || (($self->tag||'') eq 'ul')
@@ -155,11 +158,12 @@ sub fill {
             next;
           }
         }
-        $self->find(".$match")->each(sub {
+        $self->find(".$match, *[data-lace-id='$match']")->each(sub {
             my ($dom, $count) = @_;
             $is_form = 1 if $dom->tag eq 'form';
             $dom->fill($data->{$match}, $is_loop, $is_form);
         });
+
         if($is_form) {
           # Sorry, I'll come up with less suck when I can.
           $self->find("input[name='$match']")->each(sub {
@@ -196,6 +200,16 @@ sub fill {
   } else {
     die "method 'fill' does not recognize these arguments.";
   }
+}
+
+sub for {
+  my ($dom, $match, @args) = @_;
+  $dom->find($match)
+    ->each(sub {
+      my ($dom, $idx) = @_;
+      $dom->fill(@args);
+    });
+  return $dom;
 }
 
 sub append_js_src_uniquely {
@@ -420,6 +434,12 @@ sub list_helper_by_id {
 sub form { shift->tag_helper_by_id('form', @_) }
 sub ul { shift->list_helper_by_id('ul', @_) }
 sub ol { shift->list_helper_by_id('ol', @_) }
+
+sub optgroup {
+  my ($self, $id, $proto) = @_;
+  my $target = ref($proto) eq 'ARRAY' ? "optgroup$id option" : "optgroup$id";
+  return $self->unique_tag_helper($target, $proto);
+}
 
 sub dl {
   my ($self, $id, $proto) = @_;
@@ -791,6 +811,19 @@ templates.  You might find this a great convention or fragile binding
 depending on your outlook.
 
 You might want to see L</LIST HELPERS> as well.
+
+=head2 for
+
+Syntax sugar that combines 'find' and 'fill'.  So:
+
+    $dom->find($match)
+      ->each(sub $_->fill($spec));
+
+Can be written as:
+
+    $dom->for($match, $spec);
+
+Might save a bit of space.
 
 =head2 append_style_uniquely
 
@@ -1218,7 +1251,7 @@ Returns:
 
 =head2 dl
 
-this helper will either an arrayref or hashref and attempt to 'do the
+This helper will take either an arrayref or hashref and attempt to 'do the
 right thing'.  Example:
 
   my $dom = Template::Lace::DOM->new(q[
@@ -1358,6 +1391,38 @@ Returns;
     <form>
       <input id="id1" name="choose" type="radio" value="1">
       <input id="id2" name="choose" type="radio" value="2" selected="on">
+    </form>
+
+=head2 optgroup
+
+Populates an optgroup tag:
+
+    my $dom = Template::Lace::DOM->new(q[
+      <form>
+        <select name='states'>
+          <optgroup id='usa_states' label='USA States'>
+            <option class="state">Example</option>
+          </optgroup>       
+        </select>
+      </form>
+    ]);
+
+    $dom->optgroup('#usa_states')->fill({
+        state => [
+          +{ value=>'ny', content=>'New York' },
+          +{ value=>'tx', content=>'Texas' },
+        ]
+      });
+
+Returns:
+
+    <form>
+      <select name="states">
+        <optgroup id="usa_states" label="USA States">
+          <option class="state" value="ny">New York</option>
+          <option class="state" value="tx">Texas</option>
+        </optgroup>       
+      </select>
     </form>
 
 =head1 GENERAL TAG HELPERS

@@ -1,4 +1,4 @@
-# $Id: BuildCacheControl.pm,v 1.35 2016/09/12 20:33:41 pfeiffer Exp $
+# $Id: BuildCacheControl.pm,v 1.36 2017/08/06 21:19:00 pfeiffer Exp $
 
 =head1 NAME
 

@@ -10,12 +10,12 @@ build_requires:
   Test::Most: '0'
   blib: '1.01'
   constant: '0'
-  perl: '5.009005'
+  perl: '5.012'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.009005'
+  perl: '5.012'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,12 +24,12 @@ name: Bot-IRC-X-Message
 requires:
   DateTime: '0'
   DateTime::Format::Human::Duration: '0'
-  perl: '5.009005'
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC-X-Message/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC-X-Message
   repository: https://github.com/gryphonshafer/Bot-IRC-X-Message.git
-version: '1.02'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

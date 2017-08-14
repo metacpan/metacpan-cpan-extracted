@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.119;
+our $VERSION = 1.120;
 
 use Prty::Option;
 use Prty::DirHandle;
@@ -76,6 +76,10 @@ werden hierbei Dateien, die mit -writeInitially=>1 erzeugt wurden,
 nur dann gelöscht, wenn sie nicht modifiziert wurden. Wurden
 sie modifiziert, bleiben sie erhalten.
 
+=item -dryRun => $bool (Default: 0)
+
+Ändere nichts, zeige die Operationen nur an.
+
 =item -exclude => $regex (Default: keiner)
 
 Schließe alle Dateien, die Regex $regex erfüllen von der Betrachtung
@@ -130,6 +134,7 @@ sub new {
     # @_: @dirs,@opt
 
     my $cleanup = 0;
+    my $dryRun = 0;
     my $exclude = undef;
     my $files = [];
     my $force = 0;
@@ -142,6 +147,7 @@ sub new {
 
     Prty::Option->extract(-mode=>'sloppy',\@_,
         -cleanup=>\$cleanup,
+        -dryRun=>\$dryRun,
         -exclude=>\$exclude,
         -files=>\$files,
         -force=>\$force,
@@ -210,6 +216,7 @@ sub new {
         $outHandle, # [5]
         $language,  # [6]
         $prefix,    # [7]
+        $dryRun,    # [8]
     ],$class;
 }
 
@@ -265,7 +272,9 @@ sub addDir {
     # Verzeichnis erzeugen, wenn es nicht existiert
 
     if (!-e $dir) {
-        Prty::Path->mkdir($dir);
+        if (!$self->[8]) {
+            Prty::Path->mkdir($dir);
+        }
         if (!$self->[2]) {
             my $out = $self->[5];
             my $msg = $self->getText('Verzeichnis erzeugt');
@@ -525,7 +534,9 @@ sub addFile {
 
     # Datei schreiben
 
-    Prty::Path->write($file,$$dataR,-encode=>$encoding);
+    if (!$self->[8]) {
+        Prty::Path->write($file,$$dataR,-encode=>$encoding);
+    }
     if (!$self->[2] && !$quiet) {
         my $out = $self->[5];
         my $msg = $self->getText($fileExists? 'Datei aktualisiert':
@@ -588,7 +599,9 @@ sub removePath {
     my $removed = 0;
     if (-d $path) {
         if (Prty::Path->isEmpty($path)) {
-            Prty::Path->delete($path);
+            if (!$self->[8]) {
+                Prty::Path->delete($path);
+            }
             if (!$self->[2]) {
                 my $out = $self->[5];
                 my $msg = $self->getText('Verzeichnis gelöscht');
@@ -598,7 +611,9 @@ sub removePath {
         }
     }
     else {
-        Prty::Path->delete($path);
+        if (!$self->[8]) {
+            Prty::Path->delete($path);
+        }
         if (!$self->[2]) {
             my $out = $self->[5];
             my $msg = $self->getText('Datei gelöscht');
@@ -769,7 +784,7 @@ sub getText {
 
 =head1 VERSION
 
-1.119
+1.120
 
 =head1 AUTHOR
 

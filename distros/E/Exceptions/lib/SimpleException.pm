@@ -1,5 +1,5 @@
 package SimpleException;
-$SimpleException::VERSION = '0.100';
+$SimpleException::VERSION = '0.101';
 use strict;
 use warnings;
 

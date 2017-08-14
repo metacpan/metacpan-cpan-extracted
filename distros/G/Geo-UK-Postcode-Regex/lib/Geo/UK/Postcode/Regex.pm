@@ -8,7 +8,7 @@ use Geo::UK::Postcode::Regex::Hash;
 use base 'Exporter';
 our @EXPORT_OK = qw( is_valid_pc is_strict_pc is_lax_pc %REGEXES );
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 =encoding utf-8
 
@@ -25,7 +25,7 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
     ## REGULAR EXPRESSIONS
 
     my $lax_re    = Geo::UK::Postcode::Regex->regex;
-    my $strict_re = Geo::UK::Postcode::Regex->regex_strict;
+    my $strict_re = Geo::UK::Postcode::Regex->strict_regex;
     my $valid_re  = Geo::UK::Postcode::Regex->valid_regex;
 
     # matching only
@@ -157,9 +157,9 @@ See L<Geo::UK::Postcode::Regex::Simple> for an alternative interface.
 
 =head1 DESCRIPTION
 
-Parsing UK postcodes with regular expressions. This package has been
-separated from L<Geo::UK::Postcode> so it can be installed and used with fewer
-dependencies.
+Parsing UK postcodes with regular expressions (aka Regexp). This package has
+been separated from L<Geo::UK::Postcode> so it can be installed and used with
+fewer dependencies.
 
 Can handle partial postcodes (just the outcode or sector) and can test
 against valid characters and currently valid outcodes.
@@ -602,7 +602,7 @@ sub posttowns_lookup {
 
 =item *
 
-L<Geo::UK::Postcode>
+L<Geo::UK::Postcode> - companion package, provides Postcode objects
 
 =item *
 
@@ -649,7 +649,7 @@ Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2015- Michael Jemmeson
+Copyright 2015-2017 Michael Jemmeson
 
 =head1 LICENSE
 
@@ -3150,6 +3150,7 @@ SO21,0,WINCHESTER
 SO22,0,WINCHESTER
 SO23,0,WINCHESTER
 SO24,0,ALRESFORD
+SO25,1,WINCHESTER
 SO30,0,SOUTHAMPTON
 SO31,0,SOUTHAMPTON
 SO32,0,SOUTHAMPTON
@@ -3616,6 +3617,8 @@ WV13,0,WILLENHALL
 WV14,0,BILSTON
 WV15,0,BRIDGNORTH
 WV16,0,BRIDGNORTH
+WV98,1,WOLVERHAMPTON
+WV99,1,WOLVERHAMPTON
 YO1,0,YORK
 YO7,0,THIRSK
 YO8,0,SELBY

@@ -4,10 +4,9 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Data/ID/Exim.pm
-t/base62.t
+t/base.t
 t/id.t
 t/pod_cvg.t
 t/pod_syn.t

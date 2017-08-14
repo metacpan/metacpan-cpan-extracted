@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::IndustryType;
-$WebService::Braintree::ErrorCodes::IndustryType::VERSION = '0.91';
+$WebService::Braintree::ErrorCodes::IndustryType::VERSION = '0.92';
 use strict;
 
 use constant CheckInDateIsInvalid               => "93404";

@@ -1,3 +1,8 @@
+0.420   2017-08-12 (PERLANCAR)
+
+	- Add configuration: read_config, read_env.
+
+
 0.41    2017-07-07 (PERLANCAR)
 
 	- Produce scripts in script/ instead of bin/, to be compatible with

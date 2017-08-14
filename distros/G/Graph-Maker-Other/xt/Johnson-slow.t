@@ -37,9 +37,6 @@ use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
 plan tests => 22;
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 
 #------------------------------------------------------------------------------
 

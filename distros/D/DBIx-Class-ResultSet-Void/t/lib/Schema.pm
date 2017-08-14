@@ -8,8 +8,8 @@
     __PACKAGE__->table('item');
 
     __PACKAGE__->add_columns(
-        id   => { data_type => 'integer' },
-        name => { data_type => 'text' },
+        id   => {data_type => 'integer'},
+        name => {data_type => 'text'},
     );
 
     __PACKAGE__->set_primary_key('id');
@@ -30,7 +30,7 @@
 
     sub connect {
         my $class = shift;
-        unlink('t/test.db') if ( -e 't/test.db' );
+        unlink('t/test.db') if (-e 't/test.db');
         my $schema = $class->next::method('dbi:SQLite::memory:');
         $schema->deploy;
 
@@ -45,3 +45,4 @@
 }
 
 1;
+

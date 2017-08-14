@@ -15,15 +15,12 @@ WriteMakefile(
   dist          => { TARFLAGS => '--numeric-owner -cvpf' },
 );
 
-my $uint64_type = $Config{ivsize} >= 8 ? 'T_UV' : 'T_NV';
 open my $TMAP, '>', 'typemap';
-print $TMAP <<EOTM;
-mt_state*  O_OBJECT
-uint32_t   T_UV
-uint64_t   $uint64_type
-EOTM
 
 print $TMAP q[
+uint32_t   T_UV
+mt_state*  O_OBJECT
+
 OUTPUT
 O_OBJECT
   sv_setref_pv($arg, CLASS, (void*)$var);
@@ -34,6 +31,8 @@ O_OBJECT
     warn(\"${Package}::$func_name() -- $var is not a blessed SV reference\");
     XSRETURN_UNDEF;
   }
-  $var = ($type)SvIV((SV*)SvRV($arg));
-  *$var = *$var; /* tell the compiler that $var is not NULL */
 ];
+
+my $to_u32 = $Config{ptrsize} == 4 ? '(uint32_t)' : '';
+print $TMAP '  $var = ($type)'.$to_u32.'SvUV((SV*)SvRV($arg));'."\n";
+print $TMAP '  *$var = *$var; /* tell the compiler that $var is not NULL */'."\n";

@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-MITHALDU
 
+1.172230  2017-08-11 14:07:34+02:00 Europe/Berlin
+    - remove need for manual gitignore and exclude entries
+    - switch to github issues as default tracker
+    - exclude problematic critic policies
+    - include contributors section
+
 1.151340  2015-05-14 10:55:34+02:00 Europe/Berlin
     - exclude_match needs to be an array with data or not passed on
 

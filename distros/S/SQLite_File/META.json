@@ -19,12 +19,14 @@
             "AnyDBM_File" : "0",
             "AnyDBM_File::Importer" : "0",
             "DBI" : "0",
-            "Module::Build" : "0"
+            "File::Temp" : "0",
+            "Module::Build" : "0.30",
+            "TAP::Harness" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.30"
          }
       },
       "runtime" : {
@@ -40,7 +42,7 @@
    "provides" : {
       "SQLite_File" : {
          "file" : "lib/SQLite_File.pm",
-         "version" : "0.1000"
+         "version" : "0.1002"
       }
    },
    "release_status" : "stable",
@@ -55,6 +57,6 @@
          "url" : "http://github.com/majensen/sqlite_file.git"
       }
    },
-   "version" : "0.1000",
+   "version" : "0.1002",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

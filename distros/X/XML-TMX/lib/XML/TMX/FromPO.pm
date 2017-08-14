@@ -8,7 +8,7 @@ use Exporter ();
 
 use vars qw(@ISA @EXPORT_OK $VERSION);
 
-$VERSION = '0.31';
+$VERSION = '0.32';
 @ISA = 'Exporter';
 @EXPORT_OK = qw(&new &parse_dir &create_tmx &clean_tmx);
 

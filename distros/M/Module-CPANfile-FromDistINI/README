@@ -1,0 +1,60 @@
+NAME
+    Module::CPANfile::FromDistINI - Generate cpanfile from prereqs
+    information in dist.ini
+
+VERSION
+    This document describes version 0.001 of Module::CPANfile::FromDistINI
+    (from Perl distribution Module-CPANfile-FromDistINI), released on
+    2017-08-11.
+
+SYNOPSIS
+    See the included script distini-cpanfile.
+
+FUNCTIONS
+  distini_cpanfile
+    Usage:
+
+     distini_cpanfile() -> [status, msg, result, meta]
+
+    Generate cpanfile from prereqs information in dist.ini.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-CPANfile-FromDistINI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-CPANfile-FromDistINI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CPANfile-FromD
+    istINI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

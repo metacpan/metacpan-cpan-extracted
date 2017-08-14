@@ -38,8 +38,6 @@ use MyGraphs ();
 
 plan tests => 95;
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 sub make_star {
   my %params = @_;

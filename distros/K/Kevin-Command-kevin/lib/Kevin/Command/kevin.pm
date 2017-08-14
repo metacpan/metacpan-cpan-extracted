@@ -1,5 +1,5 @@
 package Kevin::Command::kevin;
-$Kevin::Command::kevin::VERSION = '0.1.1';
+$Kevin::Command::kevin::VERSION = '0.4.0';
 # ABSTRACT: Alternative Minion command
 use Mojo::Base 'Mojolicious::Commands';
 
@@ -10,7 +10,7 @@ See 'APPLICATION kevin help COMMAND' for more information on a specific
 command.
 EOF
 has message    => sub { shift->extract_usage . "\nCommands:\n" };
-has namespaces => sub { ['Kevin::Command::kevin'] };
+has namespaces => sub { [map "${_}::kevin", @{shift->app->commands->namespaces}] };
 
 sub help { shift->run(@_) }
 
@@ -33,29 +33,29 @@ sub help { shift->run(@_) }
 #pod
 #pod =head2 description
 #pod
-#pod   my $description = $cmd->description;
-#pod   $cmd            = $cmd->description('Foo');
+#pod   my $description = $command->description;
+#pod   $command        = $command->description('Foo');
 #pod
 #pod Short description of this command, used for the command list.
 #pod
 #pod =head2 hint
 #pod
-#pod   my $hint = $cmd->hint;
-#pod   $cmd     = $cmd->hint('Foo');
+#pod   my $hint = $command->hint;
+#pod   $command = $command->hint('Foo');
 #pod
 #pod Short hint shown after listing available L<Minion> commands.
 #pod
 #pod =head2 message
 #pod
-#pod   my $msg = $cmd->message;
-#pod   $cmd    = $cmd->message('Bar');
+#pod   my $msg  = $command->message;
+#pod   $command = $command->message('Bar');
 #pod
 #pod Short usage message shown before listing available L<Minion> commands.
 #pod
 #pod =head2 namespaces
 #pod
-#pod   my $namespaces = $cmd->namespaces;
-#pod   $cmd           = $cmd->namespaces(['MyApp::Command::kevin']);
+#pod   my $namespaces = $command->namespaces;
+#pod   $command       = $command->namespaces(['MyApp::Command::kevin']);
 #pod
 #pod Namespaces to search for available alternative L<Minion> commands, defaults to
 #pod L<Kevin::Command::kevin>.
@@ -67,7 +67,7 @@ sub help { shift->run(@_) }
 #pod
 #pod =head2 help
 #pod
-#pod   $minion->help('app');
+#pod   $command->help('app');
 #pod
 #pod Print usage information for alternative L<Minion> command.
 #pod
@@ -89,7 +89,7 @@ Kevin::Command::kevin - Alternative Minion command
 
 =head1 VERSION
 
-version 0.1.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -106,29 +106,29 @@ L<Mojolicious::Commands> and implements the following new ones.
 
 =head2 description
 
-  my $description = $cmd->description;
-  $cmd            = $cmd->description('Foo');
+  my $description = $command->description;
+  $command        = $command->description('Foo');
 
 Short description of this command, used for the command list.
 
 =head2 hint
 
-  my $hint = $cmd->hint;
-  $cmd     = $cmd->hint('Foo');
+  my $hint = $command->hint;
+  $command = $command->hint('Foo');
 
 Short hint shown after listing available L<Minion> commands.
 
 =head2 message
 
-  my $msg = $cmd->message;
-  $cmd    = $cmd->message('Bar');
+  my $msg  = $command->message;
+  $command = $command->message('Bar');
 
 Short usage message shown before listing available L<Minion> commands.
 
 =head2 namespaces
 
-  my $namespaces = $cmd->namespaces;
-  $cmd           = $cmd->namespaces(['MyApp::Command::kevin']);
+  my $namespaces = $command->namespaces;
+  $command       = $command->namespaces(['MyApp::Command::kevin']);
 
 Namespaces to search for available alternative L<Minion> commands, defaults to
 L<Kevin::Command::kevin>.
@@ -140,7 +140,7 @@ and implements the following new ones.
 
 =head2 help
 
-  $minion->help('app');
+  $command->help('app');
 
 Print usage information for alternative L<Minion> command.
 

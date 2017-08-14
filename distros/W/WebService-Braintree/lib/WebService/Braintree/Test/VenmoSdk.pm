@@ -1,5 +1,5 @@
 package WebService::Braintree::Test::VenmoSdk;
-$WebService::Braintree::Test::VenmoSdk::VERSION = '0.91';
+$WebService::Braintree::Test::VenmoSdk::VERSION = '0.92';
 use strict;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );

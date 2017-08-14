@@ -1,5 +1,10 @@
 Revision history for Perl extension XML::TMX.
 
+0.32   Sex Ago 11 21:57:56 WEST 2017
+       - Added better handling of files with BOM
+       - Added better handling of tmx2tmx -cat, handling input encodings
+       	 (still needing extra work with BOM files)
+
 0.31   Mon Jan 11 19:32:33 WET 2016
        - Fixed utf8 POD.
 

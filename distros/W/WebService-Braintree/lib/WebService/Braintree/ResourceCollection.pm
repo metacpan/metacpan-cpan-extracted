@@ -1,5 +1,5 @@
 package WebService::Braintree::ResourceCollection;
-$WebService::Braintree::ResourceCollection::VERSION = '0.91';
+$WebService::Braintree::ResourceCollection::VERSION = '0.92';
 use Moose;
 extends "WebService::Braintree::ResultObject";
 

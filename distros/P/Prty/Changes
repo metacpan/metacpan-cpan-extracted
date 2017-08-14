@@ -1,3 +1,36 @@
+1.120 2017-08-13
+================
+[Prty::Array]
+Methoden compare(), eq(), pick() hinzugefügt.
+
+[Prty::Confluence::Client]
+Methode createAttachment() hinzugefügt.
+
+[Prty::DestinationTree]
+Option -dryRun hinzugefügt.
+
+[Prty::Hash]
+Doku bearbeitet.
+
+[Prty::Http::Client::Message]
+Doku bearbeitet.
+
+[Prty::JavaScript]
+Methode line() hinzugefügt.
+
+[Prty::Math]
+Methode radToDegree() hinzugefügt.
+
+[Prty::Path]
+In Methode copy() Behandlung der Option -createDir hinter das Öffnen
+der Quelldatei verschoben.
+
+[Prty::Section::Object]
+Methode add() hinzugefügt.
+
+[Prty::Test::Class]
+Methode isClass() hinzugefügt.
+
 1.119 2017-07-15
 ================
 [Prty::Pod::Generator]
@@ -9,7 +42,7 @@ explizit geladen werden.
 
 [Prty::Hash]
 Methode isLocked() versions-portabel gemacht.
-    
+
 1.118 2017-07-13
 ================
 Perl - erforderliche Version auf 5.10.0 gesenkt.
@@ -38,7 +71,7 @@ eingesetzt.
 1.117 2017-07-09
 ================
 Datei LICENSE hinzugefügt.
-    
+
 [Prty::Ipc]
 Testfall für Exitcode != 0 angepasst, so dass auch bei schneller
 Ausführung von false(1) kein SIGPIPE ausgelöst wird.

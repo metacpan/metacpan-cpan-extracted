@@ -1,12 +1,5 @@
 use Module::Build;
 
-unlink $_ for
- qw(
-/home/phil/z/perl/cpan/DataEditXmlSDL/zzz.html
-/home/phil/z/perl/cpan/DataEditXmlSDL/pod2htmd.tmp
-/home/phil/z/perl/cpan/DataEditXmlSDL/lib/Data/Edit/Xml/doc.data
-);
-
 my $b = Module::Build->new
  (module_name   => 'Data::Edit::Xml::SDL',
   create_readme =>  0,

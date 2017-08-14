@@ -8,7 +8,7 @@ use Storable ();
 use Carp ();
 
 # ABSTRACT: Alien::Base role that supports alternates
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub alt
@@ -74,7 +74,7 @@ Alien::Role::Alt - Alien::Base role that supports alternates
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

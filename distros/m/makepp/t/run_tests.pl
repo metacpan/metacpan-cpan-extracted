@@ -13,10 +13,10 @@ use File::Path;
 # on some (Windowsish) filesystems rmtree may temporarily fail
 sub slow_rmtree(@) {
   for my $tree ( grep -d, @_ ) {
-    for( 0..9 ) {
-      eval { $@ = ''; local $SIG{__WARN__} = sub { die @_ }; rmtree $tree };
+    for( 0..20 ) {
+      select undef, undef, undef, .1 if $_;
+      eval { local $SIG{__WARN__} = sub { $@ = $_[0] }; rmtree $tree }; # don't die, can have chdir'ed
       -d $tree or last;
-      $_ < 9 and select undef, undef, undef, .1;
     }
     warn $@ if $@;
   }
@@ -42,10 +42,7 @@ my $dot;
 my $verbose;
 my $test;
 my $keep;
-my $name;
-my $perltype;
 my $basedir;
-my $subdir;
 my $dotted;
 our $makepp_path;
 
@@ -126,8 +123,8 @@ BEGIN {
     [qw(d dots), \$dot],
     [qw(k keep), \$keep],
     [qw(m makepp), \$makepp_path, 1],
-    [qw(n name), \$name, 1],
-    [qw(s subdir), \$subdir],
+    [qw(n name), \my $name, 1],
+    [qw(s subdir), \my $subdir],
     [qw(t test), \$test],
     [qw(v verbose), \$verbose],
     [qr/[h?]/, 'help', undef, 0, sub { print <<EOF; exit }] );
@@ -160,9 +157,9 @@ EOF
     }
   }
 
-  $perltype =
+  my $perltype =
     $Config{cf_email} =~ /(Active)(?:Perl|State)/ ? $1 :
-    $Config{ldflags} =~ /(vanilla|strawberry|chocolate)/i ? ucfirst lc $1 :
+    $Config{ldflags} =~ /(vanilla|strawb(?:erry|(?=~))|chocolate)/i ? ucfirst lc $1 :
     '';
 
   printf "%s%sPerl V%vd %dbits - %s %s\n",

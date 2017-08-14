@@ -4,7 +4,7 @@
       "Arun Prasaad <arunbear@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "gpl_3"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Minions" : {
          "file" : "lib/Minions.pm",
-         "version" : "1.000000"
+         "version" : "1.000001"
       },
       "Minions::Implementation" : {
          "file" : "lib/Minions/Implementation.pm"
@@ -82,8 +82,9 @@
          "web" : "https://github.com/arunbear/Minions"
       }
    },
-   "version" : "1.000000",
+   "version" : "1.000001",
    "x_contributors" : [
       "Arun Prasaad <arunbear@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

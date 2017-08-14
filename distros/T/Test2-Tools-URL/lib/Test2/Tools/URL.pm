@@ -12,7 +12,7 @@ use base qw( Exporter );
 our @EXPORT = qw( url url_base url_component );
 
 # ABSTRACT: Compare a URL in your Test2 test
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub url (&)
@@ -118,6 +118,11 @@ sub deltas
     my $value = $uri->$method;
     my $check = $convert->($expect);
 
+    if($^O eq 'MSWin32' && $method eq 'path')
+    {
+      $value =~ s{/([A-Z]:)}{$1};
+    }
+
     if($method eq 'query' && !$check->isa('Test2::Compare::String'))
     {
       my @query = $uri->query_form;
@@ -159,7 +164,7 @@ Test2::Tools::URL - Compare a URL in your Test2 test
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

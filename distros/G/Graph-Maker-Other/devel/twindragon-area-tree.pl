@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,10 +22,136 @@ use strict;
 use Graph::Maker::TwindragonAreaTree;
 use List::Util 'min','max','sum';
 use MyGraphs;
+$| = 1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+
+{
+  # trees symmetric and symmetric halves all the way down
+  #
+  # same vertex in each
+  # (1,) 1,2,8,64,1024    = 2^(n(n-1)/2)
+  # not 65536=2^16=64*2^10, only 1024=2^10 unique
+  # same vertex, leaf = path only
+  #
+  # same vertex, degree <=2
+  # not in OEIS: 1,2,7,36,587,14834
+  #
+  # same eccentricity
+  # not in OEIS: 1,   1,2,9,122,5894,
+  # same eccentricity, degree <=2
+  # not in OEIS: 1,2,8, 80,2210,
+  #
+
+  my $connect_max_degree = 0;
+  my $connect_at_same = 0;
+
+  require Graph::Graph6;
+  require IPC::Run;
+  Graph::Graph6::write_graph(filename  => '/tmp/1.s6',
+                                 edge_aref => [ [0,1] ],
+                                 format    => 'sparse6',
+                                );
+  foreach my $i (1 .. 10) {
+    # if ($i == 4) {
+    #   my @graphs;
+    #   open my $fh, '<', "/tmp/$i.s6" or die;
+    #   require Graph::Reader::Graph6;
+      #   my $reader = Graph::Reader::Graph6->new;
+    #   while (my $graph = $reader->read_graph($fh)) {
+    #     push @graphs, $graph;
+    #   }
+    #   hog_searches_html(@graphs);
+    #   exit;
+    # }
+
+    my $num_vertices;
+    my @edges;
+    open my $fh, '<', "/tmp/$i.s6" or die;
+    open my $out, '>', "/tmp/new.s6" or die;
+    my $count = 0;
+    while (Graph::Graph6::read_graph(fh               => $fh,
+                                     num_vertices_ref => \$num_vertices,
+                                     edge_aref        => \@edges,
+                                    )) {
+      $count++;
+      print "$count\r";
+
+      my @eccentricity = map {MyGraphs::edge_aref_eccentricity(\@edges,$_)}
+        0 .. scalar(@edges);
+      ### @eccentricity
+
+      # two copies, with $new_edges[0] dummy to be changed
+      my @new_edges = ([-1,-1],
+                       @edges,
+                       map {[ $_->[0]+$num_vertices, $_->[1]+$num_vertices ]}
+                       @edges);
+
+      foreach my $v (0 .. $num_vertices-1) {
+        $new_edges[0]->[0] = $v;
+        next if ($connect_max_degree
+                 && edge_aref_vertex_degree(\@edges, $v) > $connect_max_degree);
+
+        foreach my $v2 ($connect_at_same ? ($v) : (0 .. $num_vertices-1)) {
+        next if ($connect_max_degree
+                 && edge_aref_vertex_degree(\@edges, $v2) > $connect_max_degree);
+
+          if ($eccentricity[$v] == $eccentricity[$v2]) {
+            $new_edges[0]->[1] = $v2 + $num_vertices;
+            Graph::Graph6::write_graph(fh        => $out,
+                                       edge_aref => \@new_edges,
+                                       format    => 'sparse6',
+                                      );
+          }
+        }
+      }
+    }
+    print "k=$i  v=$num_vertices  uniq $count\n";
+
+    IPC::Run::run(['nauty-labelg'],
+                  '<', '/tmp/new.s6',
+                  '|', ['sort','-u'],
+                  '|', ['tee', '/tmp/'.($i+1).'.s6'],
+                  '|', ['wc','-l']);
+  }
+  exit 0;
+
+  sub edge_aref_vertex_is_leaf {
+    my ($edge_aref, $v) = @_;
+    my $count = 0;
+    foreach my $edge (@$edge_aref) {
+      $count += ($edge->[0] == $v);
+      $count += ($edge->[1] == $v);
+      if ($count > 1) { return 0; }
+    }
+    return 1;
+  }
+  sub edge_aref_vertex_degree {
+    my ($edge_aref, $v) = @_;
+    return scalar((  grep {$_->[0] == $v} @$edge_aref)
+                  + (grep {$_->[1] == $v} @$edge_aref));
+  }
+}
+
+{
+  # House of Graphs
+  #  k=0 https://hog.grinvin.org/ViewGraphInfo.action?id=1310    single vertex
+  #  k=1 https://hog.grinvin.org/ViewGraphInfo.action?id=19655   path-2
+  #  k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=594     path-4
+  #  k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=700
+  #  k=4 not
+  #  k=5 not
+  my @graphs;
+  foreach my $k (0 .. 2) {
+    my $graph = Graph::Maker->new('twindragon_area_tree', level=>$k,
+                                  undirected=>1);
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 {
   # vertices away from PlusOffsetVH vertex
   # eccentricity = JA
@@ -86,125 +212,8 @@ use MyGraphs;
     return $ecc;
   }
 }
-{
-  # House of Graphs
-  #  k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=700
-  #  k=4 not
-  #  k=5 not
-  my @graphs;
-  foreach my $k (0 .. 6) {
-    my $graph = Graph::Maker->new('twindragon_area_tree', level=>$k,
-                                  undirected=>1);
-    push @graphs, $graph;
-  }
-  hog_searches_html(@graphs);
-  exit 0;
-}
 
-{
-  # trees symmetric and symmetric halves all the way down
-  #
-  # same vertex in each
-  # (1,) 1,2,8,64,1024    = 2^(n(n-1)/2)
-  # not 65536=2^16=64*2^10, only 1024=2^10 unique
-  # same vertex, leaf = path only
-  # same vertex, degree <=2
-  #      1,2,7,36,587,14834
-  #
-  # same eccentricity
-  # 1,   1,2,9,122,5894,
-  # same eccentricity, degree <=2
-  #      1,2,8, 80,2210,
-  #
 
-  my $connect_max_degree = 0;
-  my $connect_at_same = 1;
-
-  $| = 1;
-  Graph::Graph6::write_graph(filename  => '/tmp/1.s6',
-                             edge_aref => [ [0,1] ],
-                             format    => 'sparse6',
-                            );
-  foreach my $i (1 .. 10) {
-    # if ($i == 4) {
-    #   my @graphs;
-    #   open my $fh, '<', "/tmp/$i.s6" or die;
-    #   require Graph::Reader::Graph6;
-    #   my $reader = Graph::Reader::Graph6->new;
-    #   while (my $graph = $reader->read_graph($fh)) {
-    #     push @graphs, $graph;
-    #   }
-    #   hog_searches_html(@graphs);
-    #   exit;
-    # }
-
-    my $num_vertices;
-    my @edges;
-    open my $fh, '<', "/tmp/$i.s6" or die;
-    open my $out, '>', "/tmp/new.s6" or die;
-    my $count = 0;
-    while (Graph::Graph6::read_graph(fh               => $fh,
-                                     num_vertices_ref => \$num_vertices,
-                                     edge_aref        => \@edges,
-                                    )) {
-      $count++;
-      print "$count\r";
-
-      my @eccentricity = map {edge_aref_eccentricity(\@edges,$_)}
-        0 .. scalar(@edges);
-      ### @eccentricity
-
-      # two copies, with $new_edges[0] dummy to be changed
-      my @new_edges = ([-1,-1],
-                       @edges,
-                       map {[ $_->[0]+$num_vertices, $_->[1]+$num_vertices ]}
-                       @edges);
-
-      foreach my $v (0 .. $num_vertices-1) {
-        $new_edges[0]->[0] = $v;
-        next if ($connect_max_degree
-                 && edge_aref_vertex_degree(\@edges, $v) > $connect_max_degree);
-
-        foreach my $v2 ($connect_at_same ? ($v) : (0 .. $num_vertices-1)) {
-        next if ($connect_max_degree
-                 && edge_aref_vertex_degree(\@edges, $v2) > $connect_max_degree);
-
-          if ($eccentricity[$v] == $eccentricity[$v2]) {
-            $new_edges[0]->[1] = $v2 + $num_vertices;
-            Graph::Graph6::write_graph(fh        => $out,
-                                       edge_aref => \@new_edges,
-                                       format    => 'sparse6',
-                                      );
-          }
-        }
-      }
-    }
-    print "k=$i  v=$num_vertices  uniq $count\n";
-
-    IPC::Run::run(['nauty-labelg'],
-                  '<', '/tmp/new.s6',
-                  '|', ['sort','-u'],
-                  '|', ['tee', '/tmp/'.($i+1).'.s6'],
-                  '|', ['wc','-l']);
-  }
-  exit 0;
-
-  sub edge_aref_vertex_is_leaf {
-    my ($edge_aref, $v) = @_;
-    my $count = 0;
-    foreach my $edge (@$edge_aref) {
-      $count += ($edge->[0] == $v);
-      $count += ($edge->[1] == $v);
-      if ($count > 1) { return 0; }
-    }
-    return 1;
-  }
-  sub edge_aref_vertex_degree {
-    my ($edge_aref, $v) = @_;
-    return scalar((  grep {$_->[0] == $v} @$edge_aref)
-                  + (grep {$_->[1] == $v} @$edge_aref));
-  }
-}
 
 {
   # degrees

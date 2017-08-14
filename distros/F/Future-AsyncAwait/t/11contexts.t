@@ -53,9 +53,25 @@ use Future::AsyncAwait;
    is( scalar $fret->get, "immediate", '$fret now ready after done in if body immediate' );
 }
 
-# foreach LIST
-# foreach @ARRAY
-# foreach 'a..'c'
-# foreach 1..3
+# await in eval{}
+{
+   async sub with_eval
+   {
+      my $f = shift;
+
+      local $@;
+      my $ret = eval {
+         await $f;
+         return "tried";
+      } or die $@;
+      return "($ret)";
+   }
+
+   my $f1 = Future->new;
+   my $fret = with_eval( $f1 );
+
+   $f1->done;
+   is( scalar $fret->get, "(tried)", '$fret now ready after done in eval' );
+}
 
 done_testing;

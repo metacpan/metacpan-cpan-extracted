@@ -9,10 +9,10 @@ my $builder = Module::Build->new(
 	dist_abstract => q(Numeric 1st and 2nd order differentiation.),
 	dist_author => [q{J. A. R. Williams},
 			q{John M. Gamble <jgamble@cpan.org>}],
-	dist_version => '0.04',
+	dist_version => '1.00',
 
 	requires => {
-		perl => '5.8.3',
+		perl => '5.10.1',
 	},
 
 	configure_requires => {
@@ -21,6 +21,7 @@ my $builder = Module::Build->new(
 
 	build_requires => {
 		'Test::More' => 0,
+		'Math::Utils' => '1.06',
 	},
 
 	license => 'perl',

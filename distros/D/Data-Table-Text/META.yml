@@ -15,7 +15,7 @@ name: Data-Table-Text
 provides:
   Data::Table::Text:
     file: lib/Data/Table/Text.pm
-    version: '20170806'
+    version: '20170812'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -26,4 +26,4 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170806'
+version: '20170812'

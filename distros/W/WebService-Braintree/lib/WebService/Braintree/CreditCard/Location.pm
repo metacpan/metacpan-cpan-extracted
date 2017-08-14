@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard::Location;
-$WebService::Braintree::CreditCard::Location::VERSION = '0.91';
+$WebService::Braintree::CreditCard::Location::VERSION = '0.92';
 use strict;
 
 use constant International => "international";

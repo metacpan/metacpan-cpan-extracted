@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -71,9 +71,10 @@
          "type" : "git",
          "url" : "git://github.com/plicease/Alien-Build-Plugin-Fetch-Rewrite.git",
          "web" : "https://github.com/plicease/Alien-Build-Plugin-Fetch-Rewrite"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

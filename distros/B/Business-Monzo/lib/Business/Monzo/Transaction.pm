@@ -80,12 +80,6 @@ has [ qw/ is_load originator / ] => (
     isa => Any,
 );
 
-has 'pagination' => (
-    is      => 'ro',
-    isa     => Bool,
-    default => sub { 1 },
-);
-
 has merchant => (
     is      => 'ro',
     isa     => Maybe[InstanceOf['Business::Monzo::Merchant']],

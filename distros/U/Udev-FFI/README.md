@@ -34,7 +34,19 @@ Udev::FFI - Perl bindings for libudev using ffi.
     if($monitor->start()) {
         for(;;) {
             #poll devices, now insert or remove your block device
-            if(defined(my $device = $monitor->poll())) {
+            my $device = $monitor->poll(); #blocking read
+            my $action = $device->get_action();
+
+            print 'ACTION: '.$action, "\n";
+            print 'SYSNAME: '.$device->get_sysname(), "\n";
+            print 'DEVNODE: '.$device->get_devnode(), "\n";
+
+            last; #for example
+        }
+
+        for(;;) {
+            #poll devices, now insert or remove your block device
+            if(defined(my $device = $monitor->poll(0))) { #non-blocking read like can_read in IO::Select
                 my $action = $device->get_action();
 
                 print 'ACTION: '.$action, "\n";
@@ -43,6 +55,8 @@ Udev::FFI - Perl bindings for libudev using ffi.
             }
 
             sleep 1;
+
+            last; #for example
         }
     }
 
@@ -55,6 +69,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
     $enumerate->scan_devices();
 
     use Data::Dumper; #for dump values in $href and @a
+
     # scalar context
     my $href = $enumerate->get_list_entries();
     print Dumper($href), "\n";

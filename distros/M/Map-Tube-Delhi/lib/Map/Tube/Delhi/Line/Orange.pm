@@ -1,6 +1,6 @@
 package Map::Tube::Delhi::Line::Orange;
 $Map::Tube::Delhi::Line::Orange::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::Line::Orange::VERSION = '0.57';
+$Map::Tube::Delhi::Line::Orange::VERSION = '0.58';
 use 5.006;
 use strict; use warnings;
 
@@ -10,7 +10,7 @@ Map::Tube::Delhi::Line::Orange - Delhi Metro Map: Orange Line.
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 DESCRIPTION
 

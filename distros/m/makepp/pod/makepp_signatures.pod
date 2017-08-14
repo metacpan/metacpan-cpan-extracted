@@ -9,7 +9,7 @@ makepp_signatures -- How makepp knows when files have changed
 =for genindex '\w+' makepp_signatures.pod
 
 B<C:>E<nbsp>L<C|/c_compilation_md5>,
-  L<c_compilation_md5|/c_compilation_md5>,E<nbsp>
+  L</c_compilation_md5>,E<nbsp>
 B<M:>E<nbsp>L</md5>,E<nbsp>
 B<P:>E<nbsp>L</plain>,E<nbsp>
 B<S:>E<nbsp>L</shared_object>,E<nbsp>

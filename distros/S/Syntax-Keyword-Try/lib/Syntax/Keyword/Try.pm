@@ -8,7 +8,7 @@ package Syntax::Keyword::Try;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 
@@ -293,6 +293,11 @@ sub import_into
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
+
+=head1 ACKNOWLEDGEMENTS
+
+With thanks to C<Zefram>, C<ilmari> and others from C<irc.perl.org/#p5p> for
+assisting with trickier bits of XS logic.
 
 =head1 AUTHOR
 

@@ -50,9 +50,15 @@ sub prepare_test {
         die "Could not find a hostname to test connections with (tried localhost, *, ::1)" if ! $env{'hostname'};
     }
 
-    warn "# Checking can_fork\n" if debug;
-    ok(can_fork(), "Can fork on this platform") || do { SKIP: { skip("Fork doesn't work on this platform", $N - 1) }; exit; };
-    warn "# Checked can_fork\n"  if debug;
+    if ($args->{'threads'}) {
+        warn "# Checking can_thread\n" if debug;
+        ok(can_thread(), "Can thread on this platform".($@ ? " ($@)" : '')) || do { SKIP: { skip("Threads don't work on this platform", $N - 1) }; exit; };
+        warn "# Checked can_thread\n"  if debug;
+    } else {
+        warn "# Checking can_fork\n" if debug;
+        ok(can_fork(), "Can fork on this platform") || do { SKIP: { skip("Fork doesn't work on this platform", $N - 1) }; exit; };
+        warn "# Checked can_fork\n"  if debug;
+    }
 
     warn "# Getting ports\n"  if debug;
     my $ports = $env{'ports'} = get_ports($args);
@@ -80,7 +86,20 @@ sub can_fork {
         die "Trouble while forking" unless defined $pid; # can't fork
         exit unless $pid; # can fork, exit child
         1;
-    };
+    } || 0;
+}
+
+sub can_thread {
+    return eval {
+        require threads;
+        my $n = 2;
+        my @thr = map { scalar threads->new(sub { return 3 }) } 1..$n;
+        die "Did not create correct number of threads" if threads->list() != $n;
+        my $sum = 0;
+        $sum += $_->join() for @thr;
+        die "Return did not match" if $sum ne $n * 3;
+        1;
+    } || 0;
 }
 
 sub get_ports {

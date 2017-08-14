@@ -1,0 +1,6 @@
+0.001002 - 2017-08-10
+  - Fix copyright to have right module name (doh, thanks Grinnz)
+  - Use die instead of croak since future already adds location
+
+0.001001 - 2017-08-10
+  - Released on an unsuspecting world

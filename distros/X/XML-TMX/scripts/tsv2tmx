@@ -67,7 +67,6 @@ sub _log {
 	say STDERR @_ if $verbose;
 }
 
-
 sub readLine {
 	my $line = <STDIN>;
 	if ($line) {

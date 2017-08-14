@@ -13,11 +13,11 @@ name: Tie-REHash
 provides:
   Tie::REHash:
     file: lib/Tie/REHash.pm
-    version: 1.05
+    version: 1.07
   Tie::REHash::StringrefBug:
     file: lib/Tie/REHash.pm
 requires:
   perl: 5.006
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.05
+version: 1.07

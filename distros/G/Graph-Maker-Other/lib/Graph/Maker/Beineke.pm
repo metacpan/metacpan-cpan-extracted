@@ -25,7 +25,7 @@ use Graph::Maker::Star;
 use Graph::Maker::Wheel;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 
@@ -146,6 +146,7 @@ my @G_data
      #           3---1---6
      #            \ /    |
      #             4-----5
+     # https://hog.grinvin.org/ViewGraphInfo.action?id=204
     );
 
 sub _default_graph_maker {
@@ -299,6 +300,40 @@ C<Graph-E<gt>new()>.
 If the graph is directed (the default) then edges are added both forward and
 backward between vertices.  Option C<undirected =E<gt> 1> creates an
 undirected graph and for it there is a single edge between vertices.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the graphs here are
+
+=over
+
+=item G1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=500>
+
+=item G2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=438>
+
+=item G3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=450>
+
+=item G4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=922>
+
+=item G5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21099>
+
+=item G6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=744>
+
+=item G7, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21093>
+
+=item G8, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21096>
+
+=item G9, L<https://hog.grinvin.org/ViewGraphInfo.action?id=204>
+
+=back
+
+=over
+
+=item 12-vertex union L<https://hog.grinvin.org/ViewGraphInfo.action?id=748>
+
+=item Subgraph relations L<https://hog.grinvin.org/ViewGraphInfo.action?id=25225>
 
 =back
 

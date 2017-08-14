@@ -2,9 +2,9 @@ NAME
     Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 VERSION
-    This document describes version 0.41 of
+    This document describes version 0.420 of
     Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution
-    Dist-Zilla-Plugin-GenPericmdScript), released on 2017-07-07.
+    Dist-Zilla-Plugin-GenPericmdScript), released on 2017-08-12.
 
 SYNOPSIS
     In dist.ini:
@@ -156,6 +156,12 @@ CONFIGURATION (SCRIPT SPECIFICATION)
     Will be passed to Perinci::CmdLine::Gen backend.
 
   per_arg_yaml => bool
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+  read_config => bool
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+  read_env => bool
     Will be passed to Perinci::CmdLine::Gen backend.
 
 CONFIGURATION (OTHER)

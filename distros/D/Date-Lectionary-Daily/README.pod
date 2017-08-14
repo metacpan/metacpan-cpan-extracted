@@ -1,7 +1,13 @@
-
 =head1 NAME
 
-Date::Lectionary
+Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
+
+=head1 VERSION
+
+Version 1.20170809
+
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -15,55 +21,81 @@ Date::Lectionary
 
 Date::Lectionary::Daily takes a Time::Piece date and returns ACNA readings for morning and evening prayer for that date.
 
-=head2 ATTRIBUTES
 
-=head3 date
+=cut
 
-The Time::Piece object date given at object construction.
+=head1 SUBROUTINES/METHODS
 
-=head3 week
 
-More to come.
+=cut
 
-=head3 readings
+=head2 BUILD
 
-More to come.
+Constructor for the Date::Lectionary object.  Takes a Time::Piect object, C<date>, to create the object.
 
-=head1 INSTALLATION
 
-To install this module, run the following commands:
+=cut
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+=head2 _parseLectDB
 
-The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Lectionary-Daily> -- and tested via TravisCI.
+Private method to open and parse the lectionary XML to be used by other methods to XPATH queries.
 
-=for html <a href='https://travis-ci.org/marmanold/Date-Lectionary-Daily'><img src='https://travis-ci.org/marmanold/Date-Lectionary-Daily.svg?branch=master' /></a>
 
-=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Daily?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Daily/badge.svg?branch=master' alt='Coverage Status' /></a>
+=cut
 
-=head1 SUPPORT AND DOCUMENTATION
+=head2 _checkFixed
 
-After installing, you can find documentation for this module with the
-perldoc command.
+Private method to determine if the day given is a fixed holiday rather than a standard day.
+
+
+=cut
+
+=head2 _buildReadings
+
+Private method that returns an ArrayRef of strings for the lectionary readings associated with the date.
+
+
+=cut
+
+=head1 AUTHOR
+
+Michael Wayne Arnold, C<< <marmanold at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-date-lectionary-daily at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary-Daily>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
 
     perldoc Date::Lectionary::Daily
 
+
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary-Daily
+=over 4
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Date-Lectionary-Daily
+=item * RT: CPAN's request tracker (report bugs here)
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Date-Lectionary-Daily
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary-Daily>
 
-    Search CPAN
-        http://search.cpan.org/dist/Date-Lectionary-Daily
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Date-Lectionary-Daily>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Date-Lectionary-Daily>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Date-Lectionary-Daily/>
+
+=back
+
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -71,10 +103,15 @@ Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Michael Wayne Arnold
+Copyright 2017 Michael Wayne Arnold.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See L<http://dev.perl.org/licenses/> for more information.
+
+
+
+=cut
+

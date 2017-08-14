@@ -1,14 +1,96 @@
 package WebService::Braintree::Configuration;
-$WebService::Braintree::Configuration::VERSION = '0.91';
+$WebService::Braintree::Configuration::VERSION = '0.92';
+=head1 NAME
+
+WebService::Braintree::Configuration
+
+=head1 PURPOSE
+
+This keeps all configuration information for your WebService::Braintree
+installation.
+
+A singleton of this class is instantiated when you use L<WebService::Braintree>.
+You are intended to set attributes of this class immediately, then the rest of
+the distribution knows what to do.
+
+=cut
 
 use WebService::Braintree::Gateway;
 use Moose;
 
-has merchant_id => (is => 'rw');
+# IS THIS UNUSED? I cannot find reference in the current documentation for Ruby
+# or Node.JS nor is it referenced anywhere else in the code.
 has partner_id => (is => 'rw');
-has public_key  => (is => 'rw');
+
+=head1 ATTRIBUTES
+
+Get these values from L<Braintree's API credentials documentation|https://articles.braintreepayments.com/control-panel/important-gateway-credentials#api-credentials>.
+
+These attributes are standard mutators. If you invoke them with a value, they
+will set the attribute to that value. If you invoke them without a value, they 
+will return the current value.
+
+=head2 merchant_id(?$value)
+
+This is your merchant_id.
+
+=cut
+
+has merchant_id => (is => 'rw');
+
+=head2 public_key(?$value)
+
+This is your public_key.
+
+=cut
+
+has public_key => (is => 'rw');
+
+=head2 private_key(?$value)
+
+This is your private_key.
+
+=cut
+
 has private_key => (is => 'rw');
-has gateway => (is  => 'ro', lazy => 1, default => sub { WebService::Braintree::Gateway->new({config => shift})});
+
+=head2 environment(?$value)
+
+This is your environment. The environment can be:
+
+=over 4
+
+=item development | integration
+
+This is when you're using a local server for testing. It's unlikely you will
+ever want to use this.
+
+=item sandbox
+
+This is when you're using your Braintree sandbox for testing.
+
+=item qa
+
+This is when you're using qa-master.braintreegateway.com for testing.
+
+=item production
+
+This is when you're live and rocking.
+
+=back
+
+If you provide a value other than the ones listed above, a warning will be
+thrown. This distribution will probably not work properly in that case.
+
+Management reserves the right to change this from a warning to a thrown
+exception in the future.
+
+=head1 USAGE
+
+Do yourself a favor and store these values in a configuration file, not your
+source-controlled code.
+
+=cut
 
 has environment => (
     is => 'rw',
@@ -24,6 +106,10 @@ has environment => (
         }
     }
 );
+
+has gateway => (is  => 'ro', lazy => 1, default => sub {
+    WebService::Braintree::Gateway->new({config => shift})
+});
 
 sub base_merchant_path {
     my $self = shift;
@@ -77,10 +163,21 @@ sub protocol {
     return $self->ssl_enabled ? 'https' : 'http';
 }
 
+=head1 METHODS
+
+There is one read-only method.
+
+=head2 api_version()
+
+This returns the Braintree API version this distribution speaks.
+
+=cut
+
 sub api_version {
     return "4";
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

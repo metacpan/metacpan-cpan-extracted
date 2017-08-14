@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+export HOME=$(pwd)
+
+if [[ $1 == "bash" ]]; then
+  /bin/bash
+  exit
+fi
+
+echo "Starting tests"
+if [[ $1 == "cover" ]]; then
+  shift
+
+  # This is a known problem. q.v.
+  # * https://github.com/p5pclub/ref-util/issues/10
+  # * https://github.com/p5pclub/ref-util/commit/b03a074cdec2
+  dzil cover "$@" 2> >(grep -v 'unexpected OP_CUSTOM' 1>&2)
+  mv .build/*/cover_db/* cover_db
+else
+  # The Dockerfile.test sets the default CMD to "prove -lrs"
+  dzil run "$@"
+fi

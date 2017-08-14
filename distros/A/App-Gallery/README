@@ -1,5 +1,5 @@
-App-Gallery version 0.001
-=========================
+App-Gallery version 0.001001
+============================
 
 gallery.pl creates basic image galleries. Pass an output directory and
 a list of images to the script. The images will be hard linked into
@@ -20,6 +20,8 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
+* File::Slurp
+* HTML::Template::Compiled
 * Image::Magick
 
 COPYRIGHT AND LICENCE

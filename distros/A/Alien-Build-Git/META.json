@@ -63,7 +63,7 @@
          "requires" : {
             "Archive::Tar" : "0",
             "Exporter" : "0",
-            "Test2::Tools::URL" : "0",
+            "Test2::Tools::URL" : "0.02",
             "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
             "Test::Alien::Build" : "0",
@@ -82,9 +82,10 @@
          "type" : "git",
          "url" : "git://github.com/plicease/Alien-Build-Git.git",
          "web" : "https://github.com/plicease/Alien-Build-Git"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

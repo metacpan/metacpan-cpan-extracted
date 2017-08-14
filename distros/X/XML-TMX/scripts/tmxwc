@@ -1,7 +1,6 @@
 #!/usr/bin/perl -s
+our($h);
 use XML::TMX::Reader;
-
-print STDERR "";
 
 my $TTU = 0;
 my $n = scalar(@ARGV);
@@ -15,11 +14,11 @@ for my $file (@ARGV) {
                        print STDERR "\r$TU..." unless $TU%1000;
                    }
                 );
-    print STDERR "\r$file: $TU tu.\n";
+    print (($h?"":"$file: "),"$TU tu.\n");
     $TTU += $TU;
-
 }
-print STDERR "total: $TTU tu.\n" if $n > 1;
+
+print  "total: $TTU tu.\n" if $n > 1;
 
 __END__
 
@@ -32,6 +31,8 @@ tmxwc - gives statistics about tmx files
 =head1 SYNOPSIS
 
  tmxwc  tmx1 [tmx2 ...]
+
+  -h     dont print filenames (default: print filenames)
 
 =head1 DESCRIPTION
 

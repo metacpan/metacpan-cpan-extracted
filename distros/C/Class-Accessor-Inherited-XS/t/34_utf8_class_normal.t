@@ -1,6 +1,6 @@
 package Jopa;
 use Test::More ($] < 5.016) ? (skip_all => 'utf8 support on this perl is broken') : (no_plan);
-use parent 'Class::Accessor::Inherited::XS';
+use parent 'Class::Accessor::Inherited::XS::Compat';
 use utf8;
 
 my $utf8_acc = "тест";

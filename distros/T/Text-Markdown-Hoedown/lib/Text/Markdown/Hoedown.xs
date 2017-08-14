@@ -16,7 +16,7 @@ extern "C" {
 #define NEED_newSVpvn_flags
 #include "ppport.h"
 
-#include "../../hoedown/src/markdown.h"
+#include "../../hoedown/src/document.h"
 #include "../../hoedown/src/html.h"
 
 #define XS_STRUCT2OBJ(sv, class, obj) \
@@ -73,50 +73,51 @@ extern "C" {
     newCONSTSUB(stash, #name, newSViv(name)); \
     av_push(get_av("Text::Markdown::Hoedown::EXPORT", GV_ADD), newSVpv(#name, 0));
 
-MODULE = Text::Markdown::Hoedown    PACKAGE = Text::Markdown::Hoedown PREFIX=hoedown_markdown_
+MODULE = Text::Markdown::Hoedown    PACKAGE = Text::Markdown::Hoedown PREFIX=hoedown_document_
 
 BOOT:
     HV* stash = gv_stashpv("Text::Markdown::Hoedown", GV_ADD);
 
-    TMH_CONST(HOEDOWN_EXT_NO_INTRA_EMPHASIS);
+    /* block-level extensions */
     TMH_CONST(HOEDOWN_EXT_TABLES);
     TMH_CONST(HOEDOWN_EXT_FENCED_CODE);
+    TMH_CONST(HOEDOWN_EXT_FOOTNOTES);
+
+    /* span-level extensions */
     TMH_CONST(HOEDOWN_EXT_AUTOLINK);
     TMH_CONST(HOEDOWN_EXT_STRIKETHROUGH);
     TMH_CONST(HOEDOWN_EXT_UNDERLINE);
-    TMH_CONST(HOEDOWN_EXT_SPACE_HEADERS);
-    TMH_CONST(HOEDOWN_EXT_SUPERSCRIPT);
-    TMH_CONST(HOEDOWN_EXT_LAX_SPACING);
-    TMH_CONST(HOEDOWN_EXT_DISABLE_INDENTED_CODE);
     TMH_CONST(HOEDOWN_EXT_HIGHLIGHT);
-    TMH_CONST(HOEDOWN_EXT_FOOTNOTES);
     TMH_CONST(HOEDOWN_EXT_QUOTE);
+    TMH_CONST(HOEDOWN_EXT_SUPERSCRIPT);
+    TMH_CONST(HOEDOWN_EXT_MATH);
 
+    /* other flags */
+    TMH_CONST(HOEDOWN_EXT_NO_INTRA_EMPHASIS);
+    TMH_CONST(HOEDOWN_EXT_SPACE_HEADERS);
+    TMH_CONST(HOEDOWN_EXT_MATH_EXPLICIT);
+
+    /* negative flags */
+    TMH_CONST(HOEDOWN_EXT_DISABLE_INDENTED_CODE);
+
+    /* HTML */
     TMH_CONST(HOEDOWN_HTML_SKIP_HTML);
-    TMH_CONST(HOEDOWN_HTML_SKIP_STYLE);
-    TMH_CONST(HOEDOWN_HTML_SKIP_IMAGES);
-    TMH_CONST(HOEDOWN_HTML_SKIP_LINKS);
-    TMH_CONST(HOEDOWN_HTML_EXPAND_TABS);
-    TMH_CONST(HOEDOWN_HTML_SAFELINK);
-    TMH_CONST(HOEDOWN_HTML_TOC);
     TMH_CONST(HOEDOWN_HTML_HARD_WRAP);
     TMH_CONST(HOEDOWN_HTML_USE_XHTML);
-    TMH_CONST(HOEDOWN_HTML_ESCAPE);
-    TMH_CONST(HOEDOWN_HTML_PRETTIFY);
 
 TYPEMAP: <<HERE
 
 hoedown_renderer* T_H_RENDERER
-hoedown_markdown* T_H_MARKDOWN
+hoedown_document* T_H_DOCUMENT
 
 OUTPUT
 
-T_H_MARKDOWN
+T_H_DOCUMENT
     sv_setref_pv($arg, \"Text::Markdown::Hoedown::Markdown\", (void*)$var);
 
 INPUT
 
-T_H_MARKDOWN
+T_H_DOCUMENT
     $var = INT2PTR($type, SvROK($arg) ? SvIV(SvRV($arg)) : SvIV($arg));
 
 HERE
@@ -125,16 +126,16 @@ PROTOTYPES: DISABLE
 
 MODULE = Text::Markdown::Hoedown    PACKAGE = Text::Markdown::Hoedown::Markdown
 
-hoedown_markdown *
+hoedown_document *
 new(const char* klass, unsigned int extensions, size_t max_nesting, SV* renderer_sv)
 CODE:
     hoedown_renderer* renderer = XS_STATE(hoedown_renderer*, renderer_sv);
-    RETVAL = hoedown_markdown_new(extensions, max_nesting, renderer);
+    RETVAL = hoedown_document_new(renderer, extensions, max_nesting);
 OUTPUT:
     RETVAL
 
 SV*
-render(hoedown_markdown *self, SV *src_sv)
+render(hoedown_document *self, SV *src_sv)
 PREINIT:
     struct hoedown_buffer* ob;
     const char *src;
@@ -146,7 +147,7 @@ CODE:
     }
 
     src = SvPV(src_sv, src_len);
-    hoedown_markdown_render(ob, src, src_len, self);
+    hoedown_document_render(self, ob, src, src_len);
 
     SV* ret = newSVpv(hoedown_buffer_cstr(ob), 0);
     if (SvUTF8(src_sv)) {

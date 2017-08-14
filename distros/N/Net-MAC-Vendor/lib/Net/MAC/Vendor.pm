@@ -78,7 +78,7 @@ use Compress::Zlib  qw(memGunzip);
 use Mojo::URL;
 use Mojo::UserAgent;
 
-our $VERSION = '1.261';
+our $VERSION = '1.262';
 
 =item run( @macs )
 
@@ -420,15 +420,15 @@ sub oui_urls {
 
 =item load_cache( [ SOURCE[, DEST ] ] )
 
-Downloads the current list of all OUIs in SOURCE, parses it with C<parse_oui()>,
-and stores it in the cache. The C<fetch_oui()> will use this cache if it exists.
+Downloads the current list of all OUIs in SOURCE, parses it with
+C<parse_oui()>, and stores it in the cache. The C<fetch_oui()> will
+use this cache if it exists.
 
-By default, this uses the URL from C<oui_url>,
-but given an argument, it tries to use that. To load from a local
-file, use the C<file://> scheme.
+By default, this uses the URL from C<oui_url>, but given an argument,
+it tries to use that.
 
-If the url indicates that the data is compressed, the response content is
-decompressed before being stored.
+If the url indicates that the data is compressed, the response content
+is decompressed before being stored.
 
 If C<load_cache> cannot load the data, it issues a warning and returns
 nothing.
@@ -565,10 +565,12 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2015, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2004-2017, brian d foy C<< <bdfoy@cpan.org> >>. All rights
+reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software; you can redistribute it under the
+Artistic License 2.0. A license file should have come with this
+distribution.
 
 =cut
 

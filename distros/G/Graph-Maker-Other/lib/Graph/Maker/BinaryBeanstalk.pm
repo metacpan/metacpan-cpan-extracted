@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 
@@ -202,6 +202,16 @@ Like C<Graph::Maker::BalancedTree>, if the graph is directed (the default)
 then edges are added both up and down between each parent and child.  Option
 C<undirected =E<gt> 1> creates an undirected graph and for it there is a
 single edge from parent to child.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for graphs here include
+
+=over
+
+=item height=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=502>
 
 =back
 

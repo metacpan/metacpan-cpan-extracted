@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 
 use utf8;
 use 5.006;
@@ -8,7 +7,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name       => 'Perl::Tokenizer',
-    license           => 'perl',
+    license           => 'artistic_2',
     dist_author       => q{Daniel "Trizen" Șuteu <trizenx@gmail.com>},
     dist_version_from => 'lib/Perl/Tokenizer.pm',
     dist_abstract     => 'A tiny Perl code tokenizer',
@@ -22,11 +21,14 @@ my $builder = Module::Build->new(
                       },
     meta_merge => {
                    resources => {
-                                 repository => 'https://github.com/trizen/Perl-Tokenizer'
+                                 bugtracker => "https://github.com/trizen/Perl-Tokenizer/issues",
+                                 homepage   => "https://github.com/trizen/Perl-Tokenizer",
+                                 repository => "https://github.com/trizen/Perl-Tokenizer",
                                 }
                   },
     requires => {
                  'perl'     => '5.18.0',
+                 'utf8'     => 0,
                  'strict'   => 0,
                  'warnings' => 0,
                  'Exporter' => 0,

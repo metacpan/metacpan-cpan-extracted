@@ -450,6 +450,8 @@ If it is not already defined, the C<MOJO_LOG_LEVEL> environment variable will
 be set to C<debug> or C<fatal>, depending on the value of the
 C<HARNESS_IS_VERBOSE> environment variable.
 
+See L<Mojolicious::Guides::Testing> for more.
+
 =head1 ATTRIBUTES
 
 L<Test::Mojo> implements the following attributes.

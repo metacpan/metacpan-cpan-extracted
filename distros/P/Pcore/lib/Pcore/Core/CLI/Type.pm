@@ -34,28 +34,28 @@ const our $TYPE => {
 };
 
 sub _validate_isa ( $self, @ ) {
-    my $vals = is_plain_arrayref $_[1] ? $_[1] : is_plain_hashref $_[1] ? [ \values $_[1]->%* ] : [ \$_[1] ];
+    my $vals = is_plain_arrayref $_[1] ? $_[1] : is_plain_hashref $_[1] ? [ values $_[1]->%* ] : [ $_[1] ];
 
     my $isa_ref = ref $self->isa;
 
-    for my $val_ref ( $vals->@* ) {
+    for my $val ( $vals->@* ) {
         if ( !$isa_ref ) {
-            return qq[value "$val_ref->$*" is not a ] . uc $self->isa if !$TYPE->{ $self->isa }->( $val_ref->$* );
+            return qq[value "$val" is not a ] . uc $self->isa if !$TYPE->{ $self->isa }->($val);
         }
         elsif ( $isa_ref eq 'CODE' ) {
-            if ( my $error_msg = $self->isa->($val_ref) ) {
+            if ( my $error_msg = $self->isa->($val) ) {
                 return $error_msg;
             }
         }
         elsif ( $isa_ref eq 'Regexp' ) {
-            return qq[value "$val_ref->$*" should match regexp ] . $self->isa if $val_ref->$* !~ $self->isa;
+            return qq[value "$val" should match regexp ] . $self->isa if $val !~ $self->isa;
         }
         elsif ( $isa_ref eq 'ARRAY' ) {
             my $possible_val = [];
 
             for ( $self->isa->@* ) {
-                if ( index( $_, $val_ref->$*, 0 ) == 0 ) {
-                    if ( length == length $val_ref->$* ) {
+                if ( index( $_, $val, 0 ) == 0 ) {
+                    if ( length == length $val ) {
 
                         # select current value if matched completely
                         $possible_val = [$_];
@@ -68,13 +68,13 @@ sub _validate_isa ( $self, @ ) {
             }
 
             if ( !$possible_val->@* ) {
-                return qq[value "$val_ref->$*" should be one of the: ] . join q[, ], map {qq["$_"]} $self->isa->@*;
+                return qq[value "$val" should be one of the: ] . join q[, ], map {qq["$_"]} $self->isa->@*;
             }
             elsif ( $possible_val->@* > 1 ) {
-                return qq[value "$val_ref->$*" is ambigous, did you mean: ] . join q[, ], map {qq["$_"]} $possible_val->@*;
+                return qq[value "$val" is ambigous, did you mean: ] . join q[, ], map {qq["$_"]} $possible_val->@*;
             }
             else {
-                $val_ref->$* = $possible_val->[0];    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+                $val = $possible_val->[0];
             }
         }
     }

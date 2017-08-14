@@ -26,7 +26,7 @@ Stores information about the logged in user account.
 
 =head1 AUTHOR
 
-<mailto:earth-tone@ubwg.net>
+<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

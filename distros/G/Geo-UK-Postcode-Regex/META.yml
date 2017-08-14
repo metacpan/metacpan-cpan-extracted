@@ -13,9 +13,9 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
   File::ShareDir::Install: '0.03'
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,21 +23,21 @@ meta-spec:
 name: Geo-UK-Postcode-Regex
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
   file:
     - lib/Geo/UK/Postcode/Regex/Hash.pm
 provides:
   Geo::UK::Postcode::Regex:
     file: lib/Geo/UK/Postcode/Regex.pm
-    version: '0.015'
+    version: '0.016'
   Geo::UK::Postcode::Regex::Simple:
     file: lib/Geo/UK/Postcode/Regex/Simple.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -50,6 +50,7 @@ resources:
   bugtracker: https://github.com/mjemmeson/Geo-UK-Postcode-Regex/issues
   homepage: https://github.com/mjemmeson/Geo-UK-Postcode-Regex
   repository: https://github.com/mjemmeson/Geo-UK-Postcode-Regex.git
-version: '0.015'
+version: '0.016'
 x_contributors:
   - 'Michael Jemmeson <michael.jemmeson@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

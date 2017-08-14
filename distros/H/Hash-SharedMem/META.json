@@ -4,13 +4,13 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Hash-SharedMem",
    "prereqs" : {
@@ -19,6 +19,7 @@
             "Data::Dumper" : "0",
             "Errno" : "1.00",
             "ExtUtils::CBuilder" : "0.15",
+            "ExtUtils::ParseXS" : "3.30",
             "File::Temp" : "0.22",
             "IO::File" : "0",
             "Module::Build" : "0",
@@ -58,18 +59,23 @@
    "provides" : {
       "Hash::SharedMem" : {
          "file" : "lib/Hash/SharedMem.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Hash::SharedMem::Handle" : {
          "file" : "lib/Hash/SharedMem/Handle.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Hash-SharedMem@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-SharedMem"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.004"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

@@ -4,6 +4,7 @@ Changes
 lib/Group/Git.pm
 lib/Group/Git/Bitbucket.pm
 lib/Group/Git/Cmd/Branch.pm
+lib/Group/Git/Cmd/Grep.pm
 lib/Group/Git/Cmd/Help.pm
 lib/Group/Git/Cmd/List.pm
 lib/Group/Git/Cmd/Pull.pm

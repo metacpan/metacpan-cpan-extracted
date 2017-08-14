@@ -462,7 +462,7 @@ sub test_getVar : Test(72) {
     my $self = shift;
 
     my $pkg = 'P1';
-    unshift @INC,$self->testPath('prty/test/data/class');
+    unshift @INC,$self->testPath('t/data/class');
     require P1;
 
     my $test = [

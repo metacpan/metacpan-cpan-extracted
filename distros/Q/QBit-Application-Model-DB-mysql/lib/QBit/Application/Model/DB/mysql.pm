@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql;
-$QBit::Application::Model::DB::mysql::VERSION = '0.010';
+$QBit::Application::Model::DB::mysql::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);
@@ -12,6 +12,10 @@ sub filter {
     my ($self, $filter, %opts) = @_;
 
     return QBit::Application::Model::DB::Filter->new($filter, %opts, db => $self);
+}
+
+sub get_dbh {
+    $_[0]->{'__DBH__'}{$$}
 }
 
 sub query {
@@ -110,11 +114,11 @@ __END__
 =encoding utf8
 
 =head1 Name
- 
+
 QBit::Application::Model::DB::mysql - Class for working with MySQL DB.
- 
+
 =head1 Description
- 
+
 Class for working with MySQL DB. It's not ORM.
 
 =head1 GitHub
@@ -124,7 +128,7 @@ https://github.com/QBitFramework/QBit-Application-Model-DB-mysql
 =head1 Install
 
 =over
- 
+
 =item *
 
 cpanm QBit::Application::Model::DB::mysql
@@ -136,19 +140,19 @@ apt-get install libqbit-application-model-db-mysql-perl (http://perlhub.ru/)
 =back
 
 =head1 Package methods
- 
+
 =head2 filter
- 
+
 B<Arguments:>
- 
+
 =over
 
 =item *
 
 B<$filter> - filter (perl variables)
- 
+
 =item *
- 
+
 B<%opts> - additional options
 
 =over
@@ -156,7 +160,7 @@ B<%opts> - additional options
 =item *
 
 B<type> - type (AND/OR NOT)
- 
+
 =back
 
 =back
@@ -174,13 +178,33 @@ B<$filter> - object (QBit::Application::Model::DB::Filter)
 B<Example:>
 
   my $filter = $app->db->filter([id => '=' => \23]);
-  
-=head2 query
- 
+
+=head2 get_dbh
+
 B<No arguments.>
 
-Create and returns a new query object. 
- 
+Returns DBI object.
+
+B<Return values:>
+
+=over
+
+=item
+
+B<$dbh> - object (DBI::db)
+
+=back
+
+B<Example:>
+
+  my $dbh = $app->db->get_dbh();
+
+=head2 query
+
+B<No arguments.>
+
+Create and returns a new query object.
+
 B<Return values:>
 
 =over
@@ -194,15 +218,15 @@ B<$query> - object (QBit::Application::Model::DB::mysql::Query)
 B<Example:>
 
   my $query = $app->db->query();
-  
+
 =head2 transaction
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<$sub> - reference to sub
 
 =back
@@ -213,17 +237,17 @@ B<Example:>
       # work with db
       ...
   });
-  
+
 =head1 Internal packages
- 
+
 =over
- 
+
 =item B<L<QBit::Application::Model::DB::mysql::Field>> - class for MySQL fields;
- 
+
 =item B<L<QBit::Application::Model::DB::mysql::Query>> - class for MySQL queries;
- 
+
 =item B<L<QBit::Application::Model::DB::mysql::Table>> - class for MySQL tables;
- 
+
 =back
 
 =cut

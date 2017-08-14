@@ -4,58 +4,63 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Array-Base",
    "prereqs" : {
       "build" : {
          "requires" : {
             "ExtUtils::CBuilder" : "0.15",
-            "Module::Build" : 0,
-            "Test::More" : 0,
+            "Module::Build" : "0",
+            "Test::More" : "0",
             "perl" : "5.008001",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : 0,
+            "Module::Build" : "0",
             "perl" : "5.008001",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "conflicts" : {
-            "B::Hooks::OP::Check" : 0
+            "B::Hooks::OP::Check" : "< 0.19"
          },
          "requires" : {
-            "Lexical::SealRequireHints" : "0.006",
-            "XSLoader" : 0,
+            "Lexical::SealRequireHints" : "0.008",
+            "XSLoader" : "0",
             "perl" : "5.008001",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Array::Base" : {
          "file" : "lib/Array/Base.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Array-Base@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Base"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

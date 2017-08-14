@@ -11,7 +11,7 @@ Business::Monzo - Perl library for interacting with the Monzo API
 
 =head1 VERSION
 
-0.09
+0.10
 
 =head1 DESCRIPTION
 
@@ -131,7 +131,7 @@ use warnings;
 use Moo;
 with 'Business::Monzo::Version';
 
-$Business::Monzo::VERSION = '0.09';
+$Business::Monzo::VERSION = '0.10';
 
 use Carp qw/ confess /;
 

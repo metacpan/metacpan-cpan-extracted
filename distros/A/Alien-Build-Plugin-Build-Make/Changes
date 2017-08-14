@@ -1,0 +1,7 @@
+Revision history for Alien-Build-Plugin-Build-Make
+
+0.02      2017-08-14 05:01:22 -0400
+  - Remove accidnetal dependency on Alien::gmake
+
+0.01      2017-08-13 08:19:47 -0400
+  - initial version

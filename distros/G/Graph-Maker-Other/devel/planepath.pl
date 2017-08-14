@@ -24,11 +24,36 @@ use MyGraphs;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use Graph::Maker::Keller;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+
+{
+  # TriangularHypot hexagon of hexagons
+  # N=1..24 2x2 hog not
+  # N=1..54 3x3
+  require Graph::Maker::PlanePath;
+  my $graph = Graph::Maker->new
+    ('planepath',
+     undirected=>1,
+     n_hi => 24,
+     n_hi => 54,
+     type => 'neighbours6',
+     planepath => 'TriangularHypot,points=hex_centred',
+     vertex_name_type => 'xy',
+    );
+  MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+
+  require Math::PlanePath::TriangularHypot;
+  my $path = Math::PlanePath::TriangularHypot->new (points=>'hex_centred');
+  foreach my $n (1 .. 54) {
+    my ($x,$y) = $path->n_to_xy($n);
+    print $x**2 + 3*$y**2, "\n";
+  }
+  exit 0;
+}
 
 {
   # hog trees and paths
@@ -141,17 +166,9 @@ use Graph::Maker::Keller;
     #                              fan_out => 2, height => $k,
     #                             );
     # }
-    # {
-    #   # Hypercube
-    #   # N=3 cubical https://hog.grinvin.org/ViewGraphInfo.action?id=1022
-    #   # N=4 tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
-    #   # N=5 not  32 nodes 80 edges
-    #   require Graph::Maker::Hypercube;
-    #   $graph = Graph::Maker->new('hypercube', N => $k, undirected=>1);
-    # }
 
     # Graph_branch_reduce($graph);
-    # print "strip hanging cycles " . Graph_strip_hanging_cycles($graph) . "\n";
+    # print "delete hanging cycles " . Graph_delete_hanging_cycles($graph) . "\n";
 
     # next if $graph->vertices == 0;
     last if $graph->vertices > 200;
@@ -159,7 +176,7 @@ use Graph::Maker::Keller;
     Graph_xy_print($graph);
     push @graphs, $graph;
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 
@@ -181,7 +198,7 @@ use Graph::Maker::Keller;
     Graph_xy_print($graph);
     push @graphs, $graph;
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 

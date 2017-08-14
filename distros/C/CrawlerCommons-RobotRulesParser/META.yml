@@ -1,0 +1,46 @@
+---
+abstract: 'parser for robots.txt files'
+author:
+  - 'Adam K Robinson <akrobinson74@gmail.com>'
+  - 'Adam K Robinson <akrobinson74@gmail.com>'
+build_requires:
+  Const::Fast: 0.014
+  ExtUtils::MakeMaker: 6.59
+  Log::Log4perl: 1.47
+  Path::Tiny: 0.094
+  Test::More: 0
+  Test::Most: 0.34
+  Try::Tiny: 0.24
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CrawlerCommons-RobotRulesParser
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Const::Fast: 0.014
+  Encode: 2.8
+  Moose: 2.1804
+  MooseX::ClassAttribute: 0.29
+  MooseX::Enumeration: 0.005
+  MooseX::Log::Log4perl: 0.47
+  Try::Tiny: 0.24
+  Types::Standard: 1.000005
+  URI: 1.71
+  URI::Escape: 3.31
+  namespace::autoclean: 0.28
+  perl: 5.10.1
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CrawlerCommons-RobotRulesParser
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git@github.com:akrobinson74/crawlercommons-robotrulesparser.git
+version: '0.03'

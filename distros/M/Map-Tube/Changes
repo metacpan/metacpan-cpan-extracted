@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.34  2017-08-11T11:25:00+00:00
+      - Added dependency on Map::Tube::Exceptions v3.13.
+
+3.33  2017-08-10T12:00:00+00:00
+      - Handled malformed map data correctly.
+
 3.32  2017-07-03T11:20:00+00:00
       - Downgraded dependency on File::Basename v2.6 (RT #122294), thanks @JWRIGHT.
       - Added optionally experimental flag.

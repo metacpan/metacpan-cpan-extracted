@@ -10,6 +10,9 @@ WriteMakefile(
     NAME            => 'Class::Accessor::Inherited::XS',
     VERSION_FROM    => 'lib/Class/Accessor/Inherited/XS.pm',
     AUTHOR          => ['Vladimir Timofeev <vovkasm@crazypanda.ru>', 'Sergey Aleynikov <randir@cpan.org>'],
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker'   => 6.64,
+    },
     PREREQ_PM       => {
         'XSLoader'    => 0,
         'Carp'        => 0,

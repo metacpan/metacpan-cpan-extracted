@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::PERLANCAR::WriteModules" => 0,
     "Module::Load" => 0,
     "Moose" => 0,
-    "Perinci::CmdLine::Gen" => "0.44",
+    "Perinci::CmdLine::Gen" => "0.482",
     "experimental" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.41",
+  "VERSION" => "0.420",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Module::Load" => 0,
   "Moose" => 0,
-  "Perinci::CmdLine::Gen" => "0.44",
+  "Perinci::CmdLine::Gen" => "0.482",
   "Test::More" => 0,
   "experimental" => 0,
   "namespace::autoclean" => 0,

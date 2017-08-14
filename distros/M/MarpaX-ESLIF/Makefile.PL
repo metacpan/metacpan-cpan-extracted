@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use 5.008;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 7.20;
 
 BEGIN {
   use File::Spec;                     # Formally it is not necessary I believe to do it here
@@ -94,7 +94,7 @@ open($fh, '>', 'c-constant-types.inc') || die "Cannot open c-constant-types.inc,
 print $fh constant_types();
 close($fh) || warn "Failed to close c-constant-types.inc, $!";
 
-my %types = ( 'event' => { pkg => 'MarpaX::ESLIF::Event::Type', constants => [qw/MARPAESLIF_EVENTTYPE_NONE MARPAESLIF_EVENTTYPE_COMPLETED MARPAESLIF_EVENTTYPE_NULLED MARPAESLIF_EVENTTYPE_PREDICTED MARPAESLIF_EVENTTYPE_BEFORE MARPAESLIF_EVENTTYPE_AFTER MARPAESLIF_EVENTTYPE_EXHAUSTED MARPAESLIF_EVENTTYPE_DISCARD/] }, 'value' => { pkg => 'MarpaX::ESLIF::Value::Type', constants => [qw/MARPAESLIF_VALUE_TYPE_UNDEF MARPAESLIF_VALUE_TYPE_CHAR MARPAESLIF_VALUE_TYPE_SHORT MARPAESLIF_VALUE_TYPE_INT MARPAESLIF_VALUE_TYPE_LONG MARPAESLIF_VALUE_TYPE_FLOAT MARPAESLIF_VALUE_TYPE_DOUBLE MARPAESLIF_VALUE_TYPE_PTR MARPAESLIF_VALUE_TYPE_ARRAY/] }, 'loggerLevel' => { pkg => 'MarpaX::ESLIF::Logger::Level', constants => [qw/GENERICLOGGER_LOGLEVEL_TRACE GENERICLOGGER_LOGLEVEL_DEBUG GENERICLOGGER_LOGLEVEL_INFO GENERICLOGGER_LOGLEVEL_NOTICE GENERICLOGGER_LOGLEVEL_WARNING GENERICLOGGER_LOGLEVEL_ERROR GENERICLOGGER_LOGLEVEL_CRITICAL GENERICLOGGER_LOGLEVEL_ALERT GENERICLOGGER_LOGLEVEL_EMERGENCY/] });
+my %types = ( 'event' => { pkg => 'MarpaX::ESLIF::Event::Type', constants => [qw/MARPAESLIF_EVENTTYPE_NONE MARPAESLIF_EVENTTYPE_COMPLETED MARPAESLIF_EVENTTYPE_NULLED MARPAESLIF_EVENTTYPE_PREDICTED MARPAESLIF_EVENTTYPE_BEFORE MARPAESLIF_EVENTTYPE_AFTER MARPAESLIF_EVENTTYPE_EXHAUSTED MARPAESLIF_EVENTTYPE_DISCARD/] }, 'value' => { pkg => 'MarpaX::ESLIF::Value::Type', constants => [qw/MARPAESLIF_VALUE_TYPE_UNDEF MARPAESLIF_VALUE_TYPE_CHAR MARPAESLIF_VALUE_TYPE_SHORT MARPAESLIF_VALUE_TYPE_INT MARPAESLIF_VALUE_TYPE_LONG MARPAESLIF_VALUE_TYPE_FLOAT MARPAESLIF_VALUE_TYPE_DOUBLE MARPAESLIF_VALUE_TYPE_PTR MARPAESLIF_VALUE_TYPE_ARRAY/] }, 'loggerLevel' => { pkg => 'MarpaX::ESLIF::Logger::Level', constants => [qw/GENERICLOGGER_LOGLEVEL_TRACE GENERICLOGGER_LOGLEVEL_DEBUG GENERICLOGGER_LOGLEVEL_INFO GENERICLOGGER_LOGLEVEL_NOTICE GENERICLOGGER_LOGLEVEL_WARNING GENERICLOGGER_LOGLEVEL_ERROR GENERICLOGGER_LOGLEVEL_CRITICAL GENERICLOGGER_LOGLEVEL_ALERT GENERICLOGGER_LOGLEVEL_EMERGENCY/] }, 'rulePropertyBitSet' => { pkg => 'MarpaX::ESLIF::Rule::PropertyBitSet', constants => [qw/MARPAESLIF_RULE_IS_ACCESSIBLE MARPAESLIF_RULE_IS_NULLABLE MARPAESLIF_RULE_IS_NULLING MARPAESLIF_RULE_IS_LOOP MARPAESLIF_RULE_IS_PRODUCTIVE/] }, 'symbolPropertyBitSet' => { pkg => 'MarpaX::ESLIF::Symbol::PropertyBitSet', constants => [qw/MARPAESLIF_SYMBOL_IS_ACCESSIBLE MARPAESLIF_SYMBOL_IS_NULLABLE MARPAESLIF_SYMBOL_IS_NULLING MARPAESLIF_SYMBOL_IS_PRODUCTIVE MARPAESLIF_SYMBOL_IS_START MARPAESLIF_SYMBOL_IS_TERMINAL/] }, 'symbol' => { pkg => 'MarpaX::ESLIF::Symbol::Type', constants => [qw/MARPAESLIF_SYMBOLTYPE_TERMINAL MARPAESLIF_SYMBOLTYPE_META/] });
 
 foreach (sort keys %types) {
   my $pkg = $types{$_}->{pkg};
@@ -208,7 +208,7 @@ my %WriteMakefileArgs = (
     "Config::AutoConf::INI" => 0,
     "ExtUtils::CBuilder" => "0.280224",
     "ExtUtils::Constant" => 0,
-    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::MakeMaker" => "7.20",
     "File::Basename" => 0,
     "File::Copy" => 0,
     "File::Copy::Recursive" => 0,
@@ -246,6 +246,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Adapter" => 0,
     "Log::Any::Adapter::Log4perl" => 0,
     "Log::Log4perl" => 0,
+    "Test::Deep::NoTest" => 0,
     "Test::More" => 0,
     "Test::More::UTF8" => 0,
     "Try::Tiny" => 0,
@@ -254,7 +255,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.0.14",
+  "VERSION" => "2.0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -280,6 +281,7 @@ my %FallbackPrereqs = (
   "Log::Any::Adapter" => 0,
   "Log::Any::Adapter::Log4perl" => 0,
   "Log::Log4perl" => 0,
+  "Test::Deep::NoTest" => 0,
   "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "Try::Tiny" => 0,

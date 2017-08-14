@@ -1,5 +1,5 @@
 package Jopa;
-use parent 'Class::Accessor::Inherited::XS';
+use parent 'Class::Accessor::Inherited::XS::Compat';
 use Test::More (Class::Accessor::Inherited::XS::BINARY_UNSAFE) ? (skip_all => 'binary support on this perl is broken') : (no_plan);
 use utf8;
 

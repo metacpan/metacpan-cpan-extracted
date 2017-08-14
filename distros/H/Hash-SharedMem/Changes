@@ -1,3 +1,49 @@
+version 0.005; 2017-08-11
+
+  * update to accommodate PERL_OP_PARENT builds of Perl 5.21.11 or later
+    (which is the default from Perl 5.25.1)
+
+  * on Perl 5.25.3 and later, where a regular hash in scalar context
+    yields the count of items in the hash, make the tied scalar(%shash)
+    behave equivalently
+
+  * update automatic configuration to not rely on . in @INC, which is
+    no longer necessarily there from Perl 5.25.7
+
+  * update for changed S_croak_xs_usage() prototype in ExtUtils::ParseXS
+    3.30, requiring the new version of that module
+
+  * skip t/taint.t if the perl empirically doesn't perform taint checks
+    but the script got run anyway (which happens with an unsupported
+    configuration of the Perl core which some people are using in the
+    absence of a supported no-taint configuration)
+
+  * test that all modules have matching version numbers
+
+  * in documentation, update the stated Perl version beyond which the
+    Unicode bug in the treatment of filenames might be fixed
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * rewrite some internal recursive functions to use the cursor system
+
+  * to perform static assertion in C, rather than a hand-crafted
+    formulation, use Perl's STATIC_ASSERT_DECL() macro (from Perl 5.27.1
+    onwards) or STATIC_ASSERT_GLOBAL() macro (from Perl 5.21.7 until it
+    was renamed to STATIC_ASSERT_DECL()), with a reserve definition for
+    older Perls
+
+  * avoid some compiler warnings that arise on Perl 5.6
+
+  * use cBOOL() where appropriate
+
+  * remove a duplicated assignment statement
+
 version 0.004; 2015-01-28
 
   * port to Perl 5.21.1, where errno-based error messages (as seen in

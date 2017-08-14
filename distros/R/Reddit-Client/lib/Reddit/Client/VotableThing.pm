@@ -81,7 +81,7 @@ neither, in the case of no vote being cast.
 
 =head1 AUTHOR
 
-Jeff Ober L<mailto:jeffober@gmail.com>
+L<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

@@ -1,5 +1,8 @@
 Revision history for Kelp::Module::FlashMessage
 
+0.05   14/08/2017
+       META.json file added to CPAN distribution
+
 0.04   2013-07-01
        * Version number support
        * released to github

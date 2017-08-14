@@ -10,7 +10,7 @@ makepp_variables -- How to use variables in makepp
 
 B<?:>E<nbsp>L<$*|/stem>,
   L<$+|/sorted_dependencies>,
-  L<$E<sol>|/__>,
+  L<$/|/__>,
   L<$E<lt>|/dependency>,
   L<$?|/changed_dependencies>,
   L<$@|/output>,

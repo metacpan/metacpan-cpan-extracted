@@ -70,6 +70,16 @@ sub build_request {
         $request->method('POST');
         $request->content_type('application/x-www-form-urlencoded');
         $request->content(build_query($post_data));
+    } elsif ($self->{method} eq 'DELETE') {
+	$request->method('DELETE');
+    } elsif ($self->{method} eq 'PUT') {
+        my $post_data = $self->{post_data} || {};
+        $post_data->{modhash} = $self->{modhash} if $self->{modhash};
+        $post_data->{uh}      = $self->{modhash} if $self->{modhash};
+
+	$request->method('PUT');
+        $request->content_type('application/x-www-form-urlencoded');
+        $request->content(build_query($post_data));
     } else {
         $request->method('GET');
     }
@@ -89,7 +99,7 @@ sub send {
     if ($res->is_success) {
         return $res->content;
     } else {
-        croak sprintf('Request error: HTTP %s', $res->status_line);
+        croak "Request error: HTTP ".$res->status_line .", Content: $res->{_content}";
     }
 }
 
@@ -166,6 +176,7 @@ Performs the HTTP request and returns the result. Croaks on HTTP error.
 
 =head1 AUTHOR
 
+L<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

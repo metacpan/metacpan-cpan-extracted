@@ -1,7 +1,6 @@
 package MarpaX::Languages::SVG::Parser::Config;
 
 use strict;
-use utf8;
 use warnings;
 use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
 
@@ -39,7 +38,7 @@ has section =>
 	required => 0,
 );
 
-our $VERSION = '1.06';
+our $VERSION = '1.09';
 
 # -----------------------------------------------
 

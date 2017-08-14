@@ -1,7 +1,7 @@
 package Jopa;
 use Test::More ($] >= 5.016) ? (skip_all => 'utf8 support on this perl is not broken') : (no_plan);
 use Test::More;
-use parent 'Class::Accessor::Inherited::XS';
+use parent 'Class::Accessor::Inherited::XS::Compat';
 use utf8;
 
 my $broken_utf8_subs = ($] < 5.016); #see perl5160delta

@@ -49,11 +49,14 @@ $mock->mock( 'json',sub { $mock } );
 *Mojo::UserAgent::put = sub { $mock };
 *Mojo::UserAgent::patch = sub { $mock };
 *Mojo::UserAgent::get = sub { $mock };
+my $proxy_mock = Test::MockObject->new;
+$proxy_mock->mock( 'detect',sub { 1 } );
+*Mojo::UserAgent::proxy = sub { $proxy_mock };
 
-test_transaction( $Monzo,$mock );
-test_account( $Monzo,$mock );
-test_balance( $Monzo,$mock );
-test_attachment( $Monzo,$mock );
+test_transaction( $Monzo,$mock,$proxy_mock );
+test_account( $Monzo,$mock,$proxy_mock );
+test_balance( $Monzo,$mock,$proxy_mock );
+test_attachment( $Monzo,$mock,$proxy_mock );
 
 *Business::Monzo::Client::_api_request = sub { shift; return shift };
 
@@ -66,7 +69,7 @@ done_testing();
 
 sub test_transaction {
 
-    my ( $Monzo,$mock ) = @_;
+    my ( $Monzo,$mock,$proxy_mock ) = @_;
 
     note( "Transaction" );
 
@@ -87,7 +90,7 @@ sub test_transaction {
 
 sub test_account {
 
-    my ( $Monzo,$mock ) = @_;
+    my ( $Monzo,$mock,$proxy_mock ) = @_;
 
     note( "Account" );
 
@@ -97,11 +100,13 @@ sub test_account {
         my $Account = ( $Monzo->accounts )[1],
         'Business::Monzo::Account'
     );
+    ok $proxy_mock->called('detect'), 'UA is lazily built and proxy detected first time';
+    $proxy_mock->clear;
 }
 
 sub test_balance {
 
-    my ( $Monzo,$mock ) = @_;
+    my ( $Monzo,$mock,$proxy_mock ) = @_;
 
     $mock->mock( 'json',sub { _balance_json() } );
 
@@ -109,11 +114,13 @@ sub test_balance {
         $Monzo->balance( account_id => 1 ),
         'Business::Monzo::Balance'
     );
+    ok !$proxy_mock->called('detect'), 'UA is reused and proxy not redetected on subsequent runs';
+    $proxy_mock->clear;
 }
 
 sub test_attachment {
 
-    my ( $Monzo,$mock ) = @_;
+    my ( $Monzo,$mock,$proxy_mock ) = @_;
 
     isa_ok(
         $Monzo->upload_attachment(
@@ -122,6 +129,8 @@ sub test_attachment {
         ),
         'Business::Monzo::Attachment'
     );
+    ok !$proxy_mock->called('detect'), 'UA is reused and proxy not redetected on subsequent runs';
+    $proxy_mock->clear;
 }
 
 sub _transaction_json {

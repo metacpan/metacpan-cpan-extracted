@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use parent qw(Type::Registry);
 
+use Type::Tiny::Class;
+
 # override
 sub new {
     my ($class) = @_;
@@ -33,7 +35,7 @@ sub _class_type {
 
     my $type = $self->SUPER::simple_lookup($name);
     unless ($type) {
-        $type = $self->make_class_type($name);
+        $type = Type::Tiny::Class->new(class => $name, display_name => $name);
         $self->add_type($type, $name);
     }
 

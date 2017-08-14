@@ -12,7 +12,7 @@ use XML::Parser;
 use Cairo;
 use Image::SVG::Path qw/extract_path_info create_path_string/;
 use constant M_PI => 3.14159265358979;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our $default_surface_type = 'argb32';
 our $default_surface_size = 100;
@@ -50,8 +50,6 @@ sub make_cr
 sub render
 {
     my ($self, $file) = @_;
-    croak "No such file '$file'" unless -f $file;
-    $self->{file} = $file;
     my $p = XML::Parser->new (
 	Handlers => {
 
@@ -67,7 +65,17 @@ sub render
 	    },
 	},
     );
+    if ($file =~ /<.*>/) {
+	# parse from scalar
+	$p->parse ($file);
+    }
+    elsif (! -f $file) {
+	croak "No such file '$file'";
+    }
+else {
+    $self->{file} = $file;
     $p->parsefile ($file);
+}
     return $self->{surface};
 }
 
@@ -92,7 +100,7 @@ sub svg
 	$height = $attr{height};
     }
     if (! defined $width && ! defined $height) {
-	my $viewBox = $attr{viewBox};
+	my $viewBox = $attr{viewBox} || $attr{viewbox};
 	if ($viewBox) {
 	    (undef, undef, $width, $height) = split /\s+/, $viewBox;
 	}

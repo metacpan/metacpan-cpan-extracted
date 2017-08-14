@@ -1,5 +1,10 @@
 Revision history for Exceptions
 
+0.101     2017-08-12
+    - Update to use @Starter revision 2
+    - Include the LICENSE in the repo
+    - Include Syntax::Keyword::Try
+
 0.100     2016-09-05
     - Dist::Zilla now used
 

@@ -1,3 +1,8 @@
+0.482   2017-08-10 (PERLANCAR)
+
+	- [Bugfix] Set script's default log level correctly.
+
+
 0.481   2017-08-09 (PERLANCAR)
 
 	- Bump generated prereq version Perinci::CmdLine::{Base,Lite} 1.76

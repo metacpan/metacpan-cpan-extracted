@@ -63,9 +63,7 @@ Wraps C<Reddit::Client::get_comments>, implicitly providing the permalink parame
 
 =head1 AUTHOR
 
-<mailto:earth-tone@ubwg.net>
-
-Jeff Ober L<mailto:jeffober@gmail.com>
+<mailto:earthtone.rc@gmail.com>
 
 =head1 LICENSE
 

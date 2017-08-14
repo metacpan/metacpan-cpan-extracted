@@ -8,8 +8,9 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 
 use XML::DT;
 use XML::TMX::Writer;
+use File::BOM qw( open_bom);
 
-$VERSION = '0.31';
+$VERSION = '0.32';
 @ISA = 'Exporter';
 @EXPORT_OK = qw();
 
@@ -68,13 +69,23 @@ sub new {
 sub _guess_encoding {
     my $file = shift;
     my $encoding = 'UTF-8';
-    open my $fh, "<", $file or die "can't open $file";
+    my $enc = open_bom (my $fh, $file, ":utf8"); # or die "can't open $file ($!)";
+    $encoding= $enc  if $enc;
     my $line = <$fh>;
     if ($line =~ /encoding=['"]([^'"]+)['"]/) {
         $encoding = $1;
     }
+    #print STDERR "Debug: defuse.ENC= $enc; enc=$encoding\n";
     close $fh;
     return $encoding;
+}
+
+sub _enc2bin{ my $enc=shift;
+    if($enc =~ /utf.*8/i){
+        $enc = "utf8" 
+    }
+    else {$enc = "encoding($enc)"}
+    return ":$enc";
 }
 
 sub _parse_header {
@@ -82,8 +93,10 @@ sub _parse_header {
 
     my $header = "";
     {
+        my $fh;
         local $/ = "<body>";
-        open my $fh, "<:encoding($self->{encoding})", $self->{filename} or die "$!";
+        open_bom($fh, $self->{filename},_enc2bin($self->{encoding})) ;#  or die "$!";
+        #print STDERR "Debug2: defuse.ENC= $!- ; enc=$self->{encoding}\n";
         $header = <$fh>;
         close $fh;
     }
@@ -352,11 +365,10 @@ sub for_tu {
 
     my $resto = "";
     ## Go through the header...
-    open X, "<encoding($self->{encoding})" ,$self->{filename} or die "cannot open file $self->{filename}\n";
-    while (<X>) {
-        if (/^\xFF\xFE/) {
-            die("UTF16 encoding not supported; try 'iconv -f unicode -t utf8 tmx' before\n");
-        }
+    my $fh;
+    open_bom($fh, $self->{filename},_enc2bin($self->{encoding})) ;#  or die "$!";
+    #print STDERR "Debug2: defuse.ENC= $! ; enc=" ,_enc2bin($self->{encoding}),"\n";
+    while (<$fh>) {
         next if /^\s*$/;
         last if /<body\b/;
     }
@@ -382,7 +394,7 @@ sub for_tu {
     $/ = "</tu>";
     $conf->{-verbose}++ if $conf->{verbose};
     print STDERR "." if $conf->{-verbose};
-    while (<X>) {
+    while (<$fh>) {
         ($_ = $resto . $_ and $resto = "" ) if $resto;
         last if /<\/body>/;
         $i++;
@@ -408,7 +420,7 @@ sub for_tu {
         }
     }
     print STDERR "\r$i\n" if $conf->{-verbose};
-    close X;
+    close $fh;
 
 
     $tmx->end_tmx if $conf->{-header} && $outputingTMX;
@@ -425,23 +437,24 @@ some images, on some specific locations.
 sub to_html {
   my $self = shift;
   my %opt = @_;
+  my @ls=$self->languages;
+  my $html="<table><tr>". join("\n",map{"<td>$_</td>"} @ls) ."</tr>\n";
   $self->for_tu(sub {
-                    my ($langs, $opts) = @_;
-                    my $ret = "<table>";
-                    for (keys %$langs) {
-                        next if /^-/;
-                        $ret .= "<tr><td style=\"vertical-align: top\">";
-                        if ($opt{icons}) {
-                            $ret .= "<img src=\"/icons/flags/".lc($_).".png\" alt=\"$_\"/>"
-                        } else {
-                            $ret .= "$_"
-                        }
-                        $ret .= "</td><td>$langs->{$_}{-seg}</td></tr>\n"
-                    }
-                    $ret .= "<tr><td></td></tr></table>";
-                    $ret;
-                }
-               );
+      my ($langs, $opts) = @_;
+      my $ret = ""; # "<table>";
+      for (@ls) { $ret .= "\n\t<td l='$_'>$langs->{$_}{-seg}</td>"} 
+
+        #if ($opt{icons}) {
+        #                    $ret .= "<img src=\"/icons/flags/".lc($_).".png\" alt=\"$_\"/>"
+        #                } else {
+        #                    $ret .= "$_"
+        #                }
+        #                $ret .= "</td><td>$langs->{$_}{-seg}</td></tr>\n"
+      $html.= "<tr>$ret\n</tr>\n";
+      return ""
+    }
+   );
+   return $html;
 }
 
 sub for_tu2 {
@@ -459,7 +472,7 @@ L<XML::Writer(3)>, TMX Specification L<https://www.gala-global.org/oscarStandard
 
 =head1 AUTHOR
 
-Alberto Simões, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
+Alberto Simoes, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
 
 Paulo Jorge Jesus Silva, E<lt>paulojjs@bragatel.ptE<gt>
 

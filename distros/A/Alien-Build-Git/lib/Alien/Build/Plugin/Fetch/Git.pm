@@ -13,7 +13,7 @@ use File::chdir;
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Alien::Build plugin to fetch from git
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub init
@@ -28,8 +28,8 @@ sub init
 
       $url ||= $build->meta_prop->{start_url};
       die "no default URL provided!" unless defined $url;
-      
-      if($url =~ /^[a-zA-Z0-9]+:/)
+
+      if($url =~ /^[a-zA-Z0-9]+:/ && !( $url =~ /^[A-Z]:/i && $^O eq 'MSWin32' ))
       {
         $url = URI->new($url);
       }
@@ -144,7 +144,7 @@ Alien::Build::Plugin::Fetch::Git - Alien::Build plugin to fetch from git
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

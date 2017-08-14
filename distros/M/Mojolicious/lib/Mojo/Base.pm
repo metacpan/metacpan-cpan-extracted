@@ -11,6 +11,10 @@ use Carp ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
+# Role support requires Role::Tiny 2.000001+
+use constant ROLES =>
+  !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
+
 # Supported on Perl 5.22+
 my $NAME
   = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
@@ -101,6 +105,11 @@ sub tap {
   return $self;
 }
 
+sub with_roles {
+  return Role::Tiny->create_class_with_roles(@_) if ROLES;
+  Carp::croak 'Role::Tiny 2.000001+ is required for roles';
+}
+
 1;
 
 =encoding utf8
@@ -158,7 +167,6 @@ All three forms save a lot of typing.
   use utf8;
   use feature ':5.10';
   use IO::Handle ();
-  use Mojo::Base;
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
@@ -170,7 +178,6 @@ All three forms save a lot of typing.
   use IO::Handle ();
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
-  use Mojo::Base;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
 =head1 FUNCTIONS
@@ -237,6 +244,18 @@ spliced or tapped into) a chained set of object method calls.
 
   # Inject side effects into a method chain
   $object->foo('A')->tap(sub { say $_->foo })->foo('B');
+
+=head2 with_roles
+
+  my $new_class = SubClass->with_roles('Foo::Role1', 'Bar::Role2');
+
+Create and return a new class that extends the given class with one or more
+L<Role::Tiny> roles. Note that role support depends on L<Role::Tiny>
+(2.000001+).
+
+  # Create a new class with roles and instantiate it
+  my $new_class = SubClass->with_roles('Foo::Role1', 'Foo::Role2');
+  my $object    = $new_class->new;
 
 =head1 SEE ALSO
 

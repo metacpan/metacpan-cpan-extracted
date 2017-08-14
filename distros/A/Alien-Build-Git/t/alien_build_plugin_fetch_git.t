@@ -5,7 +5,7 @@ use lib 't/lib';
 use Repo;
 use Capture::Tiny qw( capture_merged );
 use Path::Tiny qw( path );
-use Test2::Tools::URL;
+use Test2::Tools::URL 0.02;
 
 my $build = alienfile_ok q{
   use alienfile;
@@ -62,20 +62,6 @@ subtest 'fetch without tag' => sub {
   is $error, '';
   diag $out if $error;
 
-  my $url_check = Test2::Compare::Custom->new(
-    name => 'UrlCheck',
-    code => sub {
-      # this seems to be different from the
-      # documentation?
-      my %args = @_;
-      my $url = URI->new($args{got});
-      return 0 unless $url->scheme eq 'file'
-      &&              $url->host   eq 'localhost'
-      &&              $url->path   eq $example1;
-      1;
-    },
-  );
-
   is(
     $ret,
     hash {
@@ -111,7 +97,10 @@ subtest 'fetch without tag' => sub {
         end;
       };
     },
-  );
+  ) || do {
+    require Data::Dumper;
+    diag Data::Dumper::Dumper($ret);
+  };
 };
 
 done_testing

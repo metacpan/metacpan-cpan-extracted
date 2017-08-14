@@ -1,5 +1,5 @@
 package Text::Password::MD5;
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Moose;
 extends 'Text::Password::CoreCrypt';
@@ -37,7 +37,7 @@ No arguments are required. But you can set some parameters.
 
 =item default
 
-You can set default length with param 'default' like below
+You can set default length with param 'default' like below:
 
  $pwd = Text::Pasword::AutoMiglation->new( default => 12 );
 
@@ -45,9 +45,9 @@ You can set default length with param 'default' like below
 
 Or you can set default strength for password with param 'readablity'.
 
-It must be a Boolen, default is 1.
+It must be a boolean, default is 1.
 
-If it was set as 0, you can generate stronger passwords with generate()
+If it was set as 0, you can generate stronger passwords with generate().
 
  $pwd = Text::Pasword::AutoMiglation->new( readability => 0 );
  
@@ -57,7 +57,7 @@ If it was set as 0, you can generate stronger passwords with generate()
 
 =head3 verify( $raw, $hash )
 
-returns true if the verify is success
+returns true if the verification succeeds.
 
 =cut
 
@@ -76,15 +76,15 @@ override 'verify' => sub {
 
 =head3 nonce($length)
 
-generates the strings with enough strength
+generates the strings with enough strength.
 
-the length defaults to 8($self->default)
+the length defaults to 8($self->default).
 
 =head3 encrypt($raw)
 
-returns hash with unix_md5_crypt()
+returns hash with unix_md5_crypt().
 
-salt will be made automatically
+salt will be made automatically.
 
 =cut
 
@@ -105,12 +105,12 @@ override 'encrypt' => sub {
 
 =head3 generate($length)
 
-genarates pair of new password and it's hash
+genarates pair of new password and it's hash.
 
-not much readable characters(0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`) are fallen
+less readable characters(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`) are forbidden
 unless $self->readability is 0.
 
-the length defaults to 8($self->default)
+the length defaults to 8($self->default).
  
 =cut
 

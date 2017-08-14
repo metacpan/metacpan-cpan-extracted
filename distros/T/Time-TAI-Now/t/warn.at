@@ -1,0 +1,23 @@
+use warnings;
+use strict;
+
+use Test::More tests => 13;
+
+BEGIN {
+	use_ok "Time::TAI::Now",
+		qw(now_tai_rat now_tai_gsna now_tai_flt now_tai_dec);
+}
+
+BEGIN { $SIG{__WARN__} = sub { die "WARNING: $_[0]" }; }
+
+foreach my $now_tai
+		(\&now_tai_rat, \&now_tai_gsna, \&now_tai_flt, \&now_tai_dec) {
+	$now_tai->();
+	ok 1;
+	$now_tai->(0);
+	ok 1;
+	$now_tai->(undef);
+	ok 1;
+}
+
+1;

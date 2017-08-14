@@ -1,0 +1,11 @@
+Changes
+lib/Regexp/Functions/chmod_et_al.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001-load.t
+t/002-chmod-et-al.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

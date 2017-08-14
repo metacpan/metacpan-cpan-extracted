@@ -1,4 +1,4 @@
--- ->fill should do the right thing when the current element is ol, ul, etc.
+-- ->fill should do the right thing when the current element is DL etc.
 -- when doing ->select and there's only one optgroup do the right thing
 -- table helpers ???
 -- review docs especially the form docs.
@@ -20,26 +20,8 @@
       <tag class=[$.set_class] />  ==> sub { my ($self, $tag_dom) = @_; return 'class' }
 
 
---
-## Need to cope with the loop...
-## could solve with a subtemplate or dom->adopt
-
-my $component_handler_registry = Template::Lace::ComponentHandlerRegistry->new;
-
-$component_handler_registry
-  ->add(Template::Lace::ComponentHandler::CodeRef->new(
-      code=>sub { my ($self, $dom, $attrs) = @_; ... });
-
-my $user_template_factory = Template::Lace::Factory->new(
-  class=>'MyApp::Template::User',
-  component_handlers=>$component_handler_registry);
-    
-
-  my $registry = Template::Lace::Registry->new(
-    component_handlers
-
-  my $template_factory = Template::Lace::Factory
-
+---
+### Annotations example
 
   package MyApp::DisplayModel::User;
 
@@ -87,12 +69,6 @@ Ok now if we move components to the DOM we can support
 ->attach
 
 ==== END
-
-=== Form ideas
--- fill and smart_content for matching input[name= same as class and id.
-  ?this maybe is overloading fill to much perhaps a ->fill_form would be
-  better.
-letting a template 'reach into' a component
 
 <Lace-Status.show>
 <p>
@@ -161,6 +137,20 @@ sub process_dom {
   );
 }
 
+  my ($self, $dom) = @_;
+  $dom->bind('links',
+    add_task => { action=>$self->uri('add') },
+    clear_completed => { action=>$self->uri('clear_completed') },
+    show_all => $self->build_summary_url('all'),
+    show_active => $self->build_summary_url('active'),
+    show_completed => $self->build_summary_url('completed'),
+  )->bind('todos',
+    active_count => $self->active_task_count,
+    set => sub { $self->list_todos($_) },
+  );
+}
+
+
 sub build_summary_url {
   my ($self, $set) = @_;
   return +{
@@ -196,7 +186,6 @@ sub mark_completed {
 
 
 =======
-
 
 <section id="todos">
   <lace-todos.count>
@@ -236,6 +225,9 @@ sub list_todos {
 
 =======
 
+## The idea here is to locallzie $_ to self and %_ to 'by'
+## for easier??
+
 <section id="todos">
     <p data-lace='$.info>
       Hi there <span data-person='name'>
@@ -268,6 +260,7 @@ sub list_todos {
 }
 
 ---
+
 <li class=[.listclass]>
   ...
 </li>
@@ -278,18 +271,7 @@ sub listclass {
   return $self->completed ? 'completed : undef;
 }
 
-##===
-
-Placeholders
-<lace:person>Example</lace:person>
-
-
-<ui-checkbox label=(
-  <label>asdsd</label>
-  ) />
-
-
----
+===
 
 sub template {qq[
   <ol>
@@ -317,59 +299,19 @@ sub process_dom {
     for @{$self->tasks};
 }
 
-----
-
-sub template {qq[
-  <ol>
-    <view-todo task=@.tasks />
-  </ol>
-]}
-
-sub process_dom {
-  my ($self, $dom) = @_;
-}
-
--------
-<$.fill_user>
-  <dl>
-    <dt>Name</dt>
-    <dd lace='name'>Jo Smith</dd>
-    <dt>Age</dt>
-    <dd lace='age'>24</dd>
-  </dl>
-</$.fill_user>
-
-sub fill_user {
-  my ($self, $data) = @_;
-  $data->name($self->name);
-  $data->age($self->age);
-}
-
 --------
 
 <ul lace-method="$.display_links"
     class="nav navbar-nav navbar-right">
   <li><a lace='link_title'
-      lace@href='href'
-      lace@class='is_active'>
-    Link
-  </a></li>
-</ul>
-
-sub display_links {
-  my ($self, $dom) = @_;
-  $dom->repeat(sub {
-    my ($dom, $link, $index) = @_;
-    $dom->data
-      ->link_title($link->title)
-      ->href($link->uri)
-      ->class({'active', $self->active_link eq $link->{id}});
     return $dom;
   }, $self->links);
 }
 
 ----------
-        
+-- EXAMPLE that lets template author set a context
+----------
+
 <ul @repeat="$.links" lace-method="$.display_links"
     class="nav navbar-nav navbar-right">
   <li><a lace='link_title'
@@ -379,70 +321,101 @@ sub display_links {
   </a></li>
 </ul>
 
-sub display_links {
-  my ($self, $data) = @_;
-  $data->repeat(sub {
-    my ($datum, $link, $index) = @_;
-    $datum->content($link->title)
-      ->href($link->uri)
-      ->class({'active', $self->active_link eq $link->{id}});
-    return $datum;
-  }, $self->links);
-}
+-- Should the render 'at' methods retunr the DOM or do they 
+-- get to just modify it inline like 'process_fdom'..?
 
-<section lace-render='$.render_links'>
-  <p lace-data='title'></p>
+<$.render_links linkbase='/foo'>
+  <section>
+    <p><lace:title/></p>
+    <ul>
+      <li>
+        <lace:links>
+          <a lace@href='link'>
+            <lace:description/>
+          </a>
+        </lace:links>
+      </li>
+    </ul>
+  </section>
+</$.render_links>
+
+<section lace-do='$.render_links?linkbase=/foo'>
+  <p lace='title'></p>
   <ul>
-    <li lace-data='links'>
-      <a lace-data='description'
-          lace-data@href='link'>
+    <li lace='links'>
+      <a lace='description'
+          lace@href='link'>
         Link Link
       </a>
     </li>
   </ul>
-<section>
-
-
+</section>
 
 sub render_links {
-  my ($self, $dom) = @_;
-  $dom->data
-    ->title('Hello')
-    ->links( sub {
-        my ($self, $dom) = @_;
-        $dom->repeat( sub {
-          my ($li, $link) = @_;
-          $li->data
-            ->description($link->description)
-            ->link($link->url);
-          return $li;
-        }, $self->links);
-      });
+  my ($self, $dom, %args) = @_;
+  $dom->by
+    ->title('Hello World')
+    ->links(sub {
+      my ($li) = @_;
+      $li->repeat(sub {
+        my ($cloned_li$, $link) = @_;
+        $cloned_li->by
+          ->description($link->description)
+          ->link($link->url($arg{linkbase}));
+        return $cloned_li;
+      }, $self->links);
+      return $li;
+    });
 }
 
-  $dom->data
-    ->title('Hello')
-    ->links
-    ->repeat(sub {
-      my ($li, $link) = @_;
-      $li->data
-        ->description($link->description)
-        ->link($link->url);
-        return $li;
-    })
-    
-  $dom->data
-    ->title('Hello')
-    ->links
-    ->repeat($self->curry::render_link)
-    ->then
-    ->more...
+sub render_links {
+  my ($self, $dom, %args) = @_;
+  $dom->by
+    ->title('Hello World')
+    ->repeat::links($self->curry::render_link, $self->links);
+
+    ->links(sub { $_->repeat($self->curry::render_link, $self->links) })
+
+  $dom->for('#links', sub {
+    $_->repeat($self->curry::render_link, $self->links);
+  })
+
+  $dom->repeat::for('#links', $self->curry::render_link, $self->links)
+
+}
 
 sub render_link {
-  my (self, $li, $link) = @_;
-  $li->data
+  my ($self, $li, $link) = @_;
+  return $li->by
     ->description($link->description)
-    ->link($link->url);
-  return $li;
+    ->link($link->url($arg{linkbase}));
 }
 
+sub render_links {
+  my ($self, $dom, %args) = @_;
+  $dom->fill({
+    title => 'Hello World',
+    links => sub { shift->repeat(self->curry::render_link($arg{linkbase}), $self->links) },
+  });
+}
+
+sub render_link {
+  my ($self, $li, $base, $link) = @_;
+  $li->fill({
+    description => $link->description,
+    link => sub { shift->attr(href=> $link->url($base)),
+  });
+}
+
+
+
+      $dom->at('#links')->repeat(sub {
+        my ($cloned_li$, $link) = @_;
+        $cloned_li->by
+          ->description($link->description)
+          ->link($link->url($arg{linkbase}));
+        return $cloned_li;
+      }, $self->links);
+
+
+      $dom->repeat_for('#links', sub { ... }, $self->links); 

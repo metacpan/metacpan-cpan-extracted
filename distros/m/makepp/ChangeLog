@@ -1,3 +1,15 @@
+2017-08-11  trobador  <occitan@esperanto.org>
+
+Version 2.1rc1 makepp-2.1rc1.tgz, technically 2.0.99.1 on sourceforge & CPAN.
+
+	* Mpp/Text.pm:
+	* makepp.spec:
+	* META.yml: New version
+
+	* t/run_tests.pl (slow_rmtree): Could remain in wrong dir.
+	* t/additional_tests/2004_12_20_errors.test: Deal with Win path.
+	* t/additional_tests/2008_05_21_install.test: Exit in correct dir.
+
 2017-08-05  trobador  <occitan@esperanto.org>
 
 	* Mpp/Event.pm: Work around Docker's zombie reaper problem.
@@ -97,7 +109,7 @@
 
 2014-06-10  DP  <occitan@esperanto.org>
 
-snapshot 2.0.98.5
+Snapshot 2.0.98.5
 
 	* Mpp/Cmds.pm: Eliminate new 5.20 warning, that CPAN counts as failed test.
 	(c_template): New macro @include(filename)@.
@@ -126,7 +138,7 @@ snapshot 2.0.98.5
 
 2013-10-13  DP  <occitan@esperanto.org>
 
-snapshot 2.0.98.4
+Snapshot 2.0.98.4
 
 	* config.pl
 	* t/run_all.t
@@ -211,7 +223,7 @@ snapshot 2.0.98.4
 
 2013-03-05  DP  <occitan@esperanto.org>
 
-snapshot 2.0.98.3
+Snapshot 2.0.98.3
 
 2013-03-04  DP  <occitan@esperanto.org>
 
@@ -293,7 +305,7 @@ snapshot 2.0.98.3
 
 2012-10-25  DP  <occitan@esperanto.org>
 
-snapshot 2.0.98.2
+Snapshot 2.0.98.2
 
 	* Mpp/Text.pm: Handle new version scheme.
 
@@ -313,7 +325,7 @@ snapshot 2.0.98.2
 
 2012-10-14  DP  <occitan@esperanto.org>
 
-snapshot 2.0.98.1
+Snapshot 2.0.98.1
 
 	* Mpp/Repository.pm: Cope with rule producing symlink in repository.
 

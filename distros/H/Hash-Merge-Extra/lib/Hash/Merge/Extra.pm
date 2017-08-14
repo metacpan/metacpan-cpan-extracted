@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use Hash::Merge qw(_merge_hashes);
 
-our $VERSION = '0.02'; # Don't forget to change in pod below
+our $VERSION = '0.03'; # Don't forget to change in pod below
 
 use constant L_ADDITIVE => {
     'SCALAR' => {
@@ -147,14 +147,14 @@ Hash::Merge::Extra - Collection of extra behaviors for L<Hash::Merge>
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
     use Hash::Merge qw(merge);
     use Hash::Merge::Extra;
 
-    Hash::Merge::specify_behavior(R_OVERRIDE);
+    Hash::Merge::set_behavior('R_OVERRIDE');
 
     $result = merge($left, $right);
 
@@ -178,19 +178,28 @@ Only specified behaviors registered if list defined:
 
 =over 4
 
-=item L_ADDITIVE, R_ADDITIVE
+=item B<L_ADDITIVE>, B<R_ADDITIVE>
 
-Hashes merged, arrays joined, scalars overrided if undefined. Left and right precedence.
+Hashes merged, arrays joined, undefined scalars overrided. Left and right precedence.
 
-=item L_OVERRIDE, R_OVERRIDE
+=item B<L_OVERRIDE>, B<R_OVERRIDE>
 
-Merge hashes, override arrays and scalars. Left and right precedence.
+Hashes merged, arrays and scalars overrided. Left and right precedence.
 
-=item L_REPLACE, R_REPLACE
+=item B<L_REPLACE>, B<R_REPLACE>
 
-Don't merge, simply replace one thing by another. Left and right precedence.
+Nothing merged. One thing simply replaced by another. Left and right precedence.
 
 =back
+
+=head1 AUTHOR
+
+Michael Samoglyadov, C<< <mixas at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+L<https://github.com/mr-mixas/Hash-Merge-Extra.pm/issues>
 
 =head1 SEE ALSO
 

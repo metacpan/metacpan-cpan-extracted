@@ -3,19 +3,17 @@ abstract: 'hoedown for Perl5'
 author:
   - 'tokuhirom <tokuhirom@gmail.com>'
 build_requires:
-  Test::More: 0.98
+  Test::More: '0.98'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  ExtUtils::ParseXS: 3.22
-  File::pushd: 0
-  Module::Build: 0.38
+  ExtUtils::ParseXS: '3.22'
+  File::pushd: '0'
+  Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v0.8.4, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-Markdown-Hoedown
 no_index:
   directory:
@@ -28,16 +26,16 @@ no_index:
 provides:
   Text::Markdown::Hoedown:
     file: lib/Text/Markdown/Hoedown.pm
-    version: 1.01
+    version: '1.02'
 requires:
-  Exporter: 0
-  parent: 0
-  perl: 5.008005
+  Exporter: '0'
+  parent: '0'
+  perl: '5.008005'
 resources:
   bugtracker: https://github.com/tokuhirom/Text-Markdown-Hoedown/issues
   homepage: https://github.com/tokuhirom/Text-Markdown-Hoedown
   repository: git://github.com/tokuhirom/Text-Markdown-Hoedown.git
-version: 1.01
+version: '1.02'
 x_contributors:
   - 'Ben Noordhuis <info@bnoordhuis.nl>'
   - 'Bruno Michel <bruno.michel@af83.com>'
@@ -63,7 +61,7 @@ x_contributors:
   - 'andrius bentkus <andrius.bentkus@gmail.com>'
   - 'Chris <ckolumbus@gmx.de>'
   - 'Vicent Marti <tanoku@gmail.com>'
-  - 'Vicent MartÃ­ <vicent@github.com>'
+  - 'Vicent Martí <vicent@github.com>'
   - 'Mike Buland <mike@xagasoft.com>'
   - 'Ben Dolman <ben.dolman@gmail.com>'
   - 'Balazs Nagy <julsevern@gmail.com>'
@@ -82,3 +80,5 @@ x_contributors:
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Xavier Mendez <jmendeth@gmail.com>'
   - 'Devin Torres <devin@devintorr.es>'
+  - 'Taeril <taeril@kraina.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

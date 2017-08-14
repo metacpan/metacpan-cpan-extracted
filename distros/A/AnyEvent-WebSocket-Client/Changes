@@ -1,5 +1,19 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.41      2017-08-11 14:05:40 -0400
+  - Production version functionally identical to the 0.40_03 release.  
+
+0.40_03   2017-08-10 14:53:41 -0400
+  - Possible workaround for Perl 5.8.x bug (gh#19)
+
+0.40_02   2017-08-10 12:39:28 -0400
+  - Fix testing testing failure introduced in 0.40_01
+
+0.40_01   2017-08-06 22:59:50 -0400
+  - Add close_code, close_reason and close_error properties to AnyEvent::Connection
+  - Significant refactor of the test suite that reduces dependencies on Mojolicious
+  - Migrate to MakeMaker for installer
+
 0.39      2017-07-07 18:32:02 -0400
   - Require AnyEvent 7.13 or better to address SSL/TLS error (gh#22)
   - Updated example to use Mojo::Redis2 and modern Mojolicious (Kivanc Yazan gh#29)

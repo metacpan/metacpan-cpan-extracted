@@ -1,5 +1,8 @@
 Revision history for Perl extension Udev-FFI
 
+0.098000 2017-08-10T13:02:22Z
+    - fix udev monitor poll behavior
+
 0.097003 2017-08-07T12:32:42Z
     - update depends in cpanfile
     - add examples to SYNOPSIS

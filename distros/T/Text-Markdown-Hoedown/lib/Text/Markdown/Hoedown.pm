@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw(Exporter);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our @EXPORT = qw(
     markdown
@@ -109,40 +109,90 @@ Nesting levels for TOC generation.
 This is bit flag.  You can use the flags by '|' operator.
 Values are following:
 
-    enum hoedown_extensions {
-        HOEDOWN_EXT_NO_INTRA_EMPHASIS = (1 << 0),
-        HOEDOWN_EXT_TABLES = (1 << 1),
-        HOEDOWN_EXT_FENCED_CODE = (1 << 2),
-        HOEDOWN_EXT_AUTOLINK = (1 << 3),
-        HOEDOWN_EXT_STRIKETHROUGH = (1 << 4),
-        HOEDOWN_EXT_UNDERLINE = (1 << 5),
-        HOEDOWN_EXT_SPACE_HEADERS = (1 << 6),
-        HOEDOWN_EXT_SUPERSCRIPT = (1 << 7),
-        HOEDOWN_EXT_LAX_SPACING = (1 << 8),
-        HOEDOWN_EXT_DISABLE_INDENTED_CODE = (1 << 9),
-        HOEDOWN_EXT_HIGHLIGHT = (1 << 10),
-        HOEDOWN_EXT_FOOTNOTES = (1 << 11),
-        HOEDOWN_EXT_QUOTE = (1 << 12)
-    };
+=over 4
+
+=item HOEDOWN_EXT_TABLES
+
+Parse PHP-Markdown style tables.
+
+=item HOEDOWN_EXT_FENCED_CODE
+
+Parse fenced code blocks.
+
+=item HOEDOWN_EXT_FOOTNOTES
+
+Parse footnotes.
+
+=item HOEDOWN_EXT_AUTOLINK
+
+Automatically turn safe URLs into links.
+
+=item HOEDOWN_EXT_STRIKETHROUGH
+
+Parse ~~stikethrough~~ spans.
+
+=item HOEDOWN_EXT_UNDERLINE
+
+Parse _underline_ instead of emphasis.
+
+=item HOEDOWN_EXT_HIGHLIGHT
+
+Parse ==highlight== spans.
+
+=item HOEDOWN_EXT_QUOTE
+
+Render "quotes" as E<lt>qE<gt>quotesE<lt>/qE<gt>.
+
+=item HOEDOWN_EXT_SUPERSCRIPT
+
+Parse super^script.
+
+=item HOEDOWN_EXT_MATH
+
+Parse TeX $$math$$ syntax, Kramdown style.
+
+=item HOEDOWN_EXT_NO_INTRA_EMPHASIS
+
+Disable emphasis_between_words.
+
+=item HOEDOWN_EXT_SPACE_HEADERS
+
+Require a space after '#' in headers.
+
+=item HOEDOWN_EXT_MATH_EXPLICIT
+
+Instead of guessing by context, parse $inline math$ and $$always block math$$ (requires HOEDOWN_EXT_MATH).
+
+=item HOEDOWN_EXT_DISABLE_INDENTED_CODE
+
+Don't parse indented code blocks.
+
+=back
 
 =item html_options
 
 This is bit flag.  You can use the flags by '|' operator.
 Values are following:
 
-    typedef enum {
-        HOEDOWN_HTML_SKIP_HTML = (1 << 0),
-        HOEDOWN_HTML_SKIP_STYLE = (1 << 1),
-        HOEDOWN_HTML_SKIP_IMAGES = (1 << 2),
-        HOEDOWN_HTML_SKIP_LINKS = (1 << 3),
-        HOEDOWN_HTML_EXPAND_TABS = (1 << 4),
-        HOEDOWN_HTML_SAFELINK = (1 << 5),
-        HOEDOWN_HTML_TOC = (1 << 6),
-        HOEDOWN_HTML_HARD_WRAP = (1 << 7),
-        HOEDOWN_HTML_USE_XHTML = (1 << 8),
-        HOEDOWN_HTML_ESCAPE = (1 << 9),
-        HOEDOWN_HTML_PRETTIFY = (1 << 10)
-    } hoedown_html_render_mode;
+=over 4
+
+=item HOEDOWN_HTML_SKIP_HTML
+
+Strip all HTML tags.
+
+=item HOEDOWN_HTML_ESCAPE
+
+Escape all HTML.
+
+=item HOEDOWN_HTML_HARD_WRAP
+
+Render each linebreak as E<lt>brE<gt>.
+
+=item HOEDOWN_HTML_USE_XHTML
+
+Render XHTML.
+
+=back
 
 =item max_nesting
 

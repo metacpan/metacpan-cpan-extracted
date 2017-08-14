@@ -237,6 +237,11 @@ OTHER MODULES
     catching. If the language is to provide such a facility, it should be
     more universally applicable as a stand-alone independent ability.
 
+ACKNOWLEDGEMENTS
+
+    With thanks to Zefram, ilmari and others from irc.perl.org/#p5p for
+    assisting with trickier bits of XS logic.
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

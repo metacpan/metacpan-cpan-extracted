@@ -1,5 +1,10 @@
 Revision history for Math-Utils
 
+1.11
+	11 Aug 2017
+	- Stupidly depended on Module::Start's boilerplate text for the
+	  license, which points to a differently worded license text
+	  from what I've got in the LICENSE file. Changed that.
 1.10
 	10 May 2017
 	- Extended pl_evaluate() to allow lists of values for the X terms.

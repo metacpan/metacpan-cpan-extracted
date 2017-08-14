@@ -1,8 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 package Net::Server::Test;
 use strict;
-use POSIX qw(tmpnam);
+use File::Temp qw(tempdir);
+use File::Spec::Functions qw(catfile);
 use English qw($UID $GID);
 use FindBin qw($Bin);
 use lib $Bin;
@@ -22,7 +23,8 @@ sub accept {
     return shift->SUPER::accept(@_);
 }
 
-my $socket_file = tmpnam; # must do before fork
+my $socket_dir = tempdir(CLEANUP => 1);
+my $socket_file = catfile($socket_dir, 'socket'); # must do before fork
 my $ok = eval {
     local $SIG{'ALRM'} = sub { die "Timeout\n" };
     alarm $env->{'timeout'};

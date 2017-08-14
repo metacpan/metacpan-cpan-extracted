@@ -2,7 +2,7 @@ package App::Toodledo;
 use strict;
 use warnings;
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 BEGIN { $PPI::XS_DISABLE = 1 }  # PPI::XS throws deprecation warnings in 5.16
 

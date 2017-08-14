@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -653,6 +653,18 @@ simply 1.  (The only term in k*F^2 is the (2*k-1)*F(k+3)^2.)
 # my(k=10000); Wfull(k)/DiameterFull(k) / binomial(Nfull(k),2)*1.0
 
 =pod
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for graphs here include
+
+=over
+
+=item height=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21059>
+
+=item height=6, C<series_reduced> L<https://hog.grinvin.org/ViewGraphInfo.action?id=21048>
+
+=back
 
 =head1 OEIS
 

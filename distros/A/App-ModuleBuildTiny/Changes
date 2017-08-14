@@ -1,5 +1,9 @@
 Revision history for App-ModuleBuildTiny
 
+0.022
+          - Add check for metadata
+          - Fix missed functions in move to Dist.pm
+
 0.021
           - Fix tarball directory name
 

@@ -1,9 +1,6 @@
 package Data::DynamicValidator::Error;
-{
-  $Data::DynamicValidator::Error::VERSION = '0.03';
-}
 # ABSTRACT: Class holds validation error: reason and location
-
+$Data::DynamicValidator::Error::VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -42,7 +39,7 @@ Data::DynamicValidator::Error - Class holds validation error: reason and locatio
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 METHODS
 
@@ -64,7 +61,7 @@ Ivan Baidakou <dmol@gmx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ivan Baidakou.
+This software is copyright (c) 2017 by Ivan Baidakou.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

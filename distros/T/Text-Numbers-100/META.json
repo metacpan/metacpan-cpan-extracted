@@ -21,14 +21,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0"
+            "Carp" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Text::Numbers::100" : {
          "file" : "lib/Text/Numbers/100.pm",
-         "version" : "2017.225"
+         "version" : "20170808"
       }
    },
    "release_status" : "stable",
@@ -37,5 +38,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.225"
+   "version" : "20170808"
 }

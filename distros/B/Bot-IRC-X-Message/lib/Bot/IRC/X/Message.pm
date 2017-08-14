@@ -1,13 +1,14 @@
 package Bot::IRC::X::Message;
 # ABSTRACT: Bot::IRC plugin for leaving messages for nicks
 
+use 5.012;
 use strict;
 use warnings;
 
 use DateTime;
 use DateTime::Format::Human::Duration;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -16,7 +17,7 @@ sub init {
     $bot->hook(
         {
             to_me => 1,
-            text  => qr/^message\s+(?<nick>\S+)\s+(?<msg>.+)\s*/,
+            text  => qr/^(?:message|tell|ask)\s+(?<nick>\S+)\s+(?<msg>.+)\s*/,
         },
         sub {
             my ( $bot, $in, $m ) = @_;
@@ -80,7 +81,7 @@ Bot::IRC::X::Message - Bot::IRC plugin for leaving messages for nicks
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Message.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Message)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Message/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Message)
@@ -156,7 +157,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is copyright (c) 2017 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

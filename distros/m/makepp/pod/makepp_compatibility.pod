@@ -2,7 +2,7 @@
 
 makepp_compatibility -- Compatibility list for makepp
 
-=for vc $Id: makepp_compatibility.pod,v 1.43 2015/08/09 16:24:51 pfeiffer Exp $
+=for vc $Id: makepp_compatibility.pod,v 1.44 2017/08/06 21:19:20 pfeiffer Exp $
 
 =head1 DESCRIPTION
 

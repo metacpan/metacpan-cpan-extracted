@@ -8,28 +8,43 @@ author/generate.pl
 author/tmpl/Callbacks.pod
 builder/MyBuilder.pm
 cpanfile
+lib/Text/Markdown/Hoedown.pm
+lib/Text/Markdown/Hoedown.xs
+lib/Text/Markdown/Hoedown/Callbacks.pod
+lib/Text/Markdown/Hoedown/Markdown.pod
+lib/Text/Markdown/gen.callback.c
+lib/Text/Markdown/gen.callback.inc
+lib/Text/Markdown/ppport.h
+minil.toml
+t/00_compile.t
+t/01_simple.t
+t/02_toc.t
+t/03_custom.t
 hoedown/LICENSE
 hoedown/Makefile
 hoedown/Makefile.win
 hoedown/README.md
-hoedown/examples/hoedown.c
-hoedown/examples/smartypants.c
+hoedown/bin/common.h
+hoedown/bin/hoedown.c
+hoedown/bin/smartypants.c
 hoedown/hoedown.def
 hoedown/html_block_names.gperf
 hoedown/src/autolink.c
 hoedown/src/autolink.h
 hoedown/src/buffer.c
 hoedown/src/buffer.h
+hoedown/src/document.c
+hoedown/src/document.h
 hoedown/src/escape.c
 hoedown/src/escape.h
 hoedown/src/html.c
 hoedown/src/html.h
 hoedown/src/html_blocks.c
 hoedown/src/html_smartypants.c
-hoedown/src/markdown.c
-hoedown/src/markdown.h
 hoedown/src/stack.c
 hoedown/src/stack.h
+hoedown/src/version.c
+hoedown/src/version.h
 hoedown/test/MarkdownTest_1.0.3/MarkdownTest.pl
 hoedown/test/MarkdownTest_1.0.3/Tests/Amps and angle encoding.html
 hoedown/test/MarkdownTest_1.0.3/Tests/Amps and angle encoding.text
@@ -75,17 +90,21 @@ hoedown/test/MarkdownTest_1.0.3/Tests/Tabs.html
 hoedown/test/MarkdownTest_1.0.3/Tests/Tabs.text
 hoedown/test/MarkdownTest_1.0.3/Tests/Tidyness.html
 hoedown/test/MarkdownTest_1.0.3/Tests/Tidyness.text
-lib/Text/Markdown/Hoedown.pm
-lib/Text/Markdown/Hoedown.xs
-lib/Text/Markdown/Hoedown/Callbacks.pod
-lib/Text/Markdown/Hoedown/Markdown.pod
-lib/Text/Markdown/gen.callback.c
-lib/Text/Markdown/gen.callback.inc
-lib/Text/Markdown/ppport.h
-minil.toml
-t/00_compile.t
-t/01_simple.t
-t/02_toc.t
-t/03_custom.t
+hoedown/test/Tests/CommentsInMiddleOfLine.html
+hoedown/test/Tests/CommentsInMiddleOfLine.text
+hoedown/test/Tests/Escape character.html
+hoedown/test/Tests/Escape character.text
+hoedown/test/Tests/Formatting in Table of Contents.html
+hoedown/test/Tests/Formatting in Table of Contents.text
+hoedown/test/Tests/Images.html
+hoedown/test/Tests/Images.text
+hoedown/test/Tests/Math.html
+hoedown/test/Tests/Math.text
+hoedown/test/Tests/Table.html
+hoedown/test/Tests/Table.text
+hoedown/test/Tests/Underline.html
+hoedown/test/Tests/Underline.text
+hoedown/test/config.json
+hoedown/test/runner.py
 META.yml
 MANIFEST

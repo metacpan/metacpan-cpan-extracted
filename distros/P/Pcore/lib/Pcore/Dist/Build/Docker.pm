@@ -1,6 +1,7 @@
 package Pcore::Dist::Build::Docker;
 
 use Pcore -class, -ansi;
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'] );
 has dockerhub_api => ( is => 'lazy', isa => InstanceOf ['Pcore::API::DockerHub'], init_arg => undef );
@@ -508,14 +509,20 @@ sub create_tag ( $self, $tag_name, $source_name, $source_type, $dockerfile_locat
     return $res;
 }
 
-sub remove_tag ( $self, $tag ) {
-    print qq[Removing tag "$tag" ... ];
+sub remove_tag ( $self, $tags ) {
+    my $results;
 
-    my $res = $self->dockerhub_api->unlink_tag( $self->dist->docker->{repo_id}, $tag );
+    for my $tag ( is_plain_arrayref $tags ? $tags->@* : $tags ) {
+        print qq[Removing tag "$tag" ... ];
 
-    say $res;
+        my $res = $self->dockerhub_api->unlink_tag( $self->dist->docker->{repo_id}, $tag );
 
-    return $res;
+        $results->{$tag} = $res;
+
+        say $res;
+    }
+
+    return $results;
 }
 
 sub trigger_build ( $self, $tag ) {
@@ -535,15 +542,15 @@ sub trigger_build ( $self, $tag ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 22                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 23                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 117                  | * Subroutine "status" with high complexity score (25)                                                          |
-## |      | 301                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 118                  | * Subroutine "status" with high complexity score (25)                                                          |
+## |      | 302                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 486                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 487                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 270, 349, 479        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 271, 350, 480        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

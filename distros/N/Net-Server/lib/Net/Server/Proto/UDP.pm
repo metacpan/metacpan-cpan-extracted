@@ -2,13 +2,9 @@
 #
 #  Net::Server::Proto::UDP - Net::Server Protocol module
 #
-#  $Id$
+#  Copyright (C) 2001-2017
 #
-#  Copyright (C) 2001-2012
-#
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  Modified 2005 by Timothy Watt
 #    Added ability to deal with broadcast packets.

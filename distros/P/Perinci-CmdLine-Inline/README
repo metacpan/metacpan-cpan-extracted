@@ -1,62 +1,343 @@
-SYNOPSIS
+NAME
+    Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
+VERSION
+    This document describes version 0.540 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2017-08-12.
+
+SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
-    
+
      % ./gen-array
      ERROR 400: Missing required argument(s): len
-    
+
      % ./gen-array --help
      ... help message printed ...
-    
+
      % ./gen-array 3
      2
      3
      1
-    
+
      % ./gen-array 3 --json
      [200,"OK",[3,1,2],{}]
 
 DESCRIPTION
-
 COMPILATION DATA KEYS
+    A hash structure, $cd, is constructed and passed around between routines
+    during the generation process. It contains the following keys:
 
-    A hash structure, $cd, is constructed and passed around between
-    routines during the generation process. It contains the following keys:
+    *   module_srcs => hash
 
-      * module_srcs => hash
+        Generated script's module source codes. To reduce startup overhead
+        and dependency, these modules' source codes are included in the
+        generated script using the datapack technique (see
+        Module::DataPack).
 
-      Generated script's module source codes. To reduce startup overhead
-      and dependency, these modules' source codes are included in the
-      generated script using the datapack technique (see Module::DataPack).
+        Among the modules are Getopt::Long::EvenLess to parse command-line
+        options, Text::Table::Tiny to produce text table output, and also a
+        few generated modules to modularize the generated script's
+        structure.
 
-      Among the modules are Getopt::Long::EvenLess to parse command-line
-      options, Text::Table::Tiny to produce text table output, and also a
-      few generated modules to modularize the generated script's structure.
+    *   vars => hash
 
-      * vars => hash
+        Generated script's global variables. Keys are variable names
+        (including the sigils) and values are initial variable values (undef
+        means unitialized).
 
-      Generated script's global variables. Keys are variable names
-      (including the sigils) and values are initial variable values (undef
-      means unitialized).
+    *   sub_srcs => hash
 
-      * sub_srcs => hash
+        Generated script's subroutine source codes. Keys are subroutines'
+        names and values are subroutines' source codes.
 
-      Generated script's subroutine source codes. Keys are subroutines'
-      names and values are subroutines' source codes.
+FUNCTIONS
+  gen_inline_pericmd_script
+    Usage:
+
+     gen_inline_pericmd_script(%args) -> [status, msg, result, meta]
+
+    Generate inline Perinci::CmdLine CLI script.
+
+    The goal of this module is to let you create a CLI script from a Riap
+    function/metadata. This is like what Perinci::CmdLine::Lite or
+    Perinci::CmdLine::Classic does, except that the generated CLI script
+    will have the functionalities inlined so it only need core Perl modules
+    and not any of the "Perinci::CmdLine::*" or other modules to run
+    (excluding what modules the Riap function itself requires).
+
+    It's useful if you want a CLI script that is even more lightweight (in
+    terms of startup overhead or dependencies) than the one using
+    Perinci::CmdLine::Lite.
+
+    So to reiterate, the goal of this module is to create a
+    Perinci::CmdLine-based script which only requires core modules, and has
+    as little startup overhead as possible.
+
+    Currently it only supports a subset of features compared to other
+    "Perinci::CmdLine::*" implementations:
+
+    *   Only support local Riap URL (e.g. "/Foo/bar", not
+        CL<http://example.org/Foo/bar>);
+
+    As an alternative to this module, if you are looking to reduce
+    dependencies, you might also want to try using "depak" to
+    fatpack/datapack your Perinci::CmdLine::Lite-based script.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   actions => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   allow_prereq => *array[str]*
+
+        A list of modules that can be depended upon.
+
+        By default, Perinci::CmdLine::Inline will strive to make the script
+        freestanding and require core modules. A dependency to a non-core
+        module will cause failure (unless "pack_deps" option is set to
+        false). However, you can pass a list of modules that is allowed
+        here.
+
+    *   code_after_end => *str*
+
+    *   code_after_shebang => *str*
+
+    *   code_before_parse_cmdline_options => *str*
+
+    *   common_opts => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   completion => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   config_dirs => *array[str]*
+
+        Where to search for configuration files.
+
+    *   config_filename => *str|hash|array[str|hash]*
+
+        Configuration file name(s).
+
+    *   default_format => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   default_subcommand => *str*
+
+    *   description => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   env_name => *str*
+
+        Name of environment variable name that sets default options.
+
+    *   exit => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   extra_urls_for_version => *array[str]*
+
+        More URLs to show version for --version.
+
+        Currently not implemented in Perinci::CmdLine::Inline.
+
+    *   formats => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   get_subcommand_from_arg => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   include => *array[str]*
+
+        Include extra modules.
+
+    *   log => *bool* (default: 0)
+
+        Whether to enable logging.
+
+    *   meta => *hash*
+
+        An alternative to specifying `url`.
+
+    *   meta_is_normalized => *bool*
+
+    *   output_file => *str*
+
+        Set output file, defaults to stdout.
+
+    *   overwrite => *bool*
+
+    *   pack_deps => *bool* (default: 1)
+
+        Whether to pack dependencies into the script.
+
+        By default, Perinci::CmdLine::Inline will use datapacking technique
+        (i.e. embed dependencies into DATA section and load it on-demand
+        using require() hook) to make the script freestanding. However, in
+        some situation this is unwanted, e.g. when we want to produce a
+        script that can be packaged as a Debian package (Debian policy
+        forbids embedding convenience copy of code,
+        https://www.debian.org/doc/debian-policy/ch-source.html#s-embeddedfi
+        les ).
+
+    *   pass_cmdline_object => *bool* (default: 0)
+
+        Whether to pass Perinci::CmdLine::Inline object.
+
+    *   pod => *bool* (default: 1)
+
+        Whether to generate POD for the script.
+
+    *   read_config => *bool* (default: 1)
+
+        Whether the CLI script should read configuration files.
+
+    *   read_env => *bool*
+
+        Whether CLI script should read environment variable that sets
+        default options.
+
+    *   riap_client => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   riap_client_args => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   riap_version => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   script_name => *str*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   script_summary => *str*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   script_version => *str*
+
+        Script version (otherwise will use version from url metadata).
+
+    *   script_version_from_main_version => *bool*
+
+        Use script's $main::VERSION for the version.
+
+    *   shebang => *str*
+
+        Set shebang line.
+
+    *   skip_format => *bool* (default: 0)
+
+        Assume that function returns raw text that need no formatting, do
+        not offer --format, --json, --naked-res.
+
+    *   sub_name => *str*
+
+    *   subcommands => *hash*
+
+    *   tags => *any*
+
+        Currently does nothing, provided only for compatibility with
+        Perinci::CmdLine::Base.
+
+    *   url => *riap::url*
+
+        Program URL.
+
+    *   use_cleanser => *bool* (default: 1)
+
+        Whether to use data cleanser routine first before producing JSON.
+
+        When a function returns result, and the user wants to display the
+        result as JSON, the result might need to be cleansed first (e.g.
+        using Data::Clean) before it can be encoded to JSON, for example it
+        might contain Perl objects or scalar references or other stuffs. If
+        you are sure that your function does not produce those kinds of
+        data, you can set this to false to produce a more lightweight
+        script.
+
+    *   use_utf8 => *bool* (default: 0)
+
+        Whether to set utf8 flag on output.
+
+    *   validate_args => *bool* (default: 1)
+
+        Whether the CLI script should validate arguments using schemas.
+
+    *   with_debug => *bool*
+
+        Generate script with debugging outputs.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
 
 FAQ
-
- What about tab completion?
-
+  What about tab completion?
     Use App::GenPericmdCompleterScript to generate a separate completion
     script. If you use Dist::Zilla, see also
     Dist::Zilla::Plugin::GenPericmdScript which lets you generate script
     (and its completion script) during build.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Inline>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Inline>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inlin
+    e>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::CmdLine, Perinci::CmdLine::Any, Perinci::CmdLine::Lite,
     Perinci::CmdLine::Classic
 
     App::GenPericmdScript
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

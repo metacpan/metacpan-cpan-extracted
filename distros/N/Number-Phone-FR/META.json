@@ -43,7 +43,7 @@
       },
       "Number::Phone::FR::Full" : {
          "file" : "lib/Number/Phone/FR/Full.pm",
-         "version" : "0.0917109"
+         "version" : "0.0917215"
       },
       "Number::Phone::FR::Simple" : {
          "file" : "lib/Number/Phone/FR.pm"
@@ -59,6 +59,6 @@
          "url" : "https://github.com/dolmen/p5-Number-Phone-FR.git"
       }
    },
-   "version" : "0.0917109",
+   "version" : "0.0917215",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

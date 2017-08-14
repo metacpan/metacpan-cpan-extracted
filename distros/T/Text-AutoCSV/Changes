@@ -1,3 +1,21 @@
+1.1.9 2017-08-11 Sébastien Millet <milletseb@laposte.net>
+
+	* Adds attribute out_orderby => ['FIELD1', 'FIELD2', ...], to sort output.
+	  For the moment, just sort ascending as text.
+
+	* Adds attribute fields_dates_auto_optimize, to speed up dates format
+	  detection while fields_dates_auto is set.
+
+	* Adds method get_nb_rows, to get the number of rows in input - the header
+	  counts for one row, so for an input that has a header line, the number of
+	  rows is equal to the number of records + 1.
+
+	* get_coldata() now gives a 6th information, whether or not the field is
+	  multiline.
+
+	* print_id method prints separator chars using codes like \t, \n, when
+	  possible.
+
 1.1.8 2017-07-08 Sébastien Millet <milletseb@laposte.net>
 
 	* Adds attribute out_has_headers, to add or remove the header line.

@@ -1,0 +1,50 @@
+NAME
+    Filename::Video - Check whether filename indicates being a video file
+
+VERSION
+    This document describes version 0.001 of Filename::Video (from Perl
+    distribution Filename-Video), released on 2017-08-12.
+
+SYNOPSIS
+     use Filename::Video qw(check_video_filename);
+     my $res = check_video_filename(filename => "foo.mp3");
+     if ($res) {
+         printf "File is video";
+     } else {
+         print "File is not video\n";
+     }
+
+DESCRIPTION
+FUNCTIONS
+  check_video_filename
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Filename-Video>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Filename-Video>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Video>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Filename::Audio
+
+    Filename::Image
+
+    Filename::Media
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

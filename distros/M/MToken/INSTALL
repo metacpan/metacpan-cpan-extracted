@@ -1,0 +1,35 @@
+INSTALLATION INSTRUCTIONS
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+USING IN DEVELOPMENT MODE
+
+	0. Set PERL5LIB
+	   export PERL5LIB=/home/user/modules/MToken/lib
+
+	1. Initialize project
+	   perl bin/mtoken -d -D foo init myfooproject
+
+	2. Make
+	   cd foo
+	   perl Makefile.PL
+	   make
+	   make test
+	   make clean
+
+	3. Debugging
+	   make clean && perl Makefile.PL && make && make clean
+
+CREATE NEW VERSION
+
+    * lib/MToken.pm -- in documentation (VERSION) & in code $VERSION
+    * CHANGES       -- Result of command: localtime | gclip
+
+REQUIREMENTS
+
+    * CPAN modules:
+      - LWP (perl-libwww)
+

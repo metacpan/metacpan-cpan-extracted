@@ -92,6 +92,7 @@ my %WriteMakefileArgs = (
     "lib/alienfile.pm" => "\$(INST_LIB)/alienfile.pm"
   },
   "PREREQ_PM" => {
+    "Archive::Tar" => 0,
     "Capture::Tiny" => "0.17",
     "ExtUtils::CBuilder" => 0,
     "ExtUtils::ParseXS" => "3.30",
@@ -110,7 +111,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "0.91",
+  "VERSION" => "0.95",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -118,6 +119,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::Tar" => 0,
   "Capture::Tiny" => "0.17",
   "ExtUtils::CBuilder" => 0,
   "ExtUtils::ParseXS" => "3.30",

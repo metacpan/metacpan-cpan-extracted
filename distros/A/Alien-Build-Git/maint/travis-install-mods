@@ -1,0 +1,21 @@
+#!/bin/bash -x
+
+set -euo pipefail
+IFS=$'\n\t'
+
+rm -rf /tmp/Test2-Tools-URL /tmp/Alien-Build.git
+
+cpanm -n Dist::Zilla
+
+
+git clone --depth 2 https://github.com/plicease/Test2-Tools-URL.git /tmp/Test2-Tools-URL
+cd /tmp/Test2-Tools-URL
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n .'
+
+git clone --depth 2 https://github.com/Perl5-Alien/Alien-Build.git.git /tmp/Alien-Build.git
+cd /tmp/Alien-Build.git
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n .'

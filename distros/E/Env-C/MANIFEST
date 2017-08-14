@@ -13,6 +13,7 @@ lib/Env/C.pm
 ppport.h
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/author-signature.t
 t/leak.t
-t/signature.t
+t/smoke-multi.t
 t/smoke.t

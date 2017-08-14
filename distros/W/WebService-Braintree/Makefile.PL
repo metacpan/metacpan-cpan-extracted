@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Data::GUID" => 0,
     "DateTime" => 0,
     "DateTime::Format::Atom" => 0,
+    "DateTime::Format::RFC3339" => 0,
     "DateTime::Format::Strptime" => 0,
     "Digest" => 0,
     "Digest::HMAC_SHA1" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "0.91",
+  "VERSION" => "0.92",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Data::GUID" => 0,
   "DateTime" => 0,
   "DateTime::Format::Atom" => 0,
+  "DateTime::Format::RFC3339" => 0,
   "DateTime::Format::Strptime" => 0,
   "Digest" => 0,
   "Digest::HMAC_SHA1" => 0,

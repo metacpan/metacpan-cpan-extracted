@@ -4,14 +4,17 @@ Time::TAI::Now - determine current time in TAI
 
 =head1 SYNOPSIS
 
-	use Time::TAI::Now qw(now_tai_rat now_tai_gsna now_tai_flt);
+    use Time::TAI::Now qw(
+	now_tai_rat now_tai_gsna now_tai_flt now_tai_dec);
 
-	($instant, $bound) = now_tai_rat;
-	($instant, $bound) = now_tai_rat(1);
-	($instant, $bound) = now_tai_gsna;
-	($instant, $bound) = now_tai_gsna(1);
-	($instant, $bound) = now_tai_flt;
-	($instant, $bound) = now_tai_flt(1);
+    ($instant, $bound) = now_tai_rat;
+    ($instant, $bound) = now_tai_rat(1);
+    ($instant, $bound) = now_tai_gsna;
+    ($instant, $bound) = now_tai_gsna(1);
+    ($instant, $bound) = now_tai_flt;
+    ($instant, $bound) = now_tai_flt(1);
+    ($instant, $bound) = now_tai_dec;
+    ($instant, $bound) = now_tai_dec(1);
 
 =head1 DESCRIPTION
 
@@ -43,32 +46,34 @@ use strict;
 
 use Data::Float 0.008 qw(significand_step float_parts mult_pow2);
 use Math::BigRat 0.10;
-use Time::UTC 0.005 qw(utc_to_tai);
-use Time::UTC::Now 0.007 qw(now_utc_rat now_utc_sna now_utc_flt);
+use Math::Decimal 0.000 qw(dec_add);
+use Time::UTC 0.007 qw(utc_to_tai);
+use Time::UTC::Now 0.012 qw(now_utc_rat now_utc_sna now_utc_flt now_utc_dec);
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 use parent "Exporter";
-our @EXPORT_OK = qw(now_tai_rat now_tai_gsna now_tai_flt);
+our @EXPORT_OK = qw(now_tai_rat now_tai_gsna now_tai_flt now_tai_dec);
 
 use constant BIGRAT_ZERO => Math::BigRat->new(0);
 
 =head1 FUNCTIONS
 
-=over
+Each of these functions determines the current TAI time and returns it.
+They vary in the form in which the time is returned.  In each case,
+the function returns a list of two values.  The first value identifies
+a current TAI instant, in the form of a number of seconds since the TAI
+epoch.  The second value is an inaccuracy bound, as a number of seconds,
+or C<undef> if no accurate answer could be determined.
 
-=item now_tai_rat([DEMAND_ACCURACY])
-
-Returns a list of two values.  The first value identifies a current TAI
-instant, in the form of a number of seconds since the epoch.  The second
-value is an inaccuracy bound, as a number of seconds, or C<undef> if no
-accurate answer could be determined.
-
-If an inaccuracy bound is returned then this function is claiming to have
+If an inaccuracy bound is returned then the function is claiming to have
 answered correctly, to within the specified margin.  That is, some instant
-during the execution of C<now_tai_rat> is within the specified margin of
+during the execution of the function is within the specified margin of
 the instant identified.  (This semantic differs from older current-time
 interfaces that are content to return an instant that has already passed.)
+The inaccuracy bound describes the actual time represented in the first
+return value, not some internal value that was rounded to generate the
+return value.
 
 The inaccuracy bound is measured in TAI seconds; that is, in SI seconds
 on the Terran geoid as realised by atomic clocks.  This differs from SI
@@ -76,21 +81,25 @@ seconds at the computer's location, but the difference is only apparent
 if the computer hardware is significantly time dilated with respect to
 the geoid.
 
-If C<undef> is returned instead of an inaccuracy bound then this function
-could not find a trustable answer.  Either the clock available was
-not properly synchronised or its accuracy could not be established.
-Whatever time could be found is returned, but this function makes
-no claim that it is accurate.  It should be treated with suspicion.
-In practice, clocks of this nature are especially likely to misbehave
-around UTC leap seconds.
+If C<undef> is returned instead of an inaccuracy bound then the function
+could not find a trustable answer.  Either the clock available was not
+properly synchronised or its accuracy could not be established.  Whatever
+time could be found is returned, but the function makes no claim that it
+is accurate.  It should be treated with suspicion.  In practice, clocks
+of this nature are especially likely to misbehave around UTC leap seconds.
 
-The function C<die>s if it could not find a plausible time at all.
-If DEMAND_ACCURACY is supplied and true then it will also die if it
-could not find an accurate answer, instead of returning with C<undef>
-for the inaccuracy bound.
+Each function will C<die> if it can't find a plausible time at all.
+If the I<DEMAND_ACCURACY> parameter is supplied and true then it will
+also die if it could not find an accurate answer, instead of returning
+with C<undef> for the inaccuracy bound.
 
-Both return values are in the form of C<Math::BigRat> objects.  This
-retains full resolution, is future-proof, and is easy to manipulate,
+=over
+
+=item now_tai_rat([DEMAND_ACCURACY])
+
+Both return values are in the form of C<Math::BigRat> objects.
+
+This retains full resolution, is future-proof, and is easy to manipulate,
 but beware that C<Math::BigRat> is currently rather slow.  If performance
 is a problem then consider using one of the functions below that return
 the results in other formats.
@@ -111,14 +120,13 @@ sub now_tai_rat(;$) {
 
 =item now_tai_gsna([DEMAND_ACCURACY])
 
-This performs exactly the same operation as C<now_tai_rat>, but
-returns the results in a different form.  The time since the epoch
-and the inaccuracy bound (if present) are each returned in the form
-of a four-element array, giving a high-resolution fixed-point number
-of seconds.  The first element is the integral number of gigaseconds,
-the second is an integral number of seconds in the range [0, 1000000000),
-the third is an integral number of nanoseconds in the same range, and
-the fourth is an integral number of attoseconds in the same range.
+The time since the epoch and the inaccuracy bound (if present) are each
+returned in the form of a four-element array, giving a high-resolution
+fixed-point number of seconds.  The first element is the integral number
+of gigaseconds, the second is an integral number of seconds in the range
+[0, 1000000000), the third is an integral number of nanoseconds in the
+same range, and the fourth is an integral number of attoseconds in the
+same range.
 
 This form of return value is fairly efficient.  It is convenient for
 decimal output, but awkward to do arithmetic with.  Its resolution is
@@ -133,10 +141,6 @@ its orbital radius increases before Sol enters its red giant phase.
 In that situation the number of gigaseconds will simply continue to
 increase, ultimately overflowing if native integer formats don't grow,
 though it's a good bet that they will.
-
-The inaccuracy bound describes the actual time represented in the
-return value, not an internal value that was rounded to generate the
-return value.
 
 =cut
 
@@ -164,15 +168,11 @@ sub now_tai_gsna(;$) {
 
 =item now_tai_flt([DEMAND_ACCURACY])
 
-This performs exactly the same operation as C<now_tai_rat>, but returns
-the results as Perl floating point numbers.  This form of return value
-is very efficient and easy to manipulate.  However, its resolution is
-limited, rendering it already obsolete for high-precision applications
-at the time of writing.
+Both return values are in the form of Perl floating point numbers.
 
-The inaccuracy bound describes the actual time represented in the
-return value, not an internal value that was rounded to generate the
-return value.
+This form of return value is very efficient and easy to manipulate.
+However, its resolution is limited, rendering it already obsolete for
+high-precision applications at the time of writing.
 
 =cut
 
@@ -203,6 +203,33 @@ sub now_tai_flt(;$) {
 	return ($flt_mn_s + $secs, $bound);
 }
 
+=item now_tai_dec([DEMAND_ACCURACY])
+
+Each return value is in the form of a string expressing a number
+as a decimal fraction.  These strings are of the type processed
+by L<Math::Decimal>, and are always returned in L<Math::Decimal>'s
+canonical form.
+
+This form of return value is fairly efficient and easy to manipulate.
+It is convenient both for decimal output and (via implicit coercion to
+floating point) for low-precision arithmetic.  L<Math::Decimal> can be
+used for high-precision arithmetic.  Its resolution is unlimited.
+
+=cut
+
+my $dec_last_dayno = "0";
+my $dec_mn_s = "0";
+
+sub now_tai_dec(;$) {
+	my($dayno, $secs, $bound) = now_utc_dec($_[0]);
+	if($dayno ne $dec_last_dayno) {
+		$dec_mn_s = utc_to_tai(Math::BigRat->new($dayno), BIGRAT_ZERO)
+				->bstr;
+		$dec_last_dayno = $dayno;
+	}
+	return (dec_add($dec_mn_s, $secs), $bound);
+}
+
 =back
 
 =head1 SEE ALSO
@@ -216,7 +243,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2009, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2006, 2009, 2010, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

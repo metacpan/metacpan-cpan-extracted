@@ -8,7 +8,7 @@ use_ok 'Prty::ClassLoader';
 # push @INC,$classPath; # Verzeichnis mit Testklassen
 
 # FIXME: von Prty::Test::Class unabhängig machen
-push @INC,Prty::Test::Class->testPath('prty/test/data/class');
+push @INC,Prty::Test::Class->testPath('t/data/class');
     
 eval { InexistentClass->new };
 like $@,qr/CLASSLOADER-00001/,'Klassen-Modul existiert nicht';

@@ -2,7 +2,7 @@
 #
 # This file is part of Dist-Zilla-Plugin-ContributorsFromGit
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #

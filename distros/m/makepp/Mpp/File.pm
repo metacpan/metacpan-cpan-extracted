@@ -1,4 +1,4 @@
-# $Id: File.pm,v 1.108 2014/08/03 21:12:36 pfeiffer Exp $
+# $Id: File.pm,v 1.109 2017/08/06 21:19:08 pfeiffer Exp $
 
 package Mpp::File;
 require Exporter;

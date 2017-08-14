@@ -2,7 +2,7 @@ package Finance::Budget;
 
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 {   use Carp;
     use Text::CSV;
     use Date::Manip;
@@ -83,10 +83,7 @@ sub new
     croak 'there must be 1+ recent history for each transaction type'
         if @{ $self{recent_history} } < 1 + @{ $self{transaction_types} };
 
-    croak 'there must be 1+ categorizer for each transaction type'
-        if @{ $self{transaction_types} } > keys %{ $self{categorizer} };
-
-    $self{opening_balance} *= 100; # dollars to cents
+    $self{opening_balance} *= 100;    # dollars to cents
 
     _set_base_dates( \%self );
 
@@ -154,7 +151,7 @@ sub _set_base_dates
         grep { exists $_->{category} }
         @{ $self->{transaction_types} };
 
-    if ( @{ $self->{recent_history} } > 1 )
+    if ( @{ $self->{recent_history} } )
     {
         my $csv = Text::CSV->new()
             || die sprintf "Text::CSV: %s\n",
@@ -181,7 +178,7 @@ sub _set_base_dates
 
         my $categorize = sub {
             my ($event_hr) = @_;
-            for my $category (keys %{ $self->{categorizer} })
+            for my $category (sort keys %{ $self->{categorizer} })
             {
                 my $categorizer = $self->{categorizer}->{$category};
                 my $type = ref $categorizer;
@@ -204,6 +201,26 @@ sub _set_base_dates
                     }
                 }
             }
+
+            TYPE:
+            for my $type_hr ( @{ $self->{transaction_types} } )
+            {
+                my $category = $type_hr->{category};
+
+                next TYPE
+                    if exists $self->{categorizer}->{$category};
+
+                my ( $amount, $cents ) = $type_hr->{amount} =~ m{
+                    ( \d+ [.] ( \d+ ) )
+                }xms;
+
+                next TYPE
+                    if not $cents;
+
+                return $category
+                    if 1 == grep { $amount eq $_ } values %{$event_hr};
+            }
+
             return;
         };
 
@@ -217,8 +234,10 @@ sub _set_base_dates
             my %event;
             @event{@cols} = $csv->fields();
 
-            my $category = $categorize->( \%event )
-                || next EVENT;
+            my $category = $categorize->( \%event ) // "";
+
+            next EVENT
+                if not $category;
 
             next EVENT
                 if ref $base_date_for{$category};
@@ -233,6 +252,25 @@ sub _set_base_dates
 
             $base_date_for{$category} = $date;
         }
+    }
+
+    EXC:
+    for my $except_hr (@{ $self->{exceptions} })
+    {
+        my $category = $except_hr->{category};
+
+        next EXC
+            if ref $base_date_for{$category};
+
+        my $date = Date::Manip::Date->new();
+
+        my $err = $date->parse($except_hr->{date});
+
+        die sprintf "Date::Manip::Date::parse %s -- %s\n",
+            $except_hr->{date}, $err
+            if $err;
+
+        $base_date_for{$category} = $date;
     }
 
     CAT:
@@ -703,10 +741,10 @@ budget.
 This module consumes information about your budget planning and then creates
 a series of transactions to project what lays ahead.
 
-This can be useful when
-considering taking on a new car payment or making a big purchase. For example,
-spending $300 today might have unexpected ramifications 90 days from now. This
-can also be handy in fine tuning your budget to ensure that it is sustainable.
+This can be useful when considering taking on a new car payment or making a
+big purchase. For example, spending $300 today might have unexpected
+ramifications 90 days from now. This can also be handy in fine tuning your
+budget to ensure that it is sustainable.
 
 Check out budget.pl in the demo directory of this project.
 
@@ -811,6 +849,13 @@ A code ref for a function that returns true if the 'description' applies to
 this category.
 
 =back
+
+There doesn't need to be a categorizer entry for every single transaction
+type.  For these cases, the category will be guessed when an otherwise
+uncategorized event matches the exact dollar and non-zero cent value of
+a transaction type. For example, a particular loan payment could be
+identified because you've decided to always define that transaction type
+with an amount of $100.42.
 
 =back
 

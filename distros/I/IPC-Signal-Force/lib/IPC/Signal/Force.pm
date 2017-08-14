@@ -4,9 +4,9 @@ IPC::Signal::Force - force default handling of a signal
 
 =head1 SYNOPSIS
 
-	use IPC::Signal::Force qw(force_raise);
+    use IPC::Signal::Force qw(force_raise);
 
-	force_raise "TERM";
+    force_raise "TERM";
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,7 @@ use strict;
 use IPC::Signal 1.00 qw(sig_num);
 use POSIX qw(SIG_SETMASK SIG_UNBLOCK sigprocmask);
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(force_raise);
@@ -79,6 +79,10 @@ C<force_raise> is executing, there is a race condition that makes it
 is possible for the default signal handler to be called more than once.
 There appears to be no way to avoid this in POSIX.
 
+Perl's treatment of signals under threading is broken.  C<force_raise>,
+as with anything interesting around signals, can't be expected to work
+in multi-threaded Perl.
+
 =head1 SEE ALSO
 
 L<IPC::Signal>,
@@ -90,7 +94,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2007, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2004, 2007, 2010, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Kevin-Command-kevin",
-  "dist_version" => "0.1.1",
+  "dist_version" => "0.4.0",
   "license" => "perl",
   "module_name" => "Kevin::Command::kevin",
   "recursive_test_files" => 1,
@@ -30,7 +30,10 @@ my %module_build_args = (
     "Mojolicious::Command" => 0,
     "Mojolicious::Commands" => 0,
     "Mojolicious::Plugin" => 0,
-    "constant" => 0
+    "Text::Yeti::Table" => 0,
+    "Time::HiRes" => 0,
+    "constant" => 0,
+    "perl" => "v5.10.1"
   },
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,

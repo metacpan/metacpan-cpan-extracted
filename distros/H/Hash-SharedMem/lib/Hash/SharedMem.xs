@@ -13,6 +13,15 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if !PERL_VERSION_GE(5,7,2)
+# undef dNOOP
+# define dNOOP extern int Perl___notused_func(void)
+#endif /* <5.7.2 */
+
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef EXPECT
 # ifdef __GNUC__
 #  define EXPECT(e, v) __builtin_expect(e, v)
@@ -21,8 +30,8 @@
 # endif /* !__GNUC__ */
 #endif /* !EXPECT */
 
-#define likely(t) EXPECT(!!(t), 1)
-#define unlikely(t) EXPECT(!!(t), 0)
+#define likely(t) EXPECT(cBOOL(t), 1)
+#define unlikely(t) EXPECT(cBOOL(t), 0)
 
 #ifndef __attribute__noreturn__
 # ifdef __GNUC__
@@ -47,6 +56,17 @@
 #ifndef PERL_UNUSED_ARG
 # define PERL_UNUSED_ARG(x) PERL_UNUSED_VAR(x)
 #endif /* !PERL_UNUSED_ARG */
+
+#ifndef STATIC_ASSERT_DECL
+# ifdef STATIC_ASSERT_GLOBAL
+#  define STATIC_ASSERT_DECL STATIC_ASSERT_GLOBAL
+# else /* !STATIC_ASSERT_GLOBAL */
+#  define STATIC_ASSERT_2(COND, SUFFIX) \
+	enum { STATIC_ASSERT_ENUM_##SUFFIX = 1/(cBOOL(COND)) }
+#  define STATIC_ASSERT_1(COND, SUFFIX) STATIC_ASSERT_2(COND, SUFFIX)
+#  define STATIC_ASSERT_DECL(COND) STATIC_ASSERT_1(COND, __LINE__)
+# endif /* !STATIC_ASSERT_GLOBAL */
+#endif /* !STATIC_ASSERT_DECL */
 
 #ifndef DPTR2FPTR
 # define DPTR2FPTR(t,x) ((t)(UV)(x))
@@ -121,6 +141,12 @@ PERL_STATIC_INLINE SV *THX_newSVpv_share(pTHX_ char const *pv, U32 hash)
 # define CvPROTO(cv) SvPVX((SV*)(cv))
 # define CvPROTOLEN(cv) SvCUR((SV*)(cv))
 #endif /* !CvPROTO */
+
+#if PERL_VERSION_GE(5,7,3)
+# define PERL_UNUSED_THX() NOOP
+#else /* <5.7.3 */
+# define PERL_UNUSED_THX() ((void)(aTHX+0))
+#endif /* <5.7.3 */
 
 #ifndef SvMAGIC_set
 # define SvMAGIC_set(sv, mg) (SvMAGIC(sv) = (mg))
@@ -323,6 +349,16 @@ typedef I32 array_ix_t;
 # define my_strerror Strerror
 #endif /* !my_strerror */
 
+#ifndef OpMORESIB_set
+# define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+# define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+# define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+#endif /* !OpMORESIB_set */
+#ifndef OpSIBLING
+# define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+# define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif /* !OpSIBLING */
+
 /* Perl additions */
 
 typedef U64TYPE U64;
@@ -399,7 +435,7 @@ typedef U8 byte;
 
 typedef U64 word;
 #define WORD_C UINT64_C
-enum { ASSERT_WORD_SIZE = 1/(!!(sizeof(word) == (1<<WORD_SZ_LOG2))) };
+STATIC_ASSERT_DECL(sizeof(word) == (1<<WORD_SZ_LOG2));
 #define WORD_MAX WORD_C(0xffffffffffffffff)
 
 /*
@@ -1087,6 +1123,7 @@ static int dirref_rel_unlink(dirref_t dirref, char const *rel)
 static void THX_closefd_cleanup(pTHX_ void *fd_p_v)
 {
 	int fd = *(int*)fd_p_v;
+	PERL_UNUSED_THX();
 	Safefree(fd_p_v);
 	if(unlikely(fd != -1)) close(fd);
 }
@@ -1105,6 +1142,7 @@ static int *THX_closefd_save(pTHX_ int fd)
 static void THX_closefd_early(pTHX_ int *fd_p)
 {
 	int fd = *fd_p;
+	PERL_UNUSED_THX();
 	if(likely(fd != -1)) {
 		*fd_p = -1;
 		(void) close(fd);
@@ -1118,6 +1156,7 @@ typedef int *closefd_ref_t;
 static void THX_closedirh_cleanup(pTHX_ void *dirh_p_v)
 {
 	DIR *dirh = *(DIR**)dirh_p_v;
+	PERL_UNUSED_THX();
 	Safefree(dirh_p_v);
 	if(unlikely(dirh)) closedir(dirh);
 }
@@ -1136,6 +1175,7 @@ PERL_STATIC_INLINE DIR **THX_closedirh_save(pTHX_ DIR *dirh)
 PERL_STATIC_INLINE void THX_closedirh_early(pTHX_ DIR **dirh_p)
 {
 	DIR *dirh = *dirh_p;
+	PERL_UNUSED_THX();
 	if(likely(dirh)) {
 		*dirh_p = NULL;
 		(void) closedir(dirh);
@@ -1155,6 +1195,7 @@ static void THX_unlinkfile_cleanup(pTHX_ void *par_p_v)
 {
 	struct unlinkfile_cleanup_par *par_p = par_p_v;
 	dirref_t dir = par_p->dir;
+	PERL_UNUSED_THX();
 	if(!likely(dirref_is_null(dir)))
 		(void) dirref_rel_unlink(dir, par_p->filename);
 	Safefree(par_p_v);
@@ -1180,6 +1221,7 @@ static struct unlinkfile_cleanup_par *THX_unlinkfile_save(pTHX_ dirref_t dir,
 PERL_STATIC_INLINE void THX_unlinkfile_cancel(pTHX_
 	struct unlinkfile_cleanup_par *par_p)
 {
+	PERL_UNUSED_THX();
 	par_p->dir = dirref_null();
 }
 
@@ -1188,6 +1230,7 @@ PERL_STATIC_INLINE int THX_unlinkfile_early(pTHX_
 	struct unlinkfile_cleanup_par *par_p)
 {
 	dirref_t dir = par_p->dir;
+	PERL_UNUSED_THX();
 	if(unlikely(dirref_is_null(dir))) return 0;
 	par_p->dir = dirref_null();
 	return dirref_rel_unlink(dir, par_p->filename);
@@ -1500,6 +1543,7 @@ PERL_STATIC_INLINE struct sizes const *THX_sizes_construct(pTHX_
 	int line_sz_log2, int page_sz_log2)
 {
 	struct sizes *sizes;
+	PERL_UNUSED_THX();
 	Newx(sizes, 1, struct sizes);
 	if(unlikely(line_sz_log2 < WORD_SZ_LOG2 ||
 			page_sz_log2 < line_sz_log2 ||
@@ -1588,6 +1632,7 @@ static SV *THX_sizes_lookup(pTHX_ pMY_CXT_ word par)
 static int THX_mmap_mg_free(pTHX_ SV *sv, MAGIC *mg)
 {
 	void *addr;
+	PERL_UNUSED_THX();
 #if QWITH_DUP
 	if(unlikely(threadrc_dec((word*)mg->mg_ptr))) return 0;
 	Safefree(mg->mg_ptr);
@@ -1690,6 +1735,7 @@ struct tally { word k[K_SZ]; };
 # define tally_zero(st) THX_tally_zero(aTHX_ st)
 PERL_STATIC_INLINE void THX_tally_zero(pTHX_ struct tally *tally)
 {
+	PERL_UNUSED_THX();
 	Zero(tally, 1, struct tally);
 }
 
@@ -1906,6 +1952,7 @@ static struct shash *THX_shash_or_null_from_svref(pTHX_ SV *shsvref)
 PERL_STATIC_INLINE void THX_arg_error_notshash(pTHX) __attribute__noreturn__;
 PERL_STATIC_INLINE void THX_arg_error_notshash(pTHX)
 {
+	PERL_UNUSED_THX();
 	croak("handle is not a shared hash handle");
 }
 
@@ -1920,7 +1967,7 @@ static struct shash *THX_shash_from_svref(pTHX_ SV *shsvref)
 #define arg_is_shash(arg) THX_arg_is_shash(aTHX_ arg)
 PERL_STATIC_INLINE bool THX_arg_is_shash(pTHX_ SV *arg)
 {
-	return !!shash_or_null_from_svref(arg);
+	return cBOOL(shash_or_null_from_svref(arg));
 }
 
 #define arg_check_shash(arg) THX_arg_check_shash(aTHX_ arg)
@@ -2019,6 +2066,7 @@ static void THX_shash_check_writable(pTHX_ struct shash *sh, char const *action)
 	THX_dir_make_data_filename(aTHX_ buf, fid)
 static void THX_dir_make_data_filename(pTHX_ char *buf, word fileid)
 {
+	PERL_UNUSED_THX();
 	(void) sprintf(buf, "%s%08x%08x",
 		DATA_FILENAME_PREFIX, (unsigned)(fileid >> 32),
 		(unsigned)(fileid & WORD_C(0xffffffff)));
@@ -2030,6 +2078,7 @@ static void THX_dir_make_data_filename(pTHX_ char *buf, word fileid)
 PERL_STATIC_INLINE void THX_dir_make_temp_filename(pTHX_ char *buf)
 {
 	unsigned s, ns;
+	PERL_UNUSED_THX();
 #if QHAVE_CLOCK_GETTIME && defined(CLOCK_REALTIME)
 	{
 		struct timespec ts;
@@ -2072,6 +2121,7 @@ enum {
 static int THX_dir_filename_class(pTHX_ char const *filename, word *id_p)
 {
 	size_t fnlen;
+	PERL_UNUSED_THX();
 	if(filename[0] == '.') return FILENAME_CLASS_MASTER;
 	fnlen = strlen(filename);
 	if(fnlen == FILENAME_PREFIX_LEN &&
@@ -2261,7 +2311,7 @@ static void THX_shash_ensure_data_file(pTHX_ struct shash *sh)
 	old_tmps_floor = PL_tmps_floor;
 	SAVETMPS;
 	mapsv = mmap_as_sv(data_fd, sh->data_size,
-			!!(sh->mode & STOREMODE_WRITE));
+			cBOOL(sh->mode & STOREMODE_WRITE));
 	if(!likely(mapsv)) shash_error_errno(sh, "use");
 	sh->u.live.data_file_id = datafileid;
 	sh->data_mmap_sv = SvREFCNT_inc_simple_NN(mapsv);
@@ -2762,6 +2812,7 @@ PERL_STATIC_INLINE bool THX_btree_seek_dec(pTHX_ struct shash *sh,
 PERL_STATIC_INLINE word THX_btree_cursor_key(pTHX_ struct shash *sh,
 	struct cursor *cursor)
 {
+	PERL_UNUSED_THX();
 	return bnode_body_loc(unchecked_pointer_loc(sh, cursor->ent[0].nodeptr))
 			[(cursor->ent[0].index << 1)];
 }
@@ -2770,6 +2821,7 @@ PERL_STATIC_INLINE word THX_btree_cursor_key(pTHX_ struct shash *sh,
 PERL_STATIC_INLINE word THX_btree_cursor_get(pTHX_ struct shash *sh,
 	struct cursor *cursor)
 {
+	PERL_UNUSED_THX();
 	return bnode_body_loc(unchecked_pointer_loc(sh, cursor->ent[0].nodeptr))
 			[(cursor->ent[0].index << 1) + 1];
 }
@@ -2910,72 +2962,80 @@ static word THX_btree_cursor_set(pTHX_ struct shash *sh,
 	}
 }
 
-#define btree_count_at_layer(sh, np, el) \
-	THX_btree_count_at_layer(aTHX_ sh, np, el)
-static word THX_btree_count_at_layer(pTHX_ struct shash *sh, word ptr,
-	int expect_layer);
-static word THX_btree_count_at_layer(pTHX_ struct shash *sh, word ptr,
-	int expect_layer)
-{
-	int layer, fanout;
-	word const *loc = bnode_check(sh, ptr, expect_layer, &layer, &fanout);
-	if(likely(layer == 0)) {
-		return (word)fanout;
-	} else {
-		int i;
-		word cnt = 0;
-		loc = bnode_body_loc(loc);
-		layer--;
-		for(i = fanout; i--; loc += 2)
-			cnt += btree_count_at_layer(sh, loc[1], layer);
-		return cnt;
-	}
-}
-
 #define btree_count(sh, rt) THX_btree_count(aTHX_ sh, rt)
-PERL_STATIC_INLINE word THX_btree_count(pTHX_ struct shash *sh, word root)
+static word THX_btree_count(pTHX_ struct shash *sh, word root)
 {
-	return btree_count_at_layer(sh, root, -1);
-}
-
-#define btree_size_at_layer(sh, np, el) \
-	THX_btree_size_at_layer(aTHX_ sh, np, el)
-static word THX_btree_size_at_layer(pTHX_ struct shash *sh, word ptr,
-	int expect_layer);
-static word THX_btree_size_at_layer(pTHX_ struct shash *sh, word ptr,
-	int expect_layer)
-{
-	int layer, fanout, i;
-	word const *loc = bnode_check(sh, ptr, expect_layer, &layer, &fanout);
-	word sz;
-	if(unlikely(fanout == 0) && likely(layer == 0) &&
-			likely(sh->sizes->dhd_zeropad_sz >= WORD_SZ))
-		return 0;
-	sz = WORD_SZ + (fanout << (WORD_SZ_LOG2+1));
-	loc = bnode_body_loc(loc);
-	if(likely(layer == 0)) {
-		for(i = fanout << 1; i--; ) {
-			word asz = string_size(sh, *loc++);
-			sz += asz;
-			if(unlikely(sz < asz)) return ~(word)0;
-		}
-	} else {
-		layer--;
-		for(i = fanout; i--; ) {
-			word asz = btree_size_at_layer(sh, loc[1], layer);
-			sz += asz;
-			if(unlikely(sz < asz)) return ~(word)0;
-			loc += 2;
-		}
-	}
-	return sz;
+	struct cursor cur;
+	word cnt = 0;
+	if(!likely(btree_seek_min(sh, &cur, root))) return 0;
+	do {
+		cnt += cur.ent[0].fanout;
+		cur.ent[0].index = cur.ent[0].fanout - 1;
+	} while(btree_seek_inc(sh, &cur));
+	return cnt;
 }
 
 #define btree_size(sh, rt) THX_btree_size(aTHX_ sh, rt)
-PERL_STATIC_INLINE word THX_btree_size(pTHX_ struct shash *sh, word root)
+static word THX_btree_size(pTHX_ struct shash *sh, word root)
 {
-	word sz = btree_size_at_layer(sh, root, -1);
-	if(!likely(sz)) return 0;
+	struct cursor cur;
+	word sz;
+	if(!likely(btree_seek_min(sh, &cur, root))) {
+		if(likely(sh->sizes->dhd_zeropad_sz >= WORD_SZ)) return 0;
+		sz = WORD_SZ;
+	} else {
+		sz = 0;
+		do {
+			int i;
+			word asz;
+			word *loc = bnode_body_loc(
+				unchecked_pointer_loc(sh, cur.ent[0].nodeptr));
+			for(i = cur.ent[0].fanout << 1; i--; ) {
+				asz = string_size(sh, *loc++);
+				sz += asz;
+				if(unlikely(sz < asz)) return ~(word)0;
+			}
+			/*
+			 * To account for all the space occupied by the
+			 * btree nodes, we allow a certain number of
+			 * bytes per entry, such that there is space for
+			 * an arbitrarily high btree of minimal fanout.
+			 * The objective is to allow enough space
+			 * per entry that for each minimally-filled
+			 * layer-0 node we allocate space for that node
+			 * and have one entry's allocation left over.
+			 * That one-entry-per-node excess then accounts
+			 * for the size of the layer-1 nodes with one
+			 * entry's allocation per layer-1 node left
+			 * over, and so on recursively.  The space to
+			 * allow per entry is theoretically the size
+			 * of the minimally-filled node (WORD_SZ *
+			 * (1+2*MINFANOUT)) divided by MINFANOUT-1;
+			 * we round this up to an integral number of
+			 * bytes per entry.
+			 *
+			 * Nodes that are more than minimally filled lead
+			 * to this being an overestimate, because they
+			 * are more space-efficient both in themselves
+			 * and by using fewer higher-layer entries.
+			 * An underfilled root node can lead to needing
+			 * more bytes than this formula allows, but the
+			 * space allowed for the node will always be
+			 * strictly greater than the two words per entry
+			 * required by the node body.  Because the size
+			 * is ultimately rounded up to word alignment
+			 * (actually to line alignment), it is rounded
+			 * up sufficiently to account for the single-word
+			 * header of the root node.
+			 */
+			asz = cur.ent[0].fanout *
+				((WORD_SZ*(1+2*MINFANOUT) + MINFANOUT-2) /
+					(MINFANOUT-1));
+			sz += asz;
+			if(unlikely(sz < asz)) return ~(word)0;
+			cur.ent[0].index = cur.ent[0].fanout - 1;
+		} while(btree_seek_inc(sh, &cur));
+	}
 	sz = LINE_ALIGN(sh->sizes, sz);
 	return likely(sz) ? sz : ~(word)0;
 }
@@ -3387,7 +3447,7 @@ static SV *THX_shash_open(pTHX_ SV *top_pathname_sv, SV *mode_sv)
 		if(!likely((word)statbuf.st_size == sh->sizes->mfl_sz))
 			shash_open_error_magic(sh);
 		mapsv = mmap_as_sv(master_fd, sh->sizes->mfl_sz,
-				!!(mode & STOREMODE_WRITE));
+				cBOOL(mode & STOREMODE_WRITE));
 		if(!likely(mapsv)) shash_error_errno(sh, "open");
 		sh->u.live.master_mmap_sv = SvREFCNT_inc_simple_NN(mapsv);
 		sh->u.live.master_mmap = SvPVX(mapsv);
@@ -4151,8 +4211,8 @@ HSM_MAKE_PP(shash_tally_gzero)
 /* API operations as XS function bodies */
 
 #ifndef PERL_ARGS_ASSERT_CROAK_XS_USAGE
-static void S_croak_xs_usage(pTHX_ const CV *, const char *);
-# define croak_xs_usage(cv, params) S_croak_xs_usage(aTHX_ cv, params)
+static void S_croak_xs_usage(const CV *, const char *);
+# define croak_xs_usage(cv, params) S_croak_xs_usage(cv, params)
 #endif /* !PERL_ARGS_ASSERT_CROAK_XS_USAGE */
 
 #define HSM_MAKE_XSFUNC(name, arity, argnames) \
@@ -4211,18 +4271,18 @@ static OP *THX_ck_entersub_args_hsm(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 	int nargs;
 	entersubop = ck_entersub_args_proto(entersubop, namegv, (SV*)cv);
 	pushop = cUNOPx(entersubop)->op_first;
-	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
-	firstargop = pushop->op_sibling;
-	for (cvop = firstargop; cvop->op_sibling; cvop = cvop->op_sibling) ;
-	lastargop = pushop;
+	if(!OpHAS_SIBLING(pushop)) pushop = cUNOPx(pushop)->op_first;
+	firstargop = OpSIBLING(pushop);
+	for (cvop = firstargop; OpHAS_SIBLING(cvop); cvop = OpSIBLING(cvop)) ;
 	for (nargs = 0, lastargop = pushop, argop = firstargop; argop != cvop;
-			lastargop = argop, argop = argop->op_sibling)
+			lastargop = argop, argop = OpSIBLING(argop))
 		nargs++;
 	if(unlikely(nargs != (int)CvPROTOLEN(cv))) return entersubop;
-	pushop->op_sibling = cvop;
-	lastargop->op_sibling = NULL;
+	OpMORESIB_set(pushop, cvop);
+	OpLASTSIB_set(lastargop, NULL);
 	op_free(entersubop);
-	newop = newUNOP(OP_NULL, 0, firstargop);
+	newop = newUNOP(OP_NULL, 0, lastargop);
+	cUNOPx(newop)->op_first = firstargop;
 # ifdef XopENTRY_set
 	newop->op_type = OP_CUSTOM;
 # else /* !XopENTRY_set */
@@ -4434,8 +4494,13 @@ BOOT:
 		THX_xsfunc_shash_tied_store, __FILE__, "$$$");
 	(void) newXSproto_portable("Hash::SharedMem::Handle::DELETE",
 		THX_xsfunc_shash_tied_delete, __FILE__, "$$");
+#if PERL_VERSION_GE(5,25,3)
+	(void) hv_stores(mstash, "SCALAR",
+		SvREFCNT_inc_NN(*hv_fetchs(mstash, "count", 0)));
+#else /* <5.25.3 */
 	(void) hv_stores(mstash, "SCALAR",
 		SvREFCNT_inc_NN(*hv_fetchs(mstash, "occupied", 0)));
+#endif /* <5.25.3 */
 	(void) hv_stores(mstash, "FIRSTKEY",
 		SvREFCNT_inc_NN(*hv_fetchs(mstash, "key_min", 0)));
 	(void) hv_stores(mstash, "NEXTKEY",

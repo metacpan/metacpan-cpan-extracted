@@ -4,13 +4,11 @@
 #
 #  $Id$
 #
-#  Copyright (C) 2001-2012
+#  Copyright (C) 2001-2017
 #
-#    Rob Brown bbb@cpan,org
+#    Rob Brown <bbb@cpan,org>
 #
-#    Paul Seamons
-#    paul@seamons.com
-#    http://seamons.com/
+#    Paul Seamons <paul@seamons.com>
 #
 #  This package may be distributed under the terms of either the
 #  GNU General Public License

@@ -1,5 +1,10 @@
 Revision history for Business-Monzo
 
+0.10     2017-08-09
+        - support for proxy environment variables
+        - reuse user agent object instead of creating a new one every time
+        - thanks to zebardy for both changes (GH #6)
+
 0.09     2017-08-02
         - Fix warning in calling decimal_precision
 

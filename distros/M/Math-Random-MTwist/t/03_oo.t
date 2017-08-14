@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 use Math::Random::MTwist;
-use Test::More tests => 23;
-
-my $mt = Math::Random::MTwist->new(1_000_686_894);
+use Test::More;
 
 # If you change the order of the tests the expected results will change!
+
+my $mt = Math::Random::MTwist->new(1_000_686_894);
 
 ok($mt->irand32() == 2_390_553_143, 'irand32');
 {
@@ -51,8 +51,13 @@ ok($mt->rd_double() =~ /^8.6196948.+e-145$/, 'rd_double');
   ok(length $state > 624*4, 'getstate');
   ok($mt->irand32() == 2_419_637_362, 'irand32 before setstate');
   my $rs = $mt->rd_double(2);
+  ok($rs eq "\220ct\245\221\262g\366", 'rd_double(2) before setstate');
 
   $mt->setstate($state);
   ok($mt->irand32() == 2_419_637_362, 'irand32 after setstate');
-  ok($rs eq $mt->randstr(), 'randstr');
+  ok($rs eq $mt->rd_double(2), 'rd_double(2) after setstate');
 }
+
+ok($mt->randstr(19) eq "\0270\352\20\a)GB\205\332\325\201\32\236\13\30\317\5\312", 'randstr');
+
+done_testing();

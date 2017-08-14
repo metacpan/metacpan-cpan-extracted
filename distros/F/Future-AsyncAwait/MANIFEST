@@ -17,5 +17,7 @@ t/10pad.t
 t/11contexts.t
 t/20context-block.t
 t/21context-while.t
-t/90check-await.t
+t/22context-foreach.t
+t/40croak.t
+t/80await+try.t
 t/99pod.t

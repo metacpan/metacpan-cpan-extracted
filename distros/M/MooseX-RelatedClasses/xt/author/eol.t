@@ -17,7 +17,6 @@ my @files = (
     't/blank_namespace.t',
     't/custom-decamelization.t',
     't/desnaking-with-doublecolon.t',
-    't/funcs.pm',
     't/lib/Test/Class/__WONKY__.pm',
     't/lib/Test/Class/__WONKY__/One.pm',
     't/lib/Test/Class/__WONKY__/Sub/One.pm',

@@ -1,7 +1,7 @@
 package App::shcompgen;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.31'; # VERSION
+our $DATE = '2017-08-10'; # DATE
+our $VERSION = '0.320'; # VERSION
 
 use 5.010001;
 use strict;
@@ -217,7 +217,7 @@ sub _gen_tcsh_init_script {
     my @defs;
     for my $dir (@$dirs) {
         next unless -d $dir;
-        for my $file (<$dir/*>) {
+        for my $file (glob "$dir/*") {
             open my $fh, "<", $file or do {
                 warn "Can't open '$file': $!, skipped\n";
                 next;
@@ -225,6 +225,7 @@ sub _gen_tcsh_init_script {
             my $line = <$fh>;
             $line .= "\n" unless $line =~ /\n\z/;
             push @defs, $line;
+            close $fh;
         }
     }
     join(
@@ -247,21 +248,31 @@ sub _gen_completion_script {
     my $comp   = $detres->[3]{'func.completer_command'};
     my $qcomp  = String::ShellQuote::shell_quote($comp);
     my $args   = $detres->[3]{'func.completer_command_args'};
-    my $qargs  = String::ShellQuote::shell_quote($args) if defined $args;
+    my $qargs; $qargs = String::ShellQuote::shell_quote($args) if defined $args;
 
     my $header_at_bottom;
     my $script;
     my @helper_scripts;
 
-    if (($detres->[3]{'func.completer_type'} // '') =~ /\AGetopt::Long(?:::Descriptive)?\z/) {
+    if (($detres->[3]{'func.completer_type'} // '') =~ /\AGetopt::Long(?:::EvenLess|::Descriptive)?\z/) {
         require Data::Dmp;
-        require Getopt::Long::Dump;
 
         my $content;
-        my $dump_res = Getopt::Long::Dump::dump_getopt_long_script(
-            filename => $progpath,
-            skip_detect => 1,
-        );
+        my $dump_res;
+        if ($detres->[3]{'func.completer_type'} eq 'Getopt::Long::EvenLess') {
+            require Getopt::Long::EvenLess::Dump;
+            $dump_res = Getopt::Long::EvenLess::Dump::dump_getopt_long_evenless_script(
+                filename => $progpath,
+                skip_detect => 1,
+            );
+        } else {
+            require Getopt::Long::Dump;
+            $dump_res = Getopt::Long::Dump::dump_getopt_long_script(
+                filename => $progpath,
+                skip_detect => 1,
+            );
+        }
+
         if ($dump_res->[0] != 200) {
             log_error("Can't dump Getopt::Long script '%s': %s", $progpath, $dump_res);
             $script = "# Can't dump Getopt::Long script '$progpath': $dump_res->[0] - $dump_res->[1]\n";
@@ -615,7 +626,7 @@ sub _detect_prog {
                 if ($line =~ /^\s*((?:use|require)\s+
                                   (
                                       Getopt::Std|
-                                      Getopt::Long(?:::Complete|::Subcommand|::More|::Descriptive)?|
+                                      Getopt::Long(?:::Complete|::Less|::EvenLess|::Subcommand|::More|::Descriptive)?|
                                       Perinci::CmdLine(?:::Any|::Lite|::Classic)
                               ))\b/x) {
                     return [200, "OK", 1, {
@@ -1142,7 +1153,7 @@ App::shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.31 of App::shcompgen (from Perl distribution App-shcompgen), released on 2017-07-10.
+This document describes version 0.320 of App::shcompgen (from Perl distribution App-shcompgen), released on 2017-08-10.
 
 =head1 FUNCTIONS
 
