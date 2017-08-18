@@ -120,8 +120,7 @@ Dist::Zilla::Plugin::PromptIfStale::__clear_already_checked();
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
-                    [ 'PromptIfStale' => { phase => 'build' },
-                    ],
+                    [ 'PromptIfStale' => { phase => 'build' } ],
                 ) . "\n\n; authordep I::Am::Not::Installed\n",
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
             },

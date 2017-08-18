@@ -3,7 +3,7 @@ package X::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.11';
 
 =encoding utf-8
 
@@ -38,7 +38,7 @@ X::Tiny - Base class for a bare-bones exception factory
     sub _new {
         my ($class, @args) = @_;
 
-        my $self = $class->SUPER::_new('Blah blah, @args);
+        my $self = $class->SUPER::_new('Blah blah', @args);
 
         return bless $self, $class;
     }
@@ -55,6 +55,8 @@ X::Tiny - Base class for a bare-bones exception factory
     if ( my $err = $@ ) {
         print $err->get('key1');
     }
+
+    die My::Module::X->create('Blah', key1 => val1, … );
 
 =head1 DESCRIPTION
 
@@ -133,7 +135,7 @@ with the arguments C<foo> and C<bar>.
 
 =head1 EXCEPTION OBJECTS
 
-See C<X::Tiny::Base> for more information about the features that that
+See L<X::Tiny::Base> for more information about the features that that
 module exposes to subclasses.
 
 =head1 DESIGN CONSIDERATIONS

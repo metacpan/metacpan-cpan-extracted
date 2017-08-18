@@ -4,6 +4,8 @@ use 5.008007;
 use strict;
 use warnings;
 
+use Config;
+
 use SPVM::BaseObject;
 use SPVM::Object;
 use SPVM::Array;
@@ -20,31 +22,129 @@ use Encode 'encode';
 
 use Carp 'croak';
 
-our $VERSION = '0.0243';
+our $VERSION = '0.0247';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
 our %PACKAGE_SYMTABLE;
 our %FIELD_SYMTABLE;
 our %SUB_SYMTABLE;
+our @NATIVE_SUB_NAMES;
+our %NATIVE_SUB_SYMTABLE;
 our $API;
 our @TYPE_NAMES;
 our %TYPE_SYMTABLE;
 
+sub _get_dll_file {
+  my $package_name = shift;
+  
+  # DLL file name
+  my $dlext = $Config{dlext};
+  my $dll_base_name = $package_name . ".$dlext";
+  $dll_base_name =~ s/^.*:://;
+  my $dll_file_tail = 'auto/' . $package_name . '/' . $dll_base_name;
+  $dll_file_tail =~ s/::/\//g;
+  my $dll_file;
+  for my $dl_shared_object (@DynaLoader::dl_shared_objects) {
+    if ($dl_shared_object =~ /\Q$dll_file_tail\E$/) {
+      $dll_file = $dl_shared_object;
+      last;
+    }
+  }
+  
+  return $dll_file;
+}
+
+sub get_sub_native_address {
+  my $sub_abs_name = shift;
+  
+  my $native_address;
+  
+  my $package_name;
+  my $sub_name;
+  if ($sub_abs_name =~ /^(?:(.+)::)(.+)$/) {
+    $package_name = $1;
+    $sub_name = $2;
+  }
+  
+  my $dll_file;
+  my $dll_package_name = $package_name;
+  while (1) {
+    my $not_found;
+    $dll_file = _get_dll_file($dll_package_name);
+    if ($dll_file) {
+      my $dll_libref = DynaLoader::dl_load_file($dll_file);
+      if ($dll_libref) {
+        my $sub_abs_name_c = $sub_abs_name;
+        $sub_abs_name_c =~ s/:/_/g;
+        $native_address = DynaLoader::dl_find_symbol($dll_libref, $sub_abs_name_c);
+        if ($native_address) {
+          last;
+        }
+        else {
+          $not_found = 1;
+        }
+      }
+      else {
+        $not_found = 1;
+      }
+    }
+    else {
+      $not_found = 1;
+    }
+    
+    if ($not_found) {
+      if ($dll_package_name =~ /::/) {
+        $dll_package_name =~ s/::[^:]+$//;
+      }
+      else {
+        last;
+      }
+    }
+  }
+  
+  return $native_address;
+}
+
+sub build_native_sub_symtable {
+  for my $native_sub_name (@NATIVE_SUB_NAMES) {
+    my $native_sub_name_spvm = "SPVM::$native_sub_name";
+    my $native_address = get_sub_native_address($native_sub_name_spvm);
+    unless ($native_address) {
+      croak "Can't find native address($native_sub_name())";
+    }
+    $NATIVE_SUB_SYMTABLE{$native_sub_name} = $native_address;
+  }
+}
+
 # Compile SPVM source code just after compile-time of Perl
 CHECK {
+  require XSLoader;
+  XSLoader::load('SPVM', $VERSION);
+  
   # Compile SPVM source code
   compile();
   
+  my $sub_native_address = get_sub_native_address('SPVM::std::sum_int');
+  
   # Build type names
   build_type_names();
-
+  
   # Build type names
   build_type_symtable();
   
   # Build subroutine symbol table
   build_sub_symtable();
   
+  # Build native subroutine names
+  build_native_sub_names();
+  
+  # Build native subroutine
+  build_native_sub_symtable();
+  
+  # Bind native address
+  bind_native_address();
+
   # Build package symbol table
   build_package_symtable();
   
@@ -60,7 +160,6 @@ CHECK {
   # Free compiler
   free_compiler();
 }
-
 sub new_string_raw {
   my $string = shift;
   
@@ -275,8 +374,6 @@ sub build_spvm_subs {
   }
 }
 
-require XSLoader;
-XSLoader::load('SPVM', $VERSION);
 
 # Preloaded methods go here.
 
@@ -379,7 +476,11 @@ L<SPVM::Document::PerlAPI> - API to exchange Perl value to SPVM value.
 
 =item 3
 
-L<SPVM::Document::Specification> - SPVM Specification
+L<SPVM::Document::Spec> - SPVM Specification
+
+=item 4
+
+L<SPVM::Document::FAQ> - SPVM Specification
 
 =back
 

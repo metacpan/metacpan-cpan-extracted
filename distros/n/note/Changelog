@@ -1,3 +1,7 @@
+1.3.24:         removed bashism in mysql installer.
+================================================================================
+1.3.23:         defect distritbution. do not use.
+================================================================================
 1.3.22:		fixed bug in mysql backend.
 		added retry feature for NOTEDB::pwsafe3 backend save() password
 		entering. bails out after 5 retries.

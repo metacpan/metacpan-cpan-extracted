@@ -7,7 +7,7 @@ use Carp            qw/ croak confess /;
 use Exporter        ();
 use Algorithm::Diff ();
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 our @ISA     = qw/ Exporter /;
 our @EXPORT  = qw/ diff /;
 
@@ -423,8 +423,8 @@ slower on larger files.
 Relies on L<Algorithm::Diff> for, well, the algorithm.  This may not produce
 the same exact diff as a system's local C<diff> executable, but it will be a
 valid diff and comprehensible by C<patch>.  We haven't seen any differences
-between Algorithm::Diff's logic and GNU diff's, but we have not examined them
-to make sure they are indeed identical.
+between L<Algorithm::Diff>'s logic and GNU C<diff>'s, but we have not examined
+them to make sure they are indeed identical.
 
 B<Note>: If you don't want to import the C<diff> function, do one of the
 following:
@@ -433,27 +433,28 @@ following:
 
    require Text::Diff;
 
-That's a pretty rare occurence, so C<diff()> is exported by default.
+That's a pretty rare occurrence,
+so C<diff()> is exported by default.
 
 If you pass a filename, but the file can't be read,
 then C<diff()> will C<croak>.
 
 =head1 OPTIONS
 
-diff() takes two parameters from which to draw input and a set of
-options to control it's output.  The options are:
+C<diff()> takes two parameters from which to draw input and a set of
+options to control its output.  The options are:
 
 =over
 
 =item FILENAME_A, MTIME_A, FILENAME_B, MTIME_B
 
-The name of the file and the modification time "files"
+The name of the file and the modification time "files".
 
-These are filled in automatically for each file when diff() is passed a
+These are filled in automatically for each file when C<diff()> is passed a
 filename, unless a defined value is passed in.
 
 If a filename is not passed in and FILENAME_A and FILENAME_B are not provided
-or C<undef>, the header will not be printed.
+or are C<undef>, the header will not be printed.
 
 Unused on C<OldStyle> diffs.
 
@@ -462,7 +463,7 @@ Unused on C<OldStyle> diffs.
 The index of the first line / element.  These default to 1 for all
 parameter types except ARRAY references, for which the default is 0.  This
 is because ARRAY references are presumed to be data structures, while the
-others are line oriented text.
+others are line-oriented text.
 
 =item STYLE
 
@@ -474,9 +475,9 @@ overloading only; none of the formats provide them.
 Defaults to "Unified" (unlike standard C<diff>, but Unified is what's most
 often used in submitting patches and is the most human readable of the three.
 
-If the package indicated by the STYLE has no hunk() method, c<diff()> will
+If the package indicated by the STYLE has no C<hunk()> method, C<diff()> will
 load it automatically (lazy loading).  Since all such packages should inherit
-from Text::Diff::Base, this should be marvy.
+from C<Text::Diff::Base>, this should be marvy.
 
 Styles may be specified as class names (C<STYLE =E<gt> 'Foo'>),
 in which case they will be C<new()>ed with no parameters,
@@ -514,21 +515,23 @@ These are passed to L<Algorithm::Diff/traverse_sequences>.
 =back
 
 B<Note>: if neither C<FILENAME_> option is defined, the header will not be
-printed.  If at one is present, the other and both MTIME_ options must be
-present or "Use of undefined variable" warnings will be generated (except
+printed.  If at least one is present, the other and both C<MTIME_> options must
+be present or "Use of undefined variable" warnings will be generated (except
 on C<OldStyle> diffs, which ignores these options).
 
 =head1 Formatting Classes
 
 These functions implement the output formats.  They are grouped in to classes
-so diff() can use class names to call the correct set of output routines and so
-that you may inherit from them easily.  There are no constructors or instance
-methods for these classes, though subclasses may provide them if need be.
+so C<diff()> can use class names to call the correct set of output routines and
+so that you may inherit from them easily.  There are no constructors or
+instance methods for these classes, though subclasses may provide them if need
+be.
 
-Each class has file_header(), hunk_header(), hunk(), and footer() methods
-identical to those documented in the Text::Diff::Unified section.  header() is
-called before the hunk() is first called, footer() afterwards.  The default
-footer function is an empty method provided for overloading:
+Each class has C<file_header()>, C<hunk_header()>, C<hunk()>, and C<footer()>
+methods identical to those documented in the C<Text::Diff::Unified> section.
+C<header()> is called before the C<hunk()> is first called, C<footer()>
+afterwards.  The default footer function is an empty method provided for
+overloading:
 
     sub footer { return "End of patch\n" }
 
@@ -563,12 +566,12 @@ Returns "" for all methods (other than C<new()>).
 
 =over
 
-=item file_header
+=item Text::Diff::Unified::file_header
 
   $s = Text::Diff::Unified->file_header( $options );
 
 Returns a string containing a unified header.  The sole parameter is the
-options hash passed in to diff(), containing at least:
+C<options> hash passed in to C<diff()>, containing at least:
 
   FILENAME_A  => $fn1,
   MTIME_A     => $mtime1,
@@ -582,11 +585,11 @@ May also contain
 
 to override the default prefixes (default values shown).
 
-=item hunk_header
+=item Text::Diff::Unified::hunk_header
 
   Text::Diff::Unified->hunk_header( \@ops, $options );
 
-Returns a string containing the output of one hunk of unified diff.
+Returns a string containing the heading of one hunk of unified diff.
 
 =item Text::Diff::Unified::hunk
 
@@ -668,7 +671,7 @@ escaping works.
       12
       13
 
-Note: hunk_header() returns only "***************\n".
+Note: C<hunk_header()> returns only "***************\n".
 
 =head2 Text::Diff::OldStyle
 
@@ -681,23 +684,23 @@ Note: hunk_header() returns only "***************\n".
     12d12
     < 11d
 
-Note: no file_header().
+Note: no C<file_header()>.
 
 =head1 LIMITATIONS
 
 Must suck both input files entirely in to memory and store them with a normal
 amount of Perlish overhead (one array location) per record.  This is implied by
-the implementation of Algorithm::Diff, which takes two arrays.  If
-Algorithm::Diff ever offers an incremental mode, this can be changed (contact
-the maintainers of Algorithm::Diff and Text::Diff if you need this; it
-shouldn't be too terribly hard to tie arrays in this fashion).
+the implementation of L<Algorithm::Diff>, which takes two arrays.  If
+L<Algorithm::Diff> ever offers an incremental mode, this can be changed
+(contact the maintainers of L<Algorithm::Diff> and C<Text::Diff> if you need
+this; it shouldn't be too terribly hard to tie arrays in this fashion).
 
-Does not provide most of the more refined GNU diff options: recursive directory
-tree scanning, ignoring blank lines / whitespace, etc., etc.  These can all be
-added as time permits and need arises, many are rather easy; patches quite
-welcome.
+Does not provide most of the more refined GNU C<diff> options: recursive
+directory tree scanning, ignoring blank lines / whitespace, etc., etc.  These
+can all be added as time permits and need arises, many are rather easy; patches
+quite welcome.
 
-Uses closures internally, this may lead to leaks on C<perl> versions 5.6.1 and
+Uses closures internally, this may lead to leaks on Perl versions 5.6.1 and
 prior if used many times over a process' life time.
 
 =head1 SEE ALSO

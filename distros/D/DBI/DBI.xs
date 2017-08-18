@@ -85,10 +85,10 @@ extern Pid_t getpid (void);
 #endif
 
 #ifndef warn_sv
-static void warn_sv(SV *sv) { dTHX; warn(SvPV_nolen(sv)); }
+static void warn_sv(SV *sv) { dTHX; warn("%s", SvPV_nolen(sv)); }
 #endif
 #ifndef croak_sv
-static void croak_sv(SV *sv) { dTHX; croak(SvPV_nolen(sv)); }
+static void croak_sv(SV *sv) { dTHX; croak("%s", SvPV_nolen(sv)); }
 #endif
 
 /* types of method name */
@@ -494,7 +494,7 @@ _join_hash_sorted(HV *hash, char *kv_sep, STRLEN kv_sep_len, char *pair_sep, STR
 
 /* handy for embedding into condition expression for debugging */
 /*
-static int warn1(char *s) { warn(s); return 1; }
+static int warn1(char *s) { warn("%s", s); return 1; }
 static int dump1(SV *sv)  { dTHX; sv_dump(sv); return 1; }
 */
 
@@ -736,7 +736,8 @@ copy_statement_to_parent(pTHX_ SV *h, imp_xxh_t *imp_xxh)
     parent = DBIc_PARENT_H(imp_xxh);
     if (parent && SvROK(parent)) {
         SV *tmp_sv = *hv_fetch((HV*)SvRV(h), "Statement", 9, 1);
-        (void)hv_store((HV*)SvRV(parent), "Statement", 9, SvREFCNT_inc(tmp_sv), 0);
+        if (SvOK(tmp_sv))
+            (void)hv_store((HV*)SvRV(parent), "Statement", 9, SvREFCNT_inc(tmp_sv), 0);
     }
 }
 
@@ -2267,6 +2268,16 @@ dbih_set_attr_k(SV *h, SV *keysv, int dbikey, SV *valuesv)
     ) ) {
         cacheit = 1;
     }
+    /* deal with: NAME_(uc|lc), NAME_hash, NAME_(uc|lc)_hash */
+    else if ((keylen==7 || keylen==9 || keylen==12)
+        && strnEQ(key, "NAME_", 5)
+        && (    (keylen==9 && strEQ(key, "NAME_hash"))
+           ||   ((key[5]=='u' || key[5]=='l') && key[6] == 'c'
+                && (!key[7] || strnEQ(&key[7], "_hash", 5)))
+           )
+        ) {
+        cacheit = 1;
+    }
     else {      /* XXX should really be an event ? */
         if (isUPPER(*key)) {
             char *msg = "Can't set %s->{%s}: unrecognised attribute name or invalid value%s";
@@ -3571,6 +3582,7 @@ XS(XS_DBI_dispatch)
         && SvROK(*hook_svp)
     ) {
         SV *orig_defsv;
+        SV *temp_defsv;
         SV *code = SvRV(*hook_svp);
         I32 skip_dispatch = 0;
         if (trace_level)
@@ -3587,7 +3599,11 @@ XS(XS_DBI_dispatch)
          */
         orig_defsv = DEFSV; /* remember the current $_ */
         SAVE_DEFSV;         /* local($_) = $method_name */
-        DEFSV_set(sv_2mortal(newSVpv(meth_name,0)));
+        temp_defsv = sv_2mortal(newSVpv(meth_name,0));
+# ifdef SvTEMP_off
+        SvTEMP_off(temp_defsv);
+# endif
+        DEFSV_set(temp_defsv);
 
         EXTEND(SP, items+1);
         PUSHMARK(SP);

@@ -1,8 +1,10 @@
-# Name
+# NAME
 
 MooseX::DIC - A dependency injector container for Moose
 
-# Description
+# DESCRIPTION
+
+Full documentation on the [MooseX::DIC Webpage](http://docs.moosex-dic.org).
 
 MooseX::DIC is a dependency injection container tailored to [Moose](https://metacpan.org/pod/Moose), living in a full OOP environment and greatly
 inspired by Java DIC frameworks like [Spring](https://docs.spring.io/spring/docs/current/spring-framework-reference/html/beans.html)
@@ -24,7 +26,7 @@ course). The container will scan all configured paths to look for services to in
 There is a great amount of flexibility to account for testing environments, non-moose libraries, alternative
 implementations of services, etc, although none of it is needed for a simple usage.
 
-# Synopsis
+# SYNOPSIS
 
 A service is injectable if it consumes the Role [MooseX::DIC::Injectable](https://metacpan.org/pod/MooseX::DIC::Injectable), which is a parameterized role.
 

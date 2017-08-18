@@ -1,9 +1,9 @@
 package ETL::Yertl::Command::ymask;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 # ABSTRACT: Filter documents through applying a mask
 
 use ETL::Yertl;
-use ETL::Yertl::Format::default;
+use ETL::Yertl::Util qw( load_module );
 use Data::Partial::Google;
 
 sub main {
@@ -19,7 +19,7 @@ sub main {
     die "Must give a mask\n" unless $mask;
 
     my $filter = Data::Partial::Google->new( $mask );
-    my $out_fmt = ETL::Yertl::Format::default->new;
+    my $out_fmt = load_module( format => 'default' )->new;
 
     push @files, "-" unless @files;
     for my $file ( @files ) {
@@ -36,7 +36,7 @@ sub main {
             }
         }
 
-        my $in_fmt = ETL::Yertl::Format::default->new( input => $fh );
+        my $in_fmt = load_module( format => 'default' )->new( input => $fh );
         for my $doc ( $in_fmt->read ) {
             print $out_fmt->write( $filter->mask( $doc ) );
         }
@@ -55,7 +55,7 @@ ETL::Yertl::Command::ymask - Filter documents through applying a mask
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 AUTHOR
 

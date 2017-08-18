@@ -1,5 +1,14 @@
 Revision history for Alien-Role-Dino
 
+0.05      2017-08-17 16:53:17 -0400
+  - Transferring to the Perl5-Alien orginzation
+
+0.04      2017-08-17 14:58:30 -0400
+  - Remove Alien::Base::Dino as previously threatened
+  - Add rpath flags to Alien on darwin / OS X class as with other platforms
+    With autoconf this did not appear necessary, but cmake tests show that
+    it is.
+
 0.03      2017-08-04 15:07:43 -0400
   - Add missing prereq Class::Method::Modifiers
 

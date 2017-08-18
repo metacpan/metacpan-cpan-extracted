@@ -11,6 +11,7 @@ on 'test' => sub {
   requires "IPC::Open3" => "0";
   requires "Minion::Backend::SQLite" => "0";
   requires "Mock::MonkeyPatch" => "0";
+  requires "Mojo::SQLite" => "2.002";
   requires "Test::Fatal" => "0";
   requires "Test::Lib" => "0";
   requires "Test::More" => "1.001005";

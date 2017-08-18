@@ -1,4 +1,6 @@
 Revision history for Fuse-Class
+0.03	Aug 15, 2017
+	* Test::Class is added to dependency.
 0.02	Dec 18, 2011
 	* Add Fuse 2.8 support (Thanks to Derrik Pates)
 	* More documentation

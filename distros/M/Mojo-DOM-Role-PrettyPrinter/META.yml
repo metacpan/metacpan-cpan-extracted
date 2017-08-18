@@ -1,0 +1,29 @@
+---
+abstract: 'Add a pretty printer method to Mojo::DOM'
+author:
+  - 'Marcus Ramberg <marcus.ramberg@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-DOM-Role-PrettyPrinter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '7.42'
+  Role::Tiny: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/marcus/mojo-dom-role-prettyprinter/issues
+  homepage: https://github.com/marcus/mojo-dom-role-prettyprinter
+  repository: https://github.com/marcusramberg/mojo-dom-role-prettyprinter.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

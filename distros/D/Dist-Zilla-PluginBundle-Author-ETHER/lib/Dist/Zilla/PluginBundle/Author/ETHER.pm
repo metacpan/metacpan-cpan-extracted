@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.126-10-g8008cf7
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.127-17-g68d0e0d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 use Moose;
 with
@@ -16,7 +16,7 @@ with
 use Dist::Zilla::Util;
 use Moose::Util::TypeConstraints qw(enum subtype where class_type);
 use List::Util 1.45 qw(first any uniq);
-use Module::Runtime 'require_module';
+use Module::Runtime qw(require_module use_module);
 use Devel::CheckBin 'can_run';
 use Path::Tiny;
 use CPAN::Meta::Requirements;
@@ -78,8 +78,13 @@ has copy_file_from_release => (
 
 around copy_files_from_release => sub {
     my $orig = shift; my $self = shift;
-    sort(uniq($self->$orig(@_), qw(LICENCE LICENSE CONTRIBUTING Changes ppport.h INSTALL)));
+    sort(uniq($self->$orig(@_), qw(LICENCE LICENSE CONTRIBUTING ppport.h INSTALL)));
 };
+
+sub commit_files_after_release
+{
+    grep { -e } sort(uniq('README.md', 'README.pod', 'Changes', shift->copy_files_from_release));
+}
 
 has changes_version_columns => (
     is => 'ro', isa => subtype('Int', where { $_ > 0 && $_ < 20 }),
@@ -189,7 +194,7 @@ has _develop_requires => (
 );
 
 # files that might be in the repository that should never be gathered
-my @never_gather = qw(
+my @never_gather = grep { -e } qw(
     Makefile.PL ppport.h README.md README.pod META.json
     cpanfile TODO CONTRIBUTING LICENCE LICENSE INSTALL
     inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
@@ -257,16 +262,10 @@ sub configure
             . $self->server . ' with a read-only mirror', 'yellow'), "\n"
         if $self->server ne 'github' and $self->server ne 'none';
 
-    my @plugins = (
+    # method modifier will also apply default configs, compile develop prereqs
+    $self->add_plugins(
         # VersionProvider
-        [ 'RewriteVersion::Transitional' => {
-                ':version' => '0.004',
-                global => 1,
-                add_tarball_name => 0,
-                fallback_version_provider => 'Git::NextVersion',
-                version_regexp => '^v([\d._]+)(-TRIAL)?$',
-                (map { (my $key = $_) =~ s/Git::NextVersion\.//; $key => $self->payload->{$_} } grep { /^Git::NextVersion\./ } keys %{ $self->payload })
-            } ],
+        # see [@Git::VersionManager]
 
         # BeforeBuild
         # [ 'EnsurePrereqsInstalled' ], # FIXME: use options to make this less annoying!
@@ -281,11 +280,7 @@ sub configure
         [ 'FileFinder::ByName'  => Examples => { dir => 'examples' } ],
 
         # Gather Files
-        [ 'Git::GatherDir'      => { ':version' => '2.016', do {
-                my @filenames = grep { -e } @never_gather;
-                @filenames ? ( exclude_filename => \@filenames ) : ()
-            },
-        } ],
+        [ 'Git::GatherDir'      => { ':version' => '2.016', @never_gather ? ( exclude_filename => \@never_gather) : () } ],
 
         qw(MetaYAML MetaJSON Readme Manifest),
         [ 'License'             => { ':version' => '5.038', filename => $self->licence } ],
@@ -316,7 +311,6 @@ sub configure
 
         # Munge Files
         [ 'Git::Describe'       => { ':version' => '0.004', on_package_line => 1 } ],
-        # [RewriteVersion::Transitional], for the transitional usecase
         [
             ($self->surgical_podweaver ? 'SurgicalPodWeaver' : 'PodWeaver') => {
                 $self->surgical_podweaver ? () : ( ':version' => '4.005' ),
@@ -410,36 +404,53 @@ sub configure
         ( -e 'README.md' ?
             [ 'Run::AfterRelease' => 'remove old READMEs' => { ':version' => '0.038', quiet => 1, eval => q!unlink 'README.md'! } ]
             : ()),
-        [ 'CopyFilesFromRelease' => { filename => [ $self->copy_files_from_release ] } ],
+
+        [ 'CopyFilesFromRelease' => 'copy generated files' => { filename => [ $self->copy_files_from_release ] } ],
         [ 'ReadmeAnyFromPod'    => { ':version' => '0.142180', type => 'pod', location => 'root', phase => 'release' } ],
+    );
 
-        [ 'Git::Commit'         => 'release snapshot' => { ':version' => '2.020', add_files_in => ['.'], allow_dirty => [ grep { -e } sort(uniq('README.md', 'README.pod', $self->copy_files_from_release)) ], commit_msg => '%N-%v%t%n%n%c' } ],
-        [ 'Git::Tag'            => { tag_format => 'v%v', tag_message => 'v%v%t' } ],
-        $self->server eq 'github' ? [ 'GitHub::Update' => { ':version' => '0.40', metacpan => 1 } ] : (),
+    # plugins to do with calculating, munging, incrementing versions
+    $self->add_bundle('@Git::VersionManager' => {
+        'RewriteVersion::Transitional.global' => 1,
+        'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
+        'RewriteVersion::Transitional.version_regexp' => '^v([\d._]+)(-TRIAL)?$',
 
-        [ 'BumpVersionAfterRelease::Transitional' => { ':version' => '0.004', global => 1 } ],
-        [ 'NextRelease'         => { ':version' => '5.033', time_zone => 'UTC', format => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T' } ],
-        [ 'Git::Commit'         => 'post-release commit' => { ':version' => '2.020', allow_dirty => [ 'Changes' ], allow_dirty_match => [ '^lib/.*\.pm$' ], commit_msg => 'increment $VERSION after %v release' } ],
+        # for first Git::Commit
+        commit_files_after_release => [ $self->commit_files_after_release ],
+        # because of [Git::Check], only files copied from the release would be added -- there is nothing else
+        # hanging around in the current directory
+        'release snapshot.add_files_in' => ['.'],
+        'release snapshot.commit_msg' => '%N-%v%t%n%n%c',
+
+        'Git::Tag.tag_message' => 'v%v%t',
+
+        'BumpVersionAfterRelease::Transitional.global' => 1,
+
+        'NextRelease.:version' => '5.033',
+        'NextRelease.time_zone' => 'UTC',
+        'NextRelease.format' => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
+    });
+
+    $self->add_plugins(
         'Git::Push',
+        $self->server eq 'github' ? [ 'GitHub::Update' => { ':version' => '0.40', metacpan => 1 } ] : (),
     );
 
     # install with an author-specific URL from PAUSE, so cpanm-reporter knows where to submit the report
     # hopefully the file is available at this location soonish after release!
     my ($username, $password) = $self->_pause_config;
-    push @plugins,
-        [ 'Run::AfterRelease'   => 'install release' => { ':version' => '0.031', fatal_errors => 0, run => 'cpanm http://' . $username . ':' . $password . '@pause.perl.org/pub/PAUSE/authors/id/' . substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a' } ] if $username and $password;
+    $self->add_plugins(
+        [ 'Run::AfterRelease'   => 'install release' => { ':version' => '0.031', fatal_errors => 0, run => 'cpanm http://' . $username . ':' . $password . '@pause.perl.org/pub/PAUSE/authors/id/' . substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a' } ],
+    ) if $username and $password;
 
     # halt release after pre-release checks, but before ConfirmRelease
-    push @plugins, 'BlockRelease' if $self->airplane;
+    $self->add_plugins('BlockRelease') if $self->airplane;
 
-    push @plugins, (
+    $self->add_plugins(
         [ 'Run::AfterRelease'   => 'release complete' => { ':version' => '0.038', quiet => 1, eval => [ qq{print "release complete!\\xa"} ] } ],
         # listed late, to allow all other plugins which do BeforeRelease checks to run first.
         'ConfirmRelease',
     );
-
-    # method modifier will also apply default configs, compile develop prereqs
-    $self->add_plugins(@plugins);
 
     # if ModuleBuildTiny(::*) is being used, disable its static option if
     # [StaticInstall] is being run with mode=off or dry_run=1
@@ -454,7 +465,7 @@ sub configure
 
     # ensure that additional optional plugins are declared in prereqs
     $self->add_plugins(
-        [ 'Prereqs' => bundle_plugins =>
+        [ 'Prereqs' => 'prereqs for @Author::ETHER' =>
         { '-phase' => 'develop', '-relationship' => 'requires',
           %{ $self->_develop_requires_as_string_hash } } ]
     );
@@ -502,6 +513,38 @@ around add_plugins => sub
     return $self->$orig(@plugins);
 };
 
+around add_bundle => sub
+{
+    my ($orig, $self, $bundle, $payload) = @_;
+
+    return if $self->_plugin_removed($bundle);
+
+    my $package = Dist::Zilla::Util->expand_config_package_name($bundle);
+    &use_module(
+        $package,
+        $payload && $payload->{':version'} ? $payload->{':version'} : (),
+    );
+
+    # default configs can be passed in directly - no need to consult %extra_args
+
+    # record develop prereq of bundle only, not its components (it should do that itself)
+    $self->_add_minimum_develop_requires($package => $payload->{':version'} // 0);
+
+    # allow config slices to propagate down from the user
+    $payload = {
+        %$payload,      # caller bundle's default settings for this bundle, passed to this sub
+        # custom configs from the user, which may override defaults
+        (map { $_ => $self->payload->{$_} } grep { /^(.+?)\.(.+?)/ } keys %{ $self->payload }),
+    };
+
+    # allow the user to say -remove = <plugin added in subbundle>, but also do not override
+    # any removals that were passed into this sub directly.
+    push @{$payload->{-remove}}, @{ $self->payload->{ $self->plugin_remover_attribute } }
+        if $self->payload->{ $self->plugin_remover_attribute };
+
+    return $self->$orig($bundle, $payload);
+};
+
 # return username, password from ~/.pause
 sub _pause_config
 {
@@ -529,7 +572,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.127
+version 0.128
 
 =head1 SYNOPSIS
 
@@ -543,15 +586,6 @@ In your F<dist.ini>:
 
 This is a L<Dist::Zilla> plugin bundle. It is I<very approximately> equal to the
 following F<dist.ini> (following the preamble), minus some optimizations:
-
-    ;;; VersionProvider
-    [RewriteVersion::Transitional]
-    :version = 0.004
-    global = 1
-    add_tarball_name = 0
-    fallback_version_provider = Git::NextVersion
-    version_regexp = ^v([\d._]+)(-TRIAL)?$
-
 
     ;;; BeforeBuild
     [PromptIfStale / stale modules, build]
@@ -835,9 +869,8 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     quiet = 1
     eval = unlink 'README.md'
 
-    [CopyFilesFromRelease]
+    [CopyFilesFromRelease / copy generated files]
     filename = CONTRIBUTING
-    filename = Changes
     filename = INSTALL
     filename = LICENCE
     filename = LICENSE
@@ -848,6 +881,18 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     type = pod
     location = root
     phase = release
+
+    ;;;;;; begin [@Git::VersionManager]
+
+    ; this is actually a VersionProvider and FileMunger
+    [RewriteVersion::Transitional]
+    :version = 0.004
+    global = 1
+    fallback_version_provider = Git::NextVersion
+    version_regexp = ^v([\d._]+)(-TRIAL)?$
+
+    [CopyFilesFromRelease / copy Changes]
+    filename = Changes
 
     [Git::Commit / release snapshot]
     :version = 2.020
@@ -863,12 +908,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     commit_msg = %N-%v%t%n%n%c
 
     [Git::Tag]
-    tag_format = v%v
     tag_message = v%v%t
-
-    [GitHub::Update]    ; (if server = 'github' or omitted)
-    :version = 0.40
-    metacpan = 1
 
     [BumpVersionAfterRelease::Transitional]
     :version = 0.004
@@ -885,7 +925,13 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     allow_dirty_match = ^lib/.*\.pm$
     commit_msg = increment $VERSION after %v release
 
+    ;;;;;; end [@Git::VersionManager]
+
     [Git::Push]
+
+    [GitHub::Update]    ; (if server = 'github' or omitted)
+    :version = 0.40
+    metacpan = 1
 
     [Run::AfterRelease / install release]
     :version = 0.031
@@ -1044,7 +1090,7 @@ Defaults to false; can also be set with the environment variable C<DZIL_AIRPLANE
 Available in this form since 0.076.
 
 A file, to be present in the build, which is copied back to the source
-repository at release time and committed to git. Can be repeated more than
+repository at release time and committed to git. Can be used more than
 once. Defaults to:
 F<LICENCE>, F<LICENSE>, F<CONTRIBUTING>, F<Changes>, F<ppport.h>, F<INSTALL>;
 defaults are appended to, rather than overwritten.
@@ -1065,7 +1111,7 @@ options. Defaults to false.
 Available since 0.076.
 
 An integer that specifies how many columns (right-padded with whitespace) are
-allocated in Changes entries to the version string. Defaults to 10.
+allocated in F<Changes> entries to the version string. Defaults to 10.
 
 =head2 licence (or license)
 
@@ -1132,6 +1178,10 @@ L<Pod::Weaver::PluginBundle::Author::ETHER>
 =item *
 
 L<Dist::Zilla::MintingProfile::Author::ETHER>
+
+=item *
+
+L<Dist::Zilla::PluginBundle::Git::VersionManager>
 
 =back
 

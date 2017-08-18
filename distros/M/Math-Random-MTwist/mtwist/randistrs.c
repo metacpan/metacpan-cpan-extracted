@@ -316,10 +316,10 @@ double rds_uniform(
 /*
  * Generate a uniform distribution on the half-open interval [lower, upper).
  */
-double rds_luniform(
+NVTYPE rds_luniform(
     mt_state *		state,		/* State of the MT PRNG to use */
-    double		lower,		/* Lower limit of distribution */
-    double		upper)		/* Upper limit of distribution */
+    NVTYPE		lower,		/* Lower limit of distribution */
+    NVTYPE		upper)		/* Upper limit of distribution */
     {
     return lower + mts_ldrand(state) * (upper - lower);
     }
@@ -342,16 +342,22 @@ double rds_exponential(
 /*
  * Generate an exponential distribution with the given mean.
  */
-double rds_lexponential(
+NVTYPE rds_lexponential(
     mt_state *		state,		/* State of the MT PRNG to use */
-    double		mean)		/* Mean of generated distribution */
+    NVTYPE		mean)		/* Mean of generated distribution */
     {
-    double		random_value;	/* Random sample on [0,1) */
+    NVTYPE		random_value;	/* Random sample on [0,1) */
 
     do
 	random_value = mts_ldrand(state);
     while (random_value == 0.0);
+#if NVSIZE > 8 && defined(USE_QUADMATH)
+    return -mean * logq(random_value);
+#elif NVSIZE > 8 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+    return -mean * logl(random_value);
+#else
     return -mean * log(random_value);
+#endif
     }
 
 /*
@@ -359,10 +365,10 @@ double rds_lexponential(
  */
 double rds_erlang(
     mt_state *		state,		/* State of the MT PRNG to use */
-    int			p,		/* Order of distribution to generate */
+    IVTYPE		p,		/* Order of distribution to generate */
     double		mean)		/* Mean of generated distribution */
     {
-    int			order;		/* Order generated so far */
+    IVTYPE		order;		/* Order generated so far */
     double		random_value;	/* Value generated so far */
 
     do
@@ -380,13 +386,13 @@ double rds_erlang(
 /*
  * Generate a p-Erlang distribution with the given mean.
  */
-double rds_lerlang(
+NVTYPE rds_lerlang(
     mt_state *		state,		/* State of the MT PRNG to use */
-    int			p,		/* Order of distribution to generate */
-    double		mean)		/* Mean of generated distribution */
+    IVTYPE		p,		/* Order of distribution to generate */
+    NVTYPE		mean)		/* Mean of generated distribution */
     {
-    int			order;		/* Order generated so far */
-    double		random_value;	/* Value generated so far */
+    IVTYPE		order;		/* Order generated so far */
+    NVTYPE		random_value;	/* Value generated so far */
 
     do
 	{
@@ -397,7 +403,13 @@ double rds_lerlang(
 	    random_value *= mts_ldrand(state);
 	}
     while (random_value == 0.0);
+#if NVSIZE > 8 && defined(USE_QUADMATH)
+    return -mean * logq(random_value) / p;
+#elif NVSIZE > 8 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+    return -mean * logl(random_value) / p;
+#else
     return -mean * log(random_value) / p;
+#endif
     }
 
 /*
@@ -419,17 +431,23 @@ double rds_weibull(
 /*
  * Generate a Weibull distribution with the given shape and scale parameters.
  */
-double rds_lweibull(
+NVTYPE rds_lweibull(
     mt_state *		state,		/* State of the MT PRNG to use */
-    double		shape,		/* Shape of the distribution */
-    double		scale)		/* Scale of the distribution */
+    NVTYPE		shape,		/* Shape of the distribution */
+    NVTYPE		scale)		/* Scale of the distribution */
     {
-    double		random_value;	/* Random sample on [0,1) */
+    NVTYPE		random_value;	/* Random sample on [0,1) */
 
     do
 	random_value = mts_ldrand(state);
     while (random_value == 0.0);
+#if NVSIZE > 8 && defined(USE_QUADMATH)
+    return scale * expq(logq(-logq(random_value)) / shape);
+#elif NVSIZE > 8 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+    return scale * expl(logl(-logl(random_value)) / shape);
+#else
     return scale * exp(log(-log(random_value)) / shape);
+#endif
     }
 					/* Weibull distribution */
 /*
@@ -478,15 +496,15 @@ double rds_normal(
  * Generate a normal distribution with the given mean and standard
  * deviation.  See Law and Kelton, p. 491.
  */
-double rds_lnormal(
+NVTYPE rds_lnormal(
     mt_state *		state,		/* State of the MT PRNG to use */
-    double		mean,		/* Mean of generated distribution */
-    double		sigma)		/* Standard deviation to generate */
+    NVTYPE		mean,		/* Mean of generated distribution */
+    NVTYPE		sigma)		/* Standard deviation to generate */
     {
-    double		mag;		/* Magnitude of (x,y) point */
-    double		offset;		/* Unscaled offset from mean */
-    double		xranval;	/* First random value on [-1,1) */
-    double		yranval;	/* Second random value on [-1,1) */
+    NVTYPE		mag;		/* Magnitude of (x,y) point */
+    NVTYPE		offset;		/* Unscaled offset from mean */
+    NVTYPE		xranval;	/* First random value on [-1,1) */
+    NVTYPE		yranval;	/* Second random value on [-1,1) */
 
     /*
      * Generating a normal distribution is a bit tricky.  We may need
@@ -502,7 +520,13 @@ double rds_lnormal(
 	}
     while (mag > 1.0  ||  mag == 0.0);
 
+#if NVSIZE > 8 && defined(USE_QUADMATH)
+    offset = sqrtq((-2.0 * logq(mag)) / mag);
+#elif NVSIZE > 8 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+    offset = sqrtl((-2.0 * logl(mag)) / mag);
+#else
     offset = sqrt((-2.0 * log(mag)) / mag);
+#endif
     return mean + sigma * xranval * offset;
 
     /*
@@ -532,12 +556,18 @@ double rds_lognormal(
  * Generate a lognormal distribution with the given shape and scale
  * parameters.
  */
-double rds_llognormal(
+NVTYPE rds_llognormal(
     mt_state *		state,		/* State of the MT PRNG to use */
-    double		shape,		/* Shape of the distribution */
-    double		scale)		/* Scale of the distribution */
+    NVTYPE		shape,		/* Shape of the distribution */
+    NVTYPE		scale)		/* Scale of the distribution */
     {
+#if NVSIZE > 8 && defined(USE_QUADMATH)
+    return expq(rds_lnormal(state, scale, shape));
+#elif NVSIZE > 8 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+    return expl(rds_lnormal(state, scale, shape));
+#else
     return exp(rds_lnormal(state, scale, shape));
+#endif
     }
 
 /*
@@ -566,21 +596,33 @@ double rds_triangular(
  * Generate a triangular distibution between given limits, with a
  * given mode.
  */
-double rds_ltriangular(
+NVTYPE rds_ltriangular(
     mt_state *		state,		/* State of the MT PRNG to use */
-    double		lower,		/* Lower limit of distribution */
-    double		upper,		/* Upper limit of distribution */
-    double		mode)		/* Highest point of distribution */
+    NVTYPE		lower,		/* Lower limit of distribution */
+    NVTYPE		upper,		/* Upper limit of distribution */
+    NVTYPE		mode)		/* Highest point of distribution */
     {
-    double		ran_value;	/* Value generated by PRNG */
-    double		scaled_mode;	/* Scaled version of mode */
+    NVTYPE		ran_value;	/* Value generated by PRNG */
+    NVTYPE		scaled_mode;	/* Scaled version of mode */
 
     scaled_mode = (mode - lower) / (upper - lower);
     ran_value = mts_ldrand(state);
+#if NVSIZE > 8 && defined(USE_QUADMATH)
+    if (ran_value <= scaled_mode)
+	ran_value = sqrtq(scaled_mode * ran_value);
+    else
+	ran_value = 1.0 - sqrtq((1.0 - scaled_mode) * (1.0 - ran_value));
+#elif NVSIZE > 8 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+    if (ran_value <= scaled_mode)
+	ran_value = sqrtl(scaled_mode * ran_value);
+    else
+	ran_value = 1.0 - sqrtl((1.0 - scaled_mode) * (1.0 - ran_value));
+#else
     if (ran_value <= scaled_mode)
 	ran_value = sqrt(scaled_mode * ran_value);
     else
 	ran_value = 1.0 - sqrt((1.0 - scaled_mode) * (1.0 - ran_value));
+#endif
     return lower + (upper - lower) * ran_value;
     }
 
@@ -592,7 +634,7 @@ size_t rds_int_empirical(
     mt_state *		state,		/* State of the MT PRNG to use */
     rd_empirical_control* control)	/* Control from rd_empirical_setup */
     {
-    double		ran_value;	/* Value generated by PRNG */
+    NVTYPE		ran_value;	/* Value generated by PRNG */
     size_t		result;		/* Result we'll return */
 
     ran_value = mts_ldrand(state);
@@ -671,9 +713,9 @@ double rd_uniform(
 /*
  * Generate a uniform distribution on the open interval [lower, upper).
  */
-double rd_luniform(
-    double		lower,		/* Lower limit of distribution */
-    double		upper)		/* Upper limit of distribution */
+NVTYPE rd_luniform(
+    NVTYPE		lower,		/* Lower limit of distribution */
+    NVTYPE		upper)		/* Upper limit of distribution */
     {
     return rds_luniform (&mt_default_state, lower, upper);
     }
@@ -690,8 +732,8 @@ double rd_exponential(
 /*
  * Generate an exponential distribution with the given mean.
  */
-double rd_lexponential(
-    double		mean)		/* Mean of generated distribution */
+NVTYPE rd_lexponential(
+    NVTYPE		mean)		/* Mean of generated distribution */
     {
     return rds_lexponential (&mt_default_state, mean);
     }
@@ -700,7 +742,7 @@ double rd_lexponential(
  * Generate a p-Erlang distribution with the given mean.
  */
 double rd_erlang(
-    int			p,		/* Order of distribution to generate */
+    IVTYPE		p,		/* Order of distribution to generate */
     double		mean)		/* Mean of generated distribution */
     {
     return rds_erlang (&mt_default_state, p, mean);
@@ -709,9 +751,9 @@ double rd_erlang(
 /*
  * Generate a p-Erlang distribution with the given mean.
  */
-double rd_lerlang(
-    int			p,		/* Order of distribution to generate */
-    double		mean)		/* Mean of generated distribution */
+NVTYPE rd_lerlang(
+    IVTYPE		p,		/* Order of distribution to generate */
+    NVTYPE		mean)		/* Mean of generated distribution */
     {
     return rds_lerlang (&mt_default_state, p, mean);
     }
@@ -729,9 +771,9 @@ double rd_weibull(
 /*
  * Generate a Weibull distribution with the given shape and scale parameters.
  */
-double rd_lweibull(
-    double		shape,		/* Shape of the distribution */
-    double		scale)		/* Scale of the distribution */
+NVTYPE rd_lweibull(
+    NVTYPE		shape,		/* Shape of the distribution */
+    NVTYPE		scale)		/* Scale of the distribution */
     {
     return rds_lweibull (&mt_default_state, shape, scale);
     }
@@ -751,9 +793,9 @@ double rd_normal(
  * Generate a normal distribution with the given mean and standard
  * deviation.  See Law and Kelton, p. 491.
  */
-double rd_lnormal(
-    double		mean,		/* Mean of generated distribution */
-    double		sigma)		/* Standard deviation to generate */
+NVTYPE rd_lnormal(
+    NVTYPE		mean,		/* Mean of generated distribution */
+    NVTYPE		sigma)		/* Standard deviation to generate */
     {
     return rds_lnormal (&mt_default_state, mean, sigma);
     }
@@ -773,9 +815,9 @@ double rd_lognormal(
  * Generate a lognormal distribution with the given shape and scale
  * parameters.
  */
-double rd_llognormal(
-    double		shape,		/* Shape of the distribution */
-    double		scale)		/* Scale of the distribution */
+NVTYPE rd_llognormal(
+    NVTYPE		shape,		/* Shape of the distribution */
+    NVTYPE		scale)		/* Scale of the distribution */
     {
     return rds_llognormal (&mt_default_state, shape, scale);
     }
@@ -796,10 +838,10 @@ double rd_triangular(
  * Generate a triangular distibution between given limits, with a
  * given mode.
  */
-double rd_ltriangular(
-    double		lower,		/* Lower limit of distribution */
-    double		upper,		/* Upper limit of distribution */
-    double		mode)
+NVTYPE rd_ltriangular(
+    NVTYPE		lower,		/* Lower limit of distribution */
+    NVTYPE		upper,		/* Upper limit of distribution */
+    NVTYPE		mode)
     {
     return rds_ltriangular (&mt_default_state, lower, upper, mode);
     }

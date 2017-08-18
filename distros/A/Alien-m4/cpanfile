@@ -17,7 +17,9 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Alien::Build" => "0.32";
   requires "Alien::Build::MM" => "0.32";
+  requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
+  requires "Path::Tiny" => "0";
   requires "perl" => "5.006";
 };
 

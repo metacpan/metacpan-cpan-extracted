@@ -1,7 +1,7 @@
-use strict;
-use warnings;
+use Test2::V0 -no_srand => 1;
 use Config;
-use Test::More tests => 1;
+
+eval q{ require Test::More };
 
 # This .t file is generated.
 # make changes instead to dist.ini
@@ -10,12 +10,18 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Capture::Tiny
   ExtUtils::MakeMaker
-  File::ShareDir
+  File::ShareDir::Dist
   File::ShareDir::Install
+  File::Which
+  Test2::V0
 );
 
-
+$post_diag = sub {
+  require App::RegexFileUtils;
+  diag 'share_dir = ', App::RegexFileUtils->_share_dir;
+};
 
 my @modules = sort keys %modules;
 
@@ -59,7 +65,7 @@ if(@keys > 0)
 
 diag sprintf $format, 'perl ', $];
 
-foreach my $module (@modules)
+foreach my $module (sort @modules)
 {
   if(eval qq{ require $module; 1 })
   {
@@ -81,3 +87,4 @@ if($post_diag)
 
 spacer;
 
+done_testing;

@@ -289,7 +289,7 @@ extern uint64_t		mts_llrand(mt_state* state);
 extern double		mts_drand(mt_state* state);
 					/* Generate floating value, any gen. */
 					/* Fast, with only 32-bit precision */
-extern double		mts_ldrand(mt_state* state);
+extern NVTYPE		mts_ldrand(mt_state* state);
 					/* Generate floating value, any gen. */
 					/* Slower, with 64-bit precision */
 
@@ -301,7 +301,7 @@ extern uint64_t		mt_llrand(void);
 extern double		mt_drand(void);
 					/* Generate floating value */
 					/* Fast, with only 32-bit precision */
-extern double		mt_ldrand(void);
+extern NVTYPE		mt_ldrand(void);
 					/* Generate floating value */
 					/* Slower, with 64-bit precision */
 
@@ -363,7 +363,7 @@ extern mt_state		mt_default_state;
 					/* State of the default generator */
 extern double		mt_32_to_double;
 					/* Multiplier to convert long to dbl */
-extern double		mt_64_to_double;
+extern NVTYPE		mt_64_to_double;
 					/* Mult'r to cvt long long to dbl */
 
 /*
@@ -502,7 +502,7 @@ MT_EXTERN MT_INLINE double mts_drand(
  * (exclusive).  This function generates 64 bits of precision.  Use
  * mts_drand for more speed but less precision.
  */
-MT_EXTERN MT_INLINE double mts_ldrand(
+MT_EXTERN MT_INLINE NVTYPE mts_ldrand(
     register mt_state*	state)		/* State for the PRNG */
     {
 #ifdef UINT64_MAX
@@ -541,7 +541,7 @@ MT_EXTERN MT_INLINE double mts_ldrand(
     final_value = ((uint64_t) random_value_1 << 32) | (uint64_t) random_value_2;
     return final_value * mt_64_to_double;
 #else /* UINT64_MAX */
-    return random_value_1 * mt_32_to_double + random_value_2 * mt_64_to_double;
+    return random_value_1 * (NVTYPE)mt_32_to_double + random_value_2 * mt_64_to_double;
 #endif /* UINT64_MAX */
     }
 
@@ -632,7 +632,7 @@ MT_EXTERN MT_INLINE double mt_drand(void)
  * (exclusive).  This function generates 64 bits of precision.  Use
  * mts_drand for more speed but less precision.
  */
-MT_EXTERN MT_INLINE double mt_ldrand(void)
+MT_EXTERN MT_INLINE NVTYPE mt_ldrand(void)
     {
 #ifdef UINT64_MAX
     uint64_t		final_value;	/* Final (integer) value */
@@ -672,7 +672,7 @@ MT_EXTERN MT_INLINE double mt_ldrand(void)
     final_value = ((uint64_t) random_value_1 << 32) | (uint64_t) random_value_2;
     return final_value * mt_64_to_double;
 #else /* UINT64_MAX */
-    return random_value_1 * mt_32_to_double + random_value_2 * mt_64_to_double;
+    return random_value_1 * (NVTYPE)mt_32_to_double + random_value_2 * mt_64_to_double;
 #endif /* UINT64_MAX */
     }
 #endif /* MT_GENERATE_CODE_IN_HEADER */
@@ -778,7 +778,7 @@ class mt_prng
 			    {
 			    return mts_drand(&state);
 			    }
-	double		ldrand()	// Generate slow 64-bit floating value
+	NVTYPE		ldrand()	// Generate slow 64-bit floating value
 			    {
 			    return mts_ldrand(&state);
 			    }
@@ -793,7 +793,7 @@ class mt_prng
 	 *	// ...
 	 *	coinFlip = ranno() >= 0.5 ? heads : tails;
 	 */
-	double		operator()()
+	NVTYPE		operator()()
 			    {
 			    return mts_drand(&state);
 			    }

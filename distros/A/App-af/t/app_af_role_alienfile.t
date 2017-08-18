@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use lib 'corpus/lib';
 use lib 't/lib';
 use MyTest;

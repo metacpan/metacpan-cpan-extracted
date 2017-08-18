@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.052-5-g0a2f82e
+package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.053-7-g31c70ff
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Check at build/release time if modules are out of date
 # KEYWORDS: prerequisites upstream dependencies modules metadata update stale
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeBuild',
@@ -102,7 +102,8 @@ sub before_build
 {
     my $self = shift;
 
-    if ($ENV{CONTINUOUS_INTEGRATION} and not $self->run_under_travis)
+    if (not $ENV{PROMPTIFSTALE_REALLY_RUN_TESTS}
+        and $ENV{CONTINUOUS_INTEGRATION} and not $self->run_under_travis)
     {
         $self->log_debug('travis detected: skipping checks...');
         return;
@@ -130,7 +131,8 @@ sub after_build
 {
     my $self = shift;
 
-    return if $ENV{CONTINUOUS_INTEGRATION} and not $self->run_under_travis;
+    return if not $ENV{PROMPTIFSTALE_REALLY_RUN_TESTS}
+        and $ENV{CONTINUOUS_INTEGRATION} and not $self->run_under_travis;
 
     if ($self->phase eq 'build' and $self->check_all_prereqs)
     {
@@ -495,7 +497,7 @@ Dist::Zilla::Plugin::PromptIfStale - Check at build/release time if modules are 
 
 =head1 VERSION
 
-version 0.053
+version 0.054
 
 =head1 SYNOPSIS
 

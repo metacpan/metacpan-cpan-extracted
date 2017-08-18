@@ -15,10 +15,7 @@ my $exporter = Catmandu::Exporter::Template->new(
     end_tag   => "!>"
 );
 
-my $data = {
-    author => "brian d foy",
-    title  => "Mastering Perl",
-};
+my $data = {author => "brian d foy", title => "Mastering Perl",};
 
 $exporter->add($data);
 
@@ -27,7 +24,7 @@ Author: brian d foy
 Title: "Mastering Perl"
 EOF
 
-is( $file, $result, "html extension" );
+is($file, $result, "html extension");
 
 my $exporter2 = Catmandu::Exporter::Template->new(
     file      => \$file,
@@ -38,6 +35,6 @@ my $exporter2 = Catmandu::Exporter::Template->new(
 
 $exporter2->add($data);
 
-is( $file, $result, "tt extension" );
+is($file, $result, "tt extension");
 
 done_testing;

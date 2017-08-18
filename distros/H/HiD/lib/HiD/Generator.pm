@@ -3,7 +3,7 @@
 
 package HiD::Generator;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Generator::VERSION = '1.98';
+$HiD::Generator::VERSION = '1.991';
 use Moose::Role;
 
 use 5.014; # strict, unicode_strings
@@ -64,7 +64,7 @@ $site->posts >> and so on.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

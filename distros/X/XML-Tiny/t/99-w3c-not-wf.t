@@ -1,10 +1,10 @@
-use XML::Tiny qw(parsefile);
-
 use strict;
+use lib '.';
+
+use XML::Tiny qw(parsefile);
 require "t/test_functions";
 
 $^W = 1;
-
 $SIG{__WARN__} = sub {
     die(
         "Caught a warning, making it fatal:\n\n$_[0]\n"

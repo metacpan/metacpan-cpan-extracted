@@ -409,10 +409,23 @@ sub _build_handler_for {
                                     }
                                   }
 
-    # Hash[T] types require a hash ref, whose every value is of type T...
-    if ( exists $type_is{hash}  ) { my ($type_k, $type_v) = split '=>', $type_is{hash};
+    # Hash[T] and Hash[T=>T] types require a hash ref, whose every value is of type T...
+    my $HASH_KV_SPEC = qr{
+        \A
+        ((?&BalancedSquareBrackets))
+        (?: (=>) (.*) )?+
+        \Z
+
+        (?(DEFINE)
+            (?<BalancedSquareBrackets>
+                (?: [^][] | \[ (?&BalancedSquareBrackets) \] )*?
+            )
+        )
+    }xms;
+    if ( exists $type_is{hash}  ) { my ($type_k, $arrow, $type_v) = $type_is{hash} =~ $HASH_KV_SPEC;
                                     # Only value type specified...
-                                    if (!defined $type_v) {
+                                    if (!$arrow) {
+                                        $type_k =~ s/\A\s+|\s+\Z//g;
                                         my $value_handler = _build_handler_for($type_k);
                                         return sub {
                                             return _error_near($_[0], "Hash[$type_is{hash}]")
@@ -429,6 +442,8 @@ sub _build_handler_for {
                                     }
                                     # Both key and value type specified...
                                     else {
+                                        $type_k =~ s/\A\s+|\s+\Z//g;
+                                        $type_v =~ s/\A\s+|\s+\Z//g;
                                         my $key_handler   = _build_handler_for($type_k);
                                         my $value_handler = _build_handler_for($type_v);
                                         return sub {
@@ -537,7 +552,8 @@ sub _build_handler_for {
                                   }
 
     # Match[R] types require a stringifiable, that matches /R/x...
-    if ( exists $type_is{match} ) { my $regex = eval { qr{$type_is{match}}x };
+    if ( exists $type_is{match} ) { 
+                                    my $regex = eval { qr{$type_is{match}}x };
                                     croak "Invalid regex syntax in Match[$type_is{match}]:\n $@" if $@;
                                     return sub {
                                         return 1 if defined $_[0]

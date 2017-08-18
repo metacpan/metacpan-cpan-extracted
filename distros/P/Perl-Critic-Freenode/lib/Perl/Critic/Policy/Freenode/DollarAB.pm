@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.021';
+our $VERSION = '0.024';
 
 use constant DESC => 'Using $a or $b outside sort()';
 use constant EXPL => '$a and $b are special package variables for use in sort() and related functions. Declaring them as lexicals like "my $a" may break sort(). Use different variable names.';
@@ -57,7 +57,7 @@ sub _find_sorter {
 	$function = $function->previous_token until !$function
 		or ($function->isa('PPI::Token::Word')
 			and (is_method_call $function or is_function_call $function or is_hash_key $function));
-	return '' unless $function and $function->isa('PPI::Token::Word')
+	return $self->_find_sorter($outer) unless $function and $function->isa('PPI::Token::Word')
 		and (is_method_call $function or is_function_call $function or is_hash_key $function);
 	
 	my $name = $function;

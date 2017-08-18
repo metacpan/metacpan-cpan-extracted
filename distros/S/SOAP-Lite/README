@@ -1212,7 +1212,7 @@ FEATURES
     For more information see COMPRESSION in HTTP::Transport.
 
 SECURITY
-    For security reasons, the exisiting path for Perl modules (@INC) will be
+    For security reasons, the existing path for Perl modules (@INC) will be
     disabled once you have chosen dynamic deployment and specified your own
     "PATH/". If you wish to access other modules in your included package
     you have several options:
@@ -1252,7 +1252,7 @@ INTEROPERABILITY
                        ->uri($MY_NAMESPACE)
                        ->value($output);
 
-    In addition see comment about default incoding in .NET Web Services
+    In addition see comment about default encoding in .NET Web Services
     below.
 
   SOAP::Lite client with a .NET server
@@ -1321,7 +1321,7 @@ INTEROPERABILITY
                            ->use_prefix(0)
                            ->myMethod();
 
-        Will result in the following XML, which is more pallatable by .NET:
+        Will result in the following XML, which is more palatable by .NET:
 
           <SOAP-ENV:Envelope ...attributes skipped>
             <SOAP-ENV:Body>

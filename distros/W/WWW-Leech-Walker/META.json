@@ -4,7 +4,7 @@
       "Dmitry Selverstov <jaredspb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,12 +23,12 @@
          "requires" : {
             "LWP" : "6.08",
             "URI::URL" : "5.04",
-            "WWW::Leech::Parser" : "0.03"
+            "WWW::Leech::Parser" : "0.04"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::XS version 2.34"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

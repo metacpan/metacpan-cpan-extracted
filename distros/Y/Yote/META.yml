@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Yote
 provides:
   Yote:
     file: lib/Yote.pm
-    version: '2.0'
+    version: '2.01'
   Yote::Array:
     file: lib/Yote.pm
   Yote::Hash:
@@ -30,10 +30,9 @@ provides:
     file: lib/Yote.pm
 requires:
   Data::RecordStore: '2'
-  Devel::Refcount: '0.1'
   JSON: '0'
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.0'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

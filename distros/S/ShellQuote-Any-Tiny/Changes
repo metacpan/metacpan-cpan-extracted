@@ -1,4 +1,10 @@
-Revision history for ShellQuote-Any-Tiny
+0.005   2017-08-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Specify minimum version of Exporter 5.57 (allows use without
+	  inheriting) [CT].
+
 
 0.004   2017-01-04 (PERLANCAR)
 

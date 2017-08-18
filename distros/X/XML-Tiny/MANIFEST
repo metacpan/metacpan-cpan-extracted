@@ -1,4 +1,4 @@
-CHANGES
+CHANGELOG
 lib/XML/Tiny.pm
 Makefile.PL
 README
@@ -228,4 +228,6 @@ t/bom-UTF-32-BE.xml
 t/bom-UTF-32-LE.xml
 t/55-null-chars-in-input.t
 t/null-chars.xml
-META.yml                                 Module meta-data (added by MakeMaker)
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

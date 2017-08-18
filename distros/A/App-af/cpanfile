@@ -16,7 +16,6 @@ on 'test' => sub {
   requires "Test2::Tools::Basic" => "0.000060";
   requires "Test2::V0" => "0.000060";
   requires "Test::Exit" => "0.11";
-  requires "Test::More" => "0.94";
   requires "Test::Script" => "0";
   requires "perl" => "5.014";
 };

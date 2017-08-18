@@ -1,3 +1,12 @@
+<NOTE: Please consider for new development of Aliens that you use
+Alien::Build and alienfile instead.  Like this module they works
+with Alien::Base.  Unlike this module they are more easily customized
+and handle a number of corner cases better.  For a good place to start,
+please see Alien::Build::Manual::AlienAuthor.  Although the 
+Alien-Base / Alien-Build team will continue to maintain this module,
+(we will continue to fix bugs where appropriate), we aren't adding any
+new features to this module.
+
 Alien::Base::ModuleBuild is a base class and framework for creating Alien 
 distributions.  The goal of the project is to make things as simple and 
 easy as possible for both developers and users of Alien modules.

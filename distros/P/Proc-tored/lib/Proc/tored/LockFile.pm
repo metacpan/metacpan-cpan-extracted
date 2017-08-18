@@ -1,6 +1,6 @@
 package Proc::tored::LockFile;
 # ABSTRACT: Guard actions with atomic writes
-$Proc::tored::LockFile::VERSION = '0.18';
+$Proc::tored::LockFile::VERSION = '0.19';
 
 use warnings;
 use strict;
@@ -67,7 +67,7 @@ Proc::tored::LockFile - Guard actions with atomic writes
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

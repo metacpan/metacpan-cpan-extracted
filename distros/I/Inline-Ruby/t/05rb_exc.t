@@ -49,5 +49,5 @@ e(  "1/0",
 
 # parse error
 e(  "1/",
-    [qr/(?:compile error)|(?:syntax error, unexpected \$end)/, 'SyntaxError'],
+    [qr/(?:compile error)|(?:syntax error, unexpected (?:\$end|end-of-input))/, 'SyntaxError'],
 );

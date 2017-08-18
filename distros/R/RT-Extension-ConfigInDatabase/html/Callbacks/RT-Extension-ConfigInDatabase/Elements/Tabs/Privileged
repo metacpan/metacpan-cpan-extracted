@@ -1,0 +1,10 @@
+<%INIT>
+return unless $session{'CurrentUser'}->HasRight( Object=> RT->System, Right => 'SuperUser');
+
+my $tools = Menu->child('admin')->child('tools');
+
+$tools->child( edit_config =>
+    title => loc('Edit Configuration'),
+    path  => '/Admin/Tools/EditConfig.html',
+);
+</%INIT>

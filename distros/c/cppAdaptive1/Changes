@@ -1,0 +1,6 @@
+Revision history for Perl extension cppAdaptive1.
+
+0.01  Mon Aug 14 23:44:25 2017
+	- original version; created by h2xs 1.23 with options
+		-PAXn cppAdaptive1
+

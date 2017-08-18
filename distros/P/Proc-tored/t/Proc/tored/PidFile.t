@@ -34,7 +34,6 @@ subtest 'positive path' => sub {
 
   $pidfile->file->spew("1234\n");
   is $pidfile->read_file, 1234, 'read_file: non-existent pid';
-  is $pidfile->running_pid, 0, 'running_pid: non-existent pid';
   ok !$pidfile->is_running, 'is_running: non-existent pid';
 };
 

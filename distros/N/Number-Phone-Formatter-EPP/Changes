@@ -1,5 +1,9 @@
 Revision history for Number-Phone-Formatter-EPP
 
+0.07  2017-08-15
+    - Make Number::Phone an optional (test recommends) dependency.  This module
+      can be used stand alone without Number::Phone if desired.
+
 0.06  2017-08-03
     - add links to RFCs and ITU standards in POD docs (Thanks Mohammad S Anwar)
 

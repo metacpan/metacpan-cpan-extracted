@@ -34,7 +34,10 @@ sub test_suite {
             someval => 124.42,
             somename => 'Käse',
             someobj => $store->newobj( {
-                innerval => "This is an \\ inner `val\\`\n with Käse essen ",
+                binnerval => "`SPANXZ",
+                linnerval => "SP`A`NXZ",
+                zinnerval => "PANXZ`",
+                innerval => "This is an \\ inner `val\\`\n with Käse \\\ essen ",
                                       } ),
                         } ),
                                } );
@@ -67,8 +70,11 @@ sub test_suite {
     is( $dup_root->get_myList->[0]{objy}->get_somename, 'Käse', "utf 8 character saved in yote object" );
         is( $dup_root->get_myList->[0]{objy}->get_someval, '124.42', "number saved in yote object" );
     is( $dup_root->get_myList->[0]{objy}->get_someobj->get_innerval,
-        "This is an \\ inner `val\\`\n with Käse essen " );
-
+        "This is an \\ inner `val\\`\n with Käse \\\ essen " );
+    is( $dup_root->get_myList->[0]{objy}->get_someobj->get_binnerval, "`SPANXZ" );
+    is( $dup_root->get_myList->[0]{objy}->get_someobj->get_linnerval, "SP`A`NXZ" );
+    is( $dup_root->get_myList->[0]{objy}->get_someobj->get_zinnerval, "PANXZ`" );
+    
     # filesize of $dir/1_OBJSTORE should be 360
 
     # purge test. This should eliminate the following :

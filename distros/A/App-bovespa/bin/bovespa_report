@@ -36,10 +36,13 @@ sub parse_file {
     my $exchange = App::bovespa->new();
 
     open my $fh, "<", $file or die "Could not open the file";
+        
+        printf("%8s\t%8s\t%8s\t%8s\t%8s\t%8s\t%8s\n", qw/Symbol Quantity Paid Value Total Total_Paid Diff/ );
         while ( my $line = <$fh> ){
             my ( $stock, $quantity, $paid ) = split ( /\s+/, $line );
             my ( $value, $total, $total_paid, $diff );
             $value = $exchange->stock( $stock );
+            $paid =~ s/,/\./;
             $value =~ s/,/\./;
             if ( $quantity ){
                 $total = $value * $quantity;
@@ -53,7 +56,7 @@ sub parse_file {
                     $diff = "( ". ( abs $diff ) . " )";
                 }
             }
-            print join "\t", $stock, $quantity, $paid, $value, $total, $total_paid, $diff, "\n";
+            printf("%8s\t%8s\t%8s\t%8s\t%8s\t%8s\t%8s\n",$stock, $quantity, $paid, $value, $total, $total_paid, $diff );
         }
 
     close $fh;
@@ -84,11 +87,11 @@ value that you paid for it. Stock name is mandatory, the others are
 optional.
 
 Example:
-RENT3 300 10.00
+RENT3.SA 300 10.00
 
 The output will be, assuming the value of stock being 12.00:
 
-RENT3 300 10.00 12.00 360.00 300.00 60
+RENT3.SA 300 10.00 12.00 360.00 300.00 60
 
 The first three columns will be the same, plus the actual value,
 the actual total, the total paied for and the diference between 

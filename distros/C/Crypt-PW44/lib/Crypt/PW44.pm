@@ -5,9 +5,9 @@ use Exporter;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION $HASH $HEX);
 @ISA = qw(Exporter);
-@EXPORT_OK = qw( key compute key_md4 key_md5 compute_md4 compute_md5 generate);
-@EXPORT = qw( key key_md4 key_md5 generate);
-$VERSION = '0.13';
+@EXPORT_OK = qw( key compute key_md4 key_md5 compute_md4 compute_md5 generate_password);
+@EXPORT = qw( key key_md4 key_md5 generate_password);
+$VERSION = '0.14';
 $HASH = 'MD4';  # set default here, could be 4 or 5
 $HEX= 0; # if true, return key as a hex digit string
 
@@ -157,7 +157,7 @@ my @WORDS = qw(
 # takes a 64-bit value and the number of words to return
 # returns an N-word value suitable for use as a password
 # (entropy = 11 * N bits)
-sub generate {
+sub generate_password {
 my($thing,$num) = @_;
 return join ' ', map $WORDS[extract($thing,11*$_,11)], 0..$num;
 }
@@ -174,30 +174,30 @@ sub extract {
 1;
 __END__
 
+=pod
+
 =head1 NAME
 
-PW44 - Perl password generator - generate 44-bit passwords using OPIE dictionary
+Crypt::PW44 - Perl password generator - generate 44-bit passwords using OPIE dictionary from RFC 1760.
 
 =head1 SYNOPSIS
 
   # In perl script:
-  use Crypt::PW44 qw(generate);
+  use Crypt::PW44 qw(generate_password);
   # 44 bit (4 word) password
-  $output = generate(pack(Ll,int(rand(2**32)),int(rand(2**16))),3);
-  # $output = generate($random_binary_data,$number_of_ascii_text_words_minus_1);
+  $output = generate_password(pack("Ll",int(rand(2**32)),int(rand(2**16))),3);
+  # $output = generate_password($random_binary_data,$number_of_ascii_text_words_minus_1);
   # return value is N-word password of ascii text, with space delimiters between words
   
 
 =head1 DESCRIPTION
 
 This module contains a simple password generator, based on the S/Key calculator (as described in RFC
-1760) implemented in Perl.  It exports the function C<generate>.
+1760) implemented in Perl.  It exports the function C<generate_password>.
 
 This was inspired by the XKCD web comic "Password Strength", permalink http://xkcd.com/936/ .
 
 =head1 INSTALLATION
-
-(The usual.)
 
 perl Makefile.PL
 make
@@ -206,7 +206,7 @@ make install
 
 =head1 FUNCTIONS
 
-=head2 C<generate($random_data, $count)>
+=head2 C<generate_password($random_data, $count)>
 
 Given two arguments, uses provided entropic data, computes the hash
 value, and returns it as a
@@ -228,7 +228,7 @@ AKA "N". Counting from zero, not 1, is number of ASCII words in the password gen
 
 =head1 NOTES
 
-Derived (heavily) from the Skey module, written by
+Derived (heavily) from the S/Key module, written by
 
 Ken Williams, kwilliams@cpan.org
 
@@ -238,7 +238,7 @@ Brian Dickson, brian.peter.dickson@gmail.com
 
 =head1 COPYRIGHT
 
-Copyright 2011 Brian Dickson. All rights reserved.
+Copyright 2011-2017 Brian Dickson. All rights reserved.
 
 Copyright 2000-2009 Ken Williams.  All rights reserved.
 
@@ -246,8 +246,7 @@ This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
-
-perl(1).  L<RFC 1760|"http://rfc.net/rfc1760.html">.  Digest::MD4(1).
+perl(1).  L<RFC 1760|http://rfc.net/rfc1760.html>.  Digest::MD4(1).
 Digest::MD5(1).  Term::ReadKey(1).
 
 =cut

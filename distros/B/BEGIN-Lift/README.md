@@ -2,6 +2,8 @@
 
 Lift subroutine calls into the BEGIN phase.
 
+[![CPAN version](https://badge.fury.io/pl/BEGIN-Lift.svg)](https://metacpan.org/pod/BEGIN-Lift)
+
 # Copyright and License
 
 This software is copyright (c) 2017 by Stevan Little.

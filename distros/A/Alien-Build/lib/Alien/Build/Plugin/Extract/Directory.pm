@@ -7,7 +7,7 @@ use Alien::Build::Util qw( _mirror );
 use Path::Tiny ();
 
 # ABSTRACT: Plugin to extract a downloaded directory to a build directory
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 
 has '+format' => 'd';
@@ -51,7 +51,7 @@ Alien::Build::Plugin::Extract::Directory - Plugin to extract a downloaded direct
 
 =head1 VERSION
 
-version 0.95
+version 0.99
 
 =head1 SYNOPSIS
 

@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.053",
+  "VERSION" => "0.054",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
 
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
-    $ENV{CONTINUOUS_INTEGRATION} ? ( test => { TESTS => 't/99-placeholder.t' } ) : (),
+    $ENV{CONTINUOUS_INTEGRATION} && !$ENV{PROMPTIFSTALE_REALLY_RUN_TESTS} ? ( test => { TESTS => 't/99-placeholder.t' } ) : (),
 );
 
 my %FallbackPrereqs = (
@@ -124,7 +124,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 test_requires('IO::Pty') if isnt_os('MSWin32');
 # Dist::Zilla 5.033 has an insufficient Config::MVP prerequisite
 requires('Dist::Zilla', '5.034') if has_module('Dist::Zilla', '== 5.033');
@@ -142,15 +142,15 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;
-  warn "$module already exists in $mm_key -- need to do a sane metamerge!"
+  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
     if exists $WriteMakefileArgs{$mm_key}{$module}
       and $WriteMakefileArgs{$mm_key}{$module} ne '0'
       and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs -- need to do a sane metamerge!"
+  warn "$module already exists in FallbackPrereqs (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
     if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
         and $FallbackPrereqs{$module} ne $version_or_range;
   $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;

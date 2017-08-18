@@ -106,3 +106,14 @@ MANIFEST: New Tests/9_xx files to test new .out directive
 
 addw: Thu 03 Aug 2017 15:16
 ReadPreProcess.pm: Implement OutStreams, bump to version 0.84
+
+addw: Tue 15 Aug 2017 22:51
+MANIFEST: Add new tests: 9_include_2 & 9_stream_3
+
+addw: Tue 15 Aug 2017 23:19
+ReadPreProcess.pm: Bump to version 0.85
+	Implement in-memory streams
+	Tidy error reporting - did not always return on error
+
+addw: Tue 15 Aug 2017 23:24
+README: Mention .out divertions

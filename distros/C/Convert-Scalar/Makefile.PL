@@ -10,6 +10,12 @@ WriteMakefile(
 	           },
     NAME => "Convert::Scalar",
     VERSION_FROM => "Scalar.pm",
-    CONFIGURE_REQUIRES => { "ExtUtils::MakeMaker" => 6.52, "Canary::Stability" => 0 },
+    CONFIGURE_REQUIRES => {
+       "ExtUtils::MakeMaker" => 6.6,
+       "Canary::Stability" => 0,
+    },
+    BUILD_REQUIRES => {
+       ExtUtils::ParseXS => 3.28,
+    },
 );
 

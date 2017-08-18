@@ -5,7 +5,7 @@
 #
 package NOTEDB::binary;
 
-$NOTEDB::binary::VERSION = "1.11";
+$NOTEDB::binary::VERSION = "1.12";
 
 use strict;
 use IO::Seekable;
@@ -29,16 +29,16 @@ sub new {
     bless($self,$class);
 
     $self->{NOTEDB}  = $self->{dbname} = $param{dbname}   || File::Spec->catfile($ENV{HOME}, ".notedb");
-    my $MAX_NOTE     = $param{max_note} || 4096;
-    my $MAX_TIME     = $param{max_time} || 64;
+    my $MAX_NOTE     = $param{MaxNoteByte} || 4096;
+    my $MAX_TIME     = $param{MaxTimeByte} || 64;
 
     if(! -e $self->{NOTEDB}) {
-	open(TT,">$self->{NOTEDB}") or die "Could not create $self->{NOTEDB}: $!\n";
-	close (TT);
+      open(TT,">$self->{NOTEDB}") or die "Could not create $self->{NOTEDB}: $!\n";
+      close (TT);
     }
     elsif(! -w $self->{NOTEDB}) {
-	print "$self->{NOTEDB} is not writable!\n";
-	exit(1);
+      print "$self->{NOTEDB} is not writable!\n";
+      exit(1);
     }
 
 
@@ -51,31 +51,31 @@ sub new {
     $self->{LOCKFILE} = $self->{NOTEDB} . "~LOCK";
 
     return $self;
-}
+  }
 
 
 sub DESTROY
-{
+  {
     # clean the desk!
-}
+  }
 
-sub version {
+  sub version {
     my $this = shift;
     return $NOTEDB::binary::VERSION;
-}
+  }
 
 
 
-sub set_del_all
-{
-    my $this = shift;
-    unlink $this->{NOTEDB};
-    open(TT,">$this->{NOTEDB}") or die "Could not create $this->{NOTEDB}: $!\n";
-    close (TT);
-}
+  sub set_del_all
+    {
+      my $this = shift;
+      unlink $this->{NOTEDB};
+      open(TT,">$this->{NOTEDB}") or die "Could not create $this->{NOTEDB}: $!\n";
+      close (TT);
+    }
 
 
-sub get_single {
+    sub get_single {
     my($this, $num) = @_;
     my($address, $note, $date, $n, $t, $buffer, );
 

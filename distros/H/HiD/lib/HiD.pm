@@ -3,7 +3,7 @@
 
 package HiD;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::VERSION = '1.98';
+$HiD::VERSION = '1.991';
 use Moose;
 use namespace::autoclean;
 # note: we also do 'with HiD::Role::DoesLogging', just later on because reasons.
@@ -464,10 +464,11 @@ sub _build_potential_draft_posts_list {
 
 
 has processor => (
-  is      => 'ro' ,
-  isa     => 'HiD::Processor' ,
-  lazy    => 1 ,
-  default => sub {
+  is        => 'ro' ,
+  isa       => 'HiD::Processor' ,
+  lazy      => 1 ,
+  predicate => 'has_processor',
+  default   => sub {
     my $self = shift;
 
     my $processor_name  = $self->get_config( 'processor_name' ) // 'Handlebars';
@@ -965,6 +966,18 @@ ChinaXing
 
 reyjrar
 
+=item *
+
+Yanick Champoux
+
+=item *
+
+Jake Goldsborough
+
+=item *
+
+Trey Bianchini
+
 =back
 
 =head1 SEE ALSO
@@ -987,7 +1000,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

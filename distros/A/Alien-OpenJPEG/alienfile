@@ -1,0 +1,29 @@
+use alienfile;
+
+requires 'Alien::Build::Plugin::Gather::Dino';
+requires 'Alien::gmake';
+
+plugin 'PkgConfig' => 'libopenjp2';
+
+# http://www.openjpeg.org/
+share {
+
+	plugin Download => (
+		url => 'https://github.com/uclouvain/openjpeg/releases',
+		# Newer versions are tagged like "v2.1.2" instead of "version.2.1"
+		version => qr/v([\d\.]+)\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	build [
+		[ 'cmake', qw(-G), 'Unix Makefiles',
+			'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+			'-DBUILD_PKGCONFIG_FILES=ON',
+			'.' ],
+		[ '%{gmake}' ],
+		[ '%{gmake}', 'install' ],
+	];
+
+	plugin 'Gather::Dino';
+};

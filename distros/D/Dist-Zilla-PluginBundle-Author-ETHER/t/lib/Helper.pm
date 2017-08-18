@@ -15,7 +15,7 @@ our @EXPORT = qw(
 use Test::More 0.96;
 use Test::Deep;
 use List::Util 1.45 'uniq';
-use Path::Tiny;
+use Path::Tiny 0.062;
 use JSON::MaybeXS;
 use Moose::Util 'find_meta';
 use namespace::clean;
@@ -75,20 +75,35 @@ sub all_plugins_in_prereqs
 
     my ($tzil, %options) = @_;
 
+    my $bundle_name = $options{bundle_name} // '@Author::ETHER';    # TODO: default to dist we are in
     my %additional = map { $_ => undef } @{ $options{additional} // [] };
     my %exempt = map { $_ => undef } @{ $options{exempt} // [] };
 
     my $pluginbundle_meta = decode_json(path('META.json')->slurp_raw);
     my $dist_meta = $tzil->distmeta;
 
-    my $bundle_plugin_prereqs = $tzil->plugin_named('@Author::ETHER/bundle_plugins')->_prereq;
+    # these are develop-requires prereqs
+    my $plugin_name = "$bundle_name/prereqs for $bundle_name";
+    my $bundle_plugin_prereqs = $tzil->plugin_named($plugin_name);
+    cmp_deeply(
+        $bundle_plugin_prereqs,
+        methods(
+            prereq_phase => 'develop',
+            prereq_type => 'requires',
+        ),
+        "found '$plugin_name' develop-requires prereqs",
+    );
+    $bundle_plugin_prereqs = $bundle_plugin_prereqs->_prereq;
 
     subtest 'all plugins in use are specified as *required* runtime prerequisites by the plugin bundle, or develop prerequisites by the distribution' => sub {
-        foreach my $plugin (uniq map { find_meta($_)->name } @{$tzil->plugins})
+        foreach my $plugin (uniq map { find_meta($_)->name }
+            grep { $_->plugin_name =~ /^$bundle_name\/[^@]/ } @{$tzil->plugins})
         {
             note($plugin . ' is explicitly exempted; skipping'), next
                 if exists $exempt{$plugin};
-            next if $plugin eq 'Dist::Zilla::Plugin::FinderCode';  # added automatically by dist builder
+
+            # cannot be a (non-develop) prereq if the module lives in this distribution
+            next if exists $pluginbundle_meta->{provides}{$plugin};
 
             # plugins with a specific :version requirement are added to
             # prereqs via an extra injected [Prereqs] plugin

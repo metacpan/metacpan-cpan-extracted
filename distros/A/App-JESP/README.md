@@ -35,7 +35,8 @@ a json datastructure like this:
       "patches": [
           { "id":"foobartable", "sql": "CREATE TABLE foobar(id INT PRIMARY KEY)"},
           { "id":"foobar_more", "file": "patches/morefoobar.sql" }
-          { "id":"foobar_abs",  "file": "/absolute/path/to/patches/evenmore.sql" }
+          { "id":"foobar_abs",  "file": "/absolute/path/to/patches/evenmore.sql" },
+          { "id":"a_backfill_script", "file": "path/to/executable/file.sh" }
       ]
     }
 
@@ -44,6 +45,52 @@ contain raw SQL (SQL key), or point to a file of your choice (in the JESP home)
 itself containing the SQL.
 
 You are encouraged to look in [https://github.com/jeteve/App-JESP/tree/master/t](https://github.com/jeteve/App-JESP/tree/master/t) for examples.
+
+# PATCH TYPES
+
+# sql
+
+Simply add the SQL statement to execute in your patch structure:
+
+    {
+      "patches": [
+          ...
+          { "id":"foobartable", "sql": "CREATE TABLE foobar(id INT PRIMARY KEY)"}
+          ...
+    }
+
+This is convenient for very short SQL statment.
+
+# sql files
+
+Point to a file that contains SQL statement(s) to be executed. The filename can be either absolute
+or relative to the directory that contains the plan.
+
+    {
+      "patches": [
+           ...
+          { "id":"foobar_more", "file": "patches/morefoobar.sql" }
+          { "id":"foobar_abs",  "file": "/absolute/path/to/patches/evenmore.sql" },
+           ...
+      ]
+    }
+
+The directory structure is free, but of course you are encouraged to keep it clean.
+
+# script files (Unix only)
+
+Point to an EXECUTABLE file. (absolute or relative to the plan directory):
+
+    {
+      "patches": [
+          ...
+          { "id":"a_backfill_script", "file": "path/to/executable/file.sh" }
+          ...
+      ]
+    }
+
+See [APP::JESP::Driver#apply\_script](https://metacpan.org/pod/APP::JESP::Driver#apply_script) to see what environment the script is ran in. Note that the script
+needs to be executable by the current user to be detected as a script.
 
 # COMPATIBILITY
 

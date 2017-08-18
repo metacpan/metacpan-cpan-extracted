@@ -5,13 +5,14 @@ author:
 build_requires:
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.36
+  Test::Exception: 0
 configure_requires:
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.36
-  ExtUtils::ParseXS: 2.21
+  ExtUtils::ParseXS: 3.18
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.18'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,9 +26,9 @@ no_index:
 requires:
   DateTime: 0
   DateTime::Set: 0
-  Exporter: 5.57
+  Exporter: '5.57'
   XSLoader: 0.02
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: git://github.com/lestrrat/DateTime-Astro.git
-version: 1.00
+  repository: ssh://git://ssh.github.com/443/lestrrat/DateTime-Astro
+version: '1.01'

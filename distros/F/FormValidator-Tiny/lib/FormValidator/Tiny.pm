@@ -1,5 +1,5 @@
 package FormValidator::Tiny;
-$FormValidator::Tiny::VERSION = '0.003';
+$FormValidator::Tiny::VERSION = '0.004';
 use v5.18;
 use warnings;
 
@@ -683,7 +683,7 @@ FormValidator::Tiny - A tiny form validator
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

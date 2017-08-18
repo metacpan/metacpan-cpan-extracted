@@ -13,3 +13,4 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-signature.t
 t/basic.t
+t/numer-phone.t

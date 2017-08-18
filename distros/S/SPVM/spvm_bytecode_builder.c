@@ -29,7 +29,7 @@
 #include "spvm_constant_pool_sub.h"
 #include "spvm_constant_pool_field.h"
 #include "spvm_constant_pool_package.h"
-#include "spvm_array.h"
+#include "spvm_object.h"
 
 
 void SPVM_BYTECODE_BUILDER_push_inc_bytecode(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRAY* bytecode_array, SPVM_OP* op_inc, int32_t value) {
@@ -538,26 +538,33 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     if (!op_cur->lvalue) {
                       SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur);
                       
-                      if (type->id == SPVM_TYPE_C_ID_BYTE) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_BYTE);
+                      // Weaken field
+                      if (op_cur->flag &= SPVM_OP_C_FLAG_CALL_FIELD_WEAKEN) {
+                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_WEAKEN_FIELD_OBJECT);
                       }
-                      else if (type->id == SPVM_TYPE_C_ID_SHORT) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_SHORT);
-                      }
-                      else if (type->id == SPVM_TYPE_C_ID_INT) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_INT);
-                      }
-                      else if (type->id == SPVM_TYPE_C_ID_LONG) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_LONG);
-                      }
-                      else if (type->id == SPVM_TYPE_C_ID_FLOAT) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_FLOAT);
-                      }
-                      else if (type->id == SPVM_TYPE_C_ID_DOUBLE) {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_DOUBLE);
-                      }
+                      // Get field
                       else {
-                        SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_OBJECT);
+                        if (type->id == SPVM_TYPE_C_ID_BYTE) {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_BYTE);
+                        }
+                        else if (type->id == SPVM_TYPE_C_ID_SHORT) {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_SHORT);
+                        }
+                        else if (type->id == SPVM_TYPE_C_ID_INT) {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_INT);
+                        }
+                        else if (type->id == SPVM_TYPE_C_ID_LONG) {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_LONG);
+                        }
+                        else if (type->id == SPVM_TYPE_C_ID_FLOAT) {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_FLOAT);
+                        }
+                        else if (type->id == SPVM_TYPE_C_ID_DOUBLE) {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_DOUBLE);
+                        }
+                        else {
+                          SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_GET_FIELD_OBJECT);
+                        }
                       }
                       
                       SPVM_NAME_INFO* name_info = op_cur->uv.name_info;
@@ -1096,25 +1103,25 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                         
                         switch (type->id) {
                           case SPVM_TYPE_C_ID_BYTE_ARRAY:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_BYTE);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_BYTE);
                             break;
                           case SPVM_TYPE_C_ID_SHORT_ARRAY:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_SHORT);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_SHORT);
                             break;
                           case SPVM_TYPE_C_ID_INT_ARRAY:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_INT);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_INT);
                             break;
                           case SPVM_TYPE_C_ID_LONG_ARRAY:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_LONG);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_LONG);
                             break;
                           case SPVM_TYPE_C_ID_FLOAT_ARRAY:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_FLOAT);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_FLOAT);
                             break;
                           case SPVM_TYPE_C_ID_DOUBLE_ARRAY:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_DOUBLE);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_DOUBLE);
                             break;
                           default:
-                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_ARRAY_C_VALUE_TYPE_OBJECT);
+                            SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_OBJECT_C_VALUE_TYPE_OBJECT);
                         }
                       }
                       else {

@@ -391,19 +391,19 @@ sub _redirect_flow_from_legacy_params {
             )
             : (
                 prefilled_customer   => {
-                    address_line1           => $params{user}{billing_address1}        // '',
-                    address_line2           => $params{user}{billing_address2}        // '',
-                    address_line3           => $params{user}{billing_address3}        // '',
-                    city                    => $params{user}{city}                    // '',
-                    company_name            => $params{user}{company_name}            // '',
-                    country_code            => $params{user}{country_code}            // '',
-                    email                   => $params{user}{email}                   // '',
-                    family_name             => $params{user}{last_name}               // '',
-                    given_name              => $params{user}{given_name}              // '',
-                    language                => $params{user}{language}                // '',
-                    postal_code             => $params{user}{billing_postcode}        // '',
-                    region                  => $params{user}{region}                  // '',
-                    swedish_identity_number => $params{user}{swedish_identity_number} // '',
+
+                    # only include fields that are defined in the prefilled_customer, otherwise
+                    # gocardless will try to assume the user's location and thus the scheme
+                    ( $params{user}{billing_address1} ? ( address_line1 => $params{user}{billing_address1} ) : () ),
+                    ( $params{user}{billing_address2} ? ( address_line2 => $params{user}{billing_address2} ) : () ),
+                    ( $params{user}{billing_address3} ? ( address_line3 => $params{user}{billing_address3} ) : () ),
+                    ( $params{user}{last_name}        ? ( family_name   => $params{user}{last_name} ) : () ),
+                    ( $params{user}{postal_code}      ? ( postal_code   => $params{user}{postal_code} ) : () ),
+
+                    (
+                        map { ( $params{user}{$_} ? ( $_ => $params{user}{$_} ) : () ) }
+                        qw/ city company_name country_code email given_name language region swedish_identity_number /
+                    ),
                 },
             )
         ),

@@ -7,3 +7,4 @@ Makefile
 blib/
 callparser1.h
 pm_to_blib
+MANIFEST.bak

@@ -209,8 +209,6 @@ Files: Changes
  bin/licensecheck
  doap.ttl
  lib/App/Licensecheck.pm
- lib/Regexp/Pattern/License.pm
- lib/Regexp/Pattern/License/Parts.pm
  t/OSI.t
  t/grant.t
 Copyright: Copyright 2017 Jonas Smedegaard.

@@ -3,7 +3,7 @@
 
 package HiD::Layout;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Layout::VERSION = '1.98';
+$HiD::Layout::VERSION = '1.991';
 use Moose;
 use namespace::autoclean;
 
@@ -203,7 +203,7 @@ Will recurse into embedded layouts as needed.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

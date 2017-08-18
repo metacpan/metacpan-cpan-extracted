@@ -166,3 +166,9 @@ Revision history for Dios
 
         * Fixed the behaviour of is req/is required
           (Thanks Jeff)
+
+
+0.002009  Mon Aug 14 13:39:04 2017
+
+        * Fixed handling of Hash[K=>V] and Match[...] type declarators
+          (Thanks, Felix!)

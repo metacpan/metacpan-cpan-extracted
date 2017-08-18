@@ -49,6 +49,6 @@
          "web" : "https://github.com/domm/perl-oauth2"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

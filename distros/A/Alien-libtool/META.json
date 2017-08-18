@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,6 +26,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::MSYS" : "0.84",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.008001"
          }
@@ -77,7 +78,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Zaki Mughal (zmughal, sivoais)"

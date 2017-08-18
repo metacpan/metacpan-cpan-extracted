@@ -4,7 +4,7 @@
       "Adam Kennedy <adamk@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -44,6 +44,6 @@
          "url" : "https://github.com/neilbowers/Text-Diff"
       }
    },
-   "version" : "1.44",
+   "version" : "1.45",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

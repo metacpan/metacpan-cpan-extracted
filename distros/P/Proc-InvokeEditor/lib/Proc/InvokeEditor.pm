@@ -33,7 +33,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION
 @EXPORT = qw(
 	
 );
-$VERSION = '1.09';
+$VERSION = '1.13';
 
 @DEFAULT_EDITORS = ( $ENV{'VISUAL'}, $ENV{'EDITOR'}, '/usr/bin/vi',
                      '/bin/vi', '/bin/ed',
@@ -410,5 +410,10 @@ Patches supplied by Tim Booth.
 =head1 SEE ALSO
 
 L<perl>.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as Perl 5.
 
 =cut

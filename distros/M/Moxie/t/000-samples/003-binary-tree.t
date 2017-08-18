@@ -31,11 +31,14 @@ package BinaryTree {
     has 'left';
     has 'right';
 
-    my sub _parent : private('parent');
-    my sub _left   : private('left');
-    my sub _right  : private('right');
+    my sub _parent : private( parent );
+    my sub _left   : private( left );
+    my sub _right  : private( right );
 
-    sub BUILDARGS : init_args( left => undef, right => undef );
+    sub BUILDARGS : init_args(
+        node?   => node,
+        parent? => parent,
+    );
 
     sub BUILD ($self, $) { Scalar::Util::weaken( _parent ) }
 
@@ -77,14 +80,12 @@ package BinaryTree {
 }
 
 {
-    # this tests the `init_arg => undef` thing
     my $left  = BinaryTree->new;
     like(
         exception { BinaryTree->new( left => $left ) },
-        qr/^Attempt to set slot\[left\] in constructor\, but slot has been declared un-settable \(init_arg \= undef\)/,
+        qr/^Constructor for \(BinaryTree\) got unrecognized parameters \(`left`\)/,
         '... got the exception we expected'
     );
-
 }
 
 package MyBinaryTree {

@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 4;
+use Test2::V0 -no_srand => 1;
 use File::Temp qw( tempdir );
 
 my @cmds;
@@ -41,13 +39,15 @@ if($^O eq 'MSWin32' && @{$cmds[0]} == 3)
 {
   unshift @{ $expected[0] }, $^X;
   unshift @{ $expected[1] }, $^X;
-  $expected[0]->[1] = File::Spec->catfile(App::RegexFileUtils->share_dir, qw( ppt touch.pl ));
-  $expected[1]->[1] = File::Spec->catfile(App::RegexFileUtils->share_dir, qw( ppt touch.pl ));
+  $expected[0]->[1] = File::Spec->catfile(App::RegexFileUtils->_share_dir, qw( ppt touch.pl ));
+  $expected[1]->[1] = File::Spec->catfile(App::RegexFileUtils->_share_dir, qw( ppt touch.pl ));
 }
 
-is_deeply \@cmds, \@expected,
+is \@cmds, \@expected,
   "touch bar.txt ; touch foo.txt ";
 
 is $error, 0, '$? == 0';
 
 chdir(File::Spec->updir) || die;
+
+done_testing;

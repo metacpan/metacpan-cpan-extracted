@@ -24,6 +24,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Minion::Backend::SQLite' => '0',
                                    'Mock::MonkeyPatch' => '0',
+                                   'Mojo::SQLite' => '2.002',
                                    'Test::Fatal' => '0',
                                    'Test::Lib' => '0',
                                    'Test::More' => '1.001005'

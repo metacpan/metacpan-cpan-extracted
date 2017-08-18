@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -21,12 +21,14 @@ SYNOPSIS
      use alienfile;
      
      share {
-       requires Alien::cmake3;
+       # Build::CMake plugin pulls in Alien::cmake3 automatically
+       plugin 'Build::CMake';
        build [
-         '%{cmake3} ...'
+         # this is the default build step, if you do not specify one.
+         [ '%{cmake}', -G => '%{cmake_generator}', '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true', '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.' ],
          '%{make}',
          '%{make} install',
-       ],
+       ];
      };
 
 DESCRIPTION
@@ -60,24 +62,34 @@ HELPERS
 
 SEE ALSO
 
+    Alien::Build::Plugin::Build::CMake
+
+      Alien::Build plugin for cmake This will automatically pull in
+      Alien::cmake3 if you need it.
+
     Alien::CMake
 
       This is an older distribution that provides an alienized cmake. It is
       different in these ways:
 
-      Alien::cmake3 is based on alienfile and Alien::Build and integrates
-      better with Aliens that are based on that technology.
+      Alien::cmake3 is based on alienfile and Alien::Build
 
-      Alien::cmake3 will provide version 3.0.0 or better. Alien::CMake will
-      provide 2.x.x on some platforms where more recent binaries are not
-      available.
+	It integrates better with Aliens that are based on that technology.
+
+      Alien::cmake3 will provide version 3.0.0 or better
+
+	Alien::CMake will provide 2.x.x on some platforms where more recent
+	binaries are not available.
 
       Alien::cmake3 will install on platforms where there is no system
-      cmake and no binary cmake provided by cmake.org. It does this by
-      building cmake from source.
+      cmake and no binary cmake provided by cmake.org
 
-      Alien::cmake3 is preferred in the opinion of the maintainer of both
-      Alien::cmake3 and Alien::CMake for these reasons.
+	It does this by building cmake from source.
+
+      Alien::cmake3 is preferred
+
+	In the opinion of the maintainer of both Alien::cmake3 and
+	Alien::CMake for these reasons.
 
 AUTHOR
 

@@ -1,19 +1,8 @@
-use strict;
-use warnings;
-use Test::More tests => 11;
+use Test2::V0 -no_srand => 1;
 use File::Temp qw( tempdir );
 use App::RegexFileUtils;
+use Capture::Tiny qw( capture );
 use File::Spec;
-
-BEGIN {
-  eval q{
-    use Capture::Tiny qw( capture );
-    1;
-  } || eval q{
-    sub capture { $_[0]->() }
-  };
-  die $@ if $@;
-}
 
 my $dir = tempdir( CLEANUP => 1);
 chdir($dir) || die;
@@ -31,3 +20,5 @@ capture sub { App::RegexFileUtils->main('mv', '/\.jpe?g/.jpg/i') };
 ok -e "foo0$_.jpg", "after foo0$_.jpg" for (1..5);
 
 chdir(File::Spec->updir) || die;
+
+done_testing;

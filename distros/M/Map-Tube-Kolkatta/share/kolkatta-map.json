@@ -1,0 +1,539 @@
+{
+   "lines" : {
+      "line" : [
+         {
+            "id" : "L1",
+            "name" : "Line 1"
+         },
+         {
+            "id" : "L2",
+            "name" : "Line 2"
+         },
+         {
+            "id" : "L3",
+            "name" : "Line 3"
+         },
+         {
+            "id" : "L4",
+            "name" : "Line 4"
+         },
+         {
+            "id" : "L5",
+            "name" : "Line 5"
+         },
+         {
+            "id" : "L6",
+            "name" : "Line 6"
+         }
+      ]
+   },
+   "name" : "Kolkatta Metro",
+   "stations" : {
+      "station" : [
+         {
+            "name" : "Kabi Subhash",
+            "id" : "KABI_SUBHASH",
+            "line" : "L1:1,L6:23",
+            "link" : "L1_02,L6_22"
+         },
+         {
+            "name" : "Mother Teresa Sarani",
+            "id" : "MOTHER_TERESA_SARANI",
+            "line" : "L1:14,L3:11",
+            "link" : "L1_13,ESPLANADE,L3_10"
+         },
+         {
+            "name" : "Esplanade",
+            "id" : "ESPLANADE",
+            "line" : "L1:15,L2:9,L3:12",
+            "link" : "MOTHER_TERESA_SARANI,L1_16,L2_08,L2_10"
+         },
+         {
+            "name" : "Naopara",
+            "id" : "NAOPARA",
+            "line" : "L1:24,L4:1",
+            "link" : "L1_23,SWAMI_VIVEKANANDA,L4_02"
+         },
+         {
+            "name" : "Swami Vivekananda",
+            "id" : "SWAMI_VIVEKANANDA",
+            "line" : "L1:25,L5:1",
+            "link" : "NAOPARA,L1_26,L5_02"
+         },
+         {
+            "name" : "Salk Lake Sector V",
+            "id" : "SALT_LAKE_SECTOR_V",
+            "line" : "L2:1,L6:13",
+            "link" : "L2_02,L6_12,L6_14"
+         },
+         {
+            "name" : "Jai Hind",
+            "id" : "JAI_HIND",
+            "line" : "L4:4,L6:1",
+            "link" : "L4_03,L4_05,L6_02"
+         },
+         {
+            "name" : "Shahid Khudiram",
+            "id" : "L1_02",
+            "line" : "L1:2",
+            "link" : "KABI_SUBHASH,L1_03"
+         },
+         {
+            "name" : "Kabi Nazrul",
+            "id" : "L1_03",
+            "line" : "L1:3",
+            "link" : "L1_02,L1_04"
+         },
+         {
+            "name" : "Gitanjali",
+            "id" : "L1_04",
+            "line" : "L1:4",
+            "link" : "L1_03,L1_05"
+         },
+         {
+            "name" : "Masterda Surya Sen",
+            "id" : "L1_05",
+            "line" : "L1:5",
+            "link" : "L1_04,L1_06"
+         },
+         {
+            "name" : "Netaji",
+            "id" : "L1_06",
+            "line" : "L1:6",
+            "link" : "L1_05,L1_07"
+         },
+         {
+            "name" : "Mahanayak Uttam Kumar",
+            "id" : "L1_07",
+            "line" : "L1:7",
+            "link" : "L1_06,L1_08"
+         },
+         {
+            "name" : "Rabindra Sarobar",
+            "id" : "L1_08",
+            "line" : "L1:8",
+            "link" : "L1_07,L1_09"
+         },
+         {
+            "name" : "Kalighat",
+            "id" : "L1_09",
+            "line" : "L1:9",
+            "link" : "L1_08,L1_10"
+         },
+         {
+            "name" : "Jatin Das Park",
+            "id" : "L1_10",
+            "line" : "L1:10",
+            "link" : "L1_09,L1_11"
+         },
+         {
+            "name" : "Netaji Bhavan",
+            "id" : "L1_11",
+            "line" : "L1:11",
+            "link" : "L1_10,L1_12"
+         },
+         {
+            "name" : "Rabindra Sadan",
+            "id" : "L1_12",
+            "line" : "L1:12",
+            "link" : "L1_11,L1_13"
+         },
+         {
+            "name" : "Maidan",
+            "id" : "L1_13",
+            "line" : "L1:13",
+            "link" : "L1_12,MOTHER_TERESA_SARANI"
+         },
+         {
+            "name" : "Chandni Chowk",
+            "id" : "L1_16",
+            "line" : "L1:16",
+            "link" : "ESPLANADE,L1_17"
+         },
+         {
+            "name" : "Central",
+            "id" : "L1_17",
+            "line" : "L1:17",
+            "link" : "L1_16,L1_18"
+         },
+         {
+            "name" : "Mahatma Gandhi Road",
+            "id" : "L1_18",
+            "line" : "L1:18",
+            "link" : "L1_17,L1_19"
+         },
+         {
+            "name" : "Girish Park",
+            "id" : "L1_19",
+            "line" : "L1:19",
+            "link" : "L1_18,L1_20"
+         },
+         {
+            "name" : "Shobhabazar Sutanti",
+            "id" : "L1_20",
+            "line" : "L1:20",
+            "link" : "L1_19,L1_21"
+         },
+         {
+            "name" : "Shyambazaar",
+            "id" : "L1_21",
+            "line" : "L1:21",
+            "link" : "L1_20,L1_22"
+         },
+         {
+            "name" : "Belgachhia",
+            "id" : "L1_22",
+            "line" : "L1:22",
+            "link" : "L1_21,L1_23"
+         },
+         {
+            "name" : "Dum Dum",
+            "id" : "L1_23",
+            "line" : "L1:23",
+            "link" : "L1_22,NAOPARA"
+         },
+         {
+            "name" : "Dakshineshwar",
+            "id" : "L1_26",
+            "line" : "L1:26",
+            "link" : "SWAMI_VIVEKANANDA"
+         },
+         {
+            "name" : "Karunamoyee",
+            "id" : "L2_02",
+            "line" : "L2:2",
+            "link" : "SALT_LAKE_SECTOR_V,L2_03"
+         },
+         {
+            "name" : "Central Park",
+            "id" : "L2_03",
+            "line" : "L2:3",
+            "link" : "L2_02,L2_04"
+         },
+         {
+            "name" : "City Center",
+            "id" : "L2_04",
+            "line" : "L2:4",
+            "link" : "L2_03,L2_05"
+         },
+         {
+            "name" : "Bengal Chemical",
+            "id" : "L2_05",
+            "line" : "L2:5",
+            "link" : "L2_04,L2_06"
+         },
+         {
+            "name" : "Salt Lake Stadium",
+            "id" : "L2_06",
+            "line" : "L2:6",
+            "link" : "L2_05,L2_07"
+         },
+         {
+            "name" : "Phoolbagan",
+            "id" : "L2_07",
+            "line" : "L2:7",
+            "link" : "L2_06,L2_08"
+         },
+         {
+            "name" : "Sealdah",
+            "id" : "L2_08",
+            "line" : "L2:8",
+            "link" : "L2_07,ESPLANADE"
+         },
+         {
+            "name" : "Mahakaran",
+            "id" : "L2_10",
+            "line" : "L2:10",
+            "link" : "ESPLANADE,L2_11"
+         },
+         {
+            "name" : "Howrah Station",
+            "id" : "L2_11",
+            "line" : "L2:11",
+            "link" : "L2_10,L2_12"
+         },
+         {
+            "name" : "Howrah Maidan",
+            "id" : "L2_12",
+            "line" : "L2:12",
+            "link" : "L2_11"
+         },
+         {
+            "name" : "Joka",
+            "id" : "L3_01",
+            "line" : "L3:1",
+            "link" : "L3_02"
+         },
+         {
+            "name" : "Thakurpukur",
+            "id" : "L3_02",
+            "line" : "L3:2",
+            "link" : "L3_01,L3_03"
+         },
+         {
+            "name" : "Sakherbazar",
+            "id" : "L3_03",
+            "line" : "L3:3",
+            "link" : "L3_02,L3_04"
+         },
+         {
+            "name" : "Behala Chowrasta",
+            "id" : "L3_04",
+            "line" : "L3:4",
+            "link" : "L3_03,L3_05"
+         },
+         {
+            "name" : "Behala Bazar",
+            "id" : "L3_05",
+            "line" : "L3:5",
+            "link" : "L3_04,L3_06"
+         },
+         {
+            "name" : "Taratala",
+            "id" : "L3_06",
+            "line" : "L3:6",
+            "link" : "L3_05,L3_07"
+         },
+         {
+            "name" : "Majerhat",
+            "id" : "L3_07",
+            "line" : "L3:7",
+            "link" : "L3_06,L3_08"
+         },
+         {
+            "name" : "Mominpur",
+            "id" : "L3_08",
+            "line" : "L3:8",
+            "link" : "L3_07,L3_09"
+         },
+         {
+            "name" : "Kidderpore",
+            "id" : "L3_09",
+            "line" : "L3:9",
+            "link" : "L3_08,L3_10"
+         },
+         {
+            "name" : "Hastings",
+            "id" : "L3_10",
+            "line" : "L3:10",
+            "link" : "L3_09,MOTHER_TERESA_SARANI"
+         },
+         {
+            "name" : "Maulana Abul Kalam Azad",
+            "id" : "L4_02",
+            "line" : "L4:2",
+            "link" : "NAOPARA,L4_03"
+         },
+         {
+            "name" : "Jibananda",
+            "id" : "L4_03",
+            "line" : "L4:3",
+            "link" : "L4_02,JAI_HIND"
+         },
+         {
+            "name" : "Mother Teresa",
+            "id" : "L4_05",
+            "line" : "L4:5",
+            "link" : "JAI_HIND,L4_06"
+         },
+         {
+            "name" : "Priya Thakur",
+            "id" : "L4_06",
+            "line" : "L4:6",
+            "link" : "L4_05,L4_07"
+         },
+         {
+            "name" : "Bhibhuti Bhushan",
+            "id" : "L4_07",
+            "line" : "L4:7",
+            "link" : "L4_06,L4_08"
+         },
+         {
+            "name" : "Barasat",
+            "id" : "L4_08",
+            "line" : "L4:8",
+            "link" : "L4_07"
+         },
+         {
+            "name" : "Krishnakali",
+            "id" : "L5_02",
+            "line" : "L5:2",
+            "link" : "SWAMI_VIVEKANANDA,L5_03"
+         },
+         {
+            "name" : "Acharya Prafulla Chandra",
+            "id" : "L5_03",
+            "line" : "L5:3",
+            "link" : "L5_02,L5_04"
+         },
+         {
+            "name" : "Gandhi Ashram",
+            "id" : "L5_04",
+            "line" : "L5:4",
+            "link" : "L5_03,L5_05"
+         },
+         {
+            "name" : "Sarat Chandra",
+            "id" : "L5_05",
+            "line" : "L5:5",
+            "link" : "L5_04,L5_06"
+         },
+         {
+            "name" : "Subhash Nagar",
+            "id" : "L5_06",
+            "line" : "L5:6",
+            "link" : "L5_05,L5_07"
+         },
+         {
+            "name" : "Rishi Bankim",
+            "id" : "L5_07",
+            "line" : "L5:7",
+            "link" : "L5_06,L5_08"
+         },
+         {
+            "name" : "Rajendra Prasad",
+            "id" : "L5_08",
+            "line" : "L5:8",
+            "link" : "L5_07,L5_09"
+         },
+         {
+            "name" : "Titagarh",
+            "id" : "L5_09",
+            "line" : "L5:9",
+            "link" : "L5_08,L5_10"
+         },
+         {
+            "name" : "Ankul",
+            "id" : "L5_10",
+            "line" : "L5:10",
+            "link" : "L5_09,L5_11"
+         },
+         {
+            "name" : "Mangal Pandey",
+            "id" : "L5_11",
+            "line" : "L5:11",
+            "link" : "L5_10"
+         },
+         {
+            "name" : "Kazi Nazrul Islam Avenue",
+            "id" : "L6_02",
+            "line" : "L6:2",
+            "link" : "JAI_HIND,L6_03"
+         },
+         {
+            "name" : "New Town",
+            "id" : "L6_03",
+            "line" : "L6:3",
+            "link" : "L6_02,L6_04"
+         },
+         {
+            "name" : "Titumir",
+            "id" : "L6_04",
+            "line" : "L6:4",
+            "link" : "L6_03,L6_05"
+         },
+         {
+            "name" : "Sub CBD 2",
+            "id" : "L6_05",
+            "line" : "L6:5",
+            "link" : "L6_04,L6_06"
+         },
+         {
+            "name" : "Convention Centre",
+            "id" : "L6_06",
+            "line" : "L6:6",
+            "link" : "L6_05,L6_07"
+         },
+         {
+            "name" : "Prakriti Tirtha",
+            "id" : "L6_07",
+            "line" : "L6:7",
+            "link" : "L6_06,L6_08"
+         },
+         {
+            "name" : "Baanijya Tirtha",
+            "id" : "L6_08",
+            "line" : "L6:8",
+            "link" : "L6_07,L6_09"
+         },
+         {
+            "name" : "Rabindra Tirtha",
+            "id" : "L6_09",
+            "line" : "L6:9",
+            "link" : "L6_08,L6_10"
+         },
+         {
+            "name" : "Vivek Tirtha",
+            "id" : "L6_10",
+            "line" : "L6:10",
+            "link" : "L6_09,L6_11"
+         },
+         {
+            "name" : "Nazrul Tirtha",
+            "id" : "L6_11",
+            "line" : "L6:11",
+            "link" : "L6_10,L6_12"
+         },
+         {
+            "name" : "Bidhannagar",
+            "id" : "L6_12",
+            "line" : "L6:12",
+            "link" : "L6_11,SALT_LAKE_SECTOR_V"
+         },
+         {
+            "name" : "Nicco Park",
+            "id" : "L6_14",
+            "line" : "L6:14",
+            "link" : "SALT_LAKE_SECTOR_V,L6_15"
+         },
+         {
+            "name" : "Gour Kishore Ghosh",
+            "id" : "L6_15",
+            "line" : "L6:15",
+            "link" : "L6_14,L6_16"
+         },
+         {
+            "name" : "Varun Sengupta",
+            "id" : "L6_16",
+            "line" : "L6:16",
+            "link" : "L6_15,L6_17"
+         },
+         {
+            "name" : "Ritwik Ghatak",
+            "id" : "L6_17",
+            "line" : "L6:17",
+            "link" : "L6_16,L6_18"
+         },
+         {
+            "name" : "VIP Bazar",
+            "id" : "L6_18",
+            "line" : "L6:18",
+            "link" : "L6_17,L6_19"
+         },
+         {
+            "name" : "Hemanta Mukherjee",
+            "id" : "L6_19",
+            "line" : "L6:19",
+            "link" : "L6_18,L6_20"
+         },
+         {
+            "name" : "Kavi Sukanta",
+            "id" : "L6_20",
+            "line" : "L6:20",
+            "link" : "L6_19,L6_21"
+         },
+         {
+            "name" : "Jytotindra Nath Nandi",
+            "id" : "L6_21",
+            "line" : "L6:21",
+            "link" : "L6_20,L6_22"
+         },
+         {
+            "name" : "Satyajit Ray",
+            "id" : "L6_22",
+            "line" : "L6:22",
+            "link" : "L6_21,KABI_SUBHASH"
+         }
+      ]
+   }
+}

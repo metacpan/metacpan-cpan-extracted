@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-pWhoIs.t
+lib/Net/pWhoIs.pm

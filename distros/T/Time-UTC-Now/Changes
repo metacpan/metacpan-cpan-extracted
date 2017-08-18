@@ -1,3 +1,27 @@
+version 0.013; 2017-08-17
+
+  * automatically use the -lrt library on systems where it is required
+    in order to get access to clock_gettime(3)
+
+  * avoid multiple definitions of U64 (not valid C90 or C99) that happened
+    on Perl 5.23.2 and above
+
+  * skip thread tests on some old versions of Perl (around 5.10.0) where
+    a core bug makes thread creation violate an internal assertion and
+    causes crashes
+
+  * in documentation, note that some versions of Windows provide
+    clock_gettime(CLOCK_REALTIME) as another interface to the
+    GetSystemTimeAsFileTime() functionality
+
+  * in documentation, note that clock_gettime(CLOCK_REALTIME) is indeed
+    used on Cygwin
+
+  * have autoconfiguration macros always defined, with truth value rather
+    than definedness being significant
+
+  * correct indentation of some C preprocessor directives
+
 version 0.012; 2017-08-09
 
   * bugfix: fix handling of the demanding-accuracy parameter on Perl 5.6,

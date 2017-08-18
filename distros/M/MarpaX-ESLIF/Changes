@@ -1,6 +1,11 @@
 Changelog for MarpaX-ESLIF
 
-2.0.15 2017-08-14T05:52:52
+2.0.16 2017-08-14T19:24:41
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Fix MARPAESLIF_XV_STORE() macro usages: newSVsv(&PL_sv_undef) instead of
+   &PL_sv_undef [ci skip]
+
+2.0.15 2017-08-14T05:52:52Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - CMakeLists.txt: comment on versioning [ci skip]
  - JNI: rule and symbol grammar instrospection [ci skip]
@@ -62,7 +67,8 @@ Changelog for MarpaX-ESLIF
  - Symbol instrospection t+ [ci skip]
  - symbol introspection [ci skip]
  - perl's symbolPropertyBitSet, renamed Rule::Types to Rule::PropertyBitSet
-   [ci skip]
+
+ [ci skip]
  - Symbol introspection low-level [ci skip]
  - internal/structures.h: changed a comment [ci skip]
  - perl's MarpaX::ESLIF::Rule::Type::constant [ci skip]

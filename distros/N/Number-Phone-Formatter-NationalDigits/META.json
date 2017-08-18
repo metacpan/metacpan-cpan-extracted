@@ -1,0 +1,68 @@
+{
+   "abstract" : "A L<Number::Phone> formatter for the national digits only.",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Number-Phone-Formatter-NationalDigits",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Signature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Number::Phone" : "3.1"
+         },
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-number-phone-formatter-nationaldigits at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Phone-Formatter-NationalDigits"
+      },
+      "homepage" : "http://search.cpan.org/dist/Number-Phone-Formatter-NationalDigits/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/perl-number-phone-formatter-nationaldigits.git",
+         "web" : "https://github.com/mschout/perl-number-phone-formatter-nationaldigits"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

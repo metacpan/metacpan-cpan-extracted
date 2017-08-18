@@ -1,6 +1,10 @@
 Changes
 =======
 
+1.01 17 Aug 2017
+    * Merged PRs #2, #4, #5
+    * Updated travis settings
+
 1.00 24 Aug 2012
     * This module has been sitting around for way too long.
       Although it's not perfect, it works for about 99% of the cases, and

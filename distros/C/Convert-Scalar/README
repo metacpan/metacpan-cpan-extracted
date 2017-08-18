@@ -100,7 +100,7 @@ DESCRIPTION
         space if you know the scalar will grow. The return value is the
         modified scalar (the scalar is modified in-place).
 
-    scalar = extend scalar, addlen
+    scalar = extend scalar, addlen=64
         Reserves enough space in the scalar so that addlen bytes can be
         appended without reallocating it. The actual contents of the scalar
         will not be affected. The modified scalar will also be returned.
@@ -114,6 +114,29 @@ DESCRIPTION
         Convert::Scalar will use a "size to next power of two, roughly"
         algorithm, so as the scalar grows, perl will have to resize and copy
         it less and less often.
+
+    nread = extend_read fh, scalar, addlen=64
+        Calls "extend scalar, addlen" to ensure some space is available,
+        then do the equivalent of "sysread" to the end, to try to fill the
+        extra space. Returns how many bytes have been read, 0 on EOF or
+        undef> on eror, just like "sysread".
+
+        This function is useful to implement many protocols where you read
+        some data, see if it is enough to decode, and if not, read some
+        more, where the naive or easy way of doing this would result in bad
+        performance.
+
+    nread = read_all fh, scalar, length
+        Tries to read "length" bytes into "scalar". Unlike "read" or
+        "sysread", it will try to read more bytes if not all bytes could be
+        read in one go (this is often called "xread" in C).
+
+        Returns the total nunmber of bytes read (normally "length", unless
+        an error or EOF occured), 0 on EOF and "undef" on errors.
+
+    nwritten = write_all fh, scalar
+        Like "readall", but for writes - the equivalent of the "xwrite"
+        function often seen in C.
 
     refcnt scalar[, newrefcnt]
         Returns the current reference count of the given scalar and

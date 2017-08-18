@@ -50,7 +50,7 @@ sub open_data {
 sub before_update { # 
 #----------------------------------------------------------------------
   my ($self, $record) = @_;
-
+  
   my @upld = keys %{$self->{app}{upload_fields}};
 
   # remember paths and names of old files (in case we must delete them later)
@@ -69,7 +69,15 @@ sub before_update { #
 
   # now deal with file uploads
   foreach my $field (@upld) {
-    if (my $remote_name = $self->param($field)) {
+    
+    my $remote_name = $self->param($field);
+    # If we have a Plack::Request , use the uploads func to
+    # retrieve the file that was uploaded 
+    if(!$remote_name && $self->{req}) {
+      my $upload = $self->{req}->uploads->{$field};
+      $remote_name = $upload->basename if ($upload);      
+    }
+    if ($remote_name) {
       $self->do_upload_file($record, $field, $remote_name);
     }
     else { # upload is "" ==> must restore old name in record
@@ -81,10 +89,7 @@ sub before_update { #
 #----------------------------------------------------------------------
 sub do_upload_file { # 
 #----------------------------------------------------------------------
-  my ($self, $record, $field) = @_;
-
-  my $remote_name = $self->param($field)
-    or return;  # do nothing if empty
+  my ($self, $record, $field, $remote_name) = @_;
 
   my $src_fh;
 
@@ -96,14 +101,18 @@ sub do_upload_file { #
     $src_fh = $upld->fh;
   }
   else {
-    my @upld_fh = $self->{cgi}->upload($field); # may be an array 
+    my @uploads = $self->{req}->upload($field); # may be an array
+    my @upld_fh = map { $_->path } @uploads;
 
     # TODO : some convention for deleting an existing attached file
     # if @upload_fh == 0 && $remote_name =~ /^( |del)/ {...}
 
     # no support at the moment for multiple files under same field
     @upld_fh < 2  or die "several files uploaded to $field";
-    $src_fh = $upld_fh[0];
+    
+    # need to open the filehandle to reproduce Apache2::Upload's behaviour    
+    open $src_fh, "<$upld_fh[0]" or die "open <$upld_fh[0] : $!";
+        
   }
 
   # compute server name and server path
@@ -127,7 +136,9 @@ sub do_upload_file { #
   # do the transfer
   my ($dir) = ($path =~ m[^(.*)[/\\]]);
   -d $dir or mkpath $dir; # will die if can't make path
+  
   open my $dest_fh, ">$path.new" or die "open >$path.new : $!";
+  
   binmode($dest_fh), binmode($src_fh);
   my $buf;
   while (read($src_fh, $buf, 4096)) { print $dest_fh $buf;}

@@ -13,7 +13,7 @@ our %EXPORT_TAGS = (all => [qw(
 
 our @EXPORT_OK = (@{$EXPORT_TAGS{all}});
 
-our $VERSION = 0.04;
+our $VERSION = 1.01;
 
 use strict;
 use warnings;

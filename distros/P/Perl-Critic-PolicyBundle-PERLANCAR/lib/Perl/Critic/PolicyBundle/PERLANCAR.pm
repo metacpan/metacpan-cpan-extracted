@@ -1,7 +1,7 @@
 package Perl::Critic::PolicyBundle::PERLANCAR;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-16'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Perl::Critic policies
@@ -18,7 +18,7 @@ Perl::Critic::PolicyBundle::PERLANCAR - Perl::Critic policies
 
 =head1 VERSION
 
-This document describes version 0.001 of Perl::Critic::PolicyBundle::PERLANCAR (from Perl distribution Perl-Critic-PolicyBundle-PERLANCAR), released on 2017-08-01.
+This document describes version 0.002 of Perl::Critic::PolicyBundle::PERLANCAR (from Perl distribution Perl-Critic-PolicyBundle-PERLANCAR), released on 2017-08-16.
 
 =head1 HOMEPAGE
 

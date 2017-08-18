@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -451,11 +451,11 @@ L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
 
 =item
 
-L<Text::vCard::Precisely on CPAN|http://search.cpan.org/~worthmine/Text-vCard-Precisely-0.04/lib/Text/vCard/Precisely.pm>
+L<CPAN|http://search.cpan.org/perldoc?Text%3A%3AvCard%3A%3APrecisely>
 
 =item
 
-L<Text::vCard::Precisely on GitHub|https://github.com/worthmine/Text-vCard-Precisely>
+L<GitHub|https://github.com/worthmine/Text-vCard-Precisely>
 
 =back
 

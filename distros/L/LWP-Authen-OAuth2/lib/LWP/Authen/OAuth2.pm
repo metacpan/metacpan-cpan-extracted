@@ -59,22 +59,7 @@ sub init {
     $self->copy_option(\%opts, "user_agent", undef);
 
     if ($self->{token_string}) {
-        # Probably not the object that I need in access_token.
-        my $tokens = eval{ decode_json($self->{token_string}) };
-        if ($@) {
-            croak("While decoding token_string: $@");
-        }
-
-        my $class = $tokens->{_class}
-            or croak("No _class in token_string '$self->{token_string}'");
-
-        eval {load($class)};
-        if ($@) {
-            croak("Can't load access token class '$class': $@");
-        }
-
-        # I will assume this works.
-        $self->{access_token} = $class->from_ref($tokens);
+        $self->load_token_string();
     }
 }
 
@@ -313,6 +298,28 @@ sub set_user_agent {
     $self->{user_agent} = $agent;
 }
 
+sub load_token_string {
+    my ($self, $token_string) = @_;
+    $token_string ||= $self->{token_string};
+
+    # Probably not the object that I need in access_token.
+    my $tokens = eval{ decode_json($token_string) };
+    if ($@) {
+        croak("While decoding token_string: $@");
+    }
+
+    my $class = $tokens->{_class}
+        or croak("No _class in token_string '$token_string'");
+
+    eval {load($class)};
+    if ($@) {
+        croak("Can't load access token class '$class': $@");
+    }
+
+    # I will assume this works.
+    $self->{access_token} = $class->from_ref($tokens);
+}
+
 sub user_agent {
     my $self = shift;
     return $self->{user_agent} ||= LWP::UserAgent->new();
@@ -328,7 +335,7 @@ Version 0.13
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 =head1 SYNOPSIS
@@ -356,21 +363,27 @@ Currently L<LWP::Authen::OAuth2> provides ready-to-use classes to use OAuth2 wit
 
 =over
 
+=item * Dwolla
+
+L<LWP::Authen::OAuth2::ServiceProvider::Dwolla>
+
+implemented by L<Adi Fairbank|https://github.com/adifairbank>
+
 =item * Google
 
-LWP::Authen::OAuth2::ServiceProvider::Google
+L<LWP::Authen::OAuth2::ServiceProvider::Google>
+
+=item * Line
+
+L<LWP::Authen::OAuth2::ServiceProvider::Line>
+
+implemented by L<Adam Millerchip|https://github.com/amillerchip>
 
 =item * Strava
 
-LWP::Authen::OAuth2::ServiceProvider::Strava
+L<LWP::Authen::OAuth2::ServiceProvider::Strava>
 
 implemented by L<Leon Wright|https://github.com/techman83>
-
-=item * Dwolla
-
-LWP::Authen::OAuth2::ServiceProvider::Dwolla
-
-implemented by L<Adi Fairbank|https://github.com/adifairbank>
 
 =back
 
@@ -794,6 +807,8 @@ currently maintained by Thomas Klausner, C<< <domm@cpan.org> >>
 
 =item * L<Adi Fairbank|https://github.com/adifairbank>
 
+=item * L<Adam Millerchip|https://github.com/amillerchip>
+
 =back
 
 =head1 BUGS
@@ -861,6 +876,8 @@ C<ServiceProvider> work without requiring subclassing.
 =item * L<Leon Wright|https://github.com/techman83> for adding a L<Strava | http://strava.com> Service Provider and various bug fixes
 
 =item * L<Adi Fairbank|https://github.com/adifairbank> for adding a L<Dwolla | https://www.dwolla.com/> Service Provider and some other improvements
+
+=item * L<Adam Millerchip|https://github.com/amillerchip> for adding a L<Line | https://line.me> Service Provider and some refactoring
 
 =item * Nick Morrott for fixing some documentation typos
 

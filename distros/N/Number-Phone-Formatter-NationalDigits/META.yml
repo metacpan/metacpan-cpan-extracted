@@ -1,0 +1,27 @@
+---
+abstract: 'A L<Number::Phone> formatter for the national digits only.'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Number-Phone-Formatter-NationalDigits
+requires:
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Phone-Formatter-NationalDigits
+  homepage: http://search.cpan.org/dist/Number-Phone-Formatter-NationalDigits/
+  repository: git://github.com/mschout/perl-number-phone-formatter-nationaldigits.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

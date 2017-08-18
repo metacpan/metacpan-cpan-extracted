@@ -3,7 +3,7 @@
 
 package HiD::Types;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Types::VERSION = '1.98';
+$HiD::Types::VERSION = '1.991';
 use 5.014; # strict, unicode_strings
 use utf8;
 use autodie;
@@ -66,7 +66,7 @@ Type constraints for HiD.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

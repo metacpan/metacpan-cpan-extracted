@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-OpenStack-Swift
 
+0.12 2017-08-17T01:43:11Z
+    - swift.pl supports v1.0
+
 0.11 2016-04-04T05:10:19Z
     - Implemented full listing
     - Fixed Use of uninitialized value in length warning #21

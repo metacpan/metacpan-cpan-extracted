@@ -1,0 +1,21 @@
+.# Title: In-memory @stream, .print
+Line 1
+.out -c @stream
+.# We only did that to create the stream, not write anything, so switch back
+.out
+.print -o @stream The cat sat on the mat
+.print -o @stream How now brown cow
+End of Prints
+.if .test -m @stream
+.echo Stream @stream exists with \v{_COUNT} lines
+.else
+Stream @stream does not exist
+.fi
+.if .test -m @NoStream
+.echo Stream @NoStream exists with \v{_COUNT} lines
+.else
+Stream @NoStream does not exist
+.fi
+.read @stream aLine
+.echo Read: \v{aLine}
+Line end

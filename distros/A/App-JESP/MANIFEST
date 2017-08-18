@@ -16,6 +16,7 @@ lib/App/JESP/Cmd/Command/deploy.pm
 lib/App/JESP/Cmd/Command/install.pm
 lib/App/JESP/Cmd/Command/status.pm
 lib/App/JESP/Cmd/CommandJESP.pm
+lib/App/JESP/Colorizer.pm
 lib/App/JESP/Driver.pm
 lib/App/JESP/Driver/Pg.pm
 lib/App/JESP/Driver/SQLite.pm
@@ -24,10 +25,12 @@ lib/App/JESP/Patch.pm
 lib/App/JESP/Plan.pm
 scripts/jesp
 t/build.t
+t/colors.t
 t/deploy.t
 t/deploy_mysql.t
 t/deploy_mysqlpasswd.t
 t/deploy_pgsql.t
+t/deploy_script.t
 t/home/patches/customertrigger.sql
 t/home/patches/morefoobar.sql
 t/home/plan.json
@@ -37,7 +40,10 @@ t/home_mysql/plan.json
 t/home_pgsql/patches/pagila1.sql
 t/home_pgsql/patches/pagila2.sql
 t/home_pgsql/plan.json
+t/homescripts/backfillstuff.sh
+t/homescripts/plan.json
 t/install.t
 t/install_dbs.t
 t/plan.t
+t/plan_script.t
 t/pod-coverage.t

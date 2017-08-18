@@ -12,9 +12,7 @@ Specifically:
 * [bioseq](https://github.com/bioperl/p5-bpwrapper/wiki/bioseq):  [`Bio::Seq`](https://metacpan.org/pod/Bio::Seq) with additional methods
 * [biotree](https://github.com/bioperl/p5-bpwrapper/wiki/biotree): [`Bio::Tree`](https://metacpan.org/pod/Bio::Seq) with additional methods
 
-The motivation is to allow BioPerl users from writing full-blown
-scripts for routine manipulations of sequences, alignments, trees, and
-others. For common operations of sequences and alignments,
+The motivation is to allow users to perform routine BioPerl manipulations of sequences, alignments, and trees without having to write full-blown scripts. For common operations of sequences and alignments,
 Bio::BPWrapper makes it easy to create workflows with a single BASH
 script containing a combination command-line calls: no Perl or BioPerl
 coding is necessary.
@@ -44,13 +42,19 @@ package will check and install that.
     $ ./Build install # may require sudo or root access
 ```
 
-# Get Help
-
 Each script, [`bioaln`](https://github.com/bioperl/p5-bpwrapper/wiki/bioaln), [`biopop`](https://metacpan.org/pod/distribution/Bio-BPWrapper/bin/biopop), [`bioseq`](https://github.com/bioperl/p5-bpwrapper/wiki/bioseq) and [`biotree`](https://github.com/bioperl/p5-bpwrapper/wiki/biotree) give shorter usage help when given command-line option `--help`. Manual-page help is also giving the option `--man`.
 
 Documentation is maintained in [this project's wiki](https://github.com/bioperl/p5-bpwrapper/wiki).
 
 A help file with use cases is maintained at: http://diverge.hunter.cuny.edu/labwiki/Bioutils
+
+# Install from CPAN
+
+The git code generally has the newest code. If git is not your thing, you can also install the last release from CPAN:
+
+```
+   $ cpan install Bio::BPWrapper
+```
 
 # Developers, Contact, Citation
 * Yözen Hernández

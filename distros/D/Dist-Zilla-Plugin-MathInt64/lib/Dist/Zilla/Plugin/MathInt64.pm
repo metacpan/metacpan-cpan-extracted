@@ -1,127 +1,111 @@
-package Dist::Zilla::Plugin::MathInt64;
+use 5.014;
 
-use Moose;
-use Dist::Zilla::File::InMemory;
-use ExtUtils::Typemaps;
-use File::ShareDir qw( dist_dir );
+package Dist::Zilla::Plugin::MathInt64 0.10 {
 
-# ABSTRACT: Include the Math::Int64 C client API in your distribution
-our $VERSION = '0.09'; # VERSION
+  use Moose;
+  use Dist::Zilla::File::InMemory;
+  use ExtUtils::Typemaps;
+
+  # ABSTRACT: Include the Math::Int64 C client API in your distribution
 
 
-with 'Dist::Zilla::Role::Plugin';
-with 'Dist::Zilla::Role::FileGatherer';
-with 'Dist::Zilla::Role::FileMunger';
-with 'Dist::Zilla::Role::PrereqSource';
+  with 'Dist::Zilla::Role::Plugin';
+  with 'Dist::Zilla::Role::FileGatherer';
+  with 'Dist::Zilla::Role::FileMunger';
+  with 'Dist::Zilla::Role::PrereqSource';
 
-has dir => (
-  is => 'ro',
-);
+  has dir => (
+    is => 'ro',
+  );
 
-has typemap => (
-  is      => 'ro',
-  default => 1,
-);
+  has typemap => (
+    is      => 'ro',
+    default => 1,
+  );
 
-has typemap_path => (
-  is      => 'ro',
-  default => 'typemap',
-);
+  has typemap_path => (
+    is      => 'ro',
+    default => 'typemap',
+  );
 
-has _source_dir => (
-  is      => 'ro',
-  lazy    => 1,
-  default => sub {
-    if(defined $ENV{DIST_ZILLA_PLUGIN_MATH64_TEST})
-    {
-      require Path::Class::Dir;
-      return Path::Class::Dir->new($ENV{DIST_ZILLA_PLUGIN_MATH64_TEST});
-    }
-    elsif(defined $Dist::Zilla::Plugin::MathInt64::VERSION)
-    {
-      require Path::Class::Dir;
-      return Path::Class::Dir->new(dist_dir('Dist-Zilla-Plugin-MathInt64'));
-    }
-    else
-    {
-      require Path::Class::File;
-      return Path::Class::File->new(__FILE__)
-        ->parent
-        ->parent
-        ->parent
-        ->parent
-        ->parent
-        ->absolute
-        ->subdir('share');
-    }
-  },
-);
+  use constant _source_dir_default => do {
+    require File::ShareDir::Dist;
+    require Path::Tiny;
+    Path::Tiny->new(File::ShareDir::Dist::dist_share('Dist-Zilla-Plugin-MathInt64'));
+  };
 
-sub gather_files
-{
-  my($self) = @_;
-  
-  foreach my $source_name (qw( perl_math_int64.c  perl_math_int64.h perl_math_int64_types.h ))
+  has _source_dir => (
+    is      => 'ro',
+    lazy    => 1,
+    default => \&_source_dir_default,
+  );
+
+  sub gather_files
   {
-    my $dst = defined $self->dir
-    ? join('/', $self->dir, $source_name)
-    : $source_name;
+    my($self) = @_;
+    
+    foreach my $source_name (qw( perl_math_int64.c  perl_math_int64.h perl_math_int64_types.h ))
+    {
+      my $dst = defined $self->dir
+      ? join('/', $self->dir, $source_name)
+      : $source_name;
+    
+      $self->log("create $dst");
+      $self->add_file(
+        Dist::Zilla::File::InMemory->new(
+          name    => $dst,
+          content => $self->_source_dir->child($source_name)->slurp,
+        ),
+      );
+    }
   
-    $self->log("create $dst");
-    $self->add_file(
-      Dist::Zilla::File::InMemory->new(
-        name    => $dst,
-        content => scalar $self->_source_dir->file($source_name)->slurp,
+    return unless $self->typemap;
+  
+    unless(grep { $_->name eq $self->typemap_path } @{ $self->zilla->files })
+    {
+      $self->log("create " . $self->typemap_path);
+      $self->add_file(
+        Dist::Zilla::File::InMemory->new(
+          name    => $self->typemap_path,
+          content => ExtUtils::Typemaps->new->as_string,
+        ),
+      );
+    }
+  }
+
+  sub munge_files
+  {
+    my($self) = @_;
+    
+    return unless $self->typemap;
+    
+    my($file) = grep { $_->name eq $self->typemap_path } @{ $self->zilla->files };
+
+    unless(defined $file)
+    {
+      $self->log_fatal("unable to find " . $self->typemap_path . " which I should have created, perhaps another plugin pruned it?");
+    }
+  
+    $self->log("update " . $self->typemap_path);
+  
+    my $typemap = ExtUtils::Typemaps->new(string => $file->content);
+    $typemap->merge(
+      typemap => ExtUtils::Typemaps->new(
+        string => $self->_source_dir->child('typemap')->slurp,
       ),
     );
+    $file->content($typemap->as_string);
   }
-  
-  return unless $self->typemap;
-  
-  unless(grep { $_->name eq $self->typemap_path } @{ $self->zilla->files })
+
+  sub register_prereqs
   {
-    $self->log("create " . $self->typemap_path);
-    $self->add_file(
-      Dist::Zilla::File::InMemory->new(
-        name    => $self->typemap_path,
-        content => ExtUtils::Typemaps->new->as_string,
-      ),
+    my($self) = @_;
+  
+    $self->zilla->register_prereqs(
+      { type => 'requires', phase => 'runtime' },
+      'Math::Int64' => '0.28',
     );
   }
-}
-
-sub munge_files
-{
-  my($self) = @_;
-  
-  return unless $self->typemap;
-  
-  my($file) = grep { $_->name eq $self->typemap_path } @{ $self->zilla->files };
-
-  unless(defined $file)
-  {
-    $self->log_fatal("unable to find " . $self->typemap_path . " which I should have created, perhaps another plugin pruned it?");
-  }
-  
-  $self->log("update " . $self->typemap_path);
-
-  my $typemap = ExtUtils::Typemaps->new(string => $file->content);
-  $typemap->merge(
-    typemap => ExtUtils::Typemaps->new(
-      string => scalar $self->_source_dir->file('typemap')->slurp,
-    ),
-  );
-  $file->content($typemap->as_string);
-}
-
-sub register_prereqs
-{
-  my($self) = @_;
-  
-  $self->zilla->register_prereqs(
-    { type => 'requires', phase => 'runtime' },
-    'Math::Int64' => '0.28',
-  );
 }
 
 1;
@@ -138,7 +122,7 @@ Dist::Zilla::Plugin::MathInt64 - Include the Math::Int64 C client API in your di
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension SVG::Grid.
 
+1.06  2017-08-15T08:39:00
+	- Patch scripts/generate.images.sh to remove the call to cell.sh. The latter file was deleted
+		some time ago. Thanx to Kevin Mulholland for noticing.
+
 1.05  2017-08-11T17:10:05
 	- Add 'title' to the hash of options you can pass to image_link(), rectangle_line() and
 		text_link(). Note: This module uses keys named 'target' and 'title'. It passes these to the

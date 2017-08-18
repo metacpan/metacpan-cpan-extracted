@@ -56,6 +56,7 @@ MailSender
 MailSendmail
 Manfredi
 Mengué
+Michael
 Millar
 Miyagawa
 NTLM
@@ -76,6 +77,7 @@ STDERR
 STDOUT
 Salvador
 Schilli
+Schout
 Screen
 Steve
 Straup
@@ -117,6 +119,7 @@ kivancyazan
 lib
 logopt
 mail
+mschout
 multi
 olaf
 params

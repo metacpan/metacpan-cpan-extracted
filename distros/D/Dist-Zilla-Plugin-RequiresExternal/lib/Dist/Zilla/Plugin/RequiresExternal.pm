@@ -4,11 +4,11 @@ package Dist::Zilla::Plugin::RequiresExternal;
 
 use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '1.006';     # VERSION
+our $VERSION = '1.007';     # VERSION
 use utf8;
 
 #pod =for test_synopsis
-#pod BEGIN { die "SKIP: this is ini, not perl\n"; }
+#pod BEGIN { die "SKIP: this is ini, not perl\n" }
 #pod
 #pod =head1 SYNOPSIS
 #pod
@@ -20,8 +20,9 @@ use utf8;
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This L<Dist::Zilla|Dist::Zilla> plugin creates a test in your distribution
-#pod to check for the existence of executable commands you require.
+#pod This L<Dist::Zilla|Dist::Zilla> plugin creates a test
+#pod in your distribution to check for the existence of executable commands
+#pod you require.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -53,9 +54,9 @@ sub mvp_multivalue_args { return 'requires' }
 
 #pod =attr requires
 #pod
-#pod Each C<requires> attribute should be either an absolute path to an executable
-#pod or the name of a command in the user's C<PATH> environment.  Multiple
-#pod C<requires> lines are allowed.
+#pod Each C<requires> attribute should be either an absolute path to an
+#pod executable or the name of a command in the user's C<PATH> environment.
+#pod Multiple C<requires> lines are allowed.
 #pod
 #pod Example from a F<dist.ini> file:
 #pod
@@ -63,8 +64,8 @@ sub mvp_multivalue_args { return 'requires' }
 #pod     requires = sqlplus
 #pod     requires = /usr/bin/java
 #pod
-#pod This will require the program C<sqlplus> to be available somewhere in the
-#pod user's C<PATH> and the program C<java> specifically in F</usr/bin>.
+#pod This will require the program C<sqlplus> to be available somewhere in
+#pod the user's C<PATH> and the program C<java> specifically in F</usr/bin>.
 #pod
 #pod =cut
 
@@ -77,9 +78,9 @@ has _requires => (
 
 #pod =attr fatal
 #pod
-#pod Boolean value to determine if a failed test will immediately stop testing.
-#pod It also causes the test name to change to F<t/000-requires_external.t> so that
-#pod it runs earlier.
+#pod Boolean value to determine if a failed test will immediately stop
+#pod testing. It also causes the test name to change to
+#pod F<t/000-requires_external.t> so that it runs earlier.
 #pod Defaults to false.
 #pod
 #pod =cut
@@ -88,8 +89,8 @@ has fatal => ( is => 'ro', required => 1, isa => Maybe [Bool], default => 0 );
 
 #pod =method gather_files
 #pod
-#pod Adds a F<t/requires_external.t> test script to your distribution that checks
-#pod if each L</requires> item is executable.
+#pod Adds a F<t/requires_external.t> test script to your distribution that
+#pod checks if each L</requires> item is executable.
 #pod
 #pod =cut
 
@@ -134,9 +135,9 @@ END_TEMPLATE
 
 #pod =method metadata
 #pod
-#pod Using this plugin will add L<Test::Most|Test::Most> and L<Env::Path|Env::Path>
-#pod to your distribution's testing prerequisites since the generated script uses
-#pod those modules.
+#pod Using this plugin will add L<Test::Most|Test::Most>
+#pod and L<Env::Path|Env::Path> to your distribution's
+#pod testing prerequisites since the generated script uses those modules.
 #pod
 #pod =cut
 
@@ -160,8 +161,9 @@ __END__
 
 =encoding utf8
 
-=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url annocpan anno bugtracker rt
-cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords Mark Gardner Joenio Costa GSI Commerce and cpan testmatrix url annocpan
+anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
+metacpan
 
 =head1 NAME
 
@@ -169,7 +171,9 @@ Dist::Zilla::Plugin::RequiresExternal - make dists require external commands
 
 =head1 VERSION
 
-version 1.006
+version 1.007
+
+=for test_synopsis BEGIN { die "SKIP: this is ini, not perl\n" }
 
 =head1 SYNOPSIS
 
@@ -181,16 +185,17 @@ In your F<dist.ini>:
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla|Dist::Zilla> plugin creates a test in your distribution
-to check for the existence of executable commands you require.
+This L<Dist::Zilla|Dist::Zilla> plugin creates a test
+in your distribution to check for the existence of executable commands
+you require.
 
 =head1 ATTRIBUTES
 
 =head2 requires
 
-Each C<requires> attribute should be either an absolute path to an executable
-or the name of a command in the user's C<PATH> environment.  Multiple
-C<requires> lines are allowed.
+Each C<requires> attribute should be either an absolute path to an
+executable or the name of a command in the user's C<PATH> environment.
+Multiple C<requires> lines are allowed.
 
 Example from a F<dist.ini> file:
 
@@ -198,30 +203,28 @@ Example from a F<dist.ini> file:
     requires = sqlplus
     requires = /usr/bin/java
 
-This will require the program C<sqlplus> to be available somewhere in the
-user's C<PATH> and the program C<java> specifically in F</usr/bin>.
+This will require the program C<sqlplus> to be available somewhere in
+the user's C<PATH> and the program C<java> specifically in F</usr/bin>.
 
 =head2 fatal
 
-Boolean value to determine if a failed test will immediately stop testing.
-It also causes the test name to change to F<t/000-requires_external.t> so that
-it runs earlier.
+Boolean value to determine if a failed test will immediately stop
+testing. It also causes the test name to change to
+F<t/000-requires_external.t> so that it runs earlier.
 Defaults to false.
 
 =head1 METHODS
 
 =head2 gather_files
 
-Adds a F<t/requires_external.t> test script to your distribution that checks
-if each L</requires> item is executable.
+Adds a F<t/requires_external.t> test script to your distribution that
+checks if each L</requires> item is executable.
 
 =head2 metadata
 
-Using this plugin will add L<Test::Most|Test::Most> and L<Env::Path|Env::Path>
-to your distribution's testing prerequisites since the generated script uses
-those modules.
-
-=for test_synopsis BEGIN { die "SKIP: this is ini, not perl\n"; }
+Using this plugin will add L<Test::Most|Test::Most>
+and L<Env::Path|Env::Path> to your distribution's
+testing prerequisites since the generated script uses those modules.
 
 =head1 SEE ALSO
 
@@ -320,13 +323,23 @@ L<https://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal>
 
   git clone git://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal.git
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Mark Gardner <mjgardner@cpan.org>
 
+=item *
+
+Joenio Costa <joenio@joenio.me>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce and Joenio Costa.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

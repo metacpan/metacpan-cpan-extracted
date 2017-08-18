@@ -99,6 +99,8 @@ sub uniq {
   return $self->new(grep { !$seen{$_}++ } @$self);
 }
 
+sub with_roles { shift->Mojo::Base::with_roles(@_) }
+
 sub _flatten {
   map { _ref($_) ? _flatten(@$_) : $_ } @_;
 }
@@ -366,6 +368,14 @@ callback/method.
 
   # "[[1, 2], [2, 1]]"
   c([1, 2], [2, 1], [3, 2])->uniq(sub{ $_->[1] })->to_array;
+
+=head2 with_roles
+
+  my $new_class = Mojo::Collection->with_roles('Mojo::Collection::Role::One');
+  my $new_class = Mojo::Collection->with_roles('+One', '+Two');
+  $collection   = $collection->with_roles('+One', '+Two');
+
+Alias for L<Mojo::Base/"with_roles">.
 
 =head1 SEE ALSO
 

@@ -1,0 +1,234 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+WWW::CheckGzip - check web pages for correct gzipping of content
+
+=head1 SYNOPSIS
+
+    
+    # This example demonstrates use with the Test::More testing framework.
+    use Test::More;
+    use WWW::CheckGzip;
+    my $wc = WWW::CheckGzip->new (\& mycheck);
+    $wc->check ('http://www.piedpiper.com');
+    done_testing ();
+    exit;
+    
+    sub mycheck
+    {
+        my ($ok, $message) = @_;
+        ok ($ok, $message);
+    }
+
+
+produces output
+
+    ok 1 - successfully got compressed http://www.piedpiper.com
+    ok 2 - got content encoding
+    ok 3 - content encoding is gzip
+    ok 4 - http://www.piedpiper.com correctly gzipped
+    ok 5 - compression made it smaller
+    ok 6 - successfully got uncompressed http://www.piedpiper.com
+    ok 7 - Did not get content encoding
+    ok 8 - http://www.piedpiper.com not gzipped when requesting ungzipped
+    1..8
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-CheckGzip-0.03/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.03 of WWW::CheckGzip corresponding to
+L<git commit 18f7c39b6111935af7a67f0f22ef172f30a2e88e|https://github.com/benkasminbullock/www-checkgzip/commit/18f7c39b6111935af7a67f0f22ef172f30a2e88e> released on Thu Aug 17 17:43:51 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module offers a way to check a web page for correct gzip
+compression. It tests the following, in the order given:
+
+=over
+
+=item Page OK with compression
+
+The web page is retrievable with an Accept-Encoding header set.
+
+If the page is not retrievable, L</check> calls the test callback,
+then returns and does no further actions.
+
+=item Header OK
+
+When sent a request with an Accept-Encoding header containing the
+string C<gzip>, the web page responds with a content encoding header.
+
+=item Header is gzip
+
+The content encoding header of the response is C<gzip>.
+
+=item Content is in gzip format
+
+The content of the web page's response is in the gzip format. This is
+checked using L<Gzip::Faster/gunzip>.
+
+=item Content is smaller
+
+The size of the uncompressed content of the web page is larger than it
+is when compressed. This test will fail, for example, if gzip encoding
+is wrongly used to compress images or extremely small web pages.
+
+=item Page OK without compression
+
+The web page is retrievable without an Accept-Encoding header set.
+
+=item Response has no gzip header
+
+The web page does not send a gzip header if the Accept-Encoding header
+is not set.
+
+=item Content is not compressed
+
+The web page does not gzip compress the content when Accept-Encoding
+header is not sent. This is checked using L<Gzip::Faster/gunzip>.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+    my $wc = WWW::CheckGzip->new (\& test_sub);
+
+Create a new object. The argument is a code reference to a subroutine
+of your choosing. The subroutine should take two arguments, a boolean
+C<$ok> indicating whether the test was successful, and a string
+C<$message> containing a descriptive message about the test. See
+L</SYNOPSIS> for an example using the L<Test::More> testing framework.
+
+If you do not supply a function, a default function which prints the
+results to standard output is used. The return value is a blessed
+WWW::CheckGzip object.
+
+=head2 check
+
+    $wc->check ('http://www.hooli.xyz');
+
+Check the URL given as the argument. The tests call the callback
+supplied to L</new>. There is no return value. If no URL is supplied,
+a warning is printed and the function returns.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Carp>
+
+This is used to report user errors.
+
+=item L<Gzip::Faster/gunzip>
+
+This is used to test whether the page content is in the gzip format or not.
+
+=item L<LWP::UserAgent>
+
+This is used to retrieve the web page. However, this module
+deliberately does not use the built in methods of libwww-perl such as
+L<HTTP::Response/decoded_content>, but explicitly does its own testing
+of the headers and the content returned.
+
+=back
+
+=head1 LIMITATIONS
+
+=over
+
+=item GET only
+
+As of version 0.03, the module currently only does GET requests.
+
+=back
+
+=head1 SCRIPT
+
+A script F<checkgzip> in the distribution checks web pages given to it
+on the command line:
+
+    checkgzip http://www.lemoda.net/
+
+=head1 SEE ALSO
+
+=head2 CPAN Modules
+
+I'm not aware of any other module which explicitly checks for
+gzip-related problems from a web page.
+
+=over
+
+=item L<WWW::Mechanize::GZip>
+
+This module retrieves gzip content from web pages.
+
+=back
+
+=head2 Online gzip checkers
+
+=over
+
+=item L<http://www.computerhandlung.de/www-mechanize-gzip.htm>
+
+By the author of L<WWW::Mechanize::GZip>.
+
+=item L<http://www.whatsmyip.org/http-compression-test/>
+
+Online AJAX checker with noises and colours.
+
+=item L<https://varvy.com/tools/gzip/>
+
+Another AJAX checker.
+
+=item L<https://developers.google.com/speed/pagespeed/insights/>
+
+Google PageSpeed Insights has compression checking as one of its
+facilities. For whatever reason it doesn't actually tell you if the
+page is compressed correctly, but only lets you know if there is a
+problem.
+
+=back
+
+=head1 HISTORY
+
+I created this module to have a simple command-line script or module
+for checking that gzip compression of my own web pages was working
+correctly.
+
+On 6 March 2017, I suggested the module on PrePAN:
+L<http://prepan.org/module/nYdTCdrkEGF>. Unfortunately it didn't get
+any responses. Initially I was planning to fork
+L</WWW::Mechanize::GZip>, and the old commits in the github repository
+contain some code from that module.
+
+On 16 August 2017 I completely rewrote the module to remove the
+L</WWW::Mechanize::GZip> parts and released version 0.01 to CPAN. The
+methodology the module currently uses is based on my web page:
+L<https://www.lemoda.net/compression/lwp-use-gzip/index.html>.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

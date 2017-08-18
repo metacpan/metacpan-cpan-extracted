@@ -1,0 +1,214 @@
+NAME
+    Regexp::Pattern::License - Regular expressions for legal licenses
+
+VERSION
+    Version v3.0.31
+
+DESCRIPTION
+    Regexp::Pattern::License provides a hash of regular expression patterns
+    related to legal software licenses.
+
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+  Single licenses
+    Patterns each covering a single license.
+
+    *   adobe_2006
+
+    *   adobe_glyph
+
+    *   afl
+
+    *   agpl
+
+    *   apache
+
+    *   apafml
+
+    *   artistic
+
+    *   artistic_2
+
+    *   beerware
+
+    *   bsd_2_clause
+
+    *   bsd_3_clause
+
+    *   bsd_4_clause
+
+    *   cc_by
+
+    *   cc_by_nc
+
+    *   cc_by_nc_nd
+
+    *   cc_by_nc_sa
+
+    *   cc_by_nd
+
+    *   cc_by_sa
+
+    *   cc_cc0
+
+    *   cc_sp
+
+    *   cddl
+
+    *   cecill
+
+    *   cecill_1
+
+    *   cecill_1_1
+
+    *   cecill_2
+
+    *   cecill_2_1
+
+    *   cecill_b
+
+    *   cecill_c
+
+    *   cube
+
+    *   curl
+
+    *   dsdp
+
+    *   epl
+
+    *   eurosym
+
+    *   fsfap
+
+    *   fsful
+
+    *   fsfullr
+
+    *   ftl
+
+    *   gfdl
+
+    *   gfdl_niv
+
+    *   gpl
+
+    *   isc
+
+    *   lgpl
+
+    *   llgpl
+
+    *   libpng
+
+    *   mit_advertising
+
+    *   mit_enna
+
+    *   mit_feh
+
+    *   mit_new
+
+    *   mit_new_materials
+
+    *   mit_old
+
+    *   mit_oldstyle
+
+    *   mit_oldstyle_disclaimer
+
+    *   mit_oldstyle_permission
+
+    *   mpl
+
+    *   ms_pl
+
+    *   ms_rl
+
+    *   ntp
+
+    *   ntp_disclaimer
+
+    *   openssl
+
+    *   postgresql
+
+    *   public_domain
+
+    *   python
+
+    *   qpl
+
+    *   sgi_b
+
+    *   unicode_strict
+
+    *   unicode_tou
+
+    *   wtfpl
+
+    *   zlib
+
+    *   zlib_acknowledgement
+
+  Licensing traits
+    Patterns each covering a single trait occuring in licenses.
+
+    *   clause_retention
+
+    *   clause_reproduction
+
+    *   clause_advertising
+
+    *   clause_advertising_always
+
+    *   clause_non_endorsement
+
+    *   fsf_unlimited
+
+    *   fsf_unlimited_retention
+
+    *   version_later
+
+    *   version_later_paragraph
+
+    *   version_later_postfix
+
+    *   version_number
+
+    *   version_prefix
+
+  License combinations
+    Patterns each covering a single combination of multiple licenses.
+
+    *   perl
+
+  Multiple licenses
+    Patterns each covering multiple licenses.
+
+    *   bsd
+
+    *   gnu
+
+    *   mit
+
+AUTHOR
+    Jonas Smedegaard `<dr@jones.dk>`
+
+COPYRIGHT AND LICENSE
+      Copyright © 2016-2017 Jonas Smedegaard
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 3, or (at your option) any later
+    version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <https://www.gnu.org/licenses/>.
+

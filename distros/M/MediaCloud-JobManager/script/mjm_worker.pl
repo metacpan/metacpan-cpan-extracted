@@ -21,6 +21,11 @@ use warnings;
 use Modern::Perl "2012";
 
 use FindBin;
+
+# Include workers from the current path and its lib/
+use lib "./";
+use lib "./lib/";
+
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../samples";
 

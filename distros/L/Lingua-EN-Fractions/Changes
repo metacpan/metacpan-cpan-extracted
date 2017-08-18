@@ -1,5 +1,9 @@
 Revision history for Perl module Lingua::EN::Fractions
 
+0.09 2017-08-16 NEILB
+    - Added support for Unicode fractions that weren't already supported.
+      Thanks to Ben Bullock for the pull request for this.
+
 0.08 2015-10-27 NEILB
     - Updated github repo URL after changing my github username
     - Include a META.json in releases, and tag & push to github on release

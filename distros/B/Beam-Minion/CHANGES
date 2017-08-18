@@ -1,5 +1,18 @@
 Changelog for Beam-Minion
 
+0.004     2017-08-14 13:01:07-05:00 America/Chicago
+
+    [Added]
+
+    - Added `enqueue` Perl API to the Beam::Minion module. This makes it
+      easier to add jobs via Perl instead of using the command-line (or
+      the command class)
+
+    [Fixed]
+
+    - Fixed deprecated use of `slurp` from Mojolicious
+    - Fixed some error messages to be easier to understand for the user
+
 0.003     2017-04-28 01:26:54-05:00 America/Chicago
 
     [Fixed]

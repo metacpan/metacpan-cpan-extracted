@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use File::Temp qw( tempdir );
 use App::RegexFileUtils;
 use File::Spec;
@@ -62,3 +60,5 @@ is readlink('libfoo.so'), 'libfoo.so.1.2.3', 'libfoo.so => libfoo.so.1.2.3';
 is readlink('libbar.so'), 'libbar.so.1.2',   'libbar.so => libbar.so.1.2';
 
 chdir(File::Spec->updir) || die;
+
+done_testing;

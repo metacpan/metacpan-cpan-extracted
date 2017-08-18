@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "0.32",
     "Alien::Build::MM" => "0.32",
+    "Alien::Build::Plugin::Build::MSYS" => "0.84",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-libtool",
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -57,7 +57,7 @@ package TodoService {
 
     extends 'Moxie::Object';
 
-    has 'todos' => sub { +{} };
+    has 'todos' => ( default => sub { +{} } );
 
     my sub todos : private;
 

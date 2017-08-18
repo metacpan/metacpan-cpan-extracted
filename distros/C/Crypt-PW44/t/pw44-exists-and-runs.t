@@ -2,13 +2,13 @@
 
 use Test::Simple tests => 4;
 
-use Crypt::PW44 qw(generate);
+use Crypt::PW44 qw(generate_password);
 
-$foo=generate(pack(Ll,int(rand(2**32)),int(rand(2**16))),3);
-ok (length($foo),'generate returns something');
-ok ($foo =~ /^\S+ \S+ \S+ \S+$/,'generate produces 4 simple words, space delimited');
-ok ($foo =~ /^[A-Z ]+$/,'generate produces words in the upper case');
+$foo=generate_password(pack("Ll",int(rand(2**32)),int(rand(2**16))),3);
+ok (length($foo),'generate_password returns something');
+ok ($foo =~ /^\S+ \S+ \S+ \S+$/,'generate_password produces 4 simple words, space delimited');
+ok ($foo =~ /^[A-Z ]+$/,'generate_password produces words in the upper case');
 
-$bar=generate(pack(Ll,int(rand(2**32)),int(rand(2**16))),3);
+$bar=generate_password(pack("Ll",int(rand(2**32)),int(rand(2**16))),3);
 
 ok ($foo ne $bar, 'successive runs produce different random password strings');

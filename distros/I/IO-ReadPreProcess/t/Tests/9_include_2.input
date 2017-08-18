@@ -1,0 +1,11 @@
+.# Title: Include @stream
+Line 1
+.# Create the in-memory stream:
+.out -c @note1
+Text in @note1
+Is there jam for tea ?
+.out
+Line after out without stream
+.# Now process the in-memory stream:
+.include @note1
+Line end

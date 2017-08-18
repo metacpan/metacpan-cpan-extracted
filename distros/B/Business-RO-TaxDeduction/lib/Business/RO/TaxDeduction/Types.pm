@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction::Types;
-$Business::RO::TaxDeduction::Types::VERSION = '0.010';
+$Business::RO::TaxDeduction::Types::VERSION = '0.011';
 # ABSTRACT: Types for the TaxDeduction module
 
 use 5.010001;
@@ -20,9 +20,6 @@ declare "TaxPersons",
     as "Int",
     where { $_ >= 0 && $_ <= 4 };
 
-coerce "TaxPersons",
-    from "Int", via { $_ >= 4 ? 4 : $_ };
-
 class_type MathBigFloat, { class => 'Math::BigFloat' };
 
 1;
@@ -39,7 +36,7 @@ Business::RO::TaxDeduction::Types - Types for the TaxDeduction module
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

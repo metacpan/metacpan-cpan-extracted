@@ -1,0 +1,4 @@
+<& /Widgets/Form/MultilineString, Class => 'code', %ARGS &>
+<%METHOD InputOnly>
+<& /Widgets/Form/MultilineString:InputOnly, %ARGS &>
+</%METHOD>

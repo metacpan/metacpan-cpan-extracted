@@ -155,7 +155,6 @@ script/mojo
 script/morbo
 t/mojo/asset.t
 t/mojo/base.t
-t/mojo/base_roles.t
 t/mojo/bytestream.t
 t/mojo/cache.t
 t/mojo/certs/bad.crt
@@ -216,6 +215,7 @@ t/mojo/reactor_poll.t
 t/mojo/request.t
 t/mojo/request_cgi.t
 t/mojo/response.t
+t/mojo/roles.t
 t/mojo/subprocess.t
 t/mojo/template.t
 t/mojo/templates/exception.mt

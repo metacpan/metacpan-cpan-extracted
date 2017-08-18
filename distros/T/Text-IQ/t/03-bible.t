@@ -6,11 +6,6 @@ use Data::Dump qw( dump );
 
 use_ok('Text::IQ::EN');
 
-# diag Aspell version
-my $checker = Search::Tools::SpellCheck->new( lang => 'en_US', );
-diag "Text::Aspell config:";
-diag dump($checker->aspell->fetch_option_keys);
-
 ok( my $iq = Text::IQ::EN->new('t/doc/bible.txt.gz'), "new IQ" );
 diag sprintf( "Number of words: %d\n",        $iq->num_words );
 diag sprintf( "Avg word length: %0.4f\n",     $iq->avg_word_length );

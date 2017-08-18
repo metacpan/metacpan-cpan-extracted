@@ -1,5 +1,22 @@
 Revision history for AnyEvent::DBI
 
+3.0  Tue Aug 15 09:05:30 CEST 2017
+        - the exec_server constructor argument is now ignored, fork vs. exec
+          is now decided by availability of AnyEvent::Fork::Early or not.
+        - experimental support for fetching (but not setting) statement handle
+          attributes: ->stattr.
+        - use AnyEvent::Fork for process management.
+	- switch to CBOR::XS and Convert::Scalar for further speed and memory
+          improvements - a loop doing "select 0" is now almost twice as fast,
+          more impressive speedups are expected for larger results.
+          This also considerably simplified the code.
+	- t/02_sql_lite.t wrongly assumed sqlite doesn't implement instr(), but
+          nowadays, it does.
+        - added stability canary support.
+        - no longer load Scalar::Util, Fcntl, Socket and POSIX modules.
+        - move child code into it's own module, AnyEvent::DBI::Slave.
+        - no longer load DBI (except in slaves).
+
 2.3  Tue Apr  2 02:59:12 CEST 2013
 	- fix begin_work, commit and rollback, that were broken due
           to a precedence problem (analyzed by Jerry Lundström).

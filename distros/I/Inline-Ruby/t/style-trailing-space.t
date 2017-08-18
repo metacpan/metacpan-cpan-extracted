@@ -18,7 +18,7 @@ else
 my $finder = Test::TrailingSpace->new(
     {
         root => '.',
-        filename_regex => qr/(?:(?:\.(?:t|pm|pl|PL|yml|json|arc|vim|c|xs))|README|Changes|LICENSE)\z/,
+        filename_regex => qr/(?:(?:\.(?:t|pm|pl|PL|yml|json|arc|vim|c|xs|h|pod))|README|Changes|LICENSE)\z/,
     },
 );
 

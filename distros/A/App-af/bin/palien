@@ -1,0 +1,97 @@
+#!perl
+
+use strict;
+use warnings;
+use 5.014;
+#use lib::findbin '../lib'; # dev-only
+use App::palien;
+
+# ABSTRACT: Command line interface to Alien::Base
+# PODNAME: palien
+# VERSION
+
+
+exit App::palien->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+palien - Command line interface to Alien::Base
+
+=head1 VERSION
+
+version 0.14
+
+=head1 SYNOPSIS
+
+ % palien --cflags libfoo
+ % palien --cflags Alien::Foo
+ % palien --libs libfoo
+ % palien --libs Alien::Foo
+
+=head1 DESCRIPTION
+
+This program provides a command line interface to the data stored in
+Alien modules.  It is geared primarily for use with Alien::Base based
+distributions, but it will attempt to work with non-Alien::Base based
+Alien distributions as well.
+
+=head1 OPTIONS
+
+=head2 --bin-dir
+
+Print out a list of directories with executables in them.
+
+=head2 --dir-sep I<string>
+
+Lists of directories are output separated by I<string>, which defaults to C< >.
+
+=head2 --cflags
+
+Print out the compiler flags for the compiler
+
+=head2 --detail | -d
+
+Print out details for each package specified
+
+=head2 --dll
+
+Print out the DLLs, one per line
+
+=head2 --libs
+
+Print out the library flags for the linker
+
+=head2 --modversion
+
+Print out the package version.
+
+=head2 --help | -h
+
+Print out the usage for this command
+
+=head2 --version
+
+Print out the version of this command
+
+=head1 AUTHOR
+
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

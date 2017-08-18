@@ -10,12 +10,14 @@ require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
+use Cwd qw(chdir getcwd realpath);
 use File::Path qw(make_path);
 use File::Glob qw(:bsd_glob);
+use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
 
-our $VERSION = '20170812';
+our $VERSION = '20170817';
 
 #1 Time stamps                                                                  # Date and timestamps as used in logs of long running commands
 
@@ -106,9 +108,8 @@ sub quoteFile($)                                                                
   "\"$file\""
  }
 
-sub currentDirectory                                                            # Get the current working directory
- {my $f = qx(pwd);
-  chomp($f);
+sub currentDirectory                                                            # Get the current working directory tracking changes made by L<chdir|/chdir>
+ {my $f = getcwd;
   $f.'/'
  }
 
@@ -151,14 +152,27 @@ sub containingFolder($)                                                         
   join '/', @w, ''
  }
 
+#2 Temporary                                                                    # Temporary files and folders
+
+sub temporaryFile                                                               # Create a temporary file that will automatically be L<unlinked|/unlink> during END
+ {realpath(tempfile())
+ }
+
+sub temporaryFolder                                                             # Create a temporary folder that will automatically be L<rmdired|/rmdir> during END
+ {realpath(tempdir()).'/'
+ }
+
+sub temporaryDirectory                                                          # Create a temporary directory that will automatically be L<rmdired|/rmdir> during END
+ {temporaryFolder
+ }
+
 #2 Find                                                                         # Find files and folders below a folder
 
 sub findFiles($)                                                                # Find all the file under a folder
  {my ($dir) = @_;                                                               # Folder to start the search with
   my @f;
-  for(qx(find $dir))
-   {chomp;
-    next if -d $_;                                                              # Do not include folder names
+  for(split /\0/, qx(find $dir -print0))
+   {next if -d $_;                                                              # Do not include folder names
     push @f, $_;
    }
   @f
@@ -167,9 +181,8 @@ sub findFiles($)                                                                
 sub findDirs($)                                                                 # Find all the folders under a folder
  {my ($dir) = @_;                                                               # Folder to start the search with
   my @d;
-  for(qx(find $dir))
-   {chomp;
-    next unless -d $_;                                                          # Include only folders
+  for(split /\0/, qx(find $dir -print0))
+   {next unless -d $_;                                                          # Include only folders
     push @d, $_;
    }
   @d
@@ -624,21 +637,54 @@ sub perlPackage($)                                                              
 
 #1 Documentation                                                                # Extract, format and update documentation for a perl module
 
+sub extractTest($)                                                              ## Extract a line of a test
+ {my ($string) = @_;                                                            # String containing test line
+  $string =~ s/\A\s*{?(.+?)\s*#.*\Z/$1/;                                        # Remove any initial whitespace and possible { and any trailing whitespace and comments
+  $string
+ }
+
 sub extractDocumentation(;$)                                                    # Extract documentation from a perl script between the lines marked with:\m  #n title # description\mand:\m  #...\mwhere n is either 1 or 2 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be any combination of:\m=over\m=item P\mprivate method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. \mThe character sequence \\xn in the comment will be expanded to one new line and \\xm to two new lines.\mSearch for '#1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20170728/lib/Data/Table/Text.pm>  to see examples.\mParameters:\n
  {my ($perlModule) = @_;                                                        # Optional file name with caller's file being the default
   $perlModule //= $0;                                                           # Extract documentation from the caller if no perl module is supplied
   my $package = perlPackage($perlModule);                                       # Package name
+  my %iUseful;                                                                  # Immediately useful methods
   my %methodParms;                                                              # Method names including parameters
   my %methodX;                                                                  # Method names for methods that have an version suffixed with X that die rather than returning undef
-  my %static;                                                                   # Static methods
   my %private;                                                                  # Private methods
+  my %static;                                                                   # Static methods
+  my %tests;                                                                    # Tests for each method
   my %userFlags;                                                                # User flags
   my @doc = (qq(=head1 Description));                                           # Documentation
   my @private;                                                                  # Documentation of private methods
   my $level = 0; my $off = 1;                                                   # Header levels
+
   my @l = split /\n/, readFile($perlModule);                                    # Read the perl module
 
-  unless($perlModule eq qq(Text.pm))                                            # Load the module being documented so that we can call its extractDocumentationFlags method if needeed to process user flags
+  for my $l(keys @l)                                                            # Tests associated with each method
+   {my $line = $l[$l];
+    if (my @tags = $line =~ m/(?:\s#T(\w+))/g)
+     {my @testLines = (extractTest($line));
+
+      if ($line =~ m/<<END/)                                                    # Process here document
+       {for(my $L = $l + 1; $L < @l; ++$L)
+         {my $nextLine = $l[$L];
+          push @testLines, extractTest($nextLine);
+          if ($nextLine =~ m/\AEND/)                                            # Add a blank line after the END
+           {push @testLines, '';
+            last
+           }
+         }
+       }
+
+      for my $testLine(@testLines)                                              # Save test lines
+       {for my $t(@tags)
+         {push @{$tests{$t}}, $testLine;
+         }
+       }
+     }
+   }
+
+  unless($perlModule eq qq(Text.pm))                                            # Load the module being documented so that we can call its extractDocumentationFlags method if needed to process user flags, we do not need to load this module as it is already loaded
    {do "$perlModule";
     confess dump($@, $!) if $@;
    }
@@ -656,7 +702,7 @@ sub extractDocumentation(;$)                                                    
     elsif ($line =~ /\A#/)                                                      # Switch documentation off
      {$level = 0;
      }
-    elsif ($level and $line =~ /\A\s*sub\s*(.*?)\s*#(\w+)?\s+(.+?)\s*\Z/)       # Documentation for a method
+    elsif ($level and $line =~ /\A\s*sub\s*(.*?)\s*#(\w*)\s+(.+?)\s*\Z/)        # Documentation for a method
      {my ($sub, $flags, $comment, $example, $produces) =                        # Name from sub, flags, description
          ($1, $2, $3);
 
@@ -676,11 +722,14 @@ sub extractDocumentation(;$)                                                    
       my $methodX   = $flags =~ m/X/;                                           # Die rather than return undef
       my $private   = $flags =~ m/P/;                                           # Private
       my $static    = $flags =~ m/S/;                                           # Static
-      my $userFlags = $flags =~ s/[PSX]//gsr;                                   # User flags == all flags minus the known flags
+      my $iUseful   = $flags =~ m/I/;                                           # Immediately useful
+      my $userFlags = $flags =~ s/[IPSX]//gsr;                                  # User flags == all flags minus the known flags
 
       $methodX  {$name} = $methodX   if $methodX;                               # MethodX
       $private  {$name} = $private   if $private;                               # Private
       $static   {$name} = $static    if $static;                                # Static
+      $iUseful  {$name} = $comment   if $iUseful;                               # Immediately useful
+
       $userFlags{$name} =                                                       # Process user flags
         &docUserFlags($userFlags, $perlModule, $package, $name)
         if $userFlags;
@@ -715,7 +764,7 @@ sub extractDocumentation(;$)                                                    
 
       if (1)                                                                    # Section title
        {my $h = $private ? 2 : $headLevel;
-        push @method, "\n=head$h $name\n\n$comment\n";                          # Method description
+        push @method, "\n=head$h $name($signature)\n\n$comment\n";              # Method description
        }
 
       push @method, indentString(formatTable([[qw(Parameter Description)],
@@ -730,6 +779,12 @@ sub extractDocumentation(;$)                                                    
 
       push @method,                                                             # Produces
        "\n$produces"                           if $produces;
+
+      if (my $tests = $tests{$name})                                            # Format tests
+       {if (my @tests = @$tests)
+         {push @method, '\nExample:\m', map {"  $_"} @tests;
+         }
+       }
 
       push @method,                                                             # Add a note about the availability of an X method
        "\nUse B<${name}X> to execute L<$name|/$name> but B<die> '$name'".
@@ -751,6 +806,30 @@ sub extractDocumentation(;$)                                                    
      }
    }
 
+  if (keys %iUseful)                                                            # Alphabetic listing of immediately useful methods
+    {my @d;
+     push @d, <<END;
+
+`head2 Immediately useful methods
+
+These methods are the ones most likely to be of immediate useful to anyone
+using this package for the first time:
+
+`over
+
+END
+    for my $m(sort {lc($a) cmp lc($b)} keys %iUseful)
+     {my $c = $iUseful{$m};
+       push @d, "=item L<$m|/$m>\n\n$c\n"
+     }
+    push @d, <<END;
+
+`back
+
+END
+    unshift @doc, (shift @doc, @d)                                              # Put first after title
+   }
+
   push @doc, qq(\n\n=head1 Private Methods), @private if @private;              # Private methods in a separate section if there are any
 
   push @doc, "\n\n=head1 Index\n\n";
@@ -759,7 +838,7 @@ sub extractDocumentation(;$)                                                    
     push @doc, "L<$s|/$t>\n"
    }
 
-  push @doc, <<END =~ s/`/=/gsr;                                                # Standard stuff
+  push @doc, <<END;                                                             # Standard stuff
 `head1 Installation
 
 This module is written in 100% Pure Perl and, thus, it is easy to read, use,
@@ -788,10 +867,6 @@ under the same terms as Perl itself.
 `cut
 END
 
-  s/\\m/\n\n/gs for @doc;                                                       # Expand \\m to two new lines in documentation
-  s/\\n/\n/gs   for @doc;                                                       # Expand \\n to one new line  in documentation
-  s/\\x//gs     for @doc;                                                       # Expand \\x to ''            in documentation
-
   if (keys %methodX)                                                            # Insert X method definitions
    {my @x;
     for my $x(sort keys %methodX)
@@ -806,7 +881,7 @@ END
      }
    }
 
-  push @doc, <<'END';                                                             # Standard test sequence
+  push @doc, <<'END';                                                           # Standard test sequence
 
 # Tests and documentation
 
@@ -821,6 +896,12 @@ sub test
 
 test unless caller;
 END
+
+
+  s/\\m/\n\n/gs for @doc;                                                       # Expand \\m to two new lines in documentation
+  s/\\n/\n/gs   for @doc;                                                       # Expand \\n to one new line  in documentation
+  s/\\x//gs     for @doc;                                                       # Expand \\x to ''            in documentation
+  s/`/=/gs      for @doc;                                                       # Convert ` to =
 
   join "\n", @doc                                                               # Return documentation
  }
@@ -892,7 +973,7 @@ loadHashArrayFromLines loadHashFromLines
 makePath nws pad parseFileName powerOfTwo quoteFile
 readBinaryFile readFile
 saveToS3 searchDirectoryTreesForMatchingFiles
-timeStamp trim
+temporaryDirectory temporaryFile temporaryFolder timeStamp trim
 updatePerlModuleDocumentation writeBinaryFile writeFile
 xxx);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
@@ -982,22 +1063,22 @@ Data::Table::Text - Write data in tabular text format
 
 Date and timestamps as used in logs of long running commands
 
-=head3 dateTimeStamp
+=head3 dateTimeStamp()
 
 Year-monthNumber-day at hours:minute:seconds
 
 
-=head3 dateStamp
+=head3 dateStamp()
 
 Year-monthName-day
 
 
-=head3 timeStamp
+=head3 timeStamp()
 
 hours:minute:seconds
 
 
-=head3 xxx
+=head3 xxx(@)
 
 Execute a command checking and logging the results
 
@@ -1011,19 +1092,19 @@ Operations on files and paths
 
 Information about each file
 
-=head4 fileSize
+=head4 fileSize($)
 
 Get the size of a file
 
   1  $file  File name
 
-=head4 fileModTime
+=head4 fileModTime($)
 
 Get the modified time of a file in seconds since the epoch
 
   1  $file  File name
 
-=head4 fileOutOfDate
+=head4 fileOutOfDate($@)
 
 Returns undef if all the files exist and the first file is younger than all the following files; else returns the first file that does not exist or is younger than the first file.
 
@@ -1040,75 +1121,104 @@ Use B<fileOutOfDateX> to execute L<fileOutOfDate|/fileOutOfDate> but B<die> 'fil
 
 Create file names from file name components
 
-=head4 filePath
+=head4 filePath(@)
 
 Create a file path from an array of file name components. If all the components are blank then a blank file name is returned
 
   1  @file  File components
 
-=head4 filePathDir
+=head4 filePathDir(@)
 
 Directory from an array of file name components. If all the components are blank then a blank file name is returned
 
   1  @file  File components
 
-=head4 filePathExt
+=head4 filePathExt(@)
 
 File name from file name components and extension
 
   1  @File  File components and extension
 
-=head4 quoteFile
+=head4 quoteFile($)
 
 Quote a file name
 
   1  $file  File name
 
-=head4 currentDirectory
+=head4 currentDirectory()
 
-Get the current working directory
+Get the current working directory tracking changes made by L<chdir|/chdir>
 
 
-=head4 currentDirectoryAbove
+=head4 startDirectory()
+
+Get the directory execution started in
+
+
+=head4 startDirectoryReturn()
+
+Return to the directory that execution started in or confess if that is not possible
+
+
+=head4 currentDirectoryAbove()
 
 The path to the folder above the current working folder
 
 
-=head4 parseFileName
+=head4 parseFileName($)
 
 Parse a file name into (path, name, extension)
 
   1  $file  File name to parse
 
-=head4 containingFolder
+=head4 containingFolder($)
 
 Path to the folder that contains this file, or use L</parseFileName>
 
   1  $file  File name
 
+=head3 Temporary
+
+Temporary files and folders
+
+=head4 temporaryFile()
+
+Create a temporary file that will automatically be L<unlinked|/unlink> during END
+
+
+=head4 temporaryFolder()
+
+Create a temporary folder that will automatically be L<rmdired|/rmdir> during END
+
+
+=head4 temporaryDirectory()
+
+Create a temporary directory that will automatically be L<rmdired|/rmdir> during END
+
+
 =head3 Find
 
 Find files and folders below a folder
 
-=head4 findFiles
+=head4 findFiles($)
 
 Find all the file under a folder
 
   1  $dir  Folder to start the search with
 
-=head4 findDirs
+=head4 findDirs($)
 
 Find all the folders under a folder
 
   1  $dir  Folder to start the search with
 
-=head4 fileList
+=head4 fileList($)
 
 File list
 
   1  $pattern  Search pattern
 
-=head4 searchDirectoryTreesForMatchingFiles
+=head4 searchDirectoryTreesForMatchingFiles(@)
 
 Search the specified directory trees for files that match the specified extensions -  the argument list should include at least one folder and one extension to be useful
 
@@ -1118,39 +1228,39 @@ Search the specified directory trees for files that match the specified extensio
 
 Read and write strings from and to files creating paths as needed
 
-=head4 readFile
+=head4 readFile($)
 
 Read a file containing unicode
 
   1  $file  Name of unicode file to read
 
-=head4 readBinaryFile
+=head4 readBinaryFile($)
 
 Read binary file - a file whose contents are not to be interpreted as unicode
 
   1  $file  File to read
 
-=head4 makePath
+=head4 makePath($)
 
 Make a path for a file name or a folder
 
   1  $path  Path
 
-=head4 writeFile
+=head4 writeFile($$)
 
 Write a unicode string to a file after creating a path to the file if necessary
 
   1  $file    File to write to
   2  $string  Unicode string to write
 
-=head4 appendFile
+=head4 appendFile($$)
 
 Append a unicode string to a file after creating a path to the file if necessary
 
   1  $file    File to append to
   2  $string  Unicode string to append
 
-=head4 writeBinaryFile
+=head4 writeBinaryFile($$)
 
 Write a non unicode string to a file in after creating a path to the file if necessary
 
@@ -1161,13 +1271,13 @@ Write a non unicode string to a file in after creating a path to the file if nec
 
 Image operations
 
-=head3 imageSize
+=head3 imageSize($)
 
 Return (width, height) of an image obtained via imagemagick
 
   1  $image  File containing image
 
-=head3 convertImageToJpx
+=head3 convertImageToJpx($$$)
 
 Convert an image to jpx format
 
@@ -1179,7 +1289,7 @@ Convert an image to jpx format
 
 Integer powers of two
 
-=head3 powerOfTwo
+=head3 powerOfTwo($)
 
 Test whether a number is a power of two, return the power if it is else undef
 
@@ -1187,7 +1297,7 @@ Test whether a number is a power of two, return the power if it is else undef
 
 Use B<powerOfTwoX> to execute L<powerOfTwo|/powerOfTwo> but B<die> 'powerOfTwo' instead of returning B<undef>
 
-=head3 containingPowerOfTwo
+=head3 containingPowerOfTwo($)
 
 Find log two of the lowest power of two greater than or equal to a number
 
@@ -1199,14 +1309,14 @@ Use B<containingPowerOfTwoX> to execute L<containingPowerOfTwo|/containingPowerO
 
 Format data structures as tables
 
-=head3 formatTableBasic
+=head3 formatTableBasic($$)
 
 Tabularize text - basic version
 
   1  $data       Data to be formatted
   2  $separator  Optional line separator
 
-=head3 formatTable
+=head3 formatTable($$$)
 
 Format various data structures
 
@@ -1214,7 +1324,7 @@ Format various data structures
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head3 keyCount
+=head3 keyCount($$)
 
 Count keys down to the specified level
 
@@ -1225,31 +1335,31 @@ Count keys down to the specified level
 
 Load data structures from lines
 
-=head3 loadArrayFromLines
+=head3 loadArrayFromLines($)
 
 Load an array from lines of text in a string
 
   1  $string  The string of lines from which to create an array
 
-=head3 loadHashFromLines
+=head3 loadHashFromLines($)
 
 Load a hash: first word of each line is the key and the rest is the value
 
   1  $string  The string of lines from which to create a hash
 
-=head3 loadArrayArrayFromLines
+=head3 loadArrayArrayFromLines($)
 
 Load an array of arrays from lines of text: each line is an array of words
 
   1  $string  The string of lines from which to create an array of arrays
 
-=head3 loadHashArrayFromLines
+=head3 loadHashArrayFromLines($)
 
 Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents
 
   1  $string  The string of lines from which to create a hash of arrays
 
-=head3 checkKeys
+=head3 checkKeys($$)
 
 Check the keys in a hash
 
@@ -1260,7 +1370,7 @@ Check the keys in a hash
 
 Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelt correctly.
 
-=head3 genLValueScalarMethods
+=head3 genLValueScalarMethods(@)
 
 Generate LVALUE scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef.
 
@@ -1270,7 +1380,7 @@ Example:
 
    $a->value = 1;
 
-=head3 genLValueScalarMethodsWithDefaultValues
+=head3 genLValueScalarMethodsWithDefaultValues(@)
 
 Generate LVALUE scalar methods with default values in the current package. A reference to a method whose value has not yet been set will return a scalar whose value is the name of the method.
 
@@ -1280,7 +1390,7 @@ Example:
 
    $a->value == qq(value);
 
-=head3 genLValueArrayMethods
+=head3 genLValueArrayMethods(@)
 
 Generate LVALUE array methods in the current package. A reference to a method that has no yet been set will return a reference to an empty array.
 
@@ -1290,7 +1400,7 @@ Example:
 
    $a->value->[1] = 2;
 
-=head3 genLValueHashMethods
+=head3 genLValueHashMethods(@)
 
 Generate LVALUE hash methods in the current package. A reference to a method that has no yet been set will return a reference to an empty hash.
 
@@ -1304,45 +1414,45 @@ Example:
 
 Actions on strings
 
-=head3 indentString
+=head3 indentString($$)
 
 Indent lines contained in a string or formatted table by the specified amount
 
   1  $string  The string of lines to indent
   2  $indent  The indenting string
 
-=head3 isBlank
+=head3 isBlank($)
 
 Test whether a string is blank
 
   1  $string  String
 
-=head3 trim
+=head3 trim($)
 
 Trim off white space from from front and end of string
 
   1  $string  String
 
-=head3 pad
+=head3 pad($$)
 
 Pad a string with blanks to a multiple of a specified length
 
   1  $string  String
   2  $length  Tab width
 
-=head3 nws
+=head3 nws($)
 
 Normalize white space in a string to make comparisons easier
 
   1  $string  String to normalize
 
-=head3 javaPackage
+=head3 javaPackage($)
 
 Extract the package name from a java string or file,
 
   1  $java  Java file if it exists else the string of java
 
-=head3 perlPackage
+=head3 perlPackage($)
 
 Extract the package name from a perl string or file,
 
@@ -1352,7 +1462,7 @@ Extract the package name from a perl string or file,
 
 Extract, format and update documentation for a perl module
 
-=head3 extractDocumentation
+=head3 extractDocumentation($)
 
 Extract documentation from a perl script between the lines marked with:
 
@@ -1403,7 +1513,7 @@ Parameters:
 
 =head1 Private Methods
 
-=head2 formatTableAA
+=head2 formatTableAA($$$)
 
 Tabularize an array of arrays
 
@@ -1411,7 +1521,7 @@ Tabularize an array of arrays
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head2 formatTableHA
+=head2 formatTableHA($$$)
 
 Tabularize a hash of arrays
 
@@ -1419,7 +1529,7 @@ Tabularize a hash of arrays
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head2 formatTableAH
+=head2 formatTableAH($$$)
 
 Tabularize an array of hashes
 
@@ -1427,7 +1537,7 @@ Tabularize an array of hashes
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head2 formatTableHH
+=head2 formatTableHH($$$)
 
 Tabularize a hash of hashes
 
@@ -1435,7 +1545,7 @@ Tabularize a hash of hashes
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head2 formatTableA
+=head2 formatTableA($$$)
 
 Tabularize an array
 
@@ -1443,7 +1553,7 @@ Tabularize an array
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head2 formatTableH
+=head2 formatTableH($$$)
 
 Tabularize a hash
 
@@ -1561,6 +1671,16 @@ L<readFile|/readFile>
 
 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
+L<startDirectory|/startDirectory>
+
+L<startDirectoryReturn|/startDirectoryReturn>
+
+L<temporaryDirectory|/temporaryDirectory>
+
+L<temporaryFile|/temporaryFile>
+
+L<temporaryFolder|/temporaryFolder>
+
 L<timeStamp|/timeStamp>
 
 L<trim|/trim>
@@ -1620,7 +1740,7 @@ test unless caller;
 # podDocumentation
 
 __DATA__
-use Test::More tests => 74;
+use Test::More tests => 75;
 
 #Test::More->builder->output("/dev/null");
 
@@ -1649,10 +1769,16 @@ if (1)                                                                          
   is_deeply [parseFileName "test.data"],            [undef,         "test", "data"];
  }
 
+if (1)
+ {my $d = temporaryDirectory;
+  chdir($d);
+  ok $d eq currentDirectory;
+ }
+
 if (1)                                                                          # Unicode to local file
  {use utf8;
   my $z = "𝝰𝝱𝝲";
-  my $f = "$z.data";
+  my $f = filePathExt(temporaryFolder, $z, qq(data));
   unlink $f if -e $f;
   ok !-e $f;
   writeFile($f, $z);
@@ -1662,14 +1788,14 @@ if (1)                                                                          
   ok length($s) == 3;
   unlink $f;
   ok !-e $f;
-  qx(rmdir $z) if -d $z;
+  rmdir $z if -d $z;
   ok !-d $z;
  }
 
 if (1)                                                                          # Unicode
  {use utf8;
   my $z = "𝝰𝝱𝝲";
-  my $f = "$z/$z.data";
+  my $f = filePathExt(temporaryFolder, $z, $z, qq(data));
   unlink $f if -e $f;
   ok !-e $f;
   writeFile($f, $z);
@@ -1679,12 +1805,12 @@ if (1)                                                                          
   ok length($s) == 3;
   unlink $f;
   ok !-e $f;
-  qx(rmdir $z);
+  rmdir $z;
   ok !-d $z;
  }
 if (1)                                                                          # Binary
  {my $z = "𝝰𝝱𝝲";
-  my $f = "$z/$z.data";
+  my $f = filePathExt(temporaryFolder, $z, $z, qq(data));
   unlink $f if -e $f;
   ok !-e $f;
   writeBinaryFile($f, $z);
@@ -1694,7 +1820,7 @@ if (1)                                                                          
   ok length($s) == 12;
   unlink $f;
   ok !-e $f;
-  qx(rmdir $z);
+  rmdir $z;
   ok !-d $z;
  }
 

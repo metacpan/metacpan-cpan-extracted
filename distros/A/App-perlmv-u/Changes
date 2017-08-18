@@ -1,3 +1,9 @@
+0.004   2017-08-17 (PERLANCAR)
+
+	- [Bugfix] Redo (as well as undo) should redo (undo) the most
+	  recently undone (done) action.
+
+
 0.003   2017-08-01 (PERLANCAR)
 
 	- [Bugfix] Don't rename to NAME.1 if name doesn't change.

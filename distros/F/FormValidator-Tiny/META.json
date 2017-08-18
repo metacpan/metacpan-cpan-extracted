@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.28",
             "Scalar::Util" : "0",
             "experimental" : "0",
             "perl" : "v5.18.0",
@@ -55,7 +55,7 @@
          "web" : "https://github.com/zostay/FormValidator-Tiny"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

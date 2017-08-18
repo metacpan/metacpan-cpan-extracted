@@ -1,0 +1,23 @@
+.gitignore
+Changes
+MANIFEST
+Makefile.PL
+README
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/source/options
+lib/DR/DateTime.pm
+lib/DR/DateTime/Defaults.pm
+lib/DR/DateTime/MouseType.pm
+t/010-base.t
+t/020-parse.t
+t/030-add.t
+t/040-truncate.t
+t/050-tzforce.t
+t/600-mouse.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

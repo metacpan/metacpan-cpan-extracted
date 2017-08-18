@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 abd660ddeb6984673643401bb7ef97c4c6783b7e Changes
+SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
+SHA1 94212f9d9286c7d16cd2bf1590ef5dee4c114fa0 MANIFEST
+SHA1 dcab05692c626fb447637b8c74c58d2bd80aeee6 MANIFEST.SKIP
+SHA1 455d3ad3092d3fe77a62117d152ebed0e8f8ddda META.json
+SHA1 4657fbb9e0ce436c8b03fb4c2946371c2ea31bd9 META.yml
+SHA1 2a577990c81e681b35d15912a230a796c43ecab2 Makefile.PL
+SHA1 7031ca4c94d4edc56affad8b0e5807139502e9bf README
+SHA1 c6d2f9eb5fd41bb00cfbccf99be954dbb5184684 lib/Number/Phone/Formatter/NationalDigits.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 28bf348869dd8024cbcc0d39187f075acbc86229 t/number-phone.t
+SHA1 4d38957b1163f131399d76842c738612e9947958 t/smoke.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWZTMKUQM7y65VM2OAQj54RAAsr48f0DE2+zZRRiy5q1YMnUb5X9l6wR4
+iczDhuk0qJ1jljk/2V+KUYT45LWMxNVe6YHNaGIlhoZpwL19zDA/5WMu2AHG/MFK
+QVbNxWyTzvEJ0N1+48AryT+GK1KV4zX9kEhr03Ko1/Zy4xGsJCu+PsnsXj6D2qAx
+MHpH/WaVbc9/G/1Jb7Rh6R2BZ75yjiIuUMTDHrNPz04DT22aSlBereyS/GOyMzYe
+b8cVT/u0SkLF8YI2WHOkOeqDGqXe6Xy2UjLSJYtZTAQ2USvb++6Nb8eikd4jYFVp
+DqdTqgkhpsZmoxHQ8pQDAvd6NJ/QWD6axR4PqchzWDYflEmjLId1dbwvv97kJS8E
+FT6VnCa7Y4GSprsOqegi4eTHOz57hC3Tg8/kcJ7o2soCdlsl8Hrjp8fkj3780BSt
++dFysW29n/X48fETxw/zJv9NP1D50Rvo55qoICS6i1588QqGT1WfV8v60XFzgBFU
+se/IAJn85fVq+2yv15d7P3bWtPt/MLcmX7rWwLAV1zNJHnuYNLq8aNFgu+UWkI/3
+sbK0+eneJGcDjmCO3xQ11G9sPrkton+N2oEUqhnl5RppkGFE3PQJp6H9wkhM+DfG
+vA/FnogGB2GIDoQxoRDj0TjmCXuJk7uNRRnQ19uQvZDN+XDvLr/klTtvFb1aNOxq
+2vOs68uEgfs=
+=4oLV
+-----END PGP SIGNATURE-----

@@ -5,14 +5,14 @@ use Test::More;
 use Helper;
 
 my %notes = (
-    'anonymize' => 'anonymize sequence IDs',
+    'anonymize'   => 'anonymize sequence IDs',
     'composition' => 'base composition',
-    'length' => 'protein sequence length',
-    'linearize' => 'linearize fast sequence',
-    'nogaps' => 'remove gaps',
-    'numseq' => 'number of sequences',
-    'removestop' => 'remove stop codons',
-    'revcom' => 'reverse compliment sequence',
+    'length'      => 'protein sequence length',
+    'linearize'   => 'linearize fast sequence',
+    'no-gaps'     => 'remove gaps',
+    'num-seq'     => 'number of sequences',
+    'remove-stop' => 'remove stop codons',
+    'revcom'      => 'reverse compliment sequence',
 );
 
 # Filenames like

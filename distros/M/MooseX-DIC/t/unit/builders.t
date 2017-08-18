@@ -10,11 +10,16 @@ use lib "$FindBin::RealBin/builders/lib";
 
 use Test::Spec;
 use Try::Tiny;
+use Log::Log4perl ':easy';
 use MooseX::DIC qw/build_container/;
 
 describe 'A Moose DI container,' => sub {
 
 	my $container;
+
+	before all => sub {
+		Log::Log4perl->easy_init($ERROR);	
+	};
 
 	describe 'given a fixed scanpath,' => sub {
 

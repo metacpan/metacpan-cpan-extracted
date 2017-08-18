@@ -39,7 +39,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 Chris Travers
+Copyright (C) 2013-2017 Chris Travers
 
 This program is released under the following license: BSD
 

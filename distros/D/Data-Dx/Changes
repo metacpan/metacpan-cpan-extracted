@@ -29,3 +29,9 @@ Revision history for Data-Dx
 
     Refined Makefile.PL
     (Thanks Dave!)
+
+
+0.000007  Mon Aug 14 17:39:28 2017
+
+    Added support for Term::ANSIColor under Windows
+    (Thanks William!)

@@ -70,7 +70,14 @@ will always include, in addition to the exception’s main message:
 
 =over
 
-=item * A stack trace
+=item * A stack trace (including function arguments)
+
+B<IMPORTANT:> For security purposes, take care not to expose any function
+arguments that might contain sensitive information (e.g., passwords).
+
+Note that, in pre-5.16 Perls, this writes to the C<@DB::args> global.
+(That shouldn’t affect you, but it’s interaction with the environment, so
+better documented than not.)
 
 =item * Propagations
 
@@ -243,10 +250,16 @@ sub _get_call_stack {
 
     my @stack;
 
+    package DB;
+
+    #This local() causes pre-5.16 Perl to segfault.
+    local @DB::args if $^V ge v5.16.0;
+
     while ( my @call = (caller $level)[3, 1, 2] ) {
         my ($pkg) = ($call[0] =~ m<(.+)::>);
 
         if (!$pkg || !$pkg->isa(__PACKAGE__)) {
+            push @call, [ @DB::args ];  #need to copy the array
             push @stack, \@call;
         }
 
@@ -262,7 +275,11 @@ sub __spew {
     my $spew = $self->to_string();
 
     if ( rindex($spew, $/) != (length($spew) - length($/)) ) {
-        $spew .= $/ . join( q<>, map { "\t==> $_->[0] (called in $_->[1] at line $_->[2])$/" } @{ $CALL_STACK{$self->_get_strval()} } );
+        my $args;
+        $spew .= $/ . join( q<>, map {
+            $args = join(', ', @{ $_->[3] } );
+            "\t==> $_->[0]($args) (called in $_->[1] at line $_->[2])$/"
+        } @{ $CALL_STACK{$self->_get_strval()} } );
     }
 
     if ( $PROPAGATIONS{ $self->_get_strval() } ) {

@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction::Amount;
-$Business::RO::TaxDeduction::Amount::VERSION = '0.010';
+$Business::RO::TaxDeduction::Amount::VERSION = '0.011';
 # ABSTRACT: Personal deduction amount by year and number of persons
 
 use 5.010001;
@@ -17,7 +17,9 @@ has 'persons' => (
     is       => 'ro',
     isa      => TaxPersons,
     required => 1,
-    coerce   => 1,
+    coerce   => sub {
+		$_[0] >= 4 ? 4 : $_[0];
+	},
     default  => sub { 0 },
 );
 
@@ -90,7 +92,7 @@ Business::RO::TaxDeduction::Amount - Personal deduction amount by year and numbe
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

@@ -99,22 +99,22 @@
    "provides" : {
       "Dist::Zilla::Plugin::ContributorsFromGit" : {
          "file" : "lib/Dist/Zilla/Plugin/ContributorsFromGit.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/issues"
+         "web" : "https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit/issues"
       },
-      "homepage" : "https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit",
+      "homepage" : "https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit.git",
-         "web" : "https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit"
+         "url" : "https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit.git",
+         "web" : "https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.150010",
@@ -352,14 +352,14 @@
             "version" : "0.027"
          },
          {
-            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
-            "name" : "@RSRCHBOY/AutoPrereqs",
-            "version" : "6.010"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Prepender",
             "name" : "@RSRCHBOY/Prepender",
             "version" : "2.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@RSRCHBOY/AutoPrereqs",
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -712,7 +712,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 1,
-                  "tag" : "0.018",
+                  "tag" : "0.019",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
@@ -948,17 +948,17 @@
                      {
                         "class" : "Pod::Weaver::Section::RSRCHBOY::RoleParameters",
                         "name" : "ROLE PARAMETERS",
-                        "version" : "0.075"
+                        "version" : "0.07401"
                      },
                      {
                         "class" : "Pod::Weaver::Section::RSRCHBOY::RequiredAttributes",
                         "name" : "REQUIRED ATTRIBUTES",
-                        "version" : "0.075"
+                        "version" : "0.07401"
                      },
                      {
                         "class" : "Pod::Weaver::Section::RSRCHBOY::LazyAttributes",
                         "name" : "LAZY ATTRIBUTES",
-                        "version" : "0.075"
+                        "version" : "0.07401"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
@@ -1033,7 +1033,7 @@
                      {
                         "class" : "Pod::Weaver::Section::RSRCHBOY::Authors",
                         "name" : "RSRCHBOY::Authors",
-                        "version" : "0.075"
+                        "version" : "0.07401"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",

@@ -6,18 +6,22 @@ require Exporter;
 
 use aliased 'MooseX::DIC::ContainerException';
 use Module::Load;
+use Try::Tiny;
 
 sub build_factory {
     my ( $factory_type, $container ) = @_;
 
-    my $service_factory = eval {
+    my $service_factory;
+	try {
         load "MooseX::DIC::ServiceFactory::$factory_type";
-        "MooseX::DIC::ServiceFactory::$factory_type"
+
+        $service_factory = "MooseX::DIC::ServiceFactory::$factory_type"
             ->new( container => $container );
-    };
-    ContainerException->throw(
-        message => "Could not build the service factory $factory_type: $@" )
-        if $@;
+
+    } catch {
+		ContainerException->throw(
+			message => "Could not build the service factory $factory_type: $_" );
+	};
 
     return $service_factory;
 }

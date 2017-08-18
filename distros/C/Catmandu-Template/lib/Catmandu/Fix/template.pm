@@ -13,19 +13,23 @@ has value => (fix_arg => 1);
 sub emit {
     my ($self, $fixer) = @_;
 
-    my $path    = $fixer->split_path($self->path);
-    my $value   = $fixer->emit_value($self->value);
-    my $tt      = $fixer->capture(Template->new);
+    my $path  = $fixer->split_path($self->path);
+    my $value = $fixer->emit_value($self->value);
+    my $tt    = $fixer->capture(Template->new);
 
-	$fixer->emit_create_path($fixer->var, $path, sub {
-        my $var    = shift;
-        my $root   = $fixer->var;
-        my $output = $fixer->generate_var;
-        my $perl   = $fixer->emit_declare_vars($output, '""');
-        $perl .= "${tt}->process(\\${value},${root},\\${output});";
-        $perl .= "${var} = ${output};";
-        $perl;
-    });
+    $fixer->emit_create_path(
+        $fixer->var,
+        $path,
+        sub {
+            my $var    = shift;
+            my $root   = $fixer->var;
+            my $output = $fixer->generate_var;
+            my $perl   = $fixer->emit_declare_vars($output, '""');
+            $perl .= "${tt}->process(\\${value},${root},\\${output});";
+            $perl .= "${var} = ${output};";
+            $perl;
+        }
+    );
 }
 
 =head1 NAME

@@ -1,73 +1,39 @@
-NAME
-    IO::Tee - Multiplex output to multiple output handles
 
-SYNOPSIS
-        use IO::Tee;
+    Perl 5 module IO::Tee
 
-        $tee = IO::Tee->new($handle1, $handle2);
-        print $tee "foo", "bar";
+Lingua::Stem::Ru is a pure perl module that lets you multiplex output
+to multiple file handles.
 
-DESCRIPTION
-    The `IO::Tee' constructor, given a list of output handles, returns a
-    tied handle that can be written to but not read from. When written to
-    (using print or printf), it multiplexes the output to the list of
-    handles originally passed to the constructor. As a shortcut, you can
-    also directly pass a string or an array reference to the constructor, in
-    which case `IO::File::new' is called for you with the specified argument
-    or arguments.
+INSTALLATION
 
-    The `IO::Tee' class supports certain `IO::Handle' and `IO::File' methods
-    related to output. In particular, the following methods will iterate
-    themselves over all handles associated with the `IO::Tee' object, and
-    return TRUE indicating success if and only if all associated handles
-    returned TRUE indicating success:
+You install IO::Tee by running these commands in the *nix environment:
 
-    close
-    truncate
-    write
-    syswrite
-    format_write
-    formline
-    fcntl
-    ioctl
-    flush
-    clearerr
-    seek
-    Additionally, the following methods can be used to set (but not
-    retrieve) the current values of output-related state variables on all
-    associated handles:
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
 
-    autoflush
-    output_field_separator
-    output_record_separator
-    format_page_number
-    format_lines_per_page
-    format_lines_left
-    format_name
-    format_top_name
-    format_line_break_characters
-    format_formfeed
-EXAMPLE
-        use IO::Tee;
-        use IO::File;
+If you have a CPAN client installed, you should be able to run something like:
 
-        my $tee = new IO::Tee(\*STDOUT,
-            new IO::File(">tt1.out"), ">tt2.out");
+   cpan IO::Tee
+   cpanm IO::Tee
 
-        print join(' ', $tee->handles), "\n";
+DOCUMENTATION
 
-        for (1..10) { print $tee $_, "\n" }
-        for (1..10) { $tee->print($_, "\n") }
-        $tee->flush;
+POD format documentation is included in lib/IO/Tee.pm.
+You can read the documentation online:
 
-AUTHOR
-    Chung-chieh Shan, ken@digitas.harvard.edu
+    https://metacpan.org/pod/IO::Tee
+
+Or read it on your terminal, using the perldoc command:
+
+    perldoc IO::Tee
 
 COPYRIGHT
-    Copyright (c) 1998-2001 Chung-chieh Shan. All rights reserved. This
-    program is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
 
-SEE ALSO
-    the perlfunc manpage, the IO::Handle manpage, the IO::File manpage.
+Copyright (C) 1998-2017 Chung-chieh Shan.
 
+AUTHOR
+
+This module was created by Chung-chieh Shan (KENSHAN),
+but is currently (as of August 2017) being maintained by Neil Bowers (NEILB).

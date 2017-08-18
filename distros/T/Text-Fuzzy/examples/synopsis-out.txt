@@ -1,2 +1,0 @@
-Distance is 2
-Nearest array entry is brown

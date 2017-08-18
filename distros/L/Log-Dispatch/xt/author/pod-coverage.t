@@ -26,13 +26,13 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'Log::Dispatch::File' => [
-                                      qr/^(?:O_)?APPEND$/
-                                    ],
              'Log::Dispatch' => [
                                 qr/^(?:warn|err|crit|emerg)$/,
                                 qr/^is_\w+$/
                               ],
+             'Log::Dispatch::File' => [
+                                      qr/^(?:O_)?APPEND$/
+                                    ],
              'Log::Dispatch::Output' => [
                                         qr/^new$/
                                       ]

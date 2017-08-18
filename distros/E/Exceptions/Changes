@@ -1,5 +1,9 @@
 Revision history for Exceptions
 
+0.102     2017-08-14
+    - Update the eval-ed code to be somewhat more readable
+    - Reorganized the writeup a bit to hopefully read more smoothly
+
 0.101     2017-08-12
     - Update to use @Starter revision 2
     - Include the LICENSE in the repo

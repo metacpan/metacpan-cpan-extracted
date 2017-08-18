@@ -2,6 +2,7 @@ Build.PL
 Changes
 LICENSE
 META.json
+README.md
 cpanfile
 lib/Text/vCard/Precisely.pm
 lib/Text/vCard/Precisely/V3.pm
@@ -38,6 +39,7 @@ t/V3/Image/maltiple.vcf
 t/V3/Image/maltiple_base64.vcf
 t/V3/Image/maltiple_gd.vcf
 t/V3/Image/maltiple_gd2.vcf
+t/V3/Image/maltiple_gd3.vcf
 t/V3/Image/uri.vcf
 t/V3/Name/base.vcf
 t/V3/Name/no_suffixes.vcf
@@ -88,6 +90,7 @@ t/V4/Image/maltiple.vcf
 t/V4/Image/maltiple_base64.vcf
 t/V4/Image/maltiple_gd.vcf
 t/V4/Image/maltiple_gd2.vcf
+t/V4/Image/maltiple_gd3.vcf
 t/V4/Image/uri.vcf
 t/V4/Node/base.vcf
 t/V4/Node/hash.vcf

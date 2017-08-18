@@ -1,13 +1,18 @@
 package Beam::Minion;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: A distributed task runner for Beam::Wire containers
 
 #pod =head1 SYNOPSIS
 #pod
+#pod     # Command-line interface
 #pod     export BEAM_MINION=sqlite://test.db
 #pod     beam minion worker <container>...
 #pod     beam minion run <container> <service> [<args>...]
 #pod     beam minion help
+#pod
+#pod     # Perl interface
+#pod     local $ENV{BEAM_MINION} = 'sqlite://test.db';
+#pod     Beam::Minion->enqueue( $container, $service, @args );
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -84,8 +89,22 @@ our $VERSION = '0.003';
 
 use strict;
 use warnings;
+use Beam::Minion::Util qw( minion );
 
+#pod =sub enqueue
+#pod
+#pod     Beam::Minion->enqueue( $container_name, $task_name, @args );
+#pod
+#pod Enqueue the task named C<$task_name> from the container named C<$container_name>.
+#pod The C<BEAM_MINION> environment variable must be set.
+#pod
+#pod =cut
 
+sub enqueue {
+    my ( $class, $container, $task, @args ) = @_;
+    my $minion = minion();
+    $minion->enqueue( $task, \@args, { queue => $container } );
+}
 
 1;
 
@@ -99,14 +118,19 @@ Beam::Minion - A distributed task runner for Beam::Wire containers
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
+    # Command-line interface
     export BEAM_MINION=sqlite://test.db
     beam minion worker <container>...
     beam minion run <container> <service> [<args>...]
     beam minion help
+
+    # Perl interface
+    local $ENV{BEAM_MINION} = 'sqlite://test.db';
+    Beam::Minion->enqueue( $container, $service, @args );
 
 =head1 DESCRIPTION
 
@@ -114,6 +138,15 @@ L<Beam::Minion> is a distributed task runner. One or more workers are
 created to run tasks, and then each task is sent to a worker to be run.
 Tasks are configured as L<Beam::Runnable> objects by L<Beam::Wire>
 container files.
+
+=head1 SUBROUTINES
+
+=head2 enqueue
+
+    Beam::Minion->enqueue( $container_name, $task_name, @args );
+
+Enqueue the task named C<$task_name> from the container named C<$container_name>.
+The C<BEAM_MINION> environment variable must be set.
 
 =head1 GETTING STARTED
 

@@ -23,7 +23,7 @@ requires:
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   File::MoreUtil: '0'
-  Log::ger: '0.019'
+  Log::ger: '0.023'
   POSIX: '0'
   Perinci::CmdLine::Any: '0'
   Sah::Schema::pathname: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-u
   homepage: https://metacpan.org/release/App-perlmv-u
   repository: git://github.com/perlancar/perl-App-perlmv-u.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -112,7 +112,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.58'
+      version: '0.590'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -325,6 +325,10 @@ x_Dist_Zilla:
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.056'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::PERLANCAR/Test::Perl::Critic'
+      version: '3.001'
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

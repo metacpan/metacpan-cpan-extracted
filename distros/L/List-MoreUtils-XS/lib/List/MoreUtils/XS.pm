@@ -3,10 +3,31 @@ package List::MoreUtils::XS;
 use 5.008_001;
 use strict;
 use warnings;
+use base ('Exporter');
 
-use vars qw{$VERSION @ISA};
+use vars qw{$VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS};
 
-$VERSION = '0.418';
+$VERSION = '0.422';
+
+@EXPORT = ();
+@EXPORT_OK = qw(any all none notall one
+          any_u all_u none_u notall_u one_u
+	  reduce_u reduce_0 reduce_1
+          true false
+          insert_after insert_after_string
+          apply indexes
+          after after_incl before before_incl
+          firstidx lastidx onlyidx
+          firstval lastval onlyval
+          firstres lastres onlyres
+          singleton duplicates frequency occurrences mode
+          each_array each_arrayref
+          pairwise natatime
+          arrayify mesh zip6 uniq listcmp
+          samples minmax minmaxstr part
+          bsearch bsearchidx binsert bremove lower_bound upper_bound equal_range
+          qsort);
+%EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # Load the XS at compile-time so that redefinition warnings will be
 # thrown correctly if the XS versions of part or indexes loaded
@@ -26,8 +47,34 @@ List::MoreUtils::XS - Provide compiled List::MoreUtils functions
 
 =head1 SYNOPSIS
 
-  use List::Moreutils::XS;
-  use List::MoreUtils ...;
+  use List::Moreutils::XS ();
+  use List::MoreUtils ':all';
+
+  my @procs = get_process_stats->fetchall_array;
+  # sort by ppid, then pid
+  qsort { $a->[3] <=> $b->[3] or $a->[2] <=> $b->[2] } @procs;
+  while( @procs ) {
+      my $proc = shift @procs;
+      my @children = equal_range { $_->[3] <=> $proc->[2] } @procs;
+  }
+
+  my @left = qw(this is a test);
+  my @right = qw(this is also a test);
+  my %rlinfo = listcmp @left, @right;
+
+  # on unsorted
+  my $i = firstidx { $_ eq 'yeah' } @foo;
+  # on sorted - always first, but might not be 'yeah'
+  my $j = lower_bound { $_ cmp 'yeah' } @bar;
+  # on sorted - any of occurrences, is surely 'yeah'
+  my $k = bsearchidx { $_ cmp 'yeah' } @bar;
+
+=head1 DESCRIPTION
+
+List::MoreUtils::XS is a backend for List::MoreUtils. Even if it's possible
+(because of user wishes) to have it practically independent from
+L<List::MoreUtils>, it technically depend on C<List::MoreUtils>. Since it's
+only a backend, the API is not public and can change without any warning.
 
 =head1 SEE ALSO
 

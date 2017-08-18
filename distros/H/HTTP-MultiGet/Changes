@@ -14,3 +14,7 @@
 1.005 
   -- Added a Moo::Role for hybrid blocking nonblocking rest client development
     -- it works great!! Unfortunatly I am struggling to explain the concepts involved.
+1.006
+  -- Updated Makefile.PL due to missing dep found in cpan unit test contribution
+   Unit test results can be found here:
+     http://www.cpantesters.org/cpan/report/62db39c6-8120-11e7-a074-e1beba07c9dd

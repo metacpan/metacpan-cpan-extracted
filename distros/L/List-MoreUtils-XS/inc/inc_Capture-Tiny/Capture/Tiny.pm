@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Capture::Tiny;
 # ABSTRACT: Capture STDOUT and STDERR from Perl, XS or external programs
-our $VERSION = '0.44';
+our $VERSION = '0.46';
 use Carp ();
 use Exporter ();
 use IO::Handle ();
@@ -81,7 +81,7 @@ HERE
 #--------------------------------------------------------------------------#
 
 sub _relayer {
-  my ($fh, $layers) = @_;
+  my ($fh, $apply_layers) = @_;
   # _debug("# requested layers (@{$layers}) for @{[fileno $fh]}\n");
 
   # eliminate pseudo-layers
@@ -91,7 +91,7 @@ sub _relayer {
       binmode( $fh, ":pop" );
   }
   # apply other layers
-  my @to_apply = @$layers;
+  my @to_apply = @$apply_layers;
   shift @to_apply; # eliminate initial :unix
   # _debug("# applying layers  (unix @to_apply) to @{[fileno $fh]}\n");
   binmode($fh, ":" . join(":",@to_apply));
@@ -436,7 +436,7 @@ Capture::Tiny - Capture STDOUT and STDERR from Perl, XS or external programs
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -705,6 +705,12 @@ capture, it will shortcut in the child process and return empty strings for
 captures.  Other problems may occur in the child or parent, as well.
 Forking in a capture block is not recommended.
 
+=head3 Using threads
+
+Filehandles are global.  Mixing up I/O and captures in different threads
+without coordination is going to cause problems.  Besides, threads are
+officially discouraged.
+
 =head3 Dropping privileges during a capture
 
 If you drop privileges during a capture, temporary files created to
@@ -858,7 +864,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dagfinn Ilmari Mannsåker David E. Wheeler fecundf Peter Rabbitson
+=for stopwords Dagfinn Ilmari Mannsåker David E. Wheeler fecundf Graham Knop Peter Rabbitson
 
 =over 4
 
@@ -873,6 +879,10 @@ David E. Wheeler <david@justatheory.com>
 =item *
 
 fecundf <not.com+github@gmail.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 

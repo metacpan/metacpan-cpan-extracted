@@ -405,7 +405,7 @@ our @EXPORT = qw(
 );
 
 use vars qw($VERSION);
-$VERSION = 4203;
+$VERSION = 4204;
 
 require XSLoader;
 XSLoader::load('Mail::OpenDKIM', $VERSION);

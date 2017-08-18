@@ -13,7 +13,7 @@ configure_requires:
   File::Which: '0'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,6 @@ no_index:
     - example
     - maint
 requires:
-  Archive::Tar: '0'
   Capture::Tiny: '0.17'
   ExtUtils::CBuilder: '0'
   ExtUtils::ParseXS: '3.30'
@@ -44,7 +43,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '0.95'
+version: '0.99'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'

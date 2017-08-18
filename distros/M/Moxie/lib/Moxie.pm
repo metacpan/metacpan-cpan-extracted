@@ -17,11 +17,12 @@ use Method::Traits         (); # for accessor/method generators
 use MOP;
 use MOP::Internal::Util;
 
+use Moxie::Slot::Initializer;
 use Moxie::Object;
 use Moxie::Object::Immutable;
 use Moxie::Traits::Provider;
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import ($class, %opts) {
@@ -74,10 +75,31 @@ sub import_into ($class, $caller, $opts) {
 
     # import has, extend and with keyword
 
-    my $new_initializer = 'package '.$caller.'; sub { undef }';
     BEGIN::Lift::install(
-        ($caller, 'has') => sub ($name, $initializer = undef) {
-            $initializer ||= eval $new_initializer;
+        ($caller, 'has') => sub ($name, @args) {
+
+            my $initializer;
+            if ( @args && (scalar @args % 2) == 0 ) {
+                $initializer = Moxie::Slot::Initializer->new(
+                    meta => $meta,
+                    name => $name,
+                    @args
+                );
+            }
+            elsif ( @args && ref $args[0] eq 'CODE' ) {
+                $initializer = Moxie::Slot::Initializer->new(
+                    meta    => $meta,
+                    name    => $name,
+                    default => $args[0]
+                );
+            }
+            else {
+                $initializer = Moxie::Slot::Initializer->new(
+                    meta => $meta,
+                    name => $name
+                );
+            }
+
             $meta->add_slot( $name, $initializer );
             return;
         }
@@ -162,7 +184,7 @@ Moxie - Not Another Moose Clone
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -171,15 +193,18 @@ version 0.02
 
         extends 'Moxie::Object';
 
-        has 'x' => sub { 0 };
-        has 'y' => sub { 0 };
+        has _x => ( default => sub { 0 } );
+        has _y => ( default => sub { 0 } );
 
-        sub x : ro;
-        sub y : ro;
+        sub new : BUILDARGS(
+            x? => _x,
+            y? => _y,
+        );
 
-        sub clear ($self) {
-            @{$self}{'x', 'y'} = (0, 0);
-        }
+        sub x : ro( _x );
+        sub y : ro( _y );
+
+        sub clear ($self) { (_x, _y) = (0, 0) }
     }
 
     package Point3D {
@@ -187,19 +212,25 @@ version 0.02
 
         extends 'Point';
 
-        has 'z' => sub { 0 };
+        has _z => ( default => sub { 0 } );
 
-        sub z : ro;
+        sub new : BUILDARGS(
+            x? => super(x),
+            y? => super(y),
+            z? => _z
+        );
+
+        sub z : ro( _z );
 
         sub clear ($self) {
             $self->next::method;
-            $self->{'z'} = 0;
+            _z = 0;
         }
     }
 
 =head1 DESCRIPTION
 
-L<Moxie> is a reference implemenation for an object system built
+L<Moxie> is a reference implementation for an object system built
 on top of a set of modules.
 
 =over 4
@@ -269,7 +300,7 @@ class or role during the next C<UNITCHECK> phase.
 
 This will populate the C<@DOES> variable in the current package.
 
-=item C<has $name => sub { $default_value }>
+=item C<< has $name => sub { $default_value } >>
 
 This creates a new slot in the current class or role, with
 C<$name> being the name of the slot and a subroutine which,
@@ -289,9 +320,18 @@ this is done when C<use>ing L<Moxie> like this:
 By default L<Moxie> will enable the L<Moxie::Traits::Provider> module
 to supply this set of traits for use in L<Moxie> classes.
 
+=head3 B<A word about slot names and method trait syntax>
+
+The way C<perl> parses C<CODE> attributes is that everything within the
+C<()> is just passed onto your code for parsing. This means that it is
+not neccesary to quote slot names within the argument list of a trait,
+and all examples (eventually) will confrom to this syntax. This is a matter
+of choice, do as you prefer, but I promise you there is no additional
+safety or certainty you get from quoting slot names in trait arguments.
+
 =over 4
 
-=item C<init_args( arg_key => slot_name, ... )>
+=item C<< init_args( arg_key => slot_name, ... ) >>
 
 This is a trait that is exclusively applied to the C<BUILDARGS>
 method. This is simply a shortcut to generate a C<BUILDARGS> method
@@ -303,67 +343,140 @@ slot with a different public name.
     has _bar => sub {};
 
     # map the `foo` key to the `_bar` slot
-    sub BUILDARGS : init_arg( foo => "_bar" );
+    sub BUILDARGS : init_arg( foo => _bar );
 
-Using this same trait it is possible to also forbid a constructor
-parameter from being set, which is done by setting the C<slot_name>
-to be C<undef>. If the C<foo> key is passed to this constructor
-an exception will be thrown.
+All other parameters will be rejected and an exception thrown. If
+you wish to have an optional parameter, simply follow the parameter
+name with a question mark, like so:
 
-    sub BUILDARGS : init_arg( foo => undef );
+    # declare a slot with a private name
+    has _bar => sub {};
+
+    # the `foo` key is optional, but if
+    # given, will store in the `_bar` slot
+    sub BUILDARGS : init_arg( foo? => _bar );
+
+If you wish to accept parameters for your superclass's constructor
+but do not want to specify storage location because of encapsulation
+concerns, simply use the C<super> designator, like so:
+
+    # map the `foo` key to the local `_bar` slot
+    # with the `bar` key, let the superclass decide ...
+    sub BUILDARGS : init_arg(
+        foo => _bar,
+        bar => super(bar)
+    );
+
+If you wish to have a constructor that accepts no parameters at
+all, then simply do this.
+
+    sub BUILDARGS : init_arg;
+
+And the constructor will throw an exception if any arguments at
+all are passed in.
 
 =item C<ro( ?$slot_name )>
 
 This will generate a simple read-only accessor for a slot. The
 C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method the trait is being applied.
+name of the method that the trait is being applied to.
 
     sub foo : ro;
-    sub foo : ro('_foo');
+    sub foo : ro(_foo);
+
+If the method name is prefixed with C<get_>, then this trait will
+infer that the slot name intended is the remainder of the method's
+name, minus the C<get_> prefix, such that this:
+
+    sub get_foo : ro;
+
+Is the equivalent of writing this:
+
+    sub get_foo : ro(foo);
 
 =item C<rw( ?$slot_name )>
 
 This will generate a simple read-write accessor for a slot. The
 C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method the trait is being applied.
+name of the method that the trait is being applied to.
 
     sub foo : rw;
-    sub foo : rw('_foo');
+    sub foo : rw(_foo);
+
+If the method name is prefixed with C<set_>, then this trait will
+infer that the slot name intended is the remainder of the method's
+name, minus the C<set_> prefix, such that this:
+
+    sub set_foo : ro;
+
+Is the equivalent of writing this:
+
+    sub set_foo : ro(foo);
 
 =item C<wo( ?$slot_name )>
 
 This will generate a simple write-only accessor for a slot. The
 C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method the trait is being applied.
+name of the method that the trait is being applied to.
 
     sub foo : wo;
-    sub foo : wo('_foo');
+    sub foo : wo(_foo);
+
+If the method name is prefixed with C<set_>, then this trait will
+infer that the slot name intended is the remainder of the method's
+name, minus the C<set_> prefix, such that this:
+
+    sub set_foo : ro;
+
+Is the equivalent of writing this:
+
+    sub set_foo : ro(foo);
 
 =item C<predicate( ?$slot_name )>
 
 This will generate a simple predicate method for a slot. The
 C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method the trait is being applied.
+name of the method that the trait is being applied to.
 
     sub foo : predicate;
-    sub foo : predicate('_foo');
+    sub foo : predicate(_foo);
+
+If the method name is prefixed with C<has_>, then this trait will
+infer that the slot name intended is the remainder of the method's
+name, minus the C<has_> prefix, such that this:
+
+    sub has_foo : ro;
+
+Is the equivalent of writing this:
+
+    sub has_foo : ro(foo);
 
 =item C<clearer( ?$slot_name )>
 
 This will generate a simple clearing method for a slot. The
 C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method the trait is being applied.
+name of the method that the trait is being applied to.
 
     sub foo : clearer;
-    sub foo : clearer('_foo');
+    sub foo : clearer(_foo);
 
-=item C<handles( $slot_name->$delegate_method )>
+If the method name is prefixed with C<clear_>, then this trait will
+infer that the slot name intended is the remainder of the method's
+name, minus the C<clear_> prefix, such that this:
+
+    sub clear_foo : ro;
+
+Is the equivalent of writing this:
+
+    sub clear_foo : ro(foo);
+
+=item C<< handles( $slot_name->$delegate_method ) >>
 
 This will generate a simple delegate method for a slot. The
 C<$slot_name> and C<$delegate_method>, seperated by an arrow
 (C<< -> >>), must be specified or an exception is thrown.
 
-    sub foobar : handles('foo->bar');
+    sub foobar : handles(foo->bar);
 
 No attempt will be made to verify that the value stored in
 C<$slot_name> is an object, or that it responds to the
@@ -374,10 +487,10 @@ the writer of the class.
 
 This will generate a private read-write accessor for a slot. The
 C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method the trait is being applied.
+name of the method that the trait is being applied to.
 
     my sub foo : private;
-    my sub foo : private('_foo');
+    my sub foo : private(_foo);
 
 The privacy is accomplished via the use of a lexical method, this means
 that the method is not availble outside of the package scope and is

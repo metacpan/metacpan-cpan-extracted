@@ -2,3 +2,7 @@ Revision history for Mojo-Server-Threaded
 
 0.10    2017-08-02
         First version.
+0.11    2017-08-17
+        - Try to fix tests on cygwin
+        - fix docs and dependencies in Makefile.PL
+        - add LICENSE

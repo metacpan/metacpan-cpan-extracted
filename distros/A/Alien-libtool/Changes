@@ -1,5 +1,11 @@
 Revision history for Alien-libtool
 
+0.09      2017-08-17 14:34:11 -0400
+  - Production release identical to 0.08_01
+
+0.08_01   2017-08-04 15:24:06 -0400
+  - Support for MSYS2 / MinGW
+
 0.07      2017-08-04 06:49:21 -0400
   - Make help2man a no-op instead of touching man files during build
     (Fixes problem where time resolution on windows may not be good enough)

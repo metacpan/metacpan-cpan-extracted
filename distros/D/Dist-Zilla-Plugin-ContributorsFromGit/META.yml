@@ -38,7 +38,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::ContributorsFromGit:
     file: lib/Dist/Zilla/Plugin/ContributorsFromGit.pm
-    version: '0.018'
+    version: '0.019'
 requires:
   Dist::Zilla: '5.013'
   Dist::Zilla::Role::BeforeBuild: '0'
@@ -62,10 +62,10 @@ requires:
   perl: v5.10.0
   utf8: '0'
 resources:
-  bugtracker: https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/issues
-  homepage: https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit
-  repository: https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit.git
-version: '0.018'
+  bugtracker: https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit/issues
+  homepage: https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit
+  repository: https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit.git
+version: '0.019'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.150010'
@@ -259,13 +259,13 @@ x_Dist_Zilla:
       name: '@RSRCHBOY/Test::ReportPrereqs'
       version: '0.027'
     -
-      class: Dist::Zilla::Plugin::AutoPrereqs
-      name: '@RSRCHBOY/AutoPrereqs'
-      version: '6.010'
-    -
       class: Dist::Zilla::Plugin::Prepender
       name: '@RSRCHBOY/Prepender'
       version: '2.004'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@RSRCHBOY/AutoPrereqs'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -541,7 +541,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '1'
-          tag: '0.018'
+          tag: '0.019'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -723,15 +723,15 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::RSRCHBOY::RoleParameters
               name: 'ROLE PARAMETERS'
-              version: '0.075'
+              version: '0.07401'
             -
               class: Pod::Weaver::Section::RSRCHBOY::RequiredAttributes
               name: 'REQUIRED ATTRIBUTES'
-              version: '0.075'
+              version: '0.07401'
             -
               class: Pod::Weaver::Section::RSRCHBOY::LazyAttributes
               name: 'LAZY ATTRIBUTES'
-              version: '0.075'
+              version: '0.07401'
             -
               class: Pod::Weaver::Section::Collect
               name: 'REQUIRED METHODS'
@@ -791,7 +791,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::RSRCHBOY::Authors
               name: RSRCHBOY::Authors
-              version: '0.075'
+              version: '0.07401'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@RSRCHBOY/Contributors'

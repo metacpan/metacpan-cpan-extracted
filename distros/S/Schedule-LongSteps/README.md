@@ -321,6 +321,37 @@ Usage:
 
 Shortcut to $self->storage->find\_process( $pid );
 
+## load\_process
+
+Returns a loaded process for a given pid, or undef if there is no process
+associated with the PID.
+
+An optional hash ref context can also be passed in
+and will be used to load the process, a blank context is used if not provided.
+
+    if( my $loaded_process = $self->load_process( $pid , $context ) ){
+       ...
+    }
+
+## revive
+
+Revive a longstep process to a given step within a Longstep process.
+
+A context is required when the reviving process contains required attributes
+and when setting a step to reviving step. If no step is given then the process
+will revive on the failed process step, when setting a step that doesn't
+require a context, use an empty hashref '{}'.
+
+If you need to modify the state before reviving the longstep process, it is
+recommended to have a revive step ("revive\_do\_broken\_step") which modifies
+the state as needed and returns a next\_step to continue the process.
+
+This method will confess on any issues.
+
+    eval {
+        $self->revive( $pid, $context, $method_to_revive_to );
+    };
+
 # SEE ALSO
 
 [BPM::Engine](https://metacpan.org/pod/BPM::Engine) A business Process engine based on XPDL, in Alpha version since 2012 (at this time of writing)

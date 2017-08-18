@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.5.0
+Version 1.5.1
 
 =cut
 
-our $VERSION = 'v1.5.0';
+our $VERSION = 'v1.5.1';
 
 =head1 SYNOPSIS
 
@@ -1310,7 +1310,7 @@ sub build_artifacts_search {
     );
 }
 
-=head2 list_docker_repositories
+=head2 list_docker_repositories( n => 5, last => 'last_tag_value' )
 
 Lists all Docker repositories hosted in under an Artifactory Docker repository.
 
@@ -1318,8 +1318,25 @@ Lists all Docker repositories hosted in under an Artifactory Docker repository.
 
 sub list_docker_repositories {
     my ( $self, %args ) = @_;
-    my $repository = $args{repository} || $self->repository();
+    my $repository = delete $args{repository} || $self->repository();
     my $url = $self->_api_url() . "/docker/$repository/v2/_catalog";
+    $url .= '?' . $self->_stringify_hash( '&', %args ) if (%args);
+
+    return $self->get($url);
+}
+
+=head2 list_docker_tags( $image_name, n => 5, last => 'last_tag_value' )
+
+Lists all tags of the specified Artifactory Docker repository.
+
+=cut
+
+sub list_docker_tags {
+    my ( $self, $image_name, %args ) = @_;
+    my $repository = delete $args{repository} || $self->repository();
+    my $url = $self->_api_url() . "/docker/$repository/v2/$image_name/tags/list";
+    $url .= '?' . $self->_stringify_hash( '&', %args ) if (%args);
+
     return $self->get($url);
 }
 

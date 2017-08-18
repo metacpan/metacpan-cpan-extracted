@@ -1,0 +1,5 @@
+name = "Getopt-EX"
+authority = "cpan:UTASHIRO"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

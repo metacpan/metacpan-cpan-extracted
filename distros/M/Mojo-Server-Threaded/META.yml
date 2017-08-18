@@ -19,6 +19,7 @@ no_index:
     - inc
     - t
 requires:
+  IO::Socket::IP: '0.37'
   Mojolicious: '7.35'
   Win32::Process: '0.14'
   perl: '5.010001'
@@ -26,5 +27,5 @@ resources:
   bugtracker: https://github.com/tomk3003/mojo-server-threaded/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/tomk3003/mojo-server-threaded.git
-version: 0.1
+version: 0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

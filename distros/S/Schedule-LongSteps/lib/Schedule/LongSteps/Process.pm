@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Process;
-$Schedule::LongSteps::Process::VERSION = '0.015';
+$Schedule::LongSteps::Process::VERSION = '0.017';
 use Moose;
 use Log::Any qw/$log/;
 
@@ -117,6 +117,20 @@ sub wait_processes{
     $log->debug("Will wait a little bit more");
     return $self->new_step({ run_at => DateTime->now() });
 }
+
+
+=head2 revival_methods
+
+Returns an array-ref of revive methods associated with the process.
+
+=cut
+
+sub revival_methods {
+    my ($self) = @_;
+    my @revival_methods = map {$_->name}grep {$_->name =~ /^revive_/} $self->meta->get_all_methods;
+    return \@revival_methods;
+}
+
 
 __PACKAGE__->meta->make_immutable();
 

@@ -306,7 +306,7 @@ Perl didn't trap the error either... so the process exits:
    ttul:~/dev/cpan/Inline-Ruby$ perl -Mblib t.pl
    Using /home/nwatkiss/dev/cpan/Inline-Ruby/blib
    #<ZeroDivisionError: divided by 0>
-   ttul:~/dev/cpan/Inline-Ruby$ 
+   ttul:~/dev/cpan/Inline-Ruby$
 
 The exception is actually an object, so you can call these methods on it:
 
@@ -592,7 +592,7 @@ The name of the Ruby function to call.
 
 Optional arguments to the Ruby function.
 
-=back 
+=back
 
 For example:
 

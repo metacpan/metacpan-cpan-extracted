@@ -15,37 +15,110 @@ use B::CompilerPhase::Hook (); # multi-phase programming
 use Sub::Util              ();
 use PadWalker              (); # for generating lexical accessors
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub init_args ( $meta, $method, %init_args ) : OverwritesMethod {
 
+    my $class_name  = $meta->name;
     my $method_name = $method->name;
 
     Carp::croak('The `init_arg` trait can only be applied to BUILDARGS')
         if $method_name ne 'BUILDARGS';
 
-    $meta->add_method('BUILDARGS' => sub ($self, @args) {
+    if ( %init_args ) {
 
-        my $proto = $self->next::method( @args );
+        my @all       = sort keys %init_args;
+        my @required  = grep !/\?$/, @all;
 
-        foreach my $init_arg ( keys %init_args ) {
-            if ( exists $proto->{ $init_arg } ) {
-                Carp::croak('Attempt to set slot['.$init_arg.'] in constructor, but slot has been declared un-settable (init_arg = undef)')
-                    unless defined $init_args{ $init_arg };
-                # map it!
-                $proto->{ $init_args{ $init_arg } } = delete $proto->{ $init_arg };
+        my $max_arity = 2 * scalar @all;
+        my $min_arity = 2 * scalar @required;
+
+        # use Data::Dumper;
+        # warn Dumper {
+        #     class     => $meta->name,
+        #     all       => \@all,
+        #     required  => \@required,
+        #     min_arity => $min_arity,
+        #     max_arity => $max_arity,
+        # };
+
+        $meta->add_method('BUILDARGS' => sub ($self, @args) {
+
+            my $arity = scalar @args;
+
+            Carp::croak('Constructor for ('.$class_name.') expected '
+                . (($max_arity == $min_arity)
+                    ? ($min_arity)
+                    : ('between '.$min_arity.' and '.$max_arity))
+                . ' arguments, got ('.$arity.')')
+                if $arity < $min_arity || $arity > $max_arity;
+
+            my $proto = $self->UNIVERSAL::Object::BUILDARGS( @args );
+
+            my @missing;
+            # make sure all the expected parameters exist ...
+            foreach my $param ( @required ) {
+                push @missing => $param unless exists $proto->{ $param };
             }
-        }
 
-        return $proto;
-    });
+            Carp::croak('Constructor for ('.$class_name.') missing (`'.(join '`, `' => @missing).'`) parameters, got (`'.(join '`, `' => sort keys $proto->%*).'`), expected (`'.(join '`, `' => @all).'`)')
+                if @missing;
+
+            my (%final, %super);
+
+            # do any kind of slot assignment shuffling needed ....
+            foreach my $param ( @all ) {
+
+                my $from = $param =~ s/\?$//r; #/
+                my $to   = $init_args{ $param };
+
+                if ( $to =~ /^super\((.*)\)$/ ) {
+                    $super{ $1 } = delete $proto->{ $from }
+                         if $proto->{ $from };
+                }
+                else {
+                    # now grab the slot by the correct name ...
+                    $final{ $to } = delete $proto->{ $from }
+                        if $proto->{ $from };
+                }
+            }
+
+            # inherit keys ...
+            if ( keys %super ) {
+                my $super_proto = $self->next::method( %super );
+                %final = ( $super_proto->%*, %final );
+            }
+
+            if ( keys $proto->%* ) {
+                Carp::croak('Constructor for ('.$class_name.') got unrecognized parameters (`'.(join '`, `' => keys $proto->%*).'`)');
+            }
+
+            # use Data::Dumper;
+            # warn Dumper +{
+            #     proto => $proto,
+            #     final => \%final,
+            #     super => \%super,
+            #     meta  => {
+            #         class     => $meta->name,
+            #         all       => \@all,
+            #         required  => \@required,
+            #         min_arity => $min_arity,
+            #         max_arity => $max_arity,
+            #     }
+            # };
+
+            return \%final;
+        });
+    }
+    else {
+        $meta->add_method('BUILDARGS' => sub ($self, @args) {
+            Carp::croak('Constructor for ('.$class_name.') expected 0 arguments, got ('.(scalar @args).')')
+                if @args;
+            return $self->UNIVERSAL::Object::BUILDARGS();
+        });
+    }
 }
-
-# TODO:
-# Add a `strict_args` provider that will do what
-# MooseX::StrictConstructor would do.
-# - SL
 
 sub ro ( $meta, $method, @args ) : OverwritesMethod {
 
@@ -329,7 +402,7 @@ Moxie::Traits::Provider - built in traits
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

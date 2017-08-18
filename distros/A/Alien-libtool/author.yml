@@ -5,6 +5,10 @@ pod_spelling_system:
   # (regardless of what spell check thinks)
   stopwords:
     - libtool
+    - Mughal
+    - Zaki
+    - sivoais
+    - zmughal
 
 pod_coverage:
   skip: 0

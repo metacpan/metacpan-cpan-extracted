@@ -1,6 +1,5 @@
-requires "Alien::Autotools" => "0.99";
-requires "Alien::Base" => "0.74";
-requires "Alien::Build" => "0.74";
+requires "Alien::Base" => "0.99";
+requires "Alien::Build" => "0.99";
 requires "Alien::Build::Plugin" => "0";
 requires "Class::Method::Modifiers" => "0";
 requires "FFI::CheckLib" => "0";
@@ -9,9 +8,12 @@ requires "Role::Tiny" => "1.003001";
 requires "perl" => "5.008001";
 
 on 'test' => sub {
+  requires "Alien::Autotools" => "0.99";
+  requires "Alien::Base" => "0.99";
+  requires "Alien::cmake3" => "0.02";
   requires "Test2::Mock" => "0.000060";
   requires "Test2::V0" => "0.000060";
-  requires "Test::Alien" => "0";
+  requires "Test::Alien" => "0.99";
   requires "Test::Alien::Build" => "0";
   requires "perl" => "5.008001";
 };

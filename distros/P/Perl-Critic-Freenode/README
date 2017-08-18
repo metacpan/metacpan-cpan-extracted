@@ -86,6 +86,10 @@ POLICIES
       Don't use overload without specifying a bool overload and enabling
       fallback
 
+    Perl::Critic::Policy::Freenode::PackageMatchesFilename
+
+      Module files should declare a package matching the filename
+
     Perl::Critic::Policy::Freenode::POSIXImports
 
       Don't use POSIX without specifying an import list

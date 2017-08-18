@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-PromptIfStale
 
+0.054     2017-08-17 00:47:23Z
+          - switch to a different environment variable to control
+            functionality in tests, especially travis, to allow installing on
+            travis during other distributions' tests and still allow testing
+            ourselves under travis too (it's complicated)
+
 0.053     2017-04-19 02:19:30Z
           - all tests are skipped when installing this distribution under
             travis (unless it is this distribution testing ourselves), to

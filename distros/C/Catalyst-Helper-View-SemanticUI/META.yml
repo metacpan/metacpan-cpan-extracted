@@ -1,0 +1,34 @@
+---
+abstract: 'Helper for Semantic UI and TT view which builds a skeleton web site'
+author:
+  - 'Ferruccio Zamuner <nonsolosoft@diff.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Helper-View-SemanticUI
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Catalyst: '5.7'
+  Catalyst::View::TT: 0
+  File::ShareDir: 0
+  Path::Class: 0
+  Template: 0
+  perl: 5.12.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ferz/Catalyst--Helper--View--SemanticUI
+version: '0.0001'

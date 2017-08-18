@@ -9,6 +9,8 @@ use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract;
 
+our $VERSION = '1.04';
+
 has abstract => sub { SQL::Abstract->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
 has database_class  => 'Mojo::mysql::Database';
@@ -31,9 +33,6 @@ has pubsub => sub {
   weaken $pubsub->{mysql};
   return $pubsub;
 };
-
-
-our $VERSION = '1.03';
 
 sub db {
   my $self = shift;
@@ -73,7 +72,7 @@ sub from_string {
   return $self->dsn($dsn);
 }
 
-sub new { @_ > 1 ? shift->SUPER::new->from_string(@_) : shift->SUPER::new }
+sub new { @_ == 2 ? shift->SUPER::new->from_string(@_) : shift->SUPER::new(@_) }
 
 sub strict_mode {
   my $self = ref $_[0] ? shift : shift->new(@_);
@@ -337,6 +336,16 @@ C<mysql_auto_reconnect> is never enabled, L<Mojo::mysql> takes care of dead conn
 C<AutoCommit> cannot not be disabled, use $db->L<begin|Mojo::mysql::Database/"begin"> to manage transactions.
 
 C<RaiseError> is enabled for blocking and disabled in event loop for non-blocking queries.
+
+Note about C<mysql_enable_utf8>:
+
+  The mysql_enable_utf8 sets the utf8 charset which only supports up to 3-byte
+  UTF-8 encodings. mysql_enable_utf8mb4 (as of DBD::mysql 4.032) properly
+  supports encoding unicode characters to up to 4 bytes, such as 𠜎. It means the
+  connection charset will be utf8mb4 (supported back to at least mysql 5.5) and
+  these unicode characters will be supported, but no other changes.
+
+See also L<https://github.com/jhthorsen/mojo-mysql/pull/32>
 
 =head2 password
 

@@ -8,6 +8,8 @@ lib/LWP/Authen/OAuth2/Overview.pod
 lib/LWP/Authen/OAuth2/ServiceProvider.pm
 lib/LWP/Authen/OAuth2/ServiceProvider/Dwolla.pm
 lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm
+lib/LWP/Authen/OAuth2/ServiceProvider/Line.pm
+lib/LWP/Authen/OAuth2/ServiceProvider/Line/AccessToken.pm
 lib/LWP/Authen/OAuth2/ServiceProvider/Strava.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -19,6 +21,8 @@ t/LWP/Authen/OAuth2/AccessToken/Bearer.t
 t/LWP/Authen/OAuth2/Args.t
 t/LWP/Authen/OAuth2/ServiceProvider.t
 t/LWP/Authen/OAuth2/ServiceProvider/Google.t
+t/LWP/Authen/OAuth2/ServiceProvider/Line.t
+t/LWP/Authen/OAuth2/ServiceProvider/Line/AccessToken.t
 t/LWP/Authen/OAuth2/ServiceProvider/Strava.t
 t/manifest.t
 t/pod.t

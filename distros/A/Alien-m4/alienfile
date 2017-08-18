@@ -1,4 +1,12 @@
 use alienfile;
+use Path::Tiny qw( path );
+use Capture::Tiny qw( capture );
+use Config;
+
+configure {
+  requires 'Path::Tiny';
+  requires 'Capture::Tiny';
+};
 
 probe sub {
   my($build) = @_;
@@ -30,12 +38,24 @@ probe sub {
     $build->runtime_prop->{version} = $version;
     return 'system';
   }
-  
-  #if($^O eq 'MSWin32')
-  #{
-  #  $build->runtime_prop->{my_use_msys} = 1;
-  #  return 'system';
-  #}
+
+  if($^O eq 'MSWin32')
+  {
+    path('test1.c')->spew(
+      "#define __USE_MINGW_ANSI_STDIO 1\n",
+      "#include <stdio.h>\n",
+      "int asprintf(char **__ret, const char *__format, ...) { return 0; }\n",
+    );
+    my(undef, $ret) = capture {
+      system $Config{cc}, '-std=gnu99', -c => 'test1.c', -o => 'test1.o';
+      $?;
+    };
+    if($ret)
+    {
+      log('need to patch lib/asprintf.c');
+      $build->install_prop->{my_patch_asprintf} = 1;
+    }
+  }
   
   return 'share';
 };
@@ -51,6 +71,24 @@ share {
   
   plugin 'Build::Autoconf' => ();
 
+  patch sub {
+    my($build) = @_;
+
+    # workaround: m4 has its own implementation of asprintf
+    # and so does mingw.  The latter is defined as an inline
+    # function in stdio.h which conflicts at least on some
+    # older versions of the mingw runtime, or gcc.  This
+    # makes the asprintf.c empty so that it will build cleanly
+    # when that happened.  Observed with the mingw that comes
+    # with AS perl 5.24.  I may have also seen it from cpantesters
+    # from a probable strawberry Perl
+    if($build->install_prop->{my_patch_asprintf})
+    {
+      $build->log('patching lib/asprintf.c');
+      path('lib/asprintf.c')->spew('');
+    }
+  };
+
   gather sub {
     my($build) = @_;
     my @stdout = `m4 --version`;
@@ -61,28 +99,3 @@ share {
   };
 
 };
-
-if($^O eq 'MSWin32')
-{
-  sys {
-    #requires 'Alien::MSYS' => '0.08';
-    #requires 'Capture::Tiny';
-
-    gather sub {
-      my($build) = @_;
-      #if($build->runtime_prop->{my_use_msys})
-      #{
-      #  my $m4 = $build->runtime_prop->{command} = Path::Tiny->new(Alien::MSYS::msys_path())->child('m4.exe')->stringify;
-      #  my @stdout = `$m4 --version`;
-      #  $build->runtime_prop->{version} = 
-      #    defined $stdout[0] && $stdout[0] =~ /^m4/ && $stdout[0] =~ /([0-9\.]+)$/
-      #      ? $1
-      #      : 'unknown';
-      #  
-      #}
-    };
-
-  };
-  
-}
-

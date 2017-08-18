@@ -21,15 +21,16 @@ name: SQLite_File
 provides:
   SQLite_File:
     file: lib/SQLite_File.pm
-    version: '0.1002'
+    version: '0.1004'
 recommends:
   AnyDBM_File::Importer: '0'
 requires:
   DBD::SQLite: '1.25'
   Fcntl: '0'
+  perl: '5.010'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SQLite_File
   license: http://dev.perl.org/licenses/
   repository: http://github.com/majensen/sqlite_file.git
-version: '0.1002'
+version: '0.1004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -16,7 +16,7 @@ meta-spec:
 name: FormValidator-Tiny
 requires:
   Exporter: '0'
-  List::Util: '0'
+  List::Util: '1.28'
   Scalar::Util: '0'
   experimental: '0'
   perl: v5.18.0
@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/zostay/FormValidator-Tiny/issues
   repository: git://github.com/zostay/FormValidator-Tiny.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.69'

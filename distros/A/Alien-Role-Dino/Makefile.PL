@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Alien::Role::Dino",
   "PM" => {
-    "lib/Alien/Base/Dino.pm" => "\$(INST_LIB)/Alien/Base/Dino.pm",
     "lib/Alien/Build/Plugin/Gather/Dino.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Gather/Dino.pm",
     "lib/Alien/Role/Dino.pm" => "\$(INST_LIB)/Alien/Role/Dino.pm",
     "lib/Alien/Role/Dino/MSWin32.pm" => "\$(INST_LIB)/Alien/Role/Dino/MSWin32.pm",
@@ -37,9 +36,8 @@ my %WriteMakefileArgs = (
     "lib/Alien/Role/Dino/openbsd.pm" => "\$(INST_LIB)/Alien/Role/Dino/openbsd.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Autotools" => "0.99",
-    "Alien::Base" => "0.74",
-    "Alien::Build" => "0.74",
+    "Alien::Base" => "0.99",
+    "Alien::Build" => "0.99",
     "Alien::Build::Plugin" => 0,
     "Class::Method::Modifiers" => 0,
     "FFI::CheckLib" => 0,
@@ -47,12 +45,15 @@ my %WriteMakefileArgs = (
     "Role::Tiny" => "1.003001"
   },
   "TEST_REQUIRES" => {
+    "Alien::Autotools" => "0.99",
+    "Alien::Base" => "0.99",
+    "Alien::cmake3" => "0.02",
     "Test2::Mock" => "0.000060",
     "Test2::V0" => "0.000060",
-    "Test::Alien" => 0,
+    "Test::Alien" => "0.99",
     "Test::Alien::Build" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,16 +62,17 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::Autotools" => "0.99",
-  "Alien::Base" => "0.74",
-  "Alien::Build" => "0.74",
+  "Alien::Base" => "0.99",
+  "Alien::Build" => "0.99",
   "Alien::Build::Plugin" => 0,
+  "Alien::cmake3" => "0.02",
   "Class::Method::Modifiers" => 0,
   "FFI::CheckLib" => 0,
   "Path::Tiny" => 0,
   "Role::Tiny" => "1.003001",
   "Test2::Mock" => "0.000060",
   "Test2::V0" => "0.000060",
-  "Test::Alien" => 0,
+  "Test::Alien" => "0.99",
   "Test::Alien::Build" => 0
 );
 

@@ -1,7 +1,12 @@
-use XML::Tiny qw(parsefile);
+use strict;
+use lib '.';
 
+use XML::Tiny qw(parsefile);
 require "t/test_functions";
 print "1..3\n";
+
+$^W = 1;
+$SIG{__WARN__} = sub { die("Caught a warning, making it fatal:\n\n$_[0]\n"); };
 
 open(XML::Tiny::FH, $0) || die "Couldn't read '$0': $!"; # read a file
 seek(XML::Tiny::FH, 10, 0) || die "Couldn't seek '$0': $!";

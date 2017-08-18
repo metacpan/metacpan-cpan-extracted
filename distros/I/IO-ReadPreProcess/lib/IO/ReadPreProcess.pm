@@ -5,7 +5,7 @@ package IO::ReadPreProcess;
 # It provides IO::Handle-ish functions to slot in easily to most scripts.
 
 # Author: Alain D D Williams <addw@phcomp.co.uk> March 2015, 2016, 2017 Copyright (C) the author.
-# SCCS: @(#)ReadPreProcess.pm	1.13 08/03/17 15:16:04
+# SCCS: @(#)ReadPreProcess.pm	1.14 08/15/17 23:19:49
 
 use 5.006;
 use strict;
@@ -18,7 +18,7 @@ our $errstr; # Error string
 
 use Math::Expression;
 
-our $VERSION = 0.84;
+our $VERSION = 0.85;
 
 # Control directive recognised by getline():
 my %ctlDirectives = map { $_ => 1 } qw/ break case close continue do done echo else elseif elsif endswitch error eval exit
@@ -298,7 +298,8 @@ sub binmode
 
     $self->{Frame}->{binmode} = $mode;
 
-    $self->{Frame}->{Fd}->binmode($mode);	# Pass the call straight down
+    $self->{Frame}->{Fd}->binmode($mode)	# Pass the call straight down
+        unless(ref $self->{Frame}->{Fd} eq 'ARRAY');
 }
 
 # Return 1 if the next read will return EOF or the file is not open:
@@ -306,6 +307,7 @@ sub eof
 {
     my $self = shift;
     return 1 unless($self->{Fd});
+    return !@{$self->{Fd}} if(ref $self->{Fd} eq 'ARRAY');
     $self->{Fd}->eof;
 }
 
@@ -643,9 +645,9 @@ sub ReadBlock
         }
 
         # Next line
-        do{
+        do {
             return $self->SetError("Unexpected EOF at $self->{Place} while reading $code->{Block} $started", 1)
-        } unless($InLine = $self->{Frame}->{Fd}->getline);
+        } unless($InLine = (ref $self->{Frame}->{Fd} eq 'ARRAY') ? shift @{$self->{Frame}->{Fd}} : $self->{Frame}->{Fd}->getline);
 
         $self->{Place} = "line $. of $self->{Frame}->{Name}";
     }
@@ -769,7 +771,8 @@ sub error
 {
     my $self = shift;
 
-    $self->{Error} or (defined($self->{Frame}) and $self->{Frame}->{Fd} and $self->{Frame}->{Fd}->error)
+    $self->{Error} or (defined($self->{Frame}) and $self->{Frame}->{Fd} and
+        (ref $self->{Frame}->{Fd} ne 'ARRAY') and $self->{Frame}->{Fd}->error)
 }
 
 # As IO::Handle, clear recent error
@@ -778,6 +781,7 @@ sub clearerr
     my $self = shift;
 
     $self->{Error} = 0;
+    return 0 if(ref $self->{Frame}->{Fd} eq 'ARRAY');
     return -1 unless $self->{Fd} && $self->{Fd}->opened;
 
     $self->{Fd}->clearerr
@@ -827,7 +831,7 @@ sub getline {
 }
 
 # Write the argument line $l to the output $stream
-# It can be an IO::FILE or subroutine
+# It can be an IO::FILE, array or subroutine
 sub writeToStream {
     my ($self, $stream, $l) = @_;
 
@@ -846,8 +850,12 @@ sub writeToStream {
         &$strm($l);
         return;
     }
+    if(ref $strm eq 'ARRAY') {
+        push @$strm, $l;
+        return;
+    }
     # Should not get here
-    $self->SetError("Output stream '$stream' is not an IO::File or IO::Handle or subroutine, but is: " . ref $strm);
+    $self->SetError("At $self->{Place}: Output stream '$stream' is not an IO::File or IO::Handle or array or subroutine, but is: " . ref $strm);
 }
 
 # Called when every line is read
@@ -859,7 +867,7 @@ sub writeToStream {
 sub _getline {
     my $self = shift;
 
-    return $self->SetError("A file has not been opened", 1)
+    return $self->SetError("A file has not been opened at $self->{Place}", 1)
         unless defined $self->{Frame}->{Code} or defined $self->{Frame}->{Fd};
 
     my $doneDone = 0;    # Last directive was .done
@@ -892,8 +900,8 @@ sub _getline {
             $_ = $replay->{Txt};
             $lineno = $replay->{'#'};
         } else {
-            # From file
-            $_ = $frame->{Fd}->getline;
+            # From file or in-memory array
+            $_ = (ref $frame->{Fd} ne 'ARRAY') ? $frame->{Fd}->getline : shift @{$frame->{Fd}};
 
             # EOF:
             unless($_) {
@@ -1004,7 +1012,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
 
                 next if($frame->{CondReRun});
                 $frame->{DidGenerate} = $frame->{Generate} = $gen;
-;            } else {
+            } else {
                $frame->{Generate} = 0; # Which it might already be
             }
 
@@ -1189,7 +1197,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
             my (@push, @args, $stream, $fd);
             my $level = 0;
 
-            if($arg =~ s/^-s\s*(\w+)\s*//) {
+            if($arg =~ s/^-s\s*(\w+)\s*//i) {
                 $stream = $1;
                 return $self->SetError("Stream '$stream' already open at $place")
                     if(exists($self->{Streams}->{$stream}));
@@ -1226,6 +1234,10 @@ EVAL_RESTART:	# Restart parsing here after a .eval
                 $fn = "| $fn";    # For messages, etc, only
 
                 $vh->{_CountOpen}->[0]++;
+            } elsif($fn =~ /^(@\w+)$/i) {
+                return $self->SetError("Unknown in-memory stream '$1' at $place")
+                    unless(defined($self->{OutStreams}->{$1}));
+                $fd = $self->{OutStreams}->{$1};
             } else {
                 return undef unless(defined($fn = $self->ResolveFilename($fn)));
                 return $self->SetError("Cannot open file '$arg' at $place as $!")
@@ -1266,7 +1278,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
         if($dir eq 'print') {
             my $stream = 'STDOUT';
             $stream = 'STDERR' if($arg =~ s/^-e\b\s*//);
-            $stream = $1 if($arg =~ s/^-o\s*(\w+)\b\s*//);
+            $stream = $1 if($arg =~ s/^-o\s*(@?\w+)\b\s*//i);
 
             return undef unless(defined($arg = $self->ProcEscapes($arg)));
             $self->writeToStream($stream, "$arg\n");
@@ -1277,14 +1289,19 @@ EVAL_RESTART:	# Restart parsing here after a .eval
         if($dir eq 'out') {
             if($arg eq "") {
                 $self->{out} = "";
-            } elsif($arg =~ s/^(\w+)\s*$//) {
-                if(defined($self->{OutStreams}->{$1})) {
-                    $self->{out} = $1;
-                } else {
-                    $self->SetError("Unknown output stream '$1'");
-                }
+            } elsif($arg =~ s/^(-c)?\s*(@\w+)\s*$//i) {
+                # Create the memory stream if -c option
+                $self->{OutStreams}->{$2} = [] if(defined $1);
+
+                $self->SetError("Output in-memory stream unknown: '$2' at $place")
+                    unless(defined $self->{OutStreams}->{$2});
+                $self->{out} = $2;
+            } elsif($arg =~ s/^(\w+)\s*$//i) {
+                $self->SetError("Unknown output stream '$1' at $place")
+                    unless(defined($self->{OutStreams}->{$1}));
+                $self->{out} = $1;
             } else {
-                $self->SetError("Bad or missing stream name '$arg'");
+                return $self->SetError("Bad or missing stream name '$arg' at $place");
             }
             next;
         }
@@ -1313,11 +1330,11 @@ EVAL_RESTART:	# Restart parsing here after a .eval
         # Close a named stream
         if($dir eq 'close') {
             return $self->SetError("Missing option '-n stream' to ${leadin}close at $place", 1)
-                unless($arg =~ s/^-s\s*(\w+)\s*//);
+                unless($arg =~ s/^-s\s*(\w+)\s*//i);
 
             my $stream = $1;
 
-            $self->SetError("Unknown input stream '$stream' in ${leadin}read at $place", 1)
+            return $self->SetError("Unknown input stream '$stream' in ${leadin}read at $place", 1)
                 unless(exists($self->{Streams}->{$stream}));
 
             delete($self->{Streams}->{$stream});    # Close it
@@ -1327,11 +1344,18 @@ EVAL_RESTART:	# Restart parsing here after a .eval
 
         # Read next line into var
         if($dir eq 'read') {
-            my ($stream, $fd);
+            my ($stream, $fd, $mem);
 
-            $stream = $1 if($arg =~ s/^-s\s*(\w+)\s+//);
+            $stream = $1 if($arg =~ s/^-s\s*(\w+)\s+//i);
 
-            my ($vname) = $arg =~ /^(\w+)/;
+            # In-memory stream:
+            if($arg =~ s/^(@\w+)\s+//i) {
+                return $self->SetError("Unknown in-memory stream $1 at $place")
+                    unless(defined $self->{OutStreams}->{$1});
+                $mem = $1;
+            }
+
+            my ($vname) = $arg =~ /^(\w+)/i;
             return $self->SetError("Missing argument to ${leadin}read at $place", 1) unless($vname);
 
             # Find stream or Fd on stack:
@@ -1349,7 +1373,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
             }
 
             my $eof = 1;
-            if($_ = $fd->getline) {
+            if($_ = (defined $mem) ? shift @{$self->{OutStreams}->{$mem}} : $fd->getline) {
                 chomp;
                 $eof = 0;
                 s/\s*$// if($self->{Trim});
@@ -1374,7 +1398,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
         }
 
         if($dir eq 'test') {
-            my %an = ('-f' => 2);
+            my %an = ('-f' => 2, '-m' => 2);
             my @args = $self->SplitArgs($arg, 1);
             return $self->SetError("'$leadin$dir' bad or missing argument '$arg' at $place", 1)
                 unless(@args and exists($an{$args[0]}) and @args == $an{$args[0]});
@@ -1389,6 +1413,15 @@ EVAL_RESTART:	# Restart parsing here after a .eval
                 }
                 next;
             }
+
+            if($args[0] eq '-m') {
+                $vh->{_} = [0]; # assume error
+                if(defined($self->{OutStreams}->{$args[1]})) {
+                    $vh->{_} = [1]; # OK
+                    $vh->{_COUNT} = [scalar @{$self->{OutStreams}->{$args[1]}}];
+                }
+                next;
+            }
         }
 
         if($dir eq 'error') {
@@ -1398,7 +1431,7 @@ EVAL_RESTART:	# Restart parsing here after a .eval
 
         if($dir eq 'set') {
             return $self->SetError("'$leadin$dir' bad argument '$arg' at $place")
-                unless(($arg =~ /^(\w+)=(\d+)/) and $options{$1});
+                unless(($arg =~ /^(\w+)=(\d+)/i) and $options{$1});
             $self->{$1} = $2;
             next;
         }
@@ -1610,24 +1643,28 @@ Default 50.
 =item OutStreams
 
 This defines output streams that may be written to by C<.out> and C<.print -o>. The
-streams can either be C<IO::File> or a reference to a function (when the line will be passed as
+streams can either be C<IO::File>, an array or a reference to a function (when the line will be passed as
 the only argument).
 
 The members C<STDOUT> and C<STDERR> are added if not passed, given values C<*STDOUT{IO}> and C<*STDERR{IO}>.
-Names must match the RE C</w+/>.
+Names must match the RE C</\w+/>.
 
 Eg:
 
     my $lf = IO::File->new('logFile', 'w+');
+    my @lines;
     sub func {
         say "func called '$_[0]'";
     }
 
-    OutStreams => { fun => \&func, log => $lf }
+    OutStreams => { fun => \&func, log => $lf, buf => \@lines }
 
 This provides the ability to write to multiple places, however the file (or function) must
 be opened by the Perl script. C<IO::ReadPreProcess> does not provide the ability to
 open new files.
+
+C<.out> can create in-memory streams. These have names like C<@divert> (ie match C</@\w+/i>).
+In-memory streams can be written to by C<.out> & C<.print -o> and read by C<.include> & C<.read>.
 
 =back
 
@@ -1840,10 +1877,12 @@ The rest of the line will be printed to C<stdout>.
 If the line starts C<-e> it will be written to output stream C<STDERR>.
 
 If the line starts C<-o strm> it will be written to output stream C<strm>.
+C<strm> may be an in-memory stream.
 
 Eg:
 
     .print -o log Something interesting has happened!
+    .print -o @divert A line to be read back later
 
 The following escapes will be recognised and substitutions performed:
 
@@ -1921,6 +1960,11 @@ If the first argument is C<-pn> the file stream is put C<n> frames below the cur
 A new frame is created for every file opened, C<if>, C<while>, C<sub> executed, ...
 (C<n> is an optional number, default: 1)
 
+If the path starts with an C<@> (ie matches C</@\w+/i>) the include reads from the
+in-memory stream that was created with an earlier C<.out>. Eg:
+
+    .include @divert
+
 =item C<.close>
 
 This is only needed to close named streams. The C<-s name> option is needed.
@@ -1935,6 +1979,15 @@ Eg:
     .out index
     Meals in London
     Times of the last tube trains
+    .out
+
+In-memory streams must be created before they are used, this is done with the C<-c> option.
+C<-c> may be used on an existing stream and will throw away any existing content.
+
+Eg:
+
+    .out -c @buf
+    Text diverted to @buf
     .out
 
 =item C<.local>
@@ -1998,6 +2051,10 @@ This will be of most use with a stream opened with a C<-p> or C<-s> option:
     .read -s who me
     .echo Logged in as \v{me}
     .close -s who
+
+If the first argument is an in-memory stream (ie a name that starts with C<@>) a line is read from that. Eg:
+
+    .read @divert line
 
 =item C<.sub>
 
@@ -2127,6 +2184,11 @@ Eg:
     .fi
 
 =back
+
+=item C<-m>
+
+This returns true if the argument in-memory stream exists.
+If it exists, the variable C<_COUNT> is set to the number of lines in the stream.
 
 =item C<.error>
 

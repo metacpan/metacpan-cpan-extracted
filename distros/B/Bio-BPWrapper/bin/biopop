@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Pod::Usage;
-use FindBin;                      # Find the location of seq-manipulations
+use FindBin;                      # Find the location of pop-manipulations
 use v5.10;
 use rlib '../lib';
 use Getopt::Long qw( :config bundling permute no_getopt_compat );
@@ -16,25 +16,24 @@ GetOptions(
     \%opts,
     "help|h",
     "man",
-#    "distance|d",
-#    "dist-method|D=s" => \$flags{"dist-method"},
-    "bihaps",
-    "bisites",
-    "bisites-for-r",
+    "version|V",
+    "bi-part",
+    "bi-sites|b",
+    "bi-sites-for-r",
+    "four-gametes|f",
     "heterozygosity|H",
     "input|i=s" => \$flags{"input"},
-    "mismatch|m",
-    "mut-info",
-#    "numseq|n=i"    => \$flags{"numseq"},
+    "mis-match|m",
     "pi|p",
-    "stats|s=s@",    # Comma-separated, or multiply specified, list
-    "snp",
-    "snp-coding",
-    "snp-coding-long",
-    "snp-noncoding",
-    "version|V",
-    "segsites|S",
-    "bipart",
+    "seg-sites|s",
+    "snp-coding|c",
+    "snp-coding-long|C",
+    "snp-noncoding|n",
+    "stats|t=s@",    # Comma-separated, or multiply specified, list
+#    "distance|d",
+#    "dist-method|D=s" => \$flags{"dist-method"},
+#    "mut-info",
+#    "numseq|n=i"    => \$flags{"numseq"},
 #    "mutrec|b",
 #    "exclude|group3|seq3|r=s@",
 #    "ingroup|group1|seq1|p=s@",
@@ -57,73 +56,87 @@ __END__
 
 =head1 NAME
 
-biopop - Wrapper script for L<Bio::Perl>'s population genetics modules
+biopop - SNP statistics based on L<BioPerl>
 
 =head1 SYNOPSIS
 
-B<biopop> I<options> [I<alignment_file>]
+B<biopop> [options] <alignment_file>
 
-B<biopop> [C<-h> | C<--help> | --C<v> | C<--version> C<--man>]
+B<biopop> [-h | --help | -V | --version | --man]
+
+ biopop -s pop.fas            # num of [s]egregating sites
+ biopop -p pop.fas            # average [p]airwise nucleotide difference
+ biopop -f pop.fas            # [f]our gamete tests
+ biopop -c pop.fas            # [c]oding SNPs
+ biopop -n pop.fas            # [n]on-coding SNPs
+ biopop -m pop.fas            # [m]is-match distribution
+ biopop -b pop.fas            # Retain only [b]inary informative sites
 
 =head1 DESCRIPTION
 
-Wrapper script for L<Bio::Perl>'s population genetics modules: use L<Bio::PopGen::Utilities>;
-L<Bio::PopGen::Statistics>, and L<Bio::PopGen::Population>;
+L<biopop> is a pop-genetics utility based on L<BioPerl> modules including L<Bio::PopGen::Utilities>, L<Bio::PopGen::Statistics>, and L<Bio::PopGen::Population>. Most methods are not in BioPerl and have not been validated. Use with caution.
 
-=head2 OPTIONS
+=head1 OPTIONS
 
 =over 4
 
-=item --distance, -d
+=item --bi-part
 
-Calculates a distance matrix for all pairwise distances of all sequences in the input alignment and prints it out.
+Prints, for each binary informative SNP sites, a NEWICK tree. This could be used to test site compatibility (recombination), similar to the four-gamete test.
 
-Use B<--dist-method> to specify the method desired. The default in Bio::Align::DNAStatistics is "JukesCantor".
+=item --bi-sites, -b
 
-=item --dist-method, -D
+Prints a FASTA alignment consisting of only binary-informative SNPs.
 
-Used with --distance to specify which distance method to use when getting the distance matrix.
+=item --bi-sites-for-r
 
-Program quits if the distance method is invalid
+Prints binary-informative SNPs for each individual, in a pseudo-diploid genotype so the output could be imported into R package "genetics" for further analysis.
+
+=item --four-gametes, -f
+
+Performs four-gametes test of recombination by Hudson & Kaplan (Genetics.1985. 111:147-164) and a test of epistasis (Wilson??). It identifies all binary-informative SNPs and print, for each of pair of SNPs per line, site coordinates, counts of four possible gametes, Shannon diversity of haplotypes, and whether compatible or not. Two SNPs are incompatibile if all four possible haplotypes are present, indicating recombination. Presence of only two of the four possible haplotypes indicate, on the other hand, a possible epistatic interaction.
 
 =item --heterozygosity, -H
 
-Foreach segregating site(s), the observed heterozygosity is returned.
+Print, for each segregating site, the observed heterozygosity [i.e., 1-sum(freq^2)].
 
-=item --input, -i
+=item --input, -i <format>
 
-Input file format. By default, this is 'clustalw'.
+Input file format. By default, this is 'FASTA'.
 
-=item --mismatch, -m
+=item --mis-match, -m
 
-Pairwise calculation of mismatches for all sequences in the alignment.
-
-=item --numseq, -n
-
-Input file format. By default, this is 'clustalw'.
+Print pairwise mismatches for all sequences, the distribution of which indicates population age.
 
 =item --pi, -p
 
-Nucleotide Diversity is a measure of genetic variation or differences. It is similar to expected heterozygosity. This method takes in an alignment and outputs an integer.
+Nucleotide Diversity is a measure of genetic variation or differences.
 
-=item --stats, -s <comma separated list of values>
+=item --seg-sites, -s
 
-Specify the statistics you would like to gather from input data. e.g., "theta,pi" will calculate the theta and pi values.
+Prints number of segregating sites.
 
-Can also be specified by giving the option multiple times. e.g.,
- biopop --stats=pi --stats=theta
+=item --snp-coding, -c
 
-=item --snp_coding
+Identify & print, for each 2-state SNP, codon position, aligned nucleotide position, syn/nonsyn, frequencies of each allelic state, and Shannon diversity for a coding alignment.
 
-Identify & print, for each 2-state SNP, codon position, aligned nucleotide position, syn/nonsyn, frequencies of each allleic state, for a coding alignment.
+=item --snp-coding-long, -C
 
-=item --varsites, -v
+Print long-format of the above method.
 
-This method outputs the number of segregating or SNP sites within your alignment.
+=item --snp-noncoding, -n
+
+Identify & print, for each 2-state SNP, SNP position, SNP states, frequencies of each allleic state, and Shannon diversity.
+
+=item --stats, -t <comma separated list of values>
+
+Specify the statistics ('pi', 'theda', 'tajima_d', per-site values) you would like to gather from input data. e.g., "theta,pi" will calculate the theta and pi values.
+
+Can also be specified by giving the option multiple times. e.g., biopop --stats=pi --stats=theta
 
 =back
 
-=head3 Common Options
+=head2 Common Options
 
 =over 4
 
@@ -137,7 +150,7 @@ Print the manual page and exit.
 
 =item --version, -V
 
-Print current release version of this command and exit.
+Print current release version and exit.
 
 =back
 
@@ -159,7 +172,7 @@ L<Github project wiki page|https://github.com/bioperl/p5-bpwrapper/wiki>
 
 =item *
 
-L<bioseq>: a wrapper of BioPerl class L<Bio::Seq> with additional methods
+L<bioaln>: a wrapper of BioPerl class L<Bio::SimpleAlign> with additional methods
 
 =back
 
@@ -168,13 +181,46 @@ L<bioseq>: a wrapper of BioPerl class L<Bio::Seq> with additional methods
 =over 4
 
 =item *
- Yözen Hernández yzhernand at gmail dot com
+Yözen Hernández <yzhernand at gmail dot com> (initial design & implementation)
 
 =item *
-L<Weigang Qiu | mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
+Weigang Qiu <weigang@genectr.hunter.cuny.edu> (Maintainer)
 
 =item *
-Rocky Bernstein
+Rocky Bernstein (testing & release)
+
+=back
+
+=head1 TO DO
+
+=over 4
+
+=item *
+Clean and refactor PopManipulation codes (e.g., factor out shared variables and subroutines)
+
+=item *
+Move dist methods to bioaln
+
+=item *
+Add multiple-loci (pop-genome) capabilities
+
+=item *
+Add outgroup-based statistics, e.g, mk, iHS
+
+=item *
+Add KaKs statistiscs
+
+=back
+
+=head1 TO CITE
+
+=over 4
+
+=item *
+Hernandez, Bernstein, Qiu, et al (2017). "BpWrappers: Command-line utilities for manipulation of sequences, alignments, and phylogenetic trees based on BioPerl". (In prep).
+
+=item *
+Stajich et al (2002). "The BioPerl Toolkit: Perl Modules for the Life Sciences". Genome Research 12(10):1611-1618.
 
 =back
 

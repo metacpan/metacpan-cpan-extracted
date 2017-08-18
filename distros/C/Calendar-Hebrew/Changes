@@ -1,0 +1,8 @@
+Revision history for Calendar::Hebrew
+
+0.02  Tue Aug 15 11:10:00 2017
+      - Fixed typo in the pod section "HEBREW DAYS".
+      - Added pod section "NOTES" and "ACKNOWLEDGEMENTS".
+
+0.01  Sun Jul 23 03:00:00 2017
+      - First version, released, to celebrate the 1000th consecutive releases to CPAN.

@@ -6,7 +6,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use Test::DZil;
 use Test::Fatal;
-use Path::Tiny 0.062;
+use Path::Tiny;
 use List::Util 'first';
 use Module::Runtime 'module_notional_filename';
 use Moose::Util 'find_meta';
@@ -54,7 +54,7 @@ my $tzil = Builder->from_config(
                 } ],
             ),
             path(qw(source lib DZT Sample.pm)) => "package DZT::Sample;\nour \$VERSION = '0.002';\n1",
-            path(qw(source lib DZT Sample2.pm)) => "package DZT::Sample2;\n1",
+            path(qw(source lib DZT Sample2.pm)) => "package DZT::Sample2;\n\n1",
             path(qw(source Changes)) => '',
         },
     },
@@ -170,6 +170,7 @@ is(
             }),
             provides => {
                 # version edited, added (respectively) by [RewriteVersion::Transitional]
+                # see https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides/issues/8
                 'DZT::Sample'   => { file => 'lib/DZT/Sample.pm', version => '0.005' },
                 'DZT::Sample2'  => { file => 'lib/DZT/Sample2.pm', version => '0.005' },
             },
@@ -201,13 +202,40 @@ is(
                         version => Dist::Zilla::Plugin::Run::AfterRelease->VERSION,
                     }),
                     {
-                        class => 'Dist::Zilla::Plugin::RewriteVersion::Transitional',
+                        class => 'Dist::Zilla::Plugin::CopyFilesFromRelease',
                         config => superhashof({
-                            'Dist::Zilla::Plugin::RewriteVersion::Transitional' => superhashof({
-                                # no fallback used here - module had a $VERSION
+                            'Dist::Zilla::Plugin::CopyFilesFromRelease' => superhashof({
+                                filename => superbagof(qw(LICENCE LICENSE CONTRIBUTING ppport.h INSTALL)),
                             }),
                         }),
-                        name => '@Author::ETHER/RewriteVersion::Transitional',
+                        name => '@Author::ETHER/copy generated files',
+                        version => Dist::Zilla::Plugin::CopyFilesFromRelease->VERSION,
+                    },
+                    {
+                        class => 'Dist::Zilla::Plugin::CopyFilesFromRelease',
+                        config => superhashof({
+                            'Dist::Zilla::Plugin::CopyFilesFromRelease' => superhashof({
+                                filename => [ 'Changes' ],
+                            }),
+                        }),
+                        name => '@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease',
+                        version => Dist::Zilla::Plugin::CopyFilesFromRelease->VERSION,
+                    },
+                    {
+                        class => 'Dist::Zilla::Plugin::RewriteVersion::Transitional',
+                        config => superhashof({
+                            'Dist::Zilla::Plugin::RewriteVersion::Transitional' => all(
+                                superhashof({}),
+                                # no fallback used here - we provided a version in root config
+                                notexists(qw(fallback_version_provider _fallback_version_provider_args)),
+                            ),
+                            'Dist::Zilla::Plugin::RewriteVersion' => superhashof({
+                                global => 1,
+                                add_tarball_name => 0,
+                                skip_version_provider => 1,
+                            }),
+                        }),
+                        name => '@Author::ETHER/@Git::VersionManager/RewriteVersion::Transitional',
                         version => Dist::Zilla::Plugin::RewriteVersion::Transitional->VERSION,
                     },
                 ),

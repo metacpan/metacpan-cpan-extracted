@@ -1,5 +1,5 @@
 package Schedule::LongSteps;
-$Schedule::LongSteps::VERSION = '0.015';
+$Schedule::LongSteps::VERSION = '0.017';
 # ABSTRACT: Manage long term processes over arbitrary large spans of time.
 
 use Moose;
@@ -339,6 +339,37 @@ Usage:
 
 Shortcut to $self->storage->find_process( $pid );
 
+=head2 load_process
+
+Returns a loaded process for a given pid, or undef if there is no process
+associated with the PID.
+
+An optional hash ref context can also be passed in
+and will be used to load the process, a blank context is used if not provided.
+
+    if( my $loaded_process = $self->load_process( $pid , $context ) ){
+       ...
+    }
+
+=head2 revive
+
+Revive a longstep process to a given step within a Longstep process.
+
+A context is required when the reviving process contains required attributes
+and when setting a step to reviving step. If no step is given then the process
+will revive on the failed process step, when setting a step that doesn't
+require a context, use an empty hashref '{}'.
+
+If you need to modify the state before reviving the longstep process, it is
+recommended to have a revive step ("revive_do_broken_step") which modifies
+the state as needed and returns a next_step to continue the process.
+
+This method will confess on any issues.
+
+    eval {
+        $self->revive( $pid, $context, $method_to_revive_to );
+    };
+
 =head1 SEE ALSO
 
 L<BPM::Engine> A business Process engine based on XPDL, in Alpha version since 2012 (at this time of writing)
@@ -354,6 +385,7 @@ See L<perlartistic>
 =cut
 
 use Class::Load;
+use DateTime;
 use Log::Any qw/$log/;
 
 use Schedule::LongSteps::Storage::Memory;
@@ -388,8 +420,7 @@ sub run_due_processes{
         $process_count++;
 
         my $new_step_properties = eval{
-            Class::Load::load_class($stored_process->process_class());
-            my $process = $stored_process->process_class()->new({ longsteps => $self, stored_process => $stored_process, %{$context} });
+            my $process = $self->_load_stored_process($stored_process,$context);
 
             $process->$process_method();
         };
@@ -454,5 +485,63 @@ sub find_process{
     my ($self, $pid) = @_;
     return $self->storage()->find_process($pid);
 }
+
+sub load_process {
+    my ( $self, $pid, $context ) = @_;
+    $context ||= {};
+
+    my $stored_process = $self->find_process($pid);
+    return unless $stored_process;
+    return $self->_load_stored_process( $stored_process, $context );
+}
+
+sub revive {
+    my ( $self, $process_id, $context, $revive_to  ) = @_;
+    $context ||= {};
+
+    my $stored_process = $self->find_process($process_id);
+    confess "There is no $process_id to revive" unless $stored_process;
+
+    confess("$process_id does not have a status of 'terminated'") if ( $stored_process->status() ne "terminated" );
+
+    # load the process and check if process have the method to revive_to
+    # if revive $revive_to was not passed, used the function we failed on.
+    # and check that also, just in case we attempt to revive on a method
+    # that was previously removed.
+    my $loaded_process = $self->_load_stored_process($stored_process, $context);
+
+    $revive_to = $stored_process->what() unless $revive_to;
+
+    # check to see if we able to revive
+    confess "Unable revive $process_id to $revive_to" unless $loaded_process->can($revive_to);
+
+    # Set the process up to be revived.
+    $stored_process->what($revive_to);
+    $stored_process->error(undef);
+    $stored_process->status("paused");
+    $stored_process->run_at(DateTime->now());
+    $stored_process->update();
+
+    return 1;
+}
+
+# load_class may croak when trying to load a module you that is not in the INC
+# so to be safe make sure you put this in an eval, and handle the errors
+# appropriately
+sub _load_stored_process {
+    my ( $self, $stored_process, $context ) = @_;
+    $context ||= {};
+
+    Class::Load::load_class( $stored_process->process_class() );
+    return $stored_process->process_class()->new(
+        {
+            longsteps      => $self,
+            stored_process => $stored_process,
+            %{$context}
+        }
+    );
+}
+
+
 
 __PACKAGE__->meta->make_immutable();

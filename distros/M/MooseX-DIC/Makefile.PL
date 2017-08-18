@@ -18,16 +18,19 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::Find" => 0,
     "File::Slurp" => 0,
+    "File::Spec" => 0,
+    "Log::Log4perl" => 0,
     "Moose" => 0,
     "MooseX::Role::Parameterized" => 0,
     "Throwable" => 0,
     "Try::Tiny" => 0,
+    "YAML::XS" => 0,
     "aliased" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Spec" => 0
   },
-  "VERSION" => "0.1.0",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/unit/*.t"
   }
@@ -37,11 +40,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Find" => 0,
   "File::Slurp" => 0,
+  "File::Spec" => 0,
+  "Log::Log4perl" => 0,
   "Moose" => 0,
   "MooseX::Role::Parameterized" => 0,
   "Test::Spec" => 0,
   "Throwable" => 0,
   "Try::Tiny" => 0,
+  "YAML::XS" => 0,
   "aliased" => 0
 );
 

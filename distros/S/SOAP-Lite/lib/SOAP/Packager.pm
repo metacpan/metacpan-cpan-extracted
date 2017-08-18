@@ -481,14 +481,14 @@ SOAP::Lite client.
     Path        => "attachment.txt",
     Filename    => "attachment.txt",
     Disposition => "attachment";
-  $NS = "urn:Majordojo:TemperatureService";
-  $HOST = "http://localhost/cgi-bin/soaplite.cgi";
+  my $NS = "urn:Majordojo:TemperatureService";
+  my $HOST = "http://localhost/cgi-bin/soaplite.cgi";
   my $client = SOAP::Lite
     ->packager(SOAP::Packager::MIME->new)
     ->parts([ $ent ])
     ->uri($NS)
     ->proxy($HOST);
-  $response = $client->c2f(SOAP::Data->name("temperature" => '100'));
+  my $response = $client->c2f(SOAP::Data->name("temperature" => '100'));
   print $response->valueof('//c2fResponse/foo');
 
 =head3 SERVER SIDE EXAMPLE

@@ -4,7 +4,7 @@
       "Eric Wolf        coyocanid@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,6 @@
       "runtime" : {
          "requires" : {
             "Data::RecordStore" : "2",
-            "Devel::Refcount" : "0.1",
             "JSON" : "0",
             "perl" : "v5.10.0"
          }
@@ -37,7 +36,7 @@
    "provides" : {
       "Yote" : {
          "file" : "lib/Yote.pm",
-         "version" : "2.0"
+         "version" : "2.01"
       },
       "Yote::Array" : {
          "file" : "lib/Yote.pm"
@@ -61,6 +60,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

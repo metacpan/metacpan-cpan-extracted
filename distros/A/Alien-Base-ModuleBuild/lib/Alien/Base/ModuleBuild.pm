@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 use parent 'Module::Build';
 
@@ -1275,6 +1275,15 @@ In your Build.PL:
 
 =head1 DESCRIPTION
 
+B<NOTE>: Please consider for new development of L<Alien>s that you use
+L<Alien::Build> and L<alienfile> instead.  Like this module they work
+with L<Alien::Base>.  Unlike this module they are more easily customized
+and handle a number of corner cases better.  For a good place to start,
+please see L<Alien::Build::Manual::AlienAuthor>.  Although the 
+Alien-Base / Alien-Build team will continue to maintain this module,
+(we will continue to fix bugs where appropriate), we aren't adding any
+new features to this module.
+
 This is a subclass of L<Module::Build>, that with L<Alien::Base> allows
 for easy creation of Alien distributions.  This module is used during the
 build step of your distribution.  When properly configured it will
@@ -1436,23 +1445,19 @@ For example, C<ALIEN_OPENSSL_REPO_FTP_HOST=ftp.example.com>.
 
 =over
 
-=item * 
+=item L<Alien::Build>
 
-L<Module::Build>
+=item L<alienfile>
 
-=item *
+=item L<Alien::Build::Manual::AlienAuthor>
 
-L<Alien>
-
-=item *
-
-L<Alien::Base>
+=item L<Alien>
 
 =back
 
 =head1 SOURCE REPOSITORY
 
-L<http://github.com/Perl5-Alien-ModuleBuild/Alien-Base>
+L<http://github.com/Perl5-Alien/Alien-Base-ModuleBuild>
 
 =head1 AUTHOR
 

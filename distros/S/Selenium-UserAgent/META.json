@@ -4,7 +4,7 @@
       "Daniel Gempesaw <gempesaw@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "mit"
    ],
@@ -22,8 +22,11 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -61,6 +64,7 @@
          "web" : "https://github.com/gempesaw/Selenium-UserAgent"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

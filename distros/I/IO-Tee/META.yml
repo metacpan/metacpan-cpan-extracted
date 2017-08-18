@@ -1,0 +1,28 @@
+---
+abstract: 'Multiplex output to multiple output handles'
+author:
+  - 'Chung-chieh Shan <ken@digitas.harvard.edu>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Tee
+requires:
+  Carp: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  Symbol: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/IO-Tee
+  repository: https://github.com/neilb/IO-Tee.git
+version: '0.65'
+x_serialization_backend: 'YAML::Tiny version 1.62'

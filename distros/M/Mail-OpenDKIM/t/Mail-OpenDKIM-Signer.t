@@ -8,7 +8,7 @@ use warnings;
 
 #########################
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 BEGIN { use_ok('Mail::OpenDKIM::Signer') };
 
 #########################
@@ -55,3 +55,12 @@ ok(defined($sig),'got a signature');
 like($sig, qr/^DKIM-Signature: /,'signature header');
 like($sig, qr/a=rsa-sha1/,'signature type rsa-sha1');
 like($sig, qr/d=example.com/,'signature domain example.com');
+
+my $dkim1 = new_ok('Mail::OpenDKIM::Signer' => [
+		Algorithm => 'rsa-sha1',
+		Method => 'relaxed',
+		Domain => 'example.com',
+		Selector => 'example',
+		KeyFile => 't/example.key'
+	]
+);

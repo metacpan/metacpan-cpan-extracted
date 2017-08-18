@@ -65,3 +65,13 @@ Revision history for Keyword-Declare
     * Tweaked docs to remove POD errors
       (Thanks, Mohammad)
 
+
+
+0.001006  Thu Aug 17 23:06:46 2017
+
+    * Extended keytypes defined using a regex or string to allow them to
+      be declared with a $ sigil, in which case they create a
+      compile-time variable containing that regex or string,
+      as well as defining a (sigilless) keytype name as usual.
+      (Thanks Sebastian!)
+

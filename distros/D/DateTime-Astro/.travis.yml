@@ -1,0 +1,13 @@
+language: perl
+sudo: false
+perl:
+  - "5.26"
+  - "5.24"
+  - "5.22"
+  - "5.20"
+install: true
+script: "perl ./.travis.run"
+
+cache:
+  directories:
+    - ext

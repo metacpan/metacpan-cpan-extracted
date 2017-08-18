@@ -116,6 +116,8 @@ SKIP: {
     push @expected, $in_file->slurp_utf8;
     $in_file = path( 't', 'V4', 'Image', 'maltiple_gd2.vcf' );
     push @expected, $in_file->slurp_utf8;
+#    $in_file = path( 't', 'V4', 'Image', 'maltiple_gd3.vcf' );
+#    push @expected, $in_file->slurp_utf8;
 
     $vc->photo([
         { media_type => 'image/png',  content => $raw },
@@ -123,6 +125,7 @@ SKIP: {
     ]);
     $vc->logo( { media_type => 'image/png', content => $raw } );
     $got = $vc->as_string;
+    $got =~ s|\Q+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBkZWZhdWx0IHF1Y|+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBkZWZhdWx0IHF1Y|m;
     if ( first{ $got eq $_ } @expected ){                                # 7
         pass 'photo(ArrayRef of Hashref of raw)';
     }else{

@@ -1,0 +1,52 @@
+<div id="form-box-<% lc $Name %>" class="widget <% $Class %>">
+<span class="description label"><% $Description %></span>
+<span class="value"><& SELF:InputOnly, %ARGS &></span>
+% if ( $Default ) {
+<span class="comment"><% $DefaultLabel %></span>
+% }
+<span class="hints"><% $Hints %></span>
+</div>
+<%ARGS>
+$Name
+
+$Class        => ''
+$Description  => undef,
+$Hints        => ''
+
+$CurrentValue => '',
+
+$Default        => 0,
+$DefaultValue   => '',
+$DefaultLabel   => loc( 'Default: [_1]', $DefaultValue ),
+</%ARGS>
+
+<%METHOD InputOnly>
+<textarea name="<% $Name %>" cols="<% $Cols %>" rows="<% $Rows %>"><% $CurrentValue %></textarea>
+<%ARGS>
+$Name
+$Cols => 80
+$Rows => 6
+$CurrentValue => '',
+</%ARGS>
+</%METHOD>
+
+<%METHOD Process>
+<%ARGS>
+$Name
+
+$Arguments    => {},
+
+$Default      => 0,
+$DefaultValue => '',
+</%ARGS>
+<%INIT>
+my $value = $Arguments->{ $Name };
+$value = '' unless defined $value;
+
+if ( $value eq '' ) {
+    return $DefaultValue unless $Default;
+    return undef;
+}
+return $value;
+</%INIT>
+</%METHOD>

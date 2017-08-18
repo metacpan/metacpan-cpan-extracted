@@ -13,16 +13,22 @@ use File::Spec;
 use IO::Handle;
 use IPC::Open3;
 
+use lib 't/lib';
+use NoNetworkHits;
+use EnsureStdinTty;
+use DiagFilehandles;
+
 # make it look like we are running non-interactively
 open my $stdin, '<', File::Spec->devnull or die "can't open devnull: $!";
 my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+
+local $TODO = 'on perls <5.16, IO::Pty may not work on all platforms' if "$]" < '5.016';
 
 foreach my $test (glob('t/*'))
 {
     next if not -f $test;
     next if $test =~ /\b00-/;
     subtest $test => sub {
-
         open my $stdout, '>', File::Spec->devnull or die "can't open devnull: $!";
         my $stderr = IO::Handle->new;
         # this *should* pick up our PERL5LIB and DTRT...

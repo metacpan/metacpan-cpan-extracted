@@ -103,6 +103,13 @@ sub new {
     $b = $h;
   }
 
+  if($args{KeyFile} && !$args{Key}) {
+    $args{Key} = Mail::OpenDKIM::PrivateKey->load(File => $args{KeyFile});
+    if(!$args{Key}) {
+      croak("Private key not found: $args{KeyFile}");
+    }
+  }
+
   my ($hdrcanon_alg, $bodycanon_alg);
 
   if($h eq 'relaxed') {

@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use App::af;
 
 subtest 'compute_class' => sub {

@@ -1,5 +1,8 @@
 Revision history for Dancer2-Plugin-Auth-OAuth
 
+0.13  2017-08-15 13:26:14 CEST
+        - twitter expects a oauth_verifier header
+
 0.12  2017-05-30 23:06:50 CEST
         - minor twitter changes
         - Salesforce added (tests welcome!), thanks to TheAmigo

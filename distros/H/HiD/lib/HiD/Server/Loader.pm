@@ -3,7 +3,7 @@
 
 package HiD::Server::Loader;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Server::Loader::VERSION = '1.98';
+$HiD::Server::Loader::VERSION = '1.991';
 use 5.014;  # strict, unicode_strings
 use warnings;
 
@@ -48,7 +48,7 @@ Another helper for C<hid publish -A>
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

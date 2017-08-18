@@ -1,25 +1,55 @@
 Revision history for Bio::BPWrappers
 
+1.12 2016-07-01:
+----------------
+
+bioaln:
+
+ - Allow BLAST input in bioaln
+
+biotree:
+ - make biotree -m more efficent by avoiding pair-wise
+   OTU distances
+ - Add options:
+    --label-selected-nodes
+    --del-low-boot
+    --mid-point
+    --as-text
+ - change option --distance to --dist
+
+Bio::BPWrapper::SeqManipulations:
+ - Added support for IUPAC codes
+ - Added support for multimple sequence files
+   when performing restriction analyses
+
+Correct and expand documentation, add PDF reference
+
+
 1.11 2016-07-01:
+----------------
 
 - Another attempt to mollify smokers
 
 1.10 2016-07-01:
+----------------
 
 - Adjust testing for MSWin yet again
 - More doc improvements
 
 1.08 2016-06-30:
+----------------
 
 - Canonicalize biotree -llt output
 - More doc updates
 
 1.07 2016-06-30:
+----------------
 
 - More complete documentation
 - Address GNUMakefile testing issues on CPANTesters
 
 1.06 2016-06-29:
+----------------
 
 - Canonicalize bioaln --avpid floating point values
 - Convert links from rocky to bioperl github namespace
@@ -28,6 +58,7 @@ Revision history for Bio::BPWrappers
 - misc doc changes
 
 1.05 2016-06-28:
+----------------
 
 - Try to addess OSX testing problems:
   test using long options
@@ -41,6 +72,7 @@ Revision history for Bio::BPWrappers
 - force at least Perl 5.10 on CPAN install
 
 1.03 2016-06-01:
+----------------
 
 - Make behavior the same across more Platforms:
   use a bundled Getopt::Long. This addresses
@@ -48,9 +80,11 @@ Revision history for Bio::BPWrappers
 - Revise bioseq doc
 
 1.01 2016-05-26:
+----------------
 
 - First CPAN release.
 
 1.0  2015-02-10:
+----------------
 
 - First release. contains two utilities with tests: bioseq & bioaln.

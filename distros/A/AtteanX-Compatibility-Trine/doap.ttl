@@ -1,0 +1,60 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://kasei.us/about/foaf.xrdf#greg>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:gwilliams@cpan.org>;
+	foaf:name            "Gregory Todd Williams";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/gwilliams>.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Compatibility-Trine/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	dc:identifier        "AtteanX::Compatibility::Trine"^^doap-deps:CpanId;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Attean"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Semantic_Web>;
+	doap:created         "2017-08-14"^^xsd:date;
+	doap:developer       <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:download-page   <https://metacpan.org/release/AtteanX-Compatibility-Trine>;
+	doap:helper          <http://kasei.us/about/foaf.xrdf#greg>;
+	doap:homepage        <https://metacpan.org/release/AtteanX-Compatibility-Trine>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:name            "AtteanX-Compatibility-Trine";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Compatibility-Trine/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-atteanx-compatibility-trine>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-compatibility-trine&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Compatibility layer between RDF::Trine and Attean".
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Compatibility-Trine/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "AtteanX-Compatibility-Trine-0.001"^^xsd:string;
+	dc:issued            "2017-08-14"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Compatibility-Trine-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2Fp5-atteanx-compatibility-trine&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+

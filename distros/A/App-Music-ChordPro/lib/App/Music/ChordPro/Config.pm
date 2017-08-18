@@ -264,7 +264,7 @@ This is the current built-in configuration file, showing all settings.
   	// footer         --> subtitle @ 60%
   	// empty          --> text
 	// diagram	  --> comment
-	// diagram_capo	  --> text (but at a small size)
+	// diagram_base	  --> text (but at a small size)
   
   	// This will show the page layout if non-zero.
   	"showlayout" : false,
@@ -332,6 +332,10 @@ sub configurator {
     for ( qw(tuning) ) {
 	$cfg->{$_} //= undef;
     }
+    for ( qw(title subtitle footer) ) {
+	next if exists($cfg->{pdf}->{formats}->{first}->{$_});
+	$cfg->{pdf}->{formats}->{first}->{$_} = "";
+    }
     for my $ff ( qw(chord
 		    diagram diagram_capo
 		    comment comment_box comment_italic
@@ -386,6 +390,19 @@ sub configurator {
 	delete( $cfg->{$_} )
 	  unless defined( $cfg->{$_} );
     }
+    for ( qw(title subtitle footer) ) {
+	delete($cfg->{pdf}->{formats}->{first}->{$_})
+	  if ($cfg->{pdf}->{formats}->{first}->{$_} // 1) eq "";
+	for my $class ( qw(title first default) ) {
+	    my $t = $cfg->{pdf}->{formats}->{$class}->{$_};
+	    next unless $t;
+	    die("Config error in pdf.formats.$class.$_: not an array\n")
+	      unless ref($t) eq 'ARRAY';
+	    die("Config error in pdf.formats.$class.$_: ",
+		 scalar(@$t), " fields instead of 3\n")
+	      unless @$t == 3;
+	}
+    }
     my @allfonts = keys(%{$cfg->{pdf}->{fonts}});
     for my $ff ( @allfonts ) {
 	unless ( $cfg->{pdf}->{fonts}->{$ff}->{name}
@@ -427,7 +444,7 @@ sub configurator {
     foreach ( @{ $cfg->{chords} } ) {
 	my $res =
 	  App::Music::ChordPro::Chords::add_config_chord
-	      ( $_->{name}, $_->{base}||1, $_->{frets}, $_->{easy} );
+	      ( $_->{name}, $_->{base}||1, $_->{frets}, $_->{easy}, $_->{fingers} );
 	warn( "Invalid chord in config: ",
 	      $_->{name}, ": ", $res, "\n" ) if $res;
     }

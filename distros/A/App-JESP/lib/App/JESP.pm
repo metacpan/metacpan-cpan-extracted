@@ -1,15 +1,16 @@
 package App::JESP;
-$App::JESP::VERSION = '0.010';
+$App::JESP::VERSION = '0.013';
 use Moose;
 
 use App::JESP::Plan;
+use App::JESP::Colorizer;
 
 use Class::Load;
 use DBI;
 use DBIx::Simple;
-use Log::Any qw/$log/;
-
 use File::Spec;
+use IO::Interactive;
+use Log::Any qw/$log/;
 
 # Settings
 ## DB Connection attrbutes.
@@ -42,6 +43,9 @@ has 'meta_patches' => ( is => 'ro', isa => 'ArrayRef[HashRef]',
 
 has 'plan' => ( is => 'ro', isa => 'App::JESP::Plan', lazy_build => 1);
 has 'driver' => ( is => 'ro', isa => 'App::JESP::Driver', lazy_build => 1 );
+
+has 'interactive' => ( is => 'ro' , isa => 'Bool' , lazy_build => 1 );
+has 'colorizer' => ( is => 'ro', isa => 'App::JESP::Colorizer', lazy_build => 1 );
 
 sub _build_driver{
     my ($self) = @_;
@@ -83,6 +87,16 @@ sub _build_meta_patches{
     return [
         { id => $self->prefix().'meta_zero', sql => 'CREATE TABLE '.$self->patches_table_name().' ( id VARCHAR(512) NOT NULL PRIMARY KEY, applied_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP );' }
     ];
+}
+
+sub _build_interactive{
+    my ($self) = @_;
+    return IO::Interactive::is_interactive();
+}
+
+sub _build_colorizer{
+    my ($self) = @_;
+    return App::JESP::Colorizer->new({ jesp => $self });
 }
 
 sub install{
@@ -212,12 +226,12 @@ sub deploy{
         if( my $err = $@ ){
             $log->error("Got error $err. ROLLING BACK");
             $db->rollback();
-            die "ERROR APPLYING PATCH ".$patch->id().": $err. ABORTING\n";
+            die "ERROR APPLYING PATCH ".$patch->id().": $err. ".$self->colorizer()->colored("ABORTING", "bold red")."\n";
         };
-        $log->info("Patch '".$patch->id()."' applied successfully");
+        $log->info($self->colorizer()->colored("Patch '".$patch->id()."' applied successfully", "green"));
         $applied++;
     }
-    $log->info("DONE Deploying DB Patches");
+    $log->info($self->colorizer()->colored("DONE Deploying DB Patches", "green"));
     return $applied;
 }
 
@@ -303,7 +317,8 @@ a json datastructure like this:
     "patches": [
         { "id":"foobartable", "sql": "CREATE TABLE foobar(id INT PRIMARY KEY)"},
         { "id":"foobar_more", "file": "patches/morefoobar.sql" }
-        { "id":"foobar_abs",  "file": "/absolute/path/to/patches/evenmore.sql" }
+        { "id":"foobar_abs",  "file": "/absolute/path/to/patches/evenmore.sql" },
+        { "id":"a_backfill_script", "file": "path/to/executable/file.sh" }
     ]
   }
 
@@ -312,6 +327,52 @@ contain raw SQL (SQL key), or point to a file of your choice (in the JESP home)
 itself containing the SQL.
 
 You are encouraged to look in L<https://github.com/jeteve/App-JESP/tree/master/t> for examples.
+
+=head1 PATCH TYPES
+
+=head1 sql
+
+Simply add the SQL statement to execute in your patch structure:
+
+  {
+    "patches": [
+        ...
+        { "id":"foobartable", "sql": "CREATE TABLE foobar(id INT PRIMARY KEY)"}
+        ...
+  }
+
+This is convenient for very short SQL statment.
+
+=head1 sql files
+
+Point to a file that contains SQL statement(s) to be executed. The filename can be either absolute
+or relative to the directory that contains the plan.
+
+  {
+    "patches": [
+         ...
+        { "id":"foobar_more", "file": "patches/morefoobar.sql" }
+        { "id":"foobar_abs",  "file": "/absolute/path/to/patches/evenmore.sql" },
+         ...
+    ]
+  }
+
+The directory structure is free, but of course you are encouraged to keep it clean.
+
+=head1 script files (Unix only)
+
+Point to an EXECUTABLE file. (absolute or relative to the plan directory):
+
+  {
+    "patches": [
+        ...
+        { "id":"a_backfill_script", "file": "path/to/executable/file.sh" }
+        ...
+    ]
+  }
+
+See L<APP::JESP::Driver#apply_script> to see what environment the script is ran in. Note that the script
+needs to be executable by the current user to be detected as a script.
 
 =head1 COMPATIBILITY
 

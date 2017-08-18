@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,9 +39,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Autotools" : "0.99",
-            "Alien::Base" : "0.74",
-            "Alien::Build" : "0.74",
+            "Alien::Base" : "0.99",
+            "Alien::Build" : "0.99",
             "Alien::Build::Plugin" : "0",
             "Class::Method::Modifiers" : "0",
             "FFI::CheckLib" : "0",
@@ -52,9 +51,12 @@
       },
       "test" : {
          "requires" : {
+            "Alien::Autotools" : "0.99",
+            "Alien::Base" : "0.99",
+            "Alien::cmake3" : "0.02",
             "Test2::Mock" : "0.000060",
             "Test2::V0" : "0.000060",
-            "Test::Alien" : "0",
+            "Test::Alien" : "0.99",
             "Test::Alien::Build" : "0",
             "perl" : "5.008001"
          }
@@ -63,16 +65,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alien-Role-Dino/issues"
+         "web" : "https://github.com/Perl5-Alien/Alien-Role-Dino/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::Role::Dino",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alien-Role-Dino.git",
-         "web" : "https://github.com/plicease/Alien-Role-Dino"
-      }
+         "url" : "git://github.com/Perl5-Alien/Alien-Role-Dino.git",
+         "web" : "https://github.com/Perl5-Alien/Alien-Role-Dino"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

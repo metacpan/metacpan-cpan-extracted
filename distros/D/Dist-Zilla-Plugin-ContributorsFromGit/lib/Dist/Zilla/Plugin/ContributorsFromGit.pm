@@ -9,8 +9,8 @@
 #
 package Dist::Zilla::Plugin::ContributorsFromGit;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.017-9-ge7df715
-$Dist::Zilla::Plugin::ContributorsFromGit::VERSION = '0.018';
+# git description: 0.018-4-g702588a
+$Dist::Zilla::Plugin::ContributorsFromGit::VERSION = '0.019';
 
 # ABSTRACT: Populate your 'CONTRIBUTORS' POD from the list of git authors
 
@@ -24,7 +24,7 @@ use Encode qw(decode_utf8);
 use autobox::Core;
 use autobox::Junctions;
 use File::Which 'which';
-use List::AllUtils qw{ max uniq };
+use List::AllUtils qw{ max uniq apply };
 use File::ShareDir qw/ dist_dir /;
 use YAML::Tiny;
 use Path::Class;
@@ -49,11 +49,11 @@ has _contributor_list => (
 
         ### and get our list from git, filtering: "@authors"
         my @contributors = uniq
-            map  { $self->_contributor_emails->{$_} // $_ }
-            grep { $_ ne 'Your Name <you@example.com>'   }
-            grep { [ map { lc } @authors ]->none eq lc   }
-            map  { decode_utf8($_)                       }
-            map  { chomp; s/^\s*\d+\s*//; $_             }
+            map   { $self->_contributor_emails->{$_} // $_ }
+            grep  { $_ ne 'Your Name <you@example.com>'    }
+            grep  { [ map { lc } @authors ]->none eq lc    }
+            map   { decode_utf8($_)                        }
+            apply { chomp; s/^\s*\d+\s*//                  }
             `git shortlog -s -e HEAD`
             ;
 
@@ -174,7 +174,7 @@ Dist::Zilla::Plugin::ContributorsFromGit - Populate your 'CONTRIBUTORS' POD from
 
 =head1 VERSION
 
-This document describes version 0.018 of Dist::Zilla::Plugin::ContributorsFromGit - released August 13, 2017 as part of Dist-Zilla-Plugin-ContributorsFromGit.
+This document describes version 0.019 of Dist::Zilla::Plugin::ContributorsFromGit - released August 14, 2017 as part of Dist-Zilla-Plugin-ContributorsFromGit.
 
 =head1 SYNOPSIS
 
@@ -283,7 +283,7 @@ L<http://www.dagolden.com/index.php/1921/how-im-using-distzilla-to-give-credit-t
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/issues>
+L<https://github.com/rsrchboy/Dist-Zilla-Plugin-ContributorsFromGit/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

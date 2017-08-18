@@ -1,3 +1,17 @@
+0.86	Aug 16 2017
+
+	Fix problems with disappearing page titles.
+	Fix some packing issues.
+
+0.85	Aug 15 2017
+
+	Rename config pdf.fonts.diagram_capo to pdf.fonts.diagram_base.
+	Fix some (well, several) layout issues with odd/even page printing.
+	Fix missing fingers in config defined chords.
+	Allow PDF::Builder to be used instead of PDF::API2.
+	Improve define/chord parsing and diagnostics.
+	(WxChordPro) Update to 0.84.
+
 0.84	Jul 31 2017
 
 	Emergency fix for PDF font problem.
@@ -8,7 +22,7 @@
 	Supply default straight font for grid lines.
 	Allow empty lines in grids.
 	Improve WxChordPro integration.
-	Change old terminology "chordgrid" into "diagrams".
+	Change old terminology "chordgrid" to "diagrams".
 	(WxChordPro) Update to 0.83.
 
 0.82	Jul 21 2017

@@ -11,7 +11,7 @@ BEGIN {
       print "1..0 # SKIP this test requires Test::More and DBD::SQLite\n"; exit;
    }
    require Test::More;
-   import Test::More tests => 43;
+   import Test::More tests => 44;
 }
 
 use strict;
@@ -103,6 +103,14 @@ ok(!$error,'No errors inserting into table');
 ok($rv,'select succeeded');
 is($result->[0]->[0],'test','found correct data');
 
+# stattr
+$cv = AE::cv;
+$dbh->stattr ("NAME", sub {
+   $cv->send ($_[1]);
+});
+$rv = $cv->recv;
+is($rv->[0], "a_column", "NAME attribute returned correctly");
+
 # check the autocommit behavior
 $cv = AnyEvent->condvar;
 $dbh->attr('AutoCommit',sub {return $cv->send($@) unless $_[1]; $cv->send(undef,$_[1])});
@@ -183,7 +191,7 @@ ok($result,'Accessor with set (AutoCommit) returns true');
 # using bad function returns error
 $cv = AnyEvent->condvar;
 #$dbh->exec('select a_column from a_table where instr(a_column,?)','re',sub {return $cv->send($@) unless $_[0];$cv->send(undef,@_[1,2]);});
-$dbh->exec('select a_column from a_table where instr(a_column,?)','re',
+$dbh->exec('select a_column from a_table where xyzzyinstr(a_column,?)','re',
            sub {return $cv->send($@,@_[0,1,2]);});
 my $hdl;
 ($error,$hdl,$result,$rv) = $cv->recv();

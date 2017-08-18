@@ -15,7 +15,9 @@ corpus/with_no_weaver_ini/placeholder
 corpus/with_weaver_ini/weaver.ini
 dist.ini
 lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
+lib/Dist/Zilla/Plugin/MetaProvides/Update.pm
 lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
+lib/Dist/Zilla/PluginBundle/Git/VersionManager.pm
 lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
 share/CONTRIBUTING
 share/profiles/default/Module.pm
@@ -45,6 +47,9 @@ t/14-pluginbundle-weaver-ini.t
 t/15-weaver-expand-config.t
 t/16-podweaver-licence.t
 t/17-podweaver-support.t
+t/18-versionmanagement.t
+t/19-add_bundle.t
+t/20-git-versionmanager.t
 t/lib/Helper.pm
 t/lib/NoNetworkHits.pm
 t/lib/NoPrereqChecks.pm

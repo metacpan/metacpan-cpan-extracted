@@ -1,5 +1,16 @@
 Revision history for HiD
 
+1.991     2017-08-17 15:16:19-07:00 America/Los_Angeles
+
+  Fix an *incredibly* stupid bug
+
+1.99      2017-08-17 14:46:51-07:00 America/Los_Angeles
+
+  Add lightbox helper macro to IIBlog.pm
+  Process blog posts through XSlate prior to Markdown conversion
+  Add 400, 403, 404 error pages (Trey Bianchini)
+  Make XSlate throw error and exit on warnings [#35] (Jake Goldsborough)
+
 1.98      2016-04-04 21:21:43-07:00 America/Los_Angeles
 
   Add 'timestamp' (key pointing to DateTime object for current time) to 'template_data' 

@@ -8,14 +8,14 @@ use Data::Validator;
 use Net::OpenStack::Swift::Util qw/uri_escape uri_unescape debugf/;
 use Net::OpenStack::Swift::InnerKeystone;
 use namespace::clean -except => 'meta';
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 
 subtype 'Path' => as 'Path::Tiny';
 coerce  'Path' => from 'Str' => via { Path::Tiny->new($_) };
 
 
-has auth_version => (is => 'rw', required => 1, default => sub {"2.0"});
+has auth_version => (is => 'rw', required => 1, default => sub { $ENV{OS_AUTH_VERSION} || "2.0"});
 has auth_url     => (is => 'rw', required => 1, default => sub { $ENV{OS_AUTH_URL}    || '' });
 has user         => (is => 'rw', required => 1, default => sub { $ENV{OS_USERNAME}    || '' });
 has password     => (is => 'rw', required => 1, default => sub { $ENV{OS_PASSWORD}    || '' });
@@ -824,6 +824,7 @@ perl client for the Swift API. a command-line script (swift.pl).
 
 setup openstack environments
 
+    $ export OS_AUTH_VERSION='1.0' # default 2.0
     $ export OS_AUTH_URL='https://*******'
     $ export OS_TENANT_NAME='*******'
     $ export OS_USERNAME='*******'

@@ -1,10 +1,11 @@
 ---
-abstract: 'Provide the stuff missing in List::Util'
+abstract: 'Provide the stuff missing in List::Util in XS'
 author:
   - 'Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>'
   - 'Adam Kennedy <adamk@cpan.org>'
   - 'Jens Rehsack <rehsack@cpan.org>'
 build_requires:
+  Storable: '0'
   Test::More: '0.96'
 configure_requires:
   Carp: '0'
@@ -17,7 +18,7 @@ configure_requires:
   base: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,11 +28,10 @@ no_index:
     - t
     - inc
 requires:
-  List::MoreUtils: 0.417_001
   XSLoader: '0.22'
 resources:
-  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils
-  homepage: https://metacpan.org/release/List-MoreUtils
-  repository: https://github.com/perl5-utils/List-MoreUtils.git
-version: '0.418'
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils-XS
+  homepage: https://metacpan.org/release/List-MoreUtils-XS
+  repository: https://github.com/perl5-utils/List-MoreUtils-XS.git
+version: '0.422'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

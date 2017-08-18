@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::yaml;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 # ABSTRACT: YAML read/write support for Yertl
 
 use ETL::Yertl 'Class';
@@ -81,6 +81,11 @@ has format_module => (
 my %FORMAT_SUB = (
 
     'YAML::XS' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::XS::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::XS::Dump( @_ );
@@ -95,6 +100,11 @@ my %FORMAT_SUB = (
     },
 
     'YAML::Syck' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::Syck::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::Syck::Dump( @_ );
@@ -109,6 +119,11 @@ my %FORMAT_SUB = (
     },
 
     'YAML' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::Dump( @_ );
@@ -123,6 +138,11 @@ my %FORMAT_SUB = (
     },
 
     'YAML::Tiny' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            return YAML::Tiny::Load( $msg );
+        },
+
         write => sub {
             my $self = shift;
             return YAML::Tiny::Dump( @_ );
@@ -160,6 +180,20 @@ sub read {
     return $FORMAT_SUB{ $self->format_module }{read}->( $self );
 }
 
+#pod =method decode
+#pod
+#pod     my $msg = $yaml->decode( $bytes );
+#pod
+#pod Decode the given bytes into a single data structure. C<$bytes> must be
+#pod a single YAML document.
+#pod
+#pod =cut
+
+sub decode {
+    my ( $self, $msg ) = @_;
+    return $FORMAT_SUB{ $self->format_module }{decode}->( $self, $msg );
+}
+
 1;
 
 __END__
@@ -172,7 +206,7 @@ ETL::Yertl::Format::yaml - YAML read/write support for Yertl
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 ATTRIBUTES
 
@@ -205,6 +239,13 @@ Convert the given C<DOCUMENTS> to YAML. Returns a YAML string.
 =head2 read()
 
 Read a YAML string from L<input> and return all the documents.
+
+=head2 decode
+
+    my $msg = $yaml->decode( $bytes );
+
+Decode the given bytes into a single data structure. C<$bytes> must be
+a single YAML document.
 
 =head1 AUTHOR
 

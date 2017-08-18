@@ -17,8 +17,6 @@ LICENSE
 maint/min-perl.pl
 maint/releaseprep
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/00_diag.t
 t/builder.t
@@ -75,3 +73,5 @@ t/test_http/index.html
 t/utils.t
 t/validation.t
 t/version.t
+META.yml
+META.json

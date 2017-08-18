@@ -1,0 +1,49 @@
+---
+abstract: 'regular expressions for legal licenses'
+author:
+  - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
+build_requires:
+  Regexp::Pattern: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Licensing
+  - Sourcecode
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Pattern-License
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Regexp::Pattern::License:
+    file: lib/Regexp/Pattern/License.pm
+    version: v3.0.31
+  Regexp::Pattern::License::Parts:
+    file: lib/Regexp/Pattern/License/Parts.pm
+    version: v3.0.31
+requires:
+  perl: '5'
+  strictures: '2'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project
+  bugtracker: https://bugs.debian.org/regexp-pattern-license
+  homepage: https://metacpan.org/release/Regexp-Pattern-License
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://anonscm.debian.org/git/build-common/regexp-pattern-license.git
+version: v3.0.31
+x_help_wanted:
+  - tester
+  - documenter
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

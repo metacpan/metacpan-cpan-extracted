@@ -7,6 +7,18 @@ TODO: how to cope with tagged values and standard json decoders
 TODO: investigate magic (Eric Brine)
 TODO: rfc7464
 TODO: Victor Efimov
+TODO: move json_xs to types::serialiser
+
+3.04 Thu Aug 17 04:30:47 CEST 2017
+	- change exponential realloc algorithm on encoding and string decoding to be
+          really exponential (this helps slow/debugging allocators such as libumem)
+          (reported by Matthew Horsfall).
+        - string encoding would needlessly overallocate output space
+          (testcase by Matthew Horsfall).
+        - be very paranoid about extending buffer lengths and croak if buffers get too large,
+          which might (or might not) improve security.
+	- add cbor-packed type to json_xs.
+        - switch from YAML to YAML::XS in json_xs, as YAML is way too buggy and outdated.
 
 3.03 Wed Nov 16 20:20:59 CET 2016
 	- fix a bug introduced by a perl bug workaround that would cause

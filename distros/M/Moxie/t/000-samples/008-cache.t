@@ -15,15 +15,15 @@ package Cache {
 
     extends 'Moxie::Object';
 
-    has '$!fetcher' => sub { die '$!fetcher is required' };
+    has '$!fetcher' => ( required => 1 );
     has '$!data';
 
-    sub BUILDARGS : init_args( fetcher => '$!fetcher' );
+    sub BUILDARGS : init_args( fetcher => $!fetcher );
 
-    my sub fetcher : private('$!fetcher');
+    my sub fetcher : private( $!fetcher );
 
-    sub has_data : predicate('$!data');
-    sub clear    : clearer('$!data');
+    sub has_data : predicate( $!data );
+    sub clear    : clearer( $!data );
 
     sub data ($self) {
         $self->{'$!data'} //= $self->_fetch_data;

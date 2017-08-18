@@ -3,6 +3,7 @@ lib/Fuse/Class.pm
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
+META.json			Module meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/10subclass.t

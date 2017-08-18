@@ -464,7 +464,13 @@ hopefully useful configuration and documentation:
 
 =over 4
 
+=item L<LWP::Authen::OAuth2::ServiceProvider::Dwolla|Dwolla>
+
 =item L<LWP::Authen::OAuth2::ServiceProvider::Google|Google>
+
+=item L<LWP::Authen::OAuth2::ServiceProvider::Line|Line>
+
+=item L<LWP::Authen::OAuth2::ServiceProvider::Strava|Strava>
 
 =back
 

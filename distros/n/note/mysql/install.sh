@@ -21,7 +21,7 @@ read YESNO
 
 case $YESNO in
 	"y" | "Y")
-		if [ $UID != 0 ] ; then
+		if [ $(id -ru) != 0 ] ; then
 			echo "You should be root for that!"
 			exit
 		fi 

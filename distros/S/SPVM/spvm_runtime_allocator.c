@@ -13,6 +13,7 @@
 #include "spvm_runtime.h"
 #include "spvm_constant_pool.h"
 #include "spvm_api.h"
+#include "spvm_global.h"
 
 SPVM_RUNTIME_ALLOCATOR* SPVM_RUNTIME_ALLOCATOR_new(SPVM_RUNTIME* runtime) {
   (void)runtime;
@@ -20,10 +21,10 @@ SPVM_RUNTIME_ALLOCATOR* SPVM_RUNTIME_ALLOCATOR_new(SPVM_RUNTIME* runtime) {
   SPVM_RUNTIME_ALLOCATOR* allocator = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_RUNTIME_ALLOCATOR));
 
   // use memory pool max reference byte size
-  allocator->base_object_max_byte_size_use_memory_pool = 0xFFFF;
+  allocator->object_max_byte_size_use_memory_pool = 0xFFFF;
   
   // Memory pool
-  allocator->memory_pool = SPVM_MEMORY_POOL_new(allocator->base_object_max_byte_size_use_memory_pool);
+  allocator->memory_pool = SPVM_MEMORY_POOL_new(allocator->object_max_byte_size_use_memory_pool);
   
   // Free lists
   int64_t allocator_freelists_byte_size = (int64_t)16 * (int64_t)sizeof(SPVM_DYNAMIC_ARRAY);
@@ -77,16 +78,16 @@ int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_API* api, SPVM_RUNTIME_AL
   return index;
 }
 
-void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int32_t byte_size) {
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->runtime;
-
+void* SPVM_RUNTIME_ALLOCATOR_malloc_zero(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t byte_size) {
+  SPVM_RUNTIME* runtime = SPVM_GLOBAL_RUNTIME;
+  
   assert(byte_size > 0);
   int32_t index = SPVM_RUNTIME_ALLOCATOR_get_freelist_index(api, allocator, byte_size);
   int32_t alloc_byte_size = pow(2, index + 1);
   
   void* block;
-  if (alloc_byte_size > allocator->base_object_max_byte_size_use_memory_pool) {
-    block = SPVM_UTIL_ALLOCATOR_safe_malloc(alloc_byte_size);
+  if (alloc_byte_size > allocator->object_max_byte_size_use_memory_pool) {
+    block = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(alloc_byte_size);
   }
   else {
     void* free_address = SPVM_DYNAMIC_ARRAY_pop(allocator->freelists[index]);
@@ -96,47 +97,51 @@ void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* alloc
     else {
       block = SPVM_MEMORY_POOL_alloc(allocator->memory_pool, alloc_byte_size);
     }
+    memset(block, 0, alloc_byte_size);
   }
   
   if (block != NULL) {
-    runtime->object_count++;
+    runtime->objects_count++;
   }
 
 #ifdef DEBUG
-  fprintf(stderr, "MALLOC OBJECT COUNT %d\n", runtime->object_count);
+  fprintf(stderr, "MALLOC OBJECT COUNT %d\n", runtime->objects_count);
 #endif
+  
+  // Address first bit must be 0 for weaken reference
+  assert(((intptr_t)block & 1) == 0);
   
   return block;
 }
 
-void SPVM_RUNTIME_ALLOCATOR_free_base_object(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_BASE_OBJECT* base_object) {
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->runtime;
+void SPVM_RUNTIME_ALLOCATOR_free_object(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_OBJECT* object) {
+  SPVM_RUNTIME* runtime = SPVM_GLOBAL_RUNTIME;
   
-  if (base_object == NULL) {
+  if (object == NULL) {
     return;
   }
   else {
     // Byte size
-    int32_t byte_size = SPVM_RUNTIME_API_calcurate_base_object_byte_size(api, base_object);
+    int32_t byte_size = SPVM_RUNTIME_API_calcurate_object_byte_size(api, object);
     
     assert(byte_size > 0);
     
-    runtime->object_count--;
-    assert(runtime->object_count >= 0);
+    runtime->objects_count--;
+    assert(runtime->objects_count >= 0);
 
 #ifdef DEBUG
-    fprintf(stderr, "FREE OBJECT COUNT %d\n", runtime->object_count);
+    fprintf(stderr, "FREE OBJECT COUNT %d\n", runtime->objects_count);
 #endif
     
-    if (byte_size > allocator->base_object_max_byte_size_use_memory_pool) {
-      free(base_object);
+    if (byte_size > allocator->object_max_byte_size_use_memory_pool) {
+      free(object);
     }
     else {
       // Freelist index
       int32_t freelist_index = SPVM_RUNTIME_ALLOCATOR_get_freelist_index(api, allocator, byte_size);
       
       // Push free address
-      SPVM_DYNAMIC_ARRAY_push(allocator->freelists[freelist_index], base_object);
+      SPVM_DYNAMIC_ARRAY_push(allocator->freelists[freelist_index], object);
     }
   }
 }

@@ -21,7 +21,7 @@ my $match = qr/\d{1,3}.\d{1,2}/;
 
 #diag "This is rent3 $rent3 .";
 
-ok ( $ministock->stock( "RENT3" ) =~ /$match/ , "It seems that works localiza" );
-ok ( $ministock->stock( "PETR4" ) =~ /$match/ , "It seems that works Petrobras" );
+ok ( $ministock->stock( "RENT3.SA" ) =~ /$match/ , "It seems that works localiza" );
+ok ( $ministock->stock( "PETR4.SA" ) =~ /$match/ , "It seems that works Petrobras" );
 
 done_testing;

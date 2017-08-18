@@ -1,0 +1,9 @@
+0.002   2017-08-16 (PERLANCAR)
+
+        - [build] Rebuild with updated toolchain to properly show
+          the appropriate description ('description.alt.env.cmdline').
+
+
+0.001   2017-08-16 (PERLANCAR)
+
+        - First release.

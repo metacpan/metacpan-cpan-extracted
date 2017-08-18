@@ -92,4 +92,22 @@ test 3;
 
 test 3;
 
+keytype $Name is 'name';
+keytype $Rank is m{(?i)rank};
+
+keyword nrs (Name $name, Rank $rank) {{{
+    is q{«$name»}, q{«$Name»} => 'nrs Name';
+    is q{«$rank»}, 'RANK'     => 'nrs Rank';
+}}}
+
+nrs name RANK;
+
+BEGIN {
+    is $Name, 'name'   => 'compile-time nrs $Name';
+    like 'RANK', $Rank => 'compile-time nrs $Rank';
+}
+
+is $Name, 'name'   => 'runtime nrs $Name';
+like 'RANK', $Rank => 'runtime nrs $Rank';
+
 done_testing;

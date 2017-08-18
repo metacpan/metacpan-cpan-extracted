@@ -5,6 +5,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/Method/Traits.pm
 lib/Method/Traits/Meta/Provider.pm

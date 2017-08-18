@@ -1,5 +1,5 @@
 --- mtwist.c.orig	2014-01-24 06:11:42.364027733 +0100
-+++ mtwist.c	2014-04-01 17:42:41.569272398 +0200
++++ mtwist.c	2017-08-15 18:15:31.791880702 +0200
 @@ -4,8 +4,10 @@
  #else
  #define ATTRIBUTE(attrs)
@@ -9,6 +9,15 @@
      "$Id: mtwist.c,v 1.28 2014-01-23 21:11:42-08 geoff Exp $";
 +*/
  #endif
+ 
+ /*
+@@ -308,7 +310,7 @@
+  */
+ double			mt_32_to_double;
+ 					/* Multiplier to convert long to dbl */
+-double			mt_64_to_double;
++NVTYPE			mt_64_to_double;
+ 					/* Mult'r to cvt long long to dbl */
  
  /*
 @@ -460,6 +462,11 @@

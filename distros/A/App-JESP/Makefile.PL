@@ -25,21 +25,25 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "File::Slurp" => 0,
     "File::Spec" => 0,
-    "File::Which" => 0,
+    "File::Which" => "1.21",
+    "IO::Interactive" => "1.022",
     "IPC::Run" => 0,
     "JSON" => 0,
     "Log::Any" => "1.040",
     "Moose" => "2.1801",
     "SQL::Abstract" => "1.81",
-    "String::ShellQuote" => "1.04"
+    "String::ShellQuote" => "1.04",
+    "Term::ANSIColor" => "3.01"
   },
   "TEST_REQUIRES" => {
     "Carp::Always" => "0.13",
     "DBD::SQLite" => "1.50",
+    "File::Temp" => "0.2304",
+    "File::Which" => "1.21",
     "Test::Most" => "0.34",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,13 +59,16 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "File::Slurp" => 0,
   "File::Spec" => 0,
-  "File::Which" => 0,
+  "File::Temp" => "0.2304",
+  "File::Which" => "1.21",
+  "IO::Interactive" => "1.022",
   "IPC::Run" => 0,
   "JSON" => 0,
   "Log::Any" => "1.040",
   "Moose" => "2.1801",
   "SQL::Abstract" => "1.81",
   "String::ShellQuote" => "1.04",
+  "Term::ANSIColor" => "3.01",
   "Test::Most" => "0.34",
   "Test::Pod::Coverage" => "1.08"
 );

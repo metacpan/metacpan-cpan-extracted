@@ -5,7 +5,7 @@ use_ok "DateTime::Astro", "solar_longitude", "solar_longitude_after", "solar_lon
 
 my $DELTA_LONGITUDE = $ENV{ALLOW_SOLAR_LONGITUDE_DELTA} || 0.006;
 
-# http://www.usno.navy.mil/USNO/astronomical-applications/data-services/earth-seasons
+# http://aa.usno.navy.mil/data/docs/EarthSeasons.php
 my @data = (
     # XXX these data are now gone from above website
     [   0, 1992,  3, 20,  8, 48 ],
@@ -18,7 +18,7 @@ my @data = (
 
     # XXX these are there as of 6/12/2010
     [   0, 2000,  3, 20,  7, 35 ],
-    [  90, 2000,  6, 21,  1, 48 ], 
+    [  90, 2000,  6, 21,  1, 48 ],
     [ 180, 2000,  9, 22, 17, 28 ],
     [ 270, 2000, 12, 21, 13, 37 ],
     [   0, 2001,  3, 20, 13, 31 ],

@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution File-JSON-Slurper,
-version 0.02:
+version 0.03:
 
   slurp a JSON file into a data structure, and the reverse
 

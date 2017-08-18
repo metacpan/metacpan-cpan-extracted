@@ -1,0 +1,41 @@
+---
+abstract: 'Dist::Zilla::PluginBundle::Author::SKIRMESS - Dist::Zilla configuration the way SKIRMESS does it'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires:
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-SKIRMESS
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+provides:
+  Dist::Zilla::PluginBundle::Author::SKIRMESS:
+    file: lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::Role::BundleDeps: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0.99'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS/issues
+  homepage: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS
+  repository: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS.git
+version: '0.001'
+x_authority: cpan:SKIRMESS
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -5,6 +5,8 @@ author:
 build_requires:
   Carp::Always: '0.13'
   DBD::SQLite: '1.50'
+  File::Temp: '0.2304'
+  File::Which: '1.21'
   Test::Most: '0.34'
   Test::Pod::Coverage: '1.08'
 configure_requires:
@@ -23,14 +25,16 @@ requires:
   Data::Dumper: '0'
   File::Slurp: '0'
   File::Spec: '0'
-  File::Which: '0'
+  File::Which: '1.21'
+  IO::Interactive: '1.022'
   IPC::Run: '0'
   JSON: '0'
   Log::Any: '1.040'
   Moose: '2.1801'
   SQL::Abstract: '1.81'
   String::ShellQuote: '1.04'
+  Term::ANSIColor: '3.01'
 resources:
   homepage: https://github.com/jeteve/App-JESP
   repository: https://github.com/jeteve/App-JESP.git
-version: '0.010'
+version: '0.013'

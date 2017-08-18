@@ -29,6 +29,10 @@ use ExtUtils::MakeMaker;
 
 use inc::Config::AutoConf::LMU ();
 
+inc::Config::AutoConf::LMU->_set_argv(@ARGV);    # XXX hack because we cannot construct for global use
+inc::Config::AutoConf::LMU->check_lmu_prerequisites();
+inc::Config::AutoConf::LMU->write_config_h("LMUconfig.h");
+
 if (-d "Sandbox")
 {
     eval "use Sandbox::Tumble ();";
@@ -39,18 +43,14 @@ if (-d "Sandbox")
     Sandbox::Tumble->tumble(qw(t));
 }
 
-inc::Config::AutoConf::LMU->_set_argv(@ARGV);    # XXX hack because we cannot construct for global use
-
-inc::Config::AutoConf::LMU->check_produce_loadable_xs_build() or die "Can't produce loadable XS module";
 
 # Should we build the XS version?
 my %RUN_DEPS = (
-    'List::MoreUtils' => "0.417_001",
     'XSLoader'        => "0.22",
 );
 my %BUNDLE_CONFIGURE_DEPS = (
     'inc::latest'      => '0.500',
-    'Config::AutoConf' => '0.308',
+    'Config::AutoConf' => '0.315',
 );
 my %CONFIGURE_DEPS = (
     'Carp'                => 0,
@@ -65,6 +65,7 @@ my %CONFIGURE_DEPS = (
 my %BUILD_DEPS = ();
 
 my %TEST_DEPS = (
+    'Storable'   => 0,
     'Test::More' => 0.96,
 );
 my @XS_FILES = qw(XS.xs);
@@ -96,15 +97,15 @@ WriteMakefile1(
     META_MERGE => {
         'meta-spec' => {version => 2},
         resources   => {
-            homepage   => 'https://metacpan.org/release/List-MoreUtils',
+            homepage   => 'https://metacpan.org/release/List-MoreUtils-XS',
             repository => {
-                url  => 'https://github.com/perl5-utils/List-MoreUtils.git',
-                web  => 'https://github.com/perl5-utils/List-MoreUtils',
+                url  => 'https://github.com/perl5-utils/List-MoreUtils-XS.git',
+                web  => 'https://github.com/perl5-utils/List-MoreUtils-XS',
                 type => 'git',
             },
             bugtracker => {
-                web    => 'https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils',
-                mailto => 'bug-List-MoreUtils@rt.cpan.org',
+                web    => 'https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils-XS',
+                mailto => 'bug-List-MoreUtils-XS@rt.cpan.org',
             },
             license => 'apache_2_0',
         },
@@ -119,8 +120,7 @@ WriteMakefile1(
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
                     'Test::Spelling'                      => 0,
-                    'JSON::PP'                            => 0,
-                    'Test::WriteVariants'                 => '0.010',
+                    'Test::WriteVariants'                 => '0.013',
                     %BUNDLE_CONFIGURE_DEPS,
                 },
             },
@@ -139,14 +139,14 @@ WriteMakefile1(
         },
     },
     NAME         => 'List::MoreUtils::XS',
-    ABSTRACT     => 'Provide the stuff missing in List::Util',
+    ABSTRACT     => 'Provide the stuff missing in List::Util in XS',
     VERSION_FROM => 'lib/List/MoreUtils/XS.pm',
     AUTHOR       => [
         'Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>',
         'Adam Kennedy <adamk@cpan.org>',
         'Jens Rehsack <rehsack@cpan.org>'
     ],
-    LICENSE            => 'perl',
+    LICENSE            => 'apache_2_0',
     CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
     PREREQ_PM          => \%RUN_DEPS,
     BUILD_REQUIRES     => \%BUILD_DEPS,
@@ -154,7 +154,7 @@ WriteMakefile1(
     XS                 => {map { (my $tgt = $_) =~ s/\.xs$/\.c/; $_ => $tgt; } @XS_FILES},
     MAGICXS            => 1,
     INC                => "-I.",
-    (-d "Sandbox" ? (realclean => {FILES => "inc/latest* inc/inc_* t/xs"}) : ()),
+    (-d "Sandbox" ? (realclean => {FILES => "inc/latest* inc/inc_* t/xs config.log LMUconfig.h M*.bak"}) : ()),
     depend => {'$(FIRST_MAKEFILE)' => '$(VERSION_FROM)'},
     test   => {TESTS               => join(' ', 't/*.t', 't/xs/*.t', 'xt/*.t')},
     # Otherwise 'cxinc' isn't defined

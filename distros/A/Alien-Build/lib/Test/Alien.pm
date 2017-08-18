@@ -14,11 +14,12 @@ use Text::ParseWords qw( shellwords );
 use Test2::API qw( context run_subtest );
 use base qw( Exporter );
 use Path::Tiny qw( path );
+use Alien::Build::Util qw( _dump );
 
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 
 our @aliens;
@@ -28,22 +29,36 @@ sub alien_ok ($;$)
   my($alien, $message) = @_;
 
   my $name = ref $alien ? ref($alien) . '[instance]' : $alien;
-  
+  $name = 'undef' unless defined $name;
   my @methods = qw( cflags libs dynamic_libs bin_dir );
   $message ||= "$name responds to: @methods";
-  my @missing = grep { ! $alien->can($_) } @methods;
   
-  my $ok = !@missing;
+  my $ok;
+  my @diag;
+  
+  if(defined $alien)
+  {
+    my @missing = grep { ! $alien->can($_) } @methods;
+  
+    $ok = !@missing;
+    push @diag, map { "  missing method $_" } @missing;
+
+    if($ok)
+    {
+      push @aliens, $alien;
+      unshift @PATH, $alien->bin_dir;
+    }
+  }
+  else
+  {
+    $ok = 0;
+    push @diag, "  undefined alien";
+  }
+
   my $ctx = context();
   $ctx->ok($ok, $message);
-  $ctx->diag("  missing method $_") for @missing;
+  $ctx->diag($_) for @diag;
   $ctx->release;
-  
-  if($ok)
-  {
-    push @aliens, $alien;
-    unshift @PATH, $alien->bin_dir;
-  }
   
   $ok;
 }
@@ -138,7 +153,15 @@ sub _flags
   {
     return if $seen;
     my $ctx = context();
-    $ctx->diag("Test::Alien xs_ok C++ is considered experimental");
+    $ctx->diag('');
+    $ctx->diag('');
+    $ctx->diag(' !!!');
+    $ctx->diag('');
+    $ctx->diag("Test::Alien xs_ok C++ is DEPRECATED and will be removed on or after 31 August 2017");
+    $ctx->diag("Please use Test::Alien::CPP instead");
+    $ctx->diag('');
+    $ctx->diag(' !!!');
+    $ctx->diag('');
     $ctx->release;
     $seen++;
   }
@@ -169,22 +192,26 @@ sub xs_ok
   $xs->{xs} = "@{[ $xs->{xs} ]}";
   $xs->{pxs} ||= {};
   $xs->{cbuilder_compile} ||= {};
-  $xs->{link_compile}     ||= {};
+  $xs->{cbuilder_link}    ||= {};
 
   if($xs->{cpp} || $xs->{'C++'})
   {
     _warn_cpp();
     $xs->{pxs}->{'C++'} = 1;
     $xs->{cbuilder_compile}->{'C++'} = 1;
-    $xs->{cpp} = 1;
+    $xs->{c_ext} = 'cpp';
+  }
+  else
+  {
+    $xs->{c_ext} = 'c';
   }
 
-  my $verbose = $xs->{verbose};
+  my $verbose = $xs->{verbose} || 0;
   my $ok = 1;
   my @diag;
   my $dir = _tempdir( CLEANUP => 1, TEMPLATE => 'testalienXXXXX' );
   my $xs_filename = path($dir)->child('test.xs')->stringify;
-  my $c_filename  = path($dir)->child($xs->{cpp} ? 'test.cpp' : 'test.c')->stringify;
+  my $c_filename  = path($dir)->child("test.@{[ $xs->{c_ext} ]}")->stringify;
   
   my $ctx = context();
   my $module;
@@ -253,13 +280,15 @@ sub xs_ok
   {
     my $cb = ExtUtils::CBuilder->new;
 
+    my %compile_options = (
+      source               => $c_filename,
+      extra_compiler_flags => [shellwords map { _flags $_, 'cflags' } @aliens],
+      %{ $xs->{cbuilder_compile} },
+    );
+
     my($out, $obj, $err) = capture_merged {
       my $obj = eval {
-        $cb->compile(
-          source               => $c_filename,
-          extra_compiler_flags => [shellwords map { _flags $_, 'cflags' } @aliens],
-          %{ $xs->{cbuilder_compile} },
-        );
+        $cb->compile(%compile_options);
       };
       ($obj, $@);
     };
@@ -267,6 +296,11 @@ sub xs_ok
     $ctx->note("compile $c_filename") if $verbose;
     $ctx->note($out) if $verbose;
     $ctx->note($err) if $verbose && $err;
+
+    if($verbose > 1)
+    {
+      $ctx->note(_dump({ compile_options => \%compile_options }));
+    }
     
     unless($obj)
     {
@@ -278,15 +312,17 @@ sub xs_ok
     
     if($ok)
     {
-    
+
+      my %link_options = (
+        objects            => [$obj],
+        module_name        => $module,
+        extra_linker_flags => [shellwords map { _flags $_, 'libs' } @aliens],
+        %{ $xs->{cbuilder_link} },
+      );
+
       my($out, $lib, $err) = capture_merged {
         my $lib = eval { 
-          $cb->link(
-            objects            => [$obj],
-            module_name        => $module,
-            extra_linker_flags => [shellwords map { _flags $_, 'libs' } @aliens],
-            %{ $xs->{cbuilder_link} },
-          );
+          $cb->link(%link_options);
         };
         ($lib, $@);
       };
@@ -294,8 +330,13 @@ sub xs_ok
       $ctx->note("link $obj") if $verbose;
       $ctx->note($out) if $verbose;
       $ctx->note($err) if $verbose && $err;
-      
-      if($lib)
+
+      if($verbose > 1)
+      {
+        $ctx->note(_dump({ link_options => \%link_options }));
+      }
+
+      if($lib && -f $lib)
       {
         $ctx->note("created lib $lib") if $xs->{verbose};
       }
@@ -327,13 +368,21 @@ sub xs_ok
         
         if($alien_with_xs_load)
         {
+          {
+            no strict 'refs';
+            @{join '::', $module, 'rest'} = @rest;
+            ${join '::', $module, 'alien_with_xs_load'} = $alien_with_xs_load;
+          }
           print $fh '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
             package $module;
             
             use strict;
             use warnings;
+            our \$VERSION = '0.01';
+            our \@rest;
+            our \$alien_with_xs_load;
             
-            $alien_with_xs_load->xs_load('$module', '\$VERSION', @rest);
+            \$alien_with_xs_load->xs_load('$module', \$VERSION, \@rest);
             
             1;
           };
@@ -347,7 +396,7 @@ sub xs_ok
             use warnings;
             require XSLoader;
             our \$VERSION = '0.01';
-            XSLoader::load('$module','\$VERSION');
+            XSLoader::load('$module',\$VERSION);
           
             1;
           };
@@ -595,7 +644,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 0.95
+version 0.99
 
 =head1 SYNOPSIS
 

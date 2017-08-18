@@ -9,6 +9,8 @@ LICENSE
 MANIFEST			This list of files
 README.md
 
+doc/bpwrapper-reference-card.pdf
+
 lib/Bio/BPWrapper/AlnManipulations.pm
 lib/Bio/BPWrapper/PopManipulations.pm
 lib/Bio/BPWrapper/SeqManipulations.pm
@@ -22,31 +24,32 @@ t/10test-biotree.t
 
 t/Helper.pm
 
+
 t/check-data/bioaln-opt-aln-index.right
-t/check-data/bioaln-opt-avpid.right
+t/check-data/bioaln-opt-avg-pid.right
 t/check-data/bioaln-opt-codon-view.right
-t/check-data/bioaln-opt-conblocks.right
+t/check-data/bioaln-opt-con-blocks.right
 t/check-data/bioaln-opt-concat.right
 t/check-data/bioaln-opt-consensus.right
 t/check-data/bioaln-opt-delete.right
 t/check-data/bioaln-opt-dna2pep.right
-t/check-data/bioaln-opt-erasecol.right
 t/check-data/bioaln-opt-input.right
 t/check-data/bioaln-opt-length.right
-t/check-data/bioaln-opt-listids.right
+t/check-data/bioaln-opt-list-ids.right
 t/check-data/bioaln-opt-match.right
-t/check-data/bioaln-opt-noflatname.right
-t/check-data/bioaln-opt-nogaps.right
-t/check-data/bioaln-opt-numseq.right
+t/check-data/bioaln-opt-no-flat.right
+t/check-data/bioaln-opt-no-gaps.right
+t/check-data/bioaln-opt-num-seq.right
 t/check-data/bioaln-opt-output.right
 t/check-data/bioaln-opt-pep2dna.right
 t/check-data/bioaln-opt-pick.right
-t/check-data/bioaln-opt-refseq.right
+t/check-data/bioaln-opt-ref-seq.right
 t/check-data/bioaln-opt-resample.right
+t/check-data/bioaln-opt-rm-col.right
 t/check-data/bioaln-opt-select-third.right
 t/check-data/bioaln-opt-slice.right
 t/check-data/bioaln-opt-uniq.right
-t/check-data/bioaln-opt-varsites.right
+t/check-data/bioaln-opt-var-sites.right
 t/check-data/bioaln-opt-window.right
 t/check-data/bioseq-feat2fasta.right
 t/check-data/bioseq-genbank2fast.right
@@ -59,28 +62,28 @@ t/check-data/bioseq-opt-composition.right
 t/check-data/bioseq-opt-delete.right
 t/check-data/bioseq-opt-length.right
 t/check-data/bioseq-opt-linearize.right
-t/check-data/bioseq-opt-nogaps.right
-t/check-data/bioseq-opt-numseq.right
+t/check-data/bioseq-opt-no-gaps.right
+t/check-data/bioseq-opt-num-seq.right
 t/check-data/bioseq-opt-pick.right
 t/check-data/bioseq-opt-reloop.right
-t/check-data/bioseq-opt-removestop.right
+t/check-data/bioseq-opt-remove-stop.right
 t/check-data/bioseq-opt-revcom.right
 t/check-data/bioseq-opt-subseq.right
 t/check-data/bioseq-opt-translate.right
 t/check-data/bioseq-pick-order-2,4.right
 t/check-data/bioseq-pick-order-2-4.right
 t/check-data/bioseq-restrict.right
-t/check-data/biotree-opt-allchildOTU.right
 t/check-data/biotree-opt-depth.right
-t/check-data/biotree-opt-distance.right
-t/check-data/biotree-opt-distanceall.right
-t/check-data/biotree-opt-labelnodes.right
+t/check-data/biotree-opt-dist-all.right
+t/check-data/biotree-opt-dist.right
+t/check-data/biotree-opt-label-nodes.right
 t/check-data/biotree-opt-lca.right
+t/check-data/biotree-opt-length-all.right
 t/check-data/biotree-opt-length.right
-t/check-data/biotree-opt-lengthall.right
 t/check-data/biotree-opt-ltt.right
-t/check-data/biotree-opt-numOTU.right
-t/check-data/biotree-opt-otu.right
+t/check-data/biotree-opt-otus-all.right
+t/check-data/biotree-opt-otus-desc.right
+t/check-data/biotree-opt-otus-num.right
 t/check-data/biotree-opt-output.right
 t/check-data/biotree-opt-rmbl.right
 t/check-data/biotree-opt-subset.right
@@ -108,10 +111,16 @@ test-files/test-bioseq.cds
 test-files/test-bioseq.gb
 test-files/test-bioseq.nuc
 test-files/test-bioseq.pep
+test-files/test-biotree-ci-short.aln
+test-files/test-biotree-ci.aln
+test-files/test-biotree-ci.dnd
+test-files/test-biotree-label.txt
+test-files/test-biotree-midpoint.dnd
+test-files/test-biotree-trait-file.dnd
+test-files/test-biotree-trait-file.txt
 test-files/test-biotree.dnd
 
 TODO.md
 META.json
 META.yml
 Makefile.PL
-SIGNATURE    Added here by Module::Build

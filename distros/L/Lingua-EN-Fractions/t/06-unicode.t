@@ -29,6 +29,10 @@ my @TESTS =
     # These use the Unicode character MINUS SIGN (U+2212)
     [   ['−5/6'],       'minus five sixths'         ],
     [   ['−⅚'],         'minus five sixths'         ],
+
+    [   ['⅑'],          'one ninth'                 ], 
+    [   ['⅟10'],        'one tenth'                 ],
+    [   ['↉'],          'zero thirds'               ], 
 );
 
 plan tests => int(@TESTS);

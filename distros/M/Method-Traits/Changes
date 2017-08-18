@@ -1,5 +1,10 @@
 Revision history for Perl extension Method-Traits
 
+0.05 2017-08-14
+    [BUGFIX]
+    - I was mistakenly assuming this would work under
+      `require`, but it didn't, ... so now it does.
+
 0.04 2017-05-08
     [BACKWARDS INCOMPATIBLE CHANGE]
     - traits now get the MOP::Method instance instead

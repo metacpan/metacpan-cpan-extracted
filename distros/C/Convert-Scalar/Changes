@@ -1,5 +1,12 @@
 Revision history for Perl extension Convert::Scalar
 
+1.12 Tue Aug 15 08:01:36 CEST 2017
+	- add read_extend, read_all, write_all function.
+        - assume c99 or higher, if not already.
+        - extend addlen is now optional and defaults to 64.
+        - use automatic prototype generation - this should *not*
+          change any existing prototypes.
+
 1.11 Thu Jun 25 16:01:36 CEST 2015
 	- fix unmagic prototype.
         - added stability canary support.

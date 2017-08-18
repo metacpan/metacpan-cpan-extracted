@@ -1,4 +1,3 @@
-requires "Archive::Tar" => "0";
 requires "Capture::Tiny" => "0.17";
 requires "ExtUtils::CBuilder" => "0";
 requires "ExtUtils::ParseXS" => "3.30";

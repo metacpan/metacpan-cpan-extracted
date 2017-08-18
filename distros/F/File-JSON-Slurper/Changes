@@ -1,5 +1,9 @@
 Revision history for Perl module File::JSON::Slurper
 
+0.03 2017-08-16 NEILB
+    - Corrected the repository URL in the doc.
+      Thanks to Ed Freyfogle (EDF) for the pull request.
+
 0.02 2016-11-26 NEILB
     - Corrected the function name in JSON::Parse, in the SEE ALSO section.
       Thanks to Ben Bullock for pointing out my error.

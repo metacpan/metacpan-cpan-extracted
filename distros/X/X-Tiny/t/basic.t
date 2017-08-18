@@ -21,7 +21,7 @@ sub get_spewage {
 package t::main;
 
 use Test::More;
-plan tests => 5;
+plan tests => 6;
 
 like(
     t::basic::get_spewage(),
@@ -40,17 +40,26 @@ SKIP: {
         skip 'Perl 5.8 doesn’t like our lazy-load of overload.pm', 3;
     }
 
+    my $spewage = sub {
+        t::basic::get_spewage('arg1', 424, [], {});
+    }->();
+
     like(
-        t::basic::get_spewage(),
+        $spewage,
         qr<t::basic::get_spewage>,
         'spew includes the function where the exception happened',
     );
 
-
     like(
-        t::basic::get_spewage(),
+        $spewage,
         qr<Bad!>,
         'spew includes the message',
+    );
+
+    like(
+        $spewage,
+        qr<arg1.+424.+ARRAY.+HASH>,
+        'arguments list is in spew',
     );
 
     my $FILE = __FILE__;

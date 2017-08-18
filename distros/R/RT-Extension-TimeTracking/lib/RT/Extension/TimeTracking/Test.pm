@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/Users/jbrandt/work/bps/rt/local/lib /Users/jbrandt/work/bps/rt/lib);
+use lib qw(/Users/jbrandt/rts/rt42/local/lib /Users/jbrandt/rts/rt42/lib);
 
 package RT::Extension::TimeTracking::Test;
 

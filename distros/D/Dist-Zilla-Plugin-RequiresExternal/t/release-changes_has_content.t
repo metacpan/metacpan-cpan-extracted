@@ -2,9 +2,8 @@
 
 BEGIN {
     unless ( $ENV{RELEASE_TESTING} ) {
-        require Test::More;
-        Test::More::plan(
-            skip_all => 'these tests are for release candidate testing' );
+        print qq{1..0 # SKIP these tests are for release candidate testing\n};
+        exit;
     }
 }
 
@@ -12,7 +11,7 @@ use Test::More tests => 2;
 
 note 'Checking Changes';
 my $changes_file = 'Changes';
-my $newver       = '1.006';
+my $newver       = '1.007';
 my $trial_token  = '-TRIAL';
 
 SKIP: {

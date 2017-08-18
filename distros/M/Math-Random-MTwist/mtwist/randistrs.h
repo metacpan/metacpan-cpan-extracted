@@ -226,40 +226,40 @@ extern int64_t		rds_liuniform(mt_state* state, int64_t lower,
 extern double		rds_uniform(mt_state* state,
 			  double lower, double upper);
 					/* (Floating) uniform distribution */
-extern double		rds_luniform(mt_state* state,
-			  double lower, double upper);
+extern NVTYPE		rds_luniform(mt_state* state,
+			  NVTYPE lower, NVTYPE upper);
 					/* (Floating) uniform distribution */
 extern double		rds_exponential(mt_state* state, double mean);
 					/* Exponential distribution */
-extern double		rds_lexponential(mt_state* state, double mean);
+extern NVTYPE		rds_lexponential(mt_state* state, NVTYPE mean);
 					/* Exponential distribution */
-extern double		rds_erlang(mt_state* state, int p, double mean);
+extern double		rds_erlang(mt_state* state, IVTYPE p, double mean);
 					/* p-Erlang distribution */
-extern double		rds_lerlang(mt_state* state, int p, double mean);
+extern NVTYPE		rds_lerlang(mt_state* state, IVTYPE p, NVTYPE mean);
 					/* p-Erlang distribution */
 extern double		rds_weibull(mt_state* state,
 			  double shape, double scale);
 					/* Weibull distribution */
-extern double		rds_lweibull(mt_state* state,
-			  double shape, double scale);
+extern NVTYPE		rds_lweibull(mt_state* state,
+			  NVTYPE shape, NVTYPE scale);
 					/* Weibull distribution */
 extern double		rds_normal(mt_state* state,
 			  double mean, double sigma);
 					/* Normal distribution */
-extern double		rds_lnormal(mt_state* state,
-			  double mean, double sigma);
+extern NVTYPE		rds_lnormal(mt_state* state,
+			  NVTYPE mean, NVTYPE sigma);
 					/* Normal distribution */
 extern double		rds_lognormal(mt_state* state,
 			  double shape, double scale);
 					/* Lognormal distribution */
-extern double		rds_llognormal(mt_state* state,
-			  double shape, double scale);
+extern NVTYPE		rds_llognormal(mt_state* state,
+			  NVTYPE shape, NVTYPE scale);
 					/* Lognormal distribution */
 extern double		rds_triangular(mt_state* state,
 			  double lower, double upper, double mode);
 					/* Triangular distribution */
-extern double		rds_ltriangular(mt_state* state,
-			  double lower, double upper, double mode);
+extern NVTYPE		rds_ltriangular(mt_state* state,
+			  NVTYPE lower, NVTYPE upper, NVTYPE mode);
 					/* Triangular distribution */
 extern size_t		rds_int_empirical(mt_state* state,
 			  rd_empirical_control* control);
@@ -282,32 +282,32 @@ extern int64_t		rd_liuniform(int64_t lower, int64_t upper);
 #endif /* INT64_MAX */
 extern double		rd_uniform(double lower, double upper);
 					/* (Floating) uniform distribution */
-extern double		rd_luniform(double lower, double upper);
+extern NVTYPE		rd_luniform(NVTYPE lower, NVTYPE upper);
 					/* (Floating) uniform distribution */
 extern double		rd_exponential(double mean);
 					/* Exponential distribution */
-extern double		rd_lexponential(double mean);
+extern NVTYPE		rd_lexponential(NVTYPE mean);
 					/* Exponential distribution */
-extern double		rd_erlang(int p, double mean);
+extern double		rd_erlang(IVTYPE p, double mean);
 					/* p-Erlang distribution */
-extern double		rd_lerlang(int p, double mean);
+extern NVTYPE		rd_lerlang(IVTYPE p, NVTYPE mean);
 					/* p-Erlang distribution */
 extern double		rd_weibull(double shape, double scale);
 					/* Weibull distribution */
-extern double		rd_lweibull(double shape, double scale);
+extern NVTYPE		rd_lweibull(NVTYPE shape, NVTYPE scale);
 					/* Weibull distribution */
 extern double		rd_normal(double mean, double sigma);
 					/* Normal distribution */
-extern double		rd_lnormal(double mean, double sigma);
+extern NVTYPE		rd_lnormal(NVTYPE mean, NVTYPE sigma);
 					/* Normal distribution */
 extern double		rd_lognormal(double shape, double scale);
 					/* Lognormal distribution */
-extern double		rd_llognormal(double shape, double scale);
+extern NVTYPE		rd_llognormal(NVTYPE shape, NVTYPE scale);
 					/* Lognormal distribution */
 extern double		rd_triangular(double lower, double upper, double mode);
 					/* Triangular distribution */
-extern double		rd_ltriangular(double lower, double upper,
-			  double mode);	/* Triangular distribution */
+extern NVTYPE		rd_ltriangular(NVTYPE lower, NVTYPE upper,
+			  NVTYPE mode);	/* Triangular distribution */
 extern rd_empirical_control*
 			rd_empirical_setup(size_t n_probs,
 			  const double* probs, const double* values);
@@ -379,7 +379,7 @@ class mt_distribution : public mt_prng
 			    {
 			    return rds_uniform(&state, lower, upper);
 			    }
-	double		luniform(double lower, double upper)
+	NVTYPE		luniform(NVTYPE lower, NVTYPE upper)
 					/* Uniform distribution */
 			    {
 			    return rds_luniform(&state, lower, upper);
@@ -389,17 +389,17 @@ class mt_distribution : public mt_prng
 			    {
 			    return rds_exponential(&state, mean);
 			    }
-	double		lexponential(double mean)
+	NVTYPE		lexponential(NVTYPE mean)
 					/* Exponential distribution */
 			    {
 			    return rds_lexponential(&state, mean);
 			    }
-	double		erlang(int p, double mean)
+	double		erlang(IVTYPE p, doulbe mean)
 					/* p-Erlang distribution */
 			    {
 			    return rds_erlang(&state, p, mean);
 			    }
-	double		lerlang(int p, double mean)
+	NVTYPE		lerlang(IVTYPE p, NVTYPE mean)
 					/* p-Erlang distribution */
 			    {
 			    return rds_lerlang(&state, p, mean);
@@ -409,7 +409,7 @@ class mt_distribution : public mt_prng
 			    {
 			    return rds_weibull(&state, shape, scale);
 			    }
-	double		lweibull(double shape, double scale)
+	NVTYPE		lweibull(NVTYPE shape, NVTYPE scale)
 					/* Weibull distribution */
 			    {
 			    return rds_lweibull(&state, shape, scale);
@@ -419,7 +419,7 @@ class mt_distribution : public mt_prng
 			    {
 			    return rds_normal(&state, mean, sigma);
 			    }
-	double		lnormal(double mean, double sigma)
+	NVTYPE		lnormal(NVTYPE mean, NVTYPE sigma)
 					/* Normal distribution */
 			    {
 			    return rds_lnormal(&state, mean, sigma);
@@ -429,7 +429,7 @@ class mt_distribution : public mt_prng
 			    {
 			    return rds_lognormal(&state, shape, scale);
 			    }
-	double		llognormal(double shape, double scale)
+	NVTYPE		llognormal(NVTYPE shape, NVTYPE scale)
 					/* Lognormal distribution */
 			    {
 			    return rds_llognormal(&state, shape, scale);
@@ -439,7 +439,7 @@ class mt_distribution : public mt_prng
 			    {
 			    return rds_triangular(&state, lower, upper, mode);
 			    }
-	double		ltriangular(double lower, double upper, double mode)
+	NVTYPE		ltriangular(NVTYPE lower, NVTYPE upper, NVTYPE mode)
 					/* Triangular distribution */
 			    {
 			    return rds_ltriangular(&state, lower, upper, mode);

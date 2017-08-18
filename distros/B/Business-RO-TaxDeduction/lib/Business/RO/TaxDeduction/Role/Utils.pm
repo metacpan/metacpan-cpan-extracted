@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction::Role::Utils;
-$Business::RO::TaxDeduction::Role::Utils::VERSION = '0.010';
+$Business::RO::TaxDeduction::Role::Utils::VERSION = '0.011';
 # ABSTRACT: A utility role
 
 use Moo::Role;
@@ -45,7 +45,7 @@ Business::RO::TaxDeduction::Role::Utils - A utility role
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

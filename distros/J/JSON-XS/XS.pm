@@ -42,8 +42,8 @@ JSON::XS are installed, then JSON will fall back on JSON::XS (this can be
 overridden) with no overhead due to emulation (by inheriting constructor
 and methods). If JSON::XS is not available, it will fall back to the
 compatible JSON::PP module as backend, so using JSON instead of JSON::XS
-gives you a portable JSON API that can be fast when you need and doesn't
-require a C compiler when that is a problem.
+gives you a portable JSON API that can be fast when you need it and
+doesn't require a C compiler when that is a problem.
 
 As this is the n-th-something JSON module on CPAN, what was the reason
 to write yet another JSON module? While it seems there are many JSON
@@ -103,7 +103,7 @@ package JSON::XS;
 
 use common::sense;
 
-our $VERSION = 3.03;
+our $VERSION = 3.04;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_json decode_json);
@@ -1698,14 +1698,11 @@ handle non-reference values, in preparation for the day when the default
 will change.
 
 
-=head1 THREADS
+=head1 (I-)THREADS
 
-This module is I<not> guaranteed to be thread safe and there are no
-plans to change this until Perl gets thread support (as opposed to the
-horribly slow so-called "threads" which are simply slow and bloated
-process simulations - use fork, it's I<much> faster, cheaper, better).
-
-(It might actually work, but you have been warned).
+This module is I<not> guaranteed to be ithread (or MULTIPLICITY-) safe
+and there are no plans to change this. Note that perl's builtin so-called
+theeads/ithreads are officially deprecated and should not be used.
 
 
 =head1 THE PERILS OF SETLOCALE

@@ -4,7 +4,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 # VERSION
 
-version 2.65
+version 2.66
 
 # SYNOPSIS
 
@@ -409,6 +409,7 @@ Dave Rolsky <autarch@urth.org>
 - Kerin Millar <kfm@plushkava.net>
 - Kivanc Yazan <kivancyazan@gmail.com>
 - Konrad Bucheli <kb@open.ch>
+- Michael Schout <mschout@gkg.net>
 - Olaf Alders <olaf@wundersolutions.com>
 - Olivier Mengué <dolmen@cpan.org>
 - Rohan Carly <se456@rohan.id.au>

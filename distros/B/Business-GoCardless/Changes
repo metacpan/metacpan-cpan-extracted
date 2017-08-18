@@ -1,10 +1,17 @@
 Revision history for Business-GoCardless
 
-0.21     2017-06-09
-        - Fix add missing module to MANIFESt
+0.22     2017-08-14
+        - Don't send empty params to GoCardless for user information
+          to prevent incorrect assumptions about the user on the GoCardless
+          side
+        - print out request and response data in Client.pm if GOCARDLESS_DEBUG
+          ENV variable is set
+
+0.21     2017-06-10
+        - Fix add missing module to MANIFEST
 
 0.20     2017-06-09
-        - Fix add missing module to MANIFESt
+        - Fix add missing module to MANIFEST
 
 0.19     2017-06-08
         - Fix documentation typos

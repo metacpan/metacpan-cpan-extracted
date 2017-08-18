@@ -1,0 +1,6 @@
+Revision history for Perl extension DR::DateTime.
+
+0.01  Wed Aug 16 17:59:15 2017
+	- original version; created by h2xs 1.23 with options
+		-X DR::DateTime
+

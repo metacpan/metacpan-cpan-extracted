@@ -13,7 +13,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util 'weaken';
 
 sub all_text { _text(_nodes(shift->tree), 1) }
 
@@ -177,6 +177,8 @@ sub val {
     ->grep(sub { !$_->ancestors('optgroup[disabled]')->size })->map('val');
   return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
+
+sub with_roles { shift->Mojo::Base::with_roles(@_) }
 
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
@@ -945,6 +947,14 @@ if none could be found.
 
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;
+
+=head2 with_roles
+
+  my $new_class = Mojo::DOM->with_roles('Mojo::DOM::Role::One');
+  my $new_class = Mojo::DOM->with_roles('+One', '+Two');
+  $dom          = $dom->with_roles('+One', '+Two');
+
+Alias for L<Mojo::Base/"with_roles">.
 
 =head2 wrap
 

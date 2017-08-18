@@ -310,7 +310,7 @@ mt_state		mt_default_state;
  */
 double			mt_32_to_double;
 					/* Multiplier to convert long to dbl */
-double			mt_64_to_double;
+NVTYPE			mt_64_to_double;
 					/* Mult'r to cvt long long to dbl */
 
 /*

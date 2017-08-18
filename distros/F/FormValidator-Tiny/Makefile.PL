@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "FormValidator::Tiny",
   "PREREQ_PM" => {
     "Exporter" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.28",
     "Scalar::Util" => 0,
     "experimental" => 0,
     "strict" => 0,
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.28",
   "Scalar::Util" => 0,
   "Test2::V0" => 0,
   "experimental" => 0,

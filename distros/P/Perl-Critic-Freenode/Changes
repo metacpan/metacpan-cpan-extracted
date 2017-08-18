@@ -1,3 +1,14 @@
+0.024     2017-08-16 22:39:53 EDT
+  - Make PackageMatchesFilename more robust against infinite loops
+
+0.023     2017-08-16 22:22:40 EDT
+  - Fix issue where PackageMatchesFilename policy would loop infinitely
+
+0.022     2017-08-16 22:17:38 EDT
+  - Also consider -W a violation of WarningsSwitch policy
+  - Fix false positive in DollarAB policy where $a or $b is within another block
+  - Add PackageMatchesFilename policy
+
 0.021     2017-06-03 19:49:16 EDT
   - Be more lenient when trying to detect postderef for DeprecatedFeatures autoderef violations
 

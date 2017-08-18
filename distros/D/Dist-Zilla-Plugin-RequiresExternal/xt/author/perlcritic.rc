@@ -29,3 +29,7 @@ equivalent_modules = Modern::Perl
 
 [TestingAndDebugging::RequireUseWarnings]
 equivalent_modules = Modern::Perl
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say

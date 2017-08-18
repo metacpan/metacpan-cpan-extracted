@@ -1,7 +1,7 @@
 my $testnum = 0;
 
 my $compile_ok = sub {
-	my($builder, $hdrs, $code, $link_p) = @_;
+	my($builder, $hdrs, $code, $link_ctl) = @_;
 	use IO::File;
 	my $conftest_base = $builder->localize_file_path(
 				"lib/Time/UTC/conftest$testnum");
@@ -22,26 +22,30 @@ my $compile_ok = sub {
 		my $obj_file = $builder->compile_c($conftest_file,
 					no_feature_defs => 1);
 		my $cbuilder = $builder->cbuilder;
-		if($link_p) {
+		if($link_ctl) {
 			$builder->add_to_cleanup(
 				$cbuilder->exe_file($obj_file));
 			$cbuilder->link_executable(
 				objects => $obj_file,
-				extra_linker_flags =>
-					$builder->extra_linker_flags || [],
+				extra_linker_flags => [
+					@{$builder->extra_linker_flags || []},
+					(exists($link_ctl->{extra}) ?
+						@{$link_ctl->{extra}} : ()),
+				],
 			);
 		}
 		1;
-	};
+	} || 0;
 };
 
 sub {
 	my($builder) = @_;
 	my %defs;
+	my @libs;
 	$compile_ok->($builder, ["stdio.h"], q{
 		char buf[5];
 		return sprintf(buf, "%d", 0) + 1;
-	}, 1) or die "probe system failed: can't compile innocuous program";
+	}, {}) or die "probe system failed: can't compile innocuous program";
 	$compile_ok->($builder, [], q{
 		struct foo { int bar; } baz;
 		baz.quux = 5;
@@ -50,57 +54,73 @@ sub {
 	$compile_ok->($builder, [], q{
 		extern int HLBNzorFAJMYbPEjiEKkMFBaKqZMkqq(void);
 		return HLBNzorFAJMYbPEjiEKkMFBaKqZMkqq() + 1;
-	}, 1) and die "probe system failed: non-existent function usable";
-	if($compile_ok->($builder, ["sys/timex.h"], q{
+	}, {}) and die "probe system failed: non-existent function usable";
+	$defs{QHAVE_NTP_ADJTIME} = $compile_ok->($builder, ["sys/timex.h"], q{
 		struct timex tx;
 		int st;
 		st = ntp_adjtime(&tx);
 		return st;
-	}, 1)) {
-		$defs{QHAVE_NTP_ADJTIME} = 1;
-		$compile_ok->($builder, ["sys/timex.h"], q{
+	}, {});
+	if($defs{QHAVE_NTP_ADJTIME}) {
+		$defs{QHAVE_STRUCT_TIMEX_TIME} = $compile_ok->($builder,
+				["sys/timex.h"], q{
 			struct timex tx;
 			tx.time.tv_sec = 0;
 			return tx.time.tv_sec;
-		}, 0) and $defs{QHAVE_STRUCT_TIMEX_TIME} = 1;
-		$compile_ok->($builder, ["sys/timex.h"], q{
+		}, 0);
+		$defs{QHAVE_STRUCT_TIMEX_TIME_TV_NSEC} = $compile_ok->($builder,
+				["sys/timex.h"], q{
 			struct timex tx;
 			tx.time.tv_nsec = 0;
 			return tx.time.tv_nsec;
-		}, 0) and $defs{QHAVE_STRUCT_TIMEX_TIME_TV_NSEC} = 1;
-		$compile_ok->($builder, ["sys/timex.h"], q{
+		}, 0);
+		$defs{QHAVE_STRUCT_TIMEX_TIME_STATE} = $compile_ok->($builder,
+				["sys/timex.h"], q{
 			struct timex tx;
 			tx.time_state = 0;
 			return tx.time_state;
-		}, 0) and $defs{QHAVE_STRUCT_TIMEX_TIME_STATE} = 1;
-		$compile_ok->($builder, ["sys/timex.h"], q{
+		}, 0);
+		$defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_TV_NSEC} = $compile_ok->(
+				$builder, ["sys/timex.h"], q{
 			struct ntptimeval ntv;
 			ntv.time.tv_nsec = 0;
 			return ntv.time.tv_nsec;
-		}, 0) and $defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_TV_NSEC} = 1;
-		$compile_ok->($builder, ["sys/timex.h"], q{
+		}, 0);
+		$defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE} = $compile_ok->(
+				$builder, ["sys/timex.h"], q{
 			struct ntptimeval ntv;
 			ntv.time_state = 0;
 			return ntv.time_state;
-		}, 0) and $defs{QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE} = 1;
+		}, 0);
 	}
-	$compile_ok->($builder, ["time.h"], q{
+	$defs{QHAVE_CLOCK_GETTIME} = $compile_ok->($builder, ["time.h"], q{
 		struct timespec ts;
 		int st;
 		st = clock_gettime(0, &ts);
 		return st;
-	}, 1) and $defs{QHAVE_CLOCK_GETTIME} = 1;
-	$compile_ok->($builder, ["windows.h"], q{
+	}, {});
+	if(!$defs{QHAVE_CLOCK_GETTIME} &&
+			$compile_ok->($builder, ["time.h"], q{
+				struct timespec ts;
+				int st;
+				st = clock_gettime(0, &ts);
+				return st;
+			}, {extra=>["-lrt"]})) {
+		push @libs, "-lrt";
+		$defs{QHAVE_CLOCK_GETTIME} = 1;
+	}
+	$defs{QHAVE_GETSYSTEMTIMEASFILETIME} = $compile_ok->($builder,
+			["windows.h"], q{
 		FILETIME ft;
 		GetSystemTimeAsFileTime(&ft);
 		ft.dwLowDateTime = ft.dwHighDateTime;
 		return ft.dwLowDateTime;
-	}, 1) and $defs{QHAVE_GETSYSTEMTIMEASFILETIME} = 1;
-	$compile_ok->($builder, ["sys/time.h"], q{
+	}, {});
+	$defs{QHAVE_GETTIMEOFDAY} = $compile_ok->($builder, ["sys/time.h"], q{
 		struct timeval tv;
 		int st;
 		st = gettimeofday(&tv, NULL);
 		return st;
-	}, 1) and $defs{QHAVE_GETTIMEOFDAY} = 1;
-	return \%defs;
+	}, {});
+	return { defs => \%defs, libs => \@libs };
 }

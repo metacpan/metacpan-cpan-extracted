@@ -5,8 +5,13 @@ use warnings;
 use 5.008001;
 use Role::Tiny;
 
-# Apparently no OS specific operations need to be done
-# on OS X / darwin
+requires 'libs';
+requires 'rpath';
+
+around libs => sub {
+  my($orig, $self) = @_;
+  join(' ', (map { "-Wl,-rpath,$_" } $self->rpath), $orig->($self));
+};
 
 1;
 
@@ -22,7 +27,7 @@ Alien::Role::Dino::darwin
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 AUTHOR
 

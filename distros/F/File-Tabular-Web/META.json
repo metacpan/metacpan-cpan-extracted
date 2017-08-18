@@ -4,7 +4,7 @@
       "Laurent Dami <laurent.dami@justice.ge.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "perl_5"
    ],
@@ -49,7 +49,7 @@
    "provides" : {
       "File::Tabular::Web" : {
          "file" : "lib/File/Tabular/Web.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "File::Tabular::Web::Attachments" : {
          "file" : "lib/File/Tabular/Web/Attachments.pm"
@@ -67,5 +67,5 @@
          "url" : "https://github.com/damil/File-Tabular-Web"
       }
    },
-   "version" : "0.22"
+   "version" : "0.23"
 }

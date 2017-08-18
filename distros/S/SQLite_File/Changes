@@ -1,4 +1,6 @@
 Revision history for Perl module SQLite_File
+0.1003 2017-08-10
+    - Fix perl version in Build.PL
 0.1002 2017-08-12
     - Add EXLOCK=>0 to tempfile create in 003
       (per Slaven rec)

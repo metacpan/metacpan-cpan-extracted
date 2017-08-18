@@ -1,5 +1,27 @@
 Revision history for Alien-Build
 
+0.99      2017-08-17 12:53:55 -0400
+  - Fix bug in Test::Alien xs_ok would crash with multiple alines with xs_load methods.
+
+0.98_01   2017-08-16 17:50:17 -0400
+  - Added Alien::Build::Plugin::Build::CMake (which was briefly in its own distribution).
+
+0.97      2017-08-16 17:36:36 -0400
+  - Production release identical to 0.96_01
+
+0.96_01   2017-08-16 11:30:50 -0400
+  - Added Alien::Build::Plugin::Build::Make (which was briefly in its own distribution).
+  - Removing accidental dependency on Archive::Tar
+    (it should be optional, though it is available as part of the Perl core on 5.10+)
+  - Fixed bug where Test::Alien xs_ok could throw an exception instead
+    of failing gracefully.
+  - Test::Alien alien_ok does not crash when undef is passed to it
+  - C++ support in Test::Alien xs_ok is deprecated and will be removed on or after
+    31 August 2017.  This feature was experimental.  This capability will be developed
+    in the separate distribution Test-Alien-CPP
+  - remove Test::Alien::CanCompileCpp.  This module will come bundled with
+    Test-Alien-CPP instead.
+
 0.95      2017-08-11 09:47:57 -0400
   - Improve extractor logic for zip files
 

@@ -1,5 +1,9 @@
 Revision history for RT-Extension-TimeTracking
 
+0.09 2017-08-17
+ - Hide user time worked for RT 4.4 since it is now core
+ - Remove r modifier from regex to allow running under perl 5.10.1
+
 0.08 2016-03-21
  - Add github URL and sign
 

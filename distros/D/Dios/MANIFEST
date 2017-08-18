@@ -63,5 +63,6 @@ t/types_basic_validator.t
 t/subtype_import.t
 t/tlib/Types.pm
 t/subtype_in_class.t
+t/has_misc.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

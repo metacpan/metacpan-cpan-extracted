@@ -17,7 +17,7 @@ package LinkedList {
 
     has '_head';
     has '_tail';
-    has '_count' => sub { 0 };
+    has '_count' => ( default => sub { 0 } );
 
     # private lvalue accessors
 
@@ -27,9 +27,9 @@ package LinkedList {
 
     # public read only accessors
 
-    sub head  : ro('_head');
-    sub tail  : ro('_tail');
-    sub count : ro('_count');
+    sub head  : ro( _head );
+    sub tail  : ro( _tail );
+    sub count : ro( _count );
 
     # methods
 
@@ -113,12 +113,12 @@ package LinkedListNode {
 
     # public r/w API
 
-    sub get_previous : ro('_prev');
-    sub get_next     : ro('_next');
+    sub get_previous : ro( _prev );
+    sub get_next     : ro( _next );
     sub get_value    : ro;
 
-    sub set_previous : wo('_prev');
-    sub set_next     : wo('_next');
+    sub set_previous : wo( _prev );
+    sub set_next     : wo( _next );
     sub set_value    : wo;
 
     sub detach {

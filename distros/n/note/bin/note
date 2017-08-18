@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # note - console notes management with database and encryption support.
-# Copyright (C) 1999-2015 T.v.Dein   (see README for details!)
+# Copyright (C) 1999-2016 T.v.Dein   (see README for details!)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -144,7 +144,7 @@ $CONF 		= File::Spec->catfile($ENV{HOME}, ".noterc");
 $USER 		= getlogin || getpwuid($<);
 chomp $USER;
 $TOPIC 		= 1;
-$version 	= "1.3.22";
+$version 	= "1.3.24";
 $CurDepth 	= 1;		# the current depth inside the topic "directory" structure...
 $maxlen         = "auto";
 $timelen        = 22;
@@ -188,8 +188,8 @@ $timelen        = 22;
                       'whiteI'        => '7;37',
                       'white_black'   => '40;37;01',
                       'bold'          => ';01',
-		      'hide'          => '44;34'
-             );
+                      'hide'          => '44;34'
+         );
 
 #
 # process command line args
@@ -206,26 +206,26 @@ elsif ($#ARGV == 0 && $ARGV[0] eq "-") {
 else {
   Getopt::Long::Configure( qw(no_ignore_case));
   GetOptions (
-	      "interactive|i!"       => \$opt_i, # no arg
-	      "config|c=s"	     => \$opt_c, # string,  required
-	      "raw|r!"	             => \$opt_r, # no arg
-	      "edit|e=i"	     => \$opt_e, # integer, required
-	      "delete|d=s"	     => \$opt_d, # integer, required
-	      "search|s=s"	     => \$opt_s, # string,  required
-	      "tree|topic|t!"	     => \$opt_t, # no arg
-	      "longtopic|T!"	     => \$opt_T, # no arg
-	      "list|l:s"	     => \$opt_l, # string,  optional
-	      "longlist|L:s"	     => \$opt_L, # string,  optional
-	      "dump|Dump|D:s"       => \$opt_D, # string,  optional
-	      "import|Import|I:s"    => \$opt_I, # string,  optional
-	      "overwrite|o!"	     => \$opt_o, # no arg
-	      "help|h|?!"	     => \$opt_h, # no arg
-	      "version|v!"	     => \$opt_v, # no arg
-	      "encrypt=s"            => \$opt_enc, # string, required
-	     );
+              "interactive|i!"       => \$opt_i, # no arg
+              "config|c=s"	     => \$opt_c, # string,  required
+              "raw|r!"	             => \$opt_r, # no arg
+              "edit|e=i"	     => \$opt_e, # integer, required
+              "delete|d=s"	     => \$opt_d, # integer, required
+              "search|s=s"	     => \$opt_s, # string,  required
+              "tree|topic|t!"	     => \$opt_t, # no arg
+              "longtopic|T!"	     => \$opt_T, # no arg
+              "list|l:s"	     => \$opt_l, # string,  optional
+              "longlist|L:s"	     => \$opt_L, # string,  optional
+              "dump|Dump|D:s"       => \$opt_D, # string,  optional
+              "import|Import|I:s"    => \$opt_I, # string,  optional
+              "overwrite|o!"	     => \$opt_o, # no arg
+              "help|h|?!"	     => \$opt_h, # no arg
+              "version|v!"	     => \$opt_v, # no arg
+              "encrypt=s"            => \$opt_enc, # string, required
+             );
   $opt_n = shift;		# after that @ARGV contains eventually
-				# a note-number
-				# $opt_ is a single dash, in case of existence!
+  # a note-number
+  # $opt_ is a single dash, in case of existence!
   #
   # determine mode
   #
@@ -269,11 +269,11 @@ else {
     $mode = "dump";
     if (!$opt_) {
       if ($opt_D ne "") {
-	$dump_file = $opt_D;
+        $dump_file = $opt_D;
       }
       else {
-	$dump_file = "note.dump.$$";
-	print "no dumpfile specified, using $dump_file.\n";
+        $dump_file = "note.dump.$$";
+        print "no dumpfile specified, using $dump_file.\n";
       }
     }
     else {
@@ -284,11 +284,11 @@ else {
     $mode = "import";
     if (!$opt_) {
       if ($opt_I ne "") {
-	$dump_file = $opt_I;
+        $dump_file = $opt_I;
       }
       else {
-	print "Import-error! No dump_file specified!\n";
-	exit(1);
+        print "Import-error! No dump_file specified!\n";
+        exit(1);
       }
     }
     else {
@@ -434,7 +434,7 @@ if ($conf{useencryption} && $NOTEDB::crypt_supported == 1) {
       my $cipher = new Crypt::CBC($key, $conf{cryptmethod});
       # decrypt the dbpasswd, if it's encrypted!
       $driver{mysql}->{dbpasswd}  =
-	$cipher->decrypt(unpack("u", $driver{mysql}->{dbpasswd})) if($driver{mysql}->{encrypt_passwd});
+        $cipher->decrypt(unpack("u", $driver{mysql}->{dbpasswd})) if($driver{mysql}->{encrypt_passwd});
       &load_driver();
     };
     die "Could not connect to db: $@!\n" if($@);
@@ -480,7 +480,7 @@ else {
 
 # do we use the db cache?
 if ($conf{cache}) {
-    $db->use_cache();
+  $db->use_cache();
 }
 
 
@@ -1416,7 +1416,7 @@ sub format {
     else {
       $note =~ s/\*\*([^\*]{2,})\*\*/$BN$1$_BN/g;
       $note =~ s/__([^_]{2,})__/$UN$1$_UN/g;
-      $note =~ s/{{([^}]{2,})}}/$IN$1$_IN/g;
+      $note =~ s/\{\{([^}]{2,})\}\}/$IN$1$_IN/g;
       $note =~ s#//([^/]{2,})//#<hide>$1</hide>#g;
     }
 

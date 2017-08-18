@@ -9,7 +9,7 @@ require DynaLoader;
 require Exporter;
 use vars qw(@ISA $VERSION @EXPORT_OK);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 @ISA = qw(Inline DynaLoader Exporter);
 @EXPORT_OK = qw(rb_eval
 		rb_call_function
@@ -28,7 +28,22 @@ sub import {
 
 sub dl_load_flags { 0x01 }
 Inline::Ruby->bootstrap($VERSION);
-_eval_support_code();
+
+use constant _GET_NAMESPACE => <<EOF;
+Proc.new {
+    ns = { 'classes' => {}, 'modules' => {}, 'functions' => {} }
+    ObjectSpace.each_object(Class) do |x|
+        ns['classes'][x.name] = 1
+    end
+    ObjectSpace.each_object(Module) do |x|
+        ns['modules'][x.name] = 1
+    end
+    Object.private_instance_methods.each do |x|
+        ns['functions'][x] = 1
+    end
+    ns
+}.call
+EOF
 
 #==============================================================================
 # Register Ruby.pm as a valid Inline language
@@ -232,47 +247,74 @@ sub build {
     $o->{ILSM}{code} = $o->filter(@{$o->{ILSM}{FILTERS}});
 
     # Get the namespace before & after evaluating the code:
-    my (%pre, %post, %n);
-    rb_iter(undef, sub {my ($type, $name) = @_; $pre{$type}{$name}++})
-      ->inline_ruby_class_grokker;
+    my $pre = rb_eval(_GET_NAMESPACE);
     rb_eval($o->{ILSM}{code});
-    rb_iter(undef, sub {my ($type, $name) = @_; $post{$type}{$name}++})
-      ->inline_ruby_class_grokker;
+    my $post = rb_eval(_GET_NAMESPACE);
 
     # Select those things which sprang into existence after running the code:
     my @skip_clas = qw(PerlException PerlProc);
-    my @skip_func = qw(inline_ruby_class_grokker);
-    delete @{ $post{classes} }{@skip_clas, keys(%{$pre{classes}})};
-    delete @{ $post{functions} }{@skip_func, keys(%{$pre{functions}})};
-    delete @{ $post{modules} }{
-        keys(%{$pre{modules}}), keys(%{$post{classes}})
+    my @skip_func = qw();
+    delete @{ $post->{classes} }{@skip_clas, keys(%{$pre->{classes}})};
+    delete @{ $post->{functions} }{@skip_func, keys(%{$pre->{functions}})};
+    delete @{ $post->{modules} }{
+        keys(%{$pre->{modules}}), keys(%{$post->{classes}})
     };
 
     # Filter the results according to the {bindto} and {REGEXP} selections:
     for my $type (qw(classes modules functions)) {
 	if ($o->{ILSM}{bindto}) {
-	    delete $post{$type}
+	    delete $post->{$type}
 	      unless grep { $_ eq $type } @{$o->{ILSM}{bindto}};
 	}
 	if ($o->{ILSM}{regexp}) {
-	    for my $k (keys %{$post{$type}}) {
-		delete $post{$type}{$k} unless $k =~ $o->{ILSM}{regexp};
+	    for my $k (keys %{$post->{$type}}) {
+		delete $post->{$type}{$k} unless $k =~ $o->{ILSM}{regexp};
 	    }
 	}
     }
 
-    # Get more details about the classes and modules:
-    rb_iter(undef, sub { $n{$_[0]} = $_[1] })
-      ->inline_ruby_class_grokker(keys %{$post{classes}})
-	if (%{$post{classes} || {}});
-    rb_iter(undef, sub { $n{$_[0]} = $_[1] })
-      ->inline_ruby_class_grokker(keys %{$post{modules}})
-	if (%{$post{modules} || {}});
+    # Get more details about the classes and modules.
+    # FIXME! Is the quoting correct?
+    my $classes_arg = join ', ', map { quotemeta $_ } keys %{$post->{classes}};
+    my $c = rb_eval(<<EOF);
+Proc.new {
+    ns = {}
+    classes = [$classes_arg]
+    classes.each do |k|
+        ns[k] = {}
+        begin
+            ns[k]['methods'] = eval "#{k}.methods"
+            ns[k]['imethods'] = eval "#{k}.instance_methods"
+        rescue Exception
+            p "Exception: " + \$!
+        end
+    end
+    ns
+}.call
+EOF
+
+    my $modules_arg = join ', ', map { quotemeta $_ } keys %{$post->{modules}};
+    my $m = rb_eval(<<EOF);
+Proc.new {
+    ns = {}
+    classes = [$modules_arg]
+    classes.each do |k|
+        ns[k] = {}
+        begin
+            ns[k]['methods'] = eval "#{k}.methods"
+            ns[k]['imethods'] = eval "#{k}.instance_methods"
+        rescue Exception
+            p "Exception: " + \$!
+        end
+    end
+    ns
+}.call
+EOF
 
     # And the namespace is:
     my %namespace = (
-	classes		=> \%n,
-	functions	=> [keys %{$post{functions} || {}}],
+	classes		=> { %$c, %$m },
+	functions	=> [keys %{$post->{functions} || {}}],
     );
 
     if ((! @{$namespace{functions}})

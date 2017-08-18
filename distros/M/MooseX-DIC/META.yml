@@ -16,13 +16,16 @@ name: MooseX-DIC
 requires:
   File::Find: '0'
   File::Slurp: '0'
+  File::Spec: '0'
+  Log::Log4perl: '0'
   Moose: '0'
   MooseX::Role::Parameterized: '0'
   Throwable: '0'
   Try::Tiny: '0'
+  YAML::XS: '0'
   aliased: '0'
 resources:
   bugtracker: https://github.com/loic-prieto/moosex-dic/issues
   repository: https://github.com/loic-prieto/moosex-dic
-version: 0.1.0
+version: 0.2.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -4,6 +4,7 @@ COPYING
 Changes
 Makefile.PL
 DBI.pm
+DBI/Slave.pm
 t/00_load.t
 t/01_fake_mysql.t
 t/02_sql_lite.t

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Google-SafeBrowsing4.t
+lib/Net/Google/SafeBrowsing4.pm
+lib/Net/Google/SafeBrowsing4/URI.pm
+lib/Net/Google/SafeBrowsing4/Storage.pm
+lib/Net/Google/SafeBrowsing4/Storage/File.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

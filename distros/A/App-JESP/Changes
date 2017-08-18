@@ -1,9 +1,51 @@
 ==================================================
-Changes from 2016-07-20 00:00:00 +0000 to present.
+Changes from 2016-08-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2017-07-20 15:49:22 +0000
+version 0.013 at 2017-08-17 16:16:11 +0000
+------------------------------------------
+
+  Change: 1a56930d246eb190cd3140ca3478c892c25fb5bf
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-08-17 17:10:22 +0000
+
+    Colors on deploy 
+
+  Change: eca63717e214e6bfa75238b3ca1000e90ac29d01
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-08-17 14:21:36 +0000
+
+    Added colors to status 
+
+------------------------------------------
+version 0.012 at 2017-08-16 14:03:01 +0000
+------------------------------------------
+
+  Change: dc181a6814e54b7f06bc8df20e2611ca37afca08
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-08-16 15:03:01 +0000
+
+    Restored compatibility with perl 5.8 
+
+------------------------------------------
+version 0.011 at 2017-08-15 11:10:39 +0000
+------------------------------------------
+
+  Change: 088c2b52b1928fd8a4da624161da582804469ba3
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-08-15 12:10:39 +0000
+
+    Updated README 
+
+  Change: a4bfc2fc79fcedefa9f10ee2194571c7dedbd65e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-08-15 11:39:14 +0000
+
+    Implement script running 
+
+------------------------------------------
+version 0.010 at 2017-07-20 15:47:47 +0000
 ------------------------------------------
 
   Change: e4cd5ea4b4db2f8e4cf5936b41bb5b4f83fa95af

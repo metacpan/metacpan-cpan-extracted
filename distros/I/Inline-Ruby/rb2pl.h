@@ -32,7 +32,7 @@
  * - https://www.ruby-forum.com/topic/215406
  * */
 #ifndef STR2CSTR
-#define STR2CSTR(x) StringValuePtr(x)
+#define STR2CSTR(x) ({VALUE _v = (VALUE) x; StringValuePtr(_v); })
 #endif
 /*
  * See:
@@ -55,7 +55,7 @@
  * To save a little time, I check the calling context and don't convert
  * the arguments if I'm in void context, flatten lists in list context,
  * and return only one element in scalar context.
- * 
+ *
  * If this turns out to be a bad idea, it's easy enough to turn off.
  *==========================================================================*/
 #define	CHECK_CONTEXT
@@ -64,7 +64,7 @@
  * If FLATTEN_ARRAYS is turned on, then a return value which is a single array
  * is flattened onto the Perl return list (if the sub is called in array
  * context). This has no effect unless CHECK_CONTEXT is also defined.
- * 
+ *
  * NOTE: if enabled, you can't tell the difference between a return value of
  * "3" and ["3"]. In Ruby you can only return one value from a subroutine, so
  * "return 1, 2, 3" is identical to "return [1, 2, 3]" -- the Ruby compiler

@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::json;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 # ABSTRACT: JSON read/write support for Yertl
 
 use ETL::Yertl 'Class';
@@ -75,6 +75,11 @@ has format_module => (
 my %FORMAT_SUB = (
 
     'JSON::XS' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            state $json = JSON::XS->new->relaxed;
+            return $json->decode( $msg );
+        },
         write => sub {
             my $self = shift;
             state $json = JSON::XS->new->canonical->pretty->allow_nonref;
@@ -88,6 +93,11 @@ my %FORMAT_SUB = (
     },
 
     'JSON::PP' => {
+        decode => sub {
+            my ( $self, $msg ) = @_;
+            state $json = JSON::PP->new->relaxed;
+            return $json->decode( $msg );
+        },
         write => sub {
             my $self = shift;
             state $json = JSON::PP->new->canonical->pretty->indent_length(3)->allow_nonref;
@@ -140,6 +150,20 @@ sub read {
     return $FORMAT_SUB{ $self->format_module }{read}->( $self );
 }
 
+#pod =method decode
+#pod
+#pod     my $msg = $fmt->decode( $bytes );
+#pod
+#pod Decode the given bytes into the given message. The bytes must contain
+#pod exactly one message to be decoded.
+#pod
+#pod =cut
+
+sub decode {
+    my ( $self, $bytes ) = @_;
+    return $FORMAT_SUB{ $self->format_module }{decode}->( $self, $bytes );
+}
+
 1;
 
 __END__
@@ -152,7 +176,7 @@ ETL::Yertl::Format::json - JSON read/write support for Yertl
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -183,6 +207,13 @@ Convert the given C<DOCUMENTS> to JSON. Returns a JSON string.
 =head2 read()
 
 Read a JSON string from L<input> and return all the documents
+
+=head2 decode
+
+    my $msg = $fmt->decode( $bytes );
+
+Decode the given bytes into the given message. The bytes must contain
+exactly one message to be decoded.
 
 =head1 AUTHOR
 

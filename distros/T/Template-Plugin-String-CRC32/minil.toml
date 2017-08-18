@@ -1,0 +1,4 @@
+name = "Template-Plugin-String-CRC32"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

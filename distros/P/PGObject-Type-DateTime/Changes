@@ -1,5 +1,12 @@
 Revision history for PGObject-Type-DateTime
 
+2.0.1	2017-08-14
+	Fix regex for PGObject 1 vs 2 detection
+
+2.0.0	2017-05-17
+	Support for PGObject 2.0
+	Min Perl version is now 5.10
+
 1.0.5   2016-12-13
         Add indicator for timezone
 

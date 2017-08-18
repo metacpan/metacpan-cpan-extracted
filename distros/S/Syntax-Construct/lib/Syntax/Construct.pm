@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 my %introduces = ( '5.026' => [qw[
                                  <<~ /xx ^CAPTURE unicode9.0 unicode-scx
@@ -65,7 +65,7 @@ delete @introduced{ @{ $introduces{old} } };
 sub _hook {
     { drand48 => sub {
           require Config;
-          warn "Unknown rand implementation at ", _position(1), "\n"
+          warn "Unknown rand implementation at ", _position(1), ".\n"
               unless 'Perl_drand48' eq $Config::Config{randfunc};
       },
     }
@@ -99,7 +99,7 @@ sub import {
             ($min_version, $constr) = ($introduced{$_}, $_)
                 if $introduced{$_} gt $min_version;
         } else {
-            die "Unknown construct `$_' at ", _position(), "\n"
+            die "Unknown construct `$_' at ", _position(), ".\n"
         }
 
         if ($removed{$_}) {
@@ -110,7 +110,7 @@ sub import {
         my $action = _hook()->{$_};
         push @actions, $action if $action;
     }
-    die 'Empty construct list at ', _position(), "\n" if $min_version == 0;
+    die 'Empty construct list at ', _position(), ".\n" if $min_version == 0;
 
     my $nearest_stable = ( my $is_stable = $] =~ /^[0-5]\.[0-9][0-9][02468]/ )
                        ? $]
@@ -122,7 +122,7 @@ sub import {
                        };
     warn "Faking version $nearest_stable to test removed constructs.\n"
         unless $is_stable;
-    die "$d_constr removed in $max_version at ", _position()
+    die "$d_constr removed in $max_version at ", _position(), ".\n"
         if $max_version le $nearest_stable;
 
     die "Unsupported construct $constr at ", _position(),
@@ -140,7 +140,7 @@ Syntax::Construct - Identify which non-feature constructs are used in the code.
 
 =head1 VERSION
 
-Version 1.003
+Version 1.004
 
 =head1 SYNOPSIS
 

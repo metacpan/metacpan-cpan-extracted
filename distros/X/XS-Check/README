@@ -1,0 +1,93 @@
+  __  ______           ____ _               _    
+  \ \/ / ___|   _ _   / ___| |__   ___  ___| | __
+   \  /\___ \  (_|_) | |   | '_ \ / _ \/ __| |/ /
+   /  \ ___) |  _ _  | |___| | | |  __/ (__|   < 
+  /_/\_\____/  (_|_)  \____|_| |_|\___|\___|_|\_\
+                                                 
+
+
+This is the README for XS::Check version 0.02.
+
+XS::Check is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+XS::Check - check XS for problems
+
+Check XS files for errors.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?XS::Check
+    * http://metacpan.org/release/XS-Check
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc XS::Check
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan XS::Check
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm XS::Check
+
+To install the module from the source file, XS-Check-0.02.tar.gz, follow
+this sequence of commands:
+
+    tar xfz XS-Check-0.02.tar.gz
+    cd XS-Check-0.02
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/xs-check/issues>,
+
+or if you want to alter the source code of XS::Check, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/xs-check>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Aug 17 13:48:37 2017.
+
+-----------------------------------------------------------------------------

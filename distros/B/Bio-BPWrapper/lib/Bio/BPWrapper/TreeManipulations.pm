@@ -1,5 +1,5 @@
 =encoding utf8
-
+.
 =head1 NAME
 
 Bio::BPWrapper::TreeManipulations - Functions for biotree
@@ -15,7 +15,7 @@ Bio::BPWrapper::TreeManipulations - Functions for biotree
 
 # Package global variables
 my ($in, $out, $aln, %opts, $file, $in_format, $out_format, @nodes,
-    $tree, $print_tree, $rootnode);
+    $tree, $print_tree, $rootnode, @otus);
 
 ###################### subroutine ######################
 
@@ -28,7 +28,9 @@ use Bio::BPWrapper;
 use Bio::TreeIO;
 use Bio::Tree::Tree;
 use Bio::Tree::Node;
+use Bio::Tree::TreeFunctionsI;
 use Data::Dumper;
+use POSIX;
 
 if ($ENV{'DEBUG'}) { use Data::Dumper }
 
@@ -38,7 +40,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 @EXPORT      = qw(print_tree_shape edge_length_abundance swap_otus getdistance
                   sister_pairs countOTU reroot clean_tree delete_otus initialize
-                  write_out);
+                  write_out bin);
 
 =head1 SUBROUTINES
 
@@ -57,20 +59,293 @@ sub initialize {
     my $opts_ref = shift;
     Bio::BPWrapper::common_opts($opts_ref);
     %opts = %{$opts_ref};
-
     $in_format = $opts{"input"} // 'newick';  # This doesn't work...or does it?
     $out_format = $opts{"output"} // "newick";
     $print_tree = 0;    # Trigger printing the tree.
     my $file = shift || "STDIN";
-
     $in = Bio::TreeIO->new(-format => $in_format, ($file eq "STDIN") ? (-fh => \*STDIN) : (-file => $file));
-    $tree = $in->next_tree(); # get the first tree (and ignore the rest)
-
+    $tree  =   $in->next_tree(); # get the first tree (and ignore the rest)
     $out      = Bio::TreeIO->new(-format => $out_format);
     @nodes    = $tree->get_nodes;
     $rootnode = $tree->get_root_node;
+    foreach (@nodes) { push @otus, $_ if $_->is_Leaf }
 }
 
+sub label_selected_nodes {
+    my $label_file = $opts{'label-selected-nodes'}; # each line consists of internal_id label
+    my %labs;
+    open LAB, "<", $label_file || die "label file not found\n";
+    while(<LAB>) {
+	chomp;
+	my ($a, $b) = split;
+	$labs{$a} = $b;
+    }
+    close LAB;
+    foreach my $nd (@nodes) {
+	next if $nd->is_Leaf;
+        if ($labs{$nd->internal_id}) {
+	    $nd->id($labs{$nd->internal_id});
+	    warn $nd->internal_id, "\t", "changed to ", $labs{$nd->internal_id}, "\n";
+	} else {
+	    $nd->id('');
+	}
+    }
+    $print_tree = 1
+}
+
+sub write_tab_tree{
+#    print "*" x 200, "\n";
+    my $y_space = 1; # number of lines between two neighboring nodes
+    my $root_pos = 1;
+    my $maxL = 100;
+    my $longest_leaf_length=0;
+    my $largest_int_length =0;
+    &assign_leaf_ycoord($rootnode, \$root_pos, \$y_space);
+    &assign_inode_ycoord($rootnode);
+    my @nd_sorted = sort {$b->{ycoord} <=> $a->{ycoord}} @nodes;
+    foreach my $nd (@nd_sorted) {
+	my $branch_length = $nd->branch_length;
+	$nd->{xcoord} = &distance_to_root($nd);
+	next unless $nd->is_Leaf();
+	$longest_leaf_length = $nd->{xcoord} if $nd->{xcoord} >= $longest_leaf_length;
+    }
+    my $scale = int($maxL/$longest_leaf_length);
+
+    foreach my $nd (@nd_sorted) {
+	$nd->{xcoord_scaled} = ceil($scale * $nd->{xcoord});
+    }
+
+# draw initial lines
+    my %lines;
+    foreach my $nd (@nd_sorted) {
+        my $dashes = ceil(($nd->branch_length || 0) * $scale);
+        my $spaces = $nd->{xcoord_scaled} - $dashes + 1;
+	my $tag = $nd->is_Leaf ? $nd->id() : $nd->internal_id();
+	my $line = " " x $spaces . "+" . "-" x ($dashes ? ($dashes-1):0) . $tag;
+	$lines{$nd->internal_id()} = $line;
+    }
+
+# update by adding vertical lines
+# algorithm: replace with pipe at parent xcoord for every node in-between a node and its parent
+    for (my $i=0; $i<=$#nd_sorted; $i++) {
+	my $current_node = $nd_sorted[$i];
+	my $current_ycoord = $current_node->{ycoord};
+	next if $current_node eq $rootnode;
+	my $parent_node = $current_node->ancestor();
+	my $parent_ycoord = $parent_node->{ycoord};
+	my $parent_xcoord = $parent_node->{xcoord_scaled};
+	foreach my $nid (keys %lines) { # capture in-between nodes to add pipes
+	    my $node = $tree->find_node(internal_id=>$nid);
+	    next if $node eq $current_node || $node eq $parent_node;
+	    next if ($current_ycoord < $parent_ycoord) && (($node->{ycoord} < $current_ycoord) || ($node->{ycoord} > $parent_ycoord));
+	    next if ($current_ycoord > $parent_ycoord) && (($node->{ycoord} > $current_ycoord) || ($node->{ycoord} < $parent_ycoord));
+	    my $line = $lines{$nid};
+	    $line .= ' ' while length($line) <= $parent_xcoord+1; # pad spaces when line not long enough to reach parent node xcoord
+	    my @chars = split //, $line;
+	    $chars[$parent_xcoord+1] ='|' unless $chars[$parent_xcoord+1] eq '+';
+	    $lines{$nid} = join '', @chars;
+	}
+    }
+
+    foreach  (@nd_sorted) {
+	print $lines{$_->internal_id}, "\n";
+    }
+}
+
+sub assign_leaf_ycoord {
+    my ($node, $ypos, $yspacing) = @_;
+    return if $node->is_Leaf();
+    for my $child ($node->each_Descendent()) {
+	if ($child->is_Leaf()) {
+	    $child->{'ycoord'} = $$ypos; # de-reference
+	    $$ypos += $$yspacing;
+	} else {
+	    &assign_leaf_ycoord($child, $ypos, $yspacing);
+	}
+    }
+}
+
+sub assign_inode_ycoord {
+    my $node = shift;
+    my @tmp;
+    for my $child ($node->each_Descendent()) {
+	&assign_inode_ycoord($child) unless defined $child->{'ycoord'};
+	push @tmp, $child->{'ycoord'}
+    }
+    my @sorted = sort { $a <=> $b } @tmp;
+    $node->{'ycoord'} = $sorted[0] + 1 / 2 * ($sorted[-1] - $sorted[0])
+}
+
+
+sub distance_to_root {
+    my $node = shift;
+    my $dist = $node->branch_length() || 0;
+    my $parent = $node->ancestor();
+    $dist += &distance_to_root($parent) if defined $parent;
+    return $dist;
+}
+
+sub pars_binary {
+    my $trait_table_file = $opts{"ci"};
+    open BIN, "<", $trait_table_file || die "no trait file: $trait_table_file\n";
+    my ($sites, @colnames, @rownames);
+    my $first_line = 1;
+    while(<BIN>) {
+	chomp;
+	my @data = split /\t/, $_;
+	if ($first_line) {
+	    shift @data;
+	    @colnames = @data;
+	    $first_line = 0;
+	    next;
+	}
+
+	my $otu = shift @data;
+	push @rownames, $otu;
+	die "check colnames\n" unless @colnames == @data;
+	for(my $i=0; $i<=$#colnames; $i++) {
+	    $sites->{$otu}->{$colnames[$i]} = $data[$i] ? 1:0; # force binary
+	}
+    }
+    close BIN;
+
+     foreach my $otu (@otus) {
+#    die "otu id not found in rownames\n" unless &_check_id($node->id, \@rownames);
+	foreach my $trait_name (@colnames) {
+	    $otu->add_tag_value($trait_name, [$sites->{$otu->id}->{$trait_name}]);
+	}
+    }
+#    print Dumper(\@otus); exit;
+
+# Fitch algorithm: post-order traversal
+    my @informative;
+    for (my $i=0; $i<=$#colnames; $i++) {
+	next unless &_is_informative($colnames[$i], $i);
+	push @informative, $colnames[$i];
+	$rootnode->add_tag_value($colnames[$i], &_fitch_parsimony($rootnode, $i, \@colnames));
+	&_penny_parsimony($rootnode, $i, \@colnames) if @{$rootnode->get_tag_values($colnames[$i])} == 2; # only when root state unresolved
+	my $ci = &_consistency_index($i, \@colnames);
+	print join "\t", ($i+1, $colnames[$i], $ci);
+	print "\n";
+    }
+}
+
+sub _fitch_parsimony {
+    my ($node,$index, $refcol)=@_; #warn $node->internal_id, "\t", $node->id() || "inode", "\n";
+    my $ref_node_state;
+    my @colnames = @{$refcol};
+    if ($node->is_Leaf) {
+#       warn $node->id, "\t", Dumper($node->get_tag_values($colnames[$index])), "\n";
+        return $node->get_tag_values($colnames[$index]);
+    } else {
+        my @child = $node->each_Descendent;
+        my ($ref0, $ref1);
+        if ($child[0]->is_Leaf) { # child 0 is an OTU
+            $ref0 = $child[0]->get_tag_values($colnames[$index]);
+            if ($child[1]->is_Leaf) { # both child 0 & 1 are an OTU
+                $ref1 = $child[1]->get_tag_values($colnames[$index]);
+#               warn "got sis otu for inode ", $node->internal_id(), "\n";
+                $ref_node_state = &_intersect_or_union($ref0, $ref1);
+#               warn Dumper($node->get_tag_values($colnames[$index]));
+            } else { # child 0 is an OTU, child 1 is an inode
+                $ref_node_state = &_intersect_or_union($ref0, &_fitch_parsimony($child[1], $index, \@colnames));
+            }
+        } else { # child 0 is an inode
+            if ($child[1]->is_Leaf) { # child 1 is an inode child 1 is an OTU
+                $ref1 = $child[1]->get_tag_values($colnames[$index]);
+#               warn "got sis otu for inode ", $node->internal_id(), "\n";
+                $ref_node_state = &_intersect_or_union(&_fitch_parsimony($child[0], $index, \@colnames), $ref1);
+            } else { # both inodes
+                $ref_node_state = &_intersect_or_union(&_fitch_parsimony($child[0], $index, \@colnames), &_fitch_parsimony($child[1], $index, \@colnames));
+            }
+        }
+        $node->add_tag_value($colnames[$index], $ref_node_state);
+        return $ref_node_state;
+    }
+}
+
+sub _intersect_or_union { # from Perl Cookbook
+    my ($ref1, $ref2) = @_;
+    my (%union, %isect);
+    foreach my $e (@$ref1, @$ref2) {
+        $union{$e}++ && $isect{$e}++; # Perl Cookbook ideom
+    }
+ #   warn Dumper(\%union, \%isect);
+
+    if (@$ref1 == @$ref2) { # (0) U (0); (0) U (1); (1) U (1); (0,1) U (0,1)
+        return [keys %union];
+    } else { # (0) I (0,1); (1) I (0,1)
+        return [keys %isect];
+    }
+}
+
+sub _penny_parsimony {
+    my $nd = shift;
+    my $index = shift;
+    my $refcol = shift;
+    my @colnames = @{$refcol};
+    my $ref_states = $nd->get_tag_values($colnames[$index]);
+    my $ref_new;
+    my $pa;
+    return if $nd->is_Leaf;
+    if ($pa = $nd->ancestor()) {
+        my $ref_pa_state = $pa->get_tag_values($colnames[$index]);
+        $ref_new = &_intersect_or_union($ref_states, $ref_pa_state); # intersect with with parent
+    } else { # is the root
+        $ref_new = [1]; # resolve root state using Penny parsimony: one gain only
+    }
+    $nd->add_tag_value($colnames[$index], $ref_new); # resolve root state using Penny parsimony: one gain only
+    &_penny_parsimony($_, $index, \@colnames) for $nd->each_Descendent();
+}
+
+sub _is_informative {
+    my $col_id = shift;
+    my $index = shift;
+    my @sts = map {$_->get_tag_values($col_id)->[0]} @otus;
+    my %seen;
+    $seen{$_}++ for @sts;
+    if (keys %seen == 1) { #warn "$index: $col_id is constant\n";
+        return 0 }
+    foreach (keys %seen) {
+        if ($seen{$_} == 1) { #warn "$index: $col_id is singleton\n";
+            return 0 }
+    }
+#   warn "$index: $col_id is informative\n";
+    return 1;
+}
+
+sub _consistency_index { # ratio of minimum (1 for a binary trait) to actural changes
+    my $index = shift;
+    my $ci = 0;
+    my $refcol = shift;
+    my @colnames = @{$refcol};
+    foreach my $nd (@nodes) {
+        next if $nd eq $rootnode;
+        my $pa = $nd->ancestor();
+        my $state = $nd->get_tag_values($colnames[$index])->[0]; # assuming fully resolved (only one state)
+        my $pa_state = $pa->get_tag_values($colnames[$index])->[0];
+        if ($state ne $pa_state) {
+#            if ($state) {
+#                push @{$gain_loss{'gain'}->{$nd->internal_id}}, $colnames[$index];
+#                $fam_events{$colnames[$index]}->{$nd->internal_id}->{'gain'}++;
+#            } else {
+#                push @{$gain_loss{'loss'}->{$nd->internal_id}}, $colnames[$index];
+#                $fam_events{$colnames[$index]}->{$nd->internal_id}->{'loss'}++;
+#            }
+            $ci++;
+        }
+    }
+    return sprintf "%.4f", 1/$ci;
+}
+
+sub _check_id {
+    my $st = shift;
+    my $ref = shift;
+    foreach my $id (@$ref) {
+	return 1 if $st eq $id;
+    }
+    return 0;
+}
 
 sub print_tree_shape {
     my @matrix;
@@ -86,9 +361,9 @@ sub print_tree_shape {
     }
 
     for my $nd (@nodes) {
-	next if $nd->is_Leaf();
+	next if $nd->is_Leaf() || $nd eq $rootnode;
 	my @dscs = $nd->each_Descendent;
-	die unless @dscs == 2;
+	die $nd->internal_id . ": node has more than two descendants\n" unless @dscs == 2;
 	my $id1 = $dscs[0]->is_Leaf
 	    ? -1 * $leaf{$dscs[0]->id} : $inode{$dscs[0]->internal_id};
 	my $id2 = $dscs[1]->is_Leaf
@@ -167,8 +442,8 @@ sub swap_otus {
 
 # Get the distance between nodes
 sub getdistance {
-    my @dnodes = _name2node($opts{'distance'});
-    if (scalar(@dnodes) != 2) { say "Error: Provide exactly two nodes/leaves to use with --distance" }
+    my @dnodes = _name2node($opts{'dist'});
+    if (scalar(@dnodes) != 2) { say "Error: Provide exactly two nodes/leaves to use with --dist" }
     else { say $tree->distance(-nodes => \@dnodes) }
 }
 
@@ -214,15 +489,15 @@ Reroot tree to node in C<$opts{'reroot'}> by creating new branch.
 sub reroot {
     my $outgroup_id = $opts{'reroot'};
     my $outgroup    = $tree->find_node($outgroup_id);
-    my $newroot     = $outgroup->create_node_on_branch(-FRACTION => 0.5, -ANNOT => {id => 'newroot'});
-    $tree->reroot($newroot);
+#    my $newroot     = $outgroup->create_node_on_branch(-FRACTION => 0.5, -ANNOT => {id => 'newroot'});
+    $tree->reroot($outgroup);
     $print_tree = 1;
 }
 
 sub clean_tree {
     foreach my $nd (@nodes) {
-	$nd->branch_length(0) if $opts{'cleanbr'};
-	if ($opts{'cleanboot'}) {
+	$nd->branch_length(0) if $opts{'clean-br'};
+	if ($opts{'clean-boot'}) {
 	    $nd->bootstrap(0);
 	    $nd->id('') unless $nd->is_Leaf;
 	}
@@ -232,7 +507,7 @@ sub clean_tree {
 
 sub delete_otus {
     my $ref_otus = &_get_otus();
-    my @otus_to_retain = &_remove_otus($ref_otus, $opts{'delete-otus'});
+    my @otus_to_retain = &_remove_otus($ref_otus, $opts{'del-otus'});
 #    print Dumper(\@otus_to_retain);
     $opts{'subset'} = join ",", @otus_to_retain;
     &subset();
@@ -249,11 +524,11 @@ sub _remove_otus {
     my $str = shift;
     my @list;
     my @otus_to_remove = split /\s*,\s*/, $str;
+    my %to_del;
+    foreach (@otus_to_remove) { $to_del{$_} = 1 }
 
     foreach my $nd (@$ref) {
-	foreach my $otu (@otus_to_remove) {
-	    push @list, $nd->id() unless $otu eq $nd->id();
-	}
+	push @list, $nd->id() unless $to_del{$nd->id()};
     }
     return @list;
 }
@@ -435,8 +710,9 @@ sub print_all_lengths{
     for (@nodes) {
         next if $_ == $rootnode;
 	my $p_node = $_->ancestor();
-	my $p_id = $p_node->id ? $p_node->id : $p_node->internal_id;
-	my $c_id = $_->id ? $_->id() : $_->internal_id;
+	my ($p_id, $c_id);
+	$p_id = $p_node->internal_id;
+	$c_id = $_->is_Leaf ? $_->id() : $_->internal_id;
 	say $p_id, "\t",  $c_id, "\t", $_->branch_length;
     }
 }
@@ -463,14 +739,14 @@ sub depth_to_root {
 }
 
 # Remove Branch Lenghts
-sub remove_brlengths {
-    foreach (@nodes) { $_->branch_length(0) if defined $_->branch_length }
-    $print_tree = 1
-}
+#sub remove_brlengths {
+#    foreach (@nodes) { $_->branch_length(0) if defined $_->branch_length }
+#    $print_tree = 1
+#}
 
 sub alldesc {
     my @inodes;
-    my $inode_id = $opts{'allchildOTU'};
+    my $inode_id = $opts{'otus-desc'};
 
     if ($inode_id eq 'all') { push (@inodes, $_) for _walk_up($rootnode) }
     else { push @inodes, $tree->find_node(-internal_id => $inode_id) }
@@ -505,6 +781,60 @@ sub walk {
     }
 }
 
+# works for RAxML bipartition output and FastTree output with bootstrap values as node names
+sub delete_low_boot_support {
+   my $cutoff = $opts{'del-low-boot'} || die 'spcify cutoff, e.g., 0.75 or 75\n'; # default 75
+   &_remove_branch($rootnode, \$cutoff);
+   $print_tree = 1;
+}
+
+sub mid_point_root {
+    my $node1;
+    my $maxL=0;
+    foreach (@nodes) {
+        next unless $_->is_Leaf();
+        my $dis = $_->depth();
+        if ($dis > $maxL){
+            $node1 = $_;
+            $maxL = $dis
+        }
+    }
+
+    my $node2;
+    $maxL=0;
+    foreach (@nodes) {
+        next unless $_->is_Leaf() || $_ eq $node1;
+        my $dis = $tree->distance(-nodes=>[$node1, $_]);
+        if ($dis > $maxL){
+            $node2 = $_;
+            $maxL = $dis
+        }
+    }
+
+    my $nd = &_get_all_parents($node1,0,$maxL);
+    $nd = &_get_all_parents($node2,0,$maxL) unless $nd;
+    my ($node, $sumL) = @{$nd};
+
+    my $nodeL = $node->branch_length();
+    my $pnode = $node->ancestor();
+    my $nodeL_new = $nodeL - $sumL + $maxL/2;
+
+    $tree->reroot_at_midpoint($node);
+    $pnode->branch_length($node->branch_length()*2-$nodeL_new);
+    $node->branch_length($nodeL_new);
+
+    $print_tree = 1;
+}
+
+sub _get_all_parents {
+    my $nd = shift;
+    my $sumL = shift;
+    my $mL = shift;
+    $sumL += $nd->branch_length();
+    return [$nd, $sumL] if $sumL >= $mL/2;
+    return if $nd->ancestor() eq $rootnode;
+    &_get_all_parents($nd->ancestor(), $sumL, $mL);
+}
 
 =head2 write_out()
 
@@ -514,29 +844,33 @@ L<C<initialize(\%opts)>|/initialize>.
 Call this after calling C<#initialize(\%opts)>.
 
 =cut
+
 sub write_out {
     my $opts = shift;
-    getdistance() if $opts->{'distance'};
+    write_tab_tree() if $opts->{'as-text'};
+    mid_point_root() if $opts->{'mid-point'};
+    pars_binary() if $opts->{'ci'};
+    getdistance() if $opts->{'dist'};
+    delete_low_boot_support() if $opts->{'del-low-boot'};
     say $tree->total_branch_length() if $opts->{'length'};
-    countOTU() if $opts->{'numOTU'};
+    countOTU() if $opts->{'otus-num'};
     $print_tree = 1 if defined($opts->{'output'});
     reroot() if $opts->{'reroot'};
     subset() if $opts->{'subset'};
-    print_leaves_lengths() if $opts->{'otu'};
+    print_leaves_lengths() if $opts->{'otus-all'};
     getlca() if $opts->{'lca'};
-
-    label_nodes() if $opts->{'labelnodes'};
-    listdistance() if $opts->{'distanceall'};
+    label_nodes() if $opts->{'label-nodes'};
+    label_selected_nodes() if $opts->{'label-selected-nodes'};
+    listdistance() if $opts->{'dist-all'};
     bin() if $opts->{'ltt'};
-    print_all_lengths() if $opts->{'lengthall'};
+    print_all_lengths() if $opts->{'length-all'};
     random_tree() if defined($opts->{'random'});
     depth_to_root() if $opts->{'depth'};
-    remove_brlengths() if $opts->{'rmbl'};
-    alldesc() if $opts->{'allchildOTU'};
+    alldesc() if $opts->{'otus-desc'};
     walk() if $opts->{'walk'};
     multi2bi() if $opts->{'multi2bi'};
-    clean_tree() if $opts->{'cleanbr'} || $opts->{'cleanboot'};
-    delete_otus() if $opts->{'delete-otus'};
+    clean_tree() if $opts->{'clean-br'} || $opts->{'clean-boot'};
+    delete_otus() if $opts->{'del-otus'};
     sister_pairs() if $opts->{'sis-pairs'};
     swap_otus() if $opts->{'swap-otus'};
     edge_length_abundance() if $opts->{'ead'};
@@ -546,9 +880,30 @@ sub write_out {
 
 ################# internal subroutines ##############
 
+sub _remove_branch {
+    my $nd = shift;
+    my $ref = shift;
+    my $bootcut = $$ref;
+    return if $nd->is_Leaf();
+    my @desc = $nd->each_Descendent();
+    my $pa = $nd->ancestor();
+    foreach my $ch (@desc) {
+	if (!$nd->id()) { # no boostrap as node id (in-group branch)
+	    &_remove_branch($ch, $ref);
+	    next;
+	}
+	if ($nd->id() < $bootcut) {
+	    $pa->remove_Descendent($nd); # remove the current node
+	    $pa->add_Descendent($ch); # elevate the child node
+	    $ch->branch_length($ch->branch_length() + $nd->branch_length()); # increment branch length
+	}
+	&_remove_branch($ch, $ref);
+    }
+}
+
 sub _name2node {
     my $str = shift;
-    my @node_names = split /,/, $str;
+    my @node_names = split /\s*,\s*/, $str;
     my $nd;
     my @node_objects;
     for my $node_name (@node_names) {
@@ -671,11 +1026,11 @@ __END__
 
 =item *
 
-L<bioatree>: command-line tool for using this
+L<bioatree>: command-line tool for tree manipulations
 
 =item *
 
-L<Qui Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+L<Qiu Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
 
 =item *
 

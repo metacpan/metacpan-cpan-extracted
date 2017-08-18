@@ -124,6 +124,11 @@ sub new {
 
     while (@methods) {
         my ( $method, $params ) = splice( @methods, 0, 2 );
+        # ssl_opts takes a hash, not a ref - see RT 107924
+        if (ref $params eq 'HASH' && $method eq 'ssl_opts') {
+            $self->$method( %$params );
+            next;
+        }
         $self->$method( ref $params eq 'ARRAY' ? @$params : $params );
     }
 

@@ -215,6 +215,7 @@ perl client for the Swift API. a command-line script (swift.pl).
 
 setup openstack environments
 
+    $ export OS_AUTH_VERSION='1.0' # default 2.0
     $ export OS_AUTH_URL='https://*******'
     $ export OS_TENANT_NAME='*******'
     $ export OS_USERNAME='*******'

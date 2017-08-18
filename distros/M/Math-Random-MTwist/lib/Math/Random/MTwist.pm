@@ -12,7 +12,7 @@ use constant MT_FASTSEED => \0;
 use constant MT_GOODSEED => \0;
 use constant MT_BESTSEED => \0;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 our @ISA = 'Exporter';
 our @EXPORT = qw(MT_TIMESEED MT_FASTSEED MT_GOODSEED MT_BESTSEED);
@@ -24,6 +24,8 @@ our %EXPORT_TAGS = (
   'dist'  => [
     qw(
         rd_double
+        rd_iuniform rd_iuniform32 rd_iuniform64
+        rd_uniform rd_luniform
         rd_erlang rd_lerlang
         rd_exponential rd_lexponential
         rd_lognormal rd_llognormal
@@ -284,6 +286,16 @@ However, depending on your system's architecture, you can convert C<getstate()>
 to C<savestate()> format using something like C<join ' ', (reverse unpack
 'L624i', getstate())[1..624,0];>.
 
+=head1 FLOATING POINT PRECISION
+
+The rand() and rd_l* functions return whatever NVTYPE your Perl uses
+(i.e. quadmath, long double or double). A double gives you 53-bit
+precision. However, with larger double types you always get 64-bit precision
+since the mtwist library is limited to 64-bit. With quadmath or long double
+the corresponding math functions are used (sqrtq/sqrtl etc.).
+
+The rand32() and non-l rd_* functions always return a double.
+
 =head1 UNIFORMLY DISTRIBUTED RANDOM NUMBERS
 
 =over 2
@@ -299,13 +311,14 @@ Returns a random unsigned 32-bit integer. Calls mtwist's C<mts_lrand()>.
 
 =item B<irand64()>
 
-If your Perl uses 64-bit integers, returns a 64-bit unsigned integer. If your Perl uses
-32-bit integers but your OS knows the C<uint64_t> type, returns a 64-bit unsigned
-integer as a decimal string. Otherwise it returns undef. Calls mtwist's C<mts_llrand()>.
+If your Perl uses 64-bit integers, returns a 64-bit unsigned integer. If your
+Perl uses 32-bit integers but your OS knows the C<uint64_t> type, returns a
+64-bit unsigned integer as a decimal string. Otherwise it returns undef. Calls
+mtwist's C<mts_llrand()>.
 
 =item B<rand()>, B<rand($bound)>
 
-Returns a random double with 52-bit precision in the range C<[0, $bound)>.
+Returns a random double with 53-bit precision in the range C<[0, $bound)>.
 Calls mtwist's C<mts_ldrand()>.
 
 C<$bound> may be negative. If C<$bound> is omitted or zero it defaults to 1.
@@ -316,6 +329,23 @@ Returns a random double with 32-bit precision in the range C<[0, $bound)>.
 Slightly faster than rand(). Calls mtwist's C<mts_drand()>.
 
 C<$bound> may be negative. If C<$bound> is omitted or zero it defaults to 1.
+
+=item B<rd_iuniform(IV lower, IV upper)>
+
+Returns a signed integer in the range [lower, upper) of your Perl's IVTYPE
+(32-bit or 64-bit). Takes signed integer arguments.
+
+=item B<rd_iuniform32(IV lower, IV upper)>
+
+Returns a signed 32-bit integer in the range [lower, upper). Takes signed
+32-bit arguments.
+
+=item B<rd_iuniform64(IV lower, IV upper)>
+
+Returns a signed 64-bit integer in the range [lower, upper) if your Perl uses
+64-bit integers. Otherwise it returns undef. Note that unlike irand64() it
+doesn't return a decimal string in the 32-bit IV + uint64_t case because you
+could only pass it 32-bit arguments anyway.
 
 =item B<randstr()>, B<randstr($length)>
 
@@ -328,8 +358,11 @@ there is not enough memory.
 
 With the exception of C<rd_double()> the following methods come in two
 variants: C<B<rd_>xxx> and C<B<rd_l>xxx>. They all return a double but the
-C<B<rd_>xxx> versions provide 32-bit precision while the C<B<rd_l>xxx> versions
-provide 52-bit precision at the expense of speed.
+C<B<rd_>xxx> versions provide 32-bit precision while the C<B<rd_l>xxx>
+versions provide 53-bit precision at the expense of speed.
+
+TODO: If your Perl's NVs are long doubles, the C<B<rd_l>xxx> functions provide
+64-bit precision.
 
 =over 2
 
@@ -352,6 +385,11 @@ the packed string representation.
 For convenience, you can call B<rd_double()> with an optional argument
 B<$index> to get the same result as with B<(rd_double())[$index]>, just a bit
 more efficiently.
+
+=item B<rd_(l)uniform(NV lower, NV upper)>
+
+Generates floating point numbers from a uniform distribution in the range
+[lower, upper).
 
 =item B<rd_(l)exponential(double mean)>
 

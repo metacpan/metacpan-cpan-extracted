@@ -2,18 +2,40 @@
 
 use strict;
 use warnings;
+use Config;
 use Math::Random::MTwist;
 use Test::More;
+
+use constant IS_32_BIT => ~0 == 0xffff_ffff;
+
+sub is_string {
+  my $what = shift;
+  ($what & ~$what) ne '0';
+}
 
 # If you change the order of the tests the expected results will change!
 
 my $mt = Math::Random::MTwist->new(1_000_686_894);
 
 ok($mt->irand32() == 2_390_553_143, 'irand32');
-{
+
+do {
   my $i = $mt->irand64();
-  ok(!defined $i || $i eq '5527845158', 'irand64');
-}
+  if (! defined $i) {
+    ok(IS_32_BIT && !$Config{d_longlong}, 'irand64 is undef on 32-bit Perl w/o long long');
+    # Dummy calls to advance the state pointer like a regular 64-bit call would.
+    $mt->irand32();
+    $mt->irand32();
+  }
+  elsif (is_string($i)) {
+    ok(IS_32_BIT && $Config{d_longlong}, 'irand64 is string on 32-bit Perl with long long');
+    ok($i eq '5527845158', "irand64 string value");
+  }
+  else {
+    ok($i == 5527845158, 'irand64 numeric value');
+  }
+};
+
 ok($mt->rand()   =~ /^0\.9457734/, 'rand');
 ok($mt->rand32() =~ /^0\.3981395/, 'rand32');
 
@@ -59,5 +81,20 @@ ok($mt->rd_double() =~ /^8.6196948.+e-145$/, 'rd_double');
 }
 
 ok($mt->randstr(19) eq "\0270\352\20\a)GB\205\332\325\201\32\236\13\30\317\5\312", 'randstr');
+
+do {
+  my $i = $mt->rd_iuniform64(-42, 42);
+  if (! defined $i) {
+    ok(IS_32_BIT, 'rd_iuniform64 is undef on 32-bit Perl');
+    # Dummy calls to advance the state pointer like a regular 64-bit call would.
+    $mt->irand32();
+    $mt->irand32();
+  }
+  else {
+    ok($i == 30, 'rd_iuniform64 numeric value');
+  }
+};
+
+ok($mt->rd_iuniform32(-42, 42) == 2,  'rd_iuniform32');
 
 done_testing();

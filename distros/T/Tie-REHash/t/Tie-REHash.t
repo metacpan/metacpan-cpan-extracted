@@ -4,7 +4,7 @@
 
 use strict;
 
-use Test::More tests => 134;
+use Test::More tests => 133;
 BEGIN { $^W = 0; } 
 
 {

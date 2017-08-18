@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction;
-$Business::RO::TaxDeduction::VERSION = '0.010';
+$Business::RO::TaxDeduction::VERSION = '0.011';
 # ABSTRACT: Romanian salary tax deduction calculator
 
 use 5.010001;
@@ -119,7 +119,7 @@ Business::RO::TaxDeduction - Romanian salary tax deduction calculator
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

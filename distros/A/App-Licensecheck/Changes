@@ -7,13 +7,25 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.31	2017-08-16
+
+ [ Documentation ]
+ - Fix bogusly labelled changelog entry part of release 2.0.30 (didn't fix
+   bare-named BSD licenses, but instead tightened a bunch of license
+   patterns).
+
+ [ Packaging ]
+ - Stop ship Regexp::Pattern::License, now an independent distribution.
+
 v3.0.30	2017-07-05
 
  [ Bug Fixes ]
- - Fix detect BSD licenses as bare name.
-   Axel Beckert++
  - Fix license pattern ms_pl to detect MS Public License (not non-free MS
    Permissive License).
+ - Tighten license patterns afl agpl cdl gfdl gfdl_nivgpl lgpl llgpl mpl
+   ms_pl ms_rl qpl sgi_b wtfpl mit to require descriptive prefix when only
+   an abbreviation.
+   Axel Beckert++
 
  [ Test Suite ]
  - Add OSI test (including only currently succeeding OSI licenses for now).

@@ -30,6 +30,18 @@ push @c, [ @row{sort { $a <=> $b } keys %row } ];
 
 my $x = $b[1]||" ";
 
+## name DereferenceBlock
+## failures 0
+## cut
+
+sort { @{$a} <=> @{$b} } ();
+
+## name InnerBlock
+## failures 0
+## cut
+
+sort { {; $a } } ();
+
 ## name AllowedFunctions
 ## failures 0
 ## cut

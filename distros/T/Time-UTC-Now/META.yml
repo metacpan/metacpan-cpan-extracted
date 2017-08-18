@@ -26,7 +26,7 @@ name: Time-UTC-Now
 provides:
   Time::UTC::Now:
     file: lib/Time/UTC/Now.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Exporter: '0'
   Math::BigRat: '0.13'
@@ -40,5 +40,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Time-UTC-Now
   license: http://dev.perl.org/licenses/
-version: '0.012'
+version: '0.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

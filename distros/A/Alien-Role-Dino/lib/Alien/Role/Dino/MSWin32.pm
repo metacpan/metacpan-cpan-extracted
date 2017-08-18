@@ -30,7 +30,7 @@ Alien::Role::Dino::MSWin32
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 AUTHOR
 

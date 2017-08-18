@@ -3,7 +3,7 @@
 
 package HiD::App::Command::server;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::App::Command::server::VERSION = '1.98';
+$HiD::App::Command::server::VERSION = '1.991';
 use Moose;
 extends 'HiD::App::Command';
 with 'HiD::Role::PublishesDrafts';
@@ -48,7 +48,7 @@ has clean => (
 has debug => (
   is          => 'ro' ,
   isa         => 'Bool' ,
-  cmd_aliases => 'D' ,
+  cmd_aliases => 'd' ,
   traits      => [ 'Getopt' ] ,
 );
 
@@ -84,7 +84,10 @@ sub _run {
     $config->{publish_drafts} = 1;
   }
 
-  my $app = HiD::Server->new( root => $self->destination )->to_app;
+  my $app = HiD::Server->new(
+    error_pages => ($config->{error_pages} || {} ),
+    root        => $self->destination,
+  )->to_app;
 
   if ( $self->debug ) {
     if ( try_load_class( 'Plack::Middleware::DebugLogging' )) {
@@ -176,7 +179,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

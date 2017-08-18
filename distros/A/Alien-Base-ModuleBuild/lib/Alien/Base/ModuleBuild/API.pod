@@ -4,6 +4,15 @@ Alien::Base::ModuleBuild::API - API Reference for Alien:: Authors
  
 =head1 DESCRIPTION
 
+B<NOTE>: Please consider for new development of L<Alien>s that you use
+L<Alien::Build> and L<alienfile> instead.  Like L<Alien::Base::ModuleBUild> they work
+with L<Alien::Base>.  Unlike L<Alien::Base::Module::Build> they are more easily customized
+and handle a number of corner cases better.  For a good place to start,
+please see L<Alien::Build::Manual::AlienAuthor>.  Although the 
+Alien-Base / Alien-Build team will continue to maintain this module,
+(we will continue to fix bugs where appropriate), we aren't adding any
+new features to this module.
+
 A list of extra properties and methods provided by 
 L<Alien::Base::ModuleBuild> beyond those contained in L<Module::Build::API>.
 Note that all property and method names are prefixed with C<alien_> to prevent future 

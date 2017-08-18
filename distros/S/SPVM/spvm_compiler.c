@@ -17,10 +17,14 @@
 #include "spvm_sub.h"
 #include "spvm_constant_pool.h"
 #include "spvm_runtime.h"
+#include "spvm_global.h"
 
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
+  
+  // Set global runtime
+  SPVM_GLOBAL_RUNTIME = runtime;
   
   // Copy constant pool to runtime
   int64_t runtime_constant_pool_byte_size = (int64_t)compiler->constant_pool->length * (int64_t)sizeof(int32_t);
@@ -48,7 +52,7 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
 }
 
 SPVM_COMPILER* SPVM_COMPILER_new() {
-  SPVM_COMPILER* compiler = malloc(sizeof(SPVM_COMPILER));
+  SPVM_COMPILER* compiler = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_COMPILER));
 
   // Allocator
   compiler->allocator = SPVM_COMPILER_ALLOCATOR_new(compiler);
@@ -69,6 +73,8 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->cur_file = NULL;
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->cur_template_args = NULL;
+  
+  compiler->native_subs = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
 
   compiler->enum_default_value = 0;
   compiler->enum_default_type_id = SPVM_TYPE_C_ID_INT;
@@ -148,9 +154,9 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   }
   
   // use standard module
-  SPVM_OP* op_use_std = SPVM_OP_new_op_use_from_package_name(compiler, "stdout", "CORE", 0);
+  SPVM_OP* op_use_std = SPVM_OP_new_op_use_from_package_name(compiler, "std", "CORE", 0);
   SPVM_DYNAMIC_ARRAY_push(compiler->op_use_stack, op_use_std);
-  SPVM_HASH_insert(compiler->op_use_symtable, "stdout", strlen("stdout"), op_use_std);
+  SPVM_HASH_insert(compiler->op_use_symtable, "std", strlen("std"), op_use_std);
   
   /* call SPVM_yyparse */
   SPVM_yydebug = 0;

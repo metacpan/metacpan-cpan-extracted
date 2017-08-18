@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 2.0.15
+version 2.0.16
 
 =head1 DESCRIPTION
 

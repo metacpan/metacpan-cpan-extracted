@@ -3,15 +3,14 @@ abstract: 'Include the Math::Int64 C client API in your distribution'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Module::Build: '0.3601'
-  Path::Class: '0.26'
-  Test::More: '0.88'
-  perl: '5.006'
+  Test2::V0: '0.000060'
+  perl: '5.014'
 configure_requires:
-  Module::Build: '0.3601'
-  perl: '5.006'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,14 +20,15 @@ no_index:
   directory:
     - corpus
 requires:
-  Dist::Zilla: '0'
+  Dist::Zilla: '6.00'
   ExtUtils::Typemaps: '0'
-  File::ShareDir: '0'
+  File::ShareDir::Dist: '0'
   Moose: '0'
-  Path::Class: '0.26'
-  perl: '5.006'
+  Path::Tiny: '0'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-MathInt64/issues
-  homepage: http://perl.wdlabs.com/Dist-Zilla-Plugin-MathInt64
+  homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::MathInt64
   repository: git://github.com/plicease/Dist-Zilla-Plugin-MathInt64.git
-version: '0.09'
+version: '0.10'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -7,7 +7,7 @@ use WWW::Leech::Parser;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.02';
+    $VERSION     = '0.04';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -193,7 +193,7 @@ WWW::Leech::Walker - small web content grabbing framework
   		my $html = shift();
   		my $walker_obj = shift;
   		return $html;
-  	}
+  	},
 
   	filter => sub{
 		my $urls = shift;

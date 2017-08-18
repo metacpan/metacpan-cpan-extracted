@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Business::OnlinePayment::Litle::UpdaterResponse
-our $VERSION = '0.957'; # VERSION
+our $VERSION = '0.958'; # VERSION
 
 
 sub new{
@@ -67,7 +67,7 @@ Business::OnlinePayment::Litle::UpdaterResponse - Business::OnlinePayment::Litle
 
 =head1 VERSION
 
-version 0.957
+version 0.958
 
 =head1 NAME
 

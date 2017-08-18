@@ -1,5 +1,8 @@
 Revision history for VMware-vCloudDirector
 
+0.007     2017-08-17 11:07:41+01:00 Europe/London
+    - Slightly improved error handling - decodes vCloud response better
+
 0.006     2017-06-30 11:57:33+01:00 Europe/London
     - Require at least version 0.04 of Syntax::Keyword::Try
       Versions 0.02 & 0.03 caused errors in loading the module.

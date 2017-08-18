@@ -1,5 +1,11 @@
 Revision history for Net-IPAddress-Util
 
+3.029   2017-08-17
+        Additional documentation, and a re-check of POD coverage
+
+3.028   2017-08-17
+        Clean up versioning in docs & throughout
+
 3.027   2016-04-13
         Clean up versioning in docs & throughout
 

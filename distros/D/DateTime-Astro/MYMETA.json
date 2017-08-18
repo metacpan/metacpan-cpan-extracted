@@ -1,0 +1,47 @@
+{
+   "abstract" : "Functions For Astromical Calendars",
+   "author" : [
+      "Daisuke Maki C<< <daisuke@endeworks.jp> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Astro",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.36",
+            "ExtUtils::ParseXS" : "3.18",
+            "Test::Exception" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Set" : "0",
+            "Exporter" : "5.57",
+            "XSLoader" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}

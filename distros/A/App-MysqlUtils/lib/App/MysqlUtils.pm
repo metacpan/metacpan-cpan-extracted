@@ -1,7 +1,9 @@
 package App::MysqlUtils;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.008'; # VERSION
+## no critic (InputOutput::RequireBriefOpen)
+
+our $DATE = '2017-08-17'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,6 +61,25 @@ my %args_database = (
         schema => 'str*',
         req => 1,
         cmdline_aliases => { db=>{} },
+    },
+);
+
+my %args_overwrite_when = (
+    overwrite_when => {
+        summary => 'Specify when to overwrite existing .txt file',
+        schema => ['str*', in=>[qw/none older always/]],
+        default => 'none',
+        description => <<'_',
+
+`none` means to never overwrite existing .txt file. `older` overwrites existing
+.txt file if it's older than the corresponding .sql file. `always` means to
+always overwrite existing .txt file.
+
+_
+        cmdline_aliases => {
+            o         => {summary=>'Shortcut for --overwrite_when=older' , is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'older' }},
+            O         => {summary=>'Shortcut for --overwrite_when=always', is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'always'}},
+        },
     },
 );
 
@@ -425,6 +446,7 @@ sub mysql_sql_dump_extract_tables {
         next unless $curtbl && $pertblfh;
         print $pertblfh $_;
     }
+    close $pertblfh;
 
     [200, "OK"];
 }
@@ -442,22 +464,7 @@ $SPEC{mysql_run_sql_files} = {
         },
         %args_database,
         # XXX output_file_pattern
-        overwrite_when => {
-            summary => 'Specify when to overwrite existing .txt file',
-            schema => ['str*', in=>[qw/none older always/]],
-            default => 'none',
-            description => <<'_',
-
-`none` means to never overwrite existing .txt file. `older` overwrites existing
-.txt file if it's older than the corresponding .sql file. `always` means to
-always overwrite existing .txt file.
-
-_
-            cmdline_aliases => {
-                o         => {summary=>'Shortcut for --overwrite_when=older' , is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'older' }},
-                O         => {summary=>'Shortcut for --overwrite_when=always', is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'always'}},
-            },
-        },
+        %args_overwrite_when,
     },
     deps => {
         prog => 'mysql',
@@ -505,6 +512,74 @@ sub mysql_run_sql_files {
     [200, "OK"];
 }
 
+$SPEC{mysql_run_pl_files} = {
+    v => 1.1,
+    summary => 'Run each .pl file, feed the output to `mysql` command and '.
+        'write result to .txt file',
+    description => <<'_',
+
+The `.pl` file is supposed to produce a SQL statement. For simpler cases, use
+<prog:mysql-run-sql-files>.
+
+_
+    args => {
+        pl_files => {
+            schema => ['array*', of=>'filename*'],
+            req => 1,
+            pos => 0,
+            greedy => 1,
+        },
+        %args_database,
+        # XXX output_file_pattern
+        %args_overwrite_when,
+    },
+    deps => {
+        prog => 'mysql',
+    },
+};
+sub mysql_run_pl_files {
+    my %args = @_;
+
+    my $ov_when = $args{overwrite_when} // 'none';
+
+    for my $plfile (@{ $args{pl_files} }) {
+
+        my $txtfile = $plfile;
+        $txtfile =~ s/\.pl$/.txt/i;
+        if ($plfile eq $txtfile) { $txtfile .= ".txt" }
+
+        if (-f $txtfile) {
+            if ($ov_when eq 'always') {
+                log_debug("Overwriting existing %s ...", $txtfile);
+            } elsif ($ov_when eq 'older') {
+                if ((-M $txtfile) > (-M $plfile)) {
+                    log_debug("Overwriting existing %s because it is older than the corresponding %s ...", $txtfile, $plfile);
+                } else {
+                    log_info("%s already exists and newer than corresponding %s, skipped", $txtfile, $plfile);
+                    next;
+                }
+            } else {
+                log_info("%s already exists, we never overwrite existing .txt file, skipped", $txtfile);
+                next;
+            }
+        }
+
+        log_info("Running .pl file '%s' and putting result to '%s' ...",
+                    $plfile, $txtfile);
+        my $cmd = join(
+            " ",
+            "perl", shell_quote($plfile),
+            "|",
+            "mysql",
+            shell_quote($args{database}),
+            ">", shell_quote($txtfile),
+        );
+        system({log=>1}, $cmd);
+    }
+
+    [200, "OK"];
+}
+
 1;
 # ABSTRACT: CLI utilities related to MySQL
 
@@ -520,7 +595,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.008 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-07-03.
+This document describes version 0.009 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-08-17.
 
 =head1 SYNOPSIS
 
@@ -718,6 +793,49 @@ Will try to get default from C<~/.my.cnf>.
 =item * B<username> => I<str>
 
 Will try to get default from C<~/.my.cnf>.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 mysql_run_pl_files
+
+Usage:
+
+ mysql_run_pl_files(%args) -> [status, msg, result, meta]
+
+Run each .pl file, feed the output to `mysql` command and write result to .txt file.
+
+The C<.pl> file is supposed to produce a SQL statement. For simpler cases, use
+L<mysql-run-sql-files>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<database>* => I<str>
+
+=item * B<overwrite_when> => I<str> (default: "none")
+
+Specify when to overwrite existing .txt file.
+
+C<none> means to never overwrite existing .txt file. C<older> overwrites existing
+.txt file if it's older than the corresponding .sql file. C<always> means to
+always overwrite existing .txt file.
+
+=item * B<pl_files>* => I<array[filename]>
 
 =back
 

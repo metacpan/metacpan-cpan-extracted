@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 use Data::Dumper;
 
 BEGIN {
@@ -15,13 +16,13 @@ package BankAccount {
 
     extends 'Moxie::Object';
 
-    has '$!balance' => sub { 0 };
+    has '$!balance' => ( default => sub { 0 } );
 
-    my sub _balance : private('$!balance');
+    my sub _balance : private( $!balance );
 
-    sub BUILDARGS : init_args( balance => '$!balance' );
+    sub BUILDARGS : init_args( balance => $!balance );
 
-    sub balance : ro('$!balance');
+    sub balance : ro( $!balance );
 
     sub deposit ($self, $amount) { _balance += $amount }
 
@@ -39,11 +40,14 @@ package CheckingAccount {
 
     has '$!overdraft_account';
 
-    my sub _overdraft_account : prototype() private('$!overdraft_account');
+    my sub _overdraft_account : private( $!overdraft_account );
 
-    sub BUILDARGS : init_args( overdraft_account => '$!overdraft_account' );
+    sub BUILDARGS : init_args(
+        overdraft_account => $!overdraft_account,
+        balance?          => super(balance),
+    );
 
-    sub overdraft_account : ro('$!overdraft_account');
+    sub overdraft_account : ro( $!overdraft_account );
 
     sub withdraw ($self, $amount) {
 
@@ -92,6 +96,59 @@ subtest '... testing the BankAccount class' => sub {
         is $checking->balance, 0, '... got the checking balance we expected';
         is $savings->balance, 200, '... got the savings balance we expected';
     };
+
+    subtest '... testing the CheckingAccount class (with balance)' => sub {
+
+        my $checking = CheckingAccount->new(
+            overdraft_account => $savings,
+            balance           => 300,
+        );
+        isa_ok($checking, 'CheckingAccount');
+        isa_ok($checking, 'BankAccount');
+
+        is $checking->balance, 300, '... got the checking balance we expected';
+
+        $checking->deposit( 100 );
+        is $checking->balance, 400, '... got the checking balance we expected';
+        is $checking->overdraft_account, $savings, '... got the right overdraft account';
+
+        $checking->withdraw( 50 );
+        is $checking->balance, 350, '... got the checking balance we expected';
+        is $savings->balance, 200, '... got the savings balance we expected';
+
+        $checking->withdraw( 400 );
+        is $checking->balance, 0, '... got the checking balance we expected';
+        is $savings->balance, 150, '... got the savings balance we expected';
+    };
+};
+
+subtest '... testing some error conditions' => sub {
+
+    like(
+        exception { BankAccount->new },
+        qr/Constructor for \(BankAccount\) expected 2 arguments\, got \(0\)/,
+        '... the balance argument is required'
+    );
+
+    like(
+        exception { BankAccount->new( foo => 10 ) },
+        qr/Constructor for \(BankAccount\) missing \(`balance`\) parameters\, got \(`foo`\)\, expected \(`balance`\)/,
+        '... the balance argument is required and unknown arguments are rejected'
+    );
+
+
+    like(
+        exception { CheckingAccount->new },
+        qr/Constructor for \(CheckingAccount\) expected between 2 and 4 arguments\, got \(0\)/,
+        '... the balance argument is required'
+    );
+
+    like(
+        exception { CheckingAccount->new( balance => 10 ) },
+        qr/Constructor for \(CheckingAccount\) missing \(`overdraft_account`\) parameters\, got \(`balance`\)\, expected \(`balance\?`\, `overdraft_account`\)/,
+        '... the balance argument is required'
+    );
+
 };
 
 subtest '... testing some meta-information' => sub {

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,18 +23,16 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir::Install" : "0.06",
-            "perl" : "5.004"
+            "perl" : "5.008001"
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "FindBin" : "0",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -46,13 +44,16 @@
       },
       "runtime" : {
          "requires" : {
-            "File::ShareDir" : "0",
-            "perl" : "5.006"
+            "File::ShareDir::Dist" : "0",
+            "File::Which" : "0",
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "perl" : "5.006"
+            "Capture::Tiny" : "0",
+            "Test2::V0" : "0.000060",
+            "perl" : "5.008001"
          }
       }
    },
@@ -61,13 +62,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/App-RegexFileUtils/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/App-RegexFileUtils",
+      "homepage" : "https://metacpan.org/pod/App::RegexFileUtils",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/App-RegexFileUtils.git",
          "web" : "https://github.com/plicease/App-RegexFileUtils"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

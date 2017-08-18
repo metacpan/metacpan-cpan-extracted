@@ -2,7 +2,7 @@
 
 package HiD::Role::DoesLogging;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Role::DoesLogging::VERSION = '1.98';
+$HiD::Role::DoesLogging::VERSION = '1.991';
 use Moose::Role;
 
 use 5.014;  # strict, unicode_strings
@@ -99,7 +99,7 @@ Log4perl object for logging. Handles:
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

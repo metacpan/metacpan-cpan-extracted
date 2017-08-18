@@ -11,8 +11,8 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'foo' => sub { 'DFOO' };
-    has 'bar' => sub { die 'The slot \'bar\' is required' };
+    has 'foo' => ( default => sub { 'DFOO' } );
+    has 'bar' => ( required => 1 );
 
     sub foo : ro;
     sub bar : ro;
@@ -32,7 +32,7 @@ package Foo {
 
 like(
     exception { Foo->new },
-    qr/^The slot \'bar\' is required/,
+    qr/^A \`bar\` value is required/,
     'missing required slot throws an exception'
 );
 

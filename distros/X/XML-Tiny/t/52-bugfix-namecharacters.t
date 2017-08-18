@@ -1,15 +1,14 @@
-# _ can start a name (ie an element name or an attribute name)
+use strict;
+use lib '.';
 
 use XML::Tiny qw(parsefile);
-
-use strict;
 require "t/test_functions";
 print "1..2\n";
 
 $^W = 1;
-
 $SIG{__WARN__} = sub { die("Caught a warning, making it fatal:\n\n$_[0]\n"); };
 
+# _ can start a name (ie an element name or an attribute name)
 is_deeply(
     parsefile("_TINY_XML_STRING_<_x>\n</_x>"),
     [{ 'name' => '_x', 'content' => [], 'type' => 'e', attrib => {} }],

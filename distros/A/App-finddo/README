@@ -1,0 +1,85 @@
+NAME
+    App::finddo - Search for files and run command
+
+VERSION
+    This document describes version 0.002 of App::finddo (from Perl
+    distribution App-finddo), released on 2017-08-16.
+
+DESCRIPTION
+    See included script finddo.
+
+FUNCTIONS
+  finddo
+    Usage:
+
+     finddo(%args) -> any
+
+    Search for files and run command.
+
+    Aside from used on the command-line, *finddo* can also be used as a
+    function from Perl. For example:
+
+     my @files = finddo(newest=>1, audio=>1, max_result=>3);
+ 
+     finddo(newest=>1, audio=>1, max_result=>3, command=>["mpv", "--"]);
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   audio => *bool*
+
+    *   command => *array[str]*
+
+    *   dirs => *bool*
+
+    *   exists => *bool*
+
+    *   files => *bool*
+
+    *   image => *bool*
+
+    *   largest => *bool*
+
+    *   max_result => *int*
+
+    *   media => *bool*
+
+    *   newest => *bool*
+
+    *   oldest => *bool*
+
+    *   smallest => *bool*
+
+    *   sort => *str*
+
+    *   video => *bool*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-finddo>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-finddo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-finddo>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    find. Unix command.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

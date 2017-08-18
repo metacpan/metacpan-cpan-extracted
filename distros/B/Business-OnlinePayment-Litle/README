@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.957
+    version 0.958
 
 SYNOPSIS
 
@@ -110,6 +110,7 @@ METHODS
       post authorization
       credit
       void
+      auth reversal
 
  Fields
 
@@ -399,7 +400,7 @@ Litle specific data
 
 SPECS
 
-    Currently uses the Litle XML specifications version 8.12 and chargeback
+    Currently uses the Litle XML specifications version 11.0 and chargeback
     version 2.2
 
 TESTING
@@ -438,10 +439,11 @@ UNIMPLEMENTED
     need), though the capability of support is there, and the test data for
     the verification suite is there.
 
-        Force Capture
         Capture Given Auth
-        3DS
-        billMeLater
+        applepay
+        paypage
+    
+        return objects for bounce pages (sepa|ideal)
 
 BUGS
 
@@ -462,6 +464,11 @@ SUPPORT
     You can also look for information at:
 
     http://www.vantiv.com/
+
+SPEC
+
+    Documentation and specs are available on github at
+    http://litleco.github.io/
 
       * AnnoCPAN: Annotated CPAN documentation
 

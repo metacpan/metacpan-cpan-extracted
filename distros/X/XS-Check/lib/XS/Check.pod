@@ -1,0 +1,113 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+XS::Check - check XS for problems
+
+=head1 SYNOPSIS
+
+    use XS::Check;
+    my $check = XS::Check->new ();
+    $check->check_file ('some.xs');
+
+=head1 VERSION
+
+This documents version 0.02 of XS::Check corresponding to
+L<git commit e9bbf02ff885913ac723bd2414a8848a57afc293|https://github.com/benkasminbullock/xs-check/commit/e9bbf02ff885913ac723bd2414a8848a57afc293> released on Thu Aug 17 13:48:21 2017 +0900.
+
+=head1 DESCRIPTION
+
+Check XS files for errors.
+
+=head1 METHODS
+
+=head2 new
+
+    my $check = XS::Check->new ();
+
+=head2 check
+
+    $check->check ($xs);
+
+See L</SUGGESTIONS> for what this reports.
+
+=head2 check_file
+
+    $check->check ($xs_file);
+
+Convenience method to read in $xs_file then run L</check> on it.
+
+This assumes UTF-8 encoding of $xs_file.
+
+=head1 SUGGESTIONS
+
+This section details the possible suggestions made by the module and
+the motivations behind them.
+
+=head2 Use STRLEN in SvPV
+
+Using an int type for the second argument to SvPV may cause errors on
+64-bit Perls.
+
+=head2 Use const char * for return value of SvPV
+
+Be careful to not overwrite Perl's own buffer, which SvPV returns.
+
+=head2 Don't use malloc/calloc/realloc/free
+
+Replace with Newx etc. 
+
+These cause "free to wrong pool" errors on multithreaded Windows
+Perls.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<C::Tokenize>
+
+This supplies the regular expressions used to parse C by the module.
+
+=item L<File::Slurper/read_text>
+
+This is used by L</check_file>.
+
+=item L<Text::LineNumber>
+
+This is used to get the line numbers.
+
+=item L<Carp>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Perl XS modules and CPAN testers|https://www.lemoda.net/perl/perl-xs-cpan-testers/index.html>
+
+A collection of more or less obscure bugs found by CPAN testers, the
+original inspiration for this module.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yq::Regex;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 # ABSTRACT: A regex-based parser for programs
 
 use ETL::Yertl;
@@ -20,35 +20,45 @@ my $QUOTE_STRING = $RE{delimited}{-delim=>q{'"}};
 my $EVAL_NUMS = qr{(?:0b$RE{num}{bin}|0$RE{num}{oct}|0x$RE{num}{hex})};
 
 # Match a document path
-my $FILTER = qr{
-        [.] # entire document
-        |
-        (?:[.](?:\w+|\[\d*\]))+ # hash/array lookup
-        |
-        $QUOTE_STRING
-        |
-        $RE{num}{real}|$EVAL_NUMS
-        |
-        \w+ # Constant/bareword
-    }x;
-my $OP = qr{eq|ne|==|!=|>=?|<=?};
-my $FUNC_NAME = qr{empty|select|grep|group_by|keys|length|sort};
-my $EXPR = qr{
-    \{(\s*$FILTER\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
-    |
-    \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
-    |
-    $FUNC_NAME(?:\(\s*(?0)\s*\))? # Function with optional argument
-    |
-    $FILTER\s+$OP\s+$FILTER # Binary operator
-    |
-    $FILTER
+our $GRAMMAR = qr{
+    (?(DEFINE)
+        (?<FILTER>
+            (?:\$?[.](?:\w+|\[\d*\]))+ # hash/array lookup
+            |
+            \$?[.] # entire document
+            |
+            $QUOTE_STRING
+            |
+            $RE{num}{real}|$EVAL_NUMS
+            |
+            \w+ # Constant/bareword
+        )
+        (?<OP>eq|ne|==?|!=|>=?|<=?)
+        (?<FUNC_NAME>empty|select|grep|group_by|keys|length|sort|each)
+        (?<EXPR>
+            \{(\s*(?&FILTER)\s*:\s*(?0)\s*(?:,(?-1))*)\} # Hash constructor
+            |
+            \[(\s*(?0)\s*(?:,(?-1))*)\] # Array constructor
+            |
+            (?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))? # Function with optional argument
+            |
+            (?:(?&FILTER)|(?&FUNC_NAME)(?:\(\s*((?&EXPR))\s*\))?)\s+(?&OP)\s+(?&EXPR) # Binop with filter
+            |
+            (?&FILTER)
+        )
+    )
 }x;
+
+my $FILTER = qr{(?&FILTER)$GRAMMAR};
+my $OP = qr{(?&OP)$GRAMMAR};
+my $FUNC_NAME = qr{(?&FUNC_NAME)$GRAMMAR};
+my $EXPR = qr{(?&EXPR)$GRAMMAR};
 my $PIPE = qr{[|]};
 
 # Filter MUST NOT mutate $doc!
 sub filter {
-    my ( $class, $filter, $doc, $scope ) = @_;
+    my ( $class, $filter, $doc, $scope, $orig_doc ) = @_;
+    $orig_doc ||= $doc;
 
     # Pipes: LEFT | RIGHT pipes the output of LEFT to the input of RIGHT
     if ( $filter =~ $PIPE ) {
@@ -57,7 +67,7 @@ sub filter {
         for my $expr ( @exprs ) {
             my @out = ();
             for my $doc ( @in ) {
-                push @out, $class->filter( $expr, $doc, $scope );
+                push @out, $class->filter( $expr, $doc, $scope, $orig_doc );
             }
             @in = @out;
         }
@@ -69,8 +79,8 @@ sub filter {
         my ( $inner ) = $filter =~ /^\{\s*([^\}]+?)\s*\}$/;
         for my $pair ( split /\s*,\s*/, $inner ) {
             my ( $key_filter, $value_expr ) = split /\s*:\s*/, $pair;
-            my $key = $class->filter( $key_filter, $doc );
-            $out{ $key } = $class->filter( $value_expr, $doc );
+            my $key = $class->filter( $key_filter, $doc, $scope, $orig_doc );
+            $out{ $key } = $class->filter( $value_expr, $doc, $scope, $orig_doc );
         }
         return \%out;
     }
@@ -79,17 +89,17 @@ sub filter {
         my @out;
         my ( $inner ) = $filter =~ /^\[\s*([^\]]+?)\s*\]$/;
         for my $value_expr ( split /\s*,\s*/, $inner ) {
-            push @out, $class->filter( $value_expr, $doc );
+            push @out, $class->filter( $value_expr, $doc, $scope, $orig_doc );
         }
         return \@out;
     }
     # , does multiple filters, yielding multiple documents
     elsif ( $filter =~ /,/ ) {
         my @filters = split /\s*,\s*/, $filter;
-        return map { $class->filter( $_, $doc ) } @filters;
+        return map { $class->filter( $_, $doc, $scope, $orig_doc ) } @filters;
     }
     # Function calls
-    elsif ( $filter =~ /^($FUNC_NAME)(?:\(\s*($EXPR)\s*\))?$/ ) {
+    elsif ( $filter =~ /^((?&FUNC_NAME))(?:\(\s*((?&EXPR))\s*\))?$GRAMMAR$/ ) {
         my ( $func, $expr ) = ( $1, $2 );
         diag( 1, "F: $func, ARG: " . ( $expr || '' ) );
         if ( $func eq 'empty' ) {
@@ -103,22 +113,22 @@ sub filter {
                 warn "'$func' takes an expression argument";
                 return empty;
             }
-            return $class->filter( $expr, $doc ) ? $doc : empty;
+            return $class->filter( $expr, $doc, $scope, $orig_doc ) ? $doc : empty;
         }
         elsif ( $func eq 'group_by' ) {
-            my $grouping = $class->filter( $expr, $doc );
+            my $grouping = $class->filter( $expr, $doc, $scope, $orig_doc );
             push @{ $scope->{ group_by }{ $grouping } }, $doc;
             return;
         }
         elsif ( $func eq 'sort' ) {
             $expr ||= '.';
-            my $value = $class->filter( $expr, $doc );
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
             push @{ $scope->{sort} }, [ "$value", $doc ];
             return;
         }
         elsif ( $func eq 'keys' ) {
             $expr ||= '.';
-            my $value = $class->filter( $expr, $doc );
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return [ keys %$value ];
             }
@@ -130,9 +140,23 @@ sub filter {
                 return empty;
             }
         }
+        elsif ( $func eq 'each' ) {
+            $expr ||= '.';
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
+            if ( ref $value eq 'HASH' ) {
+                return map +{ key => $_, value => $value->{ $_ } }, keys %$value;
+            }
+            elsif ( ref $value eq 'ARRAY' ) {
+                return map +{ key => $_, value => $value->[ $_ ] }, 0..$#$value;
+            }
+            else {
+                warn "each() requires a hash or array";
+                return empty;
+            }
+        }
         elsif ( $func eq 'length' ) {
             $expr ||= '.';
-            my $value = $class->filter( $expr, $doc );
+            my $value = $class->filter( $expr, $doc, $scope, $orig_doc );
             if ( ref $value eq 'HASH' ) {
                 return scalar keys %$value;
             }
@@ -149,7 +173,7 @@ sub filter {
         }
     }
     # Hash and array keys to traverse the data structure
-    elsif ( $filter =~ /^($FILTER)$/ ) {
+    elsif ( $filter =~ /^((?&FILTER))$GRAMMAR$/ ) {
         # Extract quoted strings
         if ( $filter =~ /^(['"])(.+)(\1)$/ ) {
             return $2;
@@ -160,7 +184,7 @@ sub filter {
             return eval $filter;
         }
         # Constants/barewords do not begin with .
-        elsif ( $filter !~ /^[.]/ ) {
+        elsif ( $filter !~ /^[\$.]/ ) {
             # If it's not a reserved word, it's a string
             # XXX: This is a very poor decision...
             return $filter;
@@ -171,7 +195,7 @@ sub filter {
         }
 
         my @keys = split /[.]/, $filter;
-        my $subdoc = $doc;
+        my $subdoc = $keys[0] && $keys[0] eq '$' ? $orig_doc : $doc;
         for my $key ( @keys[1..$#keys] ) {
             if ( $key =~ /^\[\]$/ ) {
                 return @{ $subdoc };
@@ -188,43 +212,67 @@ sub filter {
         }
         return $subdoc;
     }
-    # Binary operators
-    elsif ( $filter =~ /^($FILTER)\s+($OP)\s+($FILTER)$/ ) {
+
+    # Binary operators (binops)
+    elsif ( $filter =~ /^((?&FILTER)|(?&FUNC_NAME)(?:\(\s*(?&EXPR)\s*\))?)\s+((?&OP))\s+((?&EXPR))$GRAMMAR$/ ) {
         my ( $lhs_filter, $cond, $rhs_filter ) = ( $1, $2, $3 );
-        my $lhs_value = $class->filter( $lhs_filter, $doc );
-        my $rhs_value = $class->filter( $rhs_filter, $doc );
-        diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
-        # These operators suppress undef warnings, treating undef as just
-        # another value. Undef will never be treated as '' or 0 here.
-        if ( $cond eq 'eq' ) {
-            return defined $lhs_value == defined $rhs_value 
-                && $lhs_value eq $rhs_value ? true : false;
+        if ( $cond eq '=' ) {
+            # Get the referent from the left-hand side
+            my @keys = split /[.]/, $lhs_filter;
+            my $subdoc = $keys[0] && $keys[0] eq '$' ? \$orig_doc : \$doc;
+            for my $key ( @keys[1..$#keys] ) {
+                if ( $key =~ /^\[(\d+)\]$/ ) {
+                    $subdoc = \( $$subdoc->[ $1 ] );
+                }
+                elsif ( $key =~ /^\w+$/ ) {
+                    $subdoc = \( $$subdoc->{ $key } );
+                }
+                else {
+                    die "Invalid filter key '$key'";
+                }
+            }
+
+            my $rhs_value = $class->filter( $rhs_filter, $doc, $scope, $orig_doc );
+            diag( 1, join " ", "BINOP:", $lhs_filter, $cond, $rhs_value // '<undef>' );
+            $$subdoc = $rhs_value;
+            return $doc; # Assignment does not change current document
         }
-        elsif ( $cond eq 'ne' ) {
-            return defined $lhs_value != defined $rhs_value
-                || $lhs_value ne $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '==' ) {
-            return defined $lhs_value == defined $rhs_value
-                && $lhs_value == $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '!=' ) {
-            return defined $lhs_value != defined $rhs_value
-                || $lhs_value != $rhs_value ? true : false;
-        }
-        # These operators allow undef warnings, since equating undef to 0 or ''
-        # can be a cause of problems.
-        elsif ( $cond eq '>' ) {
-            return $lhs_value > $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '>=' ) {
-            return $lhs_value >= $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '<' ) {
-            return $lhs_value < $rhs_value ? true : false;
-        }
-        elsif ( $cond eq '<=' ) {
-            return $lhs_value <= $rhs_value ? true : false;
+        else {
+            my $lhs_value = $class->filter( $lhs_filter, $doc, $scope, $orig_doc );
+            my $rhs_value = $class->filter( $rhs_filter, $doc, $scope, $orig_doc );
+            diag( 1, join " ", "BINOP:", $lhs_value // '<undef>', $cond, $rhs_value // '<undef>' );
+            # These operators suppress undef warnings, treating undef as just
+            # another value. Undef will never be treated as '' or 0 here.
+            if ( $cond eq 'eq' ) {
+                return defined $lhs_value == defined $rhs_value 
+                    && $lhs_value eq $rhs_value ? true : false;
+            }
+            elsif ( $cond eq 'ne' ) {
+                return defined $lhs_value != defined $rhs_value
+                    || $lhs_value ne $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '==' ) {
+                return defined $lhs_value == defined $rhs_value
+                    && $lhs_value == $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '!=' ) {
+                return defined $lhs_value != defined $rhs_value
+                    || $lhs_value != $rhs_value ? true : false;
+            }
+            # These operators allow undef warnings, since equating undef to 0 or ''
+            # can be a cause of problems.
+            elsif ( $cond eq '>' ) {
+                return $lhs_value > $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '>=' ) {
+                return $lhs_value >= $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '<' ) {
+                return $lhs_value < $rhs_value ? true : false;
+            }
+            elsif ( $cond eq '<=' ) {
+                return $lhs_value <= $rhs_value ? true : false;
+            }
         }
     }
     # Conditional (if/then/else)
@@ -232,12 +280,12 @@ sub filter {
     # because $EXPR has captures in itself
     elsif ( $filter =~ /^if\s+(?<expr>$EXPR)\s+then\s+(?<true>$FILTER)(?:\s+else\s+(?<false>$FILTER))?$/ ) {
         my ( $expr, $true_filter, $false_filter ) = @+{qw( expr true false )};
-        my $expr_value = $class->filter( $expr, $doc );
+        my $expr_value = $class->filter( $expr, $doc, $scope, $orig_doc );
         if ( $expr_value ) {
-            return $class->filter( $true_filter, $doc );
+            return $class->filter( $true_filter, $doc, $scope, $orig_doc );
         }
         else {
-            return $false_filter ? $class->filter( $false_filter, $doc ) : ();
+            return $false_filter ? $class->filter( $false_filter, $doc, $scope, $orig_doc ) : ();
         }
     }
     else {
@@ -258,7 +306,7 @@ ETL::Yertl::Command::yq::Regex - A regex-based parser for programs
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 AUTHOR
 

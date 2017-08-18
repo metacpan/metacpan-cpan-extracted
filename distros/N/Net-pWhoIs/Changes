@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::pWhoIs.
+
+0.01  Thu Aug 10 13:30:23 2017
+	- original version; created by h2xs 1.23 with options
+		-L./Net -XAn Net::pWhoIs
+

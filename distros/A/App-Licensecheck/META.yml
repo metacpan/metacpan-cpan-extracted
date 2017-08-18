@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Licensing
   - Sourcecode
@@ -31,13 +31,7 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.0.30
-  Regexp::Pattern::License:
-    file: lib/Regexp/Pattern/License.pm
-    version: v3.0.30
-  Regexp::Pattern::License::Parts:
-    file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.0.30
+    version: v3.0.31
 requires:
   Encode: '0'
   Fcntl: '0'
@@ -47,6 +41,7 @@ requires:
   Path::Iterator::Rule: '0'
   Path::Tiny: '0.062'
   Pod::Constants: '0'
+  Regexp::Pattern::License: v3.0.30
   Sort::Key::Multi: '1.25'
   String::Copyright: '0.003'
   String::Escape: '0'
@@ -62,12 +57,12 @@ resources:
   homepage: https://metacpan.org/release/App-Licensecheck
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/licensecheck.git
-version: v3.0.30
+version: v3.0.31
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - documenter
   - tester
+  - documenter
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

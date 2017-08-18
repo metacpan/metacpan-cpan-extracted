@@ -14,6 +14,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Fuse' => 0,
         'Test::More' => 0,
+        'Test::Class' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Fuse-Class-* cover_db' },

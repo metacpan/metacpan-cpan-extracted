@@ -1,4 +1,8 @@
+0.003     2017-08-16 13:06:36-05:00 America/Chicago
+    - No functional or documentation changes
+    - Fixed POD encoding
+    - Fixed distribution metadata
 0.002     2011-05-13 10:42:14 America/New_York
-
+    - More complete synopsis in documentation
 0.001     2011-05-12 17:36:35 America/New_York
-    initial release
+    - Initial release

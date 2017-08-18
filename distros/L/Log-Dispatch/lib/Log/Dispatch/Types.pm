@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.65';
+our $VERSION = '2.66';
 
 use parent 'Specio::Exporter';
 
@@ -84,7 +84,7 @@ Log::Dispatch::Types - Types used for parameter checking in Log::Dispatch
 
 =head1 VERSION
 
-version 2.65
+version 2.66
 
 =head1 DESCRIPTION
 

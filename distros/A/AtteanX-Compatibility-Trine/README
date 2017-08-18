@@ -1,0 +1,45 @@
+NAME
+    AtteanX::Compatibility::Trine - Compatibility layer between RDF::Trine and
+    Attean
+
+SYNOPSIS
+    In modules that have old RDF::Trine methods, but otherwise uses Attean,
+    just go:
+
+      use AtteanX::Compatibility::Trine;
+
+DESCRIPTION
+    For now, only certain methods of RDF::Trine nodes are supported. They are
+    added to the respective Attean terms by this module. They are:
+
+    *   `Attean::Blank::blank_identifier`
+
+    *   `Attean::IRI::uri`
+
+    *   `Attean::Literal::literal_value`
+
+    *   `Attean::Literal::literal_value_language`
+
+    *   `Attean::Literal::has_datatype`
+
+    *   `Attean::Literal::literal_datatype`
+
+BUGS
+    Please report any bugs or things you miss from RDF::Trine here:
+    <https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues>.
+
+SEE ALSO
+AUTHOR
+    Kjetil Kjernsmo <kjetilk@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Kjetil Kjernsmo.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,3 +1,31 @@
+/* from vutil.h
+ * Perl 5 license
+ */
+#ifndef PERL_VERSION_DECIMAL
+# define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#endif
+#ifndef PERL_DECIMAL_VERSION
+# define PERL_DECIMAL_VERSION \
+         PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#endif
+#ifndef PERL_VERSION_LT
+# define PERL_VERSION_LT(r,v,s) \
+         (PERL_DECIMAL_VERSION < PERL_VERSION_DECIMAL(r,v,s))
+#endif
+#ifndef PERL_VERSION_LE
+# define PERL_VERSION_LE(r,v,s) \
+         (PERL_DECIMAL_VERSION <= PERL_VERSION_DECIMAL(r,v,s))
+#endif
+#ifndef PERL_VERSION_GE
+# define  PERL_VERSION_GE(r,v,s) \
+         (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#endif
+#ifndef PERL_VERSION_GT
+# define PERL_VERSION_GT(r,v,s) \
+         (PERL_DECIMAL_VERSION > PERL_VERSION_DECIMAL(r,v,s))
+#endif
+
+
 /*    multicall.h		(version 1.0)
  *
  * Implements a poor-man's MULTICALL interface for old versions
@@ -5,6 +33,13 @@
  * with 5.6.0 and later.
  *
  */
+
+#if PERL_VERSION_GE(5,8,8) && PERL_VERSION_LT(5,10,1)
+# undef dMULTICALL
+# undef MULTICALL_PUSHSUB
+# undef PUSH_MULTICALL
+# undef POP_MULTICALL
+#endif
 
 #ifdef dMULTICALL
 #define REAL_MULTICALL

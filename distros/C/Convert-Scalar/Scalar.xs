@@ -4,18 +4,49 @@
 
 #define RETCOPY(sv)		\
   if (GIMME_V != G_VOID)	\
-    { 				\
+    {				\
       dXSTARG;			\
       sv_setsv (TARG, (sv));	\
       EXTEND (SP, 1);		\
       PUSHs (TARG);		\
     }
 
+static void
+extend (SV *scalar, STRLEN addlen)
+{
+  SvUPGRADE (scalar, SVt_PV);
+
+  STRLEN cur = SvCUR (scalar);
+  STRLEN len = SvLEN (scalar);
+  
+  if (cur + addlen < len)
+    return;
+
+  STRLEN l = len;
+  STRLEN o = cur + addlen >= 4096 ? sizeof (void *) * 4 : 0;
+
+  if (l < 64)
+    l = 64;
+
+  /* for big sizes, leave a bit of space for malloc management, and assume 4kb or smaller pages */
+  addlen += o;
+
+  while (cur + addlen >= l)
+    l <<= 1;
+
+  sv_grow (scalar, l - o);
+}
+
 MODULE = Convert::Scalar		PACKAGE = Convert::Scalar
+
+TYPEMAP: <<EOF
+SSize_t		T_UV
+EOF
+
+PROTOTYPES: ENABLE
 
 bool
 utf8 (SV *scalar, SV *mode = NO_INIT)
-        PROTOTYPE: $;$
         CODE:
         SvGETMAGIC (scalar);
         RETVAL = !!SvUTF8 (scalar);
@@ -33,7 +64,6 @@ utf8 (SV *scalar, SV *mode = NO_INIT)
 
 void
 utf8_on (SV *scalar)
-        PROTOTYPE: $
         PPCODE:
         if (SvREADONLY (scalar))
           croak ("Convert::Scalar::utf8_on called on read only scalar");
@@ -44,7 +74,6 @@ utf8_on (SV *scalar)
 
 void
 utf8_off (SV *scalar)
-        PROTOTYPE: $
         PPCODE:
         if (SvREADONLY (scalar))
           croak ("Convert::Scalar::utf8_off called on read only scalar");
@@ -55,7 +84,6 @@ utf8_off (SV *scalar)
 
 int
 utf8_valid (SV *scalar)
-        PROTOTYPE: $
         CODE:
         STRLEN len;
         char *str = SvPV (scalar, len);
@@ -65,7 +93,6 @@ utf8_valid (SV *scalar)
 
 void
 utf8_upgrade (SV *scalar)
-        PROTOTYPE: $
 	PPCODE:
         if (SvREADONLY (scalar))
           croak ("Convert::Scalar::utf8_upgrade called on read only scalar");
@@ -75,7 +102,6 @@ utf8_upgrade (SV *scalar)
 
 bool
 utf8_downgrade (SV *scalar, bool fail_ok = 0)
-        PROTOTYPE: $;$
 	CODE:
         if (SvREADONLY (scalar))
           croak ("Convert::Scalar::utf8_downgrade called on read only scalar");
@@ -86,7 +112,6 @@ utf8_downgrade (SV *scalar, bool fail_ok = 0)
 
 void
 utf8_encode (SV *scalar)
-        PROTOTYPE: $
 	PPCODE:
         if (SvREADONLY (scalar))
           croak ("Convert::Scalar::utf8_encode called on read only scalar");
@@ -96,7 +121,6 @@ utf8_encode (SV *scalar)
 
 UV
 utf8_length (SV *scalar)
-        PROTOTYPE: $
 	CODE:
         RETVAL = (UV) utf8_length (SvPV_nolen (scalar), SvEND (scalar));
 	OUTPUT:
@@ -104,7 +128,6 @@ utf8_length (SV *scalar)
 
 bool
 readonly (SV *scalar, SV *on = NO_INIT)
-        PROTOTYPE: $;$
         CODE:
         RETVAL = SvREADONLY (scalar);
         if (items > 1)
@@ -119,37 +142,31 @@ readonly (SV *scalar, SV *on = NO_INIT)
 
 void
 readonly_on (SV *scalar)
-        PROTOTYPE: $
         CODE:
         SvREADONLY_on (scalar);
 
 void
 readonly_off (SV *scalar)
-        PROTOTYPE: $
         CODE:
         SvREADONLY_off (scalar);
 
 void
 unmagic (SV *scalar, char type)
-        PROTOTYPE: $$
 	CODE:
         sv_unmagic (scalar, type);
 
 void
 weaken (SV *scalar)
-        PROTOTYPE: $
 	CODE:
         sv_rvweaken (scalar);
 
 void
 taint (SV *scalar)
-        PROTOTYPE: $
 	CODE:
         SvTAINTED_on (scalar);
 
 bool
 tainted (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvTAINTED (scalar);
 	OUTPUT:
@@ -157,13 +174,11 @@ tainted (SV *scalar)
 
 void
 untaint (SV *scalar)
-        PROTOTYPE: $
 	CODE:
         SvTAINTED_off (scalar);
 
 STRLEN
 len (SV *scalar)
-	PROTOTYPE: $
 	CODE:
         if (SvTYPE (scalar) < SVt_PV)
           XSRETURN_UNDEF;
@@ -173,46 +188,111 @@ len (SV *scalar)
 
 void
 grow (SV *scalar, STRLEN newlen)
-        PROTOTYPE: $$
         PPCODE:
         sv_grow (scalar, newlen);
         if (GIMME_V != G_VOID)
           XPUSHs (sv_2mortal (SvREFCNT_inc (scalar)));
 
 void
-extend (SV *scalar, STRLEN addlen)
-        PROTOTYPE: $$
+extend (SV *scalar, STRLEN addlen = 64)
         PPCODE:
 {
-	if (SvTYPE (scalar) < SVt_PV)
-          sv_upgrade (scalar, SVt_PV);
-
-        if (SvCUR (scalar) + addlen >= SvLEN (scalar))
-          {
-            STRLEN l = SvLEN (scalar);
-            STRLEN o = SvCUR (scalar) + addlen >= 4096 ? sizeof (void *) * 4 : 0;
-
-            if (l < 64)
-              l = 64;
-
-            /* for big sizes, leave a bit of space for malloc management, and assume 4kb or smaller pages */
-            addlen += o;
-
-            while (SvCUR (scalar) + addlen >= l)
-              l <<= 1;
-
-            l -= o;
-
-            sv_grow (scalar, l);
-          }
+	extend (scalar, addlen);
 
         if (GIMME_V != G_VOID)
           XPUSHs (sv_2mortal (SvREFCNT_inc (scalar)));
 }
 
+SSize_t
+extend_read (PerlIO *fh, SV *scalar, STRLEN addlen = 64)
+        CODE:
+{
+	if (SvUTF8 (scalar))
+          sv_utf8_downgrade (scalar, 0);
+
+	extend (scalar, addlen);
+
+        RETVAL = PerlLIO_read (PerlIO_fileno (fh), SvEND (scalar), SvLEN (scalar) - SvCUR (scalar));
+
+        if (RETVAL < 0)
+          XSRETURN_UNDEF;
+
+        SvPOK_only (scalar);
+        SvCUR_set (scalar, SvCUR (scalar) + RETVAL);
+}
+	OUTPUT: RETVAL
+
+SSize_t
+read_all (PerlIO *fh, SV *scalar, STRLEN count)
+	CODE:
+{
+	SvUPGRADE (scalar, SVt_PV);
+	if (SvUTF8 (scalar))
+          sv_utf8_downgrade (scalar, 0);
+
+        SvPOK_only (scalar);
+
+	int fd = PerlIO_fileno (fh);
+	RETVAL = 0;
+
+        SvGROW (scalar, count);
+
+        for (;;)
+          {
+            STRLEN rem = count - RETVAL;
+
+            if (!rem)
+              break;
+
+            STRLEN got = PerlLIO_read (fd, SvPVX (scalar) + RETVAL, rem);
+
+            if (got == 0)
+              break;
+            else if (got < 0)
+              if (RETVAL)
+                break;
+              else
+                XSRETURN_UNDEF;
+
+            RETVAL += got;
+          }
+
+        SvCUR_set (scalar, RETVAL);
+}
+	OUTPUT: RETVAL
+
+SSize_t
+write_all (PerlIO *fh, SV *scalar)
+	CODE:
+{
+	STRLEN count;
+        char *ptr = SvPVbyte (scalar, count);
+
+	int fd = PerlIO_fileno (fh);
+	RETVAL = 0;
+
+        for (;;)
+          {
+            STRLEN rem = count - RETVAL;
+
+            if (!rem)
+              break;
+
+            STRLEN got = PerlLIO_write (fd, ptr + RETVAL, rem);
+
+            if (got < 0)
+              if (RETVAL)
+                break;
+              else
+                XSRETURN_UNDEF;
+
+            RETVAL += got;
+          }
+}
+	OUTPUT: RETVAL
+
 int
 refcnt (SV *scalar, U32 newrefcnt = NO_INIT)
-        PROTOTYPE: $;$
         ALIAS:
           refcnt_rv = 1
         CODE:
@@ -231,7 +311,6 @@ void
 refcnt_inc (SV *scalar)
         ALIAS:
           refcnt_inc_rv = 1
-        PROTOTYPE: $
         CODE:
         if (ix)
           {
@@ -244,7 +323,6 @@ void
 refcnt_dec (SV *scalar)
         ALIAS:
           refcnt_dec_rv = 1
-        PROTOTYPE: $
         CODE:
         if (ix)
           {
@@ -255,7 +333,6 @@ refcnt_dec (SV *scalar)
 
 bool
 ok (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvOK (scalar);
 	OUTPUT:
@@ -263,7 +340,6 @@ ok (SV *scalar)
 
 bool
 uok (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvUOK (scalar);
 	OUTPUT:
@@ -271,7 +347,6 @@ uok (SV *scalar)
 
 bool
 rok (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvROK (scalar);
 	OUTPUT:
@@ -279,7 +354,6 @@ rok (SV *scalar)
 
 bool
 pok (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvPOK (scalar);
 	OUTPUT:
@@ -287,7 +361,6 @@ pok (SV *scalar)
 
 bool
 nok (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvNOK (scalar);
 	OUTPUT:
@@ -295,7 +368,6 @@ nok (SV *scalar)
 
 bool
 niok (SV *scalar)
-        PROTOTYPE: $
         CODE:
         RETVAL = !!SvNIOK (scalar);
 	OUTPUT:

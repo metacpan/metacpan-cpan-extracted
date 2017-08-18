@@ -1,5 +1,5 @@
 package Exceptions;
-$Exceptions::VERSION = '0.101';
+$Exceptions::VERSION = '0.102';
 use strict;
 use warnings;
 
@@ -14,22 +14,27 @@ Exceptions - Documentation for exception handling in Perl.
 =head1 DESCRIPTION
 
 This module doesn't do anything, it exists solely to document how to handle
-exceptions in Perl.
+exceptions in Perl. It was originally released in 1996, but it hasn't been
+installable or usable in any fashion since then.
 
-=head1 WHY?
+Many other alternatives have cropped up over the years to make exception
+handling much easier.
 
-This module was originally released in 1996, but it hasn't been installable or
-usable in any fashion since then. Many other alternatives have cropped up over
-the years to make exception handling much easier. If you want to skip the
-explanations below, then you should look directly at some of the modules that
-make exception handling dead simple.
+=head1 TRY CATCH FINALLY
+
+If you want to skip the explanations below, then you should look directly at
+some of the modules that make exception handling dead simple.
 
 L<Syntax::Keyword::Try> - Catch exceptions in a familiar C<try> and C<catch>
-way. If you look no further, make use of this module or L<Try::Tiny>! This
+way. If you look no further, make use of this module! This
 module requires Perl v5.14 or better as it uses pluggable keywords.
 
-L<Try::Tiny> - Catch exceptions in a familiar C<try> and C<catch> way. If you
-look no further, make use of this module!
+If you can't make use of L<Syntax::Keyword::Try> because you're not on at least
+version 5.14 of Perl, then you can use a pure-Perl module instead:
+
+L<Try::Tiny> - Catch exceptions in a familiar C<try> and C<catch> way.
+
+=head1 THROW
 
 With a good way to catch exceptions, now you need exception types so you can
 re-throw exceptions when they're something that should be handled elsewhere.
@@ -52,6 +57,9 @@ L<Mojo::Exception>
 
 
 =head1 AN EXCEPTION
+
+Now that we've shown you what you should be using above, let's explain a bit of
+the I<why> of it all.
 
 An exception is what happens anytime your program's execution exits
 unexpectedly. Let's start with a simple example.
@@ -96,22 +104,16 @@ Let's look at our previous simple application with error handling using C<eval>.
     use strict;
     use warnings;
 
+    # 1
     my $value;
     my $error = do { # catch block
         local $@;
         eval { $value = increment(0) }; # try
         $@;
     };
+    print "0 plus 1 = ", ($error ? "error": $value), "\n";
 
-    print "0 plus 1 = ";
-    if ($error) {
-        print "error";
-    }
-    else {
-        print $value;
-    }
-    print "\n"; # 1
-
+    # error
     $value = undef;
     $error = undef;
     $error = do { # catch block
@@ -119,16 +121,9 @@ Let's look at our previous simple application with error handling using C<eval>.
         eval { $value = increment('zero') }; # try
         $@;
     };
+    print "zero plus 1 = ", ($error ? "error": $value), "\n";
 
-    print "zero plus 1 = ";
-    if ($error) {
-        print "error";
-    }
-    else {
-        print $value;
-    }
-    print "\n"; # error
-
+    # 1
     $value = undef;
     $error = undef;
     $error = do { # catch block
@@ -136,15 +131,7 @@ Let's look at our previous simple application with error handling using C<eval>.
         eval { $value = increment(0) }; # try
         $@;
     };
-
-    print "0 plus 1 = ";
-    if ($error) {
-        print "error";
-    }
-    else {
-        print $value;
-    }
-    print "\n"; # 1
+    print "0 plus 1 = ", ($error ? "error": $value), "\n";
 
     sub increment {
         my $int = shift;

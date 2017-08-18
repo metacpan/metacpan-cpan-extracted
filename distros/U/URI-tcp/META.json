@@ -1,0 +1,78 @@
+{
+   "abstract" : "tcp connection string",
+   "author" : [
+      "Jan Seidl <seidl@avast.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URI-tcp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "URI::tcp" : {
+         "file" : "lib/URI/tcp.pm",
+         "version" : "v2.0.0"
+      },
+      "URI::udp" : {
+         "file" : "lib/URI/udp.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avast/URI-tcp/issues"
+      },
+      "homepage" : "https://github.com/avast/URI-tcp",
+      "repository" : {
+         "url" : "git://github.com/avast/URI-tcp.git",
+         "web" : "https://github.com/avast/URI-tcp"
+      }
+   },
+   "version" : "2.0.0",
+   "x_authority" : "cpan:JASEI",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

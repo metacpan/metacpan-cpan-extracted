@@ -1,5 +1,10 @@
 Revision history for LWP-Authen-OAuth2
 
+0.14	2017-08-16T08:18:46
+   - released on CPAN-Day 2017 from Sibiu, Romania
+   - Add Service Provider for Line (Adam Millerchip)
+
+
 0.13    2016-11-21T15:08:43
     - Add documentation for some new methods, and for Dwolla (Adi Fairbank)
 

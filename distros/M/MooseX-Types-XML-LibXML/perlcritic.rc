@@ -1,6 +1,6 @@
 severity = brutal
 verbose = 8
-exclude = Documentation::RequirePodAtEnd Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Modules::RequirePerlVersion Tics::ProhibitLongLines
+exclude = Documentation::RequirePodAtEnd Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Modules::RequirePerlVersion Tics::ProhibitLongLines CodeLayout::ProhibitHashBarewords
 
 [Lax::RequireExplicitPackage::ExceptForPragmata]
 allowed_pragmata = diagnostics feature perlversion strict warnings utf8
@@ -29,7 +29,7 @@ functions = :builtins
 exclude_functions = print say
 
 [Subroutines::ProhibitCallsToUndeclaredSubs]
-exempt_subs = MooseX::Types::as MooseX::Types::from MooseX::Types::message MooseX::Types::subtype MooseX::Types::via MooseX::Types::where
+exempt_subs = MooseX::Types::as MooseX::Types::from MooseX::Types::via
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Modern::Perl

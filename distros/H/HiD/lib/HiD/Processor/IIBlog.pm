@@ -3,7 +3,7 @@
 
 package HiD::Processor::IIBlog;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Processor::IIBlog::VERSION = '1.98';
+$HiD::Processor::IIBlog::VERSION = '1.991';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -15,7 +15,7 @@ use warnings    qw/ FATAL  utf8     /;
 use open        qw/ :std  :utf8     /;
 use charnames   qw/ :full           /;
 
-use Text::Xslate;
+use Text::Xslate qw/ mark_raw /;
 
 has 'txs' => (
   is       => 'ro' ,
@@ -39,9 +39,15 @@ sub BUILDARGS {
       function => {
         commafy     => sub { my $a = shift; join ',' , @$a },
         lc          => sub { lc( shift ) } ,
+        lightbox    => \&_lightbox,
         pretty_date => sub { shift->strftime( "%d %b %Y" ) },
       } ,
-      path => $path ,
+      path => $path,
+      warn_handler => sub {
+        my $self = shift;
+        say($self);
+        die;
+      }
     ),
   };
 }
@@ -52,6 +58,20 @@ sub process {
   $$output_ref = $self->txs->render_string( $$input_ref , $args );
 
   return 1;
+}
+
+sub _lightbox {
+  my %args = @_;
+
+  my $img   = $args{img}   // die "lightbox needs img arg";
+  my $width = $args{width} //= 300;
+  my $alt   = $args{alt}   // die "lightbox needs alt arg";
+
+  return mark_raw(<<EOHTML);
+<a href="$img" class="lightbox">
+  <img src="$img" width="$width" alt="$alt" />
+</a>
+EOHTML
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -76,9 +96,38 @@ HiD::Processor::IIBlog - The modified form of HiD::Proccessor::Handlebars we use
 Wraps up a L<Text::Xslate> object and allows it to be used during HiD
 publication.
 
+=head2 Custom Xslate functions
+
+The L<Text::Xslate> object created by this processor provides a
+few custom utility functions.
+
+=over
+
+=item commafy( \@list )
+
+Joins the items of the list with commas. Neither an Oxford comma nor
+conjunction for the terminal element is included.
+
+=item lc( $string )
+
+Lowercases the string.
+
+=item lightbox( img => $img, alt => $alt, width => $width )
+
+Creates a ligthbox. Both C<img> and C<alt> are mandatory. C<width>, if not
+provided, defaults to C<300>. Requires installation of Magnific Popup elements
+for full functioning; see L<http://dimsemenov.com/plugins/magnific-popup>.
+
+=item pretty_date( $datetime )
+
+Takes in a L<DateTime> object and returns a string of the format
+C<17 Aug 2017>.
+
+=back
+
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

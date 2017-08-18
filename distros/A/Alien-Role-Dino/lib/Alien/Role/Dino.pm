@@ -7,7 +7,7 @@ use Role::Tiny;
 use Role::Tiny::With ();
 
 # ABSTRACT: Experimental support for dynamic share Alien install
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub rpath
@@ -59,7 +59,7 @@ Alien::Role::Dino - Experimental support for dynamic share Alien install
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

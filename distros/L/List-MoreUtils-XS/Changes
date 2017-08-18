@@ -1,5 +1,46 @@
 Revision history for Perl extension List-MoreUtils-XS
 
+0.422	2017-08-15
+    - Rename 'occurances' into 'occurrences' as requested in RT#122806 by
+      Paul Howarth as a slightly late side-note in RT#91991.
+    - Add DESCRIPTION to Pod clarifying the role of List::MoreUtils::XS
+    - improve Makefile.PL regarding some build artifacts
+
+0.421	2017-08-14
+    - correct license in META thanks to Chase Whitener (RT#122702)
+    - fix issues with -DPERL_IMPLICIT_SYS on Windows with Strawberry-Perl
+
+0.420_002	2017-08-03
+    - improve configure toolchain to use Config::AutoConf 0.315
+    - speed up some inner loops by hinting the expected result
+    - fix mind screwed up issue in upper_bound and reduce elements
+      visited in equal_range
+
+0.420_001	2017-06-28
+    - fix a lot of potential memory leaks when callbacks throw exceptions
+    - add some new functions:
+      * qsort
+      * binsert
+      * bremove
+      * listcmp
+      * arrayify (RT#17230)
+      * samples (RT#77562)
+      * minmaxstr (RT#106401)
+      * lower_bound
+      * upper_bound
+      * equal_range
+      * frequencies
+      * occurances
+      * mode (RT#91991)
+      * zip6 (RT#42921)
+      * reduce_0
+      * reduce_1
+      * reduce_u
+    - improve tests
+    - make List::MoreUtils::XS independent from List::MoreUtils
+      Note that List::MoreUtils::XS doesn't guarantee API stability - this
+      feature is only provided through List::MoreUtils as frontend.
+
 0.418 2017-03-29
     - clarify license conditions
 

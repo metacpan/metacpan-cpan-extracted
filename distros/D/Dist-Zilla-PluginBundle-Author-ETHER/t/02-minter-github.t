@@ -5,7 +5,7 @@ use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use Test::DZil;
-use Path::Tiny 0.062;
+use Path::Tiny;
 use Moose::Util 'find_meta';
 
 use lib 't/lib';

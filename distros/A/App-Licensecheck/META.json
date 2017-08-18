@@ -4,7 +4,7 @@
       "Jonas Smedegaard (JONASS) <jonass@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Licensing",
       "Sourcecode"
@@ -43,6 +43,7 @@
             "Path::Iterator::Rule" : "0",
             "Path::Tiny" : "0.062",
             "Pod::Constants" : "0",
+            "Regexp::Pattern::License" : "v3.0.30",
             "Sort::Key::Multi" : "1.25",
             "String::Copyright" : "0.003",
             "String::Escape" : "0",
@@ -70,15 +71,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.0.30"
-      },
-      "Regexp::Pattern::License" : {
-         "file" : "lib/Regexp/Pattern/License.pm",
-         "version" : "v3.0.30"
-      },
-      "Regexp::Pattern::License::Parts" : {
-         "file" : "lib/Regexp/Pattern/License/Parts.pm",
-         "version" : "v3.0.30"
+         "version" : "v3.0.31"
       }
    },
    "release_status" : "stable",
@@ -96,18 +89,18 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.0.30",
+   "version" : "v3.0.31",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
    "x_help_wanted" : [
-      "documenter",
-      "tester"
+      "tester",
+      "documenter"
    ],
    "x_provides_scripts" : {
       "licensecheck" : {
          "file" : "bin/licensecheck"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

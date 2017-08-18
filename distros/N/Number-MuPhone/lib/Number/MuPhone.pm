@@ -4,7 +4,7 @@ use Number::MuPhone::Parser;
 use Number::MuPhone::Data;
 use Number::MuPhone::Config;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # need this non-Moo encapsulation to allow backwards compatability with Number::Phone
 
@@ -68,6 +68,19 @@ sub new {
       number  => $number,
     });
   }
+
+  # Improve error message for some strings
+  # starts with a + but not a valid international country?
+  if ( $parser_obj->error && !$country && $number =~ /^\s*\+(.)/ ) {
+    my $first_digit = $1;
+    if ( $first_digit eq '0' ) {
+      $parser_obj ->error('Invalid country code - no country code begins with a zero');
+    }
+    else {
+      $parser_obj ->error('Invalid country code - could not determine country');
+    }
+  }
+
 
   # duplicate Number::Phone behavior
   if ( $number && $parser_obj->error && $is_number_phone ) {

@@ -1,8 +1,315 @@
-SYNOPSIS
+NAME
+    App::MysqlUtils - CLI utilities related to MySQL
 
+VERSION
+    This document describes version 0.009 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2017-08-17.
+
+SYNOPSIS
     This distribution includes the following CLI utilities:
 
-    #INSERT_EXECS_LIST
+FUNCTIONS
+  mysql_drop_all_tables
+    Usage:
+
+     mysql_drop_all_tables(%args) -> [status, msg, result, meta]
+
+    Drop all tables in a MySQL database.
+
+    For safety, the default is dry-run mode. To actually drop the tables,
+    you must supply "--no-dry-run" or DRY_RUN=0.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   database* => *str*
+
+    *   host => *str* (default: "localhost")
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   port => *int* (default: 3306)
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_drop_tables
+    Usage:
+
+     mysql_drop_tables(%args) -> [status, msg, result, meta]
+
+    Drop tables in a MySQL database.
+
+    For safety, the default is dry-run mode. To actually drop the tables,
+    you must supply "--no-dry-run" or DRY_RUN=0.
+
+    Examples:
+
+     # Drop table T1, T2, T3 (dry-run mode)
+     % mysql-drop-tables DB T1 T2 T3
+ 
+     # Drop all tables with names matching /foo/ (dry-run mode)
+     % mysql-drop-tables DB --table-pattern foo
+ 
+     # Actually drop all tables with names matching /foo/, don't delete more than 5 tables
+     % mysql-drop-tables DB --table-pattern foo --limit 5 --no-dry-run
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   database* => *str*
+
+    *   host => *str* (default: "localhost")
+
+    *   limit => *posint*
+
+        Don't delete more than this number of tables.
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   port => *int* (default: 3306)
+
+    *   table_pattern => *re*
+
+    *   tables => *array[str]*
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_query
+    Usage:
+
+     mysql_query(%args) -> [status, msg, result, meta]
+
+    Run query and return table result.
+
+    This is like just regular querying, but the result will be returned as
+    table data (formattable using different backends). Or, you can output as
+    JSON.
+
+    Examples:
+
+     # by default, show as pretty text table, like in interactive mysql client
+     % mysql-query DBNAME "SELECT * FROM t1"
+ 
+     # show as JSON (array of hashes)
+     % mysql-query DBNAME "QUERY..." --json ;# or, --format json
+ 
+     # show as CSV
+     % mysql-query DBNAME "QUERY..." --format csv
+ 
+     # show as CSV table using Text::Table::CSV
+     % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org mysql-query DBNAME "QUERY..."
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_row_numbers => *bool*
+
+        Add first field containing number from 1, 2, ...
+
+    *   database* => *str*
+
+    *   host => *str* (default: "localhost")
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   port => *int* (default: 3306)
+
+    *   query* => *str*
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_run_pl_files
+    Usage:
+
+     mysql_run_pl_files(%args) -> [status, msg, result, meta]
+
+    Run each .pl file, feed the output to `mysql` command and write result
+    to .txt file.
+
+    The ".pl" file is supposed to produce a SQL statement. For simpler
+    cases, use mysql-run-sql-files.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   database* => *str*
+
+    *   overwrite_when => *str* (default: "none")
+
+        Specify when to overwrite existing .txt file.
+
+        "none" means to never overwrite existing .txt file. "older"
+        overwrites existing .txt file if it's older than the corresponding
+        .sql file. "always" means to always overwrite existing .txt file.
+
+    *   pl_files* => *array[filename]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_run_sql_files
+    Usage:
+
+     mysql_run_sql_files(%args) -> [status, msg, result, meta]
+
+    Feed each .sql file to `mysql` command and write result to .txt file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   database* => *str*
+
+    *   overwrite_when => *str* (default: "none")
+
+        Specify when to overwrite existing .txt file.
+
+        "none" means to never overwrite existing .txt file. "older"
+        overwrites existing .txt file if it's older than the corresponding
+        .sql file. "always" means to always overwrite existing .txt file.
+
+    *   sql_files* => *array[filename]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_sql_dump_extract_tables
+    Usage:
+
+     mysql_sql_dump_extract_tables(%args) -> [status, msg, result, meta]
+
+    Parse SQL dump and spit out tables to separate files.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_table_patterns => *array[re]*
+
+    *   exclude_tables => *array[str]*
+
+    *   include_table_patterns => *array[re]*
+
+    *   include_tables => *array[str]*
+
+    *   stop_after_table => *str*
+
+    *   stop_after_table_pattern => *re*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-MysqlUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-MysqlUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

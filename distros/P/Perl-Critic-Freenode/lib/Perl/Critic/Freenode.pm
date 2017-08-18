@@ -3,7 +3,7 @@ package Perl::Critic::Freenode;
 use strict;
 use warnings;
 
-our $VERSION = '0.021';
+our $VERSION = '0.024';
 
 1;
 
@@ -95,6 +95,10 @@ Always use the three-argument form of C<open()>
 =item L<Perl::Critic::Policy::Freenode::OverloadOptions>
 
 Don't use L<overload> without specifying a bool overload and enabling fallback
+
+=item L<Perl::Critic::Policy::Freenode::PackageMatchesFilename>
+
+Module files should declare a package matching the filename
 
 =item L<Perl::Critic::Policy::Freenode::POSIXImports>
 

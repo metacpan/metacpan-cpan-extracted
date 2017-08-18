@@ -1,7 +1,7 @@
 package App::PlUtils;
 
-our $DATE = '2016-07-20'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2017-08-16'; # DATE
+our $VERSION = '0.120'; # VERSION
 
 use 5.010001;
 use strict;
@@ -69,7 +69,7 @@ App::PlUtils - Command-line utilities related to Perl scripts
 
 =head1 VERSION
 
-This document describes version 0.11 of App::PlUtils (from Perl distribution App-PlUtils), released on 2016-07-20.
+This document describes version 0.120 of App::PlUtils (from Perl distribution App-PlUtils), released on 2017-08-16.
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,10 @@ scripts.
 =over
 
 =item * L<plcost>
+
+=item * L<pldoc>
+
+=item * L<plhtml>
 
 =item * L<pllex>
 
@@ -148,7 +152,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

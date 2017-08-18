@@ -1,6 +1,11 @@
 Revision history for Perl extension BEGIN::Lift
 
-0.04
+0.05
+    - remove enforcement of BEGIN time, it will
+      just work at runtime as well
+        - removed test that tested this
+
+0.04 2017-01-13
     - better now that the synopsis actually works
 
 0.03 2017-01-13

@@ -2,18 +2,18 @@
 abstract: 'Simple tool to follow up your stocks at Bovespa Stock Exchange'
 author:
   - 'Frederico Recsky <recsky@cpan.org>'
-build_requires: {}
+build_requires:
+  JSON: '0'
+  LWP::Protocol::https: '6.07'
+  LWP::UserAgent: '6.26'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-bovespa
-requires:
-  HTML::TreeBuilder: 0
-  LWP::Protocol::https: 0
-  LWP::UserAgent: 0
-version: 0.002
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,12 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use XS::Check;
+
+my $check = XS::Check->new ();
+for (@ARGV) {
+    $check->check_file ($_);
+}
+# Local variables:
+# mode: perl
+# End:

@@ -1,5 +1,6 @@
 use Data::Dumper;
 use Config;
+use Cwd qw(abs_path);
 use ExtUtils::MakeMaker;
 use Getopt::Long;
 use File::Spec::Functions;
@@ -22,25 +23,45 @@ usage() if $help;
 #============================================================================
 # What ruby are we going to run?
 #============================================================================
-my @rubies;
-for $p (split /$Config{path_sep}/, $ENV{PATH}) {
-    $p =~ s/^~/$ENV{HOME}/;
-    $p .= "/ruby";
-    push @rubies, { path => $p } if -f $p && -x $p;
+my $sel = $ENV{INLINE_RUBY_EXECUTABLE};
+unless (defined $sel && length $sel) {
+    my @rubies;
+    my %rubies;
+    my $sep = $^O eq 'MSWin32' ? ";" : ":";
+    for $p (split /$sep/, $ENV{PATH}) {
+        $p =~ s/^~/$ENV{HOME}/;
+        $p .= "/ruby";
+        next unless -f $p and -x $p;
+        next if $rubies{abs_path($p)}++; # filter symlinked duplicates
+        push @rubies, { path => $p };
+    }
+
+    # Keep them in PATH order.
+    # @rubies = sort { $a->{path} cmp $b->{path} } @rubies;
+
+    my $num = 1;
+    print "Found these ruby executables on your PATH:\n";
+    print $num++ . ". " . $_->{path} . "\n" for @rubies;
+
+    if (@rubies == 1 and not $sel) {
+        $sel = $rubies[0];
+        print "Using the only ruby executable I could find\n";
+        print 'Set the INLINE_RUBY_EXECUTABLE environment variable to'
+            . " the full path to your ruby executable to override this selection.\n";
+    }
+    unless ($sel) {
+        $sel = prompt("Use which?", '1');
+        if ($sel =~ /^\d+$/) {
+            die 'Invalid number. Please enter only numbers from 1 to ' . ($num - 1)
+                . " or the full path to your ruby executable.\n"
+                . 'Set the INLINE_RUBY_EXECUTABLE environment variable to'
+                . " the full path to your ruby executable to avoid this question.\n"
+                if $sel > ($num - 1);
+            $sel = $rubies[$sel - 1];
+        }
+    }
 }
-
-unless (@rubies) {
-    print "Could not find the ruby interpreter on your PATH. Stopping...\n";
-    exit 1;
-}
-
-my $num = 1;
-print "Found ${\(scalar @rubies)} ruby executables on your PATH.\n";
-print $num++ . ". " . $_->{path} . "\n" for @rubies;
-
-my $sel = prompt("Use which?", (scalar @rubies ? '1' : ()));
-$sel = $rubies[$sel-1] if $sel =~ /^\d+$/;
-$sel = { path => $sel } unless ref $sel eq 'HASH';
+$sel = { path => $sel } unless ref $sel eq 'HASH'; # in case the user entered a path
 
 print "Using $sel->{path}\n";
 
@@ -49,11 +70,10 @@ print "Using $sel->{path}\n";
 #============================================================================
 interrogate($sel);
 
-# Fix up the libpath and libruby
+# Fix up the libpath
 # substr($sel->{incpath}, 0, 0) = "-I";
 my $inc_path = join(' ', map { "-I$_" } @{$sel->{incpath}});
 substr($sel->{libpath}, 0, 0) = "-L";
-$sel->{libruby} =~ s/lib(.*)(?:\.\Q$Config{dlext}\E|\Q$Config{_a}\E).*/-l$1/;
 
 my @flags;
 push @flags, debug_flag() if defined $gdb;
@@ -72,7 +92,7 @@ END
 #============================================================================
 $defs = join ' ', $WALL, qw(-UEXPOSE_PERL -DCREATE_RUBY -UCREATE_PERL),
     $debug ? "-DI_RB_DEBUG" : (),
-    (grep { defined } map { my $v = get_config_var($sel, $_); $v ne 'nil' ? "-DRUBY_VERSION_$_=$v" : undef } qw/MAJOR MINOR/);
+    (grep { defined } map { my $v = get_config_var($sel, $_); defined $v ? "-DRUBY_VERSION_$_=$v" : undef } qw/MAJOR MINOR/);
 
 my $lddlflags = $Config{lddlflags};
 $lddlflags =~ s/-L\S+//g;
@@ -157,18 +177,23 @@ sub interrogate {
     my $ref = shift;
     $ref->{syslibs} = get_config_var($ref, "LIBS");
     $ref->{libruby} = get_config_var($ref, "LIBRUBY");
+    my $enable_shared = get_config_var($ref, "ENABLE_SHARED");
+    my $libruby_a = get_config_var($ref, "LIBRUBY_A");
+    if ($enable_shared && $ref->{libruby} ne $libruby_a) {
+            $ref->{libruby} = get_config_var($ref, "LIBRUBYARG");
+    }
     my $ruby_hdr_dir = get_config_var($ref, "rubyhdrdir");
-    if ($ruby_hdr_dir ne 'nil') {
+    if (defined $ruby_hdr_dir) {
         my $arch = get_config_var($ref, "arch");
         # no "archhdrdir", so construct it by hand:
-        my $arch_hdr_dir = $arch ne 'nil' ? catdir($ruby_hdr_dir, $arch) : undef;
+        my $arch_hdr_dir = defined $arch ? catdir($ruby_hdr_dir, $arch) : undef;
         $ref->{incpath} = [ grep { defined } $ruby_hdr_dir, $arch_hdr_dir ];
     }
 
     # Ruby 1.6.4 supports archdir, which is what we need. But 1.6.3 (the
     # earliest version I have) doesn't, so we should build it ourselves.
     $ref->{libpath} = get_config_var($ref, "archdir");
-    if ($ref->{libpath} eq 'nil')
+    if (defined $ref->{libpath})
     {
         $ref->{libpath} =
         catdir(
@@ -183,6 +208,12 @@ sub interrogate {
     }
     $ref->{incpath} ||= [ $ref->{libpath} ];
     return if -f catfile($ref->{libpath}, $ref->{libruby});
+
+    my $libdirname = get_config_var($ref, "LIBDIRNAME");
+    $libdirname = 'libdir' unless defined $libdirname && length $libdirname;
+    my $libdir = get_config_var($ref, $libdirname);
+    $ref->{libpath} .= qq{ -L$libdir}
+        if defined $libdir && length $libdir;
 
     # If ruby has been compiled for libruby.so, it continues to think
     # libruby.so is living in .../lib/ruby/1.6/$arch/; but the Makefile
@@ -200,7 +231,16 @@ sub get_config_var {
     my $ref = shift;
     my $key = shift;
     my $exe = $ref->{path};
-    my $val = `$exe -e "require 'rbconfig'; include Config; puts CONFIG['$key']"`;
+    my $val = `\n\
+    $exe -e "require 'rbconfig'\n\
+             include RbConfig\n\
+             v = CONFIG['$key']\n\
+             if v == nil\n\
+                 exit 1\n\
+             end\n\
+             puts v"`;
+    return if $?;
+
     chomp $val;
     return $val;
 }

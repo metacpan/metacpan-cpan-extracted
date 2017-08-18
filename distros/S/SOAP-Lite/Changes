@@ -15,6 +15,14 @@ http://rt.cpan.org/Public/Dist/Display.html?Name=SOAP-Lite
 THIS RELEASE
 -----------------------------------------------------------------------
 
+1.22 August 15, 2017
+    ! Noindex URI::tcp module [github/JaSei]
+    ! Correct the soap namespace declaration when calling services defined in WSDL [github/waaeer]
+    ! Fix typos [github/kmhl]
+
+1.21 November 6, 2016
+    ! #118654 consistently use '#!/usr/bin/env perl' throughout (@mototimo) [github/moto-timo]
+
 1.20 June 9, 2016
     ! Minor kwalitee updates (@oeuftete)
     ! #106688 encode utf8 content in test which fails under RHES 6.6

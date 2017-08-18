@@ -2,9 +2,9 @@ NAME
     Perl::Critic::PolicyBundle::PERLANCAR - Perl::Critic policies
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Perl::Critic::PolicyBundle::PERLANCAR (from Perl distribution
-    Perl-Critic-PolicyBundle-PERLANCAR), released on 2017-08-01.
+    Perl-Critic-PolicyBundle-PERLANCAR), released on 2017-08-16.
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -1,0 +1,27 @@
+use alienfile;
+use Path::Tiny qw( path );
+
+# ignore any system .pc files
+probe sub { 'share' };
+
+plugin 'PkgConfig' => (
+  pkg_name => 'libpalindrome',
+);
+
+share {
+  requires 'Alien::Autotools';
+
+  meta->prop->{start_url} = path(__FILE__)->parent->child('autoheck-libpalindrome')->stringify;
+  plugin 'Fetch::LocalDir';
+  plugin 'Extract::Directory';
+  plugin 'Build::Autoconf';
+  
+  build [
+    (map { $^O eq 'MSWin32' ? ['sh', -c => $_] : $_ } ('autoreconf -vfi')),
+    '%{configure} --enable-shared --disable-static',
+    '%{make}',
+    '%{make} install',
+  ];
+  
+  plugin 'Gather::Dino';
+};

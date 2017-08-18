@@ -1,12 +1,14 @@
-#!/usr/bin/perl
+#!perl
 
 use strict;
 use warnings;
+use 5.008001;
+#use lib::findbin '../lib'; # dev-only
 use App::RegexFileUtils;
 
 # ABSTRACT: move with regex
 # PODNAME: remv
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 App::RegexFileUtils->main($0, @ARGV);
@@ -23,7 +25,7 @@ remv - move with regex
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SEE ALSO
 

@@ -11,6 +11,11 @@ BEGIN {
 		require Test::More;
 		Test::More::plan(skip_all => "threads unavailable");
 	}
+	if("$]" >= 5.009005 && "$]" < 5.010001) {
+		require Test::More;
+		Test::More::plan(skip_all =>
+			"threading breaks assertions on this Perl");
+	}
 	eval { require Thread::Semaphore; };
 	if($@ ne "") {
 		require Test::More;

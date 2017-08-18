@@ -1,7 +1,7 @@
 package Text::DumbTemplate;
 
-our $DATE = '2017-08-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-16'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -75,7 +75,7 @@ Text::DumbTemplate - Yet another template system, this one's dumb but fast
 
 =head1 VERSION
 
-This document describes version 0.001 of Text::DumbTemplate (from Perl distribution Text-DumbTemplate), released on 2017-08-09.
+This document describes version 0.002 of Text::DumbTemplate (from Perl distribution Text-DumbTemplate), released on 2017-08-16.
 
 =head1 SYNOPSIS
 
@@ -128,7 +128,7 @@ feature.
 
 L<Text::sprintfn>
 
-L<Text::Table::Tiny> which also harness the power of C<sprintfn> to draw text
+L<Text::Table::Tiny> which also harness the power of C<sprintf> to draw text
 tables.
 
 =head1 AUTHOR

@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/sysread/Proc-tored/issues
   homepage: https://github.com/sysread/Proc-tored
   repository: https://github.com/sysread/Proc-tored.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'YAML::Tiny version 1.70'

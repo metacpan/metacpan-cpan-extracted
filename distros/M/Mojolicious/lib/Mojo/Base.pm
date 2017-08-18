@@ -6,7 +6,8 @@ use utf8;
 use feature ();
 
 # No imports because we get subclassed, a lot!
-use Carp ();
+use Carp         ();
+use Scalar::Util ();
 
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
@@ -106,8 +107,15 @@ sub tap {
 }
 
 sub with_roles {
-  return Role::Tiny->create_class_with_roles(@_) if ROLES;
-  Carp::croak 'Role::Tiny 2.000001+ is required for roles';
+  Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+  my ($self, @roles) = @_;
+
+  return Role::Tiny->create_class_with_roles($self,
+    map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles)
+    unless my $class = Scalar::Util::blessed $self;
+
+  return Role::Tiny->apply_roles_to_object($self,
+    map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles);
 }
 
 1;
@@ -247,14 +255,18 @@ spliced or tapped into) a chained set of object method calls.
 
 =head2 with_roles
 
-  my $new_class = SubClass->with_roles('Foo::Role1', 'Bar::Role2');
+  my $new_class = SubClass->with_roles('SubClass::Role::One');
+  my $new_class = SubClass->with_roles('+One', '+Two');
+  $object       = $object->with_roles('+One', '+Two');
 
-Create and return a new class that extends the given class with one or more
-L<Role::Tiny> roles. Note that role support depends on L<Role::Tiny>
-(2.000001+).
+Create a new class with one or more L<Role::Tiny> roles. If called on a class
+returns the new class, or if called on an object reblesses the object into the
+new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
+can use the shorthand C<+RoleName>. Note that role support depends on
+L<Role::Tiny> (2.000001+).
 
-  # Create a new class with roles and instantiate it
-  my $new_class = SubClass->with_roles('Foo::Role1', 'Foo::Role2');
+  # Create a new class with the role "SubClass::Role::Foo" and instantiate it
+  my $new_class = SubClass->with_roles('+Foo');
   my $object    = $new_class->new;
 
 =head1 SEE ALSO

@@ -2,7 +2,7 @@
 
 package HiD::Role::PublishesDrafts;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Role::PublishesDrafts::VERSION = '1.98';
+$HiD::Role::PublishesDrafts::VERSION = '1.991';
 use Moose::Role;
 
 requires '_run';
@@ -38,7 +38,7 @@ config key).
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

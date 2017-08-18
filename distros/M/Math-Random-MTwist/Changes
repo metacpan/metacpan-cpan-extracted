@@ -1,5 +1,13 @@
 Revision history for Perl extension Math::Random::MTwist.
 
+0.21  2017-08-15
+* mtwist/: Use long double or quadmath if available.
+* mtwist/: Changed double to NV where appropriate.
+* MTwist.xs: Changed double to NV.
+* Added rd_*uniform().
+* Removed PERL_STRLEN_ROUNDUP() as it doesn't exist on some older Perls.
+* POD update.
+
 0.20  2017-08-11
 * On Linux fastseed()/goodseed() now use getrandom() if available.
 * POD update.

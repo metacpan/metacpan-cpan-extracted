@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPost;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Role::IsPost::VERSION = '1.98';
+$HiD::Role::IsPost::VERSION = '1.991';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -319,7 +319,7 @@ folder or not.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

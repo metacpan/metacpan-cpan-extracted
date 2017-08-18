@@ -18,7 +18,7 @@ IOD - IOD (INI On Drugs) file format specification
 
 =head1 VERSION
 
-This document describes version 0.9.11 of IOD (from Perl distribution IOD), released on 2017-01-13.
+This document describes version 0.9.12 of IOD (from Perl distribution IOD), released on 2017-08-17.
 
 =head1 STATUS
 
@@ -77,23 +77,26 @@ other notes). Software modifying a configuration should not destroy all these.
 B<YAML>. Although YAML looks nice and has many features, it lacks round-trip
 parsers and has complex rules that can trip beginners or non-programmers, e.g.
 significant indentation, significant whitespace in some places (for example
-after colon in mapping), etc.
+after colon in mapping), etc. YAML 1.2 (2009) improves on some parts of this
+aspect but at the time of this writing (2017) many implementations are still
+stuck at version 1.0/1.1 of the specification.
 
-B<JSON>. Although JSON is popular and simple, it lacks round-trip parsers and
-some important features (e.g. comments). (Note: The documentation for L<JSON>
-Perl module mentions the phrase "round-trip", but it uses the phrase to mean
-integrity of values, not preserving comments/whitespaces.)
+B<JSON>. Although JSON is popular and simple, most parsers are not round-trip.
+And even if the parser were round-trip, the format itself lacks some things that
+are desirable in a configuration, e.g. comments. (Note: The documentation for
+L<JSON> Perl module mentions the phrase "round-trip", but it uses the phrase to
+mean integrity of values, not preserving comments/whitespaces.)
 
-But note that IOD uses JSON in places.
+Note that IOD uses JSON in places.
 
 B<Apache-webserver-style> lacks round-trip parsers.
 
-B<XML> lacks round-trip parsers and is not convenient for humans to read and
-write.
+B<XML>. Most parsers are not round-trip. The format is not convenient for humans
+to read and write.
 
 =head2 Why not plain INI?
 
-First, INI format is ill-defined. There is no single standard, thus various
+First, the INI format is ill-defined. There is no single standard, thus various
 implementations behave differently and there are various variants of the format.
 This specification intends to describe the IOD format more precisely.
 
@@ -622,7 +625,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

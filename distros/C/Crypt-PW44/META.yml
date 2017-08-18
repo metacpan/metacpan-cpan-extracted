@@ -1,12 +1,22 @@
---- #YAML:1.0
-name:                Crypt-PW44
-version:             0.13
-abstract:            ~
-license:             ~
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
+---
+abstract: 'Perl password generator - generate 44-bit passwords using OPIE dictionary from RFC 1760.'
+author:
+  - 'Brian Dickson <brian.peter.dickson@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-PW44
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -75,6 +75,10 @@
 # define PERL_UNUSED_THX() ((void)(aTHX+0))
 #endif /* <5.7.3 */
 
+#if defined(HAS_QUAD) && !PERL_VERSION_GE(5,23,2)
+typedef U64TYPE U64;
+#endif /* HAS_QUAD && <5.23.2 */
+
 #define TAI_EPOCH_MJD 36204
 
 #define UNIX_EPOCH_MJD 40587
@@ -230,7 +234,7 @@ struct mechanism {
  * database/memos/memo96b.ps>.
  */
 
-#ifdef QHAVE_NTP_ADJTIME
+#if QHAVE_NTP_ADJTIME
 
 # include <sys/timex.h>
 
@@ -249,12 +253,12 @@ struct mechanism {
 # endif
 
 /* time structures may be struct timeval or struct timespec */
-# ifdef QHAVE_STRUCT_TIMEX_TIME_TV_NSEC
+# if QHAVE_STRUCT_TIMEX_TIME_TV_NSEC
 #  define TIMEX_SUBSEC tv_nsec
 # else
 #  define TIMEX_SUBSEC tv_usec
 # endif
-# ifdef QHAVE_STRUCT_NTPTIMEVAL_TIME_TV_NSEC
+# if QHAVE_STRUCT_NTPTIMEVAL_TIME_TV_NSEC
 #  define NTPTIMEVAL_SUBSEC tv_nsec
 # else
 #  define NTPTIMEVAL_SUBSEC tv_usec
@@ -270,7 +274,7 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 	int state;
 	struct timex tx;
 	long dayno, secs;
-# ifdef QHAVE_STRUCT_TIMEX_TIME
+# if QHAVE_STRUCT_TIMEX_TIME
 #  define ntv tx
 #  define NTV_SUBSEC TIMEX_SUBSEC
 # else /* !QHAVE_STRUCT_TIMEX_TIME */
@@ -280,20 +284,19 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 # endif /* !QHAVE_STRUCT_TIMEX_TIME */
 	unsigned long maxerr, offset, err_s, err_ns;
 	PERL_UNUSED_THX();
-# if defined(QHAVE_STRUCT_TIMEX_TIME) ? \
-	defined(QHAVE_STRUCT_TIMEX_TIME_STATE) : \
-	defined(QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE)
+# if QHAVE_STRUCT_TIMEX_TIME ? QHAVE_STRUCT_TIMEX_TIME_STATE : \
+	QHAVE_STRUCT_NTPTIMEVAL_TIME_STATE
 #  define leap_state ntv.time_state
 # else
 #  define leap_state state
 # endif
-#ifdef QHAVE_STRUCT_TIMEX_TIME
+# if QHAVE_STRUCT_TIMEX_TIME
 	Zero(&tx, 1, struct timex);
 	state = ntp_adjtime(&tx);
 	if(state == -1 || tx.tolerance < 0) return GOT_NOTHING;
 	offset = tx.offset < 0 ? -(unsigned long)tx.offset :
 		(unsigned long)tx.offset;
-#else /* !QHAVE_STRUCT_TIMEX_TIME */
+# else /* !QHAVE_STRUCT_TIMEX_TIME */
 	/*
 	 * ntp_adjtime() doesn't give us the actual current time, only the
 	 * auxiliary time variables.  (D'oh!)  We need a correlated set of
@@ -345,7 +348,7 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 					(unsigned long)txx.offset;
 		offset = o0 > o1 ? o0 : o1;
 	}
-#endif /* !QHAVE_STRUCT_TIMEX_TIME */
+# endif /* !QHAVE_STRUCT_TIMEX_TIME */
 	if(ntv.time.tv_sec < 0 || ntv.time.NTV_SUBSEC < 0 ||
 			ntv.time.NTV_SUBSEC >= ((tx.status & STA_NANO) ?
 						1000000000 : 1000000) ||
@@ -427,7 +430,7 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
 # define MECH_NTPADJTIME
 #endif /* !QHAVE_NTP_ADJTIME */
 
-#ifdef QHAVE_CLOCK_GETTIME
+#if QHAVE_CLOCK_GETTIME
 # include <time.h>
 #endif /* QHAVE_CLOCK_GETTIME */
 
@@ -440,7 +443,7 @@ static int THX_try_ntpadjtime(pTHX_ struct nowtime *nt)
  * be indicated.
  */
 
-#if defined(QHAVE_CLOCK_GETTIME) && defined(CLOCK_UTC)
+#if QHAVE_CLOCK_GETTIME && defined(CLOCK_UTC)
 
 static int THX_try_clockgettime_utc(pTHX_ struct nowtime *nt)
 {
@@ -475,7 +478,7 @@ static int THX_try_clockgettime_utc(pTHX_ struct nowtime *nt)
  * There is no leap second handling or error bound here.
  */
 
-#if defined(QHAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)
+#if QHAVE_CLOCK_GETTIME && defined(CLOCK_REALTIME)
 
 static int THX_try_clockgettime_realtime(pTHX_ struct nowtime *nt)
 {
@@ -507,16 +510,14 @@ static int THX_try_clockgettime_realtime(pTHX_ struct nowtime *nt)
  * integer (in two 32-bit halves) in units of 10^-7 s.
  */
 
-#ifdef QHAVE_GETSYSTEMTIMEASFILETIME
+#if QHAVE_GETSYSTEMTIMEASFILETIME
 
 # include <windows.h>
 
 # define WINDOWS_EPOCH_MJD (-94187)
 # define WINDOWS_EPOCH_DAYNO (WINDOWS_EPOCH_MJD - TAI_EPOCH_MJD)
 
-# if defined(HAS_QUAD) && defined(UINT64_C)
-typedef U64TYPE U64;
-# else /* !(HAS_QUAD && UINT64_C) */
+# if !(defined(HAS_QUAD) && defined(UINT64_C))
 static U16 div_u64_u16(U32 *hi_p, U32 *lo_p, U16 d)
 {
 	U32 hq = *hi_p / d;
@@ -590,7 +591,7 @@ static int THX_try_getsystemtimeasfiletime(pTHX_ struct nowtime *nt)
  * will use the Unix epoch for this interface, unlike for time().
  */
 
-#ifdef QHAVE_GETTIMEOFDAY
+#if QHAVE_GETTIMEOFDAY
 
 # include <sys/time.h>
 

@@ -15,22 +15,22 @@ package Point {
 
     extends 'Moxie::Object';
 
-    has _x => sub { 0 };
-    has _y => sub { 0 };
+    has _x => ( default => sub { 0 } );
+    has _y => ( default => sub { 0 } );
 
     my sub _x : private;
     my sub _y : private;
 
     sub BUILDARGS : init_args(
-        x => '_x',
-        y => '_y',
+        x? => _x,
+        y? => _y,
     );
 
-    sub x : ro('_x');
-    sub y : ro('_y');
+    sub x : ro(_x);
+    sub y : ro(_y);
 
-    sub set_x : wo('_x');
-    sub set_y : wo('_y');
+    sub set_x : wo(_x);
+    sub set_y : wo(_y);
 
     sub clear ($self) {
         (_x, _y) = (0, 0);
@@ -48,14 +48,18 @@ package Point3D {
 
     extends 'Point';
 
-    has _z => sub { 0 };
+    has _z => ( default => sub { 0 } );
 
     my sub _z : private;
 
-    sub BUILDARGS : init_args( z => '_z' );
+    sub BUILDARGS : init_args(
+        x? => super(x),
+        y? => super(y),
+        z? => _z
+    );
 
-    sub z     : ro('_z');
-    sub set_z : wo('_z');
+    sub z     : ro( _z );
+    sub set_z : wo( _z );
 
     sub pack ($self) {
         my $data = $self->next::method;
@@ -204,12 +208,12 @@ subtest '... meta test' => sub {
 
         {
             my $m = $Point->get_method( 'set_y' );
-            is_deeply([ $m->get_code_attributes ], ['wo(\'_y\')'], '... we show one CODE attribute');
+            is_deeply([ $m->get_code_attributes ], ['wo(_y)'], '... we show one CODE attribute');
         }
 
         {
             my $m = $Point->get_method( 'y' );
-            is_deeply([ $m->get_code_attributes ], ['ro(\'_y\')'], '... we show one CODE attribute');
+            is_deeply([ $m->get_code_attributes ], ['ro(_y)'], '... we show one CODE attribute');
         }
 
     };

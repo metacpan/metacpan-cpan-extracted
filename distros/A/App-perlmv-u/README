@@ -2,8 +2,8 @@ NAME
     App::perlmv::u - Rename files using Perl code, with undo/redo
 
 VERSION
-    This document describes version 0.003 of App::perlmv::u (from Perl
-    distribution App-perlmv-u), released on 2017-08-01.
+    This document describes version 0.004 of App::perlmv::u (from Perl
+    distribution App-perlmv-u), released on 2017-08-17.
 
 DESCRIPTION
     See included script perlmv-u.

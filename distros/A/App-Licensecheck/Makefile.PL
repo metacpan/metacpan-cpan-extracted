@@ -7,7 +7,7 @@ my $meta = {
   "abstract"           => "simple license checker for source files",
   "author"             => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
   "dynamic_config"     => 0,
-  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"           => ["Licensing", "Sourcecode"],
   "license"            => ["gpl_3"],
   "meta-spec"          => {
@@ -32,6 +32,7 @@ my $meta = {
                                 "Path::Tiny"                => 0.062,
                                 "perl"                      => "5.014000",
                                 "Pod::Constants"            => 0,
+                                "Regexp::Pattern::License"  => "v3.0.30",
                                 "Sort::Key::Multi"          => 1.25,
                                 "strictures"                => 2,
                                 "String::Copyright"         => 0.003,
@@ -51,9 +52,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck"               => { file => "lib/App/Licensecheck.pm", version => "v3.0.30" },
-                            "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.0.30" },
-                            "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.0.30" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.31" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -68,9 +67,9 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.0.30",
+  "version"            => "v3.0.31",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
-  "x_help_wanted"      => ["documenter", "tester"],
+  "x_help_wanted"      => ["tester", "documenter"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },
 };
 

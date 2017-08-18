@@ -25,5 +25,5 @@ Revision history for Perl extension Tie::REHash.
 	- Test suit is extended to explicitly test new code from documentation's SYNOPSIS
 	- Second edition of documentation
 
-1.07  12 August 2017
+1.08  12 August 2017
     - fixed minor test failure due to backward-incompatible change in Perl v5.26 (see corresponding issue).

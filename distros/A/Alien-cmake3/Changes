@@ -1,5 +1,8 @@
 Revision history for Alien-cmake3
 
+0.03      2017-08-15 10:33:06 -0400
+  - Improve documentation
+
 0.02      2017-08-09 15:02:12 -0400
   - Fix copy for windows
 

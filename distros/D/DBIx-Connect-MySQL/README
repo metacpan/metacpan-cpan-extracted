@@ -1,0 +1,55 @@
+NAME
+    DBIx::Connect::MySQL - Connect to DBI (mysql), search user/password from
+    .my.cnf
+
+VERSION
+    This document describes version 0.002 of DBIx::Connect::MySQL (from Perl
+    distribution DBIx-Connect-MySQL), released on 2017-08-16.
+
+SYNOPSIS
+    Instead of:
+
+     use DBI;
+     my $dbh = DBI->connect("dbi:mysql:database=mydb", "someuser", "somepass");
+
+    you can now do:
+
+     use DBIx::Connect::MySQL;
+     my $dbh = DBIx::Connect::MySQL->connect("dbi:mysql:database=mydb", undef, undef);
+
+    and user/password will be searched in ~/.my.cnf if unset.
+
+DESCRIPTION
+    This is a small wrapper for "DBI->connect" because the client library
+    does not automatically search for user/password from .my.cnf files like
+    in PostgresSQL.
+
+METHODS
+  connect($dsn, $user, $pass, ...)
+    Will pass arguments to "DBI->connect" after setting the default of $user
+    and $pass from ~/.my.cnf if possible.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-Connect-MySQL>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DBIx-Connect-MySQL>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Connect-MySQL>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

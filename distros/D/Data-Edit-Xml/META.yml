@@ -15,13 +15,14 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '20170814'
+    version: '20170817'
 requires:
   Carp: '0'
   Data::Table::Text: '20170808'
   Storable: '0'
   Test::More: '0'
   XML::Parser: '0'
+  perl: v5.16.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170814'
+version: '20170817'

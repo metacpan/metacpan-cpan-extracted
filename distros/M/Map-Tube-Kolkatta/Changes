@@ -1,0 +1,12 @@
+Revision history for Map::Tube::Kolkatta
+
+0.03  Fri Aug 18 10:00:00 2017
+      - Updated pod about requirement of Map::Tube::CLI.
+
+0.02  Wed Aug 16 10:50:00 2017
+      - Updated dependency on Map::Tube v3.34.
+      - Added $AUTHORITY and $VERSION.
+      - Updated sample code in the pod.
+
+0.01  Wed Aug 16 10:30:00 2017
+      - First version, released, to celebrate the CPAN day.

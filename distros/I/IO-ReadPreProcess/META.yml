@@ -20,4 +20,4 @@ no_index:
 requires:
   Math::Expression: '1.47'
   perl: '5.006'
-version: '0.84'
+version: '0.85'

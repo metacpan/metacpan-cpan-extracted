@@ -3,7 +3,7 @@ package Log::Dispatch::ApacheLog;
 use strict;
 use warnings;
 
-our $VERSION = '2.65';
+our $VERSION = '2.66';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -27,7 +27,7 @@ use base qw( Log::Dispatch::Output );
 
     sub new {
         my $class = shift;
-        my %p     = validator->(@_);
+        my %p     = $validator->(@_);
 
         my $self = bless { apache_log => ( delete $p{apache} )->log }, $class;
         $self->_basic_init(%p);
@@ -71,7 +71,7 @@ Log::Dispatch::ApacheLog - Object for logging to Apache::Log objects
 
 =head1 VERSION
 
-version 2.65
+version 2.66
 
 =head1 SYNOPSIS
 

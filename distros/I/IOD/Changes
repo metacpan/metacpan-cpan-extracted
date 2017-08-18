@@ -1,3 +1,11 @@
+0.9.12  2017-08-17 (PERLANCAR)
+
+	- No spec changes.
+
+	- Update the INI vs ... section, mention YAML 1.2 and note that
+	  JSON and XML have round-trip parsers.
+
+
 0.9.11  2017-01-13 (PERLANCAR)
 
         - Introduce !none encoding.

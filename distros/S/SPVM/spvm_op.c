@@ -123,6 +123,8 @@ const char* const SPVM_OP_C_CODE_NAMES[] = {
   "FLOAT",
   "DOUBLE",
   "STRING",
+  "WEAKEN",
+  "WEAKEN_FIELD",
 };
 
 // Return cloned op and target op become stab
@@ -627,6 +629,16 @@ SPVM_OP* SPVM_OP_build_call_field(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM
   return op_field;
 }
 
+SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_call_field) {
+  
+  SPVM_OP* op_weaken_field = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_WEAKEN_FIELD, op_weaken->file, op_weaken->line);
+  SPVM_OP_insert_child(compiler, op_weaken_field, op_weaken_field->last, op_call_field);
+  
+  op_call_field->flag |= SPVM_OP_C_FLAG_CALL_FIELD_WEAKEN;
+  
+  return op_weaken_field;
+}
+
 SPVM_OP* SPVM_OP_build_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPVM_OP* op_term) {
   
   SPVM_OP* op_convert_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONVERT, op_type->file, op_type->line);
@@ -785,7 +797,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         else {
           // Bind standard functions
           if (sub->is_native) {
-            SPVM_EXTENTION_BIND_bind_core_extentions(compiler, sub, sub_abs_name);
+            SPVM_DYNAMIC_ARRAY_push(compiler->native_subs, sub);
           }
           
           sub->abs_name = sub_abs_name;

@@ -6,7 +6,7 @@ no  warnings 'uninitialized';
 
 use vars qw($VERSION);
 
-$VERSION = '2.0';
+$VERSION = '2.01';
 
 =head1 NAME
 
@@ -208,6 +208,77 @@ sub _newroot {
     my $self = shift;
     Yote::Obj->_new( $self, {}, $self->_first_id );
 }
+
+=head2 copy_from_remote_store( $obj )
+
+ This takes an object that belongs to a seperate store and makes
+ a deep copy of it.
+
+=cut
+sub copy_from_remote_store {
+    my( $self, $obj ) = @_;
+    my $r = ref( $obj );
+    return $obj unless $r;
+    if( $r eq 'ARRAY' ) {
+        return [ map { $self->copy_from_remote_store($_) } @$obj ];
+    } elsif( $r eq 'HASH' ) {
+        return { map { $_ => $self->copy_from_remote_store($obj->{$_}) } keys %$obj };
+    } else {
+        my $data = { map { $_ => $self->copy_from_remote_store($obj->{DATA}{$_}) } keys %{$obj->{DATA}} };
+        return $self->newobj( $data, $r );
+    }
+}
+
+=head2 cache_all()
+
+ This turns on caching for the store. Any objects loaded will
+ remain cached until clear_cache is called. Normally, they
+ would be DESTROYed once their last reference was removed unless
+ they are in a state that needs stowing.
+
+=cut
+sub cache_all {
+    my $self = shift;
+    $self->{CACHE_ALL} = 1;
+}
+
+=head2 uncache( obj )
+
+  This removes the object from the cache if it was in the cache
+
+=cut
+sub uncache {
+    my( $self, $obj ) = @_;
+    if( ref( $obj ) ) {
+        delete $self->{CACHE}{$self->_get_id( $obj )};
+    }
+}
+
+
+
+=head2 pause_cache()
+
+ When called, no new objects will be added to the cache until
+ cache_all is called.
+
+=cut
+sub pause_cache {
+    my $self = shift;
+    $self->{CACHE_ALL} = 0;
+}
+
+=head2 clear_cache()
+
+ When called, this dumps the object cache. Objects that
+ references or have changes that need to be stowed will
+ not be cleared.
+
+=cut
+sub clear_cache {
+    my $self = shift;
+    $self->{_CACHE} = {};
+}
+
 
 
 =head2 fetch( $id )
@@ -1183,24 +1254,36 @@ sub _fetch {
   my $parts = [ split /\`/, $val, -1 ];
 
   # check to see if any of the parts were split on escapes
+  # like  mypart`foo`oo (should be translated to mypart\`foo\`oo
   if( 0 < grep { /\\$/ } @$parts ) {
       my $newparts = [];
-      my $shim = '';
+
+      my $is_hanging = 0;
+      my $working_part = '';
+      
       for my $part (@$parts) {
-          if( $part =~ /(^|[^\\]((\\\\)+)?)$/ ) {
-              my $newpart = $shim ? "$shim\`$part" : $part;
+
+          # if the part ends in a hanging escape
+          if( $part =~ /(^|[^\\])((\\\\)+)?[\\]$/ ) {
+              if( $is_hanging ) {
+                  $working_part .= "`$part";
+              } else {
+                  $working_part = $part;
+              }
+              $is_hanging = 1;
+          } elsif( $is_hanging ) {
+              my $newpart = "$working_part`$part";
               $newpart =~ s/\\`/`/gs;
               $newpart =~ s/\\\\/\\/gs;
               push @$newparts, $newpart;
-              $shim = '';
+              $is_hanging = 0;
           } else {
-              $shim = $shim ? "$shim\`$part" : $part;
+              # normal part
+              push @$newparts, $part;
           }
       }
-      if( $shim ) {
-          $shim =~ s/\\`/`/gs;
-          $shim =~ s/\\\\/\\/gs;
-          push @$newparts, $shim;
+      if( $is_hanging ) {
+          die "Error in parsing parts\n";
       }
       $parts = $newparts;
   }
@@ -1410,6 +1493,6 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.0  (Nov 23, 2016))
+       Version 2.01  (July, 2017))
 
 =cut

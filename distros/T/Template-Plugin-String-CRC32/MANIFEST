@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Template/Plugin/String/CRC32.pm
+minil.toml
+t/00_compile.t
+t/01filter.t
+t/90podtest.t
+t/91podcover.t
+t/96metatest.t
+META.yml
+MANIFEST

@@ -1,8 +1,11 @@
 Revision history for Number::MuPhone
 
-0.06    2018-07-17
-        accidentally pushed file I was roking on in previous release
-        (still learning CPAN best practices :D
+0.07    2017-08-14
+        Added more informative error messages for bad country codes
+
+0.06    2017-07-17
+        Accidentally pushed file I was working on in previous release
+        (still learning CPAN best practices :D)
 
 0.05    2017-07-14
         fixed NANP "international" dial/display

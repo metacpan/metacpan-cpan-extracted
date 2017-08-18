@@ -1,0 +1,22 @@
+Revision history for Perl extension URI-tcp
+
+2.0.0 2017-08-16T14:55:40Z
+
+    - increase version to 2.0.0 (because last SOAP::Lite with URI::tcp are 1.13 and for index new URI::tcp must be higher version)
+
+0.1.3 2017-08-16T08:50:02Z
+
+    - history of this module
+
+0.1.2 2017-06-08T15:46:02Z
+
+    - add URI dependency
+
+0.1.1 2017-06-08T15:43:28Z
+
+    - fix udp documentation
+
+0.1.0 2017-06-08T15:34:48Z
+
+    - original version
+

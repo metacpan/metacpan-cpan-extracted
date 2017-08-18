@@ -21,10 +21,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Number::Phone" => "3.1",
     "Test::More" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +31,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Number::Phone" => "3.1",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

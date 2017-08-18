@@ -22,7 +22,9 @@ use File::Basename;
 
 # "Data::Dumper::Simple" gives better output for debugging, but at a startup cost.
 # It falls back to the default "Data::Dumper" if the "Simple" variant isn't available.
-use Best qw(Data::Dumper::Simple Data::Dumper);
+# use Best qw(Data::Dumper::Simple Data::Dumper);
+
+use Data::Dumper;
 
 use Config;
 use threads;
@@ -31,7 +33,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '1.19';
+    our $VERSION = '1.20';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -789,7 +791,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 B<VERSION>
 
-Version 1.17    (November 10, 2016)
+Version 1.20    (August 17, 2017)
 
 =head1 B<BUGS>
 
@@ -846,7 +848,7 @@ If you have any features you wish added, or functionality improved or changed, t
 
 =head1 B<LICENSE AND COPYRIGHT>
 
-Copyright 2013 Richard Kelsch.
+Copyright 2013-2017 Richard Kelsch.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 

@@ -1,0 +1,29 @@
+NAME
+    Mojo::DOM::Role::PrettyPrinter - Add a pretty printer method to
+    Mojo::DOM
+
+SYNOPSIS
+      use Mojo::DOM;
+      my $dom=Mojo::DOM->with_roles('+PrettyPrinter')->new('<div><h1>Loving it</h1></div>');
+      warn $dom->to_pretty_string;
+      # <div>
+      #   <h1>Loving it</h1>
+      # </div>
+
+DESCRIPTION
+    Support pretty printing XML documents. The original source for this
+    function was extracted from XML::Loy.
+
+METHODS
+  to_pretty_string
+    Returns the current Mojo::DOM structure as indented XML.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2017, Marcus Ramberg and Nils Diewald
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+    Mojolicious, Mojolicious::Guides, <http://mojolicious.org>.
+

@@ -24,7 +24,9 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "0.32",
     "Alien::Build::MM" => "0.32",
-    "ExtUtils::MakeMaker" => "6.52"
+    "Capture::Tiny" => 0,
+    "ExtUtils::MakeMaker" => "6.52",
+    "Path::Tiny" => 0
   },
   "DISTNAME" => "Alien-m4",
   "LICENSE" => "perl",
@@ -41,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }

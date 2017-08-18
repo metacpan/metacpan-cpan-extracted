@@ -7,3 +7,4 @@ t/pw44-exists-and-runs.t
 contrib/cgi-bin-pwgen.pl
 contrib/genpw
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

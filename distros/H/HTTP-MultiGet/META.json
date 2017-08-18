@@ -46,6 +46,7 @@
             "HTTP::Request" : "6.13",
             "HTTP::Response" : "6.13",
             "IO::Scalar" : "2.111",
+            "JSON" : "2.94",
             "Log::Dispatch::Handle" : "2.65",
             "Log::Log4perl" : "1.49",
             "Log::LogMethods" : "1.0001",
@@ -62,6 +63,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.005",
+   "version" : "1.006",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

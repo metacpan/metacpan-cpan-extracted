@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find libtool
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::libtool - Build or find libtool
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ In your script or module:
  use Alien::libtool;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::libtool->bin_dir;
+ unshift @PATH, Alien::libtool->bin_dir;
 
 =head1 DESCRIPTION
 

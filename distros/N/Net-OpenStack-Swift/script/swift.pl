@@ -264,25 +264,39 @@ sub delete {
             }
         }
     }
-
+    
     my $t;
     # delete object
     if (scalar @matche_objects) {
         for my $obj (@matche_objects) {
-            my ($headers, $containers) = $c->stash->{sw}->delete_object(
-                container_name => $obj->{container_name},
-                object_name    => $obj->{object_name}
-            );
-            printf "deleted object %s/%s\n", $obj->{container_name}, $obj->{object_name};
+            eval {
+                my ($headers, $containers) = $c->stash->{sw}->delete_object(
+                    container_name => $obj->{container_name},
+                    object_name    => $obj->{object_name}
+                );
+            };
+            if ($@) {
+                printf "WARNING: %s %s/%s\n", $@, $obj->{container_name}, $obj->{object_name}; 
+            }
+            else {
+                printf "deleted object %s/%s\n", $obj->{container_name}, $obj->{object_name};
+            }
         }
     }
     if (scalar @matche_containers) {
         for my $obj (reverse @matche_containers) {
-            my ($headers, $containers) = $c->stash->{sw}->delete_object(
-                container_name => $obj->{container_name},
-                object_name    => $obj->{object_name}
-            );
-            printf "deleted object %s/%s\n", $obj->{container_name}, $obj->{object_name};
+            eval {
+                my ($headers, $containers) = $c->stash->{sw}->delete_object(
+                    container_name => $obj->{container_name},
+                    object_name    => $obj->{object_name}
+                );
+            };
+            if ($@) {
+                printf "WARNING: %s %s/%s\n", $@, $obj->{container_name}, $obj->{object_name}; 
+            }
+            else {
+                printf "deleted object %s/%s\n", $obj->{container_name}, $obj->{object_name};
+            }
         }
     }
 

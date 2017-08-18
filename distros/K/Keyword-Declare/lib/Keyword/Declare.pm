@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001005';
+our $VERSION = '0.001006';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -52,13 +52,20 @@ sub import {
             (?<syntax>
                             (?&PerlNWS)
                 (?{ $expected = "new type name"; $failed_at = pos() })
-                (?<newtype> (?&PerlIdentifier) )
-                            (?&PerlOWS)
+                (?<typesigil> \$?+ )
+                (?<newtype>   (?&PerlIdentifier) )
+                              (?&PerlOWS)
                 (?{ $expected = "'is <existing type>'"; $failed_at = pos() })
-                            is
-                            (?&PerlOWS)
+                              is
+                              (?&PerlOWS)
                 (?{ $expected = "existing typename or literal string or regex after 'is'"; $failed_at = pos() })
-                (?<oldtype> (?&PerlMatch) | (?&PerlString) | $TYPE_JUNCTION )
+                (?<oldtype>
+                    (?<oldtyperegex>  (?&PerlMatch)  )
+                |
+                    (?<oldtypestring> (?&PerlString) )
+                |
+                    (?<oldtypetype>   $TYPE_JUNCTION )
+                )
             )
 
             $PPR::GRAMMAR
@@ -69,6 +76,23 @@ sub import {
         # Save the information from the keyword definition...
         my %keytype_info = ( %+, location => "$file line $line" );
 
+        # Set up the sigil...
+        my $sigil_decl = q{};
+        if ($keytype_info{typesigil}) {
+            my $var = qq{$keytype_info{typesigil}$keytype_info{newtype}};
+            if ($keytype_info{oldtyperegex}) {
+                $keytype_info{oldtyperegex} =~ s{^m}{};
+                $sigil_decl = qq{my $var; BEGIN { $var = qr$keytype_info{oldtyperegex}; }};
+            }
+            elsif ($keytype_info{oldtypestring}) {
+                $sigil_decl = qq{my $var; BEGIN { $var = $keytype_info{oldtypestring} }}
+            }
+            else {
+                croak "Invalid keytype definition. Can only specify a sigil on new typename ($keytype_info{typesigil}$keytype_info{newtype}) if type is specified as a string or regex";
+            }
+        }
+
+        # Debug, if requested...
         if (${^H}{"Keyword::Declare debug"}) {
             my $msg = ("#" x 50) . "\n"
                     . " Installed keytype at $keytype_info{location}:\n\n$keytype_info{syntax}\n\n"
@@ -80,6 +104,7 @@ sub import {
         # Install the lexical type definition...
         $$src_ref
             = qq{BEGIN{\$^H{q{Keyword::Declare keytype:$keytype_info{newtype}=$keytype_info{oldtype}}} = 1;}}
+            . $sigil_decl
             . $$src_ref;
     };
 
@@ -902,7 +927,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001005
+This document describes Keyword::Declare version 0.001006
 
 
 =head1 STATUS
@@ -1243,6 +1268,34 @@ For example:
 
     keyword method (Name $name, ParamList? $params, Attr? @attrs, Body $body)
     {...}
+
+When you define a new compile-time keytype from a string or regex,
+you can also request the module to create a variable of the same name
+with the same content, by prefixing the keytype name with a C<$>
+sigil. For example:
+
+    keytype $ListMode  is  /keys|values|pairs/ ;
+    keytype $In        is  'In'                ;
+
+would create two new keytypes (C<ListMode> and C<In>) and also
+two new variables (C<$ListMode> and C<$In>) that contain the
+regex adnd string respectively. Note that you would still use
+the I<sigilless> forms in the parameter list of a keyword:
+
+    keyword list (ListMode $what, In, HashVar $hash) {
+        ...
+    }
+
+but could then use the sigilled forms in the body of the keyword:
+
+    keyword list (ListMode $what, In, HashVar $hash) {
+        if ($hash =~ $Listmode || $hash eq $In) {
+            warn 'Bad name for hash';
+        }
+        ...
+    }
+
+or anywhere else in the same lexical scope as the C<keytype> declaration.
 
 
 =head3 Junctive named types

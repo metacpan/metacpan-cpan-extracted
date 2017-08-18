@@ -33,7 +33,8 @@ my $today = RT::Date->new($session{CurrentUser});
 $today->SetToNow();
 
 # Escape : so id declaration is parsed properly
-my $cf_style = $cf_name =~ s/:/\\:/gr;
+my $cf_style = $cf_name;
+$cf_style =~ s/:/\\:/g;
 
 </%init>
 <style type="text/css">
@@ -57,7 +58,8 @@ input#<% $cf_style %> {
   </td>
 </tr>
 
-% if ( $TicketObj->TimeWorked ) {
+% # Render if less than RT 4.4.0, (which includes per user time)
+% if ( RT::Handle::cmp_version($RT::VERSION,'4.4.0') < 0 && $TicketObj->TimeWorked ) {
 <tr class="time worked">
     <td class="label"><&|/l&>Worked</&>:</td>
     <td>

@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+
 BEGIN {
    unless ($ENV{PERL_ANYEVENT_DBI_TESTS}) {
       print "1..0 # SKIP env var PERL_ANYEVENT_DBI_TESTS not set\n"; exit;
@@ -31,7 +32,6 @@ unless ($server_pid) {
 # the parent is the test script
 eval {
    require Test::More;
-   #d#import Test::More tests => 34;
    import Test::More tests => 33;
 };
 if ($@) {

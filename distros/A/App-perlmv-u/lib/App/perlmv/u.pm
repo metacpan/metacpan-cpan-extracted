@@ -1,7 +1,7 @@
 package App::perlmv::u;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-08-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ sub _read_undo_file {
         open my $fh, "<", $path
             or die "perlmv-u: Can't open undo file '$path': $!\n";
         my $content = <$fh>;
+        close $fh;
         return Sereal::Decoder::decode_sereal($content);
     } else {
         return [];
@@ -307,7 +308,7 @@ sub redo {
 
     my $undo = _read_undo_file();
     my $index;
-    for my $i (reverse 0..$#{$undo}) {
+    for my $i (0..$#{$undo}) {
         if ($undo->[$i]{status} eq 'undone') {
             $index = $i;
             last;
@@ -384,7 +385,7 @@ App::perlmv::u - Rename files using Perl code, with undo/redo
 
 =head1 VERSION
 
-This document describes version 0.003 of App::perlmv::u (from Perl distribution App-perlmv-u), released on 2017-08-01.
+This document describes version 0.004 of App::perlmv::u (from Perl distribution App-perlmv-u), released on 2017-08-17.
 
 =head1 DESCRIPTION
 

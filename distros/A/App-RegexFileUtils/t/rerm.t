@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 17;
+use Test2::V0 -no_srand => 1;
 use File::Temp qw( tempdir );
 use App::RegexFileUtils;
 use File::Spec;
@@ -34,3 +32,5 @@ ok -e 'nerf.c', 'nerf.c';
 ok ! -e 'nerf.c.bak', 'nerf.c.bak';
 
 chdir(File::Spec->updir) || die;
+
+done_testing;

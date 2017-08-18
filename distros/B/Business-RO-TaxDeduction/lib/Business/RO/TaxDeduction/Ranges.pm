@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction::Ranges;
-$Business::RO::TaxDeduction::Ranges::VERSION = '0.010';
+$Business::RO::TaxDeduction::Ranges::VERSION = '0.011';
 # ABSTRACT: Deduction ranges by year
 
 use 5.010001;
@@ -72,7 +72,7 @@ Business::RO::TaxDeduction::Ranges - Deduction ranges by year
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

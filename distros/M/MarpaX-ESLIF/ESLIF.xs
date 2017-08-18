@@ -333,11 +333,11 @@ SV *boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp;
         break;                                                          \
       default:                                                          \
         warn("Unsupported action type %d", actionp->type);              \
-        MARPAESLIF_XV_STORE(hvp, key, &PL_sv_undef);                    \
+        MARPAESLIF_XV_STORE(hvp, key, newSVsv(&PL_sv_undef));           \
         break;                                                          \
       }                                                                 \
     } else {                                                            \
-      MARPAESLIF_XV_STORE(hvp, key, &PL_sv_undef);                      \
+      MARPAESLIF_XV_STORE(hvp, key, newSVsv(&PL_sv_undef));             \
     }                                                                   \
   } while (0)
 
@@ -351,7 +351,7 @@ SV *boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp;
       }                                                                 \
       MARPAESLIF_XV_STORE(hvp, key, _svp);                              \
     } else {                                                            \
-      MARPAESLIF_XV_STORE(hvp, key, &PL_sv_undef);                      \
+      MARPAESLIF_XV_STORE(hvp, key, newSVsv(&PL_sv_undef));             \
     }                                                                   \
   } while (0)
 
@@ -359,7 +359,7 @@ SV *boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp;
     if (asciis != NULL) {                                               \
       MARPAESLIF_XV_STORE(hvp, key, newSVpv(asciis, 0));                \
     } else {                                                            \
-      MARPAESLIF_XV_STORE(hvp, key, &PL_sv_undef);                      \
+      MARPAESLIF_XV_STORE(hvp, key, newSVsv(&PL_sv_undef));             \
     }                                                                   \
   } while (0)
 

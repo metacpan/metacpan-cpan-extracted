@@ -6,7 +6,7 @@
                                                 |___/ 
 
 
-This is the README for Text::Fuzzy version 0.26.
+This is the README for Text::Fuzzy version 0.27.
 
 Text::Fuzzy is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -85,11 +85,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Text::Fuzzy
 
-To install the module from the source file, Text-Fuzzy-0.26.tar.gz, follow
+To install the module from the source file, Text-Fuzzy-0.27.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Text-Fuzzy-0.26.tar.gz
-    cd Text-Fuzzy-0.26
+    tar xfz Text-Fuzzy-0.27.tar.gz
+    cd Text-Fuzzy-0.27
     perl Makefile.PL
     make
     make install
@@ -114,6 +114,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Jul 10 17:20:45 2017.
+This README was written on Tue Aug 15 12:38:16 2017.
 
 -----------------------------------------------------------------------------

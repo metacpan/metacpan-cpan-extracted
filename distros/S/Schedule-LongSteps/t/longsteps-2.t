@@ -43,6 +43,20 @@ is_deeply( $step->state() , { beef => 'saussage' });
 ok( $long_steps->run_due_processes() );
 like( $fakestep->error() , qr/locate BladiBlabla\.pm/ );
 
+{
+    eval {
+        $long_steps->load_process( $fakestep->id() );
+    };
+    like($@, qr(Can\'t locate BladiBlabla.pm), 'load procress throws an error');
+    ok( my $loaded_process = $long_steps->load_process( $step->id() ),
+        'can load a process' );
+    my $stored_process = $loaded_process->stored_process;
+    is( $step->id(),   $stored_process->id(),   'same process: id' );
+    is( $step->what(), $stored_process->what(), 'same process: what' );
+    is_deeply( $step->state(), $stored_process->state(), 'same process: state' );
+}
+
+
 # And check the step properties have been
 is_deeply( $step->state(), { some => 'new one' });
 is( $step->what(), 'do_last_stuff' );
@@ -56,5 +70,7 @@ is( $step->status() , 'terminated' );
 ok( ! $step->run_at() );
 
 ok( ! $long_steps->run_due_processes() );
+
+is($long_steps->load_process( 1234567890 ), undef, 'load_process returns undef if not found');
 
 done_testing();

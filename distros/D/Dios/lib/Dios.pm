@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002008';
+our $VERSION = '0.002009';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -673,7 +673,7 @@ my $LEXICAL_DEFN = qr{
     )
 
     (?(DEFINE)
-        (?<TYPE_SPEC>  (?&TYPE_NAME) (?: [&|] (?&TYPE_NAME) )*+ )
+        (?<TYPE_SPEC>  (?&TYPE_NAME) (?: (?: [&|] | => ) (?&TYPE_NAME) )*+ )
         (?<TYPE_NAME>  (?&QUAL_IDENT)  (?&TYPE_PARAM)?+         )
         (?<TYPE_PARAM> \[ (?: [^][]*+ | (?&TYPE_PARAM) )*+ \]   )
         (?<QUAL_IDENT> (?&IDENT) (?: :: (?&IDENT) )*+ )
@@ -1187,10 +1187,15 @@ sub import {
     keytype TypeSpec   is m{ (?&TypeSpec)
                              (?(DEFINE)
                                  (?<TypeSpec>
-                                     (?&TypeName) (?: [&|] (?&TypeName) )*+
+                                     (?&TypeName) (?: (?: [&|] | => ) (?&TypeName) )*+
+                                 )
+                                 (?<TypeSpecSpacey>
+                                     \s* (?&TypeName) (?: \s* (?: [&|] | => ) \s* (?&TypeName) )*+ \s*
                                  )
                                  (?<TypeName>
-                                     (?&PerlIdentifier) \[ (?&TypeSpec) \]
+                                     Match \[ [^]]*+ \]
+                                 |
+                                     (?&PerlIdentifier) \[ (?&TypeSpecSpacey) \]
                                  |
                                      (?&PerlQualifiedIdentifier)
                                  )
@@ -1255,7 +1260,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002008
+This document describes Dios version 0.002009
 
 
 =head1 SYNOPSIS

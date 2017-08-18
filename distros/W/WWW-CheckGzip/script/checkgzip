@@ -1,0 +1,31 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use WWW::CheckGzip;
+use Data::Validate::URI 'is_web_uri';
+my $url;
+my $wc = WWW::CheckGzip->new (\& check);
+for $url (@ARGV) {
+    if (is_web_uri ($url)) {
+	$wc->check ($url);
+    }
+    else {
+	warn "$url doesn't look like a URL.\n";
+    }
+}
+
+exit;
+
+sub check
+{
+    my ($ok, $message) = @_;
+    if (! $ok) {
+	print "$url: not ok $message\n";
+    }
+}
+
+# Local variables:
+# mode: perl
+# End:

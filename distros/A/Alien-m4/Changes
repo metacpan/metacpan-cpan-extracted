@@ -1,5 +1,11 @@
 Revision history for Alien-m4
 
+0.16      2017-08-14 08:31:07 -0400
+  - Workaround for old mingw/gcc
+
+0.15_01   2017-08-14 04:47:55 -0400
+  - Diagnostic release.
+
 0.14      2017-08-04 10:11:49 -0400
   - Tweaks to improve MSYS2 support
 

@@ -54,6 +54,7 @@ for my $j (0 .. $#expected)
 				$j,
 				$expected[$j]);
 	}
+	#diag(sprintf("%2d: returned %g, expected %g", $j, $d2ydx2[$j], $expected[$j]));
 }
 
 if ($#expected < $#d2ydx2)

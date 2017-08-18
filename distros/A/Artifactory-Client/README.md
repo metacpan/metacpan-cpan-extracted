@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.5.0
+Version 1.5.1
 
 # SYNOPSIS
 
@@ -415,9 +415,13 @@ Search for artifacts with the latest value in the "version" property
 
 Find all the artifacts related to a specific build
 
-## list\_docker\_repositories
+## list\_docker\_repositories( n => 5, last => 'last\_tag\_value' )
 
 Lists all Docker repositories hosted in under an Artifactory Docker repository.
+
+## list\_docker\_tags( $image\_name, n => 5, last => 'last\_tag\_value' )
+
+Lists all tags of the specified Artifactory Docker repository.
 
 # SECURITY
 

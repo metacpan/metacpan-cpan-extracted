@@ -1,0 +1,79 @@
+{
+   "abstract" : "JSON::PP with encoding fallbacks",
+   "author" : [
+      "Adriano Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSON-PP-Monkey",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON::PP" : "2.94",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::PP::Monkey" : {
+         "file" : "lib/JSON/PP/Monkey.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aferreira/cpan-JSON-PP-Monkey/issues"
+      },
+      "homepage" : "https://github.com/aferreira/cpan-JSON-PP-Monkey",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aferreira/cpan-JSON-PP-Monkey.git",
+         "web" : "https://github.com/aferreira/cpan-JSON-PP-Monkey"
+      }
+   },
+   "version" : "0.1.0",
+   "x_contributors" : [
+      "Adriano Ferreira <a.r.ferreira@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
+}
+

@@ -1,6 +1,6 @@
 package Catmandu::Template;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 1;
 

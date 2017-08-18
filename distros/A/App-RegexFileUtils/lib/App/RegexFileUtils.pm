@@ -2,17 +2,13 @@ package App::RegexFileUtils;
 
 use strict;
 use warnings;
+use File::Spec;
+use File::ShareDir::Dist qw( dist_share );
+use File::Which qw( which );
 
 # ABSTRACT: use regexes with file utils like rm, cp, mv, ln
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
-
-BEGIN {
-  if($^O eq 'MSWin32')
-  {
-    require App::RegexFileUtils::MSWin32;
-  }
-}
 
 sub main {
   my $class = shift;
@@ -168,7 +164,7 @@ sub main {
     push @cmd, $new unless $no_dest;
     print "% @cmd\n" if $verbose;
     
-    __PACKAGE__->fix_path(\@cmd) if $^O eq 'MSWin32';
+    __PACKAGE__->_fix_path(\@cmd);
     
     system @cmd;
 
@@ -181,6 +177,28 @@ sub main {
       print "child exited with value ", $? >> 8, "\n";
     }
   }
+}
+
+use constant _share_dir => do {
+  my $path;
+  $path = dist_share('App-RegexFileUtils');
+  die 'can not find share directory' unless $path && -d "$path/ppt";    
+  $path;
+};
+
+sub _fix_path
+{
+  my($class, $cmd) = @_;
+
+  return unless $^O eq 'MSWin32';
+
+  return if which($cmd->[0]);
+
+  $cmd->[0] = File::Spec->catfile(
+    App::RegexFileUtils->_share_dir,
+    'ppt', $cmd->[0] . '.pl',
+  );
+  unshift @$cmd, $^X;
 }
 
 1;
@@ -197,7 +215,7 @@ App::RegexFileUtils - use regexes with file utils like rm, cp, mv, ln
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -255,7 +273,9 @@ Include even hidden dot files, like C<.profile> and C<.login>.
 
 These commands can also be invoked from your Perl script, using this module:
 
-=head2 App::RegexFileUtils->main( $program, @arguments )
+=head2 main
+
+ App::RegexFileUtils->main( $program, @arguments )
 
 For example:
 
@@ -286,10 +306,10 @@ sure you do NOT include the trailing slash.  That is:
 =head1 BUNDLED FILES
 
 This distribution comes bundled with C<cp>, C<ln>, C<rm>, C<touch>
-from the old L<Perl Power Tools|https://metacpan.org/release/ppt> project.
-These are only used on C<MSWin32> if these commands are not found in
-the path as they are frequently not available on that platform.  They
-are individually licensed separately.
+from the L<Perl Power Tools|https://metacpan.org/release/ppt> project.
+These are only used if the operating system does not provide these
+commands.  This is normally only the case on Windows.  They are individually
+licensed separately.
 
 =head2 cp.pl
 

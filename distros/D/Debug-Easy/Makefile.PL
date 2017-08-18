@@ -38,7 +38,7 @@ if (WriteMakefile(
         'Term::ANSIColor' => 4.00,
         'DateTime'        => 1.18,
         'File::Basename'  => 0,
-        'Best'            => 0,
+#        'Best'            => 0,
         'Data::Dumper'    => 0,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},

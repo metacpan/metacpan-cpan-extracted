@@ -34,6 +34,7 @@ WriteMakefile(
       AnyEvent::HTTP::Response 0.302
       AnyEvent 7.14
       AnyEvent::Loop 0
+      JSON 2.94
     )
     
     }, # e.g., Module::Name => 1.1

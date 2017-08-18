@@ -15,15 +15,17 @@ name: Data-Table-Text
 provides:
   Data::Table::Text:
     file: lib/Data/Table/Text.pm
-    version: '20170812'
+    version: '20170817'
 requires:
   Carp: '0'
+  Cwd: '0'
   Data::Dump: '0'
-  File::Glob: '1.24'
+  File::Glob: '1.17'
   File::Path: '0'
+  File::Temp: '0'
   POSIX: '0'
   Test::More: '0'
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170812'
+version: '20170817'

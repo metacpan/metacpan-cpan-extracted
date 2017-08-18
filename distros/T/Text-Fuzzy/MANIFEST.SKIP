@@ -29,3 +29,4 @@ MYMETA\..*
 ^timesheet\.txt$
 # Author tests
 ^xt/.*$
+^examples/.*-out\.txt

@@ -1,25 +1,18 @@
-#!perl
-#
-# This file is part of MooseX-Types-XML-LibXML
-#
-# This software is copyright (c) 2011 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
 
 BEGIN {
     unless ( $ENV{RELEASE_TESTING} ) {
-        require Test::More;
-        Test::More::plan(
-            skip_all => 'these tests are for release candidate testing' );
+        print qq{1..0 # SKIP these tests are for release candidate testing\n};
+        exit;
     }
 }
 
-use Test::More;
-eval 'use Test::CPAN::Changes';
-plan skip_all => 'Test::CPAN::Changes required for this test' if $@;
-changes_ok();
-done_testing();
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::CPAN::Changes 0.012
+
+use Test::More 0.96 tests => 1;
+use Test::CPAN::Changes;
+subtest 'changes_ok' => sub {
+    changes_file_ok('Changes');
+};

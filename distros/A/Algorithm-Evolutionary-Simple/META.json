@@ -4,7 +4,7 @@
       "JJ Merelo <jj@merelo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "open_source"
    ],
@@ -41,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.2",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

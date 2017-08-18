@@ -17,8 +17,10 @@ lib/Beam/Runner/Command/minion.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/command.t
 t/command/run.t
 t/command/worker.t
+t/lib/Beam/Minion/Command/test.pm
 t/lib/Local/Service.pm
 t/share/container.yml
 weaver.ini

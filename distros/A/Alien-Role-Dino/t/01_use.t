@@ -1,7 +1,6 @@
 use Test2::V0 -no_srand => 1;
 sub require_ok ($);
 
-require_ok 'Alien::Base::Dino';
 require_ok 'Alien::Build::Plugin::Gather::Dino';
 require_ok 'Alien::Role::Dino';
 require_ok "Alien::Role::Dino::$^O";

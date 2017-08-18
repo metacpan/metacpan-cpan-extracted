@@ -4,14 +4,14 @@ use warnings;
 use strict;
 use Carp qw(croak);
 
-our $VERSION = '0.2'; # Probably such an increase is not guaranteed, but...
+our $VERSION = '0.3'; # Probably such an increase is not guaranteed, but...
 
 use base 'Exporter';
 use Sort::Key::Top qw(rnkeytop) ;
 
 our @EXPORT_OK= qw( random_chromosome max_ones max_ones_fast spin 
-		    get_pool_roulette_wheel get_pool_binary_tournament
-		    produce_offspring mutate crossover single_generation );
+		  get_pool_roulette_wheel get_pool_binary_tournament
+		  produce_offspring mutate crossover single_generation );
 
 # Module implementation here
 sub random_chromosome {
@@ -32,7 +32,6 @@ sub max_ones {
   $count;
 }
 
-
 sub max_ones_fast {
   ($_[0] =~ tr/1/1/);
 }
@@ -45,8 +44,8 @@ sub get_pool_roulette_wheel {
 
   my @wheel = map( $fitness_of->{$_}/$total_fitness, @$population);
   my @slots = spin( \@wheel, scalar(@$population));
-#  my $slots = scalar(@$population);
-#  my @slots = map( $_*$slots, @wheel );;
+# my $slots = scalar(@$population);
+# my @slots = map( $_*$slots, @wheel );;
   my @pool;
   my $index = 0;
   do {
@@ -56,7 +55,7 @@ sub get_pool_roulette_wheel {
       push @pool, $population->[$p];
     }
   } while ( @pool < $need );
-  
+
   @pool;
 }
 
@@ -77,13 +76,13 @@ sub get_pool_binary_tournament {
       push @pool, $another;
     }
   } while ( @pool < $need );
-  
+
   @pool;
 }
 
 sub spin {
-   my ( $wheel, $slots ) = @_;
-   return map( $_*$slots, @$wheel );
+  my ( $wheel, $slots ) = @_;
+  return map( $_*$slots, @$wheel );
 }
 
 sub produce_offspring {
@@ -91,10 +90,9 @@ sub produce_offspring {
   my $offspring_size = shift || croak "Population size needed";
   my @population = ();
   my $population_size = scalar( @$pool );
-  for ( my $i = 0; $i < $offspring_size/2; $i++ )  {
+  for ( my $i = 0; $i < $offspring_size/2; $i++ ) {
     my $first = $pool->[rand($population_size)];
     my $second = $pool->[rand($population_size)];
-    
     push @population, crossover( $first, $second );
   }
   map( $_ = mutate($_), @population );
@@ -153,35 +151,35 @@ This document describes Algorithm::Evolutionary::Simple version 0.1.2
 
 =head1 SYNOPSIS
 
-    use Algorithm::Evolutionary::Simple qw( random_chromosome max_ones max_ones_fast
+  use Algorithm::Evolutionary::Simple qw( random_chromosome max_ones max_ones_fast
 					get_pool_roulette_wheel get_pool_binary_tournament produce_offspring single_generation);
 
-   my @population;
-   my %fitness_of;
-   for (my $i = 0; $i < $number_of_strings; $i++) {
-      $population[$i] = random_chromosome( $length);
-      $fitness_of{$population[$i]} = max_ones( $population[$i] );
+  my @population;
+  my %fitness_of;
+  for (my $i = 0; $i < $number_of_strings; $i++) {
+   $population[$i] = random_chromosome( $length);
+   $fitness_of{$population[$i]} = max_ones( $population[$i] );
+  }
+
+  my @best;
+  my $generations=0;
+  do {
+    my @pool;
+    if ( $generations % 2 == 1 ) {
+      get_pool_roulette_wheel( \@population, \%fitness_of, $number_of_strings );
+    } else {
+     get_pool_binary_tournament( \@population, \%fitness_of, $number_of_strings );
     }
-  
-    my @best;
-    my $generations=0;
-    do {
-        my @pool; 
-        if ( $generations % 2 == 1 ) { 
-           get_pool_roulette_wheel( \@population, \%fitness_of, $number_of_strings );
-        } else {
-          get_pool_binary_tournament( \@population, \%fitness_of, $number_of_strings );
-        }
-        my @new_pop = produce_offspring( \@pool, $number_of_strings/2 );
-        for my $p ( @new_pop ) {
-	    if ( !$fitness_of{$p} ) {
-	        $fitness_of{$p} = max_ones( $p );
-	    }
-        }
-       @best = rnkeytop { $fitness_of{$_} } $number_of_strings/2 => @population;
-       @population = (@best, @new_pop);
-       print "Best so far $best[0] with fitness $fitness_of{$best[0]}\n";	 
-   } while ( ( $generations++ < $number_of_generations ) and ($fitness_of{$best[0]} != $length ));
+    my @new_pop = produce_offspring( \@pool, $number_of_strings/2 );
+    for my $p ( @new_pop ) {
+        if ( !$fitness_of{$p} ) {
+	   $fitness_of{$p} = max_ones( $p );
+	}
+    }
+    @best = rnkeytop { $fitness_of{$_} } $number_of_strings/2 => @population;
+    @population = (@best, @new_pop);
+    print "Best so far $best[0] with fitness $fitness_of{$best[0]}\n";
+  } while ( ( $generations++ < $number_of_generations ) and ($fitness_of{$best[0]} != $length ));
 
 
 =head1 DESCRIPTION
@@ -208,7 +206,7 @@ Faster implementation of max_ones.
 =head2 spin($wheel, $slots )
 
 Mainly for internal use, $wheel has the normalized probability, and
-    $slots  the number of individuals to return.
+  $slots the number of individuals to return.
 
 =head2 single_generation( $population_arrayref, $fitness_of_hashref )
 
@@ -230,7 +228,7 @@ Uses mutation first and then crossover to obtain a new population
 
 =head2 mutate( $string )
 
-Bitflips a  a single point in the binary string
+Bitflips a a single point in the binary string
 
 =head2 crossover( $one_string, $another_string )
 
@@ -246,17 +244,17 @@ Algorithm::Evolutionary::Simple requires no configuration files or environment v
 
 =head1 DEPENDENCIES
 
-L<Sort::Key::Top> for efficient sorting. 
+L<Sort::Key::Top> for efficient sorting.
 
 =head1 SEE ALSO
 
 There are excellent evolutionary algorithm libraries out there; see
-    for instance L<AI::Genetic::Pro>
+  for instance L<AI::Genetic::Pro>
 
 =head1 BUGS AND LIMITATIONS
 
 It's intended for simplicity, not flexibility. If you want a
-    full-featured evolutionary algorithm library, check L<Algorithm::Evolutionary>
+  full-featured evolutionary algorithm library, check L<Algorithm::Evolutionary>
 
 Please report any bugs or feature requests to
 C<bug-algorithm-evolutionary-simple@rt.cpan.org>, or through the web interface at
@@ -265,7 +263,7 @@ L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-JJ Merelo  C<< <jj@merelo.net> >>
+JJ Merelo C<< <jj@merelo.net> >>
 
 
 =head1 LICENCE AND COPYRIGHT

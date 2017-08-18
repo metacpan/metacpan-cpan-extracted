@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.94 2017-08-18
+
+ - Use relative font size in CSSs (thanks to @labdsf)
+
 0.93 2017-07-29
 
  - Updated default font list

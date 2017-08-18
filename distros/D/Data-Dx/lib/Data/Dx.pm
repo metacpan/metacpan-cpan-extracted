@@ -4,7 +4,7 @@ use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use Keyword::Declare;
 
@@ -64,13 +64,14 @@ sub unimport {
 }
 
 sub _color {
-    state $colorer = eval { require Term::ANSIColor;
-                             sub { return shift if ((caller 1)[10]//{})->{'Data::Dx no_colour'}
-                                                || ((caller 2)[10]//{})->{'Data::Dx no_colour'};
-                                   goto &Term::ANSIColor::colored;
-                                 }
-                           }
-                   // sub { shift };
+    state $colorer = eval {
+            require Win32::Console::ANSI if $^O eq 'MSWin32';
+            require Term::ANSIColor;
+            sub { return shift if ((caller 1)[10]//{})->{'Data::Dx no_colour'}
+                            || ((caller 2)[10]//{})->{'Data::Dx no_colour'};
+                 goto &Term::ANSIColor::colored;
+            }
+    } // sub { shift };
     $colorer->(@_);
 }
 
@@ -147,7 +148,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000006
+This document describes Data::Dx version 0.000007
 
 
 =head1 SYNOPSIS

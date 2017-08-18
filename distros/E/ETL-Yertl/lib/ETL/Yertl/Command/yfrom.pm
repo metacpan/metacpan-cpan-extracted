@@ -1,9 +1,9 @@
 package ETL::Yertl::Command::yfrom;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 # ABSTRACT: Read documents from a format like JSON or CSV
 
 use ETL::Yertl;
-use ETL::Yertl::Format::default;
+use ETL::Yertl::Util qw( load_module );
 use Module::Runtime qw( use_module compose_module_name );
 
 sub main {
@@ -17,18 +17,9 @@ sub main {
     my ( $format, @files ) = @_;
 
     die "Must give a format\n" unless $format;
-    my $formatter_class = compose_module_name( 'ETL::Yertl::Format', $format );
-    eval {
-        use_module( $formatter_class );
-    };
-    if ( $@ ) {
-        if ( $@ =~ /^Can't locate \S+ in \@INC/ ) {
-            die "Unknown format '$format'\n";
-        }
-        die "Could not load format '$format': $@";
-    }
+    my $formatter_class = load_module( format => $format );
+    my $out_formatter = load_module( format => "default" )->new;
 
-    my $out_formatter = ETL::Yertl::Format::default->new;
     push @files, "-" unless @files;
     for my $file ( @files ) {
 
@@ -63,7 +54,7 @@ ETL::Yertl::Command::yfrom - Read documents from a format like JSON or CSV
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 AUTHOR
 

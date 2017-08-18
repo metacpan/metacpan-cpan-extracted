@@ -1,5 +1,5 @@
 package Beam::Minion::Command::run;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Command to enqueue a job on Beam::Minion job queue
 
 #pod =head1 SYNOPSIS
@@ -51,12 +51,11 @@ our $VERSION = '0.003';
 
 use strict;
 use warnings;
-use Beam::Minion::Util qw( minion );
+use Beam::Minion;
 
 sub run {
     my ( $class, $container, $service_name, @args ) = @_;
-    my $minion = minion();
-    $minion->enqueue( $service_name, \@args, { queue => $container } );
+    Beam::Minion->enqueue( $container, $service_name, @args );
 }
 
 1;
@@ -71,7 +70,7 @@ Beam::Minion::Command::run - Command to enqueue a job on Beam::Minion job queue
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

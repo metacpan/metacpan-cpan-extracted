@@ -1,0 +1,20 @@
+Source: libdr-datetime-perl
+Section: perl
+Homepage: http://search.cpan.org/dist/DR-DateTime/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 7), cdbs
+Standards-Version: 3.9.6
+Priority: extra
+VCS-Browser: https://github.com/dr-co/r
+
+Package: libdr-datetime-perl
+Depends: ${perl:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends}
+Architecture: any
+Suggests: libdatetime-perl
+Recommends: libmouse-perl
+Description: module for manipulating dates, times and timestamps
+ DR::DateTime is a lightweight variant of DateTime. The module
+ provides (reduced) the same API and has very small Dump size.
+ 

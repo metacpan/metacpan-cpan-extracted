@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test2::Bundle::Extended" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.19",
   "test" => {
     "TESTS" => "t/*.t t/Proc/*.t t/Proc/tored/*.t"
   }

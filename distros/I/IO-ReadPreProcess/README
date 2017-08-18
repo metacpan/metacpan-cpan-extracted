@@ -59,7 +59,7 @@ Within input you may:
 * log to stdout and stderr
 
 * write to named streams opened by the main Perl script; these can transparently
-  call Perl functions.
+  call Perl functions or write to arrays.
 
 * read lines to pre-processor variables
 
@@ -112,4 +112,4 @@ See L<http://dev.perl.org/licenses/> for more information.
 This was, to begin with, called Text::ReadConditionally - renamed to what seems
 to be a more descriptive name.
 
-SCCS: %W% %G% %U%
+SCCS: @(#)README	1.4 08/15/17 23:24:46

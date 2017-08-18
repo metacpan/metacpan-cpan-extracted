@@ -1,0 +1,80 @@
+{
+   "abstract" : "Simple Bible reference parser, tester, and canonicalizer",
+   "author" : [
+      "Gryphon Shafer <gryphon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bible-Reference",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Privacy" : "0",
+            "Readonly" : "0",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Class" : "0",
+            "Test::Class::Load" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "blib" : "1.01",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gryphonshafer/Bible-Reference/issues"
+      },
+      "homepage" : "https://github.com/gryphonshafer/Bible-Reference",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gryphonshafer/Bible-Reference.git",
+         "web" : "https://github.com/gryphonshafer/Bible-Reference"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

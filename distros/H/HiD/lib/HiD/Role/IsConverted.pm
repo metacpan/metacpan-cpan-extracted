@@ -3,7 +3,7 @@
 
 package HiD::Role::IsConverted;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Role::IsConverted::VERSION = '1.98';
+$HiD::Role::IsConverted::VERSION = '1.991';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -37,7 +37,17 @@ has converted_content => (
   lazy    => 1 ,
   default => sub {
     my $self = shift;
-    return _convert_by_extension( $self->content , $self->ext );
+
+    my $content = $self->content;
+
+    # process template directives in posts
+    if( $self->isa('HiD::Post' ) and $self->hid->has_processor() ) {
+      $self->hid->processor->process(
+        \$self->content , $self->template_data_without_content , \$content
+      );
+    }
+
+    return _convert_by_extension( $content , $self->ext );
   }
 );
 
@@ -137,9 +147,24 @@ has template_data => (
   default => sub {
     my $self = shift;
 
+    my $data = $self->template_data_without_content;
+
+    $data->{content} = $self->converted_content;
+
+    return $data;
+  },
+);
+
+
+has template_data_without_content => (
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  lazy    => 1 ,
+  default => sub {
+    my $self = shift;
+
     my $data = {
       baseurl   => $self->hid->config->{baseurl} ,
-      content   => $self->converted_content ,
       page      => $self->metadata ,
       site      => $self->hid ,
       timestamp => DateTime->now(),
@@ -247,6 +272,8 @@ Page content (stuff after the YAML front matter)
 
 Content after it has gone through the conversion process.
 
+Post objects will be rendered via the processor prior to conversion.
+
 =head2 converted_excerpt ( ro / Str / lazily built from content )
 
 Excerpt after it has gone through the conversion process
@@ -280,9 +307,13 @@ Content after any layouts have been applied
 
 Data for passing to template processing function.
 
+=head2 template_data_without_content
+
+Data for passing to template processing function when processing things that will _be_ content (e.g., blog posts).
+
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

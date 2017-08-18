@@ -1,0 +1,55 @@
+Net-Google-SafeBrowsing4
+========================
+
+Net::Google::SafeBrowsing4 implements the Google Safe Browsing v4 Local API
+
+The library passes all the unit tests listed in the API documentation.
+
+The Google Safe Browsing database must be stored and managed locally.
+Net::Google::SafeBrowsing4::Storage::File uses files as the storage back-end.
+Other storage mechanisms (databases, memory, etc.) can be added and used transparently with this module.
+
+
+The source code is available on github at https://github.com/juliensobrier/Net-Google-SafeBrowsing4.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  constant
+  Carp
+  Digest::SHA
+  Exporter
+  HTTP::Message
+  JSON::XS
+  List::Util
+  LWP::UserAgent
+  MIME::Base64
+  Net::IP::Lite
+  Path::Tiny
+  Storable
+  Test::LWP::UserAgent
+  Test::More
+  Text::Trim
+  Time::HiRes
+  URI
+  List::BinarySearch
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Julien Sobrier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

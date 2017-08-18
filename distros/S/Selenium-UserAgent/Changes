@@ -1,5 +1,10 @@
 Revision history for perl module Selenium::UserAgent
 
+0.11 2017-08-15
+ - Disable tests :(
+ - Fix chrome
+ - Firefox still probably broken
+
 0.10 2016-08-19
  - Assert minimum required version for List::Util
 

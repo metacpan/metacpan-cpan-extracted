@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use base qw(DateTime);
 use DateTime::TimeZone;
+use PGObject;
 
 =head1 NAME
 
@@ -13,11 +14,11 @@ PGObject::Type::DateTime - DateTime Wrappers for PGObject
 
 =head1 VERSION
 
-Version 2
+Version 2.0.1
 
 =cut
 
-our $VERSION = 2.000000;
+our $VERSION = 2.000001;
 our $default_tz = DateTime::TimeZone->new(name => 'UTC');
 
 
@@ -74,12 +75,13 @@ sub register {
     $types = ['date', 'time', 'timestamp', 'timestamptz'] 
            unless defined $types and @$types;
     for my $type (@$types){
-        if ($PGObject::VERSION =~ /1\.*/) { # 1.x
+        if ($PGObject::VERSION =~ /^1\./) { # 1.x
             my $ret = 
                 PGObject->register_type(registry => $registry, pg_type => $type,
                                   perl_class => $self);
         } else { # higher than 1.x
-	    PGObject::Type::Registry->register_type(
+            require PGObject::Type::Registry;
+            PGObject::Type::Registry->register_type(
                  registry => $registry, dbtype => $type, apptype => $self
             );
         }
@@ -322,7 +324,7 @@ L<http://search.cpan.org/dist/PGObject-Type-DateTime/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Chris Travers.
+Copyright 2013-2017 Chris Travers.
 
 This program is released under the following license: BSD
 

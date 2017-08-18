@@ -8,7 +8,9 @@ use Test::EOL;
 
 my @files = (
     'lib/Dist/Zilla/MintingProfile/Author/ETHER.pm',
+    'lib/Dist/Zilla/Plugin/MetaProvides/Update.pm',
     'lib/Dist/Zilla/PluginBundle/Author/ETHER.pm',
+    'lib/Dist/Zilla/PluginBundle/Git/VersionManager.pm',
     'lib/Pod/Weaver/PluginBundle/Author/ETHER.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
@@ -29,6 +31,9 @@ my @files = (
     't/15-weaver-expand-config.t',
     't/16-podweaver-licence.t',
     't/17-podweaver-support.t',
+    't/18-versionmanagement.t',
+    't/19-add_bundle.t',
+    't/20-git-versionmanager.t',
     't/lib/Helper.pm',
     't/lib/NoNetworkHits.pm',
     't/lib/NoPrereqChecks.pm',

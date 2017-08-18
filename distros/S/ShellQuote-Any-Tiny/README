@@ -1,27 +1,53 @@
-SYNOPSIS
+NAME
+    ShellQuote::Any::Tiny - Escape string for the Unix/Windows shell
 
+VERSION
+    This document describes version 0.005 of ShellQuote::Any::Tiny (from
+    Perl distribution ShellQuote-Any-Tiny), released on 2017-08-16.
+
+SYNOPSIS
      use ShellQuote::Any::Tiny qw(shell_quote);
-    
+
      my $cmd = 'echo ' . shell_quote("hello world");
-    
+
      # On Windows, $cmd becomes 'echo "hello world"'.
      # On Unix, $cmd becomes q(echo 'hello world').
 
 DESCRIPTION
-
     This module tries to quote command-line argument when passed to shell
     (either Unix shells or Windows) using as little code as possible. For
     more proper quoting, see See Also section.
 
 FUNCTIONS
+  shell_quote($str) => str
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ShellQuote-Any-Tiny>.
 
- shell_quote($str) => str
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ShellQuote-Any-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ShellQuote-Any-Tiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     String::ShellQuote for Unix shells
 
     Win32::ShellQuote for Windows shells
 
     PERLANCAR::ShellQuote::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

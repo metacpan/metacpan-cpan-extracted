@@ -62,11 +62,11 @@ BEGIN {
         extends 'Moxie::Object';
            with 'Comparable', 'Printable';
 
-        has '$!amount' => sub { 0 };
+        has '$!amount' => ( default => sub { 0 } );
 
-        sub BUILDARGS : init_args( amount => '$!amount' );
+        sub BUILDARGS : init_args( amount? => $!amount );
 
-        sub amount : ro('$!amount');
+        sub amount : ro( $!amount );
 
         sub compare ($self, $other) {
             $self->amount <=> $other->amount;
@@ -115,11 +115,11 @@ ok(!$Eq->requires_method('not_equal_to'), '... EQ::not_equal_to is NOT a stub me
     ok($dollar->equal_to( $dollar ), '... we are equal to ourselves');
     ok(!$dollar->not_equal_to( $dollar ), '... we are not not equal to ourselves');
 
-    ok(US::Currency->new( '$!amount' => 20 )->greater_than( $dollar ), '... 20 is greater than 10');
-    ok(!US::Currency->new( '$!amount' => 2 )->greater_than( $dollar ), '... 2 is not greater than 10');
+    ok(US::Currency->new( 'amount' => 20 )->greater_than( $dollar ), '... 20 is greater than 10');
+    ok(!US::Currency->new( 'amount' => 2 )->greater_than( $dollar ), '... 2 is not greater than 10');
 
-    ok(!US::Currency->new( '$!amount' => 10 )->greater_than( $dollar ), '... 10 is not greater than 10');
-    ok(US::Currency->new( '$!amount' => 10 )->greater_than_or_equal_to( $dollar ), '... 10 is greater than or equal to 10');
+    ok(!US::Currency->new( 'amount' => 10 )->greater_than( $dollar ), '... 10 is not greater than 10');
+    ok(US::Currency->new( 'amount' => 10 )->greater_than_or_equal_to( $dollar ), '... 10 is greater than or equal to 10');
 }
 
 {

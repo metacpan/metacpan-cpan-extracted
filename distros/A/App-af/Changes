@@ -1,5 +1,9 @@
 Revision history for App-af
 
+0.14      2017-08-15 11:27:54 -0400
+  - Merged App-palien and App-af.  For the old App-palien change log
+    see Changes.App-palien
+
 0.12      2017-07-31 08:14:22 -0400
   - af missing does not print out some diagnostics that wes breaking it.
 

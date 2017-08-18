@@ -179,7 +179,7 @@ Net::IPAddress::Util::Range - Representation of a range of IP addresses
 
 =head1 VERSION
 
-Version 3.027
+Version 3.029
 
 =head1 SYNOPSIS
 
@@ -210,15 +210,53 @@ Version 3.027
 
 =head1 DESCRIPTION
 
+Sometimes when dealing with IP Addresses, it can be nice to talk about 
+contiguous ranges of them as whole collections of addresses without worrying 
+that the contiguous range is exactly a CIDR-compatible range.
+
+This is what Net::IPAdress::Util::Range is for. Objects of this class act
+as type-checked pairs of lower and upper bounds of a range of IP Addresses.
+
 =head1 CLASS METHODS
 
 =head2 new
 
-The constructor.
+The constructor. Takes a hashref with:
 
-=head2 BUILD
+=over
 
-Internal use only.
+=item C<lower> and C<upper>
+
+In this case, construction is straightforward. The two values must be either
+L<Net::IPAddress::Util> objects, or something that can be used to construct one.
+
+=item C<ip>
+
+If the C<ip> is a L<Net::IPAddress::Util> object (or something that can be used
+to construct one), then you get a Range consisting of a single IP. This may
+seem redundant, but allows L<Net::IPAddress::Util::Collection> to do magic.
+
+=over
+
+Also, as a convenience, CIDR strings (of the form "N.N.N.N/X", etc) may be
+passed in, and you'll get back a Range representing that whole CIDR.
+
+=back
+
+=item C<ip> and C<cidr>
+
+Pass in an IP and a numeric CIDR (which B<MUST> be valid for the version (4 or 
+6) of the IP), and you'll get back a Range representing that whole CIDR.
+
+=item C<ip> and C<netmask>
+
+Pass in two IPs, of the same version, and they'll be treated exacatly as the 
+argument names suggest. The C<netmask> argument B<MUST> (in binary) start with
+zero or more ones, followed by enough zeroes to pad out to the correct number
+of bits (either 32 or 128 for IPv4 or IPv6 respectively). The C<ip> argument 
+B<MUST> have the same number of right-hand zeroes as the C<netmask> argument.
+
+=back
 
 =head1 OBJECT METHODS
 

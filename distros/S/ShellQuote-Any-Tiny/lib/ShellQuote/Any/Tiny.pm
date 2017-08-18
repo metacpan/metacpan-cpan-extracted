@@ -1,7 +1,7 @@
 package ShellQuote::Any::Tiny;
 
-our $DATE = '2017-01-04'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-08-16'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 #use warnings;
@@ -42,7 +42,7 @@ ShellQuote::Any::Tiny - Escape string for the Unix/Windows shell
 
 =head1 VERSION
 
-This document describes version 0.004 of ShellQuote::Any::Tiny (from Perl distribution ShellQuote-Any-Tiny), released on 2017-01-04.
+This document describes version 0.005 of ShellQuote::Any::Tiny (from Perl distribution ShellQuote-Any-Tiny), released on 2017-08-16.
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

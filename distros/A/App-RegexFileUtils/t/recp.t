@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More tests => 11;
+use Test2::V0 -no_srand => 1;
 use File::Temp qw( tempdir );
 use App::RegexFileUtils;
 use File::Spec;
@@ -25,3 +23,5 @@ ok -e "perl/lib/foo.pl", "perl/lib/foo.pl";
 ok -e "perl/lib/Foo.pm", "perl/lib/Foo.pm";
 
 chdir(File::Spec->updir) || die;
+
+done_testing;

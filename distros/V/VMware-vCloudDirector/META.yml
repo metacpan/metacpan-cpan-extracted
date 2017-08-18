@@ -29,22 +29,22 @@ no_index:
 provides:
   VMware::vCloudDirector:
     file: lib/VMware/vCloudDirector.pm
-    version: '0.006'
+    version: '0.007'
   VMware::vCloudDirector::API:
     file: lib/VMware/vCloudDirector/API.pm
-    version: '0.006'
+    version: '0.007'
   VMware::vCloudDirector::Error:
     file: lib/VMware/vCloudDirector/Error.pm
-    version: '0.006'
+    version: '0.007'
   VMware::vCloudDirector::Link:
     file: lib/VMware/vCloudDirector/Link.pm
-    version: '0.006'
+    version: '0.007'
   VMware::vCloudDirector::Object:
     file: lib/VMware/vCloudDirector/Object.pm
-    version: '0.006'
+    version: '0.007'
   VMware::vCloudDirector::ObjectContent:
     file: lib/VMware/vCloudDirector/ObjectContent.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Const::Fast: '0'
   Data::Dump: '0'
@@ -68,7 +68,7 @@ requires:
 resources:
   homepage: https://github.com/Perl-VMware/perl-VMware-vCloudDirector
   repository: https://github.com/Perl-VMware/perl-VMware-vCloudDirector.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -102,7 +102,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -120,7 +120,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -133,11 +133,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.006'
+          tag: '0.007'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -151,7 +151,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -178,7 +178,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^(\d+.\d+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -186,7 +186,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -198,7 +198,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.13.0
+          git_version: 2.14.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -216,7 +216,7 @@ x_Dist_Zilla:
           release_branch: cpan
           release_message: 'Build results of %h (on %b)'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.14.1
           repo_root: .
       name: Git::CommitBuild
       version: '2.042'

@@ -11,7 +11,7 @@ Business::Monzo - Perl library for interacting with the Monzo API
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 DESCRIPTION
 
@@ -107,10 +107,10 @@ appropriate error catching code (ideally a module from CPAN):
         say $e->response; # HTTP status message
 
         # ->request may not always be present
-        say $e->request->{path}    if $e->request
-        say $e->request->{params}  if $e->request
-        say $e->request->{headers} if $e->request
-        say $e->request->{content} if $e->request
+        say $e->request->{path}    if $e->request;
+        say $e->request->{params}  if $e->request;
+        say $e->request->{headers} if $e->request;
+        say $e->request->{content} if $e->request;
     }
     catch ( $e ) {
         # some other failure?
@@ -131,7 +131,7 @@ use warnings;
 use Moo;
 with 'Business::Monzo::Version';
 
-$Business::Monzo::VERSION = '0.10';
+$Business::Monzo::VERSION = '0.11';
 
 use Carp qw/ confess /;
 

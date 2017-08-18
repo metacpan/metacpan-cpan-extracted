@@ -21,7 +21,8 @@ use IO::SessionData;
 
 # ======================================================================
 
-package URI::tcp; # ok, let's do 'tcp://' scheme
+package # hide from PAUSE
+    URI::tcp; # ok, let's do 'tcp://' scheme
 
 our $VERSION = 0.715;
 

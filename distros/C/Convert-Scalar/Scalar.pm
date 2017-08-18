@@ -26,9 +26,9 @@ The following export tags exist:
 package Convert::Scalar;
 
 BEGIN {
-   $VERSION = 1.11;
+   $VERSION = 1.12;
    @ISA = qw(Exporter);
-   @EXPORT_OK = qw(readonly readonly_on readonly_off weaken unmagic len grow extend);
+   @EXPORT_OK = qw(readonly readonly_on readonly_off weaken unmagic len grow extend extend_read readall writeall);
    %EXPORT_TAGS = (
       taint  => [qw(taint untaint tainted)],
       utf8   => [qw(utf8 utf8_on utf8_off utf8_valid utf8_upgrade utf8_downgrade utf8_encode utf8_decode utf8_length)],
@@ -142,7 +142,7 @@ contents of the scalar, but is only useful to "pre-allocate" memory space
 if you know the scalar will grow. The return value is the modified scalar
 (the scalar is modified in-place).
 
-=item scalar = extend scalar, addlen
+=item scalar = extend scalar, addlen=64
 
 Reserves enough space in the scalar so that addlen bytes can be appended
 without reallocating it. The actual contents of the scalar will not be
@@ -156,6 +156,31 @@ If you instead use C<extend $scalar, length $shortstring>, then
 Convert::Scalar will use a "size to next power of two, roughly" algorithm,
 so as the scalar grows, perl will have to resize and copy it less and less
 often.
+
+=item nread = extend_read fh, scalar, addlen=64
+
+Calls C<extend scalar, addlen> to ensure some space is available, then
+do the equivalent of C<sysread> to the end, to try to fill the extra
+space. Returns how many bytes have been read, C<0> on EOF or undef> on
+eror, just like C<sysread>.
+
+This function is useful to implement many protocols where you read some
+data, see if it is enough to decode, and if not, read some more, where the
+naive or easy way of doing this would result in bad performance.
+
+=item nread = read_all fh, scalar, length
+
+Tries to read C<length> bytes into C<scalar>. Unlike C<read> or
+C<sysread>, it will try to read more bytes if not all bytes could be read
+in one go (this is often called C<xread> in C).
+
+Returns the total nunmber of bytes read (normally C<length>, unless an
+error or EOF occured), C<0> on EOF and C<undef> on errors.
+
+=item nwritten = write_all fh, scalar
+
+Like C<readall>, but for writes - the equivalent of the C<xwrite> function
+often seen in C.
 
 =item refcnt scalar[, newrefcnt]
 

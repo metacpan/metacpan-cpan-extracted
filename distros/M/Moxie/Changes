@@ -1,5 +1,35 @@
 Revision history for Perl extension Moxie
 
+0.03 2017-08-17
+    [GITHUB]
+    - generous typo fixes from my internet friends
+        - Pierre Vigier
+        - Evan Carroll
+
+    [FEATURE CHANGES]
+    - the way the BUILDARGS:init_args trait works now
+      is very different and not backwards compatible
+        - added tests in t/100-annotations/010-init-args.t
+        - docs added to the Moxie module
+        - This change is NOT backwards compatible
+
+    - `has` now (also) takes a set of option pairs and
+       generates the correct initializer based on those
+       options
+        - docs added to the Moxie module
+        - This change is backwards compatible
+
+    [BUG FIXES]
+    - classes can now be loaded at runtime
+        - added tests for this
+
+    [DEPENDENCIES]
+    - version bump for BEGIN::Lift and Method::Traits
+      to make sure classes can be loaded at runtime
+
+    - version bump for MOP to better support the
+      custom slot initializer usage
+
 0.02 05-07-2017
     - fixing missing dependency (PadWalker)
     - fixing some simple kwalitee issues

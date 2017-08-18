@@ -1418,6 +1418,15 @@ subtest 'list_docker_repositories', sub {
     is( $resp->code, 200, 'request succeeded' );
 };
 
+subtest 'list_docker_tags', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::get'} = sub {
+        return return $mock_responses{http_200};
+    };
+    my $resp = $client->list_docker_tags( 'foobar', n => 5, last => 'some_last_value' );
+    is( $resp->code, 200, 'request succeeded' );
+};
+
 subtest 'get_users', sub {
     my $client = setup();
 

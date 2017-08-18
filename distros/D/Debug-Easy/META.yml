@@ -18,7 +18,6 @@ no_index:
     - t
     - inc
 requires:
-  Best: '0'
   Data::Dumper: '0'
   DateTime: '1.18'
   File::Basename: '0'
@@ -26,4 +25,4 @@ requires:
   Term::ANSIColor: '4'
   Time::HiRes: '1.9715'
   perl: '5.006001'
-version: '1.19'
+version: '1.20'

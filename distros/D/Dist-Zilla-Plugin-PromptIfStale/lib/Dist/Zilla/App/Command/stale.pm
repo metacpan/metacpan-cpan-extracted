@@ -4,7 +4,7 @@ package Dist::Zilla::App::Command::stale;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: print your distribution's prerequisites and plugins that are out of date
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 use Dist::Zilla::App -command;
 
@@ -167,7 +167,7 @@ Dist::Zilla::App::Command::stale - print your distribution's prerequisites and p
 
 =head1 VERSION
 
-version 0.053
+version 0.054
 
 =head1 SYNOPSIS
 

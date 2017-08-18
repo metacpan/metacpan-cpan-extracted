@@ -7,22 +7,22 @@ use Helper;
 
 my %notes = (
     # 'random' => 'build tree of random subset',
-    'distanceall' => 'half-matrix list of distances between leaves',
-    'labelnodes' => 'prepends ID to leaf/node labels',
-    'length' => 'total branch length',
-    'lengthall' => 'nodes and branch lengths',
-    'numOTU' => 'total number of OTUs',
-    'otu' => 'leaf nodes with branch lengths',
-    'rmbl' => 'remove branch lengths from tree',
+    'dist-all'    => 'half-matrix list of distances between leaves',
+    'label-nodes' => 'prepends ID to leaf/node labels',
+    'length'      => 'total branch length',
+    'length-all'  => 'nodes and branch lengths',
+    'otus-num'    => 'total number of OTUs',
+    'otus-all'    => 'leaf nodes with branch lengths',
+    # 'rmbl' => 'remove branch lengths from tree',
 );
 
 test_no_arg_opts('biotree', 'test-biotree.dnd', \%notes);
 
 my $opts = [
-    ['allchildOTU', '15',
+    ['otus-desc', '15',
      "Prints OTU's descended from node 15"],
     ['depth', 'N40,B31,SV1', 'depth to root'],
-    ['distance', 'SV1,N40',
+    ['dist', 'SV1,N40',
      'distance between a pair of nodes or leaves'],
     ['lca', 'SV1,B31,N40', 'Least Common Ancestor'],
     ['ltt', '10',
@@ -34,15 +34,8 @@ my $opts = [
 
 test_one_arg_opts('biotree', 'test-biotree.dnd', $opts);
 
-%notes = (
-    'random' => "random",
-);
-
-
-for my $opt (keys %notes) {
-    run_bio_program_nocheck('biotree', 'test-biotree.dnd', "--${opt}",
-			    {note=>$notes{$opt}});
-}
+run_bio_program_nocheck('biotree', 'test-biotree.dnd', "--random 1",
+			{note=>"Random of sample size 1"});
 
 note( "Skipping biotree -r JD1 - needs investigation" );
 # run_bio_program_nocheck('biotree', 'test-biotree.dnd', "-r JD1",

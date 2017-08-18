@@ -5,7 +5,7 @@ package VMware::vCloudDirector;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -97,7 +97,7 @@ VMware::vCloudDirector - Interface to VMWare vCloud Directory REST API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

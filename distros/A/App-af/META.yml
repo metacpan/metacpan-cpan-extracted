@@ -6,7 +6,6 @@ build_requires:
   Test2::Tools::Basic: '0.000060'
   Test2::V0: '0.000060'
   Test::Exit: '0.11'
-  Test::More: '0.94'
   Test::Script: '0'
   perl: '5.014'
 configure_requires:
@@ -43,5 +42,8 @@ resources:
   bugtracker: https://github.com/plicease/App-af/issues
   homepage: https://metacpan.org/pod/App::af
   repository: git://github.com/plicease/App-af.git
-version: '0.12'
+version: '0.14'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Diab Jerius (DJERIUS)'
 x_serialization_backend: 'YAML::Tiny version 1.70'

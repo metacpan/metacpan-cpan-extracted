@@ -1,0 +1,16 @@
+Regexp-Pattern-License
+======================
+
+Created:      2016-11-23
+Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
+Home page:    <https://metacpan.org/pod/Regexp::Pattern::License>
+Bug tracker:  <https://bugs.debian.org/regexp-pattern-license>
+Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v3.0.31	2017-08-15
+
+ [ Packaging ]
+ - Initial independent CPAN release (based on App::Licensecheck).
+
+ [ Other ]
+ - Use strict and warnings (not strictures).

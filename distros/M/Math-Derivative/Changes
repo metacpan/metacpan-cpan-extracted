@@ -1,5 +1,10 @@
 Revision history for Math-Derivative
 
+1.01
+	15 Aug 2017
+	- Move Math::Utils dependancy from 1.06 to 1.10. A test
+	  was failing in 21-secondd.t because the older version's
+	  pl_evaluate() wasn't handling lists back then.
 1.00
 	9 Aug 2017
 	- Add tests, more POD clean-up, send to CPAN.

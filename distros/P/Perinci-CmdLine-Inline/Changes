@@ -1,3 +1,9 @@
+0.541   2017-08-16 (PERLANCAR)
+
+	- Replace :utf8 I/O layer with :encoding(utf8) to make generated
+	  script pass perlcritic test.
+
+
 0.540   2017-08-12 (PERLANCAR)
 
 	- [Bugfix] Avoid double require of Getopt::Long::EvenLess.

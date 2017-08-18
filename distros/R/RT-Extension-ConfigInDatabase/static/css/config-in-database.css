@@ -1,0 +1,19 @@
+/* remove unnecessary left padding for radio options */
+body#comp-Admin-Tools-EditConfig div.widget .label {
+    width: auto;
+    float: none;
+}
+
+body#comp-Admin-Tools-EditConfig textarea:disabled,
+body#comp-Admin-Tools-EditConfig input:disabled {
+    background-color: #EEE;
+}
+
+body#comp-Admin-Tools-EditConfig .widget.code textarea,
+body#comp-Admin-Tools-EditConfig textarea.code {
+    font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+}
+
+body#comp-Admin-Tools-EditConfig ul.plugins {
+    margin: 0;
+}:

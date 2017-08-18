@@ -32,7 +32,7 @@ struct SPVM_compiler {
   const char* cur_file;
   
   // Source base_object
-  const char* cur_src;
+  char* cur_src;
   
   // AST grammar
   SPVM_OP* op_grammar;
@@ -98,6 +98,9 @@ struct SPVM_compiler {
   
   // Subroutine length
   int32_t subs_length;
+  
+  // Native subroutines
+  SPVM_DYNAMIC_ARRAY* native_subs;
   
   // Error is fatal
   _Bool fatal_error;

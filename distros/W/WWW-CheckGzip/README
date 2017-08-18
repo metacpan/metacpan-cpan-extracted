@@ -1,0 +1,141 @@
+  __        ____        ____        __      
+  \ \      / /\ \      / /\ \      / /  _ _ 
+   \ \ /\ / /  \ \ /\ / /  \ \ /\ / /  (_|_)
+    \ V  V /    \ V  V /    \ V  V /    _ _ 
+     \_/\_/      \_/\_/      \_/\_/    (_|_)
+                                            
+    ____ _               _     ____     _       
+   / ___| |__   ___  ___| | __/ ___|___(_)_ __  
+  | |   | '_ \ / _ \/ __| |/ / |  _|_  / | '_ \ 
+  | |___| | | |  __/ (__|   <| |_| |/ /| | |_) |
+   \____|_| |_|\___|\___|_|\_\\____/___|_| .__/ 
+                                         |_|    
+
+
+This is the README for WWW::CheckGzip version 0.03.
+
+WWW::CheckGzip is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+WWW::CheckGzip - check web pages for correct gzipping of content
+
+This module offers a way to check a web page for correct gzip
+compression. It tests the following, in the order given:
+
+Page OK with compression
+
+The web page is retrievable with an Accept-Encoding header set.
+
+If the page is not retrievable, "check" calls the test callback,
+then returns and does no further actions.
+
+Header OK
+
+When sent a request with an Accept-Encoding header containing the
+string "gzip", the web page responds with a content encoding header.
+
+Header is gzip
+
+The content encoding header of the response is "gzip".
+
+Content is in gzip format
+
+The content of the web page's response is in the gzip format. This is
+checked using "Gzip::Faster/gunzip".
+
+Content is smaller
+
+The size of the uncompressed content of the web page is larger than it
+is when compressed. This test will fail, for example, if gzip encoding
+is wrongly used to compress images or extremely small web pages.
+
+Page OK without compression
+
+The web page is retrievable without an Accept-Encoding header set.
+
+Response has no gzip header
+
+The web page does not send a gzip header if the Accept-Encoding header
+is not set.
+
+Content is not compressed
+
+The web page does not gzip compress the content when Accept-Encoding
+header is not sent. This is checked using "Gzip::Faster/gunzip".
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?WWW::CheckGzip
+    * http://metacpan.org/release/WWW-CheckGzip
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc WWW::CheckGzip
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan WWW::CheckGzip
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm WWW::CheckGzip
+
+To install the module from the source file, WWW-CheckGzip-0.03.tar.gz,
+follow this sequence of commands:
+
+    tar xfz WWW-CheckGzip-0.03.tar.gz
+    cd WWW-CheckGzip-0.03
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/www-checkgzip/issues>,
+
+or if you want to alter the source code of WWW::CheckGzip, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/www-checkgzip>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Aug 17 17:44:19 2017.
+
+-----------------------------------------------------------------------------

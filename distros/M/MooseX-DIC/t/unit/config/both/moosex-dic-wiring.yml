@@ -1,0 +1,5 @@
+mappings:
+  Test5:
+    Test5Impl:
+      environment: default
+      scope: singleton

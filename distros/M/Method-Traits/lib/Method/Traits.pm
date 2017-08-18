@@ -4,7 +4,7 @@ package Method::Traits;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Carp                   ();
@@ -38,9 +38,9 @@ sub import {
 }
 
 sub import_into {
-    my ($class, $target, @providers) = @_;
+    my (undef, $target, @providers) = @_;
     my $meta = Scalar::Util::blessed( $target ) ? $target : MOP::Class->new( $target );
-    $class->schedule_trait_collection( $meta, @providers );
+    __PACKAGE__->schedule_trait_collection( $meta, @providers );
 }
 
 ## --------------------------------------------------------
@@ -80,18 +80,11 @@ sub get_traits_for {
 ## --------------------------------------------------------
 
 sub schedule_trait_collection {
-    my ($class, $meta, @providers) = @_;
-
-    # It does not make any sense to create
-    # something that is meant to run in the
-    # BEGIN phase *after* that phase is done
-    # so catch this and error ...
-    Carp::croak('Trait collection must be scheduled during BEGIN time, not (' . ${^GLOBAL_PHASE}. ')')
-        unless ${^GLOBAL_PHASE} eq 'START';
+    my (undef, $meta, @providers) = @_;
 
     # add in the providers, so we can
-    # get to them in other BEGIN blocks
-    $class->add_trait_providers_for( $meta, @providers );
+    # get to them when needed ...
+    __PACKAGE__->add_trait_providers_for( $meta, @providers );
 
     # no need to install the collectors
     # if they have already been installed
@@ -105,7 +98,7 @@ sub schedule_trait_collection {
         FETCH_CODE_ATTRIBUTES => sub {
             my ($pkg, $code) = @_;
             # return just the strings, as expected by attributes ...
-            return map $_->original, $class->get_traits_for( MOP::Method->new( $code ) );
+            return map $_->original, __PACKAGE__->get_traits_for( MOP::Method->new( $code ) );
         }
     );
     $meta->alias_method(
@@ -116,7 +109,7 @@ sub schedule_trait_collection {
             my $method = MOP::Method->new( $code );
 
             my @traits    = map Method::Traits::Trait->new( $_ ), @attrs;
-            my @unhandled = $class->find_unhandled_traits( $klass, @traits );
+            my @unhandled = __PACKAGE__->find_unhandled_traits( $klass, @traits );
 
             #use Data::Dumper;
             #warn "WE ARE IN $pkg for $code with " . join ', ' => @attrs;
@@ -135,10 +128,10 @@ sub schedule_trait_collection {
             # if that actually makes sense or not
             # so it will need to be explored.
             # - SL
-            $method = $class->apply_all_trait_handlers( $klass, $method, \@traits );
+            $method = __PACKAGE__->apply_all_trait_handlers( $klass, $method, \@traits );
 
             # store the traits we applied ...
-            $class->add_traits_for( $method, @traits );
+            __PACKAGE__->add_traits_for( $method, @traits );
 
             #warn ${^GLOBAL_PHASE};
 
@@ -147,23 +140,29 @@ sub schedule_trait_collection {
         }
     );
 
-    B::CompilerPhase::Hook::enqueue_CHECK {
+
+    # Odd/nice thing about UNITCHECK, if you enqueue
+    # it during BEGIN time, it will run during BEGIN
+    B::CompilerPhase::Hook::enqueue_UNITCHECK {
         #warn "STEP 2";
-        #warn "CHECK: " . ${^GLOBAL_PHASE};
+        #warn "UNITCHECK: " . ${^GLOBAL_PHASE};
 
         $meta->delete_method_alias('MODIFY_CODE_ATTRIBUTES');
     };
+
+    #warn "HMMMM: " . ${^GLOBAL_PHASE} . " => " . $meta->name;
 }
 
+
 sub find_unhandled_traits {
-    my ($class, $meta, @traits) = @_;
+    my (undef, $meta, @traits) = @_;
 
     # Now loop through the traits and look to
     # see if we have any ones we cannot handle
     # and collect them for later ...
     return grep {
         my $stop;
-        foreach my $provider ( $class->get_trait_providers_for( $meta ) ) {
+        foreach my $provider ( __PACKAGE__->get_trait_providers_for( $meta ) ) {
             #warn "PROVIDER: $provider looking for: " . $_->[0];
             if ( my $handler = $provider->can( $_->name ) ) {
                 $_->handler( MOP::Method->new( $handler ) );
@@ -209,7 +208,7 @@ Method::Traits - Apply traits to your methods
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

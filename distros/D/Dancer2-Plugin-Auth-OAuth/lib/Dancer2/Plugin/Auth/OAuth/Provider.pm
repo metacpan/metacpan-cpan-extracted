@@ -158,7 +158,11 @@ sub callback {
         );
         $at_request->sign;
 
-        my $ua_response = $self->ua->request( GET $at_request->to_url );
+        my $ua_response = $self->ua->request(
+            POST $at_request->to_url, [
+                'oauth_verifier', $request->param('oauth_verifier')
+            ]
+        );
 
         if( $ua_response->is_success ) {
             my $response = Net::OAuth->response( 'access token' )->from_post_body( $ua_response->content );

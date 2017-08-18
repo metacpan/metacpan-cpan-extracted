@@ -3,7 +3,7 @@ package Log::Dispatch::File;
 use strict;
 use warnings;
 
-our $VERSION = '2.65';
+our $VERSION = '2.66';
 
 use IO::Handle;
 use Log::Dispatch::Types;
@@ -172,7 +172,7 @@ Log::Dispatch::File - Object for logging to files
 
 =head1 VERSION
 
-version 2.65
+version 2.66
 
 =head1 SYNOPSIS
 

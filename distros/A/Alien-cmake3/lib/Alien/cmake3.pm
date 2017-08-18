@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download or build cmake 3 or better
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub exe
@@ -41,7 +41,7 @@ Alien::cmake3 - Find or download or build cmake 3 or better
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -58,12 +58,14 @@ From L<alienfile>
  use alienfile;
  
  share {
-   requires Alien::cmake3;
+   # Build::CMake plugin pulls in Alien::cmake3 automatically
+   plugin 'Build::CMake';
    build [
-     '%{cmake3} ...'
+     # this is the default build step, if you do not specify one.
+     [ '%{cmake}', -G => '%{cmake_generator}', '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true', '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.' ],
      '%{make}',
      '%{make} install',
-   ],
+   ];
  };
 
 =head1 DESCRIPTION
@@ -97,6 +99,11 @@ The name of the <cmake> executable.
 
 =over 4
 
+=item L<Alien::Build::Plugin::Build::CMake>
+
+L<Alien::Build> plugin for C<cmake>  This will automatically pull in Alien::cmake3 if you
+need it.
+
 =item L<Alien::CMake>
 
 This is an older distribution that provides an alienized C<cmake>.  It is different in
@@ -104,13 +111,21 @@ these ways:
 
 =over 4
 
-=item L<Alien::cmake3> is based on L<alienfile> and L<Alien::Build> and integrates better with L<Alien>s that are based on that technology.
+=item L<Alien::cmake3> is based on L<alienfile> and L<Alien::Build> 
 
-=item L<Alien::cmake3> will provide version 3.0.0 or better.  L<Alien::CMake> will provide 2.x.x on some platforms where more recent binaries are not available.
+It integrates better with L<Alien>s that are based on that technology.
 
-=item L<Alien::cmake3> will install on platforms where there is no system C<cmake> and no binary C<cmake> provided by cmake.org.  It does this by building C<cmake> from source.
+=item L<Alien::cmake3> will provide version 3.0.0 or better
 
-=item L<Alien::cmake3> is preferred in the opinion of the maintainer of both L<Alien::cmake3> and L<Alien::CMake> for these reasons.
+L<Alien::CMake> will provide 2.x.x on some platforms where more recent binaries are not available.
+
+=item L<Alien::cmake3> will install on platforms where there is no system C<cmake> and no binary C<cmake> provided by cmake.org
+
+It does this by building C<cmake> from source.
+
+=item L<Alien::cmake3> is preferred
+
+In the opinion of the maintainer of both L<Alien::cmake3> and L<Alien::CMake> for these reasons.
 
 =back
 

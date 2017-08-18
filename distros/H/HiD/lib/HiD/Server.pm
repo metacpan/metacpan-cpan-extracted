@@ -3,7 +3,7 @@
 
 package HiD::Server;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Server::VERSION = '1.98';
+$HiD::Server::VERSION = '1.991';
 use 5.014; # strict, unicode_strings
 use warnings;
 
@@ -26,6 +26,74 @@ sub locate_file {
     if ( $path && $path =~ m|/$| );
 
   return $self->SUPER::locate_file( $env );
+}
+
+
+sub return_400 {
+  return $_[0]->_error_code_handler(400)
+}
+
+
+sub return_403 {
+  return $_[0]->_error_code_handler(403)
+}
+
+
+sub return_404 {
+  return $_[0]->_error_code_handler(404)
+}
+
+
+sub serve_path {
+  my ($self, $env, $file) = @_;
+
+  my $response = $self->SUPER::serve_path( $env, $file );
+
+  my $alternate_status = delete $self->{use_http_status_of};
+
+  $response->[0] = $alternate_status
+    if ( $response->[0] == 200 && $alternate_status );
+
+  return $response;
+}
+
+sub _error_code_handler {
+  my ($self, $code) = @_;
+
+  #default page name e.g. 404.html
+  my $default_page = "$code.html";
+
+  my $super = "SUPER::return_$code";
+  return $self->$super()
+    if ( grep /^searching/, keys %$self );
+
+  #stack of possible error pages to search
+  my @search = ( $default_page );
+
+  #if a custom page added via the config push it onto the stack
+  my $custom_page = $self->{error_pages}->{$code};
+
+  push @search, $custom_page
+    if ( $custom_page && lc($custom_page) ne lc($default_page) );
+
+  while ( my $page = pop( @search ) ) {
+    #set the flag so we know what we're searching for
+    $self->{'searching_'.$page} = 1;
+    my ($file, $path_info) =
+      $self->locate_file( { PATH_INFO => '/'.$page });
+
+    #done searching now in any case
+    delete $self->{'searching_'.$page};
+
+    #the Array ref indicates file not found let's check the next file
+    next if ( ref $file eq 'ARRAY' );
+
+    #set the http error response code for use in the actual response
+    $self->{use_http_status_of} = $code;
+    return ( $file, $path_info );
+  }
+  #found no custom or default error page lets return the default Plack error message;
+  return $self->$super();
 }
 
 1;
@@ -51,9 +119,29 @@ Helper for C<hid server>
 Overrides L<Plack::App::File>'s method of the same name to handle '/' and
 '/index.html' cases
 
+=head2 return_400
+
+Overrides L<Plack::App::File>'s 400 handler to return either configured or
+default html page instead of the default message
+
+=head2 return_403
+
+Overrides L<Plack::App::File>'s 403 handler to return either configured or
+default html page instead of the default message
+
+=head2 return_404
+
+Overrides L<Plack::App::File>'s 404 handler to return either configured or
+default html page instead of the default message
+
+=head2 serve_path
+
+Overrides L<Plack::App::File>'s serve_path method
+to put in alternate http response codes
+
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

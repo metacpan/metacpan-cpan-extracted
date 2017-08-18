@@ -129,7 +129,7 @@ my_iter_it(fake)
 {
     VALUE obj, method, args;
 
-    Printf(("Note: in my_iter_it(%p)\n", fake));
+    Printf(("Note: in my_iter_it(%p)\n", (void *) fake));
     Printf(("Type: TYPE(fake) = %i\n", TYPE(fake)));
     obj		= rb_ary_entry(fake, 0);
     method	= rb_ary_entry(fake, 1);
@@ -316,7 +316,7 @@ my_error_wrapper(arg)
 	VALUE it_args;
 	it_args = rb_ary_new3(3, obj, rb_str_new2(method), argv);
 	Printf(("Note: calling rb_interate(%p, %p, %p, %p)\n",
-	       my_iter_it, it_args, my_iter_bl, iter));
+	       my_iter_it, (void *) it_args, my_iter_bl, iter));
 	retv = rb_iterate(&my_iter_it, it_args, &my_iter_bl, (VALUE)iter);
     }
     else {
@@ -356,7 +356,7 @@ call_ruby_method(obj, method, iter, argv)
     VALUE	wrap_argv;
     VALUE	rb_retval;
 
-    Printf(("call_ruby_method(%p, '%s', %p)\n", obj, method, iter));
+    Printf(("call_ruby_method(%p, '%s', %p)\n", (void *) obj, method, iter));
 
     /* If obj is a string, it is the name the class upon which to call the
      * class method. */
@@ -494,7 +494,7 @@ my_rb_call_class_method(KLASS, mname, ...)
 	VALUE	argv;
 	SV*	pl_retval;
     PPCODE:
-	Printf(("rb_call_class_method('%s', '%s', %p, ...)\n",KLASS,mname));
+	Printf(("rb_call_class_method('%s', '%s', ...)\n",KLASS,mname));
 
 	INIT_RUBY_ARGV(argv);
 	klass = rb_str_new2(KLASS);
@@ -523,13 +523,13 @@ my_rb_call_instance_method(_inst, mname, ...)
 	SV*	pl_retval;
 	SV*	iter;
     PPCODE:
-	Printf(("rb_call_instance_method(%p, '%s', %p, ...)\n",
+	Printf(("rb_call_instance_method(%p, '%s', ...)\n",
 		_inst, mname));
 
 	if (isa_InlineRubyWrapper(_inst)) {
 	    inst = UNWRAP_RUBY_OBJ(_inst);
 	    iter = INLINE_MAGIC(_inst)->iter;
-	    Printf(("inst (%p) successfully passed the PVMG test\n", inst));
+	    Printf(("inst (%p) successfully passed the PVMG test\n", (void *) inst));
 	}
 	else {
 	    croak("Object is not a wrapped Inline::Ruby::Object object");

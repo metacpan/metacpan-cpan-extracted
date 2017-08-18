@@ -48,7 +48,7 @@ CODE:
 	for (i = 2; i < items; i++) {
 		SV * x;
 		char * p;
-		unsigned int len;
+		STRLEN len;
 
 		if (i >= items - 1) {
 			warn ("Odd number of parameters %d of %d",
@@ -80,7 +80,6 @@ CODE:
 		else {
 			warn ("Unknown parameter %s", p);
 		}
-		/* Plan to throw one away; you will anyway. */
 		i++;
 	}
 	RETVAL = r;

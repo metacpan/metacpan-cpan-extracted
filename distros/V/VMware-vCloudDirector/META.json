@@ -85,27 +85,27 @@
    "provides" : {
       "VMware::vCloudDirector" : {
          "file" : "lib/VMware/vCloudDirector.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "VMware::vCloudDirector::API" : {
          "file" : "lib/VMware/vCloudDirector/API.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "VMware::vCloudDirector::Error" : {
          "file" : "lib/VMware/vCloudDirector/Error.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "VMware::vCloudDirector::Link" : {
          "file" : "lib/VMware/vCloudDirector/Link.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "VMware::vCloudDirector::Object" : {
          "file" : "lib/VMware/vCloudDirector/Object.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "VMware::vCloudDirector::ObjectContent" : {
          "file" : "lib/VMware/vCloudDirector/ObjectContent.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -117,7 +117,7 @@
          "web" : "https://github.com/Perl-VMware/perl-VMware-vCloudDirector"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -160,7 +160,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -184,7 +184,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -201,12 +201,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.006",
+                  "tag" : "0.007",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -226,7 +226,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -261,7 +261,7 @@
                   "version_regexp" : "(?^u:^(\\d+.\\d+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -272,7 +272,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -288,7 +288,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -310,7 +310,7 @@
                   "release_message" : "Build results of %h (on %b)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },

@@ -4,7 +4,7 @@ author:
   - 'J. A. R. Williams'
   - 'John M. Gamble <jgamble@cpan.org>'
 build_requires:
-  Math::Utils: '1.06'
+  Math::Utils: '1.10'
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
@@ -18,10 +18,10 @@ name: Math-Derivative
 provides:
   Math::Derivative:
     file: lib/Math/Derivative.pm
-    version: '0.04'
+    version: '1.01'
 requires:
   perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

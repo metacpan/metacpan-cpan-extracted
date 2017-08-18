@@ -1,0 +1,47 @@
+{
+   "abstract" : "Multiplex output to multiple output handles",
+   "author" : [
+      "Chung-chieh Shan <ken@digitas.harvard.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-Tee",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "Symbol" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/IO-Tee",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/IO-Tee.git",
+         "web" : "https://github.com/neilb/IO-Tee"
+      }
+   },
+   "version" : "0.65",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

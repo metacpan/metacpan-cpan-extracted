@@ -29,11 +29,12 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Minion::Backend::SQLite" => 0,
     "Mock::MonkeyPatch" => 0,
+    "Mojo::SQLite" => "2.002",
     "Test::Fatal" => 0,
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t t/command/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "Minion" => 0,
   "Minion::Backend::SQLite" => 0,
   "Mock::MonkeyPatch" => 0,
+  "Mojo::SQLite" => "2.002",
   "Mojolicious" => 7,
   "Test::Fatal" => 0,
   "Test::Lib" => 0,

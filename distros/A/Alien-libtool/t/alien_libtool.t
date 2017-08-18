@@ -13,9 +13,10 @@ my $wrapper = sub { [@_] };
 
 if($^O eq 'MSWin32')
 {
-  skip_all 'test requires Alien::MSYS on Windows'
-    unless eval q{ require Alien::MSYS; 1 };
-  push @PATH, Alien::MSYS::msys_path();
+  eval {
+    require Alien::MSYS;
+    push @PATH, Alien::MSYS::msys_path();
+  };
   $wrapper = sub { ['sh', -c => "@_"] };
 }
 

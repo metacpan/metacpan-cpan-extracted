@@ -14,9 +14,9 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 ff9927bc6b1b395c388b9963558ce9b6f304b273 Changes
+SHA1 30b84993d8bf6c9b9a27d39857f909d4ab515789 Changes
 SHA1 30d3ed82fab5d233cae78e51f2591b22061e233e MANIFEST
-SHA1 4d6b6be0f157fcf893e3adb0ba94e23ba31d60c4 META.yml
+SHA1 f06c080334da068c5cce0112e000b47e98193fdd META.yml
 SHA1 585f3ce9b6218edf6f8ff7730a71cc97aaf4e5f0 Makefile.PL
 SHA1 aa599d002ed9f81745c7f301eccb0970eda76379 README
 SHA1 7d0938d44cfd4b3d4773f7c8b2f7229333d54a85 doc/images/timetracking_basics.png
@@ -28,27 +28,27 @@ SHA1 c03ac9a57e9263af30bc2b21679080441c46eaff html/Callbacks/RT-Extension-TimeTr
 SHA1 28f6a31581f5d310a837687bf0a7169f006c2199 html/Callbacks/RT-Extension-TimeTracking/Elements/ShowCustomFields/ShowComponentName
 SHA1 77462753371197275d55a1a3b9886775637bcaa9 html/Callbacks/RT-Extension-TimeTracking/Elements/Tabs/Privileged
 SHA1 bebded891553f06e3ca0aec81ecf106115872e22 html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/EditTransactionCustomFields/MassageTransactionCustomFields
-SHA1 7277e66e4652913f56261680e751607d043531ba html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/ShowBasics/EndOfList
+SHA1 853623e7c252e2a40d3dc57563e3a6f5b09782fc html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/ShowBasics/EndOfList
 SHA1 38421b8bf19ef1878f245324562b7e905e6d8a14 html/Elements/ShowCustomFieldActor
 SHA1 4e15f4786622a1708244d451b4b6bc4106ecef5f html/Tools/MyWeek.html
-SHA1 9d3b2104a620fbaa1e5291400cb14385b205c8da inc/Module/AutoInstall.pm
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 93283b6d98078acdd04b242b3e994258821f4fe5 inc/Module/Install/AutoInstall.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 780e868167858840d454ef6ad6bc2a2206f845e7 inc/Module/Install/RTx.pm
+SHA1 707278f4ee3fa8eb21b9a2d40fe26447113244a3 inc/Module/AutoInstall.pm
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
+SHA1 da26ed869803dd04c51b15609437d00ffebed3f9 inc/Module/Install/AutoInstall.pm
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 51f01eba57f9f58f7a3480115d2660126f48b35c inc/Module/Install/Include.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
 SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
 SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
 SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 1b8032d3d3f21adf1c32effa9dd212bcb0125692 lib/RT/Extension/TimeTracking.pm
-SHA1 051d912a23e89aa57f4167c4887751413c052897 lib/RT/Extension/TimeTracking/Test.pm
+SHA1 57fefcd4a0017e9b0458a58dd020b7fea67ce421 lib/RT/Extension/TimeTracking.pm
+SHA1 ab0c51eabdd37cc479bf1f42dc7ffc6fa83b7764 lib/RT/Extension/TimeTracking/Test.pm
 SHA1 95e9032f9c0250923b72ad293c7f7d07e2bf1685 lib/RT/Extension/TimeTracking/Test.pm.in
 SHA1 8938c161009684c51fe98a45b97544cb3161a8b9 static/css/time_tracking.css
 SHA1 4576930ae3f8966d32869a14bf474c0b11c31676 static/js/time_tracking.js
@@ -56,11 +56,11 @@ SHA1 b8d9e72a18d2afdfb3068d6c0d483d9239d3f22c xt/work_week.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEcBAEBAgAGBQJW7/xdAAoJEBXncVGnZqUUPwsIAI/OEvdU3aqYQv8FDY3a6/mR
-9Rue1PZ0cRtIpujMbz/MTS9+CH9TFoiwtI4I/0hNYikC3dIRk0+pcyuelH2SE5QO
-W/K2yMP6dAiep8flAbf4CdMRyPWbfH4+fTkxsMIenKu3PuBxN/NFpyzwL82Y6zI3
-EmnEqTLHyJ60HTmIqqlQeTShLPG5J5Hw3NI3l7W8c3ytgF2oBEQOcEVi4JvOp08F
-qDO/4hjZYWnGwu1gRn4k8ZwPXh4uR33WjHnvFTYu2YWL2iRrgYz82WC/wEb71pYC
-uny6qLVWxYycxvj34LzP/x/ZnuIMKQ86qwfRFS8vA8zhHKUKKW6YLWQ5VBk9rBg=
-=yl0G
+iQEcBAEBAgAGBQJZldxfAAoJEBXncVGnZqUUXJgH/0QPd/7NPJH9OsBP/PcRgD53
+mdJLHSP+8GaLJYSaGocOx6qq6MbTDg4jvUVNWyzcPcNPZZTxrREmqpuV2oaRxaoq
+iCPMxFys9yJ6y4lOcedz28bQ12KuEfU3Bpw15rHPbAXTaP67jHCCuIIchiJHndjj
+5lAH6G3yORR0rPxJ+cW1ZuBzQupWZbNgTIVL2knK7C0BsFU83mZM9d2Xd00XHd8G
+ovKCOFiMrOqPAuug7GDrzdNFH/D0uHBYOzioKeP2tfTGpf2bnx7BT6hzH3Zzov2F
+hjx4wiaOqCxfcngh89jYgI6B7UjpPD6r0eLy0JqxuAgMaJJYPew5qEypYk26Eg4=
+=85yO
 -----END PGP SIGNATURE-----

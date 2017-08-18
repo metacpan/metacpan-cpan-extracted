@@ -142,6 +142,10 @@ t/Tests/9_test_1.input
 t/Tests/9_test_1.want
 t/Tests/9_test_1.s1.want
 t/Tests/9_test_1.s2.want
+t/Tests/9_include_2.input
+t/Tests/9_include_2.want
+t/Tests/9_stream_3.input
+t/Tests/9_stream_3.want
 t/Examples/Hacks
 t/Examples/README
 t/Examples/tam1

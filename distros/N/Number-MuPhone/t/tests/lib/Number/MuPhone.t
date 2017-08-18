@@ -64,5 +64,21 @@ use Number::MuPhone;
 
 }
 
+{ # correctly throw an error when we can't identify the country code
+  my $weird_num_from_us = Number::MuPhone->new({ number => '+01161396694916' });
+  is (
+    $weird_num_from_us->error,
+    "Invalid country code - no country code begins with a zero",
+    "international dial number with erroneous plus"
+  );
+
+  # 89 is not a valid country code
+  my $weird_num_from_us2 = Number::MuPhone->new({ number => '+899396694916' });
+  is (
+    $weird_num_from_us2->error,
+    "Invalid country code - could not determine country",
+    "international dial number with erroneous country code"
+  );
+}
 
 done_testing();

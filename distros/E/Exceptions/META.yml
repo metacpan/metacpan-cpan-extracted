@@ -26,13 +26,13 @@ no_index:
 provides:
   Exception:
     file: lib/Exception.pm
-    version: '0.101'
+    version: '0.102'
   Exceptions:
     file: lib/Exceptions.pm
-    version: '0.101'
+    version: '0.102'
   SimpleException:
     file: lib/SimpleException.pm
-    version: '0.101'
+    version: '0.102'
 requires:
   strict: '0'
   warnings: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/genio/p5-exceptions/issues
   homepage: https://github.com/genio/p5-exceptions
   repository: https://github.com/genio/p5-exceptions.git
-version: '0.101'
+version: '0.102'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -223,7 +223,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -246,7 +246,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -263,7 +263,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -276,11 +276,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.101
+          tag: v0.102
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -294,7 +294,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
       name: '@Git/Push'
       version: '2.042'

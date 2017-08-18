@@ -28,8 +28,9 @@ requires:
   Alien::Base: '0.92'
   perl: '5.008001'
 resources:
+  IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-cmake3/issues
   homepage: https://metacpan.org/pod/Alien::cmake3
   repository: git://github.com/plicease/Alien-cmake3.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

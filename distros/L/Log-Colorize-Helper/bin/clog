@@ -1,0 +1,170 @@
+#! /usr/local/bin/perl
+#Copyright (c) 2017, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Log::Colorize::Helper;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "clog 0.0.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+	print "clog [switches] file\n".
+		"\n".
+		"-e   echo\n".
+		"-f   follow\n".
+		"-h   head\n".
+		"-t   tail\n".
+		"-g <grep search>   grep\n".
+		"-i   grep is case insensitive\n".
+		"-v   grep is inverted\n".
+		"-F   grep first\n".
+		"-G    un-gzip\n".
+		"-J    un-bzip2\n".
+		"-n <int>   number of lines for -t or -h\n".
+		"-l   less\n";
+}
+
+#gets the options
+my %opts=();
+getopts('efhtn:g:ivlFGJ', \%opts);
+
+#init it
+my $clog=Log::Colorize::Helper->new;
+
+#set tail/head stuff if needed
+if ( ! defined( $opts{n} ) ){
+	$opts{n}=10;
+}
+if ( $opts{t} ){
+	$opts{t}=$opts{n};
+}
+if ( $opts{h} ){
+	$opts{h}=$opts{n};
+}
+
+$clog->colorize(
+	{
+		echo=>$opts{e},
+		log=>$ARGV[0],
+		head=>$opts{h},
+		tail=>$opts{t},
+		grep=>$opts{g},
+		less=>$opts{l},
+		follow=>$opts{f},
+		'grep-insensitive'=>$opts{i},
+		'grep-invert'=>$opts{v},
+		'grep-first'=>$opts{F},
+		bzip2=>$opts{J},
+		gzip=>$opts{G},
+	}
+	);
+
+=head1 NAME
+
+clog - Searches, displays, and colorizes log files.
+
+=head1 SYNOPSIS
+
+clog [-ZJelvi] [-g <grep search string>] <log>
+
+clog [-ZJelFvi] [-g <grep search string>] -h [-n <int>] <log>
+
+clog [-ZJeflFvi] [-g <grep search string>] -t [-n <int>] <log>
+
+=head1 DESCRIPTION
+
+clog is basically a frontend to bunzip, gunzip, grep, colorize, less, head, and tail that
+exists for the purpose of reducing the amount of typing and piping when viewing/searching
+log files.
+
+=head1 FLAGS
+
+=head2 -e
+
+Echos the command to STDOUT before running it.
+
+=head2 -f
+
+Follows the file in question.
+
+It implies -t and -n with a value of 10 if it is not specified.
+
+Can't be combined with -h or -F.
+
+=head2 -F
+
+Run grep first.
+
+Can't be combined with -f.
+
+=head2 -g <grep string>
+
+A search string to pass to grep if desired.
+
+=head2 -h
+
+Head the log file
+
+Can't be combined with -t.
+
+=head2 -i
+
+Grep is case insensitive.
+
+=head2 -J
+
+The file should be un-bzip2ed.
+
+=head2 -l
+
+Pass the output to less -R.
+
+=head2 -n <int>
+
+The number of lines for either head or tail.
+
+If this is not specified, 10 is used.
+
+=head2 -t
+
+Tail the log file.
+
+Can't be combined with -h.
+
+=head2 -v
+
+Grep is inverted.
+
+=head2 -Z
+
+The file should be un-gzipped.
+
+=cut

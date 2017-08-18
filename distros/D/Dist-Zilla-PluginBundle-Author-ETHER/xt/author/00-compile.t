@@ -6,11 +6,13 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 4;
+plan tests => 6;
 
 my @module_files = (
     'Dist/Zilla/MintingProfile/Author/ETHER.pm',
+    'Dist/Zilla/Plugin/MetaProvides/Update.pm',
     'Dist/Zilla/PluginBundle/Author/ETHER.pm',
+    'Dist/Zilla/PluginBundle/Git/VersionManager.pm',
     'Pod/Weaver/PluginBundle/Author/ETHER.pm'
 );
 

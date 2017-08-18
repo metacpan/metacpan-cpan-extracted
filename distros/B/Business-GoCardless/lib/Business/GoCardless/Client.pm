@@ -13,6 +13,7 @@ there is nothing you should be doing with this.
 
 use strict;
 use warnings;
+use feature qw/ say /;
 
 use Moo;
 with 'Business::GoCardless::Utils';
@@ -363,16 +364,21 @@ sub _api_request {
     if ( $method =~ /POST|PUT/ ) {
         if ( $self->api_version > 1 ) {
             $req->content_type( 'application/json' );
-            $req->content( JSON->new->canonical->encode( $params ) ) if $params;
+            my $json;
+            $json = JSON->new->canonical->encode( $params ) if $params;
+            $req->content( $json ) if $json;
+            say STDERR "GOCARDLESS -> $json" if $ENV{GOCARDLESS_DEBUG} && $json;
         } else {
             $req->content_type( 'application/x-www-form-urlencoded' );
-            $req->content( $self->normalize_params( $params ) );
+            $req->content( my $normalize_params = $self->normalize_params( $params ) );
+            say STDERR "GOCARDLESS -> $normalize_params" if $ENV{GOCARDLESS_DEBUG} && $normalize_params;
         }
     }
 
     my $res = $ua->request( $req );
 
     if ( $res->is_success ) {
+        say STDERR "GOCARDLESS <- " . $res->content if $ENV{GOCARDLESS_DEBUG};
         my $data  = JSON->new->canonical->decode( $res->content );
         my $links = $res->header( 'link' );
         my $info  = $res->header( 'x-pagination' );

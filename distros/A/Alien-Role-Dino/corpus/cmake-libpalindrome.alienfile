@@ -1,0 +1,32 @@
+use alienfile;
+use Path::Tiny qw( path );
+
+probe sub { 'share' };
+
+share {
+
+  meta->prop->{start_url} = path(__FILE__)->parent->child('cmake-libpalindrome')->stringify;
+  plugin 'Fetch::LocalDir';
+  plugin 'Extract::Directory';
+  plugin 'Build::CMake';
+
+  gather sub {
+    my($build) = @_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{$_} = "-I$prefix/include" for qw( cflags cflags_static );
+
+    # just to be sure get rid of the static lib
+    path('lib/libpalindrome.a')->remove;
+
+    if($build->meta_prop->{platform}->{compiler_type} eq 'microsoft')
+    {
+      $build->runtime_prop->{$_} = "-LIBPATH:$prefix/lib palindromeStatic.lib" for qw( libs libs_static );
+    }
+    else
+    {
+      $build->runtime_prop->{$_} = "-L$prefix/lib -lpalindrome" for qw( libs libs_static );
+    }
+  };
+
+  plugin 'Gather::Dino';
+};

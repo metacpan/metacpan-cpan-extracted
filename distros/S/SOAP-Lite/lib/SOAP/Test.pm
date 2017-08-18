@@ -15,7 +15,8 @@ our $TIMEOUT = 5;
 
 # ======================================================================
 
-package My::PingPong; # we'll use this package in our tests
+package # hide from PAUSE
+    My::PingPong; # we'll use this package in our tests
 
 sub new {
   my $self = shift;

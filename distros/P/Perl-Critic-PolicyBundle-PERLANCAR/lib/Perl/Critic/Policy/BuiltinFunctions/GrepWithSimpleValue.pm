@@ -1,9 +1,10 @@
-package Perl::Critic::PolicyBundle::PERLANCAR;
+## no critic (Modules::RequireFilenameMatchesPackage)
+package Perl::Critic::PolicyBundle::PERLANCAR::BuiltinFunctions::GrepWithSimpleValue;
 package # hide from PAUSE
     Perl::Critic::Policy::BuiltinFunctions::GrepWithSimpleValue;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-08-16'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use warnings;
 use strict;
@@ -63,11 +64,11 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::PolicyBundle::PERLANCAR - Warn grep with simple value
+Perl::Critic::PolicyBundle::PERLANCAR::BuiltinFunctions::GrepWithSimpleValue - Warn grep with simple value
 
 =head1 VERSION
 
-This document describes version 0.001 of Perl::Critic::PolicyBundle::PERLANCAR (from Perl distribution Perl-Critic-PolicyBundle-PERLANCAR), released on 2017-08-01.
+This document describes version 0.002 of Perl::Critic::PolicyBundle::PERLANCAR::BuiltinFunctions::GrepWithSimpleValue (from Perl distribution Perl-Critic-PolicyBundle-PERLANCAR), released on 2017-08-16.
 
 =head1 SYNOPSIS
 

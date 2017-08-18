@@ -13,12 +13,12 @@ my %build_args = (
   ],
   license  => 'perl',
   configure_requires => {
-    'Module::Build' => 0.36,
+    'Module::Build' => '0.4004',
   },
   requires => {
     'perl'             => '5.8.1',
     'parent'           => 0,
-    'Module::Build'    => 0.36,
+    'Module::Build'    => '0.4004',
     'Capture::Tiny'    => 0.17,
     'File::chdir'      => 0.1005,
     'Sort::Versions'   => 0,

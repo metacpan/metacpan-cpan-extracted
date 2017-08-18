@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use SPVM 'TestCase'; my $use_test_line = __LINE__;
-use SPVM 'stdout'; my $use_std_line = __LINE__;
+use SPVM 'std'; my $use_std_line = __LINE__;
 
 use POSIX ();
 
@@ -31,12 +31,106 @@ my $FLOAT_MAX = POSIX::FLT_MAX();
 my $FLOAT_MIN = POSIX::FLT_MIN();
 my $DOUBLE_MAX = POSIX::DBL_MAX();
 my $DOUBLE_MIN = POSIX::DBL_MIN();
+my $FLOAT_PRECICE = 16384.0;
+my $DOUBLE_PRECICE = 65536.0;
 
-use SPVM::stdout;
+use SPVM::std;
+
+# Start objects count
+my $start_objects_count = SPVM::get_objects_count();
+
+# Native subroutine
+{
+  my $nums = SPVM::new_int_array([1, 2, 3]);
+  my $total = SPVM::std::sum_int($nums);
+  is($total, 6);
+}
+
+# Weaken
+{
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_target4_weaken_object_assign());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_target4());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_weaken_object_undef());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_target_object_undef());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      SPVM::TestCase::weaken_recursive3();
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      SPVM::TestCase::weaken_recursive_again();
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_recursive());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_reference_count1_object());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    {
+      ok(SPVM::TestCase::weaken_self_recuresive());
+    }
+    my $end_objects_count = SPVM::get_objects_count();
+    is($end_objects_count, $start_objects_count);
+  }
+}
 
 # Call void subroutine
 {
   ok(SPVM::TestCase::call_void());
+}
+
+# Array default
+{
+  ok(SPVM::TestCase::array_default_zero_memory_pool());
+  ok(SPVM::TestCase::array_default_zero_not_memory_pool());
 }
 
 # Array initialization
@@ -79,6 +173,12 @@ use SPVM::stdout;
   ok(SPVM::TestCase::my_var_initialized_zero());
 }
 
+# Field
+{
+  ok(SPVM::TestCase::object_field_set_and_get());
+  ok(SPVM::TestCase::object_field_set_and_get_again());
+}
+
 {
   ok(SPVM::TestCase::object_field_initialized_zero());
 }
@@ -96,7 +196,7 @@ is_deeply(
   \@SPVM::PACKAGE_INFOS,
   [
     {name => 'TestCase', file => $file, line => $use_test_line},
-    {name => 'stdout', file => $file, line => $use_std_line}
+    {name => 'std', file => $file, line => $use_std_line}
   ]
 );
 
@@ -113,6 +213,18 @@ is_deeply(
   ok(SPVM::TestCase::enum_long());
   ok(SPVM::TestCase::enum_float());
   ok(SPVM::TestCase::enum_double());
+
+=pod
+  is(SPVM::TestCase::BYTE_MAX(), 127);
+  is(SPVM::TestCase::BYTE_MIN(), -128);
+  is(SPVM::TestCase::SHORT_MAX(), 32767);
+  is(SPVM::TestCase::SHORT_MIN(), -32768);
+  is(SPVM::TestCase::INT_MAX(), 2147483647);
+  is(SPVM::TestCase::INT_MIN(), -2147483648);
+  is(SPVM::TestCase::LONG_MAX(), 9223372036854775807);
+  is(SPVM::TestCase::LONG_MIN(), -9223372036854775808);
+=cut
+
 }
 
 # Convert type - floating point narrowing convertion
@@ -180,6 +292,7 @@ is_deeply(
   # element byte array
   {
     my $object_array = SPVM::new_object_array_len("byte[]", 3);
+    
     my $object1 = SPVM::new_byte_array([1, 2, 3]);
     $object_array->set(0, $object1);
     my $object2 = SPVM::new_byte_array([4, 5, 6]);
@@ -308,8 +421,13 @@ is_deeply(
     $object->set(x_short => $SHORT_MAX);
     $object->set(x_int => $INT_MAX);
     $object->set(x_long => $LONG_MAX);
+    $object->set(x_float => $FLOAT_PRECICE);
+    $object->set(x_double => $DOUBLE_PRECICE);
     $object->set(x_int_array => SPVM::new_int_array([1, 2, 3, 4]));
     $object->set(x_string => SPVM::new_string("Hello"));
+    my $minimal = SPVM::new_object("TestCase::Minimal");
+    $minimal->set(x => 3);
+    $object->set(minimal => $minimal);
     
     ok(SPVM::TestCase::spvm_object_set($object));
     
@@ -317,6 +435,9 @@ is_deeply(
     is($object->get('x_short'), $SHORT_MAX);
     is($object->get('x_int'), $INT_MAX);
     is($object->get('x_long'), $LONG_MAX);
+    is($object->get('x_float'), $FLOAT_PRECICE);
+    is($object->get('x_double'), $DOUBLE_PRECICE);
+    is($object->get('minimal')->get('x'), 3);
   }
   
 }
@@ -864,4 +985,8 @@ is_deeply(
   my $total = SPVM::TestCase::for_basic();
   cmp_ok($total, '==', 6);
 }
+
+# All object is freed
+my $end_objects_count = SPVM::get_objects_count();
+is($end_objects_count, $start_objects_count);
 

@@ -5,7 +5,7 @@
       "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Archive::Tar" : "0",
             "Capture::Tiny" : "0.17",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::ParseXS" : "3.30",
@@ -85,7 +84,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.95",
+   "version" : "0.99",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",

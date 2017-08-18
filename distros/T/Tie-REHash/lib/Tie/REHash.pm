@@ -3,7 +3,7 @@ package Tie::REHash;
 use 5.006; 
 
 use strict qw[vars subs];
-$Tie::REHash::VERSION = '1.07'; 
+$Tie::REHash::VERSION = '1.08'; 
 
 no warnings; 
 

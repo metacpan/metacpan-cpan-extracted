@@ -11,11 +11,16 @@ use lib "$FindBin::RealBin/environments/lib/pro";
 use lib "$FindBin::RealBin/environments/lib/test";
 
 use Test::Spec;
+use Log::Log4perl ':easy';
 use MooseX::DIC qw/build_container/;
 
 describe 'A Moose DI container,' => sub {
 
 	my $container;
+
+	before all => sub {
+		Log::Log4perl->easy_init($ERROR);	
+	};
 
 	describe 'given a fixed scanpath with environments,' => sub {
 

@@ -58,7 +58,7 @@ package Time::UTC::Now;
 use warnings;
 use strict;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -281,12 +281,11 @@ in this section.
 
 =head2 Cygwin
 
-Expected to use clock_gettime(CLOCK_REALTIME) now that support for it has
-been added to this module, which gives resolution 1 ns but no uncertainty
-bound and is discontinuous at leap seconds.  Formerly used gettimeofday(),
-which gives resolution 1 us but no uncertainty
-bound and is discontinuous at leap seconds.  There is no interface that
-supplies an uncertainty bound or correct leap second handling.
+Uses clock_gettime(CLOCK_REALTIME).  Actual clock resolution undetermined,
+but probably resembles what is seen on native Windows (discussed below).
+There is no uncertainty bound, and there are discontinuities at leap
+seconds.  There is no interface that supplies an uncertainty bound or
+correct leap second handling.
 
 =head2 FreeBSD
 
@@ -317,8 +316,11 @@ Uses ntp_gettime(), which gives resolution 1 us and uncertainty bound.
 
 =head2 Windows
 
-Uses the native
-GetSystemTimeAsFileTime().  Observed clock resolution is 10 ms, but
+Effectively uses the native GetSystemTimeAsFileTime().
+(Some versions of Windows provide the POSIX clock_gettime(CLOCK_REALTIME)
+interface, which will be used in preference, but it actually provides
+access to the same functionality.)
+Observed clock resolution is 10 ms, but
 lower-order digits are supplied (filled with noise) down to the API
 resolution of 100 ns.  There is no uncertainty bound, and there are
 discontinuities at leap seconds.  There is no interface that supplies

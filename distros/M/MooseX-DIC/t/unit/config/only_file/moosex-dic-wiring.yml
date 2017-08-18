@@ -1,0 +1,8 @@
+include:
+    - included_config_file.yml
+mappings:
+    Test3:
+      Test3Impl:
+        environment: default
+        scope: singleton
+        builder: Moose

@@ -33,3 +33,16 @@ Revision history for Perl extension Proc::InvokeEditor.
 
 1.09 03 Aug 2017
   - Disable author tests for now.
+
+1.10 15 Aug 2017
+  - Move to dzil to update packaging to modern standards
+
+1.11 15 Aug 2017
+  - Fix stupid mistake
+
+1.12 15 Aug 2017
+  - Properly generate META.json
+
+1.13 16 Aug 2017
+  - Add LICENSE to docs and meta tests
+

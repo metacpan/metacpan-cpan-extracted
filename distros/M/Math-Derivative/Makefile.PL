@@ -3,14 +3,14 @@ require 5.010001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PREREQ_PM' => {
+                   'Math::Utils' => '1.10',
+                   'Test::More' => 0
+                 },
   'PL_FILES' => {},
   'NAME' => 'Math::Derivative',
   'VERSION_FROM' => 'lib/Math/Derivative.pm',
-  'PREREQ_PM' => {
-                   'Math::Utils' => '1.06',
-                   'Test::More' => 0
-                 },
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => []
+  'EXE_FILES' => [],
+  'INSTALLDIRS' => 'site'
 )
 ;

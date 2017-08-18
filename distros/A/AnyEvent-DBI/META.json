@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,17 +27,21 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Canary::Stability" : "0",
+            "ExtUtils::MakeMaker" : "6.6"
          }
       },
       "runtime" : {
          "requires" : {
             "AnyEvent" : "4.15",
+            "CBOR::XS" : "1.7",
+            "Convert::Scalar" : "1.12",
             "DBI" : "1",
             "common::sense" : "3.3"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.3"
+   "version" : "3.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

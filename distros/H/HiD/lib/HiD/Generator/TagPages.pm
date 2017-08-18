@@ -3,7 +3,7 @@
 
 package HiD::Generator::TagPages;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Generator::TagPages::VERSION = '1.98';
+$HiD::Generator::TagPages::VERSION = '1.991';
 use Moose;
 with 'HiD::Generator';
 
@@ -77,7 +77,7 @@ destination.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

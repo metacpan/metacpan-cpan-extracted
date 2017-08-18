@@ -1,0 +1,7 @@
+{
+    "patches": [
+        { "id":"foobartable", "sql": "CREATE TABLE foobar(id INTEGER PRIMARY KEY AUTOINCREMENT, atext VARCHAR)"},
+        { "id":"insert_one_foobar", "sql": "INSERT INTO foobar(atext) VALUES('from_patch')" },
+        { "id":"backfill_stuff", "file": "backfillstuff.sh" }
+    ]
+}

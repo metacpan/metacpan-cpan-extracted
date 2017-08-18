@@ -3,6 +3,11 @@
 ## cut
 #!/usr/bin/perl -w
 
+## name UppercaseSwitch
+## failures 1
+## cut
+#!/usr/bin/perl -W
+
 ## name EmbeddedSwitch
 ## failures 1
 ## cut

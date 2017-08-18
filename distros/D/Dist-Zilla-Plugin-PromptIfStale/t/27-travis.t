@@ -14,8 +14,9 @@ use EnsureStdinTty;
 use NoNetworkHits;
 use DiagFilehandles;
 
-# make it look like we are running under Travis
+# make it look like we are doing a regular Travis run (in some other repository)
 $ENV{CONTINUOUS_INTEGRATION} = 'faked for t/27-travis.t';
+undef $ENV{PROMPTIFSTALE_REALLY_RUN_TESTS};
 
 # ...but also set a variable to get test working here again...
 $ENV{HARNESS_ACTIVE} = 1;

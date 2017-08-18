@@ -1,5 +1,8 @@
 Revision history for Text-IQ
 
+0.005   16 Aug 2017
+ - tweek test counts
+
 0.004   05 May 2017
  - add Aspell diagnostics and tweek expected spellings count for t/03
 

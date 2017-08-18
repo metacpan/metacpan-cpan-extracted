@@ -50,12 +50,12 @@ is(
 );
 
 # in 0.006, this accessor changed from returning a listref to a (sorted) list.
-my @filenames = $tzil->plugin_named('@Author::ETHER/CopyFilesFromRelease')->filename;
+my @filenames = $tzil->plugin_named('@Author::ETHER/copy generated files')->filename;
 cmp_deeply(
     (eval { Dist::Zilla::Plugin::CopyFilesFromRelease->VERSION('0.006') }
         ? \@filenames
         : $filenames[0]),
-    [ qw(CONTRIBUTING Changes INSTALL LICENCE LICENSE extra_file ppport.h) ],
+    [ qw(CONTRIBUTING INSTALL LICENCE LICENSE extra_file ppport.h) ],
     'additional copy_files_from_release file does not overshadow the defaults',
 );
 

@@ -1,0 +1,38 @@
+---
+abstract: 'JSON::PP with encoding fallbacks'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-PP-Monkey
+provides:
+  JSON::PP::Monkey:
+    file: lib/JSON/PP/Monkey.pm
+    version: v0.1.0
+requires:
+  Carp: '0'
+  JSON::PP: '2.94'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-JSON-PP-Monkey/issues
+  homepage: https://github.com/aferreira/cpan-JSON-PP-Monkey
+  repository: https://github.com/aferreira/cpan-JSON-PP-Monkey.git
+version: 0.1.0
+x_contributors:
+  - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

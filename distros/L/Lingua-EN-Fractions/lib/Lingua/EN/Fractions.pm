@@ -1,5 +1,5 @@
 package Lingua::EN::Fractions;
-$Lingua::EN::Fractions::VERSION = '0.08';
+$Lingua::EN::Fractions::VERSION = '0.09';
 use 5.008;
 use strict;
 use warnings;
@@ -29,10 +29,15 @@ my %unicode =
     '⅘' => '4/5',
     '⅙' => '1/6',
     '⅚' => '5/6',
+    '⅐' => '1/7',
     '⅛' => '1/8',
     '⅜' => '3/8',
     '⅝' => '5/8',
     '⅞' => '7/8',
+    '⅑' => '1/9',
+    '⅒' => '1/10',
+    '⅟' => '1/',
+    '↉' => '0/3',
     '⁄' => '/',     # FRACTION SLASH (U+2044)
     '−' => '-',     # MINUS SIGN (U+2212)
 );
@@ -86,7 +91,7 @@ sub fraction2words
         $phrase .= 'minus ' if $negate;
         $phrase .= num2en($wholepart).' and ' if $wholepart;
         $phrase .= "$numerator_as_words $denominator_as_words";
-        $phrase .= 's' if $numerator > 1;
+        $phrase .= 's' if $numerator != 1;
         return $phrase;
     }
 

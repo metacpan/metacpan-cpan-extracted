@@ -1,0 +1,14 @@
+Revision history for Perl module WWW::CheckGzip
+
+0.03 2017-08-17
+
+- Dependencies in Makefile.PL
+
+0.02 2017-08-17
+
+- Documentation added
+
+0.01 2017-08-16
+
+- Initial version
+

@@ -37,7 +37,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 @EXPORT      = qw(initialize can_handle handle_opt write_out
 print_composition filter_seqs retrieve_seqs remove_gaps
 print_lengths print_seq_count make_revcom
-print_subseq restrict_digest anonymize
+print_subseq restrict_coord restrict_digest anonymize
 shred_seq count_codons print_gb_gene_feats
 count_leading_gaps hydroB linearize reloop_at
 remove_stop parse_orders find_by_order
@@ -58,23 +58,24 @@ my %opt_dispatch = (
     'composition' => \&print_composition,
     'delete' => \&filter_seqs,
     'fetch' => \&retrieve_seqs,
-    'nogaps' => \&remove_gaps,
+    'no-gaps' => \&remove_gaps,
     'length' => \&print_lengths,
-    'numseq' => \&print_seq_count,
+    'num-seq' => \&print_seq_count,
     'pick' => \&filter_seqs,
     'revcom' => \&make_revcom,
     'subseq' => \&print_subseq,
     'translate' => \&reading_frame_ops,
+    'restrict-coord' => \&restrict_coord,
     'restrict' => \&restrict_digest,
     'anonymize' => \&anonymize,
     'break' => \&shred_seq,
     'count-codons' => \&count_codons,
     'feat2fas' => \&print_gb_gene_feats,
-    'leadgaps' => \&count_leading_gaps,
+    'lead-gaps' => \&count_leading_gaps,
     'hydroB' => \&hydroB,
     'linearize' => \&linearize,
     'reloop' => \&reloop_at,
-    'removestop' => \&remove_stop,
+    'remove-stop' => \&remove_stop,
     'split-cdhit' => \&split_cdhit,
 #   'dotplot' => \&draw_dotplot,
 #    'extract' => \&reading_frame_ops,
@@ -105,14 +106,11 @@ my %filter_dispatch = (
 
 ##################### initializer & option handlers ###################
 
-## TODO Function documentation!
-## TODO Formal testing!
-
 =head1 SUBROUTINES
 
 =head2 initialize()
 
-Sets up most of the actions to be performed on an alignment.
+Sets up most of the actions to be performed on sequences.
 
 Call this right after setting up an options hash.
 
@@ -377,12 +375,43 @@ sub reading_frame_ops {
     }
 }
 
+=head2 restrict_coord()
+
+Finds digestion coordinates by a specified restriction enzyme
+specified in C<$opts{restrinct}> set via L<C<#initilize(\%opts)>|/initialize>.
+
+An input file with sequences is expected. Wraps
+L<Bio::Restriction::Analysis-E<gt>cut()|https://metacpan.org/pod/Bio::Restriction::Analysis#cut>.
+
+Outputs coordinates of overhangs in BED format.
+
+=cut
+
+
+sub restrict_coord {
+    use Bio::Restriction::Analysis;
+    use Bio::Restriction::EnzymeCollection;
+
+    my $enz = $opts{"restrict-coord"};
+    my $re = Bio::Restriction::EnzymeCollection->new()->get_enzyme($enz);
+    my $len = length($re->overhang_seq());
+
+    while ( $seq = $in->next_seq() ) {
+        my $seq_str = $seq->seq();
+        die "Not a DNA sequence\n" unless $seq_str =~ /^[ATCGRYSWKMBDHVN]+$/i;
+        my $ra = Bio::Restriction::Analysis->new(-seq=>$seq);
+        foreach my $pos ($ra->positions($enz)) {
+	    print $seq->id()."\t".($pos-$len)."\t".$pos."\n";
+        }
+    }
+}
+
 =head2 restrict_digest()
 
 Predicted fragments from digestion by a specified restriction enzyme
 specified in C<$opts{restrinct}> set via L<C<#initilize(\%opts)>|/initialize>.
 
-An input file with a single sequence is expected. Wraps
+An input file with sequences is expected. Wraps
 L<Bio::Restriction::Analysis-E<gt>cut()|https://metacpan.org/pod/Bio::Restriction::Analysis#cut>.
 
 =cut
@@ -391,15 +420,16 @@ L<Bio::Restriction::Analysis-E<gt>cut()|https://metacpan.org/pod/Bio::Restrictio
 sub restrict_digest {
     my $enz = $opts{"restrict"};
     use Bio::Restriction::Analysis;
-    $seq = $in->next_seq();
-    my $seq_str = $seq->seq();
-    die "Not a DNA sequence\n" unless $seq_str =~ /^[ATCG]+$/i;
-    my $ra = Bio::Restriction::Analysis->new(-seq=>$seq);
-    foreach my $frag ($ra->fragment_maps($enz)) {
-        my $seq_obj = Bio::Seq->new(
-            -id=>$seq->id().'|'.$frag->{start}.'-'.$frag->{end}.'|'.($frag->{end}-$frag->{start}+1),
-            -seq=>$frag->{seq});
-        $out->write_seq($seq_obj)
+    while ( $seq = $in->next_seq() ) {
+	my $seq_str = $seq->seq();
+	die "Not a DNA sequence\n" unless $seq_str =~ /^[ATCGRYSWKMBDHVN]+$/i;
+	my $ra = Bio::Restriction::Analysis->new(-seq=>$seq);
+	foreach my $frag ($ra->fragment_maps($enz)) {
+	    my $seq_obj = Bio::Seq->new(
+		-id=>$seq->id().'|'.$frag->{start}.'-'.$frag->{end}.'|'.($frag->{end}-$frag->{start}+1),
+		-seq=>$frag->{seq});
+	    $out->write_seq($seq_obj)
+	}
     }
 }
 
@@ -418,7 +448,7 @@ written to C<STDERR>.
 =cut
 
 sub anonymize {
-    my $char_len = $opts{"anonymize"} // die "Tried to use option 'preifx' without using option 'anonymize'. Exiting...\n";
+    my $char_len = $opts{"anonymize"} // die "Tried to use option 'prefix' without using option 'anonymize'. Exiting...\n";
     my $prefix = (defined($opts{"prefix"})) ? $opts{"prefix"} : "S";
 
     pod2usage(1) if $char_len < 1;

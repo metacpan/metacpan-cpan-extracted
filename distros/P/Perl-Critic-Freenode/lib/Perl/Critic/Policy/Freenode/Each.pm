@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.021';
+our $VERSION = '0.024';
 
 use constant DESC => 'each() called';
 use constant EXPL => 'The each function may cause undefined behavior when operating on the hash while iterating. Use a foreach loop over the hash\'s keys or values instead.';
@@ -62,4 +62,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Perl::Critic>
+L<Perl::Critic>, L<http://blogs.perl.org/users/rurban/2014/04/do-not-use-each.html>

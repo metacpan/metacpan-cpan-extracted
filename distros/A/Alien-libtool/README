@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.07
+    version 0.09
 
 SYNOPSIS
 
@@ -13,7 +13,7 @@ SYNOPSIS
      use Alien::libtool;
      use Env qw( @PATH );
      
-     unshift @ENV, Alien::libtool->bin_dir;
+     unshift @PATH, Alien::libtool->bin_dir;
 
 DESCRIPTION
 

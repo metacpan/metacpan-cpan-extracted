@@ -17,7 +17,7 @@ package SOAP::Lite;
 use strict;
 use warnings;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 package SOAP::XMLSchemaApacheSOAP::Deserializer;
 
@@ -3412,6 +3412,7 @@ EOP
     my $namespaces = $self->deserializer->ids->[1];
     foreach my $key (keys %{$namespaces}) {
         my ($ns,$prefix) = SOAP::Utils::splitqname($key);
+        next if $namespaces->{$key} eq 'http://schemas.xmlsoap.org/wsdl/soap/';
         $self->{'_stub'} .= '  $self->serializer->register_ns("'.$namespaces->{$key}.'","'.$prefix.'");'."\n"
             if (defined $ns && ($ns eq "xmlns"));
     }
@@ -4127,7 +4128,7 @@ the specified WSDL schema and uses it as the basis for generating stubs.
 When set to a true value, the raw XML is returned by the call to a remote
 method.
 
-The default is to return the a L<SOAP::SOM> object (false).
+The default is to return a L<SOAP::SOM> object (false).
 
 =item autotype(boolean)
 

@@ -6,9 +6,6 @@
 #define NEED_sv_2pv_flags
 #include "ppport.h"
 
-#include "mtwist/mtwist.c"
-#include "mtwist/randistrs.c"
-
 #if defined __GLIBC__ && defined __linux__
 #  ifndef _GNU_SOURCE
 #    define _GNU_SOURCE
@@ -17,6 +14,9 @@
 #include <sys/syscall.h>
 #include <linux/random.h>
 #endif
+
+#include "mtwist/mtwist.c"
+#include "mtwist/randistrs.c"
 
 typedef union {
   double dbl;
@@ -40,13 +40,13 @@ static inline U8 fmt_uint64(char* dest, uint64_t u) {
     len++;
 
   if (dest) {
+    len2 = len;
     dest += len;
     *dest = '\0';
-    len2 = len - 1;
     do {
       *--dest = (char)((u%10) + '0');
       u /= 10;
-    } while (len2--);
+    } while (--len2);
   }
 
   return len;
@@ -56,11 +56,11 @@ static inline U8 fmt_uint64(char* dest, uint64_t u) {
 static SV* svpv_uint64(uint64_t u) {
   SV* retval;
   char* buf;
-  size_t bufsize, length;
+  size_t length;
+  const size_t bufsize = 24;
 
   dTHX;
 
-  bufsize = PERL_STRLEN_ROUNDUP(21); /* 21 = 20 digits + terminal NUL byte */
   Newxc(buf, bufsize, char, char);
   if (!buf)
     return NULL;
@@ -464,90 +464,65 @@ _seedfull(AV* seeds)
   PPCODE:
     seedfull(NULL, seeds);
 
-
-#if IVSIZE >= 8 || defined(UINT64_MAX)
 SV*
-irand(mt_state* state);
+irand32(mt_state* state);
   ALIAS:
     irand64 = 1
+    irand = 2
   CODE:
-    PERL_UNUSED_VAR(ix);
 #if IVSIZE >= 8
-    RETVAL = newSVuv(mts_llrand(state));
+    if (ix)
+      RETVAL = newSVuv(mts_llrand(state));
+#elif defined(UINT64_MAX)
+    if (ix)
+      RETVAL = svpv_uint64(mts_llrand(state));
 #else
-    RETVAL = svpv_uint64(mts_llrand(state));
+    if (ix == 1)
+      XSRETURN_UNDEF;
 #endif
+    else
+      RETVAL = newSVuv(mts_lrand(state));
   OUTPUT:
     RETVAL
 
 SV*
-_irand();
+_irand32();
   ALIAS:
     _irand64 = 1
+    _irand = 2
   CODE:
-    PERL_UNUSED_VAR(ix);
 #if IVSIZE >= 8
-    RETVAL = newSVuv(mt_llrand());
+    if (ix)
+      RETVAL = newSVuv(mt_llrand());
+#elif defined(UINT64_MAX)
+    if (ix)
+      RETVAL = svpv_uint64(mt_llrand());
 #else
-    RETVAL = svpv_uint64(mt_llrand());
-#endif
-  OUTPUT:
-    RETVAL
-
-#else
-void
-irand(mt_state* state);
-  ALIAS:
-    irand64 = 1
-  PPCODE:
-    if (ix == 0)
-      XSRETURN_UV(mts_lrand(state));
-    else
+    if (ix == 1)
       XSRETURN_UNDEF;
-
-void
-_irand();
-  ALIAS:
-    _irand64 = 1
-  PPCODE:
-    if (ix == 0)
-      XSRETURN_UV(mt_lrand());
-    else
-      XSRETURN_UNDEF;
-
 #endif
-
-UV
-irand32(mt_state* state)
-  CODE:
-    RETVAL = mts_lrand(state);
+    else
+      RETVAL = newSVuv(mt_lrand());
   OUTPUT:
     RETVAL
 
-UV
-_irand32()
-  CODE:
-    RETVAL = mt_lrand();
-  OUTPUT:
-    RETVAL
-
-double
-rand(mt_state* state, double bound = 0)
+NV
+rand(mt_state* state, NV bound = 0)
   ALIAS:
     rand32 = 1
   CODE:
-    RETVAL = ix == 0 ? mts_ldrand(state) : mts_drand(state);
+    RETVAL = (ix == 0) ? mts_ldrand(state) : mts_drand(state);
     if (bound)
       RETVAL *= bound;
   OUTPUT:
     RETVAL
 
-double
-_rand(double bound = 0)
+NV
+_rand(NV bound = 0)
   ALIAS:
     _rand32 = 1
   CODE:
-    RETVAL = ix == 0 ? mt_ldrand() : mt_drand();
+    RETVAL = (ix == 0) ? mt_ldrand() : mt_drand();
     if (bound)
       RETVAL *= bound;
   OUTPUT:
@@ -574,7 +549,7 @@ _randstr(STRLEN length = I2D_SIZE)
     case 0:                      \
       XSRETURN_NV(i2d.dbl);      \
     case 1:                      \
-      if (sizeof(UV) >= 8)       \
+      if (IVSIZE >= 8)           \
         XSRETURN_UV(i2d.i64);    \
       else                       \
         XSRETURN_UNDEF;          \
@@ -588,7 +563,7 @@ _randstr(STRLEN length = I2D_SIZE)
     mPUSHn(i2d.dbl);             \
     if (GIMME_V == G_ARRAY) {    \
       EXTEND(SP, 2);             \
-      if (sizeof(UV) >= 8)       \
+      if (IVSIZE >= 8)           \
         mPUSHu(i2d.i64);         \
       else                       \
         PUSHs(&PL_sv_undef);     \
@@ -599,7 +574,7 @@ _randstr(STRLEN length = I2D_SIZE)
 
 void
 rd_double(mt_state* state, int index = 0)
-  INIT:
+  PREINIT:
     int2dbl i2d;
   PPCODE:
     i2d = rd_double(state);
@@ -607,14 +582,70 @@ rd_double(mt_state* state, int index = 0)
 
 void
 _rd_double(int index = 0)
-  INIT:
+  PREINIT:
     int2dbl i2d;
   PPCODE:
     i2d = rd_double(NULL);
     RETURN_I2D(items != 0);
 
-double
-rd_exponential(mt_state* state, double mean)
+IV
+rd_iuniform32(mt_state* state, IV lower, IV upper);
+  ALIAS:
+    rd_iuniform64 = 1
+    rd_iuniform   = 2
+  CODE:
+#if IVSIZE >= 8
+    if (ix)
+      RETVAL = rds_liuniform(state, lower, upper);
+#else
+    if (ix == 1)
+      XSRETURN_UNDEF;
+#endif
+    else
+      RETVAL = rds_iuniform(state, (int32_t)lower, (int32_t)upper);
+  OUTPUT:
+    RETVAL
+
+IV
+_rd_iuniform32(IV lower, IV upper);
+  ALIAS:
+    _rd_iuniform64 = 1
+    _rd_iuniform   = 2
+  CODE:
+#if IVSIZE >= 8
+    if (ix)
+      RETVAL = rd_liuniform(lower, upper);
+#else
+    if (ix == 1)
+      XSRETURN_UNDEF;
+#endif
+    else
+      RETVAL = rd_iuniform((int32_t)lower, (int32_t)upper);
+  OUTPUT:
+    RETVAL
+
+NV
+rd_uniform(mt_state* state, NV lower, NV upper);
+  ALIAS:
+    rd_luniform = 1
+  CODE:
+    RETVAL = (ix == 0) ? rds_uniform(state, lower, upper)
+                       : rds_luniform(state, lower, upper);
+  OUTPUT:
+    RETVAL
+
+NV
+_rd_uniform(NV lower, NV upper);
+  ALIAS:
+    _rd_luniform = 1
+  CODE:
+    RETVAL = (ix == 0) ? rd_uniform(lower, upper)
+                       : rd_luniform(lower, upper);
+  OUTPUT:
+    RETVAL
+
+NV
+rd_exponential(mt_state* state, NV mean)
   ALIAS:
     rd_lexponential = 1
   CODE:
@@ -623,8 +654,8 @@ rd_exponential(mt_state* state, double mean)
   OUTPUT:
     RETVAL
 
-double
-_rd_exponential(double mean)
+NV
+_rd_exponential(NV mean)
   ALIAS:
     _rd_lexponential = 1
   CODE:
@@ -633,8 +664,8 @@ _rd_exponential(double mean)
   OUTPUT:
     RETVAL
 
-double
-rd_erlang(mt_state* state, int k, double mean)
+NV
+rd_erlang(mt_state* state, int k, NV mean)
   ALIAS:
     rd_lerlang = 1
   CODE:
@@ -643,8 +674,8 @@ rd_erlang(mt_state* state, int k, double mean)
   OUTPUT:
     RETVAL
 
-double
-_rd_erlang(int k, double mean)
+NV
+_rd_erlang(int k, NV mean)
   ALIAS:
     _rd_lerlang = 1
   CODE:
@@ -653,8 +684,8 @@ _rd_erlang(int k, double mean)
   OUTPUT:
     RETVAL
 
-double
-rd_weibull(mt_state* state, double shape, double scale)
+NV
+rd_weibull(mt_state* state, NV shape, NV scale)
   ALIAS:
     rd_lweibull = 1
     rd_lognormal = 2
@@ -669,8 +700,8 @@ rd_weibull(mt_state* state, double shape, double scale)
   OUTPUT:
     RETVAL
 
-double
-_rd_weibull(double shape, double scale)
+NV
+_rd_weibull(NV shape, NV scale)
   ALIAS:
     _rd_lweibull = 1
     _rd_lognormal = 2
@@ -685,8 +716,8 @@ _rd_weibull(double shape, double scale)
   OUTPUT:
     RETVAL
 
-double
-rd_normal(mt_state* state, double mean, double sigma)
+NV
+rd_normal(mt_state* state, NV mean, NV sigma)
   ALIAS:
     rd_lnormal = 1
   CODE:
@@ -695,8 +726,8 @@ rd_normal(mt_state* state, double mean, double sigma)
   OUTPUT:
     RETVAL
 
-double
-_rd_normal(double mean, double sigma)
+NV
+_rd_normal(NV mean, NV sigma)
   ALIAS:
     _rd_lnormal = 1
   CODE:
@@ -705,8 +736,8 @@ _rd_normal(double mean, double sigma)
   OUTPUT:
     RETVAL
 
-double
-rd_triangular(mt_state* state, double lower, double upper, double mode)
+NV
+rd_triangular(mt_state* state, NV lower, NV upper, NV mode)
   ALIAS:
     rd_ltriangular = 1
   CODE:
@@ -715,8 +746,8 @@ rd_triangular(mt_state* state, double lower, double upper, double mode)
   OUTPUT:
     RETVAL
 
-double
-_rd_triangular(double lower, double upper, double mode)
+NV
+_rd_triangular(NV lower, NV upper, NV mode)
   ALIAS:
     _rd_ltriangular = 1
   CODE:

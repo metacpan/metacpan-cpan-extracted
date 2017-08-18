@@ -1,23 +1,28 @@
-#
-# This file is part of MooseX-Types-XML-LibXML
-#
-# This software is copyright (c) 2011 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package MooseX::Types::XML::LibXML;
-
-BEGIN {
-    $MooseX::Types::XML::LibXML::VERSION = '0.002';
-}
 
 # ABSTRACT: Type constraints for LibXML classes
 
-use strict;
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a L<Moose|Moose> type library for some common types used with and by
+#pod L<XML::LibXML|XML::LibXML>.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =over
+#pod
+#pod =item L<XML::LibXML|XML::LibXML>
+#pod
+#pod =item L<Moose::Manual::Types|Moose::Manual::Types>
+#pod
+#pod =back
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl;
+
+our $VERSION = '0.003';    # VERSION
 use English '-no_match_vars';
 use MooseX::Types -declare => [qw(Document XMLNamespaceMap XPathExpression)];
 use MooseX::Types::Moose qw(HashRef Str);
@@ -27,39 +32,55 @@ use URI;
 use XML::LibXML;
 use namespace::autoclean;
 
-class_type Document,    ## no critic (ProhibitCallsToUndeclaredSubs)
-    { class => 'XML::LibXML::Document' };
+## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 
-coerce Document,        ## no critic (ProhibitCallsToUndeclaredSubs)
-    from Str, via { XML::LibXML->load_xml( string => $ARG ) };
+#pod =type Document
+#pod
+#pod L<XML::LibXML::Document|XML::LibXML::Document> that coerces strings,
+#pod L<Path::Class::File|Path::Class::File>s and L<URI|URI>s.
+#pod
+#pod =cut
 
-coerce Document,        ## no critic (ProhibitCallsToUndeclaredSubs)
-    from File | Uri, via { XML::LibXML->load_xml( location => $ARG ) };
+class_type Document, { class => 'XML::LibXML::Document' };
+coerce Document, from Str, via { XML::LibXML->load_xml( string => $_ ) };
+coerce Document, from File | Uri,    ## no critic (ProhibitBitwiseOperators)
+    via { XML::LibXML->load_xml( location => $_ ) };
 
-subtype XMLNamespaceMap,    ## no critic (ProhibitCallsToUndeclaredSubs)
-    as HashRef [Uri];
+#pod =type XMLNamespaceMap
+#pod
+#pod Reference to a hash of L<URI|URI>s where the keys are XML namespace prefixes.
+#pod Coerces from a reference to a hash of strings.
+#pod
+#pod =cut
 
-coerce XMLNamespaceMap,     ## no critic (ProhibitCallsToUndeclaredSubs)
-    from HashRef [Str], via {
+subtype XMLNamespaceMap, as HashRef [Uri];
+coerce XMLNamespaceMap, from HashRef [Str], via {
     ## no critic (ProhibitAccessOfPrivateData)
-    my $hashref = $ARG;
-    return { map { $ARG => URI->new( $hashref->{$ARG} ) } keys %{$hashref} };
-    };
+    my $hashref = $_;
+    return { map { $_ => URI->new( $hashref->{$_} ) } keys %{$hashref} };
+};
 
-class_type XPathExpression,    ## no critic (ProhibitCallsToUndeclaredSubs)
-    { class => 'XML::LibXML::XPathExpression' };
+#pod =type XPathExpression
+#pod
+#pod L<XML::LibXML::XPathExpression|XML::LibXML::XPathExpression> that coerces
+#pod strings.
+#pod
+#pod =cut
 
-coerce XPathExpression,        ## no critic (ProhibitCallsToUndeclaredSubs)
-    from Str, via { XML::LibXML::XPathExpression->new($ARG) };
+class_type XPathExpression, { class => 'XML::LibXML::XPathExpression' };
+coerce XPathExpression, from Str,
+    via { XML::LibXML::XPathExpression->new($_) };
 
 1;
 
+__END__
+
 =pod
 
-=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url annocpan anno bugtracker rt
-cpants kwalitee diff irc mailto metadata placeholders
-
 =encoding utf8
+
+=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url annocpan anno bugtracker rt
+cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -67,7 +88,7 @@ MooseX::Types::XML::LibXML - Type constraints for LibXML classes
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -159,7 +180,7 @@ L<http://search.cpan.org/dist/MooseX-Types-XML-LibXML>
 
 AnnoCPAN
 
-The AnnoCPAN is a website that allows community annonations of Perl module documentation.
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
 
 L<http://annocpan.org/dist/MooseX-Types-XML-LibXML>
 
@@ -177,7 +198,7 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/MooseX-Types-XML-LibXML>
+L<http://cpants.cpanauthors.org/dist/MooseX-Types-XML-LibXML>
 
 =item *
 
@@ -191,7 +212,7 @@ L<http://www.cpantesters.org/distro/M/MooseX-Types-XML-LibXML>
 
 CPAN Testers Matrix
 
-The CPAN Testers Matrix is a website that provides a visual way to determine what Perls/platforms PASSed for a distribution.
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
 
 L<http://matrix.cpantesters.org/?dist=MooseX-Types-XML-LibXML>
 
@@ -227,11 +248,9 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__

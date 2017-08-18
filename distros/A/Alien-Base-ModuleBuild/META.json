@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-Base-ModuleBuild",
    "no_index" : {
@@ -25,7 +25,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.36"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -40,7 +40,7 @@
             "HTTP::Tiny" : "0.044",
             "JSON::PP" : "0",
             "List::Util" : "1.45",
-            "Module::Build" : "0.36",
+            "Module::Build" : "0.4004",
             "Shell::Config::Generate" : "0",
             "Shell::Guess" : "0",
             "Sort::Versions" : "0",
@@ -60,39 +60,39 @@
    "provides" : {
       "Alien::Base::ModuleBuild" : {
          "file" : "lib/Alien/Base/ModuleBuild.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::Cabinet" : {
          "file" : "lib/Alien/Base/ModuleBuild/Cabinet.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::File" : {
          "file" : "lib/Alien/Base/ModuleBuild/File.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::Repository" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::Repository::FTP" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository/FTP.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::Repository::HTTP" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository/HTTP.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::Repository::Local" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository/Local.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::ModuleBuild::Utils" : {
          "file" : "lib/Alien/Base/ModuleBuild/Utils.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       },
       "Alien::Base::PkgConfig" : {
          "file" : "lib/Alien/Base/PkgConfig.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       }
    },
    "release_status" : "stable",
@@ -109,6 +109,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.042",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.043",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

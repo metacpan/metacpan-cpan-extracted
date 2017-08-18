@@ -1,7 +1,7 @@
 package App::diffwc;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-08-16'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -80,7 +80,7 @@ App::diffwc - diff + /w/ord highlighting + /c/olor
 
 =head1 VERSION
 
-This document describes version 0.002 of App::diffwc (from Perl distribution App-diffwc), released on 2017-08-12.
+This document describes version 0.003 of App::diffwc (from Perl distribution App-diffwc), released on 2017-08-16.
 
 =head1 SYNOPSIS
 

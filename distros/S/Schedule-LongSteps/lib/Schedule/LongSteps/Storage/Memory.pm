@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage::Memory;
-$Schedule::LongSteps::Storage::Memory::VERSION = '0.015';
+$Schedule::LongSteps::Storage::Memory::VERSION = '0.017';
 use Moose;
 extends qw/Schedule::LongSteps::Storage/;
 
@@ -63,7 +63,8 @@ sub find_process{
     my ($self, $pid) = @_;
     $log->trace("Looking up process ID=$pid");
     my ( $match ) = grep{ $_->id() == $pid } @{$self->processes()};
-    $log->trace("Found: $match");
+    my $log_message = $match ? "Found: $match" : "Could not find a process for $pid";
+    $log->trace($log_message);
     return $match;
 }
 
@@ -84,7 +85,7 @@ sub create_process{
 __PACKAGE__->meta->make_immutable();
 
 package Schedule::LongSteps::Storage::Memory::Process;
-$Schedule::LongSteps::Storage::Memory::Process::VERSION = '0.015';
+$Schedule::LongSteps::Storage::Memory::Process::VERSION = '0.017';
 use Moose;
 
 use DateTime;

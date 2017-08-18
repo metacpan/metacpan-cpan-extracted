@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+cd corpus
+
+rm -rf autoheck-libpalindrome
+rm -rf autohell-libpalindrome
+git clone https://github.com/plicease/autohell-libpalindrome.git
+
+cd autohell-libpalindrome
+./maint/dist
+
+pwd
+tar xvf libpalindrome-1.3.4.tar.gz
+rm -f *.tar.gz
+
+echo 'from libpalindrome git commit ' `git log -1 | grep commit | cut -c8-` >> libpalindrome-1.3.4/README
+
+mv libpalindrome-1.3.4 ../autoheck-libpalindrome
+
+cd ..
+rm -rf autohell-libpalindrome

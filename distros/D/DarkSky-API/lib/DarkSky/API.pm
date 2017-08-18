@@ -6,7 +6,7 @@ use JSON::XS;
 use HTTP::Tiny;
 use Moo;
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.1.5';
 
 my $json = JSON::XS->new->pretty->canonical;
 

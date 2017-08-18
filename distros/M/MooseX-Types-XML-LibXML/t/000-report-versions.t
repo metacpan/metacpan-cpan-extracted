@@ -1,14 +1,4 @@
 #!perl
-#
-# This file is part of MooseX-Types-XML-LibXML
-#
-# This software is copyright (c) 2011 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
 use warnings;
 use strict;
 use Test::More 0.94;
@@ -110,7 +100,6 @@ sub read_string {
         return $self->_error("Stream has a non UTF-8 BOM");
     }
     else {
-
         # Strip UTF-8 bom if found, we'll just ignore it
         $string =~ s/^\357\273\277//;
     }
@@ -294,7 +283,6 @@ sub _read_array {
                     push @$array, undef;
                 }
                 else {
-
                     # Naked indenter
                     push @$array, [];
                     $self->_read_array( $array->[-1], [ @$indent, $indent2 ],
@@ -376,7 +364,6 @@ sub _read_hash {
                 $lines );
         }
         else {
-
             # An indent
             shift @$lines;
             unless (@$lines) {

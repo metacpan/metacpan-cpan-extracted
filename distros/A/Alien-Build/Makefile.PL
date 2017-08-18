@@ -42,7 +42,9 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin.pm" => "\$(INST_LIB)/Alien/Build/Plugin.pm",
     "lib/Alien/Build/Plugin/Build.pod" => "\$(INST_LIB)/Alien/Build/Plugin/Build.pod",
     "lib/Alien/Build/Plugin/Build/Autoconf.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Build/Autoconf.pm",
+    "lib/Alien/Build/Plugin/Build/CMake.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Build/CMake.pm",
     "lib/Alien/Build/Plugin/Build/MSYS.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Build/MSYS.pm",
+    "lib/Alien/Build/Plugin/Build/Make.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Build/Make.pm",
     "lib/Alien/Build/Plugin/Build/SearchDep.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Build/SearchDep.pm",
     "lib/Alien/Build/Plugin/Core.pod" => "\$(INST_LIB)/Alien/Build/Plugin/Core.pod",
     "lib/Alien/Build/Plugin/Core/Download.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Core/Download.pm",
@@ -85,14 +87,12 @@ my %WriteMakefileArgs = (
     "lib/Test/Alien.pm" => "\$(INST_LIB)/Test/Alien.pm",
     "lib/Test/Alien/Build.pm" => "\$(INST_LIB)/Test/Alien/Build.pm",
     "lib/Test/Alien/CanCompile.pm" => "\$(INST_LIB)/Test/Alien/CanCompile.pm",
-    "lib/Test/Alien/CanCompileCpp.pm" => "\$(INST_LIB)/Test/Alien/CanCompileCpp.pm",
     "lib/Test/Alien/CanPlatypus.pm" => "\$(INST_LIB)/Test/Alien/CanPlatypus.pm",
     "lib/Test/Alien/Run.pm" => "\$(INST_LIB)/Test/Alien/Run.pm",
     "lib/Test/Alien/Synthetic.pm" => "\$(INST_LIB)/Test/Alien/Synthetic.pm",
     "lib/alienfile.pm" => "\$(INST_LIB)/alienfile.pm"
   },
   "PREREQ_PM" => {
-    "Archive::Tar" => 0,
     "Capture::Tiny" => "0.17",
     "ExtUtils::CBuilder" => 0,
     "ExtUtils::ParseXS" => "3.30",
@@ -111,7 +111,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "0.95",
+  "VERSION" => "0.99",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -119,7 +119,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Archive::Tar" => 0,
   "Capture::Tiny" => "0.17",
   "ExtUtils::CBuilder" => 0,
   "ExtUtils::ParseXS" => "3.30",

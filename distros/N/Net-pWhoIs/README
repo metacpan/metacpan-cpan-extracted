@@ -1,0 +1,70 @@
+NAME
+    Net::pWhoIs - Client library for Prefix WhoIs (pWhois)
+
+SYNOPSIS
+      use Net::pWhoIs;
+
+      my %attrs = ( req => '166.70.12.30' );
+      my $obj = Net::pWhoIs->new(\%attrs);
+      my $output = $obj->pwhois();
+      # Output for single query is hashref.
+      for my $elmt (qw{org-name country city region}) {
+          print $output->{$elmt}, "\n";
+      }
+
+      # Bulk query, combination of IPs and hostnames.
+      my @list = ('166.70.12.30', '207.20.243.105', '67.225.131.208', 'perlmonks.org');
+      my $obj = Net::pWhoIs->new({ req => \@list });
+      # Output for bulk queries is array of hashrefs.
+      my $output = $obj->pwhois();
+
+      use Data::Dumper;
+      print Dumper($output);
+
+DESCRIPTION
+    Client for pWhois service. Includes support for bulk queries.
+
+CONSTRUCTOR
+    The following constructor methods are available:
+
+    $obj = Net::pWhoIs->new( %options )
+        This method constructs a new "Net::pWhoIs" object and returns it.
+        Key/value pair arguments may be provided to set up the initial
+        state. The only require argument is: req.
+
+            pwhoisserver  whois.pwhois.org
+            port          43
+            req           Rlequired argument, may be scalar or array
+
+METHODS
+    The following methods are available:
+
+    Net::pWhoIs->pwhois()
+        Perform a single query. Returns a hashref.
+
+    Net::pWhoIs->pwhoisBulk()
+        Perform bulk queries using a single socket. Returns an array of
+        hashrefs. This method is called by Net::pWhoIs->pwhois() if the req
+        argument is an array.
+
+HASHREF KEYS
+    The following list hashref keys returned by pwhois or pwhoisBulk.
+
+        ip
+        as-org-name
+        as-path
+        origin-as
+        org-name
+        country-code
+        prefix
+        net-name
+        latitude
+        longitude
+        cache-date
+        city
+        region
+        country
+
+AUTHOR
+    Mat Hersant <matt_hersant@yahoo.com>
+

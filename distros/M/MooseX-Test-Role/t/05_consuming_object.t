@@ -24,17 +24,25 @@ sub test_role_type {
             skip "$type not installed", 7;
         }
 
-        my $role = util::make_role(
+        my $modifier_support = 1;
+        if ($type eq 'Role::Tiny' && !try_load_class('Class::Method::Modifiers')) {
+            $modifier_support = 0;
+        }
+
+        my %make_role_args = (
             type             => $type,
             required_methods => ['c', 'appender'],
             methods          => [ 'sub a { "return a" }', ],
-            extra            => q[
+        );
+        if ($modifier_support) {
+            $make_role_args{extra} = q[
                 around 'appender' => sub {
                     my ($orig, $self) = @_;
                     return ( $self->$orig(), 'appended' );
                 };
-            ],
-        );
+            ];
+        }
+        my $role = util::make_role(%make_role_args);
 
         my $consumer = consuming_object($role);
 
@@ -47,7 +55,10 @@ sub test_role_type {
             'consuming_object should return an object that consumes the role' );
         is( $consumer->a, 'return a',
             'role methods can be called on the object' );
-        is_deeply( [$consumer->appender()], [undef, 'appended'], 'around\'s should work' );
+
+        if ($modifier_support) {
+            is_deeply( [$consumer->appender()], [undef, 'appended'], 'around\'s should work' );
+        }
 
         $consumer = consuming_object(
             $role,
@@ -79,13 +90,15 @@ sub test_role_type {
         is( $consumer->d, 'from d',
             'scalar values can be passed to consuming_object to create object methods' );
 
-        $consumer = consuming_object(
-            $role,
-            methods => {
-                appender => sub { 'x' }
-            }
-        );
-        is_deeply( [$consumer->appender()], ['x', 'appended'], 'around\'s should wrap passed in methods' );
+        if ($modifier_support) {
+            $consumer = consuming_object(
+                $role,
+                methods => {
+                    appender => sub { 'x' }
+                }
+            );
+            is_deeply( [$consumer->appender()], ['x', 'appended'], 'around\'s should wrap passed in methods' );
+        }
     }
 }
 

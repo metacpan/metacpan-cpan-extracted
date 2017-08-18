@@ -13,8 +13,6 @@ bin/licensecheck
 dist.ini
 doap.ttl
 lib/App/Licensecheck.pm
-lib/Regexp/Pattern/License.pm
-lib/Regexp/Pattern/License/Parts.pm
 scripts/licensecheck.bash_completion
 t/OSI.t
 t/OSI/AFL-3.0

@@ -1,3 +1,9 @@
+0.004     2017-08-14 14:30:43-05:00 America/Chicago
+
+    * Require List::Util v1.28 to avoid CPANTS failures. This is slightly
+      cheating for a Tiny module, so I might rewrite those bits to avoid that
+      requirement, but not today.
+
 0.003     2017-08-06 14:42:11-05:00 America/Chicago
 
     * Added new predicate for enumerations, one_of().

@@ -1,3 +1,15 @@
+2017-08-17  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Algorithm/Evolutionary/Simple.pm: Changed to 0.3 since I
+	didn't use canonical versioning from the very beginning, which was
+	stupid. 
+
+2017-08-16  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Algorithm/Evolutionary/Simple.pm: A maintenance release that
+	includes new scripts for benchmarking and has been tested to the
+	last version of Perl. Just as a way of celebrating CPAN day.  
+
 2016-03-23  JJ Merelo  <jmerelo@flash>
 
 	* lib/Algorithm/Evolutionary/Simple.pm: just a few test changes to bump up version. Adds also exception test.

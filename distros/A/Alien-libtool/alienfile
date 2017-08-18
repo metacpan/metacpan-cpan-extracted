@@ -3,11 +3,17 @@ use alienfile;
 probe sub { 'share' };
 
 share {
-  requires 'Alien::MSYS' => '0.08' if $^O eq 'MSWin32';
   requires 'Alien::m4' => '0.11';
   requires 'Path::Tiny' => 0;
 
-  meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
+  if($^O eq 'MSWin32')
+  {
+    meta->prop->{env}->{PERL} = '/usr/bin/perl' if meta->prop->{platform}->{system_type} eq 'windows-mingw';
+  }
+  else
+  {
+    meta->prop->{env}->{PERL} = $^X;
+  }
 
   if($^O eq 'openbsd')
   {
@@ -21,7 +27,7 @@ share {
     version => qr/([0-9\.]+)/,
   );
   plugin Extract => 'tar.gz',
-  plugin 'Build::Autoconf' => ();
+  plugin 'Build::Autoconf' => ( msys_version => '0.08' );
   
   patch sub {
     my($libtoolize) = Path::Tiny->new('libtoolize.in');

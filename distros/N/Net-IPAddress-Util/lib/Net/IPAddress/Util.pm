@@ -43,7 +43,7 @@ $EXPORT_TAGS{ all } = [@EXPORT_OK];
 our $DIE_ON_ERROR = 0;
 our $PROMOTE_N32 = 1;
 
-our $VERSION = '3.027';
+our $VERSION = '3.029';
 
 sub IP {
     return Net::IPAddress::Util->new($_[0]);
@@ -520,7 +520,7 @@ Net::IPAddress::Util - Version-agnostic representation of an IP address
 
 =head1 VERSION
 
-Version 3.027
+Version 3.028
 
 =head1 SYNOPSIS
 

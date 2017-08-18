@@ -1,7 +1,9 @@
 Revision history for perl module Dist::Zilla::Plugin::RequiresExternal
 
+1.007     2017-08-16 15:10:01-05:00 America/Chicago
+  - Added 'externaldeps' command (thanks @joenio!)
 1.006     2015-12-26 23:40:29-05:00 America/New_York
-  - use "#!/usr/bin/env perl" in test scripts for those who need them
+  - Use "#!/usr/bin/env perl" in test scripts for those who need them
 1.005     2015-06-09 10:51:55-06:00 America/Denver
   - Reduce CPAN dependencies by using Pod::Weaver::Plugin::SingleEncoding
     rather than ::Encoding (thanks AWSWENSON)

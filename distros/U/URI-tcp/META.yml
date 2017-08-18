@@ -1,0 +1,41 @@
+---
+abstract: 'tcp connection string'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-tcp
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  URI::tcp:
+    file: lib/URI/tcp.pm
+    version: v2.0.0
+  URI::udp:
+    file: lib/URI/udp.pm
+requires:
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/avast/URI-tcp/issues
+  homepage: https://github.com/avast/URI-tcp
+  repository: git://github.com/avast/URI-tcp.git
+version: 2.0.0
+x_authority: cpan:JASEI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

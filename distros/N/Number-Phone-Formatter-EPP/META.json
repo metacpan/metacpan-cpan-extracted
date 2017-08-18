@@ -23,6 +23,7 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
@@ -39,8 +40,10 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Number::Phone" : "3.1"
+         },
          "requires" : {
-            "Number::Phone" : "3.1",
             "Test::More" : "0",
             "perl" : "5.006"
          }
@@ -59,7 +62,7 @@
          "web" : "https://github.com/mschout/perl-number-phone-formatter-epp"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

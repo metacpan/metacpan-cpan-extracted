@@ -25,7 +25,7 @@ use Bio::Align::DNAStatistics;
 #use Bio::PopGen::IO;
 use FindBin;                # Find the location of PopGenStatistics
 use lib "$FindBin::Bin";    # to use it as a lib path
-#use PopGenStatistics;
+#use PopGenStatistics; # this is our own module that fixes MK statistics mothod; disabled for competibility
 use Bio::PopGen::Utilities;
 use Bio::PopGen::Statistics;
 use Bio::PopGen::Population;
@@ -46,7 +46,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 @EXPORT      = qw(initialize can_handle handle_opt
 print_distance print_heterozygosity print_mismatch_distr
 count_four_gametes print_diversity bi_partition
-bisites_for_r bisites snp_noncoding snp_coding
+bisites_for_r bisites snp_noncoding snp_coding write_out
 snp_coding_log print_num_snps
 );
 
@@ -63,20 +63,20 @@ use Bio::BPWrapper;
 my $VERSION = $Bio::BPWrapper::VERSION;
 
 my %opt_dispatch = (
-    'bisites' => \&bisites,
-    'bisites-for-r' => \&bisites_for_r,
-    'bihaps' => \&count_four_gametes,
+    'bi-sites' => \&bisites,
+    'bi-sites-for-r' => \&bisites_for_r,
+    'four-gametes' => \&count_four_gametes,
     'distance' => \&print_distance,
     'heterozygosity' => \&print_heterozygosity,
-    'mismatch' => \&print_mismatch_distr,
-    'mut-info' => \&pairwise_mutual_info,
+    'mis-match' => \&print_mismatch_distr,
     'pi' => \&print_diversity,
     'stats'    => \&print_stats,
-    'segsites' => \&print_num_snps,
+    'seg-sites' => \&print_num_snps,
     'snp-coding' => \&snp_coding,
     'snp-coding-long' => \&snp_coding_long,
     'snp-noncoding' => \&snp_noncoding,
-    'bipart' => \&bi_partition,
+    'bi-part' => \&bi_partition,
+#   'mut-info' => \&pairwise_mutual_info,
 #    'mutrec' => \&_mutation_or_recombination,
 #    'simmk'    => \&_sim_mk,
 #    'kaks'     => \&_print_kaks_calc,
@@ -112,7 +112,7 @@ sub initialize {
         die "Cannot use distance or kaks options together with any of the following: @popgen_list\n" if &_in_list($opts, \@popgen_list);
         $dna_stats = Bio::Align::DNAStatistics->new();
     } else {
-        $pop = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => $opts->{"snp-noncoding"} || $opts->{'bisites'} || $opts->{'bihaps'} || $opts->{'bisites-for-r'}? 0:1, -site_model => 'all');
+        $pop = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => $opts->{"snp-noncoding"} || $opts->{'bi-sites'} || $opts->{'bi-haps'} || $opts->{'bi-sites-for-r'} || $opts->{'heterozygosity'} ? 0:1, -site_model => 'all');
         $pop_cds = Bio::PopGen::Utilities->aln_to_population(-alignment => $aln, -include_monomorphic => 0, -site_model => 'codon') if $opts->{"snp-coding"} || $opts->{"snp-coding-long"};
 #        $stat_obj = PopGenStatistics->new();
         $pop_stats = Bio::PopGen::Statistics->new()
@@ -141,13 +141,13 @@ sub print_distance {
 }
 
 sub print_heterozygosity {
-    print "Heterozygosity=>\n";
+#    print "Heterozygosity=>\n";
     for my $name ($pop->get_marker_names()) {
         my $marker = $pop->get_Marker($name);
         my @alleles = $marker->get_Alleles();
         my %allele_freqs = $marker->get_Allele_Frequencies();
-        push @var_sites, $name;
-        printf "\t\t%s\t%.4f\n", $name,  &heterozygosity(\%allele_freqs)
+        push @var_sites, $name; #print Dumper(\%allele_freqs);
+        print $name,  "\t", &heterozygosity(\%allele_freqs), "\n";
     }
 }
 
@@ -290,7 +290,7 @@ sub bi_partition {
 }
 
 sub bisites_for_r {
-    my @valid_sites = &_two_allele_nogap_sites($pop);
+    my @valid_sites = &_two_allele_nogap_informative_sites($pop);
     say STDERR "bi-allelic, non-gapped sites:\t", scalar @valid_sites, "\t", join ",", @valid_sites;
     my $ref_seqs = &_base_at_snp_sites($pop, \@valid_sites);
     my %myseqs = %$ref_seqs;
@@ -304,7 +304,7 @@ sub bisites_for_r {
 }
 
 sub bisites {
-    my @valid_sites = &_two_allele_nogap_sites($pop);
+    my @valid_sites = &_two_allele_nogap_informative_sites($pop);
     say STDERR "bi-allelic, non-gapped sites:\t", scalar @valid_sites, "\t", join ",", @valid_sites;
     my $ref_seqs = &_base_at_snp_sites($pop, \@valid_sites);
     my %myseqs = %$ref_seqs;
@@ -455,25 +455,32 @@ sub write_out
     }
 }
 
-#sub print_stats {
-#    @stats = _parse_stats();
-#    my $len = $aln->length();
+sub print_stats {
+    @stats = _parse_stats();
+    my $len = $aln->length();
 
-#    foreach my $stat (@stats) {
-#        $stat = lc($stat);
-#        given ($stat) {
-#            when (/^(pi)|(theta)$/) { printf "$stat:\t%.6f\n", $stat_obj->$stat($pop, $len) }
-#            when ("tajima_d") {       printf "tajima_D:\t%.6f\n", $stat_obj->tajima_D($pop) }
-#            when ("mk") { _mk_counts() }
-#        }
-#    }
-#}
+    foreach my $stat (@stats) {
+        $stat = lc($stat);
+	if ( $stat =~ /^(pi)|(theta)$/) { printf "$stat:\t%.6f\n", $pop_stats->$stat($pop, $len) }
+	if ($stat eq "tajima_d") {       printf "tajima_D:\t%.6f\n", $pop_stats->tajima_D($pop) }
+#	if ($stat eq "mk") { _mk_counts() }
+    }
+}
 
 sub print_num_snps {
     print $pop_stats->segregating_sites_count($pop), "\n"
 }
 
 ####################### internal subroutine ###########################
+
+sub heterozygosity {
+    my %freq = %{shift @_};
+    my $h = 0;
+    foreach my $allele (keys %freq) {
+	$h += $freq{$allele} ** 2;
+    }
+    return sprintf "%.4f", 1-$h;
+}
 
 sub _snp_position {
     my ($cd1, $cd2) = @_;

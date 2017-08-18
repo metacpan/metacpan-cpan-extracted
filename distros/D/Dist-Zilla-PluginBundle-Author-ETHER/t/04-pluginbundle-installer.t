@@ -6,7 +6,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep '!none';
 use Test::DZil;
 use Test::Fatal;
-use Path::Tiny 0.062;
+use Path::Tiny;
 use List::Util 1.33 'none';
 
 use Test::Needs qw(

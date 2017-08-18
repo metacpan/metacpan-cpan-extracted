@@ -1,13 +1,9 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::More;
-BEGIN { plan skip_all => 'only test on MSWin32' if $^O ne 'MSWin32' }
+use Test2::V0 -no_srand => 1;
 use App::RegexFileUtils;
-use App::RegexFileUtils::MSWin32;
 use File::Temp qw( tempdir );
 use File::Spec;
-plan tests => 15;
+
+skip_all 'only test on MSWin32' unless $^O eq 'MSWin32';
 
 my $dir = tempdir( CLEANUP => 1 );
 
@@ -19,8 +15,8 @@ mkdir $subdir;
 
 ok -d $subdir, "subdir = $subdir";
 
-my $mv    = File::Spec->catfile(App::RegexFileUtils->share_dir, 'ppt', 'mv.pl');
-my $touch = File::Spec->catfile(App::RegexFileUtils->share_dir, 'ppt', 'touch.pl');
+my $mv    = File::Spec->catfile(App::RegexFileUtils->_share_dir, 'ppt', 'mv.pl');
+my $touch = File::Spec->catfile(App::RegexFileUtils->_share_dir, 'ppt', 'touch.pl');
 
 system $^X, $touch, File::Spec->catfile($dir, 'A01.txt');
 system $^X, $touch, File::Spec->catfile($dir, 'A02.txt');
@@ -45,3 +41,5 @@ ok ! -e File::Spec->catfile($dir, 'A02.txt'), "A02";
 ok ! -e File::Spec->catfile($dir, 'A03.txt'), "A03";
 ok -e File::Spec->catfile($dir, 'subdir', 'A02.txt'), "A02";
 ok -e File::Spec->catfile($dir, 'subdir', 'A03.txt'), "A03";
+
+done_testing;

@@ -4,6 +4,15 @@ Alien::Base::ModuleBuild::Authoring - Authoring an C<Alien::> module using Alien
 
 =head1 DESCRIPTION
 
+B<NOTE>: Please consider for new development of L<Alien>s that you use
+L<Alien::Build> and L<alienfile> instead.  Like L<Alien::Base::ModuleBuild> they work
+with L<Alien::Base>.  Unlike L<Alien::Base::Module::Build> they are more easily customized
+and handle a number of corner cases better.  For a good place to start,
+please see L<Alien::Build::Manual::AlienAuthor>.  Although the 
+Alien-Base / Alien-Build team will continue to maintain this module,
+(we will continue to fix bugs where appropriate), we aren't adding any
+new features to this module.
+
 Congratulations! You have made the decision to help the Perl community by providing a C library via CPAN. The L<Alien> namespace has been instrumental in providing C libraries for many years, but authoring those modules has been a commitment that most authors weren't willing to take on. L<Alien::Base> tries to ease that pain by providing most of the needed functionality; usually authors should only need a little boilerplate and configuration!
 
 =head1 STATUS

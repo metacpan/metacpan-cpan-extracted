@@ -3,7 +3,7 @@
 
 package HiD::App::Command::publish;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::App::Command::publish::VERSION = '1.98';
+$HiD::App::Command::publish::VERSION = '1.991';
 use Moose;
 extends 'HiD::App::Command';
 with 'HiD::Role::PublishesDrafts';
@@ -206,8 +206,6 @@ HiD::App::Command::publish - publish site
 
     $ hid publish
 
-    $ hid  # 'publish' is the default command...
-
     # publish directly to GitHub Pages
     $ hid publish --to_github_pages
     $ hid publist -G
@@ -260,7 +258,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.98
+version 1.991
 
 =head1 AUTHOR
 

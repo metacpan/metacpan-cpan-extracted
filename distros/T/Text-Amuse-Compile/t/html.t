@@ -17,7 +17,7 @@ binmode $builder->todo_output,    ":utf8";
 binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
-plan tests => 72;
+plan tests => 69;
 
 my $file_no_toc = File::Spec->catfile(qw/t tex testing-no-toc.muse/);
 my $file_with_toc = File::Spec->catfile(qw/t tex testing.muse/);
@@ -77,15 +77,14 @@ sub test_file {
                 like($body, $regexp, "$regexp matches the body") or $error++;
             }
             foreach my $string ('TeX Gyre Pagella',
-                                'TeX Gyre Cursor',
-                                '12pt') {
+                                'TeX Gyre Cursor') {
                 like $body, qr{\Q$string\E};
             }
 
             like($body, qr/div#page\s*\{\s*margin:20px;\s*padding:20px;\s*\}/s,
                  "Found the margins in the CSS");
             unlike($body, qr/\@font-face/, "\@font-face not found");
-            like($body, qr/font-size: 10pt;/, "Found the correct font size");
+            unlike($body, qr{font-size:.*pt}, "Font side not set");
             like($body, qr/font-family:.*serif;/, "Found the serif font family");
             unlike($body, qr/\@page/, "\@page not found");
             unlike($body, qr/text-align: justify/, "No justify found in the body");

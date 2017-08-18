@@ -1,5 +1,5 @@
 package File::JSON::Slurper;
-$File::JSON::Slurper::VERSION = '0.02';
+$File::JSON::Slurper::VERSION = '0.03';
 use 5.006;
 use strict;
 use warnings;
@@ -91,7 +91,7 @@ available on CPAN.
 
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/File-JSON-Slurper>
+L<https://github.com/neilb/File-JSON-Slurper>
 
 
 =head1 AUTHOR

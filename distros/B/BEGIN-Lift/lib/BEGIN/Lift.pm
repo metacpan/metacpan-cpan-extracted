@@ -13,20 +13,13 @@ use B::CompilerPhase::Hook ();
 use Devel::CallParser;
 use XSLoader;
 BEGIN {
-    $VERSION   = '0.04';
+    $VERSION   = '0.05';
     $AUTHORITY = 'cpan:STEVAN';
     XSLoader::load( __PACKAGE__, $VERSION );
 }
 
 sub install {
     my ($pkg, $method, $handler) = @_;
-
-    # It does not make any sense to create
-    # something that is meant to run in the
-    # BEGIN phase *after* that phase is done
-    # so catch this and error ...
-    die 'Lifted keywords must be created during BEGIN time, not (' . ${^GLOBAL_PHASE}. ')'
-        unless ${^GLOBAL_PHASE} eq 'START';
 
     # need to force a new CV each time here
     # not entirely sure why, but I assume
@@ -112,6 +105,12 @@ This module serves a very specific purpose, which is to provide a
 mechanism through which we can "lift" a given subroutine to be
 executed entirely within the C<BEGIN> phase of the Perl compiler
 and to leave no trace of itself in the C<RUN> phase.
+
+=head2 Modules loaded at runtime?
+
+If a package that uses this module is loaded at runtime (perhaps
+via the C<require> builtin), it will still work correctly (to the
+best of my knowledge that is).
 
 =head1 FUNCTIONS
 

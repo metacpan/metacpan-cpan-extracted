@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown",
+      "perl_5",
       "perl_5"
    ],
    "meta-spec" : {
@@ -36,14 +36,15 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.5503"
          }
       },
       "runtime" : {
          "requires" : {
             "App::Packager" : "1.42",
             "Font::TTF" : "1.04",
-            "PDF::API2" : "2.02"
+            "PDF::API2" : "2.02",
+            "perl" : "5.01"
          }
       },
       "test" : {
@@ -55,11 +56,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "0.84"
+         "version" : "0.86"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "0.84"
+         "version" : "0.86"
       }
    },
    "release_status" : "stable",
@@ -69,6 +70,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.84",
+   "version" : "0.86",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

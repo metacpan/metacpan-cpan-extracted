@@ -4,7 +4,7 @@ package Method::Traits::Trait;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Carp ();
@@ -100,7 +100,7 @@ Method::Traits::Trait - The Trait object
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

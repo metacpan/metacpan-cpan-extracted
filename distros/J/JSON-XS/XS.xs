@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <float.h>
+#include <inttypes.h>
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
 # define snprintf _snprintf // C compilers have this in stdio.h
@@ -154,6 +155,31 @@ shrink (SV *sv)
       SvPV_renew (sv, SvCUR (sv) + 1);
 #endif
     }
+}
+
+/* adds two STRLENs together, slow, and with paranoia */
+STRLEN
+strlen_sum (STRLEN l1, STRLEN l2)
+{
+  size_t sum = l1 + l2;
+
+  if (sum < (size_t)l2 || sum != (size_t)(STRLEN)sum)
+    croak ("JSON::XS: string size overflow");
+
+  return sum;
+}
+
+/* similar to SvGROW, but somewhat safer and guarantees exponential realloc strategy */
+static char *
+json_sv_grow (SV *sv, size_t len1, size_t len2)
+{
+  len1 = strlen_sum (len1, len2);
+  len1 = strlen_sum (len1, len1 >> 1);
+
+  if (len1 > 4096 - 24)
+    len1 = (len1 | 4095) - 24;
+
+  return SvGROW (sv, len1);
 }
 
 // decode an utf-8 character and return it, or (UV)-1 in
@@ -363,12 +389,12 @@ typedef struct
 INLINE void
 need (enc_t *enc, STRLEN len)
 {
-  if (expect_false (enc->cur + len >= enc->end))
+  if (expect_false ((uintptr_t)(enc->end - enc->cur) < len))
     {
       STRLEN cur = enc->cur - (char *)SvPVX (enc->sv);
-      SvGROW (enc->sv, cur + (len < (cur >> 2) ? cur >> 2 : len) + 1);
-      enc->cur = SvPVX (enc->sv) + cur;
-      enc->end = SvPVX (enc->sv) + SvLEN (enc->sv) - 1;
+      char *buf = json_sv_grow (enc->sv, cur, len);
+      enc->cur = buf + cur;
+      enc->end = buf + SvLEN (enc->sv) - 1;
     }
 }
 
@@ -394,13 +420,13 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
         {
           if (expect_false (ch == '"')) // but with slow exceptions
             {
-              need (enc, len += 1);
+              need (enc, len + 1);
               *enc->cur++ = '\\';
               *enc->cur++ = '"';
             }
           else if (expect_false (ch == '\\'))
             {
-              need (enc, len += 1);
+              need (enc, len + 1);
               *enc->cur++ = '\\';
               *enc->cur++ = '\\';
             }
@@ -413,11 +439,11 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
         {
           switch (ch)
             {
-              case '\010': need (enc, len += 1); *enc->cur++ = '\\'; *enc->cur++ = 'b'; ++str; break;
-              case '\011': need (enc, len += 1); *enc->cur++ = '\\'; *enc->cur++ = 't'; ++str; break;
-              case '\012': need (enc, len += 1); *enc->cur++ = '\\'; *enc->cur++ = 'n'; ++str; break;
-              case '\014': need (enc, len += 1); *enc->cur++ = '\\'; *enc->cur++ = 'f'; ++str; break;
-              case '\015': need (enc, len += 1); *enc->cur++ = '\\'; *enc->cur++ = 'r'; ++str; break;
+              case '\010': need (enc, len + 1); *enc->cur++ = '\\'; *enc->cur++ = 'b'; ++str; break;
+              case '\011': need (enc, len + 1); *enc->cur++ = '\\'; *enc->cur++ = 't'; ++str; break;
+              case '\012': need (enc, len + 1); *enc->cur++ = '\\'; *enc->cur++ = 'n'; ++str; break;
+              case '\014': need (enc, len + 1); *enc->cur++ = '\\'; *enc->cur++ = 'f'; ++str; break;
+              case '\015': need (enc, len + 1); *enc->cur++ = '\\'; *enc->cur++ = 'r'; ++str; break;
 
               default:
                 {
@@ -443,7 +469,7 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
                           if (uch >= 0x110000UL)
                             croak ("out of range codepoint (0x%lx) encountered, unrepresentable in JSON", (unsigned long)uch);
 
-                          need (enc, len += 11);
+                          need (enc, len + 11);
                           sprintf (enc->cur, "\\u%04x\\u%04x",
                                    (int)((uch - 0x10000) / 0x400 + 0xD800),
                                    (int)((uch - 0x10000) % 0x400 + 0xDC00));
@@ -451,7 +477,7 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
                         }
                       else
                         {
-                          need (enc, len += 5);
+                          need (enc, len + 5);
                           *enc->cur++ = '\\';
                           *enc->cur++ = 'u';
                           *enc->cur++ = PL_hexdigit [ uch >> 12      ];
@@ -469,7 +495,7 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
                     }
                   else if (is_utf8)
                     {
-                      need (enc, len += clen);
+                      need (enc, len + clen);
                       do
                         {
                           *enc->cur++ = *str++;
@@ -478,7 +504,7 @@ encode_str (enc_t *enc, char *str, STRLEN len, int is_utf8)
                     }
                   else
                     {
-                      need (enc, len += UTF8_MAXBYTES - 1); // never more than 11 bytes needed
+                      need (enc, len + UTF8_MAXBYTES - 1); // never more than 11 bytes needed
                       enc->cur = encode_utf8 (enc->cur, uch);
                       ++str;
                     }
@@ -1169,8 +1195,8 @@ decode_str (dec_t *dec)
           {
             STRLEN cur = SvCUR (sv);
 
-            if (SvLEN (sv) <= cur + len)
-              SvGROW (sv, cur + (len < (cur >> 2) ? cur >> 2 : len) + 1);
+            if (SvLEN (sv) - cur <= len)
+              json_sv_grow (sv, cur, len);
 
             memcpy (SvPVX (sv) + SvCUR (sv), buf, len);
             SvCUR_set (sv, SvCUR (sv) + len);
@@ -2160,8 +2186,8 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
               const char *str = SvPV (jsonstr, len);
               STRLEN cur = SvCUR (self->incr_text);
 
-              if (SvLEN (self->incr_text) <= cur + len)
-                SvGROW (self->incr_text, cur + (len < (cur >> 2) ? cur >> 2 : len) + 1);
+              if (SvLEN (self->incr_text) - cur <= len)
+                json_sv_grow (self->incr_text, cur, len);
 
               Move (str, SvEND (self->incr_text), len, char);
               SvCUR_set (self->incr_text, SvCUR (self->incr_text) + len);

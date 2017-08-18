@@ -8,20 +8,20 @@ use Helper;
 
 # option background (background needs special care)
 my %notes = (
-    'avpid' => 'average percent identity',
+    'avg-pid' => 'average percent identity',
     'codon-view' => 'codon view',
-    'conblocks' => 'extract conserved blocks',
+    'con-blocks' => 'extract conserved blocks',
     'concat' => 'concatenate aln files',
     'dna2pep' => 'CDS alignment to protein alignment',
     'length' => 'length of an alignment',
-    'listids' => 'list all sequence IDs',
+    'list-ids' => 'list all sequence IDs',
     'match' => 'match view',
-    'noflatname' => 'set display name flat',
-    'nogaps' => 'remove gapped sites',
-    'numseq' => 'number of aligned sequences',
+    'no-flat' => "turns ON 'begin-end' naming",
+    'no-gaps' => 'remove gapped sites',
+    'num-seq' => 'number of aligned sequences',
     'select-third' => 'extract third site',
     'uniq' => 'remove redundant sequences',
-    'varsites' => 'show only variable sites',
+    'var-sites' => 'show only variable sites',
 );
 
 test_no_arg_opts('bioaln', 'test-bioaln.cds', \%notes);
@@ -33,13 +33,13 @@ my $opts = [
      'add a 90% consensus sequence'],
     ['delete', 'JD1,118a',
      'delete sequences JD1, 118a'],
-    ['erasecol', 'B31',
+    ['rm-col', 'B31',
      'Erase sites gapped at B31'],
     ['output', 'fasta',
      'output a FASTA alignments'],
     ['pick', 'JD1,118a,N40',
      'pick sequences JD1, 118a, N40'],
-    ['refseq', 'B31',
+    ['ref-seq', 'B31',
      'change reference (or first) sequence'],
     ['window', '60',
      'average identifies for sliding windows of 60']
@@ -63,9 +63,9 @@ for my $tuple (['input', 'fasta', 'test-bioaln-pep2dna.nuc',
 
 
 %notes = (
-    'bootstrap' => "bootstrap",
+    'boot' => "bootstrap",
     'permute-states' => "permute-states",
-    'uppercase' => "Make an uppercase alignment",
+    'upper' => "Make an uppercase alignment",
     'resample' => "Resample",
 );
 

@@ -1,9 +1,92 @@
 ==================================================
-Changes from 2016-07-20 00:00:00 +0000 to present.
+Changes from 2016-08-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.957 at 2017-07-20 19:57:27 +0000
+version 0.958 at 2017-08-17 20:32:10 +0000
+------------------------------------------
+
+  Change: 4a41b56aad7928e48f82565c95e2a1bf9e6dc9ca
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-17 11:36:31 +0000
+
+    minor docs cleanup 
+
+  Change: cdda252a85b191b1af5e986debf679db191ff676
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-17 11:21:52 +0000
+
+    add in two newer perl versions, need to get this automated via dzil
+    correctly 
+
+  Change: 10a67f2a98350f404e3008503356240f69f807da
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-17 11:19:05 +0000
+
+    Merge pull request #27 from oaxlin/skip-auth-test
+
+    Skip auth test, and minor doc update 
+
+  Change: 65e7ec27a64ea70c0d7db02da244aa99df175d61
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-17 11:15:30 +0000
+
+    Added sepadirect and ideal to sale, Force capture (gag), and links to
+    spec docs 
+
+  Change: b4e7d5ddc06954a450d6d405483a337f9520e09f
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-17 10:37:01 +0000
+
+    Sale (Normal Authorization) now works. Does not add ideal/direct
+    debit feature yet 
+
+  Change: 9f53a643fe219bd6ae5652590fc1098365e8fa26
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-16 14:40:43 +0000
+
+    Capture (linked and unlinked) now up to v.11 spec 
+
+  Change: 87025316cfd5e8ec378d1e2bafa4d0600bebcc6b
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-16 09:26:31 +0000
+
+    Fix warning from not having a content map in our templates 
+
+  Change: e0817b82b17a4f2b16391dee20e14aa8321473ce
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-15 15:58:01 +0000
+
+    Auth requests now have full 11.0 spec Fixed critic warning of
+    Indirect 'new' usage on XML::Writer copy/pasta usage 
+
+  Change: 475dbbda52510edb485903a14aa53e9bab1e34a9
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2016-07-31 14:02:58 +0000
+
+    disable testing of parent cpan modules (Net::HTTPS::Any fails test
+    atm, but works otherwise) 
+
+  Change: 376425e84e43147e01045f2d60a7f51d917a15e3
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2016-07-26 18:36:03 +0000
+
+    Merge branch 'master' into skip-auth-test 
+
+  Change: 412fca12aa9f2d05603fd5fda82e6adaee8742a5
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2016-07-26 18:34:07 +0000
+
+    minor doc update 
+
+  Change: d4d3b61be6503cc8ead6199d933e6333f5f38f0b
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2016-07-26 18:32:39 +0000
+
+    update auth to skip like other tests 
+
+------------------------------------------
+version 0.957 at 2017-07-20 19:57:20 +0000
 ------------------------------------------
 
   Change: 547a9211cd30320e088fd755899c10e645e5809d
@@ -85,5 +168,5 @@ version 0.954 at 2017-02-01 18:30:54 +0000
     auto-installed 
 
 ================================================
-Plus 9 releases after 2016-07-20 00:00:00 +0000.
+Plus 9 releases after 2016-08-17 00:00:00 +0000.
 ================================================

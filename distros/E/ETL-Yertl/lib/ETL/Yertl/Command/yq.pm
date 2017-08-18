@@ -1,9 +1,9 @@
 package ETL::Yertl::Command::yq;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 # ABSTRACT: Filter and construct documents using a mini-language
 
 use ETL::Yertl;
-use ETL::Yertl::Format::default;
+use ETL::Yertl::Util qw( load_module );
 use boolean qw( :all );
 use Module::Runtime qw( use_module );
 our $VERBOSE = $ENV{YERTL_VERBOSE} // 0;
@@ -39,7 +39,7 @@ sub main {
             }
         }
 
-        my $in_fmt = ETL::Yertl::Format::default->new( input => $fh );
+        my $in_fmt = load_module( format => 'default' )->new( input => $fh );
         my $scope = {};
         for my $doc ( $in_fmt->read ) {
             my @output = $class->filter( $filter, $doc, $scope );
@@ -59,7 +59,7 @@ sub write {
         return;
     }
 
-    my $out_fmt = ETL::Yertl::Format::default->new;
+    my $out_fmt = load_module( format => 'default' )->new;
     for my $doc ( @$docs ) {
         next if is_empty( $doc );
         if ( isTrue( $doc ) ) {
@@ -105,7 +105,7 @@ ETL::Yertl::Command::yq - Filter and construct documents using a mini-language
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

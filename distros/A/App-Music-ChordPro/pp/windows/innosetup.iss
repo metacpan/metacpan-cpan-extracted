@@ -1,6 +1,6 @@
 # define APP	"ChordPro"
 # define V_MAJ	0
-# define V_MIN	83
+# define V_MIN	85
 # define V_AUX	0
 # define PUBLISHER "ChordPro.ORG"
 # define SRC	"C:\Users\Johan\Documents\ChordPro"
