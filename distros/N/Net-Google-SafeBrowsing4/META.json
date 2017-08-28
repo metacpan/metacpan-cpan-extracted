@@ -62,6 +62,6 @@
          "web" : "https://github.com/juliensobrier/Net-Google-SafeBrowsing4"
       }
    },
-   "version" : "0.5",
+   "version" : "0.6",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

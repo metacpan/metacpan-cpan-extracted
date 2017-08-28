@@ -1,0 +1,37 @@
+{
+   "abstract" : "Simple Perl extension for [configuring/stopping/starting] the vpn service in linux server.",
+   "author" : [
+      "Kaavannan Karuppaiah <kaavannaniisc@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Simple-Confvpn",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Simple::Confvpn" : {
+         "file" : "lib/Simple/Confvpn.pm",
+         "version" : "1.09"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.09",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

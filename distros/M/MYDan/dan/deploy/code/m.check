@@ -1,0 +1,59 @@
+#!# perl: deploy/code/m.check
+use strict;
+use File::Spec;
+use Sys::Hostname;
+use MYDan::Agent::Client;
+use MYDan::Node;
+use YAML::XS;
+
+my %agent;
+BEGIN{
+    %agent = MYDan::Util::OptConf->load()->dump('agent');
+};
+
+my %run = ( timeout => 300, max => 128, sudo => 'root' );
+
+return sub
+{
+    my %param = @_;
+
+    my ( $batch, $param ) = @param{qw( batch param )};
+    
+    return unless my $check = $param->{check};
+    $check = [ $check ] unless ref $check;
+
+    my $range = MYDan::Node->new();
+
+    my $code = do File::Spec->join( $agent{argv}, 'check' );
+    die "check not CODE" unless $code && ref $code eq 'CODE';
+
+    print "=" x 30,"\n";
+    my %succ;
+    my %query = ( 
+        code => 'check',
+        user => $param->{user}||'root', 
+        argv => &$code( @$check )
+    );
+
+    my $client = MYDan::Agent::Client->new( @$batch );
+
+    my ( %result, %re, %mesg ) = $client->run(  
+        query => \%query, %agent, map{ $_ => $param->{$_} ||$run{$_} }qw( timeout sudo max ) );
+
+    while( my( $node, $mesg ) = each %result )
+    {
+        $succ{$node} = 1 if $mesg && $mesg =~ /--- 0\n$/;
+        push @{$re{$mesg}}, $node;
+    }
+    while( my( $mesg, $node ) = each %re )
+    {
+        $mesg =~ s/--- \d+\n$//;
+        $node = $range->load( $node );
+        $node = sprintf "%s[%d]", $node->dump(), scalar $node->list;
+        $mesg{$node} = $mesg;
+    }
+    YAML::XS::DumpFile \*STDOUT, \%mesg if %mesg;
+
+    print "=" x 30,"\n";
+    return %succ;
+};

@@ -24,3 +24,4 @@ t/module-linkcheck.t			test LinkChecker.pm
 t/module-survey.t			test SurveyEngine.pm
 META.yml                                Module meta-data
 Makefile.PL				Module build meta-data
+META.json                                Module JSON meta-data (added by MakeMaker)

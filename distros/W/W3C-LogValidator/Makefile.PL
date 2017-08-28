@@ -13,7 +13,7 @@ WriteMakefile(
     'DISTNAME'          => 'W3C-LogValidator',
     'AUTHOR'            => 'Olivier Thereaux <ot@w3.org>',
     'ABSTRACT'		=> 'The W3C Log Validator',
-    'VERSION'      	=> '1.4', 
+    'VERSION'      	=> '1.5', 
     'PREREQ_PM'         => { 'Exporter'       => 0,
                              'Sys::Hostname'  => 0,
                              'LWP::UserAgent' => 0,

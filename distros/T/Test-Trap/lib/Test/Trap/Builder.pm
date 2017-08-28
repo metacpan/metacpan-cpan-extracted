@@ -1,6 +1,6 @@
 package Test::Trap::Builder;
 
-use version; $VERSION = qv('0.3.2');
+use version; $VERSION = qv('0.3.3');
 
 use strict;
 use warnings;
@@ -165,6 +165,7 @@ BEGIN { # Test callback registration and test method generation:
     my $ok;
     local $trap->Prop->{test_accessor} = "$accessor->{name}($index)";
     local $Test::Builder::Level = $Test::Builder::Level+1;
+    local($!, $^E) = ($!, $^E);
     $ok = $test->{code}->(@targs) or $trap->TestFailure;
     $ok;
   };
@@ -380,7 +381,7 @@ Test::Trap::Builder - Backend for building test traps
 
 =head1 VERSION
 
-Version 0.3.2
+Version 0.3.3
 
 =head1 SYNOPSIS
 

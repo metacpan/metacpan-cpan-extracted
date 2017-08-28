@@ -1,0 +1,47 @@
+---
+abstract: 'Alien package to find, and build if necessary XGBoost dynamic library'
+author:
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+build_requires:
+  Alien::Build: '1.04'
+  Alien::Build::MM: '0.32'
+  Alien::git: '0'
+  ExtUtils::MakeMaker: '6.52'
+  FFI::CheckLib: '0'
+  FFI::Platypus: '0'
+  Path::Tiny: '0'
+  Sys::Info: '0'
+  Test2::V0: '0'
+  Test::Alien: '0'
+  Test::Most: '0'
+  utf8: '0'
+configure_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::git: '0'
+  ExtUtils::MakeMaker: '6.52'
+  FFI::CheckLib: '0'
+  FFI::Platypus: '0'
+  Path::Tiny: '0'
+  Sys::Info: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-XGBoost
+requires:
+  Alien::Base: '0'
+  Alien::Build: '1.04'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pablrod/p5-Alien-XGBoost/issues
+  homepage: https://github.com/pablrod/p5-Alien-XGBoost
+  repository: https://github.com/pablrod/p5-Alien-XGBoost.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.69'

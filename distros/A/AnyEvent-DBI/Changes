@@ -1,5 +1,8 @@
 Revision history for AnyEvent::DBI
 
+3.01 Sun Aug 27 11:53:26 CEST 2017
+	- add missing dependency to AnyEvent::Fork.
+
 3.0  Tue Aug 15 09:05:30 CEST 2017
         - the exec_server constructor argument is now ignored, fork vs. exec
           is now decided by availability of AnyEvent::Fork::Early or not.

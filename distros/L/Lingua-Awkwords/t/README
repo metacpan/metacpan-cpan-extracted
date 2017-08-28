@@ -1,0 +1,5 @@
+Various tests assume that Math::Random::Discrete uses rand() and thus
+will be influenced by setting a srand() seed.
+
+Other tests are statistical and may fail if rand() produces a very rare
+sequence of numbers.

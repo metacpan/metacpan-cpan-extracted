@@ -19,7 +19,7 @@ use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
 use constant DEBUG => $ENV{JSON_VALIDATOR_DEBUG} || 0;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our @EXPORT_OK = 'validate_json';
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -143,6 +143,9 @@ sub _load_schema {
     $url =~ s!#.*!!;
     $url = path(path($parent)->dirname, split '/', $url);
     $namespace = Cwd::abs_path($url->to_string) || $url;
+  }
+  elsif ($url =~ m!^/! and !-e $url and $self->ua->server->app) {
+    $scheme = 'http';
   }
 
   # Make sure we create the correct namespace if not already done by Mojo::URL
@@ -527,7 +530,8 @@ sub _validate_type_boolean {
 
   if (  defined $value
     and $self->{coerce}{booleans}
-    and (B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK) or $value =~ /^(true|false)$/))
+    and
+    (B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK) or $value =~ /^(true|false)$/))
   {
     $_[1] = $value ? Mojo::JSON->true : Mojo::JSON->false;
     return;
@@ -841,7 +845,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SYNOPSIS
 

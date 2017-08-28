@@ -98,7 +98,7 @@ task deploy_dev =>
             source => $dist;
 
         Rex::Logger::info( 'Installing ' . $dist );
-        run 'source ~/.profile; cpanm -v --with-recommends ~/dist/' . $dist;
+        run 'source ~/.profile; cpanm -v --notest --with-recommends ~/dist/' . $dist;
         if ( $? ) {
             say last_command_output;
         }
@@ -118,7 +118,8 @@ desc "Deploy service files";
 task deploy_service =>
     group => 'api',
     sub {
-        file '~/service/api/log/main',
+        Rex::Logger::info( 'Deploying service files' );
+        file '~/service/api/log',
             ensure => 'directory';
         file '~/service/api/run',
             source => 'etc/runit/api/run';
@@ -126,14 +127,14 @@ task deploy_service =>
             source => 'etc/runit/api/api.conf';
         file '~/service/api/log/run',
             source => 'etc/runit/api/log/run';
-        file '~/service/broker/log/main',
+        file '~/service/broker/log',
             ensure => 'directory';
         file '~/service/broker/run',
             source => 'etc/runit/broker/run';
         file '~/service/broker/log/run',
             source => 'etc/runit/broker/log/run';
 
-        file '~/service/legacy-metabase/log/main',
+        file '~/service/legacy-metabase/log',
             ensure => 'directory';
         file '~/service/legacy-metabase/run',
             source => 'etc/runit/legacy-metabase/run';
@@ -143,6 +144,22 @@ task deploy_service =>
             source => 'etc/runit/legacy-metabase/etc/metabase.conf';
         file '~/service/legacy-metabase/log/run',
             source => 'etc/runit/legacy-metabase/log/run';
+
+        Rex::Logger::info( 'Deploying crontab entries' );
+        file '~/var/log/metabase',
+            ensure => 'directory';
+
+        cron_entry 'tail-log',
+            user => 'cpantesters',
+            minute => '*/5',
+            hour => '*',
+            day_of_month => '*',
+            month => '*',
+            day_of_week => '*',
+            ensure => 'present',
+            command => 'MOJO_HOME=$HOME/service/legacy-metabase cpantesters-legacy-metabase eval "app->refresh_tail_log" >>$HOME/var/log/metabase/tail.log 2>&1',
+            ;
+
     };
 
 =head2 restart
@@ -157,6 +174,7 @@ desc "Restart services";
 task restart =>
     group => 'api',
     sub {
+        Rex::Logger::info( 'Restarting services' );
         run 'sv restart ~/service/api';
         run 'sv restart ~/service/broker';
         run 'sv restart ~/service/legacy-metabase';

@@ -290,7 +290,9 @@ C<OnActiveSec> and related settings.
 Note that timers do not necessarily expire at the
 precise time configured with this setting, as it is subject to
 the C<AccuracySec> setting
-below. I< Optional. Type uniline.  > 
+below.
+
+May be specified more than once. I< Optional. Type list of uniline.  > 
 
 =head2 AccuracySec
 

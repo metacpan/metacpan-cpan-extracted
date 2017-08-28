@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2016 by Dominique Dumont.
+# This software is Copyright (c) 2013-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::LcdProc;
-$Config::Model::LcdProc::VERSION = '2.050';
+$Config::Model::LcdProc::VERSION = '2.051';
 use 5.10.1;
 
 use Config::Model 2.043;
@@ -29,7 +29,7 @@ Config::Model::LcdProc - Edit and validate LcdProc configuration file
 
 =head1 VERSION
 
-version 2.050
+version 2.051
 
 =head1 SYNOPSIS
 
@@ -55,11 +55,12 @@ You can choose to  fix (most of) these warnings with the command:
 
 =head1 DESCRIPTION
 
-This module provides a configuration editor (and models) for the 
+This module provides a configuration editor (and models) for the
 configuration file of LcdProc, i.e. C</etc/LCDd.conf>.
 
 This module can also be used to modify safely the content of this file
-from a Perl programs.
+from a Perl programs. For more details, see
+L<Managing Lcdproc configuration with cme|https://github.com/dod38fr/config-model/wiki/Managing-Lcdproc-configuration-with-cme>
 
 =head1 SEE ALSO
 
@@ -81,6 +82,10 @@ L<Config::Model>
 
 http://github.com/dod38fr/config-model/wiki/Using-config-model
 
+=item *
+
+L<Blog about config-model and lcdproc|https://ddumont.wordpress.com/tag/lcdproc/>
+
 =back
 
 =head1 AUTHOR
@@ -89,7 +94,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2016 by Dominique Dumont.
+This software is Copyright (c) 2013-2017 by Dominique Dumont.
 
 This is free software, licensed under:
 
@@ -136,7 +141,7 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/Config-Model-LcdProc>
+L<http://cpants.cpanauthors.org/dist/Config-Model-LcdProc>
 
 =item *
 

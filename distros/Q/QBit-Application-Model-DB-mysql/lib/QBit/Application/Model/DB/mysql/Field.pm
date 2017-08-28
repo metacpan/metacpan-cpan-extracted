@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql::Field;
-$QBit::Application::Model::DB::mysql::Field::VERSION = '0.011';
+$QBit::Application::Model::DB::mysql::Field::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Field);

@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2016 by Dominique Dumont.
+# This software is Copyright (c) 2013-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -48,13 +48,16 @@ use Getopt::Long;
 my $verbose = 0;
 my $show_model = 0;
 my $force = 0;
+my $source = "lcdproc/LCDd.conf" ;
+
 my $result = GetOptions (
     "verbose"  => \$verbose,
     "model" => \$show_model,
     "force" => \$force,
+    "file=s" => \$source,
 );
 
-die "Unknown option. Expected -verbose or -show_model" unless $result ;
+die "Unknown option. Expected -verbose, -force, -file  or -model" unless $result ;
 
 ########################
 #
@@ -62,14 +65,13 @@ die "Unknown option. Expected -verbose or -show_model" unless $result ;
 
 my $target = "lib/Config/Model/models/LCDd.pl";
 my $script = "script/lcdconf2model.pl";
-my $source = "lcdproc/LCDd.conf" ;
 
 if (-e $target and -M $target < -M $script and -M $target < -M $source) {
     say "LcdProc model is up to date";
     exit unless $force;
 }
 
-say "Building lcdproc model from upstream LCDd.conf file..." ;
+say "Building lcdproc model from upstream LCDd.conf file $source" ;
 
 ###########################
 #
@@ -78,8 +80,7 @@ say "Building lcdproc model from upstream LCDd.conf file..." ;
 # Here's the LCDd.conf pre-processing mentioned above
 
 # read LCDd.conf
-my $path = path('.');
-my @lines    = $path->child('lcdproc/LCDd.conf')->lines;
+my @lines    = path($source)->lines;
 
 # un-comment commented parameters and put value as default value
 foreach my $line (@lines) {
@@ -87,6 +88,7 @@ foreach my $line (@lines) {
 }
 
 # write pre-processed files
+my $path = path('.');
 my $tmp = $path->child('tmp');
 $tmp->mkpath;
 $tmp->child('LCDd.conf')->spew(@lines);
@@ -123,7 +125,7 @@ my $model = Config::Model->new();
 $model->create_config_class(
     name   => 'Dummy::Class',
     accept => [
-        'Hello|GoodBye' => {
+        'Hello|GoodBye|key' => {
             type => 'list',
             cargo => { qw/type  leaf value_type uniline/}
         },
@@ -180,8 +182,8 @@ $meta_root->load(qq!class:LCDd class_description.="\n\n$extra_description"!);
 # add legal stuff
 $meta_root->load( qq!
     class:LCDd
-        copyright:0="2011-2016, Dominique Dumont"
-        copyright:1="1999-2013, William Ferrell and others"
+        copyright:0="2011-2017, Dominique Dumont"
+        copyright:1="1999-2017, William Ferrell and others"
         license="GPL-2"
 !
 );
@@ -289,6 +291,7 @@ my %override ;
 # Handle display content
 $override{"LCDd::server"}{GoodBye}
     = $override{"LCDd::server"}{Hello}
+    = $override{"LCDd::linux_input"}{key}
     = sub {
         my ( $class, $elt ) = @_;
         my $ret = qq( class:"$class" element:$elt type=list ) ;

@@ -15,7 +15,7 @@ BEGIN {
   local $@;
   eval qq{ use $class };
   if (exists &{"$class\::import"}) {
-    plan tests => 1 + 6*10 + 5*3 + 17; # 10 runtests; 3 inner_tests; another bunch ...
+    plan tests => 1 + 6*10 + 5*3 + 11; # 10 runtests; 3 inner_tests; another bunch ...
   }
   else {
     plan skip_all => "$strategy strategy not supported; skipping";
@@ -196,13 +196,19 @@ my $errnum = 11; # "Resource temporarily unavailable" locally -- sounds good :-P
 my $errstring = do { local $! = $errnum; "$!" };
 my $erros = do { local $! = $errnum; $^E };
 my ($errsym) = do { local $! = $errnum; grep { $!{$_} } keys(%!) };
-for my $case ([Bare => sub { return 42 }], [Dying => sub { die 42 }], [Exiting => sub { exit 42 }]) {
+{
   local $! = $errnum;
   trap {};
   my ($sym) = grep { $!{$_} } keys(%!);
-  is $!+0, $errnum, "$strategy trap doesn't change errno (remains $errnum/$errstring)";
-  is $^E,  $erros,  "$strategy trap doesn't change extended OS error (remains $erros)";
-  is $sym, $errsym, "$strategy trap doesn't change the error symbol (remains $errsym)";
+  {
+    # rt.cpan.org #105125: Test::More::is() does not preserve $^E, so ...
+    my $postbang = $!+0;
+    my $postos   = $^E;
+    local($!, $^E);
+    is $postbang,$errnum, "$strategy trap doesn't change errno (remains $errnum/$errstring)";
+    is $postos, $erros,  "$strategy trap doesn't change extended OS error (remains $erros)";
+    is $sym,    $errsym, "$strategy trap doesn't change the error symbol (remains $errsym)";
+  }
 }
 
 {
@@ -212,9 +218,15 @@ for my $case ([Bare => sub { return 42 }], [Dying => sub { die 42 }], [Exiting =
     $^E = '';
   };
   my ($sym) = grep { $!{$_} } keys(%!);
-  is $!+0,     0, "Errno-unsetting trap unsets errno (it's not localized)";
-  is $^E,     '', "Errno-unsetting trap unsets extended OS error (it's not localized)";
-  is $sym, undef, "Errno-unsetting trap unsets the error symbol (it's not localized)";
+  {
+    # rt.cpan.org #105125: Test::More::is() does not preserve $^E, so ...
+    my $postbang = $!+0;
+    my $postos   = $^E;
+    local($!, $^E);
+    is $postbang,0, "Errno-unsetting trap unsets errno (it's not localized)";
+    is $postos, '', "Errno-unsetting trap unsets extended OS error (it's not localized)";
+    is $sym, undef, "Errno-unsetting trap unsets the error symbol (it's not localized)";
+  }
 }
 
 1;

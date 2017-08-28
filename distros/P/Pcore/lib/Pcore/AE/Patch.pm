@@ -105,9 +105,7 @@ sub _tcp_bind ( $host, $service, $done, $prepare = undef ) : prototype($$$;$) {
         return defined wantarray ? guard { %state = () } : ();
     }
 
-    AnyEvent::Socket::_tcp_bind_orig(@_);
-
-    return;
+    return AnyEvent::Socket::_tcp_bind_orig(@_);
 }
 
 1;

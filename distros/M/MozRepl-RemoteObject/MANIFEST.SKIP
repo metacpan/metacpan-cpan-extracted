@@ -20,3 +20,5 @@ CVS/
 \B\.git\b
 ^cover_db/
 ^MYMETA.*
+^.*.tmp$
+^.travis.yml$

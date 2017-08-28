@@ -1,0 +1,16 @@
+### perl node/callback/node
+
+use strict;
+use warnings;
+
+use MYDan::Node;
+use MYDan::Util::OptConf;
+
+return sub
+{
+    my $db = MYDan::Node->new( MYDan::Util::OptConf->load()->dump( 'range' ) )->db;
+    my %cluster = map { $_ => 1 } map { @$_ } $db->select( 'name' );
+
+    +{ map { $_ => [ map { @$_ } $db->select( 'node', name => [ 1, $_ ] ) ] }
+        keys %cluster };
+}

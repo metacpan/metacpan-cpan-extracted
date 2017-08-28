@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Mail::Address - Parse mail addresses
+Mail::Address - parse mail addresses
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,18 @@ situation, but this is not a good idea, where it will break zillions
 of existing applications.  If you wish for a fully RFC2822 compliant
 implementation you may take a look at L<Mail::Message::Field::Full>,
 part of MailBox.
+
+B<. Example>
+
+  my $s = Mail::Message::Field::Full->new($from_header);
+  # ref $s isa Mail::Message::Field::Addresses;
+
+  my @g = $s->groups;          # all groups, at least one
+  # ref $g[0] isa Mail::Message::Field::AddrGroup;
+  my $ga = $g[0]->addresses;   # group addresses
+
+  my @a = $s->addresses;       # all addresses
+  # ref $a[0] isa Mail::Message::Field::Address;
 
 =head1 METHODS
 
@@ -144,7 +156,7 @@ For other contributors see ChangeLog.
 =head1 LICENSE
 
 Copyrights 1995-2000 Graham Barr E<lt>gbarr@pobox.comE<gt> and
-2001-2007 Mark Overmeer E<lt>perl@overmeer.netE<gt>.
+2001-2017 Mark Overmeer E<lt>perl@overmeer.netE<gt>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

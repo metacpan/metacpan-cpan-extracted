@@ -1,13 +1,13 @@
 ---
 abstract: 'Decode from LaTeX to Unicode'
 author:
-  - 'FranÃ§ois Charette <firmicus@cpan.org>'
+  - 'Francois Charette <firmicus@cpan.org>'
 build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: LaTeX-Decode
 provides:
   LaTeX::Decode:
     file: lib/LaTeX/Decode.pm
-    version: '0.04'
+    version: '0.05'
   LaTeX::Decode::Data:
     file: lib/LaTeX/Decode/Data.pm
 requires:
@@ -25,5 +25,6 @@ requires:
   perl: '5.008'
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
-version: '0.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  repository: http://github.com/fc7/LaTeX-Decode
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -93,7 +93,6 @@ describe 'A Moose DI container,' => sub {
 		};
   };
 
-
 };
 
 runtests unless caller;

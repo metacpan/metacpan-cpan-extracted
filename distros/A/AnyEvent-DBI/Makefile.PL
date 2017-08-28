@@ -20,6 +20,7 @@ my $mm = MM->new({
        common::sense   => 3.3,
        CBOR::XS        => 1.7,
        Convert::Scalar => 1.12,
+       AnyEvent::Fork  => 1.31,
     },
 });
 

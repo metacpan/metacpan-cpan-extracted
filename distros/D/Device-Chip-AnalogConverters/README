@@ -1,0 +1,23 @@
+NAME
+
+    Device::Chip::AnalogConverters - a collection of chip drivers
+
+DESCRIPTION
+
+    This distribution contains a number of Device::Chip drivers for various
+    ADC and DAC chips.
+
+ADCs
+
+      * Device::Chip::ADS1115
+
+      * Device::Chip::LTC2400
+
+DACs
+
+      * Device::Chip::MCP4725
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

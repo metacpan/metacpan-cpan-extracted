@@ -1,4 +1,14 @@
-Revision history for Class-Accessor-Array
+0.031   2017-08-27 (PERLANCAR)
+
+	- Support setting attributes in generated constructor.
+
+
+0.030   2017-08-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - Add more documentation, mention Class::Accessor::PackedString.
+
 
 0.02    2016-03-28 (PERLANCAR)
 

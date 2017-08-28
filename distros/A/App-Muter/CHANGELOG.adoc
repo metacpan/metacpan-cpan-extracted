@@ -1,5 +1,17 @@
 = Changelog
 
+v0.2.2::
+* The "Feel the Change" release.
+* Improve MetaCPAN indexing of muter docs.
+* Improve documentation.
+** Note that we assume input is reasonably well-formed.
+** Document the `vis` backend.
+** Fix POD syntax errors.
+** Fix some misspellings.
+* Use Test::NoWarnings where available.
+* Fix a warning in the `uuencode` backend.
+* Improve the `uri` backend's handling of stray newlines.
+
 v0.2.1::
 * The "All of These Moments I'll Never Replace" release.
 * Add core-only compatibility with 5.14.0, minus SHA-3 and tests.

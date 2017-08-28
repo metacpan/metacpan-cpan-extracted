@@ -1,0 +1,6 @@
+BEGIN:VCARD
+VERSION:4.0
+FN:Forrest Gump
+N;SORT-AS="Gump,Forrest":Gump;Forrest;;Mr.;
+ORG:Bubba Gump Shrimp Co.
+END:VCARD

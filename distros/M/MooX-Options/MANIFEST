@@ -44,6 +44,7 @@ t/23-string_with_zero_value.t
 t/24-usage_string.t
 t/25-with_config.t
 t/26-localization.t
+t/27-short.t
 t/base.st
 t/lib/MooXCmdTest.pm
 t/lib/MooXCmdTest/Cmd/test1.pm

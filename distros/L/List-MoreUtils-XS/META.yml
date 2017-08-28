@@ -33,5 +33,5 @@ resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils-XS
   homepage: https://metacpan.org/release/List-MoreUtils-XS
   repository: https://github.com/perl5-utils/List-MoreUtils-XS.git
-version: '0.422'
+version: '0.423'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

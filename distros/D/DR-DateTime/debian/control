@@ -2,7 +2,8 @@ Source: libdr-datetime-perl
 Section: perl
 Homepage: http://search.cpan.org/dist/DR-DateTime/
 Maintainer: Dmitry E. Oboukhov <unera@debian.org>
-Build-Depends: debhelper (>= 7), cdbs
+Build-Depends: debhelper (>= 7), cdbs,
+ libtimedate-perl
 Standards-Version: 3.9.6
 Priority: extra
 VCS-Browser: https://github.com/dr-co/r
@@ -10,7 +11,8 @@ VCS-Browser: https://github.com/dr-co/r
 Package: libdr-datetime-perl
 Depends: ${perl:Depends},
  ${misc:Depends},
- ${shlibs:Depends}
+ ${shlibs:Depends},
+ libtimedate-perl
 Architecture: any
 Suggests: libdatetime-perl
 Recommends: libmouse-perl

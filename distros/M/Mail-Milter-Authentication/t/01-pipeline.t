@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use lib 't';
 use Test::More;
 use Test::File::Contents;
-use AuthMilterTestDNSCache;
+use Net::DNS::Resolver::Mock;
 use AuthMilterTest;
 
 if ( ! -e 't/01-tools.t' ) {
@@ -17,7 +17,7 @@ chdir 't';
 plan tests => 1;
 
 {
-    system 'rm -rf tmp';
+    #system 'rm -rf tmp';
     mkdir 'tmp';
     mkdir 'tmp/result';
 

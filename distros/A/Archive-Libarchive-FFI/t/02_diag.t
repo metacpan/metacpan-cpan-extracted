@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Alien::Libarchive::Installer;
+use Alien::Libarchive3;
 use Test::More tests => 1;
 
 diag '';
@@ -8,13 +8,13 @@ diag '';
 diag '';
 diag '';
 
-my $alien = Alien::Libarchive::Installer->system_install( test => "ffi" );
+my $alien = 'Alien::Libarchive3';
 
 diag 'libarchive';
-diag '  cflags       : ', join ' ', @{ $alien->cflags };
-diag '  libs         : ', join ' ', @{ $alien->libs };
-diag '  dlls         : ', (eval { join ' ', $alien->dlls } || "not found: $@");
-diag '  version      : ', (eval { $alien->version } || 'unknown');
+diag '  cflags       : ', $alien->cflags;
+diag '  libs         : ', $alien->libs;
+diag '  dlls         : ', $_ for $alien->dynamic_libs;
+diag '  version      : ', $alien->version;
 
 diag '';
 diag '';

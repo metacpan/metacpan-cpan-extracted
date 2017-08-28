@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2015-12-18 00:00:00 +0000 to present.
+Changes from 2016-08-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2016-12-17 15:15:13 +0000
+version 0.003 at 2017-08-22 06:46:18 +0000
 ------------------------------------------
+
+  Change: cdc78ae2e967c1d346542840a79754580704c59c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-22 09:44:38 +0000
+
+    added order by hash 
+
+  Change: ba5bc3b668772c1dae1ed63757296302bfe6ecd8
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:25:55 +0000
+
+    Merge pull request #3 from QBitFramework/fix_doc
+
+    fix doc 
+
+  Change: d7cf3fb1eab045eba8a8261aeeb03556fdcb611e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:24:31 +0000
+
+    fix doc 
+
+------------------------------------------
+version 0.002 at 2016-12-17 15:15:57 +0000
+------------------------------------------
+
+  Change: 69cec2fbf736ba25e7c69f08d4ed7fcc68c269fe
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:15:57 +0000
+
+    Version 0.002 
 
   Change: a63dd13c4b481c44e3d1c971e827c744b0578b4e
   Author: Igor <igor-sverdlov@mail.ru>

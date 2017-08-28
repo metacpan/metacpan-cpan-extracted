@@ -1,5 +1,9 @@
 Revision history for Redis-RateLimit
 
+1.0002  2017-08-22 23:36:50 PDT
+  - numify rules values for JSON encoding
+  - croak if interval or limit are missing from rules
+
 1.0001  2016-12-14 14:10:06 PST
   - remove dependency on Redis::ScriptCache
 

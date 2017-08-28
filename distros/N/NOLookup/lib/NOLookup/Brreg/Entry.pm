@@ -44,6 +44,7 @@ my @json_data_methods = (
     qw /
        organisasjonsform
        overordnetEnhet
+       maalform
     /,
 
     # BOOL (J/N)
@@ -67,6 +68,7 @@ my @json_data_methods = (
        naeringskode2
        naeringskode3
        links
+       orgform
     /,
 
     # web page, number of employed

@@ -1,4 +1,10 @@
 Revision history for Bible::Reference
 
+1.02      2017-08-21 18:13:34-07:00 America/Los_Angeles
+        - Add as_chapters() and as_runs() methods
+        - Fix as_books() grouping logic (to fix an edge-case bug)
+        - Removed redundant code 'use strict; use warnings;' -- Thank you: Mohammad S Anwar
+        - Add ability to set own Bible data
+
 1.01      2017-08-16 20:27:42-07:00 America/Los_Angeles
         - First version, released on an unsuspecting world.

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Capture::Tiny qw( capture_stdout );
-use Path::Class qw( file );
+use Path::Tiny qw( path );
 
 exit if $ENV{TRAVIS};
 exit if $ENV{APPVEYOR};
@@ -16,4 +16,4 @@ my($out ) = capture_stdout {
   die "failed" unless $? == 0;
 };
 
-file('example', 'default_dist.ini')->spew($out);
+path('example/default_dist.ini')->spew($out);

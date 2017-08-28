@@ -3,8 +3,8 @@
    "author" : [
       "David Farrell"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
@@ -41,10 +41,10 @@
       }
    },
    "provides" : {
-     "stasis" : {
-       "file" : "stasis",
-       "version" : "0.05"
-     }
+      "stasis" : {
+         "file" : "stasis,",
+         "version" : "0.07"
+      }
    },
    "release_status" : "stable",
    "resources" : {
@@ -54,6 +54,6 @@
          "web" : "https://github.com/dnmfarrell/Stasis"
       }
    },
-   "version" : 0.05,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.07,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

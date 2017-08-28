@@ -1,5 +1,8 @@
 Revision history for B-Hooks-Parser
 
+0.06      2017-08-26 20:47:27Z
+  - fix builds on older MSVC (PR#1; thanks, Stephan Loyd!)
+
 0.05      2016-07-13 01:26:33Z
   - release 0.04_01 as stable, with tooling updates.
 

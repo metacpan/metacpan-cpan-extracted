@@ -4,7 +4,7 @@
       "Peter Mayr <pmayr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -40,6 +40,7 @@
       },
       "test" : {
          "requires" : {
+            "Path::Class::Dir" : "0",
             "Pod::Markdown" : "3.003",
             "Test::More" : "0",
             "Test::Pod" : "0",
@@ -50,7 +51,7 @@
    "provides" : {
       "WebService::Europeana" : {
          "file" : "lib/WebService/Europeana.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -65,6 +66,7 @@
          "web" : "https://github.com/hatorikibble/webservice-europeana"
       }
    },
-   "version" : "0.0.2"
+   "version" : "0.0.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

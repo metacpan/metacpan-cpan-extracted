@@ -1,0 +1,24 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Lingua/Awkwords.pm
+lib/Lingua/Awkwords/ListOf.pm
+lib/Lingua/Awkwords/OneOf.pm
+lib/Lingua/Awkwords/Parser.pm
+lib/Lingua/Awkwords/String.pm
+lib/Lingua/Awkwords/Subpattern.pm
+t/00-load.t
+t/10-string.t
+t/11-listof.t
+t/11-subpattern.t
+t/12-oneof.t
+t/50-parser.t
+t/90-awkwords.t
+t/README
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

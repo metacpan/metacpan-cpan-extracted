@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,13 +22,10 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -47,17 +44,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla" : "0",
+            "Dist::Zilla" : "6.00",
             "File::chdir" : "0",
             "Moose" : "0",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0.000060",
             "Test::DZil" : "0",
-            "Test::More" : "0.94",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       }
    },
@@ -66,13 +63,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/Dist-Zilla-Plugin-Alt/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Dist-Zilla-Plugin-Alt",
+      "homepage" : "https://metacpan.org/pod/Dist::Zilla::Plugin::Alt",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/Dist-Zilla-Plugin-Alt.git",
          "web" : "https://github.com/plicease/Dist-Zilla-Plugin-Alt"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

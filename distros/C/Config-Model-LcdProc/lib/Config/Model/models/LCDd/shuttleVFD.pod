@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::shuttleVFD
 # ABSTRACT:  Configuration class LCDd::shuttleVFD
+
 =encoding utf8
 
 =head1 NAME

@@ -1,16 +1,12 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0;
 use ExtUtils::Installed;
 use File::Find;
-use File::ShareDir qw/dist_dir/;
 use Acme::Alien::DontPanic;
 
-plan skip_all => 'only for share install'
+skip_all 'only for share install'
   if Acme::Alien::DontPanic->install_type eq 'system';
 
-plan skip_all => 'dist appears to have been moved'
+skip_all 'dist appears to have been moved'
   if defined Acme::Alien::DontPanic->config('original_prefix')
   && Acme::Alien::DontPanic->config('original_prefix') ne Acme::Alien::DontPanic->dist_dir;
 
@@ -21,15 +17,13 @@ if($^O eq 'MSWin32') {
   %$packlist = map { $_ => undef } map { Win32::GetLongPathName($_) } keys %$packlist;
 }
 
-unless ( defined $packlist ) {
-  plan skip_all => 'Packlist test not valid when Acme::Alien::DontPanic is not fully installed'; 
-}
+skip_all 'Packlist test not valid when Acme::Alien::DontPanic is not fully installed' unless defined $packlist;
 
-my $dir = dist_dir('Acme-Alien-DontPanic');
+my $dir = Acme::Alien::DontPanic->dist_dir;
 
 $dir =~ s{\\}{/}g if $^O eq 'MSWin32';
 
-plan skip_all => 'appears to be a blib install'
+skip_all 'appears to be a blib install'
   if $dir =~ m{/blib/};
 
 my $test = sub {

@@ -2,7 +2,7 @@ NAME
     POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 VERSION
-    Version 0.32
+    Version 0.34
 
 DESCRIPTION
     This module allows one to secure connections of *POE::Wheel::ReadWrite*
@@ -377,25 +377,40 @@ FUNCTIONS
           By default *POE::Filter::SSL* acts as a SSL server. To use it in
           client mode, you have to set this option.
 
-        crt
+        crt{mem}
           The certificate file (.crt) for the server, a client certificate
           in client mode.
 
-        key
+          You are able to pass the already inmemory crt file as scalar via
+          *crtmem*.
+
+        key{mem}
           The key file (.key) of the certificate (see *crt* above).
 
-        cacrt
+          You are able to pass the already inmemory key file as scalar via
+          *keymem*.
+
+        cacrt{mem}
           The ca certificate file (ca.crt), which is used to verificate the
-          client certificates against a CA.
+          client certificates against a CA. You can store multiple ca in one
+          file, all of them gets imported.
+
+          You are able to pass the already inmemory cacrt file as scalar via
+          *cacrtmem* or as an array ref of scalars, if you have multiple ca.
+
+        caverifydepth
+          By default the ca verify depth is 5, you can override this via
+          this option.
 
         chain
-          Chain certificate, you need it for example for startssl.org wich
+          Chain certificate, you need it for example for startssl.org which
           needs a intermedia certificates. Here you can configure it. You
           can generate this the following way:
 
           cat client.crt intermediate.crt ca.crt > chain.pem
 
-          In this case, you normaly have no *key* and *crt* option.
+          In this case, you normalyly have no *key* and *crt* option.
+          Currently it is not possible to pass this inmemory, only by file.
 
         cacrl
           Configures a CRL (ca.crl) against the client certificate is
@@ -417,8 +432,21 @@ FUNCTIONS
           a client certificat.
 
           WARNING: If the client provides an untrusted or no client
-          certficate, the connection is not failing. You have to ask
-          *clientCertValid()* if the certicate is valid!
+          certificate, the connection is not failing. You have to ask
+          *clientCertValid()* if the certificate is valid!
+
+        sni
+          Allows to set the SNI hostname indication in first packet of
+          handshake. See
+          https://de.wikipedia.org/wiki/Server_Name_Indication
+
+        tls
+          Force in the handshake the use of tls, disables support for the
+          obsolete SSL handshake.
+
+        tls1_2
+          Force in the handshake the use of tls in version 1.2, disables
+          support for the obsolete SSL handshake.
 
         nohonor
           By default, as server, *POE::Filter:SSL* sets the option
@@ -447,7 +475,7 @@ FUNCTIONS
           file!
 
     handshakeDone(options)
-        Returns *true* if the handshake is done and all data for hanshake
+        Returns *true* if the handshake is done and all data for handshake
         has been written out. It accepts the following options:
 
         ignorebuf
@@ -509,9 +537,9 @@ FUNCTIONS
         Returns *true* if there is a client certificate, that might be
         untrusted.
 
-        WARNING: If the client provides an untrusted client certficate a
-        client certicate that is listed in CRL, this function returns
-        *true*. You have to ask *clientCertValid()* if the certicate is
+        WARNING: If the client provides an untrusted client certificate a
+        client certificate that is listed in CRL, this function returns
+        *true*. You have to ask *clientCertValid()* if the certificate is
         valid!
 
     errorhandler
@@ -522,7 +550,7 @@ FUNCTIONS
           Do not report any error.
 
         *CODE*
-          Setting errorhandler to a reference of a function allows to be
+          Setting errorhandler to a reference of a function allows one to be
           called it callback function with the following options:
 
           ARG1: POE:SSL::Filter instance
@@ -531,7 +559,7 @@ FUNCTIONS
 
             ret        The return code of Net::SSLeay::connect (client) or Net::SSLeay::accept (server)
             ssl        The SSL context (SSL_CTX)
-            msg        The error message as text, as normaly reported via carp
+            msg        The error message as text, as normally reported via carp
             get_error  The error code of get_error the ssl context
             error      The error code of get_error without context
 
@@ -542,7 +570,7 @@ FUNCTIONS
           Do Carp/confess (stacktrace) on error.
 
         "carponetime"
-          Report carp for one occurence only one time - over all!
+          Report carp for one occurrence only one time - over all!
 
     debug
         Shows debug messages of *clientCertNotOnCRL()*.
@@ -558,6 +586,9 @@ FUNCTIONS
   Internal functions and POE::Filter handler
     VERIFY()
     X509_get_serialNumber()
+    SSL_CTX_set_tmp_dh()
+    SSL_CTX_set_tmp_rsa()
+    SSL_set_tmp_dh()
     clone()
     doSSL()
     get()
@@ -605,12 +636,12 @@ SUPPORT
         <http://search.cpan.org/dist/POE-Filter-SSL>
 
 Commercial support
-    Commercial support can be gained at <sslsupport at priv.de>.
+    Commercial support can be gained at <sslsupport at cryptomagic.eu>.
 
     Used in our products, you can find on <https://www.cryptomagic.eu/>
 
 COPYRIGHT & LICENSE
-    Copyright 2010-2016 Markus Schraeder, CryptoMagic GmbH, all rights
+    Copyright 2010-2017 Markus Schraeder, CryptoMagic GmbH, all rights
     reserved.
 
     This program is free software; you can redistribute it and/or modify it

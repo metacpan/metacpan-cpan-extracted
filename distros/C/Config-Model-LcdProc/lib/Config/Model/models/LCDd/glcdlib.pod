@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::glcdlib
 # ABSTRACT:  Configuration class LCDd::glcdlib
+
 =encoding utf8
 
 =head1 NAME
@@ -16,76 +17,236 @@ generated from LCDd.conf
 
 =head2 Backlight
 
-Backlight if applicable. I<< Optional. Type uniline. default: 'no'.  >> 
+Backlight if applicable. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head2 Brightness
 
-Brightness (in %) if applicable. I<< Optional. Type uniline. default: '50'.  >> 
+Brightness (in %) if applicable. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+50
+
+=back
+
+
 
 =head2 CharEncoding
 
-character encoding to use. I<< Optional. Type uniline. default: 'iso8859-2'.  >> 
+character encoding to use. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+iso8859-2
+
+=back
+
+
 
 =head2 Contrast
 
-Contrast (in %) if applicable. I<< Optional. Type uniline. default: '50'.  >> 
+Contrast (in %) if applicable. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+50
+
+=back
+
+
 
 =head2 Driver
 
 which graphical display supported by graphlcd-base to use 
-(see /etc/graphlcd.conf for possible drivers) I<< Optional. Type uniline. upstream_default: 'image'.  >> 
+(see /etc/graphlcd.conf for possible drivers) I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+image
+
+=back
+
+
 
 =head2 FontFile
 
-path to font file to use. I<< Optional. Type uniline. default: '/usr/share/fonts/corefonts/courbd.ttf'.  >> 
+path to font file to use. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+/usr/share/fonts/corefonts/courbd.ttf
+
+=back
+
+
 
 =head2 Invert
 
-invert light/dark pixels. I<< Optional. Type uniline. default: 'no'.  >> 
+invert light/dark pixels. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head2 MinFontFaceSize
 
-minimum size in pixels in which fonts should be rendered. I<< Optional. Type uniline. default: '7x12'.  >> 
+minimum size in pixels in which fonts should be rendered. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+7x12
+
+=back
+
+
 
 =head2 PixelShiftX
 
-I<< Optional. Type uniline. default: '0'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+0
+
+=back
+
+
 
 =head2 PixelShiftY
 
-I<< Optional. Type uniline. default: '2'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+2
+
+=back
+
+
 
 =head2 ShowBigBorder
 
 border within the usable text area,
 for setting up TextResolution and
 MinFontFaceSize (if using FT2);
-border around the unused area. I<< Optional. Type uniline. default: 'no'.  >> 
+border around the unused area. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head2 ShowDebugFrame
 
-turns on/off 1 pixel thick debugging. I<< Optional. Type uniline. default: 'no'.  >> 
+turns on/off 1 pixel thick debugging. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head2 ShowThinBorder
 
-border around the unused area. I<< Optional. Type uniline. default: 'yes'.  >> 
+border around the unused area. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+yes
+
+=back
+
+
 
 =head2 TextResolution
 
 text resolution in fixed width characters 
 (if it won't fit according to available physical pixel resolution
 and the minimum available font face size in pixels, then
-'DebugBorder' will automatically be turned on) I<< Optional. Type uniline. upstream_default: '16x4'.  >> 
+'DebugBorder' will automatically be turned on) I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+16x4
+
+=back
+
+
 
 =head2 UpsideDown
 
-flip image upside down. I<< Optional. Type uniline. default: 'no'.  >> 
+flip image upside down. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head2 UseFT2
 
 no=use graphlcd bitmap fonts (they have only one size / font file)
 yes=use fonts supported by FreeType2 (needs Freetype2 support in
-libglcdprocdriver and its dependants) I<< Optional. Type uniline. default: 'yes'.  >> 
+libglcdprocdriver and its dependants) I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+yes
+
+=back
+
+
 
 =head1 SEE ALSO
 

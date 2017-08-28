@@ -16,7 +16,7 @@ override 'as_string' => sub {
     push @lines, 'ALTID=' . $self->altID if $self->altID;
     push @lines, 'PID=' . join ',', @{ $self->pid } if $self->pid;
     push @lines, 'LANGUAGE=' . $self->language if $self->language;
-    push @lines, 'SORT-AS=' . $self->sort_as if $self->sort_as;
+    push @lines, 'SORT-AS="' . $self->sort_as . '"' if $self->sort_as;
 
     my @values = map{ $self->_escape($_) } map{ $self->$_ or  $self->content && $self->content()->{$_} } @order;
 

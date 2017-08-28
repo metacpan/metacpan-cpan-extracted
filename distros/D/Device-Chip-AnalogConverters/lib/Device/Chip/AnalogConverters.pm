@@ -1,0 +1,43 @@
+package Device::Chip::AnalogConverters;
+our $VERSION = '0.02';
+
+=head1 NAME
+
+C<Device::Chip::AnalogConverters> - a collection of chip drivers
+
+=head1 DESCRIPTION
+
+This distribution contains a number of L<Device::Chip> drivers for various ADC
+and DAC chips.
+
+=head1 ADCs
+
+=over 2
+
+=item *
+
+L<Device::Chip::ADS1115>
+
+=item *
+
+L<Device::Chip::LTC2400>
+
+=back
+
+=head1 DACs
+
+=over 2
+
+=item *
+
+L<Device::Chip::MCP4725>
+
+=back
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

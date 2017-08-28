@@ -19,7 +19,7 @@ sub write_test_file {
     my $fh;
     my $href = {
         global => [
-            { sample_rule      => "Sample_(\\w+)" },
+            { sample_rule      => "(Sample_\\w+)_read" },
             { root_dir         => 'data/raw' },
             { indir            => '{$self->root_dir}' },
             { outdir           => 'data/processed' },
@@ -65,8 +65,10 @@ sub write_test_file {
     print $fh $yaml;
     close($fh);
 
-    make_path( $test_dir . "/data/raw/Sample_01" );
-    make_path( $test_dir . "/data/raw/Sample_02" );
+    make_path( $test_dir . "/data/raw/Sample_01_read1" );
+    make_path( $test_dir . "/data/raw/Sample_02_read1" );
+    make_path( $test_dir . "/data/raw/Sample_01_read2" );
+    make_path( $test_dir . "/data/raw/Sample_02_read2" );
 }
 
 sub construct_tests {

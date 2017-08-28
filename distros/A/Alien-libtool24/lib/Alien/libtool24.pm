@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: (Deprecated) Built or find libtool 2.4.x
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alien::libtool24 - (Deprecated) Built or find libtool 2.4.x
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

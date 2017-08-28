@@ -231,7 +231,7 @@ CACHED: {
 		$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-gb,en;q=0.5';
 		my $save_to = {
 			directory => $tempdir,
-			ttl => '3600',
+			ttl => 3600,
 			create_table => 1,
 		};
 
@@ -469,6 +469,7 @@ CACHED: {
 			my $b = new_ok('FCGI::Buffer');
 			my $info = new_ok('CGI::Info');
 
+			$save_to->{'ttl'} = 0;
 			$b->init({
 				info => $info,
 				cache => $cache,

@@ -1,0 +1,209 @@
+#!/usr/bin/perl
+
+# Created on: 2017-04-24 08:14:56
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Alt;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use App::BitBucketCli;
+use YAML::Syck qw/LoadFile/;
+
+our $VERSION = 0.001;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+exit main();
+
+sub main {
+    my ($options, $cmd, $opt) = get_options(
+        {
+            name        => 'bb-cli',
+            conf_prefix => '.',
+            helper      => 1,
+            default     => {
+                remote => 'origin',
+                colors => {
+                    aborted  => 'grey18 on_grey0',
+                    disabled => 'grey22',
+                    notbuilt => 'grey12',
+                },
+            },
+            sub_command => {
+                branch    => [
+                    'long|l',
+                    'recipient|R=s',
+                    'verbose|v+',
+                ],
+                projects => [
+                ],
+                repositories => [
+                    'project|p=s',
+                ],
+                repository => [
+                    'project|p=s',
+                    'repository|r=s',
+                ],
+                pull_requests => [
+                    'repository|r=s',
+                    'project|p=s',
+                ],
+            },
+            auto_complete => sub {
+                my ($option, $auto, $errors) = @_;
+                my $sub_command = $option->cmd;
+                if ( $sub_command eq '--' ) {
+                    warn '--';
+                }
+            },
+        },
+        [
+            'colors|c=s%',
+            'force|f!',
+            'host|h=s',
+            'long|l',
+            'out|o=s',
+            'password|P=s',
+            'project|p=s',
+            'remote|m=s',
+            'repository|r=s',
+            'regexp|R',
+            'sleep|s=i',
+            'test|T!',
+            'username|U=s',
+            'verbose|v+',
+        ],
+    );
+
+    $options = set_defaults($options);
+
+    # do stuff here
+    my $bbs = App::BitBucketCli->new(
+        host => $options->{host},
+        user => $options->{username},
+        pass => $options->{password},
+        opt  => $options,
+    );
+
+    return $bbs->$cmd(@ARGV) || 0;
+}
+
+sub set_defaults {
+    my ($opt) = @_;
+    my $config = eval { LoadFile($ENV{HOME} . '/.bb-cli.yml') } || {};
+
+    $opt->{host}     ||= $config->{host};
+    $opt->{username} ||= $config->{user};
+    $opt->{password} ||= $config->{pass};
+
+    my $top = `git rev-parse --show-toplevel 2> /dev/null`;
+    chomp $top;
+
+    if ($top) {
+        # find other information about repository
+        my @remotes = `git remote -v`;
+        # Eg
+        # origin  ssh://git@stash.example.com:45222/lux/lux.git (fetch)
+        # origin  ssh://git@stash.example.com:45222/lux/lux.git (push)
+        #
+        # ssh://git@stash.example.com:45222/lux/lux.git
+        # https://joe.blogs@stash.example.com/scm/lux/lux.git
+
+        for my $remote (@remotes) {
+            my ($name, $url, $type) = $remote =~ /^(\S+)\s+(.*?)\s+[(](\w+)[)]$/;
+            next if $name ne $opt->{remote};
+
+            if ( $url =~ /^http/ ) {
+                my ($protocol, $user, $host, $project, $repo) = $url =~ m{^(https?)://(?:([^@]+)[@])?([\w.]+)(?:[:]\d+)?/scm/(\w+)/(\w+)};
+                #warn "$url\n$protocol $user $host $project $repo\n";
+                if ( $config->{$host} ) {
+                    $opt = { %$opt, %{ $config->{$host} } };
+                }
+
+                $opt->{host}     ||= $host;
+                $opt->{username} ||= $user;
+                $opt->{project}  ||= $project;
+                $opt->{repo}     ||= $repo;
+            }
+            elsif ( $url =~ /^ssh/ ) {
+                # ssh://git@stash.optusnet.com.au:45222/lux/lux.git
+                my ($protocol, $host, $port, $project, $repo) = $url =~ m{^(ssh)://(?:[^@]+@)?([^:/]+)(?:[:](\d+))?/([^/]+)/(.*?)[.]git$};
+                #warn "$url\n$protocol $host $port $project $repo\n";
+                if ( $config->{$host} ) {
+                    $opt = { %$opt, %{ $config->{$host} } };
+                }
+
+                $opt->{host}    ||= $host;
+                $opt->{project} ||= $project;
+                $opt->{repo}    ||= $repo;
+            }
+        }
+
+    }
+
+    return $opt;
+}
+
+__DATA__
+
+=head1 NAME
+
+bb-cli - Command line tool for communicating with BitBucket Server
+
+=head1 VERSION
+
+0his documentation refers to bb-cli version 0.001
+
+=head1 SYNOPSIS
+
+   bb-cli [option]
+
+ OPTIONS:
+  -o --other         other option
+
+  -v --verbose       Show more detailed option
+     --version       Prints the version information
+     --help          Prints this help information
+     --man           Prints the full documentation for bb-cli
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2017 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

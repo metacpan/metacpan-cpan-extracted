@@ -5,7 +5,7 @@ use Moose;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %actions);
-    $VERSION     = '0.01';
+    $VERSION     = '0.05';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -13,7 +13,7 @@ BEGIN {
 };
 
     %actions = (	"query" => "/ers/config/identitygroup/",
-			"create" => "/ers/config/identitygroup/",
+                    "create" => "/ers/config/identitygroup/",
                		"update" => "/ers/config/identitygroup/",
                 	"getById" => "/ers/config/identitygroup/",
            ); 

@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -48,7 +48,7 @@
    "provides" : {
       "Test::Excel" : {
          "file" : "lib/Test/Excel.pm",
-         "version" : "1.39"
+         "version" : "1.40"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/manwar/Test-Excel"
       }
    },
-   "version" : "1.39",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.40",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.11';    # VERSION
 
 # ABSTRACT: XGBoost class for data
 
 use Moose;
 use AI::XGBoost::CAPI qw(:all);
 use Carp;
+use namespace::autoclean;
 
 has handle => ( is => 'ro', );
 
@@ -45,16 +46,50 @@ sub set_float_info {
     return $self;
 }
 
+sub set_float_info_pdl {
+    my $self = shift();
+    my ( $field, $info ) = @_;
+    XGDMatrixSetFloatInfo( $self->handle, $field, $info->flat()->unpdl() );
+    return $self;
+}
+
 sub get_float_info {
     my $self  = shift();
     my $field = shift();
     XGDMatrixGetFloatInfo( $self->handle, $field );
 }
 
+sub set_uint_info {
+    my $self = shift();
+    my ( $field, $info ) = @_;
+    XGDMatrixSetUintInfo( $self->handle, $field, $info );
+    return $self;
+}
+
+sub get_uint_info {
+    my $self  = shift();
+    my $field = shift();
+    XGDMatrixGetUintInfo( $self->handle, $field );
+}
+
+sub save_binary {
+    my $self = shift();
+    my ( $filename, $silent ) = @_;
+    $silent //= 1;
+    XGDMatrixSaveBinary( $self->handle, $filename, $silent );
+    return $self;
+}
+
 sub set_label {
     my $self  = shift();
     my $label = shift();
     $self->set_float_info( 'label', $label );
+}
+
+sub set_label_pdl {
+    my $self  = shift();
+    my $label = shift();
+    $self->set_float_info_pdl( 'label', $label->flat()->unpdl() );
 }
 
 sub get_label {
@@ -69,9 +104,35 @@ sub set_weight {
     return $self;
 }
 
+sub set_weight_pdl {
+    my $self   = shift();
+    my $weight = shift();
+    $self->set_float_info( 'weight', $weight->flat()->unpdl() );
+    return $self;
+}
+
 sub get_weight {
     my $self = shift();
     $self->get_float_info('weight');
+}
+
+sub set_base_margin {
+    my $self   = shift();
+    my $margin = shift();
+    $self->set_float_info( 'base_margin', $margin );
+    return $self;
+}
+
+sub get_base_margin {
+    my $self = shift();
+    $self->get_float_info('base_margin');
+}
+
+sub set_group {
+    my $self  = shift();
+    my $group = shift();
+    XGDMatrixSetGroup( $self->handle, $group );
+    return $self;
 }
 
 sub num_row {
@@ -89,10 +150,19 @@ sub dims {
     return ( $self->num_row(), $self->num_col() );
 }
 
+sub slice {
+    my $self              = shift;
+    my ($list_of_indices) = @_;
+    my $handle            = XGDMatrixSliceDMatrix( $self->handle(), $list_of_indices );
+    return __PACKAGE__->new( handle => $handle );
+}
+
 sub DEMOLISH {
     my $self = shift();
     XGDMatrixFree( $self->handle );
 }
+
+__PACKAGE__->meta->make_immutable();
 
 1;
 
@@ -108,7 +178,7 @@ AI::XGBoost::DMatrix - XGBoost class for data
 
 =head1 VERSION
 
-version 0.008
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -188,6 +258,24 @@ array with the information
 
 =back
 
+=head2 set_float_info_pdl
+
+Set float type property
+
+=head3 Parameters
+
+=over 4
+
+=item field
+
+Field name of the information
+
+=item info
+
+Piddle with the information
+
+=back
+
 =head2 get_float_info
 
 Get float type property
@@ -202,6 +290,58 @@ Field name of the information
 
 =back
 
+=head2 set_uint_info
+
+Set uint type property
+
+=head3 Parameters
+
+=over 4
+
+=item field
+
+Field name of the information
+
+=item info
+
+array with the information
+
+=back
+
+=head2 get_uint_info
+
+Get uint type property
+
+=head3 Parameters
+
+=over 4
+
+=item field
+
+Field name of the information
+
+=back
+
+=head2 save_binary
+
+Save DMatrix object as a binary file.
+
+This file should be used with L<FromFile>
+
+=head3 Parameters
+
+=over 4
+
+=item filename
+
+Filename and path
+
+=item silent
+
+Don't show information messages, optional, default 1
+
+=back
+
 =head2 set_label
 
 Set label of DMatrix. This label is the "classes" in classification problems
@@ -213,6 +353,20 @@ Set label of DMatrix. This label is the "classes" in classification problems
 =item data
 
 Array with the labels
+
+=back
+
+=head2 set_label_pdl
+
+Set label of DMatrix. This label is the "classes" in classification problems
+
+=head3 Parameters
+
+=over 4
+
+=item data
+
+Piddle with the labels
 
 =back
 
@@ -234,9 +388,55 @@ Array with the weights
 
 =back
 
+=head2 set_weight_pdl
+
+Set weight of each instance
+
+=head3 Parameters
+
+=over 4
+
+=item weight
+
+pdl with the weights
+
+=back
+
 =head2 get_weight
 
 Get the weight of each instance
+
+=head2 set_base_margin
+
+Set base margin of booster to start from
+
+=head3 Parameters
+
+=over 4
+
+=item margin
+
+Array with the margins
+
+=back
+
+=head2 get_base_margin
+
+Get the base margin
+
+=head2 set_group
+
+Set group size
+
+=head3 Parameters
+
+=over 4
+
+=item group
+
+Array with the size of each group
+
+=back
 
 =head2 num_row
 
@@ -250,9 +450,26 @@ Number of columns
 
 Dimensions of the matrix. That is: rows, columns
 
+=head2 slice
+
+Slice the DMatrix and return a new DMatrix tha only contains
+the list of indices
+
+=head3 Parameters
+
+=over 4
+
+=item list_of_indices
+
+Reference to an array of indices
+
+=back
+
 =head2 DEMOLISH
 
-Free the
+Free the DMatrix
+
+This method gets called automatically
 
 =head1 AUTHOR
 
@@ -260,10 +477,6 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
-
-This is free software, licensed under:
-
-  The Apache License, Version 2.0, January 2004
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 =cut

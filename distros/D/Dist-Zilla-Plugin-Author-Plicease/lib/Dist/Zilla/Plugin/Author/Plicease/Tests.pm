@@ -1,178 +1,182 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests;
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.22 {
 
-use 5.008001;
-use Moose;
-use File::chdir;
-use File::Path qw( make_path );
-use Path::Class qw( dir );
-use Sub::Exporter::ForMethods qw( method_installer );
-use Data::Section { installer => method_installer }, -setup;
-use Dist::Zilla::MintingProfile::Author::Plicease;
+  use 5.014;
+  use Moose;
+  use File::chdir;
+  use File::Path qw( make_path );
+  use Path::Tiny qw( path );
+  use Sub::Exporter::ForMethods qw( method_installer );
+  use Data::Section { installer => method_installer }, -setup;
+  use Dist::Zilla::MintingProfile::Author::Plicease;
 
-# ABSTRACT: add author only release tests to xt/release
-our $VERSION = '2.21'; # VERSION
+  # ABSTRACT: add author only release tests to xt/release
 
 
-with 'Dist::Zilla::Role::FileGatherer';
-with 'Dist::Zilla::Role::BeforeBuild';
-with 'Dist::Zilla::Role::InstallTool';
-with 'Dist::Zilla::Role::TestRunner';
+  with 'Dist::Zilla::Role::FileGatherer';
+  with 'Dist::Zilla::Role::BeforeBuild';
+  with 'Dist::Zilla::Role::InstallTool';
+  with 'Dist::Zilla::Role::TestRunner';
 
-sub mvp_multivalue_args { qw( diag diag_preamble ) }
-
-has source => (
-  is      =>'ro',
-  isa     => 'Str',
-);
-
-has diag => (
-  is      => 'ro',
-  default => sub { [] },
-);
-
-has diag_preamble => (
-  is      => 'ro',
-  default => sub { [] },
-);
-
-has _diag_content => (
-  is      => 'rw',
-  isa     => 'Str',
-  default => '',
-);
-
-has test2_v0 => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0,
-);
-
-sub gather_files
-{
-  my($self) = @_;
+  sub mvp_multivalue_args { qw( diag diag_preamble ) }
   
-  require Dist::Zilla::File::InMemory;
-
-  $self->add_file(
-    Dist::Zilla::File::InMemory->new(
-      name    => $_,
-      content => ${ $self->section_data($_) },
-    )
-  ) for qw( xt/author/strict.t
-            xt/author/eol.t
-            xt/author/pod.t
-            xt/author/no_tabs.t
-            xt/author/pod_coverage.t
-            xt/author/pod_spelling_common.t
-            xt/author/pod_spelling_system.t
-            xt/author/version.t
-            xt/release/changes.t
-            xt/release/fixme.t );
-}
-
-sub before_build
-{
-  my($self) = @_;
-
-  my $source = defined $self->source
-  ? dir($self->zilla->root)->subdir($self->source)
-  : dir(Dist::Zilla::MintingProfile::Author::Plicease->profile_dir)->subdir(qw( default skel xt release ));
-
-  my $diag = dir($self->zilla->root)->file(qw( t 00_diag.t ));
-  my $content = $source->parent->parent->file('t', $self->test2_v0 ? '00_xdiag.t' : '00_diag.t' )->absolute->slurp;
-  $content =~ s{## PREAMBLE ##}{join "\n", map { s/^\| //; $_ } @{ $self->diag_preamble }}e;
-  $self->_diag_content($content);
-}
-
-# not really an installer, but we have to create a list
-# of the prereqs / suggested modules after the prereqs
-# have been calculated
-sub setup_installer
-{
-  my($self) = @_;
+  has source => (
+    is      =>'ro',
+    isa     => 'Str',
+  );
   
-  my %list;
-  my $prereqs = $self->zilla->prereqs->as_string_hash;
-  foreach my $phase (keys %$prereqs)
+  has diag => (
+    is      => 'ro',
+    default => sub { [] },
+  );
+  
+  has diag_preamble => (
+    is      => 'ro',
+    default => sub { [] },
+  );
+  
+  has _diag_content => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => '',
+  );
+  
+  has test2_v0 => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 0,
+  );
+  
+  sub gather_files
   {
-    next if $phase eq 'develop';
-    foreach my $type (keys %{ $prereqs->{$phase} })
+    my($self) = @_;
+    
+    require Dist::Zilla::File::InMemory;
+  
+    $self->add_file(
+      Dist::Zilla::File::InMemory->new(
+        name    => $_,
+        content => ${ $self->section_data($_) },
+      )
+    ) for qw( xt/author/strict.t
+              xt/author/eol.t
+              xt/author/pod.t
+              xt/author/no_tabs.t
+              xt/author/pod_coverage.t
+              xt/author/pod_spelling_common.t
+              xt/author/pod_spelling_system.t
+              xt/author/version.t
+              xt/release/changes.t
+              xt/release/fixme.t );
+  }
+  
+  sub before_build
+  {
+    my($self) = @_;
+  
+    my $source = defined $self->source
+    ? $self->zilla->root->child($self->source)
+    : Dist::Zilla::MintingProfile::Author::Plicease->profile_dir->child("default/skel/xt/release");
+  
+    my $diag = $self->zilla->root->child("t/00_diag.t");
+    my $content = $source->parent->parent->child('t', $self->test2_v0 ? '00_xdiag.t' : '00_diag.t' )->absolute->slurp;
+    $content =~ s{## PREAMBLE ##}{join "\n", map { s/^\| //; $_ } @{ $self->diag_preamble }}e;
+    $self->_diag_content($content);
+  }
+  
+  # not really an installer, but we have to create a list
+  # of the prereqs / suggested modules after the prereqs
+  # have been calculated
+  sub setup_installer
+  {
+    my($self) = @_;
+    
+    my %list;
+    my $prereqs = $self->zilla->prereqs->as_string_hash;
+    foreach my $phase (keys %$prereqs)
     {
-      foreach my $module (keys %{ $prereqs->{$phase}->{$type} })
+      next if $phase eq 'develop';
+      foreach my $type (keys %{ $prereqs->{$phase} })
       {
-        next if $module =~ /^(perl|strict|warnings|base)$/;
-        $list{$module}++;
+        foreach my $module (keys %{ $prereqs->{$phase}->{$type} })
+        {
+          next if $module =~ /^(perl|strict|warnings|base)$/;
+          $list{$module}++;
+        }
       }
     }
-  }
-  
-  if($list{'JSON::MaybeXS'})
-  {
-    $list{'JSON::PP'}++;
-    $list{'JSON::XS'}++;
-  }
-  
-  if(my($alien) = grep { $_->isa('Dist::Zilla::Plugin::Alien') } @{ $self->zilla->plugins })
-  {
-    $list{$_}++ foreach keys %{ $alien->module_build_args->{alien_bin_requires} };
-  }
-  
-  foreach my $lib (@{ $self->diag })
-  {
-    if($lib =~ /^-(.*)$/)
+    
+    if($list{'JSON::MaybeXS'})
     {
-      delete $list{$1};
+      $list{'JSON::PP'}++;
+      $list{'JSON::XS'}++;
     }
-    elsif($lib =~ /^\+(.*)$/)
+    
+    if(my($alien) = grep { $_->isa('Dist::Zilla::Plugin::Alien') } @{ $self->zilla->plugins })
     {
-      $list{$1}++;
+      $list{$_}++ foreach keys %{ $alien->module_build_args->{alien_bin_requires} };
+    }
+    
+    foreach my $lib (@{ $self->diag })
+    {
+      if($lib =~ /^-(.*)$/)
+      {
+        delete $list{$1};
+      }
+      elsif($lib =~ /^\+(.*)$/)
+      {
+        $list{$1}++;
+      }
+      else
+      {
+        $self->log_fatal('diagnostic override must be prefixed with + or -');
+      }
+    }
+  
+    my $code = '';
+    
+    $code = "BEGIN { eval q{ use EV; } }\n" if $list{EV};
+    $code .= '$modules{$_} = $_ for qw(' . "\n";
+    $code .= join "\n", map { "  $_" } sort keys %list;
+    $code .= "\n);\n";
+    $code .= "eval q{ require Test::Tester; };" if $list{'Test::Builder'} && $list{'Test::Tester'};
+    
+    my($file) = grep { $_->name eq 't/00_diag.t' } @{ $self->zilla->files };
+  
+    my $content = $self->_diag_content;
+    $content =~ s{## GENERATE ##}{$code};
+  
+    if($file)
+    {
+      $file->content($content);
     }
     else
     {
-      $self->log_fatal('diagnostic override must be prefixed with + or -');
+      $file = Dist::Zilla::File::InMemory->new({
+        name => 't/00_diag.t',
+        content => $content
+      });
+      $self->add_file($file);
     }
+  
+    my $diag = $self->zilla->root->file(qw( t 00_diag.t ));
+    $diag->spew($content);
   }
   
-  my $code = '';
-  
-  $code = "BEGIN { eval q{ use EV; } }\n" if $list{EV};
-  $code .= '$modules{$_} = $_ for qw(' . "\n";
-  $code .= join "\n", map { "  $_" } sort keys %list;
-  $code .= "\n);\n";
-  $code .= "eval q{ require Test::Tester; };" if $list{'Test::Builder'} && $list{'Test::Tester'};
-  
-  my($file) = grep { $_->name eq 't/00_diag.t' } @{ $self->zilla->files };
-
-  my $content = $self->_diag_content;
-  $content =~ s{## GENERATE ##}{$code};
-
-  if($file)
+  sub test
   {
-    $file->content($content);
+    my($self, $target) = @_;
+    system 'prove', '-br', 'xt';
+    $self->log_fatal('release test failure') unless $? == 0;
   }
-  else
-  {
-    $file = Dist::Zilla::File::InMemory->new({
-      name => 't/00_diag.t',
-      content => $content
-    });
-    $self->add_file($file);
-  }
+  
+  __PACKAGE__->meta->make_immutable;
 
-  my $diag = dir($self->zilla->root)->file(qw( t 00_diag.t ));
-  $diag->spew($content);
 }
-
-sub test
-{
-  my($self, $target) = @_;
-  system 'prove', '-br', 'xt';
-  $self->log_fatal('release test failure') unless $? == 0;
-}
-
-__PACKAGE__->meta->make_immutable;
 
 1;
+
+
+package Dist::Zilla::Plugin::Author::Plicease::Tests;
 
 =pod
 
@@ -184,7 +188,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.21
+version 2.22
 
 =head1 SYNOPSIS
 
@@ -211,7 +215,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

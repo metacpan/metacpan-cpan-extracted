@@ -18,12 +18,12 @@ my $master_data = {
 
 plan tests => 27;
 
-my $aaa = YASF->new('{a}{a}{a}', binding => $master_data);
-my $baa = YASF->new('{b}{a}{a}', binding => $master_data);
-my $bbb = YASF->new('{b}{b}{b}', binding => $master_data);
-my $ccc = YASF->new('{c}{c}{c}', binding => $master_data);
-my $aba = YASF->new('{a}{b}{a}', binding => $master_data);
-my $aca = YASF->new('{a}{c}{a}', binding => $master_data);
+my $aaa = YASF->new('{a}{a}{a}', bindings => $master_data);
+my $baa = YASF->new('{b}{a}{a}', bindings => $master_data);
+my $bbb = YASF->new('{b}{b}{b}', bindings => $master_data);
+my $ccc = YASF->new('{c}{c}{c}', bindings => $master_data);
+my $aba = YASF->new('{a}{b}{a}', bindings => $master_data);
+my $aca = YASF->new('{a}{c}{a}', bindings => $master_data);
 
 # ne
 ok($aaa ne 'a',  'ne - obj on lhs');

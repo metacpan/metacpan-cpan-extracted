@@ -396,7 +396,7 @@ sub _read_headers ( $args, $runtime, $cb ) {
                 # fill response object with HTTP response headers data
                 $runtime->{res}->{headers} = $res->{headers};
 
-                $runtime->{res}->set_version("1.$res->{minor_version}");
+                $runtime->{res}->{version} = "1.$res->{minor_version}";
 
                 $runtime->{res}->set_status( $res->{status}, $res->{reason} );
             }
@@ -491,7 +491,7 @@ sub _read_body ( $args, $runtime, $cb ) {
         # "on_progress", "on_body" callbacks are ignored (not called)
         my $body = q[];
 
-        $runtime->{res}->set_body( \$body );
+        $runtime->{res}->{body} = \$body;
 
         $on_read = sub ( $h, $content_ref, $total_bytes_readed, $error_reason ) {
             state $total_decoded_bytes_readed = 0;
@@ -584,7 +584,7 @@ sub _read_body ( $args, $runtime, $cb ) {
     else {
         my $body = q[];
 
-        $runtime->{res}->set_body( \$body );
+        $runtime->{res}->{body} = \$body;
 
         $on_read = sub ( $h, $content_ref, $total_bytes_readed, $error_reason ) {
             state $total_decoded_bytes_readed = 0;
@@ -620,7 +620,7 @@ sub _read_body ( $args, $runtime, $cb ) {
                         if ( !$body_is_fh ) {
                             $body_is_fh = 1;
 
-                            $runtime->{res}->set_body( P->file->tempfile );
+                            $runtime->{res}->{body} = P->file->tempfile;
 
                             if ( length $body ) {
                                 syswrite $runtime->{res}->body, $body or die;

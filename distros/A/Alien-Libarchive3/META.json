@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,15 +16,18 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
-            "Alien::Build::MM" : "0.32",
+            "Alien::Build" : "0.71",
+            "Alien::Build::MM" : "0.40",
+            "Config" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.32",
-            "Alien::Build::MM" : "0.32",
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.71",
+            "Alien::Build::Plugin::Build::SearchDep" : "0.35",
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
@@ -49,14 +52,14 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.038",
+            "Path::Tiny" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
-            "Test::More" : "0.94",
             "perl" : "5.006"
          }
       }
@@ -73,7 +76,31 @@
          "web" : "https://github.com/plicease/Alien-Libarchive3"
       }
    },
-   "version" : "0.28",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.29",
+   "x_alienfile" : {
+      "dzil_plugin" : "0.22",
+      "requires" : {
+         "share" : {
+            "Alien::LZO" : "0",
+            "Alien::Libbz2" : "0",
+            "Alien::Libxml2" : "0",
+            "Alien::Nettle" : "0",
+            "Alien::xz" : "0",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "Env::ShellWords" : "0.01",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {
+            "Config" : "0"
+         }
+      }
+   },
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

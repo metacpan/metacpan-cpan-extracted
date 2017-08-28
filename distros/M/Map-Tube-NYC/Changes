@@ -1,5 +1,8 @@
 Revision history for Map::Tube::NYC
 
+0.42  Wed Aug 23 12:00:00 2017
+      - Upgraded to use Map::Tube v3.34.
+
 0.41  Mon Jul 17 11:00:00 2017
       - Upgraded to use Map::Tube v3.32.
 

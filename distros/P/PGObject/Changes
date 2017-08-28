@@ -1,5 +1,10 @@
 Revision history for PGObject
 
+2.0.2	2017-08-25
+	Code cleanup
+	Test case improvements
+	Reduced warnings in test cases in some cases
+
 2.0.1	2017-05-24
 	Fixing undeclared dependency in makefile
 

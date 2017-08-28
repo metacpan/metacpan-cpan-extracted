@@ -1,7 +1,10 @@
 package BioX::Workflow::Command::run::Utils::WriteMeta;
 
 use MooseX::App::Role;
+use namespace::autoclean;
+
 use YAML;
+use File::Slurp;
 
 =head1 BioX::Workflow::Command::run::Utils::WriteMeta;
 
@@ -41,30 +44,32 @@ option 'verbose' => (
 
 =cut
 
+=head3 print_opts
+
+Get the command line opts and config data - print those to cached workflow and
+our workflow file.
+
+=cut
+
 sub print_opts {
     my $self = shift;
+
+    my $cmd_opts    = $self->print_cmd_line_opts;
+    my $config_data = $self->print_config_data;
+
+    write_file( $self->cached_workflow, $cmd_opts );
+    write_file( $self->cached_workflow, { append => 1 }, $config_data );
+    write_file(
+        $self->cached_workflow,
+        { append => 1 },
+        Dump( $self->workflow_data )
+    );
 
     my $now = DateTime->now();
     $self->fh->say("#!/usr/bin/env bash\n\n");
 
-    $self->fh->say("$self->{comment_char}");
-    $self->fh->say("$self->{comment_char} Generated at: $now");
-    $self->fh->say(
-"$self->{comment_char} This file was generated with the following options"
-    );
-
-    $self->fh->print( "$self->{comment_char}\t" . $ARGV[0] . "\n" ) if $ARGV[0];
-    for ( my $x = 1 ; $x <= $#ARGV ; $x++ ) {
-        next unless $ARGV[$x];
-        $self->fh->print("$self->{comment_char}\t$ARGV[$x]\t");
-        if ( $ARGV[ $x + 1 ] ) {
-            $self->fh->print( $ARGV[ $x + 1 ] );
-        }
-        $self->fh->print("\n");
-        $x++;
-    }
-
-    $self->fh->say("$self->{comment_char}\n");
+    $self->fh->print($cmd_opts);
+    $self->fh->say($config_data);
 }
 
 =head3 write_workflow_meta
@@ -89,6 +94,13 @@ sub write_workflow_meta_start {
     $self->fh->say("$self->{comment_char} Starting Workflow\n");
     $self->fh->say("$self->{comment_char}");
     $self->fh->say("$self->{comment_char}");
+
+    $self->fh->say("$self->{comment_char} Samples:");
+    $self->fh->say(
+        "$self->{comment_char} \t" . join( ', ', @{ $self->samples } ) );
+    $self->fh->say("$self->{comment_char}");
+    $self->fh->say("$self->{comment_char}");
+
     $self->fh->say("$self->{comment_char} Global Variables:");
 
     foreach my $k ( $self->all_global_keys ) {
@@ -208,7 +220,7 @@ sub trim {
 sub write_hpc_meta {
     my $self = shift;
 
-    ##TODO Fetch Global HPC
+    ##TODO Fix this for mixed data types
 
     $self->local_attr->add_before_meta( ' ### HPC Directives' . "\n" );
     if ( ref( $self->local_attr->HPC ) eq 'HASH' ) {
@@ -217,6 +229,7 @@ sub write_hpc_meta {
     elsif ( ref( $self->local_attr->HPC ) eq 'ARRAY' ) {
         $self->write_hpc_array_meta;
     }
+
 }
 
 =head3 write_hpc_hash_meta
@@ -260,29 +273,15 @@ sub write_hpc_array_meta {
 
     my %lookup = ();
 
-    %lookup = %{$self->iter_hpc_array($self->global_attr->HPC, \%lookup)};
-    %lookup = %{$self->iter_hpc_array($self->local_attr->HPC, \%lookup)};
-    ##TODO add in global hpc meta
-    # foreach my $href ( @{ $self->global_attr->HPC } ) {
-    #     if ( ref($href) eq 'HASH' ) {
-    #         my @keys = keys %{$href};
-    #         map { $lookup{$_} = $href->{$_} } @keys;
-    #     }
-    #     else {
-    #         $self->warn_hpc_meta;
-    #         return;
-    #     }
-    # }
-    # foreach my $href ( @{ $self->local_attr->HPC } ) {
-    #     if ( ref($href) eq 'HASH' ) {
-    #         my @keys = keys %{$href};
-    #         map { $lookup{$_} = $href->{$_} } @keys;
-    #     }
-    #     else {
-    #         $self->warn_hpc_meta;
-    #         return;
-    #     }
-    # }
+    if ( ref( $self->global_attr->HPC ) eq 'ARRAY' ) {
+        %lookup =
+          %{ $self->iter_hpc_array( $self->global_attr->HPC, \%lookup ) };
+    }
+    elsif ( ref( $self->global_attr->HPC ) eq 'HASH' ) {
+        %lookup = %{ $self->global_attr->HPC };
+    }
+
+    %lookup = %{ $self->iter_hpc_array( $self->local_attr->HPC, \%lookup ) };
 
     if ( !exists $lookup{jobname} ) {
         $self->local_attr->add_before_meta(
@@ -310,7 +309,7 @@ sub iter_hpc_array {
     my $aref   = shift;
     my $lookup = shift;
 
-    foreach my $href ( @{ $aref } ) {
+    foreach my $href ( @{$aref} ) {
         if ( ref($href) eq 'HASH' ) {
             my @keys = keys %{$href};
             map { $lookup->{$_} = $href->{$_} } @keys;

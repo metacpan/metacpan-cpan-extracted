@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use MYDan::Multicast;
+use File::Basename;
+use MYDan::Util::OptConf;
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 --to 127.0.0.1:2000 --file /data/path \ 
+    [--repeat] number
+    [--iface] eth0 [--ttl] number [--buffer] number \
+    [--name] filename \
+    [--verbose]
+    [--knock] number
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->set( ttl => 255, repeat => 5, buffer => 8, knock => 6 )
+               ->get( qw( to=s file=s iface=s repeat=i ttl=i buffer=i name=s verbose ) )->dump();
+
+$option->assert( qw( to file ) );
+$MYDan::Multicast::VERBOSE = $o{verbose};
+
+my $name = $o{name} || basename $o{file};
+#my $cluster = Node->new( $option->dump( 'range' ) );
+
+#for( $o{group} =~ /:/ ? $o{group} : $cluster->load( "{==multicast==$o{group}??==*}" )->list )
+for( $o{to} )
+{
+    warn "to: $_\n" if $o{verbose};
+    MYDan::Multicast 
+       ->new( send => $_, iface => $o{iface} )
+       ->send
+       ( 
+           $o{file},
+           name => $name,
+           map{ $_ => $o{$_} }qw( ttl repeat buffer knock )
+       );
+}

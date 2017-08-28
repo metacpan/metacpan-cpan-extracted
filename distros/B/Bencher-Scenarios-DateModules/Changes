@@ -1,3 +1,15 @@
+0.004   2017-08-27 (PERLANCAR)
+
+	- Add scenario: DateModules::DurationCreation.
+
+
+0.003   2017-08-27 (PERLANCAR)
+
+	- Add participant: DateTime::Tiny.
+
+	- Add scenarios: DateModules::Storage, DateModules::Overhead.
+
+
 0.002   2017-01-25 (PERLANCAR)
 
 	- No functional changes.

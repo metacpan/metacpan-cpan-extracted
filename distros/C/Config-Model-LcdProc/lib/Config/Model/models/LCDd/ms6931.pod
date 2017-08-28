@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::ms6931
 # ABSTRACT:  Configuration class LCDd::ms6931
+
 =encoding utf8
 
 =head1 NAME
@@ -16,11 +17,31 @@ generated from LCDd.conf
 
 =head2 Device
 
-device to use I<< Optional. Type uniline. upstream_default: '/dev/ttyS1'.  >> 
+device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/ttyS1
+
+=back
+
+
 
 =head2 Size
 
-display size I<< Optional. Type uniline. upstream_default: '16x2'.  >> 
+display size I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+16x2
+
+=back
+
+
 
 =head1 SEE ALSO
 

@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::lb216
 # ABSTRACT:  Configuration class LCDd::lb216
+
 =encoding utf8
 
 =head1 NAME
@@ -16,19 +17,59 @@ generated from LCDd.conf
 
 =head2 Brightness
 
-Set the initial brightness I<< Optional. Type integer. upstream_default: '255'.  >> 
+Set the initial brightness I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+255
+
+=back
+
+
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Reboot
 
-Reinitialize the LCD's BIOS I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Reinitialize the LCD's BIOS I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Speed
 
-Set the communication speed I<< Optional. Type enum. choice: '2400', '9600'. upstream_default: '9600'.  >> 
+Set the communication speed I< Optional. Type enum. choice: '2400', '9600'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+9600
+
+=back
+
+
 
 =head1 SEE ALSO
 

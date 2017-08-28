@@ -1,3 +1,57 @@
+libdr-datetime-perl (1.00) nowtaxi; urgency=medium
+
+  * The module is JSON::XS compatible.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 23 Aug 2017 12:41:05 +0300
+
+libdr-datetime-perl (0.09) nowtaxi; urgency=medium
+
+  * Drop debug warnings.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 23 Aug 2017 10:30:10 +0300
+
+libdr-datetime-perl (0.08) nowtaxi; urgency=medium
+
+  * Overload '+', '-' operations. 
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 21:42:20 +0300
+
+libdr-datetime-perl (0.07) nowtaxi; urgency=medium
+
+  * Overload cmp, <=> with numeric and string work properly.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 18:45:21 +0300
+
+libdr-datetime-perl (0.06) nowtaxi; urgency=medium
+
+  * Method 'parse' allows timestamp (uses +0000 zone).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 12:42:01 +0300
+
+libdr-datetime-perl (0.05) nowtaxi; urgency=medium
+
+  * Update depends list.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 12:08:46 +0300
+
+libdr-datetime-perl (0.04) nowtaxi; urgency=medium
+
+  * Nanosecond is an optional field.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 10:27:21 +0300
+
+libdr-datetime-perl (0.03) nowtaxi; urgency=medium
+
+  * Add set_time_zone method.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 18 Aug 2017 15:26:16 +0300
+
+libdr-datetime-perl (0.02) nowtaxi; urgency=medium
+
+  * Add overload methods.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 18 Aug 2017 14:30:45 +0300
+
 libdr-datetime-perl (0.01) nowtaxi; urgency=low
 
   * Init debian package.

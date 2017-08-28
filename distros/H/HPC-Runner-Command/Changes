@@ -1,5 +1,13 @@
 Revision history for HPC-Runner-Command
 
+3.2.10  2017-08-28 09:33:43 GST
+	- Rolling back JSON::Logger features for now - problematic on some filesystems
+	- Rolling back memory profiling - requires JSON::Logger
+
+3.2.9  2017-08-25 05:16:44 GST
+	- Additional fixes for JSON logger
+	- Replaced Archive::Tar with Archive::Tar::Wrapper
+
 3.2.8  2017-07-16 17:42:15 EDT
 	- Fixed JSON logger - extra check for proc file dissapearing
 

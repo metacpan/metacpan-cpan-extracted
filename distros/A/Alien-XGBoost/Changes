@@ -1,0 +1,10 @@
+0.04    2017-08-27
+    Fix preserving executable flag for xgboost command
+0.03    2017-08-26
+    * Windows install working. Thanks again to Graham Ollis <plicease@cpan.org>
+0.02    2017-08-24
+    * System install working using ffi_name property. Thanks to Graham Ollis <plicease@cpan.org>
+    * Switch from Module::Build to ExtUtils::MakeMaker
+0.01    2017-08-20
+    * Dynamic library and command support
+

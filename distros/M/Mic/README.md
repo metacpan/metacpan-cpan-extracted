@@ -138,9 +138,9 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 # USAGE
 
-## Mic->setup\_class(HASHREF)
+## Mic->define\_class(HASHREF)
 
-In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the `setup_class()` class method, with a hashref that
+In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the `define_class()` class method, with a hashref that
 specifies the class.
 
 The class defined in the SYNOPSIS could also be defined like this
@@ -149,7 +149,7 @@ The class defined in the SYNOPSIS could also be defined like this
 
     use Mic;
 
-    Mic->setup_class({
+    Mic->define_class({
         interface => { 
             object => {
                 add => {},

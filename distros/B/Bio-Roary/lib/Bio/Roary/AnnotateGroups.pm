@@ -1,5 +1,5 @@
 package Bio::Roary::AnnotateGroups;
-$Bio::Roary::AnnotateGroups::VERSION = '3.8.2';
+$Bio::Roary::AnnotateGroups::VERSION = '3.9.1';
 # ABSTRACT: Take in a group file and associated GFF files for the isolates and update the group name to the gene name
 
 
@@ -353,7 +353,7 @@ Bio::Roary::AnnotateGroups - Take in a group file and associated GFF files for t
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

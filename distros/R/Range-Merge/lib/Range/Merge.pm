@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 Joel C. Maslak
+# Copyright (C) 2016 J. Maslak
 # All Rights Reserved - See License
 #
 
 package Range::Merge v0.01.00;
-$Range::Merge::VERSION = '1.002';
+$Range::Merge::VERSION = '1.003';
 use Range::Merge::Boilerplate 'script';
 
 require Exporter;
@@ -211,7 +211,7 @@ Range::Merge - Merges ranges of data including subset/superset ranges
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -283,7 +283,7 @@ This, too is valid:
 
 In this case, we would expect the merged output to look like:
 
-  [ [0,3,'foo','baz'], [4,8,'bar,'baz'], [9,12,'foo','baz'] ]
+  [ [0,3,'foo','baz'], [4,8,'bar','baz'], [9,12,'foo','baz'] ]
 
 There is also a variation on this where, instead of a start and end integer,
 there is an IP address (IPv4 only at this point).  For example:
@@ -294,11 +294,11 @@ This form is used by the C<merge_ipv4()> function.
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Joel Maslak.
+This software is copyright (c) 2016 by J. Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

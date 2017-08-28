@@ -3,29 +3,28 @@ abstract: 'Perl bindings to libarchive via FFI'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Module::Build: '0.28'
   Test::More: '0.94'
 configure_requires:
-  Alien::Libarchive::Installer: '0.07'
+  ExtUtils::MakeMaker: '0'
   FFI::Raw: '0.29'
-  Module::Build: '0.28'
   Module::Build::FFI: '0.04'
   perl: '5.010000'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Archive-Libarchive-FFI
 requires:
-  Alien::Libarchive::Installer: '0.07'
+  Alien::Libarchive3: '0.28'
   Exporter::Tidy: '0'
   FFI::Raw: '0.29'
   FFI::Util: '0.06'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/plicease/Archive-Libarchive-FFI/issues
-  homepage: http://perl.wdlabs.com/Archive-Libarchive-FFI
+  homepage: https://metacpan.org/pod/Archive::Libarchive::FFI
   repository: git://github.com/plicease/Archive-Libarchive-FFI.git
-version: '0.0900'
+version: '0.0901'
+x_serialization_backend: 'YAML::Tiny version 1.70'

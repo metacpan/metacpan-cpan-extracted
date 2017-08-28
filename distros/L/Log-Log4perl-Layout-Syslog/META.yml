@@ -1,0 +1,28 @@
+---
+abstract: 'Layout in Syslog format'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Layout-Syslog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006002'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Log4perl-Layout-Syslog
+  repository: git://github.com/nigelhorne/Log-Log4perl-Layout-Syslog.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package WebService::Braintree::WebhookTesting;
-$WebService::Braintree::WebhookTesting::VERSION = '0.92';
+$WebService::Braintree::WebhookTesting::VERSION = '0.93';
 
 use Moose;
 

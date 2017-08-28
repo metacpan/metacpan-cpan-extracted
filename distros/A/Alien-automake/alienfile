@@ -9,7 +9,7 @@ share {
 
   if($^O eq 'MSWin32')
   {
-    meta->prop->{env}->{PERL} = '/usr/bin/perl' if meta->prop->{platform}->{system_type} eq 'windows-mingw';
+    meta->prop->{env}->{PERL} = '/usr/bin/perl';
   }
   else
   {

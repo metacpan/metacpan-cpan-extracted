@@ -13,12 +13,12 @@ WriteMakefile(
     'strict'   => 0,
     'warnings' => 0,
     'File::Copy' => '0',
-    'File::Spec' => '0',
+    'File::Spec' => '3.32',
     'Getopt::Long' => '0',
     'Pod::Usage' => '1.33',
   },
   TEST_REQUIRES    => {
-    'Test::Script'   => 0,
+    'Test::Script'   => 1.09,
     'Test::More'   => 0,
   },
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {

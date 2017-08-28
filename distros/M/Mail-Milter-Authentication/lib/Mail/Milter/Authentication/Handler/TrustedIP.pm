@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::TrustedIP;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use Net::IP;
 use Sys::Syslog qw{:standard :macros};
@@ -64,7 +64,7 @@ __END__
 
 =head1 NAME
 
-  Authentication Milter - TrustedIP Module
+  Authentication-Milter - TrustedIP Module
 
 =head1 DESCRIPTION
 

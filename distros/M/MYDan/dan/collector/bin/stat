@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use MYDan::Collector::Stat;
+
+use FindBin qw( $RealBin );
+
+my %o = MYDan::Util::OptConf->load()->get( qw( interval=i simple ) )->dump();
+
+my ( @eval, @info, @include, @exclude );
+map{
+    $_ =~ /^include:(.+)/
+      ? push @include, $1
+      : $_ =~ /^exclude:(.+)/
+        ? push @exclude, $1
+        : $_ =~ /{/  ? push @eval, $_ : push @info, $_;
+}@ARGV;
+
+my %c; 
+if( @include || @exclude )
+{
+    my $config = eval{ YAML::XS::LoadFile "$RealBin/../conf/config" };
+    warn "load config err:$@" if $@;
+    map
+    {
+        my $conf = $config->{conf}{$_}{param}{test};
+        for my $k ( keys %$conf ) { map{ $c{$k}{$_} = 1; }@{$conf->{$k}} }
+    }keys %{$config->{conf}};
+
+    my %match;
+    for my $match ( @include ? @include : @exclude )
+    {
+        if( $match =~ m#/(.+)/# )
+        {
+            map{ $match{$_}=1 if $_ =~ /$1/ }keys %c;
+        }
+        else { $match{$match} = 1; }
+    }
+
+    map{ delete $c{$_} }grep{ @include ? ! $match{$_} : $match{$_} }keys %c;
+}
+map{ $c{'STDIN'}{$_} = 1; }@eval if @eval;
+
+
+my %cc; map{ $cc{$_} = [sort keys %{$c{$_}}] }keys %c;
+
+
+my $tc = 1;
+map{ map{ $tc= $1 if $_ =~ /<\s*\d+\s*\/\s*(\d+)\s*>\s*$/ && $1 > $tc; }@$_ }values %cc; 
+
+push @info, 'TEST', map{ $_ =~ /\{(\w+)\}\{[^}]+\}\{[^}]+\}/g; }@eval if @eval;
+$o{interval} = 3 if $tc > 1 && ! $o{interval} && ( @include || @exclude );
+
+my $info;
+for( 1 .. 100 )
+{
+    $info = MYDan::Collector::Stat->new( test => %cc ? \%cc : undef )->eval;
+
+    if( @include || @exclude || $o{simple} )
+    {
+        if(  $_ >= $tc )
+        {
+            for( @{$info->stat()} )
+            {
+                next unless $_->[0][0] eq 'TEST';
+                shift @$_;
+
+                map{ print "$_\n" }
+                    sort map{
+                    my $t = $_;
+                    sprintf "%s %s ","$_->[11]:'$_->[0]'\t=> $_->[10]",
+                        join '', map{  $t->[$_] eq 'ok' ? 'o':  $t->[$_] eq 'err' ? 'x':'-' } 1..9;
+                }@$_;
+            }
+            last;
+        }
+    }
+    else { $info->info( @info ) if ! @ARGV || @info; }
+
+    $o{interval} ? sleep $o{interval} : last;
+}
+
+$info->code() eq 'ok' ?  exit 0 : exit 1;

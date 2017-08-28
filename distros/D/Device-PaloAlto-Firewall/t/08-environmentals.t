@@ -15,7 +15,7 @@ my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', 
 my $test = $fw->tester();
 
 # VM Env
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( env_vm() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( env_vm() )->simplify( forcearray => ['entry'] )->{result} } );
 
 warning_is { $test->environmentals() } "No environmentals - is this a VM? Returning success", "VM environmentals warns";
 { 
@@ -26,7 +26,7 @@ warning_is { $test->environmentals() } "No environmentals - is this a VM? Return
 }
 
 # 5060 Env no alarms
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( env_5060() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( env_5060() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->environmentals(), "Environmentals with no alarms" );
 

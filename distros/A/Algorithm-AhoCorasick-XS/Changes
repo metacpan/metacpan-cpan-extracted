@@ -1,3 +1,6 @@
 24/03/2017 0.2 - Initial release.
 24/03/2017 0.3 - Fix memory leak in XS typemap code.
                - Fix build dependencies and min. Perl version in Makefile.PL
+07/08/2017 0.4 - Rewrite to use mixed array/linked-lists for huge reduction in memory
+                 usage (at slight speed cost)
+               - Fix for FreeBSD test failures

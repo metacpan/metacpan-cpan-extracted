@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.015';
+our $VERSION = '0.017';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -73,6 +73,7 @@ has schema => sub {
 #pod =cut
 
 sub startup ( $app ) {
+    $app->log( Mojo::Log->new ); # Log only to STDERR
     unshift @{ $app->renderer->paths },
         catdir( dist_dir( 'CPAN-Testers-API' ), 'templates' );
     unshift @{ $app->static->paths },
@@ -183,7 +184,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.015
+version 0.017
 
 =head1 SYNOPSIS
 

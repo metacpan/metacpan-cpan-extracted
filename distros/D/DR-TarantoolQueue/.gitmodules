@@ -1,0 +1,6 @@
+[submodule "megaqueue"]
+	path = megaqueue
+	url = git@github.com:dr-co/tarantool-megaqueue.git
+[submodule "queue-lts"]
+	path = queue-lts
+	url = git@github.com:dr-co/tarantool-lts-queue.git

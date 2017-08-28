@@ -1,0 +1,19 @@
+# Starting comment
+#
+{
+   # Nested hash
+   "key3" : {
+      "b" : 2,
+      "a" : 1
+   },
+   # Array
+   "key2" : [
+      0,
+      1,
+      2,
+      3,
+      4
+   ],
+   # Scalar
+   "key1" : "scalar value"
+}

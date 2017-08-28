@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 53;
+use Test::More tests => 55;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 {
@@ -303,4 +303,18 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
     is($b1called, 1);
     is($v1->key, $btvar->key);
     is($btindex, 123);
+}
+
+{
+    my $iz = Algorithm::CP::IZ->new();
+    my $v1 = $iz->create_int(1, 3);
+
+    my $label = $iz->save_context;
+
+    $iz->search([$v1]);
+    is($v1->nb_elements, 1);
+
+    $iz->restore_context_until($label);
+    is($v1->nb_elements, 3);
+
 }

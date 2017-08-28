@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::ula200
 # ABSTRACT:  Configuration class LCDd::ula200
+
 =encoding utf8
 
 =head1 NAME
@@ -16,7 +17,17 @@ generated from LCDd.conf
 
 =head2 Size
 
-Select the LCD size I<< Optional. Type uniline. upstream_default: '20x4'.  >> 
+Select the LCD size I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20x4
+
+=back
+
+
 
 =head1 SEE ALSO
 

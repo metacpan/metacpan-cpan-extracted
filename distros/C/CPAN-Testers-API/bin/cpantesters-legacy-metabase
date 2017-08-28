@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-our $VERSION = '0.015';
+our $VERSION = '0.017';
 # ABSTRACT: An API from the legacy Metabase::Web to the local database
 
 #pod =head1 SYNOPSIS
@@ -23,6 +23,7 @@ use CPAN::Testers::Report;
 use FindBin ();
 use CPAN::Testers::Schema;
 use Mojo::Util qw( b64_decode );
+use Beam::Minion;
 
 #pod =head1 CONFIG
 #pod
@@ -41,6 +42,7 @@ use Mojo::Util qw( b64_decode );
 #pod
 #pod =cut
 
+app->log( Mojo::Log->new ); # Log only to STDERR
 app->home( path( $FindBin::Bin )->dirname ) unless $ENV{MOJO_HOME};
 app->moniker( 'metabase' );
 my $root_conf = app->home->child( sprintf 'etc/%s.conf', app->moniker );
@@ -83,7 +85,7 @@ helper schema => sub {
 
 sub handle_post {
     my ( $c ) = @_;
-    $c->app->log->debug( "Got: " . $c->req->body );
+    #$c->app->log->debug( "Got: " . $c->req->body );
 
     # Validate the user
     my ( undef, $auth ) = split / /, $c->req->headers->authorization;
@@ -103,6 +105,11 @@ sub handle_post {
     my $fact = Metabase::Fact->class_from_type( $body->{metadata}{core}{type} )
         ->from_struct( $body );
     my $row = $c->schema->resultset( 'TestReport' )->insert_metabase_fact( $fact );
+    $c->app->log->info(
+        sprintf 'Wrote report %s from %s (%s)', $row->id, $user->fullname, $user->email,
+    );
+
+    Beam::Minion->enqueue( report => 'queue', $row->id );
 
     my $url = $c->req->url->clone;
     my $path = $url->path;
@@ -130,7 +137,7 @@ post '/beta/submit/CPAN-Testers-Report' => \&handle_post;
 #pod =cut
 
 sub handle_register( $c ) {
-    $c->app->log->debug( $c->req->body );
+    #$c->app->log->debug( $c->req->body );
     my @things = ref $c->req->json eq 'ARRAY' ? $c->req->json->@* : ( $c->req->json );
     for my $body ( @things ) {
         my $fact = Metabase::Fact->class_from_type( $body->{metadata}{core}{type} )
@@ -144,6 +151,10 @@ sub handle_register( $c ) {
             fullname => $fullname->content,
             email => $email->content,
         });
+
+        $c->app->log->info(
+            sprintf 'Registered user %s from %s (%s)', $row->resource, $row->fullname, $row->email,
+        );
     }
 
     return $c->render(
@@ -188,11 +199,25 @@ get '/beta/guid/:guid' => \&handle_guid;
 #pod =cut
 
 get '/tail/log' => sub( $c ) {
-    my $rs = $c->schema->resultset( 'TestReport' )->search(
+    my $file = app->home->child( 'tail.log' );
+    my $age = time - [stat $file]->[9];
+    my $expires_in = $age < 300 ? 300 - $age : 0;
+    $c->res->headers->cache_control( 'max-age=' . $expires_in . ', must-revalidate' ); # Cache for 300 seconds
+    $c->res->headers->content_type( 'text/plain' );
+    my $asset = Mojo::Asset::File->new( path => $file );
+    return $c->reply->asset( $asset );
+};
+
+helper refresh_tail_log => sub {
+    my $file = app->home->child( 'tail.log' );
+    my $rs = app->schema->resultset( 'TestReport' )->search(
         { 'report' => \'->>"$.environment.language.name" = "Perl 5"' },
         { order_by => { -desc => 'created' }, rows => 1000 },
     );
-    return $c->render( 'tail/log', format => 'txt', rs => $rs );
+    my @reports = $rs->all;
+    $file->spurt(
+        app->build_controller->render_to_string( 'tail/log', format => 'txt', reports => \@reports )
+    );
 };
 
 app->start;
@@ -205,7 +230,7 @@ CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the
 
 =head1 VERSION
 
-version 0.015
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -324,15 +349,16 @@ __DATA__
 </div>
 
 @@ tail/log.txt.ep
+% use v5.24;
 % use DateTime;
-% my $rs = stash 'rs';
-The last <%= $rs->count %> reports as of <%= DateTime->now %>Z:
-% for my $row ( $rs->all ) {
+% my @reports = stash( 'reports' )->@*;
+The last <%= scalar @reports %> reports as of <%= DateTime->now %>Z:
+% for my $row ( @reports ) {
 % my $report = $row->report;
 % my $grade = $report->{result}{grade};
 % my $name = $report->{reporter}{name};
 % my $upload = $row->upload;
 % my $file = $upload ? join "/", $upload->author, $upload->filename : '';
 % my ( $arch, $perl_version ) = $report->{environment}{language}->@{qw(archname version )};
-[<%= $row->created %>Z] [<%= $name %>] [<%= $grade %>] [<%= $file %>] [<%= $arch %>] [perl-<%= $perl_version %>] [<%= $row->id %>] [<%= $row->created %>Z]
+[<%== $row->created %>Z] [<%== $name %>] [<%== $grade %>] [<%== $file %>] [<%== $arch %>] [perl-v<%== $perl_version %>] [<%== $row->id %>] [<%== $row->created %>Z]
 % }

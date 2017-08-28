@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or install libarchive version 3.x or better
-our $VERSION = '0.28'; # VERSION
+our $VERSION = '0.29'; # VERSION
 
 
 
@@ -29,7 +29,7 @@ Alien::Libarchive3 - Find or install libarchive version 3.x or better
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ In your script or module:
  use Alien::Libarchive3;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::Libarchive3->bin_dir;
+ unshift @PATH, Alien::Libarchive3->bin_dir;
 
 In your L<FFI::Platypus> script or module:
 

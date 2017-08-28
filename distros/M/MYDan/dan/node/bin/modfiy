@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+use FindBin qw( $Bin );
+
+use MYDan::Node;
+use MYDan::Node::DBI::Root;
+use MYDan::Node::DBI::Cache;
+use MYDan::Util::OptConf;
+use MYDan::Util::Sudo;
+
+MYDan::Util::Sudo->sudo();
+
+use constant DOWN => 1;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'node';
+
+=head1 SYNOPSIS
+
+Modfiy node databases for nodes
+
+ $0 [--range nodes] [--value value] \
+    [--cluster clusters] [--table tables] [--quiet]
+
+=cut
+my $option = MYDan::Util::OptConf->load( base => $Bin );
+my %o = $option->get( qw( range=s value=s cluster=s table=s quiet ) )->dump();
+
+$option->assert(qw( range value cluster table ));
+
+my %range = $option->dump( 'range' );
+my $range = MYDan::Node->new( %range );
+my $cache = MYDan::Node::DBI::Cache->new( $range{cache} );
+
+my %table = map { $_ => 1 } $range->load( $o{table} || [] )->list();
+my %cluster = map { $_ => 1 } $range->load( $o{cluster} || [] )->list();
+my ( $value, %db ) = defined $o{value} ? $o{value} : DOWN;
+
+for my $node ( $range->load( $o{range} )->list() )
+{
+    for my $record ( $cache->select( '*', node => [ 1 => $node ] ) )
+    {
+        my $cluster = shift @$record;
+
+        next if %cluster && ! $cluster{$cluster};
+        next if %table && ! $table{$record->[0]};
+
+        $db{$cluster}{handle} ||= MYDan::Node::DBI::Root
+            ->new( File::Spec->join( $o{root}, $cluster ) );
+
+        $record->[-1] = $value;
+        push @{ $db{$cluster}{record} }, $record;
+    }
+}
+
+for my $cluster ( sort keys %db )
+{
+    my $db = $db{$cluster};
+    warn "$cluster:\n" unless $o{quiet};
+
+    for my $record ( @{ $db->{record} } )
+    {
+        warn sprintf "  %s\n", join( ': ', @$record ) unless $o{quiet};
+        $db->{handle}->insert( @$record );
+    }
+}
+
+exit 0;

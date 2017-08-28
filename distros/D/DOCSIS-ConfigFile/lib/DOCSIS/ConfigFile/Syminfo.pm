@@ -541,6 +541,12 @@ our $TREE = {
     lsize  => 1,
     limit  => [0, 0],
     nested => {
+      InitializationMode => {
+        code => 1,
+        func => "uchar",
+        lsize => 1,
+        limit => [ 0, 3 ]
+      },
       ManagementServer  => {
         code   => 2,
         func   => "nested",
@@ -555,6 +561,12 @@ our $TREE = {
           ConnectionRequestPassword => {code => 6,  func => "string", lsize => 1, limit => [0, 0]},
           ACSOverride               => {code => 7,  func => "uchar",  lsize => 1, limit => [0, 1]},
         },
+      },
+      InitializationModeOverride => {
+        code => 3,
+        func => "uchar",
+        lsize => 1,
+        limit => [ 0, 1 ]
       },
     },
   },

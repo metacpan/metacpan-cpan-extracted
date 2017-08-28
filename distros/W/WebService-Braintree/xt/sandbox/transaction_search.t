@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
+
 use lib qw(lib t/lib);
+
 use Test::More;
 use Time::HiRes qw(gettimeofday);
 use WebService::Braintree;
@@ -8,14 +10,16 @@ use WebService::Braintree::SandboxValues::TransactionAmount;
 use WebService::Braintree::Util;
 use WebService::Braintree::TestHelper qw(sandbox);
 
+require 't/lib/WebService/Braintree/Nonce.pm';
+
 my $credit_card_number = "5431111111111111";
 
 subtest "throws exception" => sub {
     should_throw "DownForMaintenanceError", sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->amount->is("-5.50");
-                                                                       });
+            my $search = shift;
+            $search->amount->is("-5.50");
+        });
     }
 };
 
@@ -123,9 +127,9 @@ subtest "credit_card_card_type - multiple value field" => sub {
     my $find = WebService::Braintree::Transaction->find($sale1->transaction->id)->transaction;
 
     my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                       my $search = shift;
-                                                                       $search->credit_card_card_type->is(WebService::Braintree::CreditCard::CardType::MasterCard);
-                                                                   });
+        my $search = shift;
+        $search->credit_card_card_type->is(WebService::Braintree::CreditCard::CardType::MasterCard);
+    });
 
     ok contains($find->id, $search_result->ids);
     my @results = ();
@@ -136,18 +140,18 @@ subtest "credit_card_card_type - multiple value field" => sub {
 subtest "credit_card_card_type - multiple value field - passing invalid credit_card_card_type" => sub {
     should_throw "Invalid Argument\\(s\\) for credit_card_card_type: invalid credit_card_card_type", sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->credit_card_card_type->is("invalid credit_card_card_type");
-                                                                       });
+            my $search = shift;
+            $search->credit_card_card_type->is("invalid credit_card_card_type");
+        });
     }
 };
 
 subtest "status - multiple value field - passing invalid status" => sub {
     should_throw "Invalid Argument\\(s\\) for status: invalid status", sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->status->is("invalid status");
-                                                                       });
+            my $search = shift;
+            $search->status->is("invalid status");
+        });
     }
 };
 
@@ -158,9 +162,9 @@ subtest "status - multiple value field" => sub {
     my $find = WebService::Braintree::Transaction->find($sale1->transaction->id)->transaction;
 
     my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                       my $search = shift;
-                                                                       $search->status->is($find->status);
-                                                                   });
+        my $search = shift;
+        $search->status->is($find->status);
+    });
 
     ok contains($find->id, $search_result->ids);
     my @results = ();
@@ -171,9 +175,9 @@ subtest "status - multiple value field" => sub {
 subtest "source - multiple value field - passing invalid source" => sub {
     should_throw "Invalid Argument\\(s\\) for source: invalid source", sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->source->is("invalid source");
-                                                                       });
+            my $search = shift;
+            $search->source->is("invalid source");
+        });
     }
 };
 
@@ -183,9 +187,9 @@ subtest "source - multiple value field" => sub {
 
     my $find = WebService::Braintree::Transaction->find($sale1->transaction->id)->transaction;
     my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                       my $search = shift;
-                                                                       $search->source->is(WebService::Braintree::Transaction::Source::Api);
-                                                                   });
+        my $search = shift;
+        $search->source->is(WebService::Braintree::Transaction::Source::Api);
+    });
 
     ok contains($find->id, $search_result->ids);
     my @results = ();
@@ -196,21 +200,23 @@ subtest "source - multiple value field" => sub {
 subtest "type - multiple value field - passing invalid type" => sub {
     should_throw "Invalid Argument\\(s\\) for type: invalid type", sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->type->is("invalid type");
-                                                                       });
+            my $search = shift;
+            $search->type->is("invalid type");
+        });
     }
 };
 
+# Something about this kind of test is failing horribly
+# Compare against master and bisect what is actually hanging
 subtest "type - multiple value field" => sub {
     my $unique = generate_unique_integer() . "status";
     my $sale1 = create_sale($unique);
 
     my $find = WebService::Braintree::Transaction->find($sale1->transaction->id)->transaction;
     my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                       my $search = shift;
-                                                                       $search->type->is(WebService::Braintree::Transaction::Type::Sale);
-                                                                   });
+        my $search = shift;
+        $search->type->is(WebService::Braintree::Transaction::Type::Sale);
+    });
 
     ok contains($find->id, $search_result->ids);
     my @results = ();
@@ -225,9 +231,9 @@ subtest "credit card number - partial match" => sub {
     my $find = WebService::Braintree::Transaction->find($sale1->transaction->id)->transaction;
 
     my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                       my $search = shift;
-                                                                       $search->credit_card_number->ends_with($find->credit_card->last_4);
-                                                                   });
+        my $search = shift;
+        $search->credit_card_number->ends_with($find->credit_card->last_4);
+    });
 
     ok contains($find->id, $search_result->ids);
 };
@@ -241,31 +247,31 @@ subtest "amount - range" => sub {
         credit_card => {
             number => $credit_card_number,
             expiration_date => "01/2000",
-            cardholder_name => "Name"
+            cardholder_name => "Name",
         }
     })->transaction;
 
     my $find = WebService::Braintree::Transaction->find($sale1->transaction->id)->transaction;
     my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                       my $search = shift;
-                                                                       $search->amount->max("5.50");
-                                                                       $search->amount->min("4.50");
-                                                                   });
+        my $search = shift;
+        $search->amount->max("5.50");
+        $search->amount->min("4.50");
+    });
 
     ok contains($find->id, $search_result->ids);
     not_ok contains($sale2->id, $search_result->ids);
 };
 
 TODO: {
-    todo_skip "Test consistently fails  against sandbox environment ", 5;
+    todo_skip "Test consistently fails against sandbox environment ", 6;
 
     subtest "disbursement_date - range - max and min" => sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->id->is("deposittransaction");
-                                                                           $search->disbursement_date->max(WebService::Braintree::TestHelper::parse_datetime("2014-01-01 00:00:00"));
-                                                                           $search->disbursement_date->min(WebService::Braintree::TestHelper::parse_datetime("2012-01-01 00:00:00"));
-                                                                       });
+            my $search = shift;
+            $search->id->is("deposittransaction");
+            $search->disbursement_date->max(WebService::Braintree::TestHelper::parse_datetime("2014-01-01 00:00:00"));
+            $search->disbursement_date->min(WebService::Braintree::TestHelper::parse_datetime("2012-01-01 00:00:00"));
+        });
 
         ok contains("deposittransaction", $search_result->ids);
         is scalar @{$search_result->ids}, 1;
@@ -273,11 +279,10 @@ TODO: {
 
     subtest "disbursement_date - range - is" => sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->id->is("deposittransaction");
-                                                                           $search->disbursement_date->is(WebService::Braintree::TestHelper::parse_datetime("2013-04-10 00:00:00"));
-                                                                       });
-
+            my $search = shift;
+            $search->id->is("deposittransaction");
+            $search->disbursement_date->is(WebService::Braintree::TestHelper::parse_datetime("2013-04-10 00:00:00"));
+        });
     };
 
     ok contains("deposittransaction", $search_result->ids);
@@ -285,11 +290,11 @@ TODO: {
 
     subtest "dispute_date - range - max and min" => sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->id->is("disputedtransaction");
-                                                                           $search->dispute_date->max(WebService::Braintree::TestHelper::parse_datetime("2014-03-31 00:00:00"));
-                                                                           $search->dispute_date->min(WebService::Braintree::TestHelper::parse_datetime("2014-03-01 00:00:00"));
-                                                                       });
+            my $search = shift;
+            $search->id->is("disputedtransaction");
+            $search->dispute_date->max(WebService::Braintree::TestHelper::parse_datetime("2014-03-31 00:00:00"));
+            $search->dispute_date->min(WebService::Braintree::TestHelper::parse_datetime("2014-03-01 00:00:00"));
+        });
 
         ok contains("disputedtransaction", $search_result->ids);
         is scalar @{$search_result->ids}, 1;
@@ -297,15 +302,14 @@ TODO: {
 
     subtest "dispute_date - range - is" => sub {
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->id->is("disputedtransaction");
-                                                                           $search->dispute_date->is(WebService::Braintree::TestHelper::parse_datetime("2014-03-01 00:00:00"));
-                                                                       });
+            my $search = shift;
+            $search->id->is("disputedtransaction");
+            $search->dispute_date->is(WebService::Braintree::TestHelper::parse_datetime("2014-03-01 00:00:00"));
+        });
 
         ok contains("disputedtransaction", $search_result->ids);
         is scalar @{$search_result->ids}, 1;
     };
-
 }
 ;
 
@@ -315,10 +319,10 @@ subtest "merchant_account_id" => sub {
         my $transaction = create_sale($unique)->transaction;
 
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->merchant_account_id->is("obvious_junk");
-                                                                           $search->id->is($transaction->id);
-                                                                       });
+            my $search = shift;
+            $search->merchant_account_id->is("obvious_junk");
+            $search->id->is($transaction->id);
+        });
 
         is scalar @{$search_result->ids}, 0;
     };
@@ -328,10 +332,10 @@ subtest "merchant_account_id" => sub {
         my $transaction = create_sale($unique)->transaction;
 
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->merchant_account_id->is($transaction->merchant_account_id);
-                                                                           $search->id->is($transaction->id);
-                                                                       });
+            my $search = shift;
+            $search->merchant_account_id->is($transaction->merchant_account_id);
+            $search->id->is($transaction->id);
+        });
 
         is scalar @{$search_result->ids}, 1;
     };
@@ -341,10 +345,10 @@ subtest "merchant_account_id" => sub {
         my $transaction = create_sale($unique)->transaction;
 
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->merchant_account_id->in("bogus_merchant_account_id", $transaction->merchant_account_id);
-                                                                           $search->id->is($transaction->id);
-                                                                       });
+            my $search = shift;
+            $search->merchant_account_id->in("bogus_merchant_account_id", $transaction->merchant_account_id);
+            $search->id->is($transaction->id);
+        });
 
         is scalar @{$search_result->ids}, 1;
     };
@@ -354,18 +358,18 @@ subtest "paypal" => sub {
     subtest "search on paypal fields" => sub {
         my $result = WebService::Braintree::Transaction->sale({
             amount => WebService::Braintree::SandboxValues::TransactionAmount::AUTHORIZE,
-            payment_method_nonce => WebService::Braintree::Nonce::paypal_one_time_payment()
+            payment_method_nonce => WebService::Braintree::Nonce->paypal_one_time_payment(),
         });
 
         ok $result->is_success;
         my $transaction = $result->transaction;
         my $search_result = WebService::Braintree::Transaction->search(sub {
-                                                                           my $search = shift;
-                                                                           $search->id->is($transaction->id);
-                                                                           $search->paypal_payment_id->starts_with("PAY");
-                                                                           $search->paypal_authorization_id->starts_with("SALE");
-                                                                           $search->paypal_payer_email->is("payer\@example.com");
-                                                                       });
+            my $search = shift;
+            $search->id->is($transaction->id);
+            $search->paypal_payment_id->starts_with("PAY");
+            $search->paypal_authorization_id->starts_with("SALE");
+            $search->paypal_payer_email->is("payer\@example.com");
+        });
     };
 };
 
@@ -408,7 +412,7 @@ sub create_sale {
             locality => "Locality",
             postal_code => "12345",
             region => "IL",
-            street_address => "Street"
+            street_address => "Street",
         },
         customer => {
             company => "Company",
@@ -421,7 +425,7 @@ sub create_sale {
         },
         options => {
             store_in_vault => "true",
-            submit_for_settlement => "true"
+            submit_for_settlement => "true",
         },
         order_id => "myorder",
         shipping => {
@@ -433,7 +437,7 @@ sub create_sale {
             locality => "Company",
             postal_code => "54321",
             region => "IL",
-            street_address => "Address"
+            street_address => "Address",
         }
     });
 
@@ -443,13 +447,13 @@ sub create_sale {
 sub perform_search {
     my($criteria) = @_;
     WebService::Braintree::Transaction->search( sub {
-                                                    my $search = shift;
-                                                    while (my($key, $value) = each(%$criteria)) {
-                                                        $search->$key->is($value);
-                                                    }
+        my $search = shift;
+        while (my($key, $value) = each(%$criteria)) {
+            $search->$key->is($value);
+        }
 
-                                                    return $search;
-                                                });
+        return $search;
+    });
 }
 
 sub make_search_criteria {
@@ -457,4 +461,5 @@ sub make_search_criteria {
         customer_first_name => "FirstName_" . shift,
     };
 }
+
 done_testing();

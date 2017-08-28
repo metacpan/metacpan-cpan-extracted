@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::pyramid
 # ABSTRACT:  Configuration class LCDd::pyramid
+
 =encoding utf8
 
 =head1 NAME
@@ -16,7 +17,17 @@ generated from LCDd.conf
 
 =head2 Device
 
-device to connect to I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+device to connect to I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head1 SEE ALSO
 

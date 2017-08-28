@@ -19,8 +19,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Exporter: '0'
   Scalar::Util: '0'
   perl: '5.010'
-version: '0.08'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

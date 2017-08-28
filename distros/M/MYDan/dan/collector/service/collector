@@ -1,0 +1,22 @@
+#!/bin/usr/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+use MYDan::Collector::Jobs;
+use Data::Dumper;
+
+
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'collector';
+my %o = MYDan::Util::OptConf->load()->dump();
+
+my $c = MYDan::Collector::Jobs->new( %o, jobs => shift );
+
+print "start...\n";
+sleep 5;
+$c->run();

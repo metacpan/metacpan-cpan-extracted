@@ -23,5 +23,5 @@ requires:
   perl: '5.008009'
 resources:
   repository: https://git.ieval.ro/?p=www-offliberty.git
-version: '1.000005'
+version: '1.000006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

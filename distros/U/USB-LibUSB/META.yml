@@ -1,0 +1,36 @@
+---
+abstract: 'Perl interface to the libusb-1.0 API.'
+author:
+  - 'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: USB-LibUSB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AutoLoader: '0'
+  Carp: '0'
+  Exporter: '0'
+  Moo: '0'
+  XSLoader: '0'
+  perl: '5.008003'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://chat.freenode.net/#labmeasurement
+  MailingList: https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users
+  homepage: http://www.labmeasurement.de
+  repository: git://github.com/lab-measurement/USB-LibUSB.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

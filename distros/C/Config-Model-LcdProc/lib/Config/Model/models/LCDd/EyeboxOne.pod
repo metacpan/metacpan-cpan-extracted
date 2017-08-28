@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::EyeboxOne
 # ABSTRACT:  Configuration class LCDd::EyeboxOne
+
 =encoding utf8
 
 =head1 NAME
@@ -16,44 +17,144 @@ generated from LCDd.conf
 
 =head2 Backlight
 
-Switch on the backlight? I<< Optional. Type uniline. upstream_default: 'yes'.  >> 
+Switch on the backlight? I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 Cursor
 
-Switch on the cursor? I<< Optional. Type uniline. upstream_default: 'no'.  >> 
+Switch on the cursor? I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Device
 
 Select the output device to use 
-Device=/dev/cua01. I<< Optional. Type uniline. upstream_default: '/dev/ttyS1'.  >> 
+Device=/dev/cua01. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/ttyS1
+
+=back
+
+
 
 =head2 DownKey
 
-I<< Optional. Type uniline. default: 'B'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+B
+
+=back
+
+
 
 =head2 EscapeKey
 
-I<< Optional. Type uniline. default: 'P'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+P
+
+=back
+
+
 
 =head2 LeftKey
 
-Enter Key is a \r character, so it's hardcoded in the driver. I<< Optional. Type uniline. default: 'D'.  >> 
+Enter Key is a \r character, so it's hardcoded in the driver. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+D
+
+=back
+
+
 
 =head2 RightKey
 
-I<< Optional. Type uniline. default: 'C'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+C
+
+=back
+
+
 
 =head2 Size
 
-Set the display size I<< Optional. Type uniline. upstream_default: '20x4'.  >> 
+Set the display size I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20x4
+
+=back
+
+
 
 =head2 Speed
 
-Set the communication speed I<< Optional. Type enum. choice: '1200', '2400', '9600', '19200'. upstream_default: '19200'.  >> 
+Set the communication speed I< Optional. Type enum. choice: '1200', '2400', '9600', '19200'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+19200
+
+=back
+
+
 
 =head2 UpKey
 
-I<< Optional. Type uniline. default: 'A'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+A
+
+=back
+
+
 
 =head2 keypad_test_mode
 
@@ -61,7 +162,17 @@ You can find out which key of your display sends which
 character by setting keypad_test_mode to yes and running
 LCDd. LCDd will output all characters it receives.
 Afterwards you can modify the settings above and set
-keypad_set_mode to no again. I<< Optional. Type uniline. default: 'no'.  >> 
+keypad_set_mode to no again. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head1 SEE ALSO
 

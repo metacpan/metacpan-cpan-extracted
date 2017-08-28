@@ -1,9 +1,6 @@
 package Catalyst::TraitFor::Controller::reCAPTCHA;
-{
-  $Catalyst::TraitFor::Controller::reCAPTCHA::VERSION = '1.122510';
-}
 # ABSTRACT: authenticate people and read books!
-
+$Catalyst::TraitFor::Controller::reCAPTCHA::VERSION = '2.00';
 use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
@@ -15,13 +12,22 @@ has recaptcha => ( is => 'ro', default => sub { Captcha::reCAPTCHA->new } );
 
 sub captcha_get :Private {
     my ( $self, $c ) = @_;
+    my $recaptcha;
 
-    my $recaptcha = $self->recaptcha->get_html(
-        $c->config->{recaptcha}{pub_key},
-        $c->stash->{recaptcha_error},
-        $c->req->secure,
-        $c->config->{recaptcha}{options}
-    );
+    if (lc($c->config->{recaptcha}{version} || '') eq 'v2') {
+        $recaptcha = $self->recaptcha->get_html_v2(
+            $c->config->{recaptcha}{pub_key},
+            $c->config->{recaptcha}{options}
+        );
+    }
+    else {
+        $recaptcha = $self->recaptcha->get_html(
+            $c->config->{recaptcha}{pub_key},
+            $c->stash->{recaptcha_error},
+            $c->req->secure,
+            $c->config->{recaptcha}{options}
+        );
+    }
 
     $c->stash( recaptcha => $recaptcha );
 }
@@ -31,19 +37,31 @@ sub captcha_check :Private {
 
     my $challenge = $c->req->param('recaptcha_challenge_field');
     my $response  = $c->req->param('recaptcha_response_field');
+    my $response_v2 = $c->req->param('g-recaptcha-response');
 
-    unless ( $response && $challenge ) {
+    unless ( ($response && $challenge || $response_v2)) {
         $c->stash->{recaptcha_error} = 'User appears not to have submitted a recaptcha';
         return;
     }
 
-    my $res = $self->recaptcha->check_answer(
-        $c->config->{recaptcha}{priv_key},
-        $c->req->address,
-        $challenge,
-        $response
-    );
-    
+    my $res;
+    if (lc($c->config->{recaptcha}{version} || '') eq 'v2') {
+        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = $c->req->secure;
+        $res = $self->recaptcha->check_answer_v2(
+            $c->config->{recaptcha}{priv_key},
+            $response_v2,
+            $c->req->address
+        );
+    }
+    else {
+        $res = $self->recaptcha->check_answer(
+            $c->config->{recaptcha}{priv_key},
+            $c->req->address,
+            $challenge,
+            $response
+        );
+    }
+
     croak 'Failed to get valid result from reCaptcha'
         unless ref $res eq 'HASH';
 
@@ -57,9 +75,11 @@ sub captcha_check :Private {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -67,7 +87,7 @@ Catalyst::TraitFor::Controller::reCAPTCHA - authenticate people and read books!
 
 =head1 VERSION
 
-version 1.122510
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -114,7 +134,8 @@ In MyApp.pm (or equivalent in config file):
  __PACKAGE__->config->{recaptcha} = {
     pub_key  => '6LcsbAAAAAAAAPDSlBaVGXjMo1kJHwUiHzO2TDze',
     priv_key => '6LcsbAAAAAAAANQQGqwsnkrTd7QTGRBKQQZwBH-L',
-    options  => { theme => 'white' }
+    options  => { theme => 'white' },
+    version  => 'v2' ## reCaptcha version default (v1)
  };
 
 (the two keys above work for http://localhost unless someone hammers the
@@ -153,11 +174,11 @@ set with the error string provided by L<Captcha::reCAPTCHA>.
 
 =item *
 
-L<Captcha::reCAPTCHA> 
+L<Captcha::reCAPTCHA>
 
 =item *
 
-L<Catalyst::Controller> 
+L<Catalyst::Controller>
 
 =item *
 
@@ -175,10 +196,9 @@ Diego Kuperman <diego@freekeylabs.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Diego Kuperman.
+This software is copyright (c) 2017 by Diego Kuperman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -1,5 +1,11 @@
-Changes
-=======
+Revision history for Perl extension DateTime-Astro
+
+1.03 2017-08-20T10:32:17Z
+    * messed up previous release
+
+1.02 2017-08-20T10:28:44Z
+    * Migrate to using Minilla for packaging
+    * Fix packaging details
 
 1.01 17 Aug 2017
     * Merged PRs #2, #4, #5

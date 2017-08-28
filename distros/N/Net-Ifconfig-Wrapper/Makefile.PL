@@ -1,4 +1,8 @@
 use 5.008004;
+
+use warnings;
+use strict;
+
 # TODO: convert to Module::Install
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -39,3 +43,5 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/Net/Ifconfig/Wrapper.pm', # retrieve abstract from module
        AUTHOR         => 'Daniel Podolsky <tpaba@cpan.org>') : ()),
 );
+
+__END__

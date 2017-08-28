@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "bin/roary-create_pan_genome_plots.R",
     "bin/roary-pan_genome_reorder_spreadsheet",
     "bin/roary-query_pan_genome",
+    "bin/roary-unique_genes_per_sample",
     "bin/transfer_annotation_to_groups"
   ],
   "LICENSE" => "gpl",
@@ -71,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Output" => 0
   },
-  "VERSION" => "3.8.2",
+  "VERSION" => "3.9.1",
   "test" => {
     "TESTS" => "t/*.t t/Bio/Roary/*.t t/Bio/Roary/CommandLine/*.t t/Bio/Roary/External/*.t t/Bio/Roary/Output/*.t t/Bio/Roary/QC/*.t"
   }

@@ -3,17 +3,17 @@ package Pcore::HTTP::Response;
 use Pcore -class;
 use Pcore::HTTP::Headers;
 use HTTP::Message;    # TODO requires for decode body
-use Pcore::Util::Scalar qw[is_plain_coderef];
+use Pcore::Util::Scalar qw[is_plain_coderef is_plain_scalarref];
 
 with qw[Pcore::Util::Result::Status];
 
 has url => ( is => 'ro', isa => Str | Object, writer => 'set_url' );
 has buf_size => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );    # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
 
-has version => ( is => 'ro', isa => Num, writer => 'set_version', init_arg => undef );
+has version => ( is => 'ro', isa => Num, init_arg => undef );
 has headers => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Headers'], init_arg => undef );
-has body => ( is => 'ro', isa => Ref, writer => 'set_body', predicate => 1, init_arg => undef );
-has path => ( is => 'ro', isa => Str, writer => 'set_path', predicate => 1, init_arg => undef );
+has body => ( is => 'ro', isa => Ref, init_arg => undef );
+has path => ( is => 'ro', isa => Str, init_arg => undef );
 
 has content_length => ( is => 'rwp', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
 
@@ -32,26 +32,11 @@ sub BUILD ( $self, $args ) {
 }
 
 sub _build_decoded_body ($self) {
-    return if !$self->has_body;
+    return if !$self->{body};
 
-    return if ref $self->body ne 'SCALAR';
+    return if !is_plain_scalarref $self->{body};
 
-    return HTTP::Message->new( [ 'Content-Type' => $self->headers->{CONTENT_TYPE} ], $self->body->$* )->decoded_content( raise_error => 1, ref => 1 );
-}
-
-# TO_PSGI
-sub to_psgi ($self) {
-    if ( $self->has_body && is_plain_coderef $self->body ) {
-        return $self->body;
-    }
-    else {
-        return [ $self->status, $self->headers->to_psgi, $self->_body_to_psgi ];
-    }
-}
-
-# TODO
-sub _body_to_psgi ($self) {
-    return [];
+    return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{CONTENT_TYPE} ], $self->{body}->$* )->decoded_content( raise_error => 1, ref => 1 );
 }
 
 1;

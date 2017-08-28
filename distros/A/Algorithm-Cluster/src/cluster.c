@@ -4,8 +4,8 @@
  * This library was written at the Laboratory of DNA Information Analysis,
  * Human Genome Center, Institute of Medical Science, University of Tokyo,
  * 4-6-1 Shirokanedai, Minato-ku, Tokyo 108-8639, Japan.
- * Contact: mdehoon 'AT' gsc.riken.jp
- * 
+ * Contact: michiel.dehoon 'AT' riken.jp
+ *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation with or without modifications and for any purpose and
  * without fee is hereby granted, provided that any copyright notices
@@ -14,7 +14,7 @@
  * names of the contributors or copyright holders not be used in
  * advertising or publicity pertaining to distribution of the software
  * without specific prior permission.
- * 
+ *
  * THE CONTRIBUTORS AND COPYRIGHT HOLDERS OF THIS SOFTWARE DISCLAIM ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL THE
@@ -23,7 +23,7 @@
  * OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
  * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE
  * OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
 
 #include <time.h>
@@ -334,7 +334,7 @@ static int svd(int m, int n, double** u, double w[], double** vt)
  *   A=usv  of a real m by n rectangular matrix, where m is greater
  *   than or equal to n.  Householder bidiagonalization and a variant
  *   of the QR algorithm are used.
- *  
+ *
  *
  *   On input.
  *
@@ -932,7 +932,7 @@ positive integer if the singular value decomposition fails to converge.
 static
 double euclid (int n, double** data1, double** data2, int** mask1, int** mask2,
   const double weight[], int index1, int index2, int transpose)
- 
+
 /*
 Purpose
 =======
@@ -1708,7 +1708,7 @@ Otherwise, the distance between two columns in the matrix is calculated.
 
 /* *********************************************************************  */
 
-static double(*setmetric(char dist)) 
+static double(*setmetric(char dist))
   (int, double**, double**, int**, int**, const double[], int, int, int)
 { switch(dist)
   { case 'e': return &euclid;
@@ -2203,7 +2203,7 @@ calculating the medians.
     }
   }
 }
- 
+
 /* ********************************************************************* */
 
 int getclustercentroids(int nclusters, int nrows, int ncolumns,
@@ -2427,7 +2427,7 @@ kmeans(int nclusters, int nrows, int ncolumns, double** data, int** mask,
         break; /* Identical solution found; break out of this loop */
     }
 
-    if (npass<=1) 
+    if (npass<=1)
     { *error = total;
       break;
     }
@@ -2532,7 +2532,7 @@ kmedians(int nclusters, int nrows, int ncolumns, double** data, int** mask,
         break; /* Identical solution found; break out of this loop */
     }
 
-    if (npass<=1) 
+    if (npass<=1)
     { *error = total;
       break;
     }
@@ -2603,7 +2603,7 @@ of the matrix are clustered.
 
 npass      (input) int
 The number of times clustering is performed. Clustering is performed npass
-times, each time starting from a different (random) initial assignment of 
+times, each time starting from a different (random) initial assignment of
 genes to clusters. The clustering solution with the lowest within-cluster sum
 of distances is chosen.
 If npass==0, then the clustering algorithm will be run once, where the initial
@@ -2697,7 +2697,7 @@ number of clusters is larger than the number of elements being clustered,
       return;
     }
   }
-  
+
   if (method=='m')
   { double* cache = malloc(nelements*sizeof(double));
     if(cache)
@@ -3105,7 +3105,7 @@ weights array, the function returns NULL.
 
 /* ******************************************************************** */
 
-void cuttree (int nelements, Node* tree, int nclusters, int clusterid[]) 
+void cuttree (int nelements, Node* tree, int nclusters, int clusterid[])
 
 /*
 Purpose
@@ -3123,7 +3123,7 @@ The number of elements that were clustered.
 
 tree           (input) Node[nelements-1]
 The clustering solution. Each node in the array describes one linking event,
-with tree[i].left and tree[i].right representig the elements that were joined.
+with tree[i].left and tree[i].right representing the elements that were joined.
 The original elements are numbered 0..nelements-1, nodes are numbered
 -1..-(nelements-1).
 
@@ -3131,48 +3131,57 @@ nclusters      (input) int
 The number of clusters to be formed.
 
 clusterid      (output) int[nelements]
-The number of the cluster to which each element was assigned. Space for this
-array should be allocated before calling the cuttree routine. If a memory
-error occured, all elements in clusterid are set to -1.
+The number of the cluster to which each element was assigned. Clusters are
+numbered 0..nclusters-1 in the left-to-right order in which they appear in the
+hierarchical clustering tree. Space for the clusterid array should be allocated
+before calling the cuttree routine. If a memory error occured, all elements in
+clusterid are set to -1.
 
 ========================================================================
 */
-{ int i, j, k;
-  int icluster = 0;
+{ int i = -nelements+1; /* top node */
+  int j;
+  int k = -1;
+  int previous = nelements;
   const int n = nelements-nclusters; /* number of nodes to join */
-  int* nodeid;
-  for (i = nelements-2; i >= n; i--)
-  { k = tree[i].left;
-    if (k>=0)
-    { clusterid[k] = icluster;
-      icluster++;
-    }
-    k = tree[i].right;
-    if (k>=0)
-    { clusterid[k] = icluster;
-      icluster++;
-    }
+  int* parents;
+  if (nclusters==1) {
+      for (i = 0; i < nelements; i++) clusterid[i] = 0;
+      return;
   }
-  nodeid = malloc(n*sizeof(int));
-  if(!nodeid)
+  parents = malloc((nelements-1)*sizeof(int));
+  if (!parents)
   { for (i = 0; i < nelements; i++) clusterid[i] = -1;
     return;
   }
-  for (i = 0; i < n; i++) nodeid[i] = -1;
-  for (i = n-1; i >= 0; i--)
-  { if(nodeid[i]<0) 
-    { j = icluster;
-      nodeid[i] = j;
-      icluster++;
-    }
-    else j = nodeid[i];
-    k = tree[i].left;
-    if (k<0) nodeid[-k-1] = j; else clusterid[k] = j;
-    k = tree[i].right;
-    if (k<0) nodeid[-k-1] = j; else clusterid[k] = j;
+  while (1) {
+      if (i >= 0) {
+          clusterid[i] = k;
+          j = i;
+          i = previous;
+          previous = j;
+      }
+      else {
+          j = -i-1;
+          if (previous == tree[j].left) {
+              previous = i;
+              i = tree[j].right;
+              if (j >= n && (i >= 0 || -i-1 < n)) k++;
+          }
+          else if (previous == tree[j].right) {
+              previous = i;
+              i = parents[j];
+              if (i==nelements) break;
+          }
+          else {
+              parents[j] = previous;
+              previous = i;
+              i = tree[j].left;
+              if (j >= n && (i >= 0 || -i-1 < n)) k++;
+          }
+      }
   }
-  free(nodeid);
-  return;
+  free(parents);
 }
 
 /* ******************************************************************** */
@@ -3269,7 +3278,7 @@ If a memory error occurs, pclcluster returns NULL.
   if(!makedatamask(nelements, ndata, &newdata, &newmask))
   { free(result);
     free(distid);
-    return NULL; 
+    return NULL;
   }
 
   for (i = 0; i < nelements; i++) distid[i] = i;
@@ -3313,7 +3322,7 @@ If a memory error occurs, pclcluster returns NULL.
     free(mask[is]);
     data[is] = data[nnodes-inode];
     mask[is] = mask[nnodes-inode];
-  
+
     /* Fix the distances */
     distid[is] = distid[nnodes-inode];
     for (i = 0; i < is; i++)
@@ -3334,7 +3343,7 @@ If a memory error occurs, pclcluster returns NULL.
   free(data);
   free(mask);
   free(distid);
- 
+
   return result;
 }
 
@@ -3829,8 +3838,115 @@ If a memory error occurs, treecluster returns NULL.
     for (i = 1; i < nelements; i++) free(distmatrix[i]);
     free (distmatrix);
   }
- 
+
   return result;
+}
+
+/* ******************************************************************* */
+
+int sorttree(const int nnodes, Node* tree, const double order[], int indices[])
+/*
+Purpose
+=======
+
+The sorttree routine sorts the items in a hierarchical clustering solution
+based on their order values, while remaining consistent with the hierchical
+clustering solution.
+
+Arguments
+=========
+
+nnodes         (input) int
+The number of nodes in the hierarchical clustering tree.
+
+tree           (input) Node[nnodes]
+The hierarchical clustering tree describing the clustering solution.
+
+order          (input) double[nnodes+1]
+The preferred order of the items.
+
+indices          (output) int*
+The indices of each item after sorting, with item i appearing at indices[i]
+after sorting.
+
+Return value
+============
+
+If no errors occur, sorttree returns 1.
+If a memory error occurs, sorttree returns 0.
+
+========================================================================
+*/
+
+{ int i;
+  int index;
+  int i1, i2;
+  double order1, order2;
+  int counts1, counts2;
+  int* nodecounts = malloc(nnodes*sizeof(int));
+  if (!nodecounts) return 0;
+  if (order) {
+    double* nodeorder = malloc(nnodes*sizeof(double));
+    if (!nodeorder) {
+        free(nodecounts);
+        return 0;
+    }
+    for (i = 0; i < nnodes; i++)
+    { i1 = tree[i].left;
+      i2 = tree[i].right;
+      /* i1 and i2 are the elements that are to be joined */
+      if (i1 < 0)
+      { index = -i1-1;
+        order1 = nodeorder[index];
+        counts1 = nodecounts[index];
+      }
+      else
+      { order1 = order[i1];
+        counts1 = 1;
+      }
+      if (i2 < 0)
+      { index = -i2-1;
+        order2 = nodeorder[index];
+        counts2 = nodecounts[index];
+      }
+      else
+      { order2 = order[i2];
+        counts2 = 1;
+      }
+      if (order1 > order2) {
+        tree[i].left = i2;
+        tree[i].right = i1;
+      }
+      nodecounts[i] = counts1 + counts2;
+      nodeorder[i] = (counts1*order1 + counts2*order2) / (counts1 + counts2);
+    }
+    free(nodeorder);
+  }
+  else
+  { for (i = 0; i < nnodes; i++)
+    { i1 = tree[i].left;
+      i2 = tree[i].right;
+      /* i1 and i2 are the elements that are to be joined */
+      counts1 = (i1 < 0) ? nodecounts[-i1-1] : 1;
+      counts2 = (i2 < 0) ? nodecounts[-i2-1] : 1;
+      nodecounts[i] = counts1 + counts2;
+    }
+  }
+  i--;
+  nodecounts[i] = 0;
+  for ( ; i >= 0; i--)
+  { i1 = tree[i].left;
+    i2 = tree[i].right;
+    counts1 = (i1<0) ? nodecounts[-i1-1] : 1;
+    index = nodecounts[i];
+    if (i1 >= 0) indices[index] = i1;
+    else nodecounts[-i1-1] = index;
+    index += counts1;
+    if (i2 >= 0) indices[index] = i2;
+    else nodecounts[-i2-1] = index;
+  }
+  free(nodecounts);
+  return 1;
 }
 
 /* ******************************************************************* */
@@ -4235,7 +4351,7 @@ somcluster.
 double clusterdistance (int nrows, int ncolumns, double** data,
   int** mask, double weight[], int n1, int n2, int index1[], int index2[],
   char dist, char method, int transpose)
-              
+
 /*
 Purpose
 =======

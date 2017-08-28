@@ -10,7 +10,9 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
-  Alien::Libarchive
+  Alien::Base::Wrapper
+  Alien::Libarchive3
+  Capture::Tiny
   Exporter::Tidy
   ExtUtils::CChecker
   Math::Int64

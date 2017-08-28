@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 package stasis;
 package main;
 use autodie;
@@ -9,7 +9,7 @@ use Time::Seconds;
 use Getopt::Long 'GetOptions';
 use Pod::Usage 'pod2usage';
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 my $start_time = localtime;
 
@@ -40,7 +40,7 @@ die "--passfile $passfile does not exist\n" if $passfile && ! -e $passfile;
 # check if a backup already exists within x days
 unless (need_backup())
 {
-  print "A backup already exists within $days\n";
+  log_msg("A backup already exists within $days days");
   exit 0;
 }
 
@@ -49,7 +49,7 @@ my $tmp_destination = join('/', $tmp, $archive_name);
 my $final_destination = join('/', $destination, $archive_name);
 
 # read file list
-print "\nStasis backup started on $start_time\nReading $file_list\n";
+log_msg("\nStasis backup started on $start_time","Reading $file_list");
 open my $files, '<', $file_list or die $!;
 my @files;
 while (<$files>)
@@ -57,7 +57,7 @@ while (<$files>)
   chomp;
   push @files, $_;
 }
-printf "Found %s files/directories to archive\n", scalar @files;
+log_msg(sprintf "Found %s files/directories to archive", scalar @files);
 
 # compress
 my $rv = compress($tmp_destination, \@files, $ignore, $verbose);
@@ -73,7 +73,7 @@ die "Failed to clean $tmp_destination $?\n" unless $rv;
 
 my $end_time = localtime;
 
-printf "Archiving complete, runtime: %u secs\n", $end_time - $start_time;
+log_msg(sprintf "Archiving complete, runtime: %u secs", $end_time - $start_time);
 
 sub compress
 {
@@ -82,20 +82,23 @@ sub compress
   my $ignore_text = $ignore ? "-X $ignore" : "";
   my $file_list = join(' ', @$files);
 
-  print "Compressing files:\n";
+  log_msg("Compressing files");
   system("tar $args $destination $ignore_text $file_list");
 }
 
 sub gen_archive_name
 {
   my $dt = localtime;
-  return 'stasis-' . $dt->datetime . '.tar.gz.gpg';
+  my $name = 'stasis-' . $dt->datetime . '.tar.gz.gpg';
+  # replace fat32 illegal characters in timestamp
+  $name =~ s/:/_/g;
+  return $name;
 }
 
 sub encrypt
 {
   my ($source, $passphrase, $referrer, $passfile, $final_destination) = @_;
-  print "Encrypting archive\n";
+  log_msg("Encrypting archive");
 
   if ($passphrase || $passfile)
   {
@@ -115,14 +118,14 @@ sub clean
 {
   my ($tmp_file, $destination, $limit, $verbose) = @_;
 
-  print "Cleaning files\n";
+  log_msg("Cleaning files");
 
   if (defined $limit)
   {
     # always keep the latest backup
     $limit = 1 if $limit == 0;
 
-    print "Cleaning backups, limit $limit\n" if $verbose;
+    log_verbose("Cleaning backups, limit $limit");
     my @backups = ();
     opendir(my $dir, $destination);
 
@@ -135,7 +138,7 @@ sub clean
     my @keep_me = splice(@sorted_backups, 0, $limit);
 
     # delete remaining backups
-    print "Deleting @sorted_backups\n" if $verbose && @sorted_backups;
+    log_verbose("Deleting @sorted_backups") if @sorted_backups;
     unlink @sorted_backups;
   }
   unlink $tmp_file;
@@ -144,15 +147,24 @@ sub clean
 sub need_backup
 {
   my $backup_horizon = $start_time - ONE_DAY * $days;
+  log_verbose("backup horizon: $backup_horizon");
+
   opendir(my $dir, $destination);
   while (readdir $dir)
   {
     next unless /^stasis-.+?\.gpg$/;
     my @stat = stat "$destination/$_";
-    return 0 if $stat[10] > $backup_horizon->epoch;
+    my $backup_dt = Time::Piece->strptime($stat[9], '%s');
+    log_verbose("$destination/$_: $backup_dt");
+
+    return 0 if $backup_dt > $backup_horizon;
   }
   return 1;
 }
+
+sub log_msg { print STDERR join("\n", @_, '') }
+sub log_verbose { log_msg(@_) if $verbose }
+
 1;
 __END__
 =head1 NAME

@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use MYDan::Project::Check;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+eval{ MYDan::Project::Check->new( conf => $param{argv} )->check(); };
+
+if( $@ ) { print "ERROR: $@"; exit 1; }
+
+print 'done.';
+exit 0;

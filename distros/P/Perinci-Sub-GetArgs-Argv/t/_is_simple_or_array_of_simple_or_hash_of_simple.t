@@ -45,7 +45,7 @@ subtest "array of simple" => sub {
         name => "based on simple types",
         test_needs => ["Sah::Schema::aos"],
         schema => "aos",
-        result => [0, 1, 0, "array", {of=>["str",{},{}], summary=>"Array of strings", description=>"\nNote that for flexibility, the strings are allowed to be undefs.\n\n"}, "str"],
+        result => [0, 1, 0, "array", {of=>["str",{},{}], summary=>"Array of strings"}, "str"],
     );
     test_is_simple_or_aos_or_hos(
         name => "array of (simple types)",
@@ -81,7 +81,7 @@ subtest "hash of simple" => sub {
         name => "based on simple types",
         test_needs => ["Sah::Schema::hos"],
         schema => "hos",
-        result => [0, 0, 1, "hash", {of=>["str",{},{}], summary=>"Hash of strings", description=>"\nNote that for flexibility, the strings are allowed to be undefs.\n\n"}, "str"],
+        result => [0, 0, 1, "hash", {of=>["str",{},{}], summary=>"Hash of strings"}, "str"],
     );
     test_is_simple_or_aos_or_hos(
         name => "hash of (simple types)",
@@ -119,6 +119,10 @@ sub test_is_simple_or_aos_or_hos {
         }
         my $nsch = normalize_schema($args{schema});
         my @res = Perinci::Sub::GetArgs::Argv::_is_simple_or_array_of_simple_or_hash_of_simple($nsch);
+
+        # remove description first
+        delete $res[4]{description};
+
         is_deeply(\@res, $args{result}, "result")
             or diag explain \@res;
     };

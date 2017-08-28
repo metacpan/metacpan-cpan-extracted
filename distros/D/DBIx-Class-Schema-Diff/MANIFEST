@@ -18,6 +18,7 @@ t/01_basic.t
 t/02_limit_ignore.t
 t/03_filter.t
 t/04_schema_data.t
+t/05_schema_data_prune.t
 t/99_pod.t
 t/lib/TestSchema/Sakila.pm
 t/lib/TestSchema/Sakila/Result/Actor.pm
@@ -91,6 +92,7 @@ t/lib/TestSchema/Sakila3/Result/SaleByFilmCategory.pm
 t/lib/TestSchema/Sakila3/Result/Staff.pm
 t/lib/TestSchema/Sakila3/Result/StaffList.pm
 t/lib/TestSchema/Sakila3/Result/Store.pm
+t/var/dbicsd-t-tmp/_tmp.json
 t/var/sakila_schema_data.json
 t/var/sakila_schema_data_pre0829.json
 t/var/sakila_schema_data_pre8280.json

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -34,6 +34,15 @@ CONSTRUCTOR
      my $abmb = Alien::Build::MB->new(%args);
 
     Takes the usual Module::Build arguments.
+
+PROPERTIES
+
+    All Alien::Build::MB specific properties have a alien_ prefix.
+
+ alien_alienfile_meta
+
+    If true (the default), then extra meta will be stored in x_alienfile
+    which includes the share and system prereqs.
 
 METHODS
 

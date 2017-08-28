@@ -1,13 +1,13 @@
 ---
 abstract: "Default Boilerplate for Joel's Code"
 author:
-  - 'Joel Maslak <jmaslak@antelope.net>'
+  - 'J. Maslak <jmaslak@antelope.net>'
 build_requires:
   Test::More: '1.001014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: JCM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '1.014'
+    version: '1.015'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
@@ -59,7 +59,8 @@ requires:
   IO::Select: '1.22'
   Import::Into: '1.002005'
   Inline: '0.80'
-  Inline::C: '0.76'
+  Inline::C: '0.78'
+  Lingua::EN::Numbers: '2.03'
   List::Util: '1.42'
   Log::Log4perl: '1.47'
   MIME::Base64: '3.15'
@@ -81,7 +82,6 @@ requires:
   POSIX: '1.53'
   Parallel::WorkUnit: '1.009'
   Perl6::Slurp: '0.051005'
-  Perl::Tags: '0.32'
   Privileges::Drop: '1.03'
   Proc::Daemon: '0.22'
   Readonly: '2.00'
@@ -108,5 +108,5 @@ requires:
   perl: v5.22.0
   strict: '0'
   warnings: '0'
-version: '1.014'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.015'
+x_serialization_backend: 'YAML::Tiny version 1.70'

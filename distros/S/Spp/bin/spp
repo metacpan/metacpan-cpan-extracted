@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use 5.012;
+no warnings "experimental";
+use Spp::Tools;
+use Spp qw(repl lint update spp);
+
+my $grammar_file = $ARGV[0];
+my $text_file    = $ARGV[1];
+if ($text_file) {
+   my $ast = spp( $grammar_file, $text_file );
+   say to_json($ast);
+}
+elsif ( $grammar_file eq 'update' ) {
+   update();
+}
+elsif ($grammar_file) { lint($grammar_file) }
+else                  { repl() }

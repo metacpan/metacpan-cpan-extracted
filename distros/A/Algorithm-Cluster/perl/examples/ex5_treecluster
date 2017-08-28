@@ -96,5 +96,18 @@ for ($i = 0; $i < $n; $i++) {
     printf("%3d: %3d %3d %7.3f\n",-1-$i,$node->left,$node->right,$node->distance);
 }
 
+print "--------------------[tree sorting]-------------\n";
+my $order =  [ 1,2,3,4,5,6,1,1,1,2,2,2,2 ];
 
+my @indices = $tree->sort($order);
+for ($i = 0; $i < $n; $i++) {
+    my $node = $tree->get($i);
+    printf("%3d: %3d %3d %7.3f\n",-1-$i,$node->left,$node->right,$node->distance);
+};
+
+print "-----------------[data after sorting]----------\n";
+for ($i = 0; $i <= $n; $i++) {
+    my $j = $indices[$i];
+    printf("%3d: %3d %7.3f %7.3f\n", $i+1, $j, $data->[$j]->[0], $data->[$j]->[1]);
+};
 __END__

@@ -12,7 +12,7 @@ copy("perl/MANIFEST.perl","MANIFEST");
 WriteMakefile(
 	NAME         => 'Algorithm::Cluster',
 	VERSION_FROM => 'perl/Cluster.pm',
-        AUTHOR       => 'John Nolan and Michiel de Hoon (mdehoon "AT" gsc.riken.jp)',
+        AUTHOR       => 'John Nolan and Michiel de Hoon (michiel.dehoon "AT" riken.jp)',
         ABSTRACT     => 'Perl interface to the C Clustering Library',
 	DIR          => [ 
 		'src', 

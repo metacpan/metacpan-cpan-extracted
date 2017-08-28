@@ -6,13 +6,14 @@ use Test::More;
 use Test::Mojo;
 use FindBin qw( $Bin );
 use File::Spec::Functions qw( catfile catdir );
-use Mojo::File qw( path );
+use Mojo::File qw( path tempdir );
 use Test::Reporter;
 use CPAN::Testers::Report;
 use CPAN::Testers::Fact::TestSummary;
 use CPAN::Testers::Fact::LegacyReport;
 use Metabase::User::Profile;
 use Mojo::Util qw( b64_encode );
+use Mock::MonkeyPatch;
 eval { require Test::mysqld } or plan skip_all => 'Requires Test::mysqld';
 
 my $mysqld = Test::mysqld->new(
@@ -23,10 +24,17 @@ my $mysqld = Test::mysqld->new(
 
 use Mojo::JSON qw( to_json );
 
+my $tempdir = tempdir;
+local $ENV{MOJO_HOME} = "".$tempdir;
+
 my $SHARE_DIR = path( $Bin, '..', 'share' );
+local $ENV{MOJO_CONFIG} = $SHARE_DIR->child( '../etc/metabase.conf' );
+
 my $bin_path = path( $Bin, '..', '..', 'bin', 'cpantesters-legacy-metabase' );
 require $bin_path;
 my $t = Test::Mojo->new;
+
+ok !-f $t->app->home->child( 'tail.lock' ), 'lock not created';
 
 my $schema = $t->app->schema(
     CPAN::Testers::Schema->connect(
@@ -36,6 +44,7 @@ my $schema = $t->app->schema(
 $schema->deploy;
 
 subtest 'post report' => sub {
+    my $mock_enqueue = Mock::MonkeyPatch->patch( 'Beam::Minion::enqueue' => sub { } );
     my %creator = (
         full_name => 'Doug Bell',
         email_address => 'doug@preaction.me',
@@ -63,6 +72,7 @@ subtest 'post report' => sub {
           ->status_is( 401 )
           ->or( sub { diag explain shift->tx->res->body } )
           ;
+        ok !$mock_enqueue->called, 'report not enqueued';
     };
 
     subtest 'check if user exists' => sub {
@@ -113,6 +123,10 @@ subtest 'post report' => sub {
             'language version is correct';
         is $row->report->{environment}{language}{archname}, 'x86_64-linux',
             'language arch is correct';
+
+        ok $mock_enqueue->called, 'report enqueued';
+        is_deeply $mock_enqueue->method_arguments, [qw( report queue ), $row->id],
+            'enqueue arguments are correct';
     };
 
     subtest 'tail/log.txt' => sub {
@@ -138,12 +152,12 @@ subtest 'post report' => sub {
             created => DateTime->new( %date ),
             report => {
                 reporter => {
-                    name => 'Doug Bell',
+                    name => 'Andreas J. K&ouml;nig (ANDK)',
                 },
                 environment => {
                     language => {
                         name => 'Perl 5',
-                        version => 'v5.24.0',
+                        version => '5.24.0',
                         archname => 'x86_64-linux',
                     },
                 },
@@ -182,9 +196,10 @@ subtest 'post report' => sub {
             },
         });
 
+        $t->app->refresh_tail_log;
         $t->get_ok( '/tail/log.txt' )
           ->content_like( qr{The last \d+ reports as of \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z:} )
-          ->content_like( qr{\Q[2017-01-01T00:00:00Z] [Doug Bell] [pass] [PREACTION/CPAN-Testers-Schema-1.001.tar.gz] [x86_64-linux] [perl-v5.24.0] [$guid] [2017-01-01T00:00:00Z]} )
+          ->content_like( qr{\Q[2017-01-01T00:00:00Z] [Andreas J. K&ouml;nig (ANDK)] [pass] [PREACTION/CPAN-Testers-Schema-1.001.tar.gz] [x86_64-linux] [perl-v5.24.0] [$guid] [2017-01-01T00:00:00Z]} )
           ->content_unlike( qr{\Q[perl-v2017.05]}, 'does not read Perl 6 reports' )
           ;
     };

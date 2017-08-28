@@ -41,7 +41,7 @@ struct SPVM_compiler {
   SPVM_DYNAMIC_ARRAY* op_constants;
   
   int64_t enum_default_value;
-  int32_t enum_default_type_id;
+  int32_t enum_default_type_code;
 
   // Packages
   SPVM_DYNAMIC_ARRAY* op_packages;
@@ -55,19 +55,25 @@ struct SPVM_compiler {
   // Include pathes
   SPVM_DYNAMIC_ARRAY* include_pathes;
   
-  // Method absolute name symbol table
+  // Subroutine ops
+  SPVM_DYNAMIC_ARRAY* op_subs;
+  
+  // Subroutine absolute name symbol table
   SPVM_HASH* op_sub_symtable;
   
   // Field absolute name symbol table
   SPVM_HASH* op_field_symtable;
+
+  // Field absolute name symbol table
+  SPVM_HASH* op_fields;
   
   // use symbol table
   SPVM_HASH* op_use_symtable;
   
-  // Types
+  // Types(This is all type ops in source code)
   SPVM_DYNAMIC_ARRAY* op_types;
   
-  // Resovled types
+  // Types(This is unique types)
   SPVM_DYNAMIC_ARRAY* types;
   
   // Resolved type symbol table
@@ -91,13 +97,16 @@ struct SPVM_compiler {
   int32_t current_package_count;
   
   // Package indexes constant pool index
-  int32_t package_indexes_constant_pool_index;
+  int32_t packages_base;
+
+  // Type indexes constant pool index
+  int32_t types_base;
+
+  // Type code to id index
+  int32_t type_code_to_id_base;
   
   // Subroutine indexes constant pool index
-  int32_t sub_indexes_constant_pool_index;
-  
-  // Subroutine length
-  int32_t subs_length;
+  int32_t subs_base;
   
   // Native subroutines
   SPVM_DYNAMIC_ARRAY* native_subs;

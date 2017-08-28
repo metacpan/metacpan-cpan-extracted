@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Lexicon::Table;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 
 use Log::Report 'log-report-lexicon';
@@ -37,15 +37,16 @@ sub translations(;$) {panic "not implemented"}
 
 sub pluralIndex($)
 {   my ($self, $count) = @_;
-    my $algo = $self->{algo} or panic;
+    my $algo = $self->{algo}
+        or error __x"there is no Plural-Forms field in the header, but needed";
+
     $algo->($count);
 }
 
 
 sub setupPluralAlgorithm()
 {   my $self  = shift;
-    my $forms = $self->header('Plural-Forms')
-        or error __x"there is no Plural-Forms field in the header";
+    my $forms = $self->header('Plural-Forms') or return;
 
     my $alg   = $forms =~ m/plural\=([n%!=><\s\d|&?:()]+)/ ? $1 : "n!=1";
     $alg =~ s/\bn\b/(\$_[0])/g;

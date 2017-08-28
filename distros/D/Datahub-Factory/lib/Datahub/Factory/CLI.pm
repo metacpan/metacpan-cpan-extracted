@@ -10,7 +10,9 @@ use Log::Any::Adapter;
 use Log::Log4perl;
 use namespace::clean;
 use DateTime;
+use Term::ANSIColor qw(:constants);
 
+use Data::Dumper qw(Dumper);
 
 use parent qw(App::Cmd);
 
@@ -20,18 +22,18 @@ sub plugin_search_path {'Datahub::Factory::Command'}
 
 sub global_opt_spec {
     return (
-      ['log_level|L:i', "Log level (1 - 3) with 3 the chattiest."],
-      ['log_output|O:s', "Log output handler: STDERR, STDOUT or the STATISTICS log file."]
+        ['log_level|L:i', "Log level (1 - 3) with 3 the chattiest."],
+        ['log_output|O:s', "Log output handler: STDERR, STDOUT or the STATISTICS log file."]
     );
 }
 
 sub default_log4perl_config {
     my ($level, $appender) = @_;
     if (!defined($level)) {
-      $level = 'WARN';
+        $level = 'WARN';
     }
     if (!defined($appender)) {
-      $appender = 'STDERR';
+        $appender = 'STDERR';
     }
 
     my $date = DateTime->now()->dmy();
@@ -66,40 +68,50 @@ EOF
 }
 
 sub setup_logging {
-  my ($logging, $appender) = @_;
-  my %LEVELS = (1 => 'WARN', 2 => 'INFO', 3 => 'DEBUG');
-  my $level  = $LEVELS{$logging};
+    my ($logging, $appender) = @_;
+    my %LEVELS = (1 => 'WARN', 2 => 'INFO', 3 => 'DEBUG');
+    my $level  = $LEVELS{$logging};
 
-  Log::Log4perl::init(default_log4perl_config($level, $appender));
-  Log::Any::Adapter->set('Log4perl');
+    Log::Log4perl::init(default_log4perl_config($level, $appender));
+    Log::Any::Adapter->set('Log4perl');
 
-  if ($level eq 'DEBUG') {
-    Datahub::Factory->log->warn(
-      "Logger activated - level $level"
-    );
-  }
+    if ($level eq 'DEBUG') {
+        Datahub::Factory->log->warn(
+            "Logger activated - level $level"
+        );
+      }
 }
 
 sub run {
-  my ($class) = @_;
-  my ($global_opts, $argv)
-    = $class->_process_args([@ARGV],
-      $class->_global_option_processing_params);
+    my ($class) = @_;
+    my ($global_opts, $argv)
+         = $class->_process_args([@ARGV],
+         $class->_global_option_processing_params);
 
-  # Setup logging
-  if (exists $global_opts->{'log_level'}) {
-    setup_logging($global_opts->{'log_level'}, $global_opts->{'log_output'});
-  }
+    # Setup logging
+    if (exists $global_opts->{'log_level'}) {
+        setup_logging($global_opts->{'log_level'}, $global_opts->{'log_output'});
+    }
 
-  my $self = ref $class ? $class : $class->new;
-  $self->set_global_options($global_opts);
+    my $self = ref $class ? $class : $class->new;
+    $self->set_global_options($global_opts);
 
-  my ($cmd, $opt, @args) = $self->prepare_command(@$argv);
+    my ($cmd, $opt, @args) = $self->prepare_command(@$argv);
 
-  # ...and then run it
-  $self->execute_command($cmd, $opt, @args);
+    # ...and then run it
+    try {
+        $self->execute_command($cmd, $opt, @args);
+    }
+    catch {
+        local $Term::ANSIColor::AUTORESET = 1;
+        print RED "Oops! $_";
+        goto ERROR;
+    };
 
-  return 1;
+    return 1;
+
+ERROR:
+    return undef;
 }
 
 1;

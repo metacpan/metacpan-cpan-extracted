@@ -1,5 +1,4 @@
-requires "Alien::Base" => "0.023";
-requires "File::ShareDir" => "1.03";
+requires "Alien::Base" => "1.00";
 requires "perl" => "5.006";
 
 on 'test' => sub {
@@ -8,9 +7,8 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "Alien::Base::ModuleBuild" => "0.023";
+  requires "Alien::Base::ModuleBuild" => "0.044";
   requires "Capture::Tiny" => "0";
-  requires "File::ShareDir" => "1.03";
   requires "File::chdir" => "0";
   requires "perl" => "5.006";
 };

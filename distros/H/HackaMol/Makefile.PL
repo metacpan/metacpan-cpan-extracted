@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "0.0",
     "YAML::XS" => "0.41"
   },
-  "VERSION" => "0.043",
+  "VERSION" => "0.044",
   "test" => {
     "TESTS" => "t/*.t t/HackaMol/*.t t/HackaMol/Roles/*.t"
   }

@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Mojopaste;
 # ABSTRACT: Service provider for mojopaste
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 use parent 'App::Nopaste::Service';
 
@@ -57,7 +57,7 @@ App::Nopaste::Service::Mojopaste - Service provider for mojopaste
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 USAGE
 

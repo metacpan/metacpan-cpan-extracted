@@ -1,0 +1,18 @@
+GLFWcursor *           T_PTRREF
+GLFWmonitor *          T_PTRREF
+GLFWwindow *           T_PTRREF
+
+GLFWgammaramp *        T_PTR
+GLFWimage *            T_PTR
+GLFWvidmode *          T_PTR
+
+const GLFWgammaramp *  T_PTR
+const GLFWimage *      T_PTR
+const GLFWvidmode *    T_PTR
+
+uint32_t               T_UV
+uint64_t               T_UV
+
+const float *          T_PTR
+const char * *         T_PTR
+const unsigned char *  T_PV

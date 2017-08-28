@@ -1,0 +1,28 @@
+Revision history for perl distribution OpenAPI-Client
+
+0.07 2017-08-22T21:05:46+0200
+ - Try to make reading from STDIN a bit more robust
+
+0.06 2017-08-21T09:14:23+0200
+ - Add validator() method
+ - Add "mojo openapi spec.json -I operationId"
+ - Will list available operationIds when no operationId is specified
+
+0.05 2017-08-20T11:18:54+0200
+ - Forgot to bump JSON::Validator to 1.01
+
+0.04 2017-08-19T23:05:26+0200
+ - Fix "mojo openapi" against online resources
+
+0.03 2017-08-19T22:39:33+0200
+ - Add "mojo openapi" command
+ - Add support for running against local app
+ - Removed local_app() method
+
+0.02 2017-08-19T10:59:07+0200
+ - Fix validation of body parameters
+
+0.01 2017-08-18T19:30:32+0200
+ - Converted Swagger2::Client to OpenAPI::Client
+ - Marked as EXPERIMENTAL
+

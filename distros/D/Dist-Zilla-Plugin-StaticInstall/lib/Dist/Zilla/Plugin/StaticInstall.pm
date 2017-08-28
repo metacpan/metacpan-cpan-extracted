@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::StaticInstall; # git description: v0.009-6-g2a0e443
+package Dist::Zilla::Plugin::StaticInstall; # git description: v0.010-7-gd38f166
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: (EXPERIMENTAL, DANGEROUS) Identify a distribution as eligible for static installation
 # KEYWORDS: distribution metadata toolchain static dynamic installation
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -232,7 +232,7 @@ Dist::Zilla::Plugin::StaticInstall - (EXPERIMENTAL, DANGEROUS) Identify a distri
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

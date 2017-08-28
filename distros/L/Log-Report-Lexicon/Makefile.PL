@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '1.08';
+my $version = '1.09';
 
 my %prereq  =
   ( Test::More               => '0.86'
@@ -14,7 +14,7 @@ my %prereq  =
   , IO::File                 => 0
   , List::Util               => 0
   , Scalar::Util             => 0
-  , Log::Report              => 1.20
+  , Log::Report              => 1.22
   , Pod::Usage               => 0
   , POSIX                    => 0
   , Encode                   => 0
@@ -43,14 +43,12 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for OODoc's oodist, DIST
 RAWDIR          = ../public_html/log-report-lexicon/raw
 DISTDIR         = ../public_html/log-report-lexicon/source
-LICENSE         = artistic
-SKIP_LINKS	= XML::LibXML
 
 # for OODoc's oodist, POD
 FIRST_YEAR      = 2007
 EMAIL           = perl@overmeer.net
 WEBSITE         = http://perl.overmeer.net/log-report/
-EXTENDS		= ../LogOpt:../Print:../LogReport
+EXTENDS         = ../LogOpt:../Print:../LogReport:../LogTT
 
 __POSTAMBLE
 

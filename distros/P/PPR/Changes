@@ -85,3 +85,33 @@ Revision history for PPR
       (Sincere thanks to Merijn)
 
     * Made interpolating quotelikes work (more) correctly.
+
+
+0.000012  Mon Aug 21 20:40:08 2017
+
+    * Handled /.../n flag
+      (thanks, David)
+
+    * Handled leading BOM correctly 
+      (thanks, David)
+
+    * Handled ${!}-style punctuation variables 
+      (thanks, David)
+
+    * "fline" is not a word (thanks, Hugo ;-)
+
+    * Added (?&PerlEndOfLine)
+      (Thanks, Yves)
+
+    * Handled s/.../.../e behaviour better.
+      Still not perfect, but perfection may not be possible using regexes.
+      (Thanks, Aaron!)
+
+    * Neutralized bizarre undefined warnings
+      under earlier Perl versions.
+
+
+0.000013  Mon Aug 21 20:54:42 2017
+
+    * Removed spurious Regexp::Debugger dependency
+      (Thanks Slaven!)

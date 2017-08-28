@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::glk
 # ABSTRACT:  Configuration class LCDd::glk
+
 =encoding utf8
 
 =head1 NAME
@@ -16,15 +17,45 @@ generated from LCDd.conf
 
 =head2 Contrast
 
-set the initial contrast value I<< Optional. Type integer. upstream_default: '560'.  >> 
+set the initial contrast value I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+560
+
+=back
+
+
 
 =head2 Device
 
-select the serial device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+select the serial device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Speed
 
-set the serial port speed I<< Optional. Type enum. choice: '9600', '19200', '38400'. upstream_default: '19200'.  >> 
+set the serial port speed I< Optional. Type enum. choice: '9600', '19200', '38400'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+19200
+
+=back
+
+
 
 =head1 SEE ALSO
 

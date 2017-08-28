@@ -1,0 +1,159 @@
+---
+global:
+    - indir: data/processed
+    - outdir: data/analysis
+    - script_dir: scripts
+    - conf_dir: conf
+    - raw_dir: data/raw
+    - raw: data/raw
+    - rename_dir: data/raw/rename
+    - rename: data/raw/rename
+    - trimmomatic_dir: "data/processed/{$sample}/trimmomatic"
+    - trimmomatic: "data/processed/{$sample}/trimmomatic"
+    - trimmomatic_fastqc_dir: "data/processed/{$sample}/trimmomatic_fastqc"
+    - trimmomatic_fastqc: "data/processed/{$sample}/trimmomatic_fastqc"
+    - analysis_dir: data/analysis/
+    - analysis: data/analysis
+    - file_rule: (Sample.*)$
+    - data_dir: "/scratch/Reference_Genomes/Public/Invertebrate/Drosophila_melanogaster/ENSEMBL-release-81-BDGP6"
+    - ANNOTATION:  "{$self->data_dir}/tr_Drosophila_melanogaster_BDGP6/Drosophila_melanogaster.BDGP6.81"
+    - REFERENCE: "{$self->data_dir}/Drosophila_melanogaster.BDGP6.dna.toplevel"
+    - htseq_dir: "data/analysis/Counts"
+    - by_sample_outdir: 1
+    - find_by_dir: 1
+    - override_process: 0
+    - wait: 0
+rules:
+    - create_analysis_dirs:
+        local:
+                - create_outdir: 0
+                - override_process: 1
+                - before_meta: |
+                        HPC THINGS
+
+                        #
+                        #HPC jobname=create_analysis_dirs
+                        #HPC module=gencore/1 gencore_rnaseq
+                        #HPC mem=8GB
+                        #HPC walltime=00:20:00
+                        #HPC cpus_per_task=1
+                        #HPC procs=1
+                        #HPC ntasks=1
+                        #HPC account=gencore
+                        #HPC partition=serial
+                        #
+        process: |
+            mkdir -p {$self->raw_dir}/rename && \
+            mkdir -p {$self->analysis_dir} && \
+            mkdir -p {$self->analysis_dir}/FPKMs &&  \
+            mkdir -p {$self->analysis_dir}/BAMs  && \
+            mkdir -p {$self->analysis_dir}/Transcripts && \
+            mkdir -p {$self->analysis_dir}/CUFFDIFF && \
+            mkdir -p {$self->analysis_dir}/Counts && \
+            mkdir -p {$self->analysis_dir}/Counts/DESeq2
+    - tophat2:
+        local:
+                - create_outdir: 1
+                - indir: "{$self->trimmomatic_dir}"
+                - before_meta: |
+                        HPC THINGS
+
+                        #
+                        #HPC jobname=tophat2
+                        #HPC deps=create_analysis_dirs
+                        #HPC module=gencore/1 gencore_rnaseq
+                        #HPC mem=60GB
+                        #HPC walltime=12:00:00
+                        #HPC cpus_per_task=12
+                        #HPC procs=1
+                        #HPC ntasks=1
+                        #HPC account=gencore
+                        #HPC partition=serial
+                        #
+        process: |
+            #TASK tags={$sample}
+            tophat2 -o {$self->outdir} \
+            --no-novel-juncs -p 12 --transcriptome-index={$self->ANNOTATION} \
+                {$self->{REFERENCE}} \
+                {$self->trimmomatic_dir}/{$sample}_read1_trimmomatic_1PE.fastq.gz \
+                {$self->trimmomatic_dir}/{$sample}_read2_trimmomatic_2PE.fastq.gz
+    - cufflinks:
+        local:
+                - create_outdir: 0
+                - INPUT: "{$self->indir}/accepted_hits.bam"
+                - OUTPUT: "{$self->analysis_dir}/BAMs/{$sample}_accepted_hits.bam"
+                - before_meta: |
+                        HPC THINGS
+
+                        #
+                        #HPC jobname=cufflinks
+                        #HPC deps=tophat2
+                        #HPC module=gencore/1 gencore_dev
+                        #HPC mem=60GB
+                        #HPC walltime=18:00:00
+                        #HPC cpus_per_task=12
+                        #HPC procs=1
+                        #HPC ntasks=1
+                        #HPC account=gencore
+                        #HPC partition=serial
+                        #
+        process: |
+                #TASK tags={$sample}
+                chmod a+rwx {$self->analysis_dir}/{$sample} && \
+                env |grep -i slurm && \
+                cufflinks -p 12 --no-update-check -o {$self->outdir} -G {$self->ANNOTATION}.gff {$self->INPUT} && \
+                    cp {$self->INPUT} {$self->OUTPUT} && \
+                    cp {$self->outdir}/gene* {$self->analysis_dir}/FPKMs/{$sample}_gene_fpkms.txt && \
+                    cp {$self->outdir}/transcrip* {$self->analysis_dir}/Transcripts/{$sample}_transcripts.gtf
+    - samtools_sort:
+        local:
+                - INPUT: "{$self->analysis_dir}/BAMs/{$sample}_accepted_hits.bam"
+                - OUTPUT: "{$self->analysis_dir}/BAMs/{$sample}_sorted.accepted_hits.bam"
+                - before_meta: |
+                        HPC THINGS
+
+                        #
+                        #HPC jobname=samtools_sort
+                        #HPC deps=cufflinks
+                        #HPC module=gencore/1 gencore_rnaseq
+                        #HPC mem=80GB
+                        #HPC walltime=18:00:00
+                        #HPC cpus_per_task=12
+                        #HPC procs=1
+                        #HPC ntasks=1
+                        #HPC account=gencore
+                        #HPC partition=serial
+                        #
+        process: |
+                #TASK tags={$sample}
+                samtools sort -n -@ 6 -O bam \
+                    -T {$self->analysis_dir}/BAMs/{$sample}_sorted.accepted_hits.tmp \
+                    -o {$self->OUTPUT} \
+                    {$self->INPUT}
+    - htseq_count:
+        local:
+                - INPUT: "{$self->analysis_dir}/BAMs/{$sample}_sorted.accepted_hits.bam"
+                - OUTPUT: "{$self->analysis_dir}/Counts/htseq_$name.txt"
+                - before_meta: |
+                        HPC THINGS
+
+                        #
+                        #HPC jobname=htseq_count
+                        #HPC deps=samtools_sort
+                        #HPC module=gencore/1 gencore_rnaseq
+                        #HPC mem=50GB
+                        #HPC walltime=18:00:00
+                        #HPC cpus_per_task=1
+                        #HPC procs=1
+                        #HPC ntasks=1
+                        #HPC account=gencore
+                        #HPC partition=serial
+                        #
+        process: |
+                #TASK tags={$sample}
+                name=`echo {$sample}| sed s/Sample_//` && \
+                htseq-count -f bam -s no -t exon \
+                    -i gene_id \
+                    {$self->INPUT} \
+                    {$self->ANNOTATION}.gff > {$self->OUTPUT} && \
+                    sed -i '/^__.*/d'  {$self->OUTPUT}

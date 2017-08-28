@@ -1,19 +1,32 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Resource::Path;
-$XML::Ant::BuildFile::Resource::Path::VERSION = '0.216';
 
 # ABSTRACT: Path-like structure in an Ant build file
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a L<Moose|Moose> type class meant for use with
+#pod L<XML::Rabbit|XML::Rabbit> when processing path-like structures in an Ant
+#pod build file.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package My::Ant;
+#pod     use Moose;
+#pod     with 'XML::Rabbit::RootNode';
+#pod
+#pod     has paths => (
+#pod         isa         => 'HashRef[XML::Ant::BuildFile::Resource::Path]',
+#pod         traits      => 'XPathObjectMap',
+#pod         xpath_query => '//classpath[@id]|//path[@id]',
+#pod         xpath_key   => './@id',
+#pod     );
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use Modern::Perl;
 use English '-no_match_vars';
 use Moose;
@@ -28,12 +41,22 @@ use XML::Ant::Properties;
 use namespace::autoclean;
 extends 'XML::Ant::BuildFile::ResourceContainer';
 
-has _paths => ( ro,
-    lazy_build,
-    isa => ArrayRef [ Dir | File ],    ## no critic (ProhibitBitwiseOperators)
-    traits  => ['Array'],
+has _paths => ( ro, lazy,
+    builder => '_build__paths',
+    isa    => ArrayRef [ Dir | File ], ## no critic (ProhibitBitwiseOperators)
+    traits => ['Array'],
     handles => {
-        all       => 'elements',
+
+        #pod =method all
+        #pod
+        #pod =cut
+
+        all => 'elements',
+
+        #pod =method as_string
+        #pod
+        #pod =cut
+
         as_string => [ join => $OSNAME =~ /\A MSWin/ ? q{;} : q{:} ],
     },
 );
@@ -50,14 +73,14 @@ sub _build__paths {    ## no critic (ProhibitUnusedPrivateSubroutines)
         }
         push @paths, file($location);
     }
-    push @paths, map { $ARG->files } $self->resources('filelist');
+    push @paths, map { $_->files } $self->resources('filelist');
 
     return \@paths;
 }
 
 has content => ( ro, lazy,
     isa => ArrayRef [ Dir | File ],    ## no critic (ProhibitBitwiseOperators)
-    default => sub { $ARG[0]->_paths },
+    default => sub { $_[0]->_paths },
 );
 
 with 'XML::Ant::BuildFile::Resource';
@@ -88,7 +111,7 @@ XML::Ant::BuildFile::Resource::Path - Path-like structure in an Ant build file
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -234,7 +257,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

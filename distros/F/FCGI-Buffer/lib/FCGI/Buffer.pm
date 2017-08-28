@@ -19,11 +19,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -597,6 +597,7 @@ sub DESTROY {
 						if(open(my $fout, '>', $path)) {
 							my $u = $request_uri;
 							$u =~ s/\?/\\?/g;
+							$u =~ s/\)/\\)/g;
 							my $copy = $unzipped_body;
 							my $changes = ($copy =~ s/<a\s+href="$u"/<a href="$path"/gi);
 
@@ -668,7 +669,14 @@ sub DESTROY {
 			if($self->{logger}) {
 				$self->{logger}->debug("Set ETag to $self->{etag}");
 			}
-		} elsif($self->{logger} && (($self->{status} == 200) || $self->{status} == 304) && !$self->is_cached()) {
+		} elsif($self->{logger} && (($self->{status} == 200) || $self->{status} == 304) && $self->{body} && !$self->is_cached()) {
+			# open(my $fout, '>>', '/tmp/FCGI-bug');
+			# print $fout "BUG: ETag not generated, status $self->{status}:\n",
+				# $headers,
+				# 'x' x 40,
+				# defined($self->{body}) ? $self->{body} : "body is empty\n",
+				# 'x' x 40,
+				# "\n";
 			$self->{logger}->warn("BUG: ETag not generated, status $self->{status}");
 		}
 	}
@@ -1373,6 +1381,7 @@ sub _save_to {
 	my ($self, $unzipped_body, $dbh) = @_;
 
 	return 0 unless($dbh && $self->{info} && (my $request_uri = $ENV{'REQUEST_URI'}));
+	return 0 if(!defined($unzipped_body));
 
 	my $query;
 	my $copy = $unzipped_body;

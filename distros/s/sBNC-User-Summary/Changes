@@ -1,5 +1,11 @@
 Revision history for sBNC-User-Summary
 
+1.02    2017-08-24
+        POD updates (fix incorrect usage)
+
+1.01    2016-12-31
+        Regexp hotfix.
+
 1.00    2016-12-30
         Initial version.
 

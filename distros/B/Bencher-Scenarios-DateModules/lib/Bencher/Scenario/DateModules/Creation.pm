@@ -1,7 +1,7 @@
 package Bencher::Scenario::DateModules::Creation;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-08-27'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,6 +17,15 @@ our $scenario = {
         {
             name => 'DateTime->now',
             fcall_template => 'DateTime->now',
+        },
+
+        {
+            name => 'DateTime::Tiny->new(ymd)',
+            fcall_template => 'DateTime::Tiny->new(year=>2016, month=>4, day=>19)',
+        },
+        {
+            name => 'DateTime::Tiny->now',
+            fcall_template => 'DateTime::Tiny->now',
         },
 
         {
@@ -38,7 +47,7 @@ our $scenario = {
             fcall_template => 'Time::Piece::localtime()',
         },
     ],
-    include_result_size => 1,
+    with_result_size => 1,
 };
 
 1;
@@ -56,7 +65,7 @@ Bencher::Scenario::DateModules::Creation - Benchmark date creation
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::DateModules::Creation (from Perl distribution Bencher-Scenarios-DateModules), released on 2017-01-25.
+This document describes version 0.004 of Bencher::Scenario::DateModules::Creation (from Perl distribution Bencher-Scenarios-DateModules), released on 2017-08-27.
 
 =head1 SYNOPSIS
 
@@ -79,6 +88,8 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 Version numbers shown below are the versions used when running the sample benchmark.
 
 L<DateTime> 1.36
+
+L<DateTime::Tiny> 1.06
 
 L<Time::Moment> 0.38
 
@@ -103,6 +114,22 @@ Function call template:
 Function call template:
 
  DateTime->now
+
+
+
+=item * DateTime::Tiny->new(ymd) (perl_code)
+
+Function call template:
+
+ DateTime::Tiny->new(year=>2016, month=>4, day=>19)
+
+
+
+=item * DateTime::Tiny->now (perl_code)
+
+Function call template:
+
+ DateTime::Tiny->now
 
 
 
@@ -147,30 +174,33 @@ Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2
 Benchmark with default options (C<< bencher -m DateModules::Creation >>):
 
  #table1#
- +------------------------+-----------+-----------+------------+---------+---------+
- | participant            | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +------------------------+-----------+-----------+------------+---------+---------+
- | DateTime->new(ymd)     |     27000 |     37    |        1   | 5.3e-08 |      20 |
- | DateTime->now          |     27000 |     36    |        1   | 5.3e-08 |      20 |
- | Time::Local::timelocal |     97000 |     10    |        3.6 |   7e-08 |      26 |
- | Time::Piece::localtime |    190000 |      5.1  |        7.2 | 6.5e-09 |      21 |
- | Time::Moment->now      |    670000 |      1.5  |       25   | 1.7e-09 |      20 |
- | Time::Moment->new(ymd) |   2900000 |      0.34 |      110   | 4.3e-10 |      20 |
- +------------------------+-----------+-----------+------------+---------+---------+
+ +--------------------------+-----------+-----------+------------+------------------+---------+---------+
+ | participant              | rate (/s) | time (μs) | vs_slowest | result_size (kB) |  errors | samples |
+ +--------------------------+-----------+-----------+------------+------------------+---------+---------+
+ | DateTime->new(ymd)       |     24000 |   42      |        1   |         22       | 1.1e-07 |      24 |
+ | DateTime->now            |     24000 |   42      |        1   |         22       | 9.3e-08 |      33 |
+ | Time::Local::timelocal   |    100000 |    9.8    |        4.3 |          0.055   |   1e-08 |      20 |
+ | Time::Piece::localtime   |    190000 |    5.2    |        8.1 |          0.44    | 1.3e-08 |      25 |
+ | DateTime::Tiny->now      |    306000 |    3.27   |       12.9 |          0.625   | 1.6e-09 |      22 |
+ | Time::Moment->now        |    860000 |    1.2    |       37   |          0.088   | 1.2e-09 |      20 |
+ | DateTime::Tiny->new(ymd) |   1400000 |    0.712  |       59.3 |          0.369   | 2.1e-10 |      20 |
+ | Time::Moment->new(ymd)   |   2942000 |    0.3399 |      124.2 |          0.08789 | 1.1e-11 |      20 |
+ +--------------------------+-----------+-----------+------------+------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m DateModules::Creation --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | DateTime            | 11                           | 15                 | 44             |      61   |                   56.1 |        1   |   0.00015 |      20 |
- | Time::Piece         | 1.5                          | 5.1                | 17             |      18   |                   13.1 |        3.4 | 4.4e-05   |      26 |
- | Time::Local         | 1.4                          | 4.7                | 19             |      13   |                    8.1 |        4.7 | 8.4e-05   |      20 |
- | Time::Moment        | 1.4                          | 4.7                | 19             |      11   |                    6.1 |        5.6 | 3.7e-05   |      21 |
- | perl -e1 (baseline) | 11                           | 15                 | 44             |       4.9 |                    0   |       12   | 1.5e-05   |      20 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ | DateTime            | 11                           | 15                 | 44             |      59   |                   54.8 |        1   | 8.7e-05 |      20 |
+ | Time::Piece         | 1.4                          | 4.7                | 19             |      17   |                   12.8 |        3.5 | 1.8e-05 |      20 |
+ | Time::Local         | 1.4                          | 4.8                | 19             |      12   |                    7.8 |        4.8 |   8e-05 |      20 |
+ | Time::Moment        | 1                            | 4.5                | 16             |      10   |                    5.8 |        5.9 | 1.8e-05 |      20 |
+ | DateTime::Tiny      | 1                            | 4.4                | 16             |       8.3 |                    4.1 |        7.1 | 5.3e-05 |      20 |
+ | perl -e1 (baseline) | 11                           | 15                 | 44             |       4.2 |                    0   |       14   | 7.8e-06 |      20 |
+ +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -180,6 +210,10 @@ To display as an interactive HTML table on a browser, you can add option C<--for
 Time::Moment is the fastest. It also produces a very compact object (second only
 to Time::Local, which produces ints). In comparison, DateTime is relatively
 crazy big.
+
+DateTime::Tiny is an alternative for DateTime if you want smaller startup
+overhead and dependencies. It also creates date objects faster. But the object
+is still relatively large (a hash of date element fields).
 
 =head1 HOMEPAGE
 

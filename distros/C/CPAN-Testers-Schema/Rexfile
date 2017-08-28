@@ -111,15 +111,20 @@ task deploy_dev =>
 Upgrade the database running on the given server. This task is called
 automatically by C<deploy> and C<deploy_dev>.
 
+This task also restarts all running services, since the code version and
+the database version must match.
+
 =cut
 
 task upgrade_database =>
     group => 'api',
     sub {
+        Rex::Logger::info( 'Upgrading database' );
         run 'source ~/.profile; cpantesters-schema upgrade';
         if ( $? ) {
             say last_command_output;
         }
+        run_task 'restart', on => connection->server;
     };
 
 =head2 install_database
@@ -133,6 +138,7 @@ database.
 task install_database =>
     group => 'api',
     sub {
+        Rex::Logger::info( 'Installing database' );
         run 'mysql --defaults-file=~/.cpanstats.cnf --database "" -e"create database cpanstats"';
         run 'source ~/.profile; cpantesters-schema install';
         if ( $? ) {
@@ -140,6 +146,25 @@ task install_database =>
         }
     };
 
+=head2 restart
+
+Restart all the services on the machine. This is run automatically by
+the deploy processes after upgrading the database.
+
+The code version and the database version must be in-sync, and any
+running processes must get the new code by restarting.
+
+=cut
+
+task restart =>
+    group => 'api',
+    sub {
+        Rex::Logger::info( 'Restating all services' );
+        run 'sv restart ~/service/*';
+        if ( $? ) {
+            say last_command_output;
+        }
+    };
 
 #######################################################################
 

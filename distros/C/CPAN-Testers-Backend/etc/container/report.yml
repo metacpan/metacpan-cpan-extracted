@@ -1,0 +1,22 @@
+$summary: Tasks to deal with test reports
+
+common:
+    $class: Beam::Wire
+    file: common.yml
+
+process:
+    $class: CPAN::Testers::Backend::ProcessReports
+    $with:
+        - Beam::Runnable::Single
+    schema:
+        $ref: common/schema
+    metabase_dbh:
+        $ref: common/metabase_dbh
+    pid_file: /home/cpantesters/var/run/report/process.pid
+
+queue:
+    $class: CPAN::Testers::Backend::ProcessReports
+    schema:
+        $ref: common/schema
+    metabase_dbh:
+        $ref: common/metabase_dbh

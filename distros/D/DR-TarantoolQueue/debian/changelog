@@ -1,3 +1,141 @@
+dr-tarantool-queue (0.44) nowtaxi; urgency=medium
+
+  * allow_blessed for json pack/unpack.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 23 Aug 2017 12:20:47 +0300
+
+dr-tarantool-queue (0.43) nowtaxi; urgency=medium
+
+  * Queue uses gzip/gunzip data if len(data) > 1M.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 02 May 2017 13:35:56 +0300
+
+dr-tarantool-queue (0.42) nowtaxi; urgency=medium
+
+  * MegaQueue uses consumer's space.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 06 Dec 2016 17:53:38 +0300
+
+dr-tarantool-queue (0.41) nowtaxi; urgency=medium
+
+  * New debian package (fixed bury stats)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 02 Nov 2016 19:07:56 +0300
+
+dr-tarantool-queue (0.40) nowtaxi; urgency=medium
+
+  * Old and new drivers can receive one argument list.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 02 Nov 2016 15:38:23 +0300
+
+dr-tarantool-queue (0.39) nowtaxi; urgency=medium
+
+  * require Queue if need.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Nov 2016 18:12:18 +0300
+
+dr-tarantool-queue (0.38) nowtaxi; urgency=medium
+
+  * fake tarantool_lts connection for tests.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Nov 2016 16:10:08 +0300
+
+dr-tarantool-queue (0.37) nowtaxi; urgency=medium
+
+  * drop coerce from HashRef.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Nov 2016 12:58:53 +0300
+
+dr-tarantool-queue (0.36) nowtaxi; urgency=medium
+
+  * queue list can be created from HashRef, too.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Nov 2016 12:46:55 +0300
+
+dr-tarantool-queue (0.35) nowtaxi; urgency=medium
+
+  * queue list can be created from ArrayRef.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Nov 2016 12:06:12 +0300
+
+dr-tarantool-queue (0.34) nowtaxi; urgency=medium
+
+  * Fix q:take collision with several tubes.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 31 Oct 2016 16:46:40 +0300
+
+dr-tarantool-queue (0.33) nowtaxi; urgency=medium
+
+  * Add fake_in_test option (default = true).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 13 Oct 2016 12:56:02 +0300
+
+dr-tarantool-queue (0.32) nowtaxi; urgency=medium
+
+  * New debian package after all reorganisations.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 12 Oct 2016 16:11:16 +0300
+
+dr-tarantool-queue (0.31) nowtaxi; urgency=medium
+
+  * Add some tests and use fixed release method.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 12 Oct 2016 13:02:36 +0300
+
+dr-tarantool-queue (0.30) nowtaxi; urgency=medium
+
+  * Add statistics for msgpack version.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 11 Oct 2016 19:51:41 +0300
+
+dr-tarantool-queue (0.29) nowtaxi; urgency=medium
+
+  * Provide tarantool 1.6+ MegaQueue.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 11 Oct 2016 16:35:39 +0300
+
+dr-tarantool-queue (0.28) nowtaxi; urgency=medium
+
+  * the package can use tarantool-lts as depends.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 01 May 2016 11:44:06 +0300
+
+dr-tarantool-queue (0.27) nowtaxi; urgency=low
+
+  * restart_check works only if restart defined, too.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 03 Mar 2015 15:41:48 +0300
+
+dr-tarantool-queue (0.26) nowtaxi; urgency=low
+
+  * Fix tests (negative timeout check), add restart_check trigger.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 03 Mar 2015 15:33:46 +0300
+
+dr-tarantool-queue (0.25-1) nowtaxi; urgency=medium
+
+  * Sync client uses realsync connection if it is available.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 17 Apr 2014 14:18:14 +0400
+
+dr-tarantool-queue (0.24-1) nowtaxi; urgency=medium
+
+  * Add method queue.put_unique.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 06 Feb 2014 14:25:13 +0400
+
+dr-tarantool-queue (0.23-1) nowtaxi; urgency=low
+
+  * Save error message before sendmail.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 12 Nov 2013 23:12:29 +0400
+
+dr-tarantool-queue (0.22-1) nowtaxi; urgency=low
+
+  * Drop 'disposition' for the first mailpart.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 12 Nov 2013 23:08:08 +0400
+
 dr-tarantool-queue (0.21-1) nowtaxi; urgency=low
 
   * Add debug information in mail.

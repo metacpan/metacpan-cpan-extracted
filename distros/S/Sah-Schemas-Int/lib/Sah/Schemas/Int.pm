@@ -1,7 +1,7 @@
 package Sah::Schemas::Int;
 
-our $DATE = '2016-07-22'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-08-19'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various integers
@@ -18,7 +18,7 @@ Sah::Schemas::Int - Sah schemas for various integers
 
 =head1 VERSION
 
-This document describes version 0.06 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2016-07-22.
+This document describes version 0.070 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2017-08-19.
 
 =head1 SAH SCHEMAS
 
@@ -56,6 +56,11 @@ Even number.
 
 Same as posint.
 
+Natural numbers are those used for counting and ordering. Some definitions, like
+ISO 80000-2 begin the natural numbers with 0. But in this definition, natural
+numbers start with 1. For integers that start at 0, see C<nonnegint>.
+
+
 =item * L<negeven|Sah::Schema::negeven>
 
 Negative even number.
@@ -68,6 +73,13 @@ Negative integer (-1, -2, ...).
 
 Negative odd number.
 
+=item * L<nonnegint|Sah::Schema::nonnegint>
+
+Non-negative integer (0, 1, 2, ...).
+
+See also C<posint> for integers that start from 1.
+
+
 =item * L<odd|Sah::Schema::odd>
 
 Odd number.
@@ -79,6 +91,10 @@ Positive even number.
 =item * L<posint|Sah::Schema::posint>
 
 Positive integer (1, 2, ...).
+
+Zero is not included in this schema because zero is neither positive nor
+negative. See also C<nonnegint> for integers that start from 0.
+
 
 =item * L<posodd|Sah::Schema::posodd>
 
@@ -134,7 +150,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

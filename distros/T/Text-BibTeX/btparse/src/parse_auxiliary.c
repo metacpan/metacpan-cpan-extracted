@@ -155,7 +155,7 @@ zzsyn(char *        text,
    if (tok == zzEOF_TOKEN)
       strcat (msg, "at end of input");
    else
-      sprintf (msg, "found \"%s\"", bad_text);
+     snprintf (msg, MAX_ERROR - 1, "found \"%s\"", bad_text);
 
    len = strlen (msg);
 

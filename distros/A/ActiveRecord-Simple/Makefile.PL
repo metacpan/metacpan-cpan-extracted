@@ -14,6 +14,7 @@ WriteMakefile1(
         'DBI' => 0,
         'Storable' => 0,
         'DBD::SQLite' => 0,
+        'Scalar::Util' => 0,
     },
     MIN_PERL_VERSION => '5.010',
     META_MERGE => {

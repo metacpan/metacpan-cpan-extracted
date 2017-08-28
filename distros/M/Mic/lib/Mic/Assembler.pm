@@ -58,7 +58,6 @@ sub assemble {
         has     => {
             %{ $meta->{has} || { } },
         },
-        forwards => $meta->{forwards},
         arrayimp => $meta->{arrayimp},
         slot_offset => $meta->{slot_offset},
     };
@@ -119,7 +118,16 @@ sub _interface {
         classmethod => [  ],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
-        $spec->{interface_meta} = $spec->{$type};
+        $spec->{interface_meta} = do {
+            my @args = %{ $spec->{$type} };
+            validate(@args, {
+                object     => { type => HASHREF },
+                class      => { type => HASHREF },
+                extends    => { type => ARRAYREF, optional => 1 },
+                invariant  => { type => HASHREF, optional => 1 },
+            });
+            $spec->{$type};
+        };
         $spec->{$type} = [ keys %{ $spec->{$type}{object} } ];
         $Mic::Spec_for{ $spec->{name} }{interface} = $spec->{interface_meta};
     }
@@ -203,6 +211,7 @@ sub _add_methods {
 
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
+        _validate_slot_def($meta);
         if ( !  $spec->{implementation}{methods}{$name}
              && $meta->{reader}
              && $in_interface->{ $meta->{reader} } ) {
@@ -219,10 +228,26 @@ sub _add_methods {
         }
 
         if ( !  $spec->{implementation}{methods}{$name}
+             && $meta->{property}
+             && $in_interface->{ $meta->{property} } ) {
+
+            confess "'property' can only be used from Perl 5.16 onwards"
+              if $] lt '5.016';
+            my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
+            $spec->{implementation}{methods}{ $meta->{property} } = sub : lvalue {
+                my ($self) = @_;
+
+                if ( reftype $self eq 'HASH' ) {
+                    return $self->{$obfu_name};
+                }
+                return $self->[ $spec->{implementation}{slot_offset}{$name} ];
+            };
+        }
+
+        if ( !  $spec->{implementation}{methods}{$name}
              && $meta->{writer}
              && $in_interface->{ $meta->{writer} } ) {
 
-            my $obfu_pkg = Mic::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{ $meta->{writer} } = sub {
                 my ($self, $new_val) = @_;
 
@@ -248,6 +273,17 @@ sub _add_methods {
         _add_post_conditions($spec, $stash, $name, 'object');
     }
     _add_invariants($spec, $stash);
+}
+
+sub _validate_slot_def {
+    validate(@_, {
+        default  => { type => SCALAR   | CODEREF, optional => 1 },
+        handles  => { type => ARRAYREF | HASHREF, optional => 1 },
+        init_arg => { type => SCALAR, optional => 1 },
+        property => { type => SCALAR, optional => 1 },
+        reader   => { type => SCALAR, optional => 1 },
+        writer   => { type => SCALAR, optional => 1 },
+    });
 }
 
 sub _add_invariants {
@@ -282,6 +318,7 @@ sub _add_pre_conditions {
 
     return unless $Mic::Contracts_for{ $spec->{name} }{pre};
 
+    _validate_contract_def($spec->{interface_meta}{$type}{$name});
     my $pre_cond_hash = $spec->{interface_meta}{$type}{$name}{require}
       or return;
 
@@ -300,6 +337,7 @@ sub _add_post_conditions {
 
     return unless $Mic::Contracts_for{ $spec->{name} }{post};
 
+    _validate_contract_def($spec->{interface_meta}{$type}{$name});
     my $post_cond_hash = $spec->{interface_meta}{$type}{$name}{ensure}
       or return;
 
@@ -331,6 +369,13 @@ sub _add_post_conditions {
         return wantarray ? @$results : $results->[0];
     };
     install_modifier($stash->name, 'around', $name, $guard);
+}
+
+sub _validate_contract_def {
+    validate(@_, {
+        ensure   => { type => HASHREF, optional => 1 },
+        require  => { type => HASHREF, optional => 1 },
+    });
 }
 
 sub _make_builder_class {

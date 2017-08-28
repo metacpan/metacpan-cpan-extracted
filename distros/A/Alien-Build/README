@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.99
+    version 1.04
 
 SYNOPSIS
 
@@ -26,13 +26,30 @@ DESCRIPTION
     of a CPAN client, and work closely with Alien::Base which is used at
     runtime.
 
-    This is the detailed documentation for Alien::Build class. If you are
-    starting out as a user of an Alien::Build based Alien module, see
-    Alien::Build::Manual::AlienUser. If you are starting out writing a new
-    Alien::Build based Alien module, see Alien::Build::Manual::AlienAuthor.
-    As an Alien author, you will also likely be interested in
-    Alien::Build::Manual::FAQ. If you are interested in writing a
-    Alien::Build plugin, see Alien::Build::Manual::PluginAuthor.
+    This is the detailed documentation for the Alien::Build class. If you
+    are starting out you probably want to do so from one of these
+    documents:
+
+    Alien::Build::Manual::AlienUser
+
+      For users of an Alien::libfoo that is implemented using Alien::Base.
+      (The developer of Alien::libfoo should provide the documentation
+      necessary, but if not, this is the place to start).
+
+    Alien::Build::Manual::AlienAuthor
+
+      If you are writing your own Alien based on Alien::Build and
+      Alien::Base.
+
+    Alien::Build::Manual::FAQ
+
+      If you have a common question that has already been answered, like
+      "How do I use alienfile with some build system".
+
+    Alien::Build::Manual::PluginAuthor
+
+      This is for the brave souls who want to write plugins that will work
+      with Alien::Build + alienfile.
 
     Note that you will usually not usually create a Alien::Build instance
     directly, but rather be using a thin installer layer, such as
@@ -281,6 +298,13 @@ PROPERTIES
       The command name for tools where the name my differ from platform to
       platform. For example, the GNU version of make is usually make in
       Linux and gmake on FreeBSD.
+
+    ffi_name
+
+      The name DLL or shared object "name" to use when searching for
+      dynamic libraries at runtime. This is passed into FFI::CheckLib, so
+      if your library is something like libarchive.so or archive.dll you
+      would set this to archive.
 
     install_type
 

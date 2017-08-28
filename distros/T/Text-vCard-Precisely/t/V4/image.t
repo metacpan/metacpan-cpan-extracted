@@ -125,7 +125,9 @@ SKIP: {
     ]);
     $vc->logo( { media_type => 'image/png', content => $raw } );
     $got = $vc->as_string;
-    $got =~ s|\Q+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBkZWZhdWx0IHF1Y|+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBkZWZhdWx0IHF1Y|m;
+    $got =~ s|\Q+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBkZWZhdWx0IHF1Y|+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2ODApLCBkZWZhdWx0IHF1Y|m;
+    $got =~ s|\Q+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBkZWZhdWx0IHF1Y|+Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2ODApLCBkZWZhdWx0IHF1Y|m;
+
     if ( first{ $got eq $_ } @expected ){                                # 7
         pass 'photo(ArrayRef of Hashref of raw)';
     }else{

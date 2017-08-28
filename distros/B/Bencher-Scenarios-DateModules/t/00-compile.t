@@ -6,11 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Bencher/Scenario/DateModules/Creation.pm',
+    'Bencher/Scenario/DateModules/DurationCreation.pm',
+    'Bencher/Scenario/DateModules/Overhead.pm',
+    'Bencher/Scenario/DateModules/Storage.pm',
     'Bencher/ScenarioR/DateModules/Creation.pm',
+    'Bencher/ScenarioR/DateModules/DurationCreation.pm',
+    'Bencher/ScenarioR/DateModules/Overhead.pm',
+    'Bencher/ScenarioR/DateModules/Storage.pm',
     'Bencher/Scenarios/DateModules.pm'
 );
 

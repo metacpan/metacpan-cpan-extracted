@@ -14,7 +14,7 @@ build_requires:
   Test::DZil: '0'
   Test::More: '0.94'
   Test::Most: '0'
-  Test::Output: '0'
+  Test::Output: '1.031'
   blib: '1.01'
   perl: '5.010'
   strict: '0'
@@ -31,10 +31,10 @@ name: Dist-Zilla-Plugin-RequiresExternal
 provides:
   Dist::Zilla::App::Command::externaldeps:
     file: lib/Dist/Zilla/App/Command/externaldeps.pm
-    version: '1.007'
+    version: '1.008'
   Dist::Zilla::Plugin::RequiresExternal:
     file: lib/Dist/Zilla/Plugin/RequiresExternal.pm
-    version: '1.007'
+    version: '1.008'
 requires:
   Dist::Zilla::App: '0'
   Dist::Zilla::File::InMemory: '0'
@@ -58,5 +58,5 @@ resources:
   bugtracker: https://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal/issues
   homepage: http://metacpan.org/release/Dist-Zilla-Plugin-RequiresExternal/
   repository: git://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal.git
-version: '1.007'
+version: '1.008'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -19,7 +19,7 @@ sub new {
     my ($self_class, $class, @param) = @_;
 
     #my $self = $class->new();
-    my $self = { class => $class };
+    my $self = bless { class => $class } => $self_class;
 
     my $table_name = ($self->{class}->can('_get_table_name'))  ? $self->{class}->_get_table_name  : undef;
     my $pkey       = ($self->{class}->can('_get_primary_key')) ? $self->{class}->_get_primary_key : undef;
@@ -45,44 +45,15 @@ sub new {
     }
     elsif (ref $param[0] && ref $param[0] eq 'HASH') {
         # find many by params
-        my ($where_str, @bind, @condition_pairs);
-        for my $param_name (keys %{ $param[0] }) {
-            if (ref $param[0]{$param_name} eq 'ARRAY') {
-                my $instr = join q/, /, map { '?' } @{ $param[0]{$param_name} };
-                push @condition_pairs, qq/"$table_name"."$param_name" IN ($instr)/;
-                push @bind, @{ $param[0]{$param_name} };
-            }
-            elsif (ref $param[0]{$param_name}) {
-                next if !$class->can('_get_relations');
-                my $relation = $class->_get_relations->{$param_name} or next;
+        my ($bind, $condition_pairs) = $self->parse_hash($param[0]);
 
-                next if $relation->{type} ne 'one';
-                my $fk = $relation->{params}{fk};
-                my $pk = $relation->{params}{pk};
-
-                my $object = $param[0]{$param_name};
-
-                push @condition_pairs, qq/"$table_name"."$fk" = ?/;
-                push @bind, $object->$pk;
-            }
-            else {
-                if (defined $param[0]{$param_name}) {
-                    push @condition_pairs, qq/"$table_name"."$param_name" = ?/;
-                    push @bind, $param[0]{$param_name};
-                }
-                else {
-                    # is NULL
-                    push @condition_pairs, qq/"$table_name"."$param_name" IS NULL/;
-                }
-            }
-        }
-        $where_str = join q/ AND /, @condition_pairs;
+        my $where_str = join q/ AND /, @$condition_pairs;
 
         $fields = qq/"$table_name".*/;
         $from   = qq/"$table_name"/;
         $where  = $where_str;
 
-        $self->{BIND} = \@bind;
+        $self->{BIND} = $bind;
     }
     elsif (ref $param[0] && ref $param[0] eq 'ARRAY') {
         # find many by primary keys
@@ -109,80 +80,107 @@ sub new {
     push @{ $self->{prep_select_from} }, $from if $from;
     push @{ $self->{prep_select_where} }, $where if $where;
 
-    return bless $self, $self_class;
+    return $self;
 }
 
 sub count {
-    my ($self_class, $class, @param) = @_;
-
-    my $self = bless {}, $self_class;
-    my $table_name = $class->_get_table_name;
-    my ($count, $sql, @bind);
-    if (scalar @param == 0) {
-        $self->{SQL} = qq/SELECT COUNT(*) FROM "$table_name"/;
+    my $inv = shift;
+    my $self = ref $inv ? $inv : $inv->new(@_);
+    $self->{prep_select_fields} = [ 'COUNT(*)' ];
+    if (@{ $self->{prep_group_by} || [] }) {
+        my $table_name = $self->{class}->_get_table_name;
+        push @{ $self->{prep_select_fields} }, map qq/"$table_name".$_/, @{ $self->{prep_group_by} };
+        my @group_by = @{ $self->{prep_group_by} };
+        s/"//g foreach @group_by;
+        my @results;
+        foreach my $item ($self->fetch) {
+            push my @line, (count => $item->{'COUNT(*)'}), map {$_ => $item->$_} @group_by;
+            push @results, { @line };
+        }
+        return @results;
     }
-    elsif (scalar @param == 1) {
-        my $params_hash = shift @param;
-        return unless ref $params_hash eq 'HASH';
+    else {
+        return $self->fetch->{'COUNT(*)'};
+    }
+}
 
-        my @condition_pairs;
-        for my $param_name (keys %$params_hash) {
-            if (ref $params_hash->{$param_name} eq 'ARRAY') {
-                my $instr = join q/, /, map { '?' } @{ $params_hash->{$param_name} };
-                push @condition_pairs, qq/"$table_name"."$param_name" IN ($instr)/;
-                push @bind, @{ $params_hash->{$param_name} };
-            }
-            elsif (ref $params_hash->{$param_name}) {
-                next if !$class->can('_get_relations');
-                my $relation = $class->_get_relations->{$param_name} or next;
+sub parse_hash {
+    my ($self, $param_hash) = @_;
+    my $class = $self->{class};
+    my $table_name = ($self->{class}->can('_get_table_name'))  ? $self->{class}->_get_table_name  : undef;
+    my ($bind, $condition_pairs) = ([],[]);
+    for my $param_name (keys %{ $param_hash }) {
+        if (ref $param_hash->{$param_name} eq 'ARRAY' and !ref $param_hash->{$param_name}[0]) {
+            my $instr = join q/, /, map { '?' } @{ $param_hash->{$param_name} };
+            push @$condition_pairs, qq/"$table_name"."$param_name" IN ($instr)/;
+            push @$bind, @{ $param_hash->{$param_name} };
+        }
+        elsif (ref $param_hash->{$param_name}) {
+            next if !$class->can('_get_relations');
+            my $relation = $class->_get_relations->{$param_name} or next;
 
-                next if $relation->{type} ne 'one';
-                my $fk = $relation->{params}{fk};
-                my $pk = $relation->{params}{pk};
+            next if $relation->{type} ne 'one';
+            my $fk = $relation->{params}{fk};
+            my $pk = $relation->{params}{pk};
 
-                my $object = $params_hash->{$param_name};
+            if (ref $param_hash->{$param_name} eq __PACKAGE__) {
+                my $object = $param_hash->{$param_name};
 
-                push @condition_pairs, qq/"$table_name"."$fk" = ?/;
-                push @bind, $object->$pk;
+                my $tmp_table = qq/tmp_table_/ . sprintf("%x", $object);
+                my $request_table = $object->{class}->_get_table_name;
+
+                $object->{prep_select_fields} = [qq/"$request_table"."$pk"/];
+                $object->_finish_sql_stmt;
+
+                push @$condition_pairs, qq/"$table_name"."$fk" IN (SELECT "$tmp_table"."$pk" from ($object->{SQL}) as $tmp_table)/;
+                push @$bind, @{ $object->{BIND} } if ref $object->{BIND} eq 'ARRAY';
             }
             else {
-                push @condition_pairs, qq/"$table_name"."$param_name" = ?/;
-                push @bind, $params_hash->{$param_name};
+                my $object = $param_hash->{$param_name};
+
+                if (ref $object eq 'ARRAY') {
+                    push @$bind, map $_->$pk, @$object;
+                    push @$condition_pairs, qq/"$table_name"."$fk" IN (@{[ join ', ', map "?", @$object ]})/;
+                }
+                else {
+                    push @$condition_pairs, qq/"$table_name"."$fk" = ?/;
+                    push @$bind, $object->$pk;
+                }
             }
         }
-        my $wherestr = (scalar @condition_pairs > 0 ) ? ' WHERE ' . join(q/ AND /, @condition_pairs) : '';
-        $self->{SQL} = qq/SELECT COUNT(*) FROM "$table_name" $wherestr/;
+        else {
+            if (defined $param_hash->{$param_name}) {
+                push @$condition_pairs, qq/"$table_name"."$param_name" = ?/;
+                push @$bind, $param_hash->{$param_name};
+            }
+            else {
+                # is NULL
+                push @$condition_pairs, qq/"$table_name"."$param_name" IS NULL/;
+            }
+        }
     }
-    elsif (scalar @param > 1) {
-        my $wherestr = shift @param;
-        @bind = @param;
-
-        $self->{SQL} = qq/SELECT COUNT(*) FROM "$table_name" WHERE $wherestr/;
-    }
-    $self->_quote_sql_stmt;
-    $count = $self->dbh->selectrow_array($self->{SQL}, undef, @bind);
-
-    return $count;
+    return ($bind, $condition_pairs);
 }
 
 sub first {
-    my ($self_class, $class, $limit) = @_;
+    my ($self, $limit) = @_;
 
-    $class->can('_get_primary_key') or croak 'Can\'t use "first" without primary key';
-    my $primary_key = $class->_get_primary_key;
     $limit //= 1;
 
-    return $self_class->new($class)->order_by($primary_key)->limit($limit);
+    $self->{class}->can('_get_primary_key') or croak 'Can\'t use "first" without primary key';
+    my $primary_key = $self->{class}->_get_primary_key;
+
+    return $self->order_by($primary_key)->limit($limit)->fetch;
 }
 
 sub last {
-    my ($self_class, $class, $limit) = @_;
+    my ($self, $limit) = @_;
 
-    $class->can('_get_primary_key') or croak 'Can\'t use "first" without primary key';
-    my $primary_key = $class->_get_primary_key;
+    $self->{class}->can('_get_primary_key') or croak 'Can\'t use "first" without primary key';
+    my $primary_key = $self->{class}->_get_primary_key;
     $limit //= 1;
 
-    return $self_class->new($class)->order_by($primary_key)->desc->limit($limit);
+    return $self->order_by($primary_key)->desc->limit($limit)->fetch;
 }
 
 sub only {
@@ -197,10 +195,21 @@ sub only {
     }
 
     my $table_name = $self->{class}->_get_table_name;
+    my $mixins = $self->{class}->can('_get_mixins') ? $self->{class}->_get_mixins : undef;
 
     my @filtered_prep_select_fields =
         grep { $_ ne qq/"$table_name".*/ } @{ $self->{prep_select_fields} };
-    push @filtered_prep_select_fields, map { qq/"$table_name"."$_"/ } @fields;
+    for my $fld (@fields) {
+        if ($mixins && grep { $_ eq $fld } keys %$mixins) {
+            my $mixin = $mixins->{$fld}->();
+            $mixin .= qq/ AS $fld/ unless $mixin =~ /as\s+\w+$/i;
+            push @filtered_prep_select_fields, $mixin;
+        }
+        else {
+            push @filtered_prep_select_fields, qq/"$table_name"."$fld"/;
+        }
+    }
+
     $self->{prep_select_fields} = \@filtered_prep_select_fields;
 
     return $self;
@@ -213,32 +222,45 @@ sub order_by {
     my ($self, @param) = @_;
 
     #return if not defined $self->{SQL}; ### TODO: die
-    return $self if exists $self->{prep_order_by};
-
-    $self->{prep_order_by} = \@param;
+    $self->{prep_order_by} ||= [];
+    push @{$self->{prep_order_by}}, map qq/"$_"/, @param;
+    delete $self->{prep_asc_desc};
 
     return $self;
 }
 
 sub desc {
-    my ($self) = @_;
+    return shift->order_by_direction('DESC');
+}
 
-    #return if not defined $self->{SQL};
-    return $self if exists $self->{prep_desc};
+sub asc {
+    return shift->order_by_direction('ASC');
+}
 
-    $self->{prep_desc} = 1;
+sub order_by_direction {
+    my ($self, $direction) = @_;
+
+    # There are no fields for order yet
+    return unless ref $self->{prep_order_by} eq 'ARRAY' and scalar @{ $self->{prep_order_by} } > 0;
+
+    # asc/desc is called before: ->asc->desc
+    return if defined $self->{prep_asc_desc};
+
+    # $direction should be ASC/DESC
+    return unless $direction =~ /^(ASC|DESC)$/i;
+
+    # Add $direction to the latest field
+    @{$self->{prep_order_by}}[-1] .= " $direction";
+    $self->{prep_asc_desc} = 1;
 
     return $self;
 }
 
-sub asc {
+sub group_by {
     my ($self, @param) = @_;
 
-    #return if not defined $self->{SQL};
-    return $self if exists $self->{prep_asc};
-
-    $self->{prep_asc} = 1;
-
+    $self->{prep_group_by} ||= [];
+    push @{$self->{prep_group_by}}, map qq/"$_"/, @param;
     return $self;
 }
 
@@ -270,8 +292,15 @@ sub abstract {
     return $self if ! ref $opts && ref $opts ne 'HASH';
 
     while (my ($method, $param) = each %$opts) {
-        my @p = (ref $param) ? @$param : ($param);
-        $self->$method(@p);
+        if ($method eq 'order_by') {
+            $self->order_by(@{ $param->{columns} });
+            my $order_direction = (defined $param->{direction}) ? $param->{direction} : undef;
+            $self->$order_direction if $order_direction;
+        }
+        else {
+            my @p = (ref $param) ? @$param : ($param);
+            $self->$method(@p);
+        }
     }
 
     return $self;
@@ -310,6 +339,10 @@ sub _finish_sql_stmt {
     ref $self->{prep_select_fields} or croak 'Invalid prepare SQL statement';
     ref $self->{prep_select_from}   or croak 'Invalid prepare SQL statement';
 
+    my $table_name = $self->{class}->_get_table_name;
+    my @add = grep { $_ !~~ $self->{prep_select_fields} } map qq/"$table_name".$_/, @{ $self->{prep_group_by}||[] };
+    push @{ $self->{prep_select_fields} }, @add;
+
     $self->{SQL} = "SELECT " . (join q/, /, @{ $self->{prep_select_fields} }) . "\n";
     $self->{SQL} .= "FROM " . (join q/, /, @{ $self->{prep_select_from} }) . "\n";
 
@@ -318,34 +351,26 @@ sub _finish_sql_stmt {
         $self->{has_joined_table} = 1;
     }
 
-    if (
-        defined $self->{prep_select_where}
-        && ref $self->{prep_select_where} eq 'ARRAY'
-        && scalar @{ $self->{prep_select_where} } > 0
-    ) {
+    if (@{ $self->{prep_select_where}||[] }) {
         $self->{SQL} .= "WHERE\n";
         $self->{SQL} .= join " AND ", @{ $self->{prep_select_where} };
     }
 
-    if (defined $self->{prep_order_by}) {
-        $self->{SQL} .= ' ORDER BY ';
-        $self->{SQL} .= join q/, /, map { q/"/.$_.q/"/ } @{ $self->{prep_order_by} };
+    if (@{ $self->{prep_group_by}||[] }) {
+        $self->{SQL} .= ' GROUP BY ';
+        $self->{SQL} .= join q/, /, @{ $self->{prep_group_by} };
     }
 
-    $self->{SQL} .= ' DESC ' if defined $self->{prep_desc};
-    $self->{SQL} .= ' ASC '  if defined $self->{prep_asc};
+    if (@{ $self->{prep_order_by}||[] }) {
+        $self->{SQL} .= ' ORDER BY ';
+        $self->{SQL} .= join q/, /, @{ $self->{prep_order_by} };
+    }
 
     $self->{SQL} .= ' LIMIT ' .  ($self->{prep_limit}  // $MAXIMUM_LIMIT);
     $self->{SQL} .= ' OFFSET '.  ($self->{prep_offset} // 0);
 
-    #$self->_delete_keys(qr/^prep\_/);
+    return $self;
 }
-
-#sub get {
-#    my ($class, $pkeyval) = @_;
-#
-#    return $class->find($pkeyval)->fetch();
-#}
 
 sub _finish_object_representation {
     my ($self, $obj, $object_data, $read_only) = @_;
@@ -363,12 +388,10 @@ sub _finish_object_representation {
                 $pairs{$key} = $val;
             }
             $obj->{"relation_instance_$rel_name"} = $relation->{class}->new(\%pairs);
-                        #bless \%pairs, $relation->{class};
 
             $obj->_delete_keys(qr/^JOINED\_$rel_name/);
         }
 
-        delete $self->{has_joined_table};
     }
 
     $obj->{read_only} = 1 if defined $read_only;
@@ -397,6 +420,7 @@ sub fetch {
 
     my $class = $self->{class};
     my $sth = $self->dbh->prepare($self->{SQL}) or croak $self->dbh->errstr;
+
     $sth->execute(@{ $self->{BIND} }) or croak $self->dbh->errstr;
     if (wantarray) {
         my @objects;
@@ -409,6 +433,7 @@ sub fetch {
 
             last if $limit && $i == $limit;
         }
+        delete $self->{has_joined_table};
 
         return @objects;
     }
@@ -416,20 +441,33 @@ sub fetch {
         my $object_data = $sth->fetchrow_hashref() or return;
         my $obj = $class->new($object_data);
         $self->_finish_object_representation($obj, $object_data, $read_only);
+        delete $self->{has_joined_table};
 
         return $obj;
     }
 }
 
+sub upload {
+    my ($self, $param) = @_;
+
+    my $o = $self->fetch($param);
+    $_[0] = $o;
+
+    return $_[0];
+}
+
 sub next {
-    my ($self) = @_;
+    my ($self, $n) = @_;
 
-    if (!$self->{_objects}) {
-        my @objects = $self->fetch();
-        $self->{_objects} = \@objects;
-    }
+    $n ||= 1;
 
-    return (scalar @{ $self->{_objects} } > 0 ) ? $self->_get_slice($self->{_objects}) : undef;
+    $self->{prep_limit} = $n;
+    $self->{prep_offset} = 0 unless defined $self->{prep_offset};
+    my @result = $self->fetch;
+
+    $self->{prep_offset} += $n;
+
+    return wantarray ? @result : $result[0];
 }
 
 sub with {
@@ -445,6 +483,7 @@ sub with {
 
     $self->{prep_left_joins} = [];
     $self->{with} = \@rels;
+
     RELATION:
     for my $rel_name (@rels) {
         my $relation = $self->{class}->_get_relations->{$rel_name}
@@ -452,13 +491,13 @@ sub with {
 
         next RELATION unless grep { $_ eq $relation->{type} } qw/one only/;
         my $rel_table_name = $relation->{class}->_get_table_name;
-
         my $rel_columns = $relation->{class}->_get_columns;
 
-        #push @{ $self->{prep_select_fields} }, qq/"$rel_table_name".*/;
-        push @{ $self->{prep_select_fields} },
-            map { qq/"$rel_table_name"."$_" AS "JOINED_$rel_name\_$_"/  }
-                @{ $relation->{class}->_get_columns };
+        REL_COLUMN:
+        for (@$rel_columns) {
+            next REL_COLUMN if ref $_;
+            push @{ $self->{prep_select_fields} }, qq/"$rel_table_name"."$_" AS "JOINED_$rel_name\_$_"/;
+        }
 
         if ($relation->{type} eq 'one') {
             my $join_sql = qq/LEFT JOIN "$rel_table_name" ON /;
@@ -481,6 +520,19 @@ sub to_sql {
     $self->_quote_sql_stmt();
 
     return wantarray ? ($self->{SQL}, $self->{BIND}) : $self->{SQL};
+}
+
+sub exists {
+    my ($self) = @_;
+
+    $self->{prep_select_fields} = ['1'];
+    $self->_finish_sql_stmt;
+    $self->_quote_sql_stmt;
+
+    my $sth = $self->dbh->prepare($self->{SQL});
+    $sth->execute(@{ $self->{BIND} });
+
+    return $sth->fetchrow_arrayref();
 }
 
 
@@ -506,16 +558,10 @@ sub _find_many_to_many {
         }
     }
 
-    my $self = bless {
-        prep_select_fields => [],
-        prep_select_from   => [],
-        prep_select_where  => [],
-        class => $class,
-    }, $self_class;
+    my $self = $self_class->new($class, @{ $param->{where_statement} });
 
     my $connected_table_name = $class->_get_table_name;
-    push @{ $self->{prep_select_from} }, $param->{m_class}->_get_table_name;
-    push @{ $self->{prep_select_fields} }, '*';
+    $self->{prep_select_from} = [ $param->{m_class}->_get_table_name ];
 
     push @{ $self->{prep_left_joins} },
         'JOIN ' . $connected_table_name . ' ON ' . $connected_table_name . '.' . $class->_get_primary_key . ' = '
@@ -523,67 +569,6 @@ sub _find_many_to_many {
 
     push @{ $self->{prep_select_where} },
         $root_class_opts->{params}{fk} . ' = ' . $param->{self}->{ $param->{root_class}->_get_primary_key };
-
-    return $self;
-}
-
-sub _find_many_to_many_OLD {
-    my ($self_class, $class, $param) = @_;
-
-    return unless $self_class->dbh && $class && $param;
-
-    my $mc_fkey;
-    my $class_opts = {};
-    my $root_class_opts = {};
-
-    eval { load $param->{m_class} };
-
-    for my $opts ( values %{ $param->{m_class}->_get_relations } ) {
-        if ($opts->{class} eq $param->{root_class}) {
-            $root_class_opts = $opts;
-        }
-        elsif ($opts->{class} eq $class) {
-            $class_opts = $opts;
-        }
-    }
-
-    my $connected_table_name = $class->_get_table_name;
-    my $sql_stm;
-    $sql_stm .=
-        'SELECT ' .
-        "$connected_table_name\.*" .
-        ' FROM ' .
-        $param->{m_class}->_get_table_name .
-        ' JOIN ' .
-        $connected_table_name .
-        ' ON ' .
-        $connected_table_name . '.' . $class->_get_primary_key .
-        ' = ' .
-        $param->{m_class}->_get_table_name . '.' . $class_opts->{params}{fk} .
-        ' WHERE ' .
-        $root_class_opts->{params}{fk} .
-        ' = ' .
-        $param->{self}->{ $param->{root_class}->_get_primary_key };
-
-    my $self = bless {}, $self_class;
-    $self->{SQL} = $sql_stm; $self->_quote_sql_stmt;
-
-    say 'SQL: ' . $self->{SQL};
-
-    my $sth = $self->dbh->prepare($self->{SQL}) or croak $self->dbh->errstr;
-    $sth->execute();
-
-    delete $self->{SQL};
-
-    my @bulk_objects;
-    while (my $params = $sth->fetchrow_hashref) {
-        my $obj = $class->new($params);
-        $obj->{isin_database} = 1;
-        push @bulk_objects, $obj;
-    }
-
-    $self->{_objects} = \@bulk_objects;
-    $self->{class} = $class;\
 
     return $self;
 }
@@ -620,8 +605,10 @@ sub _quote_sql_stmt {
 
     $self->{SQL} =~ s/"/$quote/g;
 
-    return 1;
+    return $self;
 }
+
+sub DESTROY { }
 
 sub AUTOLOAD {
     my $call = $AUTOLOAD;

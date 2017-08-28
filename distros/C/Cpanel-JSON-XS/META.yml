@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/rurban/Cpanel-JSON-XS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Cpanel-JSON-XS
-version: '3.0237'
+version: '3.0238'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

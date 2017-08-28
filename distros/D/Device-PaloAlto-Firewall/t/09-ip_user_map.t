@@ -15,7 +15,7 @@ my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', 
 my $test = $fw->tester();
 
 # User-ID not configured
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_userid_configured() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_userid_configured() )->simplify( forcearray => ['entry'] )->{result} } );
 
 
 ok( !$test->ip_user_mapping(domain => 'domain', users => [ 'user1' ]), "No User-ID with configured with domain and user args returns 0" );
@@ -24,7 +24,7 @@ ok( !$test->ip_user_mapping(domain => 'domain'), "No User-ID with configured wit
 ok( !$test->ip_user_mapping(), "No User-ID with configured with no args returns 0" );
 
 # User-ID configured and receiving entries
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( userid_mappings() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( userid_mappings() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->ip_user_mapping(), "User-ID configured with no args specified returns 1" );
 ok( $test->ip_user_mapping(domain => 'domain'), "User-ID configured with domain specified returns 1" );

@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ETL/Yertl.pm',
+    'ETL/Yertl/Adapter/influxdb.pm',
     'ETL/Yertl/Command/yfrom.pm',
     'ETL/Yertl/Command/ygrok.pm',
     'ETL/Yertl/Command/ymask.pm',
@@ -19,6 +20,7 @@ my @module_files = (
     'ETL/Yertl/Command/yq/Regex.pm',
     'ETL/Yertl/Command/ysql.pm',
     'ETL/Yertl/Command/yto.pm',
+    'ETL/Yertl/Command/yts.pm',
     'ETL/Yertl/Format/csv.pm',
     'ETL/Yertl/Format/default.pm',
     'ETL/Yertl/Format/json.pm',
@@ -32,7 +34,8 @@ my @scripts = (
     'bin/ymask',
     'bin/yq',
     'bin/ysql',
-    'bin/yto'
+    'bin/yto',
+    'bin/yts'
 );
 
 # no fake home requested

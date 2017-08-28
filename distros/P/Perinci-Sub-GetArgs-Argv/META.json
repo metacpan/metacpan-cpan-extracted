@@ -40,10 +40,10 @@
             "Data::Sah::Normalize" : "0",
             "Data::Sah::Resolve" : "0.003",
             "Data::Sah::Util::Type" : "0.45",
-            "Exporter" : "0",
+            "Exporter" : "5.57",
             "Getopt::Long" : "0",
             "Getopt::Long::Negate::EN" : "0",
-            "Getopt::Long::Util" : "0.88",
+            "Getopt::Long::Util" : "0.890",
             "JSON::PP" : "0",
             "Lingua::EN::PluralToSingular" : "0",
             "List::Util" : "0",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-GetArgs-Argv"
       }
    },
-   "version" : "0.83",
+   "version" : "0.840",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"

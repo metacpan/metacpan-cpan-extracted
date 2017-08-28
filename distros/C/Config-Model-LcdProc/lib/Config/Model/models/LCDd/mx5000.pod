@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::mx5000
 # ABSTRACT:  Configuration class LCDd::mx5000
+
 =encoding utf8
 
 =head1 NAME
@@ -16,11 +17,31 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/hiddev0'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/hiddev0
+
+=back
+
+
 
 =head2 WaitAfterRefresh
 
-Time to wait in ms after the refresh screen has been sent I<< Optional. Type uniline. upstream_default: '1000'.  >> 
+Time to wait in ms after the refresh screen has been sent I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1000
+
+=back
+
+
 
 =head1 SEE ALSO
 

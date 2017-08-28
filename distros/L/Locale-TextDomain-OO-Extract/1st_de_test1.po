@@ -1,0 +1,38 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+# comment 2
+# comment 1
+#. automatic 2
+#. automatic 1
+#: old/file.pl:1
+#: old/file.pl:2
+#: old/file.pl:3
+#: old/file.pl:456
+msgid "January"
+msgstr "Januar"
+
+#: old/file.pl:1
+msgid "This car is damaged."
+msgid_plural "This cars are damaged."
+msgstr[0] "Dieses Auto ist beschädigt."
+msgstr[1] "Diese Autos sind beschädigt."
+
+#: old/file.pl:1
+msgid "date"
+msgstr "Datum"
+
+#: old/file.pl:1
+msgctxt "appointment"
+msgid "date"
+msgstr "Date"
+

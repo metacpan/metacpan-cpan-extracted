@@ -1,5 +1,8 @@
 Revision history for App::calendr
 
+0.21  Thu Aug 24 12:00:00 2017
+      - Added order to command line options.
+
 0.20  Sun Aug 06 04:35:00 2017
       - Renamed option '--gregorian' to '--gdate', just to make sure
         it doesn't confuse user with the calendar name 'Gregorian'.

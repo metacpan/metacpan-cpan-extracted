@@ -23,25 +23,25 @@ ok( !$test->ntp_synchronised(), "ntp_synchronised(): No NTP peer configured");
 ok( !$test->ntp_reachable(), "ntp_reachable(): No NTP peer configured");
 
 # Single NTP peer, synchronised
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( single_ntp_peer_synced() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( single_ntp_peer_synced() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->ntp_synchronised(), "ntp_synchronised(): Single synchronised NTP peer");
 ok( $test->ntp_reachable(), "ntp_reachable(): Single synchronised NTP peer");
 
 # Single NTP peer, not synchronised
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( single_ntp_peer_not_synced() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( single_ntp_peer_not_synced() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( !$test->ntp_synchronised(), "ntp_synchronised(): Single unsynchronised NTP peer");
 ok( !$test->ntp_reachable(), "ntp_reachable(): Single unsynchronised NTP peer");
 
 # Multiple NTP peers, one synchronised, one not
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( multiple_peers_one_not_reachable() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( multiple_peers_one_not_reachable() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->ntp_synchronised(), "ntp_synchronised(): Two NTP peers, one synchronised, one not");
 ok( !$test->ntp_reachable(), "ntp_reachable(): Two NTP peers, one synchronised, one not");
 
 # Multiple NTP peers, both reachable, one synched.
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( multiple_peers_both_reachable() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( multiple_peers_both_reachable() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->ntp_synchronised(), "ntp_synchronised(): Two NTP peers, one synchronised, both reachable");
 ok( $test->ntp_reachable(), "ntp_reachable(): Two NTP peers, one synchronised, both reachable");

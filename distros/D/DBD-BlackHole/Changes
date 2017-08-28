@@ -1,5 +1,9 @@
 Revision history for Perl extension DBD-BlackHole
 
+0.04 2017-08-28T11:05:18Z
+
+    - fixed bind_columns
+
 0.03 2016-11-22T07:07:25Z
 
     - fixed for selectall_arrayref with HASH slice

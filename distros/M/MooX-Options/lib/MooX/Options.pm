@@ -2,7 +2,7 @@ package MooX::Options;
 
 use strictures 2;
 
-our $VERSION = "4.101";
+our $VERSION = "4.103";
 
 use Carp ('croak');
 use Module::Runtime qw(use_module);
@@ -274,7 +274,7 @@ The manual :
 
 =head1 DESCRIPTION
 
-Create a command line tool with your L<Mo>, L<Moo>, L<Moose> objects.
+Create a command line tool with your L<Moo>, L<Moose> objects.
 
 Everything is explicit. You have an C<option> keyword to replace the usual C<has> to explicitly use your attribute into the command line.
 
@@ -724,6 +724,26 @@ Or
 Add spacer before or after or both the params
 
   option 'myoption' => (is => 'ro', spacer_before => 1, spacer_after => 1);
+
+=head1 COMPATIBILITY
+
+=head2 MooX::Options and Mo
+
+C<MooX::Options> is implemented as a frontend loader class and the real magic
+provided by a role composed into the caller by C<MooX::Options::import>.
+
+Since some required features (C<with>, C<around>) isn't provided by L<Mo>,
+L<Class::Method::Modifiers> must be loaded by any C<Mo> class using C<MooX::Options>,
+L<Role::Tiny::With> is needed to I<inject> the L<MooX::Options::Role> and
+finally in the target package the private accessors to options_config
+and options_data are missing.
+
+Concluding a reasonable support for Mo based classes is beyond the goal of
+this module. It's neither forbidden nor actively prevented, but won't be
+covered by any test nor actively supported.
+
+If someome wants contribute guides how to use C<MooX::Options> together with
+C<Mo> or provide patches to solve this limitation - any support will granted.
 
 =head1 ADDITIONAL MANUALS
 

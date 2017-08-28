@@ -1,5 +1,20 @@
 Revision history for Alien-libuv
 
+0.010     2017-08-24
+  - Production release with the changes from the three previous trial releases
+
+0.009     2017-08-17 (TRIAL)
+  - Re-release to fix the bsd-tar headers in the tarball
+
+0.008     2017-08-17 (TRIAL)
+  - Ensure the download URL for libuv is now over https as that's now default
+  - Bump libuv version to 1.14.0
+
+0.007     2017-08-15 (TRIAL)
+  - Depend on Alien::Autotools now
+  - Cleanup the build on Windows a bit (hopefully speed up this process)
+  - Only require Alien::MSYS on Windows
+
 0.006     2017-07-10
   - Bump the share version to libuv v1.13.1
   - Add a recommended test install of FFI::Platypus

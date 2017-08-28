@@ -1,10 +1,18 @@
-requires "Beam::Runner" => "0.010";
+requires "Beam::Minion" => "0";
+requires "Beam::Runner" => "0.013";
 requires "Beam::Wire" => "1.020";
-requires "CPAN::Testers::Schema" => "0.008";
+requires "CPAN::Testers::Report" => "0";
+requires "CPAN::Testers::Schema" => "0.018";
 requires "DBI" => "0";
+requires "Data::FlexSerializer" => "0";
 requires "Getopt::Long" => "2.36";
 requires "Import::Base" => "0.012";
+requires "JSON::MaybeXS" => "0";
 requires "Log::Any" => "1.046";
+requires "Metabase::User::Profile" => "0";
+requires "Minion::Backend::SQLite" => "0";
+requires "Minion::Backend::mysql" => "0";
+requires "Sereal" => "0";
 requires "perl" => "5.024";
 
 on 'test' => sub {
@@ -17,6 +25,7 @@ on 'test' => sub {
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "2.120900";
+  recommends "Test::mysqld" => "0";
 };
 
 on 'configure' => sub {

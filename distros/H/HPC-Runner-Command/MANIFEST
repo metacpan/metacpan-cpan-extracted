@@ -62,12 +62,10 @@ dist.ini
 inotify-hookable.sh
 lib/HPC/Runner/Command.pm
 lib/HPC/Runner/Command/Logger/JSON.pm
+lib/HPC/Runner/Command/Logger/JSON/Archive.pm
 lib/HPC/Runner/Command/Logger/Loggers.pm
 lib/HPC/Runner/Command/Utils/Base.pm
-lib/HPC/Runner/Command/Utils/Git.pm
 lib/HPC/Runner/Command/Utils/Log.pm
-lib/HPC/Runner/Command/Utils/Plugin.pm
-lib/HPC/Runner/Command/Utils/Traits.pm
 lib/HPC/Runner/Command/archive.pm
 lib/HPC/Runner/Command/execute_array.pm
 lib/HPC/Runner/Command/execute_job.pm
@@ -93,6 +91,7 @@ lib/HPC/Runner/Command/submit_jobs.pm
 lib/HPC/Runner/Command/submit_jobs/Logger/JSON.pm
 lib/HPC/Runner/Command/submit_jobs/Plugin/Dummy.pm
 lib/HPC/Runner/Command/submit_jobs/Plugin/PBS.pm
+lib/HPC/Runner/Command/submit_jobs/Plugin/Role/Log.pm
 lib/HPC/Runner/Command/submit_jobs/Plugin/SGE.pm
 lib/HPC/Runner/Command/submit_jobs/Plugin/Slurm.pm
 lib/HPC/Runner/Command/submit_jobs/Utils/Log.pm
@@ -130,4 +129,5 @@ t/lib/TestsFor/HPC/Runner/Command/Test013.pm
 t/lib/TestsFor/HPC/Runner/Command/Test014.pm
 t/lib/TestsFor/HPC/Runner/Command/Test015.pm
 t/lib/TestsFor/HPC/Runner/Command/Test016.pm
+t/lib/TestsFor/HPC/Runner/Command/Test017.pm
 t/test_class_tests.t

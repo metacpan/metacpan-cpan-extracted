@@ -1,3 +1,17 @@
+2.051 2017-08-27
+
+  Updated for lcdproc 0.5.9:
+    * update with LCDd.conf from lcdproc 0.5.9
+    * Fix 2 comments in LCDd.conf to fix model generation
+    * Regenerated models
+
+  Other changes:
+    * handle list parameter LCDd::linux_input/key
+    * added links in pod doc and README file
+    * add -file option to model generator script (lcdconf2model.pl)
+    * update copyright year of generated model
+    * dist.ini: update copyright year
+
 2.050 2016-09-17
 
   Bug fix:

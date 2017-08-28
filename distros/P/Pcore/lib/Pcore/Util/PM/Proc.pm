@@ -36,11 +36,28 @@ our $CACHE = {};
 sub DEMOLISH ( $self, $global ) {
     if ( $self->{pid} ) {
 
-        # kill process group, eg.: windows console subprocess
-        kill '-KILL', $self->{pid};                                                          ## no critic qw[InputOutput::RequireCheckedSyscalls]
+        if ($MSWIN) {
 
-        # kill process, because -9 is ignoref by process itself
-        kill 'KILL', $self->{pid};                                                           ## no critic qw[InputOutput::RequireCheckedSyscalls]
+            # https://perldoc.perl.org/perlport.html#DOS-and-Derivatives
+            #
+            # (Win32) kill doesn't send a signal to the identified process like it does on Unix platforms.
+            # Instead kill($sig, $pid) terminates the process identified by $pid , and makes it exit immediately with exit status $sig.
+            # As in Unix, if $sig is 0 and the specified process exists, it returns true without actually terminating it.
+            #
+            # (Win32) kill(-9, $pid) will terminate the process specified by $pid and recursively all child processes owned by it.
+            # This is different from the Unix semantics, where the signal will be delivered to all processes in the same process group as the process specified by $pid.
+
+            # kill process group, eg.: windows console subprocess
+            kill '-KILL', $self->{pid};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+
+            # kill process, because -SIG is ignored by process itself
+            kill 'KILL', $self->{pid};     ## no critic qw[InputOutput::RequireCheckedSyscalls]
+        }
+        else {
+
+            # term process
+            kill 'TERM', $self->{pid};     ## no critic qw[InputOutput::RequireCheckedSyscalls]
+        }
     }
 
     $self->_on_exit( 128 + 9 ) if !$global;
@@ -70,7 +87,7 @@ around new => sub ( $orig, $self, $cmd, @ ) {
     my $hdl = $self->_redirect_std( \%args );
 
     # create process
-    my $proc = $self->_create_process( $args{win32_cflags}, $cmd->@* );
+    my $proc = $self->_create_process( $args{win32_cflags}, $cmd );
 
     # restore old STD* handles
     open STDIN,  '<&', $hdl->{old_in}  or die if $hdl->{old_in};
@@ -151,7 +168,7 @@ sub _redirect_std ( $self, $args ) {
     return $hdl;
 }
 
-sub _create_process ( $self, $win32_cflags, @cmd ) {
+sub _create_process ( $self, $win32_cflags, $cmd ) {
 
     # prepare environment
     local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
@@ -164,7 +181,7 @@ sub _create_process ( $self, $win32_cflags, @cmd ) {
         Win32::Process::Create(    #
             my $win32_proc,
             $ENV{COMSPEC},
-            join( q[ ], '/D /C', @cmd ),
+            q[/D /C "] . join( q[ ], $cmd->@* ) . q["],
             1,                     # inherit STD* handles
             $win32_cflags,
             q[.]
@@ -178,7 +195,11 @@ sub _create_process ( $self, $win32_cflags, @cmd ) {
     }
     else {
         unless ( $proc->{pid} = fork ) {
-            exec @cmd or die $!;
+
+            # run process in own PGRP
+            setpgrp;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+
+            exec $cmd->@* or die $!;
         }
     }
 

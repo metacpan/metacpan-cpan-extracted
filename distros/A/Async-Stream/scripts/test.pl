@@ -8,6 +8,9 @@ use lib "$FindBin::Bin/../lib";
 use Data::Dumper;
 
 use Async::Stream;
+use AnyEvent;
+use AnyEvent::HTTP;
+
 
 
 # my $i = 0;
@@ -31,9 +34,42 @@ use Async::Stream;
 
 # $stream->cut_sort(sub {length($a) != length($b)},sub {$a <=> $b})->peek(sub {print $_,"\n"})->to_arrayref(sub {print @{$_[0]},"\n"});
 
+my $cv = AnyEvent->condvar;
 
-my @test_array = (1,2,3,4,5,6,7,8,9,10);
-my $test_stream = Async::Stream->new_from(@test_array);
-$test_stream->reduce(sub{$a < $b ? $a : $b},sub{print $_[0]});
+
+my @test_array = qw(
+	http://ya.ru
+	http://blog.ucoz.com
+	http://google.com
+	http://reg.ru
+	http://tothetable.ru
+);
+
+{
+	my $test_stream = Async::Stream->new_from(@test_array);
+
+	$test_stream
+		->set_prefetch(4)
+		->peek(sub{print "before\n"})
+		->transform(sub{ 
+				my $return_cb = shift;
+				http_get $_ , sub { $return_cb->($_[1]->{URL}); };
+			}, 'async')
+		->peek(sub{print "after\n"})
+		->to_arrayref(sub{
+				print Dumper \@_;
+				$cv->send;
+			});
+}
+
+
+
+$cv->recv();
+
+print "Out of scope\n";
+
+sleep 1;
+
+END { print "Destructor\n"};
 
 

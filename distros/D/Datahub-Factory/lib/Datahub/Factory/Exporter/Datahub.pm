@@ -33,12 +33,12 @@ sub _build_out {
 
 sub add {
     my ($self, $item) = @_;
-    $self->out->add($item);
+    $self->out->bag->add($item);
 }
 
 sub update {
     my ($self, $id, $item) = @_;
-    $self->out->update($id, $item);
+    $self->out->bag->update($id, $item);
 }
 
 1;

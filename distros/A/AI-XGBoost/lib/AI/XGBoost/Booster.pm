@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.11';    # VERSION
 
 # ABSTRACT: XGBoost main class for training, prediction and evaluation
 
 use Moose;
 use AI::XGBoost::CAPI qw(:all);
+use namespace::autoclean;
 
 has _handle => ( is       => 'rw',
                  init_arg => undef, );
@@ -64,6 +65,24 @@ sub get_attr {
     XGBoosterGetAttr( $self->_handle, $name );
 }
 
+sub get_score {
+    my $self = shift;
+    my %args = @_;
+    my ( $fmap, $importance_type ) = @args{qw(fmap importance_type)};
+
+    if ( $importance_type eq "weight" ) {
+        my @trees = $self->get_dump;
+    } else {
+
+    }
+
+}
+
+sub get_dump {
+    my $self = shift;
+    return XGBoosterDumpModelEx( $self->_handle, "", 1, "text" );
+}
+
 sub attributes {
     my $self = shift;
     return { map { $_ => $self->get_attr($_) } @{ XGBoosterGetAttrNames( $self->_handle ) } };
@@ -86,6 +105,8 @@ sub DEMOLISH {
     XGBoosterFree( $self->_handle );
 }
 
+__PACKAGE__->meta->make_immutable();
+
 1;
 
 __END__
@@ -100,7 +121,7 @@ AI::XGBoost::Booster - XGBoost main class for training, prediction and evaluatio
 
 =head1 VERSION
 
-version 0.008
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -211,6 +232,42 @@ Set a string attribute
 
 Get a string attribute
 
+=head2 get_score
+
+Get importance of each feature
+
+=head3 Parameters
+
+=over 4
+
+=item importance_type
+
+Type of importance. Valid values:
+
+=over 4
+
+=item weight
+
+Number of times a feature is used to split the data across all trees
+
+=item gain
+
+Average gain of the feature when it is used in trees
+
+=item cover
+
+Average coverage of the feature when it is used in trees
+
+=back
+
+=item fmap
+
+Name of feature map file
+
+=back
+
+=head2 get_dump
+
 =head2 attributes
 
 Returns all attributes of the booster as a HASHREF
@@ -238,10 +295,6 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
-
-This is free software, licensed under:
-
-  The Apache License, Version 2.0, January 2004
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 =cut

@@ -8,11 +8,12 @@ use POSIX;
 use Date::Parse;
 
 # ABSTRACT: Fills in string templates from hash of fields
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 our @EXPORT = qw(expand_string missing_values expand_stringi);
 our @EXPORT_OK = qw(expand_hash);
+our %EXPORT_TAGS = ( all => [@EXPORT, @EXPORT_OK] );
 
 my %special =
 (
@@ -29,7 +30,15 @@ my %special =
 );
 
 my $specials = join('', keys %special);
-my $specialre = qr/^([^$specials]+)([$specials])(.+)$/;
+my $specialre = qr/^([^{$specials]+)([{$specials])(.+)$/;
+my $bracketre = qr/^([^$specials]*?)([{$specials])(.*?)(?<!\\)\}(.*)$/;
+
+$special{'{'} = sub {
+    my ($field, $replace) = @_;
+    $field =~ s/\\\}/}/g;
+    my ($pre, $key, $spec, $post) = $field =~ /$bracketre/;
+    $pre . $special{$key}($spec, $replace) . $post;
+};
 
 #
 # _replace($field, \%fields, $undef_flag)
@@ -135,7 +144,7 @@ String::Template - Fills in string templates from hash of fields
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -184,6 +193,22 @@ it is false (default), undefined fields are simply replace with an
 empty string.  If set to true, the field is kept verbatim.  This can
 be useful for multiple expansion passes.
 
+The C<{> character is specially special, since it allows fields to
+contain additional characters that are not intended for formatting.
+This is specially useful for specifying additional content inside a
+field that may not exist in the hash, and which should be entirely
+replaced with the empty string.
+
+This makes it possible to have templates like this:
+
+ my $template = '<name><nick{ "%s"}><surname{ %s}>';
+
+ my $mack = { name => 'Mack', nick    => 'The Knife' };
+ my $jack = { name => 'Jack', surname => 'Sheppard'  };
+
+ expand_string( $template, $mack ); # Returns 'Mack "The Knife"'
+ expand_string( $template, $jack ); # Returns 'Jack Sheppard'
+
 =head2 expand_stringi
 
  my $str = expand_stringi($template, \%fields, $undef_flag);
@@ -228,6 +253,8 @@ Contributors:
 Curt Tilmes
 
 Jeremy Mates (thirg, JMATES)
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

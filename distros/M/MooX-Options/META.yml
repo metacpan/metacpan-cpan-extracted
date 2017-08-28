@@ -40,5 +40,5 @@ resources:
   homepage: https://metacpan.org/celogeek/MooX-Options
   license: http://dev.perl.org/licenses/
   repository: https://github.com/celogeek/MooX-Options.git
-version: '4.101'
+version: '4.103'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

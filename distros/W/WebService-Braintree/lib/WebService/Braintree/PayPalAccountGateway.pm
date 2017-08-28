@@ -1,5 +1,5 @@
 package WebService::Braintree::PayPalAccountGateway;
-$WebService::Braintree::PayPalAccountGateway::VERSION = '0.92';
+$WebService::Braintree::PayPalAccountGateway::VERSION = '0.93';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

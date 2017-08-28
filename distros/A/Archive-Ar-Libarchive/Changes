@@ -1,5 +1,8 @@
 Revision history for Archive-Ar-Libarchive
 
+2.07      2017-08-24 08:22:33 -0400
+  - Switch to Alien::Libarchive3
+
 2.06      2017-03-24 10:32:59 -0400
   - Reverted changes in 2.05_01 nad 2.05_02
 

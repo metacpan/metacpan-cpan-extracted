@@ -1,7 +1,7 @@
 package Alien::zlib::Static;
 
 use parent 'Alien::Base';
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 
 =head1 NAME
 

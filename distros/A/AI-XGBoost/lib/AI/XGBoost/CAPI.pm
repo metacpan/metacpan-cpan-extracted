@@ -12,6 +12,10 @@ use Exporter::Easy (
               XGDMatrixNumCol
               XGDMatrixSetFloatInfo
               XGDMatrixGetFloatInfo
+              XGDMatrixSetUintInfo
+              XGDMatrixGetUintInfo
+              XGDMatrixSaveBinary
+              XGDMatrixSliceDMatrix
               XGDMatrixFree
               XGBoosterCreate
               XGBoosterSetParam
@@ -34,7 +38,7 @@ use AI::XGBoost::CAPI::RAW;
 use FFI::Platypus;
 use Exception::Class ( 'XGBoostException' );
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.11';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
@@ -89,6 +93,35 @@ sub XGDMatrixGetFloatInfo {
     _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixGetFloatInfo( $matrix, $info, \$out_len, \$out_result ) );
     my $ffi = FFI::Platypus->new();
     return $ffi->cast( opaque => "float[$out_len]", $out_result );
+}
+
+sub XGDMatrixSetUintInfo {
+    my ( $matrix, $info, $data ) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixSetUintInfo( $matrix, $info, $data, scalar @$data ) );
+}
+
+sub XGDMatrixGetUintInfo {
+    my ( $matrix, $info ) = @_;
+    my $out_len    = 0;
+    my $out_result = 0;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixGetUintInfo( $matrix, $info, \$out_len, \$out_result ) );
+    my $ffi = FFI::Platypus->new();
+    return $ffi->cast( opaque => "uint32[$out_len]", $out_result );
+}
+
+sub XGDMatrixSaveBinary {
+    my ( $matrix, $filename, $silent ) = @_;
+    $silent //= 1;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixSaveBinary( $matrix, $filename, $silent ) );
+}
+
+sub XGDMatrixSliceDMatrix {
+    my ( $matrix, $list_of_indices ) = @_;
+    my $new_matrix = 0;
+    my $error = AI::XGBoost::CAPI::RAW::XGDMatrixSliceDMatrix( $matrix, $list_of_indices, scalar @$list_of_indices,
+                                                               \$new_matrix );
+    _CheckCall($error);
+    return $new_matrix;
 }
 
 sub XGDMatrixFree {
@@ -284,7 +317,7 @@ AI::XGBoost::CAPI - Perl wrapper for XGBoost C API https://github.com/dmlc/xgboo
 
 =head1 VERSION
 
-version 0.008
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -392,6 +425,14 @@ DMatrix
 =head2 XGDMatrixSetFloatInfo 
 
 =head2 XGDMatrixGetFloatInfo 
+
+=head2 XGDMatrixSetUintInfo 
+
+=head2 XGDMatrixGetUintInfo 
+
+=head2 XGDMatrixSaveBinary
+
+=head2 XGDMatrixSliceDMatrix
 
 =head2 XGDMatrixFree
 
@@ -532,10 +573,6 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
-
-This is free software, licensed under:
-
-  The Apache License, Version 2.0, January 2004
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 =cut

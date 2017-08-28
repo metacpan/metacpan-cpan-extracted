@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::DMARC;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use Data::Dumper;
 use English qw{ -no_match_vars };
@@ -22,6 +22,7 @@ sub default_config {
         'detect_list_id' => 1,
         'report_skip_to' => [ 'my_report_from_address@example.com' ],
         'no_report'      => 0,
+        'config_file'    => '/etc/mail-dmarc.ini',
     };
 }
 
@@ -63,6 +64,11 @@ sub pre_loop_setup {
     my ( $self ) = @_;
     $PSL_CHECKED_TIME = time;
     my $dmarc = Mail::DMARC::PurePerl->new();
+    my $config = $self->{'config'};
+    if ( exists ( $config->{ 'config_file' } ) ) {
+        $self->log_error( 'DMARC config file does not exist' ) if ! exists $config->{ 'config_file' };
+        $dmarc->config( $config->{ 'config_file' } );
+    }
     my $psl = eval { $dmarc->get_public_suffix_list(); };
     if ( $psl ) {
         $self->{'thischild'}->loginfo( 'DMARC Preloaded PSL' );
@@ -77,6 +83,11 @@ sub pre_fork_setup {
     my ( $self ) = @_;
     my $now = time;
     my $dmarc = Mail::DMARC::PurePerl->new();
+    my $config = $self->{'config'};
+    if ( exists ( $config->{ 'config_file' } ) ) {
+        $self->log_error( 'DMARC config file does not exist' ) if ! exists $config->{ 'config_file' };
+        $dmarc->config( $config->{ 'config_file' } );
+    }
     my $check_time = 60*10; # Check no more often than every 10 minutes
     if ( $now > $PSL_CHECKED_TIME + $check_time ) {
         $PSL_CHECKED_TIME = $now;
@@ -112,6 +123,10 @@ sub get_dmarc_object {
 
     eval {
         $dmarc = Mail::DMARC::PurePerl->new();
+        if ( exists ( $config->{ 'config_file' } ) ) {
+            $self->log_error( 'DMARC config file does not exist' ) if ! exists $config->{ 'config_file' };
+            $dmarc->config( $config->{ 'config_file' } );
+        }
         if ( $dmarc->can('set_resolver') ) {
             my $resolver = $self->get_object('resolver');
             $dmarc->set_resolver($resolver);
@@ -334,6 +349,7 @@ sub eom_callback {
 #           $dmarc->dkim( $empty_dkim );
         }
         my $dmarc_result = $dmarc->validate();
+        $self->set_object('dmarc_result', $dmarc_result,1 );
         my $dmarc_code   = $dmarc_result->result;
         $self->dbgout( 'DMARCCode', $dmarc_code, LOG_INFO );
 
@@ -440,6 +456,7 @@ sub close_callback {
     delete $self->{'is_list'};
     delete $self->{'from_header'};
     $self->destroy_object('dmarc');
+    $self->destroy_object('dmarc_result');
     return;
 }
 
@@ -449,7 +466,7 @@ __END__
 
 =head1 NAME
 
-  Authentication Milter - DMARC Module
+  Authentication-Milter - DMARC Module
 
 =head1 DESCRIPTION
 
@@ -459,24 +476,25 @@ This handler requires the SPF and DKIM handlers to be installed and active.
 
 =head1 CONFIGURATION
 
-        "DMARC" : {                                     | Config for the DMARC Module
-                                                        | Requires DKIM and SPF
-            "hard_reject"         : 0,                  | Reject mail which fails with a reject policy
-            "no_list_reject"      : 0,                  | Do not reject mail detected as mailing list
-            "whitelisted"         : [                   | A list of ip addresses or CIDR ranges, or dkim domains
-                "10.20.30.40",                          | for which we do not want to hard reject mail on fail p=reject
-                "dkim:bad.forwarder.com",               | (valid) DKIM signing domains can also be whitelisted by
-                "20.30.40.0/24"                         | having an entry such as "dkim:domain.com"
+        "DMARC" : {                                      | Config for the DMARC Module
+                                                         | Requires DKIM and SPF
+            "hard_reject"         : 0,                   | Reject mail which fails with a reject policy
+            "no_list_reject"      : 0,                   | Do not reject mail detected as mailing list
+            "whitelisted"         : [                    | A list of ip addresses or CIDR ranges, or dkim domains
+                "10.20.30.40",                           | for which we do not want to hard reject mail on fail p=reject
+                "dkim:bad.forwarder.com",                | (valid) DKIM signing domains can also be whitelisted by
+                "20.30.40.0/24"                          | having an entry such as "dkim:domain.com"
             ],
-            "hide_none"           : 0,                  | Hide auth line if the result is 'none'
-            "detect_list_id"      : "1",                | Detect a list ID and modify the DMARC authentication header
-                                                        | to note this, useful when making rules for junking email
-                                                        | as mailing lists frequently cause false DMARC failures.
-            "report_skip_to"     : [                    | Do not send DMARC reports for emails to these addresses.
-                "dmarc@yourdomain.com",                 | This can be used to avoid report loops for email sent to
-                "dmarc@example.com"                     | your report from addresses.
+            "hide_none"           : 0,                   | Hide auth line if the result is 'none'
+            "detect_list_id"      : "1",                 | Detect a list ID and modify the DMARC authentication header
+                                                         | to note this, useful when making rules for junking email
+                                                         | as mailing lists frequently cause false DMARC failures.
+            "report_skip_to"     : [                     | Do not send DMARC reports for emails to these addresses.
+                "dmarc@yourdomain.com",                  | This can be used to avoid report loops for email sent to
+                "dmarc@example.com"                      | your report from addresses.
             ],
-            "no_report"          : "1"                  | If set then we will not attempt to store DMARC reports.
+            "no_report"          : "1",                  | If set then we will not attempt to store DMARC reports.
+            "config_file"        : "/etc/mail-dmarc.ini" | Optional path to dmarc config file
         },
 
 =head1 SYNOPSIS

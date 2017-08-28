@@ -4,10 +4,9 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile
  ( DISTNAME  => 'MailTools'
- , VERSION   => '2.18'
- , NAME      => 'Mail'
+ , VERSION   => '2.19'
  , AUTHOR    => 'Mark Overmeer <perl@overmeer.net>'
- , ABSTRACT  => 'Various e-mail related modules'
+ , ABSTRACT  => 'Various ancient e-mail related modules'
  , LICENSE   => 'perl'
 
  , PREREQ_PM =>
@@ -42,7 +41,7 @@ LICENSE		= artistic
 # for OODoc's oodist, POD
 FIRST_YEAR	= 1995
 EMAIL		= perl@overmeer.net
-WEBSITE		= http://perl.overmeer.net/log-report/
+WEBSITE		= http://perl.overmeer.net/
 
 ESQ
 }

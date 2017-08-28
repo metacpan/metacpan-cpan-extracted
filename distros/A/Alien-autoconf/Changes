@@ -1,5 +1,11 @@
 Revision history for Alien-autoconf
 
+0.09      2017-08-24 17:24:05 -0400
+  - Production release identical to 0.08_01
+
+0.08_01   2017-08-24 17:08:07 -0400
+  - Override PERL on Windows.
+
 0.07      2017-08-08 05:52:35 -0400
   - Production release identical to 0.06_01
 

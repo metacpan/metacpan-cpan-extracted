@@ -21,11 +21,12 @@ sub encrypt {
 
     my $retval = "";
     my $iv = $cbc->{iv};
-    my $size = $cbc->{cipher}->blocksize;
+    my $ciph = $cbc->{cipher};
+    my $size = $ciph->blocksize;
 
     while (length $data) {
         my $in = substr($data, 0, $size, '') ^ $iv;
-        $iv = $cbc->{cipher}->encrypt($in);
+        $iv = $ciph->encrypt($in);
         $retval .= $iv;
     }
 
@@ -39,11 +40,12 @@ sub decrypt {
 
     my $retval = "";
     my $iv = $cbc->{iv};
-    my $size = $cbc->{cipher}->blocksize;
+    my $ciph = $cbc->{cipher};
+    my $size = $ciph->blocksize;
 
     while (length $data) {
         my $in = substr($data, 0, $size, '');
-        $retval .= $cbc->{cipher}->decrypt($in) ^ $iv;
+        $retval .= $ciph->decrypt($in) ^ $iv;
         $iv = $in;
     }
 

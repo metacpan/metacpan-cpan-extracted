@@ -1,5 +1,12 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+0.35 2017-08-21T13:07:01+0200
+ - Need to skip close-filehandles.t for now
+
+0.24 2017-08-19T22:46:02+0200
+ - Fix running RWF with Minion 7.05 #9
+ - Add test for leaking filehandles in Mojolicious application #7
+
 0.23 2016-10-13T10:07:18+0200
  - Fix documentation: There is no "spawn" event #8
 

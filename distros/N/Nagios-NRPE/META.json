@@ -9,7 +9,7 @@
       "Micke Nordin <mikael.nordin@su.se>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "perl_5"
    ],
@@ -50,19 +50,23 @@
    "provides" : {
       "Nagios::NRPE" : {
          "file" : "lib/Nagios/NRPE.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Nagios::NRPE::Client" : {
          "file" : "lib/Nagios/NRPE/Client.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Nagios::NRPE::Daemon" : {
          "file" : "lib/Nagios/NRPE/Daemon.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
       "Nagios::NRPE::Packet" : {
          "file" : "lib/Nagios/NRPE/Packet.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
+      },
+      "Nagios::NRPE::Utils" : {
+         "file" : "lib/Nagios/NRPE/Utils.pm",
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -75,5 +79,5 @@
          "url" : "git://github.com/stockholmuniversity/nagios-nrpe.git"
       }
    },
-   "version" : "v1.0.2"
+   "version" : "v1.0.3"
 }

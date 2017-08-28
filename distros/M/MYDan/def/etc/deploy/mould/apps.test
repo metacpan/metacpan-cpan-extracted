@@ -1,0 +1,55 @@
+---
+#-
+#  title: show version
+#  global: 1
+#  check:
+##  redo: 2
+##  retry: 20
+#  repeat: 1
+#  delay: 2
+##  sleep: 20
+#  code: m.sync
+#  goon: 25%
+##  fix: 30
+#  param:
+#    bin: 'echo a b c d version: 011.1'
+#    sp: /tmp/adas/a/sda/
+#    user: search
+#    proxy: foo
+#    cont: '(version:.+)'
+-
+  title: Run a command
+  code: m.exec
+  goon: 25%
+  param:
+    bin: 'echo abc'
+
+-
+  title: ctrl apps
+  code: m.apps
+  goon: 25%
+  param:
+    name: project1
+    ctrl: [ 'start' ]
+
+-
+  title: deploy
+  code: m.deploy
+  goon: 25%
+  param:
+    name: project1
+    ctrl: [ 'deploy' ]
+
+-
+  title: mcmd
+  code: m.mcmd
+  goon: 25%
+  param:
+    bin: 'echo {}abc'
+-
+  title: check
+  code: m.check
+  goon: 25%
+  param:
+    check: [ 'project1' ]
+

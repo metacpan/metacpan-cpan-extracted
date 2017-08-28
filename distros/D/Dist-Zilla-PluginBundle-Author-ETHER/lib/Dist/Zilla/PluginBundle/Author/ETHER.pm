@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.127-17-g68d0e0d
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.129-9-g0960324
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.128';
+our $VERSION = '0.130';
 
 use Moose;
 with
@@ -15,13 +15,13 @@ with
 
 use Dist::Zilla::Util;
 use Moose::Util::TypeConstraints qw(enum subtype where class_type);
-use List::Util 1.45 qw(first any uniq);
+use List::Util 1.45 qw(first any uniq none);
 use Module::Runtime qw(require_module use_module);
 use Devel::CheckBin 'can_run';
 use Path::Tiny;
 use CPAN::Meta::Requirements;
 use Term::ANSIColor 'colored';
-eval 'require Win32::Console::ANSI' if $^O eq 'MSWin32';
+eval { +require Win32::Console::ANSI } if $^O eq 'MSWin32';
 use Config;
 use namespace::autoclean;
 
@@ -178,7 +178,7 @@ has _removed_plugins => (
         \%removed;
     },
     traits => ['Hash'],
-    handles => { _plugin_removed => 'exists' },
+    handles => { _plugin_removed => 'exists', _removed_plugins => 'keys' },
 );
 
 # this attribute and its supporting code is a candidate to be extracted out into its own role,
@@ -378,7 +378,7 @@ sub configure
         'EnsureLatestPerl',
 
         # if in airplane mode, allow our uncommitted dist.ini edit which sets 'airplane = 1'
-        [ 'Git::Check'          => 'initial check' => { allow_dirty => [ $self->airplane ? '' : 'dist.ini' ] } ],
+        [ 'Git::Check'          => 'initial check' => { allow_dirty => [ $self->airplane ? 'dist.ini' : '' ] } ],
 
         'Git::CheckFor::MergeConflicts',
         [ 'Git::CheckFor::CorrectBranch' => { ':version' => '0.004', release_branch => 'master' } ],
@@ -481,11 +481,20 @@ around add_plugins => sub
 {
     my ($orig, $self, @plugins) = @_;
 
-    foreach my $plugin_spec (@plugins = map { ref $_ ? $_ : [ $_ ] } @plugins)
+    @plugins = grep {
+        my $plugin = $_;
+        my $plugin_package = Dist::Zilla::Util->expand_config_package_name($plugin->[0]);
+        none {
+             $plugin_package eq Dist::Zilla::Util->expand_config_package_name($_)   # match by package name
+             or ($plugin->[1] and not ref $plugin->[1] and $plugin->[1] eq $_)      # match by moniker
+        } $self->_removed_plugins
+    } map { ref $_ ? $_ : [ $_ ] } @plugins;
+
+    foreach my $plugin_spec (@plugins)
     {
-        next if $self->_plugin_removed($plugin_spec->[0])
-            or $plugin_spec->[0] eq 'BlockRelease'
-            or $plugin_spec->[0] eq 'VerifyPhases';
+        # these should never be added to develop prereqs
+        next if $plugin_spec->[0] eq 'BlockRelease'     # temporary use during development
+            or $plugin_spec->[0] eq 'VerifyPhases';     # only used by ether, not others
 
         my $plugin = Dist::Zilla::Util->expand_config_package_name($plugin_spec->[0]);
         require_module($plugin);
@@ -572,7 +581,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.128
+version 0.130
 
 =head1 SYNOPSIS
 

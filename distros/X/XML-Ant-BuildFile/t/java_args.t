@@ -1,15 +1,9 @@
-#!perl
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
+#!/usr/bin/env perl
 
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+# VERSION
 use English '-no_match_vars';
 use Test::Most;
 use Path::Class;
@@ -36,8 +30,8 @@ for my $task (@java_tasks) {
 }
 
 cmp_deeply(
-    [ map { @{ [ $ARG->args ] }[ 4, 6 ] } @java_tasks ],
-    [   map { unix_filestr_to_native("t/target/yui/$ARG") }
+    [ map { @{ [ $_->args ] }[ 4, 6 ] } @java_tasks ],
+    [   map { unix_filestr_to_native("t/target/yui/$_") }
             qw(
             concat/site.css mincat/css/min/site.css
             concat/site.js  mincat/js/min/site.js
@@ -49,4 +43,4 @@ $tests++;
 
 done_testing();
 
-sub unix_filestr_to_native { file( split q{/}, $ARG[0] )->stringify() }
+sub unix_filestr_to_native { file( split q{/}, $_[0] )->stringify() }

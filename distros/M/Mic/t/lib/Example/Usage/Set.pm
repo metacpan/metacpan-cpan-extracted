@@ -2,7 +2,7 @@ package Example::Usage::Set;
 
 use Mic;
 
-Mic->setup_class({
+Mic->define_class({
     interface => { 
         object => {
             add => {},

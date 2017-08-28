@@ -23,7 +23,6 @@ requires 'Lingua::EN::Numbers', '2.03';
 requires 'MIME::Parser', '5.507';
 requires 'MIME::Types', '2.13';
 requires 'Net::Domain', '3.05';
-requires 'Net::OpenStack::Swift', '0.11';
 requires 'Number::Range', '0.12';
 requires 'Proc::ProcessTable', '0.53';
 requires 'Scalar::Util', '1.45';
@@ -46,6 +45,8 @@ requires 'Try::Tiny', '0.24';
 requires 'utf8', '1.17';
 requires 'WWW::Mechanize', '1.86';
 requires 'YAML::Syck', '1.26';
+
+requires 'AWS::S3', '0.13';
 
 requires 'WWW::Scraper::ISBN::GoogleBooks_Driver','0.30';
 requires 'LWP::Protocol::https','6.07';

@@ -1,5 +1,5 @@
 package HackaMol::Roles::SelectionRole;
-$HackaMol::Roles::SelectionRole::VERSION = '0.043';
+$HackaMol::Roles::SelectionRole::VERSION = '0.044';
 #ABSTRACT: Atom selections in molecules
 use Moose::Role;
 use HackaMol::AtomGroup;
@@ -64,7 +64,7 @@ sub _regex_method {
     #print "$str not implemented yet"; return(sub{0});
     #my @parenth = $str =~ /(\(([^()]|(?R))*\))/g
 
-    $str =~ s/(\w+)\s+([A-Za-z]+)/\$\_->$1 eq \'$2\'/g;
+    $str =~ s/(\w+)\s+(\d*[A-Za-z]+\d*)/\$\_->$1 eq \'$2\'/g;  # resnames must have at least 1 letter
     $str =~ s/(\w+)\s+(-?\d+)/\$\_->$1 == $2/g;
     $str =~ s/(\w+)\s+\.within\.\s+(\d+)/\$\_->$1 <= $2/g;
     $str =~ s/(\w+)\s+\.beyond\.\s+(\d+)/\$\_->$1 >= $2/g;
@@ -92,7 +92,7 @@ HackaMol::Roles::SelectionRole - Atom selections in molecules
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 DESCRIPTION
 

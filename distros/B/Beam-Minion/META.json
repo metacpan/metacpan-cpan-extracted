@@ -59,23 +59,23 @@
    "provides" : {
       "Beam::Minion" : {
          "file" : "lib/Beam/Minion.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "Beam::Minion::Command::run" : {
          "file" : "lib/Beam/Minion/Command/run.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "Beam::Minion::Command::worker" : {
          "file" : "lib/Beam/Minion/Command/worker.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "Beam::Minion::Util" : {
          "file" : "lib/Beam/Minion/Util.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "Beam::Runner::Command::minion" : {
          "file" : "lib/Beam/Runner/Command/minion.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/preaction/Beam-Minion"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_authority" : "cpan:PREACTION",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
 }

@@ -1,11 +1,5 @@
 package WebService::Braintree::Nonce;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
-use Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(transactable consumed paypal_one_time_payment paypal_future_payment apple_pay_visa apple_pay_amex apple_pay_mastercard);
-our @EXPORT_OK = qw();
-
 sub transactable {
   "fake-valid-nonce";
 }

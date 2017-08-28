@@ -145,7 +145,7 @@ sub read_poll_ssh1 {
         $buffer->append($inflated);
     }
 
-    my $type = unpack "c", $buffer->bytes(0, 1, "");
+    my $type = unpack "C", $buffer->bytes(0, 1, "");
     $class->new($ssh,
         type => $type,
         data => $buffer);
@@ -239,7 +239,7 @@ sub read_poll_ssh2 {
 
     $ssh->{session}{seqnr_in}++;
 
-    my $padlen = unpack "c", $buffer->bytes(4-$aadlen, 1);
+    my $padlen = unpack "C", $buffer->bytes(4-$aadlen, 1);
     $ssh->fatal_disconnect("Corrupted padlen $padlen on input")
         unless $padlen >= 4;
 
@@ -253,7 +253,7 @@ sub read_poll_ssh2 {
         $buffer->append($inflated);
     }
 
-    my $type = unpack "c", $buffer->bytes(0, 1, '');
+    my $type = unpack "C", $buffer->bytes(0, 1, '');
     $ssh->{session}{_last_packet_length} = 0;
     $class->new($ssh, type => $type, data => $buffer);
 }
@@ -356,7 +356,7 @@ sub send_ssh2 {
     $buffer->append($junk);
 
     my $packet_len = $buffer->length + 1;
-    $buffer->bytes(0, 0, pack("c", $padlen));
+    $buffer->bytes(0, 0, pack("C", $padlen));
     $buffer->bytes(0, 0, pack("N", $packet_len)) unless $mac && $mac->etm;
 
     my $out = $ciph && $ciph->enabled ? $ciph->encrypt($buffer->bytes,$seqnr,$aadlen) : $buffer->bytes;

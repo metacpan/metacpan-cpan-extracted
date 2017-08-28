@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2016-08-11 00:00:00 +0000 to present.
+Changes from 2016-08-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2017-08-11 20:30:37 +0000
+version 0.012 at 2017-08-27 08:35:30 +0000
 ------------------------------------------
+
+  Change: bcbc32685f69ca9b66dd58f466a1452e0667ac9d
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:34:18 +0000
+
+    Merge pull request #11 from Madskill/delete__get_dbh
+
+    deleted get_dbh. Use set_dbh and dbh 
+
+  Change: f29baee2280bac5747161c82eb1bb73ea40fdf87
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:32:06 +0000
+
+    deleted get_dbh. Use set_dbh and dbh 
+
+------------------------------------------
+version 0.011 at 2017-08-11 20:30:59 +0000
+------------------------------------------
+
+  Change: e6c71f5cf4041f14c409ee54c282362fcc94788a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-11 23:30:59 +0000
+
+    Version 0.011 
 
   Change: e1aa0afe260e5669a922f295b452a465ca80ea51
   Author: Igor <igor-sverdlov@mail.ru>
@@ -121,5 +145,5 @@ version 0.008 at 2016-09-04 19:16:05 +0000
     added pod documentation and upload to cpan 
 
 ================================================
-Plus 7 releases after 2016-08-11 00:00:00 +0000.
+Plus 7 releases after 2016-08-27 00:00:00 +0000.
 ================================================

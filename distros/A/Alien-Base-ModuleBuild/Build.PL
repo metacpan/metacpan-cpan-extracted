@@ -3,6 +3,8 @@ use warnings;
 use Config;
 use Module::Build;
 
+# TODO: after October, require Alien::base 0.77 (at minimum)
+
 my %build_args = (
   module_name => 'Alien::Base::ModuleBuild',
   dist_name => 'Alien-Base-ModuleBuild',
@@ -24,13 +26,13 @@ my %build_args = (
     'Sort::Versions'   => 0,
     'List::Util'       => '1.45',
     'URI'              => 0,
-    'File::ShareDir'   => 0,
     'Archive::Extract' => 0,
     'HTTP::Tiny'       => '0.044',
     'Text::ParseWords' => '3.26',
     'Shell::Guess'     => 0,
     'Shell::Config::Generate' => 0,
     'JSON::PP'         => 0,
+    'Path::Tiny'       => '0.077',
   },
   test_requires => {
     'Test2::V0'              => '0.000071',

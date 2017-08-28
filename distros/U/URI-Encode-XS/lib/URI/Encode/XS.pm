@@ -5,7 +5,7 @@ package URI::Encode::XS;
 use XSLoader;
 use Exporter 5.57 'import';
 
-our $VERSION     = '0.10';
+our $VERSION     = '0.11';
 our @EXPORT_OK   = ( qw/uri_encode uri_encode_utf8 uri_decode uri_decode_utf8/ );
 
 XSLoader::load('URI::Encode::XS', $VERSION);

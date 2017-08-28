@@ -1,3 +1,9 @@
+3.002 2017-08-22
+
+    * add doc for $skip variable
+    * reset $model_to_test between test runs to fix consecutive tests
+      that use the same model with different setup
+
 3.001 2017-06-03
 
     * Jump to version 3.001 because I messed up previous release.

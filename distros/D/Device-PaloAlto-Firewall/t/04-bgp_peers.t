@@ -16,7 +16,7 @@ plan tests => 11;
 my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', username => 'test', password => 'test', debug => 1);
 my $test = $fw->tester();
 
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_bgp_configured() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_bgp_configured() )->simplify( forcearray => ['entry'] )->{result} } );
 
 
 
@@ -30,14 +30,14 @@ ok( !$test->bgp_peers_up(peer_ips => ['192.168.122.30']), 'No configured BGP');
 
 
 ### Tests when the firewall has a single peer ###
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response_single_peer() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response_single_peer() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->bgp_peers_up(peer_ips => ['192.168.122.30']), 'Single peer up' );
 ok( !$test->bgp_peers_up(peer_ips => ['1.1.1.1']), 'Peer not present' );
 ok( !$test->bgp_peers_up(peer_ips => ['192.168.122.30', '1.1.1.1']), 'Single peer up, single peer not present' );
 
 ### Tests when the firewall has multiple peers ###
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response_multiple_peer() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response_multiple_peer() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->bgp_peers_up(peer_ips => ['192.168.122.30']), 'Single peer up' );
 ok( !$test->bgp_peers_up(peer_ips => ['192.168.122.35']), 'Single peer not up' );

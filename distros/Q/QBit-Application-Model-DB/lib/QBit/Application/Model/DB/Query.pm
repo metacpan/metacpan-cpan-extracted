@@ -1,5 +1,5 @@
 package Exception::DB::NoFieldsAvailable;
-$Exception::DB::NoFieldsAvailable::VERSION = '0.016';
+$Exception::DB::NoFieldsAvailable::VERSION = '0.018';
 use base qw(Exception::DB);
 
 =head1 Name
@@ -13,7 +13,7 @@ Base class for DB queries.
 =cut
 
 package QBit::Application::Model::DB::Query;
-$QBit::Application::Model::DB::Query::VERSION = '0.016';
+$QBit::Application::Model::DB::Query::VERSION = '0.018';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -864,10 +864,7 @@ sub _field_to_sql {
 
     $opts{'offset'} ||= 0;
 
-    if (!defined($expr)) {
-        return ('NULL');
-
-    } elsif (ref($expr) eq 'SCALAR') {
+    if (ref($expr) eq 'SCALAR') {
         # {name => \'string or number'}
         return ($self->quote($$expr) . (defined($alias) ? ' AS ' . $self->quote_identifier($alias) : ''));
 
@@ -963,7 +960,7 @@ sub _field_to_sql {
 
         for my $i (0 .. @locale_suffixes - 1) {
             my @operands = map {@$_ > 1 ? $_->[$i] : $_->[0]} @operand_sets;
-            if (in_array($operator, [qw(AND OR)])) {
+            if (grep {$operator eq $_} qw(AND OR)) {
                 push(@res,
                         "(\n$offset    "
                       . CORE::join("\n$offset    $operator ", @operands)
@@ -985,25 +982,43 @@ sub _field_to_sql {
         my @res    = ();
         my ($cmp1, $operator, $cmp2) = @$expr;
 
-        if (ref($cmp2) eq 'REF' && ref($$cmp2) eq 'ARRAY' && !@{$$cmp2}) {
-            return $offset . 'NULL';
-        }
-
-        $expr->[1] =~ s/^\s+|\s+$//g;
         # Fix operator
+        $operator =~ s/^\s+|\s+$//g;
         $operator = uc($operator);
         $operator =~ s/!=/<>/;
         $operator =~ s/==/=/;
-        $operator = 'IS'     if $operator eq '='  && !defined($expr->[2]);
-        $operator = 'IS NOT' if $operator eq '<>' && !defined($expr->[2]);
-        $operator = 'IN'     if $operator eq '='  && ref($expr->[2]) eq 'REF' && ref(${$expr->[2]}) eq 'ARRAY';
-        $operator = 'NOT IN' if $operator eq '<>' && ref($expr->[2]) eq 'REF' && ref(${$expr->[2]}) eq 'ARRAY';
+
+        if ($operator eq '=') {
+            if (ref($cmp2) eq 'SCALAR' && !defined($$cmp2)) {
+                $operator = 'IS';
+            } elsif (ref($cmp2) eq 'REF' && ref($$cmp2) eq 'ARRAY') {
+                $operator = 'IN';
+            }
+        } elsif ($operator eq '<>') {
+            if (ref($cmp2) eq 'SCALAR' && !defined($$cmp2)) {
+                $operator = 'IS NOT';
+            } elsif (ref($cmp2) eq 'REF' && ref($$cmp2) eq 'ARRAY') {
+                $operator = 'NOT IN';
+            }
+        }
 
         $cmp1 = [$self->_field_to_sql(undef, $cmp1, $cur_query_table, %opts, offset => $opts{'offset'} + 4)];
 
         if (ref($cmp2) eq 'REF' && ref($$cmp2) eq 'ARRAY') {
+            unless (@{$$cmp2}) {
+                #['field', 'NOT IN', \[]] to sql: '1'
+                #['field', 'IN', \[]] to sql: 'NULL'
+
+                return (
+                    $self->_field_to_sql(
+                        undef, $operator =~ /^NOT/ ? \1 : \undef,
+                        $cur_query_table, %opts, offset => $opts{'offset'} + 4
+                    )
+                );
+            }
+
             $cmp2 = ['(' . CORE::join(', ', map {$self->quote($_)} @{$$cmp2}) . ')'];
-        } elsif ($operator =~ /ANY|ALL/ && blessed($cmp2) && $cmp2->isa(__PACKAGE__)) {
+        } elsif (blessed($cmp2) && $cmp2->isa(__PACKAGE__)) {
             ($cmp2) = $cmp2->get_sql_with_data(offset => $opts{'offset'} + 4);
             $cmp2 = ["(\n$offset    $cmp2\n$offset)"];
         } else {

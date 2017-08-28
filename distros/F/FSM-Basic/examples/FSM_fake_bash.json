@@ -135,7 +135,7 @@
                         },
                         "test2": {
                             "catSEQ": "test.txt test1.txt test2.txt",
-                            "catSEQ_idxf": "test_state"
+                            "catSEQ_idxff": "test_state"
                         },
 			"mem": {
 				"do": "my ( $tot,$avail) = (split /\n/ ,do { local( @ARGV, $/ ) = \"/proc/meminfo\" ; <> })[0,2];$tot =~ s/\\D*//g; $avail =~ s/\\D*//g; sprintf \"%0.2f%%\\n\",(100*($tot-$avail)/$tot);"

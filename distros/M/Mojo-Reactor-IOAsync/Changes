@@ -1,3 +1,8 @@
+1.000     2017-08-22 20:11:11 EDT
+  - Use IO::Async::Loop->really_new for nested loops instead of instances of Mojo::Reactor::Poll
+  - Switch installer to Module::Build::Tiny
+  - Various optimizations
+
 0.005     2015-04-27 18:43:55 EDT
   - Support sequential next_tick
 

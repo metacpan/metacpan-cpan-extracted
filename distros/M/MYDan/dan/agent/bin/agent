@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+MYDan::Agent proxy
+
+=cut
+use strict;
+use warnings;
+
+use MYDan::Agent;
+use MYDan::Util::OptConf;
+
+$MYDan::Util::OptConf::THIS = 'agent';
+
+my %o = MYDan::Util::OptConf->load()->dump();
+MYDan::Agent->new( $o{path} )->run();
+exit 1;

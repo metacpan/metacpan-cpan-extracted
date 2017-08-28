@@ -1,0 +1,17 @@
+Changes
+GLFW.xs
+MANIFEST
+Makefile.PL
+README.md
+TODO.md
+examples/callback.pl
+examples/checkimg.pl
+examples/gears.pl
+examples/simple.pl
+lib/OpenGL/GLFW.pm
+ppport.h
+t/OpenGL-GLFW.t
+test.pl
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

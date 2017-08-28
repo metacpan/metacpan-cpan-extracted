@@ -14,7 +14,6 @@ use strict;
 #use warnings;
 no warnings;
 
-use Data::Dumper;
 use Carp;
 
 use Glib qw/TRUE FALSE/;
@@ -36,7 +35,7 @@ use constant {
 };
 
 BEGIN {
-    $Gtk3::Ex::DBI::Datasheet::VERSION                          = '3.2';
+    $Gtk3::Ex::DBI::Datasheet::VERSION                          = '3.3';
 }
 
 sub new {
@@ -62,7 +61,9 @@ sub new {
       , default_font_size    => $$req{default_font_size} || undef    # Default font size
       , fixed_row_height     => $$req{fixed_row_height} || 0         # Boolean to activate fixed-height mode 
       , read_only            => $$req{read_only}                     # Boolean to indicate read-only mode
+      , force_editable       => $$req{force_editable}                # Boolean to force cells to be editable ( eg so you can copy from them ) even if read-only
       , before_insert        => $$req{before_insert}                 # Code that runs *before* each record is inserted
+      , before_query         => $$req{before_query}                  # Code that runs *before* query() is run
       , on_insert            => $$req{on_insert}                     # Code that runs *after* each record is inserted
       , before_apply         => $$req{before_apply}                  # Code that runs *before* each record is applied
       , on_apply             => $$req{on_apply}                      # Code that runs *after* each record is applied
@@ -706,7 +707,30 @@ sub setup_treeview {
         $sw->show_all;
         
     }
-    
+
+    # Connect signal for CTRL+c for copying
+    # TODO: not working - need some way of finding the coordinates under the mouse at the time of the keypress event. Is it even possible?
+#    if ( $treeview_type eq "treeview" ) {
+#        $self->{treeview}->signal_connect( 'key_press_event'    => sub
+#            {
+#                my ( $window, $event ) = @_;
+#                my $keyval = $event->keyval;
+#                if ( $event->state =~ /control-mask/ ) { # CTRL key held down
+#                    if ( $keyval == &Gtk3::Gdk::KEY_C || $keyval == &Gtk3::Gdk::KEY_c ) {
+#                        my ( $x , $y ) = $event->get_coords;
+#                        my ( $path, $column, $cell_x, $cell_y ) = $self->{treeview}->get_path_at_pos( $event->get_root_coords->{x}, $event->get_root_coords->{y} );
+#                        my $column_name = $column->{definition}->{name};
+#                        my $value = $self->get_colummn_value( $column_name );
+#                        my $clipboard = Gtk3::Clipboard::get( Gtk3::Gdk::Atom::intern( 'CLIPBOARD', 0 ) );
+#                        $clipboard->set_text( $value, length $value );
+#                        return TRUE;
+#                    }
+#                }
+#                return FALSE;
+#            }
+#        );
+#    }
+
     # Set up icons for use in the record status column
     if ( $treeview_type eq "treeview" ) {
         $self->{icons}[UNCHANGED]   = $self->{treeview}->render_icon( "gtk-yes",                    "menu" );
@@ -739,7 +763,7 @@ sub setup_treeview {
         # We can't do that for combo cells, but otherwise if cells are read-only or hidden,
         # use the stock text renderer
         if (
-            $field->{renderer} eq "text"
+               $field->{renderer} eq "text"
             || $field->{renderer} eq "hidden"
             || $field->{renderer} eq "number"
             || (
@@ -767,7 +791,14 @@ sub setup_treeview {
             
             $renderer->{column} = $field->{column};
             
-            if ( $treeview_type ne "footer_treeview" && ! $self->{read_only} && ! $field->{read_only} ) {
+            if ( $treeview_type ne "footer_treeview"
+              && (
+                     (  ! $self->{read_only}
+                     && ! $field->{read_only}
+                     )
+                  || $self->{force_editable}
+                 )
+            ) {
                 $renderer->set( editable => TRUE );
             } else {
                 $renderer->set( editable => FALSE );
@@ -1745,20 +1776,21 @@ sub process_text_editing {
         
         if ( $self->{fields}->[$column_no]->{validation} && ! $self->{suppress_validation} ) { # Array of field defs starts at zero
             $self->{suppress_validation} = TRUE;
-            if ( ! $self->{fields}->[$column_no]->{validation}(
+            my $validation_response = $self->{fields}->[$column_no]->{validation}( # TODO Document!
                 {
-                    renderer    => $renderer,
-                    text_path   => $text_path,
-                    new_text    => $new_text,
-                    model       => $model # TODO Document!
+                    renderer    => $renderer
+                  , text_path   => $text_path
+                  , old_text    => $old_text
+                  , new_text    => $new_text
+                  , model       => $model
                 }
-            ) ) {
-                    return FALSE; # Error dialog should have already been produced by validation code
+            );
+            if ( ! $validation_response ) {
+                return FALSE; # Error dialog should have already been produced by validation code
             }
         }
         
         # Supress setting the record status if the changed column is an sql_ignore / dont_update column
-        # TOD: Consolidate into 1 attribute ... probably used for exactly the same thing
         if (
                 ( exists $self->{columns}[$column_no]->{sql_ignore} && $self->{columns}[$column_no]->{sql_ignore} )
              || ( exists $self->{columns}[$column_no]->{dont_update} && $self->{columns}[$column_no]->{dont_update} )
@@ -1882,6 +1914,10 @@ sub query {
         
     }
     
+    if ( $self->{before_query} ) {
+        $self->{before_query}();
+    }
+    
     my $sql;
     
     if ( exists $self->{sql}->{pass_through} ) {
@@ -1929,6 +1965,10 @@ sub query {
         
         if ( $self->{sql}->{where} ) {
             $sql .= " where " . $self->{sql}->{where};
+        }
+        
+        if ( $self->{sql}->{limit} ) {
+            $sql .= " limit " . $self->{sql}->{limit};
         }
         
         if ( $self->{sql}->{order_by} ) {
@@ -5575,6 +5615,14 @@ the from clause
 
 the where clause ( may contain values or placeholders )
 
+=head3 limit
+
+=over 4
+
+a limit clause
+
+=back
+
 =back
 
 =head3 bind_values
@@ -5693,6 +5741,12 @@ Note that you can also set individual fields to read_only
 
 =back
 
+=over 4 force_editable
+
+a boolean to force cells to be editable ( eg so you can copy from them ) even if read-only
+
+=back
+
 =head2 before_apply
 
 =over 4
@@ -5708,6 +5762,12 @@ For more information, see USER-DEFINED CALL-BACKS below
 
 a coderef to a custom function to run *after* a recordset is applied.
 For more information, see USER-DEFINED CALL-BACKS below
+
+=back
+
+=head2 before_query
+
+a coderef to some code to run before the query() method is called
 
 =back
 
@@ -6441,7 +6501,7 @@ For slow network connections, your Gtk3 GUI may appear to hang while populating 
 To make things feel more fluid, you can set $Gtk3::Ex::Datasheet::DBI::gtk2_main_in_query = TRUE in your
 application, which will trigger:
 
-Gtk3->main_iteration while ( Gtk3->events_pending );
+Gtk3::main_iteration while ( Gtk3::events_pending );
 
 for each record appended to the treeview. While this slows down operation of your application, it *appears* to
 have the opposite effect, as the GUI remains responsive. This is even the case when using high speed networks.
@@ -6498,7 +6558,7 @@ usual for database applications, so you shouldn't have any problems. See the exa
 
 =head1 AUTHORS
 
-Daniel Kasak - dan@entropy.homelinux.org
+Daniel Kasak - d.j.kasak.dk@gmail.com
 
 =head1 CREDITS
 

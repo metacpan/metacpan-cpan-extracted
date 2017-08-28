@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name                    : Net-SSH-Perl
-version                 : 2.12
+version                 : 2.14
 abstract                : Perl client interface to SSH
 author:              
   - David Robins <dbrobins@cpan.org>

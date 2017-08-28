@@ -4,13 +4,13 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Config-Model-LcdProc",
    "prereqs" : {
@@ -53,7 +53,7 @@
          "web" : "http://github.com/dod38fr/config-model-lcdproc"
       }
    },
-   "version" : "2.050",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "2.051",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

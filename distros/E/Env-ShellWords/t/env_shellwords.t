@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 use Env::ShellWords;
 
 subtest 'fetch' => sub {
@@ -155,6 +155,22 @@ subtest 'export' => sub {
 
   is $BAR[1], 'two two';
 
+};
+
+subtest 'custom cb' => sub {
+
+  local $ENV{FOO} = 'one:two:three';
+  
+  tie my @FOO, 'Env::ShellWords', 'FOO',
+    sub { split /:/, $_[0] },
+    sub { join ':', @_ };
+  
+  is(\@FOO, [qw( one two three )], 'fetch');
+  
+  push @FOO, 'foo';
+  unshift @FOO, 'bar';
+  
+  is(\@FOO, [qw( bar one two three foo )], 'fetch');
 };
 
 done_testing;

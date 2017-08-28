@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::Individual;
-$WebService::Braintree::ErrorCodes::MerchantAccount::Individual::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::MerchantAccount::Individual::VERSION = '0.93';
 use strict;
 
 use constant FirstNameIsRequired    => "82637";

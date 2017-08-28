@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-Options",
    "no_index" : {
@@ -98,6 +98,6 @@
          "web" : "https://github.com/celogeek/MooX-Options"
       }
    },
-   "version" : "4.101",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "4.103",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

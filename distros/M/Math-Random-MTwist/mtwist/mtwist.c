@@ -312,6 +312,8 @@ double			mt_32_to_double;
 					/* Multiplier to convert long to dbl */
 NVTYPE			mt_64_to_double;
 					/* Mult'r to cvt long long to dbl */
+NVTYPE			mt_96_to_double;
+NVTYPE			mt_128_to_double;
 
 /*
  * In the recurrence relation, the new value is XORed with MATRIX_A only if
@@ -343,12 +345,16 @@ void mts_mark_initialized(
      * don't worry too much about efficiency, since the assumption is that
      * initialization is vastly rarer than generation of random numbers.
      */
-    mt_32_to_double = 1.0;
-    for (i = 0;  i < BIT_WIDTH;  i++)
-	mt_32_to_double /= 2.0;
-    mt_64_to_double = mt_32_to_double;
-    for (i = 0;  i < BIT_WIDTH;  i++)
-	mt_64_to_double /= 2.0;
+    mt_32_to_double  = 1.0;
+    mt_64_to_double  = 1.0;
+    mt_96_to_double  = 1.0;
+    mt_128_to_double = 1.0;
+    for (i = 0;  i < BIT_WIDTH;  i++) {
+      mt_32_to_double  /= 2.0;
+      mt_64_to_double  /= 4.0;
+      mt_96_to_double  /= 8.0;
+      mt_128_to_double /= 16.0;
+    }
 
     state->initialized = 1;
     }

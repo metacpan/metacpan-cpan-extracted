@@ -1,0 +1,45 @@
+---
+abstract: 'Alien package for the Poppler PDF rendering library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Gather::Dino: '0'
+  Alien::OpenJPEG: '0'
+  Alien::gmake: '0'
+  Capture::Tiny: '0'
+  Env: '0'
+  Env::ShellWords: '0.01'
+  ExtUtils::MakeMaker: '6.52'
+  Path::Tiny: '0'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::SearchDep: '0.35'
+  Alien::Build::Plugin::Gather::Dino: '0'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Poppler
+requires:
+  Alien::Base: '0.038'
+  Alien::Role::Dino: '0'
+  File::Spec: '0'
+  Role::Tiny::With: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/project-renard/p5-Alien-Poppler
+  repository: https://github.com/project-renard/p5-Alien-Poppler.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,9 @@
 Revision history for Log-Log4Cli
 
+0.18    2017-08-23
+        replace 'notice' (deprecated) loglevel by 'alert'
+        pod fixed
+
 0.17    2017-05-01
         docs improved
         refactoring

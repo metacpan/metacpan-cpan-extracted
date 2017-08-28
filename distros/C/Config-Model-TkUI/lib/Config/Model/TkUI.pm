@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.363';
+$Config::Model::TkUI::VERSION = '1.364';
 use 5.10.1;
 use strict;
 use warnings;
@@ -112,11 +112,11 @@ sub ClassInit {
 sub set_font {
     my $cw = shift;
 
-    my $font = $main_window->FontDialog->Show;
-    if (defined $font) {
-        $main_window->RefontTree(-font => $font);
-        $config->{font} = {$font->actual} ;
-        $cw->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $font ]);
+    my $tk_font = $main_window->FontDialog->Show;
+    if (defined $tk_font) {
+        $main_window->RefontTree(-font => $tk_font);
+        $config->{font} = {$tk_font->actual} ;
+        $cw->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $tk_font ]);
         DumpFile($config_file->stringify, $config);
     }
 }
@@ -314,8 +314,9 @@ sub Populate {
     $args->{-title} = $title;
     $cw->SUPER::Populate($args);
 
+    my $tk_font = $cw->Font(%{$config->{font}});
     $cw->ConfigSpecs(
-        -font       => ['DESCENDANTS', 'font','Font', $config->{font} ],
+        -font       => ['DESCENDANTS', 'font','Font', $tk_font ],
         #-background => ['DESCENDANTS', 'background', 'Background', $background],
         #-selectbackground => [$hlist, 'selectBackground', 'SelectBackground',
         #                      $selectbackground],
@@ -1144,15 +1145,15 @@ sub create_element_widget {
     my @store = $mode eq 'edit' ? ( -store_cb => sub { $cw->reload(@_) } ) : ();
     $cw->{current_mode} = $mode;
 
+    my $tk_font = $cw->cget('-font');
     $cw->{editor} = $e_frame->$widget(
         -item => $obj,
         -path => $tree_path,
-        -font => $config->{font},
+        -font => $tk_font,
         @store,
     );
 
-    my $font = $cw->cget('-font');
-    $cw->{editor}->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $font ]);
+    $cw->{editor}->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $tk_font ]);
 
     $cw->{editor}->pack( -expand => 1, -fill => 'both' );
     return $cw->{editor};
@@ -1254,11 +1255,11 @@ sub setup_wizard {
 
     # when wizard is run, there's no need to update editor window in
     # main widget
-    my $font = $cw->cget('-font');
+    my $tk_font = $cw->cget('-font');
     return $cw->ConfigModelWizard(
         -root   => $cw->{root},
         -end_cb => $end_sub,
-        -font => $font,
+        -font => $tk_font,
     );
 }
 

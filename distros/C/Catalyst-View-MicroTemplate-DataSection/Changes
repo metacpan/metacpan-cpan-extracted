@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst-View-MicroTemplate-DataSection
 
+0.04 2017-08-25T13:23:12Z
+    - fixed dependencies Class::C3::Adopt::NEXT
+
 0.03 2016-02-02T01:30:48Z
     - include dependencies from cpanfile
 

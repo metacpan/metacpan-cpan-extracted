@@ -1,0 +1,11 @@
+See also the git repository.
+
+ * 0.03 - fixed various bugs in Subpattern ->walk. Subpatterns now close
+   over what they point to at time of object creation instead of at walk
+   or ->render time.
+ * 0.02 - Subpattern calls ->render on objects; this allows subpatterns
+   to be not just simple strings. croak/confess instead of die
+   especially if deep in some ->render or ->walk tree. Add ->walk so
+   the parse tree can be walked through with (and possibly modified by)
+   a callback.
+ * 0.01 - released on a mostly unsuspecting world.

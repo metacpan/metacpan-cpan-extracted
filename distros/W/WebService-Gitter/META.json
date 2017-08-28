@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-Gitter",
    "prereqs" : {
@@ -48,7 +48,6 @@
       },
       "test" : {
          "requires" : {
-            "Modern::Perl" : "0",
             "Test::More" : "0",
             "lib" : "0"
          }
@@ -66,7 +65,7 @@
          "web" : "https://github.com/faraco/WebService-Gitter"
       }
    },
-   "version" : "1.1.0",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "version" : "1.1.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

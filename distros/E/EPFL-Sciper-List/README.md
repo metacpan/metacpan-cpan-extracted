@@ -1,0 +1,78 @@
+<p align="center">
+  <img alt="EPFL Sciper List" src="https://raw.githubusercontent.com/epfl-devrun/epfl-sciper-list/master/docs/readme/readme-logo.png">
+</p>
+
+<p align="center">
+  Get a list of all public active sciper from EPFL.
+</p>
+
+<p align="center">
+  <a href="https://travis-ci.org/epfl-devrun/epfl-sciper-list">
+    <img alt="Travis Status" src="https://travis-ci.org/epfl-devrun/epfl-sciper-list.svg?branch=master">
+  </a>
+  <a href="https://coveralls.io/github/epfl-devrun/epfl-sciper-list?branch=master">
+    <img alt="Coverage Status" src="https://coveralls.io/repos/github/epfl-devrun/epfl-sciper-list/badge.svg?branch=master"/>
+  </a>
+  <a href="https://raw.githubusercontent.com/epfl-devrun/epfl-sciper-list/master/LICENSE">
+    <img alt="MIT License" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg">
+  </a>
+</p>
+
+---
+
+Install
+-------
+
+Via CPAN with :
+
+```bash
+$ cpan install EPFL::Sciper::List
+```
+
+Usage
+-----
+
+### Command Line
+
+```bash
+$ epfl-sciper-list.pl --help
+Usage:
+  epfl-sciper-list.pl
+  epfl-sciper-list.pl --output=json > sciper.json
+  epfl-sciper-list.pl --output=tsv > sciper.tsv
+
+Options:
+  --output=tsv|json
+    Output format in TSV or Json.
+```
+
+### Module
+
+```perl
+use EPFL::Sciper::List qw/retrieveSciper toJson toTsv/;
+
+my @listPersons = retrieveSciper();
+print toJson(@listPersons);
+print toTsv(@listPersons);
+```
+
+Contributing
+------------
+
+Contributions are always welcome.
+
+See [Contributing](CONTRIBUTING.md).
+
+Developer
+---------
+
+  * [William Belle](https://github.com/williambelle)
+
+License
+-------
+
+Apache License 2.0
+
+(c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2017.
+
+See the [LICENSE](LICENSE) file for more details.

@@ -1,0 +1,108 @@
+NAME
+    App::PackUtils - Command-line utilities related to Perl pack() and
+    unpack()
+
+VERSION
+    This document describes version 0.001 of App::PackUtils (from Perl
+    distribution App-PackUtils), released on 2017-08-27.
+
+SYNOPSIS
+    This distribution provides tha following command-line utilities related
+    to Perl "pack()" and "unpack()" functions:
+
+    *   perl-pack
+
+    *   perl-unpack
+
+FUNCTIONS
+  perl_pack
+    Usage:
+
+     perl_pack(%args) -> any
+
+    Pack() data.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   data* => *array*
+
+    *   template* => *str*
+
+    Return value: (any)
+
+  perl_pack_template_data_size
+    Usage:
+
+     perl_pack_template_data_size(%args) -> any
+
+    Show Perl pack() template data size in bytes if fixed, or -1 if
+    arbitrary.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   template* => *str*
+
+    Return value: (any)
+
+  perl_pack_template_is_fixed_size
+    Usage:
+
+     perl_pack_template_is_fixed_size(%args) -> any
+
+    Check if a Perl pack() template specifies a fixed-size data.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   template* => *str*
+
+    Return value: (any)
+
+  perl_unpack
+    Usage:
+
+     perl_unpack(%args) -> any
+
+    Unpack() string.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   escaped_string => *str*
+
+    *   string => *str*
+
+    *   template* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PackUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PackUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PackUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

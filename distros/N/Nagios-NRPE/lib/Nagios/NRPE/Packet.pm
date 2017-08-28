@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Nagios::NRPE::Packet - Assembly and de-assembly of an NRPE packet
+Nagios::NRPE::Packet - Assembly and disassembly of an NRPE packet
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Nagios::NRPE::Packet - Assembly and de-assembly of an NRPE packet
                               version => NRPE_PACKET_VERSION_3 );
 
  my $data = <$socket>
- my $response = $packet->deassemble($data);
+ my $response = $packet->disassemble($data);
 
  print $response->{buffer};
  exit $response->{result_code};
@@ -97,7 +97,11 @@ A helper function to assemble a V3 packet.
 
 =item deassemble()
 
-Takes a packet recieved by either client or server and deassembles them. The returned hashref contains 
+Deprecated function, use disassemble instead.
+
+=item disassemble()
+
+Takes a packet recieved by either client or server and disassembles them. The returned hashref contains 
 the following values for a V3 packet:
 
  packet_version 
@@ -116,13 +120,13 @@ and the following values for a V2 packet:
  result_code    
  buffer
 
-=item deassemble_v2()
+=item disassemble_v2()
 
-Helper function for deassembleing a V2 packet
+Helper function for disassembleing a V2 packet
 
-=item deassemble_v3()
+=item disassemble_v3()
 
-Helper function for deassembleing a V3 packet
+Helper function for disassembleing a V3 packet
 
 =item validate($packet)
 
@@ -190,7 +194,7 @@ the same terms as the Perl 5 programming language system itself.
 
 package Nagios::NRPE::Packet;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 use 5.010_000;
 require Exporter;
@@ -220,6 +224,7 @@ use strict;
 use Carp;
 use Convert::Binary::C;
 use Digest::CRC 'crc32';
+use Nagios::NRPE::Utils qw(return_error);
 
 use constant {
 
@@ -351,18 +356,28 @@ sub validate {
 
 sub deassemble {
     my ( $self, $packet ) = @_;
+    print
+"The deassemble function has been deprecated and will be removed in a future release, please use disassemble instead\n";
+    return $self->disassemble($packet);
+}
+
+sub disassemble {
+    my ( $self, $packet ) = @_;
+    if ( !$packet ) {
+        return_error("Could not disassemble packet, it seems empty");
+    }
     my $ver = unpack( "n", $packet );
     my $unpacked = {};
     if ( $ver eq NRPE_PACKET_VERSION_2 ) {
-        $unpacked = $self->deassemble_v2($packet);
+        $unpacked = $self->disassemble_v2($packet);
     }
     else {
-        $unpacked = $self->deassemble_v3($packet);
+        $unpacked = $self->disassemble_v3($packet);
     }
     return $unpacked;
 }
 
-sub deassemble_v3 {
+sub disassemble_v3 {
     my ( $self, $packet ) = @_;
     my @arr = unpack( "n2 N n2 N Z*", $packet );
     my $unpacked = {};
@@ -376,7 +391,7 @@ sub deassemble_v3 {
     return $unpacked;
 }
 
-sub deassemble_v2 {
+sub disassemble_v2 {
     my ( $self, $packet ) = @_;
     my @arr = unpack( "n2 N n Z*", $packet );
     my $unpacked = {};

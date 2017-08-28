@@ -6,6 +6,8 @@ WriteMakefile
   'NAME' => 'Sidef',
   'VERSION_FROM' => 'lib/Sidef.pm',
   'PREREQ_PM' => {
+                   'Algorithm::Combinatorics' => 0,
+                   'Algorithm::Loops' => 0,
                    'Cwd' => 0,
                    'Encode' => 0,
                    'Fcntl' => 0,
@@ -18,7 +20,7 @@ WriteMakefile
                    'Math::GMPq' => '0.45',
                    'Math::GMPz' => '0.39',
                    'Math::MPC' => 0,
-                   'Math::MPFR' => '3.29',
+                   'Math::MPFR' => '3.36',
                    'Math::Prime::Util::GMP' => '0.44',
                    'Memoize' => 0,
                    'POSIX' => 0,

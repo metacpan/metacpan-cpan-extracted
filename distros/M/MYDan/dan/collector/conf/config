@@ -1,0 +1,71 @@
+---
+conf:
+  stat:
+    code: stat
+    interval: 30
+    param:
+      test:
+        cpu:
+        - '{CPU}{all}{%idle} < 10'
+        - '{CPU}{all}{%user} > 90'
+        disk:
+        - '{DF}{/da10}{Use%} > 90'
+        - '{DF}{/da11}{Use%} > 90'
+        - '{DF}{/da12}{Use%} > 90'
+        - '{DF}{/da13}{Use%} > 90'
+        - '{DF}{/da14}{Use%} > 90'
+        - '{DF}{/da1}{Use%} > 90'
+        - '{DF}{/da2}{Use%} > 90'
+        - '{DF}{/da3}{Use%} > 90'
+        - '{DF}{/da4}{Use%} > 90'
+        - '{DF}{/da5}{Use%} > 90'
+        - '{DF}{/da6}{Use%} > 90'
+        - '{DF}{/da7}{Use%} > 90'
+        - '{DF}{/da8}{Use%} > 90'
+        - '{DF}{/da9}{Use%} > 90'
+        - '{DF}{/data10}{Use%} > 90'
+        - '{DF}{/data11}{Use%} > 90'
+        - '{DF}{/data1}{Use%} > 90'
+        - '{DF}{/data2}{Use%} > 90'
+        - '{DF}{/data3}{Use%} > 90'
+        - '{DF}{/data4}{Use%} > 90'
+        - '{DF}{/data5}{Use%} > 90'
+        - '{DF}{/data6}{Use%} > 90'
+        - '{DF}{/data7}{Use%} > 90'
+        - '{DF}{/data8}{Use%} > 90'
+        - '{DF}{/data9}{Use%} > 90'
+        - '{DF}{/data}{Use%} > 90'
+        - '{DF}{/ssd1}{Use%} > 90'
+        - '{DF}{/ssd2}{Use%} > 90'
+        - '{DF}{/ssd3}{Use%} > 90'
+        - '{DF}{/ssd4}{Use%} > 90'
+        - '{DF}{/ssd5}{Use%} > 90'
+        - '{DF}{/ssd6}{Use%} > 90'
+        - '{DF}{/ssd7}{Use%} > 90'
+        - '{DF}{/ssd8}{Use%} > 90'
+        - '{DF}{/tmp}{Use%} > 90'
+        - '{DF}{/var}{Use%} > 90'
+        - '{DF}{/}{Use%} > 90'
+        load:
+        - '{LOAD}{value}{ldavg-5} > 30'
+        mem:
+        - 100*({MEM}{value}{kbmemused}-{MEM}{value}{kbbuffers}-{MEM}{value}{kbcached})/({MEM}{value}{kbmemused}
+          + {MEM}{value}{kbmemfree}) > 80
+        - '{MEM}{value}{%memused} >95'
+        netdev:
+        - '{IFACE}{eth0}{speed} != 1000'
+        - '{IFACE}{eth1}{speed} != 1000'
+        - '{IFACE}{eth2}{speed} != 1000'
+        - '{IFACE}{eth3}{speed} != 1000'
+        swap:
+        - '{MEM}{value}{%swpused} > 20'
+        uptime:
+        - '{UPTIME}{value}{uptime} < 300'
+    timeout: 30
+target: i1.mydan.org
+push:
+  addr: 'http://dashboard.mydan.org/api/v1/collect/in'
+  form:
+    node: '$node'
+    data: '$data'
+  proxy: [ [ http, https], 'socks://localhost:9999' ]

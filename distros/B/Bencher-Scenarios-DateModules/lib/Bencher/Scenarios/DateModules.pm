@@ -1,7 +1,7 @@
 package Bencher::Scenarios::DateModules;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-08-27'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Collection of scenarios to benchmark date modules
@@ -18,7 +18,7 @@ Bencher::Scenarios::DateModules - Collection of scenarios to benchmark date modu
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenarios::DateModules (from Perl distribution Bencher-Scenarios-DateModules), released on 2017-01-25.
+This document describes version 0.004 of Bencher::Scenarios::DateModules (from Perl distribution Bencher-Scenarios-DateModules), released on 2017-08-27.
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,12 @@ This distribution contains the following L<Bencher> scenario modules:
 =over
 
 =item * L<Bencher::Scenario::DateModules::Creation>
+
+=item * L<Bencher::Scenario::DateModules::DurationCreation>
+
+=item * L<Bencher::Scenario::DateModules::Overhead>
+
+=item * L<Bencher::Scenario::DateModules::Storage>
 
 =back
 

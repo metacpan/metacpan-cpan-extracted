@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use MYDan::Util::File;
+
+local $/ = undef;
+my %param = %{ YAML::XS::Load( <STDIN> ) };
+local $/ = "\n";
+
+my %file = map { $_ => MYDan::Util::File->new( "/etc/$_" ) }
+    qw( passwd shadow group sudoers );
+
+for my $conf ( @{ $param{argv} } )
+{
+    next unless my $user = $conf->{user};
+    my $regex = qr/^$user\b/;
+    map { $file{$_}->munge( seek => 'set', regex => $regex, length => 1, 
+        line => $conf->{$_}, lazy => 1 ) } keys %file;
+}
+
+map { $_->commit() } values %file;
+
+for my $conf ( @{ $param{argv} } )
+{
+    next unless my $user = $conf->{user};
+    my $home = "/home/$user";
+    my $ssh = "$home/.ssh";
+    system( "mkdir -m 0700 -p $ssh && chown $user $ssh $home" )
+        if $conf->{passwd};
+}
+
+print "ok\n";
+exit 0;

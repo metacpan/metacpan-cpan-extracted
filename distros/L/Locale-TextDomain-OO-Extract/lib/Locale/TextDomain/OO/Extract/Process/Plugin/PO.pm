@@ -12,7 +12,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(HashRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 has category => (
     is      => 'rw',
@@ -77,7 +77,7 @@ sub slurp {
         ->extract_header_msgstr(
             Locale::PO->dequote(
                 $pos_ref->[0]->msgstr
-                    || confess "No header found in file $filename",
+                || confess "No header found in file $filename",
             ),
         );
     my $encode_obj = find_encoding( $header->{charset} );
@@ -171,6 +171,25 @@ sub slurp {
     return;
 }
 
+sub default_header {
+    my ( $self, $language ) = @_;
+
+    return <<"EOT";
+msgid ""
+msgstr ""
+"Project-Id-Version: Default-Project 1.0\\n"
+"PO-Revision-Date: 2000-01-01T00:00:00Z\\n"
+"Last-Translator: first and last name <info\@example.com>\\n"
+"Language-Team: LANGUAGE <LL\@li.org>\\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+"Language: $language\\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);"
+
+EOT
+}
+
 sub spew {
     my ( $self, $filename ) = @_;
 
@@ -197,7 +216,8 @@ sub spew {
     my $header = Locale::TextDomain::OO::Util::ExtractHeader
         ->instance
         ->extract_header_msgstr(
-            $entries_ref->{ q{} }->{msgstr},
+            $entries_ref->{ q{} }->{msgstr}
+            || $self->default_header,
         )
         or confess sprintf
             'No header found in lexicon of category "%s", domain "%s", language "%s" and project "%s"',
@@ -272,7 +292,7 @@ sub spew {
                                 '-msgstr_n' => {
                                     map { ## no critic (ComplexMappings)
                                         my $value = $po_data->{msgstr_plural}->[$_];
-                                        ( 
+                                        (
                                             $_ => scalar $encode_code->(
                                                 defined $value ? $value : q{},
                                             ),
@@ -308,13 +328,13 @@ __END__
 
 Locale::TextDomain::OO::Extract::Process::Plugin::PO - MO file plugin
 
-$Id: PO.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: PO.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/Process/Plugin/PO.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 SYNOPSIS
 
@@ -346,6 +366,15 @@ The type is HashRef, defaults to {}.
 Read PO file into lexicon_ref.
 
     $self->slurp($filename);
+
+=head2 method default_header
+
+Unless no header is set method spew calls method default_header to have that important thing.
+
+The language in header is set correctly, the charset is UTF-8,
+Plural-Forms are English for example, all other settings are example defaults.
+
+    $self->default_header;
 
 =head2 method spew
 
@@ -410,7 +439,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

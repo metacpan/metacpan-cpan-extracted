@@ -1,6 +1,6 @@
 package MooseX::DIC;
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.2';
 
 use MooseX::DIC::ContainerFactory;
 use MooseX::DIC::Injected
@@ -42,11 +42,12 @@ MooseX::DIC is a dependency injection container tailored to L<Moose>, living in 
 inspired by Java DIC frameworks like L<Spring|https://docs.spring.io/spring/docs/current/spring-framework-reference/html/beans.html>
 or L<CDI|http://docs.oracle.com/javaee/6/tutorial/doc/gjbnr.html>.
 
-The goal of this library is to provide an easy to use DI container without configuration files and with automatic wiring
-of dependencies via constructor by class type (ideally by Role/Interface).
+The goal of this library is to provide an easy to use DI container with automatic wiring of dependencies via constructor 
+by class type (ideally by Role/Interface).
 
-The configuration is performed by the use of L<Marker roles|https://en.wikipedia.org/wiki/Marker_interface_pattern> and
-a specific trait on attributes that have to be injected.
+The configuration is performed either by the use of L<Marker roles|https://en.wikipedia.org/wiki/Marker_interface_pattern> and
+a specific trait on attributes that have to be injected, or by use of a very terse and composable yaml config file, using sensible
+defaults to cover 90% of the use cases to minimize boilerplate.
 
 One of the principal tenets of the library is that while code may be poluted by the use of DIC roles and traits, it
 should work without a running container. The classes are fully functional without the dependency injection, the library
@@ -74,17 +75,13 @@ A service is injectable if it consumes the Role L<MooseX::DIC::Injectable>, whic
 		scope       => 'singleton'
 	};
 
-	has ldap => (
-		is     => 'ro',
-		does   => 'LDAP',
-		traits => ['Injected']
-	);
+	has ldap => (is => 'ro', does => 'LDAP' );
 
 	1;
 
 We can see that this service is both an injectable service and consumes another injectable service,LDAP. We register a
 class as injectable into the container registry by consuming the L<MooseX::DIC::Injectable> role, and we get injected
-dependencies by using the L<Injected> trait.
+dependencies automatically if the container can find them.
 
 None of the parameters of the L<MooseX::DIC::Injectable> role are mandatory, they have defaults or can be inferred.
 On the example above, the role/interface the LDAPAuthService was implementing could be inferred from the
@@ -95,9 +92,8 @@ To use this service:
 	package MyApp::LoginController;
 	
 	use Moose;
-	use Moosex::DIC;
 
-	has auth_service => ( is=>'ro', does => 'MyApp::AuthService', injected );
+	has auth_service => ( is=>'ro', does => 'MyApp::AuthService' );
 
 	sub do_login {
 		my ($self,$request) = @_;
@@ -109,14 +105,14 @@ To use this service:
 
 	1; 
 
-Here we made use of the exported C<injected> function from the MooseX::DIC package to define the traits, a little
-syntactic sugar if you only use the Injected trait.
+The dependency will have been injected automatically as long as the Logincontroller
+was created by the container.
 
 =head1 Starting the Container
 
 When starting your application, the container must be launched to start it's 
 scanning. You can tell the container which folders to scan in search of injectable
-services. 
+services or of wiring files (or both!). 
 This operation is slow as it has to scan every file under the specified folders, 
 which means you will usually only use one container per application.
 
@@ -139,6 +135,9 @@ To start the container:
 
   exit 0;
 
+As in the rest of dependency injection containers: Once the root object of your
+application is created by the container, the rest of object  will have been fetched 
+automatically.
 
 =head1 Advanced use cases
 
@@ -174,7 +173,7 @@ each time it is called, it will be created anew. To use it:
     use Moose;
     with 'MyApp::UserService';
 
-    has http_client => ( is => 'ro', does => 'MyApp::HTTPAgent', traits => [ 'Inject' ] );
+    has http_client => ( is => 'ro', does => 'MyApp::HTTPAgent' );
 
     sub persist {
         my ($self,$user) = @_;
@@ -213,7 +212,7 @@ corrupted.
     use Moose;
     with 'MyApp::UserService';
 
-    has http_client => ( is => 'ro', does => 'MyApp::HTTPAgent', scope => 'request', traits => [ 'Inject' ] );
+    has http_client => ( is => 'ro', does => 'MyApp::HTTPAgent', scope => 'request', traits => [ 'Injected' ] );
 
     sub persist {
         my ($self,$user) = @_;
@@ -229,6 +228,11 @@ corrupted.
         $ua->request(...);
         $ua->request(...);
     }
+
+Please take note of the new trait we've used for the injected attribute. When we only want singleton services to be injected,
+there's no need to configure the attribute. But when we want to apply a configuration on how the attribute must be 
+injected, then we must use the L<MooseX::DIC::Injected> trait on the attribute which allows to specify scope and qualifiers for the
+injection.
 
 There are two scopes available for the injection scope:
 
@@ -294,7 +298,7 @@ For example, we can have two implementators of an HTTPAgent service:
     use Moose;
     use MooseX::DIC;
 
-    has http_client => ( is => 'ro', does => 'MyApp::HTTPAgent', qualifiers => [ 'async' ], inject);
+    has http_client => ( is => 'ro', does => 'MyApp::HTTPAgent', qualifiers => [ 'async' ], injected);
 
     sub persist {
         # This service knows it can expect a Promise result
@@ -311,6 +315,9 @@ For example, we can have two implementators of an HTTPAgent service:
 It is a configuration error to have two implementators of the same service living in the same L<environment|/Environments>
 without at least one of them having a qualifier, and the container will generate an exception when it encounters that
 situation.
+
+Take note of the B<injected> keyword. It's sugar syntax to avoid using the trait. Although by using it, you tie your code
+more tightly to the MooseX::DIC framework.
 
 =head3 Qualifiers match resolution
 
@@ -372,14 +379,14 @@ setting the qualifier parameter of the attribute to empty array:
     use Moose;
     use MooseX::DIC;
 
-    has service => ( is => 'ro', does => 'ServiceRole', qualifiers => [], inject );
+    has service => ( is => 'ro', does => 'ServiceRole', qualifiers => [], injected );
 
 =head2 Environments
 
 Sometimes, we want the wiring of services to depend on a runtime environment. To this end, we use the concept of
 environments.
 
-By default (that is, if no environment is declared by an C<Injectable> service) all services live inside the 'default'
+By default (that is, if no environment is declared by an C<MooseX::DIC::Injectable> service) all services live inside the 'default'
 environment. But we can do more. Let's consider the following services:
 
     package MyApp::UserRepository;
@@ -407,9 +414,8 @@ With the following caller:
     package MyApp::UserController;
 
     use Moose;
-    use MooseX::DIC;
 
-    has repository => (is => 'ro', does => 'MyApp::UserRepository', inject );
+    has repository => (is => 'ro', does => 'MyApp::UserRepository' );
 
     sub do_something {
         my ($self,$user) = @_;
@@ -423,10 +429,9 @@ will depend on which environment we launch the container in, as in:
     use strict;
     use warning;
 
-	use MooseX::DIC::Container;
-	use MyApp::UserController;
+	use MooseX::DIC 'build_container';
 
-	my $container = MooseX::DIC::Container->new( environment => 'test' );
+	my $container = build_container ( scan_path => 'lib', environment => 'test' );
 
 	# In the test environment, the UserController class will have received
 	# The InMemory user repository.
@@ -434,6 +439,60 @@ will depend on which environment we launch the container in, as in:
 
 When the container doesn't find a service in a given environment, it will fall back to the default environment. If it
 doesn't find a service there, it will throw an exception.
+
+=head1 Configuration by YAML
+
+While you can configure the services and the attribute injection points by use of the 
+C<MooseX::DIC::Injectable> and C<MooseX::DIC::Injected> roles directly on your code, you may want to
+configure the container with an external YAML config file.
+
+This way, you can avoid tainting your code with infrastructure concerns. Everything that you can 
+configure with the marker interfaces, you can do with the yaml config file.
+
+Example:
+
+	# moosex-dic-wiring.yml
+	include:
+	  - included_config_file.yml
+	mappings:
+	  MyApp::LoginService:
+		MyApp::LoginService::LDAP:
+		  qualifiers:
+		    - ldap
+		  dependencies:
+		    ldap:
+			  scope: request
+		MyApp::LoginService::Database:
+		  qualifiers:
+		    - database
+		MyApp::LoginService::InMemory:
+		  environment: test
+	  MyApp::LDAP:
+        MyApp::LDAP:
+		  scope: request
+		  builder: factory
+	  MyApp::HTTPClient:
+	    MyApp::HTTPClient::LWP:
+		  builder: factory
+		  scope: request
+		  qualifiers: 
+		    - sync
+		MyApp::HTTPClient::Mojo:
+		  builder: factory
+		  scope: request
+		  qualifiers:
+		    - async
+
+Only what is different from the defaults needs to be configured. A wiring config file could be reduced to:
+
+	# moosex-dic-wiring.yml
+	mappings:
+	    MyApp::LoginService: MyApp::LoginService::Database
+		MyApp::LDAP: MyApp::LDAP
+		MyApp::HTTPClient: MyApp::HTTPClient::LWP
+
+If there's only a single mapping between an interface and it's implementation, and it's a Moose singleton 
+stateless service.
 
 =head1 AUTHOR
 

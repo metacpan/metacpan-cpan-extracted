@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::sli
 # ABSTRACT:  Configuration class LCDd::sli
+
 =encoding utf8
 
 =head1 NAME
@@ -16,11 +17,31 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Speed
 
-Set the communication speed I<< Optional. Type enum. choice: '1200', '2400', '9600', '19200', '38400', '57600', '115200'. upstream_default: '19200'.  >> 
+Set the communication speed I< Optional. Type enum. choice: '1200', '2400', '9600', '19200', '38400', '57600', '115200'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+19200
+
+=back
+
+
 
 =head1 SEE ALSO
 

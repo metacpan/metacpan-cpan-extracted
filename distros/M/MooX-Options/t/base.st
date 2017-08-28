@@ -15,7 +15,7 @@ subtest "no args" => sub {
 subtest "args value" => sub {
     note "args value with repeatable";
     local @ARGV
-        = (( map { "--$_" } @params ), '--counter', '--counter');
+        = ( ( map {"--$_"} @params ), '--counter', '--counter' );
     my $t = t->new_with_options();
     note "bool ",    $t->bool;
     note "counter ", $t->counter;
@@ -24,21 +24,21 @@ subtest "args value" => sub {
     is( $t->bool,    1, "bool is well defined" );
     is( $t->counter, 3, "counter is well defined" );
     is( $t->empty,   1, "empty is well defined" );
-    is( $t->verbose,   1, "verbose is well defined" );
+    is( $t->verbose, 1, "verbose is well defined" );
     done_testing();
 };
 
 subtest "negatable" => sub {
     note "negatable";
     {
-	local @ARGV = ( '--empty', '--no-empty' );
-	my $t = t->new_with_options();
-	is( $t->empty, 0, "empty is well defined" );
+        local @ARGV = ( '--empty', '--no-empty' );
+        my $t = t->new_with_options();
+        is( $t->empty, 0, "empty is well defined" );
     }
     {
-	local @ARGV = ( '--em', '--no-em' );
-	my $t = t->new_with_options();
-	is( $t->empty, 0, "empty is well defined" );
+        local @ARGV = ( '--em', '--no-em' );
+        my $t = t->new_with_options();
+        is( $t->empty, 0, "empty is well defined" );
     }
     done_testing();
 };
@@ -55,7 +55,7 @@ subtest "passthrough" => sub {
     note "passthrough";
     local @ARGV = ( '--split', '1', '--split=2', '--', '3' );
     my $t = t->new_with_options();
-    is_deeply( $t->split, [1, 2], "split separated correctly" );
+    is_deeply( $t->split, [ 1, 2 ], "split separated correctly" );
     done_testing();
 };
 
@@ -488,14 +488,12 @@ subtest "range_complexe_str" => sub {
         is_deeply( $t->range_str, [qw/1 2 4 5 6/], 'str4 req is ok' );
     }
     {
-        local @ARGV
-            = ( '--range_str=1', '--range_str=2', '--range_str=..6' );
+        local @ARGV = ( '--range_str=1', '--range_str=2', '--range_str=..6' );
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 6/], 'str4 req is ok' );
     }
     {
-        local @ARGV
-            = ( '--range-str=1', '--range-str=2', '--range-str=..6' );
+        local @ARGV = ( '--range-str=1', '--range-str=2', '--range-str=..6' );
         my $t = rg_str->new_with_options();
         is_deeply( $t->range_str, [qw/1 2 6/], 'str5 req is ok' );
     }
@@ -539,7 +537,8 @@ subtest "range_complexe_str" => sub {
         local @ARGV = ( '--range_str=1..3', '--range_str=10..12',
             '--range_str=20..' );
         my $t = rg_str->new_with_options();
-        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/], 'str12 req is ok' );
+        is_deeply( $t->range_str, [qw/1 2 3 10 11 12 20/],
+            'str12 req is ok' );
     }
     {
         local @ARGV = ( '--range_str=1..3', '--range_str=10..12',
@@ -664,6 +663,16 @@ subtest "range_str_shorter_name" => sub {
             'conflict detected';
     }
     done_testing();
+};
+
+subtest "range_str_short_with_overlapping_abbrev" => sub {
+    note "shorter but common abbreviation";
+    {
+        local @ARGV = ( "-r", "1..4", "-j", "[ 1, 2, 3, 4 ]" );
+        my $t = rg_str_short_common->new_with_options();
+        is_deeply( $t->range_str,  [qw/1 2 3 4/], 'str1 req is ok' );
+        is_deeply( $t->range_json, [qw/1 2 3 4/], 'str1 json is ok' );
+    }
 };
 
 1;

@@ -10,7 +10,7 @@ Base class for DB filters.
 =cut
 
 package QBit::Application::Model::DB::Filter;
-$QBit::Application::Model::DB::Filter::VERSION = '0.016';
+$QBit::Application::Model::DB::Filter::VERSION = '0.018';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);

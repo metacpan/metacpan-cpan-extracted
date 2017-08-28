@@ -1,14 +1,15 @@
-# Copyrights 1995-2016 by [Mark Overmeer <perl@overmeer.net>].
+# Copyrights 1995-2017 by [Mark Overmeer <perl@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package Mail::Field;
 use vars '$VERSION';
-$VERSION = '2.18';
+$VERSION = '2.19';
 
+
+use strict;
 
 use Carp;
-use strict;
 use Mail::Field::Generic;
 
 
@@ -108,6 +109,7 @@ sub _build
     @_==1 ? $self->parse(@_) : $self->create(@_);
 }
 
+#-------------
 
 sub new
 {   my $class = shift;
@@ -173,6 +175,7 @@ sub extract
     $class->$method($text);
 }
 
+#-------------
 
 # before 2.00, this method could be called as class method, however
 # not all extensions supported that.
@@ -190,6 +193,7 @@ sub parse
     confess "parse() not implemented";
 }
 
+#-------------
 
 sub stringify { confess "stringify() not implemented" } 
 
@@ -211,11 +215,13 @@ sub set(@) { confess "set() not implemented" }
 # prevent the calling of AUTOLOAD for DESTROY :-)
 sub DESTROY {}
 
+#-------------
 
 sub text
 {   my $self = shift;
     @_ ? $self->parse(@_) : $self->stringify;
 }
 
+#-------------
 
 1;

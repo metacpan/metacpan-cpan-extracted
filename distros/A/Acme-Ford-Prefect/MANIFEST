@@ -8,5 +8,5 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
-t/answer.t
+t/acme_ford_prefect.t
 t/dontpanic_packlist.t

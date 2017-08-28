@@ -16,28 +16,37 @@ has container => ( is => 'ro', does => 'MooseX::DIC::Container', required => 1 )
 sub build_service {
   my ( $self, $service_meta ) = @_;
 
+  my %dependencies = $self->build_dependencies_for($service_meta);
+
+  my $service;
+  try {
+    $service = $service_meta->class_name->new(%dependencies);
+  } catch {
+    MooseX::DIC::ServiceCreationException->throw(
+      message => "Error while building an injected service: $_" );
+  };
+
+  return $service;
+}
+
+sub build_dependencies_for {
+  my ($self,$service_meta) = @_;
+
+  my $class_meta = $service_meta->class_name->meta;
+
   # Build the to-be-injected dependencies of
   # the object
   my %dependencies = ();
 
-  my $class_meta = $service_meta->class_name->meta;
-
-  foreach my $attribute ( $class_meta->get_all_attributes ) {
+  while(my ($name,$dependency) = each(%{$service_meta->dependencies})) {
+    my $attribute = $class_meta->get_attribute($dependency->name);
     my $service_type = $attribute->type_constraint->name;
 
-    if( $self->container->has_service($service_type) ) {
-      $self->logger->trace("Injecting a $service_type service into ".($service_meta->class_name)."'s ".($attribute->name)." attribute");
+    if($self->container->has_service($service_type)) {
 
-      # The container has the service, so try to inject it.
-      if ( not(exists($attribute->{scope})) || $attribute->scope eq 'object' ) {
-        # If no injection point is defined, just use the default object scope
-        my $dependency = $self->container->get_service($service_type);
-        UnregisteredServiceException->throw(
-          service => $service_type )
-        unless $dependency;
-        $dependencies{ $attribute->name } = $dependency;
-      } elsif ( $attribute->scope eq 'request' ) {
-
+      if( $dependency->scope eq 'object' ) {
+        $dependencies{ $dependency->name } = $self->container->get_service($service_type);
+      } elsif( $dependency->scope eq 'request') {
         # It is a configuration error to ask for a request-injection of
         # a singleton object. It may indicate a misconception or a config
         # typo.
@@ -49,7 +58,7 @@ sub build_service {
         # Replace the getter with a custom proxy function
         $attribute->remove_accessors;
         $class_meta->add_method(
-          $attribute->name,
+          $dependency->name,
           sub {
             my ( $object, $value ) = @_;
 
@@ -58,41 +67,27 @@ sub build_service {
               "A request-injected service accessor is read-only, it cannot be used as a setter"
             ) if $value;
 
-            my $service = $self->container->get_service($service_type);
-            UnregisteredServiceException->throw(service => $service_type )
-              unless $service;
-
-            return $service;
+            return $self->container->get_service($service_type);
           }
         );
 
         # We must pass a valid attribute value in case the attribute is required. It will never
         # get used, though.
         if( $attribute->is_required) {
-          $dependencies{ $attribute->name } = $self->container->get_service($service_type);
+          $dependencies{ $dependency->name } = $self->container->get_service($service_type);
         }
-      } 
-    } else {
-      # The container does not have a service for the constraint type
-      # of the attribute. If the attribute is not required, just ignore
-      # it (but log this fact). Otherwise, it is an error.
-      
-      $self->logger->warning("While building ".($service_meta->class_name)." dependencies, the container did not find a matching service for $service_type");
-      if( $attribute->is_required ) {
-        ServiceCreationException->throw(message=>"A service cannot be created if a required attribute has no mapping on the registry");
+      } else {
+        ContainerConfigurationException->throw( message => "Injection scope of dependencies can only
+          be of type 'request' or 'object'" );
       }
+    } else {
+      UnregisteredServiceException->throw(service => $service_type )
+        if ( $attribute->is_required );
     }
-  } 
+  }
 
-  my $service;
-  try {
-    $service = $service_meta->class_name->new(%dependencies);
-  } catch {
-    MooseX::DIC::ServiceCreationException->throw(
-      message => "Error while building an injected service: $_" );
-  };
+  return %dependencies;
 
-  return $service;
 }
 
 __PACKAGE__->meta->make_immutable;

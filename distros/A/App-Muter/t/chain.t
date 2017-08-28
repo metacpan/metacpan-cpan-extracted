@@ -12,6 +12,8 @@ use Test::More;
 use IO::Scalar;
 use App::Muter;
 
+eval { require Test::NoWarnings; };
+
 App::Muter::Registry->instance->load_backends();
 
 test_run_pattern('hex', "\x00A7\x80", '00413780', 'basic hex');
@@ -300,6 +302,8 @@ test_run_chain(
     'ungWv48Bz-pBQUDeXa4iI7ADYaOWF3qctBD_YfIAFa0',
     'simple chain with no parentheses'
 );
+
+Test::NoWarnings::had_no_warnings() if $INC{'Test/NoWarnings.pm'};
 
 done_testing;
 

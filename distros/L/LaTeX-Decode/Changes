@@ -1,5 +1,9 @@
 Revision history for LaTeX-Decode
 
+0.05    [2017/08/28]
+		* Escape braces for compatibility with perl 5.26 (https://github.com/fc7/LaTeX-Decode/pull/5 < Elias Pipping)
+		* Display repository URL on MetaCPAN (https://github.com/fc7/LaTeX-Decode/pull/3 < Alexandr Ciornii)
+
 0.04    [2015/07/07]
         * Fix small POD encoding problem
 

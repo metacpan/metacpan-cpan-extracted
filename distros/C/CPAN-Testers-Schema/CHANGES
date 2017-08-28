@@ -1,5 +1,28 @@
 Changelog for CPAN-Testers-Schema
 
+0.019     2017-08-18 12:16:21-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fix exception thrown when searching for the right test author
+      details while inserting Metabase facts. SQLite supports `-col` to
+      sort by `col` descending, but MySQL doesn't. DBIx::Class let
+      `-col` through just fine though. Using the proper DBIx::Class
+      syntax for descending order fixes the problem.
+
+    - Allow updating test reports from Metabase facts. Metabase
+      clients may submit a fact multiple times, so we need to update the
+      test report if it already exists.
+
+    - The test report JSON column is now safe for Latin-1-encoded
+      tables. Any UTF-8 characters will be transformed into their
+      `\u####` escape sequence. This is a stopgap until this data can be
+      moved to a proper UTF-8-encoded table.
+
+    - Metabase facts being translated to new test report format no
+      longer allow "v" in front of the Perl version. It's not part of
+      the Perl version number and all existing data lacks it.
+
 0.018     2017-08-05 12:42:52-05:00 America/Chicago
 
     [Fixed]

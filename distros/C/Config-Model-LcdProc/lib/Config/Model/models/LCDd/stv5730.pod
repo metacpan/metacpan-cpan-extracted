@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::stv5730
 # ABSTRACT:  Configuration class LCDd::stv5730
+
 =encoding utf8
 
 =head1 NAME
@@ -16,7 +17,17 @@ generated from LCDd.conf
 
 =head2 Port
 
-Port the device is connected to I<< Optional. Type uniline. upstream_default: '0x378'.  >> 
+Port the device is connected to I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x378
+
+=back
+
+
 
 =head1 SEE ALSO
 

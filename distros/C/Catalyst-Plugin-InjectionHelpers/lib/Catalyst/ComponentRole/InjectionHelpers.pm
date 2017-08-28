@@ -3,7 +3,7 @@ package Catalyst::ComponentRole::InjectionHelpers;
 use Moose::Role;
 use Moose::Util;
 
-requires 'ACCEPT_CONTEXT';
+#requires 'ACCEPT_CONTEXT';
 
 has application => (is=>'ro', required=>1);
 has from => (is=>'ro', isa=>'ClassName|CodeRef', required=>1);

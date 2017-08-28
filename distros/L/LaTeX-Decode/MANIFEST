@@ -11,3 +11,4 @@ t/pod.t
 t/decode.t
 META.yml
 META.json
+ignore.txt

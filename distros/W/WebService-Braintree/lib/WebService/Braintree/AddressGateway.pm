@@ -1,5 +1,5 @@
 package WebService::Braintree::AddressGateway;
-$WebService::Braintree::AddressGateway::VERSION = '0.92';
+$WebService::Braintree::AddressGateway::VERSION = '0.93';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

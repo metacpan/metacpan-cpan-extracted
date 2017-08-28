@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::ApplePay;
-$WebService::Braintree::ErrorCodes::ApplePay::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::ApplePay::VERSION = '0.93';
 use strict;
 
 use constant ApplePayCardsAreNotAccepted                      => "83501";

@@ -1,4 +1,13 @@
 
+syslog:
+    $class: Log::Any::Adapter
+    $lifecycle: eager
+    $method: set
+    $args:
+        - Syslog
+        - options
+        - pid,perror
+
 schema:
     $class: CPAN::Testers::Schema
     $method: connect_from_config
@@ -7,10 +16,9 @@ metabase_dbh:
     $class: DBI
     $method: connect
     $args:
-        - 'dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application;mysql_enable_utf8=1;database=metabase'
+        - 'dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application;database=metabase'
         - ~
         - ~
         - AutoCommit: 1
           RaiseError: 1
-          mysql_enable_utf8: 1
 

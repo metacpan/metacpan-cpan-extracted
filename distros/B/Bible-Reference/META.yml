@@ -16,6 +16,8 @@ build_requires:
   constant: '0'
   parent: '0'
   perl: '5.012'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.012'
@@ -27,16 +29,13 @@ meta-spec:
   version: '1.4'
 name: Bible-Reference
 requires:
+  Carp: '0'
   Moose: '0'
-  Moose::Util::TypeConstraints: '0'
   MooseX::Privacy: '0'
-  Readonly: '0'
   perl: '5.012'
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bible-Reference/issues
   homepage: https://github.com/gryphonshafer/Bible-Reference
   repository: https://github.com/gryphonshafer/Bible-Reference.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

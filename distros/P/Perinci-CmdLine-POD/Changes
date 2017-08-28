@@ -1,3 +1,8 @@
+0.016   2017-08-25 (PERLANCAR)
+
+	- [Bugfix] Show subcommand name in example.
+
+
 0.015   2017-08-12 (PERLANCAR)
 
 	- Use description.alt.env.cmdline before description.

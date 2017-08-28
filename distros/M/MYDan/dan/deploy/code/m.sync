@@ -1,0 +1,43 @@
+#!# perl: deploy/code/m.sync
+use strict;
+use File::Spec;
+use Sys::Hostname;
+
+use Data::Dumper;
+use MYDan::Agent::Client;
+use MYDan::Node;
+use MYDan::Agent::Mrsync;
+
+my ( $conf, $port );
+BEGIN{
+    my %agent = MYDan::Util::OptConf->load()->dump('agent');
+    ( $conf, $port ) = @agent{qw( conf port )};
+};
+
+my %run = ( timeout => 86400, max => 500, user => 'root' );
+
+return sub
+{
+    my %param = @_;
+
+    my ( $batch, $param ) = @param{qw( batch param )};
+
+    my $range = MYDan::Node->new( MYDan::Util::OptConf->load()->dump('range') );
+    my ( $sp, $dp ) = @$param{qw(sp dp)};
+    die "sp and dp undef.\n" if !$sp && !$dp;
+
+    $sp = $dp unless $sp;
+    $dp = $sp unless $dp;
+
+    my $mrsync = MYDan::Agent::Mrsync->new ( sp => $sp, dp => $dp, dst => $batch,
+        src => [ $range->load( $param->{src} || hostname() )->list ]
+    );
+
+    my %succ = map{ $_ => 'sync ok' }@$batch;
+    map{ delete $succ{$_} }my @failed = $mrsync->run( %run, %$param )->failed();
+
+    printf "failed [%s]:%s\n", scalar @failed, $range->load( \@failed )->dump();
+
+    print "=" x 30,"\n";
+    return %succ;
+};

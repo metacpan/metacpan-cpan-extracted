@@ -2,14 +2,14 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
 
 #
-# Copyright (C) 2016 Joel C. Maslak
+# Copyright (C) 2016 J. Maslak
 # All Rights Reserved - See License
 #
 

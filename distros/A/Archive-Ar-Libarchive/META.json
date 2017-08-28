@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Libarchive" : "0.20",
+            "Alien::Base::Wrapper" : "1.02",
+            "Alien::Libarchive" : "0.28",
             "ExtUtils::CChecker" : "0",
             "Module::Build" : "0.28",
             "perl" : "5.006"
@@ -46,7 +47,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Libarchive" : "0",
             "Math::Int64" : "0.28",
             "base" : "0",
             "perl" : "5.008"
@@ -54,6 +54,7 @@
       },
       "test" : {
          "requires" : {
+            "Alien::Libarchive3" : "0",
             "Test::MockObject" : "0",
             "Test::More" : "0.94",
             "perl" : "5.008"
@@ -72,7 +73,7 @@
          "web" : "https://github.com/plicease/Archive-Ar-Libarchive"
       }
    },
-   "version" : "2.06",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "2.07",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

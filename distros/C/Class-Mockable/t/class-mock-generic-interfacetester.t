@@ -4,12 +4,38 @@ use warnings;
 package CMGITtests;
 
 use Config;
-use Test::More tests => 20;
+use Test::More tests => 27;
 use Capture::Tiny qw(capture);
 use Class::Mock::Generic::InterfaceTester;
 
 # Basics: if we mock a method call fixture, it works.
 correct_method_call_gets_correct_results();
+
+# Check that we can set_name
+set_name_not_mocked();
+set_name_mocked();
+
+# mock _ok in C::M::G::IT so any reported failure is considered a success.
+# That only applies to this version of the Perl interpreter; shelling out
+# and calling C::M::G::IT with bad fixtures still results in a failure.
+with_mocked_ok( sub {
+    # check that the mock works!
+    default_ok();
+
+    # Now that we've done that, we can test all sorts of ways that things can
+    # go wrong, and consider C::M::G::IT complaining about something as a
+    # test success. We list the expected test failures in the plan above,
+    # so just saying Test::More::done_testing at the end is insufficient:
+    # that wouldn't distinguish between (a) a test ran and did nothing, and
+    # (b) a test produced an error, which we turned into a test success,
+    # and counted.
+    run_out_of_tests();
+    wrong_method();
+    wrong_args_structure();
+    wrong_args_subref();
+    magic_for_new();
+    didnt_run_all_tests();
+});
 
 # The various ways we have of adding fixtures work fine.
 add_fixtures_method_not_mocked();
@@ -18,12 +44,52 @@ add_fixtures_list();
 add_fixtures_ordered_hash();
 add_fixtures_input_omitted();
 
-# mock _ok in C::M::G::IT so any reported failure is considered a success.
-# That only applies to this version of the Perl interpreter; shelling out
-# and calling C::M::G::IT with bad fixtures still results in a failure.
-Class::Mock::Generic::InterfaceTester->_ok(sub { Test::More::ok(!shift(), shift()); });
+sub with_mocked_ok {
+    Class::Mock::Generic::InterfaceTester->_ok(sub { Test::More::ok(!shift(), shift()); });
+    shift->();
+    Class::Mock::Generic::InterfaceTester->_reset_ok();
+}
 
-default_ok();
+sub set_name_not_mocked {
+    my $interface_tester = Class::Mock::Generic::InterfaceTester->new();
+    $interface_tester->set_name('Harland & Wolff, Belfast');
+    ok($interface_tester->{called_from} =~ /Harland/, "name was stored in 'called_from' attrib");
+
+    $interface_tester->add_fixtures(
+        set_name => { input  => ['Titanic'], output => "I name this ship 'Titanic'", }
+    );
+    # now that fixtures have been added this should blow up (wrong args)
+    with_mocked_ok(sub { $interface_tester->set_name('Lusitania'); });
+    # and this should blow up (run out of mocks)
+    with_mocked_ok(sub { $interface_tester->set_name('Titanic'); });
+}
+
+sub set_name_mocked {
+    # first test when we set mocks in the constructor
+    my $interface_tester = Class::Mock::Generic::InterfaceTester->new(
+        set_name => { input  => ['Titanic'], output => "I name this ship 'Titanic'", }
+    );
+    is(
+        $interface_tester->set_name('Titanic'),
+        "I name this ship 'Titanic'",
+        "The method set_name isn't magical if you supplied a list of fixtures to the constructor"
+    );
+    # this should blow up (run out of tests)
+    with_mocked_ok(sub { $interface_tester->set_name('Lusitania'); });
+
+    # now test when we set mocks using add_fixtures
+    $interface_tester = Class::Mock::Generic::InterfaceTester->new();
+    $interface_tester->add_fixtures(
+        set_name => { input  => ['Titanic'], output => "I name this ship 'Titanic'", }
+    );
+    is(
+        $interface_tester->set_name('Titanic'),
+        "I name this ship 'Titanic'",
+        "The method set_name isn't magical if you supplied a list of fixtures using add_fixtures"
+    );
+    # this should blow up (run out of tests)
+    with_mocked_ok(sub { $interface_tester->set_name('Lusitania'); });
+}
 
 sub default_ok {
     my $perl = $Config{perlpath};
@@ -43,21 +109,6 @@ sub default_ok {
     ok($result =~ /^not ok.*didn't run all tests/, "normal 'ok' works")
         || diag($result);
 }
-
-# Now that we've done that, we can test all sorts of ways that things can
-# go wrong, and consider C::M::G::IT complaining about something as a
-# test success. We list the expected test failures in the plan above,
-# so just saying Test::More::done_testing at the end is insufficient:
-# that wouldn't distinguish between (a) a test ran and did nothing, and
-# (b) a test produced an error, which we turned into a test success,
-# and counted.
-
-run_out_of_tests();
-wrong_method();
-wrong_args_structure();
-wrong_args_subref();
-magic_for_new();
-didnt_run_all_tests();
 
 sub didnt_run_all_tests {
     { 

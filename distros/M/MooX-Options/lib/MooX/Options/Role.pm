@@ -4,7 +4,7 @@ use strictures 2;
 
 ## no critic (ProhibitExcessComplexity)
 
-our $VERSION = "4.101";
+our $VERSION = "4.103";
 
 =head1 NAME
 
@@ -64,20 +64,18 @@ sub _options_prepare_descriptive {
         push @options, [] if $data{spacer_after};
 
         push @{ $all_options{$name} }, $name;
-        croak
-            "There is already an option '$data{short}' - can't use it to shorten '$name'"
-            if $data{short} and exists $options_data->{ $data{short} };
-        croak
-            "There is already an abbreviation '$data{short}' - can't use it to shorten '$name'"
-            if $data{short} and defined $all_options{ $data{short} };
-        push @{ $all_options{ $data{short} } }, $name
-            if $data{short};
-
-        for ( my $i = 1; $i <= length($name); $i++ ) {
-            my $long_short = substr( $name, 0, $i );
-            push @{ $all_options{$long_short} }, $name
-                unless exists $options_data->{$long_short}
-                or defined $all_options{$long_short};
+        if ( $data{short} ) {
+            ## no critic (RegularExpressions::RequireExtendedFormatting)
+            my @shrt_list = split( m/\|/, $data{short} );
+            foreach my $shrt (@shrt_list) {
+                croak
+                    "There is already an option '$shrt' - can't use it to shorten '$name'"
+                    if exists $options_data->{$shrt};
+                croak
+                    "There is already an abbreviation '$shrt' - can't use it to shorten '$name'"
+                    if defined $all_options{$shrt};
+                push @{ $all_options{$shrt} }, $name;
+            }
         }
 
         if ( defined $data{autosplit} ) {
@@ -93,6 +91,26 @@ sub _options_prepare_descriptive {
                 }
             );
         }
+    }
+
+    # singleton algorithm taken from List::MoreUtils
+    my $k;
+    my %abbrev_dd;
+    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+    foreach my $combo (
+        grep { 1 == $abbrev_dd{ $k = $_->[1] } }
+        grep { not $abbrev_dd{ $k = $_->[1] }++ }
+        map {
+            my $fa = $_;
+            map { [ $fa => substr $fa, 0, $_ ] } 1 .. length($fa)
+        } keys %all_options
+        )
+    {
+        my ( $name, $long_short ) = @{$combo};
+        $all_options{$name}->[0] eq $name
+            or next;    # don't generate abbreviations for short
+        defined $all_options{$long_short} and next;
+        push @{ $all_options{$long_short} }, $name;
     }
 
     return \@options, \%has_to_split, \%all_options;
@@ -135,7 +153,7 @@ sub _options_fix_argv {
             # uncoverable branch false
             @$original_long_option == 1
                 or die
-                "Internal error, duplicate map for abbreviation detected!";
+                "Internal error, duplicate map for abbreviation detected for '$arg_name_without_dash'!";
             $original_long_option = $original_long_option->[0];
         }
 

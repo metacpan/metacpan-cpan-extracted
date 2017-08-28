@@ -1,0 +1,46 @@
+USB::LibUSB::XS                       T_PTROBJ
+USB::LibUSB::XS::Device               T_PTROBJ
+USB::LibUSB::XS::Device::Handle       T_PTROBJ
+HV *                         T_HVREF_REFCOUNT_FIXED
+AV *	                     T_AVREF_REFCOUNT_FIXED
+##########################
+INPUT
+
+T_AVREF_REFCOUNT_FIXED
+	STMT_START {
+		SV* const xsub_tmp_sv = $arg;
+		SvGETMAGIC(xsub_tmp_sv);
+		if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVAV){
+		    $var = (AV*)SvRV(xsub_tmp_sv);
+		}
+		else{
+		    Perl_croak_nocontext(\"%s: %s is not an ARRAY reference\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\");
+		}
+	} STMT_END
+    
+T_HVREF_REFCOUNT_FIXED
+	STMT_START {
+		SV* const xsub_tmp_sv = $arg;
+		SvGETMAGIC(xsub_tmp_sv);
+		if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVHV){
+		    $var = (HV*)SvRV(xsub_tmp_sv);
+		}
+		else{
+		    Perl_croak_nocontext(\"%s: %s is not a HASH reference\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\");
+		}
+	} STMT_END
+
+
+
+###########################
+OUTPUT
+
+T_AVREF_REFCOUNT_FIXED
+	$arg = newRV_noinc((SV*)$var);
+    
+T_HVREF_REFCOUNT_FIXED
+	$arg = newRV_noinc((SV*)$var);

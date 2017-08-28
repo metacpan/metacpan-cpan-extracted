@@ -15,6 +15,7 @@ use File::Slurp;
 use Cwd;
 use Data::Dumper;
 use Time::HiRes;
+use Capture::Tiny ':all';
 
 has 'task_json' => (
     is       => 'rw',
@@ -50,10 +51,6 @@ sub create_json_task {
     my $self   = shift;
     my $cmdpid = shift;
 
-    my $ug   = Data::UUID->new;
-    my $uuid = $ug->create();
-    $uuid = $ug->to_string($uuid);
-
     my $job_meta = $self->parse_meta_str;
 
     my $task_obj = {
@@ -70,17 +67,18 @@ sub create_json_task {
     $task_obj->{scheduler_id} = $self->job_scheduler_id
       if $self->can('scheduler_id');
 
-    my $basename = $self->data_tar->basename('.tar.gz');
-    my $data_dir = File::Spec->catdir( $basename, $job_meta->{jobname} );
-
-    if ( !$self->no_log_json ) {
-        $self->check_lock;
-        $self->write_lock;
-
-        $self->add_to_running( $data_dir, $task_obj );
-
-        $self->lock_file->remove;
-    }
+    # We are rolling back this functionality for a future release
+    # my $basename = $self->data_tar->basename('.tar.gz');
+    # my $data_dir = File::Spec->catdir( $basename, $job_meta->{jobname} );
+    #
+    # if ( !$self->no_log_json ) {
+    #     $self->check_lock;
+    #     $self->write_lock;
+    #
+    #     $self->add_to_running( $data_dir, $task_obj );
+    #
+    #     $self->lock_file->remove;
+    # }
 
     return $task_obj;
 }
@@ -136,10 +134,10 @@ sub get_from_running {
 sub update_json_task {
     my $self = shift;
 
-    my @stats    = ( 'vmpeak', 'vmrss', 'vmsize', 'vmhwm' );
-    my $job_meta = $self->parse_meta_str;
-    my $basename = $self->data_tar->basename('.tar.gz');
-    my $data_dir = File::Spec->catdir( $basename, $job_meta->{jobname} );
+    # my @stats    = ( 'vmpeak', 'vmrss', 'vmsize', 'vmhwm' );
+    # my $job_meta = $self->parse_meta_str;
+    # my $basename = $self->data_tar->basename('.tar.gz');
+    # my $data_dir = File::Spec->catdir( $basename, $job_meta->{jobname} );
 
     my $tags = "";
     if ( exists $self->table_data->{task_tags} ) {
@@ -149,33 +147,40 @@ sub update_json_task {
         }
     }
 
-    my $task_obj = $self->get_from_running($data_dir);
+    # my $task_obj = $self->get_from_running($data_dir);
+    my $task_obj = {};
+
     $task_obj->{exit_time}      = $self->table_data->{exit_time};
     $task_obj->{duration}       = $self->table_data->{duration};
     $task_obj->{exit_code}      = $self->table_data->{exitcode};
     $task_obj->{task_tags}      = $tags;
-    $task_obj->{memory_profile} = {};
+    $task_obj->{pid}            = $self->table_data->{cmdpid};
+    $task_obj->{cmdpid}         = $self->table_data->{cmdpid};
+    $task_obj->{start_time}     = $self->table_data->{start_time};
+    $task_obj->{start_time_dt}  = $self->table_data->{start_time_dt};
 
-    foreach my $stat (@stats) {
-        $task_obj->{memory_profile}->{$stat}->{low} =
-          $self->task_mem_data->{low}->{$stat};
-        $task_obj->{memory_profile}->{$stat}->{high} =
-          $self->task_mem_data->{high}->{$stat};
-        $task_obj->{memory_profile}->{$stat}->{mean} =
-          $self->task_mem_data->{mean}->{$stat};
-        $task_obj->{memory_profile}->{$stat}->{count} =
-          $self->task_mem_data->{count}->{$stat};
-    }
+    # $task_obj->{memory_profile} = {};
+    #
+    # foreach my $stat (@stats) {
+    #     $task_obj->{memory_profile}->{$stat}->{low} =
+    #       $self->task_mem_data->{low}->{$stat};
+    #     $task_obj->{memory_profile}->{$stat}->{high} =
+    #       $self->task_mem_data->{high}->{$stat};
+    #     $task_obj->{memory_profile}->{$stat}->{mean} =
+    #       $self->task_mem_data->{mean}->{$stat};
+    #     $task_obj->{memory_profile}->{$stat}->{count} =
+    #       $self->task_mem_data->{count}->{$stat};
+    # }
 
-    if ( !$self->no_log_json ) {
-        $self->check_lock;
-        $self->write_lock;
-
-        $self->remove_from_running($data_dir);
-        ##TODO Add in mem for job
-        $self->add_to_complete( $data_dir, $task_obj );
-        $self->lock_file->remove;
-    }
+    # if ( !$self->no_log_json ) {
+    #     $self->check_lock;
+    #     $self->write_lock;
+    #
+    #     $self->remove_from_running($data_dir);
+    #     ##TODO Add in mem for job
+    #     $self->add_to_complete( $data_dir, $task_obj );
+    #     $self->lock_file->remove;
+    # }
 
     return $task_obj;
 }
@@ -201,7 +206,10 @@ sub read_json {
 
     my $json_obj;
     my $text;
-    $self->archive->read( $self->data_tar );
+
+    capture {
+        $self->archive->read( $self->data_tar );
+    };
     if ( $self->archive->contains_file($file) ) {
         $text = $self->archive->get_content($file);
         $json_obj = decode_json($text) if $text;
@@ -221,7 +229,9 @@ sub write_json {
     return unless $json_obj;
 
     my $json_text = encode_json($json_obj);
-    $self->archive->read( $self->data_tar );
+    capture {
+        $self->archive->read( $self->data_tar );
+    };
     if ( $self->archive->contains_file($file) ) {
         $self->archive->replace_content( $file, $json_text );
     }
@@ -231,9 +241,11 @@ sub write_json {
             'We were not able to add ' . $file . ' to the archive' );
     }
 
-    $self->archive->write( $self->data_tar )
-      || $self->command_log->warn(
-        'We were not able to write ' . $file . ' to the archive' );
+    capture {
+        $self->archive->write( $self->data_tar, 1 )
+          || $self->command_log->warn(
+            'We were not able to write ' . $file . ' to the archive' );
+    };
 }
 
 1;

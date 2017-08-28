@@ -22,12 +22,11 @@
 #
 ###############################################################################
 
+package YASF;
+
+use 5.008;
 use strict;
 use warnings;
-
-package YASF;
-$YASF::VERSION = '0.004';
-use 5.008;
 use overload fallback => 0,
     'eq'  => \&_eq,
     'ne'  => \&_ne,
@@ -44,10 +43,12 @@ use overload fallback => 0,
 use Carp qw(carp croak);
 use Exporter qw(import);
 
+our $VERSION = '0.005'; # VERSION
+
 BEGIN {
     no strict 'refs'; ## no critic (ProhibitNoStrict)
 
-    for my $method (qw(template binding)) {
+    for my $method (qw(template bindings on_undef)) {
         *{$method} = sub { shift->{$method} }
     }
 }
@@ -62,6 +63,13 @@ my %NOT_ACCEPTABLE_REF = (
     IO      => 1,
     VSTRING => 1,
     Regexp  => 1,
+);
+
+my %VALID_ON_UNDEF = (
+    die    => 1,
+    warn   => 1,
+    token  => 1,
+    ignore => 1,
 );
 
 our @EXPORT_OK = qw(YASF);
@@ -102,15 +110,23 @@ sub YASF ($) { return YASF->new(shift); }
 sub new {
     my ($class, $template, @args) = @_;
 
-    croak "${class}::new requires string template argument"
-        if (! $template);
+    croak 'new requires string template argument' if (! defined $template);
 
     my $args = @args == 1 ? $args[0] : { @args };
-    my $self = bless { template => $template, binding => undef }, $class;
+    my $self = bless {
+        template => $template,
+        bindings => undef,
+        on_undef => 'warn',
+    }, $class;
 
     $self->_compile;
-    if ($args->{binding}) {
-        $self->bind($args->{binding});
+    if ($args->{bindings}) {
+        $self->bind($args->{bindings});
+    }
+    if ($args->{on_undef}) {
+        croak "new: Invalid value for 'on_undef' ($args->{on_undef})"
+            if (! $VALID_ON_UNDEF{$args->{on_undef}});
+        $self->{on_undef} = $args->{on_undef};
     }
 
     return $self;
@@ -137,7 +153,7 @@ sub bind { ## no critic(ProhibitBuiltinHomonyms)
 
     if ((@_ == 2) && (! defined $bindings)) {
         # The means of unbinding is to call $obj->bind(undef):
-        undef $self->{binding};
+        undef $self->{bindings};
     } else {
         croak 'bind: New bindings must be provided as a parameter'
             if (! $bindings);
@@ -149,7 +165,7 @@ sub bind { ## no critic(ProhibitBuiltinHomonyms)
             croak "New bindings reference type ($type) not usable";
         }
 
-        $self->{binding} = $bindings;
+        $self->{bindings} = $bindings;
     }
 
     return $self;
@@ -176,8 +192,8 @@ sub bind { ## no critic(ProhibitBuiltinHomonyms)
 sub format { ## no critic(ProhibitBuiltinHomonyms)
     my ($self, $bindings) = @_;
 
-    $bindings ||= $self->binding;
-    croak 'format: Bindings are required if object has no internal binding'
+    $bindings ||= $self->bindings;
+    croak 'format: Bindings are required if object has no internal bindings'
         if (! $bindings);
 
     my $value = join q{} =>
@@ -208,6 +224,7 @@ sub _compile {
             $level++;
             push @opens, $value;
         } else {
+            # Must be 'CLOSE'.
             if ($level) {
                 my $subtree = pop @stack;
                 $level--;
@@ -308,6 +325,23 @@ sub _expr_to_value {
         carp "Format expression $expr yielded a reference value rather than " .
             'a scalar';
     }
+    # If $node is undef, react accordingly based on the "on_undef" property.
+    if (! defined $node) {
+        # We validated this value in new(), so no need to do so here.
+        my $what_to_do = $self->on_undef;
+        if ($what_to_do eq 'ignore') {
+            $node = q{};
+        } elsif ($what_to_do eq 'warn') {
+            carp "No binding for reference to '$expr'";
+            $node = q{};
+        } elsif ($what_to_do eq 'die') {
+            croak "No binding for reference to '$expr'";
+        } else {
+            # Leave the token unchanged
+            $node = "{$expr}";
+        }
+    }
+
     return $node;
 }
 
@@ -316,9 +350,9 @@ sub _expr_to_value {
 # Handle the object stringification (the "" operator)
 sub _stringify {
     my $self = shift;
-    my $binding = $self->binding;
+    my $bindings = $self->bindings;
 
-    return $binding ? $self->format($binding) : $self->template;
+    return $bindings ? $self->format($bindings) : $self->template;
 }
 
 # Handle the % interpolation operator
@@ -421,7 +455,7 @@ YASF - Yet Another String Formatter
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -575,13 +609,13 @@ When a B<YASF> object is stringified, one of two things happens:
 
 =item 1.
 
-If the object is bound to a data structure via B<bind> (or from a C<binding>
+If the object is bound to a data structure via B<bind> (or from a C<bindings>
 argument in the constructor), it is interpolated against these bindings and
 the resulting string is used.
 
 =item 2.
 
-If the object has no object-level binding, then the uninterpolated template
+If the object has no object-level bindings, then the uninterpolated template
 string will be used.
 
 =back
@@ -625,15 +659,48 @@ The following methods and subroutines are provided by this module:
 This is the object constructor. It takes one required argument and optional
 named arguments following that. The required argument is the string template
 that will be interpolated. The named arguments may be passed as a hash
-reference or as key/value pairs. Currently, only one named parameter is
-recognized:
+reference or as key/value pairs. The following parameters are recognized:
 
 =over
 
-=item B<binding>
+=item B<bindings>
 
 Specifies the bindings for the object. The value must be an array reference, a
 hash reference, or an object referent.
+
+=item B<on_undef>
+
+Specifies the behavior for the interpolation when the key being interpolated
+has no value in the bindings (i.e., the value is C<undef>). The possible values
+are:
+
+=over
+
+=item C<warn>
+
+A warning is issued (using B<carp>), similar to what Perl would do for
+interpolating an undefined value. However, the message specifies the token that
+had no value.
+
+=item C<die>
+
+An error is issued (using B<croak>), with the same message as C<warn> generates.
+
+=item C<ignore>
+
+The missing token is ignored, and a null string is inserted in its place.
+
+=item C<token>
+
+The missing token is left in place, unchanged.
+
+=back
+
+Note that if the token is the result of a "compound token", the token you see
+in the messages or left intact within the string may differ from what is in the
+template.
+
+The default value is C<warn>.
 
 =back
 
@@ -648,13 +715,13 @@ needed explicit bindings to be provided. This can be useful when binding to a
 hash reference whose contents will continually change, or an object whose
 internal state is continuously changing.
 
-The method takes one required argument, the new binding. This must be a
+The method takes one required argument, the new bindings. This must be a
 reference to a hash, to an array, or to an object. If the argument does not
 meet these criteria (or is not given), an exception is thrown via B<croak>.
 
 If an object has a bound data structure, but is interpolated with C<%> or
-B<format> with an explicit binding, the explicit binding will supercede the
-internal binding (but without replacing it permanently).
+B<format> with an explicit set of bindings, the explicit bindings will
+supercede the internal bindings (but without replacing it permanently).
 
 You can unbind data from the object by calling B<bind> with C<undef> as the
 argument.
@@ -665,7 +732,7 @@ This method formats the template within the object, using either bindings
 provided as an argument or using the object-level bindings that are already
 set.
 
-=item B<binding>
+=item B<bindings>
 
 A static accessor that returns the current object-level bindings data structure,
 or B<undef> if there are no object-level bindings. Cannot be used to set the
@@ -678,6 +745,12 @@ encapsulating. Cannot be used to change the template.
 
 (At present, there is no way to change the template of an object. You can only
 create a new object.)
+
+=item B<on_undef>
+
+A static accessor that returns the value of the C<on_undef> property of the
+object. Like the C<template> property, this cannot be changed on an object once
+the object is created.
 
 =item B<YASF>
 

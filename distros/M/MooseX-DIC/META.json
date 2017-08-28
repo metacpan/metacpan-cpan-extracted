@@ -22,24 +22,28 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::ChangelogFromGit" : "0",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
-            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::Plugin::VersionFromMainModule" : "0",
             "Dist::Zilla::PluginBundle::Git" : "0",
             "Pod::Markdown" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Exporter::Declare" : "0",
             "File::Find" : "0",
-            "File::Slurp" : "0",
+            "File::Slurper" : "0",
             "File::Spec" : "0",
             "Log::Log4perl" : "0",
+            "Module::Load" : "0",
             "Moose" : "0",
             "MooseX::Role::Parameterized" : "0",
             "Throwable" : "0",
             "Try::Tiny" : "0",
             "YAML::XS" : "0",
-            "aliased" : "0"
+            "aliased" : "0",
+            "namespace::autoclean" : "0"
          }
       },
       "test" : {
@@ -59,7 +63,7 @@
          "web" : "https://github.com/loic-prieto/moosex-dic"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.3.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

@@ -13,32 +13,32 @@ has username   => (is => 'ro', required => 1);
 has password   => (is => 'ro', required => 1);
 has field_list => (is => 'ro', default => sub {
     return [
-		'ca_objects.object_id',
-		'ca_objects.preferred_labels',
-		'ca_objects.description',
-		'ca_objects.subtitle',
-		'ca_objects.geonames',
-		'ca_objects.lcsh_terms',
-		'ca_objects.colour',
-		'ca_objects.contentActivity',
-		'ca_objects.contentConcept',
-		'ca_objects.contentDescription',
-		'ca_objects.dimensions.dimensions_width',
-		'ca_objects.dimensions.dimensions_height',
-		'ca_objects.dimensions.dimensions_depth',
-		'ca_objects.dimensions.circumference',
-		'ca_objects.dimensions.dimensions_type',
-		'ca_objects.materialInfo.materialInfostyle',
-		'ca_objects.objectProductionDate',
-		'ca_objects.techniqueInfo.techniqueInfodatePeriod',
-		'ca_objects.dateText',
-		'ca_objects.objectName.objectObjectName',
-		'ca_objects.objectWorkPid.objectWorkPidDomain',
-		'ca_objects.objectWorkPid.objectWorkPidID',
-		'ca_objects.objectRecordPid.objectRecordPidDomain',
-		'ca_objects.objectRecordPid.objectRecordPidID',
-		'ca_entities.entity_id',
-		'ca_entities.relationship_type_code'
+        'ca_objects.object_id',
+        'ca_objects.preferred_labels',
+        'ca_objects.description',
+        'ca_objects.subtitle',
+        'ca_objects.geonames',
+        'ca_objects.lcsh_terms',
+        'ca_objects.colour',
+        'ca_objects.contentActivity',
+        'ca_objects.contentConcept',
+        'ca_objects.contentDescription',
+        'ca_objects.dimensions.dimensions_width',
+        'ca_objects.dimensions.dimensions_height',
+        'ca_objects.dimensions.dimensions_depth',
+        'ca_objects.dimensions.circumference',
+        'ca_objects.dimensions.dimensions_type',
+        'ca_objects.materialInfo.materialInfostyle',
+        'ca_objects.objectProductionDate',
+        'ca_objects.techniqueInfo.techniqueInfodatePeriod',
+        'ca_objects.dateText',
+        'ca_objects.objectName.objectObjectName',
+        'ca_objects.objectWorkPid.objectWorkPidDomain',
+        'ca_objects.objectWorkPid.objectWorkPidID',
+        'ca_objects.objectRecordPid.objectRecordPidDomain',
+        'ca_objects.objectRecordPid.objectRecordPidID',
+        'ca_entities.entity_id',
+        'ca_entities.relationship_type_code'
     ];
 });
 
@@ -68,9 +68,9 @@ Datahub::Factory::Importer::CollectiveAccess - Import data from a L<CollectiveAc
     use Data::Dumper qw(Dumper);
 
     my $ca = Datahub::Factory->importer('CollectiveAccess')->new(
-		endpoint => 'https://my.ca.org/ca',
-		username => 'datahub',
-		password => 'datahub'
+        endpoint => 'https://my.ca.org/ca',
+        username => 'datahub',
+        password => 'datahub'
     );
 
     $ca->importer->each(sub {
@@ -104,33 +104,33 @@ Password for the user.
 A list of fields that the CollectiveAccess API should return.
 Is optional and can be left empty to return the default:
 
-	[
-		'ca_objects.object_id',
-		'ca_objects.preferred_labels',
-		'ca_objects.description',
-		'ca_objects.subtitle',
-		'ca_objects.geonames',
-		'ca_objects.lcsh_terms',
-		'ca_objects.colour',
-		'ca_objects.contentActivity',
-		'ca_objects.contentConcept',
-		'ca_objects.contentDescription',
-		'ca_objects.dimensions.dimensions_width',
-		'ca_objects.dimensions.dimensions_height',
-		'ca_objects.dimensions.dimensions_depth',
-		'ca_objects.dimensions.circumference',
-		'ca_objects.dimensions.dimensions_type',
-		'ca_objects.materialInfo.materialInfostyle',
-		'ca_objects.objectProductionDate',
-		'ca_objects.techniqueInfo.techniqueInfodatePeriod',
-		'ca_objects.dateText',
-		'ca_objects.objectName.objectObjectName',
-		'ca_objects.objectWorkPid.objectWorkPidDomain',
-		'ca_objects.objectWorkPid.objectWorkPidID',
-		'ca_objects.objectRecordPid.objectRecordPidDomain',
-		'ca_objects.objectRecordPid.objectRecordPidID',
-		'ca_entities.entity_id',
-		'ca_entities.relationship_type_code'
+    [
+        'ca_objects.object_id',
+        'ca_objects.preferred_labels',
+        'ca_objects.description',
+        'ca_objects.subtitle',
+        'ca_objects.geonames',
+        'ca_objects.lcsh_terms',
+        'ca_objects.colour',
+        'ca_objects.contentActivity',
+        'ca_objects.contentConcept',
+        'ca_objects.contentDescription',
+        'ca_objects.dimensions.dimensions_width',
+        'ca_objects.dimensions.dimensions_height',
+        'ca_objects.dimensions.dimensions_depth',
+        'ca_objects.dimensions.circumference',
+        'ca_objects.dimensions.dimensions_type',
+        'ca_objects.materialInfo.materialInfostyle',
+        'ca_objects.objectProductionDate',
+        'ca_objects.techniqueInfo.techniqueInfodatePeriod',
+        'ca_objects.dateText',
+        'ca_objects.objectName.objectObjectName',
+        'ca_objects.objectWorkPid.objectWorkPidDomain',
+        'ca_objects.objectWorkPid.objectWorkPidID',
+        'ca_objects.objectRecordPid.objectRecordPidDomain',
+        'ca_objects.objectRecordPid.objectRecordPidID',
+        'ca_entities.entity_id',
+        'ca_entities.relationship_type_code'
     ]
 
 =back

@@ -1,14 +1,21 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use utf8;
 
+use Cwd;
 use Text::BibTeX;
+
+BEGIN {
+  my $common = getcwd()."/t/common.pl";
+  require $common;
+}
 
 ##### parse t/corpora.bib #####
 
 my $bibtex = Text::BibTeX::File->new("t/corpora.bib", { binmode => 'utf-8'});
+
 is ref($bibtex), "Text::BibTeX::File";
 
 my @entries;
@@ -54,9 +61,11 @@ $bibtex = Text::BibTeX::File->new("t/errors.bib", { binmode => 'utf-8'});
 is ref($bibtex), "Text::BibTeX::File";
 
 @entries = ();
-while (my $entry = Text::BibTeX::Entry->new($bibtex)) {
-	push @entries, $entry;
-}
+err_like sub {
+  while (my $entry = Text::BibTeX::Entry->new($bibtex)) {
+    push @entries, $entry;
+  }
+},  qr!syntax error: found "\{error\}", expected "="!;
 
 is scalar(@entries), 1;
 

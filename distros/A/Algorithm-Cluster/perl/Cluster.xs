@@ -817,7 +817,7 @@ new (class, nodes)
     PREINIT:
     Tree* tree;
     SV* obj;
-        int i;
+    int i;
     int n;
     AV* array;
     int* flag;
@@ -838,7 +838,7 @@ new (class, nodes)
         croak("Algorithm::Cluster::Tree::new memory error\n");
     }
 
-        for (i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         Node* node;
         SV* node_ref = *(av_fetch(array, (I32) i, 0)); 
         if (!sv_isa(node_ref, "Algorithm::Cluster::Node")) break;
@@ -956,8 +956,59 @@ scale(obj)
         for (i = 0; i < n; i++) nodes[i].distance /= maximum;
     }
 
-AV *
-cut(obj, nclusters)
+
+void
+sort(obj, order = NULL)
+    SV* obj
+    SV* order 
+
+    PREINIT:
+    int i;
+    int n;
+    Tree* tree;
+    int* indices;
+    double* values = NULL;
+    int ok;
+
+    PPCODE:
+    if (!sv_isa(obj, "Algorithm::Cluster::Tree")) {
+        croak("sort can only be applied to an Algorithm::Cluster::Tree object");
+    }
+    tree = INT2PTR(Tree*,SvIV(SvRV(obj)));
+    if (order) {
+        if(!SvROK(order) || SvTYPE(SvRV(order)) != SVt_PVAV) { 
+            croak("Algorithm::Cluster::Tree::sort expects an order array\n");
+        }
+        values = malloc_row_perl2c_dbl(aTHX_ order, &n);
+        if (!values) {
+            croak("Algorithm::Cluster::Tree::sort memory error\n");
+        }
+        if (n != tree->n + 1) {
+            free(values);
+            croak("sort: size of order array is inconsistent with tree size\n");
+        }
+    }
+    else {
+        n = tree->n + 1;
+    }
+    indices = malloc(n*sizeof(int));
+    if (!indices) {
+        if(values) free(values);
+        croak("sort: insufficient memory");
+    }
+    /* --------------------------------------------------------------- */
+    ok = sorttree(tree->n, tree->nodes, values, indices);
+    if(values) free(values);
+    /* -- Check for errors flagged by the C routine ------------------ */
+    if (!ok) {
+        free(indices);
+        croak("sort: Error in the sorttree routine");
+    }
+    for(i=0; i<n; i++) XPUSHs(sv_2mortal(newSVnv(indices[i])));
+    free(indices);
+
+void
+cut(obj, nclusters=0)
     SV* obj
     int nclusters
     PREINIT:
@@ -965,37 +1016,34 @@ cut(obj, nclusters)
     int n;
     Tree* tree;
     int* clusterid;
-    CODE:
+    PPCODE:
     if (!sv_isa(obj, "Algorithm::Cluster::Tree")) {
-        croak("cut can only be applied to an Algorithm::Cluster::Tree object");
+        croak("cut can only be applied to an Algorithm::Cluster::Tree object\n");
     }
     tree = INT2PTR(Tree*,SvIV(SvRV(obj)));
     n = tree->n + 1;
-    if (nclusters < 1) {
-        croak("cut: Requested number of clusters should be positive");
+    if (nclusters < 0) {
+        croak("cut: Requested number of clusters should be positive\n");
     }
     if (nclusters > n) {
-        croak("cut: More clusters requested than items available");
+        croak("cut: More clusters requested than items available\n");
+    }
+    if (nclusters == 0) {
+        nclusters = n;
     }
     clusterid = malloc(n*sizeof(int));
     if (!clusterid) {
-        croak("cut: Insufficient memory");
+        croak("cut: Insufficient memory\n");
     }
         /* --------------------------------------------------------------- */
     cuttree(n, tree->nodes, nclusters, clusterid);
     /* -- Check for errors flagged by the C routine ------------------ */
     if (clusterid[0]==-1) {
         free(clusterid);
-        croak("cut: Error in the cuttree routine");
+        croak("cut: Error in the cuttree routine\n");
     }
-    RETVAL = newAV();
-    for(i=0; i<n; i++) {
-        av_push(RETVAL, newSVnv(clusterid[i]));
-    }
+    for(i=0; i<n; i++) XPUSHs(sv_2mortal(newSVnv(clusterid[i])));
     free(clusterid);
-    sv_2mortal((SV*)RETVAL);
-    OUTPUT:
-    RETVAL
 
 
 void DESTROY (obj)

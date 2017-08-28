@@ -1,11 +1,13 @@
 package Mojo::IOLoop::ReadWriteFork;
 use Mojo::Base 'Mojo::EventEmitter';
-use Mojo::IOLoop;
-use Mojo::Util;
+
 use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK);
 use IO::Pty;
+use Mojo::IOLoop;
+use Mojo::Util;
 use POSIX ':sys_wait_h';
 use Scalar::Util ();
+
 use constant CHUNK_SIZE        => $ENV{MOJO_CHUNK_SIZE}           || 131072;
 use constant DEBUG             => $ENV{MOJO_READWRITE_FORK_DEBUG} || $ENV{MOJO_READWRITEFORK_DEBUG} || 0;
 use constant WAIT_PID_INTERVAL => $ENV{WAIT_PID_INTERVAL}         || 0.01;
@@ -18,7 +20,7 @@ sub ESC {
   $_;
 }
 
-our $VERSION = '0.23';
+our $VERSION = '0.35';
 
 our @SAFE_SIG = grep {
   not /^(
@@ -218,26 +220,29 @@ sub _sigchld {
 
 sub _watch_pid {
   my ($self, $pid) = @_;
-  my $chld = $SIG{CHLD} || '';
   my $reactor = $self->ioloop->reactor;
 
-  # The $chld test is for code, such as Minion::Command::minion::worker
-  # where SIGCHLD is set up to DEFAULT for manual waitpid() checks.
-  # See https://github.com/kraih/minion/issues/15 for details.
-  if ($chld eq 'DEFAULT' or !$reactor->isa('Mojo::Reactor::EV')) {
+  # The CHLD test is for code, such as Minion::Command::minion::worker
+  # where SIGCHLD is set up for manual waitpid() checks.
+  # See https://github.com/kraih/minion/issues/15 and
+  # https://github.com/jhthorsen/mojo-ioloop-readwritefork/issues/9
+  # for details.
+  if ($SIG{CHLD} or !$reactor->isa('Mojo::Reactor::EV')) {
     $reactor->{fork_watcher} ||= $reactor->recurring(WAIT_PID_INTERVAL, \&_watch_forks);
     Scalar::Util::weaken($reactor->{forks}{$pid} = $self);
   }
   else {
-    Scalar::Util::weaken($self);
     $self->{ev_child} = EV::child($pid, 0, sub { _sigchld($self, $pid, $_[0]->rstatus); });
   }
 }
 
 sub _watch_forks {
   my $reactor = shift;
+  my @pids    = keys %{$reactor->{forks}};
 
-  for my $pid (keys %{$reactor->{forks}}) {
+  $reactor->remove(delete $reactor->{fork_watcher}) unless @pids;
+
+  for my $pid (@pids) {
     local ($?, $!);
     my $kid = waitpid $pid, WNOHANG or next;
     warn "waitpid $pid, WNOHANG failed: $! ($kid, $?)" unless $kid == $pid;
@@ -278,7 +283,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.23
+0.35
 
 =head1 SYNOPSIS
 

@@ -1,19 +1,31 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Task;
-$XML::Ant::BuildFile::Task::VERSION = '0.216';
 
 # ABSTRACT: Role for Ant build file tasks
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a role shared by tasks in an
+#pod L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project>.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package XML::Ant::BuildFile::Task::Foo;
+#pod     use Moose;
+#pod     with 'XML::Ant::BuildFile::Task';
+#pod
+#pod     after BUILD => sub {
+#pod         my $self = shift;
+#pod         print "I'm a ", $self->task_name, "\n";
+#pod     };
+#pod
+#pod     1;
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use strict;
 use English '-no_match_vars';
 use Moose::Role;
@@ -22,10 +34,16 @@ use MooseX::Types::Moose 'Str';
 use namespace::autoclean;
 with 'XML::Ant::BuildFile::Role::InProject';
 
+#pod =attr task_name
+#pod
+#pod Name of the task's XML node.
+#pod
+#pod =cut
+
 has task_name => ( ro, lazy,
     isa      => Str,
     init_arg => undef,
-    default  => sub { $ARG[0]->node->nodeName },
+    default  => sub { $_[0]->node->nodeName },
 );
 
 no Moose::Role;
@@ -47,7 +65,7 @@ XML::Ant::BuildFile::Task - Role for Ant build file tasks
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -192,7 +210,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

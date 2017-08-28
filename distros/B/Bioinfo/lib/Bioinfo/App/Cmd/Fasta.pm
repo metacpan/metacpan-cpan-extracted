@@ -4,7 +4,7 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options prefer_commandline => 1;
 
-our $VERSION = '0.1.1'; # VERSION: 
+our $VERSION = '0.1.8'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -28,7 +28,7 @@ Bioinfo::App::Cmd::Fasta - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.8
 
 =head1 SYNOPSIS
 

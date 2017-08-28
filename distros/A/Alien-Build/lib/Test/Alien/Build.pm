@@ -14,7 +14,7 @@ use Alien::Build::Util qw( _mirror );
 our @EXPORT = qw( alienfile alienfile_ok alien_download_ok alien_extract_ok alien_build_ok alien_build_clean alien_install_type_is );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 my $build;
@@ -364,7 +364,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 

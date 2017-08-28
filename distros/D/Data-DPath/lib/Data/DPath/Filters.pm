@@ -1,7 +1,7 @@
 package Data::DPath::Filters;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Magic functions available inside filter conditions
-$Data::DPath::Filters::VERSION = '0.56';
+$Data::DPath::Filters::VERSION = '0.57';
 use strict;
 use warnings;
 

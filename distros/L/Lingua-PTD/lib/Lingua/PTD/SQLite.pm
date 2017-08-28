@@ -1,5 +1,5 @@
 package Lingua::PTD::SQLite;
-$Lingua::PTD::SQLite::VERSION = '1.15';
+$Lingua::PTD::SQLite::VERSION = '1.16';
 use strict;
 use warnings;
 

@@ -1,5 +1,5 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use 5.8.8;
 use Moose;

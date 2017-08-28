@@ -1,0 +1,8 @@
+#!/bin/usr/env perl
+use strict;
+use warnings;
+
+$| ++;
+
+use  MYDan::Subscribe;
+MYDan::Subscribe->new()->input( @ARGV );

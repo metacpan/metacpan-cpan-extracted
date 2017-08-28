@@ -8,7 +8,7 @@ use Locale::TextDomain::OO;
 our $VERSION = 0;
 
 my $loc = Locale::TextDomain::OO->new(
-    plugins => [ qw( Expand::Gettext ) ],
+    plugins => [ qw( Expand::Gettext::Loc Expand::BabelFish::Loc ) ],
 );
 
 # run all translations
@@ -77,7 +77,17 @@ my $loc = Locale::TextDomain::OO->new(
         '{num} dates',
         2,
         num => 2,
-    );
+    ),
+    $loc->loc_b(
+        'date',
+        foo => 'bar',
+    ),
+    $loc->loc_bp(
+        'appointment',
+        'date',
+        foo => 'bar',
+    ),
+;
 
 # Extract special stuff only
 $loc->Nloc_(
@@ -119,7 +129,7 @@ $loc->loc_('text of domain d and category c');
 $loc->loc_end_dc;
 $loc->loc_('text of no domain and no category');
 
-# $Id: gettext_loc.pl 561 2014-11-11 16:12:48Z steffenw $
+# $Id: gettext_loc.pl 683 2017-08-22 18:41:42Z steffenw $
 
 __END__
 
@@ -137,3 +147,5 @@ date
 dates
 1 date
 2 dates
+date
+date

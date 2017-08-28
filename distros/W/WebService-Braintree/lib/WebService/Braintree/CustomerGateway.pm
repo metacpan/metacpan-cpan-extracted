@@ -1,5 +1,5 @@
 package WebService::Braintree::CustomerGateway;
-$WebService::Braintree::CustomerGateway::VERSION = '0.92';
+$WebService::Braintree::CustomerGateway::VERSION = '0.93';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

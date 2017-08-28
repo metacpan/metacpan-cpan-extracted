@@ -1,7 +1,7 @@
 ---
 abstract: 'L<Template::Toolkit> plugin-wrapper of L<String::CRC32>'
 author:
-  - 'Alexander A. Gnatyna <gnatyna@ya.ru>'
+  - 'Alexander A. Gnatyna <gnatyna@cpan.org>'
 build_requires:
   Template::Test: '0'
   Test::More: '0.98'
@@ -27,7 +27,7 @@ no_index:
 provides:
   Template::Plugin::String::CRC32:
     file: lib/Template/Plugin/String/CRC32.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   String::CRC32: '0'
   Template::Plugin: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/gnatyna/Template-Plugin-String-CRC32/issues
   homepage: https://github.com/gnatyna/Template-Plugin-String-CRC32
   repository: git://github.com/gnatyna/Template-Plugin-String-CRC32.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Alexander A. Gnatyna <a.gnatyna@gazeta.ru>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

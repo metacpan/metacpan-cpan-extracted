@@ -50,7 +50,7 @@
             "Dist::Zilla" : "6.00",
             "Dist::Zilla::App::Command::aliendeps" : "0.01",
             "Dist::Zilla::Plugin::Alien" : "0.023",
-            "Dist::Zilla::Plugin::Author::Plicease" : "2.21",
+            "Dist::Zilla::Plugin::Author::Plicease" : "2.22",
             "Dist::Zilla::Plugin::AutoMetaResources" : "1.20",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.150250",
             "Dist::Zilla::Plugin::InsertExample" : "0.04",
@@ -62,10 +62,8 @@
             "Dist::Zilla::Plugin::Run::BeforeBuild" : "0.035",
             "Dist::Zilla::Util::CurrentCmd" : "0",
             "File::Glob" : "0",
-            "File::ShareDir" : "0",
             "IPC::System::Simple" : "1.25",
             "Moose" : "0",
-            "Path::Class" : "0.31",
             "Path::Tiny" : "0",
             "PerlX::Maybe" : "0.003",
             "Pod::Markdown" : "1.400",
@@ -75,20 +73,14 @@
             "Test::Script" : "1.10",
             "Test::Version" : "2.00",
             "YAML" : "1.15",
-            "perl" : "5.008001"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0",
-            "Dist::Zilla::App" : "0",
-            "File::chdir" : "0",
-            "Test::Dir" : "0",
-            "Test::File" : "0",
-            "Test::File::ShareDir" : "0",
             "Test::More" : "0.94",
             "Test::Script" : "1.10",
-            "perl" : "5.008001"
+            "perl" : "5.014"
          }
       }
    },
@@ -104,7 +96,7 @@
          "web" : "https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease"
       }
    },
-   "version" : "2.21",
+   "version" : "2.22",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.13
+    version 1.14
 
 SYNOPSIS
 
@@ -17,7 +17,29 @@ DESCRIPTION
 
     This module provides a powerful way to resolve placeholders inside of a
     templated file. It uses Template::Transformer to interpolate the the
-    placeholder values.
+    placeholder values. The provided template may refer to entity values
+    directly (i.e. ${TEMPLATE{my.entity.value}}) or through transformations
+    (i.e. ${TEMPLATE_perl{property("my.truthy") ? "true" : "false"}}). You
+    may also loop over hash and array entities like this (newlines and
+    indentation included for clarity):
+
+      ${TEMPLATE<CLUB>:{my.clubs}}$
+          {TEMPLATE<MEMBER>:{<CLUB>.members}}
+              ${TEMPLATE{<MEMBER>.name}} is a member of the ${TEMPLATE{<CLUB>.club_name}} club.
+          ${TEMPLATE<MEMBER>:end}
+      ${TEMPATE<CLUB>:end}
+
+    You may access the key when iterating over hashes:
+
+      ${TEMPLATE<RESOURCE>:{my.resources}}
+          Resource, ${TEMPLATE:<RESOURCE.key>} is ${TEMPLATE{<RESOURCE>.deployed_artifact}}
+      ${TEMPLATE<RESOURCE>:end}
+
+    You may also access the index when iterating over arrays:
+
+      ${TEMPLATE<CLUB>:{my.clubs}}
+          Club at index ${TEMPLATE<CLUB.ix>} is ${TEMPLATE{<CLUB.name>}}
+      ${TEMPLATE<CLUB>:end}
 
 CONSTRUCTORS
 

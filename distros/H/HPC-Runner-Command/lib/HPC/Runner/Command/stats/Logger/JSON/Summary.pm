@@ -1,10 +1,8 @@
-use strict;
-use warnings;
-
 package HPC::Runner::Command::stats::Logger::JSON::Summary;
 use Moose::Role;
 
 use JSON;
+use Try::Tiny;
 
 ##This is probably mostly the same across plugins
 sub iter_tasks_summary {
@@ -37,8 +35,14 @@ sub count_running_tasks {
     if ( $self->archive->contains_file($running_file) ) {
         my $running_json = $self->archive->get_content($running_file);
         ##TODO Add in some error checking
-        my $running = decode_json($running_json);
-        my @keys    = keys %{$running};
+        my $running;
+        try {
+            $running = decode_json($running_json);
+        }
+        catch {
+            $running = {};
+        };
+        my @keys = keys %{$running};
         return scalar @keys;
     }
     else {
@@ -121,8 +125,14 @@ sub search_complete {
 
     if ( $self->archive->contains_file($complete_file) ) {
         my $complete_json = $self->archive->get_content($complete_file);
+        my $complete;
+        try {
+            $complete = decode_json($complete_json);
+        }
+        catch {
+            $complete = {};
+        };
         ##TODO Add in some error checking
-        my $complete = decode_json($complete_json);
         return $self->look_for_exit_code( $complete, $success );
     }
     else {

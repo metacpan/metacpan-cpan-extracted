@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use IO::Handle;
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 use vars qw($DEBUG);
 use Cwd;
@@ -35,16 +35,24 @@ my (@names);
    );
 
 while (@names) {
-    my ($name, $should_split) = (shift @names, shift @names);
-    my $actual_split = [Text::BibTeX::split_list ($name, 'and')];
+  my ($name, $should_split) = (shift @names, shift @names);
 
-    if ($DEBUG) {
-        printf "name = >%s<\n", $name;
-        print "should split to:\n  ";
-        print join ("\n  ", @$should_split) . "\n";
-        print "actually split to:\n  ";
-        print join ("\n  ", @$actual_split) . "\n";
-    }
+  my $actual_split;
+  if (!$should_split->[1]) {
+    # these should issue a warning
+    err_like sub { $actual_split = [Text::BibTeX::split_list ($name, 'and')] },
+      qr!empty substring!;
+  } else {
+    $actual_split = [Text::BibTeX::split_list ($name, 'and')];
+  }
 
-    ok(slist_equal ($should_split, $actual_split));
+  if ($DEBUG) {
+    printf "name = >%s<\n", $name;
+    print "should split to:\n  ";
+    print join ("\n  ", @$should_split) . "\n";
+    print "actually split to:\n  ";
+    print join ("\n  ", @$actual_split) . "\n";
+  }
+
+  ok(slist_equal ($should_split, $actual_split));
 }

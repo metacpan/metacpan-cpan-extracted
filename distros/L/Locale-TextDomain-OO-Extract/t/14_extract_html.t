@@ -57,6 +57,39 @@ my $expected_lexicon_ref = {
                 'maketext_loc.html:13' => undef,
             },
         },
+        'my placeholder' => {
+            reference => {
+                'gettext.html:19' => undef,
+                'gettext.html:20' => undef,
+                'gettext_loc.html:19' => undef,
+                'gettext_loc.html:20' => undef,
+                'maketext_loc.html:19' => undef,
+                'maketext_loc.html:20' => undef,
+            },
+        },
+        'my title' => {
+            reference => {
+                'gettext.html:15' => undef,
+                'gettext.html:16' => undef,
+                'gettext_loc.html:15' => undef,
+                'gettext_loc.html:16' => undef,
+                'maketext_loc.html:15' => undef,
+                'maketext_loc.html:16' => undef,
+            },
+        },
+        'my value' => {
+            reference => {
+                'gettext.html:14' => undef,
+                'gettext.html:17' => undef,
+                'gettext.html:18' => undef,
+                'gettext_loc.html:14' => undef,
+                'gettext_loc.html:17' => undef,
+                'gettext_loc.html:18' => undef,
+                'maketext_loc.html:14' => undef,
+                'maketext_loc.html:17' => undef,
+                'maketext_loc.html:18' => undef,
+            },
+        },
     },
 };
 eq_or_diff

@@ -1,14 +1,15 @@
 ---
-abstract: 'Module to interface with the ORCID webservice'
+abstract: 'A client for the ORCID 2.0 API'
 author:
   - 'Patrick Hochstenbach C<< <patrick.hochstenbach at ugent.be> >>'
 build_requires:
-  Test::Deep: '0.112'
-  Test::Exception: '0.32'
-  Test::More: '1.001003'
+  Module::Build: '0.28'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
   Test::Pod: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build: '0.28'
 dynamic_config: 0
 generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -27,22 +28,25 @@ no_index:
 recommends:
   JSON::XS: '2.3'
 requires:
+  Class::Load: '0'
   HTTP::Tiny: '0'
   JSON: '2.51'
   LWP::UserAgent: '0'
+  Log::Any: '0'
   Moo: '1.000008'
+  Sub::Quote: '0'
   URI: '0'
-  XML::Writer: '0'
-  namespace::clean: '0.24'
-  perl: v5.10.1
+  namespace::clean: '0'
 resources:
   bugtracker: https://github.com/LibreCat/WWW-ORCID/issues
   homepage: https://github.com/LibreCat/WWW-ORCID
   repository: https://github.com/LibreCat/WWW-ORCID.git
-version: '0.0201'
+version: '0.0401'
 x_contributors:
+  - 'jjatria <jjatria@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+  - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -89,6 +89,7 @@ do { my $x = {
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',
                                       'Dist::Zilla::Util' => '0',
                                       'Moose' => '0',
+                                      'Perl::Version' => '0',
                                       'Pod::Elemental::Transformer::List' => '0',
                                       'Pod::Elemental::Transformer::Verbatim' => '0',
                                       'Pod::Weaver::Config::Assembler' => '0',

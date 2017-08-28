@@ -9,6 +9,7 @@ use lib "$Bin/../lib";
 use Data::Dumper;
 
 use DBI;
+#use Scalar::Util qw/blessed/;
 
 
 package Customer;
@@ -31,6 +32,15 @@ use Test::More;
 eval { require DBD::SQLite } or plan skip_all => 'Need DBD::SQLite for testing';
 
 ok(Customer->connect("dbi:SQLite:dbname=:memory:","",""), 'connect');
+
+eval { require DBIx::Connector };
+if ($@) {
+	# There is no DBIx::Connector, use DBI/ARS::Connect
+}
+else {
+	isa_ok $ActiveRecord::Simple::connector, 'DBIx::Connector';
+}
+
 my $hello = Customer->dbh->selectrow_array('SELECT "hello"');
 is $hello, 'hello';
 

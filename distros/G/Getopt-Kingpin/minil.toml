@@ -1,4 +1,4 @@
 name = "Getopt-Kingpin"
- badges = ["travis", "codecov"]
+ badges = ["travis", "codecov", "appveyor"]
 module_maker="ModuleBuildTiny"
 

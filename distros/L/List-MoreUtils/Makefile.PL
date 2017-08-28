@@ -8,34 +8,34 @@ use 5.008_001;
 use Config;
 use ExtUtils::MakeMaker;
 
-BEGIN
-{
-    if (-d "Sandbox")
-    {
-        unless (grep { $_ eq "." } @INC)
-        {
-            use lib ".";
-        }
-        eval "use Sandbox::Tumble ();";
-        $@ and die $@;
-        eval "use File::Path ();";
-        File::Path->import;
-        -d 't/pureperl' and rmtree('t/pureperl');
-        Sandbox::Tumble->tumble(qw(t));
-    }
-}
-
 my @argv = @ARGV;
 defined $ENV{PERL_MM_OPT} and push @argv, split " ", $ENV{PERL_MM_OPT};
 
-foreach (@ARGV)
+my $recommend_xs = 1;
+
+# Should we build the XS version?
+foreach (@argv)
 {
     /^-pm/
-      and warn
-      "-pm is depreciated, please use PUREPERL_ONLY=1 where applicable. For List::MoreUtils, simply don't install List::MoreUtils::XS";
-    /^-xs/ and warn "-xs is depreciated, please install List::MoreUtils::XS";
+      and warn "-pm is depreciated, please use PUREPERL_ONLY=1 where applicable." and $recommend_xs = 0;
+    /^-xs/ and warn "-xs is depreciated" and $recommend_xs = 1;
     /^PUREPERL_ONLY=(.*)$/
-      and warn "PUREPERL_ONLY=0|1 don't make sense, please install List::MoreUtils::XS when you need native speed";
+      and $recommend_xs = !$1;
+}
+
+if (-d "Sandbox")
+{
+    unless (grep { $_ eq "." } @INC)
+    {
+        use lib ".";
+    }
+    eval "use Sandbox::Tumble ();";
+    $@ and die $@;
+    eval "use File::Path ();";
+    File::Path->import;
+    -d 't/xs' and rmtree('t/xs');
+    -d 't/pureperl' and rmtree('t/pureperl');
+    Sandbox::Tumble->tumble(qw(t));
 }
 
 my $conflictMsg = <<EOCM;
@@ -61,7 +61,6 @@ my $selfConflictMsg = <<EOSCM;
 ***
 EOSCM
 
-# Should we build the XS version?
 my %RUN_DEPS = (
     'Exporter::Tiny' => '0.038',
 );
@@ -69,6 +68,7 @@ my %CONFIGURE_DEPS = (
     'ExtUtils::MakeMaker' => 0,
 );
 my %TEST_DEPS = (
+    'Storable'   => 0,
     'Test::More' => 0.96,
 );
 my %CONFLICTS = (
@@ -104,8 +104,7 @@ WriteMakefile1(
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
                     'Test::Spelling'                      => 0,
-                    'JSON::PP'                            => 0,
-                    'Test::WriteVariants'                 => '0.010',
+                    'Test::WriteVariants'                 => '0.014',
                 },
             },
             configure => {requires => {%CONFIGURE_DEPS}},
@@ -115,6 +114,7 @@ WriteMakefile1(
             },
             runtime => {
                 requires => {%RUN_DEPS},
+		($recommend_xs ? (recommends => {'List::MoreUtils::XS' => '0.423'}) : ()),
             },
         },
     },
@@ -126,14 +126,14 @@ WriteMakefile1(
         'Adam Kennedy <adamk@cpan.org>',
         'Jens Rehsack <rehsack@cpan.org>'
     ],
-    LICENSE            => 'perl',
+    LICENSE            => 'apache_2_0',
     CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
     CONFLICTS          => \%CONFLICTS,
     PREREQ_PM          => \%RUN_DEPS,
     TEST_REQUIRES      => \%TEST_DEPS,
-    (-d "Sandbox" ? (realclean => {FILES => "t/pureperl"}) : ()),
+    (-d "Sandbox" ? (realclean => {FILES => "t/pureperl t/xs M*.bak"}) : ()),
     depend => {'$(FIRST_MAKEFILE)' => '$(VERSION_FROM)'},
-    test   => {TESTS               => join(' ', 't/*.t', 't/pureperl/*.t', 'xt/*.t')},
+    test   => {TESTS               => join(' ', 't/*.t', 't/pureperl/*.t', ($recommend_xs ?'t/xs/*.t':()), 'xt/*.t')},
     # Otherwise 'cxinc' isn't defined
     ($] < 5.012 ? (DEFINE => '-DPERL_EXT') : (),),
 );

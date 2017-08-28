@@ -1,0 +1,729 @@
+
+[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Chrome.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Chrome)
+
+# NAME
+
+MozRepl::RemoteObject - treat Javascript objects as Perl objects
+
+# SYNOPSIS
+
+    #!perl -w
+    use strict;
+    use MozRepl::RemoteObject;
+
+    # use $ENV{MOZREPL} or localhost:4242
+    my $repl = MozRepl::RemoteObject->install_bridge();
+
+    # get our root object:
+    my $tab = $repl->expr(<<JS);
+        window.getBrowser().addTab()
+    JS
+
+    # Now use the object:
+    my $body = $tab->{linkedBrowser}
+                ->{contentWindow}
+                ->{document}
+                ->{body}
+                ;
+    $body->{innerHTML} = "<h1>Hello from MozRepl::RemoteObject</h1>";
+
+    $body->{innerHTML} =~ '/Hello from/'
+        and print "We stored the HTML";
+
+    $tab->{linkedBrowser}->loadURI('https://corion.net/');
+
+# BRIDGE SETUP
+
+## `MozRepl::RemoteObject->install_bridge %options`
+
+Installs the Javascript `<->` Perl bridge. If you pass in
+an existing [MozRepl](https://metacpan.org/pod/MozRepl) instance, it must have [MozRepl::Plugin::JSON2](https://metacpan.org/pod/MozRepl::Plugin::JSON2)
+loaded if you're running on a browser without native JSON support.
+
+If `repl` is not passed in, `$ENV{MOZREPL}` will be used
+to find the ip address and portnumber to connect to. If `$ENV{MOZREPL}`
+is not set, the default of `localhost:4242` will be used.
+
+If `repl` is not a reference, it will be used instead of `$ENV{MOZREPL}`.
+
+To replace the default JSON parser, you can pass it in using the `json`
+option.
+
+- `repl` - a premade [MozRepl](https://metacpan.org/pod/MozRepl) instance to use, or alternatively a
+connection string to use
+- `use_queue` - whether to queue destructors until the next command. This
+reduces the latency and amount of queries sent via [MozRepl](https://metacpan.org/pod/MozRepl) by half,
+at the cost of a bit delayed release of objects on the remote side. The
+release commands get queued until the next "real" command gets sent
+through [MozRepl](https://metacpan.org/pod/MozRepl).
+- `launch` - the command line to launch the program that runs `mozrepl`.
+
+### Connect to a different machine
+
+If you want to connect to a Firefox instance on a different machine,
+call `->install_bridge` as follows:
+
+    MozRepl::RemoteObject->install_bridge(
+        repl => "$remote_machine:4242"
+    );
+
+### Using an existing MozRepl
+
+If you want to pass in a preconfigured [MozRepl](https://metacpan.org/pod/MozRepl) object,
+call `->install_bridge` as follows:
+
+    my $repl = MozRepl->new;
+    $repl->setup({
+        log => [qw/ error info /],
+        plugins => { plugins => [qw[ JSON2 ]] },
+    });
+    my $bridge = MozRepl::RemoteObject->install_bridge(repl => $repl);
+
+### Launch a mozrepl program if it's not found running
+
+If you want to launch Firefox if it's not already running,
+call `->install_bridge` as follows:
+
+    MozRepl::RemoteObject->install_bridge(
+        launch => 'iceweasel' # that program must be in the path
+    );
+
+### Using a custom command line
+
+By default the launched program will be launched with the `-repl`
+command line switch to start up `mozrepl`. If you need to provide
+the full command line, pass an array reference to the
+`launch` option:
+
+    MozRepl::RemoteObject->install_bridge(
+        launch => ['iceweasel','-repl','666']
+    );
+
+### Using a custom Mozrepl class
+
+By default, any class named in `$ENV{MOZREPL}` will get loaded and used
+as the MozRepl backend. That value will get untainted!
+If you want to prevent `$ENV{MOZREPL}`
+from getting used, pass an explicit class name using the `repl_class`
+option.
+
+    MozRepl::RemoteObject->install_bridge(
+        repl_class => 'MozRepl::AnyEvent',
+    );
+
+### Preventing/forcing native JSON
+
+The Javascript part of MozRepl::RemoteObject will try to detect whether
+to use the native Mozilla `JSON` object or whether to supply its own
+JSON encoder from [MozRepl::Plugin::JSON2](https://metacpan.org/pod/MozRepl::Plugin::JSON2). To prevent the autodetection,
+pass the `js_JSON` option:
+
+    js_JSON => 'native', # force to use the native JSON object
+
+    js_JSON => '', # force the json2.js encoder
+
+The autodetection detects whether the connection has a native JSON
+encoder and whether it properly transports UTF-8.
+
+## `$bridge->expr( $js, $context )`
+
+Runs the Javascript passed in through ` $js ` and links
+the returned result to a Perl object or a plain
+value, depending on the type of the Javascript result.
+
+This is how you get at the initial Javascript object
+in the object forest.
+
+    my $window = $bridge->expr('window');
+    print $window->{title};
+
+You can also create Javascript functions and use them from Perl:
+
+    my $add = $bridge->expr(<<JS);
+        function (a,b) { return a+b }
+    JS
+    print $add->(2,3);
+    # prints 5
+
+The `context` parameter allows you to specify that you
+expect a Javascript array and want it to be returned
+as list. To do that, specify `'list'` as the `$context` parameter:
+
+    for ($bridge->expr(<<JS,'list')) { print $_ };
+        [1,2,3,4]
+    JS
+
+This is slightly more efficient than passing back an array reference
+and then fetching all elements.
+
+## `as_list( $array )`
+
+    for $_ in (as_list $array) {
+        print $_->{innerHTML},"\n";
+    };
+
+Efficiently fetches all elements from ` @$array `. This is
+functionally equivalent to writing
+
+    @$array
+
+except that it involves much less roundtrips between Javascript
+and Perl. If you find yourself using this, consider
+declaring a Javascript function with `list` context
+by using `->declare` instead.
+
+## `$bridge->declare( $js, $context )`
+
+Shortcut to declare anonymous JS functions
+that will be cached in the bridge. This
+allows you to use anonymous functions
+in an efficient manner from your modules
+while keeping the serialization features
+of MozRepl::RemoteObject:
+
+    my $js = <<'JS';
+      function(a,b) {
+          return a+b
+      }
+    JS
+    my $fn = $self->bridge->declare($js);
+    $fn->($a,$b);
+
+The function `$fn` will remain declared
+on the Javascript side
+until the bridge is torn down.
+
+If you expect an array to be returned and want the array
+to be fetched as list, pass `'list'` as the `$context`.
+This is slightly more efficient than passing an array reference
+to Perl and fetching the single elements from Perl.
+
+## `$bridge->constant( $NAME )`
+
+    my $i = $bridge->constant( 'Components.interfaces.nsIWebProgressListener.STATE_STOP' );
+
+Fetches and caches a Javascript constant. If you use this to fetch
+and cache Javascript objects, this will create memory leaks, as these objects
+will not get released.
+
+## `$bridge->appinfo()`
+
+Returns the `nsIXULAppInfo` object
+so you can inspect what application
+the bridge is connected to:
+
+    my $info = $bridge->appinfo();
+    print $info->{name}, "\n";
+    print $info->{version}, "\n";
+    print $info->{ID}, "\n";
+
+## `$bridge->js_call_to_perl_struct( $js, $context )`
+
+Takes a scalar with JS code, executes it, and returns
+the result as a Perl structure.
+
+This will not (yet?) cope with objects on the remote side, so you
+will need to make sure to call `$rn.link()` on all objects
+that are to persist across the bridge.
+
+This is a very low level method. You are better advised to use
+`$bridge->expr()` as that will know
+to properly wrap objects but leave other values alone.
+
+`$context` is passed through and tells the Javascript side
+whether to return arrays as objects or as lists. Pass
+`list` if you want a list of results instead of a reference
+to a Javascript `array` object.
+
+## `$bridge->remove_callback( $callback )`
+
+    my $onload = sub {
+        ...
+    };
+    $js_object->{ onload } = $onload;
+    $bridge->remove_callback( $onload )
+
+If you want to remove a callback that you instated,
+this is the way.
+
+This will release the resources associated with the callback
+on both sides of the bridge.
+
+## `$bridge->poll`
+
+A crude no-op that can be used to just look if new events have arrived.
+
+# HASH access
+
+All MozRepl::RemoteObject objects implement
+transparent hash access through overloading, which means
+that accessing `$document->{body}` will return
+the wrapped `document.body` object.
+
+This is usually what you want when working with Javascript
+objects from Perl.
+
+Setting hash keys will try to set the respective property
+in the Javascript object, but always as a string value,
+numerical values are not supported.
+
+# ARRAY access
+
+Accessing an object as an array will mainly work. For
+determining the `length`, it is assumed that the
+object has a `.length` method. If the method has
+a different name, you will have to access the object
+as a hash with the index as the key.
+
+Note that `push` expects the underlying object
+to have a `.push()` Javascript method, and `pop`
+gets mapped to the `.pop()` Javascript method.
+
+# OBJECT IDENTITY
+
+Object identity is currently implemented by
+overloading the `==` operator.
+Two objects are considered identical
+if the javascript `===` operator
+returns true.
+
+    my $obj_a = MozRepl::RemoteObject->expr('window.document');
+    print $obj_a->__id(),"\n"; # 42
+    my $obj_b = MozRepl::RemoteObject->expr('window.document');
+    print $obj_b->__id(), "\n"; #43
+    print $obj_a == $obj_b; # true
+
+# CALLING METHODS
+
+Calling methods on a Javascript object is supported.
+
+All arguments will be autoquoted if they contain anything
+other than ASCII digits (`[0-9]`). There currently
+is no way to specify that you want an all-digit parameter
+to be put in between double quotes.
+
+Passing MozRepl::RemoteObject objects as parameters in Perl
+passes the proxied Javascript object as parameter to the Javascript method.
+
+As in Javascript, functions are first class objects, the following
+two methods of calling a function are equivalent:
+
+    $window->loadURI('http://search.cpan.org/');
+
+    $window->{loadURI}->('http://search.cpan.org/');
+
+# EVENTS / CALLBACKS
+
+This module also implements a rudimentary asynchronous
+event dispatch mechanism. Basically, it allows you
+to write code like this and it will work:
+
+    $window->addEventListener('load', sub {
+         my ($event) = @_;
+         print "I got a " . $event->{type} . " event\n";
+         print "on " . $event->{originalTarget};
+    });
+    # do other things...
+
+Note that you cannot block the execution of Javascript that way.
+The Javascript code has long continued running when you receive
+the event.
+
+Currently, only busy-waiting is implemented and there is no
+way yet for Javascript to tell Perl it has something to say.
+So in absence of a real mainloop, you have to call
+
+    $repl->poll;
+
+from time to time to look for new events. Note that _any_
+call to Javascript will carry all events back to Perl and trigger
+the handlers there, so you only need to use poll if no other
+activity happens.
+
+In the long run,
+a move to [AnyEvent](https://metacpan.org/pod/AnyEvent) would make more sense, but currently,
+MozRepl::RemoteObject is still under heavy development on
+many fronts so that has been postponed.
+
+# OBJECT METHODS
+
+These methods are considered to be internal. You usually
+do not want to call them from your code. They are
+documented here for the rare case you might need to use them directly
+instead of treating the objects as Perl structures. The
+official way to access these functions is by using
+[MozRepl::RemoteObject::Methods](https://metacpan.org/pod/MozRepl::RemoteObject::Methods) instead.
+
+## `$obj->__invoke(METHOD, ARGS)`
+
+The `->__invoke()` object method is an alternate way to
+invoke Javascript methods. It is normally equivalent to
+`$obj->$method(@ARGS)`. This function must be used if the
+METHOD name contains characters not valid in a Perl variable name
+(like foreign language characters).
+To invoke a Javascript objects native `__invoke` method (if such a
+thing exists), please use:
+
+    $object->MozRepl::RemoteObject::Methods::invoke::invoke('__invoke', @args);
+
+The same method can be used to call the Javascript functions with the
+same name as other convenience methods implemented
+by this package:
+
+    __attr
+    __setAttr
+    __xpath
+    __click
+    ...
+
+## `$obj->__transform_arguments(@args)`
+
+This method transforms the passed in arguments to their JSON string
+representations.
+
+Things that match ` /^(?:[1-9][0-9]*|0+)$/ ` get passed through.
+
+MozRepl::RemoteObject::Instance instances
+are transformed into strings that resolve to their
+Javascript global variables. Use the `->expr` method
+to get an object representing these.
+
+It's also impossible to pass a negative or fractional number
+as a number through to Javascript, or to pass digits as a Javascript string.
+
+## `$obj->__id`
+
+Readonly accessor for the internal object id
+that connects the Javascript object to the
+Perl object.
+
+## `$obj->__on_destroy`
+
+Accessor for the callback
+that gets invoked from `DESTROY`.
+
+## `$obj->bridge`
+
+Readonly accessor for the bridge
+that connects the Javascript object to the
+Perl object.
+
+## `$obj->__release_action`
+
+Accessor for Javascript code that gets executed
+when the Perl object gets released.
+
+## `$obj->__attr( $attribute )`
+
+Read-only accessor to read the property
+of a Javascript object.
+
+    $obj->__attr('foo')
+
+is identical to
+
+    $obj->{foo}
+
+## `$obj->__setAttr( $attribute, $value )`
+
+Write accessor to set a property of a Javascript
+object.
+
+    $obj->__setAttr('foo', 'bar')
+
+is identical to
+
+    $obj->{foo} = 'bar'
+
+## `$obj->__dive( @PATH )`
+
+**DEPRECATED** - this method will vanish somewhere after 0.23.
+Use [MozRepl::RemoteObject::Methods::dive](https://metacpan.org/pod/MozRepl::RemoteObject::Methods::dive) instead.
+
+Convenience method to quickly dive down a property chain.
+
+If any element on the path is missing, the method dies
+with the error message which element was not found.
+
+This method is faster than descending through the object
+forest with Perl, but otherwise identical.
+
+    my $obj = $tab->{linkedBrowser}
+                  ->{contentWindow}
+                  ->{document}
+                  ->{body}
+
+    my $obj = $tab->__dive(qw(linkedBrowser contentWindow document body));
+
+## `$obj->__keys()`
+
+Please use instead:
+
+    keys %$obj
+
+The function returns the names of all properties
+of the javascript object as a list, just like the `keys`
+Perl function.
+
+    $obj->__keys()
+
+is identical to
+
+    keys %$obj
+
+## `$obj->__values()`
+
+Please use instead:
+
+    values %$obj
+
+Returns the values of all properties
+as a list.
+
+    $obj->values()
+
+is identical to
+
+    values %$obj
+
+## `$obj->__xpath( $query [, $ref ] )`
+
+**DEPRECATED** - this method will vanish somewhere after 0.23.
+Use [MozRepl::RemoteObject::Methods::xpath](https://metacpan.org/pod/MozRepl::RemoteObject::Methods::xpath) instead:
+
+    $obj->MozRepl::RemoteObject::Methods::xpath( $query )
+
+Executes an XPath query and returns the node
+snapshot result as a list.
+
+This is a convenience method that should only be called
+on HTMLdocument nodes.
+
+The optional `$ref` parameter can be a DOM node relative to which a
+relative XPath expression will be evaluated. It defaults to `undef`.
+
+The optional `$cont` parameter can be a Javascript function that
+will get applied to every result. This can be used to directly map
+each DOM node in the XPath result to an attribute. For example
+for efficiently fetching the text value of an XPath query resulting in
+textnodes, the two snippets are equivalent, but the latter executes
+less roundtrips between Perl and Javascript:
+
+    my @text = map { $_->{nodeValue} }
+        $obj->MozRepl::RemoteObject::Methods::xpath( '//p/text()' )
+
+
+    my $fetch_nodeValue = $bridge->declare(<<JS);
+        function (e){ return e.nodeValue }
+    JS
+    my @text = map { $_->{nodeValue} }
+        $obj->MozRepl::RemoteObject::Methods::xpath( '//p/text()', undef, $fetch_nodeValue )
+
+## `$obj->__click`
+
+Sends a Javascript `click` event to the object.
+
+This is a convenience method that should only be called
+on HTMLdocument nodes or their children.
+
+## `$obj->__change`
+
+Sends a Javascript `change` event to the object.
+
+This is a convenience method that should only be called
+on HTMLdocument nodes or their children.
+
+## `$obj->__event TYPE`
+
+Sends a Javascript event of type `TYPE` to the object.
+
+This is a convenience method that should only be called
+on HTMLdocument nodes or their children.
+
+### Send a `focus`, `change` and `blur` event to an element
+
+The following code simulates the events sent by the
+user entering a value into a field:
+
+    $elt->__event('focus');
+    $elt->{value} = 'Hello';
+    $elt->__event('change');
+    $elt->__event('blur');
+
+## `MozRepl::RemoteObject::Instance->new( $bridge, $ID, $onDestroy )`
+
+This creates a new Perl object that's linked to the
+Javascript object `ID`. You usually do not call this
+directly but use `$bridge->link_ids @IDs`
+to wrap a list of Javascript ids with Perl objects.
+
+The `$onDestroy` parameter should contain a Javascript
+string that will be executed when the Perl object is
+released.
+The Javascript string is executed in its own scope
+container with the following variables defined:
+
+- `self` - the linked object
+- `id` - the numerical Javascript object id of this object
+- `repl` - the [MozRepl](https://metacpan.org/pod/MozRepl) Javascript `repl` object
+
+This method is useful if you want to automatically
+close tabs or release other resources
+when your Perl program exits.
+
+# ENCODING
+
+The communication with the MozRepl plugin is done
+through 7bit safe ASCII. The received bytes are supposed
+to be UTF-8, but this seems not always to be the case,
+so the JSON encoder on the Javascript side also
+uses a 7bit safe encoding.
+
+Currently there is no way to specify a different encoding
+on the fly. You have to replace or reconfigure
+the JSON object in the constructor.
+
+# TODO
+
+- For tests that connect to the outside world,
+check/ask whether we're allowed to. If running
+automated, skip.
+- Think more about how to handle object identity.
+Should `Scalar::Util::refaddr` return true whenever
+the Javascript `===` operator returns true?
+
+    Also see [https://perlmonks.org/?node\_id=802912](https://perlmonks.org/?node_id=802912)
+
+- Consider whether MozRepl actually always delivers
+UTF-8 as output.
+- Properly encode all output that gets send towards
+[MozRepl](https://metacpan.org/pod/MozRepl) into the proper encoding.
+- Can we find a sensible implementation of string
+overloading for JS objects? Should it be the
+respective JS object type?
+- Add truely lazy objects that don't allocate their JS counterparts
+until an `__attr()` is requested or a method call is made.
+
+    This is an optimization and hence gets postponed.
+
+- Potentially do away with attaching to the repl object and keep
+all elements as anonymous functions referenced only by Perl variables.
+
+    This would have the advantage of centralizing the value wrapping/unwrapping
+    in one place, `__invoke`, and possibly also in `__as_code`. It would
+    also keep the precompiled JS around instead of recompiling it on
+    every access.
+
+    `repl.wrapResults` would have to be handed around in an interesting
+    manner then though.
+
+- Add proper event wrappers and find a mechanism to send such events.
+
+    Having `__click()` is less than desireable. Maybe blindly adding
+    the `click()` method is preferrable.
+
+- Implement fetching of more than one property at once through \_\_attr()
+- Implement automatic reblessing of JS objects into Perl objects
+based on a typemap instead of blessing everything into
+MozRepl::RemoteObject::Instance.
+- Find out how to make MozRepl actively send responses instead
+of polling for changes.
+
+    This would lead to implementing a full two-way message bus.
+
+    `repl.print()` can create arbitrary output, but [Net::Telnet](https://metacpan.org/pod/Net::Telnet)
+    is not prepared to consume it.
+
+    On the Javascript side, `yield` can be used to implement
+    continuations in a way that could maybe allow us to "suspend" the currently
+    executing Javascript callback to introduce synchronous callbacks from
+    Javascript into Perl.
+
+- Consider using/supporting [AnyEvent](https://metacpan.org/pod/AnyEvent) for better compatibility
+with other mainloops.
+
+    This would lead to implementing a full two-way message bus.
+
+- Should I make room for promises as well?
+
+        my ($foo,$bar);
+        $bridge->transaction(sub {
+            $foo = $obj->promise;
+            $bar = $obj2->promise;
+        });
+
+    The JS could instantiate another level of proxy objects
+    that would have to get filled by a batch of JS statements
+    sent from Perl to fill in all those promises.
+
+        $bridge->promise( 'window' )
+        could return
+        sub { $bridge->expr('window') }
+
+    but that wouldn't allow for coalescing these promises into Javascript.
+
+- Create synchronous Javascript callbacks by blocking
+the current FireFox thread. This shouldn't block the
+rest of FireFox:
+
+          /**
+           * Netscape compatible WaitForDelay function.
+           * You can use it as an alternative to Thread.Sleep() in any major programming language
+           * that support it while JavaScript it self doesn't have any built-in function to do such a thing.
+           * parameters:
+           * (Number) delay in millisecond
+          */
+          function nsWaitForDelay(delay) {
+              /**
+                * Just uncomment this code if you're building an extention for Firefox.
+                * Since FF3, we'll have to ask for user permission to execute XPCOM objects.
+                */
+              // netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+              // Get the current thread.
+              var thread = Components.classes["@mozilla.org/thread-manager;1"].getService(Components.interfaces.nsIThreadManager).currentThread;
+
+              // Create an inner property to be used later as a notifier.
+              this.delayed = true;
+
+              /* Call JavaScript setTimeout function
+                * to execute this.delayed = false
+                * after it finish.
+                */
+              setTimeout("this.delayed = false;", delay);
+
+              /**
+                * Keep looping until this.delayed = false
+                */
+              while (this.delayed) {
+              /**
+                * This code will not freeze your browser as it's documented in here:
+                * https://developer.mozilla.org/en/Code_snippets/Threads#Waiting_for_a_background_task_to_complete
+                */
+              thread.processNextEvent(true);
+              }
+          }
+
+# SEE ALSO
+
+[Win32::OLE](https://metacpan.org/pod/Win32::OLE) for another implementation of proxy objects
+
+[https://wiki.github.com/bard/mozrepl](https://wiki.github.com/bard/mozrepl) - the MozRepl
+FireFox plugin homepage
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/mozrepl-remoteobject](https://github.com/Corion/mozrepl-remoteobject).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2009-2012 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

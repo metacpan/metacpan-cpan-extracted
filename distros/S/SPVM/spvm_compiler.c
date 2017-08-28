@@ -17,14 +17,17 @@
 #include "spvm_sub.h"
 #include "spvm_constant_pool.h"
 #include "spvm_runtime.h"
+#include "spvm_runtime_api.h"
 #include "spvm_global.h"
+#include "spvm_sub.h"
+#include "spvm_field_info.h"
 
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
   
   // Set global runtime
-  SPVM_GLOBAL_RUNTIME = runtime;
+  SPVM_RUNTIME_API_set_runtime(runtime->api, runtime);
   
   // Copy constant pool to runtime
   int64_t runtime_constant_pool_byte_size = (int64_t)compiler->constant_pool->length * (int64_t)sizeof(int32_t);
@@ -36,15 +39,90 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   runtime->bytecodes = SPVM_UTIL_ALLOCATOR_safe_malloc(runtime_bytecodes_byte_size);
   memcpy(runtime->bytecodes, compiler->bytecode_array->values, compiler->bytecode_array->length * sizeof(uint8_t));
   
+  // Build sub id symtable
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < compiler->op_subs->length; sub_index++) {
+      SPVM_OP* op_sub = SPVM_DYNAMIC_ARRAY_fetch(compiler->op_subs, sub_index);
+      SPVM_SUB* sub = op_sub->uv.sub;
+      SPVM_HASH_insert(runtime->sub_id_symtable, sub->abs_name, strlen(sub->abs_name), (void*)(intptr_t)sub->id);
+    }
+  }
+  
+  // Build type id symtable
+  {
+    int32_t type_index;
+    for (type_index = 0; type_index < compiler->types->length; type_index++) {
+      SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, type_index);
+      SPVM_HASH_insert(runtime->type_id_symtable, type->name, strlen(type->name), (void*)(intptr_t)type->id);
+    }
+  }
+  
+  // Build field id symtable
+  {
+    int32_t package_index;
+    for (package_index = 0; package_index < compiler->op_packages->length; package_index++) {
+      SPVM_OP* op_package = SPVM_DYNAMIC_ARRAY_fetch(compiler->op_packages, package_index);
+      SPVM_PACKAGE* package = op_package->uv.package;
+      const char* package_name = package->op_name->uv.name;
+      
+      SPVM_DYNAMIC_ARRAY* op_fields = package->op_fields;
+      SPVM_HASH* field_name_symtable = SPVM_HASH_new(0);
+      {
+        int32_t op_field_index;
+        for (op_field_index = 0; op_field_index < op_fields->length; op_field_index++) {
+          SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, op_field_index);
+          SPVM_FIELD_INFO* field_info = op_field->uv.field;
+          const char* field_name = field_info->op_name->uv.name;
+          
+          SPVM_HASH_insert(field_name_symtable, field_name, strlen(field_name), (void*)(intptr_t)(field_info->index + 1));
+        }
+      }
+      
+      SPVM_HASH_insert(runtime->field_id_symtable, package_name, strlen(package_name), field_name_symtable);
+    }
+  }
+
+  // Build field info id symtable
+  {
+    int32_t package_index;
+    for (package_index = 0; package_index < compiler->op_packages->length; package_index++) {
+      SPVM_OP* op_package = SPVM_DYNAMIC_ARRAY_fetch(compiler->op_packages, package_index);
+      SPVM_PACKAGE* package = op_package->uv.package;
+      const char* package_name = package->op_name->uv.name;
+      
+      SPVM_DYNAMIC_ARRAY* op_fields = package->op_fields;
+      SPVM_HASH* field_name_symtable = SPVM_HASH_new(0);
+      {
+        int32_t op_field_index;
+        for (op_field_index = 0; op_field_index < op_fields->length; op_field_index++) {
+          SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, op_field_index);
+          SPVM_FIELD_INFO* field_info = op_field->uv.field;
+          const char* field_name = field_info->op_name->uv.name;
+          
+          SPVM_HASH_insert(field_name_symtable, field_name, strlen(field_name), (void*)(intptr_t)field_info->id);
+        }
+      }
+      
+      SPVM_HASH_insert(runtime->field_info_id_symtable, package_name, strlen(package_name), field_name_symtable);
+    }
+  }
+  
   SPVM_DYNAMIC_ARRAY* op_packages = compiler->op_packages;
   
   runtime->packages_length = op_packages->length;
   
-  runtime->package_indexes_constant_pool_index = compiler->package_indexes_constant_pool_index;
+  runtime->packages_base = compiler->packages_base;
   
-  runtime->sub_indexes_constant_pool_index = compiler->sub_indexes_constant_pool_index;
+  runtime->subs_base = compiler->subs_base;
   
-  runtime->subs_length = compiler->subs_length;
+  runtime->subs_length = compiler->op_subs->length;
+
+  runtime->types_base = compiler->types_base;
+  
+  runtime->type_code_to_id_base = compiler->type_code_to_id_base;
+  
+  runtime->types_length = compiler->types->length;
   
   runtime->debug = compiler->debug;
   
@@ -69,66 +147,39 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->bufptr = "";
   compiler->types = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->type_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
-  compiler->cur_line = 0;
-  compiler->cur_file = NULL;
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-  compiler->cur_template_args = NULL;
+  compiler->op_subs = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   
   compiler->native_subs = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
 
-  compiler->enum_default_value = 0;
-  compiler->enum_default_type_id = SPVM_TYPE_C_ID_INT;
-
-  compiler->start_sub_name = NULL;
-  
-  compiler->fatal_error = 0;
-  
-  compiler->current_package_count = 0;
-  
-  // Error count
-  compiler->error_count = 0;
+  compiler->enum_default_type_code = SPVM_TYPE_C_CODE_INT;
 
   // Constant pool
   compiler->constant_pool = SPVM_CONSTANT_POOL_new(compiler);
   
   // Bytecodes
   compiler->bytecode_array = SPVM_BYTECODE_ARRAY_new(compiler);
-
-  // Entry point package name
-  compiler->entry_point_package_name = NULL;
-
-  // Entry point sub name
-  compiler->entry_point_sub_name = NULL;
   
-  compiler->debug = 0;
-
   // Add core types
   {
-    int32_t type_id;
-    for (type_id = 0; type_id < SPVM_TYPE_C_CORE_LENGTH; type_id++) {
+    int32_t type_code;
+    for (type_code = 0; type_code < SPVM_TYPE_C_CORE_LENGTH; type_code++) {
       // Type
       SPVM_TYPE* type = SPVM_TYPE_new(compiler);
-      const char* name = SPVM_TYPE_C_ID_NAMES[type_id];
+      const char* name = SPVM_TYPE_C_CODE_NAMES[type_code];
       type->name = name;
-      type->id = type_id;
-      if (type_id >= SPVM_TYPE_C_ID_BYTE_ARRAY && type_id <= SPVM_TYPE_C_ID_DOUBLE_ARRAY) {
+      type->code = type_code;
+      if (type_code >= SPVM_TYPE_C_CODE_BYTE_ARRAY && type_code <= SPVM_TYPE_C_CODE_STRING_ARRAY) {
         type->dimension++;
+        type->base_type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, type_code - SPVM_TYPE_C_ARRAY_SHIFT);
       }
-      type->base_name = name;
-      type->base_id = type_id;
+      else {
+        type->base_type = type;
+      }
       SPVM_DYNAMIC_ARRAY_push(compiler->types, type);
       SPVM_HASH_insert(compiler->type_symtable, name, strlen(name), type);
     }
   }
-  
-  // Package indexes constant pool index
-  compiler->package_indexes_constant_pool_index = -1;
-  
-  // Subroutine indexes constant pool index
-  compiler->sub_indexes_constant_pool_index = -1;
-  
-  // Subroutine length
-  compiler->subs_length = 0;
   
   return compiler;
 }

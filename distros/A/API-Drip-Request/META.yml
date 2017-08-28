@@ -1,0 +1,33 @@
+---
+abstract: 'Perl interface to api.getdrip.com'
+author:
+  - 'Dan Wright <Dan@DWright.Org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-Drip-Request
+provides:
+  API::Drip::Request:
+    file: lib/API/Drip/Request.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  Data::Printer: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Params::ValidationCompiler: '0'
+  Readonly: '0'
+  Types::Standard: '0'
+  URI: '0'
+  YAML: '0'
+version: '0.03'

@@ -1,7 +1,7 @@
 package HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives;
 
 use MooseX::App::Role;
-use HPC::Runner::Command::Utils::Traits qw(ArrayRefOfStrs);
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 use namespace::autoclean;
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives

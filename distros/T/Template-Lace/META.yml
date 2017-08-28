@@ -24,10 +24,11 @@ requires:
   Moo: '2.003000'
   Scalar::Util: '0'
   Storable: '0'
+  Template::Tiny: '1.12'
   UUID::Tiny: '0'
 resources:
   bugtracker: https://github.com/jjn1056/Template-Lace/issues
   homepage: https://github.com/jjn1056/Template-Lace
   repository: https://github.com/jjn1056/Template-Lace.git
-version: '0.011'
+version: '0.014'
 x_serialization_backend: 'YAML::Tiny version 1.70'

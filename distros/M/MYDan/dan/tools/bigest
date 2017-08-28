@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+Find the biggest file/directory under a path
+
+ $0
+
+ $0 /data
+
+=cut
+use strict;
+use warnings;
+use POSIX;
+use File::Spec;
+use File::stat;
+
+use constant KILO => 1024;
+use constant UNIT => qw( B K M G T P E Z Y );
+
+map{ scan( $_ ) if -d $_ } @ARGV ? sort map { glob $_ } @ARGV : getcwd();
+
+sub scan
+{
+    my $path = shift;
+    my $device = stat( $path )->dev;
+    my ( %file, $size, $dir );
+    return unless  -d $path && opendir  $dir, $path;
+
+    while( my $name = readdir $dir )
+    {
+	next if $name eq '.' || $name eq '..';
+	my $file = File::Spec->join( $path, $name );
+	next if ! -e $file || -l $file;
+	next if stat( $file )->dev ne $device;
+	my $size = ( `du -x -sb '$file' 2>/dev/null` )[0];
+	next if $size && $size !~ /^(\d+)/;
+	$file{$1} = $file;
+	
+    }
+
+    $size = ( sort { $b <=> $a } keys %file )[0] ;
+    printf " %8s  %s\n", human($size),  $file{$size} if defined $size;
+
+    closedir $dir;
+    scan( $file{$size} )
+        if defined $size && defined $file{$size} && -d $file{$size} ;
+}
+
+sub human
+{
+    my $size = shift || 0;
+    my $i = 0;
+    while ( $size >= KILO ) { $size /= KILO; $i ++ }
+    sprintf "%.1f%s", $size, (UNIT)[$i];
+}

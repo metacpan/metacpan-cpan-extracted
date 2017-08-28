@@ -6,7 +6,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -64,14 +64,17 @@ my $start_rule = qr{
 my $rules = [
     # loc_, _, __
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( x? ) \s* [(] }xms,
         'and',
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( n x? ) \s* [(] }xms,
         'and',
         $singular_rule,
@@ -85,9 +88,11 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( p x? ) \s* [(] }xms,
         'and',
         $context_rule,
@@ -97,9 +102,11 @@ my $rules = [
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( np x? ) \s* [(] }xms,
         'and',
         $context_rule,
@@ -117,11 +124,13 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
 
     # loc_d, _d, __d
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( d x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -131,9 +140,11 @@ my $rules = [
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dn x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -151,9 +162,11 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dp x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -167,9 +180,11 @@ my $rules = [
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dnp x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -191,11 +206,13 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
 
     # loc_c, _c, __c
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( c x? ) \s* [(] }xms,
         'and',
         $text_rule,
@@ -205,9 +222,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( cn x? ) \s* [(] }xms,
         'and',
         $singular_rule,
@@ -225,9 +244,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( cp x? ) \s* [(] }xms,
         'and',
         $context_rule,
@@ -241,9 +262,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( cnp x? ) \s* [(] }xms,
         'and',
         $context_rule,
@@ -265,11 +288,13 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
 
     # loc_dc, _dc, __dc
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dc x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -283,9 +308,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dcn x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -307,9 +334,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dcp x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -327,9 +356,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? (?: loc_ | __? ) ( dcnp x? ) \s* [(] }xms,
         'and',
         $domain_rule,
@@ -355,19 +386,50 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
+    ],
+
+    # babelfish loc_b
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b () \s* [(] }xms,
+        'and',
+        $text_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    # babelfish loc_bp
+    [
+        'begin',
+        qr{ \b N? loc_b ( p ) \s* [(] }xms,
+        'and',
+        $context_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $close_rule,
+        'end',
     ],
 
     # gettext
     'or',
     [
+        'begin',
         qr{ \b N? () gettext \s* [(] }xms,
         'and',
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( n ) gettext \s* [(] }xms,
         'and',
         $singular_rule,
@@ -381,9 +443,11 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( p ) gettext \s* [(] }xms,
         'and',
         $context_rule,
@@ -393,9 +457,11 @@ my $rules = [
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( np ) gettext \s* [(] }xms,
         'and',
         $context_rule,
@@ -413,11 +479,13 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
 
     # dgettext
     'or',
     [
+        'begin',
         qr{ \b N? ( d ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -427,9 +495,11 @@ my $rules = [
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( dn ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -447,9 +517,11 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( dp ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -463,9 +535,11 @@ my $rules = [
         $text_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( dnp ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -487,11 +561,13 @@ my $rules = [
         $count_rule,
         'and',
         $close_rule,
+        'end',
     ],
 
     # cgettext
     'or',
     [
+        'begin',
         qr{ \b N? ( c ) gettext \s* [(] }xms,
         'and',
         $text_rule,
@@ -501,9 +577,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( cn ) gettext \s* [(] }xms,
         'and',
         $singular_rule,
@@ -521,9 +599,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( cp ) gettext \s* [(] }xms,
         'and',
         $context_rule,
@@ -537,9 +617,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( cnp ) gettext \s* [(] }xms,
         'and',
         $context_rule,
@@ -561,11 +643,13 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
 
     # dcgettext
     'or',
     [
+        'begin',
         qr{ \b N? ( dc ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -579,9 +663,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( dcn ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -603,9 +689,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( dcp ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -623,9 +711,11 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
     'or',
     [
+        'begin',
         qr{ \b N? ( dcnp ) gettext \s* [(] }xms,
         'and',
         $domain_rule,
@@ -651,6 +741,7 @@ my $rules = [
         $category_rule,
         'and',
         $close_rule,
+        'end',
     ],
 ];
 
@@ -663,43 +754,44 @@ sub preprocess {
     ${$content_ref} =~ s{ // [^\n]* $ }{}xmsg;
     ${$content_ref} =~ s{
         / [*] ( .*? ) [*] /
-    }{
+    }
+    {
         join q{}, $1 =~ m{ ( \n ) }xmsg;
     }xmsge;
 
     return $self;
 }
 
-my $interpolate_escape_sequence = sub {
-    my $string = shift;
+sub interpolate_escape_sequence {
+    my ( undef, $string ) = @_;
 
     # nothing to interpolate
     defined $string
-        or return;
+        or return $string;
 
     my %char_of = (
-        b    => "\b",
-        f    => "\f",
-        n    => "\n",
-        r    => "\r",
-        t    => "\t",
+        b => "\b",
+        f => "\f",
+        n => "\n",
+        r => "\r",
+        t => "\t",
     );
     ## no critic (ComplexRegexes)
     $string =~ s{
         \\
         (?:
-            ( [bfnrt] ) # Backspace
-                        # Form feed
-                        # New line
-                        # Carriage return
-                        # Horizontal tab
+            ( [bfnrt] )           # Backspace
+                                  # Form feed
+                                  # New line
+                                  # Carriage return
+                                  # Horizontal tab
             | u ( [\dA-Fa-f]{4} ) # Unicode sequence (4 hex digits: dddd)
             | x ( [\dA-Fa-f]{2} ) # Hexadecimal sequence (2 digits: dd)
             |   ( [0-3][0-7]{2} ) # Octal sequence (3 digits: ddd)
-            | (.) # Backslash itself
-                  # Single quotation mark
-                  # Double quotation mark
-                  # anything else that needs no escape
+            | (.)                 # Backslash itself
+                                  # Single quotation mark
+                                  # Double quotation mark
+                                  # anything else that needs no escape
         )
     }{
         $1   ? $char_of{$1}
@@ -711,7 +803,7 @@ my $interpolate_escape_sequence = sub {
     ## use critic (ComplexRegexes)
 
     return $string;
-};
+}
 
 sub stack_item_mapping {
     my $self = shift;
@@ -725,21 +817,21 @@ sub stack_item_mapping {
     $self->add_message({
         reference    => ( sprintf '%s:%s', $self->filename, $_->{line_number} ),
         domain       => $extra_parameter =~ m{ d }xms
-            ? scalar $interpolate_escape_sequence->( shift @{$match} )
+            ? scalar $self->interpolate_escape_sequence( shift @{$match} )
             : $self->domain,
         msgctxt      => $extra_parameter =~ m{ p }xms
-            ? scalar $interpolate_escape_sequence->( shift @{$match} )
+            ? scalar $self->interpolate_escape_sequence( shift @{$match} )
             : undef,
-        msgid        => scalar $interpolate_escape_sequence->( shift @{$match} ),
+        msgid        => scalar $self->interpolate_escape_sequence( shift @{$match} ),
         msgid_plural => $extra_parameter =~ m{ n }xms
             ? do {
-                my $plural = $interpolate_escape_sequence->( shift @{$match} );
+                my $plural = $self->interpolate_escape_sequence( shift @{$match} );
                 $count = shift @{$match};
                 $plural;
             }
             : undef,
         category     => $extra_parameter =~ m{ c }xms
-            ? scalar $interpolate_escape_sequence->( shift @{$match} )
+            ? scalar $self->interpolate_escape_sequence( shift @{$match} )
             : $self->category,
         automatic    => do {
             my $placeholders = shift @{$match};
@@ -771,7 +863,7 @@ sub extract {
         $self->stack_item_mapping;
     }
 
-    return;
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -784,13 +876,13 @@ __END__
 Locale::TextDomain::OO::Extract::JavaScript
 - Extracts internationalization data from JavaScript code
 
-$Id: JavaScript.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: JavaScript.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/JavaScript.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 DESCRIPTION
 
@@ -906,6 +998,9 @@ Implemented Rules:
  __dcnp('...
  __dcnpx('...
 
+ loc_b('...
+ loc_bp('...
+
  gettext('...
  ngettext('...
  pgettext('...
@@ -938,7 +1033,7 @@ Also possible all functions with N in front like Nloc_, N__, Ngettext, ... to pr
     my $extractor = Locale::TextDomain::OO::Extract::JavaScript->new;
     for ( @files ) {
         $extractor->clear;
-        $extractor->filename($_);
+        $extractor->filename($_);            # dir/filename for reference
         $extractor->content_ref( \( path($_)->slurp_utf8 ) );
         $exttactor->category('LC_Messages'); # set defaults or q{} is used
         $extractor->domain('default');       # set defaults or q{} is used
@@ -953,17 +1048,31 @@ Also possible all functions with N in front like Nloc_, N__, Ngettext, ... to pr
 All parameters are optional.
 See Locale::TextDomain::OO::Extract to replace the defaults.
 
-=head2 method preprocess
+    my $extractor = Locale::TextDomain::OO::Extract::JavaScript->new;
+
+=head2 method preprocess (called by method extract)
 
 This method removes all comments.
 
-=head2 method stack_item_mapping
+    $extractor->preprocess;
+
+=head2 method interpolate_escape_sequence (called by method extract)
+
+This method helps e.g. \n to be a real newline in string.
+
+    $string = $extractor->interpolate_escape_sequence($string);
+
+=head2 method stack_item_mapping (called by method extract)
 
 This method maps the matched stuff as lexicon item.
+
+    $extractor->stack_item_mapping;
 
 =head2 method extract
 
 This method runs the extraction.
+
+    $extractor->extract;
 
 =head1 EXAMPLE
 
@@ -1010,7 +1119,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 - 2015,
+Copyright (c) 2009 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

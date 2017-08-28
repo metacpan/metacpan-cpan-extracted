@@ -1,12 +1,16 @@
+1.003 - Aug 19, 2017
+J. Maslak <jmaslak@antelope.net>
+ * Update author information only
+
 1.002 - Oct 17, 2016
-Joel C. Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
  * Don't re-initialize Crypt::Bytes::Random after initial initialization
 
 1.001 - Oct 09, 2016
-Joel C. Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
  * One test was pulling in JCM::Boilerplate which is EXTREMELY heavy
    on dependencies.  Removed!
 
 1.000 - Oct 03, 2016
-Joel C. Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
  * Initial Version

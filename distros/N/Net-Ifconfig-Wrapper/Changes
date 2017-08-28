@@ -1,0 +1,4 @@
+2016-02-06  Kingpin  <martin@localhost.localdomain>
+
+	* Wrapper.pm (if_ipaddr): force locale when running ifconfig command
+

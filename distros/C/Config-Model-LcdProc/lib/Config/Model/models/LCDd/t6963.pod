@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::t6963
 # ABSTRACT:  Configuration class LCDd::t6963
+
 =encoding utf8
 
 =head1 NAME
@@ -16,24 +17,74 @@ generated from LCDd.conf
 
 =head2 ClearGraphic
 
-Clear graphic memory on start-up. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Clear graphic memory on start-up. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Port
 
-port to use legal: 0x200-0x400 I<< Optional. Type uniline. upstream_default: '0x378'.  >> 
+port to use legal: 0x200-0x400 I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x378
+
+=back
+
+
 
 =head2 Size
 
-set display size in pixels I<< Optional. Type uniline. upstream_default: '128x64'.  >> 
+set display size in pixels I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+128x64
+
+=back
+
+
 
 =head2 bidirectional
 
 Use LPT port in bi-directional mode. This should work on most LPT port and
-is required for proper timing! I<< Optional. Type boolean. upstream_default: 'yes'.  >> 
+is required for proper timing! I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 delayBus
 
-Insert additional delays into reads / writes. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Insert additional delays into reads / writes. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head1 SEE ALSO
 

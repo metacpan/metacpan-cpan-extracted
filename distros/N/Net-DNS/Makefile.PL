@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1573 2017-06-12 11:03:59Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1591 2017-08-18 09:58:18Z willem $	-*-perl-*-
 #
 
 
@@ -61,7 +61,7 @@ my %optional = (
 	'Digest::BubbleBabble' => 0.01,
 	'Digest::GOST'	       => 0.06,
 	'IO::Socket::INET6'    => 2.51,
-	'IO::Socket::IP'       => 0.32,
+	'IO::Socket::IP'       => 0.38,
 	'Net::LibIDN'	       => 0.12,
 	'Scalar::Util'	       => 1.25,
 	);
@@ -83,6 +83,16 @@ use constant USE_SOCKET_IP => defined eval 'use Socket 1.98; use IO::Socket::IP 
 use constant USE_SOCKET_INET6 => defined eval 'require IO::Socket::INET6';
 
 delete $optional{'IO::Socket::INET6'} if USE_SOCKET_IP;		# exclude redundant dependency
+
+print <<EOT if !USE_SOCKET_IP && USE_SOCKET_INET6;
+#
+#	This Net::DNS installation uses the IO::Socket::INET6 package
+#	which has been superseded by IO::Socket::IP.
+#
+#	IPv6 support using IO::Socket::INET6 will be discontinued in
+#	a future release.
+#
+EOT
 
 
 # clean up existing makefile
@@ -223,14 +233,14 @@ sub install {
 	my %install_type = qw(perl INSTALLPRIVLIB site INSTALLSITELIB vendor INSTALLVENDORLIB);
 	my $install_site = join '', '$(DESTDIR)$(', $install_type{$self->{INSTALLDIRS}}, ')';
 	for ($install_site) {
-		s/\$\(([A-Z_]+)\)/$self->{$1}/g while /\$\(/;	# expand Makefile macros
+		s/\$\(([A-Z_]+)\)/$self->{$1}/eg while /\$\(/;	# expand Makefile macros
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	eval { require Net::DNS };
+	eval 'require Net::DNS';
 
 	my $nameregex = '\W+Net\WDNS.pm$';
-	my @installed = grep $_ =~ m/$nameregex/i, values %INC;
+	my @installed = grep m/$nameregex/io, values %INC;
 	my %noinstall;
 
 	foreach (@installed) {

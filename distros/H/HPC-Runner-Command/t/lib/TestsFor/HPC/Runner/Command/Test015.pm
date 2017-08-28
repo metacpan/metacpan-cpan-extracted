@@ -61,7 +61,7 @@ sub construct {
 
     my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
     MooseX::App::ParsedArgv->new(
-        argv => [ "submit_jobs", "--infile", $file, '--hpc_plugins', 'PBS', '--verbose'] );
+        argv => [ "submit_jobs", "--infile", $file, '--hpc_plugins', 'PBS' ] );
 
     my $test = HPC::Runner::Command->new_with_command();
     $test->log( $test->init_log );

@@ -21,3 +21,5 @@ t/03demon.t
 t/04constraint.t
 t/number-place.t
 t/send-more-money.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

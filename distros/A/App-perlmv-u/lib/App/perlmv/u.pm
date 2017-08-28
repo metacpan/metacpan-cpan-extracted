@@ -1,7 +1,7 @@
 package App::perlmv::u;
 
-our $DATE = '2017-08-17'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-08-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -207,9 +207,8 @@ sub perlmv {
         {
             my $orig = $file;
             local $_ = $file;
-            my $ret = $compiled_code->();
-            $new = $_ eq $orig && defined $ret ? $ret : $_;
-            $new = $orig unless defined $new;
+            $compiled_code->();
+            $new = $_;
         }
         my $absnew0 = Cwd::abs_path($new);
         if (!defined($absnew0)) {
@@ -385,7 +384,7 @@ App::perlmv::u - Rename files using Perl code, with undo/redo
 
 =head1 VERSION
 
-This document describes version 0.004 of App::perlmv::u (from Perl distribution App-perlmv-u), released on 2017-08-17.
+This document describes version 0.005 of App::perlmv::u (from Perl distribution App-perlmv-u), released on 2017-08-19.
 
 =head1 DESCRIPTION
 

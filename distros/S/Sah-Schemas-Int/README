@@ -1,0 +1,131 @@
+NAME
+    Sah::Schemas::Int - Sah schemas for various integers
+
+VERSION
+    This document describes version 0.070 of Sah::Schemas::Int (from Perl
+    distribution Sah-Schemas-Int), released on 2017-08-19.
+
+SAH SCHEMAS
+    *   byte
+
+        Same as uint8.
+
+    *   even
+
+        Even number.
+
+    *   int128
+
+        32-bit signed integer.
+
+    *   int16
+
+        16-bit signed integer.
+
+    *   int32
+
+        32-bit signed integer.
+
+    *   int64
+
+        64-bit signed integer.
+
+    *   int8
+
+        8-bit signed integer.
+
+    *   natnum
+
+        Same as posint.
+
+        Natural numbers are those used for counting and ordering. Some
+        definitions, like ISO 80000-2 begin the natural numbers with 0. But
+        in this definition, natural numbers start with 1. For integers that
+        start at 0, see "nonnegint".
+
+    *   negeven
+
+        Negative even number.
+
+    *   negint
+
+        Negative integer (-1, -2, ...).
+
+    *   negodd
+
+        Negative odd number.
+
+    *   nonnegint
+
+        Non-negative integer (0, 1, 2, ...).
+
+        See also "posint" for integers that start from 1.
+
+    *   odd
+
+        Odd number.
+
+    *   poseven
+
+        Positive even number.
+
+    *   posint
+
+        Positive integer (1, 2, ...).
+
+        Zero is not included in this schema because zero is neither positive
+        nor negative. See also "nonnegint" for integers that start from 0.
+
+    *   posodd
+
+        Positive odd number.
+
+    *   uint128
+
+        128-bit unsigned integer.
+
+    *   uint16
+
+        16-bit unsigned integer.
+
+    *   uint32
+
+        32-bit unsigned integer.
+
+    *   uint64
+
+        64-bit unsigned integer.
+
+    *   uint8
+
+        8-bit unsigned integer.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-Int>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Sah-Schema-Int>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Int>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah - specification
+
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

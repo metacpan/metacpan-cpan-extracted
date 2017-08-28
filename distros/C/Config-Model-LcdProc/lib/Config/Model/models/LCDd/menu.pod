@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::menu
 # ABSTRACT:  Configuration class LCDd::menu
+
 =encoding utf8
 
 =head1 NAME
@@ -16,15 +17,45 @@ generated from LCDd.conf
 
 =head2 DownKey
 
-I<< Optional. Type uniline. default: 'Down'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Down
+
+=back
+
+
 
 =head2 EnterKey
 
-I<< Optional. Type uniline. default: 'Enter'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Enter
+
+=back
+
+
 
 =head2 LeftKey
 
-I<< Optional. Type uniline. upstream_default: 'Left'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Left
+
+=back
+
+
 
 =head2 MenuKey
 
@@ -32,15 +63,59 @@ You can configure what keys the menu should use. Note that the MenuKey
 will be reserved exclusively, the others work in shared mode.
 Up to six keys are supported. The MenuKey (to enter and exit the menu), the
 EnterKey (to select values) and at least one movement keys are required.
-These are the default key assignments: I<< Optional. Type uniline. default: 'Escape'.  >> 
+These are the default key assignments: I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Escape
+
+=back
+
+
+
+=head2 PermissiveGoto
+
+If true the server allows transitions between different client's menus. I< Optional. Type enum. choice: 'true', 'false'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+false
+
+=back
+
+
 
 =head2 RightKey
 
-I<< Optional. Type uniline. upstream_default: 'Right'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Right
+
+=back
+
+
 
 =head2 UpKey
 
-I<< Optional. Type uniline. default: 'Up'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Up
+
+=back
+
+
 
 =head1 SEE ALSO
 

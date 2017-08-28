@@ -74,6 +74,11 @@ like ($octal_1, $C::Tokenize::octal_re, "octal matches");
 my $out = decomment ('/* comment */');
 is ($out, " comment ");
 
+like ('==', $operator_re, "Double equals is operator");
+my $double_eq = '==';
+ok ($double_eq =~ /($operator_re)/, "== matches bracketed op");
+ok ($1 eq $double_eq);
+
 done_testing ();
 
 # Local variables:

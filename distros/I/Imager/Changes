@@ -1,5 +1,25 @@
 Imager release history.  Older releases can be found in Changes.old
 
+ - the internal i_errors() function now correctly allocates the stack
+   space needed for its result.
+   https://rt.perl.org/rt3/Ticket/Display.html?id=131938
+
+ - t/100-base/020-color.t now uses Imager::Test's test functions
+   instead of its own.
+   https://rt.cpan.org/Ticket/Display.html?id=111993
+
+ - write_multi() now returns an error result (a false value) if called
+   with a non-(Imager image object).  Previously it would typically
+   crash.
+   https://rt.cpan.org/Ticket/Display.html?id=117878
+
+ - improve the documentation of the jpegquality parameter when
+   writing JPEG files.
+
+ - add code to mitigate CVE-2016-1238, Imager will no longer search the
+   default current directory entry in @INC when searching for file
+   format support modules.
+
 Imager 1.005 - 16 Apr 2016
 ============
 

@@ -1,22 +1,42 @@
+use strict;
 use ExtUtils::MakeMaker;
+
+# Normalize version strings like 6.30_02 to 6.3002,
+# so that we can do numerical comparisons on it.
+my $eumm_version = $ExtUtils::MakeMaker::VERSION;
+$eumm_version =~ s/_//;
+
+my $module = 'MozRepl::RemoteObject';
+(my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
+(my $distbase = $module) =~ s!::!-!g;
+
+my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
+
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-WriteMakefile1(
+my %module = (
     MIN_PERL_VERSION => '5.006',
     META_MERGE => {
+        "meta-spec" => { version => 2 },
         resources => {
-            repository => 'http://github.com/Corion/mozrepl-remoteobject',
+            repository => {
+                web => 'https://github.com/Corion/mozrepl-remoteobject',
+                url => 'git://github.com/Corion/mozrepl-remoteobject.git',
+                type => 'git',
+            }
         },
+        dynamic_config   => 0, # we promise to keep META.* up-to-date
+        x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
     BUILD_REQUIRES => {
                         'Task::Weaken' => 0, #to be sure that weaken is present
     },
-    'NAME'         => 'MozRepl::RemoteObject',
+    'NAME'         => $module,
     'LICENSE'      => 'perl',
-    'VERSION_FROM' => 'lib/MozRepl/RemoteObject.pm', # finds $VERSION
+    'VERSION_FROM' => $main_file, # finds $VERSION
     'PREREQ_PM'    => { 'MozRepl' => 0.06,
                         'Scalar::Util' => 0,
-                        'JSON' => 2,
                         'Encode' => 0,
                         'JSON' => 2,
                         'File::Basename' => 0,
@@ -24,9 +44,24 @@ WriteMakefile1(
                         'IPC::Run' => 0, # to optionally launch Firefox
                         'Exporter' => 0, # just to be more complete
                       }, # e.g., Module::Name => 1.1
-    'ABSTRACT_FROM' => 'lib/MozRepl/RemoteObject.pm', # retrieve abstract from module
+    'ABSTRACT_FROM' => $main_file, # retrieve abstract from module
     'AUTHOR'        => 'Max Maischein <corion@cpan.org>',
 );
+
+# This is so that we can do
+#     require 'Makefile.PL'
+# and then call get_module_info
+
+sub get_module_info { %module }
+
+if( ! caller ) {
+    # I should maybe use something like Shipwright...
+    regen_README($main_file);
+    #regen_EXAMPLES();
+    WriteMakefile1(get_module_info);
+};
+
+1;
 
 sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
     my %params=@_;
@@ -50,4 +85,115 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     
     WriteMakefile(%params);
 }
-1;
+
+sub regen_README {
+    # README is the short version that just tells people what this is
+    # and how to install it
+    eval {
+        # Get description
+        my $readme = join "\n",
+            pod_section($_[0], 'NAME', 'no heading' ),
+            pod_section($_[0], 'DESCRIPTION' ),
+            <<INSTALL,
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+INSTALL
+            pod_section($_[0], 'REPOSITORY'),
+            pod_section($_[0], 'SUPPORT'),
+            pod_section($_[0], 'BUG TRACKER'),
+            pod_section($_[0], 'AUTHOR'),
+            pod_section($_[0], 'LICENSE' ),
+            pod_section($_[0], 'COPYRIGHT' ),
+    ;
+        update_file( 'README', $readme );
+    };
+    # README.mkdn is the documentation that will be shown as the main
+    # page of the repository on Github. Hence we recreate the POD here
+    # as Markdown
+    eval {
+        require Pod::Markdown;
+
+        my $parser = Pod::Markdown->new();
+
+        # Read POD from Module.pm and write to README
+        $parser->parse_from_file($_[0]);
+        my $readme_mkdn = <<STATUS . $parser->as_markdown;
+
+[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Chrome.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Chrome)
+
+STATUS
+        update_file( 'README.mkdn', $readme_mkdn );
+    };
+}
+
+sub pod_section {
+    my( $filename, $section, $remove_heading ) = @_;
+    open my $fh, '<', $filename
+        or die "Couldn't read '$filename': $!";
+
+    my @section =
+        grep { /^=head1\s+$section/.../^=/ } <$fh>;
+    pop @section if $section[-1] =~ /^=/;
+    shift @section if $remove_heading;
+
+    # Trim the section
+    if( @section ) {
+        pop @section
+            while $section[-1] =~ /^\s*$/;
+        shift @section
+            while $section[0] =~ /^\s*$/;
+    };
+
+    @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
+    return join "", @section;
+}
+
+sub regen_EXAMPLES {
+    my $perl = $^X;
+    if ($perl =~/\s/) {
+        $perl = qq{"$perl"};
+    };
+    my $examples = `$perl -w examples/gen_examples_pod.pl`;
+    if ($examples) {
+        warn "(Re)Creating lib/WWW/Mechanize/Chrome/Examples.pm\n";
+        $examples =~ s/\r\n/\n/g;
+        update_file( 'lib/WWW/Mechanize/Chrome/Examples.pm', $examples );
+    };
+};
+
+sub update_file {
+    my( $filename, $new_content ) = @_;
+    my $content;
+    if( -f $filename ) {
+        open my $fh, '<', $filename
+            or die "Couldn't read '$filename': $!";
+        binmode $fh;
+        local $/;
+        $content = <$fh>;
+    };
+
+    if( $content ne $new_content ) {
+        if( open my $fh, '>', $filename ) {
+            binmode $fh;
+            print $fh $new_content;
+        } else {
+            warn "Couldn't (re)write '$filename': $!";
+        };
+    };
+}

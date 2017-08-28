@@ -1,6 +1,22 @@
 Revision history for WWW-ORCID
 
-0.0201  2017-08-08 10:29:24 CEST
+0.0401  2017-08-18 17:12:12 CEST
+  - cleanup sandbox example files
+  - fix module versions
+
+0.04  2017-08-18 15:58:45 CEST
+  - document client status
+
+0.03_03  2017-08-11 16:08:43 CEST
+  - record_url helper method
+  - improve generated pod
+
+0.03_02  2017-08-10 09:31:11 CEST
+  - add missing dependency on Log::Any
+
+0.03_01  2017-08-08 11:22:21 CEST
+  - support for the 2.0 API
+  - library API reorganization and cleanup
   - add missing dependency on HTTP::Tiny
 
 0.02  2015-09-01 14:22:11 CEST

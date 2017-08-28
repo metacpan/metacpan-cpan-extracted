@@ -13,7 +13,7 @@ use B::CompilerPhase::Hook ();
 use Devel::CallParser;
 use XSLoader;
 BEGIN {
-    $VERSION   = '0.05';
+    $VERSION   = '0.06';
     $AUTHORITY = 'cpan:STEVAN';
     XSLoader::load( __PACKAGE__, $VERSION );
 }

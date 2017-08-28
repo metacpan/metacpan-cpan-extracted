@@ -7,6 +7,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/AnyEvent/SlackBot.pm', # finds $VERSION
     PREREQ_PM         => {
     qw(
+      IO::Socket::SSL 1.968
       Moo  2.003002
       overload 1.28
       Modern::Perl 1.20170117

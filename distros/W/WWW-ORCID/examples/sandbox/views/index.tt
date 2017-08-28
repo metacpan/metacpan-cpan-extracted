@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ORCID API test</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="jsoneditor.min.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="/">ORCID API playground</a>
+            </div>
+          </div>
+      </nav>
+
+      <% IF success %>
+        <p class="bg-success">
+          <% success %>
+        </p>
+      <% END %>
+
+      <div class="row">
+        <div class="col-md-6">
+            <form action="/" method="post" id="orcid">
+              <div class="form-group">
+                <label for="orcid">ORCID</label>
+                <select name="orcid" id="orcid">
+                    <option value=""></option>
+                    <% FOR orcid IN tokens.keys %>
+                    <option value="<% orcid %>"<% IF orcid == params.orcid %> selected<% END %>><% orcid %></option>
+                    <% END %>
+                </select>
+              </div>
+              <div class="form-group">
+                <select name="op" id="op">
+                    <% FOR op IN ops.keys.sort %>
+                    <option value="<% op %>"
+                        <% IF params.op == op %>
+                            selected
+                        <% END %>
+                        <% FOR kv IN ops.item(op).pairs %>
+                            data-<% kv.key %>="<% kv.value %>"
+                        <% END %>
+                    >
+                        <% op | html %></option>
+                    <% END %>
+                </select>
+                <select name="action" id="action">
+                    <% FOR action IN ['get', 'add', 'update', 'delete'] %>
+                    <option value="<% action %>"><% action %></option>
+                    <% END %>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="put_code">Put code</label>
+                <input type="text" name="put_code" class="form-control" id="put_code" value="<% params.put_code %>">
+              </div>
+              <div class="form-group">
+                <label for="body">Request body</label>
+                <input type="hidden" name="body" id="body" value="<% body | html %>">
+                <div id="body_editor" style="height:400px">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <% IF error %>
+              <div class="bg-danger">
+                <% error | html %>
+              </div>
+            <% END %>
+            <% IF response_body %>
+              <input type="hidden" name="response_body" id="response_body" value="<% response_body | html %>">
+              <div id="response_body_editor" style="height:800px">
+              </div>
+            <% END %>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="jsoneditor.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var request_editor = new JSONEditor(document.getElementById('body_editor'), {mode: 'code'});
+            request_editor.setText($('#body').val());
+            $("#orcid").submit(function(e) {
+              $('#body').val(request_editor.getText());
+            });
+            <% IF response_body %>
+            var response_editor = new JSONEditor(document.getElementById('response_body_editor'), {mode: 'code'});
+            response_editor.setText($('#response_body').val());
+            <% END %>
+
+            (function() {
+                var ops = $('#op'),
+                    actions = $('#action'),
+                    orcid = $('#orcid');
+                    putCode = $('#put_code'),
+                    body = $('#body');
+
+                var needsPutCode = function() {
+                    var op = ops.find('option:selected');
+                    return actions.val() != 'add' && (
+                        op.data('get_pc') == '1' || op.data('get_pc_bulk') == '1' ||
+                        op.data('update') == '1' || op.data('delete') == '1');
+                };
+
+                var needsBody = function() {
+                    return actions.val() == 'add' || actions.val() == 'update';
+                };
+
+                var isGet = function(op) {
+                    return op.data('get') == '1' || op.data('get_pc') == '1' || op.data('get_pc_bulk') == '1';
+                };
+
+                var opChanged = function() {
+                    var op = ops.find('option:selected');
+                    orcid.closest('.form-group').toggle(op.data('orcid') == '1');
+                    actions.find('option[value="get"]').toggle(isGet(op));
+                    actions.find('option[value="add"]').toggle(op.data('add') == '1');
+                    actions.find('option[value="update"]').toggle(op.data('update') == '1');
+                    actions.find('option[value="delete"]').toggle(op.data('delete') == '1');
+                    actions.find('option').each(function () {
+                        if ($(this).css('display') != 'none') {
+                            $(this).prop('selected', true);
+                            return false;
+                        }
+                    });
+                    actionChanged();
+                };
+
+                var actionChanged = function() {
+                    putCode.closest('.form-group').toggle(needsPutCode());
+                    body.closest('.form-group').toggle(needsBody());
+                };
+
+                ops.change(opChanged);
+                actions.change(actionChanged);
+                opChanged();
+            })();
+        });
+    </script>
+  </body>
+</html>

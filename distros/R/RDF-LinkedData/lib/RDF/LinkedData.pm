@@ -32,18 +32,18 @@ RDF::LinkedData - A Linked Data server implementation
 
 =head1 VERSION
 
-Version 0.78
+Version 1.00
 
 =cut
 
- our $VERSION = '0.78';
+ our $VERSION = '1.00';
 
 
 =head1 SYNOPSIS
 
 For just setting this up and get it to run, you would just use the
 C<linked_data.psgi> script in this distribution. The usage of that is
-documented in L<Plack::App::RDF::LinkedData>, with the README is a
+documented in L<Plack::App::RDF::LinkedData>, with the README being a
 quick start guide. If you want to try and use this directly, you'd do
 stuff like:
 
@@ -62,14 +62,14 @@ See L<Plack::App::RDF::LinkedData> for a complete example.
 This module is used to create a Linked Data server that can
 serve RDF data out of an L<RDF::Trine::Model>. It will look up URIs in
 the model and do the right thing (known as the 303 dance) and mint
-URLs for that, as well as content negotiation. Thus, you can
-concentrate on URIs for your things, you need not be concerned about
+URLs for that, as well as perform content negotiation. Thus, you can
+concentrate on URIs for your things, and you need not be concerned about
 minting URLs for the pages to serve it. In addition, optional modules
-can provide other important functionalities: Cross-origin resource
+can provide other important functionality: Cross-origin resource
 sharing, VoID description, cache headers, SPARQL Endpoint, Triple
 Pattern Fragments, etc. As such, it encompasses a fair share of
-Semantic Web best practices, but possibly not in a very flexible Big
-Data manner.
+Semantic Web best practices, but possibly not in a very flexible "Big
+Data" manner.
 
 
 =head1 METHODS
@@ -81,11 +81,11 @@ Data manner.
                 request => $request, endpoint_config => $endpoint_config, 
                 void_config => $void_config ) >>
 
-Creates a new handler object based on named parameters, given a store
+Creates a new handler object based on the named parameters, given a store
 config (recommended usage is to pass a hashref of the type that can be
 passed to L<RDF::Trine::Store>->new_with_config, but a simple string
-can also be used) or model and a base URI. Optionally, you may pass a
-L<Plack::Request> object (must be passed before you call C<content>)
+can also be used) or a model and a base URI. Optionally, you may pass a
+L<Plack::Request> object (which must be passed before you call C<content>)
 and an C<endpoint_config> hashref if you want to have a SPARQL
 Endpoint running using the recommended module L<RDF::Endpoint>.
 
@@ -109,14 +109,14 @@ sub BUILD {
 
 	# A model will be passed or built by the _build_model, so we can check directly if we have one
 	unless ($self->model->isa('RDF::Trine::Model')) {
-		throw Error -text => "No valid RDF::Trine::Model, need either a store config hashref or a model.";
+		croak "No valid RDF::Trine::Model, need either a store config hashref or a model.";
 	}
 
  	if ($self->has_endpoint_config) {
 		$self->log->debug('Endpoint config found with parameters: ' . Dumper($self->endpoint_config) );
 
 		unless (can_load( modules => { 'RDF::Endpoint' => 0.03 })) {
-			throw Error -text => "RDF::Endpoint not installed. Please install or remove its configuration.";
+			croak "RDF::Endpoint not installed. Please install or remove its configuration.";
 		}
 
 		unless (defined($self->endpoint_config->{endpoint_path})) {
@@ -132,7 +132,7 @@ sub BUILD {
 		$self->log->debug('VoID config found with parameters: ' . Dumper($self->void_config) );
 
 		unless (can_load( modules => { 'RDF::Generator::Void' => 0.04 })) {
-			throw Error -text => "RDF::Generator::Void not installed. Please install or remove its configuration.";
+			croak "RDF::Generator::Void not installed. Please install or remove its configuration.";
 		}
 		my $dataset_uri = (defined($self->void_config->{dataset_uri}))
 								  ? $self->void_config->{dataset_uri} 
@@ -221,7 +221,7 @@ has fragments_config => (is => 'rw', isa=>Maybe[HashRef], predicate => 'has_frag
 
 =item C<< request ( [ $request ] ) >>
 
-Returns the L<Plack::Request> object if it exists or sets it if a L<Plack::Request> object is given as parameter.
+Returns the L<Plack::Request> object, if it exists; or sets it if a L<Plack::Request> object is given as parameter.
 
 =cut
 
@@ -426,7 +426,7 @@ sub response {
 			if ($headers_in->can('header') && $headers_in->header('Accept')) {
 				$self->log->debug('Found Accept header: ' . $headers_in->header('Accept') );
 			} else {
-				$headers_in->header('Accept' => 'application/rdf+xml');
+				$headers_in->header('Accept' => 'text/turtle');
 				if ($headers_in->header('Accept')) {
 					$self->log->warn('Setting Accept header: ' . $headers_in->header('Accept') );
 				} else {
@@ -480,8 +480,8 @@ sub _client_error {
 
 =item C<< helper_properties (  ) >>
 
-Returns the L<RDF::Helper::Properties> object if it exists or sets
-it if a L<RDF::Helper::Properties> object is given as parameter.
+Returns the L<RDF::Helper::Properties> object. if it exists; or sets
+it if an L<RDF::Helper::Properties> object is given as a parameter.
 
 =cut
 
@@ -621,8 +621,8 @@ has endpoint => (is => 'rw', isa => InstanceOf['RDF::Endpoint'], predicate => 'h
 
 =item C<< void ( [ $voidg ] ) >>
 
-Returns the L<RDF::Generator::Void> object if it exists or sets it if
-a L<RDF::Generator::Void> object is given as parameter. Like
+Returns the L<RDF::Generator::Void> object, if it exists; or sets it if
+an L<RDF::Generator::Void> object is given as parameter. Like
 C<endpoint>, it will be created for you if you pass a C<void_config>
 hashref to the constructor, so you would most likely not use this
 method.
@@ -636,7 +636,7 @@ has void => (is => 'rw', isa => InstanceOf['RDF::Generator::Void'], predicate =>
 sub _negotiate {
 	my ($self, $headers_in) = @_;
 	my ($ct, $s);
-	eval {
+	try {
 		($ct, $s) = RDF::Trine::Serializer->negotiate('request_headers' => $headers_in,
 																	 base_uri => $self->base_uri,
 																	 namespaces => $self->_namespace_hashref,
@@ -646,8 +646,7 @@ sub _negotiate {
 																				  }
 																	);
 		$self->log->debug("Got $ct content type" );
-		1;
-	} or do {
+	} catch {
 		my $response = Plack::Response->new;
 		$response->status(406);
 		$response->headers->content_type('text/plain');
@@ -855,23 +854,16 @@ L<http://lists.perlrdf.org/listinfo/dev>
 
 =head1 TODO
 
-=over
+This module does what it is supposed to do rather well, and has thus
+reached the 1.0 milestone. To support a wider variety of use cases,
+the current module isn't flexible enough, so future version will need
+substantial changes, but the version number is intended to reflect
+that.
 
-=item * Use L<IO::Handle> streams when they become available from the serializers.
-
-=item * Figure out what needs to be done to use this code in other frameworks, such as Magpie.
-
-=item * Make it read-write hypermedia.
-
-=item * Make the result graph configurable.
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGMENTS
 
 This module was started by Gregory Todd Williams C<<
-<gwilliams@cpan.org> >> for L<RDF::LinkedData::Apache>, but has been
+<gwilliams@cpan.org> >> for RDF::LinkedData::Apache, but has been
 almost totally rewritten.
 
 =head1 COPYRIGHT & LICENSE

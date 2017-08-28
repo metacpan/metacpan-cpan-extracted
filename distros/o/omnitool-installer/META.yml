@@ -26,8 +26,9 @@ no_index:
 provides:
   omnitool::installer:
     file: lib/omnitool/installer.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
+  AWS::S3: '0.13'
   Archive::Zip: '1.58'
   Benchmark: '1.20'
   DBD::mysql: '4.043'
@@ -54,7 +55,6 @@ requires:
   MIME::Parser: '5.507'
   MIME::Types: '2.13'
   Net::Domain: '3.05'
-  Net::OpenStack::Swift: '0.11'
   Number::Range: '0.12'
   Plack: '1.0044'
   Plack::Middleware::DBIx::DisconnectAll: '0.02'
@@ -77,8 +77,9 @@ resources:
   bugtracker: https://github.com/ericschernoff/omnitool-installer/issues
   homepage: https://github.com/ericschernoff/omnitool-installer
   repository: git://github.com/ericschernoff/omnitool-installer.git
-version: 1.0.1
+version: 1.0.2
 x_contributors:
   - 'Eric Chernoff <echernof@cisco.com>'
+  - 'Eric Chernoff <ericschernoff@gmail.com>'
   - 'root <root@www.omnitool.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

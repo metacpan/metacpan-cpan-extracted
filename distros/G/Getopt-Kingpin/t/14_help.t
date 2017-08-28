@@ -257,6 +257,30 @@ Flags:
     is $trap->stdout, $expected;
 };
 
+subtest 'default2' => sub {
+    local @ARGV;
+    push @ARGV, qw(--help);
+
+    my $kingpin = Getopt::Kingpin->new;
+    my $name = $kingpin->flag('name', 'Set name.')->default("")->string();
+    my $id1 = $kingpin->flag('id1', 'Set id1.')->default(1)->int();
+    my $id2 = $kingpin->flag('id2', 'Set id2.')->default(0)->int();
+
+    my $expected = sprintf <<'...', basename($0);
+usage: %s [<flags>]
+
+Flags:
+  --help     Show context-sensitive help.
+  --name=""  Set name.
+  --id1="1"  Set id1.
+  --id2="0"  Set id2.
+
+...
+
+    trap {$kingpin->parse};
+    is $trap->stdout, $expected;
+};
+
 subtest 'place holder' => sub {
     local @ARGV;
     push @ARGV, qw(--help);
@@ -270,6 +294,30 @@ usage: %s [<flags>]
 Flags:
   --help                    Show context-sensitive help.
   --name=place_holder_name  Set name.
+
+...
+
+    trap {$kingpin->parse};
+    is $trap->stdout, $expected;
+};
+
+subtest 'place holder' => sub {
+    local @ARGV;
+    push @ARGV, qw(--help);
+
+    my $kingpin = Getopt::Kingpin->new;
+    my $name = $kingpin->flag('name', 'Set name.')->placeholder("place_holder_name")->string();
+    my $id1 = $kingpin->flag('id1', 'Set id1.')->placeholder("1")->int();
+    my $id2 = $kingpin->flag('id2', 'Set id2.')->placeholder("0")->int();
+
+    my $expected = sprintf <<'...', basename($0);
+usage: %s [<flags>]
+
+Flags:
+  --help                    Show context-sensitive help.
+  --name=place_holder_name  Set name.
+  --id1=1                   Set id1.
+  --id2=0                   Set id2.
 
 ...
 

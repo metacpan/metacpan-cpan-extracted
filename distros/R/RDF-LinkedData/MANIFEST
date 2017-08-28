@@ -4,7 +4,6 @@ Changes
 INSTALL
 LICENSE
 MANIFEST
-MANIFEST
 META.json
 META.yml
 Makefile.PL
@@ -15,7 +14,6 @@ doap.ttl
 lib/Plack/App/RDF/LinkedData.pm
 lib/RDF/LinkedData.pm
 rdf_linkeddata.json
-rdf_linkeddata_acl.json
 rdf_linkeddata_dev.json
 rdf_linkeddata_end.json
 rdf_linkeddata_void.json

@@ -1,13 +1,17 @@
+1.003 - Aug 18, 2017
+J. Maslak <jmaslak@antelope.net>
+ * Change to copyright notice
+
 1.002 - Sept 5, 2016
-Joel C. Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
  * Corrections to documentation
 
 1.001 - Sept 5, 2016
-Joel C. Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
  * Only run full BGP tests as an author test - these tests were failing
    on limited platforms within CPAN Testers because of CPU demands.
  * There are no functional changes in this version
 
 1.000 - Sept 4, 2016
-Joel C. Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
  * Initial version

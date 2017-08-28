@@ -5305,6 +5305,10 @@ _constant(name)
         else if(!strcmp(name, "ARCHIVE_EXTRACT_ACL"))
           RETVAL = ARCHIVE_EXTRACT_ACL;
 #endif
+#ifdef ARCHIVE_EXTRACT_CLEAR_NOCHANGE_FFLAGS
+        else if(!strcmp(name, "ARCHIVE_EXTRACT_CLEAR_NOCHANGE_FFLAGS"))
+          RETVAL = ARCHIVE_EXTRACT_CLEAR_NOCHANGE_FFLAGS;
+#endif
 #ifdef ARCHIVE_EXTRACT_FFLAGS
         else if(!strcmp(name, "ARCHIVE_EXTRACT_FFLAGS"))
           RETVAL = ARCHIVE_EXTRACT_FFLAGS;
@@ -5396,6 +5400,10 @@ _constant(name)
 #ifdef ARCHIVE_FILTER_LRZIP
         else if(!strcmp(name, "ARCHIVE_FILTER_LRZIP"))
           RETVAL = ARCHIVE_FILTER_LRZIP;
+#endif
+#ifdef ARCHIVE_FILTER_LZ4
+        else if(!strcmp(name, "ARCHIVE_FILTER_LZ4"))
+          RETVAL = ARCHIVE_FILTER_LZ4;
 #endif
 #ifdef ARCHIVE_FILTER_LZIP
         else if(!strcmp(name, "ARCHIVE_FILTER_LZIP"))
@@ -5541,6 +5549,10 @@ _constant(name)
         else if(!strcmp(name, "ARCHIVE_FORMAT_TAR_USTAR"))
           RETVAL = ARCHIVE_FORMAT_TAR_USTAR;
 #endif
+#ifdef ARCHIVE_FORMAT_WARC
+        else if(!strcmp(name, "ARCHIVE_FORMAT_WARC"))
+          RETVAL = ARCHIVE_FORMAT_WARC;
+#endif
 #ifdef ARCHIVE_FORMAT_XAR
         else if(!strcmp(name, "ARCHIVE_FORMAT_XAR"))
           RETVAL = ARCHIVE_FORMAT_XAR;
@@ -5585,9 +5597,33 @@ _constant(name)
         else if(!strcmp(name, "ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS"))
           RETVAL = ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS;
 #endif
+#ifdef ARCHIVE_READDISK_NO_XATTR
+        else if(!strcmp(name, "ARCHIVE_READDISK_NO_XATTR"))
+          RETVAL = ARCHIVE_READDISK_NO_XATTR;
+#endif
 #ifdef ARCHIVE_READDISK_RESTORE_ATIME
         else if(!strcmp(name, "ARCHIVE_READDISK_RESTORE_ATIME"))
           RETVAL = ARCHIVE_READDISK_RESTORE_ATIME;
+#endif
+#ifdef ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_DATA
+        else if(!strcmp(name, "ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_DATA"))
+          RETVAL = ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_DATA;
+#endif
+#ifdef ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_METADATA
+        else if(!strcmp(name, "ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_METADATA"))
+          RETVAL = ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_METADATA;
+#endif
+#ifdef ARCHIVE_READ_FORMAT_CAPS_NONE
+        else if(!strcmp(name, "ARCHIVE_READ_FORMAT_CAPS_NONE"))
+          RETVAL = ARCHIVE_READ_FORMAT_CAPS_NONE;
+#endif
+#ifdef ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW
+        else if(!strcmp(name, "ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW"))
+          RETVAL = ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW;
+#endif
+#ifdef ARCHIVE_READ_FORMAT_ENCRYPTION_UNSUPPORTED
+        else if(!strcmp(name, "ARCHIVE_READ_FORMAT_ENCRYPTION_UNSUPPORTED"))
+          RETVAL = ARCHIVE_READ_FORMAT_ENCRYPTION_UNSUPPORTED;
 #endif
 #ifdef ARCHIVE_RETRY
         else if(!strcmp(name, "ARCHIVE_RETRY"))
@@ -5596,6 +5632,10 @@ _constant(name)
 #ifdef ARCHIVE_VERSION_NUMBER
         else if(!strcmp(name, "ARCHIVE_VERSION_NUMBER"))
           RETVAL = ARCHIVE_VERSION_NUMBER;
+#endif
+#ifdef ARCHIVE_VERSION_ONLY_STRING
+        else if(!strcmp(name, "ARCHIVE_VERSION_ONLY_STRING"))
+          RETVAL = ARCHIVE_VERSION_ONLY_STRING;
 #endif
 #ifdef ARCHIVE_VERSION_STAMP
         else if(!strcmp(name, "ARCHIVE_VERSION_STAMP"))

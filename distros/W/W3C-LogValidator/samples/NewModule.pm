@@ -1,12 +1,12 @@
 # Copyright (c) YYYY the World Wide Web Consortium :
 #       Keio University,
-#       European Research Consortium for Informatics and Mathematics 
+#       European Research Consortium for Informatics and Mathematics
 #       Massachusetts Institute of Technology.
 # written by Firstname Lastname <your@email.address> for W3C
 #
 # $Id: NewModule.pm,v 1.11 2004/09/10 00:41:24 ot Exp $
 
-package W3C::LogValidator::Changeme;
+package W3C::LogValidator::CHANGEME;
 use strict;
 use warnings;
 
@@ -76,9 +76,9 @@ sub process_list
 	# Opening the file with the hits and URIs data
 	if (defined ($config{tmpfile}))
 	{
-		use DB_File; 
+		use DB_File;
 		my $tmp_file = $config{tmpfile};
-		tie (%hits, 'DB_File', "$tmp_file", O_RDONLY) || 
+		tie (%hits, 'DB_File', "$tmp_file", O_RDONLY) ||
 		    die ("Cannot create or open $tmp_file");
 		@uris = sort { $hits{$b} <=> $hits{$a} } keys %hits;
 	}
@@ -95,14 +95,14 @@ sub process_list
 
 	if (defined ($config{tmpfile}))
         {
-		untie %hits;                                                                  
+		untie %hits;
 	}
-	# Here is what the module will return. The hash will be sent to 
+	# Here is what the module will return. The hash will be sent to
 	# the output module
 
 	my %returnhash;
 	# the name of the module
-	$returnhash{"name"}="CHANGEME";                                                  
+	$returnhash{"name"}="CHANGEME";
 	#intro
 	$returnhash{"intro"}="An intro string for the module's results";
 	#Headers for the result table
@@ -145,11 +145,11 @@ This module is a template for the creation of a new processing module for the W3
 
 =item $proc = W3C::LogValidator::NewModule->new
 
-Constructs a new C<W3C::LogValidator:NewModule> processor.  
+Constructs a new C<W3C::LogValidator:NewModule> processor.
 
 You might pass it a configuration hash reference (see L<W3C::LogValidator/config_module> and L<W3C::LogValidator::Config>)
 
-  $proc = W3C::LogValidator::NewModule->new(\%config);  
+  $proc = W3C::LogValidator::NewModule->new(\%config);
 
 =back
 
@@ -161,10 +161,10 @@ You might pass it a configuration hash reference (see L<W3C::LogValidator/config
 
 Processes a list of sorted URIs (through whatever you want your module to be useful for)
 
-The list can be set C<uris>. If the $val was given a config has when constructed, and if the has has a "tmpfile" key, 
+The list can be set C<uris>. If the $val was given a config has when constructed, and if the has has a "tmpfile" key,
 C<process_list> will try to read this file as a hash of URIs and "hits" (popularity) with L<DB_File>.
 
-Returns a result hash. Keys for this hash are: 
+Returns a result hash. Keys for this hash are:
 
   name (string): the name of the module
   intro (string): introduction to the processing results
@@ -180,13 +180,13 @@ Returns a result hash. Keys for this hash are:
 
 =item $proc->uris
 
-Returns a  list of URIs to be processed (unless the configuration gives the location for the hash of URI/hits berkeley file, see C<process_list> 
+Returns a  list of URIs to be processed (unless the configuration gives the location for the hash of URI/hits berkeley file, see C<process_list>
 If an array is given as a parameter, also sets the list of URIs and returns it.
 
 
 =back
 
-Note: please document other methods here. 
+Note: please document other methods here.
 
 See also L<W3c::LogValidator::HTMLValidator> for a few other interesting methods you could copy.
 

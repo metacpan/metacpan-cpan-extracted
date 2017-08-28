@@ -4,7 +4,7 @@ use Encode;
 use Text::MicroTemplate::DataSection;
 use namespace::autoclean;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 extends 'Catalyst::View';
 with 'Catalyst::Component::ApplicationAttribute';

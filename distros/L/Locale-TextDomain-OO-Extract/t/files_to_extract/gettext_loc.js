@@ -69,5 +69,20 @@ function (loc) {
     loc.Nloc_dcp  ( 'TEXTDOMAIN', 'MSGCTXT', 'MSGID_dcp', 'CATEGORY' );
     loc.Nloc_dcpx ( 'TEXTDOMAIN', 'MSGCTXT', 'MSGID_dcpx', 'CATEGORY' );
     loc.Nloc_dcnp ( 'TEXTDOMAIN', 'MSGCTXT', 'MSGID_dcnp', 'PLURAL_dcnp', COUNT, 'CATEGORY' );
-    loc.Nloc_dcnpx( 'TEXTDOMAIN', 'MSGCTXT', 'MSGID_dcnpx', 'PLURAL_dcnpx', COUNT, 'CATEGORY' );
+    loc.Nloc_dcnpx( 
+        // comment
+        'TEXTDOMAIN',
+        // comment
+        'MSGCTXT',
+        /*
+        comment
+        */
+        'MSGID_dcnpx',
+        // comment
+        'PLURAL_dcnpx',
+        // comment
+        COUNT,
+        // comment
+        'CATEGORY'
+    );
 }

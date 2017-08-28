@@ -22,12 +22,14 @@ requires:
   Exporter: '0'
   Fcntl: '0'
   File::BOM: '0'
+  Getopt::Long: '0'
   Hash::Util: '0'
   List::MoreUtils: '0'
+  Memoize: '0'
   Params::Validate: '0'
   Text::CSV: '0'
   Unicode::Normalize: '0'
   strict: '0'
   warnings: '0'
-version: 1.1.9
+version: 1.2.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

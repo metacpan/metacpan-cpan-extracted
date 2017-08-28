@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeViewer;
-$Config::Model::Tk::NodeViewer::VERSION = '1.363';
+$Config::Model::Tk::NodeViewer::VERSION = '1.364';
 use strict;
 use warnings;
 use Carp;

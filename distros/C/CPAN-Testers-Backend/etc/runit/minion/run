@@ -1,0 +1,9 @@
+#!/bin/bash
+. /opt/local/perlbrew/etc/bashrc
+eval $( perl -Mlocal::lib )
+
+export MOJO_HOME=$(pwd)
+export BEAM_PATH=$HOME/etc/container
+export BEAM_MINION='mysql+dsn+dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application'
+
+exec beam minion worker report 2>&1

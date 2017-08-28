@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(bonferroni holm hommel hochberg BH BY qvalue);
 our %EXPORT_TAGS = (all => [qw(bonferroni holm hommel hochberg BH BY qvalue)]);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 1;
 

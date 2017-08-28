@@ -1,3 +1,6 @@
+0.82 - Mon 21 Aug 2017
+    * Set recurrence timezone to the same as the 'start' attribute (fix github issue #2)
+
 0.81 - Mon 24 Nov 2014 10:11:50 PST
     * Add Makefile.PL back into MANIFEST  (fixes RT 100524)
     * Remove MYMETA.* files from MANIFEST (fixes RT 100525)

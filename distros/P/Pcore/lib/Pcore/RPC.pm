@@ -141,7 +141,8 @@ sub connect_rpc ( $self, % ) {
         $cv->begin;
 
         Pcore::WebSocket->connect_ws(
-            pcore          => "ws://$addr/",
+            "ws://$addr/",
+            protocol       => 'pcore',
             before_connect => {
                 token          => $args{token},
                 listen_events  => $args{listen_events},
@@ -207,7 +208,7 @@ sub rpc_call ( $self, $method, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 75, 170              | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 75, 171              | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

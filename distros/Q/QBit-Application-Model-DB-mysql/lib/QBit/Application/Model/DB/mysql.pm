@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql;
-$QBit::Application::Model::DB::mysql::VERSION = '0.011';
+$QBit::Application::Model::DB::mysql::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);
@@ -12,10 +12,6 @@ sub filter {
     my ($self, $filter, %opts) = @_;
 
     return QBit::Application::Model::DB::Filter->new($filter, %opts, db => $self);
-}
-
-sub get_dbh {
-    $_[0]->{'__DBH__'}{$$}
 }
 
 sub query {
@@ -178,26 +174,6 @@ B<$filter> - object (QBit::Application::Model::DB::Filter)
 B<Example:>
 
   my $filter = $app->db->filter([id => '=' => \23]);
-
-=head2 get_dbh
-
-B<No arguments.>
-
-Returns DBI object.
-
-B<Return values:>
-
-=over
-
-=item
-
-B<$dbh> - object (DBI::db)
-
-=back
-
-B<Example:>
-
-  my $dbh = $app->db->get_dbh();
 
 =head2 query
 

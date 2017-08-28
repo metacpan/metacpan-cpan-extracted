@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 196;
+use Test::More tests => 197;
 BEGIN { use_ok('Algorithm::CP::IZ') };
 
 # Add
@@ -202,6 +202,10 @@ BEGIN { use_ok('Algorithm::CP::IZ') };
 
     $v1->Eq(3);
     is($v2->value, 9 * 4 + 3 * 3);
+
+    # using same variables and constants
+    my $v3 = $iz->ScalProd([9, $v1], [4, 3]);
+    is($v3->value, $v2->value);
 }
 
 # Abs

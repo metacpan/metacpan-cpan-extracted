@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::DKIM;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use Data::Dumper;
 use English qw{ -no_match_vars };
@@ -234,13 +234,19 @@ sub eom_callback {
                     $key_size = $key->size();
                     $key_type = $key->type();
                 };
-                my $key_data = $key_size . '-bit ' . $key_type . ' key';
+
+                my $hash_algorithm   = eval { $signature->hash_algorithm(); };
+                my $canonicalization = eval { $signature->canonicalization(); };
+
+                my $key_data = $key_size . '-bit ' . $key_type . ' key ' . $hash_algorithm;
 
                 $self->metric_count( 'dkim_signatures', {
-                    'type'     => $type,
-                    'result'   => $signature_result,
-                    'key_size' => $key_size,
-                    'key_type' => $key_type,
+                    'type'             => $type,
+                    'result'           => $signature_result,
+                    'key_size'         => $key_size,
+                    'key_type'         => $key_type,
+                    'hash_algorithm'   => $hash_algorithm,
+                    'canonicalization' => $canonicalization,
                 } );
 
                 if ( $type eq 'domainkeys' ) {
@@ -393,7 +399,7 @@ __END__
 
 =head1 NAME
 
-  Authentication Milter - DKIM Module
+  Authentication-Milter - DKIM Module
 
 =head1 DESCRIPTION
 

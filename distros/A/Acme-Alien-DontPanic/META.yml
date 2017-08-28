@@ -6,14 +6,12 @@ author:
 build_requires:
   Capture::Tiny: '0'
   ExtUtils::CBuilder: '0'
-  IO::Socket::SSL: '1.56'
-  Net::SSLeay: '1.49'
   Test2: '1.302015'
   Test2::Suite: '0.000030'
+  Test2::V0: '0'
   Test::Alien: '0.05'
-  Test::More: '0'
 configure_requires:
-  Alien::Base::ModuleBuild: '0.042'
+  Alien::Base::ModuleBuild: '0.044'
   Module::Build: '0.38'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
@@ -25,10 +23,9 @@ name: Acme-Alien-DontPanic
 provides:
   Acme::Alien::DontPanic:
     file: lib/Acme/Alien/DontPanic.pm
-    version: '0.042'
+    version: '0.044'
 requires:
-  Alien::Base: '0.75'
-  File::ShareDir: '1.00'
+  Alien::Base: '1.01'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
@@ -36,5 +33,5 @@ resources:
   bugtracker: http://github.com/Perl5-Alien/Acme-Alien-DontPanic/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/Perl5-Alien/Acme-Alien-DontPanic
-version: '0.042'
+version: '0.044'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

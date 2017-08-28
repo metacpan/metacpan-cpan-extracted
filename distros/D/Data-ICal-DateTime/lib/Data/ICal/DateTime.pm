@@ -6,7 +6,7 @@ use Data::ICal;
 use DateTime::Set;
 use DateTime::Format::ICal;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 # mmm, mixin goodness
 sub import {
@@ -499,6 +499,7 @@ sub _rule_set {
     for (@{ $self->property($name) }) {
         my $recur   = DateTime::Format::ICal->parse_recurrence(recurrence => $_->value, dtstart => $start);
         # $recur->set_time_zone($_->parameters->{TZID}) if $_->parameters->{TZID};
+        $recur->set_time_zone($start->time_zone) if !$start->time_zone->is_floating;
         $set = $set->union($recur);
     }
     # $set->set_time_zone($tz);

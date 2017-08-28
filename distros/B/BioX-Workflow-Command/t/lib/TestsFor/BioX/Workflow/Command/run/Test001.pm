@@ -13,12 +13,6 @@ extends 'TestMethod::Base';
 
 #This tests the functionality with sample_by_dir: 0
 
-sub test_000 : Tags(require) {
-
-    require_ok('BioX::Workflow::Command');
-    ok(1);
-}
-
 sub write_test_file {
     my $test_dir = shift;
 
@@ -27,7 +21,7 @@ sub write_test_file {
         global => [
             { indir     => 'data/raw' },
             { outdir    => 'data/processed' },
-            { sample_rule => "Sample_(\\w+)" },
+            { sample_rule => "Sample_(\\d.*)" },
             { gatk => '{$self->outdir}/{$sample}/gatk' },
         ],
         rules => [
@@ -132,10 +126,13 @@ sub test_004 : Tags(global_attr) {
     # $test->execute();
     $test->load_yaml_workflow;
     $test->apply_global_attributes;
+    $test->get_samples;
 
     is($test->global_attr->indir, 'data/raw', 'Indir matches');
     is($test->global_attr->indir->absolute, $test_dir.'/data/raw', 'Absolute Indir matches');
     is($test->global_attr->gatk, '{$self->outdir}/{$sample}/gatk', 'GATK matches');
+    ##We have a regular expression for samples here
+    is_deeply($test->samples, ['01', '02']);
 }
 
 1;

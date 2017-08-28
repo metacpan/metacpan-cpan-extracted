@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ysql;
-our $VERSION = '0.029';
+our $VERSION = '0.032';
 # ABSTRACT: Read and write documents with a SQL database
 
 use ETL::Yertl;
@@ -35,6 +35,7 @@ sub main {
         'save=s',
         'edit|e=s',
         'select=s',
+        'count=s',
         'insert=s',
         'delete=s',
         'where=s',
@@ -165,7 +166,7 @@ sub main {
         # Insert helper requires special handling, as the query may change
         # with every document inserted.
         if ( $opt{insert} ) {
-            if ( !-t *STDIN ) {
+            if ( !-t *STDIN && !-z *STDIN ) {
                 my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
 
                 my $query;
@@ -210,6 +211,9 @@ sub main {
         if ( $opt{select} ) {
             $query = $sql->select( $opt{select}, '*', $opt{where}, $opt{order} );
         }
+        elsif ( $opt{count} ) {
+            $query = $sql->select( $opt{count}, 'COUNT(*) AS value', $opt{where} );
+        }
         elsif ( $opt{delete} ) {
             $query = $sql->delete( $opt{delete}, $opt{where} );
         }
@@ -232,7 +236,7 @@ sub main {
         my $sth = $dbh->prepare( $query )
             or die "SQL error in prepare: " . $dbh->errstr . "\n";
 
-        if ( !-t *STDIN ) {
+        if ( !-t *STDIN && !-z *STDIN ) {
             my $in_fmt = load_module( format => 'default' )->new( input => \*STDIN );
 
             for my $doc ( $in_fmt->read ) {
@@ -327,7 +331,7 @@ ETL::Yertl::Command::ysql - Read and write documents with a SQL database
 
 =head1 VERSION
 
-version 0.029
+version 0.032
 
 =head1 AUTHOR
 

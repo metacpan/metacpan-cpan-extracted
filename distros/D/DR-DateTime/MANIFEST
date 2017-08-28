@@ -1,4 +1,5 @@
 .gitignore
+.travis.yml
 Changes
 MANIFEST
 Makefile.PL
@@ -13,11 +14,14 @@ debian/source/options
 lib/DR/DateTime.pm
 lib/DR/DateTime/Defaults.pm
 lib/DR/DateTime/MouseType.pm
+t/000-depends.t
 t/010-base.t
 t/020-parse.t
 t/030-add.t
 t/040-truncate.t
 t/050-tzforce.t
+t/060-overload.t
+t/070-set_tz.t
 t/600-mouse.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

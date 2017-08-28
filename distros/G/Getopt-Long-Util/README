@@ -1,13 +1,183 @@
-SEE ALSO
+NAME
+    Getopt::Long::Util - Utilities for Getopt::Long
 
+VERSION
+    This document describes version 0.890 of Getopt::Long::Util (from Perl
+    distribution Getopt-Long-Util), released on 2017-08-10.
+
+FUNCTIONS
+  detect_getopt_long_script
+    Usage:
+
+     detect_getopt_long_script(%args) -> [status, msg, result, meta]
+
+    Detect whether a file is a Getopt::Long-based CLI script.
+
+    The criteria are:
+
+    *   the file must exist and readable;
+
+    *   (optional, if "include_noexec" is false) file must have its
+        executable mode bit set;
+
+    *   content must start with a shebang "#!";
+
+    *   either: must be perl script (shebang line contains 'perl') and must
+        contain something like "use Getopt::Long";
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename => *str*
+
+        Path to file to be checked.
+
+    *   include_noexec => *bool* (default: 1)
+
+        Include scripts that do not have +x mode bit set.
+
+    *   string => *buf*
+
+        String to be checked.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_getopt_long_spec_from_getopt_std_spec
+    Usage:
+
+     gen_getopt_long_spec_from_getopt_std_spec(%args) -> hash
+
+    Generate Getopt::Long spec from Getopt::Std spec.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   is_getopt => *bool*
+
+        Whether to assume spec is for getopt() or getopts().
+
+        By default spec is assumed to be for getopts() instead of getopt().
+        This means that for a spec like "abc:", "a" and "b" don't take
+        argument while "c" does. But if "is_getopt" is true, the meaning of
+        ":" is reversed: "a" and "b" take arguments while "c" doesn't.
+
+    *   spec* => *str*
+
+        Getopt::Std spec string.
+
+    Return value: (hash)
+
+  humanize_getopt_long_opt_spec
+    Usage:
+
+     humanize_getopt_long_opt_spec($optspec) -> str
+
+    Convert Getopt::Long option specification like "help|h|?" or "--foo=s"
+    or "debug!" into, respectively, "--help, -h, -?" or "--foo=s" or
+    "--(no)debug". Will die if can't parse the string. The output is
+    suitable for including in help/usage text.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $optspec* => *str*
+
+    Return value: (str)
+
+  parse_getopt_long_opt_spec
+    Usage:
+
+     parse_getopt_long_opt_spec($optspec) -> hash
+
+    Parse a single Getopt::Long option specification.
+
+    Examples:
+
+    *   Example #1:
+
+         parse_getopt_long_opt_spec("help|h|?"); # -> { dash_prefix => "", opts => ["help", "h", "?"] }
+
+    *   Example #2:
+
+         parse_getopt_long_opt_spec("--foo=s"); # -> { dash_prefix => "--", desttype => "", opts => ["foo"], type => "s" }
+
+    Will produce a hash with some keys:
+
+    *   "is_arg" (if true, then option specification is the special "<>" for
+        argument callback)
+
+    *   "opts" (array of option names, in the order specified in the opt
+        spec)
+
+    *   "type" (string, type name)
+
+    *   "desttype" (either '', or '@' or '%'),
+
+    *   "is_neg" (true for "--opt!")
+
+    *   "is_inc" (true for "--opt+")
+
+    *   "min_vals" (int, usually 0 or 1)
+
+    *   "max_vals" (int, usually 0 or 1 except for option that requires
+        multiple values)
+
+    Will return undef if it can't parse the string.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $optspec* => *str*
+
+    Return value: (hash)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Getopt-Long-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Getopt-Long-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Getopt::Long
 
     Getopt::Long::Spec, which can also parse Getopt::Long spec into hash as
     well as transform back the hash to Getopt::Long spec. OO interface. I
     should've found this module first before writing my own
-    parse_getopt_long_opt_spec(). But at least currently
-    parse_getopt_long_opt_spec() is at least about 30-100+% faster than
+    "parse_getopt_long_opt_spec()". But at least currently
+    "parse_getopt_long_opt_spec()" is at least about 30-100+% faster than
     Getopt::Long::Spec::Parser, has a much simpler implementation (a single
     regex match), and can handle valid Getopt::Long specs that
-    Getopt::Long::Spec::Parser fails to parse, e.g. foo|f=s@.
+    Getopt::Long::Spec::Parser fails to parse, e.g. "foo|f=s@".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

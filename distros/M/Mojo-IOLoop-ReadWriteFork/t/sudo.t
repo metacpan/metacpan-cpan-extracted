@@ -7,7 +7,7 @@ $ENV{PATH} ||= '';
 plan skip_all => './.sudo_password is missing' unless -r '.sudo_password';
 
 my $fork     = Mojo::IOLoop::ReadWriteFork->new;
-my $password = Mojo::Util::slurp('.sudo_password');
+my $password = Mojo::File->new('.sudo_password')->slurp;
 my $read     = '';
 my ($exit_value, $signal);
 
@@ -24,7 +24,7 @@ $fork->on(
   read => sub {
     my ($fork, $chunk) = @_;
     $read .= $_[1];
-    $fork->write("$password\n") if $read =~ s!password for.*:!!;
+    $fork->write("$password\n") if $read =~ s!password.*:!!i;
   }
 );
 

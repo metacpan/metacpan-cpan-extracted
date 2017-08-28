@@ -32,7 +32,7 @@
    "provides" : {
       "Alien::zlib::Static" : {
          "file" : "lib/Alien/zlib/Static.pm",
-         "version" : "1.000000"
+         "version" : "1.000001"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "git://github.com/ollyg/alien-zlib-static.git"
       }
    },
-   "version" : "1.000000",
+   "version" : "1.000001",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

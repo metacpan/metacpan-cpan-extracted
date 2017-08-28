@@ -10,6 +10,7 @@ README
 TODO
 dist.ini
 lib/Text/AutoCSV.pm
+scripts/csvcopy.pl
 t/01-gen.t
 t/02-field.t
 t/03-enc.t
@@ -173,11 +174,7 @@ t/wwu1.csv
 t/wwwf.csv
 t/wwzips.csv
 t/zips.csv
-utils/a.csv
-utils/csvcopy.pl
-utils/f1.csv
-utils/f2.csv
-utils/t.csv
+tkcsvcopy.pl
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/release/kwalitee.t

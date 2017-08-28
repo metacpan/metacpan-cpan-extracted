@@ -1,5 +1,18 @@
 CHANGELOG
 
+Version 3.3 ( add237f34c6d826c5fe93aae7ac3a4d606d675fc - 2017-08-28 )
+
+    Gtk3::Ex::DBI::Datasheet:
+     Added before_query callback
+     Added {sql}->{limit} support
+     Fixed calls to Gtk3::main_iterarion ( which we apparently shouldn't use now anyway )
+     Updated my email address
+     Minor fixes with error handling and populating combo models
+
+    Gtk3::Ex::DBI::Form:
+     Fixed rendering of the value 0
+     Fix support for GtkComboBoxText
+
 Version 3.2
 
     Gtk3::Ex::DBI:

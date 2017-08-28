@@ -5,7 +5,7 @@ BEGIN {
 # ABSTRACT: A bundle of MIDI and music modules
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 1;
 
 __END__
@@ -20,7 +20,7 @@ Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,8 @@ L<Acme::Vuvuzela>
 L<App::Music::PlayTab>
 
 L<App::MusicTools>
+
+L<Csound>
 
 L<MIDI>
 
@@ -118,8 +120,6 @@ L<Text::Chord::Piano>
 
 * Install in order of reverse dependency somehow?
 
-* Make sub-bundles for C<B::M::MIDI>, C<B::M::Theory>, C<B::M::ID3>, etc?
-
 * Maybe include:
 
 L<BokkaKumiai>,
@@ -150,7 +150,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gene Boggs.
+This software is copyright (c) 2017 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

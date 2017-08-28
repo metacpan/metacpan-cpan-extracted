@@ -32,13 +32,13 @@ BEGIN {
         solar_longitude_after
         solar_longitude_after_from_moment
     );
-    our $VERSION = '1.01';
+    our $VERSION = '1.03';
 
     my $backend = 'XS';
 
     # XXX forcibly set explicit_xs so that PP won't be loaded unless
     # explicitly called
-    my $explicit_xs = 1;
+    my $explicit_xs = 0;
     if (exists $ENV{PERL_DATETIME_ASTRO_BACKEND} && 
         $ENV{PERL_DATETIME_ASTRO_BACKEND} eq 'XS') {
         $explicit_xs = 1;

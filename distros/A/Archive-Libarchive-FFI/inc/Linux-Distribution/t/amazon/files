@@ -1,4 +1,0 @@
-exists:
-system-release
-do not:
-lsb-release

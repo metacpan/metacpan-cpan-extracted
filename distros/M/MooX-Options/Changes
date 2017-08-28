@@ -1,5 +1,15 @@
 Revision history for MooX-Options
 
+4.103	2017-08-22
+    * fix broken shortname split (Thanks to Burak Gürsoy for reporting the issue)
+    * fix copy/paste issue in tests of shortname
+    * fix some typo's in tests
+    * declare honestly the state of Mo support
+
+4.102	2017-08-21
+    * fix out-of-order abbrev (analyzed and reported by
+      Jean-Damien Durand <jeandamiendurand@free.fr>)
+
 4.101	2017-07-24
     * remove fatalized warnings for all categories and rely on wise
       strictures maintainer instead

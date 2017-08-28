@@ -26,9 +26,8 @@ my %module_build_args = (
     "protocol" => "http"
   },
   "configure_requires" => {
-    "Alien::Base::ModuleBuild" => "0.023",
+    "Alien::Base::ModuleBuild" => "0.044",
     "Capture::Tiny" => 0,
-    "File::ShareDir" => "1.03",
     "File::chdir" => 0,
     "perl" => "5.006"
   },
@@ -37,13 +36,12 @@ my %module_build_args = (
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "Alien-libtool24",
-  "dist_version" => "0.05",
+  "dist_version" => "0.06",
   "license" => "perl",
   "module_name" => "Alien::libtool24",
   "recursive_test_files" => 1,
   "requires" => {
-    "Alien::Base" => "0.023",
-    "File::ShareDir" => "1.03",
+    "Alien::Base" => "1.00",
     "perl" => "5.006"
   },
   "test_requires" => {

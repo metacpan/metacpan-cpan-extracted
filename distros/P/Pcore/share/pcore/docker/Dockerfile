@@ -1,6 +1,6 @@
 FROM <: $dockerhub_pcore_repo_id | raw :>:devel
 
-MAINTAINER <: $author | raw :>
+LABEL maintainer="<: $author | raw :>"
 
 USER root
 

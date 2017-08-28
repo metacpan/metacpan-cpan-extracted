@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails;
-$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::VERSION = '0.93';
 use strict;
 
 use constant AccountNumberIsRequired        => "82614";

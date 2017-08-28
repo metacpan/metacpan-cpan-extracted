@@ -2,22 +2,21 @@ package Bible::Reference;
 # ABSTRACT: Simple Bible reference parser, tester, and canonicalizer
 
 use 5.012;
-use strict;
-use warnings;
 
 use Moose;
-use Moose::Util::TypeConstraints;
 use MooseX::Privacy;
-use Readonly;
+use Carp 'croak';
 
-our $VERSION = '1.01'; # VERSION
+$Carp::Internal{$_}++ for ( __PACKAGE__, 'Class::MOP::Method::Wrapped' );
+
+our $VERSION = '1.02'; # VERSION
 
 has 'acronyms',             is => 'rw', isa => 'Bool', default => 0;
 has 'sorting',              is => 'rw', isa => 'Bool', default => 1;
 has 'require_verse_match',  is => 'rw', isa => 'Bool', default => 0;
 has 'require_book_ucfirst', is => 'rw', isa => 'Bool', default => 0;
 
-Readonly my %_bibles => (
+has '_bibles', is => 'rw', isa => 'HashRef', traits => ['Private'], default => sub { +{
     'Protestant' => [
         [ 'Genesis',               'Ge',   'Gn',    'Gen'          ],
         [ 'Exodus',                'Ex',   'Exo'                   ],
@@ -319,30 +318,29 @@ Readonly my %_bibles => (
         [ 'Jude',                  'Jud',  'Jude'                  ],
         [ 'Revelation',            'Rv',   'Rev'                   ],
     ],
-);
-
-subtype 'BibleType',
-    as 'Str',
-    where {
-        my $type = $_;
-        grep { $type eq $_ } keys %_bibles;
-    },
-    message {'Could not determine a valid Bible type from input'};
-
-coerce 'BibleType',
-    from 'Str',
-    via {
-        my $input = lc( substr( $_ || '', 0, 1 ) );
-        my ($type) = grep { lc( substr( $_, 0, 1 ) ) eq $input } keys %_bibles;
-        return $type;
-    };
+} };
 
 has 'bible',
-    is      => 'rw',
-    isa     => 'BibleType',
-    default => 'Protestant',
-    coerce  => 1,
-    trigger => sub { shift->_build_bible_data };
+    is          => 'rw',
+    isa         => 'Str',
+    default     => 'Protestant',
+    initializer => 'bible',
+    trigger     => sub { shift->_build_bible_data };
+
+around 'bible' => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my ( $value, $setter, $attr ) = @_;
+    return $self->$orig if ( not @_ );
+
+    my $input = lc( substr( $value || '', 0, 1 ) );
+    ($value) = grep { lc( substr( $_, 0, 1 ) ) eq $input } keys %{ $self->_bibles };
+    croak "Could not determine a valid Bible type from input" unless ($value);
+
+    return $setter->($value) if $setter;
+    return $self->$orig($value);
+};
 
 sub BUILD {
     shift->_build_bible_data;
@@ -360,7 +358,7 @@ private_method _build_bible_data => sub {
     my ($self) = @_;
 
     my $bible_data;
-    for my $book_data ( @{ $_bibles{ $self->bible } } ) {
+    for my $book_data ( @{ $self->_bibles->{ $self->bible } } ) {
         my ( $book, @acronyms ) = @$book_data;
 
         $bible_data->{simple_book_to_book}{ $self->_simple_text($book) } = $book;
@@ -617,31 +615,8 @@ sub as_array {
     return (wantarray) ? @refs : \@refs;
 }
 
-sub as_verses {
-    my ($self) = @_;
-
-    my @refs;
-    for my $ref ( $self->as_array ) {
-        my $book = $ref->[0];
-
-        for my $part ( @{ $ref->[1] } ) {
-            my $chapter = $part->[0];
-
-            if ( $part->[1] ) {
-                push( @refs, "$book $chapter:$_" ) for ( @{ $part->[1] } );
-            }
-            else {
-                push( @refs, "$book $chapter" );
-            }
-        }
-    }
-
-    return (wantarray) ? @refs : \@refs;
-}
-
 private_method _compress_range => sub {
-    my $self = shift;
-
+    my ( $self, $items, $join ) = @_;
     my ( $last, @items, @range );
 
     my $flush_range = sub {
@@ -652,7 +627,7 @@ private_method _compress_range => sub {
         }
     };
 
-    for my $item (@_) {
+    for my $item (@$items) {
         if ( not $last or $last + 1 != $item ) {
             $flush_range->();
             push( @items, $item );
@@ -665,17 +640,17 @@ private_method _compress_range => sub {
     }
     $flush_range->();
 
-    return join( ', ', @items );
+    return (wantarray) ? @items : join( ', ', @items );
 };
 
-sub as_books {
-    my ($self) = @_;
+private_method _as_getter => sub {
+    my ( $self, $method ) = @_;
     my ( @refs, @chapters, $last_book );
 
     my $flush_chapters = sub {
         if (@chapters) {
             my ($book) = @_;
-            push( @refs, "$book " . $self->_compress_range(@chapters) );
+            push( @refs, "$book " . $self->_compress_range( \@chapters ) );
             @chapters = ();
         }
     };
@@ -687,26 +662,69 @@ sub as_books {
             my $chapter = $part->[0];
 
             if ( $part->[1] ) {
-                $flush_chapters->($book);
-
-                if ( not $last_book or $last_book ne $book ) {
-                    push( @refs, "$book $chapter:" . $self->_compress_range( @{ $part->[1] } ) );
+                if ( $method eq 'as_verses' ) {
+                    push( @refs, "$book $chapter:$_" ) for ( @{ $part->[1] } );
                 }
-                else {
-                    $refs[-1] .= ", $chapter:" . $self->_compress_range( @{ $part->[1] } );
+                elsif ( $method eq 'as_runs' ) {
+                    push( @refs, "$book $chapter:$_") for ( $self->_compress_range( $part->[1] ) );
+                }
+                elsif ( $method eq 'as_chapters' ) {
+                    push( @refs, "$book $chapter:" . $self->_compress_range( $part->[1] ) );
+                }
+                elsif ( $method eq 'as_books' )  {
+                    $flush_chapters->($book);
+
+                    if ( not $last_book or $last_book ne $book ) {
+                        push( @refs, "$book $chapter:" . $self->_compress_range( $part->[1] ) );
+                    }
+                    else {
+                        $refs[-1] .= ", $chapter:" . $self->_compress_range( $part->[1] );
+                    }
                 }
             }
             else {
-                push( @chapters, $chapter );
+                if ( $method eq 'as_books' ) {
+                    push( @chapters, $chapter );
+                }
+                else {
+                    push( @refs, "$book $chapter" );
+                }
             }
+
+            $last_book = $book if ( $method eq 'as_books' );
         }
 
-        $flush_chapters->($book);
-        $last_book = $book;
+        $flush_chapters->($book) if ( $method eq 'as_books' );
     }
 
-    return (wantarray) ? @refs : \@refs;
+    return \@refs;
+};
+
+sub as_verses {
+    my ($self) = @_;
+    my $refs = $self->_as_getter('as_verses');
+    return (wantarray) ? @$refs : $refs;
 }
+
+sub as_runs {
+    my ($self) = @_;
+    my $refs = $self->_as_getter('as_runs');
+    return (wantarray) ? @$refs : $refs;
+}
+
+sub as_chapters {
+    my ($self) = @_;
+    my $refs = $self->_as_getter('as_chapters');
+    return (wantarray) ? @$refs : $refs;
+}
+
+
+sub as_books {
+    my ($self) = @_;
+    my $refs = $self->_as_getter('as_books');
+    return (wantarray) ? @$refs : $refs;
+}
+
 
 sub refs {
     my ($self) = @_;
@@ -748,6 +766,28 @@ sub as_text {
         ( @text > 1 and not wantarray ) ? \@text : join( ' ', @text );
 }
 
+sub set_bible_data {
+    my ( $self, $bible, $data ) = @_;
+
+    croak 'First argument to set_bible_data() must be a Bible name string'
+        unless ( $bible and not ref $bible and length $bible > 0 );
+    croak 'Second argument to set_bible_data() must be an arrayref of arrayrefs'
+        unless ( $data and ref $data eq 'ARRAY' );
+
+    for (@$data) {
+        croak 'Second argument to set_bible_data() does not appear valid' unless (
+            ref $_ eq 'ARRAY' and
+            not ref $_->[0] and length $_->[0] > 0 and
+            not ref $_->[1] and length $_->[1] > 0
+        );
+    }
+
+    $self->_bibles->{$bible} = $data;
+    $self->bible($bible);
+    return $self;
+}
+
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -762,7 +802,7 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-Reference.svg)](https://travis-ci.org/gryphonshafer/Bible-Reference)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-Reference/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-Reference)
@@ -928,6 +968,20 @@ This method is the same as C<refs> except that it returns a list or arrayref
     my @books = $r->as_books;
     # 'Romans 12:13-14, 17', '1 Peter 3:16'
 
+=head2 as_chapters
+
+This method is the same as C<as_books> except that it returns a list or arrayref
+(depending on context) of canonicalized references by book and chapter.
+
+=head2 as_runs
+
+This method is the same as C<as_chapters> except that it returns a list or
+arrayref (depending on context) of canonicalized references by verse run. A
+"verse run" is a set of verses in an unbroken list together.
+
+    my $books = $r->as_runs;
+    # [ 'Romans 12:13-14', 'Romans 12:17', '1 Peter 3:16' ]
+
 =head2 as_verses
 
 This method is the same as C<as_books> except that it returns a list or arrayref
@@ -991,6 +1045,32 @@ the Bible, in order.
 
     my @books = $r->books;
     my $books = $r->books;
+
+=head2 set_bible_data
+
+If the preset Bibles are not going to cover your own needs, you can set your own
+Bible data for use within the module with this method. It returns the
+instantiated object, so you can chain it like so:
+
+    my $r = Bible::Reference->new->set_bible_data(
+        'Special' => [
+            [ 'Genesis',     'Ge', 'Gn', 'Gen' ],
+            [ 'Exodus',      'Ex', 'Exo'       ],
+            [ 'Leviticus',   'Lv', 'Lev'       ],
+            [ 'Numbers',     'Nu', 'Nm', 'Num' ],
+            [ 'Deuteronomy', 'Dt', 'Deu'       ],
+        ],
+    );
+
+The method expects two inputs: a string that will be used as the label for the
+Bible and an arrayref of arrayrefs. Each sub-arrayref must contain at least 2
+strings: the first being the full-name of the book, and the second the
+canonical acronym. Subsequent matching acronyms can optionally be added. These
+are acronyms that if found will match to the book, in addition to the canoniocal
+acronym.
+
+When you call this method with good input, it will save the new Bible and
+internally call C<bible()> to set the new Bible as active.
 
 =head1 HANDLING MATCHING ERRORS
 

@@ -1,6 +1,6 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Module::Runtime;
 use Catalyst::View::Template::Lace::Renderer;
@@ -167,14 +167,15 @@ What this means is that unlike most L<Catalyst> views that you're probably
 familiar with (such as the Template::Toolkit view) we define one view per
 template instead of one view for all the templates.  Although this might seem
 like a lot of views to write the upside is by defining a strong interface for your
-view, you eliminate a host of display errors that I commonly see in the wild since
-there is no contract beween a view and the controller that is calling it.  Also
-since each component in your view has access to the L<Catalyst> context, you can
+view, you eliminate a host of display errors that I commonly see with existing views
+since there is no contract beween a view and the controller that is calling it.  For
+example a typo in setting the stash can turn into a hard to track down bug in the
+template.  Also  since each component in your view has access to the L<Catalyst> context, you can
 write smarter views with display logic properly encapsulated near the template
 code it will actually be used.  This reduces complexity in your controllers and
 makes it easier to solve complex layout logic.
 
-After reviewing these documentation you can advance to L<Catalyst::View::Template::Lace::Tutorial>
+After reviewing this documentation you can advance to L<Catalyst::View::Template::Lace::Tutorial>
 and you might find the test cases in the C</t> directory of this distribution
 handy as well.
 

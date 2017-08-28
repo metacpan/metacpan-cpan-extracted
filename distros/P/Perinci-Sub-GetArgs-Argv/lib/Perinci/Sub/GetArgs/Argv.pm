@@ -1,7 +1,7 @@
 package Perinci::Sub::GetArgs::Argv;
 
-our $DATE = '2017-08-09'; # DATE
-our $VERSION = '0.83'; # VERSION
+our $DATE = '2017-08-27'; # DATE
+our $VERSION = '0.840'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1124,7 +1124,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.83 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-08-09.
+This document describes version 0.840 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-08-27.
 
 =head1 SYNOPSIS
 

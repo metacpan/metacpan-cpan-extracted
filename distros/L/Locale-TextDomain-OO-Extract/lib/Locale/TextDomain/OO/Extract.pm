@@ -3,7 +3,7 @@ package Locale::TextDomain::OO::Extract; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '2.006';
+our $VERSION = '2.009';
 
 1;
 
@@ -12,13 +12,13 @@ __END__
 =head1 NAME
 Locale::TextDomain::OO::Extract - Extracts internationalization data
 
-$Id: Extract.pm 578 2015-04-12 06:06:11Z steffenw $
+$Id: Extract.pm 685 2017-08-23 05:42:23Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract.pm $
 
 =head1 VERSION
 
-2.006
+2.009
 
 =head1 DESCRIPTION
 
@@ -142,18 +142,25 @@ Maybe an empty match helps to have all on the right position.
 
     my $rules = [
         [
+            'begin',
             qr{ ... ( ... ) ...}xms, # match this
-            qr{ ... ( ... ) ...}xms, # and then that
+            'and',
+            qr{ ... ( ... ) ...}xms, # then that
+            'end',
         ]
         'or',
         [
+            'begin',
             [
                 qr{ ... ( ... ) ... }xms,
             ],
             'or',
             [
                 qr{ ... ( ... ) ... }xms,
+                'or',
+                qr{ ... ( ... ) ... }xms,
             ],
+            'end',
         ],
     ];
 
@@ -176,9 +183,10 @@ Tell your extractor what steps he should run.
 =head2 The whole process (extract, translate, clean, format)
 
 See also module
-L<Locale::TextDomain::OO::Process|Locale::TextDomain::OO::Process>
+L<Locale::TextDomain::OO::Extract::Process|Locale::TextDomain::OO::Extract::Process>
 
- 1.1. If the PO file not exists for a language create it with the right header.
+ 1.1. If the PO file not exists for a language create it with the right header
+      or change the defaults after initial write (spew).
         |
         |     .------------------------------------.
         |     |                                    |
@@ -321,7 +329,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

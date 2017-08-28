@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yq::RecDescent;
-our $VERSION = '0.029';
+our $VERSION = '0.032';
 # ABSTRACT: A Parse::RecDescent-based parser for programs
 
 use ETL::Yertl;
@@ -303,7 +303,7 @@ ETL::Yertl::Command::yq::RecDescent - A Parse::RecDescent-based parser for progr
 
 =head1 VERSION
 
-version 0.029
+version 0.032
 
 =head1 AUTHOR
 

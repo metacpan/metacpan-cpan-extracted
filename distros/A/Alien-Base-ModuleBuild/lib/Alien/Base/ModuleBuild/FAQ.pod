@@ -427,7 +427,6 @@ implementation:
  use strict;
  use warnings;
  use parent 'Alien::Base';
- use File::Spec;
  
  sub bin_dir
  {

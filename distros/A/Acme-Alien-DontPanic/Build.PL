@@ -17,11 +17,11 @@ my $builder = Alien::Base::ModuleBuild->new(
   module_name => 'Acme::Alien::DontPanic',
   license => 'perl',
   configure_requires => {
-    'Alien::Base::ModuleBuild' => '0.042',
+    'Alien::Base::ModuleBuild' => '0.044',
     'Module::Build' => 0.38,
   },
   test_requires => {
-    'Test::More'         => 0,
+    'Test2::V0'           => 0,
     'ExtUtils::CBuilder' => 0,
     'Capture::Tiny'      => 0,
     'Test::Alien'        => '0.05',
@@ -30,7 +30,7 @@ my $builder = Alien::Base::ModuleBuild->new(
   },
   requires => {
     'perl' => '5.008001',
-    'Alien::Base' => '0.75',
+    'Alien::Base' => '1.01',
   },
   dist_author => [
     'Graham Ollis <plicease@cpan.org>',

@@ -9,10 +9,7 @@ install:
 testsets:
 	git submodule update --init
 
-checkyaml: install testsets
-	carton exec perl woothee/bin/dataset_checker.pl
-
-lib/Woothee/DataSet.pm: install checkyaml
+lib/Woothee/DataSet.pm: install
 	carton exec perl maint/dataset_yaml2pm.pl
 	sync; sync; sync;
 

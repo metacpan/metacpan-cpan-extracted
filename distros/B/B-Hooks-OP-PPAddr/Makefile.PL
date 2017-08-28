@@ -34,11 +34,11 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Module::Metadata" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,8 +54,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DynaLoader" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Module::Metadata" => 0,
   "Test::More" => 0,
   "parent" => 0,
   "strict" => 0,

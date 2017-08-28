@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::irtrans
 # ABSTRACT:  Configuration class LCDd::irtrans
+
 =encoding utf8
 
 =head1 NAME
@@ -16,15 +17,45 @@ generated from LCDd.conf
 
 =head2 Backlight
 
-Does the device have a backlight? I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Does the device have a backlight? I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Hostname
 
-IRTrans device to connect to I<< Optional. Type uniline. upstream_default: 'localhost'.  >> 
+IRTrans device to connect to I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+localhost
+
+=back
+
+
 
 =head2 Size
 
-display dimensions. I<< Optional. Type uniline. default: '16x2'.  >> 
+display dimensions. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+16x2
+
+=back
+
+
 
 =head1 SEE ALSO
 

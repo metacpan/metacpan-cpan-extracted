@@ -1,4 +1,18 @@
-$Id: Changes 1581 2017-06-26 11:46:03Z willem $                       -*-text-*-
+$Id: Changes 1592 2017-08-18 10:02:44Z willem $                       -*-text-*-
+
+
+**** 1.12 Aug 18, 2017
+
+Fix rt.cpan.org #122586
+
+	Persistent UDP reports false timeouts
+
+Fix rt.cpan.org #122352
+
+	bgsend(): TCP retry can stall for IO::Socket::IP before 0.38
+
+Feature
+	CDS / CDNSKEY: Implement RFC8078 erratum 5049.
 
 
 **** 1.11 Jun 26, 2017

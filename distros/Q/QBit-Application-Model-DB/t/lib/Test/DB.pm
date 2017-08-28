@@ -16,25 +16,25 @@ __PACKAGE__->meta(
         table1 => {
             fields => [
                 {
-                    name          => 'field1',
-                    type          => 'TYPE',
+                    name => 'field1',
+                    type => 'TYPE',
                 },
                 {name => 'field2', type => 'TYPE'},
                 {
-                    name     => 'field3',
-                    type     => 'TYPE',
+                    name => 'field3',
+                    type => 'TYPE',
                 },
                 {name => 'field4', type => 'TYPE'},
                 {name => 'field5', type => 'TYPE'},
                 {name => 'field6', type => 'TYPE'},
                 {
-                    name      => 'field7',
-                    type      => 'TYPE',
+                    name => 'field7',
+                    type => 'TYPE',
                 },
                 {name => 'field8', type => 'TYPE'},
                 {
-                    name      => 'field9',
-                    type      => 'TEXT',
+                    name => 'field9',
+                    type => 'TEXT',
                 },
                 {name => 'field10', type => 'TEXT'},
             ],
@@ -91,10 +91,11 @@ sub query {
 sub _connect {
     my ($self) = @_;
 
-    unless (defined($self->{'__DBH__'})) {
-        $self->{'__DBH__'}{$$} = DBI->connect('DBI:Mock:', '', '') || throw DBI::errstr();
-    }
+    unless ($self->dbh) {
+        my $dbh = DBI->connect('DBI:Mock:', '', '') || throw DBI::errstr();
 
+        $self->set_dbh($dbh);
+    }
 }
 
 TRUE;

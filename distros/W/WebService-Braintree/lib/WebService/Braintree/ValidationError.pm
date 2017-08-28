@@ -1,5 +1,5 @@
 package WebService::Braintree::ValidationError;
-$WebService::Braintree::ValidationError::VERSION = '0.92';
+$WebService::Braintree::ValidationError::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::ValidationError

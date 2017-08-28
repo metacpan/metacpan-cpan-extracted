@@ -1,5 +1,5 @@
 package WebService::Braintree::PaymentMethod;
-$WebService::Braintree::PaymentMethod::VERSION = '0.92';
+$WebService::Braintree::PaymentMethod::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::PaymentMethod

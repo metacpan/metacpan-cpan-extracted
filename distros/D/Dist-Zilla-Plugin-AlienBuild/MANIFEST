@@ -10,14 +10,16 @@ README
 author.yml
 corpus/Alien-Foo1/alienfile
 corpus/Alien-Foo2/lib/Alien/Foo2.pm
-cpanfile
+corpus/Foo-XS/lib/Foo/XS.pm
 dist.ini
 lib/Dist/Zilla/Plugin/AlienBase/Doc.pm
+lib/Dist/Zilla/Plugin/AlienBase/Wrapper.pm
 lib/Dist/Zilla/Plugin/AlienBuild.pm
 maint/travis-install-alienbuild
 t/00_diag.t
 t/01_use.t
 t/dist_zilla_plugin_alienbase_doc.t
+t/dist_zilla_plugin_alienbase_wrapper.t
 t/dist_zilla_plugin_alienbuild.t
 xt/author/eol.t
 xt/author/no_tabs.t

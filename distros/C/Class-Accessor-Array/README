@@ -1,9 +1,17 @@
-SYNOPSIS
+NAME
+    Class::Accessor::Array - Generate accessors/constructor for array-based
+    object
 
+VERSION
+    This document describes version 0.031 of Class::Accessor::Array (from
+    Perl distribution Class-Accessor-Array), released on 2017-08-27.
+
+SYNOPSIS
     In lib/Your/Class.pm:
 
      package Your::Class;
      use Class::Accessor::Array {
+         # constructor => 'new',
          accessors => {
              foo => 0,
              bar => 1,
@@ -13,21 +21,86 @@ SYNOPSIS
     In code that uses your class:
 
      use Your::Class;
-    
+
      my $obj = Your::Class->new;
      $obj->foo(1980);
      $obj->bar(12);
+
+    or:
+
+     my $obj = Your::Class->new(foo => 1, bar => 2);
 
     $obj is now:
 
      bless([1980, 12], "Your::Class");
 
-DESCRIPTION
+    To subclass, in lib/Your/Subclass.pm:
 
+     package Your::Subclass;
+     our @ISA = qw(Your::Class);
+     use Class::Accessor::Array {
+         accessors => {
+             baz => 2,
+         },
+     };
+
+DESCRIPTION
     This module is a builder for array-backed classes.
 
-SEE ALSO
+    You can change the constructor name from the default "new" using the
+    "constructor" parameter.
 
-    Other class builders for array-backed objects:
-    Class::XSAccessor::Array, Class::ArrayObjects, Object::ArrayType::New.
+    Currently the built constructor does not accept parameters to set the
+    attributes, e.g.:
+
+     my $obj = Your::Class->new(foo=>1, bar=>2); # not supported
+
+    You have to set the attributes manually:
+
+     # supported
+     my $obj = Your::Class->new;
+     $obj->foo(1);
+     $obj->bar(2);
+
+    If you subclass from another class that uses Class::Accessor::Array, you
+    must make sure that: 1) the parent class' constructor is "new"; 2) you
+    choose attribute array indices that have not already been used (unless
+    you deliberately want to share storage space with attributes existing in
+    the parent class). Multiple inheritance is not supported.
+
+    Note that if you're looking to reduce memory storage usage, an object
+    based on Perl array is not that much-more-space-efficient compared to
+    the hash-based object. Try representing an object as a pack()-ed string
+    instead using Class::Accessor::PackedString.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Class-Accessor-Array>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Class-Accessor-Array>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Array>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Class::Accessor::PackedString and Class::Accessor::PackedString::Fields.
+
+    Other class builders for array-backed objects: Class::XSAccessor::Array,
+    Class::Accessor::Array::Glob, Class::ArrayObjects,
+    Object::ArrayType::New.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

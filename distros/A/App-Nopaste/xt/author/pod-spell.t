@@ -17,9 +17,11 @@ Arnfjörð
 Arthur
 Axel
 Bjarmason
+Book
 Bremner
 Codepeek
 Command
+Dan
 Darian
 David
 Dean
@@ -96,6 +98,7 @@ francois
 frioux
 gregoa
 gregor
+grinnz
 haarg
 herrmann
 irc

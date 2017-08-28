@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::SRU - SRU server backed by a searchable Catmandu::Stor
 
 =cut
 
-our $VERSION = '0.0403';
+our $VERSION = '0.0501';
 
 use Catmandu::Sane;
 use Dancer::Plugin;
@@ -43,6 +43,8 @@ sub sru_provider {
 
     my $default_limit = $setting->{limit} // $bag->default_limit;
     my $maximum_limit = $setting->{maximum_limit} // $bag->maximum_limit;
+
+    my $template_options = $setting->{template_options} || {};
 
     my $database_info = "";
     if ($setting->{title} || $setting->{description}) {
@@ -157,6 +159,7 @@ XML
                 my $data = $_[0];
                 my $metadata = "";
                 my $exporter = Catmandu::Exporter::Template->new(
+                    %$template_options,
                     template => $template,
                     file     => \$metadata
                 );
@@ -303,6 +306,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
         * name - A short descriptive name for the schema
         * fix - Optionally an array of fixes to apply to the records before they are transformed into XML
         * template - The path to a Template Toolkit file to transform your records into this format
+    * template_options - An optional hash of configuration options that will be passed to L<Catmandu::Exporter::Template> or L<Template>.
 
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 

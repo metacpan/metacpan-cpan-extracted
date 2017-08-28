@@ -1,5 +1,9 @@
 Revision history for Perl module Woothee
 
+1.7.0 2017-08-21T04:03:03Z
+   - add support for trendictionbot
+   - add support for Yeti bot
+
 1.6.0 2017-03-15T03:43:51Z
    - add support for Webview on Android
    - add support for curl

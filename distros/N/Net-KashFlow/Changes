@@ -1,5 +1,16 @@
 Revision history for Net-KashFlow
 
+0.03    Wed Aug 23 15:41:00 2018 BST
+        - Updating an invoice fixe - #7
+        - Invoices and receipt fixes - #10
+        - Move to Dist::Zilla - #11
+        - Add GetInvoicesByDateRange Method - #12
+        - Fix Perl::Critic warnings - #13
+        - Perl::Tidy - #14
+
+0.02    Lots of historic changes. See 
+        https://github.com/simoncozens/Net-KashFlow
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

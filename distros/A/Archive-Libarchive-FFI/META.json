@@ -3,8 +3,8 @@
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : "1",
-   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,24 +14,15 @@
    },
    "name" : "Archive-Libarchive-FFI",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Alien::Libarchive::Installer" : "0.07",
+            "ExtUtils::MakeMaker" : "0",
             "FFI::Raw" : "0.29",
-            "Module::Build" : "0.28",
             "Module::Build::FFI" : "0.04",
             "perl" : "5.010000"
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
@@ -47,7 +38,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Libarchive::Installer" : "0.07",
+            "Alien::Libarchive3" : "0.28",
             "Exporter::Tidy" : "0",
             "FFI::Raw" : "0.29",
             "FFI::Util" : "0.06",
@@ -65,13 +56,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/Archive-Libarchive-FFI/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Archive-Libarchive-FFI",
+      "homepage" : "https://metacpan.org/pod/Archive::Libarchive::FFI",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/Archive-Libarchive-FFI.git",
          "web" : "https://github.com/plicease/Archive-Libarchive-FFI"
       }
    },
-   "version" : "0.0900"
+   "version" : "0.0901",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

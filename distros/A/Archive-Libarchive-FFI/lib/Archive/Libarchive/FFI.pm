@@ -2,7 +2,7 @@ package Archive::Libarchive::FFI;
 
 use strict;
 use warnings;
-use Alien::Libarchive::Installer;
+use Alien::Libarchive3;
 use Exporter::Tidy ();
 use Encode ();
 use Carp qw( croak );
@@ -36,9 +36,9 @@ BEGIN {
 }
 
 # ABSTRACT: Perl bindings to libarchive via FFI
-our $VERSION = '0.0900'; # VERSION
+our $VERSION = '0.0901'; # VERSION
 
-ffi_lib(\$_) for Alien::Libarchive::Installer->system_install( test => 'ffi' )->dlls;
+ffi_lib(\$_) for Alien::Libarchive3->dynamic_libs;
 
 require Archive::Libarchive::FFI::Constant;
 
@@ -608,7 +608,7 @@ Archive::Libarchive::FFI - Perl bindings to libarchive via FFI
 
 =head1 VERSION
 
-version 0.0900
+version 0.0901
 
 =head1 SYNOPSIS
 
@@ -1200,9 +1200,8 @@ be written.
 
 =item L<Archive::Libarchive::FFI>
 
-Both of these provide the same API to libarchive via L<Alien::Libarchive>,
-but the bindings are implemented in XS for one and via L<FFI::Sweet> for
-the other.
+Both of these provide the same API to libarchive but the bindings are
+implemented in XS for one and via L<FFI::Raw> for the other.
 
 =item L<Archive::Libarchive::Any>
 

@@ -1,330 +1,326 @@
-package Dist::Zilla::PluginBundle::Author::Plicease;
+package Dist::Zilla::PluginBundle::Author::Plicease 2.22 {
 
-use 5.008001;
-use Moose;
-use Dist::Zilla;
-use PerlX::Maybe qw( maybe );
-use Path::Class::File;
-use YAML ();
-use Term::ANSIColor ();
-use Path::Class qw( file dir );
-use File::ShareDir ();
-use Dist::Zilla::Util::CurrentCmd ();
-use Path::Tiny qw( path );
-use File::Glob qw( bsd_glob );
+  use 5.014;
+  use Moose;
+  use Dist::Zilla;
+  use PerlX::Maybe qw( maybe );
+  use YAML ();
+  use Term::ANSIColor ();
+  use Dist::Zilla::Util::CurrentCmd ();
+  use Path::Tiny qw( path );
+  use File::Glob qw( bsd_glob );
+  use Path::Tiny qw( path );
 
-# ABSTRACT: Dist::Zilla plugin bundle used by Plicease
-our $VERSION = '2.21'; # VERSION
+  # ABSTRACT: Dist::Zilla plugin bundle used by Plicease
 
 
-with 'Dist::Zilla::Role::PluginBundle::Easy';
+  with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-sub mvp_multivalue_args { qw( 
-  alien_build_command
-  alien_install_command
-  alien_auto_include
-  alien_bin_requires
-  alien_helper
-  upgrade
-  preamble
-  diag_preamble
+  sub mvp_multivalue_args { qw( 
+    alien_build_command
+    alien_install_command
+    alien_auto_include
+    alien_bin_requires
+    alien_helper
+    upgrade
+    preamble
+    diag_preamble
   
-  diag
-  allow_dirty ) }
+    diag
+    allow_dirty ) }
 
-my %plugin_versions = qw(
-  Alien                0.023
-  Author::Plicease.*   2.21
-  OurPkgVersion        0.12
-  MinimumPerl          1.006
-  InstallGuide         1.200006
-  Run::.*              0.035
-  PodWeaver            4.006
-  ReadmeAnyFromPod     0.150250
-  AutoMetaResources    1.20
-  CopyFilesFromBuild   0.150250
-);
-
-require Dist::Zilla::Plugin::Author::Plicease;
-unless(Dist::Zilla::Plugin::Author::Plicease->VERSION)
-{
-  delete $plugin_versions{'Author::Plicease.*'};
-}
-    
-sub _my_add_plugin {
-  my($self, @specs) = @_;
-
-  foreach my $spec (map { [@$_] } @specs)
-  {
-    my $plugin = $spec->[0];
-    my %args = ref $spec->[-1] ? %{ pop @$spec } : ();
-    
-    foreach my $key (keys %plugin_versions)
-    {
-      if($plugin =~ /^$key$/)
-      {
-        $args{':version'} = $plugin_versions{$key};
-      }
-    }
-    $self->add_plugins([@$spec, \%args]);
-  }
-};
-
-sub configure
-{
-  my($self) = @_;
-  # undocumented for a reason: sometimes I need to release on
-  # a different platform that where I do testing, (eg. MSWin32
-  # only modules, where Dist::Zilla is frequently not working
-  # right).
-  if($self->payload->{non_native_release})
-  {
-    eval q{
-      no warnings 'redefine';
-      use Dist::Zilla::Role::BuildPL;
-      sub Dist::Zilla::Role::BuildPL::build {};
-      sub Dist::Zilla::Role::BuildPL::test {};
-    };
-  }
-
-  $self->_my_add_plugin(['Run::AfterBuild'         => { run => "%x inc/run/after_build.pl      --name %n --version %v --dir %d" }])
-    if -r "inc/run/after_build.pl";
-
-  $self->_my_add_plugin(['Run::AfterRelease'       => { run => "%x inc/run/after_release.pl    --name %n --version %v --dir %d --archive %a" }])
-    if -r "inc/run/after_release.pl";
-
-  $self->_my_add_plugin(['Run::BeforeBuild'        => { run => "%x inc/run/before_build.pl     --name %n --version %v" }])
-    if -r "inc/run/before_build.pl";
-
-  $self->_my_add_plugin(['Run::BeforeRelease'      => { run => "%x inc/run/before_release.pl   ---name %n --version %v --dir %d --archive %a" }])
-    if -r "inc/run/before_release.pl";
-
-  $self->_my_add_plugin(['Run::Release'            => { run => "%x inc/run/release.pl          ---name %n --version %v --dir %d --archive %a" }])
-    if -r "inc/run/release.pl";
-
-  $self->_my_add_plugin(['Run::Test'               => { run => "%x inc/run/test.pl             ---name %n --version %v --dir %d" }])
-    if -r "inc/run/test.pl";
-
-  $self->_my_add_plugin(
-    ['GatherDir' => { exclude_filename => [qw( Makefile.PL Build.PL cpanfile xt/release/changes.t xt/release/fixme.t )],
-                      exclude_match => '^_build/' }, ],
-    [ PruneCruft => { except => '.travis.yml' } ],
-    [ 'ManifestSkip' ],
-    [ 'MetaYAML',    ],
-    [ 'License',     ],
-    [ 'ExecDir',     ],
-    [ 'ShareDir',    ],
+  my %plugin_versions = qw(
+    Alien                0.023
+    Author::Plicease.*   2.22
+    OurPkgVersion        0.12
+    MinimumPerl          1.006
+    InstallGuide         1.200006
+    Run::.*              0.035
+    PodWeaver            4.006
+    ReadmeAnyFromPod     0.150250
+    AutoMetaResources    1.20
+    CopyFilesFromBuild   0.150250
   );
 
-  do { # installer stuff
-    my $installer = $self->payload->{installer};
-    my %mb = map { $_ => $self->payload->{$_} } grep /^mb_/, keys %{ $self->payload };
-    if(-e Path::Class::File->new('inc', 'My', 'ModuleBuild.pm'))
-    {
-      $installer ||= 'ModuleBuild';
-      $mb{mb_class} = 'My::ModuleBuild'
-        unless defined $mb{mb_class};
-    }
-    if(defined $installer && $installer eq 'Alien')
-    {
-      my %args = 
-        map { $_ => $self->payload->{"alien_$_"} }
-        map { s/^alien_//; $_ } 
-        grep /^alien_/, keys %{ $self->payload };
-      $self->_my_add_plugin([ Alien => { %args, %mb } ]);
-    }
-    elsif(defined $installer && $installer eq 'ModuleBuild')
-    {
-      $self->_my_add_plugin([ ModuleBuild => \%mb ]);
-    }
-    else
-    {
-      $installer ||= 'Author::Plicease::MakeMaker';
-      $self->_my_add_plugin([$installer]);
-    }
-  };
-  
-  $self->_my_add_plugin(map { [$_] } qw(
-    Manifest
-    TestRelease
-    PodWeaver
-  ));
-  
-  $self->_my_add_plugin([ NextRelease => { format => '%-9v %{yyyy-MM-dd HH:mm:ss Z}d' }]);
-    
-  $self->_my_add_plugin(['AutoPrereqs']);
-  $self->_my_add_plugin([$self->payload->{version_plugin} || (
-    'OurPkgVersion', {
-      underscore_eval_version => 1
-    }
-  )]);
-  $self->_my_add_plugin(['MetaJSON']);
-
-  if($^O ne 'MSWin32')
+  require Dist::Zilla::Plugin::Author::Plicease;
+  unless(Dist::Zilla::Plugin::Author::Plicease->VERSION)
   {
-    foreach my $plugin (qw( Git::Check Git::Commit Git::Tag Git::Push ))
-    {
-      my %args;
-      $args{'allow_dirty'} = [ qw( dist.ini Changes README.md ), @{ $self->payload->{allow_dirty} || [] } ]
-        if $plugin =~ /^Git::(Check|Commit)$/;
-      $self->_my_add_plugin([$plugin, \%args])
-    }
+    delete $plugin_versions{'Author::Plicease.*'};
   }
-  
-  do {
-    my $name = dir->absolute->basename;
-    my $user = $self->payload->{github_user} || 'plicease';
-    my $repo = $self->payload->{github_repo} || $name;
-  
-    $self->_my_add_plugin([
-      'MetaResources' => {
-        'homepage' => $self->payload->{homepage} || "https://metacpan.org/pod/@{[ do { my $foo = $name; $foo =~ s/-/::/g; $foo }]}",
-        'bugtracker.web'  => sprintf("https://github.com/%s/%s/issues", $user, $repo),
-        'repository.url'  => sprintf("git://github.com/%s/%s.git",      $user, $repo),
-        'repository.web'  => sprintf("https://github.com/%s/%s",        $user, $repo),
-        'repository.type' => 'git',
-        maybe 'x_IRC' => $self->payload->{irc},
-      },
-    ]);
-  };
+    
+  sub _my_add_plugin {
+    my($self, @specs) = @_;
 
-  if($self->payload->{release_tests})
-  {
-    $self->_my_add_plugin([
-      'Author::Plicease::Tests' => {
-        maybe skip          => $self->payload->{release_tests_skip},
-        maybe diag          => $self->payload->{diag},
-        maybe diag_preamble => $self->payload->{diag_preamble},
-        maybe test2_v0      => $self->payload->{test2_v0},
+    foreach my $spec (map { [@$_] } @specs)
+    {
+      my $plugin = $spec->[0];
+      my %args = ref $spec->[-1] ? %{ pop @$spec } : ();
+    
+      foreach my $key (keys %plugin_versions)
+      {
+        if($plugin =~ /^$key$/)
+        {
+          $args{':version'} = $plugin_versions{$key};
+        }
       }
-    ]);
-  }
-    
-  $self->_my_add_plugin(map { [$_] } qw(
+      $self->add_plugins([@$spec, \%args]);
+    }
+  };
 
-    InstallGuide
-    ConfirmRelease
-
-  ));
-  
-  $self->_my_add_plugin([
-    MinimumPerl => {
-      maybe perl => $self->payload->{perl},
-    },
-  ]);
-
-  unless($self->payload->{no_readme})
+  sub configure
   {
+    my($self) = @_;
+    # undocumented for a reason: sometimes I need to release on
+    # a different platform that where I do testing, (eg. MSWin32
+    # only modules, where Dist::Zilla is frequently not working
+    # right).
+    if($self->payload->{non_native_release})
+    {
+      eval q{
+        no warnings 'redefine';
+        use Dist::Zilla::Role::BuildPL;
+        sub Dist::Zilla::Role::BuildPL::build {};
+        sub Dist::Zilla::Role::BuildPL::test {};
+      };
+    }
+
+    $self->_my_add_plugin(['Run::AfterBuild'         => { run => "%x inc/run/after_build.pl      --name %n --version %v --dir %d" }])
+      if -r "inc/run/after_build.pl";
+
+    $self->_my_add_plugin(['Run::AfterRelease'       => { run => "%x inc/run/after_release.pl    --name %n --version %v --dir %d --archive %a" }])
+      if -r "inc/run/after_release.pl";
+
+    $self->_my_add_plugin(['Run::BeforeBuild'        => { run => "%x inc/run/before_build.pl     --name %n --version %v" }])
+      if -r "inc/run/before_build.pl";
+
+    $self->_my_add_plugin(['Run::BeforeRelease'      => { run => "%x inc/run/before_release.pl   ---name %n --version %v --dir %d --archive %a" }])
+      if -r "inc/run/before_release.pl";
+
+    $self->_my_add_plugin(['Run::Release'            => { run => "%x inc/run/release.pl          ---name %n --version %v --dir %d --archive %a" }])
+      if -r "inc/run/release.pl";
+
+    $self->_my_add_plugin(['Run::Test'               => { run => "%x inc/run/test.pl             ---name %n --version %v --dir %d" }])
+      if -r "inc/run/test.pl";
+
+    $self->_my_add_plugin(
+      ['GatherDir' => { exclude_filename => [qw( Makefile.PL Build.PL xt/release/changes.t xt/release/fixme.t )],
+                        exclude_match => '^_build/' }, ],
+      [ PruneCruft => { except => '.travis.yml' } ],
+      [ 'ManifestSkip' ],
+      [ 'MetaYAML',    ],
+      [ 'License',     ],
+      [ 'ExecDir',     ],
+      [ 'ShareDir',    ],
+    );
+
+    do { # installer stuff
+      my $installer = $self->payload->{installer};
+      my %mb = map { $_ => $self->payload->{$_} } grep /^mb_/, keys %{ $self->payload };
+      if(-e "inc/My/ModuleBuild.pm")
+      {
+        $installer ||= 'ModuleBuild';
+        $mb{mb_class} = 'My::ModuleBuild'
+          unless defined $mb{mb_class};
+      }
+      if(defined $installer && $installer eq 'Alien')
+      {
+        my %args = 
+          map { $_ => $self->payload->{"alien_$_"} }
+          map { s/^alien_//; $_ } 
+          grep /^alien_/, keys %{ $self->payload };
+        $self->_my_add_plugin([ Alien => { %args, %mb } ]);
+      }
+      elsif(defined $installer && $installer eq 'ModuleBuild')
+      {
+        $self->_my_add_plugin([ ModuleBuild => \%mb ]);
+      }
+      else
+      {
+        $installer ||= 'Author::Plicease::MakeMaker';
+        $self->_my_add_plugin([$installer]);
+      }
+    };
+  
+    $self->_my_add_plugin(map { [$_] } qw(
+      Manifest
+      TestRelease
+      PodWeaver
+    ));
+  
+    $self->_my_add_plugin([ NextRelease => { format => '%-9v %{yyyy-MM-dd HH:mm:ss Z}d' }]);
+      
+    $self->_my_add_plugin(['AutoPrereqs']);
+    $self->_my_add_plugin([$self->payload->{version_plugin} || (
+      'OurPkgVersion', {
+        underscore_eval_version => 1
+      }
+    )]);
+    $self->_my_add_plugin(['MetaJSON']);
+
+    if($^O ne 'MSWin32')
+    {
+      foreach my $plugin (qw( Git::Check Git::Commit Git::Tag Git::Push ))
+      {
+        my %args;
+        $args{'allow_dirty'} = [ qw( dist.ini Changes README.md ), @{ $self->payload->{allow_dirty} || [] } ]
+          if $plugin =~ /^Git::(Check|Commit)$/;
+        $self->_my_add_plugin([$plugin, \%args])
+      }
+    }
+  
+    do {
+      my $name = path(".")->absolute->basename;
+      my $user = $self->payload->{github_user} || 'plicease';
+      my $repo = $self->payload->{github_repo} || $name;
+    
+      $self->_my_add_plugin([
+        'MetaResources' => {
+          'homepage' => $self->payload->{homepage} || "https://metacpan.org/pod/@{[ do { my $foo = $name; $foo =~ s/-/::/g; $foo }]}",
+          'bugtracker.web'  => sprintf("https://github.com/%s/%s/issues", $user, $repo),
+          'repository.url'  => sprintf("git://github.com/%s/%s.git",      $user, $repo),
+          'repository.web'  => sprintf("https://github.com/%s/%s",        $user, $repo),
+          'repository.type' => 'git',
+          maybe 'x_IRC' => $self->payload->{irc},
+        },
+      ]);
+    };
+  
+    if($self->payload->{release_tests})
+    {
+      $self->_my_add_plugin([
+        'Author::Plicease::Tests' => {
+          maybe skip          => $self->payload->{release_tests_skip},
+          maybe diag          => $self->payload->{diag},
+          maybe diag_preamble => $self->payload->{diag_preamble},
+          maybe test2_v0      => $self->payload->{test2_v0},
+        }
+      ]);
+    }
+    
+    $self->_my_add_plugin(map { [$_] } qw(
+
+      InstallGuide
+      ConfirmRelease
+
+    ));
+  
     $self->_my_add_plugin([
-      'ReadmeAnyFromPod' => {
-              type            => 'text',
-              filename        => 'README',
-              location        => 'build', 
-        maybe source_filename => $self->payload->{readme_from},
+      MinimumPerl => {
+        maybe perl => $self->payload->{perl},
       },
     ]);
+
+    unless($self->payload->{no_readme})
+    {
+      $self->_my_add_plugin([
+        'ReadmeAnyFromPod' => {
+                type            => 'text',
+                filename        => 'README',
+                location        => 'build', 
+          maybe source_filename => $self->payload->{readme_from},
+        },
+      ]);
+    
+      $self->_my_add_plugin([
+        'ReadmeAnyFromPod' => ReadMePodInRoot => {
+          type                  => 'markdown',
+          filename              => 'README.md',
+          location              => 'root',
+          maybe source_filename => $self->payload->{readme_from},
+       },
+     ]);
+    }
   
     $self->_my_add_plugin([
-      'ReadmeAnyFromPod' => ReadMePodInRoot => {
-        type                  => 'markdown',
-        filename              => 'README.md',
-        location              => 'root',
-        maybe source_filename => $self->payload->{readme_from},
-     },
-   ]);
-  }
-  
-  $self->_my_add_plugin([
-    'Author::Plicease::MarkDownCleanup' => {
-            travis_status => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
-      maybe appveyor      => $self->payload->{appveyor},
-      maybe travis_user   => $self->payload->{github_user},
-    },
-  ]);
-
-  $self->_my_add_plugin([
-    'Author::Plicease::SpecialPrereqs' => {
-      maybe upgrade  => $self->payload->{upgrade},
-      maybe preamble => $self->payload->{preamble},
-    },
-  ]);
-
-  $self->_my_add_plugin(['CPANFile']);
-
-  if($self->payload->{copy_mb})
-  {
-    $self->_my_add_plugin([
-      'CopyFilesFromBuild' => {
-        copy => [ 'Build.PL', 'cpanfile' ],
+      'Author::Plicease::MarkDownCleanup' => {
+              travis_status => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
+        maybe appveyor      => $self->payload->{appveyor},
+        maybe travis_user   => $self->payload->{github_user},
       },
     ]);
-  }
-  
-  unless('bakeini' eq (Dist::Zilla::Util::CurrentCmd::current_cmd() ||'') )
-  {
-    if(eval { require Dist::Zilla::Plugin::ACPS::RPM })
-    { $self->_my_add_plugin(['ACPS::RPM']) }
-  }
-  
-  if($^O eq 'MSWin32')
-  {
+
     $self->_my_add_plugin([
-      'Run::AfterBuild' => {
-        run => 'dos2unix README.md t/00_diag.*',
+      'Author::Plicease::SpecialPrereqs' => {
+        maybe upgrade  => $self->payload->{upgrade},
+        maybe preamble => $self->payload->{preamble},
       },
     ]);
-  }
+
+    if($self->payload->{copy_mb})
+    {
+      $self->_my_add_plugin([
+        'CopyFilesFromBuild' => {
+          copy => [ 'Build.PL' ],
+        },
+      ]);
+    }
   
-  if(-e ".travis.yml")
-  {
-    my $travis = YAML::LoadFile(".travis.yml");
-    
-    if(exists $travis->{perl} && grep /^5\.19$/, @{ $travis->{perl} })
+    unless('bakeini' eq (Dist::Zilla::Util::CurrentCmd::current_cmd() ||'') )
     {
-      die "travis is trying to test Perl 5.19";
+      if(eval { require Dist::Zilla::Plugin::ACPS::RPM })
+      { $self->_my_add_plugin(['ACPS::RPM']) }
     }
     
-    unless(exists $travis->{perl} && grep /^5\.26$/, @{ $travis->{perl} })
+    if($^O eq 'MSWin32')
     {
+      $self->_my_add_plugin([
+        'Run::AfterBuild' => {
+          run => 'dos2unix README.md t/00_diag.*',
+        },
+      ]);
+    }
+    
+    if(-e ".travis.yml")
+    {
+      my $travis = YAML::LoadFile(".travis.yml");
+      
+      if(exists $travis->{perl} && grep /^5\.19$/, @{ $travis->{perl} })
+      {
+        die "travis is trying to test Perl 5.19";
+      }
+      
+      unless(exists $travis->{perl} && grep /^5\.26$/, @{ $travis->{perl} })
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "travis is not testing Perl 5.26";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
+      
+      unless(exists $travis->{sudo})
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "You have not specified a value for sudo in travis (suggest setting to false for faster travis build)";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
+    }
+    
+    foreach my $test (map { path($_) } bsd_glob ('t/*.t'))
+    {
+      my @lines = grep !/-no_srand => 1/, grep /use Test2::V0/, $test->lines_utf8;
+      next unless @lines;
       print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-      print STDERR "travis is not testing Perl 5.26";
+      print STDERR "$test has Test2::V0 without -no_srand";
       print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-      print STDERR "\n";
+      print STDERR "\n";    
     }
-    
-    unless(exists $travis->{sudo})
-    {
-      print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-      print STDERR "You have not specified a value for sudo in travis (suggest setting to false for faster travis build)";
-      print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-      print STDERR "\n";
-    }
-  }
   
-  foreach my $test (map { path($_) } bsd_glob ('t/*.t'))
-  {
-    my @lines = grep !/-no_srand => 1/, grep /use Test2::V0/, $test->lines_utf8;
-    next unless @lines;
-    print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-    print STDERR "$test has Test2::V0 without -no_srand";
-    print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-    print STDERR "\n";    
+    foreach my $name (qw( t/00_diag.txt t/00_diag.pre.txt ), 
+                        map { "xt/release/$_.t" } qw( build_environment unused eol no_tabs pod strict fixme changes pod_coverage pod_spelling_common pod_spelling_system version ))
+    {  
+      if(-e $name)
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "You have a lingering deprecated test: $name";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
+    }
   }
 
-  foreach my $name (qw( t/00_diag.txt t/00_diag.pre.txt ), 
-                      map { "xt/release/$_.t" } qw( build_environment unused eol no_tabs pod strict fixme changes pod_coverage pod_spelling_common pod_spelling_system version ))
-  {  
-    if(-e $name)
-    {
-      print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-      print STDERR "You have a lingering deprecated test: $name";
-      print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-      print STDERR "\n";
-    }
-  }
+  __PACKAGE__->meta->make_immutable;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -340,7 +336,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.21
+version 2.22
 
 =head1 SYNOPSIS
 
@@ -397,7 +393,6 @@ This plugin bundle is mostly equivalent to
  [GatherDir]
  exclude_filename = Makefile.PL
  exclude_filename = Build.PL
- exclude_filename = cpanfile
  exclude_filename = xt/release/changes.t
  exclude_filename = xt/release/fixme.t
  exclude_match = ^_build/
@@ -463,7 +458,6 @@ This plugin bundle is mostly equivalent to
  travis_status = 0
  
  [Author::Plicease::SpecialPrereqs]
- [CPANFile]
 
 Some exceptions:
 
@@ -534,7 +528,7 @@ Set the GitHub user name.
 
 =head2 copy_mb
 
-Copy Build.PL and cpanfile from the build into the git repository.
+Copy Build.PL from the build into the git repository.
 Exclude them from gather.
 
 This allows other developers to use the dist from the git checkout, without needing

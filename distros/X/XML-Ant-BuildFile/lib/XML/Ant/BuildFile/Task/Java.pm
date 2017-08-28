@@ -1,19 +1,28 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Task::Java;
-$XML::Ant::BuildFile::Task::Java::VERSION = '0.216';
+
+#pod =head1 DESCRIPTION
+#pod
+#pod This is an incomplete class for Ant Java tasks in a
+#pod L<build file project|XML::Ant::BuildFile::Project>.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use XML::Ant::BuildFile::Project;
+#pod     my $project = XML::Ant::BuildFile::Project->new( file => 'build.xml' );
+#pod     my @foo_java = $project->target('foo')->tasks('java');
+#pod     for my $java (@foo_java) {
+#pod         print $java->classname || "$java->jar";
+#pod         print "\n";
+#pod     }
+#pod
+#pod =cut
 
 # ABSTRACT: Java task node in an Ant build file
 
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use Carp;
 use English '-no_match_vars';
 use Modern::Perl;
@@ -28,6 +37,13 @@ with 'XML::Ant::BuildFile::Task';
 
 my %xpath_attr = (
     ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+
+    #pod =attr classname
+    #pod
+    #pod A string representing the Java class that's executed.
+    #pod
+    #pod =cut
+
     classname  => './@classname',
     _jar       => './@jar',
     _args_attr => './@args',
@@ -41,16 +57,29 @@ while ( my ( $attr, $xpath ) = each %xpath_attr ) {
     );
 }
 
+#pod =attr jar
+#pod
+#pod A L<Path::Class::File|Path::Class::File> for the jar file being executed.
+#pod
+#pod =cut
+
 has jar => ( ro, lazy,
     isa     => File,
-    default => sub { file( XML::Ant::Properties->apply( $ARG[0]->_jar ) ) },
+    default => sub { file( XML::Ant::Properties->apply( $_[0]->_jar ) ) },
 );
 
 has _args => ( ro,
     isa         => 'ArrayRef[XML::Ant::BuildFile::Element::Arg]',
     traits      => [qw(XPathObjectList Array)],
     xpath_query => './arg',
-    handles     => { args => [ map => sub { $ARG->args } ] },
+
+    #pod =method args
+    #pod
+    #pod Returns a list of all arguments passed to the Java class.
+    #pod
+    #pod =cut
+
+    handles => { args => [ map => sub { $_->args } ] },
 );
 
 no Moose;
@@ -72,7 +101,7 @@ XML::Ant::BuildFile::Task::Java - Java task node in an Ant build file
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -224,7 +253,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

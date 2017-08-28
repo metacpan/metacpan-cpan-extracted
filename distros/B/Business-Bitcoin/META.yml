@@ -28,5 +28,5 @@ requires:
   Math::EllipticCurve::Prime: '0.003'
   Mozilla::CA: '0'
   Test::More: '0'
-version: '1.046'
+version: '1.047'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

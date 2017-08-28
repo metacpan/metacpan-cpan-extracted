@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw( $Bin );
+
+use MYDan::Node::Cache;
+use MYDan::Util::OptConf;
+use MYDan::Util::Sudo;
+
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'node';
+
+=head1 SYNOPSIS
+
+Covert node databases to node cache
+
+=cut
+my %o = MYDan::Util::OptConf->load( base => $Bin )->get( qw( daemon interval=i ) )->dump();
+my ( $daemon, $interval ) = delete @o{ qw( daemon interval ) };
+
+$interval ||= 5;
+
+map { mkdir $o{$_} unless -e $o{$_} } qw( cache root );
+do { MYDan::Node::Cache->new( %o )->make } while $daemon && sleep $interval;
+
+exit 0;

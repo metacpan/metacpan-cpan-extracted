@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.0.6] - 2017-08-19
+
+### Improved
+
+- Generally made the class easier to subclass.
+
+## [0.0.5] - 2017-08-19
+
+### Improved
+
+- Let the events draw themselves.
+- Moved pod tests from t to xt.
+
 ## [0.0.4] - 2017-08-02
 
 ### Fixed

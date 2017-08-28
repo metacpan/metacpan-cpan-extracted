@@ -1,10 +1,13 @@
 package HPC::Runner::Command::submit_jobs::Plugin::SGE;
 
+use Moose::Role;
+use namespace::autoclean;
+
 use Data::Dumper;
 use Log::Log4perl;
 use File::Temp qw/ tempfile /;
 
-use Moose::Role;
+with 'HPC::Runner::Command::submit_jobs::Plugin::Role::Log';
 
 =head1 HPC::Runner::Command::Plugin::Scheduler::Slurm;
 
@@ -69,25 +72,6 @@ EOF
     clearer   => 'clear_template_file',
     documentation =>
       q{Path to Slurm template file if you do not wish to use the default}
-);
-
-##Application log
-##There is a bug in here somewhere - this be named anything ...
-has 'log' => (
-    is      => 'rw',
-    default => sub {
-        my $log_conf = q(
-log4perl.rootLogger = DEBUG, Screen
-log4perl.appender.Screen = \
-  Log::Log4perl::Appender::ScreenColoredLevels
-log4perl.appender.Screen.layout = \
-  Log::Log4perl::Layout::PatternLayout
-log4perl.appender.Screen.layout.ConversionPattern = \
-  [%d] %m %n
-      );
-        Log::Log4perl::init( \$log_conf );
-        return Log::Log4perl->get_logger();
-    }
 );
 
 =head2 Subroutines

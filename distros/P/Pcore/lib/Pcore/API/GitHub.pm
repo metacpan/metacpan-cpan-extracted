@@ -24,7 +24,7 @@ sub _req ( $self, $method, $endpoint, $data, $cb ) {
             CONTENT_TYPE  => 'application/json',
         },
         body => $data ? P->data->to_json($data) : undef,
-        on_finish => sub ($res) {
+        sub ($res) {
             my $data = $res->body && $res->body->$* ? P->data->from_json( $res->body ) : undef;
 
             my $api_res;

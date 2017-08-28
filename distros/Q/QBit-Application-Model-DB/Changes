@@ -1,10 +1,64 @@
 ==================================================
-Changes from 2016-01-23 00:00:00 +0000 to present.
+Changes from 2016-08-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2017-01-22 11:55:43 +0000
+version 0.018 at 2017-08-27 08:23:09 +0000
 ------------------------------------------
+
+  Change: 0a2d2066b294536949816b38f96f9adaee54985a
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:19:47 +0000
+
+    Merge pull request #20 from Madskill/perltidy
+
+    Perltidy 
+
+  Change: 09aad761e0bbebdafcf2fb61fc1b173e39ce1038
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:18:16 +0000
+
+    Merge remote-tracking branch 'upstream/master' into perltidy 
+
+  Change: 1231c568a5faf0fed87e4c70dd6e8c350a1a3fbc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:17:17 +0000
+
+    perltidy and use new methods in test 
+
+------------------------------------------
+version 0.017 at 2017-08-27 08:06:31 +0000
+------------------------------------------
+
+  Change: dc51ce4cdf1f34431cdc856882533f375a129a20
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:06:31 +0000
+
+    Version 0.017 
+
+  Change: e3ce505231f2d0a481e52a25d23d3efb8674a93f
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:04:49 +0000
+
+    Merge pull request #19 from Madskill/fix_query
+
+    fix query and added methods: set_dbh, dbh 
+
+  Change: bfee0e5d9b913acd5536192695feac6c67f3fc89
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 11:00:58 +0000
+
+    fix query and added methods: set_dbh, dbh 
+
+------------------------------------------
+version 0.016 at 2017-01-22 11:55:59 +0000
+------------------------------------------
+
+  Change: 4d76fcb7fedecb2628a9f02d249367e5c929b8c7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-01-22 14:55:59 +0000
+
+    Version 0.016 
 
   Change: d5147c6176b9ffc24ebb8ca0ef1ce475bfc0ab68
   Author: Igor <igor-sverdlov@mail.ru>
@@ -176,36 +230,6 @@ version 0.010 at 2016-10-08 19:58:21 +0000
 
     t_lib -> t/lib 
 
-------------------------------------------
-version 0.009 at 2016-06-05 17:45:12 +0000
-------------------------------------------
-
-  Change: 12b97a231f8c73e5ab07d410527e4fbea721cd3a
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-06-05 20:45:12 +0000
-
-    Version 0.009 
-
-  Change: 95ad0026735b44d42f81226f2617fc2fbfaf00fe
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-06-05 21:33:18 +0000
-
-    Merge pull request #11 from Madskill/upload_to_cpan
-
-    Upload to cpan 
-
-  Change: f926b65e4e679807a72db1d3ae051e4437b0506b
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-06-05 20:27:30 +0000
-
-    added README.md 
-
-  Change: 2c77082ed5cfe6f952d6fa7d7be6a58a5f79c0f9
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-06-05 20:06:59 +0000
-
-    upload to cpan 
-
 ================================================
-Plus 8 releases after 2016-01-23 00:00:00 +0000.
+Plus 9 releases after 2016-08-27 00:00:00 +0000.
 ================================================

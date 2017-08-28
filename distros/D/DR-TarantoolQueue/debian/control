@@ -6,12 +6,13 @@ Uploaders: Roman V. Nikolaev <rshadow@rambler.ru>
 Build-Depends: debhelper (>= 8)
 Build-Depends-Indep: libcoro-perl,
  libdr-tarantool-perl,
+ liblist-moreutils-perl,
  libjson-xs-perl,
  libmouse-perl,
  libcoro-perl,
  perl,
- tarantool (>= 1.4.8+20130110)
-Standards-Version: 3.9.3
+ tarantool-lts | tarantool (>= 1.7)
+Standards-Version: 3.9.6
 
 Package: libdr-tarantoolqueue-perl
 Section: perl
@@ -19,9 +20,10 @@ Architecture: all
 Suggests: dr-tarantool-queue
 Depends: ${misc:Depends}, ${perl:Depends},
  libcoro-perl,
- libdr-tarantool-perl,
+ libdr-tarantool-perl | libdr-tnt-perl,
  libjson-xs-perl,
  libmouse-perl,
+ liblist-moreutils-perl,
  libcoro-perl
 Homepage: http://search.cpan.org/dist/DR-TarantoolQueue/
 Description: client for tarantool's queue
@@ -32,7 +34,7 @@ Architecture: all
 Section: database
 Suggests: libdr-tarantoolqueue-perl
 Depends: ${misc:Depends}, ${perl:Depends},
- tarantool (>= 1.4.8+20130110-1)
+ tarantool-lts | tarantool (>= 1.4.8+20130110-1)
 Homepage: https://github.com/mailru/tarantool-queue/
 Description: queue components for tarantool
  The package contains init.lua and tarantool.cfg to build queue daemon

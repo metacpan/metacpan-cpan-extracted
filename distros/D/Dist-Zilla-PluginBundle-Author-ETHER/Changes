@@ -1,5 +1,18 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.130     2017-08-28 01:13:46Z
+          - fix test that is broken with older [CopyFilesFromRelease]
+          - fix inverted condition in [Git::Check] configuration (wrong since
+            version 0.126)
+          - fix airplane mode, broken since version 0.127
+          - [@Git::VersionManager] and [MetaProvides::Update] are moved off to
+            their own distribution, Dist-Zilla-PluginBundle-Git-VersionManager
+
+0.129     2017-08-21 04:45:42Z
+          - fix a new test to avoid triggering the "looks like you're
+            installing from cpan, rather than building a distribution in the
+            repository" heuristic when using Dist::Zilla (e.g. on older perls)
+
 0.128     2017-08-16 23:39:44Z
           - version extraction and updating plugins now fully extracted out
             into their own plugin bundle, [@Git::VersionManager], to be soon

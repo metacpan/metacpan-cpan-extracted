@@ -9,24 +9,91 @@ XS::Check - check XS for problems
 
 =head1 SYNOPSIS
 
+    
+    use FindBin '$Bin';
     use XS::Check;
     my $check = XS::Check->new ();
-    $check->check_file ('some.xs');
+    $check->check_file ("$Bin/synopsis.xs");
+
+
+produces output
+
+    /usr/home/ben/projects/xs-check/examples/synopsis.xs:3: x not a constant type.
+    /usr/home/ben/projects/xs-check/examples/synopsis.xs:3: len is not a STRLEN variable (unsigned int ).
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.08/examples/synopsis.pl> in the distribution.)
+
 
 =head1 VERSION
 
-This documents version 0.02 of XS::Check corresponding to
-L<git commit e9bbf02ff885913ac723bd2414a8848a57afc293|https://github.com/benkasminbullock/xs-check/commit/e9bbf02ff885913ac723bd2414a8848a57afc293> released on Thu Aug 17 13:48:21 2017 +0900.
+This documents version 0.08 of XS::Check corresponding to
+L<git commit b0c84d70e906e954deb76ca5e749f674d26ca3f7|https://github.com/benkasminbullock/xs-check/commit/b0c84d70e906e954deb76ca5e749f674d26ca3f7> released on Mon Aug 28 09:24:43 2017 +0900.
 
 =head1 DESCRIPTION
 
-Check XS files for errors.
+This module offers ways to check XS files for common flaws.
 
 =head1 METHODS
 
 =head2 new
 
     my $check = XS::Check->new ();
+
+Make a new XS::Check object.
+
+=head3 Changing where the messages go
+
+For user-defined error reporting, supply a code reference with the key
+C<reporter> as follows:
+
+    my $usercheck = XS::Check->new (reporter => sub { print "help!" });
+
+The arguments to the user defined function are a hash containing the
+fields
+
+=over
+
+=item file
+
+the file name of the file where the error occurred, if using
+L</check_file> or if set with L</set_file>, otherwise the undefined
+value (C<undef>),
+
+=item line
+
+the line number where the error occurred, starting from 1,
+
+=item message
+
+the message from the module, a text string.
+
+=back
+
+The following example demonstrates a user-defined callback using the
+C<message> and C<line> fields:
+
+    
+    use XS::Check;
+    my $rchecker = XS::Check->new (reporter => \& reporter);
+    $rchecker->check ("Perl_croak ('croaking');\n");
+    sub reporter
+    {
+        my %rstuff = @_;
+        print "$rstuff{message} at $rstuff{line}.\n";
+    }
+    
+
+
+produces output
+
+    Remove the 'Perl_' prefix from Perl_croak at 1.
+
+
+(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.08/examples/reporter.pl> in the distribution.)
+
+
+Callback error reporting was added to the module in version 0.07.
 
 =head2 check
 
@@ -41,6 +108,36 @@ See L</SUGGESTIONS> for what this reports.
 Convenience method to read in $xs_file then run L</check> on it.
 
 This assumes UTF-8 encoding of $xs_file.
+
+=head2 set_file
+
+    $check->set_file ($file);
+
+Set the file name for error reporting. Use any false value to clear
+it. For example:
+
+    
+    use XS::Check;
+    my $check = XS::Check->new ();
+    my $xs = "Perl_croak (\"frog\")\n";
+    $check->check ($xs);
+    $check->set_file ('Yabadabado');
+    $check->check ($xs);
+    $check->set_file ('');
+    $check->check ($xs);
+
+
+produces output
+
+    1: Remove the 'Perl_' prefix from Perl_croak.
+    Yabadabado:1: Remove the 'Perl_' prefix from Perl_croak.
+    1: Remove the 'Perl_' prefix from Perl_croak.
+
+
+(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.08/examples/set-file.pl> in the distribution.)
+
+
+This method was added in version 0.08.
 
 =head1 SUGGESTIONS
 
@@ -63,6 +160,46 @@ Replace with Newx etc.
 These cause "free to wrong pool" errors on multithreaded Windows
 Perls.
 
+=head2 Don't use the Perl_ prefix
+
+Functions like C<Perl_croak> should not be used, just C<croak>.
+
+This check was added in version 0.04.
+
+=head2 Don't use (void) in arguments
+
+XS functions cannot use the ANSI C C<(void)> to indicate that they do
+not take any arguments, instead this results in a variable called
+"void" being created.
+
+This check was added in version 0.06.
+
+=head1 LIMITATIONS
+
+As of 0.08, the module has the following limitations.
+
+=over
+
+=item Struct members
+
+The module is not very good at parsing struct members, so XS code like
+the following doesn't get dealt with properly:
+
+    s.txt = SvPV (sv, s.len);
+
+=item UTF-8 only
+
+L</check_file> uses L<File::Slurper/read_text> to read the text, which
+means it only takes UTF-8.
+
+=item Variable declarations rely on a simplistic hack
+
+The current method of parsing variable declarations uses a very
+simplistic hack, and it is likely to produce false results if a
+variable name is used twice for two different things in the same file.
+
+=back
+
 =head1 DEPENDENCIES
 
 =over
@@ -82,6 +219,16 @@ This is used to get the line numbers.
 =item L<Carp>
 
 =back
+
+=head1 COMMAND-LINE TOOL
+
+A command line tool called C<checkxs> is installed with the module. It
+runs the L</check_file> method on each file named on the command line.
+
+    checkxs Some.xs
+
+As of 0.08, there are no options to the script. Its
+output goes to standard error.
 
 =head1 SEE ALSO
 

@@ -52,6 +52,6 @@
          "url" : "https://github.com/jhthorsen/docsis-configfile.git"
       }
    },
-   "version" : "0.71",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.73",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

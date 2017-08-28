@@ -55,6 +55,7 @@ sub lookup_orgno {
     ##
     # Use the orgno as key to brreg.
     # Match is only found if number does exist.
+    $self->size(0);
     $self->_lookup_org_entries("$BRREG/enhet/$orgno.json");
 
 }

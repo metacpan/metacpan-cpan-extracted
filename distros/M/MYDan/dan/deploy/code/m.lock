@@ -1,0 +1,9 @@
+#!# perl: deploy/code/m.lock
+use strict;
+use warnings;
+
+return sub
+{
+    print "lock OK\n";
+    die "lock OK\n";
+};

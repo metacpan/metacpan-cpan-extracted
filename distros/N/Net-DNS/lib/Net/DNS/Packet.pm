@@ -1,9 +1,9 @@
 package Net::DNS::Packet;
 
 #
-# $Id: Packet.pm 1546 2017-03-06 09:27:31Z willem $
+# $Id: Packet.pm 1584 2017-07-28 16:15:17Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1546 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1584 $)[1];
 
 
 =head1 NAME
@@ -727,7 +727,7 @@ The truncate method takes a maximum length as argument and then tries
 to truncate the packet and set the TC bit according to the rules of
 RFC2181 Section 9.
 
-The minimum maximum length that is honoured is 512 octets.
+The smallest length limit that is honoured is 512 octets.
 
 =cut
 
@@ -760,8 +760,7 @@ sub truncate {
 	$size = UDPSZ unless $size > UDPSZ;
 	$size -= $sigrr->_size if $sigrr;
 
-	my $data = pack 'x' x 12;				# header placeholder
-	my $hdsz = length $data;
+	my $data = pack 'x' x HEADER_LENGTH;			# header placeholder
 	$self->{count} = [];
 
 	my $tc;
@@ -810,7 +809,7 @@ sub truncate {
 
 	my @part = qw(question answer authority additional);
 	my @size = map scalar( @{$self->{$_}} ), @part;
-	pack 'n6 a*', $self->header->id, $self->{status}, @size, substr( $data, $hdsz );
+	pack 'n6 a*', $self->header->id, $self->{status}, @size, substr( $data, HEADER_LENGTH );
 }
 
 

@@ -1,23 +1,38 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Role::HasProjects;
-$XML::Ant::BuildFile::Role::HasProjects::VERSION = '0.216';
 
 # ABSTRACT: Compose a collection of Ant build file projects
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This L<Moose::Role|Moose::Role> helps you compose a collection of Ant
+#pod project files found in a directory of source code.  The directory is searched
+#pod recursively for files ending in F<.xml>, skipping any symbolic links as well
+#pod as F<CVS> and Subversion F<.svn> directories.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package My::Package;
+#pod     use Moose;
+#pod     with 'XML::Ant::BuildFile::Role::HasProjects';
+#pod
+#pod     sub frobnicate_projects {
+#pod         my $self = shift;
+#pod         $self->working_copy('/dir/to/search');
+#pod         print "Found these projects:\n";
+#pod         print "$_\n" for @{$self->project_files};
+#pod     }
+#pod
+#pod     1;
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use strict;
 use Carp;
 use English '-no_match_vars';
-## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 use List::Util 1.33 'any';
 use Moose::Role;
 use MooseX::Has::Sugar;
@@ -31,14 +46,28 @@ use Try::Tiny;
 use XML::Ant::BuildFile::Project;
 use namespace::autoclean;
 
+#pod =attr working_copy
+#pod
+#pod A L<Path::Class::Dir|Path::Class::Dir> to search for L</projects>.
+#pod
+#pod =cut
+
 has working_copy => ( rw, required, coerce,
     isa           => Dir,
     documentation => 'directory containing content',
 );
 
-has projects => ( rw,
-    lazy_build,
-    isa => HashRef ['XML::Ant::BuildFile::Project'],
+#pod =attr projects
+#pod
+#pod Reference to an array of
+#pod L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project>s in the
+#pod current C<working_copy> directory.
+#pod
+#pod =cut
+
+has projects => ( rw, lazy,
+    builder => '_build_projects',
+    isa     => HashRef ['XML::Ant::BuildFile::Project'],
     traits  => ['Hash'],
     handles => {
         project       => 'get',
@@ -65,7 +94,7 @@ sub _make_ant_finder_callback {
 
         my @dir_list = $path->dir->dir_list;
         for ( 0 .. $#dir_list ) {    # skip symlinks
-            return if -l file( @dir_list[ 0 .. $ARG ] )->stringify();
+            return if -l file( @dir_list[ 0 .. $_ ] )->stringify();
         }
         return                       # skip SCM dirs
             if any { 'CVS' eq $_ } @dir_list
@@ -100,7 +129,7 @@ XML::Ant::BuildFile::Role::HasProjects - Compose a collection of Ant build file 
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -255,7 +284,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

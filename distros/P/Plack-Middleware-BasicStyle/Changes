@@ -1,4 +1,7 @@
 Revision history for Perl extension Plack::Middleware::BasicStyle.
 
+0.001001 2017-08-26T22:42+01:00
+ - Add perlcritic tests and make code comply
+
 0.001 2016-09-30T23:01+03:00
  - Initial release

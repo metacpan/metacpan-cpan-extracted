@@ -38,6 +38,7 @@ my $meta = {
                                               "Moo"                       => 0,
                                               "MooX::Log::Any"            => 0,
                                               "namespace::autoclean"      => 0.12,
+                                              "parent"                    => 0,
                                               "perl"                      => 5.006,
                                               "Plack"                     => 0.9939,
                                               "RDF::Helper::Properties"   => "0.10",
@@ -66,8 +67,8 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "Plack::App::RDF::LinkedData" => { file => "lib/Plack/App/RDF/LinkedData.pm", version => 0.78 },
-                            "RDF::LinkedData" => { file => "lib/RDF/LinkedData.pm", version => 0.78 },
+                            "Plack::App::RDF::LinkedData" => { file => "lib/Plack/App/RDF/LinkedData.pm", version => "1.00" },
+                            "RDF::LinkedData" => { file => "lib/RDF/LinkedData.pm", version => "1.00" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -80,7 +81,7 @@ my $meta = {
                             x_mailinglist => "http://lists.perlrdf.org/listinfo/dev",
                             x_wiki        => "http://wiki.perlrdf.org/",
                           },
-  "version"            => 0.78,
+  "version"            => "1.00",
   "x_contributors"     => [
                             "Gregory Todd Williams <gwilliams\@cpan.org>",
                             "Richard Lewis",

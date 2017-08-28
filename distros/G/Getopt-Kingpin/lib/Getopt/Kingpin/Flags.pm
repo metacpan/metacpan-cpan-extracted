@@ -6,7 +6,7 @@ use Object::Simple -base;
 use Getopt::Kingpin::Flag;
 use Carp;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 has _flags => sub {
     return {};
@@ -169,7 +169,7 @@ Unshift Getopt::Kingpin::Flag instances to $self->_flags
 
 =head2 get($name)
 
-Get Getopt::Kingpin::Flag instanse by $name.
+Get Getopt::Kingpin::Flag instance by $name.
 
 =head2 keys()
 

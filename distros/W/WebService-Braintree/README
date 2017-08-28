@@ -90,10 +90,6 @@ NAME
 
     Create, update, delete, and find payment methods.
 
-  WebService::Braintree::PaymentMethodNonce
-
-    Create and find payment method nonces.
-
   WebService::Braintree::PayPalAccount
 
     Find and update PayPal accounts.
@@ -274,8 +270,6 @@ NAME
 
     Thanks to the staff at Braintree for endorsing this fork.
 
-    Thanks to ziprecruiter for sponsoring improvements to the forked code.
-
  LICENSE AND COPYRIGHT
 
     Copyright 2017 Kieren Diment <zarquon@cpan.org>
@@ -287,9 +281,4 @@ NAME
     by the Free Software Foundation; or the Artistic License.
 
     See http://dev.perl.org/licenses/ for more information.
-
- AUTHORS
-
-    Braintree Staff Kieren Diment <zarquon@cpan.org> Rob Kinyon
-    <rob.kinyon@gmail.com>
 

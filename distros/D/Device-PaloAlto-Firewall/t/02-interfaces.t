@@ -15,7 +15,7 @@ plan tests => 21;
 my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', username => 'test', password => 'test');
 
 $fw->meta->remove_method('_send_request');
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response() )->simplify( forcearray => ['entry'] )->{result} } );
 
 my $test = $fw->tester();
 
@@ -33,7 +33,7 @@ ok( !$test->interfaces_up(interfaces => ['ethernet1/(1|3)']), 'Regex One interfa
 
 ok( !$test->interfaces_up(interfaces => ['ethernet1/.']), 'All ethernet interfaces' );
 
-warning_is { $test->interfaces_up(interfaces => ['ethrnet1/2']) } "Warning: 'ethrnet1/2' matched no interfaces. Test may still succeed", "interfaces_up() - no match warns";
+warning_is { $test->interfaces_up(interfaces => ['ethrnet1/2']) } "Warning: 'ethrnet1/2' matched no configured interfaces. Test may still succeed", "interfaces_up() - no match warns";
 warning_is { $test->interfaces_up(interfaces => [ ]) } "Warning: no interfaces specified - test returns true", "interfaces_up() with an empty ARRAYREF warns";
 { 
 	# Supress the warning output
@@ -46,7 +46,7 @@ warning_is { $test->interfaces_up(interfaces => [ ]) } "Warning: no interfaces s
 
 ### Testing interfaces_duplex() ###
 
-warning_is { $test->interfaces_duplex(interfaces => ['ethrnet1/2']) } "Warning: 'ethrnet1/2' matched no interfaces. Test may still succeed", "interfaces_duplex() - no match warns";
+warning_is { $test->interfaces_duplex(interfaces => ['ethrnet1/2']) } "Warning: 'ethrnet1/2' matched no configured interfaces. Test may still succeed", "interfaces_duplex() - no match warns";
 
 warning_is { $test->interfaces_duplex(interfaces => ['ethernet1/1']) } "Warning: detected 'auto' duplex, probable VM? Test may still succeed", "Probable VM Warning";
 { 
@@ -57,7 +57,7 @@ warning_is { $test->interfaces_duplex(interfaces => ['ethernet1/1']) } "Warning:
 }
 
 $fw->meta->remove_method('_send_request');
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_phy_response() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_phy_response() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->interfaces_duplex(interfaces => ['ethernet1/11']), 'Interface in full duplex mode' );
 ok( !$test->interfaces_duplex(interfaces => ['ethernet1/12']), 'Interface in half duplex mode' );

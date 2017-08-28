@@ -1,5 +1,5 @@
 package WebService::Braintree::AdvancedSearch;
-$WebService::Braintree::AdvancedSearch::VERSION = '0.92';
+$WebService::Braintree::AdvancedSearch::VERSION = '0.93';
 
 use strict;
 use vars qw(@ISA @EXPORT_OK);

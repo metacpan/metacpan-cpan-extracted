@@ -21,7 +21,10 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIx::Class::Schema::Diff",
   "PREREQ_PM" => {
     "Array::Diff" => 0,
+    "Clone" => 0,
+    "Data::Dumper" => 0,
     "Data::Dumper::Concise" => 0,
+    "Digest::SHA1" => 0,
     "Hash::Layout" => 0,
     "JSON" => 0,
     "List::MoreUtils" => 0,
@@ -46,7 +49,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.04",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,9 +58,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Array::Diff" => 0,
+  "Clone" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::Schema" => 0,
+  "Data::Dumper" => 0,
   "Data::Dumper::Concise" => 0,
+  "Digest::SHA1" => 0,
   "ExtUtils::MakeMaker" => 0,
   "FindBin" => 0,
   "Hash::Layout" => 0,

@@ -4,6 +4,7 @@ use Math::BigFloat ('lib'     => 'GMP,Pari,FastCalc');
 use Math::BigInt   ('upgrade' => 'Math::BigFloat');
 use Math::Trig();
 use POSIX ();
+use DateTime;
 
 use constant MEAN_SYNODIC_MONTH => 29.530588853;
 use constant RD_GREGORIAN_EPOCH => 1;

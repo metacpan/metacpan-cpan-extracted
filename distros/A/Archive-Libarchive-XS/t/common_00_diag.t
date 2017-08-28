@@ -169,12 +169,12 @@ foreach my $format (sort grep { s/^archive_write_set_format_// } keys %Archive::
 diag '';
 diag '';
 
-if(eval { require Alien::Libarchive; 1 })
+if(eval { require Alien::Libarchive3; 1 })
 {
-  my $alien = Alien::Libarchive->new;
-  diag 'Alien::Libarchive cflags = ' . $alien->cflags;
-  diag 'Alien::Libarchive libs   = ' . $alien->libs;
-  diag 'version                  = ' . eval { Archive::Libarchive::XS::archive_version_number() };
+  my $alien = 'Alien::Libarchive3';
+  diag 'cflags  = ' . $alien->cflags;
+  diag 'libs    = ' . $alien->libs;
+  diag 'version = ' . $alien->version;
   
   diag '';
   diag '';

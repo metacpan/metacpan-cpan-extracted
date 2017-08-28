@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use DBI;
 
@@ -106,6 +106,7 @@ use warnings;
 our $imp_data_size = 0;
 
 sub bind_col { 1 }
+sub bind_columns { 1 }
 sub bind_param { 1 }
 
 sub execute {

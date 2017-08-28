@@ -5,7 +5,7 @@ use warnings;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.08';
+    $VERSION     = '0.09';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -254,7 +254,7 @@ sub read_rules
     }
 
     my $order;
-    while ($script_raw =~m/(if|else|elsif) (.*?){(.*?)}([\s;]?)/isg) {
+    while ($script_raw =~m/(if|else|elsif) (.*?)\{(.*?)}([\s;]?)/isg) {
         my $ctrl = lc($1);
         my $test_list = $2;
         my $block = $3;
@@ -335,7 +335,7 @@ sub swap_rules
 
 =head2 reorder_rules
 
-Reorder rules with a list of number, start with 1, and with blanck separator. Usefull for ajax sort functions.
+Reorder rules with a list of number, start with 1, and with blanck separator. Useful for ajax sort functions.
 
 Thank you jeanne for your help in brain storming.
 
@@ -498,13 +498,12 @@ I will be notified, and then you'll automatically be notified of progress on you
 
 =head1 AUTHOR
 
-Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
+Yves Agostini - <yvesago@cpan.org>
 
-L<http://www.crium.univ-metz.fr>
 
 =head1 COPYRIGHT
 
-Copyright 2008 Yves Agostini - <agostini@univ-metz.fr>
+Copyright 2017 Yves Agostini - <yvesago@cpan.org>
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCardGateway;
-$WebService::Braintree::CreditCardGateway::VERSION = '0.92';
+$WebService::Braintree::CreditCardGateway::VERSION = '0.93';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

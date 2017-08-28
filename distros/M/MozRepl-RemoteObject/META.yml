@@ -2,31 +2,20 @@
 abstract: 'treat Javascript objects as Perl objects'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires:
-  Task::Weaken: 0
-configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MozRepl-RemoteObject
 no_index:
   directory:
     - t
     - inc
-requires:
-  Encode: 0
-  Exporter: 0
-  File::Basename: 0
-  IPC::Run: 0
-  JSON: 2
-  MozRepl: 0.06
-  Scalar::Util: 0
-  parent: 0
-  perl: 5.006
 resources:
-  repository: http://github.com/Corion/mozrepl-remoteobject
-version: 0.39
+  repository: git://github.com/Corion/mozrepl-remoteobject.git
+version: '0.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

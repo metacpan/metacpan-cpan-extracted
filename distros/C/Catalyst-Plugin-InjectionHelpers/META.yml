@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,4 +26,5 @@ resources:
   bugtracker: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers/issues
   homepage: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers
   repository: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers.git
-version: '0.009'
+version: '0.010'
+x_serialization_backend: 'YAML::Tiny version 1.70'

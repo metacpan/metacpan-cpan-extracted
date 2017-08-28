@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-#use Test::More tests => 11;
-use Test::More skip_all => 'released with a known bug';
+use Test::More tests => 11;
 use Test::NoWarnings;
 use Test::Exception;
 use Test::Differences;
@@ -50,6 +49,12 @@ my $expected_lexicon_ref = {
             msgstr => {
                 nplurals => 2,
                 plural => 'n != 1',
+            },
+        },
+        "' quoted text with \\\\." => {
+            reference => {
+                'gettext.pl:83' => undef,
+                'gettext_loc.pl:93' => undef,
             },
         },
         "Singular\x00Plural" => {
@@ -123,10 +128,10 @@ my $expected_lexicon_ref = {
                 'maketext_localize.pl:28' => undef,
             },
         },
-        "\\' quoted text with \\\\." => {
+        'date' => {
+            automatic => q{foo => 'bar',},
             reference => {
-                'gettext.pl:83' => undef,
-                'gettext_loc.pl:83' => undef,
+                'gettext_loc.pl:81' => undef,
             },
         },
         "date\x00dates\x04appointment" => {
@@ -142,22 +147,23 @@ my $expected_lexicon_ref = {
             reference => {
                 'gettext.pl:46' => undef,
                 'gettext_loc.pl:46' => undef,
+                'gettext_loc.pl:85' => undef,
                 'maketext.pl:32' => undef,
                 'maketext_loc.pl:32' => undef,
                 'maketext_localise.pl:32' => undef,
                 'maketext_localize.pl:32' => undef,
             },
         },
-        'q\\{ quoted text with {placeholders\\}}.' => {
+        'q{ quoted text with {placeholders}}.' => {
             reference => {
                 'gettext.pl:86' => undef,
-                'gettext_loc.pl:86' => undef,
+                'gettext_loc.pl:96' => undef,
             },
         },
         'quoted text.' => {
             reference => {
                 'gettext.pl:89' => undef,
-                'gettext_loc.pl:89' => undef,
+                'gettext_loc.pl:99' => undef,
             },
         },
         'text of no domain and no category' => {
@@ -165,9 +171,9 @@ my $expected_lexicon_ref = {
                 'gettext.pl:108' => undef,
                 'gettext.pl:116' => undef,
                 'gettext.pl:120' => undef,
-                'gettext_loc.pl:108' => undef,
-                'gettext_loc.pl:116' => undef,
-                'gettext_loc.pl:120' => undef,
+                'gettext_loc.pl:118' => undef,
+                'gettext_loc.pl:126' => undef,
+                'gettext_loc.pl:130' => undef,
             },
         },
         '{name} is programming {language}.' => {
@@ -214,32 +220,32 @@ my $expected_lexicon_ref = {
             automatic => '0',
             reference => {
                 'gettext.pl:96' => undef,
-                'gettext_loc.pl:96' => undef,
+                'gettext_loc.pl:106' => undef,
             },
         },
         "singular dnp\x00plural dnp\x04context dnp" => {
             automatic => '0',
             reference => {
                 'gettext.pl:97' => undef,
-                'gettext_loc.pl:97' => undef,
+                'gettext_loc.pl:107' => undef,
             },
         },
         'text d' => {
             reference => {
                 'gettext.pl:94' => undef,
-                'gettext_loc.pl:94' => undef,
+                'gettext_loc.pl:104' => undef,
             },
         },
         "text dp\x04context dp" => {
             reference => {
                 'gettext.pl:95' => undef,
-                'gettext_loc.pl:95' => undef,
+                'gettext_loc.pl:105' => undef,
             },
         },
         'text of domain d and no category' => {
             reference => {
                 'gettext.pl:110' => undef,
-                'gettext_loc.pl:110' => undef,
+                'gettext_loc.pl:120' => undef,
             },
         },
     },
@@ -254,32 +260,32 @@ my $expected_lexicon_ref = {
             automatic => '0',
             reference => {
                 'gettext.pl:99' => undef,
-                'gettext_loc.pl:99' => undef,
+                'gettext_loc.pl:109' => undef,
             },
         },
         "singular cnp\x00plural cnp\x04context cnp" => {
             automatic => '0',
             reference => {
                 'gettext.pl:101' => undef,
-                'gettext_loc.pl:101' => undef,
+                'gettext_loc.pl:111' => undef,
             },
         },
         'text c' => {
             reference => {
                 'gettext.pl:98' => undef,
-                'gettext_loc.pl:98' => undef,
+                'gettext_loc.pl:108' => undef,
             },
         },
         "text cp\x04context cp" => {
             reference => {
                 'gettext.pl:100' => undef,
-                'gettext_loc.pl:100' => undef,
+                'gettext_loc.pl:110' => undef,
             },
         },
         'text of no domain and category c' => {
             reference => {
                 'gettext.pl:114' => undef,
-                'gettext_loc.pl:114' => undef,
+                'gettext_loc.pl:124' => undef,
             },
         },
     },
@@ -294,34 +300,34 @@ my $expected_lexicon_ref = {
             automatic => '0',
             reference => {
                 'gettext.pl:103' => undef,
-                'gettext_loc.pl:103' => undef,
+                'gettext_loc.pl:113' => undef,
             },
         },
         "singular dcnp\x00plural dcnp\x04context dcnp" => {
             automatic => '0',
             reference => {
                 'gettext.pl:105' => undef,
-                'gettext_loc.pl:105' => undef,
+                'gettext_loc.pl:115' => undef,
             },
         },
         'text dc' => {
             reference => {
                 'gettext.pl:102' => undef,
-                'gettext_loc.pl:102' => undef,
+                'gettext_loc.pl:112' => undef,
             },
         },
         "text dcp\x04context dcp" => {
             reference => {
                 'gettext.pl:104' => undef,
-                'gettext_loc.pl:104' => undef,
+                'gettext_loc.pl:114' => undef,
             },
         },
         'text of domain d and category c' => {
             reference => {
                 'gettext.pl:112' => undef,
                 'gettext.pl:118' => undef,
-                'gettext_loc.pl:112' => undef,
-                'gettext_loc.pl:118' => undef,
+                'gettext_loc.pl:122' => undef,
+                'gettext_loc.pl:128' => undef,
             },
         },
     },

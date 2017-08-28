@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Release;
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 # ABSTRACT: Query the per-release summary testers data
 
 #pod =head1 SYNOPSIS
@@ -77,7 +77,7 @@ CPAN::Testers::Schema::ResultSet::Release - Query the per-release summary tester
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

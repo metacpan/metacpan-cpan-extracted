@@ -99,7 +99,11 @@ Returns the msgstr index used to translate a value of $count.
 
 This method needs to be called after setting (reading or creating) a new
 table header, to interpret the plural algorithm as specified in the
-C<Plural-Forms> header field.
+C<Plural-Forms> header field.  [1.09] The header field is not required
+when not used.
+
+A full list of plural forms per language can be found at
+F<http://docs.translatehouse.org/projects/localization-guide/en/latest/l10n/pluralforms.html>
 
 =item $obj-E<gt>B<translations>( [$active] )
 
@@ -119,14 +123,14 @@ references are returned.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.08,
-built on June 29, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Lexicon distribution version 1.09,
+built on August 28, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
 Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

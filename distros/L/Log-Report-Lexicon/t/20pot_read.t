@@ -6,7 +6,8 @@ use strict;
 use lib 'lib', '../lib';
 use utf8;
 
-use Test::More tests => 44;
+use Test::More tests => 47;
+
 use File::Basename        qw/dirname/;
 use File::Spec::Functions qw/catfile/;
 use Encode                qw/is_utf8/;
@@ -115,4 +116,17 @@ ok(defined $po2, 'test multi');
 my $po2t = $po2->msgstr;
 is($po2t, "Ta program teče kot proces številka {pid}.multi\tline\n");
 ok(is_utf8($po2t), 'is utf8');
+
+
+#
+### READ charset detect
+#
+
+my $ar_fn = catfile dirname(__FILE__), simplecal => 'ar.po';
+my $ar = Log::Report::Lexicon::POT->read($ar_fn);
+
+cmp_ok scalar $ar->translations, '==', 22;
+my $ar_po = $ar->msgid('December');
+isa_ok $ar_po, 'Log::Report::Lexicon::PO';
+is $ar_po->msgstr, 'ديسمبر';
 

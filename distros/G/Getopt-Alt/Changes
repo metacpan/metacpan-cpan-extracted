@@ -1,5 +1,14 @@
 Revision history for Getopt-Alt
 
+0.4.5   2017-08-20
+        Updating for release of version 0.4.5
+        Added new Module required by tests (Ivan Wills)
+        Updated config (Ivan Wills)
+        Fixed tests exiting badly and auto completion logic (Ivan Wills)
+        New test for auto completion (Ivan Wills)
+        Changed order so that the "options" may overwrite helper (Ivan Wills)
+        Added passing helper status in (Ivan Wills)
+
 0.4.4   2017-07-23
         Updating for release of version 0.4.4
         Added test for processing unknown type (Ivan Wills)

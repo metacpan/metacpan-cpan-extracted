@@ -1,22 +1,22 @@
-// ************************************************************************* 
-// Copyright (c) 2014-2016, SUSE LLC
-// 
+// *************************************************************************
+// Copyright (c) 2014-2017, SUSE LLC
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // 3. Neither the name of SUSE LLC nor the names of its contributors may be
 // used to endorse or promote products derived from this software without
 // specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // html.js - functions that generate HTML source code
 //
@@ -77,17 +77,18 @@ define ([
                         r += i + '. ' + entry.menuText + '&nbsp;&nbsp;';
                     }
                 }
-                r += 'X. ' + mm.back[0];
+                r += 'X. Exit/back';
             } else {
-                r = mm.back[0];
+                r = "To leave this page, press ENTER or click the Submit button";
             }
             return r;
         },        
         valueToDisplay = function (obj, prop) {
+            console.log("valueToDisplay with object", obj, "and prop " + prop);
             // given an object and a property, return the value to display
-            if (! obj.hasOwnProperty(prop)) {
-                return '(NO_SUCH_PROP)';
-            } else if (obj[prop] === undefined) {
+            // if (! obj.hasOwnProperty(prop)) {
+            //     return '(NO_SUCH_PROP)';
+            if (obj[prop] === undefined) {
                 return '(undefined)';
             } else if (obj[prop] === false) {
                 return 'NO';
@@ -366,7 +367,7 @@ define ([
                     r += i + '. ' + entry.menuText + '<br>';
                 }
             }
-            r += 'X. ' + back.menuText + '<br>';
+            r += 'X. Exit/back<br>';
 
             r += yourChoice();
 
@@ -379,15 +380,15 @@ define ([
             // dfo is dform object
             var dfo = target.pull(dfn);
             return function (obj) {
-        
-                console.log("Generating source code of dform " + dfn);
+                console.log("Generating source code of dform " + dfn +
+                            " with object", obj);
                 var r = '<form id="' + dfo.name + '">',
                     len,
                     i,
                     allEntries,
                     needed,
                     entry;
-        
+
                 r += '<br><b>' + dfo.title + '</b><br><br>';
         
                 if (dfo.preamble) {
@@ -411,7 +412,7 @@ define ([
 
                 // READ-ONLY entries first
                 len = dfo.entriesRead ? dfo.entriesRead.length : 0;
-                console.log("Processing " + len + "read-only dform entries");
+                console.log("Processing " + len + " read-only dform entries");
                 for (i = 0; i < len; i += 1) {
                     entry = dfo.entriesRead[i];
                     if (entry.name === 'divider') {
@@ -429,7 +430,7 @@ define ([
         
                 // READ-WRITE entries second
                 len = dfo.entriesWrite ? dfo.entriesWrite.length : 0;
-                console.log("Processing " + len + "read-write dform entries");
+                console.log("Processing " + len + " read-write dform entries");
                 for (i = 0; i < len; i += 1) {
                     entry = dfo.entriesWrite[i];
                     if (lib.privCheck(entry.aclProfileWrite)) {
@@ -456,8 +457,8 @@ define ([
         }, // dform
 
         dbrowser: function (dbn) {
-            // dfn is dform name
-            // dfo is dform object
+            // dfn is dbrowser name
+            // dfo is dbrowser object
             var dbo = target.pull(dbn);
             return function (set, pos) {
         
@@ -507,7 +508,7 @@ define ([
                 r += browserNavMenu(set.length, pos);
                 
 		// miniMenu at the bottom: selections are target names defined
-		// in the 'miniMenu' property of the dform object
+		// in the 'miniMenu' property of the dbrowser object
                 r += miniMenu(dbo.miniMenu);
 
                 // your choice section
@@ -527,7 +528,7 @@ define ([
             return function () {
                 var r = '';
                 r += '<div id="' + dnn + '"><br><b>' + dno.title + '</b><br><br>';
-                r += dno.preamble + '<br>';
+                r += dno.preamble + '<br><br>';
                 r += '<div id="noticeText"></div><br>';
                 r += "To leave this page, press ENTER or click the Submit button";
                 r += yourChoice();

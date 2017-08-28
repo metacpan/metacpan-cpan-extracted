@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 has '+format' => 'tar';
@@ -65,7 +65,7 @@ sub _pick
     # if we don't have Archive::Zip, check if we have the unzip command
     elsif(eval { require Alien::Build::Plugin::Extract::CommandLine; Alien::Build::Plugin::Extract::CommandLine->new->unzip_cmd })
     {
-      return 'Extract::CommandLine';
+      return 'CommandLine';
     }
     
     # okay fine.  I will try to install Archive::Zip :(
@@ -112,7 +112,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 

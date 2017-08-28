@@ -1,29 +1,34 @@
---- #YAML:1.0
-name:               DR-TarantoolQueue
-version:            0.21
-abstract:           client for tarantool's queue
+---
+abstract: "client for tarantool's queue"
 author:
-    - Dmitry E. Oboukhov <unera@debian.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Dmitry E. Oboukhov <unera@debian.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:           0
-    Coro:           0
-    DR::Tarantool:  0
-    JSON::XS:       0
-    Mouse:          0
-resources:
-    bugtracker:  https://github.com/mailru/tarantool-queue/issues
-    homepage:    https://github.com/mailru/tarantool-queue
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DR-TarantoolQueue
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Compress::Zlib: '0'
+  Coro: '0'
+  DR::Tnt: '0'
+  JSON::XS: '0'
+  List::MoreUtils: '0'
+  MIME::Base64: '0'
+  Mouse: '0'
+resources:
+  bugtracker: https://github.com/dr-co/tarantool-queue/issues
+  homepage: https://github.com/dr-co/tarantool-queue
+  repository: https://github.com/dr-co/tarantool-queue
+version: '0.44'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

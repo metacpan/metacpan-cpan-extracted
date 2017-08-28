@@ -18,7 +18,7 @@ use Net::Google::SafeBrowsing4::URI;
 
 our @EXPORT = qw(DATABASE_RESET INTERNAL_ERROR SERVER_ERROR NO_UPDATE NO_DATA SUCCESSFUL);
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 =head1 NAME
 

@@ -12,35 +12,35 @@ MozRepl::RemoteObject - treat Javascript objects as Perl objects
 
 =head1 SYNOPSIS
 
-    #!perl -w
-    use strict;
-    use MozRepl::RemoteObject;
-    
-    # use $ENV{MOZREPL} or localhost:4242
-    my $repl = MozRepl::RemoteObject->install_bridge();
-    
-    # get our root object:
-    my $tab = $repl->expr(<<JS);
-        window.getBrowser().addTab()
-    JS
+  #!perl -w
+  use strict;
+  use MozRepl::RemoteObject;
 
-    # Now use the object:
-    my $body = $tab->{linkedBrowser}
-                ->{contentWindow}
-                ->{document}
-                ->{body}
-                ;
-    $body->{innerHTML} = "<h1>Hello from MozRepl::RemoteObject</h1>";
+  # use $ENV{MOZREPL} or localhost:4242
+  my $repl = MozRepl::RemoteObject->install_bridge();
 
-    $body->{innerHTML} =~ '/Hello from/'
-        and print "We stored the HTML";
+  # get our root object:
+  my $tab = $repl->expr(<<JS);
+      window.getBrowser().addTab()
+  JS
 
-    $tab->{linkedBrowser}->loadURI('http://corion.net/');
+  # Now use the object:
+  my $body = $tab->{linkedBrowser}
+              ->{contentWindow}
+              ->{document}
+              ->{body}
+              ;
+  $body->{innerHTML} = "<h1>Hello from MozRepl::RemoteObject</h1>";
+
+  $body->{innerHTML} =~ '/Hello from/'
+      and print "We stored the HTML";
+
+  $tab->{linkedBrowser}->loadURI('https://corion.net/');
 
 =cut
 
 use vars qw[$VERSION $objBridge @CARP_NOT @EXPORT_OK $WARN_ON_LEAKS];
-$VERSION = '0.39';
+$VERSION = '0.40';
 
 @EXPORT_OK=qw[as_list];
 @CARP_NOT = (qw[MozRepl::RemoteObject::Instance
@@ -57,7 +57,7 @@ repl.link = function(obj) {
         repl.linkedVars = {};
         repl.linkedIdNext = 1;
     };
-    
+
     if (obj) {
         repl.linkedVars[ repl.linkedIdNext ] = obj;
         return repl.linkedIdNext++;
@@ -150,7 +150,7 @@ repl.callThis = function(id,args) {
     return res
 };
 
-repl.callMethod = function(id,fn,args) { 
+repl.callMethod = function(id,fn,args) {
     var obj = repl.getLink(id);
     var f = obj[fn];
     if (! f) {
@@ -210,18 +210,18 @@ sub to_perl {
     #s/^(\.+\>\s*)+//; # remove Mozrepl continuation prompts
     s/^"//;
     s/"$//;
-    
+
     if (/^(\.+>\s*)+/) {
         # This should now be eliminated!
         die "Continuation prompt found in [$_]";
     }
-    
+
     #warn $js;
     # reraise JS errors from perspective of caller
     if (/^!!!\s+(.*)$/m) {
         croak "MozRepl::RemoteObject: $1";
     };
-    
+
     if (! /\S/) {
         # We got an empty string back from the REPL ...
         warn "Got empty string from REPL";
@@ -236,7 +236,7 @@ sub to_perl {
     local $@;
     my $json = $self->json;
     if (! eval {
-        
+
         $res = $json->decode($js);
         #use Data::Dumper;
         #warn Dumper $res;
@@ -286,7 +286,7 @@ sub unwrap_json_result {
 sub unjson {
     my ($self,$js,$context) = @_;
     my $data = $self->js_call_to_perl_struct($js,$context);
-    return $self->unwrap_json_result($data);    
+    return $self->unwrap_json_result($data);
 };
 
 =head1 BRIDGE SETUP
@@ -417,7 +417,7 @@ sub install_bridge {
     # mozrepl
     # / Net::Telnet don't like too large commands
     $options{ max_queue_size } ||= 1000;
-    
+
     $options{ command_sep } ||= "\n--end-remote-input\n";
 
     if (! ref $options{repl}) { # we have host:port
@@ -444,7 +444,7 @@ sub install_bridge {
                     log => $options{ log },
                     plugins => { plugins => [] },
                 });
-                
+
                 if (my $bufsize = delete $options{ bufsize }) {
                     if ($options{ repl }->can('client')) {
                         $options{ repl }->client->telnet->max_buffer_length($bufsize);
@@ -469,10 +469,10 @@ sub install_bridge {
             }
         };
     };
-    
+
     if(! exists $options{ js_JSON }) {
         # Autodetect whether we need the custom JSON serializer
-        
+
         # It's required on Firefox 3.0 only
         my $capabilities = $options{ repl }->execute(
           join "",
@@ -483,14 +483,14 @@ sub install_bridge {
               q{+eval("var r;try{r=JSON.stringify('\u30BD');}catch(e){r=''};r")},
                # UTF-8 transport detection
               '+"!\u30BD"',
-              ";\n" 
+              ";\n"
         );
         $capabilities =~ s/^"(.*)"\s*$/$1/;
         $capabilities =~ s/^"//;
         $capabilities =~ s/"$//;
         #warn "Capabilities: [$capabilities]";
         my ($version, $have_native, $unicode) = split /!/, $capabilities;
-    
+
         #warn $unicode;
         #warn sprintf "%02x",$_ for map{ord} split //, $unicode;
         if ($have_native eq '') {
@@ -505,15 +505,15 @@ sub install_bridge {
             $options{ js_JSON } ||= "json2; Transport not UTF-8-safe";
         };
     };
-    
+
     if ($options{ js_JSON } ne 'native') {
         # send our own JSON encoder
         #warn "Installing custom JSON encoder ($options{ native_JSON })";
         require MozRepl::Plugin::JSON2;
-        
+
         my $json2 = MozRepl::Plugin::JSON2->new()->process('setup');
         $options{ repl }->execute($json2);
-        
+
         # Now, immediately check whether our transport is UTF-8 safe:
         my $utf8 = $options{ repl }->execute(
               q{JSON.stringify('\u30BD')}.";\n"
@@ -522,16 +522,16 @@ sub install_bridge {
         lc $utf8 eq lc q{""\u30bd""}
             or warn "Transport still not UTF-8 safe: [$utf8].\nDo you have mozrepl 1.1.0 or later installed?";
     };
-    
+
     my $rn = $options{repl}->repl;
     $options{ json } ||= JSON->new->allow_nonref->ascii; # We talk ASCII
     # Is this still true? It seems to be even when we find an UTF-8 safe
     # transport above. This needs some investigation.
-    
+
     # Switch the Perl-repl to multiline input mode
     # Well, better use a custom interactor and pass JSON messages that
     # are self-delimited and contain no newlines. Newline for a new message.
-    
+
     # Switch the JS-repl to multiline input mode
     $options{repl}->execute("$rn.setenv('inputMode','multiline');undefined;\n");
 
@@ -539,14 +539,14 @@ sub install_bridge {
     my $c = $objBridge; # make a copy
     $c =~ s/\[%\s+rn\s+%\]/$rn/g; # cheap templating
     #warn $c;
-    
+
     $package->execute_command($c, %options);
-    
+
     $options{ functions } = {}; # cache
     $options{ constants } = {}; # cache
     $options{ callbacks } = {}; # active callbacks
 
-    bless \%options, $package;    
+    bless \%options, $package;
 };
 
 sub execute_command {
@@ -570,7 +570,7 @@ in the object forest.
 
   my $window = $bridge->expr('window');
   print $window->{title};
-  
+
 You can also create Javascript functions and use them from Perl:
 
   my $add = $bridge->expr(<<JS);
@@ -815,7 +815,7 @@ sub js_call_to_perl_struct {
     };
     my $queue = join '',
                      map( { /;$/? $_ : "$_;" } map { s/\s*$//; $_ } @{ $self->queue });
-        
+
     @{ $self->queue } = ();
 
     #warn "<<$js>>";
@@ -825,17 +825,20 @@ sub js_call_to_perl_struct {
     };
     push @js, $self->repl_API('ejs', $js, $context );
     $js = join ";", @js;
-    
+
     if (defined wantarray) {
         #warn $js;
         # When going async, we would want to turn this into a callback
         my $res = $self->execute_command($js);
         $res =~ s/^(?:\.+\>\s+)+//g;
+        my $i=0;
         while ($res !~ /\S/) {
             # Gobble up continuation prompts
             warn "No result yet from repl";
             $res = $self->execute_command(";"); # no-op
             $res =~ s/^(?:\.+\>\s+)+//g;
+            $i++;
+            last if ($i == 25);
         };
         my $d = $self->to_perl($res);
         if ($d->{status} eq 'ok') {
@@ -876,7 +879,7 @@ JS
     bless $res, "$ref\::HashAccess";
     weaken $res->{bridge};
     bless $res => $ref;
-    
+
     $self->{callbacks}->{$cbid} = {
         callback => $cb, jsproxy => $res, where => [caller(1)],
     };
@@ -1011,7 +1014,7 @@ As in Javascript, functions are first class objects, the following
 two methods of calling a function are equivalent:
 
   $window->loadURI('http://search.cpan.org/');
-  
+
   $window->{loadURI}->('http://search.cpan.org/');
 
 =cut
@@ -1028,9 +1031,9 @@ sub AUTOLOAD {
 This module also implements a rudimentary asynchronous
 event dispatch mechanism. Basically, it allows you
 to write code like this and it will work:
-  
-  $window->addEventListener('load', sub { 
-       my ($event) = @_; 
+
+  $window->addEventListener('load', sub {
+       my ($event) = @_;
        print "I got a " . $event->{type} . " event\n";
        print "on " . $event->{originalTarget};
   });
@@ -1069,9 +1072,9 @@ L<MozRepl::RemoteObject::Methods> instead.
 =head2 C<< $obj->__invoke(METHOD, ARGS) >>
 
 The C<< ->__invoke() >> object method is an alternate way to
-invoke Javascript methods. It is normally equivalent to 
+invoke Javascript methods. It is normally equivalent to
 C<< $obj->$method(@ARGS) >>. This function must be used if the
-METHOD name contains characters not valid in a Perl variable name 
+METHOD name contains characters not valid in a Perl variable name
 (like foreign language characters).
 To invoke a Javascript objects native C<< __invoke >> method (if such a
 thing exists), please use:
@@ -1098,17 +1101,17 @@ This method transforms the passed in arguments to their JSON string
 representations.
 
 Things that match C< /^(?:[1-9][0-9]*|0+)$/ > get passed through.
- 
+
 MozRepl::RemoteObject::Instance instances
 are transformed into strings that resolve to their
 Javascript global variables. Use the C<< ->expr >> method
 to get an object representing these.
- 
+
 It's also impossible to pass a negative or fractional number
 as a number through to Javascript, or to pass digits as a Javascript string.
 
 =cut
- 
+
 *__transform_arguments = \&MozRepl::RemoteObject::Methods::transform_arguments;
 
 =head2 C<< $obj->__id >>
@@ -1138,7 +1141,9 @@ Perl object.
 
 =cut
 
-*bridge = \&MozRepl::RemoteObject::Methods::bridge;
+*bridge =
+*bridge =
+\&MozRepl::RemoteObject::Methods::bridge;
 
 =head2 C<< $obj->__release_action >>
 
@@ -1166,7 +1171,7 @@ sub DESTROY {
     my $release_action;
     if ($release_action = ($self->__release_action || '')) {
         $release_action =~ s/\s+$//mg;
-        $release_action = join '', 
+        $release_action = join '',
             'var self = repl.getLink(id);',
             $release_action,
             ';self = null;',
@@ -1177,7 +1182,7 @@ sub DESTROY {
         $on_destroy->($self);
     };
     if ($self->bridge) { # not always there during global destruction
-        my $rn = $self->bridge->name; 
+        my $rn = $self->bridge->name;
         if ($rn) { # not always there during global destruction
             # we don't want a result here!
             $self->bridge->exprq(<<JS);
@@ -1200,7 +1205,7 @@ Read-only accessor to read the property
 of a Javascript object.
 
     $obj->__attr('foo')
-    
+
 is identical to
 
     $obj->{foo}
@@ -1211,7 +1216,7 @@ sub __attr {
     my ($self,$attr,$context) = @_;
     my $id = MozRepl::RemoteObject::Methods::id($self)
         or die "No id given";
-    
+
     my $bridge = MozRepl::RemoteObject::Methods::bridge($self);
     $bridge->{stats}->{fetch}++;
     my $rn = $bridge->name;
@@ -1228,7 +1233,7 @@ Write accessor to set a property of a Javascript
 object.
 
     $obj->__setAttr('foo', 'bar')
-    
+
 is identical to
 
     $obj->{foo} = 'bar'
@@ -1295,7 +1300,7 @@ is identical to
 sub __keys { # or rather, __properties
     my ($self,$attr) = @_;
     die unless $self;
-    
+
     # We do not want to rely on the object actually supporting
     # .hasOwnProperty, so we support both, it having .hasOwnProperty
     # and using Object.hasOwnProperty
@@ -1326,7 +1331,7 @@ Returns the values of all properties
 as a list.
 
   $obj->values()
-  
+
 is identical to
 
   values %$obj
@@ -1429,7 +1434,7 @@ user entering a value into a field:
   $elt->{value} = 'Hello';
   $elt->__event('change');
   $elt->__event('blur');
-  
+
 =cut
 
 sub __event {
@@ -1693,7 +1698,7 @@ Think more about how to handle object identity.
 Should C<Scalar::Util::refaddr> return true whenever
 the Javascript C<===> operator returns true?
 
-Also see L<http://perlmonks.org/?node_id=802912>
+Also see L<https://perlmonks.org/?node_id=802912>
 
 =item *
 
@@ -1787,7 +1792,7 @@ sent from Perl to fill in all those promises.
   $bridge->promise( 'window' )
   could return
   sub { $bridge->expr('window') }
-  
+
 but that wouldn't allow for coalescing these promises into Javascript.
 
 =item *
@@ -1809,19 +1814,19 @@ rest of FireFox:
             * Since FF3, we'll have to ask for user permission to execute XPCOM objects.
             */
           // netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-           
+
           // Get the current thread.
           var thread = Components.classes["@mozilla.org/thread-manager;1"].getService(Components.interfaces.nsIThreadManager).currentThread;
-           
+
           // Create an inner property to be used later as a notifier.
           this.delayed = true;
-           
+
           /* Call JavaScript setTimeout function
             * to execute this.delayed = false
             * after it finish.
             */
           setTimeout("this.delayed = false;", delay);
-           
+
           /**
             * Keep looping until this.delayed = false
             */
@@ -1840,13 +1845,13 @@ rest of FireFox:
 
 L<Win32::OLE> for another implementation of proxy objects
 
-L<http://wiki.github.com/bard/mozrepl> - the MozRepl 
+L<https://wiki.github.com/bard/mozrepl> - the MozRepl
 FireFox plugin homepage
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/mozrepl-remoteobject>.
+The public repository of this module is
+L<https://github.com/Corion/mozrepl-remoteobject>.
 
 =head1 AUTHOR
 

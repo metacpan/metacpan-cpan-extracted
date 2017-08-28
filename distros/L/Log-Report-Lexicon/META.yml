@@ -26,9 +26,9 @@ requires:
   File::Temp: 0
   IO::File: 0
   List::Util: 0
-  Log::Report: 1.2
+  Log::Report: 1.22
   POSIX: 0
   Pod::Usage: 0
   Scalar::Util: 0
   Test::More: 0.86
-version: 1.08
+version: 1.09

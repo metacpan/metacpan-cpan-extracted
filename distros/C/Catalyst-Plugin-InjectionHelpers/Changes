@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::InjectionHelpers
 
+0.010   21 August 2017
+        - Application scope now inits its instance at setup time, not at
+          first run.
+
 0.009   18 July 2016
         - Fixed incorrect default value.
         - Updated license info.

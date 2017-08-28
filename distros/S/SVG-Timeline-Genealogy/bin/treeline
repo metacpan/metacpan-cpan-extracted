@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use SVG::Timeline::Genealogy;
+
+my $tree = SVG::Timeline::Genealogy->new;
+
+my @cols = qw[ahnen text start end];
+while (<>) {
+  chomp;
+  my ($rec) = split /\s*#/;
+  next unless defined $rec and $rec =~ /\W/;
+  my %rec;
+  @rec{@cols} = split /\s*\t\s*/, $rec;
+  delete $rec{end} unless defined $rec{end};
+  $tree->add_person(\%rec);
+}
+
+say $tree->draw;

@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MYDan::Sync;
+use FindBin qw( $RealBin );
+
+my $sync = MYDan::Sync->new( 
+    code => "$RealBin/../code",
+    conf => "$RealBin/../conf/config"
+);
+
+my $interval = defined $ARGV[0] && $ARGV[0] =~ /^\d+$/ ? $ARGV[0] : 900;
+
+print "run...\n";
+sleep 5 if $interval;
+
+while( my $time = time )
+{
+    $sync->run();
+    last unless $interval;
+    my $due = $time + $interval - time;
+    sleep $due if $due > 0;
+}

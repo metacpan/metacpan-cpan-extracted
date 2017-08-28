@@ -4,15 +4,14 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Brian Duggan <bduggan@cpan.org>'
 build_requires:
-  Data::Dumper: '0'
-  Test::More: '0.94'
+  Test2::V0: '0.000060'
   Time::Piece: '1.17'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +23,13 @@ requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plicease/String-Template/issues
-  homepage: http://perl.wdlabs.com/String-Template
+  homepage: https://metacpan.org/pod/String::Template
   repository: git://github.com/plicease/String-Template.git
-version: '0.19'
+version: '0.21'
+x_contributors:
+  - 'Brian Duggan'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Curt Tilmes'
+  - 'Jeremy Mates (thirg, JMATES)'
+  - 'José Joaquín Atria'
+x_serialization_backend: 'YAML::Tiny version 1.70'

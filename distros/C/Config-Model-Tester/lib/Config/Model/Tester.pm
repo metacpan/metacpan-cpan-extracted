@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.001';
+$Config::Model::Tester::VERSION = '3.002';
 use warnings;
 use strict;
 use locale;
@@ -429,6 +429,7 @@ sub run_model_test {
     undef $conf_file_name ;
     undef $conf_dir ;
     undef $home_for_test ;
+    undef $model_to_test ;
 
     note("Beginning $app_to_test test ($app_to_test_conf)");
 
@@ -626,7 +627,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 SYNOPSIS
 
@@ -817,6 +818,15 @@ your model. In this case, you should avoid specifying C<no_warnings>
 here and specify warning tests or warning filters as mentioned below.
 
 See actual L<fstab test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/fstab-test-conf.pl>.
+
+=head2 Skip a test
+
+A test file can be skipped using C<$skip> global variable.
+
+In this example, test is skipped when not running on a Debian system:
+
+ eval { require AptPkg::Config; };
+ $skip = ( $@ or not -r '/etc/debian_version' ) ? 1 : 0;
 
 =head2 Internal tests or backend tests
 

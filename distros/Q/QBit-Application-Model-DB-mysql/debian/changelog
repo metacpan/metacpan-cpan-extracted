@@ -1,3 +1,9 @@
+libqbit-application-model-db-mysql-perl (0.012) raring; urgency=low
+
+  * deleted get_dbh. Use set_dbh and dbh
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Aug 2017 11:35:30 +0300
+
 libqbit-application-model-db-mysql-perl (0.011) raring; urgency=low
 
   * speed up

@@ -1,5 +1,8 @@
 Revision history for Perl module Template::Resolver
 
+1.14 2017-08-21
+    - Added the ability to loop over entities in the template
+
 1.13 2016-10-12
     - Resolved https://rt.cpan.org/Ticket/Display.html?id=116437 Fails with perls < 5.8.9
     - Updated tests to use Log::Any instead of Log::Log4perl

@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::imonlcd
 # ABSTRACT:  Configuration class LCDd::imonlcd
+
 =encoding utf8
 
 =head1 NAME
@@ -16,39 +17,109 @@ generated from LCDd.conf
 
 =head2 Backlight
 
-Set the backlight state I<< Optional. Type boolean. upstream_default: 'on'.  >> 
+Set the backlight state I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+on
+
+=back
+
+
 
 =head2 Contrast
 
-Select the displays contrast I<< Optional. Type integer. upstream_default: '200'.  >> 
+Select the displays contrast I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+200
+
+=back
+
+
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd0'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd0
+
+=back
+
+
 
 =head2 DiscMode
 
 Set the disc mode 
 0 => spin the "slim" disc - two disc segments,
-1 => their complement spinning; I<< Optional. Type enum. choice: '0', '1'. upstream_default: '0'.  >> 
+1 => their complement spinning; I< Optional. Type enum. choice: '0', '1'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head2 OnExit
 
 Set the exit behavior 
 0 means leave shutdown message,
 1 means show the big clock,
-2 means blank device. I<< Optional. Type integer. upstream_default: '1'.  >> 
+2 means blank device. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1
+
+=back
+
+
 
 =head2 Protocol
 
 Specify which iMon protocol should be used
 
 Choose 0 for 15c2:ffdc device,
-Choose 1 for 15c2:0038 device. I<< Optional. Type enum. choice: '0', '1'. upstream_default: '0'.  >> 
+Choose 1 for 15c2:0038 device. I< Optional. Type enum. choice: '0', '1'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head2 Size
 
-Specify the size of the display in pixels I<< Optional. Type uniline. upstream_default: '96x16'.  >> 
+Specify the size of the display in pixels I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+96x16
+
+=back
+
+
 
 =head1 SEE ALSO
 

@@ -1,5 +1,5 @@
 package QBit::QueryData;
-$QBit::QueryData::VERSION = '0.002';
+$QBit::QueryData::VERSION = '0.003';
 use qbit;
 
 use base qw(QBit::Class);
@@ -326,14 +326,19 @@ sub _get_order {
 
     my @part = ();
     foreach my $order (@order_by) {
-        throw gettext('Unknown field "%s"', $order->[0]) unless $self->{'__EXISTS_FIELDS__'}{$order->[0]};
+        my @path = split(/\./, $order->[0]);
+
+        throw gettext('Unknown field "%s"', $path[0]) unless $self->{'__EXISTS_FIELDS__'}{$path[0]};
 
         my $type_operation = $self->_get_order_operation($order->[0]);
 
+        my $value = '$_[%s]';
+        $value .= "->{$_}" foreach @path;
+
         unless ($order->[1]) {
-            push(@part, "(\$_[0]->{$order->[0]} $type_operation \$_[1]->{$order->[0]})");
+            push(@part, sprintf("($value %s $value)", 0, $type_operation, 1));
         } else {
-            push(@part, "(\$_[1]->{$order->[0]} $type_operation \$_[0]->{$order->[0]})");
+            push(@part, sprintf("($value %s $value)", 1, $type_operation, 0));
         }
     }
 
@@ -442,18 +447,28 @@ B<Example:>
         data => [
             {
                 id      => 1,
-                caption => 'c1'
+                caption => 'c1',
+                data    => {
+                    k1 => 1.1,
+                    k2 => 'd1_2'
+                },
             },
             {
                 id      => 2,
-                caption => 'c2'
+                caption => 'c2',
+                data    => {
+                    k1 => 2.1,
+                    k2 => 'd2_2'
+                },
             },
         ],
         fields => [qw(id caption)],
         filter => ['OR', [{id => 1}, ['caption' => '=' => \'c2']]],
         definition => {
-            id      => {type => 'number'},
-            caption => {type => 'string'}
+            'id'      => {type => 'number'},
+            'caption' => {type => 'string'},
+            'data.k1' => {type => 'number'},
+            'data.k2' => {type => 'string'},
         },
     );
 
@@ -487,13 +502,15 @@ Types:
 
 =item *
 
-number: =, <>, !=, >. >=, <, <=, IN, NOT IN, IS, IS NOT
+number: "=" "<>" "!=" ">" ">=" "<" "<=" "IN" "NOT IN" "IS" "IS NOT"
 
 =item *
 
-string: =, <>, !=, >. >=, <, <=, IN, NOT IN, IS, IS NOT, LIKE, NOT LIKE
+string: "=" "<>" "!=" ">" ">=" "<" "<=" "IN" "NOT IN" "IS" "IS NOT" "LIKE" "NOT LIKE"
 
 =back
+
+For list: "=" "<>" "!=" "IN" "NOT IN"
 
 B<Example:>
 
@@ -510,8 +527,10 @@ B<definition> - set fields definition
 B<Example:>
 
     $q->definition({
-        id      => {type => 'number'},
-        caption => {type => 'string'}
+        'id'      => {type => 'number'},
+        'caption' => {type => 'string'},
+        'data.k1' => {type => 'number'},
+        'data.k2' => {type => 'string'},
     });
 
 =item *
@@ -521,7 +540,7 @@ B<order_by> - set order sorting
 B<Example:>
 
     # Ascending
-    $q->order_by(qw(id caption)); # or (['id', 0], ['caption', 0])
+    $q->order_by(qw(id caption data.k1)); # or (['id', 0], ['caption', 0], ['data.k1', 0])
     
     # Descending
     $q->order_by(['id', 1]);

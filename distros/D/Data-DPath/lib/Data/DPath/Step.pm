@@ -1,7 +1,7 @@
 package Data::DPath::Step;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a single Step through a Path
-$Data::DPath::Step::VERSION = '0.56';
+$Data::DPath::Step::VERSION = '0.57';
 use strict;
 use warnings;
 

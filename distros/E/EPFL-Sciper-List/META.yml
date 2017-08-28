@@ -1,0 +1,30 @@
+---
+abstract: 'Retrieve a list of all public active sciper from EPFL.'
+author:
+  - 'William Belle <william.belle@gmail.com>'
+build_requires:
+  File::Copy::Recursive: '0.38'
+  IO::All: '0.87'
+  Test::JSON: '0.11'
+  Test::MockModule: '0.12'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EPFL-Sciper-List
+provides:
+  EPFL::Sciper::List:
+    file: lib/EPFL/Sciper/List.pm
+    version: '0.01'
+requires:
+  JSON: '2.94'
+  LWP::Protocol::https: '6.07'
+  LWP::UserAgent: '6.26'
+  Readonly: '2.05'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

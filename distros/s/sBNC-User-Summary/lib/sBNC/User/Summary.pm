@@ -7,7 +7,7 @@ use Moose;
 
 use vars qw/$VERSION/;
 
-$VERSION = 1.01;
+$VERSION = 1.02;
 
 ################################################################################
 
@@ -158,10 +158,12 @@ Version 1.01
 
 =head2 USAGE
 
-    my $users = sBNC::User->new({
+    my $users = sBNC::User::Summary->new({
         users => [ 'Mike', 'Dave' ],
         dir   => '/absolute/path/to/sBNC/users/',
     });
+
+    my $output = $users->config;
 
 =head1 AUTHOR
 

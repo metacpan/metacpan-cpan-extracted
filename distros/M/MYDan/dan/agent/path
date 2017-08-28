@@ -1,0 +1,3 @@
+root: $RealBin/../../agent
+code: $root/code
+run: $root/run

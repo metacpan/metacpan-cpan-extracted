@@ -10,13 +10,19 @@ has instance => (
   required=>1,
   default=>sub {$_[0]->build_new_instance($_[0]->application)} );
 
-sub ACCEPT_CONTEXT {
-  my ($self, $c, @ignored) = @_;
+sub COMPONENT {
+  my ($self, $app, @ignored) = @_;
   return $self->instance;
 }
 
-__PACKAGE__->meta->make_immutable;
+sub expand_modules {
+  my ($self, @args);
+  return $self->instance->can('expand_modules')
+    ? $self->instance->expand_modules(@args)
+      : undef;
+}
 
+__PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 

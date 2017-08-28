@@ -11,7 +11,6 @@ author.yml
 corpus/lib/Bar.pm
 corpus/lib/Baz.pm
 corpus/lib/Foo.pm
-cpanfile
 dist.ini
 lib/Alien/Build/MB.pm
 maint/travis-install-alienbuild

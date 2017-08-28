@@ -1,4 +1,4 @@
-sse strict;
+use strict;
 use warnings;
 
 use Test::More tests => 2;
@@ -12,7 +12,7 @@ diag("Install type: ".Alien::zlib::Static->install_type);
 
 my %libs = map { $_ => 1 } shellwords( Alien::zlib::Static->libs );
 if ($^O eq 'MSWin32') {
-	ok(1, 'Library defined') if ( defined($libs{'-lz'}) ) );
+	ok(1, 'Library defined') if defined($libs{'-lz'});
 } else {
 	ok(defined($libs{'-lz'}), 'zlib defined');
 }

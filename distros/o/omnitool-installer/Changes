@@ -7,3 +7,7 @@ Revision history for Perl extension omnitool-installer
 1.0.1 2017-08-04T03:08:30Z
 
     - Correct initial permissions on start_omnitool.bash
+
+1.0.2 2017-08-21T19:29:25Z
+
+    - Add dependency for AWS:S3 so OmniTool can store files in S3.

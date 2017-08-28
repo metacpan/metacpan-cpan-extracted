@@ -8,6 +8,11 @@ To-do:
     . Automatically load the AnyEvent backend if needed.
     . Implement ->can() for MozRepl objects
 
+0.40 20170819
+    ! Fix a potential infinite loop
+      Contributed by Alexander198961
+    . Travis CI
+
 0.39 20141026
     ! Fix wrong coordinates sent in ->__click()
 
@@ -88,12 +93,12 @@ To-do:
       that prevents the repl from ever returning anything but the first result.
       If you are upgrading Firefox to version 8 or later, you will see failure
       symptoms like
-      
-        Transport still not UTF-8 safe: "8.0!"?!? 
+
+        Transport still not UTF-8 safe: "8.0!"?!?
 
 0.28 20110923
     + Switch to "multiline" input mode.
-    
+
       This should eliminate the "no result yet from mozrepl"
       warnings and make input/response somewhat better.
     . Fix a buglet in the memleak test
@@ -128,7 +133,7 @@ To-do:
     + More UTF-8 handling on the Perl side of the connection. All
       received strings are now actively decoded to unicode strings
       before being handed to JSON.pm
-      
+
     + The JS API now uses the native JSON encoder of Firefox
       instead of using a hand-rolled JSON encoder when possible. The
       conditions are:
@@ -145,11 +150,11 @@ To-do:
 0.25 20110426
     . Add CLEAR method to tied objects so now list-assignment
       to a hash works:
-      
+
           %$foo = (Just => 'another', Javascript => 'Hacker');
           $foo->{Just} # another
           $foo->{Javascript} # Hacker
-          
+
     . Add the C<bufsize> parameter to ->install_bridge
       for setting the Net::Telnet buffer size
     . Don't list MozRepl::RemoteObject::Methods in carp()
@@ -178,7 +183,7 @@ To-do:
       This makes the object cleaner and you shouldn't have many places
       where you call C<< ->__xpath >> anyway, as it is not available on
       most JS objects anyway.
-      
+
       This method will go away in 0.23.
 
 0.21 20110109

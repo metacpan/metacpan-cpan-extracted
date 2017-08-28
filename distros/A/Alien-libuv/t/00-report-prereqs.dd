@@ -2,15 +2,10 @@ do { my $x = {
        'build' => {
                     'requires' => {
                                     'Alien::Base' => '0',
-                                    'Alien::Build' => '0.40',
-                                    'Alien::Build::MM' => '0.40',
+                                    'Alien::Build' => '0.32',
+                                    'Alien::Build::MM' => '0.32',
                                     'Alien::Build::Plugin::Build::Autoconf' => '0',
                                     'Alien::Build::Plugin::Gather::IsolateDynamic' => '0',
-                                    'Alien::MSYS' => '0',
-                                    'Alien::autoconf' => '0.03',
-                                    'Alien::automake' => '0.05',
-                                    'Alien::libtool' => '0.04',
-                                    'Alien::m4' => '0.11',
                                     'Config' => '0',
                                     'ExtUtils::MakeMaker' => '6.52',
                                     'IPC::Cmd' => '0'
@@ -18,8 +13,9 @@ do { my $x = {
                   },
        'configure' => {
                         'requires' => {
-                                        'Alien::Build' => '0.40',
-                                        'Alien::Build::MM' => '0.40',
+                                        'Alien::Build' => '0.32',
+                                        'Alien::Build::MM' => '0.32',
+                                        'Alien::Build::Plugin::Build::Make' => '0.01',
                                         'ExtUtils::MakeMaker' => '6.52'
                                       }
                       },

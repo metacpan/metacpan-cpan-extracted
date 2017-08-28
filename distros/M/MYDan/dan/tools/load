@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use warnings;  
+use strict;  
+  
+use MYDan::Agent::Load;
+use Fcntl qw(:flock SEEK_END);
+ 
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 -host host [--sp srcfile] [--verbose]
+
+     [--dp dstfile (default sp )]
+
+     [--sudo sudoer ]
+     [--user username (default `logname`)]
+     [--timeout seconds (default 500)]
+     [--continue]
+
+=cut
+
+$MYDan::Util::OptConf::THIS = 'agent';
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( 
+    qw( host=s sp=s dp=s verbose user=s sudo=s timeout=i continue ) 
+)->dump();
+
+$option->assert( 'host', 'sp' );
+$o{dp} ||= $o{sp};
+$o{verbose} = 1;
+
+$o{user} = `logname` and chop $o{user} unless $o{user};
+
+MYDan::Agent::Load->new(
+    node => $o{host}, 
+    map{ $_ => $o{$_} }qw( sp dp )
+)->run( %o );

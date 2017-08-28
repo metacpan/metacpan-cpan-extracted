@@ -26,3 +26,6 @@ Revision history for Business-Bitcoin
 
 1.043   Tue May 9 22:54:03 2017 -0700
         Fix address generation bug
+
+1.047   Thu Aug 17 01:01:54 2017 -0700
+        Add missing WHERE clause in commit

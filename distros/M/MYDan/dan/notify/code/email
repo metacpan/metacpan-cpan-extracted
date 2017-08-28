@@ -1,0 +1,21 @@
+#!# perl: notify/code/email
+use warnings;
+use strict;
+
+use Data::Dumper;
+
+=head3 notify
+
+user => [ 'user1', 'user2' ... ]
+mesg = > +{ name => 'name', attr => 'attr', mesg => 'mesg', time => 'time' }
+
+=cut
+return sub
+{
+    my %param = @_;
+
+    $param{t} = 'email';
+    print Dumper \%param;
+
+    return;
+};

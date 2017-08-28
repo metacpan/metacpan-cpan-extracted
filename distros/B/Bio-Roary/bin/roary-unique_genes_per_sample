@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+package Bio::Roary::Main::UniqueGenesPerSample;
+$Bio::Roary::Main::UniqueGenesPerSample::VERSION = '3.9.1';
+# ABSTRACT: Take in the clustered file and produce a sorted file with the frequency of each samples unique genes
+# PODNAME: roary-unique_genes_per_sample
+
+
+use Cwd qw(abs_path); 
+BEGIN { unshift( @INC, abs_path('./lib') ) }
+BEGIN { unshift( @INC, abs_path('./t/lib') ) }
+use Bio::Roary::CommandLine::UniqueGenesPerSample;
+
+Bio::Roary::CommandLine::UniqueGenesPerSample->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+roary-unique_genes_per_sample - Take in the clustered file and produce a sorted file with the frequency of each samples unique genes
+
+=head1 VERSION
+
+version 3.9.1
+
+=head1 SYNOPSIS
+
+Take in the clustered file and produce a sorted file with the frequency of each samples unique genes
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -1,5 +1,5 @@
 package Bio::Roary::MergeMultifastaAlignments;
-$Bio::Roary::MergeMultifastaAlignments::VERSION = '3.8.2';
+$Bio::Roary::MergeMultifastaAlignments::VERSION = '3.9.1';
 # ABSTRACT: Merge multifasta alignment files with equal numbers of sequences.
 
 
@@ -59,7 +59,7 @@ sub _sequence_for_sample_from_gene_file {
     my ( $self, $sample_name, $gene_file ) = @_;
 
     # loop over this to get the geneIDs
-    for my $gene_id ( keys %{ $self->_gene_to_sequence->{$gene_file} } ) {
+    for my $gene_id ( sort keys %{ $self->_gene_to_sequence->{$gene_file} } ) {
         if ( defined( $self->sample_names_to_genes->{$sample_name}->{$gene_id} ) ) {
             return $self->_gene_to_sequence->{$gene_file}->{$gene_id};
         }
@@ -118,7 +118,7 @@ Bio::Roary::MergeMultifastaAlignments - Merge multifasta alignment files with eq
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

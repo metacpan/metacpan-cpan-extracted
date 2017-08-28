@@ -8,7 +8,7 @@ use Carp qw(carp confess);
 use POE;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.32';
+$VERSION = '0.34';
 sub DOSENDBACK () { 1 }
 
 our $globalinfos;
@@ -209,6 +209,47 @@ sub checkForDoSendback {
    return 0;
 }
 
+sub PEMdataToX509 {
+   my $x509 = shift;
+   my $bio = dataToBio($x509);
+   my $x509result = undef;
+   die "Error using x509: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+      unless ($x509result = Net::SSLeay::PEM_read_bio_X509($bio));
+   Net::SSLeay::BIO_free($bio);
+   return $x509result;
+}
+
+sub PEMdataToEVP_PKEY {
+   my $ssl = shift;
+   my $crt = shift;
+   my $bio = dataToBio($crt);
+   my $evp_pkey = undef;
+   die "Error using cacrt: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+      unless ($evp_pkey = Net::SSLeay::PEM_read_bio_PrivateKey($bio));
+   Net::SSLeay::BIO_free($bio);
+   return $evp_pkey;
+}
+
+sub CTX_add_client_CA {
+   my $ctx = shift;
+   my $x509 = shift;
+   my $pemx509 = PEMdataToX509($x509);
+   my $err = Net::SSLeay::CTX_add_client_CA($ctx, PEMdataToX509($x509));
+   die "Error using cacrt: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+      if ($err && ($err != 1));
+}
+
+sub dataToBio {
+   my $data = shift;
+   my $bio = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem());
+   my $sent = Net::SSLeay::BIO_write($bio, $data);
+   print "Wrote ".$sent." of ".length($data)." bytes.\n"
+      if $debug;
+   die "Cannot write to bio!"
+      if (($sent) != length($data));
+   return $bio;
+}
+
 sub new {
    my $type = shift;
    my $params = {@_};
@@ -220,52 +261,96 @@ sub new {
    $self->{errorhandler} = $params->{errorhandler};
    $self->{params} = $params;
 
-   $self->{context} = Net::SSLeay::CTX_new();
+   $self->{context} =
+      ($params->{tls} || $params->{tls1_2}) ?
+                        ($params->{tls1_2}  ?
+         Net::SSLeay::CTX_tlsv1_2_new() :
+         Net::SSLeay::CTX_tlsv1_new()) :
+         Net::SSLeay::CTX_new();
 
-   if ((!$self->{client}) && (!$params->{"nohonor"})) { # Beim Apache: SSLHonorCipherOrder
-      Net::SSLeay::CTX_set_options($self->{context}, 0x00400000); # SSL_OP_CIPHER_SERVER_PREFERENCE
-   }
+   Net::SSLeay::CTX_set_options($self->{context}, 0x00400000) # SSL_OP_CIPHER_SERVER_PREFERENCE # Beim Apache: SSLHonorCipherOrder
+      if ((!$self->{client}) && (!$params->{"nohonor"}));
 
-   Net::SSLeay::CTX_use_RSAPrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
-   Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
+   my $err = undef;
    if ($params->{chain}) {
-      Net::SSLeay::CTX_use_certificate_chain_file($self->{context}, $params->{chain});
-   }
-   if ($params->{cacrt}) {
-      Net::SSLeay::CTX_load_verify_locations($self->{context}, $params->{cacrt}, '');
-      Net::SSLeay::CTX_set_client_CA_list($self->{context}, Net::SSLeay::load_client_CA_file($params->{cacrt}));
-      Net::SSLeay::CTX_set_verify_depth($self->{context}, 5);
+      $err = Net::SSLeay::CTX_use_certificate_chain_file($self->{context}, $params->{chain});
+      die "Error using chain: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+         if ($err && ($err != 1));
+   } else {
+      if ($params->{keymem}) {
+         $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{ssl}, $params->{keymem}));
+      } else {
+         $err = Net::SSLeay::CTX_use_PrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
+      }
+      die "Error using keymem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+         if ($err && ($err != 1));
+      if ($params->{crtmem}) {
+         $err = Net::SSLeay::CTX_use_certificate($self->{context}, PEMdataToX509($params->{crtmem}));
+      } else {
+         # TODO:XXX:FIXME: Errorchecking!
+         $err = Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
+      }
+      die "Error using crtmem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+         if ($err && ($err != 1));
    }
 
-   if ($params->{cipher}) {
-      Net::SSLeay::CTX_set_cipher_list($self->{context}, $params->{cipher});
+   $err = undef;
+   if ($params->{cacrt}||
+       $params->{cacrtmem}) {
+      if ($params->{cacrtmem}) {
+         if (ref($params->{cacrtmem}) eq "ARRAY") {
+            foreach my $curcert (@{$params->{cacrtmem}}) {
+               $err = CTX_add_client_CA($self->{context}, $curcert);
+               last
+                  unless $err;
+            }
+         } else {
+            $err = CTX_add_client_CA($self->{context}, $params->{cacrtmem});
+         }
+      } else {
+         $err = Net::SSLeay::CTX_load_verify_locations($self->{context}, $params->{cacrt}, '');
+         $err = Net::SSLeay::CTX_set_client_CA_list($self->{context}, Net::SSLeay::load_client_CA_file($params->{cacrt}))
+            unless ($err && ($err == 1));
+      }
+      $err = Net::SSLeay::CTX_set_verify_depth($self->{context}, $params->{caverifydepth} || 5)
+         unless ($err && ($err == 1));
    }
+   die "Error using cacrt: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+      if ($err && ($err != 1));
 
+   $err = undef;
+   $err = Net::SSLeay::CTX_set_cipher_list($self->{context}, $params->{cipher})
+      if ($params->{cipher});
+   die "Error setting cipher: ".Net::SSLeay::ERR_error_string(ERR_get_error())
+      if ($err && ($err != 1));
+
+   $err = undef;
    $self->{rbio} = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem())
-      or die("Create rBIO_s_mem(): ".$!);
+      or die("Error creating r BIO: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
    $self->{wbio} = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem())
-      or die("Create wBIO_s_mem(): ".$!);
+      or die("Error creating w BIO: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
    $self->{ssl} = Net::SSLeay::new($self->{context});
-   Net::SSLeay::set_bio($self->{ssl}, $self->{rbio}, $self->{wbio});
+   $err = Net::SSLeay::set_bio($self->{ssl}, $self->{rbio}, $self->{wbio});
+   die "Error setting r/w BIOs: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+      if ($err && ($err != 1));
 
    if ($params->{dhcert} ||
        $params->{dhcertmem}) {
       my $dhbio = undef;
       if ($params->{dhcertmem}) {
-         $dhbio = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem());
-         my $sent = Net::SSLeay::BIO_write($dhbio, $params->{dhcertmem});
-         die "Cannot write to dhcert bio!"
-            if (($sent) != length($params->{dhcertmem}));
+         $dhbio = dataToBio($params->{dhcertmem});
       } else {
          die "Cannot open dhcert file!"
             unless (-f $params->{dhcert} && ($dhbio = Net::SSLeay::BIO_new_file($params->{dhcert}, "r")));
       }
+      # TODO:XXX:FIXME: Errorchecking!
       my $dhret = Net::SSLeay::PEM_read_bio_DHparams($dhbio);
       Net::SSLeay::BIO_free($dhbio);
       die "Couldn't set DH parameters!"
          if (SSL_set_tmp_dh($self->{ssl}, $dhret) < 0);
       #die "Couldn't set CTX DH parameters!"
       #   if (SSL_CTX_set_tmp_dh($self->{context}, $dhret) < 0);
+      # TODO:XXX:FIXME: Errorchecking!
       my $rsa = Net::SSLeay::RSA_generate_key(2048, 73);
       die "Couldn't set RSA key!"
          if (!SSL_CTX_set_tmp_rsa($self->{context}, $rsa));
@@ -277,7 +362,13 @@ sub new {
                    | &Net::SSLeay::VERIFY_CLIENT_ONCE;
       $orfilter |=  &Net::SSLeay::VERIFY_FAIL_IF_NO_PEER_CERT
          if $params->{blockbadclientcert};
+      # TODO:XXX:FIXME: Errorchecking!
       Net::SSLeay::set_verify($self->{ssl}, $orfilter, \&VERIFY);
+   }
+   if ($params->{sni}) {
+      my $err = Net::SSLeay::set_tlsext_host_name($self->{ssl}, $params->{sni});
+      die "Error setting sni:".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+         if ($err && ($err != 1));
    }
    
    $globalinfos = [0, 0, []];
@@ -290,6 +381,7 @@ sub VERIFY {
    print "VERIFY!\n" if $debug;
    $globalinfos->[0] = $ok ? 1 : 2 if ($globalinfos->[0] != 2);
    $globalinfos->[1]++;
+   # TODO:XXX:FIXME: Errorchecking!
    if (my $x = Net::SSLeay::X509_STORE_CTX_get_current_cert($x509_store_ctx)) {
       push(@{$globalinfos->[2]},[Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_subject_name($x)),
                                  Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_issuer_name($x)),
@@ -384,44 +476,6 @@ sub writeToSSLBIO {
    }
    $self->doSSL() unless $nodoSSL;
 }
-
-#sub doHandshake {
-#   my $readWrite = shift;
-#   $readWrite = shift if (ref($readWrite) eq "POE::Filter::SSL");
-#   my @newFilters = @_;
-#   if (@newFilters) {
-#      if (ref($readWrite->get_input_filter()) eq "POE::Filter::SSL") {
-#         #print "ClientInput: ".$request."\n";
-#         if ($readWrite->get_input_filter()->handshakeDone(ignorebuf => 1)) {
-#            $readWrite->set_input_filter(POE::Filter::Stackable->new(
-#               Filters => [
-#                  $readWrite->get_input_filter(),
-#                  @newFilters
-#               ])
-#            );
-#         }
-#      }
-#   }
-#
-#   unless ((ref($readWrite->get_output_filter()) ne "POE::Filter::SSL") ||
-#               ($readWrite->get_output_filter()->handshakeDone())) {
-#      $readWrite->put();
-#      return 0;
-#   }
-#
-#   if (@newFilters) {
-#      if (ref($readWrite->get_output_filter()) eq "POE::Filter::SSL") {
-#         $readWrite->set_output_filter(POE::Filter::Stackable->new(
-#            Filters => [
-#               $readWrite->get_output_filter(),
-#               @newFilters
-#            ])
-#         );
-#      }
-#   }
-#   
-#   return 1;
-#}
 
 sub get_pending {
   return undef;
@@ -569,7 +623,7 @@ POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 =head1 VERSION
 
-Version 0.32
+Version 0.34
 
 =head1 DESCRIPTION
 
@@ -976,25 +1030,35 @@ Returns a new I<POE::Filter::SSL> object. It accepts the following options:
 
 By default I<POE::Filter::SSL> acts as a SSL server. To use it in client mode, you have to set this option.
 
-=item crt
+=item crt{mem}
 
 The certificate file (.crt) for the server, a client certificate in client mode.
 
-=item key
+You are able to pass the already inmemory crt file as scalar via I<crtmem>.
+
+=item key{mem}
 
 The key file (.key) of the certificate (see I<crt> above).
 
-=item cacrt
+You are able to pass the already inmemory key file as scalar via I<keymem>.
 
-The ca certificate file (ca.crt), which is used to verificate the client certificates against a CA.
+=item cacrt{mem}
+
+The ca certificate file (ca.crt), which is used to verificate the client certificates against a CA. You can store multiple ca in one file, all of them gets imported.
+
+You are able to pass the already inmemory cacrt file as scalar via I<cacrtmem> or as an array ref of scalars, if you have multiple ca.
+
+=item caverifydepth
+
+By default the ca verify depth is 5, you can override this via this option.
 
 =item chain
 
-Chain certificate, you need it for example for startssl.org wich needs a intermedia certificates. Here you can configure it. You can generate this the following way:
+Chain certificate, you need it for example for startssl.org which needs a intermedia certificates. Here you can configure it. You can generate this the following way:
 
 cat client.crt intermediate.crt ca.crt > chain.pem
 
-In this case, you normaly have no I<key> and I<crt> option.
+In this case, you normalyly have no I<key> and I<crt> option. Currently it is not possible to pass this inmemory, only by file.
 
 =item cacrl
 
@@ -1012,7 +1076,19 @@ You are able to pass the already inmemory dhparam file as scalar(string) via I<d
 
 Only in server mode: Request during ssl handshake from the client a client certificat.
 
-B<WARNING:> If the client provides an untrusted or no client certficate, the connection is B<not> failing. You have to ask I<clientCertValid()> if the certicate is valid!
+B<WARNING:> If the client provides an untrusted or no client certificate, the connection is B<not> failing. You have to ask I<clientCertValid()> if the certificate is valid!
+
+=item sni
+
+Allows to set the SNI hostname indication in first packet of handshake. See https://de.wikipedia.org/wiki/Server_Name_Indication
+
+=item tls
+
+Force in the handshake the use of tls, disables support for the obsolete SSL handshake.
+
+=item tls1_2
+
+Force in the handshake the use of tls in version 1.2, disables support for the obsolete SSL handshake.
 
 =item nohonor
 
@@ -1038,7 +1114,7 @@ B<WARNING:> If the client is listed in the CRL file or an invalid client certifi
 
 =item handshakeDone(options)
 
-Returns I<true> if the handshake is done and all data for hanshake has been written out. It accepts the following options:
+Returns I<true> if the handshake is done and all data for handshake has been written out. It accepts the following options:
 
 =over 2
 
@@ -1092,7 +1168,7 @@ See the I<HTTPS-Server>, I<SSL on an established connection> and I<Client certif
 
 Returns I<true> if there is a client certificate, that might be untrusted.
 
-B<WARNING:> If the client provides an untrusted client certficate a client certicate that is listed in CRL, this function returns I<true>. You have to ask I<clientCertValid()> if the certicate is valid!
+B<WARNING:> If the client provides an untrusted client certificate a client certificate that is listed in CRL, this function returns I<true>. You have to ask I<clientCertValid()> if the certificate is valid!
 
 =item errorhandler
 
@@ -1106,7 +1182,7 @@ Do not report any error.
 
 =item I<CODE>
 
-Setting errorhandler to a reference of a function allows to be called it callback function with the following options:
+Setting errorhandler to a reference of a function allows one to be called it callback function with the following options:
 
 ARG1: POE:SSL::Filter instance
 
@@ -1114,7 +1190,7 @@ ARG2: Ref on a Hash with the following keys:
 
   ret        The return code of Net::SSLeay::connect (client) or Net::SSLeay::accept (server)
   ssl        The SSL context (SSL_CTX)
-  msg        The error message as text, as normaly reported via carp
+  msg        The error message as text, as normally reported via carp
   get_error  The error code of get_error the ssl context
   error      The error code of get_error without context
 
@@ -1128,7 +1204,7 @@ Do Carp/confess (stacktrace) on error.
 
 =item "carponetime"
 
-Report carp for one occurence only one time - over all!
+Report carp for one occurrence only one time - over all!
 
 =back
 
@@ -1154,6 +1230,12 @@ Example:
 =item VERIFY()
 
 =item X509_get_serialNumber()
+
+=item SSL_CTX_set_tmp_dh()
+
+=item SSL_CTX_set_tmp_rsa()
+
+=item SSL_set_tmp_dh()
 
 =item clone()
 
@@ -1221,13 +1303,13 @@ L<http://search.cpan.org/dist/POE-Filter-SSL>
 
 =head1 Commercial support
 
-Commercial support can be gained at <sslsupport at priv.de>.
+Commercial support can be gained at <sslsupport at cryptomagic.eu>.
 
 Used in our products, you can find on L<https://www.cryptomagic.eu/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010-2016 Markus Schraeder, CryptoMagic GmbH, all rights reserved.
+Copyright 2010-2017 Markus Schraeder, CryptoMagic GmbH, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

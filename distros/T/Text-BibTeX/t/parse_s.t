@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use IO::Handle;
-use Test::More tests => 50;
+use Test::More tests => 54;
 
 use vars qw($DEBUG);
 use Cwd;
@@ -79,12 +79,24 @@ test_entry ($entry, 'foo', 'mykey',
 # just returns false
 
 $entry = Text::BibTeX::Entry->new();
-$result = $entry->parse_s ('');
+
+err_like sub {
+  $result = $entry->parse_s ('');
+  ok(! $result);
+}, qr!expected "@"!;
 ok(! $result);
-$result = $entry->parse_s (undef);
+
+err_like sub {
+  $result = $entry->parse_s (undef);
+  $result = $entry->parse_s ('top-level junk that is not caught');
+}, qr!expected "@"!;
 ok(! $result);
-$result = $entry->parse_s ('top-level junk that is not caught');
+
+err_like sub {
+  $result = $entry->parse_s ('top-level junk that is not caught');
+}, qr!expected "@"!;
 ok(! $result);
+
 $result = $entry->parse_s (undef);
 ok(! $result);
 

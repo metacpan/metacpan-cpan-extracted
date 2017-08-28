@@ -4,27 +4,34 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.90';
+our $VERSION = '0.94';
 
 use utf8;
 use Encode;
 use Carp;
 use Storable qw/freeze/;
 use Module::Load;
+use vars qw/$AUTOLOAD/;
+use Scalar::Util qw/blessed/;
 
 use ActiveRecord::Simple::Find;
 use ActiveRecord::Simple::Utils;
 use ActiveRecord::Simple::Connect;
 
-my $connector;
+our $connector;
+
 
 sub new {
     my $class = shift;
     my $param = (scalar @_ > 1) ? {@_} : $_[0];
 
-    $class->_mk_accessors($class->_get_columns())
-        if $class->can('_get_columns');
+    my $accessors_fields = $class->can('_get_columns') ? $class->_get_columns : [];
 
+    if ($class->can('_get_mixins')) {
+        my @keys = keys %{ $class->_get_mixins };
+        $class->_mk_ro_accessors(\@keys);
+    }
+    $class->_mk_accessors($accessors_fields);
 
     if ($class->can('_get_relations')) {
         my $relations = $class->_get_relations();
@@ -40,29 +47,41 @@ sub new {
             *{$pkg_method_name} = sub {
                 my ($self, @objects) = @_;
 
+
                 my $rel = $class->_get_relations->{$relname};
                 my $fkey = $rel->{foreign_key} || $rel->{key};
+                my $relation = $relations->{$relname};
                 if (@objects) {
-                    OBJECT:
-                    for my $object (@objects) {
-                        next OBJECT unless ref $object;
-                        my $relation = $relations->{$relname};
+                    if ($relation->{type} eq 'many') {
+                        if ($objects[0] && blessed $objects[0]) {
+                            for my $object (@objects) {
+                                my $fk = $relation->{params}{fk};
+                                my $pk = $self->_get_primary_key;
+                                $object->$fk($self->$pk);
 
-                        next OBJECT unless grep { $relation->{type} eq $_ } qw/one many/;
+                                $object->save;
+                            }
+                        }
+                        else {
+                            my $rel_class = (%{ $rel->{class} })[1];
+                            return $rel_class->_find_many_to_many({
+                                root_class      => $class,
+                                m_class         => (%{ $rel->{class} })[0],
+                                self            => $self,
+                                where_statement => \@objects,
+                            });
+                        }
+                    }
+                    elsif ($relation->{type} eq 'one') {
+                        OBJECT:
+                        for my $object (@objects) {
+                            next OBJECT unless ref $object && grep { $relation->{type} eq $_ } qw/one many/;
 
-                        if ($relation->{type} eq 'one') {
                             $self->{"relation_instance_$relname"} = $object;
                             my $pk = $relation->{params}{pk} or next OBJECT;
                             my $fk = $relation->{params}{fk} or next OBJECT;
 
                             $self->$fk($object->$pk);
-                        }
-                        elsif ($relation->{type} eq 'many') {
-                            my $fk = $relation->{params}{fk};
-                            my $pk = $self->_get_primary_key;
-                            $object->$fk($self->$pk);
-
-                            $object->save;
                         }
                     }
 
@@ -134,12 +153,13 @@ sub new {
         use strict 'refs';
     }
 
-    $class->use_smart_saving(0);
+    $class->auto_save(0);
 
     return bless $param || {}, $class;
 }
 
-sub load_info {
+
+sub auto_load {
     my ($class) = @_;
 
     my @class_name_parts = split q/::/, $class;
@@ -161,18 +181,21 @@ sub load_info {
     push @columns, $_->{COLUMN_NAME} for @$cols;
 
     # 2. Primary key
-    my $primary_key_sth = $class->dbh->primary_key_info('', '%', $table_name);
+    my $primary_key_sth = $class->dbh->primary_key_info(undef, undef, $table_name);
     my $primary_key_data = $primary_key_sth->fetchrow_hashref;
     my $primary_key = ($primary_key_data) ? $primary_key_data->{COLUMN_NAME} : undef;
 
-    #say 'primary_key: ' . Dumper $primary_key;
-
     # 3. Foreign keys
-    # ...
+    # TODO
 
     $class->table_name($table_name) if $table_name;
     $class->primary_key($primary_key) if $primary_key;
     $class->columns(\@columns) if @columns;
+}
+
+sub load_info {
+    carp '[DEPRECATED] This method is deprecated and will be remowed in the feature. Use method "auto_load" instead.';
+    $_[0]->auto_load;
 }
 
 sub _mk_accessors {
@@ -201,10 +224,46 @@ sub _mk_accessors {
     return 1;
 }
 
+sub _mk_ro_accessors {
+    my ($class, $fields) = @_;
+
+    return unless $fields;
+    my $super = caller;
+
+    no strict 'refs';
+    FIELD:
+    for my $f (@$fields) {
+        my $pkg_accessor_name = $class . '::' . $f;
+        next FIELD if $class->can($pkg_accessor_name);
+        *{$pkg_accessor_name} = sub {
+            croak "You can't change '$f': object is read-only"
+                if scalar @_ > 1;
+
+            return $_[0]->{$f}
+        };
+    }
+}
+
 sub connect {
     my ($class, $dsn, $username, $password, $options) = @_;
 
-    $connector = ActiveRecord::Simple::Connect->new($dsn, $username, $password, $options);
+    eval { require DBIx::Connector };
+
+    $options->{HandleError} = sub {
+        my ($error_message, $DBI_st) = @_;
+
+        $error_message or return;
+        croak $error_message;
+
+    } if ! exists $options->{HandleError};
+
+    if ($@) {
+        $connector = ActiveRecord::Simple::Connect->new($dsn, $username, $password, $options);
+        $connector->db_connect;
+    }
+    else {
+        $connector = DBIx::Connector->new($dsn, $username, $password, $options);
+    }
 
     return 1;
 }
@@ -366,6 +425,8 @@ sub _append_relation {
 sub columns {
     my ($class, @args) = @_;
 
+    #return if $class->can('_get_columns');
+
     my $columns = [];
     if (scalar @args == 1) {
         my $arg = shift @args;
@@ -386,6 +447,12 @@ sub columns {
     }
 
     $class->_mk_attribute_getter('_get_columns', $columns);
+}
+
+sub mixins {
+    my ($class, %mixins) = @_;
+
+    $class->_mk_attribute_getter('_get_mixins', \%mixins);
 }
 
 sub fields {
@@ -451,12 +518,17 @@ sub _table_name {
     return $table_name;
 }
 
-sub use_smart_saving {
+sub auto_save {
     my ($class, $is_on) = @_;
 
     $is_on = 1 if not defined $is_on;
 
     $class->_mk_attribute_getter('_smart_saving_used', $is_on);
+}
+
+sub use_smart_saving {
+    carp '[DEPRECATED] Method "use_smart_saving" is deprecated and will be removed in the future. Please, use "auto_save" method insted.';
+    $_[0]->auto_save;
 }
 
 sub relations {
@@ -702,12 +774,13 @@ sub to_hash {
     my ($self, $param) = @_;
 
     my $field_names = $self->_get_columns;
+    push @$field_names, keys %{ $self->_get_mixins } if $self->can('_get_mixins');
     my $attrs = {};
 
     for my $field (@$field_names) {
         next if ref $field;
         if ( $param && $param->{only_defined_fields} ) {
-            $attrs->{$field} = $self->{$field} if $self->$field;
+            $attrs->{$field} = $self->{$field} if defined $self->$field;
         }
         else {
             $attrs->{$field} = $self->{$field};
@@ -752,27 +825,73 @@ sub exists {
 
     my ($class, @search_criteria);
     if (ref $first_arg) {
+        # FOXME: Ugly solution, need some beautifulness =)
         # object method
         $class = ref $first_arg;
-        push @search_criteria, $first_arg->to_hash({ only_defined_fields => 1 });
+
+        if ($class eq 'ActiveRecord::Simple::Find') {
+            return $first_arg->exists;
+        }
+        else {
+            return ActiveRecord::Simple::Find->new($class, $first_arg->to_hash({ only_defined_fields => 1 }))->exists;
+        }
     }
     else {
+        carp '[DEPRECATED] This way of using method "exists" is deprecated. Please, see documentation to know how does it work now.';
         $class = $first_arg;
         @search_criteria = @_;
+        return (defined $class->find(@search_criteria)->fetch) ? 1 : 0;
     }
 
-    return (defined $class->find(@search_criteria)->fetch) ? 1 : 0;
+
 }
 
-sub first  { ActiveRecord::Simple::Find->first(@_) }
-sub last   { ActiveRecord::Simple::Find->last(@_) }
+sub first  { croak '[DEPRECATED] Using method "first" as a class-method is deprecated. Sorry about that. Please, use "first" in this way: "Model->find->first".'; }
+sub last   { croak '[DEPRECATED] Using method "last" as a class-method is deprecated. Sorry about that. Please, use "last" in this way: "Model->find->last".'; }
 sub select { ActiveRecord::Simple::Find->select(shift, @_) }
 
 sub _find_many_to_many { ActiveRecord::Simple::Find->_find_many_to_many(shift, @_) }
 
+sub DESTROY {}
+
+### FIXME: this implementation is actually too slow, need much faster solution
+sub AUTOLOAD {
+    my ($self, $param) = @_;
+
+    my $sub = $AUTOLOAD; $sub =~ s/.*:://g;
+    my $error = "Unknown method: $sub";
+
+    croak "Error while executing '$sub' method, '$self' is not a valid (blessed) object." unless blessed $self;
+    croak "Undefined object for method $sub: must be not undef" unless $param;
+
+    croak $error unless $self->can('_get_relations');
+    my @many2manies;
+    my $relations = $self->_get_relations;
+
+    my $subclass = undef;
+    my %class_options;
+    for my $relation (values %$relations) {
+        next unless $relation->{type} eq 'many' && ref $relation->{class} eq 'HASH';
+        ($subclass) = keys %{ $relation->{class} };
+        next if !$subclass->can('_get_relations');
+        my $relations2 = $subclass->_get_relations;
+
+        for my $rel_name (keys %$relations2) {
+            next unless exists $relations2->{$rel_name};
+
+            my $pk = $relations2->{$rel_name}{params}{pk};
+            my $fk = $relations2->{$rel_name}{params}{fk};
+
+            next unless $pk && $fk;
+
+            $class_options{$fk} = ($rel_name eq $sub) ? $param->$pk : $self->$pk;
+        }
+    }
+
+    return $subclass->new(\%class_options);
+}
 
 ### Private
-
 
 1;
 
@@ -794,7 +913,7 @@ pattern. It's fast, very simple and very light.
     package MyModel:Person;
     use base 'ActiveRecord::Simple';
 
-    __PACKAGE__->load_info()
+    __PACKAGE__->auto_load()
 
     1;
 
@@ -841,16 +960,16 @@ That's it! Now you're ready to use your active-record class in the application:
     my $person = MyModel::Person->get(1);
 
     # to get the record with specified fields:
-    my $person = MyModel::Person->find(1)->only('name', 'age')->fetch;
+    my $person = MyModel::Person->find(1)->only('first_name', 'second_name')->fetch;
 
     # to find records by parameters:
-    my @persons = MyModel::Person->find({ name => 'Foo' })->fetch();
+    my @persons = MyModel::Person->find({ first_name => 'Foo' })->fetch();
 
     # to find records by sql-condition:
-    my @persons = MyModel::Person->find('name = ?', 'Foo')->fetch();
+    my @persons = MyModel::Person->find('first_name = ?', 'Foo')->fetch();
 
     # also you can do something like this:
-    my $persons = MyModel::Person->find('name = ?', 'Foo');
+    my $persons = MyModel::Person->find('first_name = ?', 'Foo');
     while ( my $person = $persons->next() ) {
         say $person->name;
     }
@@ -867,7 +986,7 @@ That's it! Now you're ready to use your active-record class in the application:
 =head1 METHODS
 
 ActiveRecord::Simple provides a variety of techniques to make your work with
-data little easier. It contains only a basic set of operations, such as
+data little easier. It contains set of operations, such as
 search, create, update and delete data.
 
 If you realy need more complicated solution, just try to expand on it with your
@@ -962,6 +1081,21 @@ You don't need to call "columns" method explicitly, if you use "fields".
 See L<SQL::Translator> for more information about schema and L<SQL::Translator::Field>
 for information about available data types.
 
+=head2 mixins
+
+Use this method when you need to add optional fields, computed fields etc. Method takes hash, key is a name of field,
+value is a subroutine that returns SQL:
+
+    __PACKAGE__->mixins(
+        sum_of_items => sub {
+
+            return 'SUM(`item`)';
+        }
+    );
+
+    # specify mixin as a field in the query:
+    my @items = Model->find->fields('id', 'name', 'sum_of_items')->fetch;
+
 =head2 primary_key
 
     __PACKAGE__->primary_key('id_person');
@@ -990,37 +1124,13 @@ Create an index and add it to the schema. Works only when method "fields" is usi
 Set name of the table. This method is required to use in the child (your model)
 classes.
 
-=head2 load_info
+=head2 auto_load
 
 Load table info using DBI methods: table_name, primary_key, foreign_key, columns
 
-=head2 relations [!OLD!, may be deprecated in the future]
+=head2 load_info
 
-    __PACKAGE__->relations({
-        cars => {
-            class => 'MyModel::Car',
-            key   => 'id_person',
-            type  => 'many'
-        },
-    });
-
-It's not a required method and you don't have to use it if you don't want to use
-any relationships in your tables and objects. However, if you need to,
-just keep this simple schema in youre mind:
-
-    __PACKAGE__->relations({
-        [relation key] => {
-            class => [class name],
-            key   => [column that refferers to the table],
-            type  => [many or one]
-        },
-    })
-
-    [relation key] - this is a key that will be provide the access to instance
-    of the another class (which is specified in the option "class" below),
-    associated with this relationship. Allowed to use as many keys as you need:
-
-    $package_instance->[relation key]->[any method from the related class];
+Same as "auto_load". DEPRECATED.
 
 =head2 belongs_to
 
@@ -1057,6 +1167,34 @@ You can specify one object via another one using "has_one" method. It works like
 
     say $person->wife->name; # SELECT name FROM Wife WHERE person_id = $self._primary_key
 
+=head2 relations
+
+    __PACKAGE__->relations({
+        cars => {
+            class => 'MyModel::Car',
+            key   => 'id_person',
+            type  => 'many'
+        },
+    });
+
+It's not a required method and you don't have to use it if you don't want to use
+any relationships in your tables and objects. However, if you need to,
+just keep this simple schema in youre mind:
+
+    __PACKAGE__->relations({
+        [relation key] => {
+            class => [class name],
+            key   => [column that refferers to the table],
+            type  => [many or one]
+        },
+    })
+
+    [relation key] - this is a key that will be provide the access to instance
+    of the another class (which is specified in the option "class" below),
+    associated with this relationship. Allowed to use as many keys as you need:
+
+    $package_instance->[relation key]->[any method from the related class];
+
 =head2 generic
 
     __PACKAGE__->generic(photos => { release_date => 'pub_date' });
@@ -1066,7 +1204,7 @@ You can specify one object via another one using "has_one" method. It works like
     my $single = Song->find({ type => 'single' })->fetch();
     my @photos = $single->photos->fetch();  # fetch all photos with pub_date = single.release_date
 
-=head2 use_smart_saving
+=head2 auto_save
 
 This method provides two features:
 
@@ -1076,7 +1214,11 @@ This method provides two features:
    2. Automatic save on object destroy (You don't need use "save()" method
       anymore).
 
-    __PACKAGE__->use_smart_saving;
+    __PACKAGE__->auto_save;
+
+=head2 use_smart_saving
+
+Same as "auto_save". DEPRECATED.
 
 =head2 find
 
@@ -1084,7 +1226,7 @@ There are several ways to find someone in your database using ActiveRecord::Simp
 
     # by "nothing"
     # just leave attributes blank to recieve all rows from the database:
-    my @all_persons = MyModel::Person->find()->fetch;
+    my @all_persons = MyModel::Person->find->fetch;
 
     # by primary key:
     my $person = MyModel::Person->find(1)->fetch;
@@ -1125,8 +1267,10 @@ If you want to use a real sql where-condition:
 
 You can use the ordering of results, such as ORDER BY, ASC and DESC:
 
-    my @persons = MyModel::Person->find('age > ?', 21)->order_by('name')->desc->fetch();
-    my @persons = MyModel::Person->find('age > ?', 21)->order_by('name', 'age')->fetch();
+    my @persons = MyModel::Person->find('age > ?', 21)->order_by('name')->desc->fetch;
+    my @persons = MyModel::Person->find('age > ?', 21)->order_by('name', 'age')->fetch;
+    my @persons = MyModel::Person->find->order_by('age')->desc->order_by('id')->asc->fetch;
+
 
 You can pass objects as a parameters. In this case parameter name is the name of relation.
 For example:
@@ -1155,6 +1299,24 @@ Now, get person:
     ### the same, but not so cool:
     my @bills_orders = Order->find({ customer_id => $Bill->id })->fetch;
 
+=head2 fetch
+
+When you use the "find" method to get a few rows from the table, you get the
+meta-object with a several objects inside. To use all of them or only a part,
+use the "fetch" method:
+
+    my @persons = MyModel::Person->find('id_person != ?', 1)->fetch();
+
+You can also specify how many objects you want to use at a time:
+
+    my @persons = MyModel::Person->find('id_person != ?', 1)->fetch(2);
+    # fetching only 2 objects.
+
+Another syntax of command "fetch" allows you to make read-only objects:
+
+    my @persons = MyModel::Person->find->fetch({ read_only => 1, limit => 2 });
+    # all two object are read-only
+
 =head2 select
 
 Yet another way to select data from the database:
@@ -1164,36 +1326,48 @@ Yet another way to select data from the database:
 
     my @bills = Person->select($criteria, $select_options);
 
+=head2 upload
+
+Loads fetched object into the variable:
+
+    my $finder = Person->find({ name => 'Bill' }); # now $finder isa ARS::Find
+    # you can continue using this variable as an ARS::Find object:
+    $finder->order_by('age');
+    $finder->with('orders');
+    # now, insted of creating yet another variable like this:
+    my $persons = $finder->fetch;
+    # .. you just upload the result into $finder:
+    $finder->upload; # now $finder isa Person
 
 =head2 count
 
 Returns count of records that match the rule:
 
-    say MyModel::Person->count;
-    say MyModel::Person->count({ zip => '12345' });
-    say MyModel::Person->count('age > ?', 55);
-    say MyModel::Person->count({city => City->find({ name => 'NY' })->fetch });
+    say MyModel::Person->find->count;
+    say MyModel::Person->find({ zip => '12345' })->count;
+    say MyModel::Person->find('age > ?', 55)->count;
+    say MyModel::Person->find({city => City->find({ name => 'NY' })->fetch })->count;
 
 =head2 exists
 
 Returns 1 if record is exists in database:
 
-    say "Exists" if MyModel::Person->exists({ zip => '12345' });
-    say "Exists" if MyModel::Person->exists('age > ?', 55);
+    say "Exists" if MyModel::Person->find({ zip => '12345' })->count;
+    say "Exists" if MyModel::Person->find('age > ?', 55)->count;
 
 =head2 first
 
 Returns the first record (records) ordered by the primary key:
 
-    my $first_person = MyModel::Person->first->fetch;
-    my @ten_persons  = MyModel::Person->first(10)->fetch;
+    my $first_person = MyModel::Person->find->first;
+    my @ten_persons  = MyModel::Person->find->first(10);
 
 =head2 last
 
 Returns the last record (records) ordered by the primary key:
 
-    my $last_person = MyModel::Person->last->fetch;
-    my @ten_persons = MyModel::Person->last(10)->fetch;
+    my $last_person = MyModel::Person->find->last;
+    my @ten_persons = MyModel::Person->find->last(10);
 
 =head2 increment
 
@@ -1320,6 +1494,11 @@ This method uses as many fields as you want:
     my @fields = ('name', 'age', 'zip');
     my @persons = MyModel::Person->find({ city => 'NY' })->order_by(@fields)->fetch();
 
+Use chain "order_by" if you would like to order your data in different ways:
+
+    my @persons = Model->find->order_by('name', 'age')->asc->order_by('zip')->desc->fetch;
+    # This is equal to ... ORDER BY name, age ASC, zip DESC;
+
 =head2 asc
 
 Use this attribute to order your results ascending:
@@ -1343,6 +1522,17 @@ Use this attribute to limit results of your requests:
 Offset of results:
 
     MyModel::Person->find()->offset(10)->fetch; # all next after 10 rows
+
+=head2 group_by
+
+Group by specified fields:
+
+    Model->find->group_by('name')->fetch;
+
+=head1 Object Methods
+
+Object methods are intended for management of each
+row of your table separately as an object.
 
 =head2 save
 
@@ -1421,30 +1611,6 @@ Checks weather an object is defined:
     my $person = MyModel::Person->find(1);
     return unless $person->is_defined;
 
-=head2 fetch
-
-When you use the "find" method to get a few rows from the table, you get the
-meta-object with a several objects inside. To use all of them or only a part,
-use the "fetch" method:
-
-    my @persons = MyModel::Person->find('id_person != ?', 1)->fetch();
-
-You can also specify how many objects you want to use at a time:
-
-    my @persons = MyModel::Person->find('id_person != ?', 1)->fetch(2);
-    # fetching only 2 objects.
-
-Another syntax of command "fetch" allows you to make read-only objects:
-
-    my @persons = MyModel::Person->find->fetch({ read_only => 1, limit => 2 });
-    # all two object are read-only
-
-=head1 TRACING QUERIES
-
-   use ACTIVE_RECORD_SIMPLE_TRACE=1 or ARS_TRACE=1 environment variable:
-
-   $ ACTIVE_RECORD_SIMPLE_TRACE=1 perl myscript.pl
-
 =head1 SEE ALSO
 
     L<DBIx::ActiveRecord>, L<SQL::Translator>
@@ -1485,13 +1651,12 @@ L<https://github.com/shootnix/activerecord-simple/wiki>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2016 shootnix.
+Copyright 2013-2017 shootnix.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut

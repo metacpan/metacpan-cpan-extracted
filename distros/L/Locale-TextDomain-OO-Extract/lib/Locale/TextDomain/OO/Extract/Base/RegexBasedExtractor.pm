@@ -10,7 +10,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(ArrayRef CodeRef RegexpRef ScalarRef);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 has content_ref => (
     is  => 'rw',
@@ -69,7 +69,7 @@ sub _parse_pos {
     return $self;
 }
 
-sub _parse_rules {
+sub _parse_rules { ## no critic (ExcessComplexity)
     my $self = shift;
 
     my $content_ref = $self->content_ref;
@@ -94,9 +94,9 @@ sub _parse_rules {
                         and $self->debug_code->('rules parent', "$level: Going back to parent.");
                     # delete the parent and match
                     if ( ! $has_matched ) {
-                        LEVEL:
+                        LEVEL: ## no critic (DeepNests)
                         for my $parent_level ( reverse 0 .. ( $level - 1 ) ) {
-                            if ( exists $level_and_of{$parent_level} ) {
+                            if ( exists $level_and_of{$parent_level} ) { ## no critic (DeepNests)
                                 $level_and_of{$parent_level} = 0;
                                 last LEVEL;
                             }
@@ -267,13 +267,13 @@ __END__
 Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
 - Extract data using regexes
 
-$Id: RegexBasedExtractor.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: RegexBasedExtractor.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 DESCRIPTION
 
@@ -426,7 +426,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 - 2015,
+Copyright (c) 2009 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Carp;
+use Carp qw(croak);
 
 =head1 NAME
 
@@ -12,11 +12,11 @@ Iterator for Async stream
 
 =head1 VERSION
 
-Version 0.03
+Version 0.11
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.12';
 
 
 =head1 SYNOPSIS
@@ -26,7 +26,7 @@ Creating and managing item for Async::Stream
   use Async::Stream::Iterator;
 
   my $iterator = Async::Stream::Iterator->new($stream);
-    
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new($stream)
@@ -37,13 +37,11 @@ Class method gets 1 arguments stream from which will be created iterator.
   my $iterator = Async::Stream::Iterator->new($stream);
 =cut
 sub new {
-	my ($class, $stream) = @_;
+	my ($class, $item) = @_;
 
-	if (!$stream->isa('Async::Stream')) {
-		croak "First argument can be only instance of Async::Stream or instance of derived class";
+	if (!$item->isa('Async::Stream::Item')) {
+		croak "First argument can be only instance of Async::Stream::Item or instance of derived class";
 	}
-
-	my $item = $stream->head;
 
 	return bless sub {
 			my $return_cb = shift;
@@ -52,9 +50,12 @@ sub new {
 			$item->next(sub {
 				if (defined $_[0]) {
 					$item = shift;
-					$return_cb->($item->val)
+					$return_cb->($item->val);
+					return;
 				} else {
-					$return_cb->()
+					$return_cb->();
+					undef $item;
+					return;
 				}
 			});
 		}, $class;
@@ -65,7 +66,7 @@ sub new {
 Method gets returning callback and call that when iterator ready to return next value.
 
   $iterator->(sub {
-	    my $item_value = shift;
+      my $item_value = shift;
     });
 =cut
 

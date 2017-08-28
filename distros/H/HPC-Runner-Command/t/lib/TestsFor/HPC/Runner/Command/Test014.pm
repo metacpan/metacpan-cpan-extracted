@@ -23,7 +23,7 @@ Test for non linear task deps
 
 =cut
 
-$ENV{'SLURM_ARRAY_TASK_ID'}=1;
+$ENV{'SLURM_ARRAY_TASK_ID'} = 1;
 
 sub write_test_file {
     my $test_dir = shift;
@@ -49,7 +49,7 @@ EOF
 sub construct {
     my $self = shift;
 
-    $ENV{'SLURM_ARRAY_TASK_ID'}=1;
+    $ENV{'SLURM_ARRAY_TASK_ID'} = 1;
 
     my $test_methods = TestMethods::Base->new();
     my $test_dir     = $test_methods->make_test_dir();
@@ -66,12 +66,17 @@ sub construct {
     my $test = HPC::Runner::Command->new_with_command();
     $test->logname('001_trimmomatic');
     $test->log( $test->init_log );
+
+    $self->{test_obj} = $test;
+    $self->{test_dir} = $test_dir;
     return $test;
 }
 
 sub test_001 : Tags(use_batches) {
+    my $self     = shift;
+
     my $cwd      = getcwd();
-    my $test     = construct();
+    my $test     = $self->construct;
     my $test_dir = getcwd();
 
     is( $test->read_command, 0, 'Read command passes' );
@@ -152,10 +157,10 @@ sub test_004 : Tags(use_batches) {
     my $fh = IO::File->new( $test->infile, q{<} );
     my $cmds = $test->parse_cmd_file($fh);
 
-    my $expect_cmds = [
-            "#TASK tags=Sample_PAG008_V4_E2\n"
+    my $expect_cmds =
+      [     "#TASK tags=Sample_PAG008_V4_E2\n"
           . "gzip -f Sample_PAG008_V4_E2_read2_trimmomatic_1PE.fastq\n"
-    ];
+      ];
     is_deeply( $cmds, $expect_cmds, 'Commands pass' );
 
     chdir($cwd);
@@ -169,22 +174,25 @@ sub test_005 : Tags(use_batches) {
     my $fh = IO::File->new( $test->infile, q{<} );
     my $cmds = $test->parse_cmd_file($fh);
 
-    write_file(
-'Sample_PAG008_V4_E2_read1_trimmomatic_1PE.fastq', 'THIS IS A FILE'
-    );
+    write_file( 'Sample_PAG008_V4_E2_read1_trimmomatic_1PE.fastq',
+        'THIS IS A FILE' );
 
-    $test->cmd($cmds->[0]);
+    $test->cmd( $cmds->[0] );
     $test->_log_commands;
 
     # diag($test->cmd);
     # diag($test->data_tar);
     # diag(Dumper $test->archive->list_files);
-    my $basename = $test->data_tar->basename('.tar.gz');
-    my $complete_file = File::Spec->catdir( $basename, 'job','complete.json' );
-    my $running_file = File::Spec->catdir( $basename, 'job','running.json' );
+    my $basename      = $test->data_tar->basename('.tar.gz');
+    my $complete_file = File::Spec->catdir( $basename, 'job', 'complete.json' );
+    my $running_file  = File::Spec->catdir( $basename, 'job', 'running.json' );
 
-    ok($test->archive->contains_file($complete_file));
-    ok($test->archive->contains_file($running_file));
+    ok( $test->archive->contains_file($complete_file) );
+    ok( $test->archive->contains_file($running_file) );
+
+    $test->lock_file->touchpath;
+    my $ret = $test->check_lock;
+    is($ret, 0, 'Lock file exists and should not be removed');
     # diag($test->archive->get_content($complete_file));
     ok(1);
 
@@ -193,7 +201,7 @@ sub test_005 : Tags(use_batches) {
 }
 
 sub test_006 {
-  my $test  = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     my $basename = $test->data_tar->basename('.tar.gz');
@@ -203,12 +211,22 @@ sub test_006 {
     $test->cmd('hello');
     $test->start_command_log('1234');
 
-    is($test->lock_file->exists, undef, 'Lock does not exist');
+    is( $test->lock_file->exists, undef, 'Lock does not exist' );
     $test->write_lock($job_dir);
-    is($test->lock_file->exists, 1, 'Lock exists');
+    is( $test->lock_file->exists, 1, 'Lock exists' );
     $test->lock_file->remove;
-    is($test->lock_file->exists, undef, 'Lock does not exist');
+    is( $test->lock_file->exists, undef, 'Lock does not exist' );
 
+    $test->archive->add_data( 'some_file', 'hello' );
+    $test->archive->add_data( File::Spec->catdir( $basename, 'THING' ),
+        'some_data' );
+
+    $test->archive->write( $test->data_tar, 1 );
+    $test->archive->read( $test->data_tar );
+
+    diag( 'Data tar is ' . $test->data_tar );
+    chdir($Bin);
+    remove_tree($test_dir);
 }
 
 1;

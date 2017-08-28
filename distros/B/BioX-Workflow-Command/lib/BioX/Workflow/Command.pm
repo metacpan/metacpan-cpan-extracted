@@ -1,40 +1,37 @@
 package BioX::Workflow::Command;
 
 use v5.10;
-our $VERSION = '2.0.10';
+our $VERSION = '2.2.1';
 
 use MooseX::App qw(Color);
-use MooseX::Types::Path::Tiny qw/Path/;
-use Cwd qw(getcwd);
-use File::Spec;
-use File::Path qw(make_path);
 
 app_strict 0;
 
-# TODO move this after I have a better idea of where it is going
-option 'cache_dir' => (
+with 'BioX::Workflow::Command::Utils::Log';
+with 'BioSAILs::Utils::Plugin';
+with 'BioSAILs::Utils::LoadConfigs';
+
+option '+config_base' => (
     is      => 'rw',
-    isa     => Path,
-    coerce  => 1,
-    default => sub {
-        return File::Spec->catfile( getcwd(), '.biox-cache' );
-    },
-    documentation =>
-      'BioX-Workflow will cache some information during your runs. '
-      . 'Delete with caution! '
-      . '[Default: '.getcwd().'/biox-cache. ]'
+    default => '.bioxworkflow',
 );
 
-sub BUILD {
-  my $self = shift;
-}
+sub BUILD {}
 
-before 'BUILD' => sub {
+after 'BUILD' => sub {
     my $self = shift;
 
-    make_path( $self->cache_dir );
-    make_path(File::Spec->catdir($self->cache_dir, 'logs'));
+    return unless $self->plugins;
+
+    $self->app_load_plugins( $self->plugins );
+    $self->parse_plugin_opts( $self->plugins_opts );
+
+    ##Must reload the configs to get any options from the plugins
+    if ( $self->has_config_files ) {
+        $self->load_configs;
+    }
 };
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
@@ -52,10 +49,12 @@ BioX::Workflow::Command - Opinionated Bioinformatics Genomics Workflow Creator
 =head1 SYNOPSIS
 
   biox run -w workflow.yml
+  biox -h
 
 =head1 documentation
 
-Full documentation is available at gitbooks. L<Documentation | https://biosails.gitbooks.io/biox-workflow-command-docs/content/>
+Full documentation is available at gitbooks. L<Documentation |
+https://biosails.gitbooks.io/biox-workflow-command-docs/content/>
 
 =head1 Quick Start
 
@@ -75,21 +74,18 @@ Full documentation is available at gitbooks. L<Documentation | https://biosails.
 
 =head2 Run a Workflow with make like utilities
 
-Using the option --use_timestamps will select only rules that have INPUT/OUTPUT that does not exist or has been modified since the last log.
 
-  biox run --workflow workflow.yml --use_timestamps
-
-Using the option --auto_deps will create #HPC deps based on your INPUT/OUTPUTs - use this with caution. It will only work correctly if INPUT/OUTPUT is complete and accurate.
+Using the option --auto_deps will create #HPC deps based on your INPUT/OUTPUTs -
+use this with caution. It will only work correctly if INPUT/OUTPUT is complete
+and accurate.
 
   biox run --workflow workflow.yml --auto_deps
 
-Option --make enables both --use_timestamps and --auto_deps
-
-  biox run --workflow workflow.yml --make
 
 =head2 Create a new workflow
 
-This creates a new workflow with rules rule1, rule2, rule3, with a few variables to help get you started.
+This creates a new workflow with rules rule1, rule2, rule3, with a few variables
+to help get you started.
 
   biox new -w workflow.yml --rules rule1,rule2,rule3
 
@@ -101,7 +97,8 @@ Add new rules to an existing workflow.
 
 =head2 Check the status of files in your workflow
 
-You must have defined INPUT/OUTPUTs to make use of this rule. If you do, biox will output a table with information about your files.
+You must have defined INPUT/OUTPUTs to make use of this rule. If you do, biox
+will output a table with information about your files.
 
   biox stats -w workflow.yml
 

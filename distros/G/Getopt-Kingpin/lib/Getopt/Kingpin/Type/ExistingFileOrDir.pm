@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Path::Tiny;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 sub set_value {
     my $self = shift;

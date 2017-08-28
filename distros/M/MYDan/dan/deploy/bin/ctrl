@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Spec;
+use Data::Dumper;
+
+use MYDan::Deploy::Ctrl;
+use MYDan::Node;
+use MYDan::Util::Sudo;
+use MYDan::Util::Screen;
+use MYDan::Util::OptConf;
+use MYDan::Util::ProcLock;
+
+MYDan::Util::Sudo->sudo();
+
+#unless ( MYDan::Util::Screen->check() )
+#{
+#    warn "deploy need in screen\n";
+#    exit 1;
+#}
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'deploy';
+
+=head1 SYNOPSIS
+
+ $0 name1 name2 ... --pause 
+ $0 name1 name2 ... --clear
+ $0 name1 name2 ... --kill 
+ $0 name1 name2 ... --resume
+ $0 name1 name2 ... --exclude 'host{1~10}'
+  
+ $0 name1 name2 --name offline step 1 puase
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( name=s step=s pause clear kill resume exclude=s ) )->dump();
+
+my $range = MYDan::Node->new( $option->dump( 'range' ) );
+my ( @name, @list ) = map { $range->load( $_ )->list() } @ARGV;
+my $who = operator();
+
+for my $name ( @name )
+{
+    if( $o{kill} )
+    {
+        next unless my $pid = MYDan::Util::ProcLock->new( "$o{lock}/$name" )->check();
+        print "kill $name pid: $pid\n";
+        kill 2, $pid if $pid > 1
+    }
+
+    next unless -f "$o{ctrl}/$name" || -l "$o{ctrl}/$name";
+
+    my $ctrl = MYDan::Deploy::Ctrl->new( $name => "$o{ctrl}" );
+
+    if( $o{pause} )
+    {
+        map{ $o{$_} ||= MYDan::Deploy::Ctrl->any() }qw( name step );
+        $ctrl->pause( @o{qw( name step )}, $who );
+    }
+    elsif( $o{clear} )
+    {
+        $ctrl->clear();
+    }
+    elsif( $o{resume} )
+    {
+        $ctrl->resume( ( $o{name} && $o{step}) ? @o{qw( name step )}: $o{name} ? $o{name} : () );
+    }
+    elsif( $o{exclude} )
+    {
+        $ctrl->exclude( $range->load( $o{exclude} )->list() );
+    }
+
+}
+
+exit 0;
+
+sub operator
+{
+    my $name = `logname`; chop $name; return $name;
+}
+

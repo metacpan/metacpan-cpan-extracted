@@ -12,10 +12,18 @@ id_t       T_UV
 int *      T_OPAQUEPTR
 nl_catd    T_PTR
 SysRet0    T_SYSRET0
+FILE *     T_STDIO
+psx_fd_t   T_PSX_FD
 
 ######################
+INPUT
+T_PSX_FD
+  $var = psx_fileno($arg);
+  if ($var < 0)
+    XSRETURN_UNDEF;
+
 OUTPUT
 T_SYSRET0
-    if ($var != -1) {
-        sv_setiv($arg, (IV)$var);
-    }
+    if ($var != -1)
+      sv_setiv($arg, (IV)$var);
+

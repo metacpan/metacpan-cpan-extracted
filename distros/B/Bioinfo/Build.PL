@@ -18,7 +18,7 @@ my %module_build_args = (
     "Yan Xueqing <yanxueqing621\@163.com>"
   ],
   "dist_name" => "Bioinfo",
-  "dist_version" => "0.1.1",
+  "dist_version" => "0.1.8",
   "license" => "perl",
   "module_name" => "Bioinfo",
   "recursive_test_files" => 1,
@@ -33,6 +33,7 @@ my %module_build_args = (
     "MooX::Options" => 0,
     "Moose" => 0,
     "Parallel::ForkManager" => 0,
+    "XML::Twig" => 0,
     "lib" => 0,
     "namespace::autoclean" => 0,
     "namespace::clean" => 0,

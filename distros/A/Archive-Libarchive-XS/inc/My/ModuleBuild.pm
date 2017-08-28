@@ -3,78 +3,24 @@ package My::ModuleBuild;
 use strict;
 use warnings;
 use base qw( Module::Build );
-use Alien::Libarchive;
+use Alien::Base::Wrapper qw( Alien::Libarchive3 !export );
 use File::Spec;
 use DynaLoader;
 use File::Temp qw( tempdir );
 use File::Spec;
 use Text::ParseWords qw( shellwords );
-
-our $alien;
+use Capture::Tiny qw( capture_merged );
 
 sub new
 {
   my($class, %args) = @_;
+
+  %args = (%args, Alien::Base::Wrapper->mb_args);
+  $args{include_dirs} = 'xs';
+  $args{c_source}     = 'xs';
   
-  $alien ||= Alien::Libarchive->new;
-
-  $args{extra_compiler_flags} = $alien->cflags;
-  $args{extra_linker_flags}   = $alien->libs;
-  $args{c_source}             = 'xs';
-
-  if($alien->isa('Alien::Base'))
-  {
-    if($^O eq 'MSWin32')
-    {
-      $args{extra_compiler_flags} .= ' -DLIBARCHIVE_STATIC';
-      $args{extra_linker_flags}    =~ s/-larchive\b/-larchive_static/;
-      $args{extra_linker_flags}    =~ s/\barchive\.lib\b/archive_static.lib/;
-    }
-    else
-    {
-      my $ctest = "#include <archive.h>\n" .
-                  "int main(int argc, char *argv[]) {\n" .
-                  "  struct archive *a = archive_read_new();\n" .
-                  "  return 0;\n" .
-                  "}\n";
-  
-      my $ok = 0;
-      require ExtUtils::CChecker;
-      my $cc = ExtUtils::CChecker->new;
-    
-      if($alien->install_type eq 'share')
-      {
-    
-        $ok = $cc->try_compile_run(
-          extra_compiler_flags => [ shellwords($args{extra_compiler_flags}) ],
-          extra_linker_flags   => [ '-Wl,-Bstatic', shellwords($args{extra_linker_flags}), '-Wl,-Bdynamic'],
-          source               => $ctest,
-        );
-      
-        if($ok)
-        {
-          $args{extra_linker_flags} = "-Wl,-Bstatic $args{extra_linker_flags} -Wl,-Bdynamic";
-        }
-    
-      }
-    
-      unless($ok)
-      {
-    
-        $ok = $cc->try_compile_run(
-          extra_compiler_flags => [ shellwords($args{extra_compiler_flags}) ],
-          extra_linker_flags   => [ shellwords($args{extra_linker_flags}) ],
-          source               => $ctest,
-        );
-    
-      }
-    
-      die "unable to determine flags to compile / link against libarchive" unless $ok;
-    }
-  }
-
   my $self = $class->SUPER::new(%args);
-  
+
   $self->add_to_cleanup(
     File::Spec->catfile('xs', 'func.h.tmp'),
     File::Spec->catfile('xs', 'func.h'),
@@ -92,7 +38,6 @@ sub ACTION_build_prep
   return if -e File::Spec->catfile('xs', 'func.h');
   
   print "creating xs/func.h\n";
-  $alien ||= Alien::Libarchive->new;
   
   open(my $fh, '<', File::Spec->catfile('inc', 'symbols.txt'));
   my @symbols = <$fh>;
@@ -107,30 +52,18 @@ sub ACTION_build_prep
   print $fh "#ifndef FUNC_H\n";
   print $fh "#define FUNC_H\n\n";
 
-  # TODO: can probably scan the dll on Windows 
-  # for the symbols, which will save time
-  if($alien->install_type eq 'system' || $^O eq 'MSWin32' || $^O eq 'cygwin' || ! $alien->isa('Alien::Base'))
+  print "probing with compiler...\n";
+  foreach my $symbol (sort @symbols)
   {
-    foreach my $symbol (sort @symbols)
-    {
-      if($symbol =~ /^archive_write_set_format_/ && $symbol !~ /^archive_write_set_format_(program|by_name)/)
-      {
-        print $fh "#define HAS_$symbol 1\n"
-          if $self->_test_write_format($symbol);
-      }
-      else
-      {
-        print $fh "#define HAS_$symbol 1\n"
-          if $self->_test_symbol($symbol);
-      }
-    }
-  }
-  else
-  {
-    foreach my $symbol (@symbols)
+    if($symbol =~ /^archive_write_set_format_/ && $symbol !~ /^archive_write_set_format_(program|by_name)/)
     {
       print $fh "#define HAS_$symbol 1\n"
-        if DynaLoader::dl_find_symbol_anywhere($symbol);
+        if $self->_test_write_format($symbol);
+    }
+    else
+    {
+      print $fh "#define HAS_$symbol 1\n"
+        if $self->_test_symbol($symbol);
     }
   }
 
@@ -168,46 +101,26 @@ my $dir;
 my $count = 0;
 my $cc;
 
-if(eval qq{ use Capture::Tiny; 1 })
-{
-  eval qq{
-    sub _capture_tiny {
-      my \$code = shift;
-      Capture::Tiny::capture_merged(sub { \$code->()});
-    }
-  };
-  die $@ if $@;
-}
-else
-{
-  eval qq{
-    sub _capture_tiny {
-      \$_[0]->();
-    }
-  };
-  die $@ if $@;
-}
-
 sub _cc
 {
   require ExtUtils::CChecker;
-  $alien ||= Alien::Libarchive->new;
 
   unless(defined $cc)
   {
     require Text::ParseWords;
     $cc = ExtUtils::CChecker->new;
-    $cc->push_extra_compiler_flags(shellwords($alien->cflags)) if $alien->cflags !~ /^\s*$/;
-    $cc->push_extra_linker_flags(shellwords($alien->libs))     if $alien->libs   !~ /^\s*$/;
+    $cc->push_extra_compiler_flags(shellwords(Alien::Libarchive3->cflags)) if Alien::Libarchive3->cflags !~ /^\s*$/;
+    $cc->push_extra_linker_flags(shellwords(Alien::Libarchive3->libs))     if Alien::Libarchive3->libs   !~ /^\s*$/;
   }
 }
+
 
 sub _test_write_format
 {
   my($self, $symbol) = @_;
-  _cc();
   my $ok;
-  _capture_tiny(sub { $ok = $cc->try_compile_run(source => <<EOF1) });
+  _cc();
+  capture_merged { $ok = $cc->try_compile_run(source => <<EOF1) };
 #include <archive.h>
 #include <archive_entry.h>
 int main(int argc, char **argv)
@@ -229,9 +142,9 @@ EOF1
 sub _test_symbol
 {
   my($self, $symbol) = @_;
-  _cc();
   my $ok;
-  _capture_tiny(sub { $ok = $cc->try_compile_run(source => <<EOF2) });
+  _cc();
+  capture_merged { $ok = $cc->try_compile_run(source => <<EOF2) };
 #include <stdio.h>
 #include <archive.h>
 #include <archive_entry.h>

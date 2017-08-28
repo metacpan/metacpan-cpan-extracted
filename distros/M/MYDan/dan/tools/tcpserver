@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+ $0 [--port num] [--max num] script
+
+=cut
+use strict;
+use warnings;
+
+use MYDan::Util::TcpServer;
+use MYDan::Util::OptConf;
+
+$MYDan::Util::OptConf::ARGC = 1;
+
+$| ++;
+
+#@MYDan::Util::OptConf::CONF = qw( pass_through no_ignore_case );
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->set( port => 65111, max => 20 )->get( qw( port=i max=i tmp=s ) )->dump();
+
+MYDan::Util::TcpServer->new( %o, 'exec' => shift)->run();

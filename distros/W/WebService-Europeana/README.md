@@ -4,7 +4,7 @@ WebService::Europeana - access the API of europeana.eu
 
 # VERSION
 
-This document describes WebService::Europeana version 0.0.2
+This document describes WebService::Europeana version 0.0.3
 
 # SYNOPSIS
 

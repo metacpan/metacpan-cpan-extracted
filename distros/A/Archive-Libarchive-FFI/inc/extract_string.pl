@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use v5.10;
 use FFI::Raw;
 
 $Archive::Libarchive::FFI::on_attach = sub {

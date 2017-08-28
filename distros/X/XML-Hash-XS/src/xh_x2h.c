@@ -524,6 +524,98 @@ PPCAT(loop, _SEARCH_ATTRIBUTE_VALUE):                                   \
         END(XML_DECL_SEARCH_END_TAG2)                                   \
         goto INVALID_XML;
 
+#define PARSE_DOCTYPE_END                                               \
+    goto PARSE_DOCTYPE_INTSUBSET_START;
+
+#define PARSE_DOCTYPE_LITERAL(loop, next, quot)                         \
+    EXPECT_CHAR("start of literal", quot)                               \
+        DO(PPCAT(loop, _END_OF_LITERAL))                                \
+            EXPECT_CHAR("end of literal", quot)                         \
+                next                                                    \
+        END(PPCAT(loop, _END_OF_LITERAL))                               \
+        goto INVALID_XML;
+
+#define PARSE_DOCTYPE_LITERALS(prefix, next)                            \
+    PARSE_DOCTYPE_LITERAL(PPCAT(prefix, _1), next, '"')\
+    PARSE_DOCTYPE_LITERAL(PPCAT(prefix, _2), next, '\'')
+
+#define PARSE_DOCTYPE_DELIM(prefix, next)                               \
+    DO(PPCAT(prefix, _DOCTYPE_DELIM))                                   \
+        EXPECT_BLANK("delimiter")                                       \
+            DO(PPCAT(prefix, _DOCTYPE_DELIM_SKIP_BLANK))                \
+                SKIP_BLANK                                              \
+                next                                                    \
+                EXPECT_ANY("wrong character")                           \
+                    goto INVALID_XML;                                   \
+            END(PPCAT(prefix, _DOCTYPE_DELIM_SKIP_BLANK))               \
+            goto INVALID_XML;                                           \
+        EXPECT_ANY("wrong character")                                   \
+            goto INVALID_XML;                                           \
+    END(PPCAT(prefix, _DOCTYPE_DELIM))                                  \
+    goto INVALID_XML;
+
+#define PARSE_DOCTYPE_SYSTEM                                            \
+    SCAN5(DOCTYPE_SYSTEM, 'Y', 'S', 'T', 'E', 'M')                      \
+        PARSE_DOCTYPE_DELIM(DOCTYPE_SYSTEM_LOCATION, PARSE_DOCTYPE_LITERALS(DOCTYPE_SYSTEM, PARSE_DOCTYPE_END))\
+    END5(DOCTYPE_SYSTEM, INVALID_XML)                                   \
+    goto INVALID_XML;
+
+#define PARSE_DOCTYPE_PUBLIC_ID(prefix)                                 \
+    PARSE_DOCTYPE_LITERAL(                                              \
+        PPCAT(prefix, _1),                                              \
+        PARSE_DOCTYPE_DELIM(DOCTYPE_PUBLIC_LOCATION_1, PARSE_DOCTYPE_LITERALS(DOCTYPE_PUBLIC_LOCATION_1, PARSE_DOCTYPE_END)),\
+        '"'                                                             \
+    )                                                                   \
+    PARSE_DOCTYPE_LITERAL(                                              \
+        PPCAT(prefix, _2),                                              \
+        PARSE_DOCTYPE_DELIM(DOCTYPE_PUBLIC_LOCATION_2, PARSE_DOCTYPE_LITERALS(DOCTYPE_PUBLIC_LOCATION_2, PARSE_DOCTYPE_END)),\
+        '\''                                                            \
+    )
+
+#define PARSE_DOCTYPE_PUBLIC                                            \
+    SCAN5(DOCTYPE_PUBLIC, 'U', 'B', 'L', 'I', 'C')                      \
+        PARSE_DOCTYPE_DELIM(DOCTYPE_PUBLIC_ID, PARSE_DOCTYPE_PUBLIC_ID(DOCTYPE_PUBLIC))\
+    END5(DOCTYPE_PUBLIC, INVALID_XML)                                   \
+    goto INVALID_XML;
+
+#define PARSE_DOCTYPE                                                   \
+    SCAN6(DOCTYPE, 'O', 'C', 'T', 'Y', 'P', 'E')                        \
+        if (flags & (XH_X2H_ROOT_FOUND | XH_X2H_DOCTYPE_FOUND)) goto INVALID_XML;\
+        flags |= XH_X2H_DOCTYPE_FOUND;                                  \
+        DO(DOCTYPE_NAME)                                                \
+            EXPECT_BLANK("delimiter")                                   \
+                DO(DOCTYPE_NAME_START)                                  \
+                    SKIP_BLANK                                          \
+                    EXPECT_ANY("start name")                            \
+                        DO(DOCTYPE_NAME_END)                            \
+                            EXPECT_BLANK("end name")                    \
+                                DO(DOCTYPE_NAME_BLANK)                  \
+                                    SKIP_BLANK                          \
+                                    EXPECT_CHAR("end doctype", '>')     \
+                                        goto PARSE_CONTENT;             \
+                                    EXPECT_CHAR("SYSTEM", 'S')          \
+                                        PARSE_DOCTYPE_SYSTEM            \
+                                    EXPECT_CHAR("PUBLIC", 'P')          \
+                                        PARSE_DOCTYPE_PUBLIC            \
+                                    EXPECT_CHAR("internal subset", '[') \
+                                        goto PARSE_DOCTYPE_INTSUBSET;   \
+                                    EXPECT_ANY("wrong character")       \
+                                        goto INVALID_XML;               \
+                                END(DOCTYPE_NAME_BLANK)                 \
+                                goto INVALID_XML;                       \
+                            EXPECT_CHAR("end doctype", '>')             \
+                                goto PARSE_CONTENT;                     \
+                        END(DOCTYPE_NAME_END)                           \
+                        goto INVALID_XML;                               \
+                END(DOCTYPE_NAME_START)                                 \
+                goto INVALID_XML;                                       \
+            EXPECT_ANY("wrong character")                               \
+                goto INVALID_XML;                                       \
+        END(DOCTYPE_NAME)                                               \
+        goto INVALID_XML;                                               \
+    END6(DOCTYPE, INVALID_XML)                                          \
+    goto INVALID_XML;
+
 #define PARSE_COMMENT                                                   \
     DO(COMMENT1)                                                        \
         EXPECT_CHAR("-", '-')                                           \
@@ -840,7 +932,7 @@ PARSE_CONTENT:
 #define NEW_ATTRIBUTE(k, kl, v, vl) NEW_NODE_ATTRIBUTE(k, kl, v, vl)
 #undef  SEARCH_ATTRIBUTE_VALUE
 #define SEARCH_ATTRIBUTE_VALUE(loop, top_loop, quot) SEARCH_NODE_ATTRIBUTE_VALUE(loop, top_loop, quot)
-                EXPECT_CHAR("comment", '!')
+                EXPECT_CHAR("comment or cdata or doctype", '!')
                     DO(XML_COMMENT_NODE_OR_CDATA)
                         EXPECT_CHAR("comment", '-')
                             PARSE_COMMENT
@@ -853,6 +945,8 @@ PARSE_CONTENT:
                                 PARSE_CDATA
                                 ;
                             }
+                        EXPECT_CHAR("doctype", 'D')
+                            PARSE_DOCTYPE
                         EXPECT_ANY("wrong character")
                             goto INVALID_XML;
                     END(XML_COMMENT_NODE_OR_CDATA)
@@ -943,6 +1037,32 @@ PARSE_CONTENT:
     *bytesleft          = eof - cur;
     *buf                = cur;
     return;
+
+PARSE_DOCTYPE_INTSUBSET:
+    DO(DOCTYPE_INTSUBSET)
+        EXPECT_CHAR("end of internal subset", ']')
+            DO(DOCTYPE_END)
+                SKIP_BLANK
+                EXPECT_CHAR("end doctype", '>')
+                    goto PARSE_CONTENT;
+                EXPECT_ANY("wrong character")
+                    goto INVALID_XML;
+            END(DOCTYPE_END)
+            goto INVALID_XML;
+    END(DOCTYPE_INTSUBSET)
+    goto INVALID_XML;
+
+PARSE_DOCTYPE_INTSUBSET_START:
+    DO(DOCTYPE_INTSUBSET_START)
+        SKIP_BLANK
+        EXPECT_CHAR("end doctype", '>')
+            goto PARSE_CONTENT;
+        EXPECT_CHAR("start of internal subset", '[')
+            goto PARSE_DOCTYPE_INTSUBSET;
+        EXPECT_ANY("wrong character")
+            goto INVALID_XML;
+    END(DOCTYPE_INTSUBSET_START)
+    goto INVALID_XML;
 
 XML_DECL_FOUND:
     ctx->state          = XML_DECL_FOUND;

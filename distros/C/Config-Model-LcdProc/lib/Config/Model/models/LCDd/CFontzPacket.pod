@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::CFontzPacket
 # ABSTRACT:  Configuration class LCDd::CFontzPacket
+
 =encoding utf8
 
 =head1 NAME
@@ -16,50 +17,140 @@ generated from LCDd.conf
 
 =head2 Brightness
 
-Set the initial brightness I<< Optional. Type integer. upstream_default: '1000'.  >> 
+Set the initial brightness I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1000
+
+=back
+
+
 
 =head2 Contrast
 
-Set the initial contrast I<< Optional. Type integer. upstream_default: '560'.  >> 
+Set the initial contrast I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+560
+
+=back
+
+
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Model
 
-Select the LCD model I<< Optional. Type enum. choice: '533', '631', '633', '635'. upstream_default: '633'.  >> 
+Select the LCD model I< Optional. Type enum. choice: '533', '631', '633', '635'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+633
+
+=back
+
+
 
 =head2 OffBrightness
 
 Set the initial off-brightness 
 This value is used when the display is normally
-switched off in case LCDd is inactive. I<< Optional. Type integer. upstream_default: '0'.  >> 
+switched off in case LCDd is inactive. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head2 OldFirmware
 
 Very old 633 firmware versions do not support partial screen updates using
 'Send Data to LCD' command (31). For those devices it may be necessary to
-enable this flag. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+enable this flag. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Reboot
 
-Reinitialize the LCD's BIOS on driver start. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Reinitialize the LCD's BIOS on driver start. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Size
 
 Override the LCD size known for the selected model. Usually setting this
-value should not be necessary. I<< Optional. Type uniline. upstream_default: '20x4'.  >> 
+value should not be necessary. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20x4
+
+=back
+
+
 
 =head2 Speed
 
 Override the default communication speed known for the selected model.
-Default value depends on model I<< Optional. Type enum. choice: '19200', '115200'.  >> 
+Default value depends on model I< Optional. Type enum. choice: '19200', '115200'.  > 
 
 =head2 USB
 
 Enable the USB flag if the device is connected to an USB port. For
-serial ports leave it disabled. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+serial ports leave it disabled. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head1 SEE ALSO
 

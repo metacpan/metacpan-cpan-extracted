@@ -28,7 +28,7 @@ apt-get install libqbit-application-model-db-perl (http://perlhub.ru/)
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.016';
+$QBit::Application::Model::DB::VERSION = '0.018';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -250,6 +250,70 @@ sub init {
     $self->{'__SAVEPOINTS__'} = 0;
 }
 
+=head2 set_dbh
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<$dbh> - Database handle object (optional)
+
+=back
+
+B<Return values:>
+
+=over
+
+=item
+
+B<$dbh> - Database handle object or undef
+
+=back
+
+B<Example:>
+
+  my $dbh = DBI->connect(...);
+
+  # set
+  $app->db->set_dbh($dbh);
+
+  # clear
+  $app->db->set_dbh();
+
+=cut
+
+sub set_dbh {
+    my ($self, $dbh) = @_;
+
+    if (defined($dbh)) {
+        $self->{'__DBH__'}{$$} = $dbh;
+    } else {
+        delete($self->{'__DBH__'}{$$});
+    }
+
+    return $dbh;
+}
+
+=head2 dbh
+
+B<No arguments.>
+
+returns a database handle object or undef
+
+B<Example:>
+
+  my $dbh = $app->db->dbh;
+
+=cut
+
+sub dbh {
+    my ($self) = @_;
+
+    return $self->{'__DBH__'}{$$};
+}
+
 =head2 quote
  
 B<Arguments:>
@@ -284,7 +348,7 @@ sub quote {
     my ($res) = $self->_sub_with_connected_dbh(
         sub {
             my ($self, $name) = @_;
-            return $self->{'__DBH__'}{$$}->quote($name);
+            return $self->dbh->quote($name);
         },
         [$self, $name]
     );
@@ -326,7 +390,7 @@ sub quote_identifier {
     my ($res) = $self->_sub_with_connected_dbh(
         sub {
             my ($self, $name) = @_;
-            return $self->{'__DBH__'}{$$}->quote_identifier($name);
+            return $self->dbh->quote_identifier($name);
         },
         [$self, $name]
     );
@@ -554,11 +618,9 @@ sub _do {
             my ($self, $sql, @params) = @_;
 
             my $err_code;
-            return $self->{'__DBH__'}{$$}->do($sql, undef, @params)
-              || ($err_code = $self->{'__DBH__'}{$$}->err())
-              && throw Exception::DB $self->{'__DBH__'}{$$}->errstr()
-              . " ($err_code)\n"
-              . $self->_log_sql($sql, \@params),
+            return $self->dbh->do($sql, undef, @params)
+              || ($err_code = $self->dbh->err())
+              && throw Exception::DB $self->dbh->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
         },
         \@_
@@ -580,32 +642,30 @@ sub _get_all {
 
             my $err_code;
             $self->timelog->start(gettext('DBH prepare'));
-            my $sth = $self->{'__DBH__'}{$$}->prepare($sql)
-              || ($err_code = $self->{'__DBH__'}{$$}->err())
-              && throw Exception::DB $self->{'__DBH__'}{$$}->errstr()
-              . " ($err_code)\n"
-              . $self->_log_sql($sql, \@params),
+            my $sth = $self->dbh->prepare($sql)
+              || ($err_code = $self->dbh->err())
+              && throw Exception::DB $self->dbh->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
 
             $self->timelog->finish();
 
             $self->timelog->start(gettext('STH execute'));
             $sth->execute(@params)
-              || ($err_code = $self->{'__DBH__'}{$$}->err())
+              || ($err_code = $self->dbh->err())
               && throw Exception::DB $sth->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
             $self->timelog->finish();
 
             $self->timelog->start(gettext('STH fetch_all'));
             my $data = $sth->fetchall_arrayref({})
-              || ($err_code = $self->{'__DBH__'}{$$}->err())
+              || ($err_code = $self->dbh->err())
               && throw Exception::DB $sth->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
             $self->timelog->finish();
 
             $self->timelog->start(gettext('STH finish'));
             $sth->finish()
-              || ($err_code = $self->{'__DBH__'}{$$}->err())
+              || ($err_code = $self->dbh->err())
               && throw Exception::DB $sth->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
             $self->timelog->finish();
@@ -679,11 +739,11 @@ sub _sub_with_connected_dbh {
 
         if (
             $try < 3
-            && (!exists($self->{'__DBH__'}{$$})
-                || $self->_is_connection_error($exception->{'errorcode'} || $self->{'__DBH__'}{$$}->err()))
+            && (!defined($self->dbh)
+                || $self->_is_connection_error($exception->{'errorcode'} || $self->dbh->err()))
            )
         {
-            delete($self->{'__DBH__'}{$$}) if exists($self->{'__DBH__'}{$$});
+            $self->set_dbh() if defined($self->dbh);
 
             if ($self->{'__SAVEPOINTS__'}) {
                 throw $exception;

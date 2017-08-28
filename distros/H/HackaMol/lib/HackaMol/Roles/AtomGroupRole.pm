@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.043';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.044';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -75,6 +75,16 @@ sub COM {
     my $com       = V( 0, 0, 0 );
     $com += $_ foreach @m_vectors;
     return ( $com / $self->total_mass );
+}
+
+sub center {
+    my $self = shift;
+    return ( V(0) ) unless ( $self->count_atoms );
+    my @atoms     = $self->all_atoms;
+    my @vectors = map { $_->get_coords( $_->t ) } @atoms;
+    my $center       = V( 0, 0, 0 );
+    $center += $_ foreach @vectors;
+    return ( $center / $self->count_atoms);
 }
 
 sub COZ {
@@ -204,6 +214,35 @@ sub rotate {
     my @rcor = $rvec->rotate_3d( deg2rad($ang), @cor );
 
     $atoms[$_]->set_coords( $tf, $rcor[$_] + $orig ) foreach 0 .. $#rcor;
+}
+
+sub rotate_translate{
+  # args: 
+  #      1. rotation matrix (3x3): ar, each column (cx,cy,cz, below) is a Math::Vector::Real
+  #      2. translate vector, MVR 
+  #               r' = x*cx + y*cy + z*cz + v_trans
+  #      3. t final, the final t location for transformed coordinates [defaults to current t]
+  my $self = shift;
+  my $rmat = shift;
+  my $trns = shift;
+  my $tf   = shift;
+  my @atoms = $self->all_atoms;
+  my ($cx,$cy,$cz) = @{$rmat};
+
+  my $t     = $atoms[0]->t;
+  $tf = $t unless ( defined($tf) );
+
+  foreach my $atom (@atoms){
+     my $xyz = $atom->xyz;
+     #my ($x,$y,$z) = @{$xyz};
+     my $xr = $cx*$xyz; 
+     my $yr = $cy*$xyz; 
+     my $zr = $cz*$xyz; 
+     #my $xyz_new = $x*$cx + $y*$cy + $z*$cz + $trns;  
+     my $xyz_new = V($xr,$yr,$zr) + $trns; 
+     $atom->set_coords($tf,$xyz_new);
+  }  
+
 }
 
 sub fix_serial {
@@ -390,7 +429,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 

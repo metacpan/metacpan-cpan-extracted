@@ -3,7 +3,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::Job;
 use Moose;
 use Moose::Util::TypeConstraints;
 use HPC::Runner::Command::submit_jobs::Utils::Scheduler::Batch;
-use HPC::Runner::Command::Utils::Traits qw(ArrayRefOfStrs);
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 
 with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives';
 

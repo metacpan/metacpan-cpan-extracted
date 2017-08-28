@@ -8,7 +8,7 @@ use Moo::Role;
 use MooX::Types::MooseLike::Base qw(ArrayRef Bool HashRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 has category => (
     is      => 'rw',
@@ -91,10 +91,10 @@ sub add_message {
     my ($self, $msg_ref) = @_;
 
     my $key_util = Locale::TextDomain::OO::Util::JoinSplitLexiconKeys->instance;
-    my $format_util 
-        = $self->is_maketext_format_gettext 
+    my $format_util
+        = $self->is_maketext_format_gettext
         && Locale::Utils::PlaceholderMaketext->new;
-    
+
     # build the lexicon part
     my $lexicon_key = $key_util->join_lexicon_key({(
         map {
@@ -148,13 +148,13 @@ __END__
 =head1 NAME
 Locale::TextDomain::OO::Extract::Role::File - Gettext file related stuff
 
-$Id: File.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: File.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/Role/File.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 DESCRIPTION
 
@@ -250,7 +250,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

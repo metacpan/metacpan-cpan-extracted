@@ -44,6 +44,7 @@
             "MooX::Options" : "0",
             "Moose" : "0",
             "Parallel::ForkManager" : "0",
+            "XML::Twig" : "0",
             "lib" : "0",
             "namespace::autoclean" : "0",
             "namespace::clean" : "0",
@@ -60,7 +61,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1.1",
+   "version" : "0.1.8",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

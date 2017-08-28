@@ -13,10 +13,11 @@ use URI::Escape;
 use Data::Dumper;
 
 # Net::Cisco::ISE::*
+use lib qw(.);
 use Net::Cisco::ISE::InternalUser;
 use Net::Cisco::ISE::IdentityGroup;
-#use Net::Cisco::ISE::NetworkDevice;
-#use Net::Cisco::ISE::NetworkDeviceGroup;
+use Net::Cisco::ISE::NetworkDevice;
+use Net::Cisco::ISE::NetworkDeviceGroup;
 #use Net::Cisco::ISE::Endpoint;
 #use Net::Cisco::ISE::EndpointCertificate;
 #use Net::Cisco::ISE::EndpointIdentityGroup;
@@ -26,17 +27,13 @@ use Net::Cisco::ISE::IdentityGroup;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $ERROR %actions);
-    $VERSION     = '0.02';
+    $VERSION     = '0.05';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
     %EXPORT_TAGS = ();
 	
 	$ERROR = ""; # TODO: Document error properly!
-	%actions = ( 	"version" => "/Rest/Common/AcsVersion",
-			"serviceLocation" => "/Rest/Common/ServiceLocation",
-			"errorMessage" => "/Rest/Common/ErrorMessage",
-				);
 }
 
 # Moose!
@@ -70,19 +67,25 @@ has 'mock' => (
 	isa => 'Str',
 	default => '0',
 	);    
+
+has 'debug' => (
+    is => 'rw',
+    isa => 'Str',
+    default => '0',
+);
     
 sub internalusers # No Moose here :(
 {	my $self = shift;
-        $ERROR = "";
+    $ERROR = "";
 	if (@_)
 	{ my %args = @_; 
 	  $self->{"InternalUsers"} = $args{"internalusers"};
-          if ($self->mock())
-          { return $self->{"InternalUsers"}; }      
+      if ($self->mock())
+      { return $self->{"InternalUsers"}; }      
 	  if ($args{"id"})
 	  { $self->{"InternalUsers"} = $self->query("InternalUser","id",$args{"id"}); }
 	} else
-	{ $self->{"InternalUsers"} = $self->query("InternalUser"); 
+	{ $self->{"InternalUsers"} = $self->query("InternalUser");
 	}
 	return $self->{"InternalUsers"};
 }	
@@ -95,7 +98,6 @@ sub identitygroups # No Moose here :(
 	  $self->{"IdentityGroups"} = $args{"identitygroups"}; 
       if ($self->mock())
       { return $self->{"IdentityGroups"}; }
-
 	  if ($args{"id"})
 	  { $self->{"IdentityGroups"} = $self->query("IdentityGroup","id",$args{"id"}); }
 	} else
@@ -105,20 +107,19 @@ sub identitygroups # No Moose here :(
 }	
 
 sub endpointidentitygroups # No Moose here :(
-{       my $self = shift;
+{   my $self = shift;
     $ERROR = "";
-        if (@_)
-        { my %args = @_;
-          $self->{"EndpointIdentityGroups"} = $args{"endpointidentitygroups"};
+    if (@_)
+    { my %args = @_;
+      $self->{"EndpointIdentityGroups"} = $args{"endpointidentitygroups"};
       if ($self->mock())
       { return $self->{"EndpointIdentityGroups"}; }
-
-          if ($args{"id"})
-          { $self->{"EndpointIdentityGroups"} = $self->query("EndpointIdentityGroup","id",$args{"id"}); }
-        } else
-        { $self->{"EndpointIdentityGroups"} = $self->query("EndpointIdentityGroup");
-        }
-        return $self->{"EndpointIdentityGroups"};
+        if ($args{"id"})
+        { $self->{"EndpointIdentityGroups"} = $self->query("EndpointIdentityGroup","id",$args{"id"}); }
+      } else
+      { $self->{"EndpointIdentityGroups"} = $self->query("EndpointIdentityGroup");
+      }
+      return $self->{"EndpointIdentityGroups"};
 }
 
 sub networkdevices # No Moose here :(
@@ -127,9 +128,8 @@ sub networkdevices # No Moose here :(
 	if (@_)
 	{ my %args = @_; 
 	  $self->{"NetworkDevices"} = $args{"networkdevices"};
-     if ($self->mock())
-     { return $self->{"NetworkDevices"}; }
-
+      if ($self->mock())
+      { return $self->{"NetworkDevices"}; }
 	  if ($args{"id"})
 	  { $self->{"NetworkDevices"} = $self->query("NetworkDevice","id",$args{"id"}); }
 	} else
@@ -146,7 +146,6 @@ sub networkdevicegroups # No Moose here :(
 	  $self->{"NetworkDeviceGroups"} = $args{"networkdevicegroups"};
       if ($self->mock())
       { return $self->{"NetworkDeviceGroups"}; }
-
 	  if ($args{"id"})
 	  { $self->{"NetworkDeviceGroups"} = $self->query("NetworkDeviceGroup","id",$args{"id"}); }
 	} else
@@ -163,7 +162,6 @@ sub endpoints # No Moose here :(
 	  $self->{"Endpoints"} = $args{"endpoints"};
       if ($self->mock())
       { return $self->{"Endpoints"}; }
-
 	  if ($args{"id"})
 	  { $self->{"Endpoints"} = $self->query("Endpoint","id",$args{"id"}); }
 	} else
@@ -173,55 +171,53 @@ sub endpoints # No Moose here :(
 }	
 	
 sub endpointcertificates # No Moose here :(
-{       my $self = shift;
-        $ERROR = "";
-        if (@_)
-        { my %args = @_;
-          $self->{"EndpointCertificates"} = $args{"endpointcertificates"};
+{   my $self = shift;
+    $ERROR = "";
+    if (@_)
+    { my %args = @_;
+      $self->{"EndpointCertificates"} = $args{"endpointcertificates"};
       if ($self->mock())
       { return $self->{"EndpointCertificates"}; }
-
-          if ($args{"id"})
-          { $self->{"EndpointCertificates"} = $self->query("EndpointCertificate","id",$args{"id"}); }
-        } else
-        { $self->{"EndpointCertificates"} = $self->query("EndpointCertificate");
-        }
-        return $self->{"EndpointCertificates"};
+      if ($args{"id"})
+      { $self->{"EndpointCertificates"} = $self->query("EndpointCertificate","id",$args{"id"}); }
+    } else
+    { $self->{"EndpointCertificates"} = $self->query("EndpointCertificate");
+    }
+    return $self->{"EndpointCertificates"};
 }
 
 sub portals # No Moose here :(
-{       my $self = shift;
-        $ERROR = "";
-        if (@_)
-        { my %args = @_;
-          $self->{"Portals"} = $args{"portals"};
+{   my $self = shift;
+    $ERROR = "";
+    if (@_)
+    { my %args = @_;
+      $self->{"Portals"} = $args{"portals"};
       if ($self->mock())
       { return $self->{"Portals"}; }
-
-          if ($args{"id"})
-          { $self->{"Portals"} = $self->query("Portal","id",$args{"id"}); }
-        } else
-        { $self->{"Portals"} = $self->query("Portal");
-        }
-        return $self->{"Portals"};
+      if ($args{"id"})
+      { $self->{"Portals"} = $self->query("Portal","id",$args{"id"}); }
+      } else
+      { $self->{"Portals"} = $self->query("Portal");
+    }
+    return $self->{"Portals"};
 }
 
 sub profiles # No Moose here :(
-{       my $self = shift;
-        $ERROR = "";
-        if (@_)
-        { my %args = @_;
-          $self->{"Profiles"} = $args{"profiles"};
+{   my $self = shift;
+    $ERROR = "";
+    if (@_)
+    { my %args = @_;
+      $self->{"Profiles"} = $args{"profiles"};
       if ($self->mock())
       { return $self->{"Profiles"}; }
-
-          if ($args{"id"})
-          { $self->{"Profiles"} = $self->query("Profile","id",$args{"id"}); }
-        } else
-        { $self->{"Profiles"} = $self->query("Profile");
-        }
-        return $self->{"Profiles"};
+        if ($args{"id"})
+        { $self->{"Profiles"} = $self->query("Profile","id",$args{"id"}); }
+    } else
+    { $self->{"Profiles"} = $self->query("Profile");
+    }
+    return $self->{"Profiles"};
 }
+
 
 has 'username' => (
 	is => 'rw',
@@ -234,29 +230,6 @@ has 'password' => (
 	isa => 'Str',
 	required => '1',
 	);
-
-sub version # No Moose here :(
-{	my $self = shift;
-    $ERROR = "";
-	unless ($self->{"Version"}) # Version is not going to magically change in one session
-	{ $self->{"Version"} = $self->query("Version"); }
-	return $self->{"Version"};
-}	
-	
-sub servicelocation # No Moose here :(
-{	my $self = shift;
-    $ERROR = "";
-	unless ($self->{"ServiceLocation"}) # serviceLocation is not going to magically change in one session
-	{ $self->{"ServiceLocation"} = $self->query("ServiceLocation"); }
-	return $self->{"ServiceLocation"};
-}	
-
-sub errormessage # No Moose here :(
-{	my $self = shift;
-    $ERROR = "";
-	$self->{"ErrorMessage"} = $self->query("ErrorMessage"); 
-	return $self->{"ErrorMessage"};
-}	
 	
 # Non-Moose
 
@@ -295,26 +268,26 @@ sub query
   { #$action = $Net::Cisco::ISE::EndpointIdentityGroup::actions{"query"};
     $mode = "EndpointIdentityGroups";
     $accepttype = "identity.endpointgroup.1.0";
-        if ($key eq "id")
-        { #$action = $Net::Cisco::ISE::EndpointIdentityGroup::actions{"getById"}.$value;
-          $mode = "EndpointIdentityGroup";
-        }
+    if ($key eq "id")
+    { #$action = $Net::Cisco::ISE::EndpointIdentityGroup::actions{"getById"}.$value;
+      $mode = "EndpointIdentityGroup";
+    }
   }
   if ($type eq "NetworkDevice")
-  { #$action = $Net::Cisco::ISE::NetworkDevice::actions{"query"}; 
+  { $action = $Net::Cisco::ISE::NetworkDevice::actions{"query"}; 
     $mode = "NetworkDevices";
     $accepttype = "network.networkdevice.1.1";
 	if ($key eq "id")
-	{ #$action = $Net::Cisco::ISE::NetworkDevice::actions{"getById"}.$value; 
+	{ $action = $Net::Cisco::ISE::NetworkDevice::actions{"getById"}.$value; 
 	  $mode = "NetworkDevice";
 	}
   }
   if ($type eq "NetworkDeviceGroup")
-  { #$action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"query"}; 
+  { $action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"query"}; 
     $mode = "NetworkDeviceGroups";
     $accepttype = "network.networkdevicegroup.1.1";
 	if ($key eq "id")
-	{ #$action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"getById"}.$value; 
+	{ $action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"getById"}.$value; 
 	  $mode = "NetworkDeviceGroup";
 	}
   }
@@ -331,42 +304,29 @@ sub query
   { #$action = $Net::Cisco::ISE::EndpointCertificate::actions{"query"};
     $mode = "EndpointCertificates";
     $accepttype = "ca.endpointcert.1.0";
-        if ($key eq "id")
-        { #$action = $Net::Cisco::ISE::EndpointCertificate::actions{"getById"}.$value;
-          $mode = "EndpointCertificate";
-        }
+    if ($key eq "id")
+    { #$action = $Net::Cisco::ISE::EndpointCertificate::actions{"getById"}.$value;
+      $mode = "EndpointCertificate";
+    }
   }
 
   if ($type eq "Portal")
   { #$action = $Net::Cisco::ISE::Portal::actions{"query"};
     $mode = "Portals";
     $accepttype = "identity.portal.1.0";
-        if ($key eq "id")
-        { #$action = $Net::Cisco::ISE::Portal::actions{"getById"}.$value;
-          $mode = "Portal";
-        }
+    if ($key eq "id")
+    { #$action = $Net::Cisco::ISE::Portal::actions{"getById"}.$value;
+      $mode = "Portal";
+    }
   }
   if ($type eq "Profile")
   { #$action = $Net::Cisco::ISE::Profile::actions{"query"};
     $mode = "Profiles";
     $accepttype = "identity.profilerprofile.1.0";
-        if ($key eq "id")
-        { #$action = $Net::Cisco::ISE::Profile::actions{"getById"}.$value;
-          $mode = "Profile";
-        }
-  }
-
-  if ($type eq "Version")
-  { $action = $Net::Cisco::ISE::actions{"version"}; 
-    $mode = "Version";
-  }
-  if ($type eq "ServiceLocation")
-  { $action = $Net::Cisco::ISE::actions{"serviceLocation"}; 
-    $mode = "ServiceLocation";
-  }
-  if ($type eq "ErrorMessage")
-  { $action = $Net::Cisco::ISE::actions{"errorMessage"}; 
-    $mode = "ErrorMessage";
+    if ($key eq "id")
+    { #$action = $Net::Cisco::ISE::Profile::actions{"getById"}.$value;
+      $mode = "Profile";
+    }
   }
 
   $hostname = $hostname . $action;
@@ -375,9 +335,11 @@ sub query
   $request->header('Authorization' => "Basic $credentials", Accept => "application/vnd.com.cisco.ise.$accepttype+xml");
   my $result = $useragent->request($request);
   if ($result->code eq "400") { $ERROR = "Bad Request - HTTP Status: 400"; }
-  if ($result->code eq "410") { $ERROR = "Unknown $type queried by name or ID - HTTP Status: 410"; }  
-  print $result->content;
-  $self->parse_xml($mode, $result->content);
+  if ($result->code eq "410") { $ERROR = "Unknown $type queried by name or ID - HTTP Status: 410"; }
+  warn Dumper $result->content if $self->debug;
+  $result = $self->parse_xml($mode, $result->content);
+  warn Dumper $result if $self->debug;
+  return $result;
 }
 
 sub create 
@@ -405,12 +367,12 @@ sub create
   }
 
   if (ref($record) eq "Net::Cisco::ISE::NetworkDevice")
-  { #$action = $Net::Cisco::ISE::NetworkDevice::actions{"create"}; 
+  { $action = $Net::Cisco::ISE::NetworkDevice::actions{"create"}; 
     $accepttype = "network.networkdevice.1.1";
   }
   
   if (ref($record) eq "Net::Cisco::ISE::NetworkDeviceGroup")
-  { #$action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"create"}; 
+  { $action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"create"}; 
     $accepttype = "network.networkdevicegroup.1.1";
   }
 
@@ -437,12 +399,11 @@ sub create
 
   $data .= $record->toXML;
   $data = $record->header($data,$record);
-  warn $data;
   $hostname = $hostname . $action;
   my $useragent = LWP::UserAgent->new (ssl_opts => $self->ssl_options);
   my $request = HTTP::Request->new(POST => $hostname );
   $request->content_type("application/xml");  
-  $request->header("Authorization" => "Basic $credentials",  "Content-Type" => "application/vnd.com.cisco.ise.$accepttype+xml");
+  $request->header("Authorization" => "Basic $credentials",  "Content-Type" => "application/vnd.com.cisco.ise.$accepttype+xml; charset=utf-8", Accept => "application/vnd.com.cisco.ise.$accepttype+xml");
   $request->content($data);
   my $result = $useragent->request($request);
   my $id = "";
@@ -480,12 +441,12 @@ sub update
   }
 
   if (ref($record) eq "Net::Cisco::ISE::NetworkDevice")
-  { #$action = $Net::Cisco::ISE::NetworkDevice::actions{"update"}; 
+  { $action = $Net::Cisco::ISE::NetworkDevice::actions{"update"}; 
     $accepttype = "network.networkdevice.1.1";
   }
   
   if (ref($record) eq "Net::Cisco::ISE::NetworkDeviceGroup")
-  { #$action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"update"}; 
+  { $action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"update"}; 
     $accepttype = "network.networkdevicegroup.1.1";
   }
 
@@ -523,6 +484,7 @@ sub update
   $request->content_type("application/xml");  
   $request->header("Authorization" => "Basic $credentials", "Content-Type" => "application/vnd.com.cisco.ise.$accepttype+xml");
   $request->content($data);
+  warn Dumper $request if $self->debug;
   my $result = $useragent->request($request);
   my $id = "";
   if ($result->code ne "200")
@@ -530,7 +492,6 @@ sub update
     $ERROR = $result_ref->{"messages"}{"message"}{"type"}.":".$result_ref->{"messages"}{"message"}{"code"}." - ".$result_ref->{"messages"}{"message"}{"title"}." "." - HTTP Status: ".$result->code;
   } else
   { my $location = $result->header("location");
-    warn $location;
     ($id) = $location =~ /^.*\/([^\/]*)$/;
   }
   return $id;
@@ -563,13 +524,13 @@ sub delete
   }
 
   if (ref($record) eq "Net::Cisco::ISE::NetworkDevice")
-  { #$action = $Net::Cisco::ISE::NetworkDevice::actions{"getById"}; 
+  { $action = $Net::Cisco::ISE::NetworkDevice::actions{"getById"}; 
     $type = "NetworkDevice";
     $accepttype = "network.networkdevice.1.1";
   }
   
   if (ref($record) eq "Net::Cisco::ISE::NetworkDeviceGroup")
-  { #$action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"getById"}; 
+  { $action = $Net::Cisco::ISE::NetworkDeviceGroup::actions{"getById"}; 
     $type = "NetworkDeviceGroup";
     $accepttype = "network.networkdevicegroup.1.1";
   }
@@ -622,7 +583,7 @@ sub parse_xml
 { my $self = shift;
   my $type = shift;
   my $xml_ref = shift;
-  my $xmlsimple = XML::Simple->new();
+  my $xmlsimple = XML::Simple->new(SuppressEmpty => 1);
   my $xmlout = $xmlsimple->XMLin($xml_ref);
   if ($type eq "InternalUsers")
   { #my $users_ref = $xmlout->{"InternalUser"};
@@ -645,6 +606,8 @@ sub parse_xml
   if ($type eq "IdentityGroups")
   { my $identitygroups_ref = $xmlout->{"resources"}{"resource"};
     my %identitygroups = ();
+    # With Single entry, this approach will break!!!
+    # !!BUG!!
     for my $key (keys % {$identitygroups_ref})
     { my $identitygroup = Net::Cisco::ISE::IdentityGroup->new( name => $key, %{ $identitygroups_ref->{$key} } );
       $identitygroups{$key} = $identitygroup;
@@ -658,21 +621,21 @@ sub parse_xml
 	$self->{"IdentityGroups"} = $identitygroup;
 	return $self->{"IdentityGroups"};
   }
-
+  
   if ($type eq "NetworkDevices")
   { my $device_ref = $xmlout->{"resources"}{"resource"};
-    my %devices = ();
-	for my $key (keys % {$device_ref})
-    { #my $device = Net::Cisco::ISE::NetworkDevice->new( name => $key, %{ $device_ref->{$key} } );
-      #$devices{$key} = $device;
+    my %devices = (); 
+    for my $key (keys % {$device_ref})
+    { my $device = Net::Cisco::ISE::NetworkDevice->new( name => $key, id => $device_ref->{$key}{"id"} );
+      $devices{$key} = $device;
     }
-	$self->{"NetworkDevices"} = \%devices;
-	return $self->{"NetworkDevices"};
+    $self->{"NetworkDevices"} = \%devices;
+    return $self->{"NetworkDevices"};
   }
   if ($type eq "NetworkDevice") # deviceByName and deviceById DO NOT return hash but a single instance of Net::Cisco::ISE::NetworkDevice
   { my %device_hash = %{ $xmlout };
-    #my $device = Net::Cisco::ISE::NetworkDevice->new( %device_hash );
-	#$self->{"NetworkDevices"} = $device;
+    my $device = Net::Cisco::ISE::NetworkDevice->new( %device_hash );
+	$self->{"NetworkDevices"} = $device;
 	return $self->{"NetworkDevices"};
   }
 
@@ -680,16 +643,16 @@ sub parse_xml
   { my $devicegroup_ref = $xmlout->{"resources"}{"resource"};
     my %devicegroups = ();
 	for my $key (keys % {$devicegroup_ref})
-    { #my $devicegroup = Net::Cisco::ISE::NetworkDeviceGroup->new( name => $key, %{ $devicegroup_ref->{$key} } );
-      #$devicegroups{$key} = $devicegroup;
+    { my $devicegroup = Net::Cisco::ISE::NetworkDeviceGroup->new( name => $key, %{ $devicegroup_ref->{$key} } );
+      $devicegroups{$key} = $devicegroup;
     }
 	$self->{"NetworkDeviceGroups"} = \%devicegroups;
 	return $self->{"NetworkDeviceGroups"};
   }
   if ($type eq "NetworkDeviceGroup") # deviceGroupByName and deviceGroupById DO NOT return hash but a single instance of Net::Cisco::ISE::NetworkDeviceGroup
   { my %devicegroup_hash = %{ $xmlout };
-    #my $devicegroup = Net::Cisco::ISE::NetworkDeviceGroup->new( %devicegroup_hash );
-	#$self->{"NetworkDeviceGroups"} = $devicegroup;
+    my $devicegroup = Net::Cisco::ISE::NetworkDeviceGroup->new( %devicegroup_hash );
+	$self->{"NetworkDeviceGroups"} = $devicegroup;
 	return $self->{"NetworkDeviceGroups"};
   }
   
@@ -786,19 +749,6 @@ sub parse_xml
   { my %result_hash = %{ $xmlout };
     return \%result_hash;
   }
-  if ($type eq "Version")
-  { my %version_hash = %{ $xmlout };
-    return \%version_hash;
-  }
-  if ($type eq "ServiceLocation")
-  { my %servicelocation_hash = %{ $xmlout };
-    return \%servicelocation_hash;
-  }
-  if ($type eq "ErrorMessage")
-  { my %errormessage_hash = %{ $xmlout };
-    return \%errormessage_hash;
-  }
-
 }
 
 =head1 NAME
@@ -841,6 +791,12 @@ Net::Cisco::ISE - Access Cisco ISE functionality through REST API
 
 	my $identitygroup = $ise->identitygroups("id","4fffc260-9b96-11e6-93fb-005056ad1454");
 	# Faster call to request specific identity group information by ID (assigned by ISE, present in Net::Cisco::ISE::IdentityGroup)
+
+	my $device = $acs->networkdevices("name","MAIN_Router");
+	# Faster call to request specific device information by name
+
+	my $device = $acs->networkdevices("id","250");
+	# Faster call to request specific device information by ID (assigned by ISE, present in Net::Cisco::ISE::NetworkDevice)
 	
 	$user->id(0); # Required for new user!
 	my $id = $ise->create($user);
@@ -886,7 +842,7 @@ Net::Cisco::ISE - Access Cisco ISE functionality through REST API
 	
 =head1 DESCRIPTION
 
-Net::Cisco::ISE is an implementation of the Cisco Secure Access Control System (ISE) REST API. Cisco ISE is a application / appliance that can be used for network access policy control. In short, it allows configuration of access policies for specific users onto specific devices and applications (either using RADIUS or TACISE+ authentication). Net::Cisco::ISE currently supports InternalUser and IdentityGroup.
+Net::Cisco::ISE is an implementation of the Cisco Identity Services Engine (ISE) REST API. Cisco ISE is a application / appliance that can be used for network access policy control. In short, it allows configuration of access policies for specific users onto specific devices and applications (either using RADIUS or TACACS+ authentication). Net::Cisco::ISE currently supports InternalUser and IdentityGroup.
 
 =head1 USAGE
 
@@ -987,6 +943,44 @@ The returned hash contains instances of L<Net::Cisco::ISE::IdentityGroup>, using
 
 	print $identitygroup->id;
 	
+=item devices
+
+Returns hash or single instance, depending on context.
+
+	my %devices = $acs->networkdevices(); # Slow
+	my $device = $acs->networkdevices()->{"Main_Router"};
+	print $device->name;
+	
+The returned hash contains instances of L<Net::Cisco::ISE::NetworkDevice>, using name (typically the sysname) as the hash key. Using a call to C<device> with no arguments will retrieve all devices and can take quite a few seconds (depending on the size of your database). When you know the hostname or ID, use the L<devices> call with arguments as listed below.
+	
+	my $device = $acs->device("name","Main_Router"); # Faster
+	# or
+	my $device = $acs->device("id","123"); # Faster
+	print $device->name;
+
+	The ID is typically generated by Cisco ISE when the entry is created. It can be retrieved by calling the C<id> method on the object.
+
+	print $device->id;
+
+=item devicegroups
+
+Returns hash or single instance, depending on context.
+
+	my %devicegroups = $acs->networkdevicegroups(); # Slow
+	my $devicegroup = $acs->networkdevicegroups()->{"All Locations:Main Site"};
+	print $devicegroup->name;
+
+The returned hash contains instances of L<Net::Cisco::ISE::NetworkDeviceGroup>, using name (typically the device group name) as the hash key. Using a call to C<devicegroups> with no arguments will retrieve all device groups and can take quite a few seconds (depending on the size of your database). When you know the device group or ID, use the L<devicegroups> call with arguments as listed below.
+	
+	my $devicegroup = $acs->networkdevicegroups("name","All Locations::Main Site"); # Faster
+	# or
+	my $devicegroup = $acs->networkdevicegroups("id","123"); # Faster
+	print $devicegroup->name;
+
+The ID is typically generated by Cisco ISE when the entry is created. It can be retrieved by calling the C<id> method on the object.
+
+	print $devicegroup->id;
+
 =item create
 
 This method created a new entry in Cisco ISE, depending on the argument passed. Record type is detected automatically. For all record types, the ID value must be set to 0.
@@ -998,6 +992,18 @@ This method created a new entry in Cisco ISE, depending on the argument passed. 
 	$user->description("Alternate Admin"); 
 	my $id = $ise->create($user); 
 	# Create new user based on Net::Cisco::ISE::InternalUser instance
+	# Return value is ID generated by ISE
+	print "Record ID is $id" if $id;
+	print $Net::Cisco::ISE::ERROR unless $id;
+	# $Net::Cisco::ISE::ERROR contains details about failure
+
+	my $device = $acs->networkdevices("name","Main_Router");
+	$device->name("AltRouter"); # Required field
+	$device->description("Standby Router"); 
+	$device->ips([{netMask => "32", ipAddress=>"10.0.0.2"}]); # Change IP address! Overlap check is enforced!
+	$device->id(0); # Required for new device!
+	my $id = $acs->create($device);
+	# Create new device based on Net::Cisco::ISE::NetworkDevice instance
 	# Return value is ID generated by ISE
 	print "Record ID is $id" if $id;
 	print $Net::Cisco::ISE::ERROR unless $id;
@@ -1037,6 +1043,16 @@ This method updates an existing entry in Cisco ISE, depending on the argument pa
 	print $Net::Cisco::ISE::ERROR unless $id;
 	# $Net::Cisco::ISE::ERROR contains details about failure
 
+	my $device = $acs->networkdevices("name","Main_Router");
+	$user->description("To be ceased"); # Change description
+	$device->ips([{netMask => "32", ipAddress=>"10.0.0.2"}]); # or Change IP address. Overlap check is enforced!
+	my $id = $acs->update($device);
+	# Create new device based on Net::Cisco::ISE::NetworkDevice instance
+	# Return value is ID generated by ISE
+	print "Record ID is $id" if $id;
+	print $Net::Cisco::ISE::ERROR unless $id;
+	# $Net::Cisco::ISE::ERROR contains details about failure
+
 Multiple instances can be passed as an argument. Objects will be updated in bulk (one transaction). The returned ID is not guaranteed to be the IDs of the created objects.
 
 	my $user = $ise->internalusers("name","admin");
@@ -1052,6 +1068,21 @@ Multiple instances can be passed as an argument. Objects will be updated in bulk
 	# print "Record ID is $id" if $id;
 	# print $Net::Cisco::ISE::ERROR unless $id;
 	# $Net::Cisco::ISE::ERROR contains details about failure
+
+	my $device = $acs->networkdevices("name","Main_Router");
+	$device->description("Main Router"); 
+	$device->ips([{netMask => "32", ipAddress=>"10.0.0.1"}]); # Change IP address! Overlap check is enforced!
+
+	my $device2 = $acs->networkdevices("name","Alt_Router");
+	$device2->description("Standby Router"); 
+	$device2->ips([{netMask => "32", ipAddress=>"10.0.0.2"}]); # Change IP address! Overlap check is enforced!
+	
+    my $id = $acs->create($device,$device2);
+	# Update devices based on Net::Cisco::ISE::NetworkDevice instances in arguments
+	# Return value is ID generated by ISE but not guaranteed.
+	# print "Record ID is $id" if $id;
+	# print $Net::Cisco::ISE::ERROR unless $id;
+	# $Net::Cisco::ISE::ERROR contains details about failure    
     
 =item delete
 
@@ -1126,7 +1157,11 @@ See L<Net::Cisco::ISE::InternalUser> for more information on User management.
 
 See L<Net::Cisco::ISE::IdentityGroup> for more information on User Group management.
 
-See the L<Cisco ISE product page|http://www.cisco.com/c/en/us/products/security/secure-access-control-system/index.html> for more information.
+See L<Net::Cisco::ISE::NetworkDevice> for more information on Device management.
+
+See L<Net::Cisco::ISE::NetworkDeviceGroup> for more information on Device Group management.
+
+See the L<Cisco ISE product page|http://www.cisco.com/c/en/us/products/security/identity-services-engine/index.html> for more information.
 
 L<Net::Cisco::ISE> relies on L<Moose>. 
 
@@ -1140,4 +1175,5 @@ __PACKAGE__->meta->make_immutable();
 
 1;
 # The preceding line will help the module return a true value
+
 

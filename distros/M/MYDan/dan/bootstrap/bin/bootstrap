@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan;
+use File::Basename;
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+
+use MYDan::Bootstrap;
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'bootstrap';
+
+=head1 SYNOPSIS
+
+ $0 --install
+
+ $0 --uninstall  
+         ( uninstall: Not recommended )
+
+ $0 --reload
+ $0 --run
+    
+=cut
+
+my %o = MYDan::Util::OptConf->load()->get( qw( install uninstall run reload ) )->dump();
+
+my $bootstrap = MYDan::Bootstrap->new( %o );
+
+$ENV{MYDanPATH} = $MYDan::PATH;
+if( $o{reload} )
+{
+    for my $name ( map{  $_ =~ /\*/ ? ( map{ basename $_ }glob "$o{lock}/$_" ): "$_.lock"} @ARGV ? @ARGV : ( '*' ) )
+    {
+        next unless $name =~ s/\.lock$//g;
+        printf "$name: %s\n", $bootstrap->kill( $name, 'TERM' ) ? "kill" : "undo";
+    }
+}
+elsif( $o{install} )
+{
+    system "echo '* * * * * root $MYDan::PATH/dan/bootstrap/bin/bootstrap --run 1>/dev/null 2>&1' > /etc/cron.d/mydan.bootstrap.cron";
+}
+elsif( $o{uninstall} )
+{
+    unlink '/etc/cron.d/mydan.bootstrap.cron';
+    system "killall mydan.bootstrap.master";
+}
+elsif( $o{run} )
+{
+    $bootstrap->run();
+}

@@ -1,19 +1,31 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Task::Concat;
-$XML::Ant::BuildFile::Task::Concat::VERSION = '0.216';
 
 # ABSTRACT: concat task node in an Ant build file
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a L<Moose|Moose> type class meant for use with
+#pod L<XML::Rabbit|XML::Rabbit> when processing C<< <concat/> >> tasks in an Ant
+#pod build file.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package My::Ant;
+#pod     use Moose;
+#pod     with 'XML::Rabbit::Node';
+#pod
+#pod     has paths => (
+#pod         isa         => 'ArrayRef[XML::Ant::BuildFile::Task::Concat]',
+#pod         traits      => 'XPathObjectList',
+#pod         xpath_query => './/concat',
+#pod     );
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use English '-no_match_vars';
 use Moose;
 use MooseX::Types::Moose 'Str';
@@ -33,10 +45,17 @@ has _destfile =>
     xpath_query => './@destfile',
     );
 
+#pod =attr destfile
+#pod
+#pod The file to concatenate into as a L<Path::Class::File|Path::Class::File>
+#pod object.
+#pod
+#pod =cut
+
 has destfile => ( ro, lazy,
     isa => File,
     default =>
-        sub { file( XML::Ant::Properties->apply( $ARG[0]->_destfile ) ) },
+        sub { file( XML::Ant::Properties->apply( $_[0]->_destfile ) ) },
 );
 
 no Moose;
@@ -58,7 +77,7 @@ XML::Ant::BuildFile::Task::Concat - concat task node in an Ant build file
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -204,7 +223,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

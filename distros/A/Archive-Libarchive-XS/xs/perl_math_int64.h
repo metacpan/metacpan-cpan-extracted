@@ -1,10 +1,10 @@
 /*
  * perl_math_int64.h - This file is in the public domain
- * Author: Salvador Fandino <sfandino@yahoo.com>
+ * Author: Salvador Fandino <sfandino@yahoo.com>, Dave Rolsky <autarch@urth.org>
  * Version: 2.1
  *
- * Generated on: 2015-03-25 21:36:17
- * Math::Int64 version: 0.34
+ * Generated on: 2016-01-01 07:50:27
+ * Math::Int64 version: 0.53
  * Module::CAPIMaker version: 
  */
 

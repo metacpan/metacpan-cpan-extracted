@@ -298,6 +298,10 @@ below.',
       },
       'OnCalendar',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Defines realtime (i.e. wallclock) timers with
 calendar event expressions. See
 L<systemd.time(7)>
@@ -308,9 +312,10 @@ C<OnActiveSec> and related settings.
 Note that timers do not necessarily expire at the
 precise time configured with this setting, as it is subject to
 the C<AccuracySec> setting
-below.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+below.
+
+May be specified more than once.',
+        'type' => 'list'
       },
       'AccuracySec',
       {

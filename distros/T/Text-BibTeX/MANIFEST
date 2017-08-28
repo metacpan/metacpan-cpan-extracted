@@ -29,7 +29,6 @@ lib/Text/BibTeX/Bib.pm
 lib/Text/BibTeX/BibFormat.pm
 lib/Text/BibTeX/BibSort.pm
 
-## t/00.init.t
 t/common.pl
 t/bib.t
 t/macro.t
@@ -43,7 +42,11 @@ t/parse_f.t
 t/parse_s.t
 t/purify.t
 t/split_names
-## t/zz.cleanup.t
+t/unlimited.bib
+t/unlimited.t
+t/corpora.bib
+t/errors.bib
+t/from_file.t
 
 examples/append_entries
 
@@ -150,6 +153,3 @@ btparse/src/bt_config.h.in
 README.OLD
 META.json
 MANIFEST.SKIP
-t/corpora.bib
-t/errors.bib
-t/from_file.t

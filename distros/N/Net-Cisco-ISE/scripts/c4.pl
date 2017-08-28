@@ -11,5 +11,6 @@ my $identitygroup = Net::Cisco::ISE::IdentityGroup->new(
 "description" => "Generic Group",
 );
 
-$ise->create($identitygroup);
+# This won't work!!
+#$ise->create($identitygroup);
 print $Net::Cisco::ISE::ERROR;

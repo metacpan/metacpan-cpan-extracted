@@ -105,6 +105,7 @@ sub test_005 : Tags(submit_jobs) {
 
     ok(1);
 
+    # TODO  Add this test back in
     #     $test->iterate_schedule();
     #
     #     my $logdir = $test->logdir;

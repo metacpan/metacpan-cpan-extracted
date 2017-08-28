@@ -8,7 +8,7 @@ use Catalyst::Model::InjectionHelpers::PerRequest;
 
 requires 'setup_injected_component';
 
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 my $adaptor_namespace = sub {
   my $app = shift;
@@ -50,7 +50,7 @@ after 'setup_injected_component', sub {
     my $config_namespace = $app .'::'. $injected_component_name;
 
     $app->components->{$config_namespace} = sub { 
-      $adaptor->new(
+      my $new_component = $adaptor->new(
         application=>$app,
         from=>$from,
         injected_component_name=>$injected_component_name,
@@ -59,7 +59,9 @@ after 'setup_injected_component', sub {
         injection_parameters=>$config,
         ( exists $config->{transform_args} ? (transform_args => $config->{transform_args}) : ()),
         get_config=> sub { shift->config_for($config_namespace) },
-      ) };
+      );
+      return $app->setup_component($new_component);
+    };
   }
 };
 

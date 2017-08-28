@@ -1,50 +1,132 @@
 Spp -- String Prepare Parser
 
-Spp is a programming language could give you happy.
+Spp is a powerful tool parse string.
 
-You could use Spp write code, then could transfer it to Perl, Ruby, Python, Go, or other language you don't like, but must face it.
+Spp Could use Parse text to AST according its grammar.
+
+You could use Spp parse text with grammar define and get Json.
 
 INSTALLATION
 
-To install this module, run the following commands:
+To install this tool, please install Perl5 in your computer.
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+    > cpan
+    > install Spp
+    > spp
+    This is Spp REPL, type enter to exit.
+    >> str = 'abcde'; text = 'abcdefg'
+    'abcde'
 
-then type 'spp' in shell, could inter REPL of Spp:
+    > cat rule.spp
+    door    = ^ declare Expr+ $;
+    declare = (set @type ['int']);
+    Expr    = 'type' \s Mytype (push @type $Mytype) \s Type \s*;
+    Mytype  = \w+ ;
+    Type    = @type;
 
-    This is Spp REPL implement with Perl5, type 'exit' to exit.
-    >>> 
-    
-Syntax
-    
-Spp most like lisp, perl, ruby: 
+    > cat text.txt
+    type rune int
+    type str rune
 
-    >> (say 'hello world')
-    hello world
-    true
-    >> (def (last x) (x 0))
-    last
-    >> (last 'str')
-    'r'
+    > spp rule.spp
+    Lint rule.spp ok!
 
-rule and regex:
+    > spp rule.spp text.txt
+    [["Expr",[["Mytype","rune"],["Type","int"]]],
+     ["Expr",[["Mytype","str"],["Type","rune"]]]]
 
-Spp support match rule, rule also could name as grammar. Its descript
-rule of language programming.
+DESCRIPTION
 
-    >> ('@var' ~~ Spp)
-    ['sym', '@var']
+## branch
 
-Spp array could parse by perl directly.
+if have more than one rule could match the text, then use branch.
 
-    ['str', '$']
+    | branch-one branch-two branch-three |
 
-but JSON is not compatible with Perl data.
+branch would return first rule which matched.
 
-    JSON: ["str", "$"]
+## longest branch
+
+longest branch would return longest-matching-string rule.
+
+    || branch-one branch-two branch-three ||
+
+if more than one branch matched, then return longest matching rule.
+
+## Token
+
+Token is name defined with Spp specification.
+
+    Token = 'define more rule';
+
+Token could include itself, if its have different border. just like:
+
+    array = '[' |int str array|+ ']'
+
+## Token naming
+
+if name starts with uppercase, then it is Name Token:
+
+    >> Upper = \u+; text = 'ABCDe'
+    ['Upper', 'ABCD']
+
+if name starts with lowercase, then it would not naming:
+
+    >> Lower = \l+ ; text = 'abcdEF'
+    ["Lower","abcd"]
+
+if name starts with \_, then match would be reject after match.
+
+    comment = '#' ~ $$; // return true or false
+
+## Not
+
+if some rule not permit follow other rule:
+
+    space = rule ! { \n [^\s] };
+
+Some language (EBNF) define end, if next line starts with blank then is not end.
+
+    spec  = branch-one | branch-two | branch-three
+    new_spec  =  'this is spec'
+      
+## Char Class
+
+   \a  alpha  a..z A..Z 'a' 'b' 'A'
+   \d  digit  0..9
+   \h  hspace
+   \l  lowercase a..z
+   \s  space or enter
+   \u  uppercase A..Z
+   \v  vspace
+   \w  words  [\a_-]
+   \x  xdigit 0..9 a..f A..F
+
+## Chars Class
+
+   [\sab]
+   [^ab]
+
+## string
+
+   str = :abcd
+   str = 'abcd'
+
+## Char
+
+   char = \n \r \f \t \" \' \\ \; ;
+
+## Comment
+
+   // this is comment
+   comment = '//' ~ $$ ;
+
+## branch
+    >>  rule = |:abc :abcd|; text = :abcd
+    ["abc"]
+
+    >> rule = ||:abc :abcd||; text = :abcd
+    ["abcd"]
 
 SUPPORT AND DOCUMENTATION
 

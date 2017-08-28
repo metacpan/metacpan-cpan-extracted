@@ -35,12 +35,12 @@ sub load ( $self, $cb ) {
 
         P->http->get(
             $url,
-            timeout   => $self->http_timeout,
-            on_finish => sub ($res) {
-                if ( $res->status == 200 && $res->has_body ) {
+            timeout => $self->http_timeout,
+            sub ($res) {
+                if ( $res->status == 200 && $res->{body} ) {
                     decode_eol $res->body->$*;
 
-                    for my $addr ( split /\n/sm, $res->body->$* ) {
+                    for my $addr ( split /\n/sm, $res->{body}->$* ) {
                         push $proxies, $addr;
                     }
                 }

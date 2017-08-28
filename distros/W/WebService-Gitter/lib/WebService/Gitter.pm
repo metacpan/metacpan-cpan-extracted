@@ -44,7 +44,7 @@ method rooms_under_group($group_id) {
 
 # rooms resources
 # list user's rooms
-method rooms($q = "") {	
+method rooms($q = "") {
 	# if empty
 	if (!$q) {
 		return $self->get("/rooms?access_token=" . $self->api_key);
@@ -90,46 +90,46 @@ WebService::Gitter - An interface to Gitter REST API via Perl 5.
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.2
 
 =head1 SYNOPSIS
 
-	use strict;
-	use warnings;
-	use WebService::Gitter;
-
-	my $git = WebService::Gitter->new(api_key => 'secret');
-
+    use strict;
+    use warnings;
+    use WebService::Gitter;
+    
+    my $git = WebService::Gitter->new(api_key => 'secret');
+    
     # user methods
-	# get current logged in user
-	$git->me();
+    # # get current logged in user
+    # $git->me();
 
-	# show data structure
-	$git->show_dst($method_name);
-	
-	# group methods
-	# list groups
-	$git->groups();
+    # show data structure
+    $git->show_dst($method_name);
 
-	# list rooms under group
-	$git->rooms_under_group();
+    # group methods
+    # list groups
+    $git->groups();
 
-	# room methods	
-	# list rooms
-	$git->rooms();
+    # list rooms under group
+    $git->rooms_under_group();
 
-	# list all users in the room
-	$git->room_users($room_id);
+    # room methods
+    # list rooms
+    $git->rooms();
 
-	# messages methods
-	# list all messages in the room
-	$git->list_messages($room_id);
+    # list all users in the room
+    $git->room_users($room_id);
 
-	# get single message from message id
-	$git->single_message($room_id, $message_id);
+    # messages methods
+    # list all messages in the room
+    $git->list_messages($room_id);
 
-	# send message to a room/channel
-	$git->send_message($room_id, $text_to_send);
+    # get single message from message id
+    $git->single_message($room_id, $message_id);
+
+    # send message to a room/channel
+    $git->send_message($room_id, $text_to_send);
 
 =head1 SEE ALSO
 

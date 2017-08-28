@@ -6,7 +6,7 @@ use warnings;
 
 use MooX 'late';
 
-our $VERSION = '0.14.11';
+our $VERSION = 'v0.14.12';
 
 extends("XML::Grammar::Fiction::FromProto::Node::WithContent");
 
@@ -45,7 +45,7 @@ XML::Grammar::Fiction::FromProto::Node::Element - an XML element node.
 
 =head1 VERSION
 
-version 0.14.11
+version v0.14.12
 
 =head1 METHODS
 
@@ -68,8 +68,9 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction or by email to
-bug-xml-grammar-fiction@rt.cpan.org.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction> or by email
+to
+L<bug-xml-grammar-fiction@rt.cpan.org|mailto:bug-xml-grammar-fiction@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -114,7 +115,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Grammar-Fiction>
 
 =item *
 
@@ -146,7 +147,7 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/XML-Grammar-Fiction>
+L<http://cpants.cpanauthors.org/dist/XML-Grammar-Fiction>
 
 =item *
 
@@ -177,7 +178,7 @@ L<http://deps.cpantesters.org/?module=XML::Grammar::Fiction>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-xml-grammar-fiction at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-Grammar-Fiction>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-Grammar-Fiction>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code

@@ -2,11 +2,11 @@ use strict;
 use warnings;
 
 use utf8;
-use Test::More 0.88;
+use Test::More 0.96;
 use Test::Warnings 0.009 ':no_end_test', ':all';
 use Test::DZil;
 use Path::Tiny;
-use File::pushd 'pushd';
+use File::pushd 1.004 'pushd';
 
 plan skip_all => 'These tests use options that are only legal in perl 5.14.0 and higher'
     if "$]" < 5.014000;

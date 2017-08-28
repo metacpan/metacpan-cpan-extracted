@@ -1,5 +1,5 @@
 package WebService::Braintree::TransparentRedirect;
-$WebService::Braintree::TransparentRedirect::VERSION = '0.92';
+$WebService::Braintree::TransparentRedirect::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::TransparentRedirect

@@ -21,11 +21,11 @@ sub BUILD ( $self, $args ) {
 sub load ( $self, $cb ) {
     P->http->get(
         'http://awmproxy.com/allproxy.php?full=1',
-        timeout   => $self->http_timeout,
-        on_finish => sub ($res) {
+        timeout => $self->http_timeout,
+        sub ($res) {
             my $proxies;
 
-            if ( $res->status == 200 && $res->has_body ) {
+            if ( $res->status == 200 && $res->{body} ) {
                 decode_eol $res->body->$*;
 
                 for my $addr ( split /\n/sm, $res->body->$* ) {

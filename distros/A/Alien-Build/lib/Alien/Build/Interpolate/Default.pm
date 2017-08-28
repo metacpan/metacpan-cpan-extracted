@@ -6,7 +6,7 @@ use base qw( Alien::Build::Interpolate );
 use File::chdir;
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub _config
 {
@@ -59,6 +59,9 @@ sub new
   $self->add_helper( make => sub { _config 'make' }, 'Config' );
 
 
+  $self->add_helper( mkdir_deep => sub { $^O eq 'MSWin32' ? 'md' : 'mkdir -p'}, 'Alien::Build' => '1.04' );
+
+
   $self->add_helper( nasm => undef, 'Alien::nasm' => '0.11' );
 
 
@@ -108,7 +111,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 CONSTRUCTOR
 
@@ -195,6 +198,13 @@ Requires: L<Alien::m4> 0.08
  %{make}
 
 The make program used by Perl.
+
+=head2 mkdir_deep
+
+ %{mkdir_deep}
+
+Make directory, including all parent directories as needed.  This is usually C<mkdir -p>
+on Unix and simply C<md> on windows.
 
 =head2 nasm
 

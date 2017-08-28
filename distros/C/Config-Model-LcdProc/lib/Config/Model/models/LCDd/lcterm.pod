@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::lcterm
 # ABSTRACT:  Configuration class LCDd::lcterm
+
 =encoding utf8
 
 =head1 NAME
@@ -16,11 +17,31 @@ generated from LCDd.conf
 
 =head2 Device
 
-I<< Optional. Type uniline. default: '/dev/ttyS1'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+/dev/ttyS1
+
+=back
+
+
 
 =head2 Size
 
-I<< Optional. Type uniline. default: '16x2'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+16x2
+
+=back
+
+
 
 =head1 SEE ALSO
 

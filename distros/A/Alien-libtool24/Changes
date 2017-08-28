@@ -1,5 +1,8 @@
 Revision history for Alien-libtool24
 
+0.06      2017-08-23 13:29:45 -0400
+  - remove dependency on File::ShareDir
+
 0.05      2017-06-26 18:04:10 -0400
   - Deprecate in favor of Alien::libtool
     May be removed from CPAN, but not before 27 June 2018.

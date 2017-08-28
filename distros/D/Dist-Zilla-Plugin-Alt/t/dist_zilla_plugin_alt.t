@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Test::DZil;
 use List::Util qw( first );
 
@@ -17,7 +15,7 @@ subtest MM => sub {
 
   my $plugin = first { $_->isa('Dist::Zilla::Plugin::Alt') } @{ $tzil->plugins };
   ok $plugin, 'plugin found';
-  is_deeply $plugin->metadata, { no_index => { file => [ 'lib/Foo/Bar.pm' ] } }, 'metadata';
+  is $plugin->metadata, { no_index => { file => [ 'lib/Foo/Bar.pm' ] } }, 'metadata';
 
   is $plugin->provide_name, 'Alt-Foo-Bar-stuff', 'provide_name';
   
@@ -41,7 +39,7 @@ subtest MB => sub {
 
   my $plugin = first { $_->isa('Dist::Zilla::Plugin::Alt') } @{ $tzil->plugins };
   ok $plugin, 'plugin found';
-  is_deeply $plugin->metadata, { no_index => { file => [ 'lib/Foo/Bar.pm' ] } }, 'metadata';
+  is $plugin->metadata, { no_index => { file => [ 'lib/Foo/Bar.pm' ] } }, 'metadata';
 
   is $plugin->provide_name, 'Alt-Foo-Bar-stuff', 'provide_name';
   

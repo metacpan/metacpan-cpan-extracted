@@ -1,5 +1,14 @@
 Revision history for BioX-Workflow-Command
 
+2.2.1  2017-08-25 05:10:43 GST
+	- Removed List::MoreUtils - funky licensing
+
+2.2.0  2017-08-24 07:39:45 GST
+	- Added additional interface for custom processing of rules
+	- Bug fix for samples are files but output structure should be directories.
+	- Bug fixes for sample_rule/file_rule.
+	- Bug fix for mixed HPC types.
+
 2.0.10  2017-05-08 13:20:42 +04
 	- Removing orphan input check
 

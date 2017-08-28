@@ -1,5 +1,5 @@
 package Mercury;
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 # ABSTRACT: Main broker application class
 
 #pod =head1 SYNOPSIS
@@ -33,6 +33,7 @@ use Mojo::WebSocket 'WS_PING';
 
 sub startup {
     my ( $app ) = @_;
+    $app->log( Mojo::Log->new ); # Log only to STDERR
     $app->plugin( 'Config', { default => { broker => { } } } );
     $app->commands->namespaces( [ 'Mercury::Command::mercury' ] );
 
@@ -118,7 +119,7 @@ Mercury - Main broker application class
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

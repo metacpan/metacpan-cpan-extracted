@@ -1,3 +1,8 @@
+0.43
+ - Fix test script bugs (t/NOK_and_POK.t).
+ - Re DoubleDouble arch, fix _Rmpf_set_ld and tweak t/get_set_NV.t
+ - Add Rmpf_get_d_rndn, Rmpf_get_ld_rndn, Rmpf_get_float128_rndn and Rmpf_get_NV_rndn.
+
 0.42
  - Remove gmp_v from Math::GMPf::V as we don't want any library functions in that module.
  - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)

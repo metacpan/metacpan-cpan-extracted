@@ -1,12 +1,24 @@
 Revision history for POSIX::2008.
 
+0.07  2017-08-27
+  - Call croak_xs_usage() only if available.
+  - Really let all I/O functions accept file handles.
+  - Try to reduce compiler errors on non-Linux systems.
+0.06  2017-08-26
+  - Fixed an fd leak in fdopendir() and openat() (see Ye Olde Perl #59268).
+    XS docs are really poor.
+  - Cleaned up openat().
+  - Dropped Perl 5.10 dependency.
+0.05  2017-08-25
+  - Added fdopen() and fdopendir().
+  - All I/O functions taking file descriptors now accept file handles as well.
+  - Fixed pread() to truncate the buffer if the data doesn't exceed it.
 0.04  2015-05-25
-        - Fixed _readlink50c (#96644).
+  - Fixed _readlink50c (#96644).
 0.03  2013-09-15
-	- check SvGROW for NULL
-	- use shorter mPUSH macros
+  - check SvGROW for NULL
+  - use shorter mPUSH macros
 0.02  2013-09-14
-	- added strptime()
+  - added strptime()
 0.01  2013-09-13
-	- initial version
-
+  - initial version

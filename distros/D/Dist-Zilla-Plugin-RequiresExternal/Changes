@@ -1,5 +1,7 @@
 Revision history for perl module Dist::Zilla::Plugin::RequiresExternal
 
+1.008     2017-08-18 11:45:27-05:00 America/Chicago
+  - Added explicit version to Test::Output dependency
 1.007     2017-08-16 15:10:01-05:00 America/Chicago
   - Added 'externaldeps' command (thanks @joenio!)
 1.006     2015-12-26 23:40:29-05:00 America/New_York

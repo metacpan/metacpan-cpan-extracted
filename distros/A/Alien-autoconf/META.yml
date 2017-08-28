@@ -21,7 +21,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-autoconf/issues
   homepage: https://metacpan.org/pod/Alien::autoconf
   repository: git://github.com/plicease/Alien-autoconf.git
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'YAML::Tiny version 1.70'

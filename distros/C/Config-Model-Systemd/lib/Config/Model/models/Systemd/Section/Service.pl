@@ -96,7 +96,7 @@ C<simple>; however, it is expected that the
 process has to exit before systemd starts follow-up units.
 C<RemainAfterExit> is particularly useful for
 this type of service. This is the implied default if neither
-C<Type> or C<ExecStart> are
+C<Type> nor C<ExecStart> are
 specified.
 
 Behavior of C<dbus> is similar to
@@ -204,7 +204,9 @@ C<Type=oneshot> is used, zero or more commands may be specified. Commands may be
 providing multiple command lines in the same directive, or alternatively, this directive may be specified more
 than once with the same effect. If the empty string is assigned to this option, the list of commands to start
 is reset, prior assignments of this option will have no effect. If no C<ExecStart> is
-specified, then the service must have C<RemainAfterExit=yes> set.
+specified, then the service must have C<RemainAfterExit=yes> and at least one
+C<ExecStop> line set. (Services lacking both C<ExecStart> and
+C<ExecStop> are not valid.)
 
 For each of the specified commands, the first argument must be an absolute path to an
 executable. Optionally, if this file name is prefixed with C<@>, the second token will be
@@ -247,14 +249,13 @@ C<ExecStart> commands are only run after
 all C<ExecStartPre> commands that were not prefixed
 with a C<-> exit successfully.
 
-C<ExecStartPost> commands are only run after
-the service has started successfully, as determined by C<Type>
-(i.e. the process has been started for C<Type=simple>
-or C<Type=idle>, the process exits successfully for
-C<Type=oneshot>, the initial process exits successfully
-for C<Type=forking>, C<READY=1> is sent
-for C<Type=notify>, or the C<BusName>
-has been taken for C<Type=dbus>).
+C<ExecStartPost> commands are only run after the commands specified in
+C<ExecStart> have been invoked successfully, as determined by C<Type>
+(i.e. the process has been started for C<Type=simple> or C<Type=idle>, the last
+C<ExecStart> process exited successfully for C<Type=oneshot>, the initial
+process exited successfully for C<Type=forking>, C<READY=1> is sent for
+C<Type=notify>, or the C<BusName> has been taken for
+C<Type=dbus>).
 
 Note that C<ExecStartPre> may not be
 used to start long-running processes. All processes forked
@@ -288,14 +289,13 @@ C<ExecStart> commands are only run after
 all C<ExecStartPre> commands that were not prefixed
 with a C<-> exit successfully.
 
-C<ExecStartPost> commands are only run after
-the service has started successfully, as determined by C<Type>
-(i.e. the process has been started for C<Type=simple>
-or C<Type=idle>, the process exits successfully for
-C<Type=oneshot>, the initial process exits successfully
-for C<Type=forking>, C<READY=1> is sent
-for C<Type=notify>, or the C<BusName>
-has been taken for C<Type=dbus>).
+C<ExecStartPost> commands are only run after the commands specified in
+C<ExecStart> have been invoked successfully, as determined by C<Type>
+(i.e. the process has been started for C<Type=simple> or C<Type=idle>, the last
+C<ExecStart> process exited successfully for C<Type=oneshot>, the initial
+process exited successfully for C<Type=forking>, C<READY=1> is sent for
+C<Type=notify>, or the C<BusName> has been taken for
+C<Type=dbus>).
 
 Note that C<ExecStartPre> may not be
 used to start long-running processes. All processes forked
@@ -348,7 +348,8 @@ started via C<ExecStart>. This argument takes
 multiple command lines, following the same scheme as described
 for C<ExecStart> above. Use of this setting
 is optional. After the commands configured in this option are
-run, all processes remaining for a service are terminated
+run, it is implied that the service is stopped, and any processes
+remaining for it are terminated
 according to the C<KillMode> setting (see
 L<systemd.kill(5)>).
 If this option is not specified, the process is terminated by
@@ -357,15 +358,11 @@ when service stop is requested. Specifier and environment
 variable substitution is supported (including
 C<$MAINPID>, see above).
 
-Note that it is usually not sufficient to specify a
-command for this setting that only asks the service to
-terminate (for example, by queuing some form of termination
-signal for it), but does not wait for it to do so. Since the
-remaining processes of the services are killed using
-C<SIGKILL> immediately after the command
-exited, this would not result in a clean stop. The specified
-command should hence be a synchronous operation, not an
-asynchronous one.
+Note that it is usually not sufficient to specify a command for this setting that only asks the service
+to terminate (for example, by queuing some form of termination signal for it), but does not wait for it to do
+so. Since the remaining processes of the services are killed according to C<KillMode> and
+C<KillSignal> as described above immediately after the command exited, this may not result in
+a clean stop. The specified command should hence be a synchronous operation, not an asynchronous one.
 
 Note that the commands specified in C<ExecStop> are only executed when the service
 started successfully first. They are not invoked if the service was never started at all, or in case its
@@ -570,10 +567,17 @@ abnormally by a signal, or hit a timeout.
 
 As exceptions to the setting above, the service will not
 be restarted if the exit code or signal is specified in
-C<RestartPreventExitStatus> (see below).
-Also, the services will always be restarted if the exit code
-or signal is specified in
+C<RestartPreventExitStatus> (see below) or
+the service is stopped with systemctl stop
+or an equivalent operation. Also, the services will always be
+restarted if the exit code or signal is specified in
 C<RestartForceExitStatus> (see below).
+
+Note that service restart is subject to unit start rate
+limiting configured with C<StartLimitIntervalSec>
+and C<StartLimitBurst>, see
+L<systemd.unit(5)>
+for details.
 
 Setting this to C<on-failure> is the
 recommended choice for long-running services, in order to
@@ -699,15 +703,14 @@ Defaults to false.',
       },
       'NonBlocking',
       {
-        'description' => 'Set the C<O_NONBLOCK> flag
-for all file descriptors passed via socket-based activation.
-If true, all file descriptors >= 3 (i.e. all except stdin,
-stdout, and stderr) will have the
-C<O_NONBLOCK> flag set and hence are in
-non-blocking mode. This option is only useful in conjunction
-with a socket unit, as described in
-L<systemd.socket(5)>.
-Defaults to false.',
+        'description' => 'Set the C<O_NONBLOCK> flag for all file descriptors passed via socket-based
+activation. If true, all file descriptors >= 3 (i.e. all except stdin, stdout, stderr), excluding those passed
+in via the file descriptor storage logic (see C<FileDescriptorStoreMax> for details), will
+have the C<O_NONBLOCK> flag set and hence are in non-blocking mode. This option is only
+useful in conjunction with a socket unit, as described in
+L<systemd.socket(5)> and has no
+effect on file descriptors which were previously saved in the file-descriptor store for example.  Defaults to
+false.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -716,25 +719,29 @@ Defaults to false.',
         'choice' => [
           'none',
           'main',
+          'exec',
           'all'
         ],
-        'description' => 'Controls access to the service status
-notification socket, as accessible via the
-L<sd_notify(3)>
-call. Takes one of C<none> (the default),
-C<main> or C<all>. If
-C<none>, no daemon status updates are accepted
-from the service processes, all status update messages are
-ignored. If C<main>, only service updates sent
-from the main process of the service are accepted. If
-C<all>, all services updates from all members of
-the service\'s control group are accepted. This option should
-be set to open access to the notification socket when using
-C<Type=notify> or
-C<WatchdogSec> (see above). If those options
-are used but C<NotifyAccess> is not
-configured, it will be implicitly set to
-C<main>.',
+        'description' => 'Controls access to the service status notification socket, as accessible via the
+L<sd_notify(3)> call. Takes one
+of C<none> (the default), C<main>, C<exec> or
+C<all>. If C<none>, no daemon status updates are accepted from the service
+processes, all status update messages are ignored. If C<main>, only service updates sent from the
+main process of the service are accepted. If C<exec>, only service updates sent from any of the
+main or control processes originating from one of the C<Exec*=> commands are accepted. If
+C<all>, all services updates from all members of the service\'s control group are accepted. This
+option should be set to open access to the notification socket when using C<Type=notify> or
+C<WatchdogSec> (see above). If those options are used but C<NotifyAccess> is
+not configured, it will be implicitly set to C<main>.
+
+Note that sd_notify() notifications may be attributed to units correctly only if
+either the sending process is still around at the time PID 1 processes the message, or if the sending process
+is explicitly runtime-tracked by the service manager. The latter is the case if the service manager originally
+forked off the process, i.e. on all processes that match C<main> or
+C<exec>. Conversely, if an auxiliary process of the unit sends an
+sd_notify() message and immediately exits, the service manager might not be able to
+properly attribute the message to the unit, and thus will ignore it, even if
+C<NotifyAccess>C<all> is set for it.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -777,21 +784,18 @@ C<none>. ',
       },
       'FileDescriptorStoreMax',
       {
-        'description' => 'Configure how many file descriptors may be
-stored in the service manager for the service using
+        'description' => 'Configure how many file descriptors may be stored in the service manager for the service using
 L<sd_pid_notify_with_fds(3)>\'s
-C<FDSTORE=1> messages. This is useful for
-implementing service restart schemes where the state is
-serialized to /run and the file
-descriptors passed to the service manager, to allow restarts
-without losing state. Defaults to 0, i.e. no file descriptors
-may be stored in the service manager. All file
-descriptors passed to the service manager from a specific
-service are passed back to the service\'s main process on the
-next service restart. Any file descriptors passed to the
-service manager are automatically closed when POLLHUP or
-POLLERR is seen on them, or when the service is fully stopped
-and no job is queued or being executed for it.',
+C<FDSTORE=1> messages. This is useful for implementing services that can restart after an
+explicit request or a crash without losing state. Any open sockets and other file descriptors which should not
+be closed during the restart may be stored this way. Application state can either be serialized to a file in
+/run, or better, stored in a
+L<memfd_create(2)> memory file
+descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service manager. All file descriptors
+passed to the service manager from a specific service are passed back to the service\'s main process on the next
+service restart. Any file descriptors passed to the service manager are automatically closed when
+C<POLLHUP> or C<POLLERR> is seen on them, or when the service is fully
+stopped and no job is queued or being executed for it.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

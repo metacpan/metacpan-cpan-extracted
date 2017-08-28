@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Expect;
+
+use YAML::XS;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+$MYDan::Util::OptConf::ARGC = 1;
+@MYDan::Util::OptConf::CONF = qw( pass_through ignore_case );
+
+=head1 SYNOPSIS
+
+ $0 cmd ..
+
+=cut
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get()->dump('util');
+
+my $conf = eval{ YAML::XS::LoadFile "$o{conf}/expect" };
+die "error $o{conf}/expect :$@" if $@;
+
+my $exp = Expect->new();
+$exp->spawn( join ' ', @ARGV );
+$exp->expect( 60, [ 
+    map{ 
+        my $t = $_;
+        qr/$t/ =>  sub { $exp->send( $conf->{$t} ); exp_continue }
+    }keys %$conf
+] );

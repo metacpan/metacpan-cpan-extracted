@@ -416,6 +416,10 @@
         {
           "type": "object",
           "properties": {
+            "version": {
+                "type": "string",
+                "pattern": "^5\\.\\d+\\.\\d+"
+            },
             "commit_id": { "type": "string" }
           }
         }

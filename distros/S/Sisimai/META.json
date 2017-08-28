@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.21.1"
+         "version" : "v4.22.0"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -68,14 +68,179 @@
       "Sisimai::Address" : {
          "file" : "lib/Sisimai/Address.pm"
       },
+      "Sisimai::Bite" : {
+         "file" : "lib/Sisimai/Bite.pm"
+      },
+      "Sisimai::Bite::Email" : {
+         "file" : "lib/Sisimai/Bite/Email.pm"
+      },
+      "Sisimai::Bite::Email::Activehunter" : {
+         "file" : "lib/Sisimai/Bite/Email/Activehunter.pm"
+      },
+      "Sisimai::Bite::Email::AmazonSES" : {
+         "file" : "lib/Sisimai/Bite/Email/AmazonSES.pm"
+      },
+      "Sisimai::Bite::Email::AmazonWorkMail" : {
+         "file" : "lib/Sisimai/Bite/Email/AmazonWorkMail.pm"
+      },
+      "Sisimai::Bite::Email::Aol" : {
+         "file" : "lib/Sisimai/Bite/Email/Aol.pm"
+      },
+      "Sisimai::Bite::Email::ApacheJames" : {
+         "file" : "lib/Sisimai/Bite/Email/ApacheJames.pm"
+      },
+      "Sisimai::Bite::Email::Bigfoot" : {
+         "file" : "lib/Sisimai/Bite/Email/Bigfoot.pm"
+      },
+      "Sisimai::Bite::Email::Biglobe" : {
+         "file" : "lib/Sisimai/Bite/Email/Biglobe.pm"
+      },
+      "Sisimai::Bite::Email::Courier" : {
+         "file" : "lib/Sisimai/Bite/Email/Courier.pm"
+      },
+      "Sisimai::Bite::Email::Domino" : {
+         "file" : "lib/Sisimai/Bite/Email/Domino.pm"
+      },
+      "Sisimai::Bite::Email::EZweb" : {
+         "file" : "lib/Sisimai/Bite/Email/EZweb.pm"
+      },
+      "Sisimai::Bite::Email::EinsUndEins" : {
+         "file" : "lib/Sisimai/Bite/Email/EinsUndEins.pm"
+      },
+      "Sisimai::Bite::Email::Exchange2003" : {
+         "file" : "lib/Sisimai/Bite/Email/Exchange2003.pm"
+      },
+      "Sisimai::Bite::Email::Exchange2007" : {
+         "file" : "lib/Sisimai/Bite/Email/Exchange2007.pm"
+      },
+      "Sisimai::Bite::Email::Exim" : {
+         "file" : "lib/Sisimai/Bite/Email/Exim.pm"
+      },
+      "Sisimai::Bite::Email::Facebook" : {
+         "file" : "lib/Sisimai/Bite/Email/Facebook.pm"
+      },
+      "Sisimai::Bite::Email::GMX" : {
+         "file" : "lib/Sisimai/Bite/Email/GMX.pm"
+      },
+      "Sisimai::Bite::Email::GSuite" : {
+         "file" : "lib/Sisimai/Bite/Email/GSuite.pm"
+      },
+      "Sisimai::Bite::Email::Google" : {
+         "file" : "lib/Sisimai/Bite/Email/Google.pm"
+      },
+      "Sisimai::Bite::Email::IMailServer" : {
+         "file" : "lib/Sisimai/Bite/Email/IMailServer.pm"
+      },
+      "Sisimai::Bite::Email::InterScanMSS" : {
+         "file" : "lib/Sisimai/Bite/Email/InterScanMSS.pm"
+      },
+      "Sisimai::Bite::Email::KDDI" : {
+         "file" : "lib/Sisimai/Bite/Email/KDDI.pm"
+      },
+      "Sisimai::Bite::Email::MXLogic" : {
+         "file" : "lib/Sisimai/Bite/Email/MXLogic.pm"
+      },
+      "Sisimai::Bite::Email::MailFoundry" : {
+         "file" : "lib/Sisimai/Bite/Email/MailFoundry.pm"
+      },
+      "Sisimai::Bite::Email::MailMarshalSMTP" : {
+         "file" : "lib/Sisimai/Bite/Email/MailMarshalSMTP.pm"
+      },
+      "Sisimai::Bite::Email::MailRu" : {
+         "file" : "lib/Sisimai/Bite/Email/MailRu.pm"
+      },
+      "Sisimai::Bite::Email::McAfee" : {
+         "file" : "lib/Sisimai/Bite/Email/McAfee.pm"
+      },
+      "Sisimai::Bite::Email::MessageLabs" : {
+         "file" : "lib/Sisimai/Bite/Email/MessageLabs.pm"
+      },
+      "Sisimai::Bite::Email::MessagingServer" : {
+         "file" : "lib/Sisimai/Bite/Email/MessagingServer.pm"
+      },
+      "Sisimai::Bite::Email::Notes" : {
+         "file" : "lib/Sisimai/Bite/Email/Notes.pm"
+      },
+      "Sisimai::Bite::Email::Office365" : {
+         "file" : "lib/Sisimai/Bite/Email/Office365.pm"
+      },
+      "Sisimai::Bite::Email::OpenSMTPD" : {
+         "file" : "lib/Sisimai/Bite/Email/OpenSMTPD.pm"
+      },
+      "Sisimai::Bite::Email::Outlook" : {
+         "file" : "lib/Sisimai/Bite/Email/Outlook.pm"
+      },
+      "Sisimai::Bite::Email::Postfix" : {
+         "file" : "lib/Sisimai/Bite/Email/Postfix.pm"
+      },
+      "Sisimai::Bite::Email::ReceivingSES" : {
+         "file" : "lib/Sisimai/Bite/Email/ReceivingSES.pm"
+      },
+      "Sisimai::Bite::Email::SendGrid" : {
+         "file" : "lib/Sisimai/Bite/Email/SendGrid.pm"
+      },
+      "Sisimai::Bite::Email::Sendmail" : {
+         "file" : "lib/Sisimai/Bite/Email/Sendmail.pm"
+      },
+      "Sisimai::Bite::Email::SurfControl" : {
+         "file" : "lib/Sisimai/Bite/Email/SurfControl.pm"
+      },
+      "Sisimai::Bite::Email::UserDefined" : {
+         "file" : "lib/Sisimai/Bite/Email/UserDefined.pm"
+      },
+      "Sisimai::Bite::Email::V5sendmail" : {
+         "file" : "lib/Sisimai/Bite/Email/V5sendmail.pm"
+      },
+      "Sisimai::Bite::Email::Verizon" : {
+         "file" : "lib/Sisimai/Bite/Email/Verizon.pm"
+      },
+      "Sisimai::Bite::Email::X1" : {
+         "file" : "lib/Sisimai/Bite/Email/X1.pm"
+      },
+      "Sisimai::Bite::Email::X2" : {
+         "file" : "lib/Sisimai/Bite/Email/X2.pm"
+      },
+      "Sisimai::Bite::Email::X3" : {
+         "file" : "lib/Sisimai/Bite/Email/X3.pm"
+      },
+      "Sisimai::Bite::Email::X4" : {
+         "file" : "lib/Sisimai/Bite/Email/X4.pm"
+      },
+      "Sisimai::Bite::Email::X5" : {
+         "file" : "lib/Sisimai/Bite/Email/X5.pm"
+      },
+      "Sisimai::Bite::Email::Yahoo" : {
+         "file" : "lib/Sisimai/Bite/Email/Yahoo.pm"
+      },
+      "Sisimai::Bite::Email::Yandex" : {
+         "file" : "lib/Sisimai/Bite/Email/Yandex.pm"
+      },
+      "Sisimai::Bite::Email::Zoho" : {
+         "file" : "lib/Sisimai/Bite/Email/Zoho.pm"
+      },
+      "Sisimai::Bite::Email::mFILTER" : {
+         "file" : "lib/Sisimai/Bite/Email/mFILTER.pm"
+      },
+      "Sisimai::Bite::Email::qmail" : {
+         "file" : "lib/Sisimai/Bite/Email/qmail.pm"
+      },
+      "Sisimai::Bite::JSON" : {
+         "file" : "lib/Sisimai/Bite/JSON.pm"
+      },
+      "Sisimai::Bite::JSON::AmazonSES" : {
+         "file" : "lib/Sisimai/Bite/JSON/AmazonSES.pm"
+      },
+      "Sisimai::Bite::JSON::SendGrid" : {
+         "file" : "lib/Sisimai/Bite/JSON/SendGrid.pm"
+      },
       "Sisimai::CED" : {
          "file" : "lib/Sisimai/CED.pm"
       },
       "Sisimai::CED::US::AmazonSES" : {
-         "file" : "lib/Sisimai/CED/US/AmazonSES.pm"
+         "file" : "lib/Sisimai/CED.pm"
       },
       "Sisimai::CED::US::SendGrid" : {
-         "file" : "lib/Sisimai/CED/US/SendGrid.pm"
+         "file" : "lib/Sisimai/CED.pm"
       },
       "Sisimai::Data" : {
          "file" : "lib/Sisimai/Data.pm"
@@ -99,157 +264,157 @@
          "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::DE::EinsUndEins" : {
-         "file" : "lib/Sisimai/MSP/DE/EinsUndEins.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::DE::GMX" : {
-         "file" : "lib/Sisimai/MSP/DE/GMX.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::JP::Biglobe" : {
-         "file" : "lib/Sisimai/MSP/JP/Biglobe.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::JP::EZweb" : {
-         "file" : "lib/Sisimai/MSP/JP/EZweb.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::JP::KDDI" : {
-         "file" : "lib/Sisimai/MSP/JP/KDDI.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::RU::MailRu" : {
-         "file" : "lib/Sisimai/MSP/RU/MailRu.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::RU::Yandex" : {
-         "file" : "lib/Sisimai/MSP/RU/Yandex.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::UK::MessageLabs" : {
-         "file" : "lib/Sisimai/MSP/UK/MessageLabs.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::AmazonSES" : {
-         "file" : "lib/Sisimai/MSP/US/AmazonSES.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::AmazonWorkMail" : {
-         "file" : "lib/Sisimai/MSP/US/AmazonWorkMail.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Aol" : {
-         "file" : "lib/Sisimai/MSP/US/Aol.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Bigfoot" : {
-         "file" : "lib/Sisimai/MSP/US/Bigfoot.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Facebook" : {
-         "file" : "lib/Sisimai/MSP/US/Facebook.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::GSuite" : {
-         "file" : "lib/Sisimai/MSP/US/GSuite.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Google" : {
-         "file" : "lib/Sisimai/MSP/US/Google.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Office365" : {
-         "file" : "lib/Sisimai/MSP/US/Office365.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Outlook" : {
-         "file" : "lib/Sisimai/MSP/US/Outlook.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::ReceivingSES" : {
-         "file" : "lib/Sisimai/MSP/US/ReceivingSES.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::SendGrid" : {
-         "file" : "lib/Sisimai/MSP/US/SendGrid.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Verizon" : {
-         "file" : "lib/Sisimai/MSP/US/Verizon.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Yahoo" : {
-         "file" : "lib/Sisimai/MSP/US/Yahoo.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MSP::US::Zoho" : {
-         "file" : "lib/Sisimai/MSP/US/Zoho.pm"
+         "file" : "lib/Sisimai/MSP.pm"
       },
       "Sisimai::MTA" : {
          "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Activehunter" : {
-         "file" : "lib/Sisimai/MTA/Activehunter.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::ApacheJames" : {
-         "file" : "lib/Sisimai/MTA/ApacheJames.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Courier" : {
-         "file" : "lib/Sisimai/MTA/Courier.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Domino" : {
-         "file" : "lib/Sisimai/MTA/Domino.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Exchange2003" : {
-         "file" : "lib/Sisimai/MTA/Exchange2003.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Exchange2007" : {
-         "file" : "lib/Sisimai/MTA/Exchange2007.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Exim" : {
-         "file" : "lib/Sisimai/MTA/Exim.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::IMailServer" : {
-         "file" : "lib/Sisimai/MTA/IMailServer.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::InterScanMSS" : {
-         "file" : "lib/Sisimai/MTA/InterScanMSS.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::MXLogic" : {
-         "file" : "lib/Sisimai/MTA/MXLogic.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::MailFoundry" : {
-         "file" : "lib/Sisimai/MTA/MailFoundry.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::MailMarshalSMTP" : {
-         "file" : "lib/Sisimai/MTA/MailMarshalSMTP.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::McAfee" : {
-         "file" : "lib/Sisimai/MTA/McAfee.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::MessagingServer" : {
-         "file" : "lib/Sisimai/MTA/MessagingServer.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Notes" : {
-         "file" : "lib/Sisimai/MTA/Notes.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::OpenSMTPD" : {
-         "file" : "lib/Sisimai/MTA/OpenSMTPD.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Postfix" : {
-         "file" : "lib/Sisimai/MTA/Postfix.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::Sendmail" : {
-         "file" : "lib/Sisimai/MTA/Sendmail.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::SurfControl" : {
-         "file" : "lib/Sisimai/MTA/SurfControl.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::UserDefined" : {
-         "file" : "lib/Sisimai/MTA/UserDefined.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::V5sendmail" : {
-         "file" : "lib/Sisimai/MTA/V5sendmail.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::X1" : {
-         "file" : "lib/Sisimai/MTA/X1.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::X2" : {
-         "file" : "lib/Sisimai/MTA/X2.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::X3" : {
-         "file" : "lib/Sisimai/MTA/X3.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::X4" : {
-         "file" : "lib/Sisimai/MTA/X4.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::X5" : {
-         "file" : "lib/Sisimai/MTA/X5.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::mFILTER" : {
-         "file" : "lib/Sisimai/MTA/mFILTER.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::MTA::qmail" : {
-         "file" : "lib/Sisimai/MTA/qmail.pm"
+         "file" : "lib/Sisimai/MTA.pm"
       },
       "Sisimai::Mail" : {
          "file" : "lib/Sisimai/Mail.pm"
@@ -344,6 +509,9 @@
       "Sisimai::Reason::OnHold" : {
          "file" : "lib/Sisimai/Reason/OnHold.pm"
       },
+      "Sisimai::Reason::PolicyViolation" : {
+         "file" : "lib/Sisimai/Reason/PolicyViolation.pm"
+      },
       "Sisimai::Reason::Rejected" : {
          "file" : "lib/Sisimai/Reason/Rejected.pm"
       },
@@ -376,6 +544,9 @@
       },
       "Sisimai::Reason::Vacation" : {
          "file" : "lib/Sisimai/Reason/Vacation.pm"
+      },
+      "Sisimai::Reason::VirusDetected" : {
+         "file" : "lib/Sisimai/Reason/VirusDetected.pm"
       },
       "Sisimai::Rhost" : {
          "file" : "lib/Sisimai/Rhost.pm"
@@ -419,7 +590,7 @@
          "web" : "https://github.com/sisimai/p5-Sisimai"
       }
    },
-   "version" : "4.21.1",
+   "version" : "4.22.0",
    "x_contributors" : [
       "jcbf <underspell@gmail.com>",
       "Jonathan Leroy <jonathan@inikup.com>",

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -17,7 +17,7 @@ SYNOPSIS
 DESCRIPTION
 
     This Dist::Zilla plugin can be added to an existing dist.ini file to
-    turn your (or someone else's distribution into an Alt distribution).
+    turn your (or someone else's) distribution into an Alt distribution.
     What it does is:
 
     Modifies Makefile.PL or Build.PL

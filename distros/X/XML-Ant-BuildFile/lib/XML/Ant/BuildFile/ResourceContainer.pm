@@ -1,21 +1,25 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::ResourceContainer;
-$XML::Ant::BuildFile::ResourceContainer::VERSION = '0.216';
 
 # ABSTRACT: Container for XML::Ant::BuildFile::Resource plugins
 
+#pod =head1 DESCRIPTION
+#pod
+#pod Base class for containers of multiple
+#pod L<XML::Ant::BuildFile::Resource|XML::Ant::BuildFile::Resource> plugins.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package XML::Ant::BuildFile::Resource::Foo;
+#pod     use Moose;
+#pod     extends 'XML::Ant::BuildFile::ResourceContainer';
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use English '-no_match_vars';
-## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 use List::Util 1.33 'any';
 use Moose;
 use Module::Pluggable (
@@ -27,16 +31,22 @@ use Regexp::DefaultFlags;
 ## no critic (RequireDotMatchAnything, RequireExtendedFormatting)
 ## no critic (RequireLineBoundaryMatching)
 
+#pod =method BUILD
+#pod
+#pod Automatically run after object construction to set up task object support.
+#pod
+#pod =cut
+
 sub BUILD {
     my $self = shift;
 
     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-    my %isa_map = map { lc( ( split /::/ => $ARG )[-1] ) => $ARG }
-        $self->resource_plugins;
+    my %isa_map
+        = map { lc( ( split /::/ )[-1] ) => $_ } $self->resource_plugins;
     $self->meta->add_attribute(
         _resources => (
             traits      => [qw(XPathObjectList Array)],
-            xpath_query => join( q{|} => map {".//$ARG"} keys %isa_map ),
+            xpath_query => join( q{|} => map {".//$_"} keys %isa_map ),
             isa_map     => \%isa_map,
             handles     => {
                 all_resources    => 'elements',
@@ -51,8 +61,14 @@ sub BUILD {
     return;
 }
 
+#pod =method resources
+#pod
+#pod Given one or more resource type names, returns a list of objects.
+#pod
+#pod =cut
+
 sub resources {
-    my ( $self, @names ) = @ARG;
+    my ( $self, @names ) = @_;
     return $self->filter_resources(
         sub {
             my $resource = $_;
@@ -80,7 +96,7 @@ XML::Ant::BuildFile::ResourceContainer - Container for XML::Ant::BuildFile::Reso
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -222,7 +238,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

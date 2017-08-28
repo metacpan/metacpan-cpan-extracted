@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 PGObject - A toolkit integrating intelligent PostgreSQL dbs into Perl objects
@@ -7,17 +8,18 @@ PGObject - A toolkit integrating intelligent PostgreSQL dbs into Perl objects
 package PGObject;
 use strict;
 use warnings;
-use PGObject::Type::Registry;
+
 use Carp;
 use Memoize;
+use PGObject::Type::Registry;
 
 =head1 VERSION
 
-Version 2.0.0
+Version 2.0.2
 
 =cut
 
-our $VERSION = 2.000001;
+our $VERSION = 2.000002;
 
 =head1 SYNPOSIS
 
@@ -27,7 +29,7 @@ To use without caching:
 
 To use with caching:
 
-  use PGObject ':cache'; 
+  use PGObject ':cache';
 
 To get basic info from a function
 
@@ -73,7 +75,8 @@ To do the same with a running total
 sub import {
     my @directives = @_;
     memoize 'function_info' if grep { $_ eq ':cache' } @directives;
-    PGObject::Type::Registry->new_registry($_) for grep { $_ !~ /^\:/; } @directives; 
+    PGObject::Type::Registry->new_registry($_)
+        for grep { $_ !~ /^\:/; } @directives;
 }
 
 =head1 DESCRIPTION
@@ -83,14 +86,14 @@ stored procedures in PostgreSQL databases.  This module contains only common
 functionality and support structures, and low-level API's.  Most developers will
 want to use more functional modules which add to these functions.
 
-The overall approach here is to provide the basics for a toolkit that other 
-modules can extend.  This is thus intended to be a component for building 
-integration between PostgreSQL user defined functions and Perl objects.  
+The overall approach here is to provide the basics for a toolkit that other
+modules can extend.  This is thus intended to be a component for building
+integration between PostgreSQL user defined functions and Perl objects.
 
-Because decisions such as state handling are largely outside of the scope of 
-this module, this module itself does not do any significant state handling.  
-Database handles (using DBD::Pg 2.0 or later) must be passed in on every call. 
-This decision was made in order to allow for diversity in this area, with the 
+Because decisions such as state handling are largely outside of the scope of
+this module, this module itself does not do any significant state handling.
+Database handles (using DBD::Pg 2.0 or later) must be passed in on every call.
+This decision was made in order to allow for diversity in this area, with the
 idea that wrapper classes would be written to implement this.
 
 =head1 FUNCTIONS
@@ -109,7 +112,6 @@ sub clear_info_cache {
     eval { Memoize::flush_cache('function_info') };
 }
 
-
 =head2 function_info(%args)
 
 Arguments:
@@ -126,7 +128,7 @@ function name
 
 =item funcschema (optional, default 'public')
 
-function schema 
+function schema
 
 =item funcprefix (optiona, default '')
 
@@ -142,8 +144,8 @@ Name of first argument type's schema.  If not provided defaults to 'public'
 
 =back
 
-This function looks up basic mapping information for a function.  If more than 
-one function is found, an exception is raised.  This function is primarily 
+This function looks up basic mapping information for a function.  If more than
+one function is found, an exception is raised.  This function is primarily
 intended to be used by packages which extend this one, in order to accomplish
 stored procedure to object mapping.
 
@@ -155,7 +157,7 @@ Return data is a hashref containing the following elements:
 
 This is an arrayref of hashrefs, each of which contains 'name' and 'type'
 
-=item name 
+=item name
 
 The name of the function
 
@@ -168,56 +170,54 @@ The number of arguments
 =cut
 
 sub function_info {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
     $args{funcschema} ||= 'public';
     $args{funcprefix} ||= '';
-    $args{funcname} = $args{funcprefix}.$args{funcname};
+    $args{funcname} = $args{funcprefix} . $args{funcname};
     $args{argschema} ||= 'public';
 
     my $dbh = $args{dbh} || croak 'No dbh provided';
 
-    
-
     my $query = qq|
-        SELECT proname, pronargs, proargnames, 
-               string_to_array(array_to_string(proargtypes::regtype[], ' '), 
+        SELECT proname, pronargs, proargnames,
+               string_to_array(array_to_string(proargtypes::regtype[], ' '),
                                ' ') as argtypes
-          FROM pg_proc 
+          FROM pg_proc
           JOIN pg_namespace pgn ON pgn.oid = pronamespace
          WHERE proname = ? AND nspname = ?
     |;
-    my @queryargs = ($args{funcname}, $args{funcschema});
-    if ($args{argtype1}) {
-       $query .= qq|
-               AND (proargtypes::int[])[0] IN (select t.oid 
+    my @queryargs = ( $args{funcname}, $args{funcschema} );
+    if ( $args{argtype1} ) {
+        $query .= qq|
+               AND (proargtypes::int[])[0] IN (select t.oid
                                                  from pg_type t
                                                  join pg_namespace n
                                                       ON n.oid = typnamespace
-                                                where typname = ? 
+                                                where typname = ?
                                                       AND n.nspname = ?
        )|;
-       push @queryargs, $args{argtype1};
-       push @queryargs, $args{argschema};
+        push @queryargs, $args{argtype1};
+        push @queryargs, $args{argschema};
     }
 
     my $sth = $dbh->prepare($query) || die $!;
     $sth->execute(@queryargs) || die $dbh->errstr . ": " . $query;
     my $ref = $sth->fetchrow_hashref('NAME_lc');
-    croak "transaction already aborted" if  $dbh->state eq '25P02';
-    croak "No such function" if !$ref;
+    croak "transaction already aborted"  if $dbh->state eq '25P02';
+    croak "No such function"             if !$ref;
     croak 'Ambiguous discovery criteria' if $sth->fetchrow_hashref('NAME_lc');
 
     my $f_args;
-    for my $n (@{$ref->{proargnames}}){
-        push @$f_args, {name => $n, type => shift @{$ref->{argtypes}}};
+    for my $n ( @{ $ref->{proargnames} } ) {
+        push @$f_args, { name => $n, type => shift @{ $ref->{argtypes} } };
     }
 
     return {
-        name     => $ref->{proname}, 
+        name     => $ref->{proname},
         num_args => $ref->{pronargs},
         args     => $f_args,
     };
-    
+
 }
 
 =head2 call_procedure(%args)
@@ -240,8 +240,8 @@ Prefix for the function.  This can be useful for separating functions by class.
 
 =item args
 
-This is an arrayref.  Each item is either a literal value, an arrayref, or a 
-hashref of extended information.  In the hashref case, the type key specifies 
+This is an arrayref.  Each item is either a literal value, an arrayref, or a
+hashref of extended information.  In the hashref case, the type key specifies
 the string to use to cast the type in, and value is the value.
 
 =item orderby
@@ -252,14 +252,14 @@ The list (arrayref) of columns on output for ordering.
 
 An arrayref of running windowed aggregates.  Each contains two keys, namely 'agg' for the aggregate and 'alias' for the function name.
 
-These are aggregates, each one has appended 'OVER (ROWS UNBOUNDED PRECEDING)' 
-to it.  
+These are aggregates, each one has appended 'OVER (ROWS UNBOUNDED PRECEDING)'
+to it.
 
 =item registry
 
 This is the name of the registry used for type conversion.  It can be omitted
-and defaults to 'default.'  Note that use of a non-standard registry currently 
-does *not* merge changes from the default registry, so you need to reregister 
+and defaults to 'default.'  Note that use of a non-standard registry currently
+does *not* merge changes from the default registry, so you need to reregister
 types in non-default registries when you create them.
 
 Please note, these aggregates are not intended to be user-supplied.  Please only
@@ -272,57 +272,61 @@ the framework level for this parameter.
 =cut
 
 sub call_procedure {
-    my ($self) = shift @_;
-    my %args = @_;
+    my ( $self, %args ) = @_;
     local $@;
     $args{funcschema} ||= 'public';
     $args{funcprefix} ||= '';
-    $args{funcname} = $args{funcprefix}.$args{funcname};
+    $args{funcname} = $args{funcprefix} . $args{funcname};
     $args{registry} ||= 'default';
 
     my $dbh = $args{dbh};
     croak "No database handle provided" unless $dbh;
-    croak "dbh not a database handle" unless eval {$dbh->isa('DBI::db')};
+    croak "dbh not a database handle" unless eval { $dbh->isa('DBI::db') };
 
     my $wf_string = '';
 
-    $wf_string = join ', ', map { 
-                         $_->{agg} 
-                         . ' OVER (ROWS UNBOUNDED PRECEDING) AS '
-                         . $_->{alias}
-                 } @{$args{running_funcs}} if $args{running_funcs};
+    $wf_string = join ', ', map {
+              $_->{agg}
+            . ' OVER (ROWS UNBOUNDED PRECEDING) AS '
+            . $_->{alias}
+    } @{ $args{running_funcs} } if $args{running_funcs};
     $wf_string = ', ' . $wf_string if $wf_string;
 
-    my @qargs = map { 
-                      my $arg = $_;
-                      local ($@);
-                      $arg = $arg->to_db if eval {$arg->can('to_db')};
-                      $arg = $arg->pgobject_to_db if eval {$arg->can('pgobject_to_db')};
-                      $arg;
-                }  @{$args{args}};
+    my @qargs = map {
+        my $arg = $_;
+        local ($@);
+        $arg = $arg->to_db          if eval { $arg->can('to_db') };
+        $arg = $arg->pgobject_to_db if eval { $arg->can('pgobject_to_db') };
+        $arg;
+    } @{ $args{args} };
 
-    my $argstr = join ', ', map { 
-                  (ref $_ and eval { $_->{cast} } ) ? "?::$_->{cast}" : '?';
-                  } @{$args{args}};  
+    my $argstr = join ', ', map {
+        ( ref $_ and eval { $_->{cast} } ) ? "?::$_->{cast}" : '?';
+    } @{ $args{args} };
 
     my $order = '';
-    if ($args{orderby}){
-        $order = join(', ', map {
-                                  my $dir = undef;
-                                  if ( s/\s+(ASC|DESC)\s*$//i ) {
-                                      $dir = $1;
-                                  }
-                                  defined $dir ? $dbh->quote_identifier($_)
-                                                  . " $dir"
-                                               : $dbh->quote_identifier($_);
-                                } @{$args{orderby}}); 
+    if ( $args{orderby} ) {
+        $order = join(
+            ', ',
+            map {
+                my $dir = undef;
+                if (s/\s+(ASC|DESC)\s*$//i) {
+                    $dir = $1;
+                }
+                defined $dir
+                    ? $dbh->quote_identifier($_) . " $dir"
+                    : $dbh->quote_identifier($_);
+            } @{ $args{orderby} }
+        );
     }
     my $query = qq|
-           SELECT * $wf_string 
-             FROM | . $dbh->quote_identifier($args{funcschema}) . '.' . 
-                      $dbh->quote_identifier($args{funcname}) . qq|($argstr) |;
-    if ($order){ 
-       $query .= qq|
+           SELECT * $wf_string
+             FROM |
+        . $dbh->quote_identifier( $args{funcschema} ) . '.'
+        . $dbh->quote_identifier( $args{funcname} )
+        . qq|($argstr) |;
+    if ($order) {
+        $query .= qq|
          ORDER BY $order |;
     }
 
@@ -330,49 +334,50 @@ sub call_procedure {
 
     my $place = 1;
 
-    foreach my $carg (@qargs){
-        if (ref($carg) =~ /HASH/){
-            $sth->bind_param($place, $carg->{value},
-                       { pg_type => $carg->{type} });
-        } else {
+    foreach my $carg (@qargs) {
+        if ( ref($carg) =~ /HASH/ ) {
+            $sth->bind_param( $place, $carg->{value},
+                { pg_type => $carg->{type} } );
+        }
+        else {
 
-            # This is used to support arrays of db-aware types.  Long-run 
+            # This is used to support arrays of db-aware types.  Long-run
             # I think we should merge bytea support into this framework. --CT
-            if (ref($carg) =~ /ARRAY/){
-               local ($@);
-               if (eval{$carg->[0]->can('to_db')}){
-                  for my $ref(@$carg){
-                       $ref = $ref->to_db;
-                  }
-               }
+            if ( ref($carg) =~ /ARRAY/ ) {
+                local ($@);
+                if ( eval { $carg->[0]->can('to_db') } ) {
+                    for my $ref (@$carg) {
+                        $ref = $ref->to_db;
+                    }
+                }
             }
 
-            $sth->bind_param($place, $carg);
+            $sth->bind_param( $place, $carg );
         }
         ++$place;
     }
 
     $sth->execute() || die $dbh->errstr . ": " . $query;
-    
-    clear_info_cache() if $dbh->state eq '42883'; # (No Such Function)
+
+    clear_info_cache() if $dbh->state eq '42883';    # (No Such Function)
 
     my @rows = ();
-    while (my $row = $sth->fetchrow_hashref('NAME_lc')){
-       my @types = @{$sth->{pg_type}};
-       my @names = @{$sth->{NAME_lc}};
-       my $i = 0;
-       for my $type (@types){
-           $row->{$names[$i]} =
-                 PGObject::Type::Registry->deserialize(
-                       registry => $args{registry}, 
-                       dbtype => $type, dbstring => $row->{$names[$i]}
-                 );
-           ++$i;
-       }
-       
-       push @rows, $row;
+    while ( my $row = $sth->fetchrow_hashref('NAME_lc') ) {
+        my @types = @{ $sth->{pg_type} };
+        my @names = @{ $sth->{NAME_lc} };
+        my $i     = 0;
+        for my $type (@types) {
+            $row->{ $names[$i] } = PGObject::Type::Registry->deserialize(
+                registry => $args{registry},
+                dbtype   => $type,
+                dbstring => $row->{ $names[$i] }
+            );
+            ++$i;
+        }
+
+        push @rows, $row;
     }
-    return @rows;      
+    return @rows;
 }
 
 =head2 new_registry($registry_name)
@@ -388,8 +393,8 @@ This no longer returns anything of significance.
 
 =cut
 
-sub new_registry{
-    my ($self, $registry_name) = @_;
+sub new_registry {
+    my ( $self, $registry_name ) = @_;
     carp "Deprecated use of PGObject->new_registry()";
     PGObject::Type::Registry->new_registry($registry_name);
 }
@@ -412,13 +417,14 @@ Use PGObject::Type::Registry->register_type() instead.
 
 =cut
 
-sub register_type{
+sub register_type {
     carp 'Use of deprecated method register_type of PGObject module';
-    my $self = shift @_;
-    my %args = @_;
+    my ( $self, %args ) = @_;
 
-    PGObject::Type::Registry->register_type(registry => $args{registry},
-          dbtype => $args{pg_type}, apptype => $args{perl_class}
+    PGObject::Type::Registry->register_type(
+        registry => $args{registry},
+        dbtype   => $args{pg_type},
+        apptype  => $args{perl_class}
     );
     return 1;
 }
@@ -434,13 +440,14 @@ instead.
 
 =cut
 
-sub unregister_type{
+sub unregister_type {
     carp 'Use of deprecated method unregister_type of PGObject';
-    my $self = shift @_;
-    my %args = @_;
+    my ( $self, %args ) = @_;
+
     $args{registry} ||= 'default';
     PGObject::Type::Registry->unregister_type(
-       registry => $args{registry}, dbtype =>  $args{pg_type}
+        registry => $args{registry},
+        dbtype   => $args{pg_type}
     );
 }
 
@@ -448,8 +455,8 @@ sub unregister_type{
 
 One of the powerful features of PGObject is the ability to declare methods in
 types which can be dynamically detected and used to serialize data for query
-purposes. Objects which contain a pgobject_to_db() or a to_db() method, that 
-method will be called and the return value used in place of the object.  This 
+purposes. Objects which contain a pgobject_to_db() or a to_db() method, that
+method will be called and the return value used in place of the object.  This
 can allow arbitrary types to serialize themselves in arbitrary ways.
 
 For example a date object could be set up with such a method which would export
@@ -467,11 +474,11 @@ returned, it must follow the type format:
 
 =head2 REQUIRED INTERFACES
 
-Registered types MUST implement a $class->from_db function accepts the string 
-from the database as its only argument, and returns the object of the desired 
+Registered types MUST implement a $class->from_db function accepts the string
+from the database as its only argument, and returns the object of the desired
 type.
 
-Any type MAY present an $object->to_db() interface, requiring no arguments, and returning a valid value.  These can be hashrefs as specified above, arrayrefs 
+Any type MAY present an $object->to_db() interface, requiring no arguments, and returning a valid value.  These can be hashrefs as specified above, arrayrefs
 (converted to PostgreSQL arrays by DBD::Pg) or scalar text values.
 
 =head2 UNDERSTANDING THE REGISTRY SYSTEM
@@ -480,7 +487,7 @@ Note that 2.0 moves the registry to a service module which handles both
 registry and deserialization of database types.  This is intended to be both
 cleaner and more flexible than the embedded system in 1.x.
 
-The registry system allows Perl classes to "claim" PostgreSQL types within a 
+The registry system allows Perl classes to "claim" PostgreSQL types within a
 certain domain.  For example, if I want to ensure that all numeric types are
 turned into Math::BigFloat objects, I can build a wrapper class with appropriate
 interfaces, but PGObject won't know to convert numeric types to this new class,
@@ -547,8 +554,8 @@ module and similar functions in other catalog-bound modules may not be safe to
 modify in arbitrary ways.  Therefore we recommend that the return values from
 catalog-lookup functions are treated as immutable.
 
-Normalizing output is safe provided there are no conflicts between naming 
-conventions.  This is usually true since different naming conventions would 
+Normalizing output is safe provided there are no conflicts between naming
+conventions.  This is usually true since different naming conventions would
 interfere withmapping.  However, there could be cases where it is not true, for
 example, where two different mapping modules agree on a subset of normalization
 conventions but differ on some details.  The two might safely handle the same
@@ -596,7 +603,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 
+=over
 
 =item * RT: CPAN's request tracker (report bugs here)
 
@@ -618,12 +625,12 @@ L<http://search.cpan.org/dist/PGObject/>
 
 =head1 ACKNOWLEDGEMENTS
 
-This code has been loosely based on code written for the LedgerSMB open source 
+This code has been loosely based on code written for the LedgerSMB open source
 accounting and ERP project.  While that software uses the GNU GPL v2 or later,
-this is my own reimplementation, based on my original contributions to that 
+this is my own reimplementation, based on my original contributions to that
 project alone, and it differs in significant ways.   This being said, without
-LedgerSMB, this module wouldn't exist, and without the lessons learned there, 
-and the great people who have helped make this possible, this framework would 
+LedgerSMB, this module wouldn't exist, and without the lessons learned there,
+and the great people who have helped make this possible, this framework would
 not be half of what it is today.
 
 
@@ -642,22 +649,22 @@ not be half of what it is today.
 COPYRIGHT (C) 2013-2014 Chris Travers
 COPYRIGHT (C) 2014-2017 The LedgerSMB Core Team
 
-Redistribution and use in source and compiled forms with or without 
+Redistribution and use in source and compiled forms with or without
 modification, are permitted provided that the following conditions are met:
 
 =over
 
-=item 
+=item
 
 Redistributions of source code must retain the above
 copyright notice, this list of conditions and the following disclaimer as the
 first lines of this file unmodified.
 
-=item 
+=item
 
 Redistributions in compiled form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
-source code, documentation, and/or other materials provided with the 
+source code, documentation, and/or other materials provided with the
 distribution.
 
 =back

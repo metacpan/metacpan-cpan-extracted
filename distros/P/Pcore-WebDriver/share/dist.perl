@@ -29,7 +29,5 @@
     },
 
     phantomjs_ver    => '2.1.1',
-    chromedriver_ver => '2.30',
-    geckodriver_ver  => '0.17.0',
-    ff_ver           => '54.0.1',
+    chromedriver_ver => '2.30',    # TODO v2.31 requires glibc-v2.18
 }

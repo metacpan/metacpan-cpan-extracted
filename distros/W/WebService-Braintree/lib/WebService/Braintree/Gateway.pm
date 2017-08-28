@@ -1,5 +1,5 @@
 package WebService::Braintree::Gateway;
-$WebService::Braintree::Gateway::VERSION = '0.92';
+$WebService::Braintree::Gateway::VERSION = '0.93';
 
 use WebService::Braintree::AddressGateway;
 use WebService::Braintree::ClientTokenGateway;

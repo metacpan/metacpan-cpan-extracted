@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::HIDAPI' => '0',
+                                    'Alien::HIDAPI' => '0.004',
                                     'ExtUtils::MakeMaker' => '0'
                                   }
                   },
@@ -18,17 +18,12 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41',
-                                      'blib' => '1.01',
-                                      'perl' => '5.006'
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
-                                      'Device::HID::XS' => '0',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'Alien::HIDAPI' => '0.004'
                                     }
                     },
        'test' => {
@@ -38,7 +33,6 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::HexString' => '0',
                                    'Test::More' => '0'
                                  }
                  }

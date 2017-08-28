@@ -1,15 +1,31 @@
-use strict;
-use warnings;
-use Test::More tests => 10;
+use Test2::V0 -no_srand => 1;
 
-use_ok 'Dist::Zilla::Plugin::Author::Plicease';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::MakeMaker';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::Tests';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::DevShare';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::Upload';
-use_ok 'Dist::Zilla::Plugin::Author::Plicease::Thanks';
-use_ok("Dist::Zilla::MintingProfile::Author::Plicease");
-use_ok("Dist::Zilla::Plugin::Author::Plicease::Init2");
+sub require_ok ($);
 
+require_ok 'Dist::Zilla::MintingProfile::Author::Plicease';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::DevShare';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::Init2';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::MakeMaker';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::Tests';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::Thanks';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::TravisInstall';
+require_ok 'Dist::Zilla::Plugin::Author::Plicease::Upload';
+done_testing;
+
+sub require_ok ($)
+{
+  # special case of when I really do want require_ok.
+  # I just want a test that checks that the modules
+  # will compile okay.  I won't be trying to use them.
+  my($mod) = @_;
+  my $ctx = context();
+  eval qq{ require $mod };
+  my $error = $@;
+  my $ok = !$error;
+  $ctx->ok($ok, "require $mod");
+  $ctx->diag("error: $error") if $error ne '';
+  $ctx->release;
+}

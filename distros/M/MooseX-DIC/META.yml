@@ -14,18 +14,21 @@ meta-spec:
   version: '1.4'
 name: MooseX-DIC
 requires:
+  Exporter::Declare: '0'
   File::Find: '0'
-  File::Slurp: '0'
+  File::Slurper: '0'
   File::Spec: '0'
   Log::Log4perl: '0'
+  Module::Load: '0'
   Moose: '0'
   MooseX::Role::Parameterized: '0'
   Throwable: '0'
   Try::Tiny: '0'
   YAML::XS: '0'
   aliased: '0'
+  namespace::autoclean: '0'
 resources:
   bugtracker: https://github.com/loic-prieto/moosex-dic/issues
   repository: https://github.com/loic-prieto/moosex-dic
-version: 0.2.0
+version: 0.3.2
 x_serialization_backend: 'YAML::Tiny version 1.70'

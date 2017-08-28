@@ -48,16 +48,22 @@ bytes; where character interpretation is required, UTF-8 is used.
 A chain is a series of transforms separated by colons.  A reverse transform
 (decoding) is specified by preceding the transform with a C<-> character.  If a
 transform takes parameters, they are separated by commas and follow the
-transform either surrounded by parentheses or preceded by a comma.
+transform either surrounded by parentheses or preceded by a comma.  Unknown
+parameters are ignored.
 
 Not all transforms have an reverse transforms.  For example, the I<hash>
 transform, which implements cryptographic hashes, is not practically invertible
-(we hope).  An exception will be thrown if you attmept to use an invalid
+(we hope).  An exception will be thrown if you attempt to use an invalid
 transform.
 
 Generally, a reverse transform will decode any variant of the forward transform.
 To preserve this invariant, related but incompatible transforms such as base64
 and url64 are separate transforms.
+
+In general, B<muter> expects the input to its decoders to be well-formed.
+Passing broken or corrupt data will not generally produce useful results.  For
+example, it isn't a good idea to try to decode URI-encoded data containing
+unencoded newlines.  In other words, garbage in, garbage out.
 
 =head1 OPTIONS
 
@@ -187,6 +193,51 @@ Implements UUencoding.  Note that the "begin" and "end" markers are not emitted.
 Implements the L<vis(3)> function found on the BSDs.  The options supported
 correspond directly to the constants that function takes.
 
+The default encoding, if neither C<cstyle> nor C<octal> is specified, is to
+encode control characters in the form C<\^C>, control characters with the eighth
+bit set in the form C<\M^C>, other characters with the eighth bit in the form
+C<\M-C>, and space and meta-space as octal escapes.
+
+The flags C<httpstyle> and C<mimestyle> are not implemented.  Instead, use the
+C<uri> and C<quotedprintable> encoders.
+
+=over 4
+
+=item cstyle
+
+Use C-style backslash escapes for common control characters.  Space is encoded
+as C<\s>.  NUL is encoded as C<\0> if the next character is not an octal digit
+and C<\000> if it is.
+
+=item glob
+
+Encode the characters C<*>, C<?>, C<[> and C<#>, which are recognized by
+L<glob(3)>.
+
+=item nl
+
+Encode newline.
+
+=item octal
+
+Encode characters as three-digit octal escapes.
+
+=item sp
+
+=item space
+
+Encode space (U+0020).
+
+=item tab
+
+Encode tab.
+
+=item white
+
+Encode whitespace.  Equivalent to C<space,tab,nl>.
+
+=back
+
 =head2 xml
 
 Implements encoding of XML special characters.  Note that the reverse transform
@@ -209,6 +260,8 @@ Use hexadecimal entity names for all entities.
 Use XML entitiy names, except for the apostrophe, which uses a hexadecimal
 entity.
 
+=back
+
 =head1 EXAMPLES
 
 =over 4
@@ -226,7 +279,7 @@ Exactly the same as the above.
 
 Read from I<file>, which contains a single hex-encoded string, hash the result
 with SHA-256, and encode the result as base64.  This chain could also be written
-as C-hex:hash,sha256:base64>, which may be easier to type.
+as C<-hex:hash,sha256:base64>, which may be easier to type.
 
 =back
 

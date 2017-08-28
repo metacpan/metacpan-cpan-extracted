@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::icp_a106
 # ABSTRACT:  Configuration class LCDd::icp_a106
+
 =encoding utf8
 
 =head1 NAME
@@ -16,7 +17,31 @@ generated from LCDd.conf
 
 =head2 Device
 
-I<< Optional. Type uniline. default: '/dev/ttyS1'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+/dev/ttyS1
+
+=back
+
+
+
+=head2 Size
+
+Display dimensions. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+20x2
+
+=back
+
+
 
 =head1 SEE ALSO
 

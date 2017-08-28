@@ -23,5 +23,5 @@ requires:
   Test::More: '0'
 resources:
   repository: https://github.com/dnmfarrell/URI-Encode-XS.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

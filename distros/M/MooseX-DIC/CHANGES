@@ -1,0 +1,521 @@
+==================================================
+Changes from 2016-08-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.3.2 at 2017-08-21 21:04:48 +0000
+------------------------------------------
+
+  Change: 7e1ee3a1970fc40392e7f04ed7f3e826d1e02d10
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-21 23:04:48 +0000
+
+    Exclude Bump or Merge messages from changelog 
+
+  Change: 07bbeb1e49722151acb49943493ac0eb71e2e08a
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-21 22:55:55 +0000
+
+    Add changelog functionality to dist build 
+
+  Change: b568b0836027121152509199ca4d3854ed02cf90
+  Author: Dan Book <grinnz@grinnz.com>
+  Date : 2017-08-21 13:43:34 +0000
+
+    use [VersionFromMainModule] 
+
+  Change: da29c6caa8d46826bd754dc743dc7b962bdcf7df
+  Author: Dan Book <grinnz@grinnz.com>
+  Date : 2017-08-21 13:39:26 +0000
+
+    use File::Slurper instead of File::Slurp 
+
+------------------------------------------
+version 0.3.1 at 2017-08-20 18:10:03 +0000
+------------------------------------------
+
+  Change: 2dbcb765d48845c3e771f79159f9ffe986723411
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-20 19:44:14 +0000
+
+    Continue documentation of config features 
+
+  Change: 098574e22209f87e741f2f84e801947c56526f42
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-20 12:42:31 +0000
+
+    Adapt existing documentation to the new yaml config possibilities 
+
+  Change: 45520afa382a929ac4f8443d8f21413cf1d07600
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-20 12:18:32 +0000
+
+    Update the main documentation file of the module to reflect yaml config 
+
+  Change: 8b33f113a779200f6af85f729359e1ad3569e2b6
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-20 01:47:35 +0000
+
+    Start updating the main readme file 
+
+  Change: 022ecedd12b3fab54409eee4b831fb6c8c7d11e6
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-19 19:44:19 +0000
+
+    Add massive refactor to dependency building
+
+    To enable YAML config file to configure injection points on attributes of injected services, a massive refactor was
+    needed on how to build the dependencies and how to configure them, both on the code config and the file config
+    manner.
+
+    Now there's more flexibility on how you can configure your services.
+
+    You won't need anymore the injected trait if the default values are enough for your service's dependencies. It will
+    only be used if you want request-injected dependencies.
+
+    Now the Moose service factory will automatically try to build every dependency of a service for which an entry is
+    found in the registry. If the dependency is required and the service is not found, an error will be thrown.
+    Otherwise, we can assume it is not important. 
+
+  Change: 0e7b4a2fdbfadcca8cb58f71c9a171448843a628
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-18 22:33:50 +0000
+
+    Update library version to 0.2 
+
+  Change: 512b2b3835351a911e71cbcebe275aea8d930a80
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-08-16 12:51:40 +0000
+
+    - Added missing prereqs as reported by CPANTS. 
+
+  Change: bc5b794168b26f85c831e3e5c5d93b29e5bed527
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-15 23:38:47 +0000
+
+    Apply fixes to pass tests
+
+    Also, the interface to put injection points has changed: The injected trait is no longer necessary to let the
+    container inject dependent attributes of injected services. It it is in the container it will inject mapped
+    attributes. 
+
+  Change: 665ba2601a231cb69bf08565a8c0daf18aa7c690
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-15 10:33:14 +0000
+
+    Further fix syntax and code errors to make file config pass tests 
+
+  Change: c8729d4230d6c28c881c36e8bf525c96f306c32b
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-15 09:31:00 +0000
+
+    Syntactic typos 
+
+  Change: 09cf65c987442b8d5dd6eda7081c09ec9e9bb1dc
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-13 12:17:21 +0000
+
+    Refactor Configuration related classes 
+
+  Change: db70ab5e2461f5968640e0514220750e7e60f66a
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-13 00:01:48 +0000
+
+    Implement YAML Config parser 
+
+  Change: 8eb11e20aca957ac6b4e58cdb2a1d161c7bc5744
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-12 14:07:59 +0000
+
+    Move out service registry from the container 
+
+  Change: 9d518fda91f1d65252b3279bfba254db97c75502
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-07 00:45:40 +0000
+
+    Refine ServiceMetadata to have sensible defaults 
+
+  Change: 8027689ce671de4c9d8559390a49884dfc2769c0
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-06 22:48:04 +0000
+
+    Add test suite for the configuration feature 
+
+  Change: 48b4350b39755955a123cec814327e0a0feebd6d
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-06 13:03:15 +0000
+
+    Further refine the configuration by code documentation 
+
+  Change: 9ef7d65e5db00c78c58d188e8548ba485b3e5e21
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-06 12:33:13 +0000
+
+    Further refine the config subsystem 
+
+  Change: bdd2b722a8a2ebbb3d4893d3152f8fcf705cc32d
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-08-06 10:35:13 +0000
+
+    Partial restructuring of the config-building system 
+
+  Change: af6d51f9e4306ba4523a4899aedac6e32bc44757
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-31 02:12:13 +0000
+
+    Add DI documentation 
+
+  Change: 7e7fa8607164ef03763cded233a248948c07fd13
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 16:43:46 +0000
+
+    Add website link to the documentation 
+
+  Change: e659b109a8c0a9246bff9040d699db67140fa319
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 16:43:26 +0000
+
+    Refactor makefile 
+
+  Change: c5942384eee47de5527a9f21f817e5286fb05f2b
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 16:02:24 +0000
+
+    Refactor travis targets 
+
+  Change: ea7a7741fc840b58b821ff3e6f597ff0f5476f1d
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 16:00:37 +0000
+
+    Fix deploy travis target 
+
+  Change: 017594df7d7c499dd5872eb048dabcc609185de4
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 15:58:02 +0000
+
+    Deploy documentation to the S3 website 
+
+  Change: 287019c58ff66585ad0f8add3328edefe68722ca
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:48:26 +0000
+
+    Remove --deployment from the carton install step of travis 
+
+  Change: 33e64f05a708236ed83bd72a0e75b15ef2fb3a62
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:43:58 +0000
+
+    Add sudo requirement to travis build 
+
+  Change: 45edac1ce494c361ae16cff724298ec3ed99fdbc
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:41:48 +0000
+
+    Sudo the install step of travis 
+
+  Change: 6fcb8748a7919b0541eedf1ff27389889f7fdb74
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:38:44 +0000
+
+    Change jenkins to travis in travis config file 
+
+  Change: fc11dbf3b503c8e13eb2bd6a02ab82ab805d2dd4
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:35:32 +0000
+
+    Make use of travis make targets in travis build 
+
+  Change: b4ea28d8cc71946186a6655ea5777a0561014172
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:32:34 +0000
+
+    Only build commits to master 
+
+  Change: 91900bebfc245bc2c5ce95d1b798ec3b7e4d3e57
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:31:50 +0000
+
+    Add makefile for travis builds 
+
+  Change: 0b18b107f967dae60617ffc3079a9ddc51bc8c3e
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:22:13 +0000
+
+    Fix distro to use in travis 
+
+  Change: db45a8f23e0e6a32687a68b6c5fb4d992824c3fe
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:21:25 +0000
+
+    Add make targets related to doc building and serving 
+
+  Change: 2d6416137061ee47ba25c7cdfa2dc6180f691c77
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-30 12:21:01 +0000
+
+    Refine the container usage doc and setup the doc site 
+
+  Change: afe7d49d513f5907ee9da46e347804a5b3ae9610
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-29 16:14:00 +0000
+
+    Fix incorrect travis file name 
+
+  Change: 6ab9dc549db3a144ace1259c54ac0b9e78a1da61
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-29 16:12:12 +0000
+
+    Add travis.yml integration 
+
+  Change: 7253a413e7604b66ac9d1289c5d728b658054780
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-29 13:26:29 +0000
+
+    Add documentation about using the container 
+
+  Change: cdc2d9d6335f4c6ad5c57dca98be2e8fdc69473f
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-28 18:07:25 +0000
+
+    Add more documentation 
+
+  Change: 48a859e00091fb572ddcb671215e9ac475bed7f4
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-28 16:53:39 +0000
+
+    Build CPAN distribution 
+
+  Change: 0250a04a5b6ef46d2574ddc19898c97853e0ff45
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-24 11:52:31 +0000
+
+    Refine the container's documentation 
+
+  Change: de79fb6a33b5d05647798e2141da4a38d513be31
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-24 11:52:08 +0000
+
+    Add DI doc section to index 
+
+  Change: 8e64503ed1e2cfcfeb657ab47127885438d8167b
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-21 17:46:42 +0000
+
+    Add the basic skeleton of the documentation with mkdocs 
+
+  Change: ab682b37ee9fab17b539720dcea1043134576752
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 17:01:14 +0000
+
+    Tidy up codebase 
+
+  Change: 94c4e0d1294e7a5d69eeca5a2ff50f2e66e03757
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 16:58:30 +0000
+
+    Add factory builder feature 
+
+  Change: 5ee3aae8d5a102647e02e2bf2a446e85fdde8099
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 14:01:43 +0000
+
+    Add tests for the builders feature 
+
+  Change: db0e803ec789eefdcf0ee9e1a46db23e641cc806
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 13:44:03 +0000
+
+    Smarten ignore files 
+
+  Change: e5ee9feee41385798b421941830d6eed03b5e261
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 13:42:32 +0000
+
+    Fix permissions issues with dependency installing 
+
+  Change: 843e5746c370060280324b372c867d6f8b3348a5
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 12:32:30 +0000
+
+    Update scope documentation 
+
+  Change: 7aee6e50c1ce8bfa2e912be6e45ea6a694ffd267
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 12:27:13 +0000
+
+    Add singleton-into-request-injected check 
+
+  Change: 28d00e53b0e92ede3cc617e4ee43e2bf6b66ef96
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 12:05:17 +0000
+
+    Retidy code 
+
+  Change: bcba34fe1db41cdba7cf0a031708cce5c0737c8d
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 12:04:51 +0000
+
+    Refine tidy codebase target to avoid permission conflict with docker 
+
+  Change: 81cd5842a8199d13becdd659a3a46537e66ff57d
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 11:56:34 +0000
+
+    Apply first perltidy to the project 
+
+  Change: df71b60eaa292806ef32e1a97e5a52ffe8fcd1e2
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 11:56:17 +0000
+
+    Add perltidy target for the project based on Moose config 
+
+  Change: 3cc528d962683dda274f9d82b415f5f09164112c
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-15 11:32:37 +0000
+
+    Implement request-injected services 
+
+  Change: eb36ca28f9b856f70fc0d07145674ad35744ab12
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-14 17:08:39 +0000
+
+    Add scope behaviour for injected services. Injection scopes to be working yet 
+
+  Change: dc94523d1a091d09dd9784f4c2894912b452cb21
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-09 00:12:30 +0000
+
+    Add test suite for the scopes behaviour 
+
+  Change: 455787d66557ab28c622f3108387a986b08bec33
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-08 17:08:32 +0000
+
+    Update documentation with progress and container building 
+
+  Change: 9b1417b337a46d5da5c1fcbac8cdd54d7bb9e229
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-08 16:52:10 +0000
+
+    Fully implement and test environments behaviour 
+
+  Change: 61dcd3d79807d17a00fd2f810fd39e730b657e65
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-08 16:17:49 +0000
+
+    Add docker and make to the project to ease testing 
+
+  Change: 082b54d056115b99955b24ecc855bbaf4da2fa7a
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-08 10:04:24 +0000
+
+    Implement environments, prepare test cases 
+
+  Change: 32435b9605666a4d9472324153422bbcbe679915
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-07-08 09:18:47 +0000
+
+    Implement injected dependencies with Injected trait 
+
+  Change: e3b4abb73ecbeeb5f19414f489db1fe60a67b113
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-07 18:23:51 +0000
+
+    Add new tests 
+
+  Change: 48ab396dcb290d735d8a92a60d826e2c9ea0a562
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-07 17:59:27 +0000
+
+    Further fixing of container classes to make them work 
+
+  Change: 4bd5d7c5164432b4c7673c57b6343899a1358ac3
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-07 17:58:42 +0000
+
+    Add vim config file 
+
+  Change: f556cc9af458399c793db5be8902bf84d1a62fa4
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-07-03 15:00:56 +0000
+
+    Fix typo errors in package names and variables 
+
+  Change: fe9665300cb358b4313bee6348ff9920d0351319
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-06-30 18:42:43 +0000
+
+    Scanning of services first implementation 
+
+  Change: 16353ef778c38914e5048787f5ca8b6d823d26fb
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-24 12:45:51 +0000
+
+    Add some basic infrastructure to build services 
+
+  Change: 1c06bbb62a2ea5bbfd3b543167fd2852306d357b
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-24 11:40:02 +0000
+
+    The Container is no longer a singleton
+
+    The documentation is updated to reflect that design decision. 
+
+  Change: d74988844b6ad77ede06c7579e4d12c7c954ebbf
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-23 09:02:47 +0000
+
+    Create basic infrastructure for the container 
+
+  Change: 03820b0f46b31d022d92e8306a4f8c5560d0ad2c
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-18 11:14:38 +0000
+
+    Add first container test
+
+    This test verifies a very simple use case of the container. Namely that it can scan a fixed lib path, extract from
+    it services that implement interfaces, and register those services. It will also prove that it can instance a
+    singleton service and that it fetches the correct implementation class for it. 
+
+  Change: cef7a9051cba7321d973f0bb95e27af185357640
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-18 10:54:41 +0000
+
+    Fix some documentation translation typos 
+
+  Change: b2242977ebfc290486c754ba47e24af20b5e8d13
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-18 10:47:57 +0000
+
+    Add the readme file for the project 
+
+  Change: 3632ddb0e60fafb48b1bf6dafbfe1c54aace37fc
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-17 15:37:12 +0000
+
+    Add the initial test 
+
+  Change: 21d1f758551eee4d6de1d3946b8182d39570861f
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-17 15:14:13 +0000
+
+    Add more documentation for the general behaviour of the library 
+
+  Change: 8a0ad9bafbcc9e414a99336e96290af4d7cfebd1
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-17 15:13:48 +0000
+
+    Add some more folders/files to ignore by git 
+
+  Change: 945c5994e6b264135a30790bf4519bf8836dc1cf
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-06-17 11:10:50 +0000
+
+    Add documentation for the project
+
+    As the first commit, we're starting by defining how our package is to be used, design constraints, use cases,
+    examples,etc. 
+
+================
+End of releases.
+================

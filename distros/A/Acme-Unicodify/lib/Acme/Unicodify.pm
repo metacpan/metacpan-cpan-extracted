@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015 Joel Maslak
+# Copyright (C) 2015 J. Maslak
 # All Rights Reserved - See License
 #
 
 package Acme::Unicodify;
 # ABSTRACT: Convert ASCII text into look-somewhat-alike unicode
-$Acme::Unicodify::VERSION = '0.006';
+$Acme::Unicodify::VERSION = '0.007';
 use utf8;
 use v5.22;
 
@@ -178,7 +178,7 @@ Acme::Unicodify - Convert ASCII text into look-somewhat-alike unicode
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -249,11 +249,11 @@ case that no codepoints >127 are used).
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016 by Joel Maslak.
+This software is copyright (c) 2015,2016 by J. Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Subscription::Modification;
-$WebService::Braintree::ErrorCodes::Subscription::Modification::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::Subscription::Modification::VERSION = '0.93';
 use strict;
 
 use constant AmountCannotBeBlank                          => "92003";

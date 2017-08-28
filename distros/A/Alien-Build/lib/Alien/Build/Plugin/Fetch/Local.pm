@@ -7,7 +7,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Local file plugin for fetching files
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 has '+url' => '';
@@ -27,8 +27,9 @@ sub init
 
   if($self->url =~ /^file:/)
   {
-    $meta->add_requires('share' => 'URI' => 0 );
-    $meta->add_requires('share' => 'URI::file' => 0 );
+    $meta->add_requires('share' => 'URI'         => 0 );
+    $meta->add_requires('share' => 'URI::file'   => 0 );
+    $meta->add_requires('share' => 'URI::Escape' => 0 );
   }
 
   {
@@ -53,7 +54,7 @@ sub init
     {
       my $root = URI::file->new($self->root);
       my $url = URI->new_abs($path, $root);
-      $path = $url->path;
+      $path = URI::Escape::uri_unescape($url->path);
       $path =~ s{^/([a-z]:)}{$1}i if $^O eq 'MSWin32';
     }
     
@@ -101,7 +102,7 @@ Alien::Build::Plugin::Fetch::Local - Local file plugin for fetching files
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 

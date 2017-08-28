@@ -181,24 +181,6 @@ __EOF__
         'short conflict with existing option';
 }
 
-{
-    eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
-    {
-        package ShortShortConflict;
-        use Moo;
-        use MooX::Options;
-	option 'list' => (is => 'rw', short => 'l');
-        option 'legal' => (is => 'rw');
-        1;
-    }
-    ShortShortConflict->new_with_options;
-__EOF__
-        ;
-    like $@,
-        qr/^There\sis\salready\san\sabbreviation\s'l'\s\-\scan't\suse\sit\sto\sshorten\s'list'/x,
-        'short conflict with previous option abbreviation';
-}
-
 trap {
     eval "#line ${\(__LINE__+1 . ' ' . __FILE__)}\n" . <<__EOF__
     {

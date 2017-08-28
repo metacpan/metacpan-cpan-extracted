@@ -1,0 +1,8 @@
+"A":
+  code: foo
+  param:
+    p1: a
+
+"B":
+  sync: [ "A" ]
+  code: foo

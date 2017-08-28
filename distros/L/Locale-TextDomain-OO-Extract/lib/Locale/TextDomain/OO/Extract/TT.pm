@@ -2,11 +2,12 @@ package Locale::TextDomain::OO::Extract::TT; ## no critic (TidyCode)
 
 use strict;
 use warnings;
+use Carp qw(confess);
 use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -51,7 +52,7 @@ my $category_rule
             # q{text with 0 .. n {placeholders} and/or 0 .. n escaped chars}
             ## no critic (EscapedMetacharacters)
             qr{
-                \s* ( qq? ) \{        # q curly bracket quoted
+                \s* ( qq? \{ )        # q curly bracket quoted
                 (
                     (?:
                         [^\{\}\\]     # normal text
@@ -73,6 +74,8 @@ my $start_rule = qr{
     (?:
         # Gettext::Loc, Gettext
         N? (?: loc_ | __ ) d? c? n? p? x?
+        # BabelFish::Loc
+        | N? loc_b p?
         # Maketext
         | l
     )
@@ -408,6 +411,33 @@ my $rules = [
         'end',
     ],
 
+    # babelfish loc_b
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b () \s* [(] }xms,
+        'and',
+        $text_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    # babelfish loc_bp
+    [
+        'begin',
+        qr{ \b N? loc_b ( p ) \s* [(] }xms,
+        'and',
+        $context_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+
     # l (maketext)
     'or',
     [
@@ -421,7 +451,7 @@ my $rules = [
     ]
 ];
 
-# remove pod and code after __END__
+# handle different newlines
 sub preprocess {
     my $self = shift;
 
@@ -430,6 +460,7 @@ sub preprocess {
     ${$content_ref} =~ s{ \r? \n }{\n}xmsg;
 
     # replace heredoc's without killing the line number
+    # <<'...'
     REPLACE: {
         ${$content_ref} =~ s{
             << \s* ' ( \w+ ) ' ( [^\n]* ) \n
@@ -443,6 +474,8 @@ sub preprocess {
             . $2
         }xmsge and redo REPLACE;
     }
+    # <<...
+    # <<"..."
     REPLACE: {
         ${$content_ref} =~ s{
             << \s* ( ["]? ) ( \w+ ) \1 ( [^\n]* ) \n
@@ -457,29 +490,35 @@ sub preprocess {
         }xmsge and redo REPLACE;
     }
 
-    return;
+    return $self;
 }
 
-my $interpolate_escape_sequence = sub {
-    my ( $quot, $string ) = @_;
+sub interpolate_escape_sequence {
+    my ( undef, $string, $quot ) = @_;
 
     # nothing to interpolate
     defined $string
-        or return;
+        or return $string;
     defined $quot
-        or return;
-    my $is_interpolate = $quot eq q{"} || $quot eq 'qq';
+        or confess 'Quote expected';
+
+    my $is_interpolate = $quot eq q{"} || $quot eq 'qq{';
     if ( ! $is_interpolate ) {
+        # '...'
         if ( $quot eq q{'} ) {
             $string =~ s{ \\ ( ['] ) }{$1}xmsg;
             return $string;
         }
-        if ( $quot eq q{q} ) {
-            $string =~ s{ \\ ( [\{\}] ) }{$1}xmsg;
+        # q{...}
+        if ( $quot eq 'q{' ) {
+            $string =~ s{ \\ ( [\{\}] ) }{$1}xmsg; ## no critic (EscapedMetacharacters)
             return $string;
         }
+        confess "Unknown quot $quot";
     }
 
+    # "..."
+    # qq{...}
     my %char_of = (
         b => "\b",
         f => "\f",
@@ -487,7 +526,6 @@ my $interpolate_escape_sequence = sub {
         r => "\r",
         t => "\t",
     );
-    ## no critic (ComplexRegexes)
     $string =~ s{
         \\
         (?:
@@ -507,10 +545,9 @@ my $interpolate_escape_sequence = sub {
         : $2 ? "\\$2"
         :      $3
     }xmsge;
-    ## use critic (ComplexRegexes)
 
     return $string;
-};
+}
 
 sub stack_item_mapping {
     my $self = shift;
@@ -525,21 +562,31 @@ sub stack_item_mapping {
     $self->add_message({
         reference    => ( sprintf '%s:%s', $self->filename, $_->{line_number} ),
         domain       => $extra_parameter =~ m{ d }xms
-            ? scalar $interpolate_escape_sequence->( splice @{$match}, 0, 2 )
+            ? scalar $self->interpolate_escape_sequence(
+                reverse splice @{$match}, 0, 2
+            )
             : $self->domain,
         msgctxt      => $extra_parameter =~ m{ p }xms
-            ? scalar $interpolate_escape_sequence->( splice @{$match}, 0, 2 )
+            ? scalar $self->interpolate_escape_sequence(
+                reverse splice @{$match}, 0, 2
+            )
             : undef,
-        msgid        => scalar $interpolate_escape_sequence->( splice @{$match}, 0, 2 ),
+        msgid        => scalar $self->interpolate_escape_sequence(
+            reverse splice @{$match}, 0, 2
+        ),
         msgid_plural => $extra_parameter =~ m{ n }xms
             ? do {
-                my $plural = $interpolate_escape_sequence->( splice @{$match}, 0, 2 );
+                my $plural = $self->interpolate_escape_sequence(
+                    reverse splice @{$match}, 0, 2
+                );
                 $count = shift @{$match};
                 $plural;
             }
             : undef,
         category     => $extra_parameter =~ m{ c }xms
-            ? scalar $interpolate_escape_sequence->( splice @{$match}, 0, 2 )
+            ? scalar $self->interpolate_escape_sequence(
+                reverse splice @{$match}, 0, 2
+            )
             : $self->category,
         automatic    => do {
             my $placeholders = shift @{$match};
@@ -571,7 +618,7 @@ sub extract {
         $self->stack_item_mapping;
     }
 
-    return;
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -584,13 +631,13 @@ __END__
 Locale::TextDomain::OO::Extract::TT
 - Extracts internationalization data from TemplateToolkit code
 
-$Id: TT.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: TT.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/TT.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 DESCRIPTION
 
@@ -670,6 +717,9 @@ Implemented rules:
  __dcnp('...
  __dcnpx('...
 
+ loc_b('...
+ loc_bp('...
+
  l('...
 
 N before loc..., __... and maketext... is allowed. E.g. Nloc_ and so on.
@@ -684,7 +734,7 @@ Quote and escape any text like: ' text {placeholder} \\ \' ' or q{ text {placeho
     my $extractor = Locale::TextDomain::OO::Extract::TT->new;
     for ( @files ) {
         $extractor->clear;
-        $extractor->filename($_);
+        $extractor->filename($_);            # dir/filename for reference
         $extractor->content_ref( \( path($_)->slurp_utf8 ) );
         $exttactor->category('LC_Messages'); # set defaults or q{} is used
         $extractor->domain('default');       # set defaults or q{} is used
@@ -699,19 +749,31 @@ Quote and escape any text like: ' text {placeholder} \\ \' ' or q{ text {placeho
 All parameters are optional.
 See Locale::TextDomain::OO::Extract to replace the defaults.
 
-=head2 method preprocess
+    my $extractor = Locale::TextDomain::OO::Extract::TT->new;
 
-Remove pod and code after __END__
+=head2 method preprocess (called by method extract)
 
-    $self->preprocess;
+This method removes the POD and all after __END__.
 
-=head2 method stack_item_mapping
+    $extractor->preprocess;
+
+=head2 method interpolate_escape_sequence (called by method extract)
+
+This method helps e.g. \n to be a real newline in string.
+
+    $string = $extractor->interpolate_escape_sequence($string, $quot);
+
+=head2 method stack_item_mapping (called by method extract)
 
 This method maps the matched stuff as lexicon item.
+
+    $extractor->stack_item_mapping;
 
 =head2 method extract
 
 This method runs the extraction.
+
+    $extractor->extract;
 
 =head1 EXAMPLE
 
@@ -727,6 +789,8 @@ none
 none
 
 =head1 DEPENDENCIES
+
+L<Carp|Carp>
 
 L<Moo|Moo>
 
@@ -758,7 +822,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 - 2015,
+Copyright (c) 2009 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

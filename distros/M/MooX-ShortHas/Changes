@@ -1,5 +1,8 @@
 Revision history for MooX-ShortHas
 
+1.172300  2017-08-18 16:04:56+02:00 Europe/Berlin
+    - added a third recognized form of "this is ro" to tests
+
 1.172251  2017-08-13 15:51:39+02:00 Europe/Berlin
     - tests now accept various Moo error message styles
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Acme::Alien::DontPanic;
 
-our $VERSION = '0.042';
+our $VERSION = '0.044';
 require DynaLoader;
 our @ISA = 'DynaLoader';
 __PACKAGE__->bootstrap($VERSION);
@@ -19,14 +19,14 @@ Acme::Ford::Prefect - Test Module for Alien::Base
 
 =head1 SYNOPSIS
 
- use strict;
- use warnings;
+ use Test2::V0;
  use Acme::Ford::Prefect;
- use Test::More tests => 1;
 
  is Acme::Ford::Prefect::answer(), 42;
  # if 42 is returned then Acme::Alien::DontPanic
  # properly provided the C library
+ 
+ done_testing;
 
 =head1 DESCRIPTION
 

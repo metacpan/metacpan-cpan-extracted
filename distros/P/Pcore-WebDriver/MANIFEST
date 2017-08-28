@@ -7,10 +7,9 @@ README.md
 cpanfile
 lib/Build.PL
 lib/Pcore/WebDriver.pm
-lib/Pcore/WebDriver/Chrome.pm
-lib/Pcore/WebDriver/Firefox.pm
-lib/Pcore/WebDriver/PhantomJS.pm
-lib/Pcore/WebDriver/WebElement.pm
+lib/Pcore/WebDriver/Element.pm
+lib/Pcore/WebDriver/Session.pm
+lib/Pcore/WebDriver/Window.pm
 script/update-webdriver-deps.pl
 share/dist-id.json
 share/dist.perl

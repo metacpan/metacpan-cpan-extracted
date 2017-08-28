@@ -77,14 +77,20 @@ sub ACTION_code {
     $self->notes('libbuilder', $libbuilder);
 
     my $version = $self->notes('btparse_version');
+
     my $alloca_h = 'undef HAVE_ALLOCA_H';
     $alloca_h = 'define HAVE_ALLOCA_H 1' if Config::AutoConf->check_header("alloca.h");
+
+    my $vsnprintf = 'undef HAVE_VSNPRINTF';
+    $vsnprintf = 'define HAVE_VSNPRINTF 1' if Config::AutoConf->check_func('vsnprintf');
+
     _interpolate("btparse/src/bt_config.h.in",
                  "btparse/src/bt_config.h",
                  PACKAGE  => "\"libbtparse\"",
                  FPACKAGE => "\"libbtparse $version\"",
                  VERSION  => "\"$version\"",
-                 ALLOCA_H => $alloca_h
+                 ALLOCA_H => $alloca_h,
+		 VSNPRINTF => $vsnprintf
                 );
 
 

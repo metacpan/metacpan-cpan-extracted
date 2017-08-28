@@ -1,5 +1,5 @@
 package WebService::Braintree::PayPalAccount;
-$WebService::Braintree::PayPalAccount::VERSION = '0.92';
+$WebService::Braintree::PayPalAccount::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::PayPalAccount

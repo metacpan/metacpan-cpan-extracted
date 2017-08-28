@@ -1,5 +1,5 @@
 {
-   "abstract" : "Module to interface with the ORCID webservice",
+   "abstract" : "A client for the ORCID 2.0 API",
    "author" : [
       "Patrick Hochstenbach C<< <patrick.hochstenbach at ugent.be> >>"
    ],
@@ -24,9 +24,14 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build" : "0.28"
          }
       },
       "develop" : {
@@ -40,21 +45,22 @@
             "JSON::XS" : "2.3"
          },
          "requires" : {
+            "Class::Load" : "0",
             "HTTP::Tiny" : "0",
             "JSON" : "2.51",
             "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
             "Moo" : "1.000008",
+            "Sub::Quote" : "0",
             "URI" : "0",
-            "XML::Writer" : "0",
-            "namespace::clean" : "0.24",
-            "perl" : "v5.10.1"
+            "namespace::clean" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Deep" : "0.112",
-            "Test::Exception" : "0.32",
-            "Test::More" : "1.001003",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
             "Test::Pod" : "0"
          }
       }
@@ -71,12 +77,14 @@
          "web" : "https://github.com/LibreCat/WWW-ORCID"
       }
    },
-   "version" : "0.0201",
+   "version" : "0.0401",
    "x_contributors" : [
+      "jjatria <jjatria@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
-      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
+      "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }

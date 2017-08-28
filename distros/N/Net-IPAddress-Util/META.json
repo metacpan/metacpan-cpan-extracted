@@ -1,7 +1,7 @@
 {
    "abstract" : "Version-agnostic representation of an IP address",
    "author" : [
-      "Paul Bennett <paul.w.bennett@gmail.com>"
+      "PWBENNETT"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
@@ -37,8 +37,7 @@
             "List::MoreUtils" : "0",
             "Math::BigInt" : "0",
             "overload" : "0",
-            "perl" : "5.010000",
-            "utf8" : "0"
+            "perl" : "5.010000"
          }
       },
       "test" : {
@@ -49,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.029",
+   "version" : "3.031",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

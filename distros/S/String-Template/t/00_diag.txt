@@ -1,6 +1,0 @@
-Data::Dumper
-Date::Parse
-ExtUtils::MakeMaker
-POSIX
-Test::More
-Time::Piece

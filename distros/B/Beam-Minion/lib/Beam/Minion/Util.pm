@@ -1,5 +1,5 @@
 package Beam::Minion::Util;
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 # ABSTRACT: Utility functions for Beam::Minion
 
 #pod =head1 SYNOPSIS
@@ -54,8 +54,14 @@ our %BACKEND = (
 #pod
 #pod =item <backend>+<url>
 #pod
-#pod A backend name and backend spec, separated by C<+>, like
-#pod C<Storable+/tmp/minion.db>.  Any backend may be used this way
+#pod A backend name and arguments, separated by C<+>, like
+#pod C<Storable+/tmp/minion.db>. Any backend may be used this way.
+#pod
+#pod If your backend requires more arguments, you can separate them with
+#pod C<+>:
+#pod
+#pod     # Configure the MySQL backend with a DBI DSN
+#pod     BEAM_MINION=mysql+dsn+dbi:mysql:minion
 #pod
 #pod =back
 #pod
@@ -67,7 +73,8 @@ sub minion_init_args {
         unless $ENV{BEAM_MINION};
     my ( $backend, $url );
     if ( $ENV{BEAM_MINION} =~ /^[^+:]+\+/ ) {
-        return split /\+/, $ENV{BEAM_MINION};
+        my @args = split /\+/, $ENV{BEAM_MINION};
+        return @args;
     }
     my ( $schema ) = $ENV{BEAM_MINION} =~ /^([^:]+)/;
     return $BACKEND{ $schema }, $ENV{BEAM_MINION};
@@ -99,7 +106,7 @@ Beam::Minion::Util - Utility functions for Beam::Minion
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -135,8 +142,14 @@ L<Minion::Backend::MongoDB>, L<Minion::Backend::mysql>.
 
 =item <backend>+<url>
 
-A backend name and backend spec, separated by C<+>, like
-C<Storable+/tmp/minion.db>.  Any backend may be used this way
+A backend name and arguments, separated by C<+>, like
+C<Storable+/tmp/minion.db>. Any backend may be used this way.
+
+If your backend requires more arguments, you can separate them with
+C<+>:
+
+    # Configure the MySQL backend with a DBI DSN
+    BEAM_MINION=mysql+dsn+dbi:mysql:minion
 
 =back
 

@@ -6,12 +6,12 @@ POSIX::2008 - Perl interface to POSIX.1-2008
 
 =head1 SYNOPSIS
 
-  use POSIX qw(:fcntl_h);
-  use POSIX::2008;
+  use Fcntl;
+  use POSIX::2008 qw(openat pwrite);
 
-  my $dd = POSIX::2008::open('/tmp/');
-  my $fd = POSIX::2008::openat($dd, 'foobar', O_RDWR|O_CREAT);
-  POSIX::2008::pwrite($fd, 'fuckyounsa', 50);
+  sysopen my $dh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW or die 'Dafuq?';
+  my $fh = openat($dh, 'foobar', O_RDWR|O_CREAT);
+  pwrite($fh, 'fuckyounsa', 50);
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,22 @@ POSIX::2008 contains many of the interfaces specified by POSIX.1-2008 that
 the core POSIX module withholds, implements in Perl or fucked up.
 
 This module is provided "as is" unless someone volunteers to maintain it.
+
+=head1 FILE DESCRIPTORS AND HANDLES
+
+Since version 0.05, all I/O functions that take numeric file descriptors also
+accept Perl file or directory handles. C<openat()> even returns a handle if
+you passed it one.
+
+=head1 SYSTEM CALL RETURN VALUES
+
+For system calls that return -1 on failure and 0 on success the return value
+is mapped to undef on failure and "0 but true" on success. This is the
+majority of system calls.
+
+For system calls where 0 is a valid return value it is left unchanged. These
+are C<read()>, C<write()>, C<pread()>, C<pwrite()>. C<openat()> gets a special
+treatment in this module, see its description below.
 
 =head1 FUNCTIONS
 
@@ -300,7 +316,7 @@ y = expm1(x);
 
 =item faccessat
 
-ret = faccessat(dirfd, path, amode, flags);
+ret = faccessat(dirfd, path, amode, flags=0);
 
 I<flags> is the bitwise OR of zero or more of AT_EACCESS, AT_SYMLINK_NOFOLLOW.
 
@@ -314,7 +330,7 @@ ret = fchmod(fd, mode);
 
 =item fchmodat
 
-ret = fchmodat(dirfd, path, mode, flags);
+ret = fchmodat(dirfd, path, mode, flags=0);
 
 I<flags> can be 0 or AT_SYMLINK_NOFOLLOW.
 
@@ -324,13 +340,45 @@ ret = fchown(fd, uid, gid);
 
 =item fchownat
 
-ret = fchownat(dirfd, path, uid, gid, flags);
+ret = fchownat(dirfd, path, uid, gid, flags=0);
 
 I<flags> can be 0 or AT_SYMLINK_NOFOLLOW.
 
 =item fdatasync
 
 ret = fdatasync(fd);
+
+=item fdopen
+
+ret = fdopen(fd, mode)
+
+Returns a file handle associated with the file descriptor I<fd>. I<mode> is
+one of the values C<"r">, C<"w">, C<"a"> with an optional C<"+"> and/or
+C<"b">.
+
+It's similar to C<IO::Handle::new_from_fd()> but it I<really> calls
+C<fdopen(3)>, expects letter mode strings (e.g. C<"r">, not C<"<">) and fails
+if the I<mode> is not compatible with the flags of I<fd> (none of which
+C<new_from_fd()> does).
+
+Returns undef on failure.
+
+=item fdopendir
+
+ret = fdopendir(fd)
+
+Returns a directory handle associated with the file descriptor I<fd>. Usage
+example:
+
+  my $dh = do {
+    sysopen my $fh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW;
+    fdopendir($fh); # or fdopendir(fileno $fh) but the former also works
+                    # with handles from opendir() for which fileno does
+                    # not work before Perl 5.22
+  };
+  my @files = readdir $dh;  # this would fail with $fh from sysopen
+
+Returns undef on failure.
 
 =item fdim
 
@@ -388,7 +436,7 @@ Returns one of FP_NAN, FP_INFINITE, FP_ZERO, FP_SUBNORMAL, FP_NORMAL.
 
 (dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
 blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = fstatat(dirfd, path,
-flags);
+flags = 0);
 
 I<flags> is the bitwise OR of zero or more of AT_SYMLINK_NOFOLLOW,
 AT_NO_AUTOMOUNT.
@@ -600,7 +648,7 @@ ret = link(path1, path2);
 
 =item linkat
 
-ret = linkat(fd1, path1, fd2, path2, flags);
+ret = linkat(fd1, path1, fd2, path2, flags=0);
 
 I<flags> can be 0 or AT_SYMLINK_FOLLOW.
 
@@ -678,30 +726,40 @@ z = nextafter(x, y);
 
 r = nrand48()
 
-=item openat
-
-ret = openat(fd, path, oflag, mode);
-
-I<oflag> defaults to O_RDONLY, I<mode> defaults to 0666.
-
 =item open
 
-ret = open(path, oflag, mode);
+ret = open(path, oflag[, mode]);
 
-I<oflag> defaults to O_RDONLY, I<mode> defaults to 0666.
+I<oflag> defaults to O_RDONLY, I<mode> defaults to 0600.
+
+=item openat
+
+ret = openat(fd, path, oflag[, mode]);
+
+I<oflag> defaults to O_RDONLY, I<mode> defaults to 0600.
+
+If I<fd> is numeric (i.e. a file descriptor), C<openat()> returns a file
+descriptor. If I<fd> is a file or directory handle the return value is also a
+handle whose type depends on the file type of I<path>: If path is a directory,
+the return value is a directory handle, otherwise it's a file handle.
+
+Returns undef on failure.
 
 =item pread
 
 bytes_read = pread(fd, buf, file_offset, nbytes[, buf_offset]);
 
-pread() reads I<nbytes> of data from the file descriptor I<fd> at file offset
-I<offset> into the scalar I<buf> without changing the file offset. I<buf> will
-be enlarged automatically if necessary.
+C<pread()> reads I<nbytes> bytes of data from the file descriptor I<fd> at
+file offset I<offset> into the scalar I<buf> without changing the file
+offset. I<buf> will be enlarged automatically if necessary.
 
-I<buf_offset> may be specified to store the data at that position in
-I<buf>. Defaults to 0. If I<buf_offset> is past the end of I<buf>, I<buf> will
-be padded with zeros before appending the data. If I<buf_offset> is negative
-it is counted from the end of the string.
+C<pread()> treats I<buf> just like C<sysread()> does: I<buf_offset> may be
+specified to place the read data at that position in I<buf>. Defaults to 0. If
+I<buf_offset> is past the end of I<buf>, I<buf> will be padded with zeros
+before appending the data. If I<buf_offset> is negative, it is counted from
+the end of the string. If I<buf_offset> plus I<bytes_read> does not exceed the
+current string length of I<buf>, I<buf> will be truncated accordingly. This
+latter detail is missing from the sysread() documentation.
 
 Returns the number of bytes read, 0 at EOF, undef on error.
 
@@ -729,6 +787,9 @@ of the string.
 Returns the number of bytes written, undef on error.
 
 Note that pwrite() deals with I<bytes> not characters.
+
+On Linux, if a file is opened with O_APPEND, pwrite() appends data to the end
+of the file, regardless of the value of offset (in violation of POSIX).
 
 =item random
 
@@ -918,7 +979,7 @@ y = trunc(x);
 
 =item unlinkat
 
-ret = unlinkat(dirfd, path, flags);
+ret = unlinkat(dirfd, path, flags=0);
 
 I<flags> can be 0 or AT_REMOVEDIR.
 
@@ -935,6 +996,15 @@ I<flags> can be 0 or AT_SYMLINK_NOFOLLOW, defaults to 0.
 
 I<atime_sec> and I<mtime_sec> default to 0. I<atime_nsec> and I<mtime_nsec>
 default to UTIME_NOW.
+
+=item write
+
+ret = write(fd, buf[, nbytes]);
+
+Like POSIX::write() but returns 0 instead of "0 but true" if 0 bytes were
+written, and it does not write more bytes than I<buf> contains.
+
+If I<nbytes> is omitted, it defaults to the length of I<buf>
 
 =item y0
 
@@ -956,6 +1026,17 @@ yn() is the Bessel function of the second kind of order n.
 
 =back
 
+=head1 EXPORTS
+
+This module does not export anything by default. The following export tags are
+available:
+
+ :at     All *at() functions like openat() etc. plus all AT_ constants
+ :id     All get/set*id() functions like getuid() etc.
+ :is     All is* functions like isdigit() etc.
+ :prw    pread() and pwrite()
+ :clock  All clock_* functions like clock_gettime() etc. plus all CLOCK_ constants
+
 =head1 CONSTANTS
 
 AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
@@ -973,7 +1054,7 @@ TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
 
 Initially hacked together by Carsten Gaebler.
 
-=head1 LICENCE
+=head1 LICENSE
 
 This library is free software. You can redistribute and/or modify it under the
 terms of the Do What The Fuck You Want To Public License, Version 2, as

@@ -1,7 +1,7 @@
 {
    "abstract" : "L<Template::Toolkit> plugin-wrapper of L<String::CRC32>",
    "author" : [
-      "Alexander A. Gnatyna <gnatyna@ya.ru>"
+      "Alexander A. Gnatyna <gnatyna@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.0.13",
@@ -58,7 +58,7 @@
    "provides" : {
       "Template::Plugin::String::CRC32" : {
          "file" : "lib/Template/Plugin/String/CRC32.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/gnatyna/Template-Plugin-String-CRC32"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Alexander A. Gnatyna <a.gnatyna@gazeta.ru>"
    ],

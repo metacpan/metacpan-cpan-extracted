@@ -8,6 +8,7 @@ struct SPVM_sub {
   SPVM_OP* op_name;
   SPVM_OP* op_return_type;
   SPVM_OP* op_block;
+  SPVM_OP* op_package;
   SPVM_DYNAMIC_ARRAY* op_args;
   SPVM_DYNAMIC_ARRAY* op_my_vars;
   void* native_address;
@@ -16,7 +17,7 @@ struct SPVM_sub {
   int32_t bytecode_base;
   int32_t bytecode_length;
   int32_t operand_stack_max;
-  int32_t constant_pool_index;
+  int32_t id;
   _Bool is_native;
   _Bool is_constant;
 };

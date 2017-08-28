@@ -11,4 +11,10 @@ metabase_users:
     metabase_dbh:
         $ref: common/metabase_dbh
 
+metabase_cache:
+    $class: CPAN::Testers::Backend::Migrate::MetabaseCache
+    schema:
+        $ref: common/schema
+    metabase_dbh:
+        $ref: common/metabase_dbh
 

@@ -1,3 +1,7 @@
+2017-08-26  Kingpin  <martin@ubuntu>
+
+	* lib/WWW/Search/Ebay/DE.pm (_result_count_pattern): fixed pattern
+
 2016-02-07  Kingpin  <martin@localhost.localdomain>
 
 	* lib/WWW/Search/Ebay/ES.pm (_result_count_pattern): fixed pattern

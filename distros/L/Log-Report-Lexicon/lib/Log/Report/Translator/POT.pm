@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Translator::POT;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 use base 'Log::Report::Translator';
 
@@ -52,8 +52,8 @@ sub init($)
         $l->index;   # index the files now
         push @lex, $l;
     }
-    $self->{lexicons} = \@lex;
-    $self->{charset}  = $args->{charset} || 'utf-8';
+    $self->{LRTP_lexicons} = \@lex;
+    $self->{LRTP_charset}  = $args->{charset};
     $self;
 }
 
@@ -65,10 +65,10 @@ sub _fn_to_lexdir($)
 
 #------------
 
-sub lexicons() { @{shift->{lexicons}} }
+sub lexicons() { @{shift->{LRTP_lexicons}} }
 
 
-sub charset() {shift->{charset}}
+sub charset() { shift->{LRTP_charset} }
 
 #------------
 
@@ -80,8 +80,8 @@ sub translate($;$$)
         or return $self->SUPER::translate($msg, $lang, $ctxt);
 
     my $pot
-      = exists $self->{pots}{$domain}{$locale}
-      ? $self->{pots}{$domain}{$locale}
+      = exists $self->{LRTP_pots}{$domain}{$locale}
+      ? $self->{LRTP_pots}{$domain}{$locale}
       : $self->load($domain, $locale);
 
        ($pot ? $pot->msgstr($msg->{_msgid}, $msg->{_count}, $ctxt) : undef)
@@ -113,11 +113,11 @@ sub load($$)
 
         eval "require $class" or panic $@;
  
-        return $self->{pots}{$domain}{$locale}
+        return $self->{LRTP_pots}{$domain}{$locale}
           = $class->read($fn, charset => $self->charset);
     }
 
-    $self->{pots}{$domain}{$locale} = undef;
+    $self->{LRTP_pots}{$domain}{$locale} = undef;
 }
 
 1;

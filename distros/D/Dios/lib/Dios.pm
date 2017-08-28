@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002009';
+our $VERSION = '0.002010';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -1130,7 +1130,7 @@ sub import {
 
         # Assemble and return the method definition...
         ($sub_name ? "sub $sub_name;" : q{} )
-        . qq{sub $sub_name $attrs { $attr_binding $parameter_list->{code}; do $block } };
+        . qq{sub $sub_name $attrs { $attr_binding { $parameter_list->{code}; do $block } } };
     }
 
     # Submethod definitions are translated like methods, but with special re-routing...
@@ -1260,7 +1260,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002009
+This document describes Dios version 0.002010
 
 
 =head1 SYNOPSIS

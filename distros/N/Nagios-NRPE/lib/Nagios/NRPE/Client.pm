@@ -34,7 +34,7 @@ the same terms as the Perl 5 programming language system itself.
 
 package Nagios::NRPE::Client;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 use 5.010_000;
 
@@ -45,6 +45,7 @@ use Data::Dumper;
 use Carp;
 use IO::Socket;
 use IO::Socket::INET6;
+use Nagios::NRPE::Utils qw(return_error);
 use Nagios::NRPE::Packet qw(NRPE_PACKET_VERSION_3
   NRPE_PACKET_VERSION_2
   NRPE_PACKET_QUERY
@@ -159,6 +160,7 @@ sub create_socket {
         $socket = IO::Socket::SSL->new(%socket_opts);
         if ($SSL_ERROR) {
             $reason = "$!,$SSL_ERROR";
+            return return_error($reason);
         }
 
     }
@@ -170,10 +172,7 @@ sub create_socket {
     }
 
     if ( !$socket ) {
-        my %return;
-        $return{'error'}  = 1;
-        $return{'reason'} = $reason;
-        return ( \%return );
+        return return_error($reason);
     }
 
     return $socket;
@@ -227,7 +226,7 @@ sub run {
     }
 
     my $socket = $self->create_socket();
-    if ( ref $socket eq "REF" ) {
+    if ( ref $socket eq "HASH" ) {
         return ($socket);
     }
     my $packet = Nagios::NRPE::Packet->new();
@@ -237,7 +236,6 @@ sub run {
         check   => $check,
         version => NRPE_PACKET_VERSION_3
     );
-
     print $socket $assembled;
     while (<$socket>) {
         $response .= $_;
@@ -264,13 +262,11 @@ sub run {
         close($socket);
 
         if ( !$response ) {
-            my %return;
-            $return{'error'}  = 1;
-            $return{'reason'} = "No output from remote host";
-            return ( \%return );
+            my $reason = "No output from remote host";
+            return return_error($reason);
         }
     }
-    return $packet->deassemble($response);
+    return $packet->disassemble($response);
 }
 
 =pod

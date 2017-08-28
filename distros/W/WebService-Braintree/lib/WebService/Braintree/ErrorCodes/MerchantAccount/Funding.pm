@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::Funding;
-$WebService::Braintree::ErrorCodes::MerchantAccount::Funding::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::MerchantAccount::Funding::VERSION = '0.93';
 use strict;
 
 use constant RoutingNumberIsRequired                          => "82640";

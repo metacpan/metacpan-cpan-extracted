@@ -1,0 +1,18 @@
+#!# perl: agent/argv/apps
+
+use strict;
+use warnings;
+
+use Cwd;
+use Digest::MD5;
+use Getopt::Long;
+use MYDan::Project::Apps;
+
+return sub
+{
+    local $/;
+    my ( $name, @ctrl ) = @_;
+
+    my @c = MYDan::Project::Apps->new( name => $name )->ctrl( @ctrl );
+    return \@c;
+};

@@ -42,6 +42,6 @@
          "web" : "https://github.com/sisyphus/math-mpfr"
       }
    },
-   "version" : "3.35",
+   "version" : "3.36",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

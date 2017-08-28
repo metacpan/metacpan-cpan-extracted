@@ -4,7 +4,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(fa2hs);
 
-our $VERSION = '0.1.1'; # VERSION: 
+our $VERSION = '0.1.8'; # VERSION: 
 # ABSTRACT: get one or more sequences from a FASTA file quickly.
 
 
@@ -82,7 +82,7 @@ Bioinfo::Fasta - get one or more sequences from a FASTA file quickly.
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.8
 
 =head1 SYNOPSIS
 

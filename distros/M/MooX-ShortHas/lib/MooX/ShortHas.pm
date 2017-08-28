@@ -2,7 +2,7 @@ package MooX::ShortHas;
 
 use strictures 2;
 
-our $VERSION = '1.172251'; # VERSION
+our $VERSION = '1.172300'; # VERSION
 
 # ABSTRACT: shortcuts for common Moo has attribute configurations
 
@@ -53,7 +53,7 @@ MooX::ShortHas - shortcuts for common Moo has attribute configurations
 
 =head1 VERSION
 
-version 1.172251
+version 1.172300
 
 =head1 SYNOPSIS
 

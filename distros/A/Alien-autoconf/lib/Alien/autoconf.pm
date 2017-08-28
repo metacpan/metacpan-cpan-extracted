@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find autoconf
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::autoconf - Build or find autoconf
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ In your script or module:
  use Alien::autoconf;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::autoconf->bin_dir;
+ unshift @PATH, Alien::autoconf->bin_dir;
 
 =head1 DESCRIPTION
 

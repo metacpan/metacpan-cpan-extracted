@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Descriptor;
-$WebService::Braintree::ErrorCodes::Descriptor::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::Descriptor::VERSION = '0.93';
 use strict;
 
 use constant DynamicDescriptorsDisabled        => "92203";

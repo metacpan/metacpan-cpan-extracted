@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Address;
-$WebService::Braintree::ErrorCodes::Address::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::Address::VERSION = '0.93';
 use strict;
 
 use constant CannotBeBlank                   => "81801";

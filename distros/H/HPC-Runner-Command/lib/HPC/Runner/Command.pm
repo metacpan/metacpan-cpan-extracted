@@ -2,8 +2,8 @@ package HPC::Runner::Command;
 
 use MooseX::App qw(Color);
 
-with 'HPC::Runner::Command::Utils::Plugin';
-with 'HPC::Runner::Command::Utils::ManyConfigs';
+with 'BioSAILs::Utils::Plugin';
+with 'BioSAILs::Utils::LoadConfigs';
 
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
 
@@ -25,12 +25,6 @@ option 'project' => (
     cmd_aliases => ['p'],
 );
 
-# option 'verbose' => (
-#     is      => 'rw',
-#     isa     => 'Bool',
-#     default => 0,
-# );
-
 option 'no_log_json' => (
     traits        => ['Bool'],
     is            => 'rw',
@@ -47,7 +41,7 @@ has 'submission_uuid' => (
     predicate => 'has_submissions_uuid',
 );
 
-our $VERSION = '3.2.8';
+our $VERSION = '3.2.10';
 
 app_strict 0;
 

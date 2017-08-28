@@ -56,7 +56,7 @@ sub _create_dbh ($self) {
 
     Pcore::PgSQL::DBH->connect(
         handle     => $self,
-        on_connect => sub ( $status, $dbh ) {
+        on_connect => sub ( $dbh, $status ) {
             if ( !$status ) {
                 $self->{active_dbh}--;
 
@@ -81,7 +81,7 @@ sub _create_dbh ($self) {
 sub _get_dbh ( $self, $cb ) {
     while ( my $dbh = shift $self->{_dbh_pool}->@* ) {
         if ( $dbh->{state} == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
-            $cb->( result(200), $dbh );
+            $cb->( $dbh, result 200 );
 
             return;
         }
@@ -93,7 +93,7 @@ sub _get_dbh ( $self, $cb ) {
     if ( $self->{backlog} && $self->{_get_dbh_queue}->@* > $self->{backlog} ) {
         warn 'DBI: backlog queue is full';
 
-        $cb->( result( [ 500, 'backlog queue is full' ] ), undef );
+        $cb->( undef, result [ 500, 'backlog queue is full' ] );
 
         return;
     }
@@ -110,7 +110,7 @@ sub push_dbh ( $self, $dbh ) {
     # dbh is ready for query
     if ( $dbh->{state} == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
         if ( my $cb = shift $self->{_get_dbh_queue}->@* ) {
-            $cb->( result(200), $dbh );
+            $cb->( $dbh, result 200 );
         }
         else {
             push $self->{_dbh_pool}->@*, $dbh;
@@ -204,9 +204,9 @@ for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref 
     eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
         *$method = sub ( \$self, \@args ) {
             \$self->_get_dbh(
-                sub ( \$status, \$dbh ) {
+                sub ( \$dbh, \$status ) {
                     if (!\$status) {
-                        \$args[-1]->( \$status, undef, undef );
+                        \$args[-1]->( undef, \$status, undef );
                     }
                     else {
                         \$dbh->$method(\@args);
@@ -226,9 +226,9 @@ for my $method (qw[begin_work commit rollback]) {
     eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
         *$method = sub ( \$self, \@args ) {
             \$self->_get_dbh(
-                sub ( \$status, \$dbh ) {
+                sub ( \$dbh, \$status ) {
                     if (!\$status) {
-                        \$args[-1]->( \$status, undef );
+                        \$args[-1]->( undef, \$status );
                     }
                     else {
                         \$dbh->$method(\@args);

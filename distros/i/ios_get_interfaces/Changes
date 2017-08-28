@@ -1,0 +1,5 @@
+Revision history for Perl extension ios_get_interfaces.
+
+1.7  Sat Sun 26 10:22:18 2017
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -AX -n ios_get_interfaces

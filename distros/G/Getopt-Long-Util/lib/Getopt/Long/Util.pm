@@ -1,7 +1,7 @@
 package Getopt::Long::Util;
 
-our $DATE = '2016-10-30'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2017-08-10'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010001;
 use strict;
@@ -261,6 +261,7 @@ sub detect_getopt_long_script {
                 local $/;
                 $str = <$fh>;
             }
+            close $fh;
         }
         unless ($str =~ /\A#!/) {
             $reason = "Does not start with a shebang (#!) sequence";
@@ -281,14 +282,14 @@ sub detect_getopt_long_script {
         #}
 
         for (split /^/, $str) {
-            if (/^\s*(use|require)\s+(Getopt::Long(?:::Complete)?)(\s|;|$)/) {
+            if (/^\s*(use|require)\s+(Getopt::Long(?:::Complete|::Less|::EvenLess)?)(\s|;|$)/) {
                 $yesno = 1;
                 $extrameta{'func.module'} = $2;
                 last DETECT;
             }
         }
 
-        $reason = "Can't find any statement requiring Getopt::Long(?::Complete)? module";
+        $reason = "Can't find any statement requiring Getopt::Long(?::Complete|::Less|::EvenLess)? module";
     } # DETECT
 
     [200, "OK", $yesno, {"func.reason"=>$reason, %extrameta}];
@@ -336,6 +337,7 @@ sub gen_getopt_long_spec_from_getopt_std_spec {
     $spec;
 }
 
+1;
 # ABSTRACT: Utilities for Getopt::Long
 
 __END__
@@ -350,12 +352,16 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.88 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2016-10-30.
+This document describes version 0.890 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2017-08-10.
 
 =head1 FUNCTIONS
 
 
-=head2 detect_getopt_long_script(%args) -> [status, msg, result, meta]
+=head2 detect_getopt_long_script
+
+Usage:
+
+ detect_getopt_long_script(%args) -> [status, msg, result, meta]
 
 Detect whether a file is a Getopt::Long-based CLI script.
 
@@ -407,7 +413,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 gen_getopt_long_spec_from_getopt_std_spec(%args) -> hash
+=head2 gen_getopt_long_spec_from_getopt_std_spec
+
+Usage:
+
+ gen_getopt_long_spec_from_getopt_std_spec(%args) -> hash
 
 Generate Getopt::Long spec from Getopt::Std spec.
 
@@ -435,7 +445,11 @@ Getopt::Std spec string.
 Return value:  (hash)
 
 
-=head2 humanize_getopt_long_opt_spec($optspec) -> str
+=head2 humanize_getopt_long_opt_spec
+
+Usage:
+
+ humanize_getopt_long_opt_spec($optspec) -> str
 
 Convert L<Getopt::Long> option specification like C<help|h|?> or C<--foo=s> or
 C<debug!> into, respectively, C<--help, -h, -?> or C<--foo=s> or C<--(no)debug>.
@@ -455,7 +469,11 @@ Arguments ('*' denotes required arguments):
 Return value:  (str)
 
 
-=head2 parse_getopt_long_opt_spec($optspec) -> hash
+=head2 parse_getopt_long_opt_spec
+
+Usage:
+
+ parse_getopt_long_opt_spec($optspec) -> hash
 
 Parse a single Getopt::Long option specification.
 
@@ -545,7 +563,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

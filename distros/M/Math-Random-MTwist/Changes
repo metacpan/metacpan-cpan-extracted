@@ -1,6 +1,17 @@
 Revision history for Perl extension Math::Random::MTwist.
 
+0.23  2017-08-27
+* Reseeding each test hoping to get cpantesters green again (couldn't reproduce the red lights on my Fedora, Debian and Windows systems, though).
+
+0.22  2017-08-26
+* Support up to 128-bit floating point precision, i.e. _we_ can if _they_ can,
+  but currently _they_ can up to 112 bit. :-)
+* timeseed() uses clock_getime() if available, hopes for some more randomness via ASLR.
+* Added irand128(). Currently only works with GCCs that have __int128.
+* Moved POD to MTwist.pod
+
 0.21  2017-08-15
+* Allow for up to 64-bit floating point precision.
 * mtwist/: Use long double or quadmath if available.
 * mtwist/: Changed double to NV where appropriate.
 * MTwist.xs: Changed double to NV.

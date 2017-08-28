@@ -15,13 +15,13 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "TestML-Bin",
   "EXE_FILES" => [
     "bin/testml",
-    "bin/testml-perl5"
+    "bin/testml-pl5"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "TestML::Bin",
   "PREREQ_PM" => {},
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

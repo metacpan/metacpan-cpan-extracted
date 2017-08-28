@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql::Table;
-$QBit::Application::Model::DB::mysql::Table::VERSION = '0.011';
+$QBit::Application::Model::DB::mysql::Table::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Table);
@@ -131,16 +131,14 @@ sub add_multi {
                     unless ($sql) {
                         $sql = $sql_header . $values;
 
-                        $sth = $db->get_dbh()->prepare($sql)
-                          || ($err_code = $db->get_dbh()->err())
-                          && throw Exception::DB $db->get_dbh()->errstr()
-                          . " ($err_code)\n"
-                          . $db->_log_sql($sql, \@params),
+                        $sth = $db->dbh->prepare($sql)
+                          || ($err_code = $db->dbh->err())
+                          && throw Exception::DB $db->dbh->errstr() . " ($err_code)\n" . $db->_log_sql($sql, \@params),
                           errorcode => $err_code;
                     }
 
                     $add_rows += $sth->execute(@params)
-                      || ($err_code = $db->get_dbh()->err())
+                      || ($err_code = $db->dbh->err())
                       && throw Exception::DB $sth->errstr() . " ($err_code)\n" . $db->_log_sql($sql, \@params),
                       errorcode => $err_code;
                 }

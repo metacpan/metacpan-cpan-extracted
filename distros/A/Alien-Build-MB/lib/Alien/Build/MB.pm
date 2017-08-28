@@ -7,7 +7,7 @@ use Alien::Build;
 use base qw( Module::Build );
 
 # ABSTRACT: Alien::Build installer class for Module::Build
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new
@@ -69,8 +69,25 @@ sub new
   
   $build->checkpoint;
 
+  if($self->alien_alienfile_meta)
+  {
+    $self->meta_merge->{x_alienfile} = {
+      generated_by => "@{[ __PACKAGE__ ]} version @{[ __PACKAGE__->VERSION || 'dev' ]}",
+      requires => {
+        map {
+          my %reqs = %{ $build->requires($_) };
+          $reqs{$_} = "$reqs{$_}" for keys %reqs;
+          $_ => \%reqs;
+        } qw( share system )
+      },
+    };
+  }
+
   $self;
 }
+
+
+__PACKAGE__->add_property( alien_alienfile_meta => 1 );
 
 
 sub alien_build
@@ -154,7 +171,7 @@ Alien::Build::MB - Alien::Build installer class for Module::Build
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -185,6 +202,15 @@ installer for you!
  my $abmb = Alien::Build::MB->new(%args);
 
 Takes the usual L<Module::Build> arguments.
+
+=head1 PROPERTIES
+
+All L<Alien::Build::MB> specific properties have a C<alien_> prefix.
+
+=head2 alien_alienfile_meta
+
+If true (the default), then extra meta will be stored in C<x_alienfile> which includes
+the C<share> and C<system> prereqs.
 
 =head1 METHODS
 

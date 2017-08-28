@@ -1,5 +1,9 @@
 Revision history for Perl module Text::BibTeX
 
+0.82 2017-08-27
+ * Fix buffer overflow (thanks to Hamid Ebadi).
+ * Hide error messages on tests, and use them for testing purposes.
+
 0.81 2017-07-19
  * Fix issue with NameFormat and unitialized join-tokens.
    (thanks to Karl Wette for the bug report).

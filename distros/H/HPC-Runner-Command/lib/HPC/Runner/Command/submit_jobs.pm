@@ -4,10 +4,17 @@ package HPC::Runner::Command::submit_jobs;
 
 Call the hpcrunner.pl submit_jobs command
 
+  hpcrunner.pl submit_jobs -h
+
 =cut
 
 use MooseX::App::Command;
 use Moose::Util qw/apply_all_roles/;
+
+use File::Spec;
+use File::Slurp;
+use DateTime;
+
 extends 'HPC::Runner::Command';
 
 with 'HPC::Runner::Command::submit_jobs::Utils::Plugin';
@@ -15,7 +22,8 @@ with 'HPC::Runner::Command::execute_job::Utils::Plugin';
 with 'HPC::Runner::Command::Logger::JSON';
 with 'HPC::Runner::Command::Utils::Base';
 with 'HPC::Runner::Command::Utils::Log';
-with 'HPC::Runner::Command::Utils::Git';
+with 'BioSAILs::Integrations::Github';
+with 'BioSAILs::Utils::CacheUtils';
 with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler';
 with 'HPC::Runner::Command::submit_jobs::Logger::JSON';
 
@@ -44,7 +52,6 @@ sub BUILD {
         $self->hpc_plugins( ['Dummy'] );
     }
 
-    $self->git_things;
     $self->gen_load_plugins;
     $self->hpc_load_plugins;
 
@@ -56,25 +63,54 @@ sub BUILD {
         apply_all_roles( $self,
             'HPC::Runner::Command::submit_jobs::Utils::Scheduler::UseArrays' );
     }
-
-    my $tar = $self->set_archive;
-    $self->archive($tar);
 }
 
 sub execute {
     my $self = shift;
 
+    $self->write_cache_files;
+    $self->git_things;
     $self->app_log->info('Parsing input file');
-    $self->create_json_submission;
     $self->parse_file_slurm;
+    $self->create_json_submission;
     $self->app_log->info('Submitting jobs');
     $self->iterate_schedule;
     $self->update_json_submission;
     $self->app_log->info('Your jobs have been submitted.');
-    $self->app_log->info('Experimental! For status updates please run:');
-    $self->app_log->info('hpcrunner.pl stats');
-    $self->app_log->info('To get status updates for only this submission please run:');
-    $self->app_log->info('hpcrunner.pl stats --data_tar '.$self->data_tar);
+
+    ##Rolling this back until a future release
+    # $self->app_log->info('Experimental! For status updates please run:');
+    # $self->app_log->info('hpcrunner.pl stats');
+    # $self->app_log->info(
+    #     'To get status updates for only this submission please run:');
+    # $self->app_log->info( 'hpcrunner.pl stats --data_tar ' . $self->data_tar );
+}
+
+##TODO Combine this with the BioX cache file functions
+
+sub write_cache_files {
+    my $self          = shift;
+    my $cmd_line_opts = $self->print_cmd_line_opts;
+    my $config_data   = $self->print_config_data;
+
+    my $dt = DateTime->now( time_zone => 'local' );
+    $dt = "$dt";
+    $dt =~ s/:/-/g;
+
+    my $cache_base = $self->infile->basename;
+
+    $self->cache_file(
+        File::Spec->catdir(
+            $self->cache_dir, '.hpcrunner-cache',
+            $cache_base . '--' . $dt . '.cache'
+        )
+    );
+
+    write_file($self->cache_file, $cmd_line_opts);
+    write_file($self->cache_file, {append => 1}, $config_data);
+
+    my $data = read_file($self->infile);
+    write_file($self->cache_file, {append => 1}, $data);
 }
 
 1;

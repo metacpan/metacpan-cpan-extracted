@@ -1,5 +1,15 @@
 Revision history for Shell-Config-Generate
 
+0.28      2017-08-22 20:26:12 -0400
+  - Production release identical to 0.27_02
+
+0.27_02   2017-08-21 16:55:18 -0400
+  - Fix testing bug introduced in 0.27_01
+
+0.27_01   2017-08-20 05:28:25 -0400
+  - Works on Windows with a Perl installed in a directory with whitespace
+  - Works on Windows when installed from a directory with whitespace
+
 0.26      2017-01-31 19:02:25 -0500
   - Improved escaping on windows (brad++)
   - Added cmd_escape_path function (brad++)

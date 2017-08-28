@@ -1,10 +1,10 @@
-# Copyrights 1995-2016 by [Mark Overmeer <perl@overmeer.net>].
+# Copyrights 1995-2017 by [Mark Overmeer <perl@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package Mail::Internet;
 use vars '$VERSION';
-$VERSION = '2.18';
+$VERSION = '2.19';
 
 use strict;
 # use warnings?  probably breaking too much code
@@ -85,6 +85,7 @@ sub dup()
     $dup;
 }
 
+#---------------
 
 sub body(;$@)
 {   my $self = shift;
@@ -98,6 +99,7 @@ sub body(;$@)
 
 sub head         { shift->{mail_inet_head} ||= Mail::Header->new }
 
+#---------------
 
 sub print($)
 {   my $self = shift;
@@ -138,6 +140,7 @@ sub as_mbox_string($)
     $self->as_string . "\n";
 }
 
+#---------------
 
 sub header       { shift->head->header(@_) }
 sub fold         { shift->head->fold(@_) }
@@ -199,6 +202,7 @@ sub empty()
     1;
 }
 
+#---------------
 
 sub remove_sig($)
 {   my $body   = shift->body;
@@ -251,6 +255,7 @@ sub tidy_body()
     $body;
 }
 
+#---------------
 
 sub reply(@)
 {   my ($self, %arg) = @_;

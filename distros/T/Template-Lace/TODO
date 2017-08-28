@@ -373,15 +373,6 @@ sub render_links {
   $dom->by
     ->title('Hello World')
     ->repeat::links($self->curry::render_link, $self->links);
-
-    ->links(sub { $_->repeat($self->curry::render_link, $self->links) })
-
-  $dom->for('#links', sub {
-    $_->repeat($self->curry::render_link, $self->links);
-  })
-
-  $dom->repeat::for('#links', $self->curry::render_link, $self->links)
-
 }
 
 sub render_link {
@@ -390,6 +381,8 @@ sub render_link {
     ->description($link->description)
     ->link($link->url($arg{linkbase}));
 }
+
+#??     'links::repeat' => [$self->curry::render_link, $self->links],
 
 sub render_links {
   my ($self, $dom, %args) = @_;
@@ -407,15 +400,21 @@ sub render_link {
   });
 }
 
+=============
+
+package UITable;
+
+sub process_dom {
+  my ($self, $dom) = @_;
+  my $tr_dom = $self->tr;
+
+}
 
 
-      $dom->at('#links')->repeat(sub {
-        my ($cloned_li$, $link) = @_;
-        $cloned_li->by
-          ->description($link->description)
-          ->link($link->url($arg{linkbase}));
-        return $cloned_li;
-      }, $self->links);
-
-
-      $dom->repeat_for('#links', sub { ... }, $self->links); 
+<UITable row=$.list>
+  <UITable.tr>
+    <tr>
+      <td></td>
+    </tr>
+  </UITable.tr>
+</UITable

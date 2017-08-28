@@ -1,37 +1,38 @@
-package Dist::Zilla::Plugin::Author::Plicease::DevShare;
+package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.22 {
 
-use Moose;
-use Path::Class qw( dir );
-use namespace::autoclean;
+  use 5.014;
+  use Moose;
+  use Path::Tiny ();
+  use namespace::autoclean;
 
-# ABSTRACT: Plugin to deal with dev/project share directory
-our $VERSION = '2.21'; # VERSION
+  # ABSTRACT: Plugin to deal with dev/project share directory
 
-with 'Dist::Zilla::Role::FileGatherer';
+  with 'Dist::Zilla::Role::FileGatherer';
 
-sub gather_files
-{
-  my($self) = @_;
+  sub gather_files
+  {
+    my($self) = @_;
 
-  my $filename = $self->zilla->main_module->name;
-  $filename =~ s{^(.*)/(.*?)\.pm$}{$1/.$2.devshare};
+    my $filename = $self->zilla->main_module->name;
+    $filename =~ s{^(.*)/(.*?)\.pm$}{$1/.$2.devshare};
   
-  my $count = $filename;
-  $count =~ s/[^\/]//g;
-  $count = length $count;
-  my $content = ('../' x $count) . 'share';
+    my $count = $filename;
+    $count =~ s/[^\/]//g;
+    $count = length $count;
+    my $content = ('../' x $count) . 'share';
   
-  my $file = Dist::Zilla::File::InMemory->new({
-    name    => $filename,
-    content => $content,
-  });
+    my $file = Dist::Zilla::File::InMemory->new({
+      name    => $filename,
+      content => $content,
+    });
   
-  $self->add_file($file);
+    $self->add_file($file);
   
-  dir->file($filename)->spew($content);
+    Path::Tiny->($filename)->spew($content);
+  }
+
+  __PACKAGE__->meta->make_immutable;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -47,7 +48,7 @@ Dist::Zilla::Plugin::Author::Plicease::DevShare - Plugin to deal with dev/projec
 
 =head1 VERSION
 
-version 2.21
+version 2.22
 
 =head1 AUTHOR
 
@@ -55,7 +56,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Graham Ollis.
+This software is copyright (c) 2017 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,37 +5,46 @@ use warnings;
 use Text::ParseWords qw( shellwords );
 
 # ABSTRACT: Environment variables for arguments as array
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
+
+use constant _NAME  => 0;
+use constant _SPLIT  => 1;
+use constant _JOIN => 2;
+
+sub _join
+{
+  join ' ', map {
+    my $value = $_;
+    $value = '' unless defined $value;
+    $value =~ s/(\s)/\\$1/g;
+    $value eq '' ? "''" : $value;
+  } @_;
+}
 
 sub TIEARRAY
 {
-  my($class, $name) = @_;
-  bless \$name, $class;
+  my($class, $name, $read, $write) = @_;
+  bless [$name, $read || \&shellwords, $write || \&_join ], $class;
 }
 
 sub FETCH
 {
   my($self, $key) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   $list[$key];
 }
 
 sub _render
 {
-  my($self, @list) = @_;
-  $ENV{$$self} = join ' ', map {
-    my $value = $_;
-    $value = '' unless defined $value;
-    $value =~ s/(\s)/\\$1/g;
-    $value eq '' ? "''" : $value;
-  } @list;
+  my $self = shift;
+  $ENV{$self->[_NAME]} = $self->[_JOIN]->(@_);
 }
 
 sub STORE
 {
   my($self, $key, $value) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   $list[$key] = $value;
   _render($self, @list);
   $value;
@@ -44,14 +53,14 @@ sub STORE
 sub FETCHSIZE
 {
   my($self) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   $#list + 1;
 }
 
 sub STORESIZE
 {
   my($self, $count) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   $#list = $count - 1;
   _render($self, @list);
   return;
@@ -67,14 +76,14 @@ sub CLEAR
 sub PUSH
 {
   my($self, @values) = @_;
-  _render($self, shellwords($ENV{$$self}), @values);
+  _render($self, $self->[_SPLIT]->($ENV{$self->[_NAME]}), @values);
   return;
 }
 
 sub POP
 {
   my($self) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   my $value = pop @list;
   _render($self, @list);
   return $value;
@@ -83,7 +92,7 @@ sub POP
 sub SHIFT
 {
   my($self) = @_;
-  my($value, @list) = shellwords($ENV{$$self});
+  my($value, @list) = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   _render($self, @list);
   return $value;
 }
@@ -91,14 +100,14 @@ sub SHIFT
 sub UNSHIFT
 {
   my($self, @values) = @_;
-  _render($self, @values, shellwords($ENV{$$self}));
+  _render($self, @values, $self->[_SPLIT]->($ENV{$self->[_NAME]}));
   return;
 }
 
 sub SPLICE
 {
   my($self, $offset, $length, @values) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   my @ret = splice @list, $offset, $length, @values;
   _render($self, @list);
   @ret;
@@ -107,7 +116,7 @@ sub SPLICE
 sub DELETE
 {
   my($self, $key) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   my $value = delete $list[$key];
   _render($self, @list);
   return $value;
@@ -116,7 +125,7 @@ sub DELETE
 sub EXISTS
 {
   my($self, $key) = @_;
-  my @list = shellwords($ENV{$$self});
+  my @list = $self->[_SPLIT]->($ENV{$self->[_NAME]});
   return exists $list[$key];
 }
 
@@ -156,18 +165,18 @@ Env::ShellWords - Environment variables for arguments as array
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
  # Tie Interface
  use Env::ShellWords;
- tie my @CFLAGS,   'CFLAGS';
- tie my @LDFLAGS,  'LDFLAGS';
+ tie my @CFLAGS,  'Env::ShellWords', 'CFLAGS';
+ tie my @LDFLAGS, 'Env::ShellWords', 'LDFLAGS';
 
  # same thing with import interface:
  use Env::ShellWords qw( @CFLAGS @LDFLAGS );
- 
+
  # usage:
  $ENV{CFLAGS} = '-DBAR=1';
  unshift @CFLAGS, '-I/foo/include';
@@ -189,10 +198,24 @@ those variables without doing space quoting and other messy mucky stuff.
 The intent is to use this from L<alienfile> to deal with hierarchical
 prerequisites.
 
+You can provide split and join callbacks when you tie:
+
+ use Env::ShellWords;
+ # split on any space, ignore quotes
+ tie my @FOO, 'Env::ShellWords',
+   sub { split /\s+/, $_[0] },
+   sub { join ' ', @_ };
+
+Which may be useful if you have to split on words on an operating
+system with a different specification.
+
 =head1 CAVEATS
 
 Not especially fast.  C<undef> gets mapped to the empty string C<''>
 since C<undef> doesn't have a meaning as an argument in a string.
+
+Writing to an environment variable using this interface is inherently
+lossy.
 
 =head1 SEE ALSO
 

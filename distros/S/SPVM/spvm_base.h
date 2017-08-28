@@ -8,13 +8,17 @@
 struct SPVM_constant_pool_sub;
 typedef struct SPVM_constant_pool_sub SPVM_CONSTANT_POOL_SUB;
 
-// spvm_constant_pool_field.h
-struct SPVM_constant_pool_field;
-typedef struct SPVM_constant_pool_field SPVM_CONSTANT_POOL_FIELD;
+// spvm_constant_pool_field_info.h
+struct SPVM_constant_pool_field_info;
+typedef struct SPVM_constant_pool_field_info SPVM_CONSTANT_POOL_FIELD_INFO;
 
 // spvm_constant_pool_package.h
 struct SPVM_constant_pool_package;
 typedef struct SPVM_constant_pool_package SPVM_CONSTANT_POOL_PACKAGE;
+
+// spvm_constant_pool_package.h
+struct SPVM_constant_pool_type;
+typedef struct SPVM_constant_pool_type SPVM_CONSTANT_POOL_TYPE;
 
 // spvm_object.h
 struct SPVM_object;
@@ -136,9 +140,9 @@ typedef struct SPVM_constant SPVM_CONSTANT;
 struct SPVM_op;
 typedef struct SPVM_op SPVM_OP;
 
-/* spvm_field.h */
-struct SPVM_field;
-typedef struct SPVM_field SPVM_FIELD;
+/* spvm_field_info.h */
+struct SPVM_field_info;
+typedef struct SPVM_field_info SPVM_FIELD_INFO;
 
 /* spvm_descriptor.h */
 struct SPVM_descriptor;

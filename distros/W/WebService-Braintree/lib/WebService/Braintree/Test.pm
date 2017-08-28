@@ -1,5 +1,5 @@
 package WebService::Braintree::Test;
-$WebService::Braintree::Test::VERSION = '0.92';
+$WebService::Braintree::Test::VERSION = '0.93';
 use strict;
 
 use WebService::Braintree::Test::VenmoSdk;

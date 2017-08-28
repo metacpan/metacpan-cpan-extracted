@@ -19,6 +19,8 @@ use MIME::Base64;
 use MIME::QuotedPrint;
 use App::Muter;
 
+eval { require Test::NoWarnings; };
+
 my $seed = $ENV{'TEST_SEED'};
 
 diag "Running with test seed '$seed'" if defined $seed;
@@ -112,6 +114,8 @@ foreach my $tech (sort keys %maps) {
     };
 }
 
+Test::NoWarnings::had_no_warnings() if $INC{'Test/NoWarnings.pm'};
+
 done_testing;
 
 sub test_run_pattern {
@@ -172,7 +176,7 @@ sub byte_pattern {
     $seed = defined $seed ? "$seed:" : '';
 
     while (length($s) < $len) {
-        $s .= Digest::SHA::sha512($seed . pack("NN", $len, $count));
+        $s .= Digest::SHA::sha512($seed . pack("NN", $len, $count++));
     }
     return substr($s, 0, $len);
 }

@@ -38,6 +38,8 @@ lib/Mail/Send.pm
 lib/Mail/Send.pod
 lib/Mail/Util.pm
 lib/Mail/Util.pod
+lib/MailTools.pm
+lib/MailTools.pod
 t/extract.t
 t/header.t
 t/internet.t

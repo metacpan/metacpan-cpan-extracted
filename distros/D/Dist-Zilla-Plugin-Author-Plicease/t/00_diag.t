@@ -1,7 +1,7 @@
-use strict;
-use warnings;
+use Test2::V0 -no_srand => 1;
 use Config;
-use Test::More tests => 1;
+
+eval q{ require Test::More };
 
 # This .t file is generated.
 # make changes instead to dist.ini
@@ -14,19 +14,22 @@ $modules{$_} = $_ for qw(
   Dist::Zilla
   ExtUtils::MakeMaker
   File::Path
-  File::ShareDir
+  File::ShareDir::Dist
   File::ShareDir::Install
   File::chdir
   IPC::System::Simple
   Moose
-  Path::Class
+  Path::Tiny
   Sub::Exporter::ForMethods
-  Test::More
+  Test2::V0
   autodie
   namespace::autoclean
 );
 
-
+$post_diag = sub {
+  use Dist::Zilla::Plugin::Author::Plicease;
+  diag 'share dir = ', Dist::Zilla::Plugin::Author::Plicease->dist_dir;
+};
 
 my @modules = sort keys %modules;
 
@@ -70,7 +73,7 @@ if(@keys > 0)
 
 diag sprintf $format, 'perl ', $];
 
-foreach my $module (@modules)
+foreach my $module (sort @modules)
 {
   if(eval qq{ require $module; 1 })
   {
@@ -92,3 +95,4 @@ if($post_diag)
 
 spacer;
 
+done_testing;

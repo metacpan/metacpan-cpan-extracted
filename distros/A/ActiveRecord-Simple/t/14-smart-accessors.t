@@ -132,7 +132,7 @@ package Customer;
 #use parent 'Schema';
 our @ISA = qw/Schema/;
 
-__PACKAGE__->load_info();
+__PACKAGE__->auto_load();
 __PACKAGE__->has_many('orders' => 'Order');
 __PACKAGE__->has_many('achievements' => { 'CustomersAchievement' => 'Achievement' });
 
@@ -141,7 +141,7 @@ package Order;
 
 our @ISA = qw/Schema/;
 
-__PACKAGE__->load_info();
+__PACKAGE__->auto_load();
 __PACKAGE__->belongs_to(customer => 'Customer');
 
 
@@ -149,7 +149,7 @@ package Achievement;
 
 our @ISA = qw/Schema/;
 
-__PACKAGE__->load_info();
+__PACKAGE__->auto_load();
 __PACKAGE__->has_many(customers => { 'CustomersAchievement' => 'Customer' });
 
 
@@ -157,7 +157,7 @@ package CustomersAchievement;
 
 our @ISA = qw/Schema/;
 
-__PACKAGE__->load_info();
+__PACKAGE__->auto_load();
 __PACKAGE__->belongs_to(customer => 'Customer');
 __PACKAGE__->belongs_to(achievement => 'Achievement');
 
@@ -182,6 +182,6 @@ is $no2->customer_id, $Bill->id, 'saving with relational accessors works fine';
 ok my @orders = Order->find({ customer => $Bill })->fetch;
 is scalar @orders, 3, 'accessors in find';
 
-is(Order->count({ customer => $Bill }), scalar @orders, 'accessors in count');
+is(Order->find({ customer => $Bill })->count, scalar @orders, 'accessors in count');
 
 done_testing();

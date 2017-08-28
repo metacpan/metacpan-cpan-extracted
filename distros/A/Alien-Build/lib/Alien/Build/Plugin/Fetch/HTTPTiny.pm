@@ -7,7 +7,7 @@ use File::Basename ();
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 has '+url' => '';
@@ -98,7 +98,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 

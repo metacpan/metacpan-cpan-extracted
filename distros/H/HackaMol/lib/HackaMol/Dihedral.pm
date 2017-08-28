@@ -1,5 +1,5 @@
 package HackaMol::Dihedral;
-$HackaMol::Dihedral::VERSION = '0.043';
+$HackaMol::Dihedral::VERSION = '0.044';
 #ABSTRACT: Dihedral Angle class for HackaMol
 use 5.008;
 use Moose;
@@ -92,7 +92,7 @@ HackaMol::Dihedral - Dihedral Angle class for HackaMol
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCardVerification;
-$WebService::Braintree::CreditCardVerification::VERSION = '0.92';
+$WebService::Braintree::CreditCardVerification::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::CreditCardVerification

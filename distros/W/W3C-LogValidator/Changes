@@ -1,6 +1,9 @@
 Revision history for Perl module W3C::LogValidator
 $Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
 
+1.5 [2017-08-24]
+  - resolved sample module naming conflict, per request from PAUSE
+
 1.4 [2008-11-21]
   - patch for perl 5.10 support, courtesy of Colm Dougan
     http://www.w3.org/Bugs/Public/show_bug.cgi?id=5665
@@ -12,7 +15,7 @@ $Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
   - Adding ExcludeHosts option to filter our log records originating from (a) specific host(s) or IP address(es)
     patches courtesy of Martin B. Smith
     http://www.w3.org/Bugs/Public/show_bug.cgi?id=5221
-    
+
 1.3.1 [2008-05-28]
   - removed macos-specific files which tend to trip up some systems.
     No Functional Changes.
@@ -24,12 +27,12 @@ $Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
   - clean tarball - similar in feature to 1.1
 
 1.1 [2007-09-05]
-  - adding options for the HTML and CSS Validator modules to show which 
+  - adding options for the HTML and CSS Validator modules to show which
     of the valid, invalid and other (non validable) documents should be listed
     in the final report. As a result, one can decide only to list the top
     valid, top invalid, or all documents with their validation status, etc.
   - supporting additional log format used by e.g squid revers proxy
-  - adding ExcludeCGI option to switch on of off filtering of URIs 
+  - adding ExcludeCGI option to switch on of off filtering of URIs
     with query strings, e.g http://www.example.com/script?foo=bar
   - fixing the "Basic" (counting the most popular resource) module
     for input formats which do not include the HTTP response code
@@ -63,8 +66,8 @@ $Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
 	- documentation improvements
 
 0.5 [2004-11-10]
-	- adding "QuietIfNoReport" option. 
-	If this option is set, the LogValidator skips reports 
+	- adding "QuietIfNoReport" option.
+	If this option is set, the LogValidator skips reports
 	where the details table is empty (nothing to validate, or nothing invalid)
 
 0.4.1 [2004-09-08]
@@ -91,7 +94,7 @@ $Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
 0.1.1 [2003-05-08]
 	- mostly packaging and documentation issues
 
-0.1 [2003-04-14] 	
+0.1 [2003-04-14]
 	- first stable release
 
 0.1.beta2 [2003-04-01]
@@ -100,4 +103,3 @@ $Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
 
 0.1beta1 [2002-08-28]
 	- This first version has 2 modules, Basic and HTMLValidator
-

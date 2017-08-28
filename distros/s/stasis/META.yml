@@ -6,8 +6,8 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 provides:
- stasis:
-   file: stasis
-   version: 0.05
+  stasis:
+    file: stasis,
+    version: '0.07'
 requires:
   Getopt::Long: '0'
   Pod::Usage: '0'
@@ -29,5 +29,5 @@ requires:
   autodie: '0'
 resources:
   repository: https://github.com/dnmfarrell/Stasis.git
-version: 0.05
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: 0.07
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 package App::Muter::Backend;
 # ABSTRACT: App::Muter::Backend - a backend for muter
-$App::Muter::Backend::VERSION = '0.002001';
+$App::Muter::Backend::VERSION = '0.002002';
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ App::Muter::Backend - App::Muter::Backend - a backend for muter
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 METHODS
 

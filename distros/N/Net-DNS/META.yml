@@ -20,7 +20,7 @@ no_index:
 recommends:
   Digest::BubbleBabble: '0.01'
   Digest::GOST: '0.06'
-  IO::Socket::IP: '0.32'
+  IO::Socket::IP: '0.38'
   Net::LibIDN: '0.12'
   Scalar::Util: '1.25'
 requires:
@@ -33,5 +33,5 @@ requires:
   Test::More: '0.52'
   Time::Local: '1.19'
   perl: '5.006'
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -12,6 +12,10 @@ bin/biotools
 dist.ini
 lib/Bioinfo.pm
 lib/Bioinfo/App.pm
+lib/Bioinfo/App/Cmd/Blast.pm
+lib/Bioinfo/App/Cmd/Blast/Cmd/ParseXML.pm
+lib/Bioinfo/App/Cmd/Blast/Cmd/SplitSubmit.pm
+lib/Bioinfo/App/Cmd/Blast/Cmd/SplitSubmitB.pm
 lib/Bioinfo/App/Cmd/Fasta.pm
 lib/Bioinfo/App/Cmd/Fasta/Cmd/Split.pm
 lib/Bioinfo/App/Cmd/Fasta/Cmd/SplitBlast.pm

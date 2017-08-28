@@ -1,4 +1,4 @@
-# $Id: 05-CDNSKEY.t 1526 2017-01-16 09:17:54Z willem $	-*-perl-*-
+# $Id: 05-CDNSKEY.t 1586 2017-08-15 09:01:57Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -15,7 +15,7 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 33;
+plan tests => 35;
 
 
 my $name = 'CDNSKEY.example';
@@ -102,15 +102,31 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 
 
 {
-	my $rr = new Net::DNS::RR("$name $type 0 3 0 0");
-	is( $rr->rdstring(),  '0 3 0 0', "DNSKEY delete: $name. $type 0 3 0 0" );
-	is( $rr->flags(),     0,	 'DNSKEY delete: flags 0' );
-	is( $rr->protocol(),  3,	 'DNSKEY delete: protocol 3' );
-	is( $rr->algorithm(), 0,	 'DNSKEY delete: algorithm 0' );
-	is( $rr->keybin(),    '',	 'DNSKEY delete: key empty' );
+	my @arg = qw(0 3 0 AA==);				# per RFC8078(4), erratum 5049
+	my $rr	= new Net::DNS::RR("$name. $type @arg");
+	ok( ref($rr), "DNSKEY delete: $name. $type @arg" );
+	is( $rr->flags(),     0, 'DNSKEY delete: flags 0' );
+	is( $rr->protocol(),  3, 'DNSKEY delete: protocol 3' );
+	is( $rr->algorithm(), 0, 'DNSKEY delete: algorithm 0' );
 
-	my $rdata = $rr->rdata();
-	is( unpack( 'H*', $rdata ), '00000300', 'DNSKEY delete: rdata wire-format' );
+	is( $rr->string(), "$name.\tIN\t$type\t@arg", 'DNSKEY delete: presentation format' );
+
+	my $rdata = unpack 'H*', $rr->rdata();
+	is( $rdata, '0000030000', 'DNSKEY delete: rdata wire-format' );
+}
+
+
+{
+	my @arg = qw(0 3 0 0);					# per RFC8078(4) as published
+	my $rr	= new Net::DNS::RR("$name. $type @arg");
+	is( $rr->rdstring(), '0 3 0 AA==', 'DNSKEY delete: accept old format' );
+}
+
+
+{
+	my @arg = qw(0 0 0 -);					# unexpected empty field
+	my $rr	= new Net::DNS::RR("$name. $type @arg");
+	is( $rr->rdstring(), '0 3 0 -', 'DNSKEY delete: represent empty key' );
 }
 
 

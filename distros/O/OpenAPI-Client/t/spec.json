@@ -1,0 +1,25 @@
+{
+  "swagger": "2.0",
+  "info": { "version": "0.8", "title": "Test client spec" },
+  "schemes": [ "http" ],
+  "host": "localhost",
+  "basePath": "/v1",
+  "paths": {
+    "/pets/{type}": {
+      "get": {
+        "operationId": "listPets",
+        "x-mojo-to": "listPets",
+        "parameters": [
+          { "in": "path", "name": "type", "type": "string", "required": true },
+          { "in": "query", "name": "p", "type": "integer" }
+        ],
+        "responses": {
+          "200": {
+            "description": "pet response",
+            "schema": { "type": "array" }
+          }
+        }
+      }
+    }
+  }
+}

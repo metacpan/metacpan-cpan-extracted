@@ -5,8 +5,18 @@ package Template::Lace::DOM;
 use base 'Mojo::DOM58';
 use Storable ();
 use Scalar::Util;
+use Template::Tiny;
 
 # General Helpers
+
+my $tt = Template::Tiny->new;
+
+sub tt {
+  my ($dom, @proto) = @_;
+  my %vars = ref($proto[0]) eq 'HASH' ? %{$proto[0]} : @proto;
+  $tt->process( \$dom->content, \%vars, \$dom->tree->[-1][1] ); # only works in some cases
+  return $dom;
+}
 
 sub ctx {
   my $self = shift;
@@ -384,6 +394,21 @@ sub class {
     return $self->attribute_helper('class', $classes);    
   } else {
     return $self->attribute_helper('class',@proto);
+  }
+}
+
+sub add_class {
+  my ($self, @proto) = @_;
+  my $current_class = $self->attr('class') ||'';
+  if(ref($proto[0]) eq 'HASH') {
+    my $classes = join ' ', grep { $proto[0]->{$_} } keys %{$proto[0]};
+    return $self->attribute_helper('class', "$current_class $classes");
+  } elsif(ref($proto[0]) eq 'ARRAY') {
+    my $classes = join ' ', @{$proto[0]};
+    return $self->attribute_helper('class', "$current_class $classes");    
+  } else {
+    my $classes = shift @proto;
+    return $self->attribute_helper('class', "$current_class $classes");
   }
 }
 
@@ -975,6 +1000,22 @@ it for you
 B<NOTE> if you want to set content or attributes on the DOM that ->do is run on
 you can use '.' as the match specification.
 
+=head2 tt
+
+Lets you fill the matching node's content via <Template::Tiny>.  This of course
+violates the 'pure no logic templates' but its here as an escapt hatch should
+you find the transformation are very awkward.  Also its probably the best way
+to fill variable into an inline script.
+
+  my $dom = Template::Lace::DOM->new(
+    qq[<span>Hello [% name%]! It is a [% weather %] day!</span>]);
+
+  $dom->at('span')
+   ->tt(name=>'John',
+     weather=>'great');
+
+  print $dom; # prints '<span>Hello John! It is a great day!</span>'
+
 =head1 ATTRIBUTE HELPERS
 
 The following methods are intended to make setting standard attributes on
@@ -1045,6 +1086,11 @@ Returns:
 If you instead use an arrayref, all the classes are just added.
 
 Useful to reduce some boilerplate.
+
+=head2 add_class
+
+Works just like L</class> except the classes are added to any ones that are already
+there.
 
 =head1 UNIQUE TAG HELPERS
 

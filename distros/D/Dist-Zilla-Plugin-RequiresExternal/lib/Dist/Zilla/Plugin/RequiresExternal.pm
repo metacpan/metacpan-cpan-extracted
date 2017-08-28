@@ -4,7 +4,7 @@ package Dist::Zilla::Plugin::RequiresExternal;
 
 use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '1.007';     # VERSION
+our $VERSION = '1.008';     # VERSION
 use utf8;
 
 #pod =for test_synopsis
@@ -171,7 +171,7 @@ Dist::Zilla::Plugin::RequiresExternal - make dists require external commands
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =for test_synopsis BEGIN { die "SKIP: this is ini, not perl\n" }
 

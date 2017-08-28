@@ -42,7 +42,7 @@ Nagios::NRPE - A Nagios NRPE implementation in pure perl
                               version => NRPE_PACKET_VERSION_3 );
 
  my $data = <$socket>
- my $response = $packet->deassemble($data);
+ my $response = $packet->disassemble($data);
 
  print $response->{buffer};
 
@@ -65,6 +65,6 @@ package Nagios::NRPE;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 1;

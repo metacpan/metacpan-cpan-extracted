@@ -1,0 +1,18 @@
+#!# perl: collector/code/stat
+use strict;
+use Carp;
+
+use Data::Dumper;
+use MYDan::Collector::Stat;
+
+return sub
+{
+    my %param = @_;
+
+    print Dumper \%param;
+
+    my $stat = MYDan::Collector::Stat->new( test => $param{test} )->eval;
+    
+
+    return $stat->stat;
+};

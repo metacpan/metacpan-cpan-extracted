@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our
-$VERSION = 2.104;
+$VERSION = 2.105;
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ sub _result_count_element_specs_NOT_NEEDED
 
 sub _result_count_pattern
   {
-  return qr'(\d+)\s+(Artikel|Ergebnisse|Angebote)'i;
+  return qr'(\d+)\s+(?:Artikel|Ergebnis(?:se)?|Angebote)'i;
   } # _result_count_pattern
 
 sub _next_text

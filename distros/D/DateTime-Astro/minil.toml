@@ -1,0 +1,8 @@
+name = "DateTime-Astro"
+license = "artistic_2"
+module_maker = "ModuleBuild"
+allow_pureperl = 1
+badges = ["travis"]
+
+[build]
+build_class = "builder::MyBuilder"

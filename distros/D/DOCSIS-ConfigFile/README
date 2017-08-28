@@ -2,7 +2,7 @@ NAME
     DOCSIS::ConfigFile - Decodes and encodes DOCSIS config files
 
 VERSION
-    0.71
+    0.73
 
 DESCRIPTION
     DOCSIS::ConfigFile is a class which provides functionality to decode and

@@ -1,5 +1,5 @@
 package Bio::Roary::SortFasta;
-$Bio::Roary::SortFasta::VERSION = '3.8.2';
+$Bio::Roary::SortFasta::VERSION = '3.9.1';
 # ABSTRACT: sort a fasta file by name
 
 
@@ -127,7 +127,7 @@ Bio::Roary::SortFasta - sort a fasta file by name
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "C::Tokenize" : "0.13",
+            "C::Tokenize" : "0.14",
+            "Carp" : "0",
             "File::Slurper" : "0.009",
             "Text::LineNumber" : "0.02",
             "perl" : "5.006001"
@@ -50,6 +51,6 @@
          "web" : "https://github.com/benkasminbullock/xs-check"
       }
    },
-   "version" : "0.02",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

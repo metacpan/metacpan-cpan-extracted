@@ -1,4 +1,4 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.014004';
 
 requires 'AnyEvent';
 requires 'App::Ack';
@@ -29,6 +29,9 @@ requires 'Web::Query';
 
 recommends 'App::rainbarf';
 recommends 'App::scan_prereqs_cpanfile';
+recommends 'CPAN::Mini::Webserver';
+recommends 'DB::Pluggable';
+recommends 'DB::Skip';
 recommends 'Devel::Cover';
 recommends 'LWP::Protocol::rsync';
 recommends 'Paws';

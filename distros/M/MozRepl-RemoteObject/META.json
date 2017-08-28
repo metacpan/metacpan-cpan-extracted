@@ -3,8 +3,8 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -19,36 +19,15 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Task::Weaken" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Encode" : "0",
-            "Exporter" : "0",
-            "File::Basename" : "0",
-            "IPC::Run" : "0",
-            "JSON" : "2",
-            "MozRepl" : "0.06",
-            "Scalar::Util" : "0",
-            "parent" : "0",
-            "perl" : "5.006"
-         }
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/Corion/mozrepl-remoteobject"
+         "type" : "git",
+         "url" : "git://github.com/Corion/mozrepl-remoteobject.git",
+         "web" : "https://github.com/Corion/mozrepl-remoteobject"
       }
    },
-   "version" : "0.39"
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "x_static_install" : 1
 }

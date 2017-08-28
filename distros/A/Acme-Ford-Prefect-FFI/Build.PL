@@ -22,7 +22,7 @@ my $builder = Module::Build->new(
     license           => 'perl',
     configure_requires => {
       'Module::Build' => '0.38',
-      'Acme::Alien::DontPanic' => '0.042',
+      'Acme::Alien::DontPanic' => '0.044',
     },
     build_requires    => {
       'ExtUtils::CBuilder' => 0,

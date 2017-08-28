@@ -6,27 +6,25 @@ build_requires:
   Test::More: '0.94'
   perl: '5.006'
 configure_requires:
-  Alien::Base::ModuleBuild: '0.023'
+  Alien::Base::ModuleBuild: '0.044'
   Capture::Tiny: '0'
-  File::ShareDir: '1.03'
   File::chdir: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-libtool24
 requires:
-  Alien::Base: '0.023'
-  File::ShareDir: '1.03'
+  Alien::Base: '1.00'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-libtool24/issues
   homepage: https://metacpan.org/pod/Alien::libtool24
   repository: git://github.com/plicease/Alien-libtool24.git
-version: '0.05'
+version: '0.06'
 x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'

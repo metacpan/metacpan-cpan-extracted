@@ -2,7 +2,7 @@ package Mail::Milter::Authentication;
 use strict;
 use warnings;
 use base 'Net::Server::PreFork';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use English qw{ -no_match_vars };
 use ExtUtils::Installed;
@@ -26,7 +26,7 @@ sub _warn {
     my @parts = split "\n", $msg;
     foreach my $part ( @parts ) {
         next if $part eq q{};
-        print STDERR scalar localtime . ' ' . $Mail::Milter::Authentication::Config::IDENT . "[$PID] $part\n";
+        print STDERR scalar(localtime) . ' ' . $Mail::Milter::Authentication::Config::IDENT . "[$PID] $part\n";
     }
     return;
 }
@@ -327,14 +327,34 @@ sub get_valid_pid {
     my $pid = <$inf>;
     close $inf;
 
+    my $self_pid   = $PID;
+    my $found_self = 0;
+    my $found_pid  = 0;
+
     my $process_table = Proc::ProcessTable->new();
     foreach my $process ( @{$process_table->table} ) {
+        if ( $process->pid == $self_pid ) {
+            if ( $process->cmndline eq $Mail::Milter::Authentication::Config::IDENT . ':control' ) {
+                $found_self = 1;
+            }
+        }
         if ( $process->pid == $pid ) {
+            $found_pid = 1;
             if ( $process->cmndline eq $Mail::Milter::Authentication::Config::IDENT . ':master' ) {
                 return $pid;
             }
         }
     }
+
+    # If we didn't find ourself in the process table then we can assume that
+    # $0 is read only on our current operating system, and return the pid that we read from the
+    # pidfile if it is in the process table regardness of it's process name..
+    if ( ! $found_self ) {
+        if ( $found_pid ) {
+            return $pid;
+        }
+    }
+
     return undef; ## no critic
 }
 
@@ -352,6 +372,9 @@ sub control {
     my ( $args ) = @_;
     my $pid_file = $args->{'pid_file'};
     my $command  = $args->{'command'};
+
+    my $OriginalProgramName = $PROGRAM_NAME;
+    $PROGRAM_NAME = $Mail::Milter::Authentication::Config::IDENT . ':control';
 
     if ( $command eq 'stop' ) {
         my $pid = get_valid_pid( $pid_file ) || find_process();
@@ -371,6 +394,7 @@ sub control {
         }
         else {
             print "No process found, starting up\n";
+            $PROGRAM_NAME = $OriginalProgramName;
             start({
                 'pid_file'   => $pid_file,
                 'daemon'     => 1,
@@ -452,6 +476,7 @@ sub start {
     $srvargs{'syslog_facility'}   = LOG_MAIL;
     $srvargs{'syslog_ident'}      = $Mail::Milter::Authentication::Config::IDENT;
     $srvargs{'syslog_logopt'}     = 'pid';
+    $srvargs{'syslog_logsock'}    = 'native';
 
     if ( $EUID == 0 ) {
         my $user  = $config->{'runas'};
@@ -560,7 +585,11 @@ sub start {
     $srvargs{'listen'} = $listen_backlog;
     $srvargs{'leave_children_open_on_hup'} = 1;
 
-    _warn "==========\nStarting server\n==========";
+    _warn "==========";
+    _warn "Starting server";
+    _warn "Running with perl $PERL_VERSION";
+    _warn "==========";
+
     __PACKAGE__->run( %srvargs );
 
     # Never reaches here.
@@ -632,7 +661,7 @@ sub setup_handler {
     my $object = $package->new( $self );
     $self->{'handler'}->{$name} = $object;
 
-    foreach my $callback ( qw { setup connect helo envfrom envrcpt header eoh body eom abort close } ) {
+    foreach my $callback ( qw { setup connect helo envfrom envrcpt header eoh body eom addheader abort close } ) {
         if ( $object->can( $callback . '_callback' ) ) {
             $self->register_callback( $name, $callback );
         }
@@ -663,7 +692,7 @@ sub register_callback {
 
 sub sort_all_callbacks {
     my ($self) = @_;
-    foreach my $callback ( qw { setup connect helo envfrom envrcpt header eoh body eom abort close } ) {
+    foreach my $callback ( qw { setup connect helo envfrom envrcpt header eoh body eom addheader abort close } ) {
         $self->sort_callbacks( $callback );
     }
     return;
@@ -832,7 +861,7 @@ Mail::Milter::Authentication - A Perl Mail Authentication Milter
 
 =head1 DESCRIPTION
 
-A Perl Implemetation of email authentication standards rolled up into a single easy to use milter.
+A Perl Implementation of email authentication standards rolled up into a single easy to use milter.
 
 =head1 SYNOPSIS
 

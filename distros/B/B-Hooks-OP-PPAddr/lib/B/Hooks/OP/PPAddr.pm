@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package B::Hooks::OP::PPAddr; # git description: 0.04_01-4-gecc7b66
+package B::Hooks::OP::PPAddr; # git description: v0.05-5-gf0d3ed7
 # ABSTRACT: Hook into opcode execution
 
 use parent qw/DynaLoader/;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub dl_load_flags { 0x01 }
 
@@ -25,7 +25,7 @@ B::Hooks::OP::PPAddr - Hook into opcode execution
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Alexandr Ciornii
+=for stopwords Karen Etheridge Alexandr Ciornii Stephan Loyd
 
 =over 4
 
@@ -117,6 +117,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+Stephan Loyd <stephanloyd9@gmail.com>
 
 =back
 

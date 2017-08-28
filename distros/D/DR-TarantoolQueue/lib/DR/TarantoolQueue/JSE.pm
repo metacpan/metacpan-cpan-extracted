@@ -3,17 +3,20 @@ use Mouse::Role;
 use utf8;
 use strict;
 use warnings;
+use DR::TarantoolQueue::PackUnpack;
 
 
 has jse => (
     is      => 'ro',
     isa     => 'Object',
     lazy    => 1,
-    builder => '_build_jse'
+    builder => sub {
+        DR::TarantoolQueue::PackUnpack->new
+    }
 );
 
-sub _build_jse {
-    return JSON::XS->new->allow_nonref->utf8;
-}
+
+
+
 
 1;

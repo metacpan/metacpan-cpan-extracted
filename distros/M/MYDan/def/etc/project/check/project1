@@ -1,0 +1,10 @@
+-
+  addr: http://127.0.0.1:5555
+  check: 'mydan'
+#  type: post # type: get  default
+#  data: a=1&b=2
+#  Host: abc.org
+-
+  port: 8080
+#  type: tcp # type: udp  default
+#  host: abc.foo.org # host: 127.0.0.1 default

@@ -1,0 +1,19 @@
+{
+  "GSA_available": true,
+  "hasMore": false,
+  "maxRows": 99999999,
+  "origin": "ws_autocomplete",
+  "remoteAddr": "192.33.203.170",
+  "result": [{
+    "name": "Ellingson",
+    "firstname": "Lindsay",
+    "sciper": "190760"
+  }, {
+    "name": "Kerr",
+    "firstname": "Miranda",
+    "sciper": "290765"
+  }],
+  "size": 1,
+  "term": "e",
+  "test": false
+}

@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::TestReport;
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 # ABSTRACT: Raw reports as JSON documents
 
 #pod =head1 SYNOPSIS
@@ -60,13 +60,17 @@ column created => {
 #pod XXX: Describe the format a little and link to the main schema OpenAPI
 #pod format on http://api.cpantesters.org
 #pod
+#pod The serializer for this column will convert UTF-8 characters into their
+#pod corresponding C<\u####> escape sequence, so this column is safe for
+#pod tables with Latin1 encoding.
+#pod
 #pod =cut
 
 column 'report', {
     data_type            => 'JSON',
     is_nullable          => 0,
     'serializer_class'   => 'JSON',
-    'serializer_options' => { allow_blessed => 1, convert_blessed => 1 }
+    'serializer_options' => { allow_blessed => 1, convert_blessed => 1, ascii => 1 }
 };
 
 #pod =method new
@@ -113,7 +117,7 @@ CPAN::Testers::Schema::Result::TestReport - Raw reports as JSON documents
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -145,6 +149,10 @@ The full JSON report.
 
 XXX: Describe the format a little and link to the main schema OpenAPI
 format on http://api.cpantesters.org
+
+The serializer for this column will convert UTF-8 characters into their
+corresponding C<\u####> escape sequence, so this column is safe for
+tables with Latin1 encoding.
 
 =head1 METHODS
 

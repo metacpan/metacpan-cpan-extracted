@@ -1,16 +1,27 @@
 package Dist::Zilla::PluginBundle::Author::SKIRMESS;
 
+use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.005';
 
 use Moose 0.99;
 use namespace::autoclean 0.09;
 
 with qw(
   Dist::Zilla::Role::PluginBundle::Easy
-  Dist::Zilla::Role::BundleDeps
+);
+
+sub mvp_multivalue_args { return qw/stopwords/ }
+
+has stopwords => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    lazy    => 1,
+    default => sub {
+        exists $_[0]->payload->{stopwords} ? $_[0]->payload->{stopwords} : undef;
+    },
 );
 
 sub configure {
@@ -18,20 +29,54 @@ sub configure {
 
     $self->add_plugins(
 
+        # Check at build/release time if modules are out of date
+        [
+            'PromptIfStale', 'stale modules, build',
+            {
+                phase  => 'build',
+                module => [ $self->meta->name ],
+            }
+        ],
+
+        'Author::SKIRMESS::Test::XT::Test::CPAN::Meta',
+        'Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON',
+        'Author::SKIRMESS::Test::XT::Test::DistManifest',
+        'Author::SKIRMESS::Test::XT::Test::Kwalitee',
+        'Author::SKIRMESS::Test::XT::Test::MinimumVersion',
+        'Author::SKIRMESS::Test::XT::Test::Mojibake',
+        'Author::SKIRMESS::Test::XT::Test::NoTabs',
+        'Author::SKIRMESS::Test::XT::Test::Perl::Critic',
+        'Author::SKIRMESS::Test::XT::Test::Pod',
+        'Author::SKIRMESS::Test::XT::Test::Pod::No404s',
+        'Author::SKIRMESS::Test::XT::Test::Portability::Files',
+        [ 'Author::SKIRMESS::Test::XT::Test::Spelling', { stopwords => $self->stopwords } ],
+        'Author::SKIRMESS::Test::XT::Test::Version',
+
+        # Check at build/release time if modules are out of date
+        [
+            'PromptIfStale', 'stale modules, release',
+            {
+                phase             => 'release',
+                check_all_plugins => 1,
+                check_all_prereqs => 1,
+            }
+        ],
+
         # Add contributor names from git to your distribution
-        ['Git::Contributors'],
+        'Git::Contributors',
 
         # Gather all tracked files in a Git working directory
         [
             'Git::GatherDir',
             {
                 ':version'       => '2.016',
-                exclude_filename => [qw( cpanfile dist.ini LICENSE Makefile.PL META.json META.yml README.md )],
+                exclude_filename => [qw( cpanfile dist.ini INSTALL LICENSE Makefile.PL META.json META.yml README.md )],
+                include_dotfiles => 1,
             }
         ],
 
         # Set the distribution version from your main module's $VERSION
-        ['VersionFromMainModule'],
+        'VersionFromMainModule',
 
         # Bump and reversion $VERSION on release
         [
@@ -58,8 +103,24 @@ sub configure {
             }
         ],
 
+        # Ensure no pending commits on a remote branch before release
+        [
+            'Git::Remote::Check',
+            {
+                do_update => 0,
+            }
+        ],
+
+        # Prune stuff that you probably don't mean to include
+        [
+            'PruneCruft',
+            {
+                except => [qw( \.perltidyrc )],
+            }
+        ],
+
         # Decline to build files that appear in a MANIFEST.SKIP-like file
-        ['ManifestSkip'],
+        'ManifestSkip',
 
         # automatically extract prereqs from your modules
         [
@@ -121,70 +182,95 @@ sub configure {
             }
         ],
 
-        # Add Dist::Zilla authordeps to META files as develop prereqs
-        ['Prereqs::AuthorDeps'],
+        # Summarize Dist::Zilla configuration into distmeta
+        'MetaConfig',
 
         # Produce a META.yml
-        ['MetaYAML'],
+        'MetaYAML',
 
         # Produce a META.json
-        ['MetaJSON'],
+        'MetaJSON',
 
         # Produce a cpanfile prereqs file
-        ['CPANFile'],
+        'CPANFile',
 
         # Automatically convert POD to a README in any format for Dist::Zilla
         [ 'ReadmeAnyFromPod', 'ReadmeAnyFromPod/ReadmeTextInBuild' ],
 
         # Set copyright year from git
-        ['CopyrightYearFromGit'],
+        'CopyrightYearFromGit',
 
         # Output a LICENSE file
-        ['License'],
+        'License',
+
+        # Build an INSTALL file
+        [
+            'InstallGuide',
+            {
+                ':version' => '1.200007',
+            }
+        ],
 
         # Install a directory's contents as executables
-        ['ExecDir'],
+        'ExecDir',
 
         # Install a directory's contents as "ShareDir" content
-        ['ShareDir'],
+        'ShareDir',
 
         # Build a Makefile.PL that uses ExtUtils::MakeMaker
-        ['MakeMaker'],
+        'MakeMaker',
 
         # Build a MANIFEST file
-        ['Manifest'],
+        'Manifest',
 
         # Copy (or move) specific files after building (for SCM inclusion, etc.)
         [
             'CopyFilesFromBuild',
             {
-                copy => [qw( cpanfile LICENSE Makefile.PL META.json META.yml )],
+                copy => [qw( cpanfile INSTALL LICENSE Makefile.PL META.json META.yml )],
             }
         ],
 
         # Check that you're on the correct branch before release
-        ['Git::CheckFor::CorrectBranch'],
+        'Git::CheckFor::CorrectBranch',
+
+        # Check your repo for merge-conflicted files
+        'Git::CheckFor::MergeConflicts',
 
         # Ensure META includes resources
-        ['CheckMetaResources'],
+        'CheckMetaResources',
 
         # Prevent a release if you have prereqs not found on CPAN
-        ['CheckPrereqsIndexed'],
+        'CheckPrereqsIndexed',
 
         # Ensure Changes has content before releasing
-        ['CheckChangesHasContent'],
+        'CheckChangesHasContent',
+
+        # Check if your distribution declares a dependency on itself
+        'CheckSelfDependency',
+
+        # BeforeRelease plugin to check for a strict version number
+        [
+            'CheckStrictVersion',
+            {
+                decimal_only => 1,
+            }
+        ],
 
         # Support running xt tests via dzil test
-        ['RunExtraTests'],
+        'RunExtraTests',
 
         # Extract archive and run tests before releasing the dist
-        ['TestRelease'],
+        'TestRelease',
+
+        # Retrieve count of outstanding RT and github issues for your distribution
+        'CheckIssues',
 
         # Prompt for confirmation before releasing
-        ['ConfirmRelease'],
+        'ConfirmRelease',
 
         # Upload the dist to CPAN
-        [ $ENV{FAKE_RELEASE} ? 'FakeRelease' : 'UploadToCPAN' ],
+        'UploadToCPAN',
 
         # Copy files from a release (for SCM inclusion, etc.)
         [
@@ -199,7 +285,7 @@ sub configure {
             'Git::Commit',
             {
                 commit_msg        => '%v',
-                allow_dirty       => [qw(Changes cpanfile dist.ini LICENSE Makefile.PL META.json META.yml README.md)],
+                allow_dirty       => [qw(Changes cpanfile dist.ini INSTALL LICENSE Makefile.PL META.json META.yml README.md)],
                 allow_dirty_match => '\.pm$',
             }
         ],
@@ -214,8 +300,10 @@ sub configure {
         ],
 
         # Push current branch
-        ['Git::Push'],
+        'Git::Push',
 
+        # Compare data and files at different phases of the distribution build process
+        'VerifyPhases',
     );
 
     return;
@@ -227,14 +315,62 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::PluginBundle::Author::SKIRMESS - Dist::Zilla configuration the way SKIRMESS does it
+
 =head1 SYNOPSIS
 
-# in dist.ini
-[@Author::SKIRMESS]
+  # in dist.ini
+  [@Author::SKIRMESS]
+
+=head1 DESCRIPTION
+
+This is a L<Dist::Zilla|Dist::Zilla> PluginBundle.
 
 =head1 USAGE
 
 To use this PluginBundle, just add it to your dist.ini.
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS>
+
+  git clone https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS.git
+
+=head1 AUTHOR
+
+Sven Kirmess <sven.kirmess@kzone.ch>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Sven Kirmess.
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::PluginBundle::Author::ETHER|Dist::Zilla::PluginBundle::Author::ETHER>,
+L<Dist::Zilla::PluginBundle::DAGOLDEN|Dist::Zilla::PluginBundle::DAGOLDEN>,
+L<Dist::Zilla::PluginBundle::Milla|Dist::Zilla::PluginBundle::Milla>,
+L<Dist::Milla|Dist::Milla>
 
 =cut
 

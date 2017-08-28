@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-#use Test::More tests => 9;
-use Test::More skip_all => 'released with a known bug';
+use Test::More tests => 9;
 use Test::NoWarnings;
 use Test::Exception;
 use Test::Differences;
@@ -35,7 +34,7 @@ lives_ok
 # http://www.c-point.com/javascript_tutorial/special_characters.htm
 {
     eq_or_diff
-        $extractor->_interpolate_escape_sequence(<<"EOT"),
+        $extractor->interpolate_escape_sequence(<<"EOT"),
 \\' \\\\'
 \\" \\\\"
 \\b \\\\b
@@ -350,6 +349,11 @@ my $expected_lexicon_ref = {
             msgstr => {
                 nplurals => 2,
                 plural => 'n != 1',
+            },
+        },
+        'MSGID c' => {
+            reference => {
+                'jsgettext.js:81' => undef,
             },
         },
         "MSGID cn\x00PLURAL cn" => {

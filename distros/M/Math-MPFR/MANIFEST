@@ -32,6 +32,7 @@ t/DoubleDouble2.t
 t/exceptions.t
 t/flags.t
 t/float128_conv.t
+t/float128_subnormal.t
 t/get_NV.t
 t/grandom.t
 t/integer_string.t
@@ -45,10 +46,12 @@ t/neg_zero_bug.t
 t/NOK_and_POK.t
 t/not_zero.t
 t/new.t
-t/new_in_3.2.0.t
+t/new_in_4.0.0.t
 t/NV_overloading.t
 t/out_str.t
 t/overload.t
+t/overload_cmp_q.t
+t/overload_cmp_z.t
 t/overload_cross_class.t
 t/overload_float128.t
 t/P_specifier.t
@@ -56,6 +59,8 @@ t/pod.t
 t/printf.t
 t/remainder.t
 t/Rmpfr_get_q.t
+t/Rmpfr_q_div_and_Rmpfr_z_div.t
+t/Rmpfr_rec_root.t
 t/rndna.t
 t/rndna2.t
 t/set_NV.t

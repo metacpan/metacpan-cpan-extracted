@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use MYDan::OpenAPI::Node;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'node';
+
+=head1 SYNOPSIS
+
+update node cache
+
+=cut
+
+my %o = MYDan::Util::OptConf->load()->set( interval => 5 )->get( qw( interval=i ) )->dump();
+my $openapi = MYDan::OpenAPI::Node->new();
+
+my ( $path, $tmp ) = ( "$o{cache}/current" , "$o{cache}/.download" );
+
+map{ unlink $_ if -f $_ }
+    grep{ $_ =~ m#$tmp.\d+.tmp# }
+        glob "$tmp.*.tmp";
+
+my $i;
+while(1)
+{
+    sleep $o{interval};
+    printf "do(%d)...\n", ++$i;
+
+    my $md5 = $openapi->md5();
+    unless ( $md5 )
+    {
+        warn "openapi get md5 fail\n";
+        next;
+    }
+
+    my $cmd5 = `md5sum $path`;
+
+    if( $cmd5 && $cmd5 =~ /^([a-z0-9]{32})\s+$path/ )
+    {
+        next if $1 eq $md5;
+    }
+
+    $openapi->wget( "$tmp.$$.tmp" );
+    
+    warn "move to $path fail" if system "mv '$tmp.$$.tmp' '$path'";
+}

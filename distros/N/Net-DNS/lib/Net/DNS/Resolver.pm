@@ -1,9 +1,9 @@
 package Net::DNS::Resolver;
 
 #
-# $Id: Resolver.pm 1576 2017-06-19 12:39:09Z willem $
+# $Id: Resolver.pm 1590 2017-08-18 09:56:05Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1576 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1590 $)[1];
 
 =head1 NAME
 
@@ -307,9 +307,6 @@ the C<bgbusy()> and C<bgread()> methods.
 Errors are indicated by returning C<undef> in which case
 the reason for failure may be determined using C<errorstring()>.
 
-The program may determine when the handle is ready for reading by
-calling C<bgbusy()>.
-
 The response L<Net::DNS::Packet> object is obtained by calling C<bgread()>.
 
 B<BEWARE>:
@@ -319,13 +316,14 @@ returned by C<bgsend()> which should be used strictly as described here.
 
 =head2 bgread
 
+    $handle = $resolver->bgsend( 'www.example.com' );
     $packet = $resolver->bgread($handle);
 
 Reads the answer from a background query.
 The argument is the handle returned by C<bgsend()>.
 
 Returns a L<Net::DNS::Packet> object or C<undef> if no response was
-received or timeout occurred. 
+received before the timeout interval expired. 
 
 
 =head2 bgbusy
@@ -386,6 +384,14 @@ Get or set the dnsrch flag.
 If true, calls to C<search()> will apply the search list to resolve
 names that are not fully qualified.
 The default is true.
+
+
+=head2 domain
+
+    $domain = $resolver->domain;
+    $resolver->domain( 'domain.example' );
+
+Gets or sets the resolver default domain.
 
 
 =head2 igntc
@@ -524,7 +530,7 @@ The default is 30 seconds.
     $resolver->udppacketsize(2048);
 
 Get or set the UDP packet size.
-If set to a value greater than the default DNS packet size,
+If set to a value not less than the default DNS packet size,
 an EDNS extension will be added indicating support for
 large UDP datagram.
 
@@ -546,14 +552,6 @@ The default is false.
 
 Returns the IP address from which the most recent packet was
 received in response to a query.
-
-
-=head2 answersize
-
-    print 'size of last answer: ', $resolver->answersize, "\n";
-
-Returns the size in bytes of the most recent packet received in
-response to a query.
 
 
 =head2 errorstring

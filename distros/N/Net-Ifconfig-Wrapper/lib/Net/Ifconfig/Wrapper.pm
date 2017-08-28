@@ -1,11 +1,10 @@
 package Net::Ifconfig::Wrapper;
 
+use warnings;
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @EXPORT_FAIL);
 
-$VERSION = 0.14;
-
-#$^W++;
+$VERSION = 0.15;
 
 require Exporter;
 
@@ -221,11 +220,12 @@ my $LinuxList = sub($$$$)
 		$Info->{$Iface}{'status'} = 0;
 	    }
 	    elsif (
-		($_ =~ m/\A([a-z0-9]+)\:\s+flags=\d+<(\w+(?:,\w+)*)*>.*\n?\Z/io)
+		($_ =~ m/\A([a-z0-9]+)(?:\:(\d+))?\:\s+flags=\d+<(\w+(?:,\w+)*)*>.*\n?\Z/io)
 		)
 	    {
 		$Iface = $1;
-		my $sFlags = $2;
+		$Logic = defined($2) ? $2 : '';
+		my $sFlags = $3;
 		$DEBUG && warn " DDD   matched 'flags' line, Iface=$Iface, sFlags=$sFlags\n";
 		$Info->{$Iface}{'status'} = 1 if ($sFlags =~ m/\bUP\b/);
 	    }

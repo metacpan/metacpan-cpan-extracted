@@ -194,6 +194,19 @@ BEGIN {
     1;
 }
 
+{
+
+    package rg_str_short_common;
+    use Moose;
+    use MooX::Options;
+
+    option 'range_str' =>
+        ( is => 'ro', format => 's', autorange => 1, short => 'r' );
+    option 'range_json' => ( is => 'ro', format => 'json', short => 'j' );
+
+    1;
+}
+
 subtest "Moose" => sub {
     note "Test Moose";
     do $RealBin . '/base.st';

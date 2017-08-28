@@ -23,4 +23,5 @@ t/command/worker.t
 t/lib/Beam/Minion/Command/test.pm
 t/lib/Local/Service.pm
 t/share/container.yml
+t/util.t
 weaver.ini

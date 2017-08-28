@@ -27,7 +27,7 @@ WriteMakefile(
 			#'Scalar::Util' => '0',
 			}, # e.g., Module::Name => 1.1
     ($] >= 5.014 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT       => 'Sim::OPT is a decomposition-oriented optimization and morphing program that can mix sequential and parallel block search methods.', # retrieve abstract from module
+      (ABSTRACT       => 'Sim::OPT is a decomposition-oriented program for optimization and parametric exploration that can mix sequential and parallel block search methods.', # retrieve abstract from module
        AUTHOR         => 'Gian Luca Brunetti <gianluca.brunetti@polimi.it>') : ()),
 );
 

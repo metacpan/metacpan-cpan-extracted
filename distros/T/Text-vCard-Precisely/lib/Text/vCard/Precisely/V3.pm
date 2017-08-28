@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use 5.8.9;
 
@@ -500,7 +500,7 @@ coerce 'Address'
     => via { [ map { Text::vCard::Precisely::V3::Node::Address->new($_) } @$_ ] };
 has adr => ( is => 'rw', isa => 'Address', coerce => 1 );
 
-=head2 email()
+=head3 email()
 
 Accepts/returns an ArrayRef that looks like:
 

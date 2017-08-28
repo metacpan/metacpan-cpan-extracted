@@ -48,6 +48,6 @@
          "url" : "https://github.com/rurban/Cpanel-JSON-XS"
       }
    },
-   "version" : "3.0237",
+   "version" : "3.0238",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

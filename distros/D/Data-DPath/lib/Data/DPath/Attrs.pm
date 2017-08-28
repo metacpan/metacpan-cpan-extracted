@@ -1,7 +1,7 @@
 package Data::DPath::Attrs;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for internal attributes attached to a point
-$Data::DPath::Attrs::VERSION = '0.56';
+$Data::DPath::Attrs::VERSION = '0.57';
 use strict;
 use warnings;
 

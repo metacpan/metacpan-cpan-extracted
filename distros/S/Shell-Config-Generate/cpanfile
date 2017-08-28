@@ -2,7 +2,9 @@ requires "Shell::Guess" => "0.02";
 requires "perl" => "5.008001";
 
 on 'test' => sub {
+  requires "Test2::API" => "1.302015";
   requires "Test::More" => "0.94";
+  requires "base" => "0";
   requires "perl" => "5.008001";
 };
 
@@ -12,6 +14,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "FindBin" => "0";
   requires "Test::CPAN::Changes" => "0";
   requires "Test::EOL" => "0";
   requires "Test::Fixme" => "0.07";

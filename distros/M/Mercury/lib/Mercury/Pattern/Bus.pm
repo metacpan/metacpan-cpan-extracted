@@ -1,5 +1,5 @@
 package Mercury::Pattern::Bus;
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 # ABSTRACT: A messaging pattern where all peers share messages
 
 #pod =head1 SYNOPSIS
@@ -92,7 +92,7 @@ Mercury::Pattern::Bus - A messaging pattern where all peers share messages
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

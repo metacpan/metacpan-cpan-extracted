@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::SettlementBatchSummary;
-$WebService::Braintree::ErrorCodes::SettlementBatchSummary::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::SettlementBatchSummary::VERSION = '0.93';
 use strict;
 
 use constant CustomFieldIsInvalid     => "82303";

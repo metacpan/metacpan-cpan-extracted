@@ -1,5 +1,18 @@
 Changelog for CPAN-Testers-Backend
 
+0.002     2017-08-22 20:03:05-05:00 America/Chicago
+
+    [Added]
+
+    - Added new test report processing script,
+      CPAN::Testers::Backend::ProcessReports (thanks @jberger!)
+    - Added Minion job processing system via Beam::Minion
+    - Added migration for metabase cache:
+      CPAN::Testers::Backend::Migrate::MetabaseCache
+    - Added logging to our container files. Now all processes in the
+      backend get logged to STDERR (and syslog, though our syslog is not
+      configured to put those logs anywhere useful).
+
 0.001     2017-05-13 11:00:49+02:00 Europe/Paris
 
     [Added]

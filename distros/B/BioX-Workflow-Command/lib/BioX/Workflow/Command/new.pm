@@ -8,7 +8,7 @@ use YAML;
 
 use MooseX::Types::Path::Tiny qw/Path/;
 
-use BioX::Workflow::Command::Utils::Traits qw(ArrayRefOfStrs);
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 
 extends 'BioX::Workflow::Command';
 
@@ -20,7 +20,10 @@ command_long_description 'Create a new workflow';
 
 =head1 BioX::Workflow::Command::new
 
-This is the main class of the `biox-workflow.pl new` command.
+Create a new workflow
+
+  biox new -h
+  biox new -w my_new_workflow.yml
 
 =cut
 
@@ -46,7 +49,7 @@ sub execute {
     my $global = {
         global =>
             [
-                { sample_rule      => "Sample_.*" },
+                { sample_rule      => "(Sample_.*)" },
                 { indir            => 'data/raw' },
                 { outdir           => 'data/processed' },
                 { root_dir         => 'data' },

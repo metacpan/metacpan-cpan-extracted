@@ -291,11 +291,18 @@ html,body {
 	font-family: [% IF fonts %]"[% fonts.main.name %]",[% END %] serif;
 }
 
-[% IF epub %]
-div#page > p {
+div#thework {
+    margin-top: 3em;
+}
+
+div#thework > p {
    margin: 0;
    text-indent: 1em;
    text-align: justify;
+}
+
+p.tableofcontentline {
+   margin: 0;
 }
 
 blockquote > p, li > p {
@@ -306,9 +313,8 @@ blockquote > p, li > p {
 
 a {
    color:#000000;
-   text-decoration: underline
+   text-decoration: underline;
 }
-[%  END %]
 
 [% IF html %]
 div#page {

@@ -3,12 +3,13 @@ abstract: 'Sliding window rate limiting with Redis'
 author:
   - 'Marc Mims <marc@questright.com>'
 build_requires:
+  Test::Fatal: '0'
   Test::Mock::Time: '0'
   Test::Spec: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,5 +39,5 @@ resources:
   bugtracker: https://github.com/semifor/Redis-RateLimit/issues
   homepage: https://github.com/semifor/Redis-RateLimit
   repository: https://github.com/semifor/Redis-RateLimit.git
-version: '1.0001'
+version: '1.0002'
 x_serialization_backend: 'YAML::Tiny version 1.69'

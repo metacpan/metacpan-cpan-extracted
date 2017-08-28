@@ -1,6 +1,0 @@
-exists:
-redhat-release
-fedora-release
-do not:
-redhat_version
-lsb-release

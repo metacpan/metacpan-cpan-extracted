@@ -13,7 +13,8 @@ use AnyEvent::HTTP::MultiGet;
 use AnyEvent::WebSocket::Client;
 use JSON;
 use namespace::clean;
-our $VERSION='1.0002';
+use IO::Socket::SSL;
+our $VERSION='1.0003';
 
 BEGIN { 
   no namespace::clean;
@@ -198,6 +199,11 @@ sub connect_and_run {
   my ($self)=@_;
   my $request=POST $self->rtm_start_url,[token=>$self->token];
   my $ua=LWP::UserAgent->new;
+  $ua->ssl_opts(
+    SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE,
+    SSL_hostname => '',
+    verify_hostname => 0 
+  );
   my $response=$ua->request($request);
   $self->{timer}=undef;
   if($response->code==200) {

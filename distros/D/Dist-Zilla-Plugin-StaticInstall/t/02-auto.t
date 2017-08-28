@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Deep;
@@ -455,12 +455,12 @@ subtest $_->{test_name} => sub
     {
         plan skip_all => "[$plugin] is not installed"
             if eq_deeply($config->{zilla_config_pre}, supersetof(supersetof($plugin)))
-                and not eval "require Dist::Zilla::Plugin::$plugin; 1";
+                and not eval { require_module("Dist::Zilla::Plugin::$plugin") };
     }
 
     plan skip_all => '[MetaJSON] (as of 6.007) is no longer capable of generating files using metaspec version 1.4'
         if eq_deeply($config->{zilla_config_pre}, supersetof([ 'MetaJSON' => { version => '1.4' } ]))
-            and eval { require Dist::Zilla::Plugin::MetaJSON; Dist::Zilla::Plugin::MetaJSON->VERSION('6.007') };
+            and eval { +require Dist::Zilla::Plugin::MetaJSON; Dist::Zilla::Plugin::MetaJSON->VERSION('6.007') };
 
     local $MyMetadata::metadata = $config->{metadata} || {};
     local $MyMetadata::prereqs = $config->{metadata}{prereqs};

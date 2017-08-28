@@ -1,5 +1,6 @@
 use Test::More;
-use Modern::Perl '2009';
+use strict;
+use warnings;
 use lib 'lib';
 use WebService::Gitter;
 
@@ -17,11 +18,11 @@ my $true = 1;
 my $false = 0;
 
 # change $false to $true if you want to do advanced test
-my $AUTHOR_TESTING = $true;
+my $AUTHOR_TESTING = $false;
 
 SKIP:
 {
-	skip "installation testing", 1 unless $AUTHOR_TESTING == $false;
+	skip "installation testing", 1 unless $AUTHOR_TESTING == $true;
 
 	ok(my $git =
 		WebService::Gitter->new(
@@ -38,20 +39,14 @@ SKIP:
 		ok(my $current_user = $git->me(), "Get current logged in user");
 		ok($git->show_dst($current_user), "Show current logged in user data structures");
 		ok(my $groups = $git->groups(), "List groups");
-		ok($git->show_dst($groups), "list groups dst");
 		ok(my $rooms_group = $git->rooms_under_group($group_id), "list rooms under group");
 		ok(my $rooms = $git->rooms(), "list rooms");
-		ok($git->show_dst($rooms), "show_dst list_messages()");
 		ok($git->rooms("FreeCodeCamp"), "list rooms based on query search");
 	
 		ok(my $room_users = $git->room_users($room_id), "list room's users");
-		ok($git->show_dst($room_users), "show_dst rooms()"); 
 		ok(my $messages = $git->list_messages($room_id), "list all messages in the room");
-		ok($git->show_dst($messages), "show_dst list_messages()");
 		ok(my $a_message = $git->single_message($room_id, "596a44a9329651f46e8dd496"), "get a single message from room");
-		ok($git->show_dst($a_message), "show_dst single_message()");
-		ok(my $send_message_resp = $git->send_message($room_id, "heh"), "send message");
-	}
+    }
 };
 
 done_testing;

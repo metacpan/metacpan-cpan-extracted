@@ -45,6 +45,7 @@
             "Class::Method::Modifiers" : "2.12",
             "Hash::Merge" : "0.2",
             "List::MoreUtils" : "0.33",
+            "Module::Runtime" : "0.014",
             "Package::Stash" : "0.36",
             "Params::Validate" : "1.10",
             "Readonly" : "2.00",
@@ -63,7 +64,7 @@
    "provides" : {
       "Mic" : {
          "file" : "lib/Mic.pm",
-         "version" : "0.000003"
+         "version" : "0.000005"
       },
       "Mic::ArrayImpl" : {
          "file" : "lib/Mic/ArrayImpl.pm"
@@ -104,9 +105,10 @@
          "web" : "https://github.com/arunbear/Mic"
       }
    },
-   "version" : "0.000003",
+   "version" : "0.000005",
    "x_contributors" : [
-      "Arun Prasaad <arunbear@gmail.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "arunbear <arunbear@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -25,7 +25,7 @@ while (my $r = $tree->next()) {
         my @lines = io->file($r)->getlines();
         foreach (@lines)
         {
-            s#(\$VERSION = '|^Version )\d+\.\d+(?:\.\d+)?('|)#$1 . $version_n . $2#e;
+            s#(\$VERSION = 'v?|^Version )\d+\.\d+(?:\.\d+)?('|)#$1 . $version_n . $2#e;
         }
         io->file($r)->print(
             @lines

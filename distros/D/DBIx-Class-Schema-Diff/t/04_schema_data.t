@@ -10,7 +10,8 @@ my @Core_ISA = @{ mro::get_linear_isa('DBIx::Class::Core') };
 
 use Path::Class qw( dir file );
 my $var_dir = dir("$Bin/var");
-my $tmp_dir = dir($var_dir,"tmp");
+my $tmp_dir = dir($var_dir,"dbicsd-t-tmp");
+$tmp_dir->rmtree if (-d $tmp_dir);
 $tmp_dir->mkpath unless (-d $tmp_dir);
 
 use Test::More;

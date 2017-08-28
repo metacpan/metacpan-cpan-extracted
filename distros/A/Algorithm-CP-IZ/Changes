@@ -1,5 +1,8 @@
 Revision history for Perl extension Algorithm::CP::IZ.
 
+0.03  Sun Aug 27 2017
+	- Now $iz->restore_context_until can restore values even if $iz->search is called.
+
 0.02  Mon Nov 07 2015
 	- Change default directories for header and include in Makefile.PL
 	- Avoid error "during global destruction."

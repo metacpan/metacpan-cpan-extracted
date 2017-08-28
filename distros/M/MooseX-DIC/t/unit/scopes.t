@@ -6,7 +6,8 @@ use FindBin;
 
 use lib "$FindBin::RealBin/../../local/lib/perl5";
 use lib "$FindBin::RealBin/../../lib";
-use lib "$FindBin::RealBin/scopes/lib";
+use lib "$FindBin::RealBin/scopes/code";
+use lib "$FindBin::RealBin/scopes/file";
 
 use Test::Spec;
 use Log::Log4perl ':easy';
@@ -24,7 +25,7 @@ describe 'A Moose DI container,' => sub {
 	describe 'given a fixed scanpath,' => sub {
 
 		before all => sub {
-			$container = build_container( scan_path => ["$FindBin::RealBin/scopes/lib"] );
+			$container = build_container( scan_path => ["$FindBin::RealBin/scopes/code"] );
 		};
 
 		it 'should provide a singleton scoped service' => sub {
@@ -55,6 +56,21 @@ describe 'A Moose DI container,' => sub {
 			is(ref $exception,'MooseX::DIC::ContainerConfigurationException');
 		};
 	};
+
+  describe 'given a file config,' => sub {
+
+		before all => sub {
+			$container = build_container( scan_path => ["$FindBin::RealBin/scopes/file"] );
+		};
+
+    it 'should be capable of injecting a request-injected request scoped service' => sub {
+    	my $service = $container->get_service('Test6');
+			my $dependency1 = $service->dependency1;
+			my $dependency2 = $service->dependency1;
+
+			ok($dependency1 != $dependency2);
+    };
+  }
 
 };
 

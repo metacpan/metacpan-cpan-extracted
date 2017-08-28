@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-PluginBundle-Author-CCM.
 
+0.008001  2017-08-25 22:00:56-06:00 MST7MDT
+
+  * Declare new dependency on Perl::Version
+
+0.008     2017-08-25 21:28:07-06:00 MST7MDT
+
+  * Automatically figure out perl_version and perl_version_build TravisYML
+    configuration based on configured minimum perl requirement
+
 0.007     2017-03-11 18:33:58-07:00 MST7MDT
 
   * Prevent writing wrong version to Changes

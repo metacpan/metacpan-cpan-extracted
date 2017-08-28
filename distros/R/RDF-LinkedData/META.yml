@@ -34,10 +34,10 @@ optional_features: {}
 provides:
   Plack::App::RDF::LinkedData:
     file: lib/Plack/App/RDF/LinkedData.pm
-    version: '0.78'
+    version: '1.00'
   RDF::LinkedData:
     file: lib/RDF/LinkedData.pm
-    version: '0.78'
+    version: '1.00'
 recommends:
   Config::ZOMG: '0'
   JSON: '0'
@@ -66,6 +66,7 @@ requires:
   URI: '1.52'
   URI::NamespaceMap: '0.32'
   namespace::autoclean: '0.12'
+  parent: '0'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#perlrdf
@@ -76,7 +77,7 @@ resources:
   homepage: https://metacpan.org/release/RDF-LinkedData
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kjetilk/RDF-LinkedData/
-version: '0.78'
+version: '1.00'
 x_contributors:
   - 'Gregory Todd Williams <gwilliams@cpan.org>'
   - 'Richard Lewis'

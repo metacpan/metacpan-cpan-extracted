@@ -16,21 +16,24 @@ my %WriteMakefileArgs = (
   "LICENSE" => "apache",
   "NAME" => "MooseX::DIC",
   "PREREQ_PM" => {
+    "Exporter::Declare" => 0,
     "File::Find" => 0,
-    "File::Slurp" => 0,
+    "File::Slurper" => 0,
     "File::Spec" => 0,
     "Log::Log4perl" => 0,
+    "Module::Load" => 0,
     "Moose" => 0,
     "MooseX::Role::Parameterized" => 0,
     "Throwable" => 0,
     "Try::Tiny" => 0,
     "YAML::XS" => 0,
-    "aliased" => 0
+    "aliased" => 0,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Spec" => 0
   },
-  "VERSION" => "0.2.0",
+  "VERSION" => "0.3.2",
   "test" => {
     "TESTS" => "t/unit/*.t"
   }
@@ -38,17 +41,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Exporter::Declare" => 0,
   "File::Find" => 0,
-  "File::Slurp" => 0,
+  "File::Slurper" => 0,
   "File::Spec" => 0,
   "Log::Log4perl" => 0,
+  "Module::Load" => 0,
   "Moose" => 0,
   "MooseX::Role::Parameterized" => 0,
   "Test::Spec" => 0,
   "Throwable" => 0,
   "Try::Tiny" => 0,
   "YAML::XS" => 0,
-  "aliased" => 0
+  "aliased" => 0,
+  "namespace::autoclean" => 0
 );
 
 

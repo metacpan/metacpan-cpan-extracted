@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Spec;
+
+use MYDan::Node;
+use MYDan::Util::OptConf;
+use MYDan::Monitor::Collector;
+use MYDan::Monitor::Make;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'monitor';
+
+=head1 SYNOPSIS
+
+ $0  # default '{==*==*??==*}'
+
+ $0 -r range
+
+=cut
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->set( range => '{==*==*??==*}' )->get( qw( range=s ) )->dump();
+
+my $range = MYDan::Node->new( $option->dump( 'range' ) );
+
+my $make = MYDan::Monitor::Make->new( %o, option => $option );
+my @node = $range->load( delete $o{range} )->list;
+$make->make( @node );
+my $client = MYDan::Monitor::Collector->new( 
+    @node
+);
+
+my %result = $client->run( %o ); 
+
+YAML::XS::DumpFile \*STDERR, \%result if %result;
+exit 0;

@@ -99,6 +99,9 @@ t/V4/Node/utf8.vcf
 t/V4/Simple/base.vcf
 t/V4/Simple/sort_as.vcf
 t/V4/Simple/utf8.vcf
+t/V4/Sort_as/fn.vcf
+t/V4/Sort_as/n.vcf
+t/V4/Sort_as/org.vcf
 t/V4/Tel/base.vcf
 t/V4/Tel/maltiple.vcf
 t/V4/address.t
@@ -114,6 +117,7 @@ t/V4/node.t
 t/V4/related.t
 t/V4/related.vcf
 t/V4/simple.t
+t/V4/sort_as.t
 t/V4/tel.t
 t/precisely.t
 META.yml

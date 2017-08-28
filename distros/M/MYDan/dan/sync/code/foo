@@ -1,0 +1,25 @@
+#!# perl: sync/code/foo
+use strict;
+use warnings;
+use Carp;
+
+# task => check  %% jobs for check
+# task => sync %% jobs for sync
+
+return sub
+{
+    my ( %param, $stat  ) = @_;
+
+    if( $param{task} eq 'check' )
+    {
+        #check bala bala ...
+        $stat = int rand 4;
+    }
+    else
+    {
+        $stat = int rand 2;
+    }
+
+    &{$param{say}}( "stat: $stat" );
+    return $stat;
+};

@@ -70,7 +70,7 @@
 #undef HAVE_VPRINTF
 
 /* Define to 1 if you have the `vsnprintf' function. */
-#undef HAVE_VSNPRINTF
+#[% VSNPRINTF %]
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */

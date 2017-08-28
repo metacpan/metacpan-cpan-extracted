@@ -3,7 +3,7 @@
 # Business::Bitcoin - Easy and secure way to accept Bitcoin payments online
 # Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash.neo.tc>
 #
-# $Id: lib/Business/Bitcoin.pm v1.046 Tue Jun  6 01:38:01 PDT 2017 $
+# $Id: lib/Business/Bitcoin.pm v1.047 Thu Aug 17 01:01:54 PDT 2017 $
 
 use strict;
 
@@ -18,18 +18,18 @@ use Business::Bitcoin::Request;
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.046 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.047 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
-  my %args = @_;
-  return undef unless $args{XPUB};
-  return undef if $args{StartIndex} and $args{StartIndex} =~ /\D/;
-  unlink $args{DB} if $args{Clobber} and $args{DB} ne ':memory:';
-  my $db = DBI->connect("dbi:SQLite:dbname=$args{DB}", undef, undef, {AutoCommit => 1});
+  my %arg = @_;
+  return undef unless $arg{XPUB};
+  return undef if $arg{StartIndex} and $arg{StartIndex} =~ /\D/;
+  unlink $arg{DB} if $arg{Clobber} and $arg{DB} ne ':memory:';
+  my $db = DBI->connect("dbi:SQLite:dbname=$arg{DB}", undef, undef, {AutoCommit => 1});
   my @tables = $db->tables('%','%','requests','TABLE');
   unless ($tables[0]) {
-    if ($args{Create}) {
+    if ($arg{Create}) {
       return undef unless $db->do('CREATE TABLE requests (
 		                                         reqid INTEGER PRIMARY KEY AUTOINCREMENT,
 		                                         amount int NOT NULL,
@@ -41,7 +41,7 @@ sub new {
 		                                        );');
       return undef unless $db->do('CREATE INDEX idx_requests_address ON requests(address);');
       return undef unless $db->do('CREATE INDEX idx_requests_refid ON requests(refid);');
-      my $startindex = $args{StartIndex} || 0;
+      my $startindex = $arg{StartIndex} || 0;
       $startindex--;
       return unless $db->do("INSERT INTO SQLITE_SEQUENCE values ('requests',$startindex);");
     }
@@ -49,23 +49,23 @@ sub new {
       return undef;
     }
   }
-  bless { XPUB => $args{XPUB}, DB => $db, PATH => $args{Path} || 'penultimate' }, $class;
+  bless { XPUB => $arg{XPUB}, DB => $db, PATH => $arg{Path} || 'penultimate' }, $class;
 }
 
 sub request {                      # Create a Bitcoin payment request
-  my ($self, %args) = @_;
-  return undef if $args{Amount} !~ /^\d+$/;
+  my ($self, %arg) = @_;
+  return undef if $arg{Amount} !~ /^\d+$/;
 
   # Workaround for SQLite not starting sequence from 0 when asked to in new()
   my $startindex = $self->db->selectcol_arrayref("SELECT seq from SQLITE_SEQUENCE WHERE name='requests';")->[0];
   my %forcezero; %forcezero = ( StartIndex => 0 ) if $startindex == -1;
 
-  my $req = new Business::Bitcoin::Request (_BizBTC => $self, %args, %forcezero);
+  my $req = new Business::Bitcoin::Request (_BizBTC => $self, %arg, %forcezero);
 }
 
 sub findreq {                      # Retrieve a previously created request
-  my ($self, %args) = @_;
-  my $req = _find Business::Bitcoin::Request (_BizBTC => $self, %args);
+  my ($self, %arg) = @_;
+  my $req = _find Business::Bitcoin::Request (_BizBTC => $self, %arg);
 }
 
 sub AUTOLOAD {
@@ -92,8 +92,8 @@ Business::Bitcoin - Easy and secure way to accept Bitcoin payments online
 
 =head1 VERSION
 
- $Revision: 1.046 $
- $Date: Tue Jun  6 01:38:01 PDT 2017 $
+ $Revision: 1.047 $
+ $Date: Thu Aug 17 01:01:54 PDT 2017 $
 
 =head1 SYNOPSIS
 

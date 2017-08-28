@@ -1,5 +1,5 @@
 {
-   "abstract" : "Sim::OPT is a decomposition-oriented optimization and morphing program that can mix sequential and parallel block search methods.",
+   "abstract" : "Sim::OPT is a decomposition-oriented program for optimization and parametric exploration that can mix sequential and parallel block search methods.",
    "author" : [
       "Gian Luca Brunetti <gianluca.brunetti@polimi.it>"
    ],
@@ -54,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.72.71",
+   "version" : "v0.72.73",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

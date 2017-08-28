@@ -1,5 +1,9 @@
 Revision history for Perl module App::rmspaces
 
+0.6 2017-08-25
+  * Improve installation instructions in documentation.
+  * Require specific version of dependencies.
+
 0.5 2017-07-23
   * Fix bug when operating on paths with target character.
   * Do not overwrite files by default.

@@ -1,5 +1,5 @@
 package WebService::Braintree;
-$WebService::Braintree::VERSION = '0.92';
+$WebService::Braintree::VERSION = '0.93';
 use strict;
 use warnings;
 use WebService::Braintree::Address;
@@ -14,7 +14,6 @@ use WebService::Braintree::Dispute;
 use WebService::Braintree::MerchantAccount;
 use WebService::Braintree::PartnerMerchant;
 use WebService::Braintree::PaymentMethod;
-use WebService::Braintree::PaymentMethodNonce;
 use WebService::Braintree::PayPalAccount;
 use WebService::Braintree::PayPalDetails;
 use WebService::Braintree::ResourceCollection;
@@ -124,10 +123,6 @@ Create, update, and find merchant accounts.
 =head3 L<WebService::Braintree::PaymentMethod>
 
 Create, update, delete, and find payment methods.
-
-=head3 L<WebService::Braintree::PaymentMethodNonce>
-
-Create and find payment method nonces.
 
 =head3 L<WebService::Braintree::PayPalAccount>
 
@@ -329,8 +324,6 @@ One of the sandbox tests is really really slow.
 
 Thanks to the staff at Braintree for endorsing this fork.
 
-Thanks to ziprecruiter for sponsoring improvements to the forked code.
-
 =head2 LICENSE AND COPYRIGHT
 
 Copyright 2017 Kieren Diment <zarquon@cpan.org>
@@ -343,11 +336,6 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
-=head2 AUTHORS
-
-Braintree Staff
-Kieren Diment <zarquon@cpan.org>
-Rob Kinyon <rob.kinyon@gmail.com>
 
 =cut
 

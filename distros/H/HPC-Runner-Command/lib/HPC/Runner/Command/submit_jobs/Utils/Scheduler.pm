@@ -18,7 +18,7 @@ use Text::ASCIITable;
 use Memoize;
 use List::MoreUtils qw(first_index);
 
-use HPC::Runner::Command::Utils::Traits qw(ArrayRefOfStrs);
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 
 with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::ParseInput';
 with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps';
@@ -651,9 +651,9 @@ sub iterate_schedule {
     $self->update_job_scheduler_deps_by_task;
 
     $self->summarize_jobs;
-    
-    $self->write_job_project_table;
-    $self->write_task_project_table;
+
+    # $self->write_job_project_table;
+    # $self->write_task_project_table;
 }
 
 =head3 iterate_job_deps

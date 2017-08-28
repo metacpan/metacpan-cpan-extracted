@@ -11,13 +11,21 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   ExtUtils::CBuilder
+  ExtUtils::CppGuess
   ExtUtils::MakeMaker
   Test2::Require
   Test2::V0
   Test::Alien
+  Text::ParseWords
 );
 
-
+$post_diag = sub {
+  require ExtUtils::CppGuess;
+  my %cppguess = ExtUtils::CppGuess->new->module_build_options;
+  foreach my $key (sort keys %cppguess) {
+    diag sprintf("%30s = %s\n", $key, $cppguess{$key});
+  }
+};
 
 my @modules = sort keys %modules;
 

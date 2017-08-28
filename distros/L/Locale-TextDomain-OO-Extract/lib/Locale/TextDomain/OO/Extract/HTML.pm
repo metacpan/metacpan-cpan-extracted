@@ -1,4 +1,4 @@
-package Locale::TextDomain::OO::Extract::HTML; ## no critic (TidyCode)
+package Locale::TextDomain::OO::Extract::HTML; ## no critic (TidyCode MainComplexity)
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -29,7 +29,9 @@ my $start_rule = qr{
 }xms;
 
 my $rules = [
-    # <input type="submit|button|checkbox|radio" class="... loc_|__|loc ..." value="text to extract" ...>
+    # <input class="... loc_|__|loc ..." ... placeholder="text to extract" ... />
+    # <input class="... loc_|__|loc ..." ... title="text to extract" ... />
+    # <input class="... loc_|__|loc ..." ... value="text to extract" ... />
     [
         'begin',
         sub {
@@ -37,42 +39,193 @@ my $rules = [
 
             my $regex = qr{
                 [<] input \b
-                (
-                    .*? \b type \s* [=]
-                    (?:
-                        ["] ( button | checkbox | radio | submit ) ["]
-                        | ['] ( button | checkbox | radio | submit ) [']
-                    )
-                    .*?
-                )
-                [>]
+                ( [^>]* )
+                />
             }xms;
             $content_ref
                 or return $regex;
-            my ( $full_match, $inner, $type1, $type2 )
+            my ( $full_match, $inner )
                 = ${$content_ref} =~ m{ \G ( $regex ) }xms
                     or return;
-            my $type = $type1 || $type2;
-            if ( $type eq 'button' || $type eq 'submit' ) {
-                $inner =~ m{ \b value \s* [=] \s* ["] ( [^"]+ ) ["] }xms
-                    and return $full_match, $1;
-                $inner =~ m{ \b value \s* [=] \s* ['] ( [^']+ ) ['] }xms
-                    and return $full_match, $1;
 
-            }
-            elsif ( $type eq 'checkbox' || $type eq 'radio' ) {
-                $inner =~ m{ \b title \s* [=] \s* ["] ( [^"]+ ) ["] }xms
-                    and return $full_match, $1;
-                $inner =~ m{ \b title \s* [=] \s* ['] ( [^']+ ) ['] }xms
-                    and return $full_match, $1;
-            }
+            my @match = (
+                $inner =~ m{ \b placeholder \s* [=] \s* ["] ( [^"]+ ) ["] }xms,
+                $inner =~ m{ \b placeholder \s* [=] \s* ['] ( [^']+ ) ['] }xms,
+                $inner =~ m{ \b title \s* [=] \s* ["] ( [^"]+ ) ["] }xms,
+                $inner =~ m{ \b title \s* [=] \s* ['] ( [^']+ ) ['] }xms,
+                (
+                    $inner =~ m{ \b type \s* [=] \s* ["] (?: submit | reset | button ) ["] }xms
+                    || $inner =~ m{ \b type \s* [=] \s* ['] (?: submit | reset | button ) ['] }xms
+                )
+                ? (
+                    $inner =~ m{ \b value \s* [=] \s* ["] ( [^"]+ ) ["] }xms
+                    ? $1
+                    : $inner =~ m{ \b value \s* [=] \s* ['] ( [^']+ ) ['] }xms
+                    ? $1
+                    : ()
+                )
+                : (),
+            );
+            @match
+                and return +( $full_match, @match );
 
             return;
         },
         'end',
     ],
     'or',
-    # <... class="... loc_|__|loc ...' ... >text to extract<
+    # <textarea
+    #   class="... loc_|__|loc ..."
+    #   placeholder="text to extract"
+    #   ...
+    # ></textarea>
+    [
+        'begin',
+        sub {
+            my $content_ref = shift;
+
+            my $regex = qr{
+                [<] textarea \b
+                ( [^>]* )
+                [>]
+            }xms;
+            $content_ref
+                or return $regex;
+            my ( $full_match, $inner )
+                = ${$content_ref} =~ m{ \G ( $regex ) }xms
+                    or return;
+                $inner =~ m{ \b placeholder \s* [=] \s* ["] ( [^"]+ ) ["] }xms
+                    and return +( $full_match, $1 );
+                $inner =~ m{ \b placeholder \s* [=] \s* ['] ( [^']+ ) ['] }xms
+                    and return +( $full_match, $1 );
+
+            return;
+        },
+        'end',
+    ],
+    'or',
+    # <img class="... loc_|__|loc ..." ... alt="text to extract" ... />
+    [
+        'begin',
+        sub {
+            my $content_ref = shift;
+
+            my $regex = qr{
+                [<] img \b
+                ( [^>]* )
+                />
+            }xms;
+            $content_ref
+                or return $regex;
+            my ( $full_match, $inner )
+                = ${$content_ref} =~ m{ \G ( $regex ) }xms
+                    or return;
+
+            my @match = (
+                $inner =~ m{ \b alt \s* [=] \s* ["] ( [^"]+ ) ["] }xms,
+                $inner =~ m{ \b alt \s* [=] \s* ['] ( [^']+ ) ['] }xms,
+            );
+            @match
+                and return +( $full_match, @match );
+
+            return;
+        },
+        'end',
+    ],
+    'or',
+    # <a class="... loc_|__|loc ..." ... title="text to extract" ... >text_to_extract</a>
+    [
+        'begin',
+        sub {
+            my $content_ref = shift;
+
+            my $regex = qr{
+                [<] [a] \b
+                ( [^>]* )
+                [>]
+                ( [^<]* )
+            }xms;
+            $content_ref
+                or return $regex;
+            my ( $full_match, $inner, $text )
+                = ${$content_ref} =~ m{ \G ( $regex ) }xms
+                    or return;
+
+            my @match = (
+                $inner =~ m{ \b title \s* [=] \s* ["] ( [^"]+ ) ["] }xms,
+                $inner =~ m{ \b title \s* [=] \s* ['] ( [^']+ ) ['] }xms,
+            );
+            @match
+                and return +( $full_match, $text, @match );
+
+            return;
+        },
+        'end',
+    ],
+    'or',
+    # <button class="... loc_|__|loc ..." ... title="text to extract" ... >text_to_extract</button>
+    [
+        'begin',
+        sub {
+            my $content_ref = shift;
+
+            my $regex = qr{
+                [<] button \b
+                ( [^>]* )
+                [>]
+                ( [^<]* )
+            }xms;
+            $content_ref
+                or return $regex;
+            my ( $full_match, $inner, $text )
+                = ${$content_ref} =~ m{ \G ( $regex ) }xms
+                    or return;
+
+            my @match = (
+                $inner =~ m{ \b title \s* [=] \s* ["] ( [^"]+ ) ["] }xms,
+                $inner =~ m{ \b title \s* [=] \s* ['] ( [^']+ ) ['] }xms,
+            );
+            @match
+                and return +( $full_match, $text, @match );
+
+            return;
+        },
+        'end',
+    ],
+    'or',
+    # < class="... loc_|__|loc ..." ... title="text to extract" ... >text_to_extract<
+    [
+        'begin',
+        sub {
+            my $content_ref = shift;
+
+            my $regex = qr{
+                [<] \w+ \b
+                ( [^>]* )
+                [>]
+                ( [^<]* )
+            }xms;
+            $content_ref
+                or return $regex;
+            my ( $full_match, $inner, $text )
+                = ${$content_ref} =~ m{ \G ( $regex ) }xms
+                    or return;
+
+
+            my @match = (
+                $inner =~ m{ \b title \s* [=] \s* ["] ( [^"]+ ) ["] }xms,
+                $inner =~ m{ \b title \s* [=] \s* ['] ( [^']+ ) ['] }xms,
+                $text,
+            );
+            @match
+                and return +( $full_match, @match );
+
+            return;
+        },
+        'end',
+    ],
+    'or',
+    # <... class="... loc_|__|loc ..." ... >text to extract<
     [
         'begin',
         qr{
@@ -115,7 +268,7 @@ sub preprocess {
         join q{}, $1 =~ m{ ( \n ) }xmsg
     }xmsge;
 
-    return;
+    return $self;
 }
 
 sub stack_item_mapping {
@@ -125,17 +278,18 @@ sub stack_item_mapping {
     @{$match}
         or return;
 
-    my $string = shift @{$match};
-    $string =~ s{ \s+ \z }{}xms;
-    my ( $msgctxt, $msgid )
-        = $string =~ m{ \A (?: ( .*? ) \s* \Q{CONTEXT_SEPARATOR}\E )? \s* ( .* ) \z }xms;
-    $self->add_message({
-        reference => ( sprintf '%s:%s', $self->filename, $_->{line_number} ),
-        msgctxt   => $msgctxt,
-        msgid     => $msgid,
-    });
+    while ( my $string = shift @{$match} ) {
+        $string =~ s{ \s+ \z }{}xms;
+        my ( $msgctxt, $msgid )
+            = $string =~ m{ \A (?: ( .*? ) \s* \Q{CONTEXT_SEPARATOR}\E )? \s* ( .* ) \z }xms;
+        $self->add_message({
+            reference => ( sprintf '%s:%s', $self->filename, $_->{line_number} ),
+            msgctxt   => $msgctxt,
+            msgid     => $msgid,
+        });
+    }
 
-    return $self;
+    return;
 }
 
 sub extract {
@@ -146,11 +300,13 @@ sub extract {
     $self->preprocess;
     $self->SUPER::extract;
     for ( @{ $self->stack } ) {
-        $self->stack_item_mapping($_);
+        $self->stack_item_mapping;
     }
 
     return $self;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -160,13 +316,13 @@ __END__
 Locale::TextDomain::OO::Extract::HTML
 - Extracts internationalization data from HTML
 
-$Id: HTML.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: HTML.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/HTML.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 DESCRIPTION
 
@@ -194,6 +350,18 @@ Whitespace is allowed everywhere.
 =head1 SYNOPSIS
 
     use Locale::TextDomain::OO::Extract::HTML;
+    use Path::Tiny qw(path);
+
+    my $extractor = Locale::TextDomain::OO::Extract::HTML->new;
+    for ( @files ) {
+        $extractor->clear;
+        $extractor->filename($_);            # dir/filename for reference
+        $extractor->content_ref( \( path($_)->slurp_utf8 ) );
+        $exttactor->category('LC_Messages'); # set defaults or q{} is used
+        $extractor->domain('default');       # set defaults or q{} is used
+        $extractor->extract;
+    }
+    ... = $extractor->lexicon_ref;
 
 =head1 SUBROUTINES/METHODS
 
@@ -204,22 +372,21 @@ See Locale::TextDomain::OO::Extract to replace the defaults.
 
     my $extractor = Locale::TextDomain::OO::Extract::HTML->new;
 
-=head2 method extract
-
-Call
-
-    $extractor->filename('dir/filename for reference');
-    $extractor->extract;
-    
-=head2 preprocess
+=head2 method preprocess (called by method extract)
 
 Remove code between <!-- -->
 
-    $self->preprocess;
+    $extractor->preprocess;
 
-=head2 method stack_item_mapping
+=head2 method stack_item_mapping (called by method extract)
 
-    $self->stack_item_mapping($stack_item);
+    $extractor->stack_item_mapping;
+
+=head2 method extract
+
+This method runs the extraction.
+
+    $extractor->extract;
 
 =head1 EXAMPLE
 
@@ -266,7 +433,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

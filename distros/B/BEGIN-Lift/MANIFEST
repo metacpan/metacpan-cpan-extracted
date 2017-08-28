@@ -1,6 +1,6 @@
-.gitignore
 Changes
 lib/BEGIN/Lift.pm
+Makefile.PL
 Lift.xs
 MANIFEST			This list of files
 MANIFEST.skip

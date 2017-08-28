@@ -1,5 +1,12 @@
 Revision history for Net-IPAddress-Util
 
+3.031   2017-08-18
+        Fixup whitespace and make the tests smarter
+
+3.030   2017-08-18
+        Fix Range->outer_bounds() to return a moderately-compatible object (instead of gibberish), and nudge the tests to reflect that.
+        Get rid of weird dangling dependency on utf8 -- we don't use Unicode.
+
 3.029   2017-08-17
         Additional documentation, and a re-check of POD coverage
 

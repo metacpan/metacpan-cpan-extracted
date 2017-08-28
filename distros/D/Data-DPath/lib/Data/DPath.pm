@@ -1,9 +1,9 @@
 package Data::DPath;
-# git description: v0.55-15-g75abea8
+# git description: v0.56-7-g681b3f6
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: DPath is not XPath!
-$Data::DPath::VERSION = '0.56';
+$Data::DPath::VERSION = '0.57';
 use 5.008;
 use strict;
 use warnings;

@@ -35,13 +35,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Moose" : "0",
-            "Moose::Util::TypeConstraints" : "0",
             "MooseX::Privacy" : "0",
-            "Readonly" : "0",
-            "perl" : "5.012",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.012"
          }
       },
       "test" : {
@@ -58,7 +55,9 @@
             "blib" : "1.01",
             "constant" : "0",
             "parent" : "0",
-            "perl" : "5.012"
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -74,7 +73,7 @@
          "web" : "https://github.com/gryphonshafer/Bible-Reference"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

@@ -88,7 +88,8 @@ sub init {
     my $ede3 = shift;
     my($key) = @_;
     for my $i (1..3) {
-        $ede3->{"des$i"} = Crypt::Cipher::DES->new(substr $key, 8*($i-1), 8);
+        my $k = substr $key, 8*($i-1), 8;
+        $ede3->{"des$i"} = Crypt::Cipher::DES->new($k);
     }
 }
 

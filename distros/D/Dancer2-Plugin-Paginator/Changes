@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Paginator
 
+2.05  2017-08-25 MANWAR
+      - Generated 'provides' as recommended by CPANTS.
+
 2.04  2017-08-12 MANWAR
       - Added minimum perl version using dzil plugin [MinimumPerlFast].
 

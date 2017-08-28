@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find automake
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::automake - Build or find automake
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ In your script or module:
  use Alien::automake;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::automake->bin_dir;
+ unshift @PATH, Alien::automake->bin_dir;
 
 =head1 DESCRIPTION
 

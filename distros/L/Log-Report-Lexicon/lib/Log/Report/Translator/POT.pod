@@ -18,12 +18,12 @@ Log::Report::Translator::POT - translation based on POT files
    );
 
  print Log::Report::Translator::POT
-    ->new(lexicon => ...)
+    ->new(lexicon => $dir)
     ->translate($msg, 'nl-BE');
 
- # normal use (end-users view)
+ # normal use (end-users view in the program's ::main)
  textdomain 'my-domain'
-   , translator =>  Log::Report::Translator::POT->new;
+   , translator =>  Log::Report::Translator::POT->new(lexicon => $dir);
  print __"Hello World\n";
 
 =head1 DESCRIPTION
@@ -48,15 +48,15 @@ Extends L<"Constructors" in Log::Report::Translator|Log::Report::Translator/"Con
 =item Log::Report::Translator::POT-E<gt>B<new>(%options)
 
  -Option  --Default
-  charset   <from locale>
+  charset   <undef>
   lexicons  <see text>
 
 =over 2
 
 =item charset => STRING
 
-When the locale contains a codeset in its name, then that will be
-used.  Otherwise, the default is C<utf-8>.
+Enforce character set for files.  We default to reading the character-set
+as defined in the header of each PO file.
 
 =item lexicons => DIRECTORY
 
@@ -117,14 +117,14 @@ Inherited, see L<Log::Report::Translator/"Translating">
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.08,
-built on June 29, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Lexicon distribution version 1.09,
+built on August 28, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
 Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

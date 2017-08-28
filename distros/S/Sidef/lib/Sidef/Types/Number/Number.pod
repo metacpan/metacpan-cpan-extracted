@@ -270,8 +270,6 @@ Number.abs() -> I<Obj>
 
 Return the
 
-Aliases: I<pos>, I<positive>
-
 =cut
 
 =head2 acos
@@ -343,6 +341,14 @@ Aliases: I<airy>
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_cfrac
+
+Number.as_cfrac() -> I<Obj>
 
 Return the
 
@@ -556,9 +562,33 @@ Return the
 
 =cut
 
+=head2 circular_permutations
+
+Number.circular_permutations() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cis
 
 Number.cis() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 combinations
+
+Number.combinations() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 combinations_with_repetition
+
+Number.combinations_with_repetition() -> I<Obj>
 
 Return the
 
@@ -661,6 +691,16 @@ Return the
 Number.deg2rad() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 derangements
+
+Number.derangements() -> I<Obj>
+
+Return the
+
+Aliases: I<complete_permutations>
 
 =cut
 
@@ -816,6 +856,14 @@ Aliases: I<factors_exp>
 
 =cut
 
+=head2 falling_factorial
+
+Number.falling_factorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -839,26 +887,6 @@ Return the
 Number.floor() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 forcomb
-
-Number.forcomb() -> I<Obj>
-
-Return the
-
-Aliases: I<combinations>
-
-=cut
-
-=head2 forperm
-
-Number.forperm() -> I<Obj>
-
-Return the
-
-Aliases: I<permutations>
 
 =cut
 
@@ -1009,6 +1037,22 @@ Aliases: I<modinv>
 =head2 ipow
 
 Number.ipow() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ipow10
+
+Number.ipow10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ipow2
+
+Number.ipow2() -> I<Obj>
 
 Return the
 
@@ -1504,8 +1548,6 @@ Number.neg() -> I<Obj>
 
 Return the
 
-Aliases: I<negative>
-
 =cut
 
 =head2 new
@@ -1630,6 +1672,14 @@ Return the
 
 =cut
 
+=head2 permutations
+
+Number.permutations() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 phi
 
 Number.phi() -> I<Obj>
@@ -1649,6 +1699,14 @@ Return the
 =head2 pn_primorial
 
 Number.pn_primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 polymod
+
+Number.polymod() -> I<Obj>
 
 Return the
 
@@ -1792,6 +1850,14 @@ Return the
 
 =cut
 
+=head2 rat_approx
+
+Number.rat_approx() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 re
 
 Number.re() -> I<Obj>
@@ -1817,6 +1883,14 @@ Number.remdiv() -> I<Obj>
 Return the
 
 Aliases: I<remove>
+
+=cut
+
+=head2 rising_factorial
+
+Number.rising_factorial() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1952,6 +2026,14 @@ Return the
 
 =cut
 
+=head2 subsets
+
+Number.subsets() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tan
 
 Number.tan() -> I<Obj>
@@ -1981,6 +2063,26 @@ Return the
 Number.times() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 tuples
+
+Number.tuples() -> I<Obj>
+
+Return the
+
+Aliases: I<variations>
+
+=cut
+
+=head2 tuples_with_repetition
+
+Number.tuples_with_repetition() -> I<Obj>
+
+Return the
+
+Aliases: I<variations_with_repetition>
 
 =cut
 

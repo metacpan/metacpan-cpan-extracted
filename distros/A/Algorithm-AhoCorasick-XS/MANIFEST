@@ -1,4 +1,6 @@
-ac.hpp
+Matcher.hpp
+Matcher.cpp
+Trie.hpp
 ac.xs
 lib/Algorithm/AhoCorasick/XS.pm
 Makefile.PL

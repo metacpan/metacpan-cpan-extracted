@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Lexicon::Index;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 
 use Log::Report       'log-report-lexicon';
@@ -15,11 +15,11 @@ use Log::Report::Util  qw/parse_locale/;
 use File::Find         ();
 
 # The next two need extension when other lexicon formats are added
-sub _understand_file_format($) { $_[0] =~ qr/\.[mp]o$/i }
+sub _understand_file_format($) { $_[0] =~ qr/\.(?:gmo|mo|po)$/i }
 
 sub _find($$)
 {   my ($index, $name) = (shift, lc shift);
-    $index->{"$name.mo"} || $index->{"$name.po"};  # prefer mo
+    $index->{"$name.mo"} || $index->{"name.gmo"} || $index->{"$name.po"};  # prefer mo
 }
 
 # On windows, other locale names are used.  They will get translated
@@ -42,9 +42,11 @@ sub new($;@)
     bless {dir => $dir, @_}, $class;  # dir before first argument.
 }
 
+#-------------------
 
 sub directory() {shift->{dir}}
 
+#-------------------
 
 sub index() 
 {   my $self = shift;
@@ -99,9 +101,9 @@ sub find($$)
     $cs    = defined $cs    ? '.'.$cs    : '';
     $modif = defined $modif ? '@'.$modif : '';
 
-    (my $normcs = $cs) =~ s/[^a-z\d]//g;
+    (my $normcs = $cs) =~ s/[^a-z0-9]//g;
     if(length $normcs)
-    {   $normcs = "iso$normcs" if $normcs !~ /\D/;
+    {   $normcs = "iso$normcs" if $normcs !~ /[^0-9-]/;
         $normcs = '.'.$normcs;
     }
 

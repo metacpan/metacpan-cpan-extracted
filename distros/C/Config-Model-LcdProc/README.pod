@@ -4,6 +4,10 @@ This module provides a graphical configuration editor for
 L<LcdProc|http://lcdproc.omnipotent.net/> configuration file
 (C</etc/LCDd.conf>).
 
+=head2 Usage
+
+See L<Managing Lcdproc configuration with cme|https://github.com/dod38fr/config-model/wiki/Managing-Lcdproc-configuration-with-cme>
+
 =head2 Main dependencies
 
 =over

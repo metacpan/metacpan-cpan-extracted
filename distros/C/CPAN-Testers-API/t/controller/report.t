@@ -17,12 +17,24 @@ my $t = prepare_test_app();
 subtest '/v3/report' => \&_test_api, '/v3';
 
 sub _test_api( $base ) {
-    subtest 'post report' => sub {
-        my $report = decode_json( $SHARE_DIR->child( 'perl5.v3.json' )->slurp );
+    subtest 'post valid report' => sub {
+        my $report = decode_json( $SHARE_DIR->child( qw( report perl5 valid.v3.json ) )->slurp );
         $t->post_ok( $base . '/report', json => $report )
           ->status_is( 201 )
           ->or( sub { diag shift->tx->res->body } )
           ->json_like( '/id' => qr{${HEX}{8}-${HEX}{4}-${HEX}{4}-${HEX}{4}-${HEX}{12}} )
+          ;
+    };
+
+    subtest 'invalid report: version number starts with v' => sub {
+        my $report = decode_json( $SHARE_DIR->child( qw( report perl5 invalid-version-v.json ) )->slurp );
+        $t->post_ok( $base . '/report', json => $report )
+          ->status_is( 400 )
+          ->or( sub { diag shift->tx->res->body } )
+          ->json_is( '/errors/0/path' => '/report/environment/language' )
+          ->or( sub { diag shift->tx->res->body } )
+          ->json_like( '/errors/0/message' => qr{String does not match} )
+          ->or( sub { diag shift->tx->res->body } )
           ;
     };
 

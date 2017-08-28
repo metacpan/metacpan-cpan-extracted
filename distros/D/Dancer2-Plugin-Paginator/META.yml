@@ -15,6 +15,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Dancer2-Plugin-Paginator
+provides:
+  Dancer2::Plugin::Paginator:
+    file: lib/Dancer2/Plugin/Paginator.pm
+    version: 2.05
 requires:
   Dancer2::Plugin: 0.159002
   Paginator::Lite: 2.001003
@@ -22,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/Dancer2-Plugin-Paginator/issues
   repository: git://github.com/manwar/Dancer2-Plugin-Paginator.git
-version: 2.04
+version: 2.05
 x_serialization_backend: 'YAML::Tiny version 1.56'

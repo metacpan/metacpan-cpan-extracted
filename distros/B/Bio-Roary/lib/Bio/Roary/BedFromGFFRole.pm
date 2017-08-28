@@ -1,5 +1,5 @@
 package Bio::Roary::BedFromGFFRole;
-$Bio::Roary::BedFromGFFRole::VERSION = '3.8.2';
+$Bio::Roary::BedFromGFFRole::VERSION = '3.9.1';
 # ABSTRACT: A role to create a bed file from a gff
 
 
@@ -76,7 +76,7 @@ Bio::Roary::BedFromGFFRole - A role to create a bed file from a gff
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

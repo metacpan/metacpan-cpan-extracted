@@ -1,5 +1,9 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.172320 2017-08-20T19:58:15Z
+ - Switch to using ReadmeAnyFromPod, ReadmeFromPod seems to be broken (Ioan
+   Rogers)
+
 1.162691 2016-09-25T14:25:58Z
  - DZP::AssertOS now required because dzil authordeps doesn't list
    recommends. Needed for travis-ci (Ioan Rogers)

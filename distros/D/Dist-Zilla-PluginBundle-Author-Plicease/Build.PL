@@ -1,7 +1,7 @@
 use strict; use warnings;
 BEGIN {
-  unless(eval q{ use 5.008001; 1}) {
-    print "Perl 5.008001 or better required\n";
+  unless(eval q{ use 5.014; 1}) {
+    print "Perl 5.014 or better required\n";
     exit;
   }
 }
@@ -26,7 +26,7 @@ my %module_build_args = (
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "Dist-Zilla-PluginBundle-Author-Plicease",
-  "dist_version" => "2.21",
+  "dist_version" => "2.22",
   "license" => "perl",
   "module_name" => "Dist::Zilla::PluginBundle::Author::Plicease",
   "recommends" => {
@@ -37,7 +37,7 @@ my %module_build_args = (
     "Dist::Zilla" => "6.00",
     "Dist::Zilla::App::Command::aliendeps" => "0.01",
     "Dist::Zilla::Plugin::Alien" => "0.023",
-    "Dist::Zilla::Plugin::Author::Plicease" => "2.21",
+    "Dist::Zilla::Plugin::Author::Plicease" => "2.22",
     "Dist::Zilla::Plugin::AutoMetaResources" => "1.20",
     "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0.150250",
     "Dist::Zilla::Plugin::InsertExample" => "0.04",
@@ -49,10 +49,8 @@ my %module_build_args = (
     "Dist::Zilla::Plugin::Run::BeforeBuild" => "0.035",
     "Dist::Zilla::Util::CurrentCmd" => 0,
     "File::Glob" => 0,
-    "File::ShareDir" => 0,
     "IPC::System::Simple" => "1.25",
     "Moose" => 0,
-    "Path::Class" => "0.31",
     "Path::Tiny" => 0,
     "PerlX::Maybe" => "0.003",
     "Pod::Markdown" => "1.400",
@@ -62,33 +60,21 @@ my %module_build_args = (
     "Test::Script" => "1.10",
     "Test::Version" => "2.00",
     "YAML" => "1.15",
-    "perl" => "5.008001"
+    "perl" => "5.014"
   },
   "test_requires" => {
-    "Capture::Tiny" => 0,
-    "Dist::Zilla::App" => 0,
-    "File::chdir" => 0,
-    "Test::Dir" => 0,
-    "Test::File" => 0,
-    "Test::File::ShareDir" => 0,
     "Test::More" => "0.94",
     "Test::Script" => "1.10",
-    "perl" => "5.008001"
+    "perl" => "5.014"
   }
 );
 
 
 my %fallback_build_requires = (
-  "Capture::Tiny" => 0,
-  "Dist::Zilla::App" => 0,
-  "File::chdir" => 0,
   "Module::Build" => "0.28",
-  "Test::Dir" => 0,
-  "Test::File" => 0,
-  "Test::File::ShareDir" => 0,
   "Test::More" => "0.94",
   "Test::Script" => "1.10",
-  "perl" => "5.008001"
+  "perl" => "5.014"
 );
 
 

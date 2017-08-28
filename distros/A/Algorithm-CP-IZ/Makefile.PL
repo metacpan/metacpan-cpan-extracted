@@ -81,7 +81,7 @@ my $iz_inc_dir = get_iz_inc_dir;
 WriteMakefile(
     NAME              => 'Algorithm::CP::IZ',
     VERSION_FROM      => 'lib/Algorithm/CP/IZ.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => { UNIVERSAL => 0, }, # e.g., Module::Name => 1.1
+    PREREQ_PM         => { UNIVERSAL => 0, "Scalar::Util" => 0,}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Algorithm/CP/IZ.pm', # retrieve abstract from module
     AUTHOR            => 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>',
     #LICENSE           => 'perl',

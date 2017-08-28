@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 41 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 43 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sah/Schema/byte.pm',
@@ -20,6 +20,7 @@ my @module_files = (
     'Sah/Schema/negeven.pm',
     'Sah/Schema/negint.pm',
     'Sah/Schema/negodd.pm',
+    'Sah/Schema/nonnegint.pm',
     'Sah/Schema/odd.pm',
     'Sah/Schema/poseven.pm',
     'Sah/Schema/posint.pm',
@@ -40,6 +41,7 @@ my @module_files = (
     'Sah/SchemaR/negeven.pm',
     'Sah/SchemaR/negint.pm',
     'Sah/SchemaR/negodd.pm',
+    'Sah/SchemaR/nonnegint.pm',
     'Sah/SchemaR/odd.pm',
     'Sah/SchemaR/poseven.pm',
     'Sah/SchemaR/posint.pm',

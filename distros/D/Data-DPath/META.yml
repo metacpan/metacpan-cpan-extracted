@@ -12,34 +12,12 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-DPath
-provides:
-  Data::DPath:
-    file: lib/Data/DPath.pm
-    version: '0.56'
-  Data::DPath::Attrs:
-    file: lib/Data/DPath/Attrs.pm
-    version: '0.56'
-  Data::DPath::Context:
-    file: lib/Data/DPath/Context.pm
-    version: '0.56'
-  Data::DPath::Filters:
-    file: lib/Data/DPath/Filters.pm
-    version: '0.56'
-  Data::DPath::Path:
-    file: lib/Data/DPath/Path.pm
-    version: '0.56'
-  Data::DPath::Point:
-    file: lib/Data/DPath/Point.pm
-    version: '0.56'
-  Data::DPath::Step:
-    file: lib/Data/DPath/Step.pm
-    version: '0.56'
 requires:
   Class::XSAccessor: '0'
   Class::XSAccessor::Array: '0'
@@ -62,10 +40,10 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-DPath
   homepage: http://metacpan.org/release/Data-DPath
   repository: git://github.com/renormalist/data-dpath.git
-version: '0.56'
+version: '0.57'
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.022000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -79,94 +57,78 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@SCHWIGON/@Basic/GatherDir'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@SCHWIGON/@Basic/PruneCruft'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@SCHWIGON/@Basic/ManifestSkip'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@SCHWIGON/@Basic/MetaYAML'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::License
       name: '@SCHWIGON/@Basic/License'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@SCHWIGON/@Basic/Readme'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@SCHWIGON/@Basic/ExtraTests'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@SCHWIGON/@Basic/ExecDir'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@SCHWIGON/@Basic/ShareDir'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@SCHWIGON/@Basic/MakeMaker'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@SCHWIGON/@Basic/Manifest'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@SCHWIGON/@Basic/TestRelease'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@SCHWIGON/@Basic/ConfirmRelease'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@SCHWIGON/@Basic/UploadToCPAN'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@SCHWIGON/MetaConfig'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@SCHWIGON/MetaJSON'
-      version: '5.043'
-    -
-      class: Dist::Zilla::Plugin::MetaProvides::Package
-      config:
-        Dist::Zilla::Plugin::MetaProvides::Package:
-          finder_objects:
-            -
-              class: Dist::Zilla::Plugin::FinderCode
-              name: '@SCHWIGON/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '5.043'
-        Dist::Zilla::Role::MetaProvider::Provider:
-          Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.001011'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
-      name: '@SCHWIGON/MetaProvides::Package'
-      version: '2.003001'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@SCHWIGON/PkgVersion'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@SCHWIGON/PodSyntaxTests'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -202,7 +164,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@SCHWIGON/MetaResources'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@SCHWIGON/Authority'
@@ -302,7 +264,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@SCHWIGON/AutoPrereqs'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@SCHWIGON/Git::Describe'
@@ -314,7 +276,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@SCHWIGON/NextRelease'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
@@ -373,7 +335,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.56
+          tag: v0.57
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -396,7 +358,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -404,7 +366,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:
@@ -420,50 +382,46 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.043'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: '@SCHWIGON/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '5.043'
+      version: '5.041'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.043'
+    version: '5.041'
 x_authority: cpan:SCHWIGON

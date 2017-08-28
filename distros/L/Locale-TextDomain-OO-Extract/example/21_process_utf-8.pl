@@ -21,6 +21,9 @@ my $process = Locale::TextDomain::OO::Extract::Process->new(
                            # project not used
 );
 
+# Skip if po file not exists. You get a default header, change later by hand.
+# If skipped, check plural-forms for non English, see:
+# http://translate.sourceforge.net/wiki/l10n/pluralforms
 SLURP_EXISTING_FILES: {
     # category and project unchanged
     for my $language (@languages) {
@@ -29,6 +32,7 @@ SLURP_EXISTING_FILES: {
     }
 }
 
+# Skip if po file not exists. You get a default header, change later by hand.
 PREPARE_FOR_EXTRACTION: {
     $process->remove_all_reference;
     $process->remove_all_automatic;
@@ -66,7 +70,7 @@ EXTRTACT: {
 }
 
 SPEW_TO_EXISTING_FILES: {
-    # use new files here to see what's going on
+    # Use new files here, to see what's going on.
     # category and project unchanged
     for my $language (@languages) {
         $process->language($language);
@@ -83,12 +87,12 @@ TRANSLATE: {
 }
 
 CLEAN_NO_LONGER_IN_SOURCE_ENTRIES: {
-    # cleans all entries that have got no new reference after extract files
+    # Cleans all entries that have got no new reference after extract files.
     $process->remove_all_non_referenced;
 }
 
 SPEW_TO_EXISTING_FILES: {
-    # use new files here to see what's going on
+    # Use new files here to see what's going on.
     # category and project unchanged
     for my $language (@languages) {
         $process->language($language);
@@ -110,7 +114,7 @@ my @content
     "de-at/LC_MESSAGES/example1.po (clean)\n\n",
     $content[1];
 
-# $Id: 21_process_utf-8.pl 561 2014-11-11 16:12:48Z steffenw $
+# $Id: 21_process_utf-8.pl 685 2017-08-23 05:42:23Z steffenw $
 
 __END__
 
@@ -139,6 +143,7 @@ msgstr "Januar"
 #. thing => 'text'
 #: files_to_extract_for_process/gettext_loc.pl:15
 msgid "This is a new {thing}."
+msgstr ""
 
 de-at/LC_MESSAGES/example1.po (clean)
 

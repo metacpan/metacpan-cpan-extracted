@@ -3,67 +3,93 @@ package WWW::ORCID;
 use strict;
 use warnings;
 
+our $VERSION = 0.0401;
+
+use Class::Load qw(try_load_class);
+use Carp;
+use namespace::clean;
+
+my $DEFAULT_VERSION = '2.0';
+
+sub new {
+    my $self    = shift;
+    my $opts    = ref $_[0] ? {%{$_[0]}} : {@_};
+    my $version = $opts->{version} ||= $DEFAULT_VERSION;
+    $version =~ s/\./_/g;
+    $version .= '_public' if $opts->{public};
+    my $class = "WWW::ORCID::API::v${version}";
+    try_load_class($class) or croak("Could not load $class: $!");
+    $class->new($opts);
+}
+
+1;
+
+__END__
+
+=pod
+
 =head1 NAME
 
-WWW::ORCID - Module to interface with the ORCID webservice
+WWW::ORCID - A client for the ORCID 2.0 API
 
 =head1 SYNOPSIS
 
-    use WWW::ORCID;
+    my $client = WWW::ORCID->new(client_id => "XXX", client_secret => "XXX");
 
-    my $orcid   = WWW::ORCID::API::Pub->new;
-    my $id      = '0000-0001-8390-6171';
+    my $client = WWW::ORCID->new(client_id => "XXX", client_secret => "XXX", sandbox => 1);
 
-    my $profile = $orcid->get_profile($id);
-    my $bio     = $orcid->get_bio($id);
-    my $works   = $orcid->get_works($id);
-
-    my $result  = $orcid->search_bio({q => "johnson"});
-
-    # Fielded search
-    ############################################################
-    # Fields
-    #   - orcid
-    #   - given-names
-    #   - family-name
-    #   - credit-name
-    #   - other-names
-    #   - email
-    #   - external-id-reference
-    #   - digital-object-ids
-    #   - work-titles
-    #   - keywords
-    #   - creation date
-    #   - last modified date
-    #   - text
-    # The query string follow the Lucene query syntax
-    # See also: http://members.orcid.org/api/tutorial-searching-api-12-and-earlier
-    my $result  = $orcid->search_bio({q => "family-name:johnson"});
-
-    my $found   = $result->{'orcid-search-results'}->{'num-found'};
-
-    # paging search results
-
-    my $result2 = $orcid->search_bio({q => "family-name:hochstenbach", start => 10, rows => 10});
+    my $client = WWW::ORCID->new(client_id => "XXX", client_secret => "XXX", public => 1);
 
 =head1 DESCRIPTION
 
-Module to interface with the ORCID webservice.
+A client for the ORCID 2.x API.
 
-=head1 VERSION
+=head1 STATUS
 
-Version 0.0101
+The client is mostly complete. The 2.0 member API is implemented except C<notification-permission>. The 2.0
+public API is implemented except C<identifiers> and C<status>. The 2.1 member
+API has not yet been implemented.
 
-=cut
+=head1 CREATING A NEW INSTANCE
 
-our $VERSION = 0.0201;
+The C<new> method returns a new L<2.0 API client|WWW::ORCID::API::v2_0>.
 
-use WWW::ORCID::API::Pub ();
-use WWW::ORCID::API ();
+Arguments to new:
+
+=head2 C<client_id>
+
+Your ORCID client id (required).
+
+=head2 C<client_secret>
+
+Your ORCID client secret (required).
+
+=head2 C<version>
+
+The only possible value at the moment is C<"2.0"> which will load L<WWW::ORCID::API::v2_0> or L<WWW::ORCID::API::v2_0_public>.
+
+=head2 C<sandbox>
+
+The client will use the API sandbox if set to C<1>.
+
+=head2 C<public>
+
+The client will use the L<ORCID public API|https://pub.sandbox.orcid.org/v2.0>
+if set to C<1>. Default is the
+L<ORCID member API|https://pub.sandbox.orcid.org/v2.0>.
+
+=head2 C<transport>
+
+Specify the HTTP client to use. Possible values are L<LWP> or L<HTTP::Tiny>.
+Default is L<LWP>.
+
+=head1 METHODS
+
+Please refer to the API clients L<WWW::ORCID::API::v2_0> and L<WWW::ORCID::API::v2_0_public> for method documentation.
 
 =head1 SEE ALSO
 
-L<http://members.orcid.org/api>
+L<https://api.orcid.org/v2.0/#/Member_API_v2.0>
 
 =head1 AUTHOR
 
@@ -82,5 +108,3 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-
-1;

@@ -1,5 +1,15 @@
 Revision history for perl module C::Tokenize
 
+0.15 2017-08-28
+
+* In "strip_comments", preserve at least one space when removing
+  traditional comments.
+
+0.14 2017-08-28
+
+* Added "strip_comments", a routine to completely remove comments from
+  C program text, while preserving line numbering (from XS::Check).
+
 0.13 2016-12-07
 
 * Improve $cvar_re to match more possible lvalues, and test it

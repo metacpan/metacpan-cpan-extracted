@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Sieve
 
+0.12
+    * better fix for 2.3
+    * add missing bitlenght patch
+
 0.11 Fri, 09 Nov 2012 13:13:08 +0100
     * fix cyrus 2.3 connection drop
     * minor debug messages fixes

@@ -1,7 +1,6 @@
 package MooseX::DIC::Configuration::Scanner::FileConfig;
 
 use File::Find;
-use File::Slurp;
 
 require Exporter;
 @ISA       = qw/Exporter/;

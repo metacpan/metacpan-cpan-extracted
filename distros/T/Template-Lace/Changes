@@ -1,5 +1,19 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.014   August 24, 2017
+        - Another tweak to the tt helper.
+
+0.013   August 24, 2017
+        - Fixed incorrect version number of dependency that caused install to
+          fall.
+
+0.012   August 24, 2017
+        - New 'add_class' helper for when you want to append classes to the
+          existing ones.
+        - New 'tt' helper that lets you escape DOM only transformations at
+          fill a node's content via Template::Tiny.  Useful when you need to
+          populate an inline script with variables.
+
 0.011   August 11, 2017
         - New list helper for optgroup
         - New helper 'for' that combines 'fill' with a match specification.

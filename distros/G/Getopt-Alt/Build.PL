@@ -31,6 +31,7 @@ my $builder = Module::Build->new(
         'Test::Warnings' => 0,
     },
     recommends => {
+        'Capture::Tiny'      => 0,
         'Test::Spelling'     => 0,
         'Test::Perl::Critic' => 0,
         'Test::Kwalitee'     => 0,

@@ -1,0 +1,91 @@
+# Brazilian Portuguese translations for SimpleCal.
+# Copyright (C) 2003 Imperia AG, Guido Flohr <guido@imperia.net>.
+# This file is distributed under the same license as libintl-perl.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: SimpleCal\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-07-28 04:27+0200\n"
+"PO-Revision-Date: 2003-07-27 18:56+0200\n"
+"Last-Translator: Guido Flohr <Guido.Flohr@imperia.net>\n"
+"Language-Team: Brazilian Portuguese <guido@imperia.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/SimpleCal.pm:26
+msgid "January"
+msgstr "janeiro"
+
+#: ../lib/SimpleCal.pm:28
+msgid "February"
+msgstr "fevereiro"
+
+#: ../lib/SimpleCal.pm:30
+msgid "March"
+msgstr "março"
+
+#: ../lib/SimpleCal.pm:32
+msgid "April"
+msgstr "abril"
+
+#: ../lib/SimpleCal.pm:34
+msgid "May"
+msgstr "maio"
+
+#: ../lib/SimpleCal.pm:36
+msgid "June"
+msgstr "junho"
+
+#: ../lib/SimpleCal.pm:38
+msgid "July"
+msgstr "julho"
+
+#: ../lib/SimpleCal.pm:40
+msgid "August"
+msgstr "agosto"
+
+#: ../lib/SimpleCal.pm:42
+msgid "September"
+msgstr "setembro"
+
+#: ../lib/SimpleCal.pm:44
+msgid "October"
+msgstr "outubro"
+
+#: ../lib/SimpleCal.pm:46
+msgid "November"
+msgstr "novembro"
+
+#: ../lib/SimpleCal.pm:48
+msgid "December"
+msgstr "dezembro"
+
+#: ../lib/SimpleCal.pm:70
+msgid "Sun"
+msgstr "Dom"
+
+#: ../lib/SimpleCal.pm:71
+msgid "Mon"
+msgstr "Seg"
+
+#: ../lib/SimpleCal.pm:72
+msgid "Tue"
+msgstr "Ter"
+
+#: ../lib/SimpleCal.pm:73
+msgid "Wed"
+msgstr "Qua"
+
+#: ../lib/SimpleCal.pm:74
+msgid "Thu"
+msgstr "Qui"
+
+#: ../lib/SimpleCal.pm:75
+msgid "Fri"
+msgstr "Sex"
+
+#: ../lib/SimpleCal.pm:76
+msgid "Sat"
+msgstr "Sáb"

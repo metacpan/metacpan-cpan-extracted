@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-tester/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-tester.git
-version: '3.001'
+version: '3.002'
 x_serialization_backend: 'YAML::Tiny version 1.70'

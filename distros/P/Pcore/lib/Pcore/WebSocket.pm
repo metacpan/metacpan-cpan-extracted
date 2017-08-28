@@ -31,19 +31,17 @@ sub accept_ws ( $self, $protocol, $req, $on_accept ) {
             return $req->return_xxx( [ 400, q[Unsupported WebSocket protocol] ] );
         }
 
-        # load wesocket protocol class
-        my $implementation = $protocol || 'raw';
+        # load protocol implementation
+        my $class = eval { P->class->load( $protocol || 'raw', ns => 'Pcore::WebSocket::Protocol' ) } or do {
+            $req->return_xxx( [ 400, q[Unsupported WebSocket protocol] ] );
 
-        eval { require "Pcore/WebSocket/Protocol/$implementation.pm" };    ## no critic qw[Modules::RequireBarewordIncludes]
-
-        if ($@) {
-            return $req->return_xxx( [ 400, q[Unsupported WebSocket protocol] ] );
-        }
+            return;
+        };
 
         my $accept = sub ( %args ) {
 
             # create websocket object
-            my $ws = "Pcore::WebSocket::Protocol::$implementation"->new( \%args );
+            my $ws = $class->new( \%args );
 
             my $compression = 0;
 
@@ -102,7 +100,7 @@ sub accept_ws ( $self, $protocol, $req, $on_accept ) {
     return;
 }
 
-sub connect_ws ( $self, $protocol, $uri, @ ) {
+sub connect_ws ( $self, $uri, @ ) {
     my %args = (
         connect_timeout  => 30,
         tls_ctx          => $TLS_CTX_HIGH,
@@ -111,12 +109,13 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
         on_connect_error => undef,
         on_connect       => undef,           # mandatory
 
+        protocol         => undef,
         max_message_size => 0,
         compression      => 0,               # use permessage_deflate compression
         on_disconnect    => undef,           # passed to websocket constructor
         on_rpc           => undef,           # passed to websocket constructor
 
-        @_[ 3 .. $#_ ],
+        @_[ 2 .. $#_ ],
     );
 
     my $on_connect_error = sub ( $status ) {
@@ -131,17 +130,11 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
     };
 
     # load protocol implementation
-    my $implementation = $protocol || 'raw';
-
-    eval { require "Pcore/WebSocket/Protocol/$implementation.pm" };    ## no critic qw[Modules::RequireBarewordIncludes]
-
-    my $class = "Pcore::WebSocket::Protocol::$implementation";
-
-    if ($@) {
+    my $class = eval { P->class->load( $args{protocol} || 'raw', ns => 'Pcore::WebSocket::Protocol' ) } or do {
         $on_connect_error->( result [ 400, 'WebSocket protocol is not supported' ] );
 
         return;
-    }
+    };
 
     my $connect;
 
@@ -189,7 +182,7 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
                 'Connection:upgrade',
                 "Sec-WebSocket-Version:$Pcore::WebSocket::Handle::WEBSOCKET_VERSION",
                 "Sec-WebSocket-Key:$sec_websocket_key",
-                ( $protocol          ? "Sec-WebSocket-Protocol:$protocol"            : () ),
+                ( $args{protocol}    ? "Sec-WebSocket-Protocol:$args{protocol}"      : () ),
                 ( $args{compression} ? 'Sec-WebSocket-Extensions:permessage-deflate' : () ),
             );
 
@@ -243,13 +236,13 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
 
                     # check protocol
                     if ( $res_headers->{SEC_WEBSOCKET_PROTOCOL} ) {
-                        if ( !$protocol || $res_headers->{SEC_WEBSOCKET_PROTOCOL} !~ /\b$protocol\b/smi ) {
+                        if ( !$args{protocol} || $res_headers->{SEC_WEBSOCKET_PROTOCOL} !~ /\b$args{protocol}\b/smi ) {
                             $on_connect_error->( result [ 596, qq[WebSocket server returned unsupported protocol "$res_headers->{SEC_WEBSOCKET_PROTOCOL}"] ] );
 
                             return;
                         }
                     }
-                    elsif ($protocol) {
+                    elsif ( $args{protocol} ) {
                         $on_connect_error->( result [ 596, q[WebSocket server returned no protocol] ] );
 
                         return;
@@ -288,9 +281,7 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 37, 136              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 105                  | Subroutines::ProhibitExcessComplexity - Subroutine "connect_ws" with high complexity score (33)                |
+## |    3 | 103                  | Subroutines::ProhibitExcessComplexity - Subroutine "connect_ws" with high complexity score (33)                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

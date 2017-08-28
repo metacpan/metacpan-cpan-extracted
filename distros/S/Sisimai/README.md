@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.24-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.21.1-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.22.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README-JA(日本語)**](README-JA.md)
 - [What is Sisimai](#what-is-sisimai)
@@ -50,7 +50,7 @@ Key features
 * __Convert Bounce Mails to Structured Data__
   * Supported formats are Perl(Hash, Array) and JSON(String)
 * __Easy to Install, Use.__
-  * cpanm
+  * `cpan`, `cpanm`, or `cpm`
   * git clone & make
 * __High Precision of Analysis__
   * 2 times higher than bounceHammer
@@ -58,7 +58,7 @@ Key features
   * Support 22 major MSPs(Mail Service Providers)
   * Support  2 major Cloud Email Delivery Services(JSON format)
   * Support Feedback Loop Message(ARF)
-  * Can detect 27 error reasons
+  * Can detect 29 error reasons
 * __Faster than bounceHammer 2.7.13p3__
   * About 1.7 times faster
 
@@ -86,9 +86,9 @@ Install
 ### From CPAN
 
 ```shell
-$ sudo cpanm Sisimai
+$ cpanm --sudo Sisimai
 --> Working on Sisimai
-Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-4.21.0.tar.gz ... OK
+Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-4.22.0.tar.gz ... OK
 ...
 1 distribution installed
 $ perldoc -l Sisimai
@@ -101,9 +101,9 @@ $ perldoc -l Sisimai
 $ cd /usr/local/src
 $ git clone https://github.com/sisimai/p5-Sisimai.git
 $ cd ./p5-Sisimai
-$ sudo make install-from-local
+$ make install-from-local
 --> Working on .
-Configuring Sisimai-4.21.0 ... OK
+Configuring Sisimai-4.22.0 ... OK
 1 distribution installed
 ```
 
@@ -228,7 +228,7 @@ Output example
 ![](http://libsisimai.org/static/images/demo/sisimai-dump-02.gif)
 
 ```json
-[{"rhost": "mx.example.co.jp","recipient": "filtered@example.co.jp","token": "01b88ad40b2f7089a6b1986ade14d323aaad9da2","deliverystatus": "5.2.1","smtpcommand": "RCPT","alias": "filtered@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Postfix","messageid": "","diagnosticcode": "550 5.2.1 <filtered@example.co.jp>... User Unknown","lhost": "smtp.example.com","replycode": "550","reason": "userunknown","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp"},{"lhost": "smtp.example.com","reason": "userunknown","replycode": "550","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp","rhost": "mx.example.co.jp","recipient": "userunknown@example.co.jp","deliverystatus": "5.1.1","token": "948ed89b794207632dbab0ce3b72175553d9de83","smtpcommand": "RCPT","alias": "userunknown@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Postfix","messageid": "","diagnosticcode": "550 5.1.1 <userunknown@example.co.jp>... User Unknown"}]
+[{"rhost": "mx.example.co.jp","recipient": "filtered@example.co.jp","token": "01b88ad40b2f7089a6b1986ade14d323aaad9da2","deliverystatus": "5.2.1","smtpcommand": "RCPT","alias": "filtered@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Email::Postfix","messageid": "","diagnosticcode": "550 5.2.1 <filtered@example.co.jp>... User Unknown","lhost": "smtp.example.com","replycode": "550","reason": "userunknown","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp"},{"lhost": "smtp.example.com","reason": "userunknown","replycode": "550","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp","rhost": "mx.example.co.jp","recipient": "userunknown@example.co.jp","deliverystatus": "5.1.1","token": "948ed89b794207632dbab0ce3b72175553d9de83","smtpcommand": "RCPT","alias": "userunknown@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Email::Postfix","messageid": "","diagnosticcode": "550 5.1.1 <userunknown@example.co.jp>... User Unknown"}]
 ```
 
 Sisimai Specification
@@ -249,16 +249,16 @@ and Sisimai. More information about differences are available at
 | Database schema for storing parsed bounce data | Available     | N/A[1]      |
 | Analytical precision ratio(2000 emails)[2]     | 0.49          | 1.00        |
 | The speed of parsing email(1000 emails)        | 4.24s         | 2.33s       |
-| The number of detectable bounce reasons        | 19            | 27          |
+| The number of detectable bounce reasons        | 19            | 29          |
 | Parse 2 or more bounces in a single email      | Only 1st rcpt | ALL         |
 | Parse FeedBack Loop Message/ARF format mail    | Unable        | OK          |
 | Classification based on recipient domain       | Available     | N/A         |
 | Output format of parsed data                   | YAML,JSON,CSV | JSON only   |
 | Easy to install                                | No            | Yes         |
-| Install using cpan or cpanm command            | N/A           | OK          |
+| Install using cpan, cpanm, or cpm command      | N/A           | OK          |
 | Dependencies (Except core modules of Perl)     | 24 modules    | 2 modules   |
-| LOC:Source lines of code                       | 18200 lines   | 9000 lines  |
-| The number of tests in t/, xt/ directory       | 27365 tests   | 191300 tests|
+| LOC:Source lines of code                       | 18200 lines   | 9100 lines  |
+| The number of tests in t/, xt/ directory       | 27365 tests   | 202400 tests|
 | License                                        | GPLv2 or Perl | 2 clause BSD|
 | Support Contract provided by Developer         | End Of Sales  | Available   |
 

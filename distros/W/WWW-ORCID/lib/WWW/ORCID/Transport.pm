@@ -2,21 +2,29 @@ package WWW::ORCID::Transport;
 
 use strict;
 use warnings;
-use namespace::clean;
-use URI ();
+
+our $VERSION = 0.0401;
+
 use Moo::Role;
+use namespace::clean;
 
-requires 'get';
-requires 'post_form';
-requires 'post';
+with 'WWW::ORCID::Base';
 
-has debug => (is => 'ro');
+for my $method (qw(get post_form post put delete)) {
+    requires $method;
 
-sub _param_url {
-    my ($self, $url, $params) = @_;
-    $url = URI->new($url);
-    $url->query_form($params);
-    $url->as_string;
+    around $method => sub {
+        my $orig = shift;
+        my $self = shift;
+        if ($self->log->is_debug) {
+            $self->log->debugf("$method request: %s", \@_);
+        }
+        my $res = $orig->($self, @_);
+        if ($self->log->is_debug) {
+            $self->log->debugf("$method response: %s", $res);
+        }
+        $res;
+    };
 }
 
 1;

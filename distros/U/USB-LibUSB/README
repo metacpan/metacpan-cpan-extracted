@@ -1,0 +1,14 @@
+This archive contains the USB::LibUSB distribution.
+
+ Perl interface to the libusb-1.0 API.
+
+See the module documentation for more info.
+
+This software is copyright (c) 2017 by Simon Reinhardt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+
+

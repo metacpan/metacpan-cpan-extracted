@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Alt
 
+0.05      2017-08-24 16:08:46 -0400
+  - Require Perl 5.14, Dist::Zilla 6.00
+    (cpantesters suggests that it doesn't work on 5.x or earlier anyway)
+
 0.04      2016-03-15 20:35:47 -0400
   - Modify Makefile/Build.PL in munge_files instead of setup_installer
 

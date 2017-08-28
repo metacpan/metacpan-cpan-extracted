@@ -131,7 +131,8 @@ directories for system services can be placed in /usr/lib/systemd/system or
 /run/systemd/system directories. Drop-in files in /etc
 take precedence over those in /run which in turn take precedence over those
 in /usr/lib. Drop-in files under any of these directories take precedence
-over unit files wherever located.
+over unit files wherever located. Multiple drop-in files with different names are applied in
+lexicographic order, regardless of which of the directories they reside in.
 
 Some unit names reflect paths existing in the file system
 namespace. Example: a device unit
@@ -227,32 +228,30 @@ effect. I< Optional. Type list of uniline.  >
 
 =head2 Requires
 
-Configures requirement dependencies on other
-units. If this unit gets activated, the units listed here will
-be activated as well. If one of the other units gets
-deactivated or its activation fails, this unit will be
-deactivated. This option may be specified more than once or
-multiple space-separated units may be specified in one option
-in which case requirement dependencies for all listed names
-will be created. Note that requirement dependencies do not
-influence the order in which services are started or stopped.
-This has to be configured independently with the
-C<After> or C<Before>
-options. If a unit foo.service requires a
-unit bar.service as configured with
-C<Requires> and no ordering is configured
-with C<After> or C<Before>,
-then both units will be started simultaneously and without any
-delay between them if foo.service is
-activated. Often, it is a better choice to use
-C<Wants> instead of
-C<Requires> in order to achieve a system that
-is more robust when dealing with failing services.
+Configures requirement dependencies on other units. If this unit gets activated, the units
+listed here will be activated as well. If one of the other units gets deactivated or its activation fails, this
+unit will be deactivated. This option may be specified more than once or multiple space-separated units may be
+specified in one option in which case requirement dependencies for all listed names will be created. Note that
+requirement dependencies do not influence the order in which services are started or stopped.  This has to be
+configured independently with the C<After> or C<Before> options. If a unit
+foo.service requires a unit bar.service as configured with
+C<Requires> and no ordering is configured with C<After> or
+C<Before>, then both units will be started simultaneously and without any delay between them
+if foo.service is activated. Often, it is a better choice to use C<Wants>
+instead of C<Requires> in order to achieve a system that is more robust when dealing with
+failing services.
 
-Note that dependencies of this type may also be
-configured outside of the unit configuration file by adding a
-symlink to a .requires/ directory
-accompanying the unit file. For details, see
+Note that this dependency type does not imply that the other unit always has to be in active state when
+this unit is running. Specifically: failing condition checks (such as C<ConditionPathExists>,
+C<ConditionPathExists>, … — see below) do not cause the start job of a unit with a
+C<Requires> dependency on it to fail. Also, some unit types may deactivate on their own (for
+example, a service process may decide to exit cleanly, or a device may be unplugged by the user), which is not
+propagated to units having a C<Requires> dependency. Use the C<BindsTo>
+dependency type together with C<After> to ensure that a unit may never be in active state
+without a specific other unit also in active state (see below).
+
+Note that dependencies of this type may also be configured outside of the unit configuration file by
+adding a symlink to a .requires/ directory accompanying the unit file. For details, see
 above. I< Optional. Type list of uniline.  > 
 
 =head2 Requisite
@@ -280,14 +279,21 @@ above. I< Optional. Type list of uniline.  >
 
 =head2 BindsTo
 
-Configures requirement dependencies, very
-similar in style to C<Requires>, however in
-addition to this behavior, it also declares that this unit is
-stopped when any of the units listed suddenly disappears.
-Units can suddenly, unexpectedly disappear if a service
-terminates on its own choice, a device is unplugged or a mount
-point unmounted without involvement of
-systemd. I< Optional. Type list of uniline.  > 
+Configures requirement dependencies, very similar in style to
+C<Requires>. However, this dependency type is stronger: in addition to the effect of
+C<Requires> it declares that if the unit bound to is stopped, this unit will be stopped
+too. This means a unit bound to another unit that suddenly enters inactive state will be stopped too.
+Units can suddenly, unexpectedly enter inactive state for different reasons: the main process of a service unit
+might terminate on its own choice, the backing device of a device unit might be unplugged or the mount point of
+a mount unit might be unmounted without involvement of the system and service manager.
+
+When used in conjunction with C<After> on the same unit the behaviour of
+C<BindsTo> is even stronger. In this case, the unit bound to strictly has to be in active
+state for this unit to also be in active state. This not only means a unit bound to another unit that suddenly
+enters inactive state, but also one that is bound to another unit that gets skipped due to a failed condition
+check (such as C<ConditionPathExists>, C<ConditionPathIsSymbolicLink>, … —
+see below) will be stopped, should it be running. Hence, in many cases it is best to combine
+C<BindsTo> with C<After>. I< Optional. Type list of uniline.  > 
 
 =head2 PartOf
 
@@ -319,81 +325,55 @@ unit that is conflicted is stopped. I< Optional. Type list of uniline.  >
 
 =head2 Before
 
-A space-separated list of unit names.
-Configures ordering dependencies between units. If a unit
-foo.service contains a setting
-C<Before=bar.service> and both units are being
-started, bar.service's start-up is
-delayed until foo.service is started up.
-Note that this setting is independent of and orthogonal to the
-requirement dependencies as configured by
-C<Requires>. It is a common pattern to
-include a unit name in both the C<After> and
-C<Requires> option, in which case the unit
-listed will be started before the unit that is configured with
-these options. This option may be specified more than once, in
-which case ordering dependencies for all listed names are
-created. C<After> is the inverse of
-C<Before>, i.e. while
-C<After> ensures that the configured unit is
-started after the listed unit finished starting up,
-C<Before> ensures the opposite, i.e. that the
-configured unit is fully started up before the listed unit is
-started. Note that when two units with an ordering dependency
-between them are shut down, the inverse of the start-up order
-is applied. i.e. if a unit is configured with
-C<After> on another unit, the former is
-stopped before the latter if both are shut down. Given two units
-with any ordering dependency between them, if one unit is shut
-down and the other is started up, the shutdown is ordered
-before the start-up. It doesn't matter if the ordering
-dependency is C<After> or
-C<Before>. It also doesn't matter which of the
-two is shut down, as long as one is shut down and the other is
-started up. The shutdown is ordered before the start-up in all
-cases. If two units have no ordering dependencies between them,
-they are shut down or started up simultaneously, and no ordering
-takes place.
-I< Optional. Type list of uniline.  > 
+These two settings expect a space-separated list of unit names. They configure ordering
+dependencies between units. If a unit foo.service contains a setting
+C<Before=bar.service> and both units are being started, bar.service's
+start-up is delayed until foo.service has finished starting up.  Note that this setting is
+independent of and orthogonal to the requirement dependencies as configured by C<Requires>,
+C<Wants> or C<BindsTo>. It is a common pattern to include a unit name in both
+the C<After> and C<Requires> options, in which case the unit listed will be
+started before the unit that is configured with these options. This option may be specified more than once, in
+which case ordering dependencies for all listed names are created. C<After> is the inverse of
+C<Before>, i.e. while C<After> ensures that the configured unit is started
+after the listed unit finished starting up, C<Before> ensures the opposite, that the
+configured unit is fully started up before the listed unit is started. Note that when two units with an
+ordering dependency between them are shut down, the inverse of the start-up order is applied. i.e. if a unit is
+configured with C<After> on another unit, the former is stopped before the latter if both are
+shut down. Given two units with any ordering dependency between them, if one unit is shut down and the other is
+started up, the shutdown is ordered before the start-up. It doesn't matter if the ordering dependency is
+C<After> or C<Before>, in this case. It also doesn't matter which of the two
+is shut down, as long as one is shut down and the other is started up. The shutdown is ordered before the
+start-up in all cases. If two units have no ordering dependencies between them, they are shut down or started
+up simultaneously, and no ordering takes place. It depends on the unit type when precisely a unit has finished
+starting up. Most importantly, for service units start-up is considered completed for the purpose of
+C<Before>/C<After> when all its configured start-up commands have been
+invoked and they either failed or reported start-up success. I< Optional. Type list of uniline.  > 
 
 =head2 After
 
-A space-separated list of unit names.
-Configures ordering dependencies between units. If a unit
-foo.service contains a setting
-C<Before=bar.service> and both units are being
-started, bar.service's start-up is
-delayed until foo.service is started up.
-Note that this setting is independent of and orthogonal to the
-requirement dependencies as configured by
-C<Requires>. It is a common pattern to
-include a unit name in both the C<After> and
-C<Requires> option, in which case the unit
-listed will be started before the unit that is configured with
-these options. This option may be specified more than once, in
-which case ordering dependencies for all listed names are
-created. C<After> is the inverse of
-C<Before>, i.e. while
-C<After> ensures that the configured unit is
-started after the listed unit finished starting up,
-C<Before> ensures the opposite, i.e. that the
-configured unit is fully started up before the listed unit is
-started. Note that when two units with an ordering dependency
-between them are shut down, the inverse of the start-up order
-is applied. i.e. if a unit is configured with
-C<After> on another unit, the former is
-stopped before the latter if both are shut down. Given two units
-with any ordering dependency between them, if one unit is shut
-down and the other is started up, the shutdown is ordered
-before the start-up. It doesn't matter if the ordering
-dependency is C<After> or
-C<Before>. It also doesn't matter which of the
-two is shut down, as long as one is shut down and the other is
-started up. The shutdown is ordered before the start-up in all
-cases. If two units have no ordering dependencies between them,
-they are shut down or started up simultaneously, and no ordering
-takes place.
-I< Optional. Type list of uniline.  > 
+These two settings expect a space-separated list of unit names. They configure ordering
+dependencies between units. If a unit foo.service contains a setting
+C<Before=bar.service> and both units are being started, bar.service's
+start-up is delayed until foo.service has finished starting up.  Note that this setting is
+independent of and orthogonal to the requirement dependencies as configured by C<Requires>,
+C<Wants> or C<BindsTo>. It is a common pattern to include a unit name in both
+the C<After> and C<Requires> options, in which case the unit listed will be
+started before the unit that is configured with these options. This option may be specified more than once, in
+which case ordering dependencies for all listed names are created. C<After> is the inverse of
+C<Before>, i.e. while C<After> ensures that the configured unit is started
+after the listed unit finished starting up, C<Before> ensures the opposite, that the
+configured unit is fully started up before the listed unit is started. Note that when two units with an
+ordering dependency between them are shut down, the inverse of the start-up order is applied. i.e. if a unit is
+configured with C<After> on another unit, the former is stopped before the latter if both are
+shut down. Given two units with any ordering dependency between them, if one unit is shut down and the other is
+started up, the shutdown is ordered before the start-up. It doesn't matter if the ordering dependency is
+C<After> or C<Before>, in this case. It also doesn't matter which of the two
+is shut down, as long as one is shut down and the other is started up. The shutdown is ordered before the
+start-up in all cases. If two units have no ordering dependencies between them, they are shut down or started
+up simultaneously, and no ordering takes place. It depends on the unit type when precisely a unit has finished
+starting up. Most importantly, for service units start-up is considered completed for the purpose of
+C<Before>/C<After> when all its configured start-up commands have been
+invoked and they either failed or reported start-up success. I< Optional. Type list of uniline.  > 
 
 =head2 OnFailure
 
@@ -449,11 +429,9 @@ C<Requires> and C<After> for
 all mount units required to access the specified path.
 
 Mount points marked with C<noauto> are not
-mounted automatically and will be ignored for the purposes of
-this option. If such a mount should be a requirement for this
-unit, direct dependencies on the mount units may be added
-(C<Requires> and C<After> or
-some other combination). I< Optional. Type uniline.  > 
+mounted automatically through local-fs.target,
+but are still honored for the purposes of this option, i.e. they
+will be pulled in by this unit. I< Optional. Type uniline.  > 
 
 =head2 OnFailureJobMode
 
@@ -549,14 +527,44 @@ ones. I< Optional. Type boolean.  >
 
 =head2 JobTimeoutSec
 
-When a job for this unit is queued, a time-out may be configured. If this time limit is
-reached, the job will be cancelled, the unit however will not change state or even enter the
-C<failed> mode. This value defaults to C<infinity> (job timeouts disabled),
-except for device units. NB: this timeout is independent from any unit-specific timeout (for example, the
-timeout set with C<TimeoutStartSec> in service units) as the job timeout has no effect on the
-unit itself, only on the job that might be pending for it. Or in other words: unit-specific timeouts are useful
-to abort unit state changes, and revert them. The job timeout set with this option however is useful to abort
-only the job waiting for the unit state to change.
+When a job for this unit is queued, a time-out C<JobTimeoutSec> may be
+configured. Similarly, C<JobRunningTimeoutSec> starts counting when the queued job is actually
+started. If either time limit is reached, the job will be cancelled, the unit however will not change state or
+even enter the C<failed> mode. This value defaults to C<infinity> (job timeouts
+disabled), except for device units (C<JobRunningTimeoutSec> defaults to
+C<DefaultTimeoutStartSec>). NB: this timeout is independent from any unit-specific timeout
+(for example, the timeout set with C<TimeoutStartSec> in service units) as the job timeout has
+no effect on the unit itself, only on the job that might be pending for it. Or in other words: unit-specific
+timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
+is useful to abort only the job waiting for the unit state to change.
+
+C<JobTimeoutAction>
+optionally configures an additional
+action to take when the time-out is
+hit. It takes the same values as the
+per-service
+C<StartLimitAction>
+setting, see
+L<systemd.service(5)>
+for details. Defaults to
+C<none>. C<JobTimeoutRebootArgument>
+configures an optional reboot string
+to pass to the
+L<reboot(2)>
+system call. I< Optional. Type uniline.  > 
+
+=head2 JobRunningTimeoutSec
+
+When a job for this unit is queued, a time-out C<JobTimeoutSec> may be
+configured. Similarly, C<JobRunningTimeoutSec> starts counting when the queued job is actually
+started. If either time limit is reached, the job will be cancelled, the unit however will not change state or
+even enter the C<failed> mode. This value defaults to C<infinity> (job timeouts
+disabled), except for device units (C<JobRunningTimeoutSec> defaults to
+C<DefaultTimeoutStartSec>). NB: this timeout is independent from any unit-specific timeout
+(for example, the timeout set with C<TimeoutStartSec> in service units) as the job timeout has
+no effect on the unit itself, only on the job that might be pending for it. Or in other words: unit-specific
+timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
+is useful to abort only the job waiting for the unit state to change.
 
 C<JobTimeoutAction>
 optionally configures an additional
@@ -575,14 +583,16 @@ system call. I< Optional. Type uniline.  >
 
 =head2 JobTimeoutAction
 
-When a job for this unit is queued, a time-out may be configured. If this time limit is
-reached, the job will be cancelled, the unit however will not change state or even enter the
-C<failed> mode. This value defaults to C<infinity> (job timeouts disabled),
-except for device units. NB: this timeout is independent from any unit-specific timeout (for example, the
-timeout set with C<TimeoutStartSec> in service units) as the job timeout has no effect on the
-unit itself, only on the job that might be pending for it. Or in other words: unit-specific timeouts are useful
-to abort unit state changes, and revert them. The job timeout set with this option however is useful to abort
-only the job waiting for the unit state to change.
+When a job for this unit is queued, a time-out C<JobTimeoutSec> may be
+configured. Similarly, C<JobRunningTimeoutSec> starts counting when the queued job is actually
+started. If either time limit is reached, the job will be cancelled, the unit however will not change state or
+even enter the C<failed> mode. This value defaults to C<infinity> (job timeouts
+disabled), except for device units (C<JobRunningTimeoutSec> defaults to
+C<DefaultTimeoutStartSec>). NB: this timeout is independent from any unit-specific timeout
+(for example, the timeout set with C<TimeoutStartSec> in service units) as the job timeout has
+no effect on the unit itself, only on the job that might be pending for it. Or in other words: unit-specific
+timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
+is useful to abort only the job waiting for the unit state to change.
 
 C<JobTimeoutAction>
 optionally configures an additional
@@ -601,14 +611,16 @@ system call. I< Optional. Type uniline.  >
 
 =head2 JobTimeoutRebootArgument
 
-When a job for this unit is queued, a time-out may be configured. If this time limit is
-reached, the job will be cancelled, the unit however will not change state or even enter the
-C<failed> mode. This value defaults to C<infinity> (job timeouts disabled),
-except for device units. NB: this timeout is independent from any unit-specific timeout (for example, the
-timeout set with C<TimeoutStartSec> in service units) as the job timeout has no effect on the
-unit itself, only on the job that might be pending for it. Or in other words: unit-specific timeouts are useful
-to abort unit state changes, and revert them. The job timeout set with this option however is useful to abort
-only the job waiting for the unit state to change.
+When a job for this unit is queued, a time-out C<JobTimeoutSec> may be
+configured. Similarly, C<JobRunningTimeoutSec> starts counting when the queued job is actually
+started. If either time limit is reached, the job will be cancelled, the unit however will not change state or
+even enter the C<failed> mode. This value defaults to C<infinity> (job timeouts
+disabled), except for device units (C<JobRunningTimeoutSec> defaults to
+C<DefaultTimeoutStartSec>). NB: this timeout is independent from any unit-specific timeout
+(for example, the timeout set with C<TimeoutStartSec> in service units) as the job timeout has
+no effect on the unit itself, only on the job that might be pending for it. Or in other words: unit-specific
+timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
+is useful to abort only the job waiting for the unit state to change.
 
 C<JobTimeoutAction>
 optionally configures an additional
@@ -731,9 +743,11 @@ C<arm64>,
 C<arm64-be>,
 C<sh>,
 C<sh64>,
-C<m86k>,
+C<m68k>,
 C<tilegx>,
-C<cris> to test
+C<cris>,
+C<arc>,
+C<arc-be> to test
 against a specific architecture. The architecture is
 determined from the information returned by
 L<uname(2)>
@@ -1061,13 +1075,11 @@ doesn't require its functionality. Use the various C<AssertArchitecture=>,
 C<AssertVirtualization=>, … options for a similar mechanism that puts the unit in a failure
 state and logs about the failed check (see below).
 
-C<ConditionFirstBoot=> takes a boolean
-argument. This condition may be used to conditionalize units
-on whether the system is booting up with an unpopulated
-/etc directory. This may be used to
-populate /etc on the first boot after
-factory reset, or when a new system instances boots up for the
-first time.
+C<ConditionFirstBoot=> takes a boolean argument. This condition may be used to
+conditionalize units on whether the system is booting up with an unpopulated /etc
+directory (specifically: an /etc with no /etc/machine-id). This may
+be used to populate /etc on the first boot after factory reset, or when a new system
+instance boots up for the first time.
 
 If multiple conditions are specified, the unit will be
 executed if all of them apply (i.e. a logical AND is applied).
@@ -1375,6 +1387,75 @@ the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
 effect. I< Optional. Type list of uniline.  > 
 
+=head2 ConditionUser
+
+Before starting a unit, verify that the specified condition is true. If it is not true, the
+starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
+respected. A failing condition will not result in the unit being moved into a failure state. The condition is
+checked at the time the queued start job is to be executed. Use condition expressions in order to silently skip
+units that do not apply to the local running system, for example because the kernel or runtime environment
+doesn't require its functionality. Use the various C<AssertArchitecture=>,
+C<AssertVirtualization=>, … options for a similar mechanism that puts the unit in a failure
+state and logs about the failed check (see below).
+
+C<ConditionUser=> takes a numeric
+C<UID>, a UNIX user name, or the special value
+C<@system>. This condition may be used to check
+whether the service manager is running as the given user. The
+special value C<@system> can be used to check
+if the user id is within the system user range. This option is not
+useful for system services, as the system manager exclusively
+runs as the root user, and thus the test result is constant.
+
+If multiple conditions are specified, the unit will be
+executed if all of them apply (i.e. a logical AND is applied).
+Condition checks can be prefixed with a pipe symbol (|) in
+which case a condition becomes a triggering condition. If at
+least one triggering condition is defined for a unit, then the
+unit will be executed if at least one of the triggering
+conditions apply and all of the non-triggering conditions. If
+you prefix an argument with the pipe symbol and an exclamation
+mark, the pipe symbol must be passed first, the exclamation
+second. Except for
+C<ConditionPathIsSymbolicLink=>, all path
+checks follow symlinks. If any of these options is assigned
+the empty string, the list of conditions is reset completely,
+all previous condition settings (of any kind) will have no
+effect. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionGroup
+
+Before starting a unit, verify that the specified condition is true. If it is not true, the
+starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
+respected. A failing condition will not result in the unit being moved into a failure state. The condition is
+checked at the time the queued start job is to be executed. Use condition expressions in order to silently skip
+units that do not apply to the local running system, for example because the kernel or runtime environment
+doesn't require its functionality. Use the various C<AssertArchitecture=>,
+C<AssertVirtualization=>, … options for a similar mechanism that puts the unit in a failure
+state and logs about the failed check (see below).
+
+C<ConditionGroup=> is similar
+to C<ConditionUser=> but verifies that the
+service manager's real or effective group, or any of its
+auxiliary groups match the specified group or GID. This setting
+does not have a special value C<@system>.
+
+If multiple conditions are specified, the unit will be
+executed if all of them apply (i.e. a logical AND is applied).
+Condition checks can be prefixed with a pipe symbol (|) in
+which case a condition becomes a triggering condition. If at
+least one triggering condition is defined for a unit, then the
+unit will be executed if at least one of the triggering
+conditions apply and all of the non-triggering conditions. If
+you prefix an argument with the pipe symbol and an exclamation
+mark, the pipe symbol must be passed first, the exclamation
+second. Except for
+C<ConditionPathIsSymbolicLink=>, all path
+checks follow symlinks. If any of these options is assigned
+the empty string, the list of conditions is reset completely,
+all previous condition settings (of any kind) will have no
+effect. I< Optional. Type list of uniline.  > 
+
 =head2 AssertArchitecture
 
 Similar to the C<ConditionArchitecture>,
@@ -1529,6 +1610,24 @@ expressions for units that cannot operate when specific requirements are not met
 the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertFileIsExecutable
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings add
+assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
+that is not met results in failure of the start job (which means this is logged loudly). Use assertion
+expressions for units that cannot operate when specific requirements are not met, and when this is something
+the administrator or user should look into. I< Optional. Type uniline.  > 
+
+=head2 AssertUser
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings add
+assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
+that is not met results in failure of the start job (which means this is logged loudly). Use assertion
+expressions for units that cannot operate when specific requirements are not met, and when this is something
+the administrator or user should look into. I< Optional. Type uniline.  > 
+
+=head2 AssertGroup
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings add

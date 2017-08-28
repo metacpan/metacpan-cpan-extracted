@@ -132,3 +132,27 @@ Revision history for Perl module ActiveRecord::Simple
         + Added "smart accessors" to methods "new", "find", "count".
         * Small fixes
         * Improved documentation
+
+0.91    2017-08-19
+        + New behavior of method "fetch"
+        + Use DBIx::Connector if it's in the system
+        + Added "group_by" method (thanks to @reindeer)
+        * Imrpoved many-to-many objects manipulations
+        * "asc", "desc" in every columns (thanks to @reindeer)
+        * New API for "count" method (thanks to @reindeer)
+        * New API for "last", "first" methods
+        * Fixed connection bug
+        * Renamed method "load_info" to "autoload"
+        * Renamed "use_smart_saving" to "autosave"
+        * Fixed typos
+
+0.92    2017-08-20
+        * Improve "next" method in favor less memory usage
+        * Fixes
+
+0.93    2017-08-21
+        + Method "next" not takes a number of given objects. Default is 1
+        * Fixed auto_load error
+        * Fixed error messages
+        * Different fixes
+

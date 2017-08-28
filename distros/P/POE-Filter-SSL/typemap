@@ -6,3 +6,4 @@ BIO_METHOD *  T_PTR
 RSA *		     T_PTR
 X509 *		  T_PTR
 DH *          T_PTR
+EVP_PKEY *    T_PTR

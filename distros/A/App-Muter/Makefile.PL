@@ -45,9 +45,10 @@ my %WriteMakefileArgs = (
     "MIME::QuotedPrint" => 0,
     "Perl::Critic" => 0,
     "Test::More" => 0,
+    "Test::NoWarnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.002001",
+  "VERSION" => "0.002002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "MIME::QuotedPrint" => 0,
   "Perl::Critic" => 0,
   "Test::More" => 0,
+  "Test::NoWarnings" => 0,
   "bytes" => 0,
   "feature" => 0,
   "if" => 0,

@@ -152,6 +152,21 @@ subtest 'req alien::base' => sub {
     },
     'build prereqs',
   );
+  
+  is(
+    $meta->{x_alienfile}->{requires},
+    hash {
+      field 'share' => hash {
+        field 'Foo::Build' => '0.01';
+        field 'Foo::Share' => '0.02';
+      };
+      field 'system' => hash {
+        field 'Foo::Build'  => '0.01';
+        field 'Foo::System' => '0.03';
+      };
+    },
+    'x_alienfile meta',
+  );
 };
 
 done_testing;

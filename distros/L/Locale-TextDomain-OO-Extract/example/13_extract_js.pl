@@ -17,9 +17,10 @@ my $extractor = Locale::TextDomain::OO::Extract::JavaScript->new(
     lexicon_ref => \my %lexicon,
 );
 
-my @files = Path::Iterator::Rule
+my @files = Path::Iterator::Rule ## no critic (LongChainsOfMethodCalls)
     ->new
-    ->file( qw( *.js ) )
+    ->file
+    ->name( qw( *.js ) )
     ->all( qw( ./files_to_extract ) );
 
 for my $file ( map { path($_) } @files ) {
@@ -36,7 +37,7 @@ for my $file ( map { path($_) } @files ) {
     ->Useqq(1)
     ->Dump;
 
-# $Id: 13_extract_js.pl 561 2014-11-11 16:12:48Z steffenw $
+# $Id: 13_extract_js.pl 683 2017-08-22 18:41:42Z steffenw $
 
 __END__
 
@@ -50,12 +51,6 @@ $lexicon_ref = {
         plural => "n != 1"
       }
     },
-    "' quoted text with \\." => {
-      reference => {
-        "files_to_extract/gettext.pl:83" => undef,
-        "files_to_extract/gettext_loc.pl:83" => undef
-      }
-    },
     "Hello %1" => {
       reference => {
         "files_to_extract/jsgettext.js:9" => undef
@@ -64,11 +59,6 @@ $lexicon_ref = {
     "Hello World!\n" => {
       reference => {
         "files_to_extract/jsgettext.js:8" => undef
-      }
-    },
-    January => {
-      reference => {
-        "files_to_extract/test_process.pl:16" => undef
       }
     },
     "MSGID %0 %1" => {
@@ -178,43 +168,6 @@ $lexicon_ref = {
         "files_to_extract/jsgettext.js:15" => undef
       }
     },
-    "Singular\0Plural" => {
-      automatic => 1,
-      reference => {
-        "files_to_extract/gettext.pl:24" => undef,
-        "files_to_extract/gettext.pl:29" => undef,
-        "files_to_extract/gettext.tt:27" => undef,
-        "files_to_extract/gettext.tt:32" => undef,
-        "files_to_extract/gettext_loc.pl:24" => undef,
-        "files_to_extract/gettext_loc.pl:29" => undef,
-        "files_to_extract/gettext_loc.tt:27" => undef,
-        "files_to_extract/gettext_loc.tt:32" => undef
-      }
-    },
-    "Text \x{dc}" => {
-      reference => {
-        "files_to_extract/gettext.tt:16" => undef,
-        "files_to_extract/gettext_loc.tt:16" => undef
-      }
-    },
-    "This is a new text." => {
-      reference => {
-        "files_to_extract/test_process.pl:15" => undef
-      }
-    },
-    "This is a text." => {
-      reference => {
-        "files_to_extract/gettext.pl:16" => undef,
-        "files_to_extract/gettext.tt:21" => undef,
-        "files_to_extract/gettext_loc.pl:16" => undef,
-        "files_to_extract/gettext_loc.tt:21" => undef
-      }
-    },
-    "This is an old text." => {
-      reference => {
-        "files_to_extract/test_process.pl:14" => undef
-      }
-    },
     "This is the %1 %2" => {
       reference => {
         "files_to_extract/jsgettext.js:10" => undef
@@ -230,43 +183,10 @@ $lexicon_ref = {
         "files_to_extract/jsgettext.js:19" => undef
       }
     },
-    "date\0dates\4appointment" => {
-      automatic => 1,
-      reference => {
-        "files_to_extract/gettext.pl:55" => undef,
-        "files_to_extract/gettext.pl:61" => undef,
-        "files_to_extract/gettext.tt:58" => undef,
-        "files_to_extract/gettext.tt:64" => undef,
-        "files_to_extract/gettext_loc.pl:55" => undef,
-        "files_to_extract/gettext_loc.pl:61" => undef,
-        "files_to_extract/gettext_loc.tt:58" => undef,
-        "files_to_extract/gettext_loc.tt:64" => undef
-      }
-    },
-    "date\4appointment" => {
-      reference => {
-        "files_to_extract/gettext.pl:46" => undef,
-        "files_to_extract/gettext.tt:49" => undef,
-        "files_to_extract/gettext_loc.pl:46" => undef,
-        "files_to_extract/gettext_loc.tt:49" => undef
-      }
-    },
     "one banana\0%1 bananas" => {
       automatic => "count",
       reference => {
         "files_to_extract/jsgettext.js:22" => undef
-      }
-    },
-    "q{quoted text.},\r\n" => {
-      reference => {
-        "files_to_extract/gettext.pl:89" => undef,
-        "files_to_extract/gettext_loc.pl:89" => undef
-      }
-    },
-    "q{q{ quoted text with {placeholders}}.},\r\n" => {
-      reference => {
-        "files_to_extract/gettext.pl:86" => undef,
-        "files_to_extract/gettext_loc.pl:86" => undef
       }
     },
     "some string" => {
@@ -281,83 +201,9 @@ $lexicon_ref = {
         "files_to_extract/jsgettext.js:7" => undef
       }
     },
-    "text of domain d and category c" => {
-      reference => {
-        "files_to_extract/gettext.pl:112" => undef,
-        "files_to_extract/gettext.pl:118" => undef,
-        "files_to_extract/gettext_loc.pl:112" => undef,
-        "files_to_extract/gettext_loc.pl:118" => undef
-      }
-    },
-    "text of domain d and no category" => {
-      reference => {
-        "files_to_extract/gettext.pl:110" => undef,
-        "files_to_extract/gettext_loc.pl:110" => undef
-      }
-    },
-    "text of no domain and category c" => {
-      reference => {
-        "files_to_extract/gettext.pl:114" => undef,
-        "files_to_extract/gettext_loc.pl:114" => undef
-      }
-    },
-    "text of no domain and no category" => {
-      reference => {
-        "files_to_extract/gettext.pl:108" => undef,
-        "files_to_extract/gettext.pl:116" => undef,
-        "files_to_extract/gettext.pl:120" => undef,
-        "files_to_extract/gettext_loc.pl:108" => undef,
-        "files_to_extract/gettext_loc.pl:116" => undef,
-        "files_to_extract/gettext_loc.pl:120" => undef
-      }
-    },
     "this will get translated" => {
       reference => {
         "files_to_extract/jsgettext.js:6" => undef
-      }
-    },
-    "{name} is programming {language}." => {
-      automatic => "name => 'Steffen', language => 'Perl',",
-      reference => {
-        "files_to_extract/gettext.pl:19" => undef,
-        "files_to_extract/gettext.tt:22" => undef,
-        "files_to_extract/gettext_loc.pl:19" => undef,
-        "files_to_extract/gettext_loc.tt:22" => undef
-      }
-    },
-    "{num} date\0{num} dates" => {
-      automatic => "1, num => 1,",
-      reference => {
-        "files_to_extract/gettext.pl:34" => undef,
-        "files_to_extract/gettext.pl:40" => undef,
-        "files_to_extract/gettext.tt:37" => undef,
-        "files_to_extract/gettext.tt:43" => undef,
-        "files_to_extract/gettext_loc.pl:34" => undef,
-        "files_to_extract/gettext_loc.pl:40" => undef,
-        "files_to_extract/gettext_loc.tt:37" => undef,
-        "files_to_extract/gettext_loc.tt:43" => undef
-      }
-    },
-    "{num} date\0{num} dates\4appointment" => {
-      automatic => "1, num => 1,",
-      reference => {
-        "files_to_extract/gettext.pl:67" => undef,
-        "files_to_extract/gettext.pl:74" => undef,
-        "files_to_extract/gettext.tt:70" => undef,
-        "files_to_extract/gettext.tt:77" => undef,
-        "files_to_extract/gettext_loc.pl:67" => undef,
-        "files_to_extract/gettext_loc.pl:74" => undef,
-        "files_to_extract/gettext_loc.tt:70" => undef,
-        "files_to_extract/gettext_loc.tt:77" => undef
-      }
-    },
-    "{num} date\4appointment" => {
-      automatic => "num => 1,",
-      reference => {
-        "files_to_extract/gettext.pl:50" => undef,
-        "files_to_extract/gettext.tt:53" => undef,
-        "files_to_extract/gettext_loc.pl:50" => undef,
-        "files_to_extract/gettext_loc.tt:53" => undef
       }
     }
   },
@@ -467,45 +313,16 @@ $lexicon_ref = {
       }
     }
   },
-  "i-default::domain d" => {
-    "" => {
-      msgstr => {
-        nplurals => 2,
-        plural => "n != 1"
-      }
-    },
-    "singular dn\0plural dn" => {
-      automatic => 0,
-      reference => {
-        "files_to_extract/gettext.pl:96" => undef,
-        "files_to_extract/gettext_loc.pl:96" => undef
-      }
-    },
-    "singular dnp\0plural dnp\4context dnp" => {
-      automatic => 0,
-      reference => {
-        "files_to_extract/gettext.pl:97" => undef,
-        "files_to_extract/gettext_loc.pl:97" => undef
-      }
-    },
-    "text d" => {
-      reference => {
-        "files_to_extract/gettext.pl:94" => undef,
-        "files_to_extract/gettext_loc.pl:94" => undef
-      }
-    },
-    "text dp\4context dp" => {
-      reference => {
-        "files_to_extract/gettext.pl:95" => undef,
-        "files_to_extract/gettext_loc.pl:95" => undef
-      }
-    }
-  },
   "i-default:CATEGORY:" => {
     "" => {
       msgstr => {
         nplurals => 2,
         plural => "n != 1"
+      }
+    },
+    "MSGID c" => {
+      reference => {
+        "files_to_extract/jsgettext.js:81" => undef
       }
     },
     "MSGID cn\0PLURAL cn" => {
@@ -705,74 +522,6 @@ $lexicon_ref = {
         "files_to_extract/gettext_loc.js:30" => undef,
         "files_to_extract/gettext_loc.js:66" => undef,
         "files_to_extract/jsgettext.js:63" => undef
-      }
-    }
-  },
-  "i-default:category c:" => {
-    "" => {
-      msgstr => {
-        nplurals => 2,
-        plural => "n != 1"
-      }
-    },
-    "singular cn\0plural cn" => {
-      automatic => 0,
-      reference => {
-        "files_to_extract/gettext.pl:99" => undef,
-        "files_to_extract/gettext_loc.pl:99" => undef
-      }
-    },
-    "singular cnp\0plural cnp\4context cnp" => {
-      automatic => 0,
-      reference => {
-        "files_to_extract/gettext.pl:101" => undef,
-        "files_to_extract/gettext_loc.pl:101" => undef
-      }
-    },
-    "text c" => {
-      reference => {
-        "files_to_extract/gettext.pl:98" => undef,
-        "files_to_extract/gettext_loc.pl:98" => undef
-      }
-    },
-    "text cp\4context cp" => {
-      reference => {
-        "files_to_extract/gettext.pl:100" => undef,
-        "files_to_extract/gettext_loc.pl:100" => undef
-      }
-    }
-  },
-  "i-default:category c:domain d" => {
-    "" => {
-      msgstr => {
-        nplurals => 2,
-        plural => "n != 1"
-      }
-    },
-    "singular dcn\0plural dcn" => {
-      automatic => 0,
-      reference => {
-        "files_to_extract/gettext.pl:103" => undef,
-        "files_to_extract/gettext_loc.pl:103" => undef
-      }
-    },
-    "singular dcnp\0plural dcnp\4context dcnp" => {
-      automatic => 0,
-      reference => {
-        "files_to_extract/gettext.pl:105" => undef,
-        "files_to_extract/gettext_loc.pl:105" => undef
-      }
-    },
-    "text dc" => {
-      reference => {
-        "files_to_extract/gettext.pl:102" => undef,
-        "files_to_extract/gettext_loc.pl:102" => undef
-      }
-    },
-    "text dcp\4context dcp" => {
-      reference => {
-        "files_to_extract/gettext.pl:104" => undef,
-        "files_to_extract/gettext_loc.pl:104" => undef
       }
     }
   }

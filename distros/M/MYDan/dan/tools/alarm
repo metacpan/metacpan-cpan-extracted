@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+=head1 Usage
+
+alarm number-of-seconds command ..
+
+=cut
+use strict;
+use warnings;
+
+exit 1 unless my $timeout = shift @ARGV;
+
+if( my $pid = fork )
+{
+    $SIG{ALRM} = sub { warn "timeout!\n"; kill 'KILL', $pid;};
+
+    alarm $timeout;
+
+    wait;
+    if ($? == -1) {
+        warn "failed to execute: $!\n";
+        exit 110;
+    }
+    elsif ($? & 127) {
+        warn sprintf "child $pid died with signal %d, %s coredump\n",
+        ($? & 127),  ($? & 128) ? 'with' : 'without';
+        exit 110;
+    }
+    if( my $exit = $? >> 8 )
+    {
+        warn sprintf "child exited with value %d\n", $exit;
+        exit $exit;
+    }
+}
+else
+{
+    exec join ' ', @ARGV;
+}

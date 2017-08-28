@@ -8,12 +8,12 @@
 #
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Test::Compile; # git description: v2.055-4-g2b15431
+package Dist::Zilla::Plugin::Test::Compile; # git description: v2.056-4-g5817fa6
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Common tests to check syntax of your modules, using only core modules
 # KEYWORDS: plugin test compile verify validate load modules scripts
 
-our $VERSION = '2.056';
+our $VERSION = '2.057';
 
 use Moose;
 use Path::Tiny;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Test::Compile - Common tests to check syntax of your module
 
 =head1 VERSION
 
-version 2.056
+version 2.057
 
 =head1 SYNOPSIS
 
@@ -702,7 +702,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -734,7 +734,7 @@ foreach my $file (@scripts)
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

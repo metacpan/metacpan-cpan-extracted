@@ -1,11 +1,10 @@
-package Dist::Zilla::Plugin::AlienBase::Doc;
+package Dist::Zilla::Plugin::AlienBase::Doc 0.24 {
 
 use 5.014;
 use Moose;
 use Carp ();
 
 # ABSTRACT: Generate boilerplate documentation for Alien::Base subclass
-our $VERSION = '0.22'; # VERSION
 
 
 with 'Dist::Zilla::Role::FileMunger';
@@ -59,12 +58,7 @@ has see_also => (
 
 around mvp_multivalue_args => sub {
   my($orig, $self) = @_;
-  return ($self->$orig, 'type');
-};
-
-around mvp_multivalue_args => sub {
-  my($orig, $self) = @_;
-  return ($self->$orig, 'type', 'see_also');
+  ($self->$orig, 'type', 'see_also');
 };
     
 sub render_synopsis
@@ -195,6 +189,10 @@ sub munge_file
 
 __PACKAGE__->meta->make_immutable;
 
+}
+
+package Dist::Zilla::Plugin::AlienBase::Doc;
+
 1;
 
 =pod
@@ -207,7 +205,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 SYNOPSIS
 

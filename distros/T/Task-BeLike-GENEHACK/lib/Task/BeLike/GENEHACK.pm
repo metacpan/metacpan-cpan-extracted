@@ -1,6 +1,6 @@
 package Task::BeLike::GENEHACK;
 our $AUTHORITY = 'cpan:GENEHACK';
-$Task::BeLike::GENEHACK::VERSION = '0.303';
+$Task::BeLike::GENEHACK::VERSION = '0.304';
 # ABSTRACT: individuality via conformity
 
 use strict;
@@ -22,13 +22,15 @@ Task::BeLike::GENEHACK - individuality via conformity
 
 =head1 VERSION
 
-version 0.303
+version 0.304
 
 =head1 TASK CONTENTS
 
 =head2 Modules I use
 
 =head3 L<App::Cmd>
+
+=head3 L<App::GitGitr>
 
 =head3 L<App::GitGot>
 
@@ -64,6 +66,8 @@ version 0.303
 
 =head3 L<HiD>
 
+=head3 L<HiD::Generator::Sass>
+
 =head3 L<Imager>
 
 =head3 L<List::MoreUtils>
@@ -89,6 +93,8 @@ version 0.303
 =head3 L<Pod::Cpandoc>
 
 =head3 L<Reply>
+
+=head3 L<Template::Plugin::Markdown>
 
 =head3 L<Term::ReadLine::Perl>
 

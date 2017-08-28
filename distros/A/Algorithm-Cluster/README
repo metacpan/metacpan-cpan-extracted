@@ -46,8 +46,8 @@ The routines in the C Clustering Library is described in the manual
 and from Perl. Cluster 3.0 has a separate manual (cluster3.pdf). Both of these
 manuals can be found in the doc subdirectory. They can also be downloaded from
 our website:
-http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster/cluster.pdf;
-http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster/cluster3.pdf.
+http://bonsai.hgc.jp/~mdehoon/software/cluster/cluster.pdf;
+http://bonsai.hgc.jp/~mdehoon/software/cluster/cluster3.pdf.
 
 
 LITERATURE
@@ -64,5 +64,5 @@ Michiel de Hoon
 University of Tokyo, Institute of Medical Science
 Human Genome Center, Laboratory of DNA Information Analysis
 Currently at
-RIKEN Genomic Sciences Center
-mdehoon 'AT' gsc.riken.jp
+RIKEN Center for Life Science Technologies
+michiel.dehoon 'AT' riken.jp

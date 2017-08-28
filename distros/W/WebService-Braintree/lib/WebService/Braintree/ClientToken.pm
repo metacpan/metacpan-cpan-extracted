@@ -1,5 +1,5 @@
 package WebService::Braintree::ClientToken;
-$WebService::Braintree::ClientToken::VERSION = '0.92';
+$WebService::Braintree::ClientToken::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::ClientToken

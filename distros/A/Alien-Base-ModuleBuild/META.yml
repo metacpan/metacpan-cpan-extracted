@@ -23,42 +23,42 @@ no_index:
 provides:
   Alien::Base::ModuleBuild:
     file: lib/Alien/Base/ModuleBuild.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::Cabinet:
     file: lib/Alien/Base/ModuleBuild/Cabinet.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::File:
     file: lib/Alien/Base/ModuleBuild/File.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::Repository:
     file: lib/Alien/Base/ModuleBuild/Repository.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::Repository::FTP:
     file: lib/Alien/Base/ModuleBuild/Repository/FTP.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::Repository::HTTP:
     file: lib/Alien/Base/ModuleBuild/Repository/HTTP.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::Repository::Local:
     file: lib/Alien/Base/ModuleBuild/Repository/Local.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::ModuleBuild::Utils:
     file: lib/Alien/Base/ModuleBuild/Utils.pm
-    version: '0.043'
+    version: '0.044'
   Alien::Base::PkgConfig:
     file: lib/Alien/Base/PkgConfig.pm
-    version: '0.043'
+    version: '0.044'
 recommends:
   HTML::LinkExtor: '0'
 requires:
   Archive::Extract: '0'
   Capture::Tiny: '0.17'
-  File::ShareDir: '0'
   File::chdir: '0.1005'
   HTTP::Tiny: '0.044'
   JSON::PP: '0'
   List::Util: '1.45'
   Module::Build: '0.4004'
+  Path::Tiny: '0.077'
   Shell::Config::Generate: '0'
   Shell::Guess: '0'
   Sort::Versions: '0'
@@ -72,5 +72,5 @@ resources:
   bugtracker: http://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/Perl5-Alien/Alien-Base-ModuleBuild
-version: '0.043'
+version: '0.044'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Temp;
+use Digest::MD5;
+use YAML::XS;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+use MYDan::Util::OptConf;
+my %o = MYDan::Util::OptConf->load()->dump('collector');
+
+exit 1 unless my $param = shift @{$param{argv}};
+
+YAML::XS::DumpFile "$o{conf}/config", $param->{conf};
+my $x = YAML::XS::LoadFile "$o{data}/output";
+YAML::XS::DumpFile \*STDOUT, [ grep{ $_->[0][0] eq 'TEST' }@{$x->{stat}} ];
+
+exit 0;

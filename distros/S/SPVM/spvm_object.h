@@ -8,15 +8,10 @@ struct SPVM_object {
   SPVM_OBJECT* weaken_back_refs;
   int32_t ref_count;
   int32_t weaken_back_refs_length;
-  int32_t package_constant_pool_index;
   int32_t length;
-  int8_t type;
   int8_t value_type;
-};
-
-enum {
-  SPVM_OBJECT_C_TYPE_OBJECT = 0,
-  SPVM_OBJECT_C_TYPE_ARRAY = 1,
+  int32_t type_id;
+  int32_t dimension;
 };
 
 enum {

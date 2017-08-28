@@ -30,7 +30,7 @@ my $rwaccessors = [
     'recipient',        # [Sisimai::Address] Recipient address which bounced
     'messageid',        # [String] Message-Id: header
     'replycode',        # [String] SMTP Reply Code
-    'smtpagent',        # [String] MTA name
+    'smtpagent',        # [String] Module(Engine) name
     'softbounce',       # [Integer] 1 = Soft bounce, 0 = Hard bounce, -1 = ?
     'smtpcommand',      # [String] The last SMTP command
     'destination',      # [String] The domain part of the "recipinet"
@@ -65,18 +65,18 @@ sub new {
     my $thing = {};
 
     # Create email address object
-    my $x0 = Sisimai::Address->parse([$argvs->{'addresser'}]);
-    my $y0 = Sisimai::Address->parse([$argvs->{'recipient'}]);
+    my $x0 = Sisimai::Address->find($argvs->{'addresser'});
+    my $y0 = Sisimai::Address->find($argvs->{'recipient'});
     my @v1 = ();
 
     return undef unless ref $x0 eq 'ARRAY';
     return undef unless ref $y0 eq 'ARRAY';
 
-    $thing->{'addresser'} = Sisimai::Address->new(shift @$x0);
+    $thing->{'addresser'} = Sisimai::Address->new($x0->[0]->{'address'});
     return undef unless ref $thing->{'addresser'} eq 'Sisimai::Address';
     $thing->{'senderdomain'} = $thing->{'addresser'}->host;
 
-    $thing->{'recipient'} = Sisimai::Address->new(shift @$y0);
+    $thing->{'recipient'} = Sisimai::Address->new($y0->[0]->{'address'});
     return undef unless ref $thing->{'recipient'} eq 'Sisimai::Address';
     $thing->{'destination'} = $thing->{'recipient'}->host;
     $thing->{'alias'} = $argvs->{'alias'};
@@ -711,7 +711,7 @@ as the return value from host() method of addresser accessor.
 =head2 C<smtpagent> (I<String>)
 
 C<smtpagent> is a module name to be used for detecting bounce reason. For 
-example, when the value is C<Sendmail>, Sisimai used L<Sisimai::MTA::Sendmail>
+example, when the value is C<Sendmail>, Sisimai used L<Sisimai::Bite::Email::Sendmail>
 to get the recipient address and other delivery status information from a 
 bounce message.
 

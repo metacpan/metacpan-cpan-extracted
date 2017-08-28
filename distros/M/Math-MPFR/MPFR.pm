@@ -98,6 +98,7 @@ Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
 Rmpfr_csc Rmpfr_csch
 Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui
 Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint
+Rmpfr_q_div Rmpfr_z_div
 Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp
 Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui
 Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p
@@ -156,7 +157,7 @@ Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
 Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
 Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
-Rmpfr_rec_sqrt Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
+Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
 Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_snprintf
 Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
@@ -167,11 +168,11 @@ MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
 mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
 Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_set
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
-Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc
+Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
 );
 
-    our $VERSION = '3.35';
+    our $VERSION = '3.36';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -199,6 +200,7 @@ Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
 Rmpfr_csc Rmpfr_csch
 Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui
 Rmpfr_div_q Rmpfr_div_si Rmpfr_div_ui Rmpfr_div_z Rmpfr_dump Rmpfr_eint
+Rmpfr_q_div Rmpfr_z_div
 Rmpfr_eq Rmpfr_equal_p Rmpfr_erangeflag_p Rmpfr_erf Rmpfr_erfc Rmpfr_exp
 Rmpfr_exp10 Rmpfr_exp2 Rmpfr_expm1 Rmpfr_fac_ui
 Rmpfr_fits_intmax_p Rmpfr_fits_sint_p Rmpfr_fits_slong_p
@@ -257,7 +259,7 @@ Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
 Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
 Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
-Rmpfr_rec_sqrt Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
+Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
 Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_snprintf
 Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
@@ -268,7 +270,7 @@ MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
 mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
 Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_set
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
-Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc
+Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
 )]);
 
@@ -666,7 +668,7 @@ sub Rmpfr_round_nearest_away {
 
   if($emin <= Rmpfr_get_emin_min()) {
     warn "\n Rmpfr_round_nearest_away requires that emin ($emin)\n",
-         " be greater than or equal to emin_min (", Rmpfr_get_emin_min(), "\n";
+         " be greater than or equal to emin_min (", Rmpfr_get_emin_min(), ")\n";
     die " You need to set emin (using Rmpfr_set_emin()) accordingly";
   }
 

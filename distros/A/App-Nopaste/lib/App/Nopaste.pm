@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package App::Nopaste; # git description: 1.009-3-gb592e97
+package App::Nopaste; # git description: 1.010-5-ge64d42a
 # ABSTRACT: Easy access to any pastebin
 # KEYWORDS: application executable paste output pastebin debugging
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 use 5.008003;
 use Module::Pluggable search_path => 'App::Nopaste::Service', sub_name => '_plugins';
@@ -101,7 +101,7 @@ App::Nopaste - Easy access to any pastebin
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -203,7 +203,7 @@ Shawn M Moore, <sartak@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Shawn M Moore Karen Etheridge Thomas Sibley François Gannaz Ricardo Signes Justin Hunter Kevin Falcone Zoffix Znet Sergey Romanov David Golden Jesse Luehrs Dean Hamstead Rafael Kitover vti Ævar Arnfjörð Bjarmason Сергей Романов Andrew Rodland יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Darian Anthony Patrick Bremner J. Shultz Graham Knop Jason Mills John Goulah Maximilian Gass Sebastian Paaske Tørholm Tatsuhiko Miyagawa Zakariyya Mughal gregor herrmann
+=for stopwords Shawn M Moore Karen Etheridge Thomas Sibley François Gannaz Ricardo Signes Justin Hunter Kevin Falcone Zoffix Znet Sergey Romanov David Golden Jesse Luehrs Dean Hamstead Rafael Kitover gregor herrmann vti Ævar Arnfjörð Bjarmason Сергей Романов Andrew Rodland יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Dan Book Darian Anthony Patrick Bremner J. Shultz Graham Knop Jason Mills John Goulah Maximilian Gass Sebastian Paaske Tørholm Tatsuhiko Miyagawa Zakariyya Mughal
 
 =over 4
 
@@ -261,6 +261,10 @@ Rafael Kitover <rkitover@cpan.org>
 
 =item *
 
+gregor herrmann <gregoa@debian.org>
+
+=item *
+
 vti <viacheslav.t@gmail.com>
 
 =item *
@@ -282,6 +286,10 @@ Andrew Rodland <andrew@cleverdomain.org>
 =item *
 
 Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
 
 =item *
 
@@ -322,10 +330,6 @@ Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 =item *
 
 Zakariyya Mughal <zaki.mughal@gmail.com>
-
-=item *
-
-gregor herrmann <gregoa@debian.org>
 
 =back
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.12 2017-08-24T13:25:51Z
+
+    - Now require Perls from 5.14.4 up
+    - Add DB::Pluggable, DB::Skip, CPAN::Mini::WebServer to recommends
+
 0.11 2017-06-24T07:50:35Z
 
     - Add Devel::Cover to recommends

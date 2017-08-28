@@ -7,12 +7,14 @@ use strict;
 
 package Log::Report::Lexicon::POTcompact;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 use base 'Log::Report::Lexicon::Table';
 
 use Log::Report        'log-report-lexicon';
 use Log::Report::Util  qw/escape_chars unescape_chars/;
+
+use Encode             qw/find_encoding/;
 
 sub _unescape($$);
 sub _escape($$);
@@ -23,28 +25,54 @@ sub read($@)
 
     my $self    = bless {}, $class;
 
-    my $charset = $args{charset}
-        or error __x"charset parameter required for {fn}", fn => $fn;
+    my $charset = $args{charset};
 
-    open my $fh, "<:encoding($charset):crlf", $fn
-        or fault __x"cannot read in {cs} from file {fn}"
-             , cs => $charset, fn => $fn;
+    # Try to pick-up charset from the filename (which may contain a modifier)
+    $charset    = $1
+        if !$charset && $fn =~ m!\.([\w-]+)(?:\@[^/\\]+)?\.po$!i;
+
+    my $fh;
+    if($charset)
+    {   open $fh, "<:encoding($charset):crlf", $fn
+            or fault __x"cannot read in {charset} from file {fn}"
+                , charset => $charset, fn => $fn;
+    }
+    else
+    {   open $fh, '<:raw:crlf', $fn
+            or fault __x"cannot read from file {fn} (unknown charset)", fn=>$fn;
+    }
 
     # Speed!
     my $msgctxt = '';
     my ($last, $msgid, @msgstr);
     my $index   = $self->{index} ||= {};
 
+	my $add = sub {
+       unless($charset)
+       {   $msgid eq ''
+               or error __x"header not found for charset in {fn}", fn => $fn;
+           $charset = $msgstr[0] =~ m/^content-type:.*?charset=["']?([\w-]+)/mi
+              ? $1 : error __x"cannot detect charset in {fn}", fn => $fn;
+           my $enc = find_encoding($charset)
+               or error __x"unsupported charset {charset} in {fn}"
+                    , charset => $charset, fn => $fn;
+
+           trace "auto-detected charset $charset for $fn";
+           $fh->binmode(":encoding($charset):crlf");
+
+           $_ = $enc->decode($_) for @msgstr, $msgctxt;
+       }
+
+       $index->{"$msgid#$msgctxt"} = @msgstr > 1 ? [@msgstr] : $msgstr[0];
+       ($msgctxt, $msgid, @msgstr) = ('');
+    };
+
  LINE:
     while(my $line = $fh->getline)
     {   next if substr($line, 0, 1) eq '#';
 
         if($line =~ m/^\s*$/)  # blank line starts new
-        {   if(@msgstr)
-            {   $index->{"$msgid#$msgctxt"}
-                   = @msgstr > 1 ? [@msgstr] : $msgstr[0];
-                ($msgctxt, $msgid, @msgstr) = ('');
-            }
+        {   $add->() if @msgstr;
             next LINE;
         }
 
@@ -67,21 +95,23 @@ sub read($@)
         {   $$last .= _unescape $line, $fn;
         }
     }
-
-    $index->{"$msgid#$msgctxt"} = (@msgstr > 1 ? \@msgstr : $msgstr[0])
-        if @msgstr;   # don't forget the last
+    $add->() if @msgstr;   # don't forget the last
 
     close $fh
         or failure __x"failed reading from file {fn}", fn => $fn;
 
-    $self->{filename} = $fn;
+    $self->{origcharset} = $charset;
+    $self->{filename}    = $fn;
     $self->setupPluralAlgorithm;
     $self;
 }
 
+#------------------
 
-sub filename()  {shift->{filename}}
+sub filename() {shift->{filename}}
+sub originalCharset() {shift->{origcharset}}
 
+#------------------
 
 sub index()     {shift->{index}}
 # The index is a HASH with "$msg#$msgctxt" keys.  If there is no

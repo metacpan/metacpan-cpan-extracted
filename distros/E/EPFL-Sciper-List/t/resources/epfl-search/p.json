@@ -1,0 +1,31 @@
+{
+  "GSA_available": true,
+  "hasMore": false,
+  "maxRows": 99999999,
+  "origin": "ws_autocomplete",
+  "remoteAddr": "192.33.203.170",
+  "result": [{
+    "name": "Palvin",
+    "firstname": "Barbara",
+    "sciper": "214375"
+  }, {
+    "name": "Pestova",
+    "firstname": "Daniela",
+    "sciper": "289545"
+  }, {
+    "name": "Pietersen",
+    "firstname": "Jenna",
+    "sciper": "166545"
+  }, {
+    "name": "Praver",
+    "firstname": "Tori",
+    "sciper": "239545"
+  }, {
+    "name": "Prinsloo",
+    "firstname": "Behati",
+    "sciper": "126545"
+  }],
+  "size": 5,
+  "term": "p",
+  "test": false
+}

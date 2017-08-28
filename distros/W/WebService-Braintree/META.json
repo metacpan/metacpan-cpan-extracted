@@ -1,0 +1,77 @@
+{
+   "abstract" : "A Client Library for wrapping the Braintree Payment Services Gateway API",
+   "author" : [
+      "Kieren Diment <zarquon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Braintree",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::GUID" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Atom" : "0",
+            "DateTime::Format::RFC3339" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Digest" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Digest::SHA" : "0",
+            "Digest::SHA1" : "0",
+            "Digest::SHA256" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request" : "0",
+            "Hash::Inflator" : "0",
+            "JSON" : "0",
+            "LWP" : "6.02",
+            "LWP::Protocol::https" : "0",
+            "MIME::Base64" : "0",
+            "Module::Install::TestTarget" : "0",
+            "Moose" : "0",
+            "Mozilla::CA" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "URI::Query" : "0",
+            "XML::LibXML" : "0",
+            "XML::Simple" : "0",
+            "local::lib" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Moose" : "0",
+            "Test::More" : "0.98",
+            "Test::Pod" : "0",
+            "Test::Warn" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/singingfish/braintree_perl/issues"
+      },
+      "homepage" : "https://www.braintreepayments.com",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/singingfish/braintree_perl.git",
+         "web" : "https://github.com/singingfish/braintree_perl"
+      }
+   },
+   "version" : "0.93",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

@@ -1,0 +1,23 @@
+v0.1.5 2017-08-25T05:10:34Z
+ - logo updated
+ - call pending callbacks on websocket disconnect
+ - stack "connect" callbacks
+
+v0.1.4 2017-08-24T10:13:25Z
+ - chrome timeout arg added
+
+v0.1.3 2017-08-24T10:05:03Z
+ - chrome startup timeout set to 3 sec
+
+v0.1.2 2017-08-24T09:06:41Z
+ - connect_ws args changed
+
+v0.1.1 2017-08-24T08:47:32Z
+ - chrome cli updated
+ - new_tab opens about:blank by default
+ - quote chrome bin
+ - POD updated
+
+v0.1.0 2017-08-23T21:59:05Z
+ - API implemented
+ - init

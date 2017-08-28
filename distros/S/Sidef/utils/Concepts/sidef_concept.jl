@@ -5,7 +5,7 @@
 import Base.sqrt
 import Base./;
 
-type S_Number
+mutable struct S_Number
     value::Number;
 
     function S_Number(x::Number)
@@ -73,22 +73,22 @@ if (m = match(r"\G(\d+(?:\.\d+)?)", code)) != nothing
 
 end
 
-#=
-__END__
+abstract type Animal
+end
 
-abstract Animal
-
-type Horse <: Animal
+struct Horse <: Animal
   name::String
 end
 
-run(::Animal) = println("Run, animal, run")
+run(::Animal) = println("Run, animal, run!")
+sleep(a::Animal) = println("It's late; ", a.name, " is going to bed...")
 
 function //(z::Horse)
-    println("Run horse, run")
-    println(z.name)
+    println("Run horsie, run!")
+    println("Horsie's name is ", z.name, ".")
 end
 
-foo = Horse("Horsie");
+foo = Horse("Hashy");
 //(foo);
-=#
+
+sleep(Horse("Hashy"))

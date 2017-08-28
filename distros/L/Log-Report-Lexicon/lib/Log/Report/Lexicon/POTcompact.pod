@@ -12,8 +12,7 @@ Log::Report::Lexicon::POTcompact - use translations from a POT file
 =head1 SYNOPSIS
 
  # using a PO table efficiently
- my $pot = Log::Report::Lexicon::POTcompact
-             ->read('po/nl.po', charset => 'utf-8')
+ my $pot = Log::Report::Lexicon::POTcompact->read('po/nl.po')
     or die;
 
  my $header = $pot->msgid('');
@@ -55,14 +54,14 @@ Comments, plural-form, and such are lost on purpose: they are not
 needed for translations.
 
  -Option --Default
-  charset  <required>
+  charset  undef
 
 =over 2
 
 =item charset => STRING
 
-The character-set which is used for the file.  You must specify
-this explicitly, while it cannot be trustfully detected automatically.
+When the charset is not specified, it will be taken from the content-type
+field in the po-file header.
 
 =back
 
@@ -77,6 +76,11 @@ Extends L<"Attributes" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Tabl
 =item $obj-E<gt>B<filename>()
 
 Returns the name of the source file for this data.
+
+=item $obj-E<gt>B<originalCharset>()
+
+[1.09] Returns the character-set of the strings found in the file.  They will
+get translated into utf8 before being used in Perl.
 
 =back
 
@@ -145,14 +149,14 @@ Inherited, see L<Log::Report::Lexicon::Table/"Administration">
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.08,
-built on June 29, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Lexicon distribution version 1.09,
+built on August 28, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
 Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

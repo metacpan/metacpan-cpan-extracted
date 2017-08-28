@@ -36,13 +36,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Alien::XGBoost" : "0",
             "Carp" : "0",
             "Exception::Class" : "0",
             "Exporter::Easy" : "0",
             "FFI::Platypus" : "0",
             "Moose" : "0",
             "NativeCall" : "0",
-            "parent" : "0",
+            "namespace::autoclean" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "utf8" : "0",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/pablrod/p5-AI-XGBoost"
       }
    },
-   "version" : "0.008",
+   "version" : "0.11",
    "x_contributors" : [
       "Ruben <me@ruben.tech>"
    ],

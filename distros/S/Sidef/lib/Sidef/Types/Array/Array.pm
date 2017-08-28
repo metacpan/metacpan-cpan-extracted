@@ -106,13 +106,17 @@ package Sidef::Types::Array::Array {
     }
 
     sub reduce_operator {
-        my ($self, $operator) = @_;
+        my ($self, $operator, $initial) = @_;
 
         $operator = "$operator" if ref($operator);
-        (my $end = $#$self) >= 0 || return undef;
 
-        my $x = $self->[0];
-        foreach my $i (1 .. $end) {
+        my ($x, $beg) = (
+                         defined($initial)
+                         ? ($initial, 0)
+                         : ($self->[0], 1)
+                        );
+
+        foreach my $i ($beg .. $#$self) {
             $x = $x->$operator($self->[$i]);
         }
         $x;
@@ -173,7 +177,7 @@ package Sidef::Types::Array::Array {
 
     sub mul {
         my ($self, $num) = @_;
-        bless [(@$self) x $num], __PACKAGE__;
+        bless [(@$self) x CORE::int($num)], __PACKAGE__;
     }
 
     sub div {
@@ -295,7 +299,9 @@ package Sidef::Types::Array::Array {
 
     sub is_empty {
         my ($self) = @_;
-        ($#$self == -1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        ($#$self < 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sub {
@@ -542,7 +548,8 @@ package Sidef::Types::Array::Array {
     }
 
     sub collapse {
-        $_[0]->reduce_operator('+');
+        my ($self, $initial) = @_;
+        $self->reduce_operator('+', $initial);
     }
 
     sub sum_by {
@@ -901,6 +908,52 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub expand {
+        my ($self, $code) = @_;
+
+        if (not defined($code)) {
+            $code = Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        }
+
+        my @new;
+        my @copy = @$self;
+
+        foreach my $item (@copy) {
+            my $res = $code->run($item);
+
+            if (ref($res) eq __PACKAGE__) {
+                CORE::push(@copy, @$res);
+            }
+            else {
+                CORE::push(@new, $res);
+            }
+        }
+
+        bless \@new, __PACKAGE__;
+    }
+
+    *expand_by = \&expand;
+
+    sub recmap {
+        my ($self, $code) = @_;
+
+        if (not defined($code)) {
+            $code = Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        }
+
+        my @copy = @$self;
+
+        foreach my $item (@copy) {
+            my $res = $code->run($item);
+
+            if (ref($res) eq __PACKAGE__) {
+                CORE::push(@copy, @$res);
+            }
+        }
+
+        bless \@copy, __PACKAGE__;
+    }
+
     sub map {
         my ($self, $code) = @_;
 
@@ -938,15 +991,8 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         my @array;
-        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
-            foreach my $item (@$self) {
-                CORE::push(@array, $item) if $obj->match($item);
-            }
-        }
-        else {
-            foreach my $item (@$self) {
-                CORE::push(@array, $item) if $obj->run($item);
-            }
+        foreach my $item (@$self) {
+            CORE::push(@array, $item) if $obj->run($item);
         }
 
         bless \@array, __PACKAGE__;
@@ -967,7 +1013,7 @@ package Sidef::Types::Array::Array {
 
     *select_kv = \&grep_kv;
 
-    sub group_by {
+    sub group {
         my ($self, $code) = @_;
 
         my %hash;
@@ -977,6 +1023,8 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}, __PACKAGE__) } CORE::keys(%hash));
     }
+
+    *group_by = \&group;
 
     sub match {
         my ($self, $regex) = @_;
@@ -998,7 +1046,7 @@ package Sidef::Types::Array::Array {
                     $sub->($item, $regex)
                       && return Sidef::Types::Bool::Bool::TRUE;
                 }
-                elsif ("$item" =~ $regex->{regex}) {
+                elsif ($regex->run($item)) {
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
             }
@@ -1273,16 +1321,21 @@ package Sidef::Types::Array::Array {
         my ($self, $obj, $initial) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            (my $end = $#$self) >= 0 || return undef;
-            my ($beg, $x) = defined($initial) ? (0, $initial) : (1, $self->[0]);
-            foreach my $i ($beg .. $end) {
+
+            my ($beg, $x) = (
+                             defined($initial)
+                             ? (0, $initial)
+                             : (1, $self->[0])
+                            );
+
+            foreach my $i ($beg .. $#$self) {
                 $x = $obj->run($x, $self->[$i]);
             }
 
             return $x;
         }
 
-        $self->reduce_operator("$obj");
+        $self->reduce_operator("$obj", $initial);
     }
 
     *inject = \&reduce;
@@ -1534,6 +1587,59 @@ package Sidef::Types::Array::Array {
     *last_unique_by = \&last_uniq_by;
 
     sub abbrev {
+        my ($self, $pattern) = @_;
+
+        if (defined($pattern)) {
+            if (ref($pattern) eq 'Sidef::Types::Regex::Regex') {
+                $pattern = $pattern->get_value;
+            }
+            else {
+                $pattern = qr/\Q$pattern\E/;
+            }
+        }
+
+        my (%seen, %table);
+        foreach my $item (@$self) {
+            my $word = "$item";
+            my $length = CORE::length($word) || next;
+
+            for (my $len = $length ; $len >= 1 ; --$len) {
+                my $abbrev = substr($word, 0, $len);
+
+                if (defined($pattern)) {
+                    ($abbrev =~ $pattern) || next;
+                }
+
+                my $count = ++$seen{$abbrev};
+
+                if ($count == 1) {
+                    $table{$abbrev} = $item;
+                }
+                elsif ($count == 2) {
+                    CORE::delete($table{$abbrev});
+                }
+                else {
+                    last;
+                }
+            }
+        }
+
+        foreach my $item (@$self) {
+            my $word = "$item";
+
+            if (defined($pattern)) {
+                ($word =~ $pattern) || next;
+            }
+
+            $table{$word} = $item;
+        }
+
+        Sidef::Types::Hash::Hash->new(%table);
+    }
+
+    *abbreviations = \&abbrev;
+
+    sub uniq_prefs {
         my ($self, $block) = @_;
 
         my $tail     = {};                # some unique value
@@ -1582,7 +1688,7 @@ package Sidef::Types::Array::Array {
         bless \@abbrev, __PACKAGE__;
     }
 
-    *abbreviations = \&abbrev;
+    *unique_prefixes = \&uniq_prefs;
 
     sub contains {
         my ($self, $obj) = @_;
@@ -1771,61 +1877,109 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
-    sub combinations {
-        my ($self, $k, $block) = @_;
+    foreach my $name (
+                      qw(
+                      derangements
+                      permutations
+                      circular_permutations
+                      )
+      ) {
 
-        $k = CORE::int($k);
+        no strict 'refs';
 
-        if (defined($block)) {
+        *{__PACKAGE__ . '::' . $name} = sub {
+            my ($self, $block) = @_;
 
-            if ($k == 0) {
-                $block->run();
+            require Algorithm::Combinatorics;
+            my $iter = &{'Algorithm::Combinatorics::' . $name}([@$self]);
+
+            if (defined($block)) {
+                while (defined(my $arr = $iter->next)) {
+                    $block->run(@$arr);
+                }
                 return $self;
             }
 
-            my $n = @$self;
-            return $self if ($k < 0 or $k > $n or $n == 0);
-
-            my @c = (0 .. $k - 1);
-
-            while (1) {
-                $block->run(@$self[@c]);
-                next if ($c[$k - 1]++ < $n - 1);
-                my $i = $k - 2;
-                $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-                last if $i < 0;
-                $c[$i]++;
-                while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+            my @result;
+            while (defined(my $arr = $iter->next)) {
+                push @result, bless [@$arr], __PACKAGE__;
             }
 
+            bless \@result, __PACKAGE__;
+        };
+    }
+
+    *complete_permutations = \&derangements;
+
+    foreach my $name (
+                      qw(
+                      variations
+                      variations_with_repetition
+                      combinations
+                      combinations_with_repetition
+                      subsets
+                      )
+      ) {
+
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . $name} = sub {
+            my ($self, $k, $block) = @_;
+
+            require Algorithm::Combinatorics;
+
+            if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+                ($block, $k) = ($k, undef);
+            }
+
+            my $iter = do {
+                local $SIG{__WARN__} = sub { };
+                &{'Algorithm::Combinatorics::' . $name}([@$self], defined($k) ? CORE::int($k) : ());
+            };
+
+            if (defined($block)) {
+                while (defined(my $arr = $iter->next)) {
+                    $block->run(@$arr);
+                }
+                return $self;
+            }
+
+            my @result;
+            while (defined(my $arr = $iter->next)) {
+                push @result, bless [@$arr], __PACKAGE__;
+            }
+
+            bless \@result, __PACKAGE__;
+        };
+    }
+
+    *tuples                 = \&variations;
+    *tuples_with_repetition = \&variations_with_repetition;
+
+    sub partitions {
+        my ($self, $k, $block) = @_;
+
+        require Algorithm::Combinatorics;
+
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::partitions([@$self], defined($k) ? CORE::int($k) : ());
+        };
+
+        if (defined($block)) {
+            while (defined(my $arr = $iter->next)) {
+                $block->run(map { __PACKAGE__->new($_) } @$arr);
+            }
             return $self;
         }
 
-        ($k == 0)
-          && return bless [bless [], __PACKAGE__], __PACKAGE__;
-
-        my $n = @$self;
-
-        ($k < 0 or $k > $n or $n == 0)
-          && return bless([], __PACKAGE__);
-
-        my @c = (0 .. $k - 1);
         my @result;
-
-        while (1) {
-            CORE::push(@result, bless([@$self[@c]], __PACKAGE__));
-            next if ($c[$k - 1]++ < $n - 1);
-            my $i = $k - 2;
-            $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-            last if $i < 0;
-            $c[$i]++;
-            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+        while (defined(my $arr = $iter->next)) {
+            push @result, bless [map { __PACKAGE__->new($_) } @$arr], __PACKAGE__;
         }
 
         bless \@result, __PACKAGE__;
     }
-
-    *each_comb = \&combinations;
 
     sub nth_permutation {
         my ($self, $n) = @_;
@@ -1863,109 +2017,25 @@ package Sidef::Types::Array::Array {
 
     *nth_perm = \&nth_permutation;
 
-    sub permutations {
-        my ($self, $code) = @_;
-
-        my @idx = 0 .. $#$self;
-
-        if (not @idx) {
-
-            if (defined $code) {
-                $code->run();
-                return $self;
-            }
-
-            return bless [bless [], __PACKAGE__], __PACKAGE__;
-        }
-
-        if (defined($code)) {
-            my @perm;
-
-            while (1) {
-                @perm = @$self[@idx];
-
-                my $p = $#idx;
-                --$p while $idx[$p - 1] > $idx[$p];
-
-                my $q = $p || do {
-                    $code->run(@perm);
-                    return $self;
-                };
-
-                CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
-                ++$q while $idx[$p - 1] > $idx[$q];
-                @idx[$p - 1, $q] = @idx[$q, $p - 1];
-
-                $code->run(@perm);
-            }
-
-            return $self;
-        }
-
-        my @array;
-        while (1) {
-            CORE::push(@array, bless([@$self[@idx]], __PACKAGE__));
-            my $p = $#idx;
-            --$p while $idx[$p - 1] > $idx[$p];
-            my $q = $p || (return bless(\@array, __PACKAGE__));
-            CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
-            ++$q while $idx[$p - 1] > $idx[$q];
-            @idx[$p - 1, $q] = @idx[$q, $p - 1];
-        }
-    }
-
-    *permute     = \&permutations;    # deprecated
-    *permutation = \&permutations;    # deprecated
-    *each_perm   = \&permutations;
-
     sub cartesian {
         my ($self, $block) = @_;
 
-        my ($more, @arrs, @lengths);
+        require Algorithm::Loops;
 
-        foreach my $arr (@$self) {
-            my @arr = @$arr;
+        my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @$self]);
 
-            if (@arr) {
-                $more ||= 1;
+        if (defined($block)) {
+            while (my @arr = $iter->()) {
+                $block->run(@arr);
             }
-            else {
-                $more = 0;
-                last;
-            }
-
-            push @arrs,    \@arr;
-            push @lengths, $#arr;
+            return $self;
         }
 
-        my @indices = (0) x @arrs;
-        my (@temp, @cartesian);
-
-        while ($more) {
-            @temp = @indices;
-
-            for (my $i = $#indices ; $i >= 0 ; --$i) {
-                if ($indices[$i] == $lengths[$i]) {
-                    $indices[$i] = 0;
-                    $more = 0 if $i == 0;
-                }
-                else {
-                    ++$indices[$i];
-                    last;
-                }
-            }
-
-            if (defined($block)) {
-                $block->run(map { $_->[CORE::shift(@temp)] } @arrs);
-            }
-            else {
-                push @cartesian, bless([map { $_->[CORE::shift(@temp)] } @arrs], __PACKAGE__);
-            }
+        my @result;
+        while (my @arr = $iter->()) {
+            push @result, bless(\@arr, __PACKAGE__);
         }
-
-        defined($block)
-          ? $self
-          : bless(\@cartesian, __PACKAGE__);
+        bless \@result, __PACKAGE__;
     }
 
     sub zip {

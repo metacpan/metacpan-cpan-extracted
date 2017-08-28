@@ -1,5 +1,5 @@
 package WebService::Braintree::MerchantAccount;
-$WebService::Braintree::MerchantAccount::VERSION = '0.92';
+$WebService::Braintree::MerchantAccount::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::Customer
@@ -59,7 +59,7 @@ sub gateway {
 
 {
     package WebService::Braintree::MerchantAccount::Status;
-$WebService::Braintree::MerchantAccount::Status::VERSION = '0.92';
+$WebService::Braintree::MerchantAccount::Status::VERSION = '0.93';
 use constant Active => "active";
     use constant Pending => "pending";
     use constant Suspended => "suspended";
@@ -67,7 +67,7 @@ use constant Active => "active";
 
 {
     package WebService::Braintree::MerchantAccount::FundingDestination;
-$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '0.92';
+$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '0.93';
 use constant Bank => "bank";
     use constant Email => "email";
     use constant MobilePhone => "mobile_phone";

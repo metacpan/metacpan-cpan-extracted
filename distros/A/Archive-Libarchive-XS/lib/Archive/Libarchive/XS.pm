@@ -11,13 +11,7 @@ use Encode qw( decode );
 BEGIN {
 
 # ABSTRACT: Perl bindings to libarchive via XS
-our $VERSION = '0.0901'; # VERSION
-
-  unless($^O eq 'MSWin32')
-  {
-    require Alien::Libarchive;
-    Alien::Libarchive->import;
-  }
+our $VERSION = '0.0902'; # VERSION
 
   require XSLoader;
   XSLoader::load('Archive::Libarchive::XS', $VERSION);
@@ -137,6 +131,7 @@ eval q{
       ARCHIVE_ENTRY_ACL_WRITE_OWNER
       ARCHIVE_EOF
       ARCHIVE_EXTRACT_ACL
+      ARCHIVE_EXTRACT_CLEAR_NOCHANGE_FFLAGS
       ARCHIVE_EXTRACT_FFLAGS
       ARCHIVE_EXTRACT_HFS_COMPRESSION_FORCED
       ARCHIVE_EXTRACT_MAC_METADATA
@@ -160,6 +155,7 @@ eval q{
       ARCHIVE_FILTER_GRZIP
       ARCHIVE_FILTER_GZIP
       ARCHIVE_FILTER_LRZIP
+      ARCHIVE_FILTER_LZ4
       ARCHIVE_FILTER_LZIP
       ARCHIVE_FILTER_LZMA
       ARCHIVE_FILTER_LZOP
@@ -196,6 +192,7 @@ eval q{
       ARCHIVE_FORMAT_TAR_PAX_INTERCHANGE
       ARCHIVE_FORMAT_TAR_PAX_RESTRICTED
       ARCHIVE_FORMAT_TAR_USTAR
+      ARCHIVE_FORMAT_WARC
       ARCHIVE_FORMAT_XAR
       ARCHIVE_FORMAT_ZIP
       ARCHIVE_LIBRARY_VERSION
@@ -208,9 +205,16 @@ eval q{
       ARCHIVE_READDISK_HONOR_NODUMP
       ARCHIVE_READDISK_MAC_COPYFILE
       ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS
+      ARCHIVE_READDISK_NO_XATTR
       ARCHIVE_READDISK_RESTORE_ATIME
+      ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_DATA
+      ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_METADATA
+      ARCHIVE_READ_FORMAT_CAPS_NONE
+      ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW
+      ARCHIVE_READ_FORMAT_ENCRYPTION_UNSUPPORTED
       ARCHIVE_RETRY
       ARCHIVE_VERSION_NUMBER
+      ARCHIVE_VERSION_ONLY_STRING
       ARCHIVE_VERSION_STAMP
       ARCHIVE_WARN
   )],
@@ -230,7 +234,7 @@ Archive::Libarchive::XS - Perl bindings to libarchive via XS
 
 =head1 VERSION
 
-version 0.0901
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -822,9 +826,8 @@ be written.
 
 =item L<Archive::Libarchive::FFI>
 
-Both of these provide the same API to libarchive via L<Alien::Libarchive>,
-but the bindings are implemented in XS for one and via L<FFI::Sweet> for
-the other.
+Both of these provide the same API to libarchive but the bindings are
+implemented in XS for one and via L<FFI::Raw> for the other.
 
 =item L<Archive::Libarchive::Any>
 

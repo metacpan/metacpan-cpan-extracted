@@ -1,0 +1,105 @@
+{
+   "abstract" : "Standard(ized) Analysis Information Layers",
+   "author" : [
+      "Jillian Rowe <jillian.e.rowe@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BioSAILs",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Config::Any" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Git::Wrapper" : "0",
+            "Git::Wrapper::Plus::Branches" : "0",
+            "Git::Wrapper::Plus::Ref::Tag" : "0",
+            "Git::Wrapper::Plus::Tags" : "0",
+            "Hash::Merge" : "0",
+            "IO::File" : "0",
+            "IPC::Cmd" : "0",
+            "List::Util" : "0",
+            "Moose::Role" : "0",
+            "MooseX::App::Role" : "0",
+            "MooseX::Object::Pluggable" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Path::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Sort::Versions" : "0",
+            "Try::Tiny" : "0",
+            "Version::Next" : "0",
+            "YAML" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Moose" : "0",
+            "MooseX::App" : "0",
+            "MooseX::App::Command" : "0",
+            "Test::Class::Moose" : "0",
+            "Test::Class::Moose::Load" : "0",
+            "Test::Class::Moose::Runner" : "0",
+            "Test::More" : "0.96",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/biosails/BioSAILs/issues"
+      },
+      "homepage" : "https://github.com/biosails/BioSAILs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/biosails/BioSAILs.git",
+         "web" : "https://github.com/biosails/BioSAILs"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

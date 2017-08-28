@@ -1,17 +1,21 @@
 ChangeLog
-IPv6Addr.pm
-MANIFEST
+examples/synopsis.pl
+lib/Net/IPv6Addr.pm
+lib/Net/IPv6Addr.pod
 Makefile.PL
+MANIFEST
+MANIFEST.SKIP
 README
 t/base85.t
 t/chkip.t
 t/compressed.t
 t/ipv4.t
 t/ipv4comp.t
+t/joacim.t
 t/new.t
 t/parse.t
 t/preferred.t
 t/string.t
-rfc1886.txt
-rfc1924.txt
-rfc2373.txt
+t/synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

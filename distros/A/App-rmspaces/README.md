@@ -1,5 +1,8 @@
 ## rmspaces
 
+[![Build Status](https://travis-ci.org/athos-ribeiro/rmspaces.svg?branch=master)](https://travis-ci.org/athos-ribeiro/rmspaces)
+[![CPAN version](https://badge.fury.io/pl/App-rmspaces.svg)](https://badge.fury.io/pl/App-rmspaces)
+
 This is a simple script to remove those anoying, lame, awful spaces from file
 names. Just run `rmspaces FILENAME`.
 
@@ -25,15 +28,48 @@ source code.
 
 ### Installing
 
-You can either install rmspaces from CPAN, available under
-[App-rmspaces](http://search.cpan.org/~athos/) or install it through sources by
-running
+#### From CPAN
+
+You can install rmspaces from CPAN, available under
+[App-rmspaces](http://search.cpan.org/~athos/App-rmspaces/)
+
+cpanm
+```
+cpanm App::rmspaces
+```
+
+CPAN shell
+```
+perl -MCPAN -e shell
+install App::rmspaces
+```
+
+#### From sources
+
+You can install rmspaces from sources by running
 
 ```
 perl Makefile.PL
 make
 make install
 ```
+
+#### RPM package
+
+A RPM package is also available in
+[COPR](https://copr.fedorainfracloud.org/coprs/athoscr/extra/)
+
+If using Fedora, you can run
+
+```
+sudo dnf copr enable athoscr/extra
+sudo dnf install rmspaces
+```
+
+### Contributing
+
+Just open a Pull Request if you have any improvements to this script. Also,
+feel free to open issues in this repository.
 
 ### License
 

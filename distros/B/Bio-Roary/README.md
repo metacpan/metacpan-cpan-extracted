@@ -15,6 +15,8 @@ Roary is a high speed stand alone pan genome pipeline, which takes annotated ass
 Theres are a number of dependancies required for Roary, with instructions specific to the type of system you have:
 * Ubuntu/Debian
 * CentOS/RedHat
+* Bioconda - OSX/Linux
+* Galaxy
 * Homebrew/Linuxbrew - OSX/Linux
 * Guix - Linux
 * Virtual Machine - OSX/Linux/Windows
@@ -43,6 +45,20 @@ Some of the software versions in apt are quite old so follow the instructions fo
 ## CentOS/RedHat
 To install the dependancies, the easiest way is to install [LinuxBrew](http://brew.sh/linuxbrew/) using the steps for Fedora, then follow the steps below for installing Roary on LinuxBrew.
 
+## Bioconda - OSX/Linux
+Install conda. Then install bioconda and roary:
+
+```
+conda config --add channels r
+conda config --add channels defaults
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda install roary
+```
+
+## Galaxy
+Roary is available from the Galaxy toolshed ( as is Prokka).
+
 ## Homebrew/Linuxbrew - OSX/Linux
 Assuming you have [homebrew](http://brew.sh/) (OSX) or [linuxbrew](http://brew.sh/linuxbrew/) (Linux) setup and installed on your system:
 
@@ -64,7 +80,7 @@ Roary wont run natively on Windows but we have created virtual machine which has
 
 ftp://ftp.sanger.ac.uk/pub/pathogens/pathogens-vm/pathogens-vm.latest.ova
 
-More importantly though, if your trying to do bioinformatics on Windows, your not going to get very far and you should seriously consider upgrading to Linux.
+More importantly though, if you're trying to do bioinformatics on Windows, you're not going to get very far and you should seriously consider upgrading to Linux.
 
 ## Docker - OSX/Linux/Windows/Cloud
 We have a docker container which gets automatically built from the latest version of Roary in Debian Med. To install it:
@@ -107,7 +123,7 @@ bedtools cd-hit blast mcl GNUparallel prank mafft fasttree
 ```
 
 ## Ancient systems and versions of perl
-The code will not work with perl 5.8 or below (pre-modern perl). We no longer test against 5.10 (released 2007). If your running a very old verison of Linux, your also in trouble.
+The code will not work with perl 5.8 or below (pre-modern perl). We no longer test against 5.10 (released 2007). If you're running a very old verison of Linux, you're also in trouble.
 
 # Versions of software we test against
 * Perl 5.14, 5.16, 5.20, 5.24

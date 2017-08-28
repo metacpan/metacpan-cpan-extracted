@@ -49,7 +49,7 @@ package Sidef::Types::Block::Block {
 
         my @methods = ($self, exists($self->{kids}) ? @{$self->{kids}} : ());
 
-        if (defined($self->{class}) and length($self->{name})) {
+        if (defined($self->{class}) and defined($self->{name})) {
 
             my $limit = 4096;
 
@@ -386,9 +386,6 @@ package Sidef::Types::Block::Block {
         state $x = require Data::Dump::Filtered;
         open(my $fh, '+>', undef);    # an anonymous temporary file
         my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
-
-        # Prevent the destruction of Math::GMPq objects
-        #local *Math::GMPq::DESTROY;
 
         # Try to fork
         my $pid = fork() // die "[ERROR] Cannot fork";

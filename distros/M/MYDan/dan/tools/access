@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use MYDan::Node;
+use MYDan::Util::MIO::TCP;
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+use MYDan::Agent::Client;
+
+$MYDan::Util::OptConf::THIS = 'agent';
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 -r range [--delete] [--add] users1 user2 ..
+
+ Add or delete some users on the remote machine
+
+ Only root users can execute
+
+=cut
+MYDan::Util::Sudo->sudo();
+
+my $option = MYDan::Util::OptConf->load();
+my %o = MYDan::Util::OptConf->load()->get( qw( range=s delete add ) )->dump();
+my @conf;
+
+exit unless $o{add} || $o{delete};
+
+for my $user ( @ARGV )
+{
+    my %param = ( user => $user );
+
+    if ( $o{add} )
+    {
+        map { next unless ( $param{$_} ) = `grep -P '^$user:' /etc/$_`;
+            chop $param{$_} } qw( passwd shadow group );
+
+        if ( my ( $sudo ) = `grep -P '^$user ' /etc/sudoers` )
+        {
+            chop $sudo; $param{sudoers} = $sudo;
+        }
+    }
+    push @conf, \%param;
+}
+
+my %query = ( code => 'access', argv => \@conf, sudo => 'root' );
+
+$query{user} = `logname`;chop $query{user};
+my $range = MYDan::Node->new( $option->dump( 'range' ) );
+
+my %result = MYDan::Agent::Client->new(
+    $range->load( delete $o{range} )->list
+)->run( %o, query => \%query );
+
+YAML::XS::DumpFile \*STDERR, \%result if %result;
+exit 0;

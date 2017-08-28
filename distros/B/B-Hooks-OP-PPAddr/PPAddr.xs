@@ -97,9 +97,11 @@ END ()
 		MY_CXT.op_map = NULL;
 
 BOOT:
-	MY_CXT_INIT;
-	MY_CXT.op_map = PTABLE_new ();
+    {
+        MY_CXT_INIT;
+        MY_CXT.op_map = PTABLE_new ();
 
-	if (!MY_CXT.op_map) {
-		croak ("can't initialize op map");
-	}
+        if (!MY_CXT.op_map) {
+            croak ("can't initialize op map");
+        }
+    }

@@ -1,5 +1,9 @@
 Revision history for Perl module HTTP::Cookies::Safari
 
+1.153 2017-08-24T21:00:42Z
+	* Update test with an expired cookie (hRT #122874)
+	* Freshen distro
+
 1.152 2017-01-05T23:52:20Z
 	* Bump version to index in PAUSE. This is actually an ADOPTME
 	module, but I made a small fix.

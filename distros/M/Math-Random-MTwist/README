@@ -4,8 +4,11 @@ Math-Random-MTwist
 PREREQUISITES
 
 Perl >= 5.8
+ExtUtils::MakeMaker
 Test::More
+Time::HiRes
 
+The mtwist library is located in the mtwist/ directory.
 mtwist needs a fairly "modern" C compiler (see IMPORANT NOTE in mtwist.h).
 
 
@@ -21,7 +24,7 @@ To install this module type the following:
 
 USAGE
 
-See POD documentation in MTwist.pm
+See POD documentation in MTwist.pod
 
 
 COPYRIGHT
@@ -33,5 +36,11 @@ mtwist C library: Copyright © 2001, 2002, 2010, 2012, 2013 by Geoff Kuenning.
 LICENSE
 
 Perl and XS portion: WTFPL (http://wtfpl.net/).
-
 mtwist C library: LGPL (https://gnu.org/licenses/lgpl.html).
+
+
+NOTES
+
+I made some changes to the mtwist library (not affecting the algorithms) to
+adapt it to the Perl module. These changes are documented in the patches/
+directory.

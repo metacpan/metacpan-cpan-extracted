@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::tyan
 # ABSTRACT:  Configuration class LCDd::tyan
+
 =encoding utf8
 
 =head1 NAME
@@ -16,15 +17,45 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Size
 
-set display size I<< Optional. Type uniline. upstream_default: '16x2'.  >> 
+set display size I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+16x2
+
+=back
+
+
 
 =head2 Speed
 
-Set the communication speed I<< Optional. Type enum. choice: '4800', '9600'. upstream_default: '9600'.  >> 
+Set the communication speed I< Optional. Type enum. choice: '4800', '9600'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+9600
+
+=back
+
+
 
 =head1 SEE ALSO
 

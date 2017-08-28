@@ -10,13 +10,14 @@ use BioX::Workflow::Command;
 use YAML::XS;
 use Data::Walk;
 use Storable qw(dclone);
+use File::Spec;
+use File::Slurp;
 
 extends 'TestMethod::Base';
 
 sub write_test_file {
     my $test_dir = shift;
 
-    my $fh;
     my $href = {
         global => [
             { root_dir      => 'data/raw' },
@@ -76,30 +77,26 @@ sub write_test_file {
     };
 
     #Write out the config
-    open( $fh, ">$test_dir/conf/test1.1.yml" )
-      or die print "Couldn't open file! $!";
     my $yaml = Dump $href;
-    print $fh $yaml;
-    close($fh);
+    make_path( File::Spec->catdir( $test_dir, 'conf' ) );
+    write_file( File::Spec->catdir( $test_dir, 'conf', 'test1.1.yml' ), $yaml );
+
+    make_path( File::Spec->catdir( $test_dir, 'data', 'raw' ) );
 
     #Create some samples
-    open( $fh, ">$test_dir/data/raw/Sample_01" )
-      or die print "Couldn't open file! $!";
-    print $fh "";
-    close($fh);
-
-    open( $fh, ">$test_dir/data/raw/Sample_02" )
-      or die print "Couldn't open file! $!";
-    print $fh "";
-    close($fh);
+    write_file( File::Spec->catdir( $test_dir, 'data', 'raw', 'Sample_01' ),
+        '' );
+    write_file( File::Spec->catdir( $test_dir, 'data', 'raw', 'Sample_02' ),
+        '' );
 }
 
 sub construct_tests {
     my $test_methods = TestMethod::Base->new();
     my $test_dir     = $test_methods->make_test_dir();
+
     write_test_file($test_dir);
 
-    my $t = "$test_dir/conf/test1.1.yml";
+    my $t = File::Spec->catdir( $test_dir, 'conf', 'test1.1.yml' );
 
     MooseX::App::ParsedArgv->new( argv => [ "run", "--workflow", $t ] );
 
@@ -123,7 +120,7 @@ sub test_001 : Tags(global_attr) {
     is( $test->global_attr->indir, '{$self->root_dir}', 'Indir matches' );
     is(
         $test->global_attr->gatk,
-        '{$self->outdir}/{$sample}/gatk',
+        File::Spec->catdir( '{$self->outdir}', '{$sample}', 'gatk' ),
         'GATK matches'
     );
     is( $test->global_attr->some_hash->{'banana'}, 'yellow',
@@ -158,15 +155,15 @@ sub test_003 : Tags(get_samples) {
     is_deeply(
         $test->sample_files,
         [
-            $test_dir . '/data/raw/Sample_01',
-            $test_dir . '/data/raw/Sample_02'
+            File::Spec->catdir( $test_dir, 'data', 'raw', 'Sample_01' ),
+            File::Spec->catdir( $test_dir, 'data', 'raw', 'Sample_02' ),
         ],
         'Samples files match'
     );
 
     ok( $test->global_attr->indir->can('absolute'),
         'Indir has method absolute' );
-    ok( $test->global_attr->can('all_some_arrays'),  'Array has all method' );
+    ok( $test->global_attr->can('all_some_arrays'), 'Array has all method' );
     ok( $test->global_attr->can('some_hash_pairs'), 'Hash has pairs method' );
 }
 

@@ -1,0 +1,11 @@
+0.002   2017-08-25 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with fixed Perinci::CmdLine::POD that shows subcommand
+          names in examples.
+
+
+0.001   2017-08-21 (PERLANCAR)
+
+        - First release.

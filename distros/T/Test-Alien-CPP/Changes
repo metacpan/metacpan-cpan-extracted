@@ -1,4 +1,10 @@
 Revision history for Test-Alien-CPP
 
+0.98      2017-08-25 10:26:05 -0400
+  - Production release identical to 0.97_01
+
+0.97_01   2017-08-22 12:13:00 -0400
+  - use ExtUtils::CppGuess for a hopefully better support for C++
+
 0.96      2017-08-16 11:37:50 -0400
   - initial version

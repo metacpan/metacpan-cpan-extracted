@@ -1,5 +1,93 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.005  2017-08-26 18:55:22 UTC
+
+  - A default Perl::Critic config file xt/author/perlcriticrc is created if
+    none exists. Existing files are not changed
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta
+  - Added
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::DistManifest
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Kwalitee
+  - Added
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::MinimumVersion
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Mojibake
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::NoTabs
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod::No404s
+  - Added
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Portability::Files
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Spelling
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Version
+  - Added Dist::Zilla::Role::Author::SKIRMESS::Test::XT
+  - Added new modules to t/00-load.t
+  - Added RemovePrereqs::Provided plugin
+  - Added Test::CPAN::Meta release test
+  - Added Test::CPAN::Meta::JSON release test
+  - Allow stopwords configuration option for dist.ini
+  - Increased required version of Test::Pod to 1.26
+  - Moved Test::DistManifest test from author to release
+  - Moved Test::Pod::No404s test from release to author
+  - Reformatted Changes file to use less indentation
+  - Removed check on AUTHOR_TESTING env variable for tests under xt
+  - Removed Test::More import in tests that don't use Test::More directly
+  - Require at least version 0.008 of Test::MinimumVersion
+  - Scan bin, lib, t and xt directories with Test::Pod
+  - Test::MinimumVersion now uses all_minimum_version_from_metayml_ok
+  - The authors are now added as stopwords to Test::Spelling
+  - The default perlcriticrc now excludes the InputOutput::RequireBriefOpen
+    test
+  - xt tests are now automatically created by plugins under the
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT:: hierarchy
+
+0.004  2017-08-20 21:21:05 UTC
+
+  - Added .perltidyrc
+  - Added .travis.yml
+  - Added 00-load.t test
+  - Added Prereqs::Plugins plugin to dist.ini
+  - Added Test::CPAN::Meta author test
+  - Added Test::Kwalitee release test
+  - Added Test::MinimumVersion author test
+  - Added Test::Mojibake author test
+  - Added Test::NoTabs author test
+  - Added Test::Perl::Critic author test and perlcriticrc config file
+  - Added Test::Pod author test
+  - Added Test::Pod::No404s release test
+  - Added Test::Portability::Files author test
+  - Added Test::Spelling author test
+  - Added Test::Version author test
+  - Fixed links in POD to specify text
+  - Removed Dist::Zilla::Role::BundleDeps role
+  - Removed Prereqs plugin
+  - Removed Prereqs::AuthorDeps plugin
+
+0.003  2017-08-19 20:02:02 UTC
+
+  - Added Prereqs plugin to add a dependency on the bundle in the used version
+  - Added PromptIfStale plugin
+  - Added PruneCruft plugin
+  - Improved abstract
+  - Improved documentation
+  - Removed UpdateGitHub plugin
+
+0.002  2017-08-18 23:45:16 UTC
+
+  - Added CheckIssues plugin
+  - Added CheckSelfDependency plugin
+  - Added CheckStrictVersion plugin
+  - Added Git::CheckFor::MergeConflicts plugin
+  - Added Git::Remote::Check plugin
+  - Added InstallGuide plugin and therefore an INSTALL file
+  - Added MetaConfig plugin
+  - Added UpdateGitHub plugin
+  - Added VerifyPhases plugin
+  - Added copyright_holder to dist.ini
+  - Fixed a display issue in the POD
+  - Plugins without arguments can be mentioned as scalar to add_plugins()
+  - Removed FakeRelease plugin
+
 0.001  2017-08-17 21:01:13 UTC
 
-        - Initial release
+  - Initial release

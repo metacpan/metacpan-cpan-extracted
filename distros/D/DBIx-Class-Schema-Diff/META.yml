@@ -3,43 +3,46 @@ abstract: 'Simple Diffing of DBIC Schemas'
 author:
   - 'Henry Van Styn <vanstyn@cpan.org>'
 build_requires:
-  DBIx::Class::Core: 0
-  DBIx::Class::Schema: 0
-  FindBin: 0
-  Test::Exception: 0
-  Test::More: 0
-  aliased: 0
-  base: 0
-  lib: 0
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  FindBin: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  aliased: '0'
+  base: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Class-Schema-Diff
 requires:
-  Array::Diff: 0
-  Data::Dumper::Concise: 0
-  Hash::Layout: 0
-  JSON: 0
-  List::MoreUtils: 0
-  List::Util: 0
-  Module::Runtime: 0
-  Moo: 0
-  Moo::Role: 0
-  Path::Class: 0
-  Scalar::Util: 0
-  Try::Tiny: 0
-  Types::Standard: 0
-  strict: 0
-  warnings: 0
+  Array::Diff: '0'
+  Clone: '0'
+  Data::Dumper: '0'
+  Data::Dumper::Concise: '0'
+  Digest::SHA1: '0'
+  Hash::Layout: '0'
+  JSON: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Path::Class: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/vanstyn/DBIx-Class-Schema-Diff/issues
   repository: https://github.com/vanstyn/DBIx-Class-Schema-Diff.git
-version: 1.04
+version: '1.05'
 x_contributors:
   - 'Peter Rabbitson <ribasushi@cpan.org>'
   - 'Michael Lackhoff <michael@lackhoff.de>'

@@ -1,5 +1,5 @@
 package WebService::Braintree::Configuration;
-$WebService::Braintree::Configuration::VERSION = '0.92';
+$WebService::Braintree::Configuration::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::Configuration

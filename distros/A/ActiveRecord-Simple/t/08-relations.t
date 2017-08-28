@@ -53,8 +53,8 @@ package CustomersAchievement;
 use parent 'ActiveRecord::Simple';
 
 
-__PACKAGE__->table_name('customers_achievents');
-__PACKAGE__->columns(qw/customer_id acheivement_id/);
+__PACKAGE__->table_name('customers_achievements');
+__PACKAGE__->columns(qw/customer_id achievement_id/);
 
 __PACKAGE__->belongs_to(customer => 'Customer');
 __PACKAGE__->belongs_to(achievement => 'Achievement');
@@ -149,7 +149,7 @@ $dbh->do($_DATA_SQL_ACHEIVEMENTS);
 
 my $_INIT_SQL_CA = q{
 
-	CREATE TABLE `customers_achievents` (
+	CREATE TABLE `customers_achievements` (
 		`customer_id` int NOT NULL references customers (id),
 		`achievement_id` int NOT NULL references achievements (id)
 	);
@@ -158,7 +158,7 @@ my $_INIT_SQL_CA = q{
 
 my $_DATA_SQL_CA = q{
 
-	INSERT INTO `customers_achievents` (`customer_id`, `achievement_id`)
+	INSERT INTO `customers_achievements` (`customer_id`, `achievement_id`)
 	VALUES
 		(1, 1),
 		(1, 2),
@@ -177,6 +177,24 @@ $dbh->do($_DATA_SQL_CA);
 Customer->dbh($dbh);
 
 ok my $Bill = Customer->get(3), 'got Bill';
+ok my $achievement = Achievement->new({ title => 'Bill Achievement', id => 4 })->save, 'create achievement';
+
+is $Bill->id, 3;
+is $achievement->id, 4;
+
+ok $Bill->achievement($achievement)->save, 'trying to bind achievement to the customer';
+ok my $ca = CustomersAchievement->find({ customer_id => $Bill->id, achievement_id => $achievement->id })->fetch, 'fetching binding';
+is $ca->customer_id, $Bill->id;
+is $ca->achievement_id, $achievement->id;
+
+my @ca = CustomersAchievement->find({ customer_id => $Bill->id, achievement_id => $achievement->id })->fetch;
+
+ok my $cnt = $Bill->achievements({ title => 'Bill Achievement' })->count(), 'trying to count customers achievements';
+is $cnt, 1, 'looks good';
+
+ok $Bill->achievements({ title => 'Bill Achievement' })->exists;
+ok !$Bill->achievements({ title => 'Not Existing Achievement' })->exists;
+
 ok my @bills_orders = $Bill->orders->fetch, 'got Bill\'s orders';
 
 is scalar @bills_orders, 1;
@@ -184,18 +202,14 @@ ok my $order = Order->get(3), 'order';
 ok $order->customer, 'the order has a customer';
 is $order->customer->id, $bills_orders[0]->id;
 
-pass 'PASS one to many / many to one';
+ok my @achievements = $Bill->achievements->fetch;#
 
-ok my @achievements = $Bill->achievements->fetch;
-
-is @achievements, 3;
+is @achievements, 4;
 isa_ok $achievements[0], 'Achievement';
 
 ok my $a = Achievement->get(1);
 ok my @customers = $a->customers->order_by('id')->fetch;
 is @customers, 3;
-
-pass 'PASS many to many';
 
 
 done_testing();

@@ -74,6 +74,52 @@ subtest 'insert_metabase_fact' => sub {
     is $row->created . 'Z', $given_report->core_metadata->{creation_time};
 
     is_deeply $got_report, $expect_report, 'Metabase::Fact is converted correctly';
+
+    subtest 'update metabase fact with same GUID' => sub {
+        my $given_report = create_metabase_report(
+            grade => 'fail',
+            distfile => 'PREACTION/Foo-Bar-6.24.tar.gz',
+            distribution => 'Foo-Bar-6.24',
+            textreport => 'Test output',
+            creator => $user_resource,
+        );
+        my $expect_report = {
+            reporter => {
+                name => 'Doug Bell',
+                email => 'doug@preaction.me',
+            },
+            environment => {
+                system => {
+                    osname => 'linux',
+                    osversion => '2.14.4',
+                },
+                language => {
+                    name => 'Perl 5',
+                    archname => 'x86_64-linux',
+                    version => '5.12.0',
+                },
+            },
+            distribution => {
+                name => 'Foo-Bar',
+                version => '6.24',
+            },
+            result => {
+                grade => 'fail',
+                output => {
+                    uncategorized => 'Test output',
+                },
+            },
+        };
+
+        my $existing_row = $schema->resultset( 'TestReport' )->create({
+            id => $given_report->core_metadata->{guid},
+            report => { foo => 'bar' },
+        });
+
+        my $new_row = $schema->resultset( 'TestReport' )->insert_metabase_fact( $given_report );
+        my $got_report = $new_row->report;
+        is_deeply $got_report, $expect_report, 'Row is updated and Metabase::Fact is converted';
+    };
 };
 
 subtest 'dist() - fetch reports by language/dist' => sub {
@@ -207,7 +253,7 @@ sub create_metabase_report( %attrs ) {
         osname => 'linux',
         osversion => '2.14.4',
         archname => 'x86_64-linux',
-        perl_version => '5.12.0',
+        perl_version => 'v5.12.0', # Some have a leading "v", some do not
         textreport => $text,
     });
 

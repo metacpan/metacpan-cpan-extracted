@@ -5,6 +5,7 @@ use warnings;
 use feature ':5.10';
 
 my $experimental;
+
 BEGIN {
     $experimental = 1 if exists $warnings::Offsets{'experimental::smartmatch'};
 }
@@ -19,6 +20,8 @@ use Test::More;
 use IO::File;
 use IO::Scalar;
 use App::Muter;
+
+eval { require Test::NoWarnings; };
 
 App::Muter::Registry->instance->load_backends();
 
@@ -70,6 +73,8 @@ foreach my $test (@files) {
         }
     };
 }
+
+Test::NoWarnings::had_no_warnings() if $INC{'Test/NoWarnings.pm'};
 
 done_testing;
 

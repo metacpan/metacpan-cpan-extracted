@@ -1,4 +1,7 @@
-Revision history for App-CompleteCLIs
+0.13    2017-08-18 (PERLANCAR)
+
+	- Add utility: complete-ppr-subpattern.
+
 
 0.12    2017-01-01 (PERLANCAR)
 

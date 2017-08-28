@@ -45,6 +45,11 @@ CONFIGURATION
       to STDERR (pass STDERR as parameter), but STDOUT (STDOUT) and a log
       file (logs/import_-date-.log) (STATISTICS) are also supported.
 
+    --verbose
+
+      Set verbosity. Invoking the command with the --verbose, -v flag will
+      render verbose output to the terminal.
+
 COMMANDS
 
  help COMMAND

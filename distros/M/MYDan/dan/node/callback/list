@@ -1,0 +1,34 @@
+#!# perl node/callback/list
+
+use strict;
+use warnings;
+
+use File::Basename;
+
+use MYDan::Node;
+use MYDan::Util::OptConf;
+
+return sub
+{
+    local $/ = "\n";
+
+    my $range = MYDan::Node->new( MYDan::Util::OptConf->load()->dump( 'range' ) );
+    my ( $ext, %cluster ) = '.list';
+
+    for my $file ( glob( '*' . $ext ) )
+    {
+        $file = readlink $file if -l $file;
+        next unless -f $file && open my $fh => $file;
+
+        my $cluster = MYDan::Node->new();
+        
+        for my $line ( <$fh> )
+        {
+            map { $cluster->add( $range->load( $_ ) ) } split /\s+/, $line;
+        }
+
+        close $fh;
+        $cluster{ basename( $file, $ext ) } = [ $cluster->list() ];
+    }
+    return \%cluster;
+};

@@ -1,5 +1,5 @@
 package WebService::Braintree::Digest;
-$WebService::Braintree::Digest::VERSION = '0.92';
+$WebService::Braintree::Digest::VERSION = '0.93';
 use strict;
 
 use Digest::HMAC_SHA1 qw(hmac_sha1 hmac_sha1_hex);

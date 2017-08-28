@@ -1,0 +1,63 @@
+{
+   "abstract" : "Perl distribution for libpid",
+   "author" : [
+      "Ahmad Fatoum <athreef@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-libpid",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::CMake" : "0.07",
+            "IO::Socket::SSL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Alien::CMake" : "0.07",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Socket::SSL" : "0"
+         },
+         "requires" : {
+            "Alien::Base" : "0.030",
+            "File::ShareDir" : "1.00",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test2" : "1.302015",
+            "Test2::Suite" : "0.000030",
+            "Test::Alien" : "0.05"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libpid" : {
+         "file" : "lib/Alien/libpid.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

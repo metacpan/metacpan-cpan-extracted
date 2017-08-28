@@ -2,9 +2,10 @@ package Archive::Libarchive::FFI::Callback;
 
 use strict;
 use warnings;
+use 5.008;
 
 # ABSTRACT: Libarchive callbacks
-our $VERSION = '0.0900'; # VERSION
+our $VERSION = '0.0901'; # VERSION
 
 package
   Archive::Libarchive::FFI;
@@ -376,7 +377,7 @@ Archive::Libarchive::FFI::Callback - Libarchive callbacks
 
 =head1 VERSION
 
-version 0.0900
+version 0.0901
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Spec;
+use Data::Dumper;
+
+use MYDan::Deploy;
+use MYDan::Util::Sudo;
+use MYDan::Util::Screen;
+use MYDan::Util::OptConf;
+
+MYDan::Util::Sudo->sudo();
+
+#unless ( MYDan::Util::Screen->check() )
+#{
+#    warn "deploy need in screen\n";
+#    exit 1;
+#}
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'deploy';
+$MYDan::Util::OptConf::ARGC = 1;
+
+=head1 SYNOPSIS
+
+ $0 name
+ $0 name --check
+ $0 name --unlog 
+
+=cut
+
+my @argv = @ARGV;
+my %o = MYDan::Util::OptConf->load()->get( qw( check unlog ) )->dump();
+
+exit 0 unless my $name = shift;
+
+if( $o{unlog} || $o{check} )
+{
+    my %macro;
+    map{ $_ =~ /^([^=]+)=(.*)/ ? ( $macro{$1} = $2 ) : ( $macro{$_} = 1 ); }@ARGV;
+
+    my $deploy = MYDan::Deploy->new( 
+        macro => \%macro, 
+        name => $name,
+        map{ 
+            system( "mkdir -p '$o{$_}'" )if $o{$_} && ! -d $o{$_};
+            $_ => $o{$_}
+        }qw( mould cache ctrl conf code lock )
+    );
+
+    exit 0 if $o{check};
+
+    $deploy->run( );
+}
+else
+{
+    my $log = POSIX::strftime( "$name.%Y-%m-%d_%H:%M:%S", localtime );
+
+    system( "mkdir -p '$o{logs}'" )if $o{logs} && ! -d $o{logs};
+    system sprintf "ln -fsn '%s' '%s'" , $log, File::Spec->join( $o{logs}, $name );
+    exec sprintf "$0 --unlog '%s' %s %s",
+        join( "' '", @argv ), $ENV{TERM}? '|tee' : '>', File::Spec->join( $o{logs}, $log );
+}

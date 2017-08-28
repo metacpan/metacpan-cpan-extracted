@@ -1,12 +1,12 @@
 {
    "abstract" : "Perl interface for iZ-C library",
    "author" : [
-      "Toshimitsu FUJIWARA <tttfjw at gmail.com>"
+      "A. U. Thor <a.u.thor@a.galaxy.far.far.away>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
-      "artistic_2"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,11 +32,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Scalar::Util" : "0",
             "UNIVERSAL" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.03"
 }

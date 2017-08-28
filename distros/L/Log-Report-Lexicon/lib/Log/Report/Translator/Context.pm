@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Translator::Context;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 
 use Log::Report 'log-report-lexicon';

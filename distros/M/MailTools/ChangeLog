@@ -1,6 +1,11 @@
 
 ==== version history for MailTools
 
+version 2.19: Tue 22 Aug 13:30:41 CEST 2017
+
+	Improvements:
+	- block namespace MailTools rt.cpan.org#120905 [Karen Etheridge]
+
 version 2.18: Wed 18 May 23:52:30 CEST 2016
 
 	Fixes:

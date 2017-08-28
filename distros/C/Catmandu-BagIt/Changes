@@ -1,5 +1,8 @@
 Revision history for Catmandu-BagIt
 
+0.151  2017-08-24 15:30:12 CEST
+    - Fixing minimum required Catmandu dependency
+
 0.15  2017-07-10 12:20:32 CEST
     - Adding BagIt as Catmandu::Store::File
     

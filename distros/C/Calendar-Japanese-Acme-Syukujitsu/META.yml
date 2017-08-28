@@ -1,0 +1,31 @@
+---
+abstract: 'Japanese Syukujitsu in calender'
+author:
+  - 'Nao Muto <n@o625.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Calendar-Japanese-Acme-Syukujitsu
+provides:
+  Calendar::Japanese::Acme::Syukujitsu:
+    file: lib/Calendar/Japanese/Acme/Syukujitsu.pm
+    version: '0.01'
+requires:
+  Carp: '1.36'
+  Class::Accessor::Lite: '0.08'
+  Encode: '2.92'
+  File::Slurp: '9999.19'
+  Furl: '3.11'
+  List::Util: '1.48'
+  Smart::Args: '0.14'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

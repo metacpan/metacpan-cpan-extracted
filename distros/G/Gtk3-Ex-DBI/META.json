@@ -4,7 +4,7 @@
       "Daniel Kasak <d.j.kasak.dk@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -38,5 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.2"
+   "version" : "3.3",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

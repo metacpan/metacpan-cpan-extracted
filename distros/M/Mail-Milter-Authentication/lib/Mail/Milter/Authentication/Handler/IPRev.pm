@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::IPRev;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use Net::DNS;
 use Net::IP;
@@ -153,7 +153,7 @@ __END__
 
 =head1 NAME
 
-  Authentication Milter - IPRev Module
+  Authentication-Milter - IPRev Module
 
 =head1 DESCRIPTION
 

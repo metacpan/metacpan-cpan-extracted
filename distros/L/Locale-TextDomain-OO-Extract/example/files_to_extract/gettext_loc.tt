@@ -81,5 +81,12 @@
             2,
             num => 2,
         ) %]
+        [% loc_b(
+            'date',
+        ) %]
+        [% loc_bp(
+            'appointment',
+            'date',
+        ) %]
     </pre>
 </form>

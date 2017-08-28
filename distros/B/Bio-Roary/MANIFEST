@@ -23,6 +23,7 @@ bin/roary
 bin/roary-create_pan_genome_plots.R
 bin/roary-pan_genome_reorder_spreadsheet
 bin/roary-query_pan_genome
+bin/roary-unique_genes_per_sample
 bin/transfer_annotation_to_groups
 contrib/roary2svg/roary2svg.pl
 contrib/roary_plots/README.md
@@ -58,6 +59,7 @@ lib/Bio/Roary/CommandLine/RoaryCoreAlignment.pm
 lib/Bio/Roary/CommandLine/RoaryPostAnalysis.pm
 lib/Bio/Roary/CommandLine/RoaryReorderSpreadsheet.pm
 lib/Bio/Roary/CommandLine/TransferAnnotationToGroups.pm
+lib/Bio/Roary/CommandLine/UniqueGenesPerSample.pm
 lib/Bio/Roary/ContigsToGeneIDsFromGFF.pm
 lib/Bio/Roary/Exceptions.pm
 lib/Bio/Roary/External/Blastp.pm
@@ -112,6 +114,7 @@ lib/Bio/Roary/SequenceLengths.pm
 lib/Bio/Roary/SortFasta.pm
 lib/Bio/Roary/SplitGroups.pm
 lib/Bio/Roary/SpreadsheetRole.pm
+lib/Bio/Roary/UniqueGenesPerSample.pm
 t/00_requires_external.t
 t/Bio/Roary/AccessoryBinaryFasta.t
 t/Bio/Roary/AccessoryClustering.t
@@ -163,6 +166,7 @@ t/Bio/Roary/SampleOrder.t
 t/Bio/Roary/SequenceLengths.t
 t/Bio/Roary/SortFasta.t
 t/Bio/Roary/SplitGroups.t
+t/Bio/Roary/UniqueGenesPerSample.t
 t/bin/dummy_blastp
 t/bin/dummy_cd-hit
 t/bin/dummy_makeblastdb
@@ -419,6 +423,8 @@ t/data/split_pan_genome_sequences/reannotated_groups_file
 t/data/split_pan_genome_sequences/speH.fa
 t/data/uneven_sequences.fa
 t/data/uneven_sequences.fa.sorted.fa
+t/data/unique_genes_per_sample/clustered_proteins_valid
+t/data/unique_genes_per_sample/expected_unique_genes_per_sample.tsv
 t/data/variable_core/gene_1.fa.aln
 t/data/variable_core/gene_2.fa.aln
 t/data/variable_core/gene_3.fa.aln

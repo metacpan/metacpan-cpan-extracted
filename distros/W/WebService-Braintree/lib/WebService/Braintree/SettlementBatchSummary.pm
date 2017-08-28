@@ -1,5 +1,5 @@
 package WebService::Braintree::SettlementBatchSummary;
-$WebService::Braintree::SettlementBatchSummary::VERSION = '0.92';
+$WebService::Braintree::SettlementBatchSummary::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::SettlementBatchSummary

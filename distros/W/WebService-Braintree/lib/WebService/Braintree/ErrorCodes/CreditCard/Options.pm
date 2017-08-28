@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::CreditCard::Options;
-$WebService::Braintree::ErrorCodes::CreditCard::Options::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::CreditCard::Options::VERSION = '0.93';
 use strict;
 
 use constant UpdateExistingTokenIsInvalid           => "91723";

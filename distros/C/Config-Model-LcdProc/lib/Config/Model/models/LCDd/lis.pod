@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::lis
 # ABSTRACT:  Configuration class LCDd::lis
+
 =encoding utf8
 
 =head1 NAME
@@ -17,26 +18,76 @@ generated from LCDd.conf
 =head2 Brightness
 
 Set the initial brightness 
-0-250 = 25%, 251-500 = 50%, 501-750 = 75%, 751-1000 = 100% I<< Optional. Type integer. upstream_default: '1000'.  >> 
+0-250 = 25%, 251-500 = 50%, 501-750 = 75%, 751-1000 = 100% I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1000
+
+=back
+
+
 
 =head2 Lastline
 
 Specifies if the last line is pixel addressable (yes) or it only controls an
-underline effect (no). I<< Optional. Type boolean. upstream_default: 'yes'.  >> 
+underline effect (no). I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 ProductID
 
 USB Product ID 
-Change only if testing a compatible device. I<< Optional. Type uniline. upstream_default: '0x6001'.  >> 
+Change only if testing a compatible device. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x6001
+
+=back
+
+
 
 =head2 Size
 
-Columns by lines I<< Optional. Type uniline. upstream_default: '20x2'.  >> 
+Columns by lines I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20x2
+
+=back
+
+
 
 =head2 VendorID
 
 USB Vendor ID 
-Change only if testing a compatible device. I<< Optional. Type uniline. upstream_default: '0x0403'.  >> 
+Change only if testing a compatible device. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x0403
+
+=back
+
+
 
 =head1 SEE ALSO
 

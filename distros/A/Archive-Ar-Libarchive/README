@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.06
+    version 2.07
 
 SYNOPSIS
 
@@ -327,8 +327,6 @@ METHODS
     stack trace.
 
 SEE ALSO
-
-    Alien::Libarchive
 
     Archive::Ar
 

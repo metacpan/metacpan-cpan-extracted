@@ -30,6 +30,7 @@ share/js/core/main.js
 share/js/core/prototypes.js
 share/js/core/qunit.js
 share/js/core/require.js
+share/js/core/stack.js
 share/js/core/start.js
 share/js/core/target.js
 share/js/core/test.js
@@ -43,7 +44,6 @@ share/js/mfile-www/daction-start.js
 share/js/mfile-www/dbrowser-init.js
 share/js/mfile-www/dform-init.js
 share/js/mfile-www/dmenu-init.js
-share/js/mfile-www/dnotice-hooks.js
 share/js/mfile-www/dnotice-init.js
 share/js/mfile-www/drowselect-init.js
 share/js/mfile-www/dtable-init.js

@@ -9,7 +9,7 @@ configure_requires:
 conflicts:
   LWP::Authen::Negotiate: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ no_index:
     - xt
 requires:
   App::Cmd: '0'
-  Catmandu: '1.0304'
+  Catmandu: '1.0602'
   Catmandu::Importer::XML: '0'
   Catmandu::LIDO: '0'
   Catmandu::OAI: '0'
@@ -45,6 +45,7 @@ requires:
   MooX::Role::Logger: '0'
   Ref::Util: '0'
   Sub::Exporter: '0'
+  Term::ANSIColor: '0'
   Try::Tiny: '0'
   namespace::clean: '0'
   perl: '5.008005'
@@ -52,7 +53,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Datahub-Factory/issues
   homepage: https://github.com/thedatahub/Datahub-Factory
   repository: https://github.com/thedatahub/Datahub-Factory.git
-version: '1.4'
+version: '1.5'
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'

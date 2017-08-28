@@ -1,0 +1,23 @@
+Revision history for Perl extension OpenGL::GLFW.
+
+0.03     2017-08-25 12:13:51-04:00
+         - First official CPAN release
+	 - Clean up perl docs
+	 - Add git repo information to META
+
+0.02_02  2017-08-19 14:48:34-04:00
+         - Improved documentation of implementation
+         - Added gears.pl implementation to examples
+         - This is release candidate for our first
+           official release
+
+
+0.02_01  2017-08-06 12:13:54-04:00
+         - First complete coverage of GLFW bindings
+         - Add rudimentary pkg-config for build support
+
+0.01     2017-06-14 17:13:17-04:00 
+         - original version; created by h2xs 1.23 with options
+             -b 5.10.1 -OAfn OpenGL::GLFW
+         - edit template h2xs files
+

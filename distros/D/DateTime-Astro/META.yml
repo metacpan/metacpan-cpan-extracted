@@ -3,32 +3,45 @@ abstract: 'Functions For Astromical Calendars'
 author:
   - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
 build_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.36
-  Test::Exception: 0
+  Test::Exception: '0'
 configure_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.36
-  ExtUtils::ParseXS: 3.18
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.16'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DateTime-Astro
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DateTime::Astro:
+    file: lib/DateTime/Astro.pm
+    version: '1.03'
+  DateTime::Event::SolarTerm:
+    file: lib/DateTime/Event/SolarTerm.pm
 requires:
-  DateTime: 0
-  DateTime::Set: 0
+  DateTime: '0'
+  DateTime::Set: '0'
   Exporter: '5.57'
-  XSLoader: 0.02
 resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: ssh://git://ssh.github.com/443/lestrrat/DateTime-Astro
-version: '1.01'
+  bugtracker: https://github.com/lestrrat/DateTime-Astro/issues
+  homepage: https://github.com/lestrrat/DateTime-Astro
+  repository: git://github.com/lestrrat/DateTime-Astro.git
+version: '1.03'
+x_contributors:
+  - 'jonasbn <jonasbn@logicLAB.dk>'
+  - 'nric62 <uluparello@gmail.com>'
+  - 'jonasbn <jonasbn@gmail.com>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

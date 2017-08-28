@@ -12,7 +12,7 @@ use Test::More;
 
 use YASF;
 
-plan tests => 27;
+plan tests => 29;
 
 # I use Perl::Critic on tests. These two policies are not important in this
 # suite:
@@ -29,22 +29,28 @@ local $SIG{__WARN__} = sub {
 $result = eval { $str = YASF->new; };
 like($@, qr/new requires string template/i, 'Empty constructor fails');
 
+# Try the constructor with something that would evaluate as false (should pass)
+$str = YASF->new(q{});
+isa_ok($str, 'YASF', '$str (null string)');
+$str = YASF->new(0);
+isa_ok($str, 'YASF', '$str (0 value)');
+
 # Proper constructor call
 $str = YASF->new('{foo}');
 isa_ok($str, 'YASF', '$str');
 is($str->template, '{foo}', 'template() method');
-ok(! defined $str->binding, 'binding() method returns undef');
+ok(! defined $str->bindings, 'bindings() method returns undef');
 
 # Proper constructor (2)
 $bind = {};
-$str = YASF->new('{bar}', binding => $bind);
+$str = YASF->new('{bar}', bindings => $bind);
 isa_ok($str, 'YASF', '$str');
-is($str->binding, $bind, 'binding() method (non-undef)');
+is($str->bindings, $bind, 'bindings() method (non-undef)');
 
 # Proper constructor (3) (hashref args)
-$str = YASF->new('{bar}', { binding => $bind });
+$str = YASF->new('{bar}', { bindings => $bind });
 isa_ok($str, 'YASF', '$str');
-is($str->binding, $bind, 'binding() method (non-undef 2)');
+is($str->bindings, $bind, 'bindings() method (non-undef 2)');
 
 # Error cases for the bind() method
 $result = eval { $str->bind; };
@@ -52,23 +58,23 @@ like($@, qr/new bindings must be provided/i, 'Empty call to bind() fails');
 $result = eval { $str->bind('must be a reference'); };
 like($@, qr/new bindings must be a reference/i, 'Call to bind() with non-ref');
 $result = eval { $str->bind(\my $foo); };
-like($@, qr/reference type .* not usable/i, 'Call to bind with unusable ref');
+like($@, qr/reference type .* not usable/i, 'Call to bind() with unusable ref');
 
 # Correct bind() calls
 $str->bind($bind);
-is($str->binding, $bind, 'bind() method (hashref)');
+is($str->bindings, $bind, 'bind() method (hashref)');
 $bind = [];
 $str->bind($bind);
-is($str->binding, $bind, 'bind() method (listref)');
+is($str->bindings, $bind, 'bind() method (listref)');
 $bind = File::stat::stat($0);
 $str->bind($bind);
-is($str->binding, $bind, 'bind() method (object)');
+is($str->bindings, $bind, 'bind() method (object)');
 $str->bind(undef);
-ok(! defined $str->binding, 'bind(undef) clears');
+ok(! defined $str->bindings, 'bind(undef) clears');
 
 # Errors/warnings from format()
 $result = eval { $str->format; };
-like($@, qr/bindings are required if object has no internal binding/i,
+like($@, qr/bindings are required if object has no internal bindings/i,
      'format() with no arg and no bindings');
 $result = $str->format({ bar => [] });
 like($warning, qr/format expression bar yielded a reference/i,

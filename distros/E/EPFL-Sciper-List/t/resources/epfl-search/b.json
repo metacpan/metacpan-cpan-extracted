@@ -1,0 +1,19 @@
+{
+  "GSA_available": true,
+  "hasMore": false,
+  "maxRows": 99999999,
+  "origin": "ws_autocomplete",
+  "remoteAddr": "192.33.203.170",
+  "result": [{
+    "name": "Brook",
+    "firstname": "Kelly",
+    "sciper": "212775"
+  }, {
+    "name": "Bundchen",
+    "firstname": "Gisele",
+    "sciper": "219545"
+  }],
+  "size": 2,
+  "term": "b",
+  "test": false
+}

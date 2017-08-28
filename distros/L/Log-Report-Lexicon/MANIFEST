@@ -40,9 +40,24 @@ t/12test/en_US.UTF-8.po
 t/20pot_read.t
 t/21pot_modif.t
 t/22compact.t
+t/30index.t
 t/40ppi.t
 t/41templ.t
 t/hello-world-slovak.po
+t/simplecal/README
+t/simplecal/ar.po
+t/simplecal/ar_SA.mo
+t/simplecal/ar_SA.po
+t/simplecal/cs.po
+t/simplecal/de.po
+t/simplecal/de_AT.po
+t/simplecal/fr.po
+t/simplecal/ga.po
+t/simplecal/it.po
+t/simplecal/nl.po
+t/simplecal/pt.po
+t/simplecal/pt_BR.po
+t/simplecal/ru.po
 xt/30index.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -28,7 +28,6 @@ option 'batch_index_start' => (
 sub BUILD {
     my $self = shift;
 
-    $self->git_things;
     $self->gen_load_plugins;
     $self->job_load_plugins;
 
@@ -42,13 +41,14 @@ sub BUILD {
       $self->counter($job_meta->{job_cmd_start} + $self->batch_index_start);
     }
 
-    my $tar = $self->set_archive;
-    $self->archive($tar);
+    # my $tar = $self->set_archive;
+    # $self->archive($tar);
 }
 
 sub execute {
     my $self = shift;
 
+    $self->git_things;
     $self->run_mce;
 }
 

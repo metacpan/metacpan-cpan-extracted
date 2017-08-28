@@ -85,7 +85,7 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb ) {
                 $require_auth ? ( AUTHORIZATION => 'JWT ' . $self->{_login_token} ) : (),
             },
             body => $data ? P->data->to_json($data) : undef,
-            on_finish => sub ($res) {
+            sub ($res) {
                 my $api_res = result [ $res->status, $res->reason ], $res->body && $res->body->$* ? P->data->from_json( $res->body ) : ();
 
                 $cb->($api_res) if $cb;

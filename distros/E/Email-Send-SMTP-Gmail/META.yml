@@ -25,5 +25,5 @@ requires:
   Net::SMTP: '3.1'
   Net::SMTP_auth: '0'
   Test::More: '0'
-version: '1.21'
+version: '1.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

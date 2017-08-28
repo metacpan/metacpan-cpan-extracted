@@ -6,7 +6,7 @@ DOCSIS::ConfigFile - Decodes and encodes DOCSIS config files
 
 =head1 VERSION
 
-0.71
+0.73
 
 =head1 DESCRIPTION
 
@@ -93,7 +93,7 @@ use constant DEBUG => $ENV{DOCSIS_CONFIGFILE_DEBUG} || 0;
 
 use base 'Exporter';
 
-our $VERSION = '0.71';
+our $VERSION = '0.73';
 our @EXPORT_OK = qw( decode_docsis encode_docsis );
 our $DEPTH     = 0;
 
@@ -264,8 +264,12 @@ sub encode_docsis {
         die qq(Can't locate object method "$syminfo->{func}" via package "DOCSIS::ConfigFile::Encode");
       }
 
-      $type = pack 'C', $syminfo->{code};
-      $length = $syminfo->{lsize} == 2 ? pack('n', length $value) : pack('C', length $value);
+      {
+        use warnings FATAL => 'all';
+        $type = pack 'C', $syminfo->{code};
+        $length = $syminfo->{lsize} == 2 ? pack('n', length $value) : pack('C', length $value);
+      }
+
       $mic->{$name} = "$type$length$value";
       $bytes .= $mic->{$name};
     }

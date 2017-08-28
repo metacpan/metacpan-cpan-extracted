@@ -1,5 +1,11 @@
 Revision history for Perl module HTTP::Cookies::Mozilla
 
+2.033 2017-08-24T21:16:22Z
+	* Bump version and test release code
+
+2.033 2017-08-24T21:15:01Z
+	* Bump version and test release code
+
 2.032 2016-11-26T10:33:16Z
 	* Bump to a user release
 

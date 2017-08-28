@@ -14,11 +14,6 @@ sub run ( $class, $rpc_boot_args ) {
         return;
     };
 
-    # ignore SIGTERM
-    $SIG->{TERM} = AE::signal TERM => sub {
-        return;
-    };
-
     my $cv = AE::cv;
 
     # create object
@@ -160,9 +155,9 @@ sub run ( $class, $rpc_boot_args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (27)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 114                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 109                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 42                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 37                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

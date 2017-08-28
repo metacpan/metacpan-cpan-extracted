@@ -1,7 +1,7 @@
 package Perinci::CmdLine::POD;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2017-08-25'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -435,7 +435,7 @@ sub gen_pod_for_pericmd_script {
                 my $meta = $metas{ $eg->{_sc_name} };
                 push @sectpod, "$eg->{summary}:\n\n" if $eg->{summary};
                 my $cmdline = $eg->{cmdline};
-                $cmdline =~ s/\[\[prog\]\]/$program_name/;
+                $cmdline =~ s/\[\[prog\]\]/$cli->{subcommands} ? "$program_name $eg->{_sc_name}" : $program_name/e;
                 push @sectpod, " % $cmdline\n";
 
                 my $show_result;
@@ -449,7 +449,7 @@ sub gen_pod_for_pericmd_script {
                             # execute script and get its output
                             if (defined $args{script}) {
                                 my $cmdline = $eg->{cmdline};
-                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script})/e;
+                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script}, ($cli->{subcommands} ? ($eg->{_sc_name}) : ()))/e;
                                 system(
                                     {log=>1, shell => 0, capture_stdout => \$fres},
                                     "bash", "-c", $cmdline);
@@ -981,7 +981,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.015 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-08-12.
+This document describes version 0.016 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-08-25.
 
 =head1 SYNOPSIS
 

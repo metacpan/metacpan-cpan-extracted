@@ -79,7 +79,7 @@ use Pod::Usage;
 use Data::Dumper;
 use Nagios::NRPE::Client;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 my (
     $arglist, $bindaddr, $check, $host,    $ipv4,

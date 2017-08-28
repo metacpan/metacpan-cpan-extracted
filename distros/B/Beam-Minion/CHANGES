@@ -1,5 +1,22 @@
 Changelog for Beam-Minion
 
+0.006     2017-08-22 18:48:33-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed issue with passing plain DBI DSNs: The backend expects
+      a list of arguments, not an arrayref of arguments.
+
+    - Moved log to STDERR. This is temporary until we can come up with
+      some more robust logging configuration (probably Log::Any)
+
+0.005     2017-08-19 21:42:31-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed raw Minion args to allow passing plain DBI DSNs. This allows
+      me to use the `mysql_read_defaults_file` DBD::mysql configuration.
+
 0.004     2017-08-14 13:01:07-05:00 America/Chicago
 
     [Added]

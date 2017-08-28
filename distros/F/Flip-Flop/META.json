@@ -1,0 +1,44 @@
+{
+   "abstract" : "Flop a switch in your script to zero after a clean run with the switch set to one",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Flip-Flop",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Table::Text" : "20170820",
+            "Test::More" : "0",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "provides" : {
+      "Flip::Flop" : {
+         "file" : "lib/Flip/Flop.pm",
+         "version" : "20170823"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "20170823"
+}

@@ -1,4 +1,5 @@
 #!/bin/bash
 . /opt/local/perlbrew/etc/bashrc
 eval $( perl -Mlocal::lib )
+export MOJO_LOG_SHORT=1 # Remove timestamps from Mojo, added by log svc
 exec mercury broker -i 14400 -l http://*:9000 2>&1

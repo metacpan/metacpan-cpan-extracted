@@ -4,37 +4,45 @@ use Test::Class::Moose;
 use FindBin qw($Bin);
 use File::Path qw(make_path remove_tree);
 use BioX::Workflow::Command;
+use Cwd;
+use File::Spec;
+use File::Temp;
+use File::Spec;
+use File::Slurp;
+use Cwd;
 
 sub make_test_dir {
 
-    my $test_dir;
-
-    my @chars = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9 );
-    my $string = join '', map { @chars[ rand @chars ] } 1 .. 8;
-
-    if ( exists $ENV{'TMP'} ) {
-        $test_dir = $ENV{TMP} . "/bioxworkflow/$string";
-    }
-    else {
-        $test_dir = "/tmp/bioxworkflow/$string";
-    }
+    my $tmpdir = File::Spec->tmpdir();
+    my $tmp    = File::Temp->newdir(
+        UNLINK   => 0,
+        CLEANUP  => 0,
+        TEMPLATE => File::Spec->catdir( $tmpdir, 'bioxworkflowXXXXXXX' )
+    );
+    my $test_dir = $tmp->dirname;
 
     remove_tree($test_dir);
     make_path($test_dir);
-    make_path( $test_dir . "/data/raw" );
-    make_path( $test_dir . "/data/analysis" );
-    make_path( $test_dir . "/conf" );
+    make_path( File::Spec->catdir( $test_dir, 'data', 'raw' ) );
+    make_path( File::Spec->catdir( $test_dir, 'data', 'analysis' ) );
+    make_path( File::Spec->catdir( $test_dir, 'conf' ) );
 
     chdir($test_dir);
 
-    return $test_dir;
+    return cwd();
 }
 
 sub make_test_env {
-    my $self = shift;
+    my $self     = shift;
     my $workflow = shift;
+    my $args     = shift || [];
 
-    MooseX::App::ParsedArgv->new( argv => [ "run", "--workflow", $workflow ] );
+    my $init_args = [ "run", "--workflow", $workflow ];
+    if ( $args && ref($args) eq 'ARRAY' ) {
+        map { push( @{$init_args}, $_ ) } @{$args};
+    }
+
+    MooseX::App::ParsedArgv->new( argv => $init_args );
 
     my $test = BioX::Workflow::Command->new_with_command();
 
@@ -51,14 +59,9 @@ sub make_test_env {
 
 sub test_shutdown {
 
+    my $cwd = cwd();
     chdir("$Bin");
-
-    if ( exists $ENV{'TMP'} ) {
-        remove_tree( $ENV{TMP} . "/bioxworkflow" );
-    }
-    else {
-        remove_tree("/tmp/bioxworkflow");
-    }
+    remove_tree($cwd);
 }
 
 sub print_diff {

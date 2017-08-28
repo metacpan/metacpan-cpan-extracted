@@ -9,10 +9,11 @@ use Text::ASCIITable;
 sub build_table {
     my $self = shift;
     my $res  = shift;
+    my $id   = shift || '';
 
     my $start_time = $res->{submission_time} || '';
-    my $project    = $res->{project}    || '';
-    my $id         = $res->{uuid}       || '';
+    my $project    = $res->{project}         || '';
+    # my $id         = $res->{uuid}            || '';
     my $header     = "Time: " . $start_time;
     $header .= " Project: " . $project;
     $header .= "\nSubmissionID: " . $id;

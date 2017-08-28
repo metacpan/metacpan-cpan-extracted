@@ -1,0 +1,46 @@
+{
+   "abstract" : "Perl bindings to the GIO library",
+   "author" : [
+      "Torsten Schoenfeld <kaffeetisch@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Glib-IO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Glib::Object::Introspection" : "0.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Glib-IO [at] rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Glib-IO"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnome.org/perl-Glib-IO",
+         "web" : "http://git.gnome.org/browse/perl-Glib-IO"
+      },
+      "x_IRC" : "irc://irc.gimp.org/#gtk-perl",
+      "x_twitter" : "https://twitter.com/GTKPerl"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.022"
+}
+

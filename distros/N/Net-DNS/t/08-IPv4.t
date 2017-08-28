@@ -1,4 +1,4 @@
-# $Id: 08-IPv4.t 1567 2017-05-19 09:52:52Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1584 2017-07-28 16:15:17Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -542,7 +542,7 @@ NonFatalBegin();
 
 
 {					## exercise error paths in _send_???() and bgbusy()
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, retry => 1 );
 	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
 
 	my $mismatch = $resolver->_make_query_packet(qw(net-dns.org SOA));
@@ -553,20 +553,18 @@ NonFatalBegin();
 }
 
 
-{					## exercise error paths in _decode_reply()
+{					## exercise error paths in _accept_reply()
 	my $resolver = Net::DNS::Resolver->new( nameservers => $NOIP );
 
-	my $corrupt = '';
-	ok( !$resolver->_decode_reply( \$corrupt ), '_decode_reply()	corrupt reply' );
-
 	my $query = new Net::DNS::Packet(qw(net-dns.org SOA IN));
-	my $qdata = $query->data;
-	ok( !$resolver->_decode_reply( \$qdata ), '_decode_reply()	qr not set' );
-
 	my $reply = new Net::DNS::Packet(qw(net-dns.org SOA IN));
 	$reply->header->qr(1);
-	my $rdata = $reply->data;
-	ok( !$resolver->_decode_reply( \$rdata, $query ), '_decode_reply()	id mismatch' );
+
+	ok( !$resolver->_accept_reply(undef), '_accept_reply()	corrupt reply' );
+
+	ok( !$resolver->_accept_reply($query), '_accept_reply()	qr not set' );
+
+	ok( !$resolver->_accept_reply( $reply, $query ), '_accept_reply()	id mismatch' );
 }
 
 

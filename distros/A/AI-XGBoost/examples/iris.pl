@@ -17,6 +17,23 @@ my $iris = Data::Dataset::Classic::Iris::get();
 # Split train and test, label and features
 my $train_dataset = [map {$iris->{$_}} grep {$_ ne 'species'} keys %$iris];
 my $test_dataset = [map {$iris->{$_}} grep {$_ ne 'species'} keys %$iris];
+
+sub transpose {
+# Transposing without using PDL, Data::Table, Data::Frame or other modules
+# to keep minimal dependencies
+    my $array = shift;
+    my @aux = ();
+    for my $row (@$array) {
+        for my $column (0 .. scalar @$row - 1) {
+            push @{$aux[$column]}, $row->[$column];
+        }
+    }
+    return \@aux;
+}
+
+$train_dataset = transpose($train_dataset);
+$test_dataset = transpose($test_dataset);
+
 my $train_label = [map {$class{$_}} @{$iris->{'species'}}];
 my $test_label = [map {$class{$_}} @{$iris->{'species'}}];
 

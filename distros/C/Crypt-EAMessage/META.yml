@@ -1,13 +1,13 @@
 ---
 abstract: 'Simple-to-use Abstraction of Encrypted Authenticated Messages'
 author:
-  - 'Joel Maslak <jmaslak@antelope.net>'
+  - 'J. Maslak <jmaslak@antelope.net>'
 build_requires:
   Test2::Bundle::Extended: '0.000058'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Crypt-EAMessage
 provides:
   Crypt::EAMessage:
     file: lib/Crypt/EAMessage.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Bytes::Random::Secure: '0'
   Carp: '0'
@@ -34,4 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Crypt-EAMessage/issues
   repository: git://github.com/jmaslak/Crypt-EAMessage.git
-version: '1.002'
+version: '1.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

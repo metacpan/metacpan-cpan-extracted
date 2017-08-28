@@ -11,7 +11,7 @@ ETL::Yertl::Help::Cookbook - Some recipies for common ETL tasks
 
 =head1 VERSION
 
-version 0.029
+version 0.032
 
 =head1 DESCRIPTION
 

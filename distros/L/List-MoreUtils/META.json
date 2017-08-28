@@ -8,11 +8,11 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "List-MoreUtils",
    "no_index" : {
@@ -34,7 +34,6 @@
       },
       "develop" : {
          "requires" : {
-            "JSON::PP" : "0",
             "Module::CPANTS::Analyse" : "0.96",
             "Test::CPAN::Changes" : "0",
             "Test::CheckManifest" : "0",
@@ -43,10 +42,13 @@
             "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
-            "Test::WriteVariants" : "0.010"
+            "Test::WriteVariants" : "0.014"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "List::MoreUtils::XS" : "0.423"
+         },
          "requires" : {
             "Exporter::Tiny" : "0.038"
          }
@@ -56,6 +58,7 @@
             "Test::LeakTrace" : "0"
          },
          "requires" : {
+            "Storable" : "0",
             "Test::More" : "0.96"
          }
       }
@@ -73,6 +76,6 @@
          "web" : "https://github.com/perl5-utils/List-MoreUtils"
       }
    },
-   "version" : "0.419",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.423",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

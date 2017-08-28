@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
+
 use lib qw(lib t/lib);
+
 use Test::More;
 use Data::GUID;
 use WebService::Braintree;
@@ -8,6 +10,8 @@ use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Test;
 use WebService::Braintree::Xml;
 
+require 't/lib/WebService/Braintree/Nonce.pm';
+
 subtest "Find" => sub {
     subtest "it returns paypal accounts by token" => sub {
         my $customer_result = WebService::Braintree::Customer->create();
@@ -15,7 +19,7 @@ subtest "Find" => sub {
 
         my $result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment
+            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
         });
 
         ok $result->is_success;
@@ -39,7 +43,7 @@ subtest "Find" => sub {
             credit_card => {
                 number => "5105105105105100",
                 expiration_date => "05/12",
-                cvv => "123"
+                cvv => "123",
             }
         });
 
@@ -56,7 +60,7 @@ subtest "Delete" => sub {
 
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce::paypal_future_payment
+            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
         });
 
         ok $payment_method_result->is_success;
@@ -76,7 +80,7 @@ subtest "Update" => sub {
         ok $customer_result->is_success;
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce::paypal_future_payment
+            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
         });
 
         ok $payment_method_result->is_success;
@@ -84,7 +88,7 @@ subtest "Update" => sub {
         my $update_result = WebService::Braintree::PayPalAccount->update(
             $payment_method_result->paypal_account->token,
             {
-                token => $new_token
+                token => $new_token,
             });
 
         ok $update_result->is_success;
@@ -98,13 +102,13 @@ subtest "Update" => sub {
         my $credit_card_result = WebService::Braintree::CreditCard->create({
             customer_id => $customer_result->customer->id,
             number => "5105105105105100",
-            expiration_date => "05/12"
+            expiration_date => "05/12",
         });
 
         ok $credit_card_result->credit_card->default;
         my $payment_method_result = WebService::Braintree::PaymentMethod->create({
             customer_id => $customer_result->customer->id,
-            payment_method_nonce => WebService::Braintree::Nonce::paypal_future_payment
+            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
         });
 
         ok $payment_method_result->is_success;
@@ -112,7 +116,7 @@ subtest "Update" => sub {
             $payment_method_result->payment_method->token,
             {
                 options => {
-                    make_default => "true"
+                    make_default => "true",
                 }
             });
 
@@ -129,12 +133,12 @@ TODO: {
         my $payment_method_token = "paypal-account-" . int(rand(10000));
         my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
             consent_code => "consent-code",
-            token => $payment_method_token
+            token => $payment_method_token,
         });
 
         my $result = WebService::Braintree::PaymentMethod->create({
             payment_method_nonce => $nonce,
-            customer_id => $customer->id
+            customer_id => $customer->id,
         });
 
         ok $result->is_success;
@@ -142,12 +146,12 @@ TODO: {
         my $token = $result->payment_method->token;
         my $subscription1 = WebService::Braintree::Subscription->create({
             payment_method_token => $token,
-            plan_id => WebService::Braintree::TestHelper::TRIALLESS_PLAN_ID
+            plan_id => WebService::Braintree::TestHelper::TRIALLESS_PLAN_ID,
         })->subscription;
 
         my $subscription2 = WebService::Braintree::Subscription->create({
             payment_method_token => $token,
-            plan_id => WebService::Braintree::TestHelper::TRIALLESS_PLAN_ID
+            plan_id => WebService::Braintree::TestHelper::TRIALLESS_PLAN_ID,
         })->subscription;
 
         my $paypal_account = WebService::Braintree::PayPalAccount->find($token);

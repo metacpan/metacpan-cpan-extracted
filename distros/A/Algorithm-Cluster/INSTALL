@@ -11,7 +11,7 @@ Cluster 3.0 for Windows
 -----------------------
 
 For Cluster 3.0 for Windows, download the Windows installer from our website
-(http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster/clustersetup.exe).
+(http://bonsai.hgc.jp/~mdehoon/software/cluster/clustersetup.exe).
 Run the installer, and you're done.
 
 If for some reason, you want to recompile Cluster 3.0 from the source, you can
@@ -37,7 +37,7 @@ Cluster 3.0 for Mac OS X
 
 Cluster 3.0 can be installed most easily on Mac OS X by using the installer for
 Mac OS X, which is available at
-http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster.
+http://bonsai.hgc.jp/~mdehoon/software/cluster.
 
 If you want to recompile Cluster 3.0, it is easiest to use Xcode and Interface
 Builder that are part of Mac OS X. The subdirectory mac contains the project
@@ -98,7 +98,7 @@ depend on the version of Python you are using.
 
 Note that Pycluster is also available as a tarball containing only the source
 code needed for Pycluster. A Windows installer for Pycluster is available from
-our website (http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster).
+our website (http://bonsai.hgc.jp/~mdehoon/software/cluster).
 
 Biopython versions 1.11 and up also contain Pycluster. There, it is referred to
 as Bio.Cluster. See http://www.biopython.org.
@@ -119,14 +119,10 @@ to install the module in /some/other/directory/lib/perl5/.
 The subdirectory perl/examples contains some example Perl scripts that use
 Algorithm::Cluster.
 
-To install Algorithm::Cluster for Perl 5.8 and Perl 5.10 on Windows, you can
-use the precompiled package by executing
-  ppm install http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster/Algorithm-Cluster.ppd
-
 
 CONTACT
 =======
 
 Michiel de Hoon, University of Tokyo, Human Genome Center
-(currently at the RIKEN Genomic Sciences Center)
-Email: mdehoon 'AT' gsc.riken.jp
+(currently at the RIKEN Center for Life Science Technologies)
+Email: michiel.dehoon 'AT' riken.jp

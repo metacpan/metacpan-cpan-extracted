@@ -11,7 +11,7 @@ plan tests => 4;
 
 my $i = 0;
 my $test_stream = Async::Stream->new(sub {$_[0]->($i++)});
-my $iterator = Async::Stream::Iterator->new($test_stream);
+my $iterator = Async::Stream::Iterator->new( $test_stream->head );
 
 isa_ok($iterator,'Async::Stream::Iterator');
 

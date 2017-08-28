@@ -3,8 +3,11 @@ abstract: 'Use Alien::Build with Dist::Zilla'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
+  Alien::Base::Wrapper: '1.02'
+  JSON::MaybeXS: '0'
+  Test2::Mock: '0.000060'
   Test2::V0: '0.000060'
-  Test::More: '0.94'
+  YAML: '0'
   perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -33,5 +36,5 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-AlienBuild/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::AlienBuild
   repository: git://github.com/plicease/Dist-Zilla-Plugin-AlienBuild.git
-version: '0.22'
+version: '0.24'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -36,7 +36,7 @@ no_index:
 provides:
   MooX::ShortHas:
     file: lib/MooX/ShortHas.pm
-    version: '1.172251'
+    version: '1.172300'
 requires:
   Moo::_Utils: '0'
   perl: '5.006'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/wchristian/MooX-ShortHas/issues
   homepage: https://github.com/wchristian/MooX-ShortHas
   repository: https://github.com/wchristian/MooX-ShortHas.git
-version: '1.172251'
+version: '1.172300'
 x_contributors:
   - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

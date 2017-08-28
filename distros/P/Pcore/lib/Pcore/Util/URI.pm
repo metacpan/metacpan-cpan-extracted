@@ -324,16 +324,6 @@ sub to_nginx ( $self, $scheme = 'http' ) {
     }
 }
 
-# used to generate addr from Plack::Runner --listen directive
-sub to_psgi ($self) {
-    if ( $self->scheme eq 'unix' ) {
-        return $self->path;
-    }
-    else {
-        return $self->hostport;
-    }
-}
-
 sub TO_DUMP ( $self, $dumper, @ ) {
     my %args = (
         path => undef,

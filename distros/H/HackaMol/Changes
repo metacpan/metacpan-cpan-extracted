@@ -1,5 +1,11 @@
 Revision history for HackaMol
 
+0.044     2017-08-27 13:41:30-06:00 America/Denver
+  * added support for resnames with 
+  * added superpose_rt method to HackaMol class, grabbed from Bio::PDB::Structure
+  * added rmsd method to HackaMol class 
+  * added center to AtomGroupRole, method for geometric center
+
 0.043     2017-06-24 14:05:20-07:00 America/Vancouver
   * minor fix on FileFetchRole return
 

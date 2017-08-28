@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use v5.10;
 use Path::Class qw( file dir );
 
 exit unless $ENV{ARCHIVE_LIBARCHIVE_FFI_BUILD_IMPORT};
+
+sub say { print @_, "\n" }
 
 require Archive::Libarchive::XS;
 

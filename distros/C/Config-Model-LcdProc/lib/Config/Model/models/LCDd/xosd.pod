@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::xosd
 # ABSTRACT:  Configuration class LCDd::xosd
+
 =encoding utf8
 
 =head1 NAME
@@ -16,15 +17,45 @@ generated from LCDd.conf
 
 =head2 Font
 
-X font to use, in XLFD format, as given by "xfontsel" I<< Optional. Type uniline. default: '-*-terminus-*-r-*-*-*-320-*-*-*-*-*'.  >> 
+X font to use, in XLFD format, as given by "xfontsel" I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+-*-terminus-*-r-*-*-*-320-*-*-*-*-*
+
+=back
+
+
 
 =head2 Offset
 
-Offset in pixels from the top-left corner of the monitor I<< Optional. Type uniline. upstream_default: '0x0'.  >> 
+Offset in pixels from the top-left corner of the monitor I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x0
+
+=back
+
+
 
 =head2 Size
 
-set display size I<< Optional. Type uniline. upstream_default: '20x4'.  >> 
+set display size I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20x4
+
+=back
+
+
 
 =head1 SEE ALSO
 

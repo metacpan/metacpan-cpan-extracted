@@ -1,0 +1,23 @@
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+use C::Tokenize 'function_arg';
+my $f1 = 'bsearch (a, b, sizeof (c), d, (void *) e);';
+my @args = function_arg ($f1);
+print join ('::', @args), "\n";
+is ($args[0], 'bsearch');
+is ($args[1], 'a');	    
+is ($args[2], 'b');	    
+is ($args[3], 'sizeof (c)');
+is ($args[4], 'd');	    
+is ($args[5], '(void *) e');
+
+done_testing ();

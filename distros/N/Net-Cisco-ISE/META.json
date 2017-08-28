@@ -34,15 +34,23 @@
    "provides" : {
       "Net::Cisco::ISE" : {
          "file" : "lib/Net/Cisco/ISE.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Net::Cisco::ISE::IdentityGroup" : {
          "file" : "lib/Net/Cisco/ISE/IdentityGroup.pm",
-         "version" : "0.01"
+         "version" : "0.05"
       },
       "Net::Cisco::ISE::InternalUser" : {
          "file" : "lib/Net/Cisco/ISE/InternalUser.pm",
-         "version" : "0.02"
+         "version" : "0.05"
+      },
+      "Net::Cisco::ISE::NetworkDevice" : {
+         "file" : "lib/Net/Cisco/ISE/NetworkDevice.pm",
+         "version" : "0.05"
+      },
+      "Net::Cisco::ISE::NetworkDeviceGroup" : {
+         "file" : "lib/Net/Cisco/ISE/NetworkDeviceGroup.pm",
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -51,6 +59,6 @@
          "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

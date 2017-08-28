@@ -6,18 +6,18 @@
 # podDocumentation
 
 package Data::Table::Text;
-require v5.16.0;
+use v5.16.0;
+our $VERSION = '20170824';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
-use Cwd qw(chdir getcwd realpath);
+use Cwd;
 use File::Path qw(make_path);
 use File::Glob qw(:bsd_glob);
 use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
-
-our $VERSION = '20170817';
+use utf8;
 
 #1 Time stamps                                                                  # Date and timestamps as used in logs of long running commands
 
@@ -33,8 +33,8 @@ sub timeStamp                                                                   
  {strftime('%H:%M:%S', localtime)
  }
 
-sub xxx(@)                                                                      # Execute a command checking and logging the results
- {my (@cmd) = @_;                                                               # Command to execute specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
+sub xxx(@)                                                                      # Execute a command checking and logging the results: the command to execute is specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
+ {my (@cmd) = @_;                                                               # Command to execute followed by an optional regular expression to test the results
   @cmd or confess "No command";                                                 # Check that there is a command to execute
   $_ or confess "Missing command component\n" for @cmd;                         # Check that there are no undefined command components
   my $success = $cmd[-1];                                                       # Error check if present
@@ -76,20 +76,29 @@ sub fileOutOfDate($@)                                                           
 
 #2 Components                                                                   # Create file names from file name components
 
+sub denormalizeFolderName($)                                                    #P Remove any trailing folder separator from a folder name component
+ {my ($name) = @_;                                                              # Name
+  $name =~ s([\/\\]+\Z) ()gsr;
+ }
+
+sub renormalizeFolderName($)                                                    #P Normalize a folder name component by adding a trailing separator
+ {my ($name) = @_;                                                              # Name
+  ($name =~ s([\/\\]+\Z) ()gsr).'/';
+ }
+
 sub filePath(@)                                                                 # Create a file path from an array of file name components. If all the components are blank then a blank file name is returned
  {my (@file) = @_;                                                              # File components
   defined($_) or confess "Missing file component\n" for @file;                  # Check that there are no undefined file components
-  my @c = grep {$_} map {s/[\/\\]+\Z//r} @file;                                 # Skip blank components
+  my @c = grep {$_} map {denormalizeFolderName($_)} @file;                      # Skip blank components
   return '' unless @c;                                                          # No components resolves to '' rather than '/'
-  join '/', @c                                                                  # Join on or more components
+  join '/', @c;                                                                 # Separate components
  }
 
 sub filePathDir(@)                                                              # Directory from an array of file name components. If all the components are blank then a blank file name is returned
  {my (@file) = @_;                                                              # File components
   my $f = filePath(@_);
   return '' unless $f;                                                          # No components resolves to '' rather than '/'
-  $f =~ s/[\/\\]+\Z//s;
-  $f.'/';
+  renormalizeFolderName($f)                                                     # Normalize with trailing separator
  }
 
 sub filePathExt(@)                                                              # File name from file name components and extension
@@ -103,22 +112,49 @@ sub filePathExt(@)                                                              
   filePath(@file, $f)
  }
 
+sub checkFile($)                                                                # Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
+ {my ($file) = @_;                                                              # File to check
+  unless(-e $file)
+   {confess "Can only find the prefix (below) of the file (further below):\n".
+      matchPath($file)."\n$file\n";
+   }
+  $file
+ }
+
+sub checkFilePath(@)                                                            # L<Check|/checkFile> a folder name constructed from its L<components|/filePath>.
+ {my (@file) = @_;                                                              # File components
+  checkFile(filePath(@_))                                                       # Return the constructed file name if it exists
+ }
+
+sub checkFilePathExt(@)                                                         # L<Check|/checkFile> a file name constructed from its  L<components|/filePathExt>.
+ {my (@File) = @_;                                                              # File components and extension
+  checkFile(filePathExt(@_))                                                    # Return the constructed file name if it exists
+ }
+
+sub checkFilePathDir(@)                                                         # L<Check|/checkFile> a folder name constructed from its L<components|/filePathDir>.
+ {my (@file) = @_;                                                              # File components
+  checkFile(filePathDir(@_))                                                    # Return the constructed folder name if it exists
+ }
+
 sub quoteFile($)                                                                # Quote a file name
  {my ($file) = @_;                                                              # File name
   "\"$file\""
  }
 
-sub currentDirectory                                                            # Get the current working directory tracking changes made by L<chdir|/chdir>
- {my $f = getcwd;
-  $f.'/'
+#2 Position                                                                     # Position in the file system
+
+sub currentDirectory                                                            # Get the current working directory
+ {renormalizeFolderName(getcwd)
  }
 
 sub currentDirectoryAbove                                                       # The path to the folder above the current working folder
- {my @p = split m(/)s, currentDirectory;
+ {my $p = currentDirectory;
+  my @p = split m(/)s, $p;
+  shift @p if @p and $p[0] =~ m/\A\s*\Z/;
   @p or confess "No directory above\n:".currentDirectory;
   pop @p;
   my $r = shift @p;
-  filePathDir("/$r", @p)
+  filePathDir("/$r", @p);
  }
 
 sub parseFileName($)                                                            # Parse a file name into (path, name, extension)
@@ -152,14 +188,26 @@ sub containingFolder($)                                                         
   join '/', @w, ''
  }
 
+sub fullFileName                                                                # Full name of a file
+ {my ($file) = @_;                                                              # File name
+  filePath(currentDirectory, $file)                                             # Full file name
+ }
+
+sub printFullFileName                                                           # Print a file name on a separate line with escaping so it can be use easily from the command line
+ {my ($file) = @_;                                                              # File name
+  "\n\'".dump(fullFileName($file))."\'\n'"
+ }
+
 #2 Temporary                                                                    # Temporary files and folders
 
 sub temporaryFile                                                               # Create a temporary file that will automatically be L<unlinked|/unlink> during END
- {realpath(tempfile())
+ {tempfile()
  }
 
 sub temporaryFolder                                                             # Create a temporary folder that will automatically be L<rmdired|/rmdir> during END
- {realpath(tempdir()).'/'
+ {my $d = tempdir();
+     $d =~ s/[\/\\]+\Z//s;
+  $d.'/';
  }
 
 sub temporaryDirectory                                                          # Create a temporary directory that will automatically be L<rmdired|/rmdir> during END
@@ -206,6 +254,18 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
   sort @f
  } # searchDirectoryTreesForMatchingFiles
 
+sub matchPath($)                                                                # Given an absolute path find out how much of the path exists
+ {my ($file) = @_;                                                              # File name
+  return $file if -e $file;                                                     # File exists so nothing more to match
+  my @p = split /[\/\\]/, $file;                                                # Split path into components
+  while(@p)                                                                     # Remove components one by one
+   {my $d = join '/', @p;                                                       # Containing folder
+    return $d if -d $d;                                                         # Containing folder exists
+    pop @p;                                                                     # Remove deepest component and try again
+   }
+  ''                                                                            # Nothing matches
+ } # matchPath
+
 #2 Read and write files                                                         # Read and write strings from and to files creating paths as needed
 
 sub readFile($)                                                                 # Read a file containing unicode
@@ -213,7 +273,7 @@ sub readFile($)                                                                 
   my $f = $file;
   defined($f) or confess "Cannot read undefined file";
   $f =~ m(\n) and confess "File name contains a new line:\n=$file=";
-  -e $f or confess "Cannot read file $f because it does not exist";
+  -e $f or confess "Cannot read file because it does not exist, file:\n$f\n";
   open(my $F, "<:encoding(UTF-8)", $f) or confess
     "Cannot open $f for unicode input";
   local $/ = undef;
@@ -637,7 +697,7 @@ sub perlPackage($)                                                              
 
 #1 Documentation                                                                # Extract, format and update documentation for a perl module
 
-sub extractTest($)                                                              ## Extract a line of a test
+sub extractTest($)                                                              #P Extract a line of a test
  {my ($string) = @_;                                                            # String containing test line
   $string =~ s/\A\s*{?(.+?)\s*#.*\Z/$1/;                                        # Remove any initial whitespace and possible { and any trailing whitespace and comments
   $string
@@ -647,38 +707,53 @@ sub extractDocumentation(;$)                                                    
  {my ($perlModule) = @_;                                                        # Optional file name with caller's file being the default
   $perlModule //= $0;                                                           # Extract documentation from the caller if no perl module is supplied
   my $package = perlPackage($perlModule);                                       # Package name
+  my %collaborators;                                                            # Collaborators #C pause-id  comment
+  my %examples;                                                                 # Examples for each method
   my %iUseful;                                                                  # Immediately useful methods
+  my %methods;                                                                  # Methods that have been coded as opposed to being generated
   my %methodParms;                                                              # Method names including parameters
   my %methodX;                                                                  # Method names for methods that have an version suffixed with X that die rather than returning undef
   my %private;                                                                  # Private methods
   my %static;                                                                   # Static methods
-  my %tests;                                                                    # Tests for each method
   my %userFlags;                                                                # User flags
-  my @doc = (qq(=head1 Description));                                           # Documentation
+  my @doc = (<<END);                                                            # Documentation
+`head1 Description
+
+The following sections describe the methods in each functional area of this
+module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
+
+END
   my @private;                                                                  # Documentation of private methods
-  my $level = 0; my $off = 1;                                                   # Header levels
+  my $level = 0; my $off = 0;                                                   # Header levels
 
   my @l = split /\n/, readFile($perlModule);                                    # Read the perl module
 
   for my $l(keys @l)                                                            # Tests associated with each method
    {my $line = $l[$l];
     if (my @tags = $line =~ m/(?:\s#T(\w+))/g)
-     {my @testLines = (extractTest($line));
+     {my %tags; $tags{$_}++ for @tags;
 
-      if ($line =~ m/<<END/)                                                    # Process here document
+      for(grep {$tags{$_} > 1} sort keys %tags)                                 # Check for duplicate example names on the same line
+       {warn "Duplicate example name $_ on line $l";
+       }
+
+       my @testLines = (extractTest($line));
+
+      if ($line =~ m/<<(END|'END'|"END")/)                                      # Process here documents
        {for(my $L = $l + 1; $L < @l; ++$L)
          {my $nextLine = $l[$L];
           push @testLines, extractTest($nextLine);
           if ($nextLine =~ m/\AEND/)                                            # Add a blank line after the END
-           {push @testLines, '';
-            last
+           {last
            }
          }
        }
 
+      push @testLines, '';                                                      # Blank line between each test line
+
       for my $testLine(@testLines)                                              # Save test lines
-       {for my $t(@tags)
-         {push @{$tests{$t}}, $testLine;
+       {for my $t(sort keys %tags)
+         {push @{$examples{$t}}, $testLine;
          }
        }
      }
@@ -698,6 +773,9 @@ sub extractDocumentation(;$)                                                    
       my $headLevel = $level+$off;
       push @doc, "\n=head$headLevel $2" if $level;                              # Heading
       push @doc, "\n$4"                 if $level and $4;                       # Text of section
+     }
+    elsif ($line =~ /\A#C\s+(\S+)\s+(.+?)\s*\Z/)                                # Collaborators
+     {$collaborators{$1} = $2;
      }
     elsif ($line =~ /\A#/)                                                      # Switch documentation off
      {$level = 0;
@@ -753,6 +831,7 @@ sub extractDocumentation(;$)                                                    
       my $headLevel = $level+$off+1;                                            # Heading level
       my $methodSignature = "$name($parametersAsString)";                       # Method(signature)
 
+      $methods{$name}++;                                                        # Methods that have been coded as opposed to being generated
       $methodParms{$name} = $name;                                              # Method names not including parameters
       $methodParms{$name.'X'} = $name if $methodX;                              # Method names not including parameters
       $methodX{$name}++ if $methodX;                                            # Method names that have an X version
@@ -780,9 +859,9 @@ sub extractDocumentation(;$)                                                    
       push @method,                                                             # Produces
        "\n$produces"                           if $produces;
 
-      if (my $tests = $tests{$name})                                            # Format tests
-       {if (my @tests = @$tests)
-         {push @method, '\nExample:\m', map {"  $_"} @tests;
+      if (my $examples = $examples{$name})                                      # Format examples
+       {if (my @examples = @$examples)
+         {push @method, '\nExample:\m', map {"  $_"} @examples;
          }
        }
 
@@ -806,25 +885,30 @@ sub extractDocumentation(;$)                                                    
      }
    }
 
+  if (1)                                                                        # Alphabetic listing of methods that still need examples
+   {my %m = %methods;
+    delete @m{$_, "$_ :lvalue"} for keys %examples;
+    delete @m{$_, "$_ :lvalue"} for keys %private;
+    my $n = keys %m;
+    my $N = keys %methods;
+    say STDERR formatTable(\%m), "\n$n of $N methods still need tests" if $n;
+   }
+
   if (keys %iUseful)                                                            # Alphabetic listing of immediately useful methods
     {my @d;
      push @d, <<END;
 
-`head2 Immediately useful methods
+`head1 Immediately useful methods
 
 These methods are the ones most likely to be of immediate useful to anyone
-using this package for the first time:
-
-`over
+using this module for the first time:
 
 END
     for my $m(sort {lc($a) cmp lc($b)} keys %iUseful)
      {my $c = $iUseful{$m};
-       push @d, "=item L<$m|/$m>\n\n$c\n"
+       push @d, "L<$m|/$m>\n\n$c\n"
      }
     push @d, <<END;
-
-`back
 
 END
     unshift @doc, (shift @doc, @d)                                              # Put first after title
@@ -863,9 +947,22 @@ Copyright (c) 2016-2017 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
-
-`cut
 END
+
+  if (keys %collaborators)                                                      # Acknowledge any collaborators
+   {push @doc,
+     '\n=head1 Acknowledgements\m'.
+     'Thanks to the following people for their help with this module:\m'.
+     '=over\m';
+    for(sort keys %collaborators)
+     {my $p = "L<$_|mailto:$_>";
+      my $r = $collaborators{$_};
+      push @doc, "=item $p\n\n$r\n\n";
+     }
+    push @doc, '=back\m';
+   }
+
+  push @doc, '=cut\m';                                                          # Finish documentation
 
   if (keys %methodX)                                                            # Insert X method definitions
    {my @x;
@@ -887,6 +984,7 @@ END
 
 sub test
  {my $p = __PACKAGE__;
+  binmode($_, ":utf8") for *STDOUT, *STDERR;
   return if eval "eof(${p}::DATA)";
   my $s = eval "join('', <${p}::DATA>)";
   $@ and die $@;
@@ -957,12 +1055,14 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(appendFile
+checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys containingPowerOfTwo
 containingFolder convertImageToJpx currentDirectory currentDirectoryAbove
 dateStamp dateTimeStamp
 extractDocumentation
 fileList fileModTime fileOutOfDate
-filePath filePathDir filePathExt fileSize findDirs findFiles formatTableBasic
+filePath filePathDir filePathExt fileSize findDirs findFiles
+formatTableBasic fullFileName
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 imageSize indentString isBlank
@@ -970,8 +1070,10 @@ javaPackage
 keyCount
 loadArrayArrayFromLines loadArrayFromLines
 loadHashArrayFromLines loadHashFromLines
-makePath nws pad parseFileName powerOfTwo quoteFile
+makePath matchPath
+nws pad parseFileName powerOfTwo quoteFile
 readBinaryFile readFile
+printFullFileName
 saveToS3 searchDirectoryTreesForMatchingFiles
 temporaryDirectory temporaryFile temporaryFolder timeStamp trim
 updatePerlModuleDocumentation writeBinaryFile writeFile
@@ -979,6 +1081,7 @@ xxx);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
 # podDocumentation
+#C mim@cpan.org Testing on windows
 
 =pod
 
@@ -1059,52 +1162,57 @@ Data::Table::Text - Write data in tabular text format
 
 =head1 Description
 
-=head2 Time stamps
+The following sections describe the methods in each functional area of this
+module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
+
+
+
+=head1 Time stamps
 
 Date and timestamps as used in logs of long running commands
 
-=head3 dateTimeStamp()
+=head2 dateTimeStamp()
 
 Year-monthNumber-day at hours:minute:seconds
 
 
-=head3 dateStamp()
+=head2 dateStamp()
 
 Year-monthName-day
 
 
-=head3 timeStamp()
+=head2 timeStamp()
 
 hours:minute:seconds
 
 
-=head3 xxx(@)
+=head2 xxx(@)
 
-Execute a command checking and logging the results
+Execute a command checking and logging the results: the command to execute is specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
 
-  1  @cmd  Command to execute specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
+  1  @cmd  Command to execute followed by an optional regular expression to test the results
 
-=head2 Files and paths
+=head1 Files and paths
 
 Operations on files and paths
 
-=head3 Statistics
+=head2 Statistics
 
 Information about each file
 
-=head4 fileSize($)
+=head3 fileSize($)
 
 Get the size of a file
 
   1  $file  File name
 
-=head4 fileModTime($)
+=head3 fileModTime($)
 
 Get the modified time of a file in seconds since the epoch
 
   1  $file  File name
 
-=head4 fileOutOfDate($@)
+=head3 fileOutOfDate($@)
 
 Returns undef if all the files exist and the first file is younger than all the following files; else returns the first file that does not exist or is younger than the first file.
 
@@ -1117,167 +1225,201 @@ Example:
 
 Use B<fileOutOfDateX> to execute L<fileOutOfDate|/fileOutOfDate> but B<die> 'fileOutOfDate' instead of returning B<undef>
 
-=head3 Components
+=head2 Components
 
 Create file names from file name components
 
-=head4 filePath(@)
+=head3 filePath(@)
 
 Create a file path from an array of file name components. If all the components are blank then a blank file name is returned
 
   1  @file  File components
 
-=head4 filePathDir(@)
+=head3 filePathDir(@)
 
 Directory from an array of file name components. If all the components are blank then a blank file name is returned
 
   1  @file  File components
 
-=head4 filePathExt(@)
+=head3 filePathExt(@)
 
 File name from file name components and extension
 
   1  @File  File components and extension
 
-=head4 quoteFile($)
+=head3 checkFile($)
+
+Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
+
+  1  $file  File to check
+
+=head3 checkFilePath(@)
+
+L<Check|/checkFile> a folder name constructed from its L<components|/filePath>.
+
+  1  @file  File components
+
+=head3 checkFilePathExt(@)
+
+L<Check|/checkFile> a file name constructed from its  L<components|/filePathExt>.
+
+  1  @File  File components and extension
+
+=head3 checkFilePathDir(@)
+
+L<Check|/checkFile> a folder name constructed from its L<components|/filePathDir>.
+
+  1  @file  File components
+
+=head3 quoteFile($)
 
 Quote a file name
 
   1  $file  File name
 
-=head4 currentDirectory()
+=head2 Position
 
-Get the current working directory tracking changes made by L<chdir|/chdir>
+Position in the file system
 
+=head3 currentDirectory()
 
-=head4 startDirectory()
-
-Get the directory execution started in
-
-
-=head4 startDirectoryReturn()
-
-Return to the directory that execution started in or confess if that is not possible
+Get the current working directory
 
 
-=head4 currentDirectoryAbove()
+=head3 currentDirectoryAbove()
 
 The path to the folder above the current working folder
 
 
-=head4 parseFileName($)
+=head3 parseFileName($)
 
 Parse a file name into (path, name, extension)
 
   1  $file  File name to parse
 
-=head4 containingFolder($)
+=head3 containingFolder($)
 
 Path to the folder that contains this file, or use L</parseFileName>
 
   1  $file  File name
 
-=head3 Temporary
+=head3 fullFileName()
+
+Full name of a file
+
+
+=head3 printFullFileName()
+
+Print a file name on a separate line with escaping so it can be use easily from the command line
+
+
+=head2 Temporary
 
 Temporary files and folders
 
-=head4 temporaryFile()
+=head3 temporaryFile()
 
 Create a temporary file that will automatically be L<unlinked|/unlink> during END
 
 
-=head4 temporaryFolder()
+=head3 temporaryFolder()
 
 Create a temporary folder that will automatically be L<rmdired|/rmdir> during END
 
 
-=head4 temporaryDirectory()
+=head3 temporaryDirectory()
 
 Create a temporary directory that will automatically be L<rmdired|/rmdir> during END
 
 
-=head3 Find
+=head2 Find
 
 Find files and folders below a folder
 
-=head4 findFiles($)
+=head3 findFiles($)
 
 Find all the file under a folder
 
   1  $dir  Folder to start the search with
 
-=head4 findDirs($)
+=head3 findDirs($)
 
 Find all the folders under a folder
 
   1  $dir  Folder to start the search with
 
-=head4 fileList($)
+=head3 fileList($)
 
 File list
 
   1  $pattern  Search pattern
 
-=head4 searchDirectoryTreesForMatchingFiles(@)
+=head3 searchDirectoryTreesForMatchingFiles(@)
 
 Search the specified directory trees for files that match the specified extensions -  the argument list should include at least one folder and one extension to be useful
 
   1  @foldersandExtensions  Mixture of folder names and extensions
 
-=head3 Read and write files
+=head3 matchPath($)
+
+Given an absolute path find out how much of the path exists
+
+  1  $file  File name
+
+=head2 Read and write files
 
 Read and write strings from and to files creating paths as needed
 
-=head4 readFile($)
+=head3 readFile($)
 
 Read a file containing unicode
 
   1  $file  Name of unicode file to read
 
-=head4 readBinaryFile($)
+=head3 readBinaryFile($)
 
 Read binary file - a file whose contents are not to be interpreted as unicode
 
   1  $file  File to read
 
-=head4 makePath($)
+=head3 makePath($)
 
 Make a path for a file name or a folder
 
   1  $path  Path
 
-=head4 writeFile($$)
+=head3 writeFile($$)
 
 Write a unicode string to a file after creating a path to the file if necessary
 
   1  $file    File to write to
   2  $string  Unicode string to write
 
-=head4 appendFile($$)
+=head3 appendFile($$)
 
 Append a unicode string to a file after creating a path to the file if necessary
 
   1  $file    File to append to
   2  $string  Unicode string to append
 
-=head4 writeBinaryFile($$)
+=head3 writeBinaryFile($$)
 
 Write a non unicode string to a file in after creating a path to the file if necessary
 
   1  $file    File to write to
   2  $string  Non unicode string to write
 
-=head2 Images
+=head1 Images
 
 Image operations
 
-=head3 imageSize($)
+=head2 imageSize($)
 
 Return (width, height) of an image obtained via imagemagick
 
   1  $image  File containing image
 
-=head3 convertImageToJpx($$$)
+=head2 convertImageToJpx($$$)
 
 Convert an image to jpx format
 
@@ -1285,11 +1427,11 @@ Convert an image to jpx format
   2  $target  Target folder (as multiple files will be created)
   3  $size    Size of each tile
 
-=head2 Powers
+=head1 Powers
 
 Integer powers of two
 
-=head3 powerOfTwo($)
+=head2 powerOfTwo($)
 
 Test whether a number is a power of two, return the power if it is else undef
 
@@ -1297,7 +1439,7 @@ Test whether a number is a power of two, return the power if it is else undef
 
 Use B<powerOfTwoX> to execute L<powerOfTwo|/powerOfTwo> but B<die> 'powerOfTwo' instead of returning B<undef>
 
-=head3 containingPowerOfTwo($)
+=head2 containingPowerOfTwo($)
 
 Find log two of the lowest power of two greater than or equal to a number
 
@@ -1305,18 +1447,18 @@ Find log two of the lowest power of two greater than or equal to a number
 
 Use B<containingPowerOfTwoX> to execute L<containingPowerOfTwo|/containingPowerOfTwo> but B<die> 'containingPowerOfTwo' instead of returning B<undef>
 
-=head2 Format
+=head1 Format
 
 Format data structures as tables
 
-=head3 formatTableBasic($$)
+=head2 formatTableBasic($$)
 
 Tabularize text - basic version
 
   1  $data       Data to be formatted
   2  $separator  Optional line separator
 
-=head3 formatTable($$$)
+=head2 formatTable($$$)
 
 Format various data structures
 
@@ -1324,53 +1466,53 @@ Format various data structures
   2  $title      Optional title
   3  $separator  Optional line separator
 
-=head3 keyCount($$)
+=head2 keyCount($$)
 
 Count keys down to the specified level
 
   1  $maxDepth  Maximum depth to count to
   2  $ref       Reference to an array or a hash
 
-=head2 Lines
+=head1 Lines
 
 Load data structures from lines
 
-=head3 loadArrayFromLines($)
+=head2 loadArrayFromLines($)
 
 Load an array from lines of text in a string
 
   1  $string  The string of lines from which to create an array
 
-=head3 loadHashFromLines($)
+=head2 loadHashFromLines($)
 
 Load a hash: first word of each line is the key and the rest is the value
 
   1  $string  The string of lines from which to create a hash
 
-=head3 loadArrayArrayFromLines($)
+=head2 loadArrayArrayFromLines($)
 
 Load an array of arrays from lines of text: each line is an array of words
 
   1  $string  The string of lines from which to create an array of arrays
 
-=head3 loadHashArrayFromLines($)
+=head2 loadHashArrayFromLines($)
 
 Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents
 
   1  $string  The string of lines from which to create a hash of arrays
 
-=head3 checkKeys($$)
+=head2 checkKeys($$)
 
 Check the keys in a hash
 
   1  $test       The hash to test
   2  $permitted  The permitted keys and their meanings
 
-=head2 LVALUE methods
+=head1 LVALUE methods
 
 Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelt correctly.
 
-=head3 genLValueScalarMethods(@)
+=head2 genLValueScalarMethods(@)
 
 Generate LVALUE scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef.
 
@@ -1380,7 +1522,7 @@ Example:
 
    $a->value = 1;
 
-=head3 genLValueScalarMethodsWithDefaultValues(@)
+=head2 genLValueScalarMethodsWithDefaultValues(@)
 
 Generate LVALUE scalar methods with default values in the current package. A reference to a method whose value has not yet been set will return a scalar whose value is the name of the method.
 
@@ -1390,7 +1532,7 @@ Example:
 
    $a->value == qq(value);
 
-=head3 genLValueArrayMethods(@)
+=head2 genLValueArrayMethods(@)
 
 Generate LVALUE array methods in the current package. A reference to a method that has no yet been set will return a reference to an empty array.
 
@@ -1400,7 +1542,7 @@ Example:
 
    $a->value->[1] = 2;
 
-=head3 genLValueHashMethods(@)
+=head2 genLValueHashMethods(@)
 
 Generate LVALUE hash methods in the current package. A reference to a method that has no yet been set will return a reference to an empty hash.
 
@@ -1410,59 +1552,59 @@ Example:
 
    $a->value->{a} = 'b';
 
-=head2 Strings
+=head1 Strings
 
 Actions on strings
 
-=head3 indentString($$)
+=head2 indentString($$)
 
 Indent lines contained in a string or formatted table by the specified amount
 
   1  $string  The string of lines to indent
   2  $indent  The indenting string
 
-=head3 isBlank($)
+=head2 isBlank($)
 
 Test whether a string is blank
 
   1  $string  String
 
-=head3 trim($)
+=head2 trim($)
 
 Trim off white space from from front and end of string
 
   1  $string  String
 
-=head3 pad($$)
+=head2 pad($$)
 
 Pad a string with blanks to a multiple of a specified length
 
   1  $string  String
   2  $length  Tab width
 
-=head3 nws($)
+=head2 nws($)
 
 Normalize white space in a string to make comparisons easier
 
   1  $string  String to normalize
 
-=head3 javaPackage($)
+=head2 javaPackage($)
 
 Extract the package name from a java string or file,
 
   1  $java  Java file if it exists else the string of java
 
-=head3 perlPackage($)
+=head2 perlPackage($)
 
 Extract the package name from a perl string or file,
 
   1  $perl  Perl file if it exists else the string of perl
 
-=head2 Documentation
+=head1 Documentation
 
 Extract, format and update documentation for a perl module
 
-=head3 extractDocumentation($)
+=head2 extractDocumentation($)
 
 Extract documentation from a perl script between the lines marked with:
 
@@ -1513,6 +1655,18 @@ Parameters:
 
 =head1 Private Methods
 
+=head2 denormalizeFolderName($)
+
+Remove any trailing folder separator from a folder name component
+
+  1  $name  Name
+
+=head2 renormalizeFolderName($)
+
+Normalize a folder name component by adding a trailing separator
+
+  1  $name  Name
+
 =head2 formatTableAA($$$)
 
 Tabularize an array of arrays
@@ -1561,11 +1715,25 @@ Tabularize a hash
   2  $title      Optional title
   3  $separator  Optional line separator
 
+=head2 extractTest($)
+
+Extract a line of a test
+
+  1  $string  String containing test line
+
 
 =head1 Index
 
 
 L<appendFile|/appendFile>
+
+L<checkFile|/checkFile>
+
+L<checkFilePath|/checkFilePath>
+
+L<checkFilePathDir|/checkFilePathDir>
+
+L<checkFilePathExt|/checkFilePathExt>
 
 L<checkKeys|/checkKeys>
 
@@ -1585,7 +1753,11 @@ L<dateStamp|/dateStamp>
 
 L<dateTimeStamp|/dateTimeStamp>
 
+L<denormalizeFolderName|/denormalizeFolderName>
+
 L<extractDocumentation|/extractDocumentation>
+
+L<extractTest|/extractTest>
 
 L<fileList|/fileList>
 
@@ -1623,6 +1795,8 @@ L<formatTableHA|/formatTableHA>
 
 L<formatTableHH|/formatTableHH>
 
+L<fullFileName|/fullFileName>
+
 L<genLValueArrayMethods|/genLValueArrayMethods>
 
 L<genLValueHashMethods|/genLValueHashMethods>
@@ -1651,6 +1825,8 @@ L<loadHashFromLines|/loadHashFromLines>
 
 L<makePath|/makePath>
 
+L<matchPath|/matchPath>
+
 L<nws|/nws>
 
 L<pad|/pad>
@@ -1663,17 +1839,17 @@ L<powerOfTwo|/powerOfTwo>
 
 L<powerOfTwoX|/powerOfTwo>
 
+L<printFullFileName|/printFullFileName>
+
 L<quoteFile|/quoteFile>
 
 L<readBinaryFile|/readBinaryFile>
 
 L<readFile|/readFile>
 
+L<renormalizeFolderName|/renormalizeFolderName>
+
 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
-
-L<startDirectory|/startDirectory>
-
-L<startDirectoryReturn|/startDirectoryReturn>
 
 L<temporaryDirectory|/temporaryDirectory>
 
@@ -1716,7 +1892,24 @@ Copyright (c) 2016-2017 Philip R Brenan.
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
 
+
+=head1 Acknowledgements
+
+Thanks to the following people for their help with this module:
+
+=over
+
+
+=item L<mim@cpan.org|mailto:mim@cpan.org>
+
+Testing on windows
+
+
+=back
+
+
 =cut
+
 
 sub containingPowerOfTwoX  {&containingPowerOfTwo  (@_) || die 'containingPowerOfTwo'}
 sub fileOutOfDateX         {&fileOutOfDate         (@_) || die 'fileOutOfDate'}
@@ -1727,6 +1920,7 @@ sub powerOfTwoX            {&powerOfTwo            (@_) || die 'powerOfTwo'}
 
 sub test
  {my $p = __PACKAGE__;
+  binmode($_, ":utf8") for *STDOUT, *STDERR;
   return if eval "eof(${p}::DATA)";
   my $s = eval "join('', <${p}::DATA>)";
   $@ and die $@;
@@ -1738,11 +1932,30 @@ test unless caller;
 
 1;
 # podDocumentation
-
 __DATA__
-use Test::More tests => 75;
+use Test::More tests => 87;
 
 #Test::More->builder->output("/dev/null");
+
+if (1)                                                                          # Unicode to local file
+ {use utf8;
+  my $z = "𝝰𝝱𝝲";
+  my $t = temporaryFolder;
+  my $f = filePathExt($t, $z, qq(data));
+  unlink $f if -e $f;
+  ok !-e $f;
+  writeFile($f, $z);
+  ok  -e $f;
+  my $s = readFile($f);
+  ok $s eq $z;
+  ok length($s) == 3;
+  unlink $f;
+  ok !-e $f,    'unlink1';
+  rmdir $t;
+  ok !-d $t,    'rmDir1';
+  rmdir 'tmp';
+  ok !-d 'tmp', 'rmDir2';
+ }
 
 if (1)                                                                          # Key counts
  {my $a = [[1..3],       {map{$_=>1} 1..3}];
@@ -1769,33 +1982,12 @@ if (1)                                                                          
   is_deeply [parseFileName "test.data"],            [undef,         "test", "data"];
  }
 
-if (1)
- {my $d = temporaryDirectory;
-  chdir($d);
-  ok $d eq currentDirectory;
- }
-
-if (1)                                                                          # Unicode to local file
- {use utf8;
-  my $z = "𝝰𝝱𝝲";
-  my $f = filePathExt(temporaryFolder, $z, qq(data));
-  unlink $f if -e $f;
-  ok !-e $f;
-  writeFile($f, $z);
-  ok  -e $f;
-  my $s = readFile($f);
-  ok $s eq $z;
-  ok length($s) == 3;
-  unlink $f;
-  ok !-e $f;
-  rmdir $z if -d $z;
-  ok !-d $z;
- }
-
 if (1)                                                                          # Unicode
  {use utf8;
   my $z = "𝝰𝝱𝝲";
-  my $f = filePathExt(temporaryFolder, $z, $z, qq(data));
+  my $T = temporaryFolder;
+  my $t = filePath($T, $z);
+  my $f = filePathExt($t, $z, qq(data));
   unlink $f if -e $f;
   ok !-e $f;
   writeFile($f, $z);
@@ -1805,23 +1997,56 @@ if (1)                                                                          
   ok length($s) == 3;
   unlink $f;
   ok !-e $f;
-  rmdir $z;
-  ok !-d $z;
+  rmdir $t;
+  ok !-d $t;
+  rmdir $T;
+  ok !-d $T;
+  rmdir 'tmp';
+  ok !-d 'tmp';
  }
+
 if (1)                                                                          # Binary
  {my $z = "𝝰𝝱𝝲";
-  my $f = filePathExt(temporaryFolder, $z, $z, qq(data));
+  my $Z = join '', map {chr($_)} 0..11;
+  my $T = temporaryFolder;
+  my $t = filePath($T, $z);
+  my $f = filePathExt($t, $z, qq(data));
   unlink $f if -e $f;
   ok !-e $f;
-  writeBinaryFile($f, $z);
+  writeBinaryFile($f, $Z);
   ok  -e $f;
   my $s = readBinaryFile($f);
-  ok $s eq $z;
+  ok $s eq $Z;
   ok length($s) == 12;
   unlink $f;
   ok !-e $f;
-  rmdir $z;
-  ok !-d $z;
+  rmdir $t;
+  ok !-d $t;
+  rmdir $T;
+  ok !-d $T;
+  rmdir 'tmp';
+  ok !-d 'tmp';
+ }
+
+if (1)                                                                          # Check files
+ {my @d =             qw(a b c d);
+  my $d = filePath   (qw(a b c d));
+  my $f = filePathExt(qw(a b c d e x));
+  my $F = filePathExt(qw(a b c e d));
+  writeFile($f, '1');
+  ok checkFile($d);
+  ok checkFile($f);
+  eval {checkFile($F)};
+  my @m = split m/\n/, $@;
+  ok $m[1] eq  "a/b/c";
+  unlink $f;
+  ok !-e $f;
+  while(@d)                                                                     # Remove path
+   {my $d = filePathDir(@d);
+    rmdir $d;
+    ok !-e $d;
+    pop @d;
+   }
  }
 
 if (1)                                                                          # Format table and AA

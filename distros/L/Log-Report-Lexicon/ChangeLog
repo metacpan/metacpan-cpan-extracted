@@ -9,9 +9,25 @@ bugs:
 	  appear in one PO but the file moved to other domain, not scanned
 	  in the same xgettext-perl run.
 	- manual-page for xgettext-perl is missing
+	- xgettext-perl does not yet support __*p* introduced by Log::Report
+	  version 1.22.  It should probably accept variables as $msgctxt
+	  argument, to make code maintainable.
 
 wishlist:
 	- let xgettext-perl produce mo files as well.
+
+version 1.09: Mon 28 Aug 10:37:30 CEST 2017
+
+	Fixes:
+	- support PO-table charsets only available in the file's header
+	  Reported by [Lars Dɪᴇᴄᴋᴏᴡ]
+
+	Improvements:
+	- do not require Plural-Forms in the header when it is not used.
+	- remove option Log::Report::Lexicon::MOTcompact::read(take_all)
+	  Always take all, don't be smart (because it wasn't efficient at all)
+	- support filename extension .gmo as alternative to .mo
+	- ::Lexicon::POT::new(charset) from required to default 'UTF-8'
 
 version 1.08: Thu 29 Jun 15:02:15 CEST 2017
 

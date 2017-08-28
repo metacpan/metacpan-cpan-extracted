@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 use Carp;
 use DateTime::Duration;
@@ -65,7 +65,7 @@ use overload (
     fallback => 1,
     '<=>'    => '_compare_overload',
     'cmp'    => '_string_compare_overload',
-    q{""}    => '_stringify',
+    q{""}    => 'stringify',
     bool     => sub {1},
     '-'      => '_subtract_overload',
     '+'      => '_add_overload',
@@ -921,7 +921,7 @@ sub leap_seconds {
     return $self->_accumulated_leap_seconds( $self->{utc_rd_days} );
 }
 
-sub _stringify {
+sub stringify {
     my $self = shift;
 
     return $self->iso8601 unless $self->{formatter};
@@ -952,6 +952,10 @@ sub datetime {
 }
 
 sub is_leap_year { $_[0]->_is_leap_year( $_[0]->year ) }
+
+sub is_last_day_of_month {
+    $_[0]->day == $_[0]->_month_length( $_[0]->year, $_[0]->month );
+}
 
 sub week {
     my $self = shift;
@@ -2307,7 +2311,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 
@@ -2956,10 +2960,23 @@ very good ISO8601 format, as it lacks a time zone.  If called as
 C<< $dt->iso8601() >> you cannot change the separator, as ISO8601 specifies
 that "T" must be used to separate them.
 
+=head2 $dt->stringify()
+
+This method returns a stringified version of the object. It is how
+stringification overloading is limited. If the object has a formatter, then
+it's C<format_datetime()> method is used to produce a string. Otherwise, this
+method calls C<< $dt->iso8601() >> to produce a string. See L<Formatters And
+Stringification> for details.
+
 =head3 $dt->is_leap_year()
 
-This method returns a true or false indicating whether or not the
+This method returns a true or false value indicating whether or not the
 datetime object is in a leap year.
+
+=head3 $dt->is_last_day_of_month()
+
+This method returns a true or false value indicating whether or not the
+datetime object is the last day of the month.
 
 =head3 $dt->week()
 

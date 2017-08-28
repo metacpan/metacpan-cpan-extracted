@@ -1,6 +1,6 @@
 package Test::Internet;
 
-$Test::Internet::VERSION   = '0.06';
+$Test::Internet::VERSION   = '0.07';
 $Test::Internet::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Internet - Interface to test internet connection.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -21,7 +21,7 @@ use Net::DNS;
 use Data::Dumper;
 use Test::Builder ();
 
-require Exporter;
+use parent 'Exporter';
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(connect_ok);
 

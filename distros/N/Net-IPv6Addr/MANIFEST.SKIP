@@ -1,0 +1,14 @@
+^pm_to_blib$
+^MYMETA\..*
+^Net-IPv6Addr-[0-9].*$
+^(build|make-pod)\.pl$
+^Makefile(?:\.(?:old|bak))?$
+^\.git/.*
+^\.gitignore$
+.*~$
+^#.*
+^blib/.*
+^MANIFEST\.bak$
+^xt/.*\.t$
+^examples/.*-out\.txt$
+^lib/Net/IPv6Addr\.pod\.tmpl$

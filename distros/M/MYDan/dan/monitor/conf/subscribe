@@ -1,0 +1,2 @@
+user1:
+  project1: [ 'net', 'disk', 'cpu' ]

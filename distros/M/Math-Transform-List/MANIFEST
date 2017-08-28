@@ -3,6 +3,14 @@ lib/Math/Transform/List.pm
 MANIFEST			This list of files
 t/even.t
 t/symmetric.t
-t/test.t
+t/test0.t
+t/test1.t
+t/test2.t
+t/test26.t
+t/test3.t
+t/test4.t
+t/test4a.t
+t/test4b.t
+t/test4c.t
 META.yml
 META.json

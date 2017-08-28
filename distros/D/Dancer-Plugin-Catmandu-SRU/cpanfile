@@ -7,5 +7,5 @@ on test => sub {
 
 requires 'Dancer', '1.3123';
 requires 'Catmandu', '>=0.8014';
-requires 'Catmandu::Exporter::Template', '0.03';
+requires 'Catmandu::Exporter::Template', '0.11';
 requires 'SRU', '1.01';

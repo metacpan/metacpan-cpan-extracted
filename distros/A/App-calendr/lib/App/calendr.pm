@@ -1,6 +1,6 @@
 package App::calendr;
 
-$App::calendr::VERSION   = '0.20';
+$App::calendr::VERSION   = '0.21';
 $App::calendr::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::calendr - Application to display supported Calendar.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
@@ -48,45 +48,39 @@ it. In case none C<flag> passed in it would show the current calendar month.
 
     USAGE: calendr [-h] [long options...]
 
-        --as_svg:
-            Generate calendar in SVG format
-
-
-        --list_month_names:
-            List calendar month names
-
-
-        --gdate: String
-            Gregorian date (YYYY-MM-DD)
-
-
-        --jday: Int
-            Julian day
-
+        --name: String
+           Calendar name e.g. Bahai,Gregorian,Hebrew,Hijri,Julian,Persian,Saka.
+           Default is Gregorian.
 
         --month: String
-            Month number/name e.g. 1,2,3... or January,February...
-
-
-        --name: String
-            Calendar name e.g. Bahai,Gregorian,Hebrew,Hijri,Julian,Persian,Saka.
-            Default is Gregorian.
-
+           Month number/name e.g. 1,2,3... or January,February...
 
         --year: Int
-            Year number (3/4 digits)
+           Year number (3/4 digits)
 
+        --gdate: String
+           Gregorian date (YYYY-MM-DD)
+
+        --jday: Int
+           Julian day
+
+        --as_svg:
+           Generate calendar in SVG format
+
+        --list_month_names:
+           List calendar month names
 
         --usage:
-            show a short help message
+           show a short help message
 
+        -h:
+           show a compact help message
 
-        -h --help:
-            show a help message
-
+        --help:
+           show a long help message
 
         --man:
-            show the manual
+           show the manual
 
 =head1 SUPPORTED CALENDARS
 

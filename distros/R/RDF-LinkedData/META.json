@@ -62,6 +62,7 @@
             "URI" : "1.52",
             "URI::NamespaceMap" : "0.32",
             "namespace::autoclean" : "0.12",
+            "parent" : "0",
             "perl" : "5.006"
          }
       },
@@ -82,11 +83,11 @@
    "provides" : {
       "Plack::App::RDF::LinkedData" : {
          "file" : "lib/Plack/App/RDF/LinkedData.pm",
-         "version" : "0.78"
+         "version" : "1.00"
       },
       "RDF::LinkedData" : {
          "file" : "lib/RDF/LinkedData.pm",
-         "version" : "0.78"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -107,7 +108,7 @@
       "x_mailinglist" : "http://lists.perlrdf.org/listinfo/dev",
       "x_wiki" : "http://wiki.perlrdf.org/"
    },
-   "version" : "0.78",
+   "version" : "1.00",
    "x_contributors" : [
       "Gregory Todd Williams <gwilliams@cpan.org>",
       "Richard Lewis",

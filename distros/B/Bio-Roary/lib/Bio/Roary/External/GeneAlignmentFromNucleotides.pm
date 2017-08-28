@@ -1,5 +1,5 @@
 package Bio::Roary::External::GeneAlignmentFromNucleotides;
-$Bio::Roary::External::GeneAlignmentFromNucleotides::VERSION = '3.8.2';
+$Bio::Roary::External::GeneAlignmentFromNucleotides::VERSION = '3.9.1';
 # ABSTRACT: Take in multi-FASTA files of nucleotides and align each file with PRANK or MAFFT
 
 
@@ -12,6 +12,7 @@ has 'translation_table'           => ( is => 'rw', isa => 'Int',      default =>
 has 'core_definition'             => ( is => 'ro', isa => 'Num',      default => 1 );
 has 'mafft'                       => ( is => 'ro', isa => 'Bool',     default => 0 );
 has 'dont_delete_files'           => ( is => 'rw', isa => 'Bool',     default  => 0 );
+has 'allow_paralogs'              => ( is => 'rw', isa => 'Bool',     default  => 0 );
 has 'num_input_files'             => ( is => 'ro', isa => 'Int',      required => 1);
 
 # Overload Role`
@@ -68,6 +69,7 @@ sub _build__core_alignment_cmd {
     my $core_cmd = "pan_genome_core_alignment";
     $core_cmd .= " -cd " . ($self->core_definition*100) if ( defined $self->core_definition );
     $core_cmd .= " --dont_delete_files " if ( defined $self->dont_delete_files  && $self->dont_delete_files == 1 );
+	$core_cmd .= " --allow_paralogs " if ( defined $self->allow_paralogs  && $self->allow_paralogs == 1 );
 
     return $core_cmd;
 }
@@ -124,7 +126,7 @@ Bio::Roary::External::GeneAlignmentFromNucleotides - Take in multi-FASTA files o
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

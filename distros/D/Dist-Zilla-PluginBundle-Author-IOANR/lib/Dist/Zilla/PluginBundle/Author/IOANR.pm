@@ -1,5 +1,5 @@
-package Dist::Zilla::PluginBundle::Author::IOANR;
-$Dist::Zilla::PluginBundle::Author::IOANR::VERSION = '1.162691';
+package Dist::Zilla::PluginBundle::Author::IOANR 1.172320;
+
 # ABSTRACT: Build dists the way IOANR likes
 use v5.12;
 use Moose;
@@ -16,7 +16,7 @@ use Dist::Zilla::Plugin::MetaData::BuiltWith;
 use Dist::Zilla::Plugin::ModuleBuildTiny;
 use Dist::Zilla::Plugin::MojibakeTests;
 use Dist::Zilla::Plugin::PodWeaver 4.000;
-use Dist::Zilla::Plugin::ReadmeFromPod;
+use Dist::Zilla::Plugin::ReadmeAnyFromPod;
 use Dist::Zilla::Plugin::RunExtraTests;
 use Dist::Zilla::Plugin::Signature;
 use Dist::Zilla::Plugin::Test::CheckDeps;
@@ -121,11 +121,11 @@ sub configure {
         ['MetaData::BuiltWith' => {show_config => 1}],
         'MetaJSON',
         ['PodWeaver' => {config_plugin => '@Author::IOANR'}],
-        'PkgVersion',
+        ['PkgVersion' => {use_package => 1}],
         'PruneCruft',
+        [ 'ReadmeAnyFromPod' => { type => 'gfm', location => 'build' } ],
         'ShareDir',
         'Signature',
-        ['ReadmeFromPod' => {type => 'markdown'}],
         'MojibakeTests',
         'Test::CheckDeps',
         'Test::Compile',
@@ -188,7 +188,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 =head1 VERSION
 
-version 1.162691
+version 1.172320
 
 =head1 OPTIONS
 
@@ -246,7 +246,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ioan Rogers.
+This software is Copyright (c) 2017 by Ioan Rogers.
 
 This is free software, licensed under:
 

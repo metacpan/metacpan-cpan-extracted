@@ -5,6 +5,11 @@ author:
   - 'Marc Bradshaw <marc@marcbradshaw.net>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  Net::DNS::Packet: 0
+  Net::DNS::Question: 0
+  Net::DNS::Resolver: 0
+  Net::DNS::Resolver::Mock: 0
+  Net::DNS::ZoneFile: 0
   Test::CheckManifest: 0
   Test::File::Contents: 0
   Test::More: 0
@@ -17,7 +22,7 @@ configure_requires:
   version: 0
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -57,4 +62,4 @@ resources:
   bugtracker: https://github.com/fastmail/authentication_milter/issues/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/fastmail/authentication_milter/
-version: '1.001001'
+version: '1.001002'

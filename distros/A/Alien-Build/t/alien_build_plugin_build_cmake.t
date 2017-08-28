@@ -75,6 +75,9 @@ subtest 'basic' => sub {
   }
   
   alien_ok $alien;
+
+  note 'cflags = ', $alien->cflags;
+  note 'libs   = ', $alien->libs;
   
   xs_ok { xs => do { local $/; <DATA> }, verbose => 1 }, with_subtest {
     my($mod) = @_;

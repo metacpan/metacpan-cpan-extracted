@@ -117,11 +117,12 @@ SUPPORT
     on your bug as I make changes.
 
 AUTHOR
-    Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
+    Yves Agostini - <yvesago@cpan.org>
 
-    <http://www.crium.univ-metz.fr>
 
 COPYRIGHT
+    Copyright 2008-2017 Yves Agostini - <yvesago@cpan.org>
+
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 

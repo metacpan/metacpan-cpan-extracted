@@ -1,7 +1,7 @@
 package Data::DPath::Point;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a single reference (a "point") in the datastructure
-$Data::DPath::Point::VERSION = '0.56';
+$Data::DPath::Point::VERSION = '0.57';
 use strict;
 use warnings;
 

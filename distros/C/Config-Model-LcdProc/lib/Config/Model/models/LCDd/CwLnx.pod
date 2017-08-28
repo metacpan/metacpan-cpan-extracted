@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::CwLnx
 # ABSTRACT:  Configuration class LCDd::CwLnx
+
 =encoding utf8
 
 =head1 NAME
@@ -16,32 +17,92 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Keypad
 
 If you have a keypad connected. Keypad layout is currently not
-configureable from the config file. I<< Optional. Type uniline. default: 'yes'.  >> 
+configureable from the config file. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+yes
+
+=back
+
+
 
 =head2 Model
 
-Select the LCD model I<< Optional. Type enum. choice: '12232', '12832', '1602'. upstream_default: '12232'.  >> 
+Select the LCD model I< Optional. Type enum. choice: '12232', '12832', '1602'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+12232
+
+=back
+
+
 
 =head2 Reboot
 
 Reinitialize the LCD's BIOS 
-normally you shouldn't need this. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+normally you shouldn't need this. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Size
 
 Select the LCD size. Default depends on model:
 12232: 20x4
 12832: 21x4
-1602: 16x2. I<< Optional. Type uniline. default: '20x4'.  >> 
+1602: 16x2. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+20x4
+
+=back
+
+
 
 =head2 Speed
 
-Set the communication speed I<< Optional. Type enum. choice: '9600', '19200'. upstream_default: '19200'.  >> 
+Set the communication speed I< Optional. Type enum. choice: '9600', '19200'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+19200
+
+=back
+
+
 
 =head2 keypad_test_mode
 
@@ -60,7 +121,17 @@ KeyMap_D=Right
 KeyMap_E=Enter
 KeyMap_F=Escape
 keypad_test_mode permits one to test keypad assignment
-Default value is no. I<< Optional. Type uniline. upstream_default: 'yes'.  >> 
+Default value is no. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head1 SEE ALSO
 

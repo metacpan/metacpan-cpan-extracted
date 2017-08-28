@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::SenderID;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use Sys::Syslog qw{:standard :macros};
 
@@ -129,7 +129,7 @@ __END__
 
 =head1 NAME
 
-  Authentication Milter - SenderID Module
+  Authentication-Milter - SenderID Module
 
 =head1 DESCRIPTION
 

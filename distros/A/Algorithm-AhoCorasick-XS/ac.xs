@@ -20,7 +20,7 @@ extern "C" {
 #undef do_open
 #undef do_close
 
-#include "ac.hpp"
+#include "Matcher.hpp"
 
 typedef AhoCorasick::Matcher AhoCorasick__Matcher;
 typedef AhoCorasick::match AhoCorasick__match;

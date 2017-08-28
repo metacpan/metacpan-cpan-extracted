@@ -1,15 +1,9 @@
-#!perl
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
+#!/usr/bin/env perl
 
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+# VERSION
 use Test::Most tests => 4;
 use English '-no_match_vars';
 use Path::Class;
@@ -31,11 +25,11 @@ isa_ok(
     'file list to copy',
 );
 cmp_bag(
-    [ $filelist->map_files( sub {"$ARG"} ) ],
-    [   map { unix_filestr_to_native("t/target/yui/mincat/$ARG") }
+    [ $filelist->map_files( sub {"$_"} ) ],
+    [   map { unix_filestr_to_native("t/target/yui/mincat/$_") }
             qw(css/min/site.css js/min/site.js),
     ],
     'names in file list',
 );
 
-sub unix_filestr_to_native { file( split q{/}, $ARG[0] )->stringify() }
+sub unix_filestr_to_native { file( split q{/}, $_[0] )->stringify() }

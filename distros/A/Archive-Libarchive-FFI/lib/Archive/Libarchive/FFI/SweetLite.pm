@@ -27,7 +27,7 @@ sub attach_function ($$$;$)
 {
   my($name, $arg_types, $rv_type, $wrapper ) = @_;
   my $pkg = caller;
-  $arg_types //= [];
+  $arg_types = [] unless defined $arg_types;
   my $install_name = $name;
   ( $name, $install_name ) = @{ $name } if ref $name;
   
@@ -74,7 +74,7 @@ Archive::Libarchive::FFI::SweetLite
 
 =head1 VERSION
 
-version 0.0900
+version 0.0901
 
 =head1 AUTHOR
 

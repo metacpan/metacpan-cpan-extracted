@@ -1,5 +1,15 @@
 Revision history for Net::SSH::Perl
 
+2.14 2017.07.03
+    - DSA key bugfix: verify would fail if r had unnecessary leading zeros
+
+2.13 2017.06.30
+    - Bug Fix: AES-CBC IV length needs to be blocksize, not keysize
+    - Bug Fix: DES3 init needs to pass key as variable to avoid scalar error
+    - Bug Fix: Packet padlen decode was using signed 8-bit unpack (should be unsigned)
+    - Fix CBC inefficiency
+    - Fix Key not being loaded prior to Agent use [ https://github.com/lkinley/Net-SSH-Perl/issues/10 ]
+
 2.12 2017.04.22
     - Fix inefficiency in CTR, revealed by profiling with Devel::NYTProf
     - Avoid warnings in Host from strange/invalid known_host entries

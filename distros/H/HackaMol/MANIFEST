@@ -56,6 +56,7 @@ examples/group_rot.pl
 examples/hackamol_synopsis.pl
 examples/store.pl
 examples/store_mol.pl
+examples/superpose/superpose_nmr.pl
 lib/HackaMol.pm
 lib/HackaMol/Angle.pm
 lib/HackaMol/Atom.pm

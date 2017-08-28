@@ -5,7 +5,7 @@ use warnings;
 use AI::XGBoost::Booster;
 use Exporter::Easy ( OK => ['train'] );
 
-our $VERSION = '0.008';    # VERSION
+our $VERSION = '0.11';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>
 
@@ -39,7 +39,7 @@ AI::XGBoost - Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost
 
 =head1 VERSION
 
-version 0.008
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -91,6 +91,23 @@ version 0.008
  # Split train and test, label and features
  my $train_dataset = [map {$iris->{$_}} grep {$_ ne 'species'} keys %$iris];
  my $test_dataset = [map {$iris->{$_}} grep {$_ ne 'species'} keys %$iris];
+ 
+ sub transpose {
+ # Transposing without using PDL, Data::Table, Data::Frame or other modules
+ # to keep minimal dependencies
+     my $array = shift;
+     my @aux = ();
+     for my $row (@$array) {
+         for my $column (0 .. scalar @$row - 1) {
+             push @{$aux[$column]}, $row->[$column];
+         }
+     }
+     return \@aux;
+ }
+ 
+ $train_dataset = transpose($train_dataset);
+ $test_dataset = transpose($test_dataset);
+ 
  my $train_label = [map {$class{$_}} @{$iris->{'species'}}];
  my $test_label = [map {$class{$_}} @{$iris->{'species'}}];
  
@@ -120,9 +137,8 @@ you need the data to be used contained in a C<DMatrix> object
 This is a work in progress, feedback, comments, issues, suggestion and
 pull requests are welcome!!
 
-Currently this module need the xgboost binary available in your system. 
-I'm going to make an Alien module for xgboost but meanwhile you need to
-compile yourself xgboost: L<https://github.com/dmlc/xgboost>
+XGBoost library is used via L<Alien::XGBoost>. That means downloading,
+compiling and installing if it's not available in your system.
 
 =head1 FUNCTIONS
 
@@ -160,16 +176,16 @@ The goal is to make a full wrapper for XGBoost.
 
 =over 4
 
-=item 0.1 
-
-Full raw C API available as L<AI::XGBoost::CAPI::RAW>
-
 =item 0.2 
 
 Full C API "easy" to use, with PDL support as L<AI::XGBoost::CAPI>
 
 Easy means clients don't have to use L<FFI::Platypus> or modules dealing
 with C structures
+
+=item 0.25
+
+Alien package for libxgboost.so/xgboost.dll
 
 =item 0.3
 
@@ -203,11 +219,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
-
-This is free software, licensed under:
-
-  The Apache License, Version 2.0, January 2004
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 =head1 CONTRIBUTOR
 

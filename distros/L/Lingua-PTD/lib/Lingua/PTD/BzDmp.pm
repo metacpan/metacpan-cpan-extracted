@@ -1,5 +1,5 @@
 package Lingua::PTD::BzDmp;
-$Lingua::PTD::BzDmp::VERSION = '1.15';
+$Lingua::PTD::BzDmp::VERSION = '1.16';
 use warnings;
 use strict;
 

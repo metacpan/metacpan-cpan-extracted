@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Template::Resolver;
-$Template::Resolver::VERSION = '1.13';
+$Template::Resolver::VERSION = '1.14';
 # ABSTRACT: A powerful, and simple, library for resolving placeholders in templated files
 # PODNAME: Template::Resolver
 
@@ -75,6 +75,78 @@ sub _init {
     return $self;
 }
 
+sub _resolve_loop {
+    my ( $self, $template_key, $loop_name, $property_name, $content ) = @_;
+    my $property_value = $self->_get_value($property_name);
+    my $result         = '';
+    my $ref            = ref($property_value);
+    my ( $replacer, $key_match, @keys );
+
+    if ( $ref && $ref eq 'HASH' ) {
+        $replacer  = sub { return $_[1] ? $_[0] : "${property_name}.${_[0]}" };
+        $key_match = "key";
+        @keys      = sort( keys(%$property_value) );
+    }
+    elsif ( $ref && $ref eq 'ARRAY' ) {
+        $replacer  = sub { return $_[1] ? $_[0] : "${property_name}[${_[0]}]" };
+        $key_match = "ix";
+        @keys      = keys(@$property_value);
+    }
+    elsif ($ref) {
+        croak("'$property_name': cannot loop on unsupported ref type '$ref'");
+    }
+    else {
+        croak("'$property_name': does not exist");
+    }
+
+    my $resolve_template = sub {
+        my ( $text, $key ) = @_;
+        if ( $text eq "\$\{\Q$template_key\E<\Q$loop_name\E\.\Q$key_match\E\}\}" ) {
+            $text = $key;
+        }
+        else {
+            $text =~ s/<\Q$loop_name\E(\.\Q$key_match\E)?>/$replacer->($key,$1)/egs;
+        }
+        return $text;
+    };
+
+    foreach my $key (@keys) {
+        my $line = $content;
+        $line =~ s/\$\{$template_key<\Q$loop_name\E\.\Q$key_match\E>\}/$key/egs;
+        $line =~ s/(\$\{$template_key.*?\}\})/$resolve_template->($1, $key)/egs;
+        $result = $result . $line;
+    }
+
+    return $result;
+}
+
+sub _resolve_loops {
+    my ( $self, $key, $content ) = @_;
+    my $done = 0;
+    while ( !$done ) {
+        my $converted = $content
+            =~ s/\$\{$key<(\S+)>:\{(.*?)\}\}(.*?)\$\{$key<\1>:end\}/$self->_resolve_loop($key,$1,$2,$3)/egs;
+        $done = ( $converted == 0 );
+    }
+    return $content;
+}
+
+sub _get_value {
+    my ( $self, $key ) = @_;
+    my $val = $self->{entity};
+    for my $token ( split( /\./, $key ) ) {
+        my ( $name, $indices ) = $token =~ /^(\w+)?((?:\[\d+\])*)$/;
+        croak("Invalid entity: '$key'") if ( !$name && !$indices );
+        $val = $val->{$name} if ($name);
+        if ($indices) {
+            for my $index ( split( /\]\[/, substr( $indices, 1, length($indices) - 2 ) ) ) {
+                $val = $val->[$index];
+            }
+        }
+    }
+    return $val;
+}
+
 sub resolve {
     my ( $self, %options ) = @_;
 
@@ -93,7 +165,7 @@ sub resolve {
     else {
         croak('Must provide one of [content, handle, filename]');
     }
-
+    $content = $self->_resolve_loops( $key, $content );
     $content =~ s/\$\{$key(?:_(.*?))?\{(.*?)\}\}/$self->_get_property($2,$1)/egs;
     return $content;
 }
@@ -110,7 +182,7 @@ Template::Resolver - A powerful, and simple, library for resolving placeholders 
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 SYNOPSIS
 
@@ -121,7 +193,30 @@ version 1.13
 =head1 DESCRIPTION
 
 This module provides a powerful way to resolve placeholders inside of a templated file.
-It uses L<Template::Transformer> to interpolate the the placeholder values.
+It uses L<Template::Transformer> to interpolate the the placeholder values. The
+provided template may refer to entity values directly (i.e.
+C<${TEMPLATE{my.entity.value}}>) or through transformations (i.e.
+C<${TEMPLATE_perl{property("my.truthy") ? "true" : "false"}}>).
+You may also loop over hash and array entities like this (newlines and indentation
+included for clarity):
+
+  ${TEMPLATE<CLUB>:{my.clubs}}$
+      {TEMPLATE<MEMBER>:{<CLUB>.members}}
+          ${TEMPLATE{<MEMBER>.name}} is a member of the ${TEMPLATE{<CLUB>.club_name}} club.
+      ${TEMPLATE<MEMBER>:end}
+  ${TEMPATE<CLUB>:end}
+
+You may access the key when iterating over hashes:
+
+  ${TEMPLATE<RESOURCE>:{my.resources}}
+      Resource, ${TEMPLATE:<RESOURCE.key>} is ${TEMPLATE{<RESOURCE>.deployed_artifact}}
+  ${TEMPLATE<RESOURCE>:end}
+
+You may also access the index when iterating over arrays:
+
+  ${TEMPLATE<CLUB>:{my.clubs}}
+      Club at index ${TEMPLATE<CLUB.ix>} is ${TEMPLATE{<CLUB.name>}}
+  ${TEMPLATE<CLUB>:end}
 
 =head1 CONSTRUCTORS
 

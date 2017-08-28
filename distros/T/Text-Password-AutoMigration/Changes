@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.07 2017-08-21T13:20:05Z
+  - added the describe for SQL setting on POD
+
 0.06 2017-08-09T13:49:20Z
  - made verify() to return regenerated hash or undef
  - fixed the English in PODs

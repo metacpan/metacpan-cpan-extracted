@@ -1,9 +1,36 @@
-2002-05-03	Tony Monroe <tmonroe+perl@nog.net>	(0.2)
+Revision history for Perl module Net::IPv6Addr
+
+0.7 2017-08-26      Ben Bullock <bkb@cpan.org>
+
+	* Documentation rewrite
+
+0.6 2017-08-25      Ben Bullock <bkb@cpan.org>
+
+	* Changed format of ChangeLog to follow CPAN::Changes::Spec,
+	  which means it will be displayed nicely by MetaCPAN.
+
+0.5 2017-08-24      Ben Bullock <bkb@cpan.org>
+
+	* Add licence information to POD documentation
+
+0.4 2017-08-24      Ben Bullock <bkb@cpan.org>
+
+	* Add contributors and licence information
+	* Add documentation
+	* Remove RFCs from distro
+
+0.3 2017-08-24      Ben Bullock <bkb@cpan.org>
+
+	* Add meta files to distribution
+	* in_network altered
+	* Documentation updates
+
+0.2 2002-08-06	Tony Monroe <tmonroe+perl@nog.net>
 
 	* Many patches from Jyrki Soini <jyrki.soini@sonera.com>,
 	  fixing bugs and adding features!
 
-2001-07-20	Tony Monroe <tmonroe+perl@nog.net>	(0.1)
+0.1 2001-07-21	Tony Monroe <tmonroe+perl@nog.net>
 
 	* Based on Net::IPv4Addr version 0.10.
 		Author: Francis J. Lacoste <francis.lacoste@iNsu.COM>
@@ -13,3 +40,4 @@
 	* Takes any input or output format described by RFC1884 or RFC1924.
 
 	* Automatically generates those pesky IP6.INT. strings (RFC1886).
+

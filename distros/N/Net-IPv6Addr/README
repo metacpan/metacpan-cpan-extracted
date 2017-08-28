@@ -1,5 +1,5 @@
 =========================
-Net::IPv6Addr Version 0.1
+Net::IPv6Addr Version 0.3
 =========================
 
 Net::IPv6Addr provides functions for parsing IPv6 addresses in all
@@ -18,9 +18,6 @@ The usual installation instructions apply:
     make install
 
 Documentation is included in pod format.
-
-Please send bug reports and suggestions to the author at
-<tmonroe plus perl at nog dot net>.
 
 ---------------------
 Copyright and License

@@ -100,6 +100,7 @@ my $query = $app->db->query->select(
     fields => {
         id        => '',
         new_name  => 'field',
+        undefined => \undef,
         val5      => \5,
         t1value   => {value => $app->db->qtable1},
         ml_field  => '',
@@ -111,7 +112,7 @@ my $query = $app->db->query->select(
         ml_expr  => ['/' => ['ml_field', {id => 't1'}, ['*' => ['value',    \5]]]],
         ml_expr2 => ['/' => ['field',    {id => 't1'}, ['*' => ['ml_field', \5]]]],
         cmp1    => [field    => '='  => \7],
-        cmp2    => [field    => '='  => undef],
+        cmp2    => [field    => '='  => \undef],
         cmp3    => [field    => '<>' => \7],
         cmp4    => [field    => '='  => \[1, 2, 3, 4]],
         ml_cmp1 => [ml_field => '='  => \5],
@@ -158,6 +159,7 @@ eq_or_diff(
     "t1"."field" AS "new_name",
     "qt2"."field" AS "q2value",
     "t1"."value" AS "t1value",
+    NULL AS "undefined",
     '5' AS "val5"
 FROM "qtable1" AS "t1"
 LEFT JOIN "qtable2" AS "qt2" ON (
@@ -221,6 +223,7 @@ eq_or_diff(
     "t1"."field" AS "new_name",
     "qt2"."field" AS "q2value",
     "t1"."value" AS "t1value",
+    NULL AS "undefined",
     '5' AS "val5"
 FROM "qtable1" AS "t1"
 LEFT JOIN "qtable2" AS "qt2" ON (

@@ -12,7 +12,7 @@ WriteMakefile(
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'bsd')
       : ()),
-    PREREQ_PM           => { 
+    PREREQ_PM           => {
                            'DBD::Pg'    => 2.0,
                            'Test::More' => 0,
                            'Try::Tiny' => 0,

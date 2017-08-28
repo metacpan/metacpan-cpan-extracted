@@ -1,0 +1,23 @@
+#!# perl: agent/argv/check
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use MYDan::Util::OptConf;
+
+our %o; BEGIN{ %o = MYDan::Util::OptConf->load()->dump('project'); };
+
+return sub
+{
+    local $/;
+
+    my @c;
+    for my $name ( @_ )
+    {
+        my $c = eval{ YAML::XS::LoadFile "$o{check}/$name" };
+        die "load $o{check}/$name fail:$@" if $@;
+        push @c, @$c;
+    }
+    return \@c;
+};

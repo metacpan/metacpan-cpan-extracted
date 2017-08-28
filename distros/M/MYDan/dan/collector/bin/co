@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+use MYDan::Collector::Show;
+use Data::Dumper;
+
+
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'collector';
+
+=head1 SYNOPSIS
+
+ check out data from logs
+
+ $0                        show last logs 
+
+ $0 [DF|MEM|CPU ... ]      show all logs about [DF|MEM|CPU ... ] 
+    
+ $0 --sock                 show cache via sock 
+
+=cut
+
+my %o = MYDan::Util::OptConf->load()->get( qw( sock ring name=s ) )->dump();
+
+MYDan::Collector::Show->new( %o )->show( @ARGV );

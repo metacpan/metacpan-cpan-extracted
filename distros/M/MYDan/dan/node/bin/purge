@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+use FindBin qw( $Bin );
+
+use MYDan::Node;
+use MYDan::Node::DBI::Root;
+use MYDan::Util::OptConf;
+use MYDan::Util::Sudo;
+
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'node';
+
+=head1 SYNOPSIS
+
+Delete node databases entries
+
+ $0 --cluster clusters --table table [--key nodes] [--value values]
+
+=cut
+my $option = MYDan::Util::OptConf->load( base => $Bin );
+my %o = $option->get( qw( cluster=s table=s key=s value=s ) )->dump();
+
+$option->assert(qw( cluster table key value ));
+
+my %range = $option->dump( 'range' );
+my $range = MYDan::Node->new( %range );
+my ( $drop, %query ) = 1;
+
+for my $index ( qw( key value ) )
+{
+    next unless defined $o{$index};
+    $drop = 0;
+
+    next unless my @list = $range->load( $o{$index} )->list();
+    $query{$index} = [ 1 => @list ];
+}
+
+for my $cluster ( $range->load( $o{cluster} || [] )->list() )
+{
+    unless( $o{table} )
+    {
+        unlink File::Spec->join( $o{root}, $cluster );
+        next;
+    }
+
+    my $db = MYDan::Node::DBI::Root->new( File::Spec->join( $o{root}, $cluster ) );
+
+    for my $table ( $range->load( $o{table} || [] )->list() )
+    {
+        if ( %query ) { $db->delete( $table, %query ) }
+        elsif ( $drop ) { $db->drop( $table ) }
+    }
+}
+
+exit 0;

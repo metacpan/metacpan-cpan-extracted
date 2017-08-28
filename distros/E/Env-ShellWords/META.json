@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,8 +45,7 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0.000060",
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "perl" : "5.006"
          }
       }
@@ -63,7 +62,7 @@
          "web" : "https://github.com/plicease/Env-ShellWords"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

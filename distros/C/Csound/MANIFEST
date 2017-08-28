@@ -1,0 +1,28 @@
+Changes
+Csound-0.01.tar.gz
+ignore.txt
+lib/Csound.pm
+lib/Csound/Composition.pm
+lib/Csound/Instrument.pm
+lib/Csound/Orchestra.pm
+lib/Csound/Score.pm
+lib/Csound/ScoreStatement.pm
+lib/Csound/ScoreStatement/f.pm
+lib/Csound/ScoreStatement/i.pm
+lib/Csound/ScoreStatement/t.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/001-load.t
+t/002-Csound.t
+t/002-expected.orc
+t/002-Orchestra.t
+t/003-ScoreStatement-f.t
+t/003-ScoreStatement-i.t
+t/004-Instrument.t
+t/005-Composition-expected.orc
+t/005-Composition-expected.sco
+t/005-Composition.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

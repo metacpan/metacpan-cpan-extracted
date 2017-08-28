@@ -1,5 +1,8 @@
 Revision history for Alien-Build-MB
 
+0.04      2017-08-23 17:01:53 -0400
+  - set x_alienfile meta unless alien_alienfile_meta is false
+
 0.03      2017-07-12 16:45:46 -0400
   - Set perl_module_version runtime property
 

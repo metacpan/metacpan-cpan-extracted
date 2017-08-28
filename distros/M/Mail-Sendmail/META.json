@@ -1,0 +1,50 @@
+{
+   "abstract" : "Simple platform independent mailer",
+   "author" : [
+      "Milivoj Ivkovic <mivkovic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mail-Sendmail",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "MIME::Base64" : "0",
+            "Socket" : "0",
+            "Sys::Hostname" : "0",
+            "Time::Local" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Mail-Sendmail",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Mail-Sendmail.git",
+         "web" : "https://github.com/neilb/Mail-Sendmail"
+      }
+   },
+   "version" : "0.80",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -12,6 +12,7 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
   Shell::Guess
+  Test2::API
   Test::More
 );
 

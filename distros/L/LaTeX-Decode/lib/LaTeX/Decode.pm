@@ -13,12 +13,12 @@ LaTeX::Decode - Decode from LaTeX to Unicode
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
 use base qw(Exporter);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT  = qw(latex_decode);
 use LaTeX::Decode::Data;
 use Unicode::Normalize;
@@ -128,14 +128,14 @@ sub latex_decode {
 
     if ( $scheme eq 'full' ) {
         $text =~ s/\\not\\($NEG_SYMB_RE)/$NEGATEDSYMBOLS{$1}/ge;
-        $text =~ s/\\textsuperscript{($SUPER_RE)}/$SUPERSCRIPTS{$1}/ge;
-        $text =~ s/\\textsuperscript{\\($SUPERCMD_RE)}/$CMDSUPERSCRIPTS{$1}/ge;
-        $text =~ s/\\dings{([2-9AF][0-9A-F])}/$DINGS{$1}/ge;
+        $text =~ s/\\textsuperscript\{($SUPER_RE)\}/$SUPERSCRIPTS{$1}/ge;
+        $text =~ s/\\textsuperscript\{\\($SUPERCMD_RE)\}/$CMDSUPERSCRIPTS{$1}/ge;
+        $text =~ s/\\dings\{([2-9AF][0-9A-F])\}/$DINGS{$1}/ge;
     }
 
     $text =~ s/(\\[a-zA-Z]+)\\(\s+)/$1\{\}$2/g;    # \foo\ bar -> \foo{} bar
     $text =~ s/([^{]\\\w)([;,.:%])/$1\{\}$2/g;     #} Aaaa\o, -> Aaaa\o{},
-    $text =~ s/(\\(?:$DIAC_RE_BASE|$ACCENTS_RE)){\\i}/$1\{i\}/g;
+    $text =~ s/(\\(?:$DIAC_RE_BASE|$ACCENTS_RE))\{\\i\}/$1\{i\}/g;
            # special cases such as '\={\i}' -> '\={i}' -> "i\x{304}"
 
     ## remove {} around macros that print one character

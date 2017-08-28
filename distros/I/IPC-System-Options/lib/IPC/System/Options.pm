@@ -1,7 +1,7 @@
 package IPC::System::Options;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.32'; # VERSION
+our $DATE = '2017-08-10'; # DATE
+our $VERSION = '0.330'; # VERSION
 
 use strict;
 use warnings;
@@ -59,6 +59,7 @@ sub _system_or_readpipe_or_run {
         die "Unknown option '$_'"
             unless /\A(
                         capture_stdout|capture_stderr|capture_merged|
+                        tee_stdout|tee_stderr|tee_merged|
                         chdir|dies?|dry_run|env|lang|log||max_log_output|shell|
                         stdin # XXX: only for run()
                     )\z/x;
@@ -135,6 +136,23 @@ sub _system_or_readpipe_or_run {
             require Capture::Tiny;
             ${ $opts->{capture_stderr} } =
                 &Capture::Tiny::capture_stderr($doit);
+
+        } elsif ($opts->{tee_stdout} && $opts->{tee_stderr}) {
+            require Capture::Tiny;
+            (${ $opts->{tee_stdout} }, ${ $opts->{tee_stderr} }) =
+                &Capture::Tiny::tee($doit);
+        } elsif ($opts->{tee_merged}) {
+            require Capture::Tiny;
+            ${ $opts->{tee_merged} } =
+                &Capture::Tiny::tee_merged($doit);
+        } elsif ($opts->{tee_stdout}) {
+            require Capture::Tiny;
+            ${ $opts->{tee_stdout} } =
+                &Capture::Tiny::tee_stdout($doit);
+        } elsif ($opts->{tee_stderr}) {
+            require Capture::Tiny;
+            ${ $opts->{tee_stderr} } =
+                &Capture::Tiny::tee_stderr($doit);
         } else {
             $doit->();
         }
@@ -379,7 +397,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.32 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2017-07-10.
+This document describes version 0.330 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2017-08-10.
 
 =head1 SYNOPSIS
 
@@ -474,14 +492,39 @@ If set to true, will die on failure.
 
 Capture stdout using L<Capture::Tiny>.
 
+Cannot be used together with C<tee_*> or C<capture_merged>.
+
 =item * capture_stderr => scalarref
 
 Capture stderr using L<Capture::Tiny>.
+
+Cannot be used together with C<tee_*> or C<capture_merged>.
 
 =item * capture_merged => scalarref
 
 Capture stdout and stderr in a single variable using L<Capture::Tiny>'s
 C<capture_merged>.
+
+Cannot be used together with C<tee_*>, C<capture_stdout>, or C<capture_stderr>.
+
+=item * tee_stdout => scalarref
+
+Tee stdout using L<Capture::Tiny>.
+
+Cannot be used together with C<capture_*> or C<tee_merged>.
+
+=item * tee_stderr => scalarref
+
+Capture stderr using L<Capture::Tiny>.
+
+Cannot be used together with C<capture_*> or C<tee_merged>.
+
+=item * tee_merged => scalarref
+
+Capture stdout and stderr in a single variable using L<Capture::Tiny>'s
+C<capture_merged>.
+
+Cannot be used together with C<capture_*>, C<tee_stdout>, or C<tee_stderr>.
 
 =item * chdir => str
 
@@ -562,6 +605,18 @@ See option documentation in C<system()>.
 
 See option documentation in C<system()>.
 
+=item * tee_stdout => scalarref
+
+See option documentation in C<system()>.
+
+=item * tee_stderr => scalarref
+
+See option documentation in C<system()>.
+
+=item * tee_merged => scalarref
+
+See option documentation in C<system()>.
+
 =item * max_log_output => int
 
 If set, will limit result length being logged. It's a good idea to set this
@@ -608,6 +663,18 @@ See option documentation in C<system()>.
 See option documentation in C<system()>.
 
 =item * capture_merged => scalarref
+
+See option documentation in C<system()>.
+
+=item * tee_stdout => scalarref
+
+See option documentation in C<system()>.
+
+=item * tee_stderr => scalarref
+
+See option documentation in C<system()>.
+
+=item * tee_merged => scalarref
 
 See option documentation in C<system()>.
 

@@ -13,10 +13,10 @@ use PGObject::Type::Registry;
 use Test::Exception;
 
 lives_ok {PGObject::Type::Registry->register_type(
-        registry => 'default', dbtype => 'foo', apptype => 'PGObject') },
+        registry => 'default', dbtype => 'foo', apptype => 'Serializer') },
         "Basic type registration";
 lives_ok {PGObject::Type::Registry->register_type(
-        registry => 'default', dbtype => 'foo', apptype => 'PGObject') },
+        registry => 'default', dbtype => 'foo', apptype => 'Serializer') },
         "Repeat type registration";
 
 throws_ok { PGObject::Type::Registry->register_type(

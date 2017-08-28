@@ -3,20 +3,6 @@ package Pcore::HTTP::Headers;
 use Pcore -class;
 extends qw[Pcore::Util::Hash::Multivalue];
 
-sub to_psgi ($self) {
-    my $hash = $self->get_hash;
-
-    my $headers = [];
-
-    for ( keys $hash->%* ) {
-        my $header = ( ucfirst lc ) =~ s/_([[:alpha:]])/q[-] . uc $1/smger;
-
-        push $headers->@*, map { ( $header, $_ ) } $hash->{$_}->@*;
-    }
-
-    return $headers;
-}
-
 sub to_string ($self) {
     my $hash = $self->get_hash;
 

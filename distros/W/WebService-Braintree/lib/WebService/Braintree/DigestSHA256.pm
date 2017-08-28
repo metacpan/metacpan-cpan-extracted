@@ -1,5 +1,5 @@
 package WebService::Braintree::DigestSHA256;
-$WebService::Braintree::DigestSHA256::VERSION = '0.92';
+$WebService::Braintree::DigestSHA256::VERSION = '0.93';
 
 use strict;
 use Digest;

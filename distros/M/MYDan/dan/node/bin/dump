@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use FindBin qw( $Bin );
+
+use MYDan::Node;
+use MYDan::Node::DBI::Root;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'node';
+
+=head1 SYNOPSIS
+
+Dump node databases to YAML
+
+ $0 [clusters] [--output output-file] [--compress] [--list]
+
+=cut
+my $option = MYDan::Util::OptConf->load( base => $Bin );
+my %o = $option->get( qw( list compress output=s ) )->dump();
+my $range = MYDan::Node->new( $option->dump( 'range' ) );
+
+my ( $root, @data, %data, @empty ) = delete $o{root};
+
+die "cannot chdir $root" unless chdir $root;
+
+for my $cluster ( @ARGV ? map { $range->load( $_ )->list } @ARGV : glob '*' )
+{
+    my $db = File::Spec->join( $root, $cluster );
+    my %datum;
+
+    $db = -f $db ? MYDan::Node::DBI::Root->new( $db ) : next;
+
+    for my $table ( $db->table() )
+    {
+        my ( @record, %record ) = $db->dump( $table );
+
+        if ( $o{compress} )
+        {
+            map { push @{ $record{ $_->[1] } },  $_->[0] } @record;
+
+            for my $val ( keys %record )
+            {
+                my $key = $range->load( $record{$val} )->dump;
+                $datum{$cluster}{$table}{$key} = $val;
+            }
+        }
+        else
+        {
+            map { $datum{$cluster}{$table}{ $_->[0] } = $_->[1] } @record;
+        }
+    }
+
+    unless ( %datum ) { push @empty, $cluster }
+    elsif ( $o{list} ) { push @data, \%datum }
+    else { $data{$cluster} = $datum{$cluster} }
+}
+
+YAML::XS::DumpFile( $o{output} || \*STDOUT, $o{list} ? @data : \%data );
+
+warn sprintf "\nEmpty clusters ( possibly cruft ):\n\n%s\n\n",
+    $range->load( \@empty )->dump() if @empty;
+
+exit 0;

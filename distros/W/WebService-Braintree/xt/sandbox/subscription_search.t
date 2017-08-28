@@ -29,8 +29,8 @@ subtest "id (equality)" => sub {
                                                                     });
   TODO: {
         todo_skip "Tests consistently fail in sandbox environment", 2;
-        ok contains($subscription1->id, $search_result->ids);
-        not_ok contains($subscription2->id, $search_result->ids);
+        ok grep { $_ eq $subscription1->id } @{$search_result->ids};
+        not_ok grep { $_ eq $subscription2->id } @{$search_result->ids};
     }
     ;
 };
@@ -59,8 +59,8 @@ subtest "price (range)" => sub {
 
   TODO: {
         todo_skip "Tests consistently fail in sandbox environment", 2;
-        ok contains($subscription1->id, $search_result->ids);
-        not_ok contains($subscription2->id, $search_result->ids);
+        ok grep { $_ eq $subscription1->id } @{search_result->ids};
+        not_ok grep { $_ eq $subscription2->id } @{search_result->ids};
     }
     ;
 };
@@ -89,8 +89,8 @@ subtest "price (is)"  => sub {
 
   TODO: {
         todo_skip "Tests consistently fail in sandbox environment", 2;
-        ok contains($subscription1->id, $search_result->ids);
-        not_ok contains($subscription2->id, $search_result->ids);
+        ok grep { $_ eq $subscription1->id } @{search_result->ids};
+        not_ok grep { $_ eq $subscription2->id } @{search_result->ids};
     }
     ;
 };
@@ -120,8 +120,8 @@ subtest "status (multiple value)" => sub {
                                                                             $search->status->is("Active");
                                                                         });
 
-        ok contains($subscription_active->id, $search_result->ids);
-        not_ok contains($subscription_past_due->id, $search_result->ids);
+        ok grep { $_ eq $subscription_active->id } @{search_result->ids};
+        not_ok grep { $_ eq $subscription_past_due->id } @{search_result->ids};
     }
     ;
 };

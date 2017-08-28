@@ -8,7 +8,7 @@ the model and do the right thing (known as the 303 dance) and mint
 URLs for that, as well as content negotiation. Thus, you can
 concentrate on URIs for your things, you need not be concerned about
 minting URLs for the pages to serve it. In addition, optional modules
-can provide other important functionalities: Cross-origin resource
+can provide other important functionality: Cross-origin resource
 sharing, VoID description, cache headers, SPARQL Endpoint, Triple
 Pattern Fragments, etc. As such, it encompasses a fair share of
 Semantic Web best practices, but possibly not in a very flexible Big
@@ -156,6 +156,11 @@ To set this up under Apache, put this in the host configuration:
     SetHandler default-handler
   </Location>
 
+Note that in some environments, for example if the Plack server that
+is dynamically configured, and/or behind a proxy server, the server
+may fail to bind to the address you give it as hostname. In this case,
+it is wise to allow the server to bind to any public IP address,
+i.e. set the host name to 0.0.0.0.
 
 
 
@@ -185,7 +190,7 @@ COPYRIGHT & LICENSE
 
     Copyright 2010 ABC Startsiden AS
 
-    Copyright 2010, 2011, 2012, 2013, 2014 Kjetil Kjernsmo
+    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

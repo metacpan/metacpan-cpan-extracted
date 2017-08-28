@@ -6,7 +6,7 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/Mojo/IOLoop/ReadWriteFork.pm',
   VERSION_FROM => 'lib/Mojo/IOLoop/ReadWriteFork.pm',
-  EXE_FILES => [qw(  )],
+  EXE_FILES => [qw()],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/mojo-ioloop-readwritefork/issues',
@@ -20,7 +20,7 @@ WriteMakefile(
 ,
   PREREQ_PM => {
   'IO::Pty' => '1.10',
-  'Mojolicious' => '4.30'
+  'Mojolicious' => '7.20'
 }
 ,
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},

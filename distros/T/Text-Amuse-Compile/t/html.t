@@ -87,7 +87,7 @@ sub test_file {
             unlike($body, qr{font-size:.*pt}, "Font side not set");
             like($body, qr/font-family:.*serif;/, "Found the serif font family");
             unlike($body, qr/\@page/, "\@page not found");
-            unlike($body, qr/text-align: justify/, "No justify found in the body");
+            like($body, qr/text-align: justify/, "No justify found in the body");
         }
         if (ref($file)) {
             my $index = 0;

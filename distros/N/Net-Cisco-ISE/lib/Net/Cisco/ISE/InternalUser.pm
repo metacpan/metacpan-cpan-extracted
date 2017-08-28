@@ -5,7 +5,7 @@ use Moose;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %actions);
-    $VERSION     = '0.02';
+    $VERSION     = '0.05';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -13,7 +13,7 @@ BEGIN {
 };
 
     %actions = (	"query" => "/ers/config/internaluser/",
-			"create" => "/ers/config/internaluser/",
+        			"create" => "/ers/config/internaluser/",
                		"update" => "/ers/config/internaluser/",
                 	"getById" => "/ers/config/internaluser/",
            ); 
@@ -27,32 +27,33 @@ has 'email' => (
 
 has 'firstName' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 );
 
 has 'lastName' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 );
 
 has 'id' => (
       is  => 'rw',
-      isa => 'Str',
+      isa => 'Any',
   );
 
 has 'identityGroups' => ( 
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 has 'name' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 has 'changePassword' => ( 
 	is => 'ro',
-	isa => 'Str',
+	isa => 'Maybe[Str]',
+    default => "",
 	);
 
 #has 'customAttributes' => ( 
@@ -63,32 +64,32 @@ has 'changePassword' => (
 
 has 'expiryDateEnabled' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 has 'expiryDate' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 );
 
 has 'enablePassword' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 has 'enabled' => (
 	is => 'rw', 
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 has 'password' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 has 'passwordIDStore' => (
 	is => 'rw',
-	isa => 'Str',
+	isa => 'Any',
 	);
 
 # No Moose	
@@ -127,7 +128,7 @@ sub toXML
   <lastName>$lastname</lastName>
   <password>$password</password> 
 XML
-
+warn $result;
 return $result;
 }
 

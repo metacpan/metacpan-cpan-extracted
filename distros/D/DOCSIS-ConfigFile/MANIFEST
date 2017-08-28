@@ -43,12 +43,14 @@ t/deprecated-rt70882.t
 t/deprecated-rt83013.t
 t/docsis-configfile.t
 t/encode.t
+t/longdschannellist.t
 t/mta.t
 t/real.t
 t/rt70882.t
 t/rt83013.t
 t/rt87812.t
 t/symtree.t
+t/tlv-202.t
 t/tos.t
 t/tr069.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

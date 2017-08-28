@@ -3,6 +3,7 @@ Changes
 Dockerfile.test
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README

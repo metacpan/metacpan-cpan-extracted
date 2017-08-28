@@ -1,0 +1,47 @@
+#!# perl: deploy/code/m.mcmd
+use strict;
+use File::Spec;
+use Sys::Hostname;
+
+use Data::Dumper;
+use MYDan::Agent::Client;
+use MYDan::Node;
+use MYDan::Util::MIO::CMD;
+
+my $conf;
+BEGIN{
+    $conf = MYDan::Util::OptConf->load()->dump('agent')->{conf};
+};
+
+return sub
+{
+    my %param = @_;
+
+    my ( $batch, $param ) = @param{qw( batch param )};
+    
+    return unless my $bin = $param->{bin};
+    $bin = [ $bin ] unless ref $bin;
+
+    my $range = MYDan::Node->new();
+
+    print "=" x 30,"\n";
+
+    my %result = MYDan::Util::MIO::CMD->new( map { $_ => $bin } @$batch  )->run( %$param );
+    my ( %mesg, %succ );
+    while ( my ( $io, $mesg ) = each %result )
+    {
+        while ( my ( $mesg, $node ) = each %$mesg )
+        {
+            push @{ $mesg{$io} }, join ': ', $range->load( $node )->dump, $mesg;
+        }
+    }
+    for my $io ( sort keys %mesg )
+    {
+        print "\n---\n$io:\n";
+        map { print "  $_" } @{ $mesg{$io} };
+    }
+
+    %succ = map{ $_ => 1 }@{$result{status}{0}} if $result{status} && $result{status}{0};
+    print "=" x 30,"\n";
+    return map{ $_ => 1 }keys %succ;
+};

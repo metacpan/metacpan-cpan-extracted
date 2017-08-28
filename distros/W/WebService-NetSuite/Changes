@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::NetSuite.
 
+0.05 2017-08-24
+    - Removed passport authentication header in map_sso function.
+      Multiple authentication methods have been deprecated since NetSuite Release 2017.1 according to NetSuite support.
+
 0.04 2014-02-22
     - All 0.04 fixes by github/dbeusee
     - Fixed getSelectValue usage for correct 2013_2 usage.

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2016 by Dominique Dumont.
+# This software is Copyright (c) 2013-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -13,8 +13,8 @@
 
 Model information was extracted from /etc/LCDd.conf',
     'copyright' => [
-      '2011-2016, Dominique Dumont',
-      '1999-2013, William Ferrell and others'
+      '2011-2017, Dominique Dumont',
+      '1999-2017, William Ferrell and others'
     ],
     'element' => [
       'server',
@@ -175,6 +175,23 @@ Model information was extracted from /etc/LCDd.conf',
           ]
         }
       },
+      'Olimex_MOD_LCD1x9',
+      {
+        'config_class_name' => 'LCDd::Olimex_MOD_LCD1x9',
+        'level' => 'hidden',
+        'type' => 'warped_node',
+        'warp' => {
+          'follow' => {
+            'selected' => '- server Driver'
+          },
+          'rules' => [
+            '$selected.is_set(\'Olimex_MOD_LCD1x9\')',
+            {
+              'level' => 'normal'
+            }
+          ]
+        }
+      },
       'SureElec',
       {
         'config_class_name' => 'LCDd::SureElec',
@@ -237,6 +254,23 @@ Model information was extracted from /etc/LCDd.conf',
           },
           'rules' => [
             '$selected.is_set(\'ea65\')',
+            {
+              'level' => 'normal'
+            }
+          ]
+        }
+      },
+      'futaba',
+      {
+        'config_class_name' => 'LCDd::futaba',
+        'level' => 'hidden',
+        'type' => 'warped_node',
+        'warp' => {
+          'follow' => {
+            'selected' => '- server Driver'
+          },
+          'rules' => [
+            '$selected.is_set(\'futaba\')',
             {
               'level' => 'normal'
             }
@@ -458,6 +492,23 @@ Model information was extracted from /etc/LCDd.conf',
           },
           'rules' => [
             '$selected.is_set(\'lcterm\')',
+            {
+              'level' => 'normal'
+            }
+          ]
+        }
+      },
+      'linux_input',
+      {
+        'config_class_name' => 'LCDd::linux_input',
+        'level' => 'hidden',
+        'type' => 'warped_node',
+        'warp' => {
+          'follow' => {
+            'selected' => '- server Driver'
+          },
+          'rules' => [
+            '$selected.is_set(\'linux_input\')',
             {
               'level' => 'normal'
             }
@@ -871,6 +922,23 @@ Model information was extracted from /etc/LCDd.conf',
           },
           'rules' => [
             '$selected.is_set(\'xosd\')',
+            {
+              'level' => 'normal'
+            }
+          ]
+        }
+      },
+      'yard2LCD',
+      {
+        'config_class_name' => 'LCDd::yard2LCD',
+        'level' => 'hidden',
+        'type' => 'warped_node',
+        'warp' => {
+          'follow' => {
+            'selected' => '- server Driver'
+          },
+          'rules' => [
+            '$selected.is_set(\'yard2LCD\')',
             {
               'level' => 'normal'
             }

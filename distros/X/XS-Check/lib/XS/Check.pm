@@ -3,23 +3,18 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-require Exporter;
-# our @ISA = qw(Exporter);
-# our @EXPORT_OK = qw//;
-# our %EXPORT_TAGS = (
-#     all => \@EXPORT_OK,
-# );
-our $VERSION = '0.02';
-use C::Tokenize ':all';
+our $VERSION = '0.08';
+use C::Tokenize '0.14', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
 use Carp qw/croak carp cluck confess/;
 
-sub new
-{
-    my ($class, %options) = @_;
-    return bless {};
-}
+#  ____       _            _       
+# |  _ \ _ __(_)_   ____ _| |_ ___ 
+# | |_) | '__| \ \ / / _` | __/ _ \
+# |  __/| |  | |\ V / (_| | ||  __/
+# |_|   |_|  |_| \_/ \__,_|\__\___|
+#                                 
 
 sub get_line_number
 {
@@ -40,13 +35,18 @@ sub report
     my $file = $o->get_file ();
     my $line = $o->get_line_number ();
     confess "No message" unless $message;
-    warn "$file$line: $message";
+    if (my $r = $o->{reporter}) {
+	&$r (file => $file, line => $line, message => $message);
+    }
+    else {
+	warn "$file$line: $message.\n";
+    }
 }
 
 # Match a call to SvPV
 
 my $svpv_re = qr/
-		    ($word_re)
+		    ((?:$word_re(?:->|\.))*$word_re)
 		    \s*=[^;]*
 		    SvPV
 		    \s*\(\s*
@@ -72,10 +72,20 @@ sub check_svpv
 	    $o->report ("$lvar not a constant type");
 	}
 	if ($arg2_type && $arg2_type !~ /\bSTRLEN\b/) {
-	    $o->report ("$lvar is not a STRLEN variable");
+	    $o->report ("$arg2 is not a STRLEN variable ($arg2_type)");
 	}
     }
 }
+
+# Best equivalents.
+
+my %equiv = (
+    #  Newxc is for C++ programmers (cast malloc).
+    malloc => 'Newx/Newxc',
+    calloc => 'Newxz',
+    free => 'Safefree',
+    realloc => 'Renew',
+);
 
 # Look for malloc/calloc/realloc/free and suggest replacing them.
 
@@ -83,7 +93,25 @@ sub check_malloc
 {
     my ($o) = @_;
     while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\b/g) {
-	$o->report ("Change $1 to Newx/Newz/Safefree");
+	# Bad function
+	my $badfun = $1;
+	my $equiv = $equiv{$badfun};
+	if (! $equiv) {
+	    $o->report ("(BUG) No equiv for $badfun");
+	}
+	else {
+	    $o->report ("Change $badfun to $equiv");
+	}
+    }
+}
+
+# Look for a Perl_ prefix before functions.
+
+sub check_perl_prefix
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /\b(Perl_$word_re)\b/g) {
+	$o->report ("Remove the 'Perl_' prefix from $1");
     }
 }
 
@@ -103,6 +131,7 @@ my $declare_re = qr/
 			       $word_re
 			   )
 		       )
+		       # Match initial value.
 		       \s*(?:=[^;]+)?;
 		   /x;
 
@@ -116,6 +145,10 @@ sub read_declarations
 	my $var = $3;
 	#print "type = $type for $var\n";
 	if ($o->{vars}{$type}) {
+	    # This is very likely to produce false positives in a long
+	    # file. A better way to do this would be to have variables
+	    # associated with line numbers, so that x on line 10 is
+	    # different from x on line 20.
 	    warn "duplicate variable $var of type $type\n";
 	}
 	$o->{vars}{$var} = $type;
@@ -127,12 +160,20 @@ sub read_declarations
 sub get_type
 {
     my ($o, $var) = @_;
+    # We currently do not have a way to store and retrieve types of
+    # structure members
+    if ($var =~ /->|\./) {
+	$o->report ("Cannot get type of $var, please check manually");
+	return undef;
+    }
     my $type = $o->{vars}{$var};
     if (! $type) {
-	warn "No type for $var";
+	$o->report ("(BUG) No type for $var");
     }
     return $type;
 }
+
+# Set up the line numbering object.
 
 sub line_numbers
 {
@@ -140,6 +181,9 @@ sub line_numbers
     my $tln = Text::LineNumber->new ($o->{xs});
     $o->{tln} = $tln;
 }
+
+# This adds a colon to the end of the file, so it shouldn't really be
+# user-visible.
 
 sub get_file
 {
@@ -150,12 +194,71 @@ sub get_file
     return "$o->{file}:";
 }
 
-# Clear up old variables
+# Clear up old variables, inputs, etc. Don't delete everything since
+# we want to keep at least the field "reporter" from one call to
+# "check" to the next.
 
 sub cleanup
 {
     my ($o) = @_;
-    delete $o->{vars};
+    for (qw/vars xs file/) {
+	delete $o->{$_};
+    }
+}
+
+# Regex to match (void) in XS function call.
+
+my $void_re = qr/
+		    $word_re\s*
+		    \(\s*void\s*\)\s*
+		    (?=
+			# CODE:, PREINIT:, etc.
+			[A-Z]+:
+#		    |
+			# Normal C function start
+#			\{
+		    )
+/xsm;
+
+# Look for (void) XS functions
+
+sub check_void_arg
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /$void_re/g) {
+	$o->report ("Don't use (void) in function arguments");
+    }
+}
+
+#  _   _                       _     _ _     _      
+# | | | |___  ___ _ __  __   _(_)___(_) |__ | | ___ 
+# | | | / __|/ _ \ '__| \ \ / / / __| | '_ \| |/ _ \
+# | |_| \__ \  __/ |     \ V /| \__ \ | |_) | |  __/
+#  \___/|___/\___|_|      \_/ |_|___/_|_.__/|_|\___|
+#                                                  
+
+sub new
+{
+    my ($class, %options) = @_;
+    my $o = bless {};
+    if (my $r = $options{reporter}) {
+	if (ref $r ne 'CODE') {
+	    carp "reporter should be a code reference";
+	}
+	else {
+	    $o->{reporter} = $r;
+	}
+    }
+    return $o;
+}
+
+sub set_file
+{
+    my ($o, $file) = @_;
+    if (! $file) {
+	$file = undef;
+    }
+    $o->{file} = $file;
 }
 
 # Check the XS.
@@ -164,22 +267,23 @@ sub check
 {
     my ($o, $xs) = @_;
     $o->{xs} = $xs;
+    $o->{xs} = strip_comments ($o->{xs});
     $o->line_numbers ();
     $o->read_declarations ();
     $o->check_svpv ();
     $o->check_malloc ();
-    $o->{xs} = undef;
+    $o->check_perl_prefix ();
+    $o->check_void_arg ();
+    # Final line
     $o->cleanup ();
 }
 
 sub check_file
 {
     my ($o, $file) = @_;
-    $o->{file} = $file;
+    $o->set_file ($file);
     my $xs = read_text ($file);
-    #print "$xs\n";
-    check ($o, $xs);
-    $o->{file} = undef;
+    $o->check ($xs);
 }
 
 1;

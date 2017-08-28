@@ -1,0 +1,5 @@
+Revision history for Dist-Zilla-PluginBundle-Git-VersionManager
+
+0.001     2017-08-27 00:30:08Z
+          - Initial release, extracted out of
+            Dist-Zilla-PluginBundle-Author-ETHER-0.129.

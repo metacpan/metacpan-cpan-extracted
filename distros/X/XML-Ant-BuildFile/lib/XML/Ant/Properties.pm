@@ -1,19 +1,26 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::Properties;
-$XML::Ant::Properties::VERSION = '0.216';
 
 # ABSTRACT: Singleton class for Ant properties
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a singleton class for storing and applying properties while processing
+#pod an Ant build file.  When properties are set their values are also subject to
+#pod repeated Ant-style C<${name}> expansion.  You can also perform expansion with
+#pod the L<apply|/apply> method.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use XML::Ant::Properties;
+#pod     XML::Ant::Properties->set(foo => 'fooprop', bar => 'barprop');
+#pod     my $fooprop = XML::Ant::Properties->apply('${foo}');
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use strict;
 use English '-no_match_vars';
 use MooseX::Singleton 0.26;
@@ -30,14 +37,37 @@ has _properties => ( rw,
     traits   => ['Hash'],
     default  => sub { {} },
     handles  => {
-        map { $ARG => $ARG }
+        map { ($_) x 2 }
+
+            #pod =method count
+            #pod
+            #pod =method get
+            #pod
+            #pod =method set
+            #pod
+            #pod =method delete
+            #pod
+            #pod =method exists
+            #pod
+            #pod =method defined
+            #pod
+            #pod =method keys
+            #pod
+            #pod =method values
+            #pod
+            #pod =method clear
+            #pod
+            #pod =method kv
+            #pod
+            #pod =cut
+
             qw(count get set delete exists defined keys values clear kv),
     },
 );
 
 around set => sub {
-    my ( $orig, $self ) = splice @ARG, 0, 2;
-    my %element  = @ARG;
+    my ( $orig, $self ) = splice @_, 0, 2;
+    my %element  = @_;
     my %property = %{ $self->_properties };
     while ( my ( $key, $value ) = each %element ) {
         $property{$key} = $self->apply($value);
@@ -46,15 +76,21 @@ around set => sub {
     return $self->$orig(%element);
 };
 
+#pod =method apply
+#pod
+#pod Takes a string and applies property substitution to it.
+#pod
+#pod =cut
+
 sub apply {
     my $self = shift;
     my $source = shift or return;
 
     my %property = %{ $self->_properties };
-    while ( $source =~ / \$ { [\w:.]+ } / ) {
+    while ( $source =~ / \$ [{] [\w:.]+ [}] / ) {
         my $old_source = $source;
         while ( my ( $property, $value ) = each %property ) {
-            $source =~ s/ \$ {$property} /$value/g;
+            $source =~ s/ \$ [{] $property [}] /$value/g;
         }
         last if $old_source eq $source;
     }
@@ -78,7 +114,7 @@ XML::Ant::Properties - Singleton class for Ant properties
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -238,7 +274,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Alien package for the Poppler PDF rendering library",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Poppler",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Gather::Dino" : "0",
+            "Alien::OpenJPEG" : "0",
+            "Alien::gmake" : "0",
+            "Env::ShellWords" : "0.01",
+            "ExtUtils::MakeMaker" : "6.52",
+            "Path::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::SearchDep" : "0.35",
+            "Alien::Build::Plugin::Gather::Dino" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "Alien::Role::Dino" : "0",
+            "File::Spec" : "0",
+            "Role::Tiny::With" : "0",
+            "base" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Alien::OpenJPEG" : "0",
+            "Capture::Tiny" : "0",
+            "Env" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/project-renard/p5-Alien-Poppler",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/project-renard/p5-Alien-Poppler.git",
+         "web" : "https://github.com/project-renard/p5-Alien-Poppler"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

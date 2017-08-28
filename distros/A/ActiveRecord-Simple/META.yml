@@ -22,9 +22,10 @@ requires:
   DBD::SQLite: '0'
   DBI: '0'
   Module::Load: '0'
+  Scalar::Util: '0'
   Storable: '0'
   perl: '5.010'
 resources:
   repository: https://github.com/shootnix/activerecord-simple
-version: '0.90'
+version: '0.94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,31 @@
+---
+abstract: 'Simple platform independent mailer'
+author:
+  - 'Milivoj Ivkovic <mivkovic@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Sendmail
+requires:
+  Digest::MD5: '0'
+  Exporter: '0'
+  MIME::Base64: '0'
+  Socket: '0'
+  Sys::Hostname: '0'
+  Time::Local: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Mail-Sendmail
+  repository: https://github.com/neilb/Mail-Sendmail.git
+version: '0.80'
+x_serialization_backend: 'YAML::Tiny version 1.62'

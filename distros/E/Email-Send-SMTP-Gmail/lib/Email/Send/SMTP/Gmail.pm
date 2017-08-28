@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION='1.21';
+$VERSION='1.22';
 require Net::SMTP;
 use MIME::Base64;
 use File::Spec;
@@ -198,8 +198,6 @@ sub send
   # Load all the email param
   my $mail;
 
-  print "HOLA\n";
-  
   $mail->{to}=$properties{'-to'} if defined $properties{'-to'};
 
   $mail->{to}=' ' if((not defined $mail->{to}) or ($mail->{to} eq ''));

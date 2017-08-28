@@ -9,6 +9,12 @@ use List::MoreUtils::XS (":all");
 use Test::More;
 use Test::LMU;
 
+SCOPE: {
+    my @list = ();
+    is(0, (binsert { $_ cmp "Hello" } "Hello", @list), "Inserting into empty list");
+    is(1, (binsert { $_ cmp "world" } "world", @list), "Inserting into one-item list");
+}
+
 my @even = map { $_ * 2 } 1 .. 100;
 my @odd  = map { $_ * 2 - 1 } 1 .. 100;
 my (@expected, @in);

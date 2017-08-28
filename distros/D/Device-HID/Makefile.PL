@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl Interface to HIDAPI",
   "AUTHOR" => "Ahmad Fatoum <athreef\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::HIDAPI" => 0,
+    "Alien::HIDAPI" => "0.004",
     "ExtUtils::MakeMaker" => 0
   },
   "CONFIGURE_REQUIRES" => {
@@ -25,18 +25,14 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Device::HID",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Device::HID::XS" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Alien::HIDAPI" => "0.004"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::HexString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,15 +45,10 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "Alien::HIDAPI" => 0,
-  "Carp" => 0,
-  "Device::HID::XS" => 0,
+  "Alien::HIDAPI" => "0.004",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Test::HexString" => 0,
-  "Test::More" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

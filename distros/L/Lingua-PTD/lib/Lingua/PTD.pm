@@ -1,5 +1,5 @@
 package Lingua::PTD;
-$Lingua::PTD::VERSION = '1.15';
+$Lingua::PTD::VERSION = '1.16';
 use 5.010;
 
 use parent 'Exporter';

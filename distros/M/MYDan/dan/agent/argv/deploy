@@ -1,0 +1,31 @@
+#!# perl: agent/argv/deploy
+
+use strict;
+use warnings;
+
+use Cwd;
+use Digest::MD5;
+use Getopt::Long;
+use MYDan::Project::Deploy;
+use File::Basename;
+
+our %o; BEGIN{ %o = MYDan::Util::OptConf->load()->dump('project'); };
+
+return sub
+{
+    local $/;
+    my ( $name, @ctrl ) = @_;
+    my ( $n, $v ) = ( $name );
+    ( $n, $v ) = ( $1, $2 ) if $name =~ /^(.+):(.+)$/;
+
+    unless(  $v )
+    {
+       my ( $vv ) = reverse grep{ $_ !~ /\.md5/ } glob "$o{package}/$n/*";
+       die "no find version" unless $vv;
+       $v = basename $vv;
+    }
+
+    my $c = MYDan::Project::Deploy->new( name => $n )->conf( $v );
+
+    return [ $c, @ctrl ];
+};

@@ -1,3 +1,21 @@
+1.2.0 2017-08-21 Sébastien Millet <milletseb@laposte.net>
+
+	* Now installs csvcopy.pl as part of module installation
+
+	* Faster datetime format detection
+
+	* Fixes cases where out_orderby was ignored
+
+	* ref array returned by get_coldata now contains a 6th value, saying whether
+	  the field is one-line ('1') or if it is multiline ('m').
+
+	* print_id method prints ML column, saying if the field is one-line or
+	  if it is multiline.
+
+	* NOT A FEATURE (DEV): numerous updates to pass 'perlcritic' checks, in .pm,
+	  .t and .pl, severity set to 4 (with some exceptions).
+	  All .pm, .t and .pl files undergo "perltidy" with no option
+
 1.1.9 2017-08-11 Sébastien Millet <milletseb@laposte.net>
 
 	* Adds attribute out_orderby => ['FIELD1', 'FIELD2', ...], to sort output.
@@ -255,3 +273,4 @@
 
 	* Initial release
 
+vim: tw=80 :noet

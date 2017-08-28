@@ -1,5 +1,5 @@
 package WebService::Braintree::ApplePayCard::CardType;
-$WebService::Braintree::ApplePayCard::CardType::VERSION = '0.92';
+$WebService::Braintree::ApplePayCard::CardType::VERSION = '0.93';
 use strict;
 
 use constant AmericanExpress => "Apple Pay - American Express";

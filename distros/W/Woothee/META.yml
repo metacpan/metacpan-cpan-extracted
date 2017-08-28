@@ -29,41 +29,41 @@ no_index:
 provides:
   Woothee:
     file: lib/Woothee.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::Appliance:
     file: lib/Woothee/Appliance.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::Browser:
     file: lib/Woothee/Browser.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::Crawler:
     file: lib/Woothee/Crawler.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::DataSet:
     file: lib/Woothee/DataSet.pm
   Woothee::Misc:
     file: lib/Woothee/Misc.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::MobilePhone:
     file: lib/Woothee/MobilePhone.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::OS:
     file: lib/Woothee/OS.pm
-    version: v1.6.0
+    version: v1.7.0
   Woothee::Util:
     file: lib/Woothee/Util.pm
-    version: v1.6.0
+    version: v1.7.0
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/woothee/woothee-perl/issues
   homepage: https://github.com/woothee/woothee-perl
   repository: git://github.com/woothee/woothee-perl.git
-version: 1.6.0
+version: 1.7.0
 x_contributors:
   - 'hitode909 <hitode909@gmail.com>'
   - 'yusuke-enomoto <yusuke.enomoto@dena.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-  - 'tell-k <ffk2005@gmail.com>'
   - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'
+  - 'tell-k <ffk2005@gmail.com>'
   - 'Satoshi "Moris" Tagomori <tagomoris@gmail.com>'

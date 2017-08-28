@@ -776,4 +776,50 @@ use Scalar::Util 'refaddr';
   is $dom->at('#arrayref')->find('dd.value')->[3]->[0], 'jjn1056@yahoo.com';
 }
 
+{
+  my $dom = Template::Lace::DOM->new(qq[<span class='existing'></span>]);
+
+  $dom->at('span')
+    ->add_class('aaa')
+    ->add_class(['bbb','ccc'])
+    ->add_class({
+        ddd => 1,
+        eee => 0,
+      });
+
+  is $dom->at('span')->attr('class'), 'existing aaa bbb ccc ddd';
+}
+
+{
+  my $dom = Template::Lace::DOM->new(qq[<span>Hello [% name%]! It is a [% weather %] day!</span>]);
+
+  $dom->at('span')
+   ->tt(name=>'John',
+     weather=>'great');
+
+  is $dom, '<span>Hello John! It is a great day!</span>';
+}
+
+{
+  my $dom = Template::Lace::DOM->new(q[
+  <script>
+    $('foo[name="[% name1 %]"]').src('[% src1 %]');
+    $('foo[name="[% name2 %]"]').src('[% src2 %]');
+  </script>
+  ]);
+
+  $dom->at('script')
+   ->tt(name1=>'bar1',
+     src1=>'/ajax1',
+     name2=>'/ajax2',
+     src2=>'/ajax2');
+
+  my $string = q[
+    $('foo[name="bar1"]').src('/ajax1');
+    $('foo[name="/ajax2"]').src('/ajax2');
+  ];
+
+  is $dom->at('script')->content, $string;
+}
+
 done_testing;

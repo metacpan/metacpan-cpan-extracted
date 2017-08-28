@@ -164,7 +164,7 @@ To specify revision information about the current vCard
 To specify the family name, given name or organization text to be used for
 national-language-specific sorting of the FN, N and ORG.
 
-**This method will be DEPRECATED in vCard4.0** Use SORT-AS param instead of it.
+**This method is DEPRECATED in vCard4.0** Use SORT-AS param instead of it.
 
 ## COMPLEX GETTERS/SETTERS
 
@@ -204,7 +204,7 @@ Accepts/returns an ArrayRef that looks like:
        },
     ]
 
-## email()
+### email()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -355,17 +355,9 @@ There is no documents about X-SOCIALPROFILE in RFC but it works in iOS and Mac O
 
 I don't know well about in Android or Windows. Somebody please feedback me
 
-### sort\_string()
-
-**It's DEPRECATED from 4.0** You can use this method Just ONLY in vCard3.0
-
 ### label()
 
 **It's DEPRECATED from 4.0** You can use this method Just ONLY in vCard3.0
-
-## TODO
-
-- SORT-AS param in N,FN,ORG is NOT available completely
 
 ## aroud UTF-8
 

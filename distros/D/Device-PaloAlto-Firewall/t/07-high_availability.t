@@ -15,7 +15,7 @@ my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', 
 my $test = $fw->tester();
 
 # No HA Configured
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ha_configured() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ha_configured() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( !$test->ha_enabled(), "ha_enabled(): No HA configured" );
 ok( !$test->ha_state(state => 'active'), "ha_state(): Test for 'active' on no HA configured firewall" );
@@ -29,7 +29,7 @@ ok( !$test->ha_config_sync(), "ha_config_sync(): No HA Configured");
 
 
 # HA Configured and Active
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ha_active() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ha_active() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->ha_enabled(), "ha_enabled(): HA Configured and Active" );
 ok( $test->ha_state(state => 'active'), "ha_state(): Test for 'active' on acive firewall" );

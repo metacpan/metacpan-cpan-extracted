@@ -10,6 +10,7 @@ use Path::Tiny;
 
 foreach my $input (0, 'off', 1, 'on')
 {
+    note "mode = $input";
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {

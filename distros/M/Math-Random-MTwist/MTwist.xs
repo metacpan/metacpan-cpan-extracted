@@ -3,6 +3,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define NEED_newCONSTSUB
 #define NEED_sv_2pv_flags
 #include "ppport.h"
 
@@ -18,18 +19,43 @@
 #include "mtwist/mtwist.c"
 #include "mtwist/randistrs.c"
 
+/* Some guesswork for older Perls */
+#ifndef NVMANTBITS
+  #if NVSIZE <= 4
+    #define NVMANTBITS 23
+  #elif NVSIZE <= 8
+    #define NVMANTBITS 52
+  #elif defined(USE_QUADMATH)
+    #define NVMANTBITS 112
+  #elif defined(__LDBL_MANT_DIG__)
+    #define NVMANTBITS __LDBL_MANT_DIG__
+  #else
+    #define NVMANTBITS 64
+  #endif
+#endif
+
+#ifdef UINT64_MAX
+  #define HAS_UINT64_T 1
+#else
+  #define HAS_UINT64_T 0
+#endif
+
+#define MT_HAS_INT128 defined(UINT64_MAX) && defined(__SIZEOF_INT128__)
+#define MT_USE_QUADMATH NVMANTBITS > 64 && defined(USE_QUADMATH)
+#define MT_USE_LONG_DOUBLE NVMANTBITS > 53 && defined(HAS_LONG_DOUBLE) && defined(USE_LONG_DOUBLE)
+
 typedef union {
   double dbl;
   char str[8];
   uint32_t i32[2];
-#ifdef UINT64_MAX
+#if HAS_UINT64_T
   uint64_t i64;
 #endif
 } int2dbl;
 
 #define I2D_SIZE sizeof(int2dbl)
 
-#if IVSIZE < 8 && defined(UINT64_MAX)
+#if HAS_UINT64_T
 /* based on libowfat */
 static inline U8 fmt_uint64(char* dest, uint64_t u) {
   U8 len, len2;
@@ -42,7 +68,6 @@ static inline U8 fmt_uint64(char* dest, uint64_t u) {
   if (dest) {
     len2 = len;
     dest += len;
-    *dest = '\0';
     do {
       *--dest = (char)((u%10) + '0');
       u /= 10;
@@ -52,6 +77,7 @@ static inline U8 fmt_uint64(char* dest, uint64_t u) {
   return len;
 }
 
+#if IVSIZE < 8
 /* newSVpvf doesn't handle "%llu" correctly. */
 static SV* svpv_uint64(uint64_t u) {
   SV* retval;
@@ -72,6 +98,106 @@ static SV* svpv_uint64(uint64_t u) {
   }
 
   length = fmt_uint64(buf, u);
+
+  sv_upgrade(retval, SVt_PV);
+  SvCUR_set(retval, length);
+  SvLEN_set(retval, bufsize);
+  SvPV_set(retval, buf);
+  SvPOK_only(retval);
+
+  return retval;
+}
+#endif  /* IVSIZE < 8 */
+#endif  /* UINT64_MAX */
+
+#if MT_HAS_INT128
+typedef unsigned __int128 mt_uint128_t;
+
+static inline mt_uint128_t mts_u128rand(register mt_state*  state) {
+  unsigned i;
+  union u128 {
+    uint32_t u32[4];
+    mt_uint128_t u128;
+  } rv;
+  uint32_t* u32 = rv.u32 + 4;
+
+  for (i = 4; i > 0; i--) {
+    if (state->stateptr <= 0)
+      mts_refresh(state);
+    *--u32 = state->statevec[--state->stateptr];
+    MT_TEMPER(*u32);
+  }
+
+  return rv.u128;
+}
+
+static inline mt_uint128_t mt_u128rand(void) {
+  return mts_u128rand(&mt_default_state);
+}
+
+/* 128-bit division and modulo are very time-consuming because there is no
+ * native 128-bit integer arithmetic. We speed it up a bit by dividing by 1e9
+ * instead of 10.
+ */
+static inline void fmt_nsec(char* dest, uint64_t u) {
+  if (dest && u < 1000000000) {
+    do {
+      *--dest = (char)((u%10) + '0');
+      u /= 10;
+    } while (u);
+  }
+}
+
+static inline U8 fmt_uint128(char* dest, mt_uint128_t u) {
+  U8 len, len2;
+  mt_uint128_t tmp;
+  uint64_t mod;
+
+  /* count digits */
+  for (len = 0, tmp = u; tmp > 999999999; tmp /= 1000000000)
+    len += 9;
+  len += fmt_uint64(NULL, (uint64_t)tmp);
+
+  if (dest) {
+    memset(dest, '0', len);
+    len2 = len;
+    dest += len;
+    while (1) {
+      mod = u % 1000000000;
+      if (mod)
+        fmt_nsec(dest, mod);
+
+      len2 -= 9;
+      if ((I8)len2 <= 0)
+        break;
+
+      dest -= 9;
+      u /= 1000000000;
+    }
+  }
+
+  return len;
+}
+
+static SV* svpv_uint128(mt_uint128_t u) {
+  SV* retval;
+  char* buf;
+  size_t length;
+  const size_t bufsize = 40;
+
+  dTHX;
+
+  Newxc(buf, bufsize, char, char);
+  if (!buf)
+    return NULL;
+
+  retval = newSV(0);
+  if (!retval) {
+    Safefree(buf);
+    return NULL;
+  }
+
+  length = fmt_uint128(buf, u);
 
   sv_upgrade(retval, SVt_PV);
   SvCUR_set(retval, length);
@@ -117,12 +243,19 @@ static void get_seeds_from_av(AV* av_seeds, uint32_t* mt_seeds) {
 }
 
 /*
- * We calculate gettimeofday() in microseconds and use the lower 32 bit as the
+ * We calculate clock_gettime() in nanoseconds or gettimeofday() in
+ * microseconds XORed with a memory address and use the lower 32 bit as the
  * seed.
  */
 static uint32_t timeseed(mt_state* state) {
+  UV seed;
+#ifdef CLOCK_MONOTONIC
+  struct timespec ts;
+
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  seed = ts.tv_sec*1000000000 + ts.tv_nsec;
+#else
   I32 return_count;
-  UV usecs;
 
   /* Who invented those silly cryptic macro names? */
   dTHX;
@@ -136,16 +269,21 @@ static uint32_t timeseed(mt_state* state) {
           return_count);
 
   SPAGAIN;
-  usecs = POPu;
-  usecs += POPu * 1000000;
+  seed = POPu;
+  seed += POPu * 1000000;
   PUTBACK;
+#endif
+
+  /* Hopefully Address Space Layout Randomization gives us some additional
+     randomness. */
+  seed ^= PTR2UV(&get_seeds_from_av);
 
   if (state)
-    mts_seed32new(state, usecs);
+    mts_seed32new(state, seed);
   else
-    mt_seed32new(usecs);
+    mt_seed32new(seed);
 
-  return usecs;
+  return seed;
 }
 
 #ifdef SYS_getrandom
@@ -226,7 +364,7 @@ static inline uint32_t srand50c(mt_state* state, uint32_t* seed) {
 static inline int2dbl rd_double(mt_state* state) {
   int2dbl i2d;
 
-#ifdef UINT64_MAX
+#if HAS_UINT64_T
   i2d.i64 = state ? mts_llrand(state) : mt_llrand();
 #else
   if (state) {
@@ -481,7 +619,7 @@ irand32(mt_state* state);
       XSRETURN_UNDEF;
 #endif
     else
-      RETVAL = newSVuv(mts_lrand(state));
+      RETVAL = newSVuv(state ? mts_lrand(state) : mt_lrand());
   OUTPUT:
     RETVAL
 
@@ -506,12 +644,45 @@ _irand32();
   OUTPUT:
     RETVAL
 
+SV*
+irand128(mt_state* state);
+  CODE:
+#if IVSIZE >= 16
+    RETVAL = newSVuv(mts_u128rand(state));
+#elif MT_HAS_INT128
+    RETVAL = svpv_uint128(mts_u128rand(state));
+#else
+    XSRETURN_UNDEF;
+#endif
+  OUTPUT:
+    RETVAL
+
+SV*
+_irand128();
+  CODE:
+#if IVSIZE >= 16
+    RETVAL = newSVuv(mt_u128rand());
+#elif MT_HAS_INT128
+    RETVAL = svpv_uint128(mt_u128rand());
+#else
+    XSRETURN_UNDEF;
+#endif
+  OUTPUT:
+    RETVAL
+
 NV
 rand(mt_state* state, NV bound = 0)
   ALIAS:
     rand32 = 1
   CODE:
-    RETVAL = (ix == 0) ? mts_ldrand(state) : mts_drand(state);
+    if (NVMANTBITS <= 32 || ix)
+      RETVAL = mts_drand(state);
+    else
+#if NVMANTBITS <= 64
+      RETVAL = mts_ldrand(state);
+#else
+      RETVAL = mts_lldrand(state);
+#endif
     if (bound)
       RETVAL *= bound;
   OUTPUT:
@@ -522,7 +693,14 @@ _rand(NV bound = 0)
   ALIAS:
     _rand32 = 1
   CODE:
-    RETVAL = (ix == 0) ? mt_ldrand() : mt_drand();
+    if (NVMANTBITS <= 32 || ix)
+      RETVAL = mt_drand();
+    else
+#if NVMANTBITS <= 64
+      RETVAL = mt_ldrand();
+#else
+      RETVAL = mt_lldrand();
+#endif
     if (bound)
       RETVAL *= bound;
   OUTPUT:
@@ -665,7 +843,7 @@ _rd_exponential(NV mean)
     RETVAL
 
 NV
-rd_erlang(mt_state* state, int k, NV mean)
+rd_erlang(mt_state* state, IV k, NV mean)
   ALIAS:
     rd_lerlang = 1
   CODE:
@@ -799,3 +977,14 @@ void
 _setstate(SV* sv_state)
   PPCODE:
     set_state_from_sv(sv_state, &mt_default_state);
+
+BOOT:
+{
+  HV *stash;
+
+  stash = gv_stashpv("Math::Random::MTwist", TRUE);
+  newCONSTSUB(stash, "HAS_UINT64_T", newSViv(HAS_UINT64_T));
+  newCONSTSUB(stash, "NVMANTBITS",   newSViv(NVMANTBITS));
+}
+
+# vim: set ts=2 sw=2 sts=2 expandtab:

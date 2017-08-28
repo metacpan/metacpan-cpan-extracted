@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Sieve::Script
 
+0.09 Mon, 21 Aug 2017 14:53:59 +0200
+   - spelling and unescaped_left_brace patch from gregoa AT debian.org
+
 0.08 Mon, 15 Sep 2008 12:48:29 +0200
    - equals methods on Script, Action, Condition, Rule
    - test exists

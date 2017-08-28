@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 919704966c0ed7a15ce2deeb07e297af0543f36d Changes
+SHA1 5c67ae1f730d63cf3674a9f6489808ba48e306bf LICENSE
+SHA1 9e608c3e02bf2358024619b66874ccb20013b90d MANIFEST
+SHA1 739b49c5c9809318a6438ad082c51bda968c9215 META.json
+SHA1 57793dab0e525f12a99d25fb896291ecf8dbe7b7 META.yml
+SHA1 a1acc04bb42ca0c4aa6b2edf913bf685e225ea02 Makefile.PL
+SHA1 d15923a32c47263d8c9a6f800a7368c69fecb0df README
+SHA1 c2be20f2b5ab010529a987159aaf31f97f3a000f lib/Lingua/Awkwords.pm
+SHA1 054f691fe4acfebdbc778083dd665281157b4575 lib/Lingua/Awkwords/ListOf.pm
+SHA1 e340ee40eee348d0203a628b24e004f61226d02a lib/Lingua/Awkwords/OneOf.pm
+SHA1 737cb457ac050b950c2f862044bdbb668355fe7f lib/Lingua/Awkwords/Parser.pm
+SHA1 80cac9a2512139f07872421575449583d78fe927 lib/Lingua/Awkwords/String.pm
+SHA1 076cd8cef1d227673ca1c97dd5036dcb1c5df415 lib/Lingua/Awkwords/Subpattern.pm
+SHA1 79331d9de8149d1430c592666c11201a2c4b0113 t/00-load.t
+SHA1 9112acb0da1d0ffd3bbb5bfaaf6ae6ed8a3c95bb t/10-string.t
+SHA1 05088766e3df763194cafcef083e5b291c910d70 t/11-listof.t
+SHA1 1affd0a56c47d96d0cbbfe3f862f938d92c24e7f t/11-subpattern.t
+SHA1 5120bec19ec542c2f88a75cad9f8ff6fa2996c08 t/12-oneof.t
+SHA1 8af5646d4b508805fb611fbf70ca0e4cc904bb8f t/50-parser.t
+SHA1 2bfa3e0e2aa93b54517c76f499c0b7b2135ebf4e t/90-awkwords.t
+SHA1 9aec91d0372781210370e87ef569ec41a6f59de1 t/README
+SHA1 76bf74b8bd83e9ee3d57ccbdc103ff4496aa56af t/pod-coverage.t
+SHA1 da0bf4e152c77bac871d12a0482f544c636bb461 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZnw+CAAoJEKSYBH5dablgGh8H/0G2j7lIzirVntlNt/8Ww/uy
+9Tul+I7hdhYgWkh7T1iqVc6WSa6WW+oG1JqRnqshSUL0plV3kvLyAplnq4KsM/kB
+vKzTcVM4/ZIqc3p+v1UvqLvPug91sCTU8uorhlRbefj7tc3tQX6opvQI7kCqPkvA
+ZPiGHnwecvsVRsw4JjIPsdmJhb1tcboyTeG4skdv1yy2/iZR4w/XwBmchvOkdBjU
+YzPpJ/v/x5g7t+d+vuakV9nJ6zCi/C215T/mJ4npmXuVlj3P+2PpxTu+iYHA15xb
+BOn/FklFP8aHz1hEMm/LCiE8xEsk0fY1h0lzY8eSnxuoDAa2b0yGmI61LS9zcT0=
+=yxy3
+-----END PGP SIGNATURE-----

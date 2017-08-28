@@ -4,8 +4,8 @@
       "Graham Ollis <plicease@cpan.org>",
       "Brian Duggan <bduggan@cpan.org>"
    ],
-   "dynamic_config" : "1",
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,9 +22,6 @@
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -50,8 +47,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::Dumper" : "0",
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "Time::Piece" : "1.17",
             "perl" : "5.008001"
          }
@@ -62,13 +58,21 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/String-Template/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/String-Template",
+      "homepage" : "https://metacpan.org/pod/String::Template",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/String-Template.git",
          "web" : "https://github.com/plicease/String-Template"
       }
    },
-   "version" : "0.19"
+   "version" : "0.21",
+   "x_contributors" : [
+      "Brian Duggan",
+      "Graham Ollis <plicease@cpan.org>",
+      "Curt Tilmes",
+      "Jeremy Mates (thirg, JMATES)",
+      "Jos\u00e9 Joaqu\u00edn Atria"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

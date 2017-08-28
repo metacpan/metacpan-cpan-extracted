@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: CMake plugin for Alien::Build
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 sub cmake_generator
@@ -59,6 +59,7 @@ sub init
       {
         $meta->interpolator->replace_helper('make' => sub { $exe });
         $found_gnu_make = 1;
+        last;
       }
     }
 
@@ -74,10 +75,12 @@ sub init
 
   my @args = (
     -G => '%{cmake_generator}', 
-    '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true', 
-    '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', 
+    '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
+    '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
     '-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
   );
+
+  $meta->prop->{plugin_build_cmake}->{args} = \@args;
 
   $meta->default_hook(
     build => [
@@ -86,8 +89,7 @@ sub init
       ['%{make}', 'install' ],
     ],
   );
-  
-  # TODO: set the makefile type ??
+
   # TODO: handle destdir on windows ??
 }
 
@@ -125,7 +127,7 @@ Alien::Build::Plugin::Build::CMake - CMake plugin for Alien::Build
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -135,11 +137,9 @@ version 0.99
    plugin 'Build::CMake';
    build [
      # this is the default build step, if you do not specify one.
-     [ '%{cmake}', 
-         -G => '%{cmake_generator}', 
-         '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true', 
-         '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', 
-         '-DCMAKE_MAKE_PROGRAM:PATH=%{make}', 
+     [ '%{cmake}',
+         @{ meta->prop->{plugin_build_cmake}->{args} },
+         # ... put extra cmake args here ...
          '.'
      ],
      '%{make}',
@@ -152,6 +152,14 @@ version 0.99
 This plugin helps build alienized projects that use C<cmake>.
 The intention is to make this a core L<Alien::Build> plugin if/when
 it becomes stable enough.
+
+This plugin provides a meta property C<plugin_build_cmake.args> which may change over time
+but for the moment includes:
+
+ -G %{cmake_generator}                          \
+ -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true    \
+ -DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix} \
+ -DCMAKE_MAKE_PROGRAM:PATH=%{make}
 
 =head1 METHODS
 

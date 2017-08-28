@@ -1,0 +1,95 @@
+#!# perl: deploy/code/b.node
+use warnings;
+use strict;
+use File::Spec;
+use Sys::Hostname;
+
+use MYDan::Util::OptConf;
+use MYDan::Node;
+
+return sub
+{
+    my ( %param, @batch ) = @_;
+
+    my $param = $param{param};
+    my $batch = $param->{batch} || 1;
+
+    my $range = MYDan::Node->new( MYDan::Util::OptConf->load()->dump( 'range' ) );
+
+    my @b = split /:/, $batch
+        unless my $ARRAY = ref $batch ? scalar @$batch : 0;
+
+
+    my %exclued = map{ $_ => 1 } $range->load( '{==deploy==exclude??==*}' )->list;
+
+    my ( $bindex, $group, $gindex ) = ( 0, 0, 0 );
+
+    my %selectgroup;
+    map{ $selectgroup{$_} = 1; }split( /,/, $param->{selectgroup} )
+        if $param->{selectgroup};
+
+    my $selectgroupindex = 0;
+    for my $target ( @{$param->{target}} )
+    {
+        $selectgroupindex++;
+        next if $param->{selectgroup} && !$selectgroup{$selectgroupindex};
+
+        $group ++;
+        if( $ARRAY )
+        {
+            $group = $ARRAY if $group > $ARRAY;
+            @b = split /:/, $batch->[$group-1];
+            $gindex = 0;
+        }
+
+
+	my @node = sort grep{ ! $exclued{$_} }$range->load( $target )->list;
+        if( my $sort = $param->{sort} )
+        {
+            $sort = '(\d+)' if $sort eq 'D';
+            my %N = map{ $_ =~ /$sort/; $_ => $1 || 0 }@node;
+            @node = sort{ $N{$a} <=> $N{$b} }keys %N;
+        }
+
+
+        if( my $each = $param->{each} )
+        {
+            $each = '\.(\w+?)\d?\.mydan\.org$' if $each eq 'idc';
+
+            my ( %type, %count );
+            map{ $_ =~ /$each/; push @{$type{$1||'null'}}, $_; }@node;
+            map{ $count{$_} = scalar @{$type{$_}}}keys %type;
+
+            for ( ; %type; $bindex ++, $gindex ++ )
+            {
+                 my $index = $gindex >= @b ? @b - 1 : $gindex;
+                 map{
+                     my $c = $b[$index] <1 ? ( $b[$index] * $count{$_} ) + 0.9999 : $b[$index];
+                     push @{ $batch[$bindex] }, splice @{$type{$_}}, 0, $c;
+                     delete $type{$_} unless @{$type{$_}};
+                 }keys %type;
+            }
+        }
+        else
+        {
+            my $count = scalar @node;
+            for ( ; @node; $bindex ++ , $gindex ++ )
+            {
+                my $index = $gindex >= @b ? @b - 1 : $gindex;
+                my $c = $b[$index] <1 ? ( $b[$index] * $count ) + 0.9999 : $b[$index];
+                push @{ $batch[$bindex] }, splice @node, 0, $c;
+            }
+        }
+
+    }
+
+    map{ printf "[%d]: [%s]\n", scalar $range->load($_)->list, $range->load($_)->dump }@batch;
+
+    if( @batch && $param->{test} )
+    {
+        printf "[WARN] The test pattern:%s\n", $batch[0][0];
+        @batch = $batch[0][0]?  ([$batch[0][0]]): ();
+    }
+
+    return @batch;
+};

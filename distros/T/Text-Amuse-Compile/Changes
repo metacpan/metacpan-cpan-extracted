@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.95 2017-08-20
+
+ - Improved style for HTML and EPUB
+
 0.94 2017-08-18
 
  - Use relative font size in CSSs (thanks to @labdsf)

@@ -1,4 +1,10 @@
-libdr-r-perl (0.02) unstable; urgency=low
+libdr-r-perl (0.03) nowtaxi-stretch; urgency=medium
+
+  * Depends to Perl >= 5.10.1. Add travis-ci infrastructure.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Aug 2017 12:25:50 +0300
+
+libdr-r-perl (0.02) nowtaxi-stretch; urgency=low
 
   * Init debian package.
 

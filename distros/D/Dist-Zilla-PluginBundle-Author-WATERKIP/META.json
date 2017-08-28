@@ -1,0 +1,52 @@
+{
+   "abstract" : "An plugin bundle for all distributions by WATERKIP",
+   "author" : [
+      "Wesley Schwengle <wesley@schwengle.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-WATERKIP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
+            "Software::License::Perl_5" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0.103",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0210"
+}
+

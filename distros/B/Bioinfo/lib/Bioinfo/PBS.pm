@@ -4,7 +4,7 @@ use Modern::Perl;
 use IO::All;
 use namespace::autoclean;
 
-our $VERSION = '0.1.1'; # VERSION: 
+our $VERSION = '0.1.8'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -72,12 +72,12 @@ sub get_sh {
   my ($self, $sh_name) = @_;
   $sh_name ||= $self->name . "_" . time . ".sh";
   my ($path, $cmd) = ($self->path, $self->cmd);
+  chdir $path;
   my $sh_content =<<EOF;
 cd $path
 echo "Directory is $path"
-NP = `cat \$PBS_NODEFILE|wc -l`
+NP=`cat \$PBS_NODEFILE|wc -l`
 echo \$NP
-echo "Work dir is \$PBS_O_WORKDIR"
 echo "Excuting Hosts is flowing:"
 cat \$PBS_NODEFILE
 echo "begin time: `date`"
@@ -88,7 +88,7 @@ echo "DONE";
 EOF
   io($sh_name)->print($sh_content);
   $self->_sh_name($sh_name);
-  say "task setted attr sh_name:". $self->_sh_name;
+  #say "task setted attr sh_name:". $self->_sh_name. "\n";
   return $sh_name;
 }
 
@@ -98,12 +98,12 @@ sub qsub {
   my $sh_name = $self->get_sh;
   my ($name, $cpu) = ($self->name, $self->cpu);
   my $qsub_result = `qsub -l nodes=1:ppn=$cpu -N $name $sh_name`;
-  say "$qsub_result";
+  say "qsub result: $qsub_result\n";
   if ($qsub_result =~/^(\d+?)\./) {
-    say "job_id: $1";
+    say "job_id: $1\n";
     $self->_set_job_id($1);
   } else {
-    say "Error: fail to qsub $sh_name; \n $qsub_result";
+    say "Error: fail to qsub $sh_name; \nqsub output: $qsub_result\n";
   }
   return $self;
 }
@@ -150,7 +150,7 @@ Bioinfo::PBS - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.8
 
 =head1 SYNOPSIS
 

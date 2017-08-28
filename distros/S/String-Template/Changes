@@ -1,5 +1,11 @@
 Revision history for Perl extension String-Template
 
+0.21      2017-08-25 08:02:04 -0400
+  - Allow tight fields when using curly braces (jjatria++)
+
+0.20      2017-08-24 21:56:55 -0400
+  - Add { specially special character (jjatria++)
+
 0.19      2015-12-10 06:45:23 -0500
   - Migrate to EUMM
 

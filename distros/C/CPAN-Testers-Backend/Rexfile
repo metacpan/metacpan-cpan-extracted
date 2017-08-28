@@ -66,13 +66,7 @@ task deploy =>
     group => 'backend',
     sub {
         run 'source ~/.profile; cpanm CPAN::Testers::Backend DBD::mysql';
-        file '~/etc/container',
-            ensure => 'directory';
-        sync_up 'etc/container' => '~/etc/container';
-        for my $file ( qw( .profile .bash_profile ) ) {
-            append_if_no_such_line '/home/cpantesters/' . $file,
-                'export BEAM_PATH=$HOME/etc/container';
-        }
+        run_task 'deploy_config', on => connection->server;
     };
 
 =head2 deploy_dev
@@ -107,13 +101,69 @@ task deploy_dev =>
         if ( $? ) {
             say last_command_output;
         }
+        run_task 'deploy_config', on => connection->server;
+    };
+
+=head2 deploy_config
+
+    rex -E vm deploy_config
+
+Deploy the configuration for the backend, including L<Beam::Wire> container
+files, C<crontab> files, and user profile files.
+
+=cut
+
+task deploy_config =>
+    group => 'backend',
+    sub {
+        Rex::Logger::info( 'Creating log/pid directories' );
+        file '~/var/run/report', ensure => 'directory';
+        file '~/var/log/report', ensure => 'directory';
+
+        Rex::Logger::info( 'Syncing container files' );
         file '~/etc/container',
             ensure => 'directory';
-        sync_up 'etc/container' => '~/etc/container';
+        sync_up 'etc/container' => '~/etc/container',
+            exclude => [ '*.sw*' ];
+
+        Rex::Logger::info( 'Syncing service files' );
+        file '~/service/minion/log',
+            ensure => 'directory';
+        file '~/service/minion/run',
+            source => 'etc/runit/minion/run';
+        file '~/service/minion/log/run',
+            source => 'etc/runit/minion/log/run';
+
+        Rex::Logger::info( 'Syncing crontab files' );
+        cron env => 'cpantesters' => add => {
+            BEAM_PATH => '/home/cpantesters/etc/container',
+            PERL5LIB => '/home/cpantesters/perl5/lib/perl5',
+            PATH => '/home/cpantesters/perl5/bin:/opt/local/perlbrew/bin:/opt/local/perlbrew/perls/perl-5.24.0/bin:/usr/local/bin:/usr/bin:/bin',
+            MAILTO => 'doug@preaction.me',
+        };
+        cron_entry 'process-reports',
+            user => 'cpantesters',
+            minute => '*/10',
+            hour => '*',
+            day_of_month => '*',
+            month => '*',
+            day_of_week => '*',
+            ensure => 'present',
+            command => 'beam run report process >>$HOME/var/log/report/process.log 2>&1',
+            ;
+
+        Rex::Logger::info( 'Ensuring user profile is correct' );
+        file '~/var/db', ensure => 'directory';
         for my $file ( qw( .profile .bash_profile ) ) {
             append_if_no_such_line '/home/cpantesters/' . $file,
                 'export BEAM_PATH=$HOME/etc/container';
+            delete_lines_according_to qr{^export BEAM_MINION=}, "/home/cpantesters/" . $file;
+            append_if_no_such_line '/home/cpantesters/' . $file,
+                'export BEAM_MINION="mysql+dsn+dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application"';
         }
+
+        Rex::Logger::info( 'Restarting services' );
+        run 'sv restart ~/service/minion';
     };
 
 #######################################################################

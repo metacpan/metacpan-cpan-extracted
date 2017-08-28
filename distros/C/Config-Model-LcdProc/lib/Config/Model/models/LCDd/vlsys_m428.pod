@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::vlsys_m428
 # ABSTRACT:  Configuration class LCDd::vlsys_m428
+
 =encoding utf8
 
 =head1 NAME
@@ -16,7 +17,17 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/ttyUSB0'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/ttyUSB0
+
+=back
+
+
 
 =head1 SEE ALSO
 

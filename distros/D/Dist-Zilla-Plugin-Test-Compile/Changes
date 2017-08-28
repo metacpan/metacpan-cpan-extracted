@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-Test-Compile
 
+2.057     2017-08-20 00:55:40Z
+  - load optional modules in generated test in such a way that
+    Perl::PrereqScanner doesn't think they are required dependencies
+    (this is only significant on perl 5.7.2 and older)
+
 2.056     2016-10-26 06:15:40Z
   - fix test failure on older perls
 

@@ -1,10 +1,58 @@
 ==================================================
-Changes from 2016-07-16 00:00:00 +0000 to present.
+Changes from 2016-08-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.1.0 at 2017-07-16 04:41:11 +0000
+version 1.1.2 at 2017-08-20 18:49:44 +0000
 ------------------------------------------
+
+  Change: 62c7aa41345863a4cadd0c42936187305de219cc
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-08-21 02:49:17 +0000
+
+    - patched 
+
+  Change: 5b19ed810b5994ee2825618e3c68cfcdd2a3489c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-08-21 02:43:17 +0000
+
+    - patched test 
+
+  Change: 6c96fc115f81dd7d731834d700c4225f64fd5c3a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-08-21 02:41:24 +0000
+
+    - patched doc 
+
+  Change: fe10aae067f045a0ec7f64daf722b3283febb006
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 13:01:42 +0000
+
+    - updated 
+
+  Change: ca97f886be590e50d41012e1f90c308cfd5fabfa
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:58:50 +0000
+
+    - 
+
+  Change: 7e425b1b026aa1e97943145cebf532a6fb40b644
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:57:55 +0000
+
+    - updated 
+
+  Change: 6a148cfa138730c64c575ad61ec7882024264db1
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:55:41 +0000
+
+    - updated 
+
+  Change: 6a8f09d33e7a0345bca3b0db8bf00770f96c8e2f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:54:31 +0000
+
+    - updated 
 
   Change: b8df41f85e987defdc1a727afa72d51cd67b5c4d
   Author: faraco <skelic3@gmail.com>

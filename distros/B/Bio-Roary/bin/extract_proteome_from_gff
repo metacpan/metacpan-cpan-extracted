@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::ExtractProteomeFromGFF;
-$Bio::Roary::Main::ExtractProteomeFromGFF::VERSION = '3.8.2';
+$Bio::Roary::Main::ExtractProteomeFromGFF::VERSION = '3.9.1';
 # ABSTRACT: Take in GFF files and output the proteome
 # PODNAME: extract_proteome_from_gff
 
@@ -25,7 +25,7 @@ extract_proteome_from_gff - Take in GFF files and output the proteome
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

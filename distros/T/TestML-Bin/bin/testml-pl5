@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use v5.10;
+use lib 't', 'lib';
+
+use TestML;
+use TestMLBridge;
+
+my $file = shift
+  or die "Can't find input file for 'testml-pl5'";
+
+open INPUT, $file
+  or die "Can't open '$file' for input";
+
+my $input = do {local $/; <INPUT>};
+
+close INPUT;
+
+TestML->new(
+  testml => $input,
+  bridge => 'TestMLBridge',
+)->run;

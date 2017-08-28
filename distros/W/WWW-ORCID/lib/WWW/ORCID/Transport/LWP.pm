@@ -2,18 +2,17 @@ package WWW::ORCID::Transport::LWP;
 
 use strict;
 use warnings;
-use namespace::clean;
-use Moo;
+
+our $VERSION = 0.0401;
+
 use LWP::UserAgent ();
+use Moo;
+use namespace::clean;
 
 with 'WWW::ORCID::Transport';
 
-has _client => (
-    is => 'ro',
-    init_arg => 0,
-    lazy => 1,
-    builder => '_build_client',
-);
+has _client =>
+    (is => 'ro', init_arg => 0, lazy => 1, builder => '_build_client',);
 
 sub _build_client {
     LWP::UserAgent->new;
@@ -21,27 +20,34 @@ sub _build_client {
 
 sub get {
     my ($self, $url, $params, $headers) = @_;
-    if ($params) {
-        $url = $self->_param_url($url, $params);
-    }
+    $url = $self->_param_url($url, $params) if $params;
     my $res = $self->_client->get($url, %$headers);
-    $res->code, $self->_get_headers($res), $res->content;
+    [$res->code, $self->_get_headers($res), $res->content];
 }
 
 sub post_form {
     my ($self, $url, $form, $headers) = @_;
     my $res = $self->_client->post($url, $form, %$headers);
-    $res->code, $self->_get_headers($res), $res->content;
+    [$res->code, $self->_get_headers($res), $res->content];
 }
 
 sub post {
     my ($self, $url, $body, $headers) = @_;
     my $res = $self->_client->post($url, %$headers, Content => $body);
-    if ($self->debug) {
-        use Data::Dumper;
-        print STDERR Dumper($res)."\n";
-    }
-    $res->code, $self->_get_headers($res), $res->content;
+    [$res->code, $self->_get_headers($res), $res->content];
+}
+
+sub put {
+    my ($self, $url, $body, $headers) = @_;
+    my $res = $self->_client->put($url, %$headers, Content => $body);
+    [$res->code, $self->_get_headers($res), $res->content];
+}
+
+sub delete {
+    my ($self, $url, $params, $headers) = @_;
+    $url = $self->_param_url($url, $params) if $params;
+    my $res = $self->_client->delete($url, %$headers);
+    [$res->code, $self->_get_headers($res), $res->content];
 }
 
 sub _get_headers {

@@ -8,6 +8,7 @@ use IO::Socket;
 use Carp qw( croak );
 use Net::SSH::Perl::Constants qw( :agent SSH_COM_AGENT2_FAILURE );
 use Net::SSH::Perl::Buffer;
+use Net::SSH::Perl::Key;
 
 sub new {
     my $class = shift;

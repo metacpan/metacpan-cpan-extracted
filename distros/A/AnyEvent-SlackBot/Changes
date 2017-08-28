@@ -2,3 +2,5 @@
   -- Inital Release
 1.0002
   -- Http posts now show up correctly in stats
+1.003
+  -- set ssl loose for connecting to the internet

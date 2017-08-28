@@ -1,0 +1,61 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Tony Monroe"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-IPv6Addr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Math::Base85" : "0.2",
+            "Math::BigInt" : "0",
+            "Net::IPv4Addr" : "0.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benkasminbullock/net-ipv6addr.git",
+         "web" : "https://github.com/benkasminbullock/net-ipv6addr"
+      }
+   },
+   "version" : "0.7",
+   "x_bugtracker" : {
+      "web" : "https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr"
+   },
+   "x_contributors" : [
+      "Jyrki Soini",
+      "Joacim Haggmark",
+      "Ben Bullock <bkb@cpan.org>",
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

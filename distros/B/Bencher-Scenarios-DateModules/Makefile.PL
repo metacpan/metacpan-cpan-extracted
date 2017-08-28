@@ -18,6 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Bencher::Scenarios::DateModules",
   "PREREQ_PM" => {
     "DateTime" => 0,
+    "DateTime::Duration" => 0,
+    "DateTime::Tiny" => 0,
     "Time::Local" => 0,
     "Time::Moment" => 0,
     "Time::Piece" => 0,
@@ -25,13 +27,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bencher::Backend" => "1.034",
+    "Bencher::Backend" => "1.040",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,8 +41,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bencher::Backend" => "1.034",
+  "Bencher::Backend" => "1.040",
   "DateTime" => 0,
+  "DateTime::Duration" => 0,
+  "DateTime::Tiny" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

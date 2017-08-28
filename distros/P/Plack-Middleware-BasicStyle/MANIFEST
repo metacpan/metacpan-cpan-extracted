@@ -2,6 +2,8 @@ Changes
 Makefile.PL
 MANIFEST
 README
+t/perlcritic.t
+t/perlcriticrc
 t/Plack-Middleware-BasicStyle.t
 lib/Plack/Middleware/BasicStyle.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

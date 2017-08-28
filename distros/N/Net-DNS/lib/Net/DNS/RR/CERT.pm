@@ -1,9 +1,9 @@
 package Net::DNS::RR::CERT;
 
 #
-# $Id: CERT.pm 1567 2017-05-19 09:52:52Z willem $
+# $Id: CERT.pm 1582 2017-07-07 21:45:14Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1582 $)[1];
 
 
 use strict;
@@ -42,7 +42,7 @@ my %certtype = (
 #
 {
 	my @algbyname = (
-		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8087]
+		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8078]
 		'RSAMD5'	     => 1,			# [RFC3110][RFC4034]
 		'DH'		     => 2,			# [RFC2539]
 		'DSA'		     => 3,			# [RFC3755][RFC2536]

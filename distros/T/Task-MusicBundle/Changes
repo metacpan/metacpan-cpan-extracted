@@ -1,5 +1,8 @@
 Revision history for Task-MusicBundle
 
+0.08 2017-08-19 06:28:59
+    - Added Csound
+
 0.07 2016-07-16 10:53:40
     - Added Music::RecRhythm
 

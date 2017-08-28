@@ -17,13 +17,21 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.024",
   "NAME" => "CPAN::Testers::Backend",
   "PREREQ_PM" => {
-    "Beam::Runner" => "0.010",
+    "Beam::Minion" => 0,
+    "Beam::Runner" => "0.013",
     "Beam::Wire" => "1.020",
-    "CPAN::Testers::Schema" => "0.008",
+    "CPAN::Testers::Report" => 0,
+    "CPAN::Testers::Schema" => "0.018",
     "DBI" => 0,
+    "Data::FlexSerializer" => 0,
     "Getopt::Long" => "2.36",
     "Import::Base" => "0.012",
-    "Log::Any" => "1.046"
+    "JSON::MaybeXS" => 0,
+    "Log::Any" => "1.046",
+    "Metabase::User::Profile" => 0,
+    "Minion::Backend::SQLite" => 0,
+    "Minion::Backend::mysql" => 0,
+    "Sereal" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -32,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t t/migrate/*.t"
   }
@@ -40,17 +48,25 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Beam::Runner" => "0.010",
+  "Beam::Minion" => 0,
+  "Beam::Runner" => "0.013",
   "Beam::Wire" => "1.020",
-  "CPAN::Testers::Schema" => "0.008",
+  "CPAN::Testers::Report" => 0,
+  "CPAN::Testers::Schema" => "0.018",
   "DBI" => 0,
+  "Data::FlexSerializer" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.36",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Import::Base" => "0.012",
+  "JSON::MaybeXS" => 0,
   "Log::Any" => "1.046",
+  "Metabase::User::Profile" => 0,
+  "Minion::Backend::SQLite" => 0,
+  "Minion::Backend::mysql" => 0,
+  "Sereal" => 0,
   "Test::More" => "1.001005"
 );
 

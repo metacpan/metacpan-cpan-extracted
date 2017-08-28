@@ -1,5 +1,5 @@
 package WebService::Braintree::WebhookNotification::Kind;
-$WebService::Braintree::WebhookNotification::Kind::VERSION = '0.92';
+$WebService::Braintree::WebhookNotification::Kind::VERSION = '0.93';
 use strict;
 
 use constant PartnerMerchantConnected => "partner_merchant_connected";

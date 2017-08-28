@@ -1,12 +1,12 @@
 {
    "abstract" : "Easy DateTime implementator.",
    "author" : [
-      "Dmitry E. Oboukhov <unera@>"
+      "Dmitry E. Oboukhov <unera@debian.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,10 +31,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Time::Local" : "0",
+            "Time::Zone" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

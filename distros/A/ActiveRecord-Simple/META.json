@@ -36,6 +36,7 @@
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "Module::Load" : "0",
+            "Scalar::Util" : "0",
             "Storable" : "0",
             "perl" : "5.010"
          }
@@ -47,6 +48,6 @@
          "url" : "https://github.com/shootnix/activerecord-simple"
       }
    },
-   "version" : "0.90",
+   "version" : "0.94",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

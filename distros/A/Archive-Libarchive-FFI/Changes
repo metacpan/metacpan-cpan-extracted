@@ -1,5 +1,10 @@
 Revision history for Archive-Libarchive-FFI
 
+0.0901    2017-08-24 08:23:42 -0400
+  - Switch to Alien::Libarchive3
+  - Remove accidental requirement for Perl 5.10
+    Minimum required Perl is probably 5.8.x, though may work on 5.6.x
+
 0.0900    2015-10-15 15:20:18 -0400
   - New constant ARCHIVE_EXTRACT_SECURE_NOABSOLUTEPATHS
   - Fixed synopsis for archive_entry_set_pathname style functions

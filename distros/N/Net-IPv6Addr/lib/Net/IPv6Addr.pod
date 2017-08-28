@@ -1,0 +1,374 @@
+
+=head1 NAME
+
+Net::IPv6Addr - Check validity of IPv6 addresses
+
+=head1 VERSION
+
+This documents version 0.7 of Net::IPv6Addr corresponding to
+L<git commit 83d5db1fd6c943e35e1893c5b129923857481701|https://github.com/benkasminbullock/net-ipv6addr/commit/83d5db1fd6c943e35e1893c5b129923857481701> released on Sat Aug 26 07:50:04 2017 +0900.
+
+=head1 SYNOPSIS
+
+    
+    use Net::IPv6Addr;
+    my $addr = "dead:beef:cafe:babe::f0ad";
+    Net::IPv6Addr::ipv6_parse($addr);
+    my $x = Net::IPv6Addr->new($addr);
+    print $x->to_string_preferred(), "\n";
+
+
+produces output
+
+    dead:beef:cafe:babe:0:0:0:f0ad
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Net-IPv6Addr-0.7/examples/synopsis.pl> in the distribution.)
+
+
+=head1 DESCRIPTION
+
+C<Net::IPv6Addr> checks strings for valid IPv6 addresses, as
+specified in L<RFC1884|/RFCs>.  You throw possible addresses at it, it
+either accepts them or throws an exception.
+
+This module is able to process addresses formatted in the style
+referenced by L<RFC1924|/RFCs>.
+
+=head1 METHODS AND FUNCTIONS
+
+=head2 new
+
+    my $ni = Net::IPv6Addr->new ('dead:beef:cafe:babe::f0ad');
+
+=head3 Parameters
+
+A string to be interpreted as an IPv6 address.
+
+=head3 Returns
+
+A C<Net::IPv6Addr> object if successful.
+
+=head3 Notes
+
+Throws an exception if the string isn't a valid address.
+
+=head2 ipv6_parse
+
+    my $ni = Net::IPv6Addr::ipv6_parse ('dead:beef:cafe:babe::f0ad');
+
+=head3 Parameters
+
+A string containing an IPv6 address string.  Optionally, it may
+also include a C</> character, and a numeric prefix length, in that
+order.
+
+or
+
+An IPv6 address string.  Optionally, a numeric prefix length.
+
+=head3 Returns
+
+What you gave it, more or less, if it does parse out correctly.
+
+=head3 Notes
+
+Throws an exception on malformed input.  This is not an object
+method or class method; it's just a subroutine.
+
+=head2 is_ipv6
+
+    my $niok = Net::IPv6Addr::is_ipv6 ('dead:beef:cafe:babe::f0ad');
+
+=head3 Parameters
+
+A string containing an IPv6 address string.  Optionally, it may
+also include a C</> character, and a numeric prefix length, in that
+order.
+
+-or-
+
+An IPv6 address string.  Optionally, a numeric prefix length.
+
+=head3 Returns
+
+What you gave it, more or less, if it does parse out correctly,
+otherwise returns undef.
+
+=head3 Notes
+
+This is not an object method or class method; it is just a subroutine.
+
+=head2 ipv6_chkip
+
+    my $niok = Net::IPv6Addr::ipv6_chkip ('dead:beef:cafe:babe::f0ad');
+
+=head3 Parameters
+
+An IPv6 address string.
+
+=head3 Returns
+
+Something true if it's a valid address; something false otherwise.
+
+=head2 to_string_preferred
+
+    my $tsp = $ni->to_string_preferred ();
+    my $tsp = Net::IPv6Addr::to_string_preferred ('dead:beef:cafe:babe::f0ad');
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The IPv6 address, formatted in the "preferred" way (as detailed by
+RFC1884).
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+=head2 to_string_compressed
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The IPv6 address in "compressed" format (as detailed by RFC1884).
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+
+=head2 to_string_ipv4
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The IPv6 address in IPv4 format (as detailed by RFC1884).
+
+=head3 Notes
+
+Invalid input (such as an address that was not originally IPv4)
+will generate an exception.
+
+
+=head2 to_string_ipv4_compressed
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The IPv6 address in compressed IPv4 format (as detailed by RFC1884).
+
+=head3 Notes
+
+Invalid input (such as an address that was not originally IPv4)
+will generate an exception.
+
+
+=head2 to_string_base85
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The IPv6 address in the style detailed by RFC1924.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+
+=head2 to_bigint
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The BigInt representation of IPv6 address.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+
+=head2 to_array
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+An array [0..7] of 16 bit hexadecimal numbers.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+
+=head2 to_intarray
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+An array [0..7] of decimal numbers.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+
+=head2 to_string_ip6_int
+
+=head3 Parameters
+
+If used as an object method, none; if used as a plain old subroutine,
+an IPv6 address string in any format.
+
+=head3 Returns
+
+The reverse-address pointer as defined by L<RFC1886|/RFCs>.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+
+=head2 in_network_of_size
+
+=head3 Parameters
+
+If used as an object method, network size in bits
+
+If used as a plain old subroutine, an IPv6 address string in any format
+and network size in bits. Network size may be given with / notation.
+
+=head3 Returns
+
+Network IPv6Addr of given size.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+=head2 in_network
+
+    my $ok = $x->in_network("aa:bb:cc:dd::/64");
+
+=head3 Parameters
+
+If used as an object method, network and its size in bits
+
+If used as a plain old subroutine, an IPv6 address string in any format
+network address string and size in bits.
+Network size may be given with / notation.
+
+=head3 Returns
+
+A true value if address is a member of the network, false otherwise.
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+=head1 EXPORTS
+
+As of version 0.7, nothing at all can be exported, so
+all of the routines need to be called in fully-qualified format, like
+C<Net::IPv6Addr::is_ipv6>. This may change in future versions of the
+module.
+
+=head1 BUGS
+
+Report them at
+L<https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr> or by email
+to C<bug-Net-IPv6Addr [at] rt.cpan.org>.
+
+=head1 DEPENDENCIES
+
+L<Net::IPv4Addr>, L<Math::Base85>, L<Math::BigInt>
+
+=head2 Reverse dependencies
+
+L<Search grep.cpan.me for uses of this module|http://grep.cpan.me/?q=Net%3A%3AIPv6Addr%5Cb>
+
+=head1 SEE ALSO
+
+=head2 RFCs
+
+L<RFC1884|https://www.ietf.org/rfc/rfc1884.txt>,
+L<RFC1886|https://www.ietf.org/rfc/rfc1886.txt>,
+L<RFC1924|https://www.ietf.org/rfc/rfc1924.txt>,
+L<RFC2373|https://www.ietf.org/rfc/rfc2373.txt>
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Net::IPv6Address>
+
+=item L<IPv6::Address>
+
+=item L<Regexp::IPv6>
+
+=item L<IPTables::IPv6>
+
+=back
+
+=head1 HISTORY
+
+This module was originally written by Tony Monroe in 2001 to simplify
+the task of maintaining DNS records after he set himself up with
+Freenet6.
+
+In 2017 the module was adopted by Ben Bullock with the help of Neil
+Bowers as part of "CPAN day".
+
+=head1 AUTHOR
+
+Tony Monroe(*)
+
+The module's interface probably looks like it vaguely resembles
+L<Net::IPv4Addr> by Francis J. Lacoste E<lt>francis dot lacoste at
+iNsu dot COME<gt>.
+
+Some fixes and subroutines from Jyrki Soini E<lt>jyrki dot soini
+at sonera dot comE<gt>.
+
+(*) The current module maintainer does not have any contact
+information for Tony Monroe. Those wishing to contact him can do so
+via Neil Bowers (neilb@cpan.org).
+
+=head1 LICENSE
+
+This distribution is copyright (c) 2001-2002 Tony Monroe.  All rights
+reserved.  This software is distributed under the same license terms
+as Perl itself.  This software comes with NO WARRANTIES WHATSOEVER,
+express, implied, or otherwise.
+

@@ -34,4 +34,4 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager
   homepage: http://imager.perl.org/
   repository: git://git.imager.perl.org/imager.git
-version: '1.005'
+version: '1.006'

@@ -16,7 +16,7 @@ plan tests => 9;
 my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', username => 'test', password => 'test');
 
 $fw->meta->remove_method('_send_request');
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_vm_response() )->simplify( forcearray => ['entry'] )->{result} } );
 
 my $test = $fw->tester();
 

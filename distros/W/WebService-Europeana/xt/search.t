@@ -31,8 +31,6 @@ $result = $Europeana->search(query=>"where:asdfasdf", rows=>1);
 
 is($result->{success},1,"Search for non-existant place successful");
 is($result->{itemsCount},0,"Zero rows returned");
-my @ar=("TYPE:IMAGE","LANGUAGE:de");
-$result = $Europeana->search(query=>"where:Paris", rows=>1, qf=>["TYPE:IMAGE","LANGUAGE:de"]);
 
 #print Dumper($result);
 

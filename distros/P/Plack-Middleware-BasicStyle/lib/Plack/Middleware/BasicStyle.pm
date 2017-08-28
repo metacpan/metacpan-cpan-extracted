@@ -11,8 +11,8 @@ use Plack::Request;
 use Plack::Util;
 use Plack::Util::Accessor qw/style any_content_type even_if_styled use_link_header/;
 
-our $VERSION = '0.001';
-our $DEFAULT_STYLE = <<EOF =~ y/\n\t //rd;
+our $VERSION = '0.001001';
+our $DEFAULT_STYLE = <<'EOF' =~ y/\n\t //rd;
 <style>
   body {
     margin:40px auto;
@@ -43,15 +43,15 @@ sub _content_type_ok {
 	my $content_type =
 	  Plack::Util::header_get($hdrs, 'Content-Type');
 	return '' unless $content_type;
-	$content_type =~ m,text/html,i;
+	$content_type =~ m,text/html,is;
 }
 
-sub call {
+sub call { ## no critic (Complexity)
 	my ($self, $env) = @_;
 	if ($self->use_link_header) {
 		my $req = Plack::Request->new($env);
 		if (lc $req->path eq lc $self->use_link_header) {
-			my $days30 = 30 * 86400;
+			my $days30 = 30 * 86_400;
 			my @hdrs = (
 				'Content-Length' => length $self->style,
 				'Content-Type'   => 'text/css',
@@ -77,7 +77,7 @@ sub call {
 			$doctype_end //= $offset_end if $tagname eq 'doctype';
 			$styled = 1 if $tagname eq 'style';
 			$styled = 1 if $tagname eq 'link'
-			  && ($attr->{rel} // '') =~ /stylesheet/i;
+			  && ($attr->{rel} // '') =~ /stylesheet/is;
 		};
 
 		my $p = HTML::Parser->new(api_version => 3);
@@ -240,7 +240,7 @@ Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Marius Gavrilescu
+Copyright (C) 2016-2017 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.0 or,

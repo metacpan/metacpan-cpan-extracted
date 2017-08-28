@@ -113,7 +113,7 @@ sub connect ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHo
 
     $self->{state} = $STATE_CONNECT;
 
-    $self->{on_connect} = sub ( $status, $dbh ) {
+    $self->{on_connect} = sub ( $dbh, $status ) {
         undef $self;
 
         $on_connect->(@_);
@@ -228,7 +228,7 @@ sub _on_error ( $self, $reason, $fatal ) {
         $self->{sth}->{error} = $reason;
     }
     elsif ( $state == $STATE_CONNECT ) {
-        delete( $self->{on_connect} )->( result( [ 500, $reason ] ), undef );
+        delete( $self->{on_connect} )->( undef, result [ 500, $reason ] );
     }
 
     return;
@@ -286,7 +286,7 @@ sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
 
     # connected
     if ( $state == $STATE_CONNECT ) {
-        delete( $self->{on_connect} )->( result(200), $self );
+        delete( $self->{on_connect} )->( $self, result 200 );
     }
     elsif ( $state == $STATE_BUSY ) {
         my $sth = delete $self->{sth};
@@ -294,10 +294,10 @@ sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
         my $cb = delete $sth->{cb};
 
         if ( $sth->{error} ) {
-            $cb->( result( [ 500, $sth->{error} ] ), $sth );
+            $cb->( $sth, result [ 500, $sth->{error} ] );
         }
         else {
-            $cb->( result( 200, $sth->{tag}->%* ), $sth );
+            $cb->( $sth, result 200, $sth->{tag}->%* );
         }
     }
 
@@ -526,7 +526,7 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
     if ( $self->{state} != $STATE_READY ) {
         warn 'DBI: DBH is busy';
 
-        $cb->( result( [ 500, 'DBH is busy' ] ), undef );
+        $cb->( undef, result [ 500, 'DBH is busy' ] );
 
         return;
     }
@@ -694,7 +694,7 @@ sub destroy_sth ( $self, $id ) {
 sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $status, $sth ) {
+    my $on_finish = sub ( $sth, $status ) {
         my $data;
 
         if ( $status && defined $sth->{rows} ) {
@@ -707,7 +707,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             }
         }
 
-        $cb->( $status, $self, $data );
+        $cb->( $self, $status, $data );
 
         return;
     };
@@ -721,7 +721,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 sub selectall ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $status, $sth ) {
+    my $on_finish = sub ( $sth, $status ) {
         my $data;
 
         if ( $status && defined $sth->{rows} ) {
@@ -743,7 +743,7 @@ sub selectall ( $self, $query, @args ) {
                         if ( $key_field + 1 > $num_of_fields ) {
                             warn qq[DBI: Invalid field index "$key_field"];
 
-                            $cb->( result( [ 500, qq[Invalid field index "$key_field"] ] ), $self, undef );
+                            $cb->( $self, result( [ 500, qq[Invalid field index "$key_field"] ] ), undef );
 
                             return;
                         }
@@ -756,7 +756,7 @@ sub selectall ( $self, $query, @args ) {
                         if ( !defined $idx ) {
                             warn qq[DBI: Invalid field name "$key_field"];
 
-                            $cb->( result( [ 500, qq[Invalid field name "$key_field"] ] ), $self, undef );
+                            $cb->( $self, result( [ 500, qq[Invalid field name "$key_field"] ] ), undef );
 
                             return;
                         }
@@ -784,7 +784,7 @@ sub selectall ( $self, $query, @args ) {
             }
         }
 
-        $cb->( $status, $self, $data );
+        $cb->( $self, $status, $data );
 
         return;
     };
@@ -797,14 +797,14 @@ sub selectall ( $self, $query, @args ) {
 sub selectall_arrayref ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $status, $sth ) {
+    my $on_finish = sub ( $sth, $status ) {
         my $data;
 
         if ( $status && defined $sth->{rows} ) {
             $data = $sth->{rows};
         }
 
-        $cb->( $status, $self, $data );
+        $cb->( $self, $status, $data );
 
         return;
     };
@@ -817,7 +817,7 @@ sub selectall_arrayref ( $self, $query, @args ) {
 sub selectrow ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $status, $sth ) {
+    my $on_finish = sub ( $sth, $status ) {
         my $data;
 
         if ( $status && defined $sth->{rows} ) {
@@ -828,7 +828,7 @@ sub selectrow ( $self, $query, @args ) {
             }
         }
 
-        $cb->( $status, $self, $data );
+        $cb->( $self, $status, $data );
 
         return;
     };
@@ -841,14 +841,14 @@ sub selectrow ( $self, $query, @args ) {
 sub selectrow_arrayref ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $status, $sth ) {
+    my $on_finish = sub ( $sth, $status ) {
         my $data;
 
         if ( $status && defined $sth->{rows} ) {
             $data = $sth->{rows}->[0];
         }
 
-        $cb->( $status, $self, $data );
+        $cb->( $self, $status, $data );
 
         return;
     };
@@ -862,7 +862,7 @@ sub selectrow_arrayref ( $self, $query, @args ) {
 sub selectcol ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $status, $sth ) {
+    my $on_finish = sub ( $sth, $status ) {
         my $data;
 
         if ( $status && defined $sth->{rows} ) {
@@ -879,7 +879,7 @@ sub selectcol ( $self, $query, @args ) {
                         if ( $col > $num_of_fields ) {
                             warn qq[DBI: Invalid column index: "$col"];
 
-                            $cb->( result( [ 500, qq[Invalid column index: "$col"] ] ), $self, undef );
+                            $cb->( $self, result( [ 500, qq[Invalid column index: "$col"] ] ), undef );
 
                             return;
                         }
@@ -902,7 +902,7 @@ sub selectcol ( $self, $query, @args ) {
                         if ( !exists $name2idx->{$col} ) {
                             warn qq[DBI: Invalid column name: "$col"];
 
-                            $cb->( result( [ 500, qq[Invalid column name: "$col"] ] ), $self, undef );
+                            $cb->( $self, result( [ 500, qq[Invalid column name: "$col"] ] ), undef );
 
                             return;
                         }
@@ -917,7 +917,7 @@ sub selectcol ( $self, $query, @args ) {
             }
         }
 
-        $cb->( $status, $self, $data );
+        $cb->( $self, $status, $data );
 
         return;
     };
@@ -929,8 +929,8 @@ sub selectcol ( $self, $query, @args ) {
 
 # TRANSACTIONS
 sub begin_work ( $self, $cb ) {
-    my $on_finish = sub ( $status, $sth ) {
-        $cb->( $status, $self );
+    my $on_finish = sub ( $sth, $status ) {
+        $cb->( $self, $status );
 
         return;
     };
@@ -941,8 +941,8 @@ sub begin_work ( $self, $cb ) {
 }
 
 sub commit ( $self, $cb ) {
-    my $on_finish = sub ( $status, $sth ) {
-        $cb->( $status, $self );
+    my $on_finish = sub ( $sth, $status ) {
+        $cb->( $self, $status );
 
         return;
     };
@@ -953,8 +953,8 @@ sub commit ( $self, $cb ) {
 }
 
 sub rollback ( $self, $cb ) {
-    my $on_finish = sub ( $status, $sth ) {
-        $cb->( $status, $self );
+    my $on_finish = sub ( $sth, $status ) {
+        $cb->( $self, $status );
 
         return;
     };

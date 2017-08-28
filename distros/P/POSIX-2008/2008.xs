@@ -1,10 +1,12 @@
+#undef _GNU_SOURCE
+#define _GNU_SOURCE
 #define _ATFILE_SOURCE 1
 #define _POSIX_C_SOURCE 200809L
 #define _XOPEN_SOURCE 700
-#define _XOPEN_SOURCE_EXTENDED 1
 #define _FILE_OFFSET_BITS 64
 
 #include <complex.h>
+#include <dirent.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -17,6 +19,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -24,13 +27,17 @@
 #include <unistd.h>
 #include <utmpx.h>
 
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+#define NEED_newCONSTSUB
 #include "ppport.h"
 
 typedef int SysRet;   /* returns 0 as "0 but true" */
 typedef int SysRet0;  /* returns 0 as 0 */
+typedef int psx_fd_t; /* checks for file handle or descriptor via typemap */
 
 /* is*() stuff borrowed from POSIX.xs */
 typedef int (*isfunc_t)(int);
@@ -41,7 +48,11 @@ static XSPROTO(is_common)
 {
     dXSARGS;
     if (items != 1)
+#ifdef PERL_ARGS_ASSERT_CROAK_XS_USAGE
        croak_xs_usage(cv,  "charstring");
+#else
+       croak("Usage: isX(charstring)");
+#endif
 
     {
         dXSTARG;
@@ -61,47 +72,104 @@ static XSPROTO(is_common)
     XSRETURN(1);
 }
 
-char *
+static char *
 _readlink50c(char *path, int *dirfd) {
-    /*
-     * CORE::readlink() is broken because it unnecessarily uses a fixed-size
-     * result buffer. We use a dynamically growing buffer instead, leaving it
-     * up to the file system how long a symlink may be.
-     */
-    size_t bufsize = 128;
-    ssize_t linklen;
-    char *buf;
+  /*
+   * CORE::readlink() is broken because it unnecessarily uses a fixed-size
+   * result buffer. We use a dynamically growing buffer instead, leaving it
+   * up to the file system how long a symlink may be.
+   */
+  size_t bufsize = 256;
+  ssize_t linklen;
+  char *buf;
 
-    errno = 0;
+  dTHX;
 
-    Newx(buf, bufsize, char);
-    if (buf == NULL)
-        return(NULL);
+  errno = 0;
 
-    while (1) {
-        linklen = readlinkat((dirfd ? *dirfd : AT_FDCWD), path, buf, bufsize);
+  Newx(buf, bufsize, char);
+  if (!buf)
+    return NULL;
 
-        if (linklen < 0 && errno != ERANGE) { // ERANGE check from coreutils
-            Safefree(buf);
-            return(NULL);
-        }
+  while (1) {
+    if (dirfd)
+      linklen = readlinkat(*dirfd, path, buf, bufsize);
+    else
+      linklen = readlink(path, buf, bufsize);
 
-        if ((size_t)linklen < bufsize) {
-            buf[linklen] = 0;
-            return(buf);
-        }
-
-        /*
-         * Since linklen is at most SSIZE_MAX and bufsize starts at a small
-         * power of 2, bufsize is at most SSIZE_MAX+1, so it cannot overflow.
-         */
-        bufsize <<= 1;
-
-        Renew(buf, bufsize, char);
-        if (buf == NULL)
-            return(NULL);
+    if (linklen >= 0) {
+      if (linklen < bufsize || linklen == SSIZE_MAX) {
+        buf[linklen] = '\0';
+        return buf;
+      }
     }
+    else if (errno != ERANGE) {
+      /* gnulib says, on some systems ERANGE means that bufsize is too small */
+      Safefree(buf);
+      return NULL;
+    }
+
+    bufsize <<= 1;
+
+    Renew(buf, bufsize, char);
+    if (buf == NULL)
+      return NULL;
+  }
 }
+
+static const char*
+flags2raw(int flags) {
+  int accmode = flags & O_ACCMODE;
+  if (accmode == O_RDONLY)
+    return "rb";
+  else if (flags & O_APPEND)
+    return (accmode == O_RDWR) ? "a+b" : "ab";
+  else if (accmode == O_WRONLY)
+    return "wb";
+  else if (accmode == O_RDWR)
+    return "r+b";
+  else
+    return "";
+}
+
+static int
+psx_looks_like_number(SV *sv) {
+  dTHX;
+
+#if PERL_BCDVERSION >= 0x5008005
+    return looks_like_number(sv);
+#else
+  if (SvPOK(sv) || SvPOKp(sv))
+    return looks_like_number(sv);
+  else
+    return (SvFLAGS(fh) & (SVf_NOK|SVp_NOK|SVf_IOK|SVp_IOK));
+#endif
+}
+
+static int
+psx_fileno(SV *sv) {
+  IO *io;
+  int fn = -1;
+
+  dTHX;
+
+  if (SvOK(sv)) {
+    if (psx_looks_like_number(sv))
+      fn = SvIV(sv);
+    else {
+      io = sv_2io(sv);
+      if (IoDIRP(io))  /* from opendir() */
+        fn = my_dirfd(IoDIRP(io));
+      else if (IoIFP(io))  /* from open() or sysopen() */
+        fn = PerlIO_fileno(IoIFP(io));
+    }
+  }
+
+  return fn;
+}
+
+#define PACKNAME "POSIX::2008"
+
 
 MODULE = POSIX::2008    PACKAGE = POSIX::2008
 
@@ -184,14 +252,23 @@ clock_getres(clockid_t clock_id = CLOCK_REALTIME);
         XSRETURN_UNDEF;                                     \
 }
 
+# if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000
+void
+clock_nanosleep(...);
+    PPCODE:
+        croak("clock_nanosleep not available");
+
+# else
 void
 clock_nanosleep(clockid_t clock_id, int flags, time_t sec, long nsec);
     INIT:
-        struct timespec request = { sec, nsec };
+        const struct timespec request = { sec, nsec };
         struct timespec remain = { 0, 0 };
     PPCODE:
         errno = clock_nanosleep(clock_id, flags, &request, &remain);
         RETURN_NANOSLEEP_REMAIN(errno)
+
+# endif
 
 void
 nanosleep(time_t sec, long nsec);
@@ -269,6 +346,18 @@ fnmatch(char *pattern, char *string, int flags);
 int
 killpg(pid_t pgrp, int sig);
 
+# ifdef __FreeBSD__
+void
+getdate(...);
+    PPCODE:
+        croak("getdate() not available");
+
+void
+getdate_err();
+    PPCODE:
+        croak("getdate_err() not available");
+
+# else
 void
 getdate(char *string);
     INIT:
@@ -286,6 +375,15 @@ getdate(char *string);
             mPUSHi(tm->tm_yday);
             mPUSHi(tm->tm_isdst);
         }
+
+int
+getdate_err();
+    CODE:
+        RETVAL = getdate_err;
+    OUTPUT:
+        RETVAL
+
+# endif
 
 void
 strptime(char *s, char *format, SV *sec = &PL_sv_undef, SV *min = &PL_sv_undef, SV *hour = &PL_sv_undef, SV *mday = &PL_sv_undef, SV *mon = &PL_sv_undef, SV *year = &PL_sv_undef, SV *wday = &PL_sv_undef, SV *yday = &PL_sv_undef, SV *isdst = &PL_sv_undef);
@@ -324,17 +422,12 @@ strptime(char *s, char *format, SV *sec = &PL_sv_undef, SV *min = &PL_sv_undef, 
             PUSHs(tm.tm_isdst == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_isdst)));
         }
 
-int
-getdate_err();
-    CODE:
-        RETVAL = getdate_err;
-    OUTPUT:
-        RETVAL
-
 long
 gethostid();
 
-
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX 255
+#endif
 char *
 gethostname();
     INIT:
@@ -555,31 +648,35 @@ chmod(char *path, mode_t mode);
 SysRet
 chown(char *path, uid_t owner, gid_t group);
 
-#
-# For the sake of all the *at() functions
-# someone should finally fix RT#77990 ...
-#
+SysRet
+faccessat(psx_fd_t dirfd, char *path, int amode, int flags = 0);
 
 SysRet
-faccessat(int dirfd, char *path, int amode, int flag);
+fchdir(psx_fd_t dirfd);
 
 SysRet
-fchdir(int dirfd);
+fchmod(psx_fd_t fd, mode_t mode);
 
 SysRet
-fchmod(int fd, mode_t mode);
+fchmodat(psx_fd_t dirfd, char *path, mode_t mode, int flags = 0);
 
 SysRet
-fchmodat(int dirfd, char *path, mode_t mode, int flag);
+fchown(psx_fd_t fd, uid_t owner, gid_t group);
 
 SysRet
-fchown(int fd, uid_t owner, gid_t group);
+fchownat(psx_fd_t dirfd, char *path, uid_t owner, gid_t group, int flags = 0);
 
-SysRet
-fchownat(int dirfd, char *path, uid_t owner, gid_t group, int flag);
+# if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000
+void
+fdatasync(...);
+    PPCODE:
+        croak("fdatasync not available");
 
+# else
 SysRet
-fdatasync(int fd);
+fdatasync(psx_fd_t fd);
+
+#endif
 
 #define RETURN_STAT_BUF(buf) { \
     EXTEND(SP, 16);                                     \
@@ -607,11 +704,11 @@ fdatasync(int fd);
 }
 
 void
-fstatat(int dirfd, char *path, int flag);
+fstatat(psx_fd_t dirfd, char *path, int flags = 0);
     INIT:
         struct stat buf;
     PPCODE:
-        if (fstatat(dirfd, path, &buf, flag) == 0)
+        if (fstatat(dirfd, path, &buf, flags) == 0)
             RETURN_STAT_BUF(buf);
 
 void
@@ -627,22 +724,22 @@ lstat(char *path);
             RETURN_STAT_BUF(buf);
 
 SysRet
-fsync(int fd);
+fsync(psx_fd_t fd);
 
 SysRet
-ftruncate(int fd, off_t length);
+ftruncate(psx_fd_t fd, off_t length);
 
 SysRet
 link(char *path1, char *path2);
 
 SysRet
-linkat(int fd1, char *path1, int fd2, char *path2, int flag);
+linkat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath, int flags = 0);
 
 SysRet
 mkdir(char *path, mode_t mode);
 
 SysRet
-mkdirat(int fd, char *path, mode_t mode);
+mkdirat(psx_fd_t dirfd, char *path, mode_t mode);
 
 char *
 mkdtemp(char *template);
@@ -651,13 +748,13 @@ SysRet
 mkfifo(char *path, mode_t mode);
 
 SysRet
-mkfifoat(int fd, char *path, mode_t mode);
+mkfifoat(psx_fd_t dirfd, char *path, mode_t mode);
 
 SysRet
 mknod(char *path, mode_t mode, dev_t dev);
 
 SysRet
-mknodat(int fd, char *path, mode_t mode, dev_t dev);
+mknodat(psx_fd_t dirfd, char *path, mode_t mode, dev_t dev);
 
 void
 mkstemp(char *template);
@@ -676,103 +773,256 @@ mkstemp(char *template);
 #
 # POSIX::open(), read() and write() return "0 but true" for 0, which
 # is not quite what you want. We return a real 0. Since we require
-# Perl 5.10 as a minimum you can say "open(...) // die ...".
+# Perl 5.10 as a minimum, you can say "open(...) // die ...".
 #
 
-SysRet0
-open(char *path, int oflag = O_RDONLY, mode_t mode = 0666);
+FILE*
+fdopen(psx_fd_t fd, char *mode);
+
+SV*
+fdopendir(psx_fd_t fd);
+  INIT:
+    DIR *dir;
+    GV *gv;
+    IO *io;
+    int fd2;
+  CODE:
+  {
+    /*
+     * This dup() feels a bit hacky but otherwise if whatever we got the fd
+     * from goes out of scope, the caller would be left with an invalid file
+     * descriptor.
+     */
+    fd2 = dup(fd);
+    if (fd2 < 0)
+      XSRETURN_UNDEF;
+
+    dir = fdopendir(fd2);
+    if (!dir) {
+      close(fd2);
+      XSRETURN_UNDEF;
+    }
+
+    /*
+     * I'm not exactly sure if this is the right way to create and return a
+     * directory handle. This is what I extracted from pp_open_dir, the code
+     * xsubpp generated for the above fdopen(), Symbol::geniosym(), and
+     * http://www.perlmonks.org/?node_id=1197703
+     */
+    gv = newGVgen(PACKNAME);
+    io = GvIOn(gv);
+    IoDIRP(io) = dir;
+    RETVAL = newRV_inc((SV*)gv);
+    RETVAL = sv_bless(RETVAL, GvSTASH(gv));
+    /* https://rt.perl.org/Public/Bug/Display.html?id=59268 */
+    (void) hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
+  }
+  OUTPUT:
+    RETVAL
 
 SysRet0
-openat(int fd, char *path, int oflag = O_RDONLY, mode_t mode = 0666);
+open(char *path, int oflag = O_RDONLY, mode_t mode = 0600);
 
-ssize_t
-read(int fd, SV *buf, size_t count);
+void
+openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
+  PREINIT:
+    int got_fd, dir_fd, path_fd;
+    int return_handle = 0;
+    struct stat st;
+    DIR *dir;
+    FILE *file;
+    GV *gv = NULL;
+    IO *io;
+    PerlIO *fp;
+    SV *retvalsv;
+  PPCODE:
+  {
+    if (!SvOK(dirfdsv))
+      XSRETURN_UNDEF;
+
+    got_fd = psx_looks_like_number(dirfdsv);
+    dir_fd = psx_fileno(dirfdsv);
+    if (dir_fd < 0)
+      XSRETURN_UNDEF;
+
+    path_fd = openat(dir_fd, path, oflag, mode);
+    if (path_fd < 0)
+      XSRETURN_UNDEF;
+
+    /* If we were passed a file descriptor, return a file descriptor. */
+    if (got_fd)
+      XSRETURN_IV(path_fd);
+
+    /* Does this fstat() limit the usefulness of openat()? I don't think so
+     * because the only error that might occur is EOVERFLOW and that would be
+     * really unusual.
+     */
+    if (fstat(path_fd, &st) == 0) {
+      /* If path is a directory, return a directory handle, otherwise return a
+       * file handle.
+       */
+      gv = newGVgen(PACKNAME);
+      if (S_ISDIR(st.st_mode)) {
+        if ((dir = fdopendir(path_fd))) {
+          io = GvIOn(gv);
+          IoDIRP(io) = dir;
+          return_handle = 1;
+        }
+      }
+      else if ((file = fdopen(path_fd, flags2raw(oflag)))) {
+        fp = PerlIO_importFILE(file, 0);
+        if (fp && do_open(gv, "+<&", 3, FALSE, 0, 0, fp))
+          return_handle = 1;
+      }
+    }
+
+    if (return_handle) {
+      retvalsv = newRV_inc((SV*)gv);
+      retvalsv = sv_bless(retvalsv, GvSTASH(gv));
+      mPUSHs(retvalsv);
+    }
+    else
+      close(path_fd);
+
+    if (gv) 
+      /* https://rt.perl.org/Public/Bug/Display.html?id=59268 */
+      (void) hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
+  }
+
+SysRet0
+read(psx_fd_t fd, SV *buf, size_t count);
     INIT:
         char *cbuf;
     CODE:
-        if(!SvPOK(buf))
-            sv_setpvn(buf, "", 0);
+        if (! SvPOK(buf))
+          sv_setpvn(buf, "", 0);
         cbuf = SvGROW(buf, count);
         if (cbuf == NULL)
-            XSRETURN_UNDEF;
-        RETVAL = read(fd, cbuf, count);
-        if (RETVAL >= 0) {
-            SvCUR_set(buf, RETVAL);
-            SvPOK_only(buf);
-            SvTAINTED_on(buf);
-        }
+          RETVAL = -1;
+        else if (count == 0)
+          RETVAL = 0;
         else
-            XSRETURN_UNDEF;
-    OUTPUT:
-        buf
-        RETVAL
-
-ssize_t
-pread(int fd, SV *buf, off_t file_offset, size_t nbytes, off_t buf_offset = 0);
-    INIT:
-        STRLEN buf_len, new_buf_len;
-        ssize_t bytes_read;
-        char *cbuf;
-    CODE:
-        if(!SvPOK(buf))
-            sv_setpvn(buf, "", 0);
-        cbuf = SvPV(buf, buf_len);
-        new_buf_len = buf_len;
-        /* ensure buf_offset is a valid string index */
-        if (buf_offset < 0) {
-            buf_offset += buf_len;
-            if (buf_offset < 0) {
-                warn("Offset %ld outside string", buf_offset);
-                XSRETURN_UNDEF;
-            }
+          RETVAL = read(fd, cbuf, count);
+        if (RETVAL >= 0) {
+          SvCUR_set(buf, RETVAL);
+          SvPOK_only(buf);
+          SvTAINTED_on(buf);
         }
-        /* must we enlarge the buffer? */
-        if (buf_offset + nbytes > buf_len) {
-            new_buf_len = buf_offset + nbytes;
-            cbuf = SvGROW(buf, new_buf_len);
-            if (cbuf == NULL)
-                XSRETURN_UNDEF;
-        }
-        /* must we pad the buffer with zeros? */
-        if (buf_offset >= buf_len)
-            Zero(cbuf + buf_len, buf_offset - buf_len, char);
-        /* now fscking finally read teh data */
-        RETVAL = bytes_read = pread(fd, cbuf + buf_offset, nbytes, file_offset);
-        if (bytes_read < 0)
-            XSRETURN_UNDEF;
-        if (new_buf_len > buf_len)
-            SvCUR_set(buf, new_buf_len - (nbytes - bytes_read));
-        SvPOK_only(buf);
-        SvTAINTED_on(buf);
     OUTPUT:
         buf
         RETVAL
 
 SysRet0
-pwrite(int fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, off_t buf_offset = 0);
+write(psx_fd_t fd, SV *buf, SV *count = &PL_sv_undef);
     INIT:
-        STRLEN buf_len, nbytes, max_nbytes;
-        char *cbuf = SvPV(buf, buf_len);
+        char *cbuf;
+        STRLEN buf_cur, nbytes;
     CODE:
-        /* ensure buf_offset is a valid string index */
-        if (buf_offset < 0)
-            buf_offset += buf_len;
-        if (buf_offset < 0 || (!buf_len && buf_offset > 0) ||
-            (buf_len && buf_offset >= buf_len)) {
-            warn("Offset %ld outside string", buf_offset);
-            XSRETURN_UNDEF;
-        }
-        max_nbytes = buf_len - buf_offset;
-        if (sv_nbytes == &PL_sv_undef)
-            nbytes = max_nbytes;
+    {
+      if (!SvPOK(buf))
+        RETVAL = 0;
+      else {
+        cbuf = SvPV(buf, buf_cur);
+        if (!cbuf || !buf_cur)
+          RETVAL = 0;
         else {
-            nbytes = SvUV(sv_nbytes);
-            if (nbytes > max_nbytes)
-                nbytes = max_nbytes;
+          if (count == &PL_sv_undef)
+            nbytes = buf_cur;
+          else
+            nbytes = SvUV(count);
+          if (nbytes > buf_cur)
+            nbytes = buf_cur;
+          RETVAL = write(fd, cbuf, nbytes);
         }
-        RETVAL = pwrite(fd, cbuf + buf_offset, nbytes, file_offset);
+      }
+    }
     OUTPUT:
         RETVAL
+
+SysRet0
+pread(psx_fd_t fd, SV *buf, off_t file_offset, size_t nbytes, off_t buf_offset = 0);
+    INIT:
+      STRLEN
+        buf_cur,  /* The actual string length in buf */
+        buf_len,  /* The size of the string buffer in buf */
+        new_len;
+      char *cbuf;
+    CODE:
+    {
+      if (! SvPOK(buf))
+        sv_setpvn(buf, "", 0);
+      cbuf = SvPV(buf, buf_cur);
+
+      /* ensure buf_offset is a valid string index */
+      if (buf_offset < 0) {
+        buf_offset += buf_cur;
+        if (buf_offset < 0) {
+          warn("Offset %ld outside string", buf_offset);
+          XSRETURN_UNDEF;
+        }
+      }
+
+      /* must we enlarge the buffer? */
+      buf_len = SvLEN(buf);
+      if ((new_len = buf_offset + nbytes) > buf_len) {
+        cbuf = SvGROW(buf, new_len);
+        if (cbuf == NULL)
+          XSRETURN_UNDEF;
+      }
+
+      /* must we pad the buffer with zeros? */
+      if (buf_offset > buf_cur)
+        Zero(cbuf + buf_cur, buf_offset - buf_cur, char);
+
+      /* now fscking finally read teh data */
+      if (nbytes)
+        RETVAL = pread(fd, cbuf + buf_offset, nbytes, file_offset);
+      else
+        RETVAL = 0;
+      if (RETVAL >= 0) {
+        SvCUR_set(buf, buf_offset + RETVAL);
+        SvPOK_only(buf);
+        SvTAINTED_on(buf);
+      }
+    }
+    OUTPUT:
+        buf
+        RETVAL
+
+SysRet0
+pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, off_t buf_offset = 0);
+  INIT:
+    STRLEN buf_cur, nbytes, max_nbytes;
+    char *cbuf;
+  CODE:
+  {
+    cbuf = SvPV(buf, buf_cur);
+    if (!cbuf || !buf_cur)
+      RETVAL = 0;
+    else {
+      /* ensure buf_offset is a valid string index */
+      if (buf_offset < 0)
+        buf_offset += buf_cur;
+      if (buf_offset < 0 || (!buf_cur && buf_offset > 0) ||
+          (buf_cur && buf_offset >= buf_cur)) {
+        warn("Offset %ld outside string", buf_offset);
+        XSRETURN_UNDEF;
+      }
+      max_nbytes = buf_cur - buf_offset;
+      if (sv_nbytes == &PL_sv_undef)
+        nbytes = max_nbytes;
+      else
+        nbytes = SvUV(sv_nbytes);
+      if (nbytes > max_nbytes)
+        nbytes = max_nbytes;
+      if (nbytes)
+        RETVAL = pwrite(fd, cbuf + buf_offset, nbytes, file_offset);
+      else
+        RETVAL = 0;
+    }
+  }
+  OUTPUT:
+    RETVAL
 
 char *
 ptsname(int fd);
@@ -788,7 +1038,7 @@ readlink(char *path);
             Safefree(RETVAL);
 
 char *
-readlinkat(int dirfd, char *path);
+readlinkat(psx_fd_t dirfd, char *path);
     CODE:
         RETVAL = _readlink50c(path, &dirfd);
     OUTPUT:
@@ -810,13 +1060,13 @@ SysRet
 rename(char *old, char *new);
 
 SysRet
-renameat(int olddirfd, char *oldpath, int newdirfd, char *newpath);
+renameat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath);
 
 SysRet
 symlink(char *old, char *new);
 
 SysRet
-symlinkat(char *old, int dirfd, char *new);
+symlinkat(char *old, psx_fd_t newdirfd, char *new);
 
 void
 sync();
@@ -828,10 +1078,11 @@ SysRet
 unlink(char *path);
 
 SysRet
-unlinkat(int dirfd, char *path, int flags);
+unlinkat(psx_fd_t dirfd, char *path, int flags = 0);
 
+# ifdef UTIME_NOW
 SysRet
-futimens(int fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+futimens(psx_fd_t fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
     INIT:
         struct timespec times[2] = { { atime_sec, atime_nsec },
                                      { mtime_sec, mtime_nsec } };
@@ -841,14 +1092,27 @@ futimens(int fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime
         RETVAL
 
 SysRet
-utimensat(int dirfd, char *path, int flag = 0, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+utimensat(psx_fd_t dirfd, char *path, int flags = 0, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
     INIT:
         struct timespec times[2] = { { atime_sec, atime_nsec },
                                      { mtime_sec, mtime_nsec } };
     CODE:
-        RETVAL = utimensat(dirfd, path, times, flag);
+        RETVAL = utimensat(dirfd, path, times, flags);
     OUTPUT:
         RETVAL
+
+# else
+void
+futimens(...);
+    PPCODE:
+        croak("futimens() not available");
+
+void
+utimensat(...);
+    PPCODE:
+        croak("futimensat() not available");
+
+# endif
 
 # Integer and real number arithmetic
 #####################################
@@ -1040,8 +1304,13 @@ cabs(double re, double im);
         cimag = 2
         creal = 3
     INIT:
+#ifdef _Complex_I
         double complex z = re + im * _Complex_I;
+#else
+        ;
+#endif
     CODE:
+#ifdef _Complex_I
         switch(ix) {
         case 0:
             RETVAL = cabs(z);
@@ -1055,20 +1324,38 @@ cabs(double re, double im);
         default:
             RETVAL = creal(z);
         }
+#else
+        PERL_UNUSED_VAR(re);
+        PERL_UNUSED_VAR(im);
+        PERL_UNUSED_VAR(ix);
+        PERL_UNUSED_VAR(RETVAL);
+        croak("Complex functions not available.");
+#endif
     OUTPUT:
         RETVAL
-
 
 void
 cpow(double re_x, double im_x, double re_y, double im_y);
     INIT:
+#ifdef _Complex_I
         double complex x = re_x + im_x * _Complex_I;
         double complex y = re_y + im_y * _Complex_I;
         double complex result = cpow(x, y);
+#else
+        ;
+#endif
     PPCODE:
+#ifdef _Complex_I
         EXTEND(SP, 2);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
+#else
+        PERL_UNUSED_VAR(re_x);
+        PERL_UNUSED_VAR(im_x);
+        PERL_UNUSED_VAR(re_y);
+        PERL_UNUSED_VAR(im_y);
+        croak("Complex functions not available.");
+#endif
 
 void
 cacos(double re, double im);
@@ -1090,9 +1377,19 @@ cacos(double re, double im);
         ctan = 15
         ctanh = 16
     INIT:
+#ifdef _Complex_I
         double complex z = re + im * _Complex_I;
         double complex result;
+#else
+        ;
+#endif
     PPCODE:
+#ifndef _Complex_I
+        PERL_UNUSED_VAR(re);
+        PERL_UNUSED_VAR(im);
+        PERL_UNUSED_VAR(ix);
+        croak("Complex functions not available.");
+#else
         switch(ix) {
         case 0:
             result = cacos(z);
@@ -1148,12 +1445,14 @@ cacos(double re, double im);
         EXTEND(SP, 2);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
+#endif
+
 
 BOOT:
 {
     HV *stash;
     CV *cv;
-    const char *file = __FILE__;
+    char *file = __FILE__;
 
     /* is*() stuff borrowed vom POSIX.xs */
 #undef isalnum
@@ -1190,7 +1489,7 @@ BOOT:
     cv = newXS("POSIX::2008::isxdigit", is_common, file);
     XSANY.any_dptr = (any_dptr_t) &isxdigit;
 
-    stash = gv_stashpv("POSIX::2008", TRUE);
+    stash = gv_stashpv(PACKNAME, TRUE);
     newCONSTSUB(stash, "_CS_PATH",            newSViv(_CS_PATH));
 #ifdef _CS_GNU_LIBC_VERSION
     newCONSTSUB(stash, "_CS_GNU_LIBC_VERSION",newSViv(_CS_GNU_LIBC_VERSION));
@@ -1199,28 +1498,44 @@ BOOT:
     newCONSTSUB(stash, "_CS_GNU_LIBPTHREAD_VERSION",
                 newSViv(_CS_GNU_LIBPTHREAD_VERSION));
 #endif
+#ifdef AT_EACCESS
     newCONSTSUB(stash, "AT_EACCESS",          newSViv(AT_EACCESS));
+#endif
 #ifdef AT_EMPTY_PATH
     newCONSTSUB(stash, "AT_EMPTY_PATH",       newSViv(AT_EMPTY_PATH));
 #endif
+#ifdef AT_FDCWD
     newCONSTSUB(stash, "AT_FDCWD",            newSViv(AT_FDCWD));
+#endif
 #ifdef AT_NO_AUTOMOUNT
     newCONSTSUB(stash, "AT_NO_AUTOMOUNT",     newSViv(AT_NO_AUTOMOUNT));
 #endif
+#ifdef AT_REMOVEDIR
     newCONSTSUB(stash, "AT_REMOVEDIR",        newSViv(AT_REMOVEDIR));
+#endif
 #ifdef AT_SYMLINK_FOLLOW
     newCONSTSUB(stash, "AT_SYMLINK_FOLLOW",   newSViv(AT_SYMLINK_FOLLOW));
 #endif
+#ifdef AT_SYMLINK_NOFOLLOW
     newCONSTSUB(stash, "AT_SYMLINK_NOFOLLOW", newSViv(AT_SYMLINK_NOFOLLOW));
+#endif
+#ifdef CLOCK_REALTIME
     newCONSTSUB(stash, "CLOCK_REALTIME",      newSViv(CLOCK_REALTIME));
+#endif
+#ifdef CLOCK_MONOTONIC
     newCONSTSUB(stash, "CLOCK_MONOTONIC",     newSViv(CLOCK_MONOTONIC));
+#endif
 #ifdef CLOCK_MONOTONIC_RAW
     newCONSTSUB(stash, "CLOCK_MONOTONIC_RAW", newSViv(CLOCK_MONOTONIC_RAW));
 #endif
+#ifdef CLOCK_PROCESS_CPUTIME_ID
     newCONSTSUB(stash, "CLOCK_PROCESS_CPUTIME_ID",
                 newSViv(CLOCK_PROCESS_CPUTIME_ID));
+#endif
+#ifdef CLOCK_THREAD_CPUTIME_ID
     newCONSTSUB(stash, "CLOCK_THREAD_CPUTIME_ID",
                 newSViv(CLOCK_THREAD_CPUTIME_ID));
+#endif
     newCONSTSUB(stash, "FNM_NOMATCH",         newSViv(FNM_NOMATCH));
     newCONSTSUB(stash, "FNM_PATHNAME",        newSViv(FNM_PATHNAME));
     newCONSTSUB(stash, "FNM_PERIOD",          newSViv(FNM_PERIOD));
@@ -1239,12 +1554,18 @@ BOOT:
     newCONSTSUB(stash, "FP_ZERO",             newSViv(FP_ZERO));
     newCONSTSUB(stash, "FP_SUBNORMAL",        newSViv(FP_SUBNORMAL));
     newCONSTSUB(stash, "FP_NORMAL",           newSViv(FP_NORMAL));
+#ifdef O_CLOEXEC
     newCONSTSUB(stash, "O_CLOEXEC",           newSViv(O_CLOEXEC));
+#endif
+#ifdef O_DIRECTORY
     newCONSTSUB(stash, "O_DIRECTORY",         newSViv(O_DIRECTORY));
+#endif
 #ifdef O_EXEC
     newCONSTSUB(stash, "O_EXEC",              newSViv(O_EXEC));
 #endif
+#ifdef O_NOFOLLOW
     newCONSTSUB(stash, "O_NOFOLLOW",          newSViv(O_NOFOLLOW));
+#endif
 #ifdef O_RSYNC
     newCONSTSUB(stash, "O_RSYNC",             newSViv(O_RSYNC));
 #endif
@@ -1260,8 +1581,10 @@ BOOT:
     newCONSTSUB(stash, "O_TTY_INIT",          newSViv(O_TTY_INIT));
 #endif
     newCONSTSUB(stash, "TIMER_ABSTIME",       newSViv(TIMER_ABSTIME));
+#ifdef UTIME_NOW
     newCONSTSUB(stash, "UTIME_NOW",           newSViv(UTIME_NOW));
     newCONSTSUB(stash, "UTIME_OMIT",          newSViv(UTIME_OMIT));
+#endif
 #ifdef RUN_LVL
     newCONSTSUB(stash, "RUN_LVL",             newSViv(RUN_LVL));
 #endif

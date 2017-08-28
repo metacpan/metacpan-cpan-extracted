@@ -1,0 +1,25 @@
+---
+batch:
+  code: b.node
+  param:
+    batch:
+      - 1
+      - 1:2
+    target:
+#      - 'localhost{1~10}'
+      - '127.0.0.1'
+
+maint:
+  mould: apps.test
+  macro:
+    version: 0001
+    aa: 0001
+    bb: $env{bb}
+    aabbcc: $env{aabbcc}
+
+macro:
+  a: 1
+  b: 1
+  bb: 22
+  aabbcc: 11221
+

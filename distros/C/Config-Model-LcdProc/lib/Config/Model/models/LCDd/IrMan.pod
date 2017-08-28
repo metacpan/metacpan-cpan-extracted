@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::IrMan
 # ABSTRACT:  Configuration class LCDd::IrMan
+
 =encoding utf8
 
 =head1 NAME
@@ -16,12 +17,32 @@ generated from LCDd.conf
 
 =head2 Config
 
-Select the configuration file to use. I<< Optional. Type uniline. upstream_default: '/etc/irman.cfg'.  >> 
+Select the configuration file to use. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/etc/irman.cfg
+
+=back
+
+
 
 =head2 Device
 
 in case of trouble with IrMan, try the Lirc emulator for IrMan
-Select the input device to use. I<< Optional. Type uniline. upstream_default: '/dev/irman'.  >> 
+Select the input device to use. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/irman
+
+=back
+
+
 
 =head1 SEE ALSO
 

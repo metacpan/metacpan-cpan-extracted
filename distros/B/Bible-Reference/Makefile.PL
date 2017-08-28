@@ -17,12 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Bible::Reference",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Moose" => 0,
-    "Moose::Util::TypeConstraints" => 0,
-    "MooseX::Privacy" => 0,
-    "Readonly" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "MooseX::Privacy" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -36,9 +33,11 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "blib" => "1.01",
     "constant" => 0,
-    "parent" => 0
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,14 +45,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moose" => 0,
-  "Moose::Util::TypeConstraints" => 0,
   "MooseX::Privacy" => 0,
-  "Readonly" => 0,
   "Test::Class" => 0,
   "Test::Class::Load" => 0,
   "Test::Moose" => 0,

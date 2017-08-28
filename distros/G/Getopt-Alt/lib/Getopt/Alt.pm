@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.4.4');
+our $VERSION = version->new('0.4.5');
 our $EXIT    = 1;
 
 has options => (
@@ -281,7 +281,7 @@ sub process {
             my $opt_name = $opt->name;
             if ( $self->opt->auto_complete && $opt_name eq 'auto_complete_list' ) {
                 print join ' ', $self->list_options;
-                exit 0;
+                $EXIT ? exit 0 : return;
             }
             $self->opt->{$opt->name} = $value;
 
@@ -353,6 +353,7 @@ sub process {
             # build sub command object
             my $sub_obj = Getopt::Alt->new(
                 {
+                    helper  => $self->helper,
                     %{ $options },  ## no critic
                     options => $self->options, # inherit this objects options
                     default => { %{ $self->opt }, %{ $options->{default} || {} } },
@@ -393,12 +394,13 @@ sub complete {
     my ($self, $errors) = @_;
 
     if ( $self->sub_command && !$self->cmd ) {
-        my $cmd = $ARGV[1];
+        my $cmd = shift @ARGV;
         my @sub_command = grep { $cmd ? /$cmd/ : 1 } sort keys %{ $self->sub_command };
         print join ' ', @sub_command;
     }
     elsif ( $ARGV[-1] && $ARGV[-1] =~ /^-/xms ) {
-        print join ' ', $self->list_options;
+        my $cmd = $ARGV[-1];
+        print join ' ', grep { $cmd ? /^$cmd/ : 1 } sort $self->list_options;
     }
     else {
         # run the auto complete method
@@ -406,7 +408,7 @@ sub complete {
     }
 
     # exit here as auto complete should stop processing
-    return exit 0;
+    return $EXIT ? exit 0 : undef;
 }
 
 sub list_options {
@@ -522,7 +524,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.4.4.
+This documentation refers to Getopt::Alt version 0.4.5.
 
 =head1 SYNOPSIS
 
@@ -815,7 +817,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.4.4 and earlier
+B<Note>: This is different from version 0.4.5 and earlier
 
 =head1 DIAGNOSTICS
 

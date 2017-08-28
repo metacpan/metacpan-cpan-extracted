@@ -4,7 +4,7 @@
       "Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
@@ -41,7 +41,7 @@
             "Log::Log4perl" : "1.44"
          },
          "requires" : {
-            "Catmandu" : "0.9209",
+            "Catmandu" : "1.06",
             "File::Copy" : "0",
             "IO" : "0",
             "LWP::Simple" : "6.00",
@@ -71,10 +71,10 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.15",
+   "version" : "0.151",
    "x_contributors" : [
-      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

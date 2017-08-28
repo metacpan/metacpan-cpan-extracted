@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.22      2017-08-23 15:08:45 -0400
+  - Add templates for specific types of modules
+  - Add templates for specific versios of Perl
+  - Require Perl 5.14
+  - Require Dist::Zilla 6.00
+  - Remove dependency on File::ShareDir
+  - Switch to Test2::V0
+  - Remove dependency on Path::Class
+
 2.21      2017-07-31 13:51:38 -0400
   - Add [Author::Plicease::TravisInstall]
   - Default to using -no_srand on Test2::V0

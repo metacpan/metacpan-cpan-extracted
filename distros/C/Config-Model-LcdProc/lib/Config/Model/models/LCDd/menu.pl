@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2016 by Dominique Dumont.
+# This software is Copyright (c) 2013-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -39,6 +39,17 @@ EnterKey (to select values) and at least one movement keys are required.
 These are the default key assignments:',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'PermissiveGoto',
+      {
+        'choice' => [
+          'true',
+          'false'
+        ],
+        'description' => 'If true the server allows transitions between different client\'s menus',
+        'type' => 'leaf',
+        'upstream_default' => 'false',
+        'value_type' => 'enum'
       },
       'RightKey',
       {

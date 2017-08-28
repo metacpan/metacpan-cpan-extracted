@@ -1,0 +1,70 @@
+use alienfile;
+use Alien::git;
+use FFI::CheckLib;
+use FFI::Platypus;
+use Sys::Info;
+use Config;
+use Path::Tiny;
+
+configure {
+    requires 'Alien::git';
+    requires 'FFI::CheckLib';
+    requires 'FFI::Platypus';
+    requires 'Sys::Info';
+    requires 'Path::Tiny';
+};
+
+my $cpu_count = Sys::Info->new()->device('CPU')->count;
+my $name      = 'xgboost';
+my $command   = 'xgboost' . $Config{'_exe'};
+
+probe sub {
+    my ($library) = FFI::CheckLib::find_lib_or_die(
+        lib    => $name,
+        verify => sub {
+            my ( $name, $libpath ) = @_;
+            my $platypus = FFI::Platypus->new;
+            $platypus->lib($libpath);
+
+            my $f =
+              $platypus->function( 'XGDMatrixCreateFromMat_omp', [] => 'int' );    # This function was defined recently
+        }
+    );
+    return ( defined $library ? 'system' : 'share' );
+};
+
+share {
+    download [ [ Alien::git::exe, 'clone', '--recursive', 'https://github.com/dmlc/xgboost.git', $name ], ];
+
+    plugin 'Extract::Directory' => ();
+    extract [$name];
+
+    plugin 'Build::CMake';
+    build [
+        [ '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} } ],
+        '%{make}' . " -j $cpu_count",
+        '%{mkdir_deep} "%{.install.stage}/dynamic"',
+        '%{mkdir_deep} "%{.install.stage}/bin"',
+        ['%{cp}', $command, '%{.install.stage}/bin/'],
+        sub {
+            my ($build) = @_;
+            path($_)->copy( path( $build->install_prop->{stage} )->child('dynamic')->child( path($_)->basename ) )
+              for FFI::CheckLib::find_lib( libpath => 'lib', lib => $name );
+        },
+    ];
+
+    meta_prop->{destdir} = 0;
+    plugin 'Gather::IsolateDynamic';
+    gather sub {
+        my ($build) = @_;
+        $build->runtime_prop->{command} = $command;
+    };
+};
+
+sys {
+    gather sub {
+        my ($build) = @_;
+        $build->runtime_prop->{ffi_name} = $name;
+    };
+};
+

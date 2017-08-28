@@ -3,23 +3,10 @@ Upstream-Name: RDF-LinkedData
 Upstream-Contact: Kjetil Kjernsmo <kjetilk@cpan.org>
 Source: https://metacpan.org/release/RDF-LinkedData
 
-Files: INSTALL
- LICENSE
- MANIFEST
- README
- rdf_linkeddata.json
- rdf_linkeddata_acl.json
- rdf_linkeddata_dev.json
- rdf_linkeddata_end.json
- rdf_linkeddata_void.json
- script/linked_data.psgi
- t/data/add.ttl
- t/data/basic.ttl
- t/data/fragments.ttl
-Copyright: Unknown
-License: Unknown
-
-Files: dist.ini
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
  t/00-load.t
  t/10-basic.t
  t/11-constructor.t
@@ -31,15 +18,22 @@ Files: dist.ini
  t/20-psgi-basic.t
  t/25-psgi-endpoint.t
  t/28-psgi-void.t
-Copyright: Copyright 2016 Kjetil Kjernsmo.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Changes
- META.json
- META.yml
- doap.ttl
 Copyright: Copyright 2017 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ README
+ rdf_linkeddata.json
+ rdf_linkeddata_dev.json
+ rdf_linkeddata_end.json
+ rdf_linkeddata_void.json
+ script/linked_data.psgi
+ t/data/add.ttl
+ t/data/basic.ttl
+ t/data/fragments.ttl
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -47,18 +41,22 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: lib/Plack/App/RDF/LinkedData.pm
-Copyright: Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: lib/RDF/LinkedData.pm
 Copyright: Copyright 2010 Gregory Todd Williams.
  Copyright 2010 ABC Startsiden AS.
  Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Plack/App/RDF/LinkedData.pm
+Copyright: Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2016 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

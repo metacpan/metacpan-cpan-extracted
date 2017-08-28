@@ -20,6 +20,7 @@ lib/Mic/_Guts.pm
 t/docs/arrayimps/fixed_size_queue.t
 t/docs/arrayimps/set.t
 t/docs/arrayimps/spider.t
+t/docs/arrayimps/spider2.t
 t/docs/construction/build_with_arg.t
 t/docs/construction/counter1.t
 t/docs/construction/counter3.t
@@ -53,6 +54,7 @@ t/lib/Example/ArrayImps/BoundedQueueImp.pm
 t/lib/Example/ArrayImps/HashSet.pm
 t/lib/Example/ArrayImps/QueueImp.pm
 t/lib/Example/ArrayImps/Spider.pm
+t/lib/Example/ArrayImps/Spider_v2.pm
 t/lib/Example/Construction/Acme/Counter.pm
 t/lib/Example/Construction/Acme/CounterWithNew.pm
 t/lib/Example/Construction/Acme/Counter_v2.pm

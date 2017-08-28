@@ -1,0 +1,10 @@
+- Add real tests
+- Add platform build support
+    - simple defaults for standard platforms and locations
+    - Alien::GLFW eventually
+- Example code
+    - Creating and using GLFWgammaramp structure hashes
+    - Creating and using GLFWimage structure hashes
+    - Convert GLFW examples to use perl
+- Add cbfun returns to set callback routines
+    - need XS help to implement without SEGFAULT

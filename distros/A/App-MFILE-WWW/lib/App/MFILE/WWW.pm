@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 
 # ------------------------
 # App::MFILE::WWW top-level module
@@ -58,11 +58,11 @@ App::MFILE::WWW - Web UI development toolkit with prototype demo app
 
 =head1 VERSION
 
-Version 0.156
+Version 0.157
 
 =cut
 
-our $VERSION = '0.156';
+our $VERSION = '0.157';
 our @EXPORT_OK = ( '$VERSION' );
 
 
@@ -110,8 +110,8 @@ various widgets are used.
 
 =head1 QUICK START (DEMO)
 
-L<App::MFILE::WWW> can be run as a standalone HTTP server providing a
-self-contained demo web application, or "web frontend".
+L<App::MFILE::WWW> can be run as a standalone "front-end web application" written
+in JavaScript with an embedded HTTP server.
 
 Assuming L<App::MFILE::WWW> has been installed properly, this mode of operation
 can be started by running C<mfile-www>, as a normal user (even 'nobody'), with
@@ -135,28 +135,43 @@ to as such in this document.
 
 =head2 Derived client operation
 
-In a derived-client scenario, L<App::MFILE::WWW> is basically used as a
-library, or framework, upon which the "real" application is built.
+In a derived-client scenario, L<App::MFILE::WWW> serves as the foundation
+upon which the "real" application is built.
 
 The derived-client handling is triggered by providing the C<--ddist>
 command-line option, i.e.
 
     $ mfile-www --ddist=App-Dochazka-WWW
 
-Where 'App-Dochazka-WWW' refers to the Perl module L<App::Dochazka::WWW>,
+where 'App-Dochazka-WWW' refers to the Perl module L<App::Dochazka::WWW>,
 which is assumed to contain the derived client source code.
 
-So, in the first place it is necessary to create such a Perl module.  It should
+So, in the first place it is necessary to create such a Perl module. It should
 have a sharedir configured and present. One such derived client,
 L<App::Dochazka::WWW>, is available on CPAN.
 
 
 
-=head1 IMPLEMENTATION DETAILS
+=head1 PERL AND JAVASCRIPT
 
-=head2 HTTP request-response cycle
+The L<App::MFILE::WWW> codebase has two parts, or "sides": the "Perl side"
+and the "JavaScript side". The Perl side implements the embedded web server
+and the JavaScript side implements the front-end application served to
+browsers by the Perl side.
 
-The HTTP request-response cycle is implemented as follows:
+Control passes from the Perl side to the JavaScript side
+
+=over
+
+=item * B<synchronously> whenever the user (re)loads the page
+
+=item * B<asynchronously> whenever the user triggers an AJAX call
+
+
+=head2 Perl side
+
+The HTTP request-response cycle implemented by the Perl side is designed to
+work approximately like this:
 
 =over
 
@@ -166,12 +181,13 @@ The HTTP request-response cycle is implemented as follows:
 high-numbered port where a PSGI-compatible HTTP server (such as L<Starman>) is
 listening
 
-=item * The HTTP server takes the connection and passes it to the Plack middleware.
-The key middleware component is L<Plack::Middleware::Session>, which assigns an
-ID to the session, stores whatever data the server-side code needs to associate
-with the session, links the session to the user's browser via a cookie, and
-provides the application a hook (in the Plack environment stored in the HTTP
-request) to access the session data
+=item * The embedded HTTP server takes the connection and passes it to the
+Plack middleware.  The key middleware component is
+L<Plack::Middleware::Session>, which assigns an ID to the session, stores
+whatever data the server-side code needs to associate with the session, links
+the session to the user's browser via a cookie, and provides the application a
+hook (in the Plack environment stored in the HTTP request) to access the
+session data
 
 =item * if the connection is asking for static content (defined as anything in
 C<images/>, C<css/>, or C<js/>), that content is served immediately and the
@@ -218,39 +234,96 @@ interacting with the JavaScript code running in her browser, which will
 communicate asynchronously as needed with the back-end (which must be
 implemented separately) via AJAX calls.
 
+
+
+=head2 JavaScript side
+
+The JavaScript side provides a toolkit for building web applications that
+
+=over
+
+=item do not require the use of a mouse; and 
+
+=item look and feel very much like text terminal applications from the 1980s
+
 =back
+
+Developing a front-end application with L<App::MFILE::WWW> currently assumes
+that you, the developer, will want to use RequireJS, jQuery, and QUnit.
+
+The JavaScript code is modular. Each code module has its own file and
+modules are loaded asynchronously by L<RequireJS|http://requirejs.org/>.
+Also, jQuery and QUnit L<http://qunitjs.com/> are loaded automatically.
+
+In addition to the above, L<App::MFILE::WWW> provides a number of primitives,
+also referred to as "targets", that can be used to quickly slap together a web
+application. The next chapter explains what these widgets are and how to use
+them.
+
+
+
+=head1 FRONT-END PRIMITIVES
+
+The JavaScript side implements a set of primitives, or widgets, from which the
+front-end application is built up. These include a menu primitive, a form
+primitive for entering data, table and "browser" primitives for viewing
+datasets, and a "rowselect" primitive for selecting among 
+
+=head2 daction
+
+The C<daction> primitive is a generalized widget that can do anything. 
+
+
+=head2 dbrowser
+
+The C<dbrowser> primitive is like C<dform>, except that it displays a set
+of data objects and enables the user to "browse" the dataset using arrow keys.
+Like C<dform>, the primitive includes "miniMenu" functionality through which
+the user can potentially trigger actions that take the current object as input.
+
+
+=head2 dform
+
+The C<dform> primitive is used to implement forms consisting of read-only
+fields (for viewing data), read-write fields (for entering data), or a
+combination of both. A "miniMenu" can be defined, allowing the user to trigger
+actions that take the current object as input.
+
+
+=head2 dmenu
+
+The C<dmenu> primitive is used to implement menus.
+
+
+=head2 dnotice
+
+The C<dnotice> primitive takes an HTML string and displays it. The same
+functionality can be accomplished with a C<daction>, of course, but using the
+C<dnotice> primitive ensures that the notice will have the same "look and feel"
+as the other widgets.
+
+
+=head2 drowselect
+
+The C<drowselect> primitive takes an array of strings, displays them vertically
+as a list, and allows the user to choose one and perform an action on it. Actions
+are defined via a C<miniMenu>. The currently-selected item is displayed in
+reverse-video.
+
+
+=head2 dtable
+
+The C<dtable> primitive is similar to C<dbrowser> in that it takes a set of
+objects and allows the user to choose one and perform actions on it via a
+C<miniMenu>. Unlike C<dbrowser>, however, it display the objects in table form.
+The currently-selected object is displayed in reverse video.
+
 
 
 =head1 DEVELOPMENT NOTES
 
-The L<App::MFILE::WWW> codebase has two parts, or "sides": the "Perl side"
-and the "JavaScript side". Control passes from the Perl side to the
-JavaScript side
 
-=over
-
-=item * B<synchronously> whenever the user (re)loads the page
-
-=item * B<asynchronously> whenever the user triggers an AJAX call
-
-=back
-
-
-=head3 JavaScript side
-
-=head4 Modular (RequireJS)
-
-The JavaScript code is modular. Each code module has its own file and
-modules are loaded asynchronously by L<RequireJS|http://requirejs.org/>.
-
-=head4 Unit testing (QUnit)
-
-The JavaScript code included in this package is set up for unit testing
-using the QUnit L<http://qunitjs.com/> library.
-
-
-
-=head3 UTF-8
+=head2 UTF-8
 
 In conformance with the JSON standard, all data passing to and from the
 server are assumed to be encoded in UTF-8. Users who need to use non-ASCII
@@ -261,8 +334,6 @@ characters should check their browser's settings.
 
 To minimize latency, L<App::MFILE::WWW> can be deployed on the same server
 as the back-end (e.g. L<App::Dochazka::REST>), but this is not required.
-
-=cut
 
 
 
@@ -283,6 +354,8 @@ my $dist_dir = File::ShareDir::dist_dir( 'App-MFILE-WWW' );
 Initialization routine - run from C<bin/mfile-www>, the server startup script.
 This routine loads configuration parameters from files in the distro and site
 configuration directories, and sets up logging.
+
+FIXME: This code could be moved into the startup script.
 
 =cut
 

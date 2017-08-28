@@ -3,7 +3,7 @@
 # Business::Bitcoin::Request - Bitcoin payment request
 # Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash dot neomailbox.ch>
 #
-# $Id: lib/Business/Bitcoin/Request.pm v1.046 Tue Jun  6 01:38:01 PDT 2017 $
+# $Id: lib/Business/Bitcoin/Request.pm v1.047 Thu Aug 17 01:01:54 PDT 2017 $
 
 use warnings;
 use strict;
@@ -21,7 +21,7 @@ use Crypt::RIPEMD160;
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.046 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.047 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %args) = @_;
@@ -80,11 +80,12 @@ sub commit {
   my $self = shift;
   my $processed = $self->processed;
   my $status = $self->status;
+  my $address = $self->address;
   my @updates;
   push @updates, "processed = '" . $processed . "'" if $processed;
   push @updates, "status = '" . $status . "'" if $status;
   return 1 unless my $updates = join ',',@updates;
-  return undef unless $self->db->do("UPDATE requests SET $updates;");
+  return undef unless $self->db->do("UPDATE requests SET $updates where address='$address';");
   return 1;
 }
 
@@ -183,8 +184,8 @@ Business::Bitcoin::Request - Bitcoin payment request
 
 =head1 VERSION
 
- $Revision: 1.046 $
- $Date: Tue Jun  6 01:38:01 PDT 2017 $
+ $Revision: 1.047 $
+ $Date: Thu Aug 17 01:01:54 PDT 2017 $
 
 =head1 SYNOPSIS
 

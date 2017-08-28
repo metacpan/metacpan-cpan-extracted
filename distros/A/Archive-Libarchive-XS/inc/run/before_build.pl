@@ -3,7 +3,7 @@ use warnings;
 use Alien::Libarchive;
 use Path::Class qw( file dir );
 
-my $alien = Alien::Libarchive->new;
+my $alien = 'Alien::Libarchive';
 my $report = '';
 my @pathtypes = qw( gname hardlink pathname symlink uname );
 

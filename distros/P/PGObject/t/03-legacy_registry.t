@@ -1,6 +1,10 @@
 package Foo;
 
+sub from_db { }; # needs to exist to be a valid class for registration
+
 package Foo2;
+
+sub from_db { }; # needs to exist to be a valid class for registration
 
 package main;
 
@@ -9,8 +13,8 @@ use PGObject;
 use Test::Exception;
 
 
-lives_ok(sub {PGObject->register_type(pg_type => 'foo', perl_class => 'PGObject') },      "Basic type registration");
-lives_ok(sub {PGObject->register_type(pg_type => 'foo', perl_class => 'PGObject')},
+lives_ok(sub {PGObject->register_type(pg_type => 'foo', perl_class => 'Foo') },      "Basic type registration");
+lives_ok(sub {PGObject->register_type(pg_type => 'foo', perl_class => 'Foo')},
        "Repeat type registration, same type");
 throws_ok(sub {PGObject->register_type(pg_type => 'foo', 
     perl_class => 'main')}, qr/different target/,
@@ -27,7 +31,7 @@ throws_ok{PGObject->register_type(
 
 ok(PGObject->unregister_type(pg_type => 'foo'), 'Unregister type, try 1');
 dies_ok(sub {PGObject->unregister_type(pg_type => 'foo')}, 'Unregister type, try 2');
-is(PGObject->register_type(pg_type => 'foo', perl_class => 'main'), 1,
+is(PGObject->register_type(pg_type => 'foo', perl_class => 'Foo2'), 1,
        "Repeat type registration, different type, succeeds now");
 
 throws_ok{PGObject->unregister_type(

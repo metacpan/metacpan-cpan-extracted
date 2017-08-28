@@ -53,7 +53,7 @@ and hooks in case you want to build your own NRPE Server.
 
 package Nagios::NRPE::Daemon;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 use 5.010_000;
 
@@ -170,7 +170,7 @@ sub start {
         while ( ( $s = $socket->accept() ) ) {
             my $request;
             $s->recv( $request, 1036 );
-            my $unpacked_request = $packet->deassemble($request);
+            my $unpacked_request = $packet->disassemble($request);
             my $buffer           = $unpacked_request->{buffer};
             my $version          = $unpacked_request->{packet_version};
             my ( $command, @options ) = split /!/, $buffer;

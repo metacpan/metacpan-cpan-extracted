@@ -6,7 +6,7 @@ use Object::Simple -base;
 use Getopt::Kingpin::Arg;
 use Carp;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 has _args => sub {
     return [];
@@ -130,7 +130,7 @@ Get count of Getopt::Kingpin::Arg objects.
 
 =head2 get($name)
 
-Get Getopt::Kingpin::Arg instanse by $name.
+Get Getopt::Kingpin::Arg instance by $name.
 
     my $kingpin = Getopt::Kingpin->new;
     $kingpin->arg('name', 'set name')->string();
@@ -140,14 +140,14 @@ Get Getopt::Kingpin::Arg instanse by $name.
 
 =head2 get_by_index($index)
 
-Get Getopt::Kingpin::Arg instanse by $index.
+Get Getopt::Kingpin::Arg instance by $index.
 
     $args->get_by_index(0);
     $args->get_by_index(1);
 
 =head2 get_all()
 
-Get all Getopt::Kingpin::Arg instanses.
+Get all Getopt::Kingpin::Arg instances.
 
 =head2 keys()
 
@@ -157,7 +157,7 @@ Get order is same as add() order.
 =head2 values()
 
 Get array of Getopt::Kingpin::Arg.
-get order is same sa add() order.
+get order is same as add() order.
 
 =head2 _help_length()
 

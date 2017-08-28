@@ -1,5 +1,5 @@
 {
-   "abstract" : "Various e-mail related modules",
+   "abstract" : "Various ancient e-mail related modules",
    "author" : [
       "Mark Overmeer <perl@overmeer.net>"
    ],
@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MailTools",
    "no_index" : {
@@ -42,5 +42,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.18"
+   "version" : "2.19"
 }

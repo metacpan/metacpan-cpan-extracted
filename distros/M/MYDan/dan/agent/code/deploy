@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+use File::Temp;
+use Digest::MD5;
+use MYDan::Project::Deploy::Ctrl;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+my ( $conf, @ctrl ) = @{$param{argv}};
+
+eval{
+    my $deploy = MYDan::Project::Deploy::Ctrl->new( conf => $conf );
+    $deploy->do( @ctrl );
+};
+if( $@ )
+{
+   print "ERROR: $@";
+   exit 1;
+}
+print 'done.';
+
+exit 0;

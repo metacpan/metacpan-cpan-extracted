@@ -1,9 +1,9 @@
-use strict;
-use warnings;
-
 package HPC::Runner::Command::submit_jobs::Logger::JSON;
 
 use Moose::Role;
+use namespace::autoclean;
+
+with 'HPC::Runner::Command::execute_job::Logger::Lock';
 
 use JSON;
 use File::Spec;
@@ -11,25 +11,43 @@ use Data::UUID;
 use File::Path qw(make_path remove_tree);
 use File::Slurp;
 use DateTime;
+use Capture::Tiny ':all';
 
 =head3 create_json_submission
 
 Create the data for the json submission
-
-We don't actually do anything here, but its a handy wrapper for loggers that create the submission and then update it
 
 =cut
 
 sub create_json_submission {
     my $self = shift;
 
-    # my $tar = $self->set_archive;
-    # $self->archive($tar);
+    $self->logger('app_log');
+    my $hpc_meta = $self->gen_hpc_meta;
+
+    my $json_text = encode_json $hpc_meta;
+
+    # We are rolling back this functionality for a future release
+    # my $basename = $self->data_tar->basename('.tar.gz');
+    # my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
+    #
+    # $self->check_lock;
+    # $self->write_lock;
+    #
+    # $self->archive->add_data( $submission_file, $json_text );
+    # capture {
+    #     $self->archive->write( $self->data_tar, 1 );
+    # };
+    # $self->lock_file->remove;
+
+    return $hpc_meta;
 }
 
 =head3 update_json_submission
 
 Take the initial submission and update it to contain the hpcmeta
+
+We only rerun this here to get the submission status
 
 =cut
 
@@ -37,16 +55,29 @@ sub update_json_submission {
     my $self = shift;
 
     my $hpc_meta = $self->gen_hpc_meta;
-
     my $json_text = encode_json $hpc_meta;
 
-    my $basename = $self->data_tar->basename('.tar.gz');
-    my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
-
-    $self->archive->add_data( $submission_file, $json_text );
-    $self->archive->write( $self->data_tar );
+    # We are rolling back this functionality for a future release
+    #
+    # my $basename = $self->data_tar->basename('.tar.gz');
+    # my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
+    #
+    # ##TODO Change this to around?
+    # $self->check_lock;
+    # $self->write_lock;
+    #
+    # $self->archive->add_data( $submission_file, $json_text );
+    # capture {
+    #     $self->archive->write( $self->data_tar, 1 );
+    # };
+    #
+    # $self->lock_file->remove;
+    my $file_name = File::Spec->catdir( $self->logdir, 'submission.json' );
+    $self->_make_the_dirs( $self->logdir );
+    write_file($file_name, $json_text);
 
     return $hpc_meta;
+
 }
 
 =head3 gen_hpc_meta
@@ -61,24 +92,26 @@ sub gen_hpc_meta {
     my $self = shift;
 
     my $hpc_meta = {};
-    $hpc_meta->{uuid}        = $self->submission_uuid;
-    $hpc_meta->{project}     = $self->project if $self->has_project;
-    my $dt = DateTime->now(time_zone => 'local');
+    $hpc_meta->{uuid} = $self->submission_uuid;
+    $hpc_meta->{project} = $self->project if $self->has_project;
+    my $dt = DateTime->now( time_zone => 'local' );
     $hpc_meta->{submission_time} = "$dt";
-    $hpc_meta->{jobs}        = [];
-    $hpc_meta->{submissions} = {};
+    $hpc_meta->{jobs}            = [];
+    $hpc_meta->{submissions}     = {};
+    $hpc_meta->{schedule}        = $self->schedule;
 
     foreach my $job ( $self->all_schedules ) {
         my $job_obj = {};
 
         #Dependencies
-        my $ref       = $self->graph_job_deps->{$job};
-        my $depstring = join( ", ", @{$ref} );
-        my $count_cmd = $self->jobs->{$job}->cmd_counter;
-        my $mem       = $self->jobs->{$job}->mem;
-        my $cpus      = $self->jobs->{$job}->cpus_per_task;
-        my $walltime  = $self->jobs->{$job}->walltime;
-        my $cmd_start = $self->jobs->{$job}->{cmd_start};
+        my $ref             = $self->graph_job_deps->{$job};
+        my $depstring       = join( ", ", @{$ref} );
+        my $count_cmd       = $self->jobs->{$job}->cmd_counter;
+        my $mem             = $self->jobs->{$job}->mem;
+        my $cpus            = $self->jobs->{$job}->cpus_per_task;
+        my $walltime        = $self->jobs->{$job}->walltime;
+        my $cmd_start       = $self->jobs->{$job}->{cmd_start};
+        my $submission_stat = $self->jobs->{$job}->submission_failure || 0;
 
         $job_obj->{job}           = $job;
         $job_obj->{deps}          = $depstring;
@@ -131,11 +164,9 @@ sub gen_hpc_meta {
             push( @{ $job_obj->{schedule} }, $obj );
         }
 
-        # $hpc_meta->{jobs}->{$job} = $job_obj;
         push( @{ $hpc_meta->{jobs} }, $job_obj );
     }
 
-    # $hpc_meta->{batches} = $self->job_stats->batches;
     return $hpc_meta;
 }
 

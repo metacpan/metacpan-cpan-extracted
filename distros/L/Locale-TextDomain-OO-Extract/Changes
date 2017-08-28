@@ -1,5 +1,21 @@
 Revision history for Perl extension Locale::TextDomain:OO::Extract.
 
+2.009  Fri Aug 25 07:11:21 2017
+- fixed 21_process_utf-8.t
+  wrong plan
+
+2.008  Wed Aug 23 07:18:16 2017
+- fixed 21_process_utf-8.t
+  do not write into ./ during install dist test
+
+2.007  Tue Aug 22 18:44:02 2017
+- removed dependency Module::Build
+- handle not existing PO files, create a default header
+- fixed HTML extractor
+- added Expand::BabelFish::Loc to examples
+- fixed call of Path::Iterator::Rule in example scripts
+- fixed POD
+
 2.006  Tue Apr 14 08:41:50 2015
 - added forgotten dependency Locale::Utils::PlaceholderMaketext
 

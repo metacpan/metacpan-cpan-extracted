@@ -7,11 +7,14 @@ Build.PL
 lib/Net/Cisco/ISE.pm
 lib/Net/Cisco/ISE/InternalUser.pm
 lib/Net/Cisco/ISE/IdentityGroup.pm
+lib/Net/Cisco/ISE/NetworkDevice.pm
+lib/Net/Cisco/ISE/NetworkDeviceGroup.pm
 t/001_load.t
 scripts/m1.pl
 scripts/m2.pl
+scripts/m5.pl
+scripts/m6.pl
 scripts/m9.pl
-scripts/m1.pl
 scripts/c1.pl
 scripts/c2.pl
 scripts/c3.pl

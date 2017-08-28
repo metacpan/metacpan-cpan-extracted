@@ -91,7 +91,7 @@ ok $James = Customer->find({ first_name => 'James' })->fetch;
 is $James->first_name, 'James';
 
 ok $James->delete, 'delete James';
-ok ! Customer->exists({ first_name => 'James' }), 'totally deleted';
+ok ! Customer->find({ first_name => 'James' })->exists, 'totally deleted';
 
 
 

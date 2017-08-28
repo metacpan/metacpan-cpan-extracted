@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.007
+    version 0.008001
 
 SYNOPSIS
 
@@ -116,6 +116,10 @@ DESCRIPTION
         remotes_must_exist  = 0
 
 ATTRIBUTES
+
+ max_target_perl
+
+    Specify the minimum perl version. Defaults to 5.10.1.
 
  authority
 

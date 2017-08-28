@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015,2016 Joel C. Maslak
+# Copyright (C) 2015,2016 J. Maslak
 # All Rights Reserved - See License
 #
 
 package JCM::Boilerplate v0.01.11;
 # ABSTRACT: Default Boilerplate for Joel's Code
-$JCM::Boilerplate::VERSION = '1.014';
+$JCM::Boilerplate::VERSION = '1.015';
 
 use v5.22;
 use strict;
@@ -79,7 +79,7 @@ JCM::Boilerplate - Default Boilerplate for Joel's Code
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -106,11 +106,11 @@ outside dependencies that may be undesired.
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by Joel Maslak.
+This software is copyright (c) 2015-2017 by J. Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

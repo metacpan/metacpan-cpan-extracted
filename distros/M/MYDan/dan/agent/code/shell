@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use IO::Pty;
+use IO::Poll qw( POLLIN POLLHUP POLLOUT POLLERR);
+use IO::Socket;
+
+$|++;
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+my( $host, $port, $uuid, $row, $col ) = @{$param{argv}};
+$host ||= $ENV{TCPREMOTEIP};
+
+die "nofind user" unless my $user = $ENV{MYDan_sudo} ||  $ENV{MYDan_user};
+die "nofind user home" unless my $dir = ( getpwnam $user )[7];
+chdir $dir;
+
+warn sprintf "shell info: host:%s port:%s uuid:%s\n", map{ $_||''}$host, $port, $uuid;
+
+$ENV{HISTORY_FILE}="$dir/.bash_history";
+
+map{ die "param error" unless $_ }( $host, $port );
+
+my $soc = IO::Socket::INET->new(
+    PeerAddr => $host,
+    PeerPort => $port,
+    Proto    => 'tcp'
+);
+
+exit 0 if fork;
+
+my ( $pty, $pid ) = bash();
+
+$pty->set_winsize($row, $col, 0, 0);
+
+$soc->blocking(0);
+$pty->blocking(0);
+
+my $poll = IO::Poll->new();
+$poll->mask( $soc => POLLIN  );
+
+my $d;
+$poll->poll();
+sysread( $soc, $d, 36 );
+
+die( sprintf "check fail: data:%s uuid:%s\n", $d||'', $uuid|'' )
+    unless $d && $uuid && $d eq $uuid;
+
+$poll->mask( $pty => POLLIN );
+
+while ( $poll->handles && $soc ) {
+    $poll->poll();
+    for my $handle ( $poll->handles( POLLIN ) ) {
+        my ( $byte, $data );
+	syswrite( $pty, $data, $byte ) if $handle eq $soc && ( $byte = sysread( $soc, $data, 1024 ) );
+        syswrite( $soc, $data, $byte ) if $handle eq $pty && ( $byte = sysread( $pty, $data, 1024 ) );
+    }
+    if ( $poll->handles( POLLHUP | POLLERR) ) {
+        $soc->shutdown( 2 );
+        last;
+    }
+}
+
+sub bash {
+    my $pty = IO::Pty->new();
+
+    if ( my $pid = fork ) {
+        $pty->close_slave();
+        return ( $pty, $pid  );
+    }
+
+    POSIX::setsid();
+
+    my $slave = $pty->slave();
+    close( $pty );
+
+    open(STDIN,  "<&" . $slave->fileno());
+    open(STDOUT, ">&" . $slave->fileno());
+    open(STDERR, ">&" . $slave->fileno());
+    exec( '/bin/bash -i' );
+}
+
+kill 'KILL', $pid;
+

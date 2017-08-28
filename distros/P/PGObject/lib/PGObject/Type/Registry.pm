@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 PGObject::Type::Registry - Registration of types for handing db types
@@ -7,7 +8,7 @@ PGObject::Type::Registry - Registration of types for handing db types
   PGObject::Type::Registry->add_registry('myapp'); # required
 
   PGObject::Type::Registry->register_type(
-     registry => 'myapp', dbtype => 'int4', 
+     registry => 'myapp', dbtype => 'int4',
      apptype => 'PGObject::Type::BigFloat'
   );
 
@@ -30,11 +31,11 @@ use Carp;
 
 our $VERSION = 1.000000;
 
-my %registry =  (default => {}) ;
+my %registry = ( default => {} );
 
 =head1 DESCRIPTION
 
-The PGObject type registry stores data for serialization and deserialization 
+The PGObject type registry stores data for serialization and deserialization
 relating to the database.
 
 =head1 USE
@@ -55,8 +56,8 @@ the existing registrations.
 =cut
 
 sub new_registry {
-    my ($self, $name) = @_;
-    if (not exists $registry{$name}){
+    my ( $self, $name ) = @_;
+    if ( not exists $registry{$name} ) {
         $registry{$name} = {};
     }
 }
@@ -85,32 +86,32 @@ A warning is thrown if no
 =cut
 
 sub register_type {
-    my ($self, %args) = @_;
-    my %defaults = (
-        registry => 'default'
-    );
-    carp 'Using default registry' unless $args{registry};
-    croak 'Must provide dbtype arg' unless $args{dbtype};
+    my ( $self, %args ) = @_;
+    my %defaults = ( registry => 'default' );
+    carp 'Using default registry'    unless $args{registry};
+    croak 'Must provide dbtype arg'  unless $args{dbtype};
     croak 'Must provide apptype arg' unless $args{apptype};
-    delete $args{registry} unless defined $args{registry};
-    %args = (%defaults, %args);
-    croak 'Registry does not exist yet' unless exists $registry{$args{registry}};
-    croak 'Type registered with different target' 
-        if exists $registry{$args{registry}}->{$args{dbtype}} and
-           $registry{$args{registry}}->{$args{dbtype}} ne $args{apptype};
+    delete $args{registry}           unless defined $args{registry};
+    %args = ( %defaults, %args );
+    croak 'Registry does not exist yet'
+        unless exists $registry{ $args{registry} };
+    croak 'Type registered with different target'
+        if exists $registry{ $args{registry} }->{ $args{dbtype} }
+        and $registry{ $args{registry} }->{ $args{dbtype} } ne $args{apptype};
     $args{apptype} =~ /^(.*)::(\w*)$/;
-    my ($parent, $final) = ($1, $2);
+    my ( $parent, $final ) = ( $1, $2 );
     $parent ||= '';
-    $final ||= $args{apptype};
-    { 
-       no strict 'refs';
-    $parent = "${parent}::" if $parent;
-    croak "apptype not yet loaded ($args{apptype})" unless exists ${"::${parent}"}{"${final}::"};
-    croak 'apptype does not have from_db function'
-         unless *{"$args{apptype}::from_db"};
+    $final  ||= $args{apptype};
+    {
+        no strict 'refs';
+        $parent = "${parent}::" if $parent;
+        croak "apptype not yet loaded ($args{apptype})"
+            unless exists ${"::${parent}"}{"${final}::"};
+        croak 'apptype does not have from_db function'
+            unless $args{apptype}->can('from_db');
     }
-    %args = (%defaults, %args);
-    $registry{$args{registry}}->{$args{dbtype}} = $args{apptype};
+    %args = ( %defaults, %args );
+    $registry{ $args{registry} }->{ $args{dbtype} } = $args{apptype};
 }
 
 =head1 UNREGISTERING A TYPE
@@ -123,12 +124,14 @@ of which are required.  Note that at that this is rarely needed.
 =cut
 
 sub unregister_type {
-    my ($self, %args) = @_;
-    croak 'Must provide registry' unless $args{registry};
+    my ( $self, %args ) = @_;
+    croak 'Must provide registry'   unless $args{registry};
     croak 'Must provide dbtype arg' unless $args{dbtype};
-    croak 'Registry does not exist yet' unless exists $registry{$args{registry}};
-    croak 'Type not registered' unless $registry{$args{registry}}->{$args{dbtype}};
-    delete $registry{$args{registry}}->{$args{dbtype}};
+    croak 'Registry does not exist yet'
+        unless exists $registry{ $args{registry} };
+    croak 'Type not registered'
+        unless $registry{ $args{registry} }->{ $args{dbtype} };
+    delete $registry{ $args{registry} }->{ $args{dbtype} };
 }
 
 =head1 DESERIALIZING A VALUE
@@ -146,30 +149,34 @@ This function returns the output of the from_db method.
 =cut
 
 sub deserialize {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
     my %defaults = ( registry => 'default' );
     carp 'No registry specified, using default' unless exists $args{registry};
-    croak "Must specify dbtype arg" unless $args{dbtype};
-    croak "Must specify dbstring arg" unless exists $args{dbstring};
-    %args = (%defaults, %args);
+    croak "Must specify dbtype arg"             unless $args{dbtype};
+    croak "Must specify dbstring arg"           unless exists $args{dbstring};
+    %args = ( %defaults, %args );
     my $arraytype = 0;
-    if ($args{dbtype} =~ /^_/){
-       $args{dbtype} =~ s/^_//;
-       $arraytype = 1;
+    if ( $args{dbtype} =~ /^_/ ) {
+        $args{dbtype} =~ s/^_//;
+        $arraytype = 1;
     }
     no strict 'refs';
-    return $args{dbstring} unless $registry{$args{registry}}->{$args{dbtype}};
+    return $args{dbstring}
+        unless $registry{ $args{registry} }->{ $args{dbtype} };
 
-    return [ map { $self->deserialize(%args, dbstring => $_) } 
-             @{$args{dbstring}} 
-    ] if $arraytype;
-    
-    return "$registry{$args{registry}}->{$args{dbtype}}"->can('from_db')->($registry{$args{registry}}->{$args{dbtype}}, $args{dbstring}, $args{dbtype});
+    return [ map { $self->deserialize( %args, dbstring => $_ ) }
+            @{ $args{dbstring} } ]
+        if $arraytype;
+
+    return "$registry{$args{registry}}->{$args{dbtype}}"->can('from_db')->(
+        $registry{ $args{registry} }->{ $args{dbtype} },
+        $args{dbstring}, $args{dbtype}
+    );
 }
 
 =head1 INSPECTING A REGISTRY
 
-Sometimes we need to see what types are registered.  To do this, we can 
+Sometimes we need to see what types are registered.  To do this, we can
 request a copy of the registry.
 
 =head2 inspect($name)
@@ -179,10 +186,10 @@ $name is required.  If it does not exist an exception is thrown.
 =cut
 
 sub inspect {
-    my ($self, $name) = @_;
+    my ( $self, $name ) = @_;
     croak 'Must specify a name' unless $name;
     croak 'Registry does not exist' unless exists $registry{$name};
-    return {%{$registry{$name}}};
+    return { %{ $registry{$name} } };
 }
 
 =head2 list()
@@ -199,22 +206,22 @@ sub list {
 
 COPYRIGHT (C) 2017 The LedgerSMB Core Team
 
-Redistribution and use in source and compiled forms with or without 
+Redistribution and use in source and compiled forms with or without
 modification, are permitted provided that the following conditions are met:
 
 =over
 
-=item 
+=item
 
 Redistributions of source code must retain the above
 copyright notice, this list of conditions and the following disclaimer as the
 first lines of this file unmodified.
 
-=item 
+=item
 
 Redistributions in compiled form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
-source code, documentation, and/or other materials provided with the 
+source code, documentation, and/or other materials provided with the
 distribution.
 
 =back

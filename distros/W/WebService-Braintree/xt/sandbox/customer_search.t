@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
+
 use lib qw(lib t/lib);
+
 use Test::More;
 use Time::HiRes qw(gettimeofday);
 use WebService::Braintree;
@@ -32,20 +34,20 @@ subtest "can find duplicate credit cards given payment method token" => sub {
     my $customer2 = create_customer($unique_company2, $unique_token2)->customer;
 
     my $search_result = WebService::Braintree::Customer->search(sub {
-                                                                    my $search = shift;
-                                                                    $search->payment_method_token_with_duplicates->is($customer1->credit_cards->[0]->token);
-                                                                });
+        my $search = shift;
+        $search->payment_method_token_with_duplicates->is($customer1->credit_cards->[0]->token);
+    });
 
     not_ok $search_result->is_empty;
-    ok contains($customer1->id, $search_result->ids);
-    ok contains($customer2->id, $search_result->ids);
+    ok grep { $_ eq $customer1->id } @{$search_result->ids};
+    ok grep { $_ eq $customer2->id } @{$search_result->ids};
 };
 
 subtest "can search on text fields" => sub {
     my $search_result = WebService::Braintree::Customer->search(sub {
-                                                                    my $search = shift;
-                                                                    $search->first_name->contains("NotIn")
-                                                                });
+        my $search = shift;
+        $search->first_name->contains("NotIn");
+    });
 
     not_ok $search_result->is_empty;
     is $search_result->first->first_name, $customer->first_name;
@@ -53,20 +55,20 @@ subtest "can search on text fields" => sub {
 
 subtest "can search on credit card number (partial match)" => sub {
     my $search_result = WebService::Braintree::Customer->search(sub {
-                                                                    my $search = shift;
-                                                                    $search->credit_card_number->ends_with(1111);
-                                                                });
+        my $search = shift;
+        $search->credit_card_number->ends_with(1111);
+    });
 
     not_ok $search_result->is_empty;
 
-    ok contains("1111", [map { $_->last_4 } @{$search_result->first->credit_cards}]);
+    ok grep { $_ eq "1111" } map { $_->last_4 } @{$search_result->first->credit_cards};
 };
 
 subtest "can search on ids (multiple values)" => sub {
     my $search_result = WebService::Braintree::Customer->search(sub {
-                                                                    my $search = shift;
-                                                                    $search->ids->in([$customer->id]);
-                                                                });
+        my $search = shift;
+        $search->ids->in([$customer->id]);
+    });
 
     not_ok $search_result->is_empty;
     is $search_result->first->id, $customer->id;
@@ -79,13 +81,13 @@ subtest "can search on created_at (range field)" => sub {
     ok $result->is_success;
     my $new_customer = WebService::Braintree::Customer->find($result->customer->id);
     my $search_result = WebService::Braintree::Customer->search(sub {
-                                                                    my $search = shift;
-                                                                    my $one_minute = DateTime::Duration->new(minutes => 1);
-                                                                    $search->created_at->min($new_customer->created_at - $one_minute);
-                                                                });
+        my $search = shift;
+        my $one_minute = DateTime::Duration->new(minutes => 1);
+        $search->created_at->min($new_customer->created_at - $one_minute);
+    });
 
     not_ok $search_result->is_empty;
-    ok contains($new_customer->id, $search_result->ids);
+    ok grep { $_ eq $new_customer->id } @{$search_result->ids};
 };
 
 subtest "can search on address (text field)" => sub {
@@ -95,19 +97,19 @@ subtest "can search on address (text field)" => sub {
     ok $result->is_success;
     my $new_customer = WebService::Braintree::Customer->find($result->customer->id);
     my $search_result = WebService::Braintree::Customer->search(sub {
-                                                                    my $search = shift;
-                                                                    $search->address_street_address->is("1 E Main St");
-                                                                    $search->address_first_name->is("Thomas");
-                                                                    $search->address_last_name->is("Otool");
-                                                                    $search->address_extended_address->is("Suite 3");
-                                                                    $search->address_locality->is("Chicago");
-                                                                    $search->address_region->is("Illinois");
-                                                                    $search->address_postal_code->is("60622");
-                                                                    $search->address_country_name->is("United States of America");
-                                                                });
+        my $search = shift;
+        $search->address_street_address->is("1 E Main St");
+        $search->address_first_name->is("Thomas");
+        $search->address_last_name->is("Otool");
+        $search->address_extended_address->is("Suite 3");
+        $search->address_locality->is("Chicago");
+        $search->address_region->is("Illinois");
+        $search->address_postal_code->is("60622");
+        $search->address_country_name->is("United States of America");
+    });
 
     not_ok $search_result->is_empty;
-    ok contains($new_customer->id, $search_result->ids);
+    ok grep { $_ eq $new_customer->id } @{$search_result->ids};
 };
 
 subtest "gets all customers" => sub {
@@ -137,7 +139,7 @@ sub create_customer {
                 locality => "Chicago",
                 region => "Illinois",
                 postal_code => "60622",
-                country_name => "United States of America"
+                country_name => "United States of America",
             }
         }
     };
@@ -147,12 +149,12 @@ sub create_customer {
 sub perform_search {
     my($criteria) = @_;
     WebService::Braintree::Customer->search(sub {
-                                                my $search = shift;
-                                                while (my($key, $value) = each(%$criteria)) {
-                                                    $search->$key->is($value);
-                                                }
-                                                return $search;
-                                            });
+        my $search = shift;
+        while (my($key, $value) = each(%$criteria)) {
+            $search->$key->is($value);
+        }
+        return $search;
+    });
 }
 
 sub make_search_criteria {

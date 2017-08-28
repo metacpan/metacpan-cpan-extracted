@@ -1,0 +1,26 @@
+---
+abstract: 'Flop a switch in your script to zero after a clean run with the switch set to one'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Flip-Flop
+provides:
+  Flip::Flop:
+    file: lib/Flip/Flop.pm
+    version: '20170823'
+requires:
+  Carp: '0'
+  Data::Table::Text: '20170820'
+  Test::More: '0'
+  perl: v5.16.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '20170823'

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Test-CheckBreaks
 
+0.019     2017-08-20 00:47:23Z
+          - switch from stringy to block eval in generated test, but carefully
+            such that unwanted dependencies still aren't picked up
+
 0.018     2017-04-17 00:24:22Z
           - fixed use of skip(..., 0) so messages are properly displayed
 

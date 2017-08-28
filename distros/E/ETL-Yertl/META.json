@@ -42,14 +42,18 @@
          },
          "requires" : {
             "Data::Partial::Google" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
             "File::HomeDir" : "0",
             "File::Spec" : "0",
             "Getopt::Long" : "2.36",
             "Hash::Merge::Simple" : "0",
             "Import::Base" : "0.010",
+            "JSON::MaybeXS" : "0",
             "List::Util" : "1.29",
             "Module::Runtime" : "0",
             "Moo" : "2",
+            "Net::Async::HTTP" : "0",
             "Parse::RecDescent" : "0",
             "Path::Tiny" : "0.072",
             "Pod::Usage::Return" : "0",
@@ -58,6 +62,7 @@
             "Text::Trim" : "0",
             "Type::Tiny" : "0",
             "Types::Standard" : "0",
+            "URI" : "0",
             "YAML" : "0",
             "boolean" : "0",
             "perl" : "5.010"
@@ -72,9 +77,11 @@
             "Dir::Self" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "Future" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "JSON::PP" : "0",
+            "Mock::MonkeyPatch" : "0",
             "Test::Deep" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
@@ -86,63 +93,71 @@
    "provides" : {
       "ETL::Yertl" : {
          "file" : "lib/ETL/Yertl.pm",
-         "version" : "0.029"
+         "version" : "0.032"
+      },
+      "ETL::Yertl::Adapter::influxdb" : {
+         "file" : "lib/ETL/Yertl/Adapter/influxdb.pm",
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::yfrom" : {
          "file" : "lib/ETL/Yertl/Command/yfrom.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::ygrok" : {
          "file" : "lib/ETL/Yertl/Command/ygrok.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::ymask" : {
          "file" : "lib/ETL/Yertl/Command/ymask.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::yq" : {
          "file" : "lib/ETL/Yertl/Command/yq.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::yq::RecDescent" : {
          "file" : "lib/ETL/Yertl/Command/yq/RecDescent.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::yq::RecDescentTree" : {
          "file" : "lib/ETL/Yertl/Command/yq/RecDescentTree.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::yq::Regex" : {
          "file" : "lib/ETL/Yertl/Command/yq/Regex.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::ysql" : {
          "file" : "lib/ETL/Yertl/Command/ysql.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Command::yto" : {
          "file" : "lib/ETL/Yertl/Command/yto.pm",
-         "version" : "0.029"
+         "version" : "0.032"
+      },
+      "ETL::Yertl::Command::yts" : {
+         "file" : "lib/ETL/Yertl/Command/yts.pm",
+         "version" : "0.032"
       },
       "ETL::Yertl::Format::csv" : {
          "file" : "lib/ETL/Yertl/Format/csv.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Format::default" : {
          "file" : "lib/ETL/Yertl/Format/default.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Format::json" : {
          "file" : "lib/ETL/Yertl/Format/json.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Format::yaml" : {
          "file" : "lib/ETL/Yertl/Format/yaml.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       },
       "ETL::Yertl::Util" : {
          "file" : "lib/ETL/Yertl/Util.pm",
-         "version" : "0.029"
+         "version" : "0.032"
       }
    },
    "release_status" : "stable",
@@ -158,7 +173,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#yertl"
    },
-   "version" : "0.029",
+   "version" : "0.032",
    "x_authority" : "cpan:PREACTION",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
 }

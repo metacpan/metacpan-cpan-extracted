@@ -124,8 +124,8 @@ sub _send_http ( $self, $method, @ ) {
             AUTHORIZATION => "Token $self->{token}",
             CONTENT_TYPE  => 'application/cbor',
         },
-        body      => to_cbor($payload),
-        on_finish => sub ($res) {
+        body => to_cbor($payload),
+        sub ($res) {
             if ( !$res ) {
                 $cb->( result [ $res->status, $res->reason ] ) if $cb;
             }
@@ -185,7 +185,8 @@ sub _get_ws ( $self, $cb ) {
         weaken $self;
 
         Pcore::WebSocket->connect_ws(
-            pcore            => $self->uri,
+            $self->uri,
+            protocol         => 'pcore',
             max_message_size => 0,
             compression      => $self->{compression},
             connect_timeout  => $self->{connect_timeout},

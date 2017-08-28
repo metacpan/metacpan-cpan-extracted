@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use File::Temp;
+use File::Basename;
+
+$| ++;
+
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+use MYDan::Oncall::Policy;
+
+MYDan::Util::Sudo->sudo();
+
+$MYDan::Util::OptConf::THIS = 'oncall';
+
+=head1 SYNOPSIS
+
+ $0 [ name ]
+
+=cut
+my %o = MYDan::Util::OptConf->load()->get()->dump();
+
+map { "mkdir -p $o{$_}" } keys %o;
+
+if ( @ARGV )
+{
+    my %path = map { $_ => "$o{$_}/$ARGV[0]" } qw( conf data );
+    my $temp = File::Temp->new( UNLINK => 0 );
+    MYDan::Oncall::Policy->new( $path{conf}, reverse => 1 )->dump( $temp );
+    system "chmod a+r $temp && mv $temp $path{data}";
+}
+else
+{
+    die "nothing to make.\n" unless my @name =
+    map { File::Basename::basename( $_ ) } glob "$o{conf}/*";
+    YAML::XS::DumpFile \*STDERR, { 'one of these' => \@name };
+}
+
+exit 0;

@@ -32,19 +32,28 @@
       },
       "runtime" : {
          "requires" : {
-            "Beam::Runner" : "0.010",
+            "Beam::Minion" : "0",
+            "Beam::Runner" : "0.013",
             "Beam::Wire" : "1.020",
-            "CPAN::Testers::Schema" : "0.008",
+            "CPAN::Testers::Report" : "0",
+            "CPAN::Testers::Schema" : "0.018",
             "DBI" : "0",
+            "Data::FlexSerializer" : "0",
             "Getopt::Long" : "2.36",
             "Import::Base" : "0.012",
+            "JSON::MaybeXS" : "0",
             "Log::Any" : "1.046",
+            "Metabase::User::Profile" : "0",
+            "Minion::Backend::SQLite" : "0",
+            "Minion::Backend::mysql" : "0",
+            "Sereal" : "0",
             "perl" : "5.024"
          }
       },
       "test" : {
          "recommends" : {
-            "CPAN::Meta" : "2.120900"
+            "CPAN::Meta" : "2.120900",
+            "Test::mysqld" : "0"
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
@@ -58,15 +67,23 @@
    "provides" : {
       "CPAN::Testers::Backend" : {
          "file" : "lib/CPAN/Testers/Backend.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "CPAN::Testers::Backend::Base" : {
          "file" : "lib/CPAN/Testers/Backend/Base.pm",
-         "version" : "0.001"
+         "version" : "0.002"
+      },
+      "CPAN::Testers::Backend::Migrate::MetabaseCache" : {
+         "file" : "lib/CPAN/Testers/Backend/Migrate/MetabaseCache.pm",
+         "version" : "0.002"
       },
       "CPAN::Testers::Backend::Migrate::MetabaseUsers" : {
          "file" : "lib/CPAN/Testers/Backend/Migrate/MetabaseUsers.pm",
-         "version" : "0.001"
+         "version" : "0.002"
+      },
+      "CPAN::Testers::Backend::ProcessReports" : {
+         "file" : "lib/CPAN/Testers/Backend/ProcessReports.pm",
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -81,8 +98,11 @@
          "web" : "https://github.com/cpan-testers/cpantesters-backend"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
 }
 

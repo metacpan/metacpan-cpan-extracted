@@ -1,0 +1,14 @@
+show_errors: 1
+logger: LogAny
+log: debug
+charset: UTF-8
+session: YAML
+template: template_toolkit
+plack_middlewares:
+  -
+    - Plack::Middleware::MethodOverride
+LogAny:
+  logger:
+    - Stdout
+
+

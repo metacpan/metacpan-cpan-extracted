@@ -1,0 +1,15 @@
+Revision history for Perl extension USB::LibUSB.
+
+0.01 2017-08-23
+	- first CPAN release
+    - on PrePAN: http://prepan.org/module/nYfNhvSqeCm
+    - Implement all portable features of libusb-1.0 including USB 3.0 descriptors
+    - Not yet implemented: Async interface, hotplug events, polling
+    - Raw XS interface: USB::LibUSB::XS
+    - More High-level interface: USB::LibUSB (currently uses Moo for OO)
+
+0.02 2017-08-24
+    - Add repo data to META
+
+0.03 2017-08-27
+    - Add missing functions to @EXPORT list

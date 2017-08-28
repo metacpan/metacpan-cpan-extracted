@@ -1,15 +1,14 @@
 package HPC::Runner::Command::Logger::JSON;
 
-use strict;
-use warnings;
-
 use MooseX::App::Role;
 use MooseX::Types::Path::Tiny qw/File Path Paths AbsPath AbsFile/;
 use File::Spec;
 use Data::UUID;
 use DateTime;
 use File::Path qw(make_path remove_tree);
-use Archive::Tar;
+use HPC::Runner::Command::Logger::JSON::Archive;
+
+with 'BioSAILs::Utils::Files::CacheDir';
 
 has 'data_dir' => (
     is            => 'rw',
@@ -19,7 +18,10 @@ has 'data_dir' => (
     required      => 1,
     documentation => q{Data directory for hpcrunner},
     predicate     => 'has_data_dir',
-    default       => '.hpcrunner-data',
+    default       => sub {
+        my $self = shift;
+        return File::Spec->catdir( $self->cache_dir, '.hpcrunner-data' );
+    }
 );
 
 option 'data_tar' => (
@@ -29,11 +31,16 @@ option 'data_tar' => (
     required      => 0,
     predicate     => 'has_data_tar',
     documentation => 'Location of tar file for hpcrunner logging data.',
+    lazy          => 1,
     trigger       => sub {
         my $self = shift;
         $self->data_tar->touchpath;
-        my $tar  = $self->set_archive;
+        my $tar = $self->set_archive;
         $self->archive($tar);
+    },
+    default => sub {
+        my $self = shift;
+        $self->create_data_archive;
     },
 );
 
@@ -45,25 +52,20 @@ has 'archive' => (
     clearer   => 'clear_archive',
     default   => sub {
         my $self = shift;
-        return $self->set_archive;
+        # return $self->set_archive;
     },
 );
 
 sub set_archive {
     my $self = shift;
-    my $tar  = Archive::Tar->new;
+    my $tar = HPC::Runner::Command::Logger::JSON::Archive->new( dirs => 1 );
 
-    if ( $self->has_data_tar && $self->data_tar->exists ) {
-        $tar->read( $self->data_tar );
-    }
-    elsif ( $self->has_data_tar ) {
+    if ( $self->has_data_tar ) {
         $self->data_tar->touchpath;
-        $tar->write( $self->data_tar );
     }
     else {
         #Create a UID and a tar
         my $archive = $self->create_data_archive;
-        $tar->write($archive);
     }
 
     $ENV{HPC_DATA_TAR} = $self->data_tar->stringify;

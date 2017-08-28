@@ -8,7 +8,7 @@ META.yml
 Makefile.PL
 README
 bin/testml
-bin/testml-perl5
+bin/testml-pl5
 lib/TestML/Bin.pm
 lib/TestML/Bin.pod
 t/000-compile-modules.t

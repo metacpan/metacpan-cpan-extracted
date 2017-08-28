@@ -4,7 +4,7 @@
       "karupanerura <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.5",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "DBD::BlackHole" : {
          "file" : "lib/DBD/BlackHole.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "DBD::BlackHole::db" : {
          "file" : "lib/DBD/BlackHole.pm"
@@ -78,7 +78,7 @@
          "web" : "https://github.com/karupanerura/DBD-BlackHole"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KARUPA",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

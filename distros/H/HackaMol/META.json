@@ -57,7 +57,7 @@
          "web" : "https://github.com/demianriccardi/HackaMol"
       }
    },
-   "version" : "0.043",
+   "version" : "0.044",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

@@ -3,9 +3,9 @@ package Alien::Base::ModuleBuild::Cabinet;
 use strict;
 use warnings;
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
-use Sort::Versions;
+use Sort::Versions qw( versioncmp );
 
 sub new {
   my $class = shift;

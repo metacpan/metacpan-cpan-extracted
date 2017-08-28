@@ -3,28 +3,25 @@ package Async::Stream;
 use 5.010;
 use strict;
 use warnings;
+no warnings qw(ambiguous);
 
 use Async::Stream::Item;
 use Async::Stream::Iterator;
-use Scalar::Util qw(weaken);
-use Carp;
-use Exporter 'import';
 
-our @EXPORT_OK = qw(merge branch);
+use Carp         qw(croak);
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
 Async::Stream - it's convenient way to work with async data flow.
 
-IMPORTANT! PUBLIC INTERFACE ISN'T STABLE, DO NOT USE IN PRODACTION BEFORE VERSION 1.0.
-
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -38,7 +35,7 @@ Module helps to organize your async code to stream.
       http://google.com
     );
 
-  my $stream = Async::Stream->new_from(@urls);
+  my $stream = Async::Stream::FromArray->new(@urls);
 
   $stream
     ->transform(sub {
@@ -46,11 +43,10 @@ Module helps to organize your async code to stream.
         http_get $_, sub {
             $return_cb->({headers => $_[0], body => $_[0]})
           };
-      }, 'async')
-    ->filter(sub { $_->{headers}->{Status} =~ /^2/ })
-    ->for_each(sub {
-        my $item = shift;
-        print $item->{body};
+      })
+    ->grep(sub { $_->{headers}->{Status} =~ /^2/ })
+    ->each(sub {
+        print $_->{body};
       });
 
 =head1 SUBROUTINES/METHODS
@@ -79,7 +75,8 @@ sub new {
 
 	if (ref $generator ne 'CODE') {
 		croak 'First argument can be only subroutine reference';
-	} elsif (defined $args{prefetch} and $args{prefetch} < 0) {
+	} 
+	elsif ($args{prefetch} && $args{prefetch} < 0) {
 		croak 'Prefetch can\'t be less then zero';
 	}
 
@@ -91,27 +88,6 @@ sub new {
 	$self->_set_head($generator);
 
 	return $self;
-}
-
-=head2 new_from(@array_of_items)
-
-Constructor creates instance of class. 
-Class method gets a list of items which are used for generating streams.
-	
-  my @domains = qw(
-    ucoz.com
-    ya.ru
-    googl.com
-  );
-  
-  my $stream = Async::Stream->new_from(@urls)
-
-=cut
-sub new_from {
-	my $class = shift;
-	my $items = \@_;
-
-	return $class->new(sub { $_[0]->(@{$items} ? (shift @{$items}) : ()) })
 }
 
 =head2 head()
@@ -155,8 +131,37 @@ Iterator is a instance of class Async::Stream::Iterator.
 =cut
 
 sub iterator {
-	return Async::Stream::Iterator->new($_[0]);
+	return Async::Stream::Iterator->new( $_[0]->head );
 }
+
+=head2 shift($return_cb)
+
+Remove first item from stream and return it to return callback
+
+  $stream->shift(sub {
+    if (@_){
+      my $item = shift;
+
+      ...
+    }
+  });
+=cut
+sub shift {
+	my ($self, $return_cb) = @_;
+
+	my $head = $self->head;
+	$head->next(sub {
+			if (@_) {
+				$self->{_head} = $_[0];
+				$return_cb->($_[0]->val);
+			} else {
+				$return_cb->();
+			}
+		});
+
+	return $self;
+}
+
 
 =head1 CONVEYOR METHODS
 
@@ -181,8 +186,7 @@ sub peek {
 			my $return_cb = shift;
 			$iterator->next(sub {
 					if (@_) {
-						local *{_} = \$_[0];
-						$action->();
+						$action->() for ($_[0]);
 						$return_cb->($_[0]);
 					} else {
 						$return_cb->()
@@ -195,22 +199,16 @@ sub peek {
 	return $self;
 }
 
-=head2 filter($predicate)
+=head2 grep($predicate)
 
-The method filters current stream. Filter works like lazy grep.
+The method greps current stream. Filter works like lazy grep.
 
-  $stream->filter(sub {$_ % 2})->to_arrayref(sub {print @{$_[0]}});
+  $stream->grep(sub {$_ % 2})->to_arrayref(sub {print @{$_[0]}});
 
 =cut
-sub filter {
+sub grep {
 	my $self = shift;
 	my $predicate = shift;
-	my $async_opt = shift // 'sync';
-
-	my $is_async = 0;
-	if ($async_opt eq 'async') {
-		$is_async = 1;
-	}
 
 	if (ref $predicate ne 'CODE') {
 		croak 'First argument can be only subroutine reference'
@@ -222,23 +220,12 @@ sub filter {
 		my $return_cb = shift;
 		$iterator->next(sub {
 			if (@_) {
-				my $item = shift;
-				local *{_} = \$item;
-				if ($is_async) {
-					$predicate->(sub {
-							my $is_intresting = shift;
-							if ($is_intresting) {
-								$return_cb->($item);
-							} else {
-								$next_cb->($return_cb);
-							}
-						});
+				my $is_valid;
+				$is_valid = $predicate->() for ($_[0]);
+				if ($is_valid) {
+					$return_cb->($_[0]);
 				} else {
-					if ($predicate->()) {
-						$return_cb->($item);
-					} else {
-						$next_cb->($return_cb);
-					}
+					$next_cb->($return_cb);
 				}
 			} else {
 				$return_cb->()
@@ -246,7 +233,40 @@ sub filter {
 		});
 	};
 
-	$self->_set_head($next_cb, $is_async ? () : ( prefetch => 0 ),);
+	$self->_set_head($next_cb, prefetch => 0);
+
+	return $self;
+}
+
+=head2 map($transformer)
+
+Method makes synchronous transformation for stream, like usual map for array.
+
+  $stream->map(sub { $_ * 2 })->to_arrayref(sub {print @{$_[0]}});
+
+=cut
+sub map {
+	my $self = shift;
+	my $transformer = shift;
+
+	if (ref $transformer ne 'CODE') {
+		croak 'First argument can be only subroutine reference'
+	}
+
+	my $iterator = $self->iterator;
+
+	my $next_cb; $next_cb = sub {
+		my $return_cb = shift;
+		$iterator->next(sub {
+			if (@_) {
+				$return_cb->($transformer->()) for ($_[0]);
+			} else {
+				$return_cb->()
+			}
+		});
+	};
+
+	$self->_set_head($next_cb, prefetch => 0);
 
 	return $self;
 }
@@ -259,22 +279,16 @@ You can use the method for example for async http request or another async
 operation.
 
   $stream->transform(sub {
-  	  $return_cb = shift;
+      $return_cb = shift;
       $return_cb->($_ * 2)
     })->to_arrayref(sub {print @{$_[0]}});
 
 =cut
 sub transform {
 	my $self = shift;
-	my $transform = shift;
-	my $async_opt = shift // 'sync';
+	my $transformer = shift;
 
-	my $is_async = 0;
-	if ($async_opt eq 'async') {
-		$is_async = 1;
-	}
-
-	if (ref $transform ne 'CODE') {
+	if (ref $transformer ne 'CODE') {
 		croak 'First argument can be only subroutine reference'
 	}
 
@@ -284,26 +298,21 @@ sub transform {
 		my $return_cb = shift;
 		$iterator->next(sub {
 			if (@_) {
-				local *{_} = \$_[0];
-				if ($is_async) {
-					$transform->($return_cb);
-				} else {
-					$return_cb->($transform->());
-				}
+				$transformer->($return_cb) for ($_[0]);
 			} else {
 				$return_cb->()
 			}
 		});
 	};
 
-	$self->_set_head($next_cb, $is_async ? () : ( prefetch => 0 ),);
+	$self->_set_head($next_cb);
 
 	return $self;
 }
 
 =head2 append(@list_streams)
 
-The method appends several streams to tail of current stream.
+The method appends one or several streams to tail of current stream.
 
   $stream->append($stream1)->to_arrayref(sub {print @{$_[0]}}); 
 =cut
@@ -348,9 +357,7 @@ sub skip {
 	my $self = shift;
 	my $skip = int shift;
 
-	if ($skip < 0) {
-		croak 'First argument can be only non-negative integer'
-	};
+	croak 'First argument can be only non-negative integer' if ($skip < 0);
 
 	if ($skip) {
 		my $iterator = $self->iterator;
@@ -372,9 +379,9 @@ sub skip {
 		$self->_set_head($generator, prefetch => 0);
 
 		return $self;
-	} else {
-		return $self;
 	}
+		
+	return $self;
 }
 
 =head2 limit($number)
@@ -387,38 +394,78 @@ sub limit {
 	my $self = shift;
 	my $limit = int shift;
 
-	if ($limit < 0) {
-		croak 'First argument can be only non-negative integer'
-	}
+	croak 'First argument can be only non-negative integer' if ($limit < 0);
 
-	my $generator;
-	if ($limit) {
-		my $iterator = $self->iterator;
+	my $iterator = $self->iterator;
 
-		$generator = sub {
-			my $return_cb = shift;
+	$self->_set_head(
+		sub {
+			my ($return_cb) = @_;
 			return $return_cb->() if ($limit-- <= 0);
 			$iterator->next($return_cb);
-		}
-	} else {
-		$generator = sub {
-			my $return_cb = shift;
-			$return_cb->();
-		}
+		}, 
+		prefetch => 0
+	);
+
+	return $self;
+}
+
+=head2 spray($number)
+
+The method helps to divide items of stream to several items. 
+For example you can use this method to get some page, 
+then get all link from that page and make from these link another items.
+
+  $stream->spray(sub{ return (1 .. $_) })->to_arrayref(sub {print @{$_[0]}});
+=cut
+sub spray {
+	my $self = shift;
+	my $splitter = shift;
+
+	if (ref $splitter ne 'CODE') {
+		croak 'First argument can be only subroutine reference'
 	}
+
+	my $iterator = $self->iterator;
+
+	my @buffer;
+	my $generator;
+	$generator = sub {
+		my $return_cb = shift;
+		if (@buffer) {
+			$return_cb->(shift @buffer);
+		} 
+		else {
+			$iterator->next(sub {
+					if (@_) {
+						@buffer = $splitter->() for ($_[0]);
+						if (@buffer) {
+							$return_cb->(shift @buffer);	
+						} else {
+							$generator->($return_cb);
+						}
+					} else {
+						$return_cb->();
+					}
+					return;
+				});
+		}
+		return;
+	};
 
 	$self->_set_head($generator, prefetch => 0);
 
 	return $self;
 }
 
-=head2 sorted($comparator)
+
+=head2 sort($comparator)
 
 The method sorts whole stream.
 
-  $stream->sorted(sub{$a <=> $b})->to_arrayref(sub {print @{$_[0]}});
+  $stream->sort(sub{$a <=> $b})->to_arrayref(sub {print @{$_[0]}});
 =cut
-sub sorted {
+sub sort {
 	my $self = shift;
 	my $comporator = shift;
 
@@ -430,7 +477,6 @@ sub sorted {
 
 	my $is_sorted = 0;
 	my @stream_items;
-	my $stream = $self;
 
 	my $iterator = $self->iterator;
 
@@ -449,8 +495,8 @@ sub sorted {
 							if (@stream_items) {
 								{
 									no strict 'refs';
-									local *{ $pkg . '::a' } = *{ ref($self) . '::a' };
-									local *{ $pkg . '::b' } = *{ ref($self) . '::b' };
+									local *{ $pkg . '::a' } = *{ __PACKAGE__ . '::a' };
+									local *{ $pkg . '::b' } = *{ __PACKAGE__ . '::b' };
 									@stream_items = sort $comporator @stream_items;
 								}
 								$is_sorted = 1;
@@ -470,16 +516,16 @@ sub sorted {
 	return $self;
 }
 
-=head2 cut_sorted($predicate, $comparator)
+=head2 cut_sort($predicate, $comparator)
 
-Sometimes stream can be infinity and you can't you $stream->sorted, 
+Sometimes stream can be infinity and you can't you $stream->sort, 
 you need certain parts of streams for example cut part by length of items.
 
   $stream
-    ->cut_sorted(sub {length $a != length $b},sub {$a <=> $b})
+    ->cut_sort(sub {length $a != length $b},sub {$a <=> $b})
     ->to_arrayref(sub {print @{$_[0]}});
 =cut
-sub cut_sorted {
+sub cut_sort {
 	my $self = shift;
 	my $cut = shift;
 	my $comporator = shift;
@@ -516,16 +562,16 @@ sub cut_sorted {
 							my $is_cut;
 							{
 								no strict 'refs';
-								local ${ $pkg . '::a' } = $prev;
-								local ${ $pkg . '::b' } = $_[0];
+								local *{ $pkg . '::a' } = \$prev;
+								local *{ $pkg . '::b' } = \$_[0];
 								$is_cut = $cut->();
 							}
 							$prev = $_[0];
 							if ($is_cut) {
 								{
 									no strict 'refs';
-									local *{ $pkg . '::a' } = *{ ref($self) . '::a' };
-									local *{ $pkg . '::b' } = *{ ref($self) . '::b' };
+									local *{ $pkg . '::a' } = *{ __PACKAGE__ . '::a' };
+									local *{ $pkg . '::b' } = *{ __PACKAGE__ . '::b' };
 									@sorted_array = sort $comporator @cur_slice;
 								}
 								@cur_slice = ($prev);
@@ -538,8 +584,8 @@ sub cut_sorted {
 							if (@cur_slice) {
 								{
 									no strict 'refs';
-									local *{ $pkg . '::a' } = *{ ref($self) . '::a' };
-									local *{ $pkg . '::b' } = *{ ref($self) . '::b' };
+									local *{ $pkg . '::a' } = *{ __PACKAGE__ . '::a' };
+									local *{ $pkg . '::b' } = *{ __PACKAGE__ . '::b' };
 									@sorted_array = sort $comporator @cur_slice;
 								}
 								@cur_slice = ();
@@ -550,6 +596,50 @@ sub cut_sorted {
 						}
 					});
 			}
+		}
+	};
+
+	$self->_set_head($generator, prefetch => 0);
+
+	return $self;
+}
+
+=head2 reverse()
+
+Revers order of stream's items. Can't be done on endless stream.
+
+  $stream->reverse;
+=cut
+sub reverse {
+	my $self = shift;
+
+	my $is_received = 0;
+	my @stream_items;
+
+	my $iterator = $self->iterator;
+
+	my $generator = sub {
+		my $return_cb = shift;
+		if ($is_received) {
+			$return_cb->( @stream_items ? pop @stream_items : () );
+		} else {
+			my $next_cb; $next_cb = sub {
+				my $next_cb = $next_cb;
+				$iterator->next(sub {
+						if (@_) {
+							push @stream_items, $_[0];
+							$next_cb->();
+						} else {
+							if (@stream_items) {
+								$is_received = 1;
+								$return_cb->(pop @stream_items);
+							} else {
+								$return_cb->();
+							}
+						}
+					});
+			};$next_cb->();
+			weaken $next_cb;
 		}
 	};
 
@@ -611,7 +701,7 @@ sub merge_in {
 							}
 							### ###
 							if (@iterators) {
-								my $item = pop @{$iterators[0]};
+								my $item = pop @{ $iterators[0] };
 								$return_cb->($item);
 							} else {
 								$return_cb->();
@@ -629,8 +719,7 @@ sub merge_in {
 
 =head2 $branch_stream branch_out($predicat);
 
-Split stream into 2 stream are divided by predicat. Branch returns 2 streams.
-First stream will contain "true" items, Second - "false" items;
+Method makes new branch of current stream by predicate.
 
   my $error_stream = $stream->branch_out(sub{$_->{headers}{status} != 200});
 =cut
@@ -659,22 +748,17 @@ sub branch_out {
 
 		$iterator->next(sub {
 				if (@_) {
-					my $item = shift;
 					my $is_branch_item;
-					
-					{
-						local *{_} = \$item;
-						$is_branch_item = $predicat->();
-					}
+					$is_branch_item = $predicat->() for ($_[0]);
 
 					if ($is_for_branch && !$is_branch_item) {
-						push @self_items, $item;
+						push @self_items, $_[0];
 						return $generator->($return_cb,$is_for_branch);
 					} elsif (!$is_for_branch && $is_branch_item) {
-						push @branch_items, $item;
+						push @branch_items, $_[0];
 						return $generator->($return_cb,$is_for_branch);
 					} else {
-						return $return_cb->($item);
+						return $return_cb->($_[0]);
 					}
 				} else {
 					$return_cb->();
@@ -710,10 +794,7 @@ sub distinct {
 		$iterator->next(sub {
 				if (@_) {
 					my $key;
-					{
-						local *{_} = \$_[0];
-						$key = $to_key->()
-					}
+					$key = $to_key->() for ($_[0]);
 
 					if (exists $index_of{$key}) {
 						$generator->($return_cb);
@@ -742,7 +823,7 @@ Method returns stream's iterator.
   $stream->to_arrayref(sub {
       $array_ref = shift;
 
-      #...	
+      #...
     });
 =cut
 sub to_arrayref {
@@ -773,17 +854,15 @@ sub to_arrayref {
 	return $self;
 }
 
-=head2 for_each($action)
+=head2 each($action)
 
 Method execute action on each item in stream.
 
-  $stream->to_arrayref(sub {
-      $array_ref = shift;
-      
-      #...	
+  $stream->each(sub {
+      print $_, "\n";
     });
 =cut
-sub for_each {
+sub each {
 	my $self = shift;
 	my $action = shift;
 
@@ -797,7 +876,39 @@ sub for_each {
 		my $each = $each;
 		$iterator->next(sub {
 			if (@_) {
-				$action->($_[0]);
+				$action->() for ($_[0]);
+				$each->()
+			}
+		});
+	}; $each->();
+	weaken $each;
+
+	return $self;
+}
+
+
+=head2 shift_each($action)
+
+Method acts like each,but after process item, it removes them from the stream
+
+  $stream->shift_each(sub {
+      print $_, "\n";
+    });
+=cut
+sub shift_each {
+	my $self = shift;
+	my $action = shift;
+
+	if (ref $action ne 'CODE') {
+		croak 'First argument can be only subroutine reference'
+	}
+
+
+	my $each; $each = sub {
+		my $each = $each;
+		$self->shift(sub {
+			if (@_) {
+				$action->() for ($_[0]);
 				$each->()
 			}
 		});
@@ -814,12 +925,13 @@ Performs a reduction on the items of the stream.
   $stream->reduce(
     sub{ $a + $b }, 
     sub {
-    	$sum = shift 
-		  #...
+      my $sum_of_items = shift;
+
+      ...
     });
 
 =cut
-sub reduce  {
+sub reduce {
 	my $self = shift;
 	my $code = shift;
 	my $return_cb = shift;
@@ -867,8 +979,9 @@ The method computes sum of all items in stream.
 
   $stream->sum(
     sub {
-    	$sum = shift 
-		  #...
+      my $sum_of_items = shift;
+
+      ...
     });
 =cut
 sub sum {
@@ -890,8 +1003,9 @@ The method finds out minimum item among all items in stream.
 
   $stream->min(
     sub {
-    	$sum = shift 
-		  #...
+      my $min_item = shift;
+      
+      ...
     });
 =cut
 sub min {
@@ -913,8 +1027,9 @@ The method finds out maximum item among all items in stream.
 
   $stream->max(
     sub {
-    	$sum = shift 
-		  #...
+      my $max_item = shift;
+
+      ...
     });
 =cut
 sub max {
@@ -935,7 +1050,7 @@ sub max {
 The method counts number items in streams.
 
   $stream->count(sub {
-      $count = shift;
+      my $count = shift;
     }); 
 =cut
 sub count {
@@ -969,7 +1084,11 @@ sub count {
 Method look for any equivalent item in steam. if there is any then return that.
 if there isn't  then return nothing.
 
-  $stream->any(sub {$_ % 2})->to_arrayref(sub {print @{$_[0]}});
+  $stream->any(sub {$_ % 2}, sub{
+    my $odd_item = shift
+
+    ...
+  });
 =cut
 sub any {
 	my $self = shift;
@@ -982,8 +1101,9 @@ sub any {
 		my $next_cb = $next_cb;
 		$iterator->next(sub {
 			if (@_) {
-				local *{_} = \$_[0];
-				if ($predicat->()) {
+				my $is_valid;
+				$is_valid = $predicat->() for ($_[0]);
+				if ($is_valid) {
 					$return_cb->($_[0]);
 				} else {
 					$next_cb->();
@@ -1006,12 +1126,13 @@ sub _set_head {
 
 	my $prefetch = $args{prefetch} // $self->{_prefetch};
 
+	my $new_generator = $generator;
+
 	if ($prefetch) {
-		my $new_generator = _get_prefetch_generator($generator, $self->{_prefetch});
-		$self->{_head} = Async::Stream::Item->new(undef, $new_generator);
-	} else {
-		$self->{_head} = Async::Stream::Item->new(undef, $generator);
+		$new_generator = _get_prefetch_generator($generator, $self->{_prefetch});
 	}
+
+	$self->{_head} = Async::Stream::Item->new(undef, $new_generator);
 
 	return $self;
 }

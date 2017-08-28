@@ -1,5 +1,5 @@
 --- mtwist.c.orig	2014-01-24 06:11:42.364027733 +0100
-+++ mtwist.c	2017-08-15 18:15:31.791880702 +0200
++++ mtwist.c	2017-08-21 21:17:27.694337383 +0200
 @@ -4,8 +4,10 @@
  #else
  #define ATTRIBUTE(attrs)
@@ -11,16 +11,42 @@
  #endif
  
  /*
-@@ -308,7 +310,7 @@
+@@ -308,8 +310,10 @@
   */
  double			mt_32_to_double;
  					/* Multiplier to convert long to dbl */
 -double			mt_64_to_double;
 +NVTYPE			mt_64_to_double;
  					/* Mult'r to cvt long long to dbl */
++NVTYPE			mt_96_to_double;
++NVTYPE			mt_128_to_double;
  
  /*
-@@ -460,6 +462,11 @@
+  * In the recurrence relation, the new value is XORed with MATRIX_A only if
+@@ -341,12 +345,16 @@
+      * don't worry too much about efficiency, since the assumption is that
+      * initialization is vastly rarer than generation of random numbers.
+      */
+-    mt_32_to_double = 1.0;
+-    for (i = 0;  i < BIT_WIDTH;  i++)
+-	mt_32_to_double /= 2.0;
+-    mt_64_to_double = mt_32_to_double;
+-    for (i = 0;  i < BIT_WIDTH;  i++)
+-	mt_64_to_double /= 2.0;
++    mt_32_to_double  = 1.0;
++    mt_64_to_double  = 1.0;
++    mt_96_to_double  = 1.0;
++    mt_128_to_double = 1.0;
++    for (i = 0;  i < BIT_WIDTH;  i++) {
++      mt_32_to_double  /= 2.0;
++      mt_64_to_double  /= 4.0;
++      mt_96_to_double  /= 8.0;
++      mt_128_to_double /= 16.0;
++    }
+ 
+     state->initialized = 1;
+     }
+@@ -460,6 +468,11 @@
      uint32_t		seeds[MT_STATE_SIZE])
  					/* Seed array to start from */
      {
@@ -32,7 +58,7 @@
      int			had_nz = 0;	/* NZ if at least one NZ seen */
      int			i;		/* Loop index */
  
-@@ -520,6 +527,11 @@
+@@ -520,6 +533,11 @@
      mt_state*		state,		/* State vector to seed */
      char*		seed_dev)	/* Device to seed from */
      {
@@ -44,7 +70,7 @@
      int			bytesread;	/* Byte count read from device */
      int			nextbyte;	/* Index of next byte to read */
      FILE*		ranfile;	/* Access to device */
-@@ -599,6 +611,11 @@
+@@ -599,6 +617,11 @@
  void mts_bestseed(
      mt_state*		state)		/* State vector to seed */
      {
@@ -56,7 +82,7 @@
      int			bytesread;	/* Byte count read from device */
      int			nextbyte;	/* Index of next byte to read */
      FILE*		ranfile;	/* Access to device */
-@@ -804,6 +821,11 @@
+@@ -804,6 +827,11 @@
      FILE*		statefile,	/* File to save to */
      mt_state*		state)		/* State to be saved */
      {

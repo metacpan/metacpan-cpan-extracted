@@ -24,6 +24,18 @@ struct SPVM_runtime {
   // Constant pool
   int32_t* constant_pool;
   
+  // Constant pool subroutine symbol table
+  SPVM_HASH* sub_id_symtable;
+  
+  // Constant pool type symbol table
+  SPVM_HASH* type_id_symtable;
+  
+  // Constant pool type symbol table
+  SPVM_HASH* field_id_symtable;
+  
+  // Constant pool type symbol table
+  SPVM_HASH* field_info_id_symtable;
+  
   // Call stack capacity
   int32_t call_stack_capacity;
   
@@ -35,16 +47,25 @@ struct SPVM_runtime {
   
   // Packages length
   int32_t packages_length;
-
-  // Indexes of package
-  int32_t package_indexes_constant_pool_index;
-
+  
+  // Package base
+  int32_t packages_base;
+  
   // Subroutines length
   int32_t subs_length;
-
-  // Indexes of package
-  int32_t sub_indexes_constant_pool_index;
-
+  
+  // Subroutine base
+  int32_t subs_base;
+  
+  // Subroutines length
+  int32_t types_length;
+  
+  // Subroutine base
+  int32_t types_base;
+  
+  // Type code to id
+  int32_t type_code_to_id_base;
+  
   int32_t objects_count;
   
   int32_t debug;
@@ -54,6 +75,6 @@ SPVM_RUNTIME* SPVM_RUNTIME_new();
 void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime);
 SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime);
 
-void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index);
+void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id);
 
 #endif

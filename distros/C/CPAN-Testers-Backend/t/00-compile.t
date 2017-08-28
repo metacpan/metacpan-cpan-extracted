@@ -6,12 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CPAN/Testers/Backend.pm',
     'CPAN/Testers/Backend/Base.pm',
-    'CPAN/Testers/Backend/Migrate/MetabaseUsers.pm'
+    'CPAN/Testers/Backend/Migrate/MetabaseCache.pm',
+    'CPAN/Testers/Backend/Migrate/MetabaseUsers.pm',
+    'CPAN/Testers/Backend/ProcessReports.pm'
 );
 
 

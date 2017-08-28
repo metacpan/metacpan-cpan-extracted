@@ -2,10 +2,10 @@ use strict;
 use warnings;
 use Dist::Zilla::PluginBundle::Author::Plicease;
 use Config::INI::Reader;
-use Path::Class qw( file dir );
+use Path::Tiny qw( path );
 use File::Temp qw( tempdir );
 
-BEGIN {  @INC = map { ref($_) ? $_ : dir($_)->absolute->stringify } @INC }
+BEGIN {  @INC = map { ref($_) ? $_ : path($_)->absolute->stringify } @INC }
 
 my $nl = 0;
 my $in_config;
@@ -30,7 +30,7 @@ my $bundle = Bundle->new;
 
 Dist::Zilla::PluginBundle::Author::Plicease::configure($bundle);
 
-chdir(dir("")->stringify);
+chdir(Path::Tiny->rootdir);
 
 package
   Bundle;

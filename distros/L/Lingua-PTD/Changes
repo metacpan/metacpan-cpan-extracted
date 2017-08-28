@@ -1,5 +1,8 @@
 Revision history for Lingua-PTD
 
+0.16    2017-08-20
+	- fixed 'do' code to cope with no . in @INC
+
 1.15    2015-10-10
         - Fixed dependencies
 

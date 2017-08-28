@@ -3,5 +3,7 @@
 eval $( perl -Mlocal::lib )
 
 export MOJO_HOME=$(pwd)
+export MOJO_LOG_SHORT=1 # Remove timestamps from Mojo, added by log svc
+export BEAM_MINION='mysql+dsn+dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application'
 
-exec cpantesters-legacy-metabase prefork -l http://*:8250 -G 90 -H 90 -i 90  2>&1
+exec cpantesters-legacy-metabase prefork -l http://*:8250 -G 1500 -H 300 -i 240  2>&1

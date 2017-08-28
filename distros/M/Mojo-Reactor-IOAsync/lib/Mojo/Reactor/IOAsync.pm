@@ -1,5 +1,5 @@
 package Mojo::Reactor::IOAsync;
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 
 $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::IOAsync';
 
@@ -7,19 +7,31 @@ use Carp 'croak';
 use IO::Async::Loop;
 use IO::Async::Handle;
 use IO::Async::Timer::Countdown;
-use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_REACTOR_IOASYNC_DEBUG} || 0;
 
-our $VERSION = '0.005';
+our $VERSION = '1.000';
 
 my $IOAsync;
 
+# Use IO::Async::Loop singleton for the first instance only
+sub new {
+	my $self = shift->SUPER::new;
+	if ($IOAsync++) {
+		$self->{loop} = IO::Async::Loop->really_new;
+	} else {
+		$self->{loop} = IO::Async::Loop->new;
+		$self->{loop_singleton} = 1;
+	}
+	return $self;
+}
+
 sub DESTROY {
-	shift->reset;
-	undef $IOAsync;
+	my $self = shift;
+	$self->reset;
+	undef $IOAsync if $self->{loop_singleton};
 }
 
 sub again {
@@ -36,75 +48,53 @@ sub io {
 	return $self->watch($handle, 1, 1);
 }
 
-sub is_running { !!shift->{running} }
-
-# We have to fall back to Mojo::Reactor::Poll, since IO::Async::Loop is unique
-sub new { $IOAsync++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
-
-sub next_tick {
-	my ($self, $cb) = @_;
-	push @{$self->{next_tick}}, $cb;
-	$self->{next_timer} //= $self->timer(0 => \&_next);
-	return undef;
-}
-
 sub one_tick {
 	my $self = shift;
 	
-	# Remember state for later
-	my $running = $self->{running};
-	$self->{running} = 1;
+	# Just one tick
+	local $self->{running} = 1 unless $self->{running};
 	
 	# Stop automatically if there is nothing to watch
-	return $self->stop unless $self->_loop->notifiers;
+	return $self->stop unless keys %{$self->{timers}} || keys %{$self->{io}} || $self->{loop}->notifiers;
 	
-	$self->_loop->loop_once;
-	
-	# Restore state if necessary
-	$self->{running} = $running if $self->{running};
+	$self->{loop}->loop_once;
 }
 
 sub recurring { shift->_timer(1, @_) }
 
 sub remove {
 	my ($self, $remove) = @_;
-	return unless defined $remove;
+	return !!0 unless defined $remove;
 	if (ref $remove) {
 		my $fd = fileno $remove;
-		if (exists $self->{io}{$fd}) {
+		my $io = delete $self->{io}{$fd};
+		if ($io) {
 			warn "-- Removed IO watcher for $fd\n" if DEBUG;
-			my $w = delete $self->{io}{$fd}{watcher};
-			$w->remove_from_parent if $w;
+			$io->{watcher}->remove_from_parent if $io->{watcher};
 		}
-		return !!delete $self->{io}{$fd};
+		return !!$io;
 	} else {
-		if (exists $self->{timers}{$remove}) {
+		my $timer = delete $self->{timers}{$remove};
+		if ($timer) {
 			warn "-- Removed timer $remove\n" if DEBUG;
-			my $w = delete $self->{timers}{$remove}{watcher};
-			$w->remove_from_parent if $w;
+			$timer->{watcher}->remove_from_parent if $timer->{watcher};
 		}
-		return !!delete $self->{timers}{$remove};
+		return !!$timer;
 	}
 }
 
 sub reset {
 	my $self = shift;
 	$_->remove_from_parent for
-		grep { defined } map { delete $_->{watcher} }
+		map { $_->{watcher} ? ($_->{watcher}) : () }
 		values %{$self->{io}}, values %{$self->{timers}};
-	delete @{$self}{qw(io next_tick next_timer timers)};
-}
-
-sub start {
-	my $self = shift;
-	$self->{running}++;
-	$self->one_tick while $self->{running};
+	$self->SUPER::reset;
 }
 
 sub stop {
 	my $self = shift;
 	delete $self->{running};
-	$self->_loop->loop_stop;
+	$self->{loop}->loop_stop;
 }
 
 sub timer { shift->_timer(0, @_) }
@@ -128,7 +118,7 @@ sub watch {
 			want_readready => $read,
 			want_writeready => $write,
 		);
-		$self->_loop->add($w);
+		$self->{loop}->add($w);
 	}
 	
 	return $self;
@@ -137,16 +127,8 @@ sub watch {
 sub _id {
 	my $self = shift;
 	my $id;
-	do { $id = md5_sum 't' . $self->_loop->time . rand 999 } while $self->{timers}{$id};
+	do { $id = md5_sum 't' . $self->{loop}->time . rand 999 } while $self->{timers}{$id};
 	return $id;
-}
-
-sub _loop { shift->{loop} ||= IO::Async::Loop->new }
-
-sub _next {
-	my $self = shift;
-	delete $self->{next_timer};
-	while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
 }
 
 sub _timer {
@@ -169,7 +151,7 @@ sub _timer {
 		delay => $after,
 		on_expire => $on_expire,
 	)->start;
-	$self->_loop->add($w);
+	$self->{loop}->add($w);
 	
 	if (DEBUG) {
 		my $is_recurring = $recurring ? ' (recurring)' : '';
@@ -240,12 +222,18 @@ C<Mojo::Reactor::IOAsync>.
 
 =head1 EVENTS
 
-L<Mojo::Reactor::IOAsync> inherits all events from L<Mojo::Reactor>.
+L<Mojo::Reactor::IOAsync> inherits all events from L<Mojo::Reactor::Poll>.
 
 =head1 METHODS
 
-L<Mojo::Reactor::IOAsync> inherits all methods from L<Mojo::Reactor> and
+L<Mojo::Reactor::IOAsync> inherits all methods from L<Mojo::Reactor::Poll> and
 implements the following new ones.
+
+=head2 new
+
+  my $reactor = Mojo::Reactor::IOAsync->new;
+
+Construct a new L<Mojo::Reactor::IOAsync> object.
 
 =head2 again
 
@@ -266,31 +254,12 @@ readable or writable.
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
 
-=head2 is_running
-
-  my $bool = $reactor->is_running;
-
-Check if reactor is running.
-
-=head2 new
-
-  my $reactor = Mojo::Reactor::IOAsync->new;
-
-Construct a new L<Mojo::Reactor::IOAsync> object.
-
-=head2 next_tick
-
-  my $undef = $reactor->next_tick(sub {...});
-
-Invoke callback as soon as possible, but not before returning or other
-callbacks that have been registered with this method, always returns C<undef>.
-
 =head2 one_tick
 
   $reactor->one_tick;
 
-Run reactor until an event occurs or no events are being watched anymore. Note
-that this method can recurse back into the reactor, so you need to be careful.
+Run reactor until an event occurs or no events are being watched anymore. See
+L</"CAVEATS">.
 
   # Don't block longer than 0.5 seconds
   my $id = $reactor->timer(0.5 => sub {});
@@ -316,16 +285,6 @@ Remove handle or timer.
   $reactor->reset;
 
 Remove all handles and timers.
-
-=head2 start
-
-  $reactor->start;
-
-Start watching for I/O and timer events, this will block until L</"stop"> is
-called or no events are being watched anymore. See L</"CAVEATS">.
-
-  # Start reactor only if it is not running already
-  $reactor->start unless $reactor->is_running;
 
 =head2 stop
 
@@ -363,9 +322,9 @@ this method requires an active I/O watcher.
 
 When using L<Mojo::IOLoop> with L<IO::Async>, the event loop must be controlled
 by L<Mojo::IOLoop> or L<Mojo::Reactor::IOAsync>, such as with the methods
-L</"start">, L</"stop">, and L</"one_tick">. Starting or stopping the event
-loop through L<IO::Async> will not provide required functionality to
-L<Mojo::IOLoop> applications.
+L<Mojo::Reactor::Poll/"start">, L</"stop">, and L</"one_tick">. Starting or
+stopping the event loop through L<IO::Async> will not provide required
+functionality to L<Mojo::IOLoop> applications.
 
 Externally-added L<IO::Async> notifiers will keep the L<Mojo::IOLoop> loop
 running if they are added to the event loop as a notifier, see

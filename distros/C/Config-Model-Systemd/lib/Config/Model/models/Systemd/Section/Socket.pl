@@ -138,6 +138,14 @@ it is read as IPv6 address x on a port y. Note that this might
 make the service available via IPv4, too, depending on the
 C<BindIPv6Only> setting (see below).
 
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID C<x> on
+a port C<y> address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit
+integer identifier in C<AF_VSOCK> analogous to an IP
+address.  Specifying the CID is optional, and may be set to the empty
+string.
+
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
 for C<AF_UNIX> sockets.
@@ -209,6 +217,14 @@ it is read as IPv6 address x on a port y. Note that this might
 make the service available via IPv4, too, depending on the
 C<BindIPv6Only> setting (see below).
 
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID C<x> on
+a port C<y> address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit
+integer identifier in C<AF_VSOCK> analogous to an IP
+address.  Specifying the CID is optional, and may be set to the empty
+string.
+
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
 for C<AF_UNIX> sockets.
@@ -279,6 +295,14 @@ If the address string is a string in the format [x]:y,
 it is read as IPv6 address x on a port y. Note that this might
 make the service available via IPv4, too, depending on the
 C<BindIPv6Only> setting (see below).
+
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID C<x> on
+a port C<y> address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit
+integer identifier in C<AF_VSOCK> analogous to an IP
+address.  Specifying the CID is optional, and may be set to the empty
+string.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available

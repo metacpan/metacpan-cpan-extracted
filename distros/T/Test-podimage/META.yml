@@ -1,21 +1,20 @@
---- #YAML:1.0
-name:               Test-podimage
-version:            0.04
-abstract:           ~
+---
+abstract: unknown
 author:
-    - Dmitry Karasik <dmitry@karasik.eu.org>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Dmitry Karasik <dmitry@karasik.eu.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-podimage
+no_index:
+  directory:
+    - t
+    - inc
+version: '0.05'

@@ -1,5 +1,5 @@
 package WebService::Braintree::TransparentRedirectGateway;
-$WebService::Braintree::TransparentRedirectGateway::VERSION = '0.92';
+$WebService::Braintree::TransparentRedirectGateway::VERSION = '0.93';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

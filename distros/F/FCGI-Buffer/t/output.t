@@ -11,7 +11,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 255;
+use Test::Most tests => 270;
 use IO::Uncompress::Brotli;
 use DateTime;
 use Capture::Tiny ':all';
@@ -405,6 +405,8 @@ OUTPUT: {
 	$length = $1;
 	ok(defined($length));
 	ok($length <= 40);
+	ok($body =~ /^<HTML>/);
+	ok($body !~ /<\/HTML>$/ms);
 
 	ok($headers =~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
 	$etag = $1;
@@ -412,6 +414,27 @@ OUTPUT: {
 
 	ok(length($body) eq $length);
 	ok(length($body) > 0);
+
+	$ENV{'HTTP_RANGE'} = 'bytes=20-';
+	($stdout, $stderr) = capture { test12() };
+
+	ok($stderr eq '');
+	($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
+	ok($headers =~ /^Content-Length:\s+(\d+)/m);
+	$length = $1;
+	ok(defined($length));
+	ok($body !~ /^<HTML>/);
+	ok($body =~ /<\/HTML>$/ms);
+
+	ok($headers =~ /^Status: 206 Partial Content/m);
+	ok($headers =~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
+	$etag = $1;
+	ok(defined($etag));
+
+	ok(length($body) eq $length);
+	ok(length($body) > 0);
+	ok($body !~ /^<HTML>/);
+	ok($body =~ /<\/HTML>$/ms);
 
 	$ENV{'HTTP_RANGE'} = 'bytes=30-39';
 	($stdout, $stderr) = capture { test12() };

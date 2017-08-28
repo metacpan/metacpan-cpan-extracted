@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '3.02'
+    version: '3.03'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
@@ -117,6 +117,8 @@ recommends:
   Digest::SHA: '0'
   File::Find: '0'
 requires:
+  Algorithm::Combinatorics: '0'
+  Algorithm::Loops: '0'
   Cwd: '0'
   Encode: '0'
   Fcntl: '0'
@@ -129,7 +131,7 @@ requires:
   Math::GMPq: '0.45'
   Math::GMPz: '0.39'
   Math::MPC: '0'
-  Math::MPFR: '3.29'
+  Math::MPFR: '3.36'
   Math::Prime::Util::GMP: '0.44'
   Memoize: '0'
   POSIX: '0'
@@ -143,7 +145,7 @@ requires:
 resources:
   bugtracker: https://github.com/trizen/sidef/issues
   homepage: https://github.com/trizen/sidef
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/trizen/sidef
-version: '3.02'
+version: '3.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

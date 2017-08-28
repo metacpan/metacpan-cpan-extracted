@@ -1,6 +1,6 @@
 
 package Bio::Roary::Output::GroupsMultifastasNucleotide;
-$Bio::Roary::Output::GroupsMultifastasNucleotide::VERSION = '3.8.2';
+$Bio::Roary::Output::GroupsMultifastasNucleotide::VERSION = '3.9.1';
 # ABSTRACT:  Take in a set of GFF files and a groups file and output one multifasta file per group with nucleotide sequences.
 
 
@@ -84,7 +84,7 @@ Bio::Roary::Output::GroupsMultifastasNucleotide - Take in a set of GFF files and
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

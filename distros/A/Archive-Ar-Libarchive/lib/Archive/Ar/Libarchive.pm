@@ -10,13 +10,7 @@ use Carp qw( carp longmess );
 use File::Basename ();
 
 # ABSTRACT: Interface for manipulating ar archives with libarchive
-our $VERSION = '2.06'; # VERSION
-
-unless($^O eq 'MSWin32')
-{
-  require Alien::Libarchive;
-  Alien::Libarchive->import;
-}
+our $VERSION = '2.07'; # VERSION
 
 require XSLoader;
 XSLoader::load('Archive::Ar::Libarchive', $VERSION);
@@ -260,7 +254,7 @@ Archive::Ar::Libarchive - Interface for manipulating ar archives with libarchive
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -592,8 +586,6 @@ and stack trace.
 =head1 SEE ALSO
 
 =over 4
-
-=item L<Alien::Libarchive>
 
 =item L<Archive::Ar>
 

@@ -1,37 +1,42 @@
 package C::Tokenize;
+use warnings;
+use strict;
+use Carp;
 require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw/tokenize
-                decomment
-		remove_quotes
-                @fields
-		$include
-		$include_local
-                $char_const_re
-                $comment_re
-                $cpp_re
-		$cvar_re
-                $cxx_comment_re
-		$decimal_re
-                $grammar_re
-		$hex_re
-                $number_re
-		$octal_re
-                $operator_re
-                $reserved_re
-                $single_string_re
-                $string_re
-                $trad_comment_re
-                $word_re
-               /;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw/
+		       $fargs_re
+		       $char_const_re
+		       $comment_re
+		       $cpp_re
+		       $cvar_re
+		       $cxx_comment_re
+		       $decimal_re
+		       $grammar_re
+		       $hex_re
+		       $include
+		       $include_local
+		       $number_re
+		       $octal_re
+		       $operator_re
+		       $reserved_re
+		       $single_string_re
+		       $string_re
+		       $trad_comment_re
+		       $word_re
+		       @fields
+		       decomment
+		       remove_quotes
+		       tokenize
+		       function_arg
+		       strip_comments
+		   /;
 
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-use warnings;
-use strict;
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf
 # 6.4.1
@@ -152,7 +157,7 @@ our $one_char_op_re = qr/(?:\%|\&|\+|\-|\=|\/|\||\.|\*|\:|>|<|\!|\?|~|\^)/;
 our $operator_re = qr/
                         (?:
                                 # Operators with two characters
-                                \|\||&&|<<|>>|--|\+\+|->
+                                \|\||&&|<<|>>|--|\+\+|->|==
                             |
                                 # Operators with one or two characters
                                 # followed by an equals sign.
@@ -240,7 +245,7 @@ our $include_local = qr/
 			      \s*
 			      include
 			      \s*
-			      "([a-zA-Z0-9\-]+\.h)"
+			      "((?:[^"]|\\"))"
 			  )
 			  (\s|$comment_re)*
 			  $
@@ -307,6 +312,17 @@ our $cvar_re = qr!
 		 )
 	     !x;
 
+# Function arguments
+
+our $fargs_re = qr!
+		      \(
+		      (?:
+			  \s*$cvar_re\s*,
+		      )*
+		      (?:\s*$cvar_re\s*)?
+		      \)
+		  !x;
+
 sub decomment
 {
     my ($comment) = @_;
@@ -333,7 +349,7 @@ sub tokenize
         if ($match =~ /^\s+$/s) {
             die "Bad match.\n";
         }
-	# Add one to the line number while
+	# Add one to the line number for each newline.
         while ($match =~ /\n/g) {
             $line++;
         }
@@ -382,6 +398,78 @@ sub get_lines
         $start = $end + 1;
     }
     return @lines;
+}
+
+sub function_arg
+{
+    my ($c) = @_;
+    my $tokens = tokenize ($c);
+    my @args;
+    # Number of ('s minus number of )'s.
+    my $depth = 0;
+    my $arg = '';
+    for (@$tokens) {
+	my $type = $_->{type};
+	my $value = $_->{$type};
+	if ($depth == 1 && $value eq ',') {
+	    $arg =~ s/^\s+//;
+	    push @args, $arg;
+	    $arg = '';
+	    next;
+	}
+	if ($value eq '(') {
+	    $depth++;
+	    if ($depth == 1) {
+		$arg =~ s/^\s+//;
+		push @args, $arg;
+		$arg = '';
+		next;
+	    }
+	}
+	if ($value eq ')') {
+	    $depth--;
+	    # Push final argument before the last ) of the function's
+	    # arguments.
+	    if ($depth == 0) {
+		$arg =~ s/^\s+//;
+		push @args, $arg;
+		$arg = '';
+		next;
+	    }
+	}
+	$arg .= $_->{leading} . $value;
+    }
+    if (! wantarray ()) {
+	carp "Return value of function_arg is array";
+    }
+    return @args;
+}
+
+# This comes from XS::Check, moved here because it might be useful for
+# other C projects.
+
+sub strip_comments
+{
+    my ($xs) = @_;
+    # Remove trad comments but keep the line numbering. Trad comments
+    # are deleted before C++ comments, see below for explanation.
+    while ($xs =~ /($trad_comment_re)/) {
+        my $comment = $1;
+	# If the C comment consists of int/* comment */x;, it compiles
+	# OK, but if /* comment */ is completely removed then intx;
+	# doesn't compile, so at minimum substitute one space
+	# character for each comment.
+        my $subs = ' ';
+        while ($comment =~ /([\n\r])/g) {
+            $subs .= $1;
+        }
+        $xs =~ s/\Q$comment\E/$subs/;
+    }
+    # Remove "//" comments. Must do this only after removing trad
+    # comments, otherwise "/* http://bad */" has its final "*/"
+    # wrongly removed.
+    $xs =~ s/$cxx_comment_re/\n/g;
+    return $xs;
 }
 
 1;

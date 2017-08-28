@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.32 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2017-07-10.
+    This document describes version 0.330 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2017-08-10.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run);
@@ -92,14 +92,41 @@ FUNCTIONS
 
         Capture stdout using Capture::Tiny.
 
+        Cannot be used together with "tee_*" or "capture_merged".
+
     *   capture_stderr => scalarref
 
         Capture stderr using Capture::Tiny.
+
+        Cannot be used together with "tee_*" or "capture_merged".
 
     *   capture_merged => scalarref
 
         Capture stdout and stderr in a single variable using Capture::Tiny's
         "capture_merged".
+
+        Cannot be used together with "tee_*", "capture_stdout", or
+        "capture_stderr".
+
+    *   tee_stdout => scalarref
+
+        Tee stdout using Capture::Tiny.
+
+        Cannot be used together with "capture_*" or "tee_merged".
+
+    *   tee_stderr => scalarref
+
+        Capture stderr using Capture::Tiny.
+
+        Cannot be used together with "capture_*" or "tee_merged".
+
+    *   tee_merged => scalarref
+
+        Capture stdout and stderr in a single variable using Capture::Tiny's
+        "capture_merged".
+
+        Cannot be used together with "capture_*", "tee_stdout", or
+        "tee_stderr".
 
     *   chdir => str
 
@@ -177,6 +204,18 @@ FUNCTIONS
 
         See option documentation in "system()".
 
+    *   tee_stdout => scalarref
+
+        See option documentation in "system()".
+
+    *   tee_stderr => scalarref
+
+        See option documentation in "system()".
+
+    *   tee_merged => scalarref
+
+        See option documentation in "system()".
+
     *   max_log_output => int
 
         If set, will limit result length being logged. It's a good idea to
@@ -219,6 +258,18 @@ FUNCTIONS
         See option documentation in "system()".
 
     *   capture_merged => scalarref
+
+        See option documentation in "system()".
+
+    *   tee_stdout => scalarref
+
+        See option documentation in "system()".
+
+    *   tee_stderr => scalarref
+
+        See option documentation in "system()".
+
+    *   tee_merged => scalarref
 
         See option documentation in "system()".
 

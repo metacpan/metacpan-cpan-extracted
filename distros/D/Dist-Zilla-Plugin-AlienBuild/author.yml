@@ -5,6 +5,7 @@ pod_spelling_system:
   # (regardless of what spell check thinks)
   stopwords:
     - ffi
+    - alienfile
 
 pod_coverage:
   skip: 0
@@ -12,5 +13,6 @@ pod_coverage:
   # for either Class or method.
   private:
     - Dist::Zilla::Plugin::AlienBase::Doc
+    - Dist::Zilla::Plugin::AlienBase::Wrapper
     - Dist::Zilla::Plugin::AlienBuild
 

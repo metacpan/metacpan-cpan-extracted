@@ -1,3 +1,6 @@
+v0.10.0 2017-08-25T09:25:06Z
+ - SQL functions returns $dbh as first arg
+
 v0.9.3 2017-08-07T17:27:13Z
  - blessed -> is_blessed_ref
 

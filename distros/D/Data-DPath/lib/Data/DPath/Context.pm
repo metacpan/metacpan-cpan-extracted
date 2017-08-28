@@ -1,7 +1,7 @@
 package Data::DPath::Context;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a current context that enables incremental searches
-$Data::DPath::Context::VERSION = '0.56';
+$Data::DPath::Context::VERSION = '0.57';
 use strict;
 use warnings;
 
@@ -29,9 +29,12 @@ BEGIN {
 
         $COMPARTMENT = Safe->new;
         $COMPARTMENT->permit(qw":base_core");
-        $COMPARTMENT->permit(qw":load");
         $COMPARTMENT->reval( 'no warnings;' ); # just so warnings is loaded
-        $COMPARTMENT->deny(qw":load");
+        if ($] >= 5.010) {
+            $COMPARTMENT->deny(qw":load");
+        } else {
+            $COMPARTMENT->deny(qw"require dofile caller");
+        }
         # map DPath filter functions into new namespace
         $COMPARTMENT->share(qw(affe
                                idx

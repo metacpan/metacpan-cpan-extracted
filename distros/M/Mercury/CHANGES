@@ -1,5 +1,12 @@
 Changelog for Mojolicious-Broker
 
+0.015     2017-08-22 20:15:48-05:00 America/Chicago
+
+    [Fixed]
+
+    - The broker now always logs to STDERR, even if a directory named
+      "log" happens to exist in the working directory.
+
 0.014     2017-08-07 14:20:52-05:00 America/Chicago
 
     [Fixed]

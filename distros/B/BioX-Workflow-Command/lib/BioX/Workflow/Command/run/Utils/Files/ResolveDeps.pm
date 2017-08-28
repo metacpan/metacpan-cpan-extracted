@@ -44,8 +44,10 @@ sub add_graph {
     my $self = shift;
     my $cond = shift;
 
-    for my $pair ( $self->files_pairs ) {
-        my $file = $pair->[0];
+    return unless $self->files;
+    return unless $self->has_files;
+
+    for my $file ( $self->all_files ) {
         if ( !exists $self->rule_deps->{ $self->rule_name }->{$cond}->{$file} )
         {
             $self->rule_deps->{ $self->rule_name }->{$cond}->{$file} = 1;
@@ -58,26 +60,6 @@ sub post_process_rules {
 
     #Create flags for outputs that have a similar input
     $self->app_log->info();
-    $self->app_log->info( 'Selected rules:' . "\t"
-          . join( ', ', @{ $self->select_rule_keys } )
-          . "\n" )
-      if $self->use_timestamps;
-    # $self->app_log->info( 'Looking for orphan INPUTs '
-    #       . '(INPUTs with no corresponding OUTPUTs)' );
-
-    # my $rule_count = 0;
-    # foreach my $rule ( $self->all_select_rule_keys ) {
-    #     ##Skip the first rule
-    #     if ( $rule_count == 0 ) {
-    #         $rule_count++;
-    #         next;
-    #     }
-    #     $self->check_input_output($rule);
-    # }
-    #
-    #
-    # $self->app_log->warn( "Found Orphan Inputs (inputs with no corresponding outputs)\n" . $self->orphan_table )
-    #   if $self->orphan_inputs;
 
     $self->dedeps;
     $self->process_auto_deps;
@@ -88,7 +70,7 @@ sub post_process_rules {
 sub print_process_workflow {
     my $self = shift;
 
-    $self->app_log->info( 'Post processing rules and printing workflow...' );
+    $self->app_log->info('Post processing rules and printing workflow...');
     foreach my $rule ( $self->all_rule_names ) {
 
         #TODO This should be named select_rule_names
@@ -99,9 +81,44 @@ sub print_process_workflow {
         my $text = $self->process_obj->{$rule}->{text} || [];
 
         map { $self->fh->say($_) } @{$meta};
-        $self->fh->say("");
-        map { $self->fh->say($_) } @{$text};
+        $self->fh->say('');
+        map { $self->fh->say($_); $self->fh->say('') } @{$text};
 
+        $self->print_stats_rules($rule);
+
+    }
+}
+
+sub print_stats_rules {
+    my $self = shift;
+    my $rule = shift;
+
+    return unless $self->run_stats;
+    $self->fh->say("");
+
+    $self->fh->say( $self->comment_char );
+    $self->fh->say(
+        $self->comment_char . " Starting " . $rule . "_biox_stats" );
+    $self->fh->say( $self->comment_char );
+    $self->fh->say("");
+
+    $self->fh->say( $self->comment_char );
+    $self->fh->say( '### HPC Directives' . "\n" );
+    $self->fh->say( $self->comment_char );
+    $self->fh->say( '#HPC jobname=' . $rule . "_biox_stats" );
+    $self->fh->say( '#HPC deps=' . $rule );
+    $self->fh->say('#HPC mem=2GB');
+    $self->fh->say('#HPC cpus_per_task=1');
+    $self->fh->say( $self->comment_char );
+    $self->fh->say("");
+
+    foreach my $sample ($self->all_samples){
+    $self->fh->say("");
+    $self->fh->say(
+        "biox stats --samples " . $sample . " \\" );
+    $self->fh->say( "--select_rules " . $rule . " \\" );
+    $self->fh->say( "-w " . $self->cached_workflow );
+    $self->fh->say("");
     }
 }
 
@@ -165,67 +182,6 @@ sub process_auto_deps {
         my @text = split( "\n", $before_meta );
         $self->process_obj->{$rule}->{meta} = \@text;
     }
-
-
-}
-
-#TODO Add in deps check
-
-has 'orphan_table' => (
-    is      => 'rw',
-    default => sub {
-        my $self = shift;
-        my $t    = Text::ASCIITable->new();
-        $t->setCols( [ 'Rule', 'INPUT', 'Possible Matches' ] );
-        return $t;
-    }
-);
-
-has 'orphan_inputs' => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 0,
-);
-
-sub check_input_output {
-    my $self = shift;
-    my $rule = shift;
-
-    #if this exists it means we already processed this through hpc-deps
-    # return if exists $self->graph->{$rule};
-    $self->graph->{$rule} = [] if !exists $self->graph->{$rule};
-
-    my @INPUTS = keys %{ $self->rule_deps->{$rule}->{INPUT} };
-
-    #TODO Add Seen
-
-    foreach my $srule ( $self->all_select_rule_keys ) {
-        next if $srule eq $rule;
-        my @trow = ();
-
-        my @inter = grep( $self->rule_deps->{$srule}->{OUTPUT}->{$_}, @INPUTS );
-        if ( !@inter ) {
-            $self->orphan_inputs(1);
-            my @OUTPUTS = keys %{ $self->rule_deps->{$srule}->{OUTPUT} };
-            map {
-                my @matches = amatch( $_, @OUTPUTS );
-                my @rels = map { path($_)->relative->stringify } @matches;
-                my $f = path($_)->relative->stringify;
-
-                push( @trow, $rule );
-                push( @trow, $f );
-                push( @trow, join( "\n", @rels ) );
-                $self->orphan_table->addRow( \@trow );
-                $self->orphan_table->addRowLine();
-                @trow = ();
-
-            } @INPUTS;
-        }
-        else {
-            push( @{ $self->graph->{$rule} }, $srule );
-        }
-    }
-
 }
 
 1;

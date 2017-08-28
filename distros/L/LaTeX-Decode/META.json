@@ -1,16 +1,16 @@
 {
    "abstract" : "Decode from LaTeX to Unicode",
    "author" : [
-      "FranÃ§ois Charette <firmicus@cpan.org>"
+      "Francois Charette <firmicus@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LaTeX-Decode",
    "prereqs" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "LaTeX::Decode" : {
          "file" : "lib/LaTeX/Decode.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "LaTeX::Decode::Data" : {
          "file" : "lib/LaTeX/Decode/Data.pm"
@@ -45,8 +45,11 @@
    "resources" : {
       "license" : [
          "http://opensource.org/licenses/artistic-license-2.0.php"
-      ]
+      ],
+      "repository" : {
+         "url" : "http://github.com/fc7/LaTeX-Decode"
+      }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27202"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

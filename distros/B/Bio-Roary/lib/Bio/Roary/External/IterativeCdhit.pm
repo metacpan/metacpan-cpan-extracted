@@ -1,5 +1,5 @@
 package Bio::Roary::External::IterativeCdhit;
-$Bio::Roary::External::IterativeCdhit::VERSION = '3.8.2';
+$Bio::Roary::External::IterativeCdhit::VERSION = '3.9.1';
 # ABSTRACT: Iteratively run CDhit
 
 
@@ -87,7 +87,7 @@ Bio::Roary::External::IterativeCdhit - Iteratively run CDhit
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

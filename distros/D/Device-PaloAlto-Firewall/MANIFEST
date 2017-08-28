@@ -21,6 +21,8 @@ t/07-high_availability.t
 t/08-environmentals.t
 t/09-ip_user_map.t
 t/10-server_monitor.t
+t/11-interface_counters.t
+t/12-bfd.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
@@ -28,6 +30,3 @@ t/release-kwalitee.t
 t/release-live_error_codes.t
 t/release-live_method_calls.t
 tags
-xml_scratchpad/show_system_environmentals_power-supply.xml
-xml_scratchpad/show_system_environmentals_power.xml
-xml_scratchpad/show_user_ip-user-mapping_all.xml

@@ -8,11 +8,14 @@ Makefile.PL
 README
 dist.ini
 lib/Bencher/Scenario/DataCleansing/Object.pm
+lib/Bencher/Scenario/DataCleansing/Object_DateTime.pm
 lib/Bencher/Scenario/DataCleansing/Startup.pm
 lib/Bencher/ScenarioR/DataCleansing/Object.pm
+lib/Bencher/ScenarioR/DataCleansing/Object_DateTime.pm
 lib/Bencher/ScenarioR/DataCleansing/Startup.pm
 lib/Bencher/Scenarios/DataCleansing.pm
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 weaver.ini

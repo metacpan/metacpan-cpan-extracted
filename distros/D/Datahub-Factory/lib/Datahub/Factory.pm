@@ -1,6 +1,6 @@
 package Datahub::Factory;
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 use Datahub::Factory::Sane;
 
@@ -142,6 +142,11 @@ Set the log_level. Takes a numeric parameter. Supported levels are:
 
 Selects an output for the log messages. By default, it will send them to STDERR (pass C<STDERR> as parameter), but STDOUT (C<STDOUT>) and a log file (C<logs/import_-date-.log>) (C<STATISTICS>) are also supported.
 
+=item C<--verbose>
+
+Set verbosity. Invoking the command with the --verbose, -v flag will render
+verbose output to the terminal.
+
 =back
 
 =head1 COMMANDS
@@ -165,12 +170,12 @@ I<Datahub::Factory> uses a plugin-based architecture, making it easy to extend
 with new functionality.
 
 New commands can be added by creating a Perl module that contains a C<command_name.pm>
-file in the C<lib/Datahub/Factory/Command> path. I<Datahub::Factory> uses the 
+file in the C<lib/Datahub/Factory/Command> path. I<Datahub::Factory> uses the
 L<Datahub::Factory::Command> namespace and L<App::Cmd> internally.
 
 New L<Datahub::Factory::Importer>, L<Exmporter|Datahub::Factory::Exporter> and L<Fixer|Datahub::Factory::Fixer> plugins
 can be added in the same way, in the C<lib/Datahub/Factory/Importer>, C<Exporter> or C<Fixer>
-path. All plugins use the I<Datahub::Factory::Importer/Exporter/Fixer> namespace and the 
+path. All plugins use the I<Datahub::Factory::Importer/Exporter/Fixer> namespace and the
 namespace package as a L<Moose::Role>.
 
 =head1 AUTHORS

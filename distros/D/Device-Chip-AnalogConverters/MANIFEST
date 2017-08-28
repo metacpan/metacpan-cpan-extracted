@@ -1,0 +1,19 @@
+Build.PL
+Changes
+examples/ads1115.pl
+examples/ltc2400.pl
+examples/mcp4725.pl
+lib/Device/Chip/ADS1115.pm
+lib/Device/Chip/AnalogConverters.pm
+lib/Device/Chip/LTC2400.pm
+lib/Device/Chip/MCP4725.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/50-ads1115.t
+t/50-ltc2400.t
+t/50-mcp4725.t
+t/99pod.t

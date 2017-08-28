@@ -15,6 +15,7 @@ use File::stat;
 use File::Spec;
 use Path::Tiny;
 use File::Basename;
+use Capture::Tiny ':all';
 
 command_short_description 'Query submissions by project, or jobname';
 command_long_description 'Query submissions by project, or jobname. ' . 'This
@@ -102,7 +103,7 @@ parameter 'stats_type' => (
     isa     => 'Str',
     default => 'JSON',
     documentation =>
-      'hpcrunner.pl stats json/sqlite/elasticsearch --other_opts',
+      'hpcrunner.pl stats JSON/Sqlite/Elasticsearch .',
 );
 
 sub BUILD {
@@ -110,19 +111,27 @@ sub BUILD {
 
     if ( $self->json && $self->summary ) {
         apply_all_roles( $self,
-            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Summary::JSONOutput' );
+                'HPC::Runner::Command::stats::Logger::'
+              . $self->stats_type
+              . '::Summary::JSONOutput' );
     }
     elsif ( !$self->json && $self->summary ) {
         apply_all_roles( $self,
-            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Summary::TableOutput' );
+                'HPC::Runner::Command::stats::Logger::'
+              . $self->stats_type
+              . '::Summary::TableOutput' );
     }
     elsif ( $self->json && $self->long ) {
         apply_all_roles( $self,
-            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Long::JSONOutput' );
+                'HPC::Runner::Command::stats::Logger::'
+              . $self->stats_type
+              . '::Long::JSONOutput' );
     }
     elsif ( !$self->json && $self->long ) {
         apply_all_roles( $self,
-            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Long::TableOutput' );
+                'HPC::Runner::Command::stats::Logger::'
+              . $self->stats_type
+              . '::Long::TableOutput' );
     }
 }
 
@@ -140,6 +149,9 @@ sub iter_submissions {
     foreach my $result ( @{$results} ) {
         $self->clear_archive;
         $self->data_tar($result);
+        capture {
+            $self->archive->read( $self->data_tar );
+        };
         my $basename = $self->data_tar->basename('.tar.gz');
         my $submission_file =
           File::Spec->catdir( $basename, 'submission.json' );
@@ -153,7 +165,7 @@ sub iter_submissions {
             $self->iter_jobs_long( $submission, $jobref ) if $self->long;
         }
         else {
-            $self->app_log->info( 'Data Tar '
+            $self->screen_log->info( 'Data Tar '
                   . $self->data_tar
                   . ' does not contain any submission info!' );
         }

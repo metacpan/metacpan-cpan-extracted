@@ -80,8 +80,8 @@ perl command.pl 2
 =cut
 
 sub _log_commands {
-  my $self = shift;
-  my $pid = shift;
+    my $self = shift;
+    my $pid  = shift;
 
     my $dt1 = DateTime->now( time_zone => 'local' );
     $self->task_start_time($dt1);
@@ -91,10 +91,11 @@ sub _log_commands {
     my $hms = $dt1->hms();
 
     $self->clear_table_data;
-    $self->set_table_data( start_time    => "$ymd $hms" );
+    $self->set_table_data( start_time    => "$dt1" );
     $self->set_table_data( start_time_dt => $dt1 );
 
     my ( $cmdpid, $exitcode ) = $self->log_job;
+
     return unless defined $cmdpid;
     return unless defined $exitcode;
 
@@ -158,7 +159,7 @@ sub log_table {
     my $ymd = $dt1->ymd();
     my $hms = $dt1->hms();
 
-    $self->set_table_data( exit_time => "$ymd $hms" );
+    $self->set_table_data( exit_time => "$dt1" );
     $self->set_table_data( exitcode  => $exitcode );
     $self->set_table_data( duration  => $duration );
     $self->set_table_data( task_id   => $self->counter );
@@ -186,7 +187,7 @@ sub log_table {
         my $schedulerid = $self->job_scheduler_id || '';
 
         my $jobname = $self->jobname || '';
-        $text =<<EOF;
+        $text = <<EOF;
 |$version|$schedulerid|$jobname|$task_tags|$cmdpid|$exitcode|$duration|
 EOF
 
@@ -194,12 +195,13 @@ EOF
         $self->set_table_data( jobname     => $jobname );
     }
     else {
-        $text =<<EOF;
+        $text = <<EOF;
 |$cmdpid|$exitcode|$duration|
 EOF
     }
 
-    write_file($self->process_table, {append => 1}, $text) || $self->app_log->warn("Unable to write to the process table! $!");
+    write_file( $self->process_table, { append => 1 }, $text )
+      || $self->app_log->warn("Unable to write to the process table! $!");
 }
 
 #TODO move to execute_jobs
@@ -223,38 +225,41 @@ sub log_job {
     my $self = shift;
 
     #Start running job
-    my ( $infh, $outfh, $errfh, $exitcode );
+    my ( $infh, $outfh, $errfh, $exitcode, $stderr );
     $errfh = gensym();    # if you uncomment this line, $errfh will
     my $cmdpid;
 
-    try {
-        $cmdpid = open3( $infh, $outfh, $errfh, $self->cmd );
-    }
-    catch {
+    eval { $cmdpid = open3( $infh, $outfh, $errfh, $self->cmd ); };
+    if ($@) {
+        $stderr   = $@;
         $exitcode = $?;
-        $self->app_log(
-            "fatal",
-            "Error running job " . $self->counter . " with ExitCode $exitcode",
-            $cmdpid
-        );
-        $self->app_log->warn("There was an error running the command $@\n");
+        $self->app_log->fatal( "Error running job "
+              . $self->counter
+              . " with ExitCode $exitcode" );
 
-        return ( $cmdpid, $exitcode );
-    };
+        $self->app_log->warn("There was an error running the command $@\n");
+        $cmdpid = 0;
+    }
 
     $infh->autoflush();
 
     # Start Command Log
     $self->start_command_log($cmdpid);
     $self->create_json_task($cmdpid);
-    $self->get_cmd_stats($cmdpid);
+
+    ##IF we have an exitcode the job failed with a command not found
+    return ( $cmdpid, $exitcode ) if $exitcode;
+
+    ## Rolling back cmd_stats for now
+    # $self->get_cmd_stats($cmdpid);
 
     my $sel = new IO::Select;    # create a select object
     $sel->add( $outfh, $errfh ); # and add the fhs
 
-    while (1) {
-        last unless $sel->can_read;
-        my @ready = $sel->can_read;
+    # while (1) {
+    #     last unless $sel->can_read;
+    while ( my @ready = $sel->can_read ) {
+
         foreach my $fh (@ready) {    # loop through them
             my $line;
             my $len = sysread $fh, $line, 4096;
@@ -275,12 +280,15 @@ sub log_job {
                 }
             }
         }
-        $self->get_cmd_stats($cmdpid);
-        sleep( $self->poll_time );
+
     }
 
+    # $self->get_cmd_stats($cmdpid);
+    # sleep( $self->poll_time );
+    # }
+
     waitpid( $cmdpid, 1 );
-    $exitcode = $?;
+    $exitcode = $? unless $exitcode;
 
     return ( $cmdpid, $exitcode );
 }
@@ -326,7 +334,7 @@ sub start_command_log {
           . "\nJobID:\t"
           . $self->job_scheduler_id
           . " \nCmdPID:\t"
-          . $cmdpid . "\n"
+          . $cmdpid
           . "\nHostname:\t"
           . $self->hostname
           . "\nJob Scheduler ID:\t"

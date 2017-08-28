@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::MtxOrb
 # ABSTRACT:  Configuration class LCDd::MtxOrb
+
 =encoding utf8
 
 =head1 NAME
@@ -16,66 +17,206 @@ generated from LCDd.conf
 
 =head2 Brightness
 
-Set the initial brightness I<< Optional. Type integer. upstream_default: '1000'.  >> 
+Set the initial brightness I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1000
+
+=back
+
+
 
 =head2 Contrast
 
 Set the initial contrast 
 NOTE: The driver will ignore this if the display
-      is a vfd or vkd as they don't have this feature. I<< Optional. Type uniline. upstream_default: '480'.  >> 
+      is a vfd or vkd as they don't have this feature. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+480
+
+=back
+
+
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 KeyMap_A
 
 The following table translates from MtxOrb key letters to logical key names.
-By default no keys are mapped, meaning the keypad is not used at all. I<< Optional. Type uniline. upstream_default: 'Left'.  >> 
+By default no keys are mapped, meaning the keypad is not used at all. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Left
+
+=back
+
+
 
 =head2 KeyMap_B
 
-I<< Optional. Type uniline. upstream_default: 'Right'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Right
+
+=back
+
+
 
 =head2 KeyMap_C
 
-I<< Optional. Type uniline. upstream_default: 'Up'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Up
+
+=back
+
+
 
 =head2 KeyMap_D
 
-I<< Optional. Type uniline. upstream_default: 'Down'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Down
+
+=back
+
+
 
 =head2 KeyMap_E
 
-I<< Optional. Type uniline. upstream_default: 'Enter'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Enter
+
+=back
+
+
 
 =head2 KeyMap_F
 
-I<< Optional. Type uniline. upstream_default: 'Escape'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+Escape
+
+=back
+
+
 
 =head2 OffBrightness
 
 Set the initial off-brightness 
 This value is used when the display is normally
-switched off in case LCDd is inactive. I<< Optional. Type integer. upstream_default: '0'.  >> 
+switched off in case LCDd is inactive. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head2 Size
 
-Set the display size I<< Optional. Type uniline. upstream_default: '20x4'.  >> 
+Set the display size I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20x4
+
+=back
+
+
 
 =head2 Speed
 
-Set the communication speed I<< Optional. Type enum. choice: '1200', '2400', '9600', '19200'. upstream_default: '19200'.  >> 
+Set the communication speed I< Optional. Type enum. choice: '1200', '2400', '9600', '19200'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+19200
+
+=back
+
+
 
 =head2 Type
 
-Set the display type I<< Optional. Type enum. choice: 'lcd', 'lkd', 'vfd', 'vkd'. upstream_default: 'lcd'.  >> 
+Set the display type I< Optional. Type enum. choice: 'lcd', 'lkd', 'vfd', 'vkd'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+lcd
+
+=back
+
+
 
 =head2 hasAdjustableBacklight
 
 Some old displays do not have an adjustable backlight but only can
 switch the backlight on/off. If you experience randomly appearing block
-characters, try setting this to false. I<< Optional. Type boolean. upstream_default: 'yes'.  >> 
+characters, try setting this to false. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 keypad_test_mode
 
@@ -84,7 +225,17 @@ You can find out which key of your display sends which
 character by setting keypad_test_mode to yes and running
 LCDd. LCDd will output all characters it receives.
 Afterwards you can modify the settings above and set
-keypad_set_mode to no again. I<< Optional. Type uniline. default: 'no'.  >> 
+keypad_set_mode to no again. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+no
+
+=back
+
+
 
 =head1 SEE ALSO
 

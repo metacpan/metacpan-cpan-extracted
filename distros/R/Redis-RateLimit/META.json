@@ -4,7 +4,7 @@
       "Marc Mims <marc@questright.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "mit"
    ],
@@ -51,6 +51,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::Mock::Time" : "0",
             "Test::Spec" : "0"
          }
@@ -68,7 +69,7 @@
          "web" : "https://github.com/semifor/Redis-RateLimit"
       }
    },
-   "version" : "1.0001",
+   "version" : "1.0002",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

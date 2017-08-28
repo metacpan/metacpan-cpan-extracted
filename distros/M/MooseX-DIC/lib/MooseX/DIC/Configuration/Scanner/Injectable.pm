@@ -1,7 +1,8 @@
 package MooseX::DIC::Configuration::Scanner::Injectable;
 
 use File::Find;
-use File::Slurp;
+use File::Slurper 'read_text';
+use Try::Tiny;
 
 require Exporter;
 @ISA       = qw/Exporter/;
@@ -34,7 +35,7 @@ sub is_injectable {
     return 0 if index( $file_name, '.pm' ) == -1;
 
     # Must have the injectable role applied
-    my $file_content = read_file( $file_name, err_mode => 'quiet' );
+    my $file_content = try { read_text( $file_name ) };
     return 0
         unless ( $file_content
         and ( index( $file_content, 'MooseX::DIC::Injectable' ) != -1 ) );
@@ -47,7 +48,7 @@ sub extract_package_name_from_filename {
     my $file_name = shift;
 
     my $package_name;
-    my $file_content = read_file( $file_name, err_mode => 'quiet' );
+    my $file_content = try { read_text( $file_name ) };
     if ($file_content) {
         $file_content =~ /package\ +([a-zA-Z0-9]+)/;
         $package_name = $1;

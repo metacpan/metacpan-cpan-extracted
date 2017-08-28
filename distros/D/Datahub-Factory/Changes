@@ -1,5 +1,14 @@
 Revision history for Datahub-Factory
 
+1.5  2017-08-27 14:38:46 CEST
+
+    - Updated: Catmandu dependency from 1.0304 to 1.0602.
+    - fixed: uninitialized error on item_id.
+    - fixed: missing add method in stock datahub module.
+    - added: verbose output instead of relying on stock log output.
+    - changed: refactored the transport command.
+    - removed: deprecated cli options and validation.
+
 1.4  2017-07-08 13:40:43 CEST
     - added: JSON importer per issue ##43
     - changed: moved fetching id from item before item is fixed.

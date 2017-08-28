@@ -1,3 +1,5 @@
+use 5.010001;
+
 use strict;
 use warnings;
 
@@ -9,16 +11,21 @@ WriteMakefile(
   ABSTRACT     => 'Browses online documentation of your Mojolicious application',
   AUTHOR       => 'Viliam Pucik <viliam.pucik@gmail.com>',
   LICENSE      => 'artistic_2',
-  PREREQ_PM    => {'Mojolicious' => '4.99'},
   META_MERGE   => {
-    requires  => {perl => '5.010001'},
+    'meta-spec'   => {version => 2},
+    no_index      => {directory => ['t']},
+    prereqs       => {runtime => {requires => {perl => '5.010001'}}},
     resources => {
+      bugtracker  => {web => 'https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer/issues'},
       homepage    => 'https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer',
-      license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer',
-      bugtracker  => 'https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer/issues'
+      license     => ['http://www.opensource.org/licenses/artistic-license-2.0'],
+      repository  => {
+        type => 'git',
+        url  => 'https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer.git',
+        web  => 'https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer',
+      },
     },
-    no_index => {directory => ['t']}
   },
+  PREREQ_PM    => {'Mojolicious' => '7.43'},
   test         => {TESTS => 't/*.pl'}
 );

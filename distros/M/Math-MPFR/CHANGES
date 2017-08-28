@@ -1,3 +1,16 @@
+3.36
+ - Add Rmpfr_rec_root, provided by Vincent Lefevre:
+   (See https://sympa.inria.fr/sympa/arc/mpfr/2016-12/msg00032.html)
+   Re-arranged as an XSub, and some special case handling added.
+ - Add Rmpfr_beta (mpfr-4.0.0 and later only).
+ - Rename t/new_in_3.2.0.t to t/new_in_4.0.0.t
+ - Add Rmpfr_q_div and Rmpfr_z_div and use them in overload_div to replace the existing
+   code (that was rounding twice).
+ - Add overloading of comparisons with mpq_t and mpz_t
+ - use mpfr library of version of mpfr_get_q (in preference to homegrown rendition) iff
+   MPFR_VERSION_MAJOR >= 4.
+ - Workaround mpfr_get_float128() failure to round subnormals reliably.
+
 3.35
  - In Makefile.PL define -DNV_IS_DOUBLE if appropriate (for use in math_mpfr_include.h as part of
    fix for __float128 handling in nvtype=double DEBUGGING builds of perl).
@@ -14,7 +27,7 @@
 
 3.33
  - Document Rmpfr_grandom as deprecated as of mpfr-3.2.0.
- - Add the following functions which will be available when mpfr-3.2.0 (or higher) is installed:
+ - Add the following functions which will be available when mpfr-4.0.0 (or higher) is installed:
     Rmpfr_fmodquo, Rmpfr_fpif_export, Rmpfr_fpif_import, Rmpfr_flags_clear, Rmpfr_flags_set,
     Rmpfr_flags_test, Rmpfr_flags_save, Rmpfr_flags_restore, Rmpfr_rint_roundeven, Rmpfr_roundeven,
     Rmpfr_nrandom, Rmpfr_erandom, Rmpfr_fmma, Rmpfr_fmms, Rmpfr_log_ui and Rmpfr_gamma_inc

@@ -8,7 +8,6 @@ META.json
 META.yml
 README
 author.yml
-cpanfile
 dist.ini
 example/default_dist.ini
 example/unbundle.pl
@@ -17,7 +16,6 @@ inc/run/before_build.pl
 lib/Dist/Zilla/PluginBundle/Author/Plicease.pm
 t/00_diag.t
 t/01_use.t
-t/mint.t
 t/unbundle.t
 travis/install-dzil-plugin-author-plicease.sh
 xt/author/eol.t

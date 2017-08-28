@@ -6,7 +6,7 @@ use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 __PACKAGE__->mk_accessors(qw(command param));
 
@@ -107,9 +107,7 @@ return 1 if actions are equals
 
 =head1 AUTHOR
 
-Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
-
-L<http://www.crium.univ-metz.fr>
+Yves Agostini - <yvesago@cpan.org>
 
 =head1 COPYRIGHT
 

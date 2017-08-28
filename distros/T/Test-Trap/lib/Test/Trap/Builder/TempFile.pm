@@ -1,6 +1,6 @@
 package Test::Trap::Builder::TempFile;
 
-use version; $VERSION = qv('0.3.2');
+use version; $VERSION = qv('0.3.3');
 
 use strict;
 use warnings;
@@ -80,7 +80,7 @@ Test::Trap::Builder::TempFile - Capture strategies using File::Temp
 
 =head1 VERSION
 
-Version 0.3.2
+Version 0.3.3
 
 =head1 DESCRIPTION
 

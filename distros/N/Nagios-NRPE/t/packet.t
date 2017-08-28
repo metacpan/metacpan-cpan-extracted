@@ -45,16 +45,16 @@ ok(STATE_WARNING eq 1, 'STATE_WARNING correct value');
 ok(STATE_OK eq 0, 'STATE_OK correct value');
 
 my $assembly_v2 = $packet_v2->assemble(type => NRPE_PACKET_QUERY, check => "check_load", version => NRPE_PACKET_VERSION_2);
-my $deassembly_v2 = $packet_v2->deassemble($assembly_v2);
+my $disassembly_v2 = $packet_v2->disassemble($assembly_v2);
 
-is($deassembly_v2->{packet_type}, NRPE_PACKET_QUERY,"Packet type for V2 packet");
-is($deassembly_v2->{packet_version}, NRPE_PACKET_VERSION_2, "Packet version for V2 packet");
-is($deassembly_v2->{buffer}, "check_load", "Packet buffer for V2 packet");
+is($disassembly_v2->{packet_type}, NRPE_PACKET_QUERY,"Packet type for V2 packet");
+is($disassembly_v2->{packet_version}, NRPE_PACKET_VERSION_2, "Packet version for V2 packet");
+is($disassembly_v2->{buffer}, "check_load", "Packet buffer for V2 packet");
 
 my $packet_v3 = Nagios::NRPE::Packet->new();
 my $assembly_v3 = $packet_v3->assemble(type => NRPE_PACKET_QUERY, check => "check_load", version => NRPE_PACKET_VERSION_3);
-my $deassembly_v3 = $packet_v3->deassemble($assembly_v3);
+my $disassembly_v3 = $packet_v3->disassemble($assembly_v3);
 
-is($deassembly_v3->{packet_type}, NRPE_PACKET_QUERY,"Packet type for V3 packet");
-is($deassembly_v3->{packet_version}, NRPE_PACKET_VERSION_3, "Packet version for V3 packet");
-is($deassembly_v3->{buffer}, "check_load", "Packet buffer for V3 packet");
+is($disassembly_v3->{packet_type}, NRPE_PACKET_QUERY,"Packet type for V3 packet");
+is($disassembly_v3->{packet_version}, NRPE_PACKET_VERSION_3, "Packet version for V3 packet");
+is($disassembly_v3->{buffer}, "check_load", "Packet buffer for V3 packet");

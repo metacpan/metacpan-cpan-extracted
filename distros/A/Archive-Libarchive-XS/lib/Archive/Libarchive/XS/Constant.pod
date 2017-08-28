@@ -14,7 +14,7 @@ Archive::Libarchive::XS::Constant - Constants reference for libarchive perl bind
 
 =head1 VERSION
 
-version 0.0901
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -180,6 +180,8 @@ constants using the C<:const> export tag).
 
 =item ARCHIVE_EXTRACT_ACL
 
+=item ARCHIVE_EXTRACT_CLEAR_NOCHANGE_FFLAGS
+
 =item ARCHIVE_EXTRACT_FFLAGS
 
 =item ARCHIVE_EXTRACT_HFS_COMPRESSION_FORCED
@@ -225,6 +227,8 @@ constants using the C<:const> export tag).
 =item ARCHIVE_FILTER_GZIP
 
 =item ARCHIVE_FILTER_LRZIP
+
+=item ARCHIVE_FILTER_LZ4
 
 =item ARCHIVE_FILTER_LZIP
 
@@ -298,6 +302,8 @@ constants using the C<:const> export tag).
 
 =item ARCHIVE_FORMAT_TAR_USTAR
 
+=item ARCHIVE_FORMAT_WARC
+
 =item ARCHIVE_FORMAT_XAR
 
 =item ARCHIVE_FORMAT_ZIP
@@ -322,11 +328,25 @@ constants using the C<:const> export tag).
 
 =item ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS
 
+=item ARCHIVE_READDISK_NO_XATTR
+
 =item ARCHIVE_READDISK_RESTORE_ATIME
+
+=item ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_DATA
+
+=item ARCHIVE_READ_FORMAT_CAPS_ENCRYPT_METADATA
+
+=item ARCHIVE_READ_FORMAT_CAPS_NONE
+
+=item ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW
+
+=item ARCHIVE_READ_FORMAT_ENCRYPTION_UNSUPPORTED
 
 =item ARCHIVE_RETRY
 
 =item ARCHIVE_VERSION_NUMBER
+
+=item ARCHIVE_VERSION_ONLY_STRING
 
 =item ARCHIVE_VERSION_STAMP
 

@@ -1,23 +1,37 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Role::InProject;
-$XML::Ant::BuildFile::Role::InProject::VERSION = '0.216';
 
 # ABSTRACT: role for nodes in an Ant project
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a role providing common attributes for all child nodes in an
+#pod L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project>.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package My::Project::Node;
+#pod     use Moose;
+#pod     with 'XML::Ant::BuildFile::Role::InProject';
+#pod
+#pod     1;
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use strict;
 use Moose::Role;
 use namespace::autoclean;
 with 'XML::Rabbit::Node' => { -version => '0.0.4' };
+
+#pod =attr project
+#pod
+#pod Reference to the L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project>
+#pod at the root of the build file.
+#pod
+#pod =cut
 
 has project => (
     isa         => 'XML::Ant::BuildFile::Project',
@@ -44,7 +58,7 @@ XML::Ant::BuildFile::Role::InProject - role for nodes in an Ant project
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -185,7 +199,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

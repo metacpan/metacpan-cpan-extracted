@@ -4,7 +4,7 @@
       "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -15,12 +15,12 @@
    "name" : "Dancer-Plugin-Catmandu-SRU",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -31,14 +31,14 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Catmandu" : "0.8014",
-            "Catmandu::Exporter::Template" : "0.03",
+            "Catmandu::Exporter::Template" : "0.11",
             "Dancer" : "1.3123",
             "SRU" : "1.01",
             "perl" : "v5.10.1"
@@ -63,12 +63,14 @@
          "web" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-SRU"
       }
    },
-   "version" : "0.0403",
+   "version" : "0.0501",
    "x_contributors" : [
+      "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "njfranck <njfranck@ca20c521.ugent.be>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "vpeil <vitali.peil@uni-bielefeld.de>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

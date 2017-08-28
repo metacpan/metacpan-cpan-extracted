@@ -1,10 +1,10 @@
-# Copyrights 1995-2016 by [Mark Overmeer <perl@overmeer.net>].
+# Copyrights 1995-2017 by [Mark Overmeer <perl@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package Mail::Cap;
 use vars '$VERSION';
-$VERSION = '2.18';
+$VERSION = '2.19';
 
 use strict;
 
@@ -24,6 +24,7 @@ else
         );   # this path is specified under RFC1524 appendix A 
 }
 
+#--------
 
 sub new
 {   my $class = shift;
@@ -114,6 +115,7 @@ sub _process_file
     close MAILCAP;
 }
 
+#------------------
 
 sub view    { my $self = shift; $self->_run($self->viewCmd(@_))    }
 sub compose { my $self = shift; $self->_run($self->composeCmd(@_)) }
@@ -128,6 +130,7 @@ sub _run($)
     1;
 }
 
+#------------------
 
 sub viewCmd    { shift->_createCommand(view    => @_) }
 sub composeCmd { shift->_createCommand(compose => @_) }
@@ -153,6 +156,7 @@ sub makeName($$)
     $template;
 }
 
+#------------------
 
 sub field($$)
 {   my($self, $type, $field) = @_;

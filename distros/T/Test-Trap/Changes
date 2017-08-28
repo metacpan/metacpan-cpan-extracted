@@ -1,5 +1,16 @@
 Revision history for Test-Trap
 
+0.3.3   Tue Aug 22 02:06:09 CEST 2017
+	For this release, many thanks go to Slaven Rezic, who found
+        that Test::More::is() (or Test2::Formatter::TAP::write())
+        clobbers $^E on Windows.
+        - RT #105125 is addressed:  The tests now use a copy of $^E
+          taken before Test::More gets a chance to touch it.
+	- Further, the Test::Trap test methods might also clobber $^E
+          (via Test::More or other modules), so they now localize $^E
+          before invoking the callback.
+        - Regression tests have been added for this.
+
 0.3.2	Tue Feb 24 00:19:23 CET 2015
         The tempfile-preserve strategy was (always) broken on
         non-perlio perls.

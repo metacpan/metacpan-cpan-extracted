@@ -15,13 +15,13 @@ my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', 
 my $test = $fw->tester();
 
 # No servers configured
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_servers_configured() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_servers_configured() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( !$test->userid_server_monitor(), "No servers configured no args returns 0" );
 ok( !$test->userid_server_monitor(servers => ['ad01.domain.int']), "No servers configured some args returns 0" );
 
 # Servers configured some not connected
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( servers_configured_some_not_connected() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( servers_configured_some_not_connected() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->userid_server_monitor(servers => ['ad02.domain.int']), "One connected server matched returns 1" );
 ok( !$test->userid_server_monitor(servers => ['ad01.domain.int']), "One not connected server matched returns 0" );
@@ -32,7 +32,7 @@ ok( !$test->userid_server_monitor(servers => ['ad01.domain.int', 'ad02.domain.in
 ok( !$test->userid_server_monitor(), "No servers arg and servers not connected in response returns 0" );
 
 # Servers configured all connected
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( servers_configured_all_connected() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( servers_configured_all_connected() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( $test->userid_server_monitor(), "No servers arg and all servers connected in response returns 1" );
 

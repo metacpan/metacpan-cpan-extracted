@@ -20,7 +20,7 @@ use Text::Tradition::TypeMap::Entry;
 extends 'KiokuX::Model';
 
 use vars qw/ $VERSION /;
-$VERSION = "1.2";
+$VERSION = "1.3";
 
 =head1 NAME
 
@@ -440,10 +440,14 @@ sub add_user {
     my $password = $userinfo->{password};
     my $role = $userinfo->{role} || 'user';
 
+    if ($userinfo->{sub}) {
+        $username = $userinfo->{sub};
+    }
+
 	throw( "No username given" ) unless $username;
 	throw( "Invalid password - must be at least " . $self->MIN_PASS_LEN 
 		. " characters long" )
-		unless ( $self->validate_password($password) || $username =~ /^https?:/ );
+		unless ( $self->validate_password($password) || $username =~ /^https?:/  || exists ($userinfo->{openid_id}) || exists ($userinfo->{sub}));
 
     my $user = Text::Tradition::User->new(
         id => $username,
@@ -513,6 +517,10 @@ sub find_user {
         _extract_openid_data($userinfo);
     }
 
+    if (exists $userinfo->{sub}) {
+        return $self->_find_gplus($userinfo);
+    }
+
 	my $user;
 	if( exists $userinfo->{username} ) {
     	my $username = $userinfo->{username};
@@ -526,10 +534,59 @@ sub find_user {
 		$self->scan( sub { push( @matches, @_ ) 
 			if $_[0]->isa('Text::Tradition::User') 
 			&& $_[0]->email eq $userinfo->{email} } );
+		if( $userinfo->{google_user} ) {
+			@matches = grep { $_->id =~ m!https://www.google.com/accounts/o8/id! } @matches;
+		}
 		$user = shift @matches;
 	}
 #    print STDERR "Found user, $username, email is :", $user->email, ":\n";
     return $user;
+}
+
+sub _find_gplus {
+    my ($self, $userinfo) = @_;
+
+    my $sub = $userinfo->{sub};
+    my $email = $userinfo->{email};
+
+    # Do we have a user with the google id already?
+
+    my $user = $self->find_user({
+        username => $sub
+    });
+    warn "Found by google+id" if $user;
+
+    if ($user) {
+        return $user;
+    }
+
+    # Do we have a user with the email and an old G+ OpenID?
+    $user = $self->find_user({ email => $userinfo->{email}, google_user => 1 });
+    warn "Found by email" if $user;
+
+    if (!$user) {
+        return undef;
+    }
+
+    my $new_user = $self->add_user({
+            username  => $sub,
+            password  => $user->password,
+            role      => $user->role,
+            active    => $user->active,
+            sub       => $sub,
+            email     => $email,
+        });
+
+    foreach my $t (@{ $user->traditions }) {
+        $user->remove_tradition($t);
+        $new_user->add_tradition($t);
+        $self->update($t);
+    }
+    $self->update($user);
+    $self->update($new_user);
+
+    # $self->delete_user({ username => $user->id });
+    return $new_user;
 }
 
 =head2 modify_user( $userinfo )

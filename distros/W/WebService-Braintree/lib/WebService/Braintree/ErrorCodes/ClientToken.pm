@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::ClientToken;
-$WebService::Braintree::ErrorCodes::ClientToken::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::ClientToken::VERSION = '0.93';
 use strict;
 
 use constant CustomerDoesNotExist                            => "92804";

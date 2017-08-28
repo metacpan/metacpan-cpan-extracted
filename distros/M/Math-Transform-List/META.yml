@@ -4,9 +4,9 @@ author:
   - PhilipRBrenan@gmail.com
 build_requires: {}
 configure_requires:
-  Module::Build: '0.42'
+  Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,10 +15,10 @@ name: Math-Transform-List
 provides:
   Math::Transform::List:
     file: lib/Math/Transform/List.pm
-    version: '20170808'
+    version: '20170824'
 requires:
   Carp: '0'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20170808'
+version: '20170824'

@@ -1,0 +1,12 @@
+Revision history for API-Drip
+
+0.03    8/24/17
+        Fixed bug when the endpoint contains slashes.
+        Added more options to drip.pl
+
+0.02    8/23/17
+        Adding dependencies in Build.PL.   We might need those.
+
+0.01    8/23/17
+        First version, released on an unsuspecting world.
+

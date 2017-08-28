@@ -1,16 +1,125 @@
+NAME
+    App::CompleteCLIs - CLI wrappers for complete_*() functions
+
+VERSION
+    This document describes version 0.13 of App::CompleteCLIs (from Perl
+    distribution App-CompleteCLIs), released on 2017-08-18.
+
 SYNOPSIS
-
 DESCRIPTION
-
     This distribution comes with the following CLI's from the various
-    Complete::* modules. They are meant for convenient testing of the
-    various complete_* functions on the command-line.
+    "Complete::*" modules. They are meant for convenient testing of the
+    various "complete_*" functions on the command-line.
 
-    # INSERT_EXECS_LIST
+    *   complete-array-elem
+
+    *   complete-dist
+
+    *   complete-dzil-bundle
+
+    *   complete-dzil-plugin
+
+    *   complete-dzil-role
+
+    *   complete-env
+
+    *   complete-env-elem
+
+    *   complete-file
+
+    *   complete-float
+
+    *   complete-gid
+
+    *   complete-group
+
+    *   complete-hash-key
+
+    *   complete-int
+
+    *   complete-kernel
+
+    *   complete-known-host
+
+    *   complete-known-mac
+
+    *   complete-locale
+
+    *   complete-manpage
+
+    *   complete-manpage-section
+
+    *   complete-module
+
+    *   complete-path-env-elem
+
+    *   complete-perl-builtin-function
+
+    *   complete-perl-builtin-symbol
+
+    *   complete-perl-version
+
+    *   complete-pid
+
+    *   complete-ppr-subpattern
+
+    *   complete-proc-name
+
+    *   complete-program
+
+    *   complete-regexp-pattern-module
+
+    *   complete-regexp-pattern-pattern
+
+    *   complete-riap-url
+
+    *   complete-riap-url-clientless
+
+    *   complete-service-name
+
+    *   complete-service-port
+
+    *   complete-tz
+
+    *   complete-uid
+
+    *   complete-user
+
+    *   complete-weaver-bundle
+
+    *   complete-weaver-plugin
+
+    *   complete-weaver-role
+
+    *   complete-weaver-section
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CompleteCLIs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CompleteCLIs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Complete
 
-    Complete::* modules
+    "Complete::*" modules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -755,7 +755,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $double = Rmpfr_get_d($op, $rnd);
    $ld     = Rmpfr_get_ld($op, $rnd);
    $f128   = Rmpfr_get_float128($op, $rnd); # nvtype must be quad prec.
-                                            # mpfr-3.2.0 or later &&
+                                            # mpfr-4.0.0 or later &&
                                             # built with __float128
                                             # support
    $nv     = Rmpfr_get_NV($op, $rnd);    # double/long double/__float128
@@ -765,7 +765,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                          # built with _Decimal64
                                          # support. $d64 is a
                                          # Math::Decimal64 object.
-   Rmpfr_get_FLOAT128($F128, $op, $rnd); # mpfr-3.2.0 and later.
+   Rmpfr_get_FLOAT128($F128, $op, $rnd); # mpfr-4.0.0 and later.
                                          # $F128 is a Math::Float128
                                          # object.
     Convert $op to a 'double', a 'long double', a __float128, an 'NV',
@@ -877,7 +877,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_div_d($rop, $op, $double, $rnd);
    $si = Rmpfr_d_div($rop, $double, $op, $rnd);
    $si = Rmpfr_div_z($rop, $op, $z, $rnd);   # $z is a mpz object.
+   $si = Rmpfr_z_div($rop, $z, $op, $rnd);   # $z is a mpz object.
    $si = Rmpfr_div_q($rop, $op, $q, $rnd);   # $q is a mpq object.
+   $si = Rmpfr_q_div($rop, $q, $op, $rnd);   # $q is a mpq object.
+    NOTE: The mpfr library does not provide mpfr_z_div and
+           mpfr_q_div functions.
     Set $rop to 2nd arg / 3rd arg rounded in the direction $rnd.
     These functions return 0 if the division is exact, a positive
     value when $rop is larger than 2nd arg divided by 3rd arg,
@@ -893,13 +897,22 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Return 0 if the operation is exact, a non-zero value otherwise.
 
    $si = Rmpfr_rec_sqrt($rop, $op, $rnd);
-    Set $rop to the reciprocal square root of $op rounded in the
-    direction $rnd. Set $rop to +Inf if $op is 0, and 0 if $op is
-    +Inf. Set $rop to NaN if $op is negative.
+    Set $rop to $op ** (-1 / 2) rounded in the direction $rnd. Set
+    $rop to +Inf if $op is 0, and 0 if $op is +Inf. Set $rop to NaN
+    if $op is less than zero.
+
+   $si = Rmpfr_rec_root($rop, $op, $ui, $rnd);
+    NOTE: There is no such mpfr function as mpfr_rec_root.
+    This function originally provided as a perl implementation by
+    Vincent Lefevre - and rewritten by sisyphus as an XSub.
+    (See https://sympa.inria.fr/sympa/arc/mpfr/2016-12/msg00032.html)
+
+    Set $rop to $op ** (-1 / $ui) rounded in the direction $rnd.
+
+    May not correctly handle overflow or underflow.
 
    $si = Rmpfr_cbrt($rop, $op, $rnd);
-    Set $rop to the cubic root (defined over the real numbers)
-    of $op, rounded in the direction $rnd.
+    Set $rop to the cubic root of $op, rounded in the direction $rnd.
 
    $si = Rmpfr_root($rop, $op, $ui $rnd);
     Set $rop to the $ui'th root of $op, rounded in the direction
@@ -1053,7 +1066,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    SPECIAL
 
    $si = Rmpfr_log($rop, $op, $rnd);
-   $si = Rmpfr_log_ui($rop, $ui, $rnd); # mpfr-3.2.0 & later only
+   $si = Rmpfr_log_ui($rop, $ui, $rnd); # mpfr-4.0.0 & later only
    $si = Rmpfr_log2($rop, $op, $rnd);
    $si = Rmpfr_log10($rop, $op, $rnd);
     Set $rop to the natural logarithm of $op, the natural
@@ -1165,7 +1178,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $rop to $op1 * $op2 + $op3, rounded to the direction $rnd.
 
    $si = Rmpfr_fmma($rop, $op1, $op2, $op3, $op4, $rnd);
-    NOTE: Needs mpfr-3.2.0. or later
+    NOTE: Needs mpfr-4.0.0 or later
     Set $rop to $op1 * $op2 + $op3 * $op4, rounded to the
     direction $rnd.
 
@@ -1173,7 +1186,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $rop to $op1 * $op2 - $op3, rounded to the direction $rnd.
 
    $si = Rmpfr_fmms($rop, $op1, $op2, $op3, $op4, $rnd);
-    NOTE: Needs mpfr-3.2.0. or later
+    NOTE: Needs mpfr-4.0.0 or later
     Set $rop to $op1 * $op2 - $op3 * $op4, rounded to the
     direction $rnd.
 
@@ -1241,6 +1254,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     needed (currently 'mpfr_const_log2', 'mpfr_const_pi' and
     'mpfr_const_euler').
 
+   $si = Rmpfr_beta($rop, $op1, $op2, $rnd); # mpfr-4.0.0 &
+                                             # later only
+    Set $rop to the beta function at $op1, $op2, rounded
+    according to $rnd.
+
    $si = Rmpfr_gamma($rop, $op, $rnd);
    $si = Rmpfr_lngamma($rop, $op, $rnd);
     Set $rop to the value of the Gamma function on $op
@@ -1250,7 +1268,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     negative value if $rop is less than the exact value.
     'Rmpfr_gamma' sets $rop to NaN when $op is negative.
 
-   $si = Rmpfr_gamma_inc($rop, $op1, $op2, $rnd); # mpfr-3.2.0 &
+   $si = Rmpfr_gamma_inc($rop, $op1, $op2, $rnd); # mpfr-4.0.0 &
                                                   # later only
     Set $rop to the value of the incomplete Gamma function on $op1
     and $op2, rounded in the direction $rnd.
@@ -1315,7 +1333,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_eint ($rop, $op, $rnd)
      Set $rop to the exponential integral of $op, rounded in the
      direction $rnd. See the MPFR documentation for details.
-     As of mpfr-3.2.0 Rmpfr_eint() returns the value of the
+     As of mpfr-4.0.0 Rmpfr_eint() returns the value of the
      E1/eint1 function for negative input. (With previous versions
      of mpfr NaN was returned for negative argument.)
 
@@ -1399,8 +1417,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Output "$op\n" on stdout in base 2.
     As with 'Rmpfr_print_binary' the exponent is in base 10.
 
-   $si = Rmpfr_fpif_export ($stream, $op); # Needs mpfr-3.2.0
-   $si = Rmpfr_fpif_export ($op, $stream); # Needs mpfr-3.2.0
+   $si = Rmpfr_fpif_export ($stream, $op); # Needs mpfr-4.0.0
+   $si = Rmpfr_fpif_export ($op, $stream); # Needs mpfr-4.0.0
     Note: These function are experimental and their interface might
           change in future versions of mpfr.
     Export/import the number $op to/from the stream $stream in a
@@ -1492,11 +1510,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Return the corresponding (underflow, overflow, invalid, inexact,
     erange, divide-by-zero) flag, which is non-zero iff the flag is set.
 
-   Rmpfr_flags_clear($mask);            # needs mpfr-3.2.0 or later
-   Rmpfr_flags_set($mask);              # needs mpfr-3.2.0 or later
-   $mask2 = Rmpfr_flags_test($mask);    # needs mpfr-3.2.0 or later
-   $mask  = Rmpfr_flags_save();         # needs mpfr-3.2.0 or later
-   Rmpfr_flags_restore($mask1, $mask2); # needs mpfr-3.2.0 or later
+   Rmpfr_flags_clear($mask);            # needs mpfr-4.0.0 or later
+   Rmpfr_flags_set($mask);              # needs mpfr-4.0.0 or later
+   $mask2 = Rmpfr_flags_test($mask);    # needs mpfr-4.0.0 or later
+   $mask  = Rmpfr_flags_save();         # needs mpfr-4.0.0 or later
+   Rmpfr_flags_restore($mask1, $mask2); # needs mpfr-4.0.0 or later
     $mask is an integer value resulting from OR'ing (or adding) any of
     the following constants together:
      MPFR_FLAGS_UNDERFLOW
@@ -1624,7 +1642,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_ceil($rop, $op);
    $si = Rmpfr_floor($rop, $op);
    $si = Rmpfr_round($rop, $op);
-   $si = Rmpfr_roundeven($rop, $op); # mpfr-3.2.0 and later only
+   $si = Rmpfr_roundeven($rop, $op); # mpfr-4.0.0 and later only
    $si = Rmpfr_trunc($rop, $op);
     Set $rop to $op rounded to an integer. 'Rmpfr_ceil' rounds to the
     next higher representable integer, 'Rmpfr_floor' to the next lower,
@@ -1643,7 +1661,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $si = Rmpfr_rint_ceil($rop, $op, $rnd);
     $si = Rmpfr_rint_floor($rop, $op, $rnd);
     $si = Rmpfr_rint_round($rop, $op, $rnd);
-    $si = Rmpfr_rint_roundeven($rop, $op, $rnd);  # mpfr-3.2.0 & later
+    $si = Rmpfr_rint_roundeven($rop, $op, $rnd);  # mpfr-4.0.0 & later
     $si = Rmpfr_rint_trunc($rop, $op, $rnd);
      Set $rop to $op rounded to an integer. 'Rmpfr_rint_ceil' rounds to
      the next higher or equal integer, 'Rmpfr_rint_floor' to the next
@@ -1673,7 +1691,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si         = Rmpfr_remainder($rop, $op1, $op2, $rnd);
    $si         = Rmpfr_fmod($rop, $op1, $op2, $rnd);
    ($si2, $si) = Rmpfr_remquo  ($rop, $op1, $op2, $rnd);
-   ($si2, $si) = Rmpfr_fmodquo ($rop, $op1, $op2, $rnd); # mpfr-3.2.0 &
+   ($si2, $si) = Rmpfr_fmodquo ($rop, $op1, $op2, $rnd); # mpfr-4.0.0 &
                                                          # later only
     Set $rop to the value of $op - N*$op2, rounded according to the
     direction $rnd, where N is the integer quotient of $op1 divided by
@@ -1794,7 +1812,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Math::MPFR and mpfr have been built with quadmath support - in
     which case Math::MPFR::_MPFR_WANT_FLOAT128() will return 1.
     Note however, that not all architectures support quadmath, and
-    even then mpfr-3.2.0 or later is needed.
+    even then mpfr-4.0.0 or later is needed.
     If you have the __float128 representation you also have the
     IEEE long double representation, as they are identical.
 
@@ -1840,7 +1858,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_grandom($rop1, $rop2, $state, $rnd);
     Available only with mpfr-3.1.0 and later.
-    Deprecated as of mpfr-3.2.0.
+    Deprecated as of mpfr-4.0.0.
     Generate two random floats according to a standard normal
     gaussian distribution. The floating-point numbers $rop1 and
     $rop2 can be seen as if a random real number were generated
@@ -1850,7 +1868,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     by calling one of the Rmpfr_randinit functions (below), then
     seed $state by calling one of the Rmpfr_randseed functions.
 
-   $si = Rmpfr_nrandom ($rop, $state, $rnd);  # mpfr-3.2.0 and
+   $si = Rmpfr_nrandom ($rop, $state, $rnd);  # mpfr-4.0.0 and
                                               # later only
     Generate a random floating-point number according to a standard
     normal Gaussian distribution (with mean zero and variance one).
@@ -1859,7 +1877,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     distribution and then rounded in the direction $rnd.
     This function is more efficient than Rmpfr_grandom.
 
-   $si = Rmpfr_erandom($rop, $state, $rnd);  # mpfr-3.2.0 and
+   $si = Rmpfr_erandom($rop, $state, $rnd);  # mpfr-4.0.0 and
                                              # later only
      Generate one random floating-point number according to an
      exponential distribution, with mean one.  Other characteristics
@@ -1988,6 +2006,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      = (The copy has the same precision as the copied object.)
      ""
 
+    All overloaded comparisons ( < <= > >= == != <=> ) between
+    Math::MPFR and Math::GMPz objects or between Math::MPFR and
+    Math::GMPq objects are now also permitted.
+   . allowed
+
     As of version 3.13 of Math::MPFR, some cross-class overloading
     is allowed.
     Let $M be a Math::MPFR object, and $G be any one of a Math::GMPz,
@@ -2021,11 +2044,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Again, each of those operations returns a Math::MPFR object
     containing the result of the operation.
     Each operation is conducted using current default rounding mode.
-
-    NOTE: If $G is a Math::GMPq object or a Math::GMPz object, then
-    the value of $G/$M is calculated by doing 1/($M/$G). This
-    involves *2* roundings of the value that is returned - once when
-    $M/$G is calculated, and again when the inverse is calculated.
 
     NOTE: In overloading a ** (power) operation that involves a
     Math::GMPq object, it is necessary to convert the Math::GMPq

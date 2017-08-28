@@ -17,7 +17,6 @@ use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
 $File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
 install_share dist => "share";
-install_share module => "Dist::Zilla::MintingProfile::Author::Plicease", "profiles";
 
 
 my %WriteMakefileArgs = (
@@ -46,21 +45,21 @@ my %WriteMakefileArgs = (
   },
   "PREREQ_PM" => {
     "Data::Section" => 0,
-    "Dist::Zilla" => "5.039",
+    "Dist::Zilla" => "6.00",
     "File::Path" => 0,
-    "File::ShareDir" => 0,
+    "File::ShareDir::Dist" => 0,
     "File::chdir" => 0,
     "IPC::System::Simple" => "1.25",
     "Moose" => 0,
-    "Path::Class" => "0.26",
+    "Path::Tiny" => 0,
     "Sub::Exporter::ForMethods" => 0,
     "autodie" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => "0.94"
+    "Test2::V0" => "0.000060"
   },
-  "VERSION" => "2.21",
+  "VERSION" => "2.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,15 +68,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Section" => 0,
-  "Dist::Zilla" => "5.039",
+  "Dist::Zilla" => "6.00",
   "File::Path" => 0,
-  "File::ShareDir" => 0,
+  "File::ShareDir::Dist" => 0,
   "File::chdir" => 0,
   "IPC::System::Simple" => "1.25",
   "Moose" => 0,
-  "Path::Class" => "0.26",
+  "Path::Tiny" => 0,
   "Sub::Exporter::ForMethods" => 0,
-  "Test::More" => "0.94",
+  "Test2::V0" => "0.000060",
   "autodie" => 0,
   "namespace::autoclean" => 0
 );

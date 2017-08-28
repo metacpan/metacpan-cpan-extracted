@@ -1,6 +1,6 @@
 package Test::Excel;
 
-$Test::Excel::VERSION   = '1.39';
+$Test::Excel::VERSION   = '1.40';
 $Test::Excel::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Excel - Interface to test and compare Excel files.
 
 =head1 VERSION
 
-Version 1.39
+Version 1.40
 
 =cut
 
@@ -23,7 +23,7 @@ use Scalar::Util 'blessed';
 use Spreadsheet::ParseExcel;
 use Spreadsheet::ParseExcel::Utility qw(int2col col2int);
 
-require Exporter;
+use parent 'Exporter';
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(cmp_excel compare_excel cmp_excel_ok cmp_excel_not_ok);
 

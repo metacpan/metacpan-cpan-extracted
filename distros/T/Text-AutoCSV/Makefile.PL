@@ -13,6 +13,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Text-AutoCSV",
+  "EXE_FILES" => [
+    "scripts/csvcopy.pl"
+  ],
   "LICENSE" => "perl",
   "NAME" => "Text::AutoCSV",
   "PREREQ_PM" => {
@@ -23,8 +26,10 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Fcntl" => 0,
     "File::BOM" => 0,
+    "Getopt::Long" => 0,
     "Hash::Util" => 0,
     "List::MoreUtils" => 0,
+    "Memoize" => 0,
     "Params::Validate" => 0,
     "Text::CSV" => 0,
     "Unicode::Normalize" => 0,
@@ -35,7 +40,7 @@ my %WriteMakefileArgs = (
     "POSIX" => 0,
     "Time::Local" => 0
   },
-  "VERSION" => "1.1.9",
+  "VERSION" => "1.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,8 +55,10 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "Fcntl" => 0,
   "File::BOM" => 0,
+  "Getopt::Long" => 0,
   "Hash::Util" => 0,
   "List::MoreUtils" => 0,
+  "Memoize" => 0,
   "POSIX" => 0,
   "Params::Validate" => 0,
   "Text::CSV" => 0,

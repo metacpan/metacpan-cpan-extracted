@@ -1,7 +1,7 @@
 undef $VERSION;
 
 package Bio::Roary::CommandLine::Roary;
-$Bio::Roary::CommandLine::Roary::VERSION = '3.8.2';
+$Bio::Roary::CommandLine::Roary::VERSION = '3.9.1';
 # ABSTRACT: Take in FASTA files of proteins and cluster them
 
 
@@ -42,6 +42,7 @@ has 'dont_split_groups'       => ( is => 'rw', isa => 'Bool', default => 0 );
 has 'verbose_stats'           => ( is => 'rw', isa => 'Bool', default => 0 );
 has 'translation_table'       => ( is => 'rw', isa => 'Int',  default => 11 );
 has 'mafft'                   => ( is => 'rw', isa => 'Bool', default => 0 );
+has 'allow_paralogs'          => ( is => 'rw', isa => 'Bool', default => 0 );
 has 'group_limit'             => ( is => 'rw', isa => 'Num',  default => 50000 );
 has 'core_definition'         => ( is => 'rw', isa => 'Num',  default => 0.99 );
 has 'verbose'                 => ( is => 'rw', isa => 'Bool', default => 0 );
@@ -66,7 +67,7 @@ sub BUILD {
         $job_runner,            $makeblastdb_exec,  $mcxdeblast_exec,         $mcl_exec,      $blastp_exec,
         $apply_unknowns_filter, $cpus,              $output_multifasta_files, $verbose_stats, $translation_table,
         $run_qc,                $core_definition,   $help,                    $kraken_db,     $cmd_version,
-        $mafft,                 $output_directory,  $check_dependancies, $inflation_value,
+        $mafft,                 $output_directory,  $check_dependancies, $inflation_value, $allow_paralogs,
     );
 
     GetOptionsFromArray(
@@ -93,6 +94,7 @@ sub BUILD {
         'cd|core_definition=f'      => \$core_definition,
         'v|verbose'                 => \$verbose,
         'n|mafft'                   => \$mafft,
+		'ap|allow_paralogs'         => \$allow_paralogs,
         'k|kraken_db=s'             => \$kraken_db,
         'w|version'                 => \$cmd_version,
         'a|check_dependancies'      => \$check_dependancies,
@@ -297,7 +299,8 @@ sub run {
         core_definition         => $self->core_definition,
         verbose                 => $self->verbose,
         mafft                   => $self->mafft,
-	inflation_value         => $self->inflation_value,
+        allow_paralogs          => $self->allow_paralogs,
+	    inflation_value         => $self->inflation_value,
     );
     $pan_genome_obj->run();
 
@@ -338,11 +341,12 @@ Options: -p INT    number of threads [1]
          -r        create R plots, requires R and ggplot2
          -s        dont split paralogs
          -t INT    translation table [11]
+         -ap       allow paralogs in core alignment
          -z        dont delete intermediate files
          -v        verbose output to STDOUT
          -w        print version and exit
          -y        add gene inference information to spreadsheet, doesnt work with -e
-	 -iv STR   Change the MCL inflation value [1.5]
+         -iv STR   Change the MCL inflation value [1.5]
          -h        this help message
 
 Example: Quickly generate a core gene alignment using 8 threads
@@ -368,7 +372,7 @@ Bio::Roary::CommandLine::Roary - Take in FASTA files of proteins and cluster the
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

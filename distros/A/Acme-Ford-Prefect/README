@@ -2,14 +2,14 @@ NAME
     Acme::Ford::Prefect - Test Module for Alien::Base
 
 SYNOPSIS
-     use strict;
-     use warnings;
+     use Test2::V0;
      use Acme::Ford::Prefect;
-     use Test::More tests => 1;
 
      is Acme::Ford::Prefect::answer(), 42;
      # if 42 is returned then Acme::Alien::DontPanic
      # properly provided the C library
+ 
+     done_testing;
 
 DESCRIPTION
     Alien::Base comprises base classes to help in the construction of
@@ -29,7 +29,7 @@ SEE ALSO
     *   Acme::Alien::DontPanic
 
 SOURCE REPOSITORY
-    <http://github.com/Perl5-Alien/Alien-Base-Extras>
+    <http://github.com/Perl5-Alien/Acme-Ford-Prefect>
 
 AUTHOR
     Original author: Joel Berger, <joel.a.berger@gmail.com>

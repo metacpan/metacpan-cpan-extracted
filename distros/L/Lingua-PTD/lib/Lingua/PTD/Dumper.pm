@@ -1,8 +1,9 @@
 package Lingua::PTD::Dumper;
-$Lingua::PTD::Dumper::VERSION = '1.15';
+$Lingua::PTD::Dumper::VERSION = '1.16';
 use warnings;
 use strict;
 
+use Cwd 'abs_path';
 use parent 'Lingua::PTD';
 
 =encoding UTF-8
@@ -36,8 +37,9 @@ Copyright (C) 2010-2014 by Alberto Manuel Brandão Simões
 =cut
 
 sub new {
-    my ($class, $filename) = @_;
-    my $self = do $filename;
+  my ($class, $filename) = @_;
+  
+    my $self = do(abs_path($filename));
     bless $self => $class #amen
 }
 

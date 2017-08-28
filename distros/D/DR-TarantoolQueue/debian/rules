@@ -11,14 +11,16 @@ pkt = $(shell dpkg-parsechangelog|grep ^Source|awk '{print $$2}')
 	dh $@
 
 override_dh_install:
-	install -m 0644 tarantool.cfg queue.cfg
+	install -m 0644 queue-lts/tarantool.cfg queue.cfg
 	echo >> queue.cfg
 	echo script_dir = /usr/lib/dr-tarantool-queue/ >> queue.cfg
+	install -m 0644 megaqueue/example/instance-queue.lua queue-example.lua 
 	dh_install
 	make tardist
 
 override_dh_clean:
 	rm -f queue.cfg
+	rm -f queue-example.lua
 	rm -f DR-TarantoolQueue-?.??.tar.gz
 	dh_clean
 
@@ -30,4 +32,6 @@ tarball: clean
 		$(pkt)-$(vdeb)
 
 manifest: clean
-	find -type f|grep -v '\.git'|sed 's/^..//'|sort -u > MANIFEST
+	git ls-files > MANIFEST
+	cd megaqueue && git ls-files |sed 's#^#manifest/#'  >> ../MANIFEST
+	cd queue-lts && git ls-files |sed 's@^#queue-lts/#' >> ../MANIFEST

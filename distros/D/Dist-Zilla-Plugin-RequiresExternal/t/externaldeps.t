@@ -2,7 +2,7 @@
 
 use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
 use Test::More 'no_plan';
-use Test::Output;
+use Test::Output 1.031;
 use Cwd;
 use Dist::Zilla::App;
 

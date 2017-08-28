@@ -1,4 +1,4 @@
-# Copyrights 1995-2016 by [Mark Overmeer <perl@overmeer.net>].
+# Copyrights 1995-2017 by [Mark Overmeer <perl@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -6,7 +6,7 @@ use strict;
 
 package Mail::Field::AddrList;
 use vars '$VERSION';
-$VERSION = '2.18';
+$VERSION = '2.19';
 
 use base 'Mail::Field';
 

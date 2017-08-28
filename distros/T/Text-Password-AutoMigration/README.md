@@ -2,6 +2,10 @@
 
 Text::Password::AutoMigration - generate and verify Password with any contexts
 
+<div>
+    <a href="https://travis-ci.org/worthmine/Text-Password-AutoMigration"><img src="https://travis-ci.org/worthmine/Text-Password-AutoMigration.svg?branch=master"></a>
+</div>
+
 # SYNOPSIS
 
     my $pwd = Text::Password::AutoMigration->new();
@@ -77,6 +81,10 @@ So you can replace hashes in your DB very easily like below:
        my $sth = $dbh->prepare('UPDATE DB SET passwd=? WHERE uid =?') or die $dbh->errstr;
        $sth->excute( $hash, $req->body_parameters->{uid} ) or die $sth->errstr;
     }
+
+New hash length is at least 98. So you have to change your DB like below:
+
+    ALTER TABLE User CHANGE passwd passwd VARCHAR(98);
 
 ### nonce($length)
 

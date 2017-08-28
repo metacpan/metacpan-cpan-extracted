@@ -84,7 +84,6 @@ my $ORK_GRAMMAR = qr{
     $PPR::GRAMMAR
 }x;
 
-#use Regexp::Debugger;
 $source_code = <<'END_CODE';
 
     use Object::Result;

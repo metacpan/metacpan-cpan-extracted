@@ -16,7 +16,7 @@ use Text::ParseWords qw( shellwords );
 # distributed with Alien-Build.
 
 # ABSTRACT: Compiler and linker wrapper for Alien
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 my @cflags_I;
@@ -93,6 +93,7 @@ sub import
     if($alien eq '!export')
     {
       $export = 0;
+      next;
     }
     $alien = "Alien::$alien" unless $alien =~ /::/;
     my $alien_pm = $alien . '.pm';
@@ -169,7 +170,7 @@ Alien::Base::Wrapper - Compiler and linker wrapper for Alien
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 

@@ -29,7 +29,10 @@ my $tzil = Builder->from_config(
                     version  => '0.006',
                 },
                 [ '@Author::ETHER' => {
-                    # we do NOT remove plugins here, because do not do a build.
+                    # we do NOT need to remove the usual plugins here, because we do not do a build.
+                    # but we do need to avoid our heuristic for "looks like a CPAN download" on older
+                    # Dist::Zilla, where we don't change directories into the build during testing.
+                    -remove => [ 'Git::GatherDir' ],
                     server => 'none',
                     'Test::MinimumVersion.max_target_perl' => '5.008',
                     # necessary, as there are no files added to the build to read a version from
@@ -51,7 +54,7 @@ cmp_deeply(
     superbagof(
         methods(
             [ isa => 'Dist::Zilla::Plugin::RewriteVersion::Transitional' ] => bool(1),
-            plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?RewriteVersion::Transitional$}),
+            plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/RewriteVersion::Transitional$}),
             global => 1,
             fallback_version_provider => 'Git::NextVersion',
             _fallback_version_provider_args => { version_regexp => '^v([\d._]+)(-TRIAL)?$' },
@@ -59,45 +62,50 @@ cmp_deeply(
         all(
             methods(
                 [ isa => 'Dist::Zilla::Plugin::CopyFilesFromRelease' ] => bool(1),
-                plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?CopyFilesFromRelease$}),
+                plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/CopyFilesFromRelease$}),
             ),
-            listmethods(
+            noclass(superhashof({
+                # in 0.006, the method started returning a list rather than a listref
                 filename => [ 'Changes' ],
-            ),
+            })),
         ),
         methods(
             [ isa => 'Dist::Zilla::Plugin::Git::Commit' ] => bool(1),
-            plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?release snapshot$}),
+            plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/release snapshot$}),
             add_files_in => [ str('.') ],
             allow_dirty => superbagof(str('Changes')),
             commit_msg => '%N-%v%t%n%n%c'
         ),
         methods(
             [ isa => 'Dist::Zilla::Plugin::Git::Tag' ] => bool(1),
-            plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?Git::Tag$}),
+            plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/Git::Tag$}),
             tag_format => 'v%v',
             tag_message => 'v%v%t',
         ),
         methods(
             [ isa => 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' ] => bool(1),
-            plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?BumpVersionAfterRelease::Transitional$}),
+            plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/BumpVersionAfterRelease::Transitional$}),
             global => 1,
         ),
         methods(
             [ isa => 'Dist::Zilla::Plugin::NextRelease' ] => bool(1),
-            plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?NextRelease$}),
+            plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/NextRelease$}),
             time_zone => 'UTC',
             format => '%-8v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
         ),
         methods(
             [ isa => 'Dist::Zilla::Plugin::Git::Commit' ] => bool(1),
-            plugin_name => re(qr{^\@Author::ETHER/([^/]+/)?post-release commit$}),
+            plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/post-release commit$}),
             allow_dirty => [ str('Changes') ],
             allow_dirty_match => [ qr{^lib/.*\.pm$} ],
             commit_msg => 'increment $VERSION after %v release'
         ),
     ),
     'all expected plugins make it into the build, with the correct configurations',
-);
+)
+or diag 'got plugin configurations: ', do {
+    local $Data::Dumper::Maxdepth = 4;
+    explain $tzil->plugins
+};
 
 done_testing;

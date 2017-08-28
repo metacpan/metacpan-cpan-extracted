@@ -24,10 +24,7 @@ Mojolicious::Plugin::DOCRenderer - Doc Renderer Plugin
   use Mojolicious::Lite;
   use File::Basename;
 
-  plugin 'DOCRenderer' => {
-      # use this script base name as a default module to show for "/doc"
-      module => fileparse( __FILE__, qr/\.[^.]*/ );
-  };
+  plugin 'DOCRenderer';
 
   app->start;
 
@@ -49,13 +46,12 @@ Mojolicious::Plugin::DOCRenderer - Doc Renderer Plugin
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  sub development_mode {
-    # Enable browsing of "/doc" only in development mode
-    shift->plugin( 'DOCRenderer' );
-  }
-
   sub startup {
     my $self = shift;
+
+    # Enable browsing of "/doc" only in development mode
+    $self->plugin( 'DOCRenderer' ) if $self->mode eq 'development';
+
     # some code
   }
 

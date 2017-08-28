@@ -30,7 +30,7 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-cpp.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/synopsis-cpp.pl> in the distribution.)  
+(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/synopsis-cpp.pl> in the distribution.)  
 
     
     # Print all the comments in a C program:
@@ -60,12 +60,12 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-comment.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/synopsis-comment.pl> in the distribution.)  
+(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/synopsis-comment.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents version 0.13 of C::Tokenize corresponding
-to git commit L<d887a78537b732d981aa07f72ce248a6c083056a|https://github.com/benkasminbullock/C-Tokenize/commit/d887a78537b732d981aa07f72ce248a6c083056a> released on Wed Dec 7 14:27:15 2016 +0900.
+This documents version 0.15 of C::Tokenize corresponding
+to git commit L<adccd168d3c753454f353dfb06e4773b94e29c5f|https://github.com/benkasminbullock/C-Tokenize/commit/adccd168d3c753454f353dfb06e4773b94e29c5f> released on Mon Aug 28 13:21:31 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,8 @@ comment line.
 It also supplies some extra regular expressions for, for example,
 local include statements, L</$include_local>, or C variables,
 L</$cvar_re>, as well as extra functions, like L</decomment> for
-removing traditional C comments.
+removing traditional C comments, and L</strip_comments> for removing
+all comments from a C program.
 
 =head1 REGULAR EXPRESSIONS
 
@@ -110,6 +111,9 @@ Match C<//> comments.
 Match both C</* */> and C<//> comments.
 
 =back
+
+See also L</decomment> for converting a comment to a string, and
+L</strip_comments> for removing all comments from a program.
 
 =head2 Preprocessor instructions
 
@@ -151,7 +155,7 @@ produces output
     Include statement #include "that.h" includes file that.h.
 
 
-(This example is included as L<F<includes.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/includes.pl> in the distribution.)  
+(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/includes.pl> in the distribution.)  
 
 This was added in version 0.12 of C::Tokenize.
 
@@ -239,7 +243,7 @@ produces output
     & q is a C variable.
 
 
-(This example is included as L<F<cvar.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/cvar.pl> in the distribution.)  
+(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/cvar.pl> in the distribution.)  
 
 Because in theory this can contain very complex things, this regex is
 somewhat heuristic and there are edge cases where it is known to
@@ -269,12 +273,12 @@ string has to begin and end with comment marks.
 
 =head2 tokenize
 
-    my $tokens = tokenize ($file);
+    my $tokens = tokenize ($text);
 
-Convert C<$file> into a series of tokens. The return value is an array
-reference which contains hash references. Each hash reference
-corresponds to one token in the C file. Each token contains the
-following keys:
+Convert the C program code C<$text> into a series of tokens. The
+return value is an array reference which contains hash
+references. Each hash reference corresponds to one token in the C
+text. Each token contains the following keys:
 
 =over
 
@@ -343,7 +347,7 @@ L</@fields> which can be exported from the module:
 =item $name
 
 The value of the type. For example, if C<< $token->{name} >> equals
-'comment', then the value of the type is in , C<< $token->{comment} >>.
+'comment', then the value of the type is in C<< $token->{comment} >>.
 
     if ($token->{name} eq 'string') {
         my $c_string = $token->{string};
@@ -356,6 +360,42 @@ multi-line comment or preprocessor instruction, the line number refers
 to the final line.
 
 =back
+
+=head2 strip_comments
+
+    my $no_comment = strip_comments ($c);
+
+This removes all comments from its input while preserving line breaks.
+
+    
+    use C::Tokenize 'strip_comments';
+    my $c = <<EOF;
+    /* The X coordinate. */
+    int x;
+    /* The Y coordinate.
+       See https://en.wikipedia.org/wiki/Cartesian_coordinates. */
+    int y;
+    // The Z coordinate.
+    int z;
+    EOF
+    print strip_comments ($c);
+
+
+produces output
+
+    
+    int x;
+    
+    
+    int y;
+    
+    int z;
+
+
+(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/strip-comments.pl> in the distribution.)  
+
+This function was moved to this module from L<XS::Check> in version
+0.14.
 
 =head1 EXPORTS
 
@@ -397,6 +437,8 @@ distribution called F<c2html.pl>.
 
 No handling of trigraphs.
 
+This is L<issue 4|https://github.com/benkasminbullock/C-Tokenize/issues/4>.
+
 =item Requires Perl 5.10
 
 This module uses named captures in regular expressions, so it requires
@@ -407,10 +449,18 @@ Perl 5.10 or more.
 The line numbers provided by L</tokenize> do not respect C line
 directives.
 
+This is L<issue 11|https://github.com/benkasminbullock/C-Tokenize/issues/11>.
+
 =item Insufficient tests
 
 The module has been used somewhat, but the included tests do not
 exercise many of the features of C.
+
+=item $include and $include_local assume the included file end with .h
+
+The C language does not impose a requirement that included file names
+end in .h. You can include a file with any name. However, the regexes
+L</$include> and L</$include_local> insist on a final .h.
 
 =back
 
@@ -422,7 +472,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2016
+2012-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

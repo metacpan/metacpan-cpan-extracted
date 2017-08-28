@@ -1,0 +1,200 @@
+NAME
+    App::dbinfo - Get/extract information from database
+
+VERSION
+    This document describes version 0.002 of App::dbinfo (from Perl
+    distribution App-dbinfo), released on 2017-08-25.
+
+SYNOPSIS
+    See included script dbinfo.
+
+FUNCTIONS
+  dump_table
+    Usage:
+
+     dump_table(%args) -> [status, msg, result, meta]
+
+    Dump table into various formats.
+
+    Examples:
+
+    *   Example #1:
+
+         dump_table( dsn => "table1");
+
+    *   Only include specified columns:
+
+         dump_table( dsn => "table2", include_columns => ["col1", "col2"]);
+
+    *   Exclude some columns:
+
+         dump_table( dsn => "table3", exclude_columns => ["col1", "col2"]);
+
+    *   Select some rows:
+
+         dump_table( dsn => "table4", limit_number => 10, wheres => ["name LIKE 'John*'"]);
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh => *obj*
+
+        Alternative to specifying dsn/user/password (from Perl).
+
+    *   dsn => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
+
+    *   exclude_columns => *array[str]*
+
+    *   include_columns => *array[str]*
+
+    *   limit_number => *nonnegint*
+
+    *   limit_offset => *nonnegint*
+
+    *   password => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   row_format => *str* (default: "hash")
+
+    *   table* => *str*
+
+        Table name.
+
+    *   user => *str*
+
+    *   wheres => *array[str]*
+
+        Add WHERE clause.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (str)
+
+  list_columns
+    Usage:
+
+     list_columns(%args) -> [status, msg, result, meta]
+
+    List columns of a table.
+
+    Examples:
+
+    *   Example #1:
+
+         list_columns(dsn => "dbi:SQLite:database=/tmp/test.db", table => "main.table1");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh => *obj*
+
+        Alternative to specifying dsn/user/password (from Perl).
+
+    *   detail => *bool*
+
+        Show detailed information per record.
+
+    *   dsn => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
+
+    *   password => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   table* => *str*
+
+        Table name.
+
+    *   user => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_tables
+    Usage:
+
+     list_tables(%args) -> [status, msg, result, meta]
+
+    List tables in the database.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh => *obj*
+
+        Alternative to specifying dsn/user/password (from Perl).
+
+    *   dsn => *str*
+
+        DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
+
+    *   password => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   user => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-dbinfo>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-dbinfo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-dbinfo>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBI
+
+    App::diffdb
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address;
-$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address::VERSION = '0.93';
 use strict;
 
 use constant LocalityIsRequired      => "82618";

@@ -17,9 +17,10 @@ my $extractor = Locale::TextDomain::OO::Extract::HTML->new(
     lexicon_ref => \my %lexicon,
 );
 
-my @files = Path::Iterator::Rule
+my @files = Path::Iterator::Rule ## no critic (LongChainsOfMethodCalls)
     ->new
-    ->file( qw( *.html *.htm ) )
+    ->file
+    ->name( qw( *.html *.htm ) )
     ->all( qw( ./files_to_extract ) );
 
 for my $file ( map { path($_) } @files ) {
@@ -36,7 +37,7 @@ for my $file ( map { path($_) } @files ) {
     ->Useqq(1)
     ->Dump;
 
-# $Id: 14_extract_html.pl 561 2014-11-11 16:12:48Z steffenw $
+# $Id: 14_extract_html.pl 683 2017-08-22 18:41:42Z steffenw $
 
 __END__
 

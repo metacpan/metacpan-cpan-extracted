@@ -24,7 +24,7 @@ sub init {
 
     $key = substr($key,0,$ciph->keysize);
     my $aes = Crypt::Cipher::AES->new($key);
-    $ciph->{cbc} = Net::SSH::Perl::Cipher::CBC->new($aes, substr($iv,0,$ciph->keysize));
+    $ciph->{cbc} = Net::SSH::Perl::Cipher::CBC->new($aes, substr($iv,0,$ciph->blocksize));
 }
 
 sub encrypt {

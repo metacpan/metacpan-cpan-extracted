@@ -117,9 +117,13 @@ sub verify {
     }
     # convert to ASN.1 DER format
     my $r = substr($sigblob,0,INTBLOB_LEN);
+    # remove leading zeros
+    substr($r,0,1,'') until ord(substr($r,0,1));
     # pad $r with leading zero if highest bit set
     $r = "\0" . $r if ord(substr($r,0,1)) & 0x80;
     my $s = substr($sigblob,INTBLOB_LEN);
+    # remove leading zeros
+    substr($s,0,1,'') until ord(substr($s,0,1));
     # pad $s with leading zero if highest bit set
     $s = "\0" . $s if ord(substr($s,0,1)) & 0x80;
     my $ints = chr(2) . chr(length($r)) . $r .

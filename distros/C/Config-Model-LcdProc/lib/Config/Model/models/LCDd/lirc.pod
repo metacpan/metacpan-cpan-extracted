@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::lirc
 # ABSTRACT:  Configuration class LCDd::lirc
+
 =encoding utf8
 
 =head1 NAME
@@ -16,11 +17,31 @@ generated from LCDd.conf
 
 =head2 lircrc
 
-Specify an alternative location of the lircrc file I<< Optional. Type uniline. upstream_default: '~/.lircrc'.  >> 
+Specify an alternative location of the lircrc file I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+~/.lircrc
+
+=back
+
+
 
 =head2 prog
 
-Must be the same as in your lircrc. I<< Optional. Type uniline. upstream_default: 'lcdd'.  >> 
+Must be the same as in your lircrc. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+lcdd
+
+=back
+
+
 
 =head1 SEE ALSO
 

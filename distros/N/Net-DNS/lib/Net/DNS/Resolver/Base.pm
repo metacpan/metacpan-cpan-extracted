@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1573 2017-06-12 11:03:59Z willem $
+# $Id: Base.pm 1588 2017-08-17 12:41:15Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1573 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1588 $)[1];
 
 
 #
@@ -293,8 +293,6 @@ sub nameservers {
 				push @iplist, _cname_addr( $packet, $names );
 			}
 
-			$self->errorstring( $defres->errorstring );
-
 			my %unique = map( ( $_ => $_ ), @iplist );
 
 			my @address = values(%unique);		# tainted
@@ -358,8 +356,9 @@ sub _reset_errorstring {
 
 sub errorstring {
 	my $self = shift;
-	$self->{errorstring} = shift if scalar @_;
-	return $self->{errorstring};
+	my $text = shift || return $self->{errorstring};
+	$self->_diag( 'errorstring:', $text );
+	return $self->{errorstring} = $text;
 }
 
 
@@ -420,11 +419,11 @@ sub send {
 
 
 sub _send_tcp {
-	my ( $self, $packet, $packet_data ) = @_;
+	my ( $self, $query, $query_data ) = @_;
 
 	$self->_reset_errorstring;
 
-	my $tcp_packet = pack 'n a*', length($packet_data), $packet_data;
+	my $tcp_packet = pack 'n a*', length($query_data), $query_data;
 	my @ns = $self->nameservers();
 	my $lastanswer;
 	my $timeout = $self->{tcp_timeout};
@@ -444,31 +443,32 @@ sub _send_tcp {
 		$self->answerfrom($ip);
 		$self->_diag( 'answer from', "[$ip]", length($buffer), 'bytes' );
 
-		my $ans = $self->_decode_reply( \$buffer, $packet ) || next;
+		my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
+		$self->errorstring($@);
+		next unless $self->_accept_reply( $reply, $query );
+		$reply->answerfrom($ip);
 
-		$ans->answerfrom($ip);
-		$lastanswer = $ans;
+		if ( $self->{tsig_rr} && !$reply->verify($query) ) {
+			$self->errorstring( $reply->verifyerr );
+			next;
+		}
 
-		my $rcode = $ans->header->rcode;
-		last if $rcode eq 'NOERROR';
-		last if $rcode eq 'NXDOMAIN';
-		$self->errorstring($rcode);
+		$lastanswer = $reply;
+
+		my $rcode = $reply->header->rcode;
+		$self->errorstring($rcode);			# historical quirk
+		return $reply if $rcode eq 'NOERROR';
+		return $reply if $rcode eq 'NXDOMAIN';
 	}
 
-	return unless $lastanswer;
-
-	if ( $self->{tsig_rr} && !$lastanswer->verify($packet) ) {
-		$self->_diag( $self->errorstring( $lastanswer->verifyerr ) );
-		return;
-	}
-
-	$self->errorstring( $lastanswer->header->rcode );	# historical quirk
+	$self->{errorstring} = $lastanswer->header->rcode if $lastanswer;
+	$self->errorstring('query timed out') unless $self->{errorstring};
 	return $lastanswer;
 }
 
 
 sub _send_udp {
-	my ( $self, $packet, $packet_data ) = @_;
+	my ( $self, $query, $query_data ) = @_;
 
 	$self->_reset_errorstring;
 
@@ -476,7 +476,6 @@ sub _send_udp {
 	my $port    = $self->{port};
 	my $retrans = $self->{retrans} || 1;
 	my $retry   = $self->{retry} || 1;
-	my $select  = IO::Select->new();
 	my $servers = scalar(@ns);
 	my $timeout = $servers ? do { no integer; $retrans / $servers } : 0;
 	my $lastanswer;
@@ -485,9 +484,11 @@ sub _send_udp {
 RETRY: for ( 1 .. $retry ) {					# assumed to be a small number
 
 		# Try each nameserver.
+		my $select = IO::Select->new();
+
 NAMESERVER: foreach my $ns (@ns) {
 
-			# Construct an array of 3 element arrays
+			# state vector replaces corresponding element of @ns array
 			unless ( ref $ns ) {
 				my $socket = $self->_create_udp_socket($ns) || next;
 				my $dst_sockaddr = $self->_create_dst_sockaddr( $ns, $port );
@@ -499,53 +500,53 @@ NAMESERVER: foreach my $ns (@ns) {
 
 			$self->_diag( 'udp send', "[$ip]:$port" );
 
-			$socket->send( $packet_data, 0, $dst_sockaddr );
+			$select->add($socket);
+			$socket->send( $query_data, 0, $dst_sockaddr );
 			$self->errorstring( $$ns[3] = $! );
 
 			# handle failure to detect taint inside socket->send()
 			die 'Insecure dependency while running with -T switch'
 					if TESTS && Scalar::Util::tainted($dst_sockaddr);
 
-			$select->add($socket);
-
+			my $reply;
 			while ( my ($socket) = $select->can_read($timeout) ) {
-				$select->remove($socket);
-
 				my $peer = $socket->peerhost;
 				$self->answerfrom($peer);
 
 				my $buffer = _read_udp( $socket, $self->_packetsz );
 				$self->_diag( "answer from [$peer]", length($buffer), 'bytes' );
 
-				my $ans = $self->_decode_reply( \$buffer, $packet ) || next;
+				my $packet = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
+				$self->errorstring($@);
+				next unless $self->_accept_reply( $packet, $query );
+				$reply = $packet;
+				$reply->answerfrom($peer);
+				last;
+			}					#SELECT LOOP
 
-				$ans->answerfrom($peer);
-				$lastanswer = $ans;
+			next unless $reply;
 
-				my $rcode = $ans->header->rcode;
-				last if $rcode eq 'NOERROR';
-				last if $rcode eq 'NXDOMAIN';
-
-				$self->errorstring( $$ns[3] = $rcode );
-			}					#SELECTOR LOOP
-
-			next unless $lastanswer;
-
-			if ( $self->{tsig_rr} && !$lastanswer->verify($packet) ) {
-				my $error = $$ns[3] = $lastanswer->verifyerr;
-				$self->_diag( $self->errorstring($error) );
+			if ( $self->{tsig_rr} && !$reply->verify($query) ) {
+				$self->errorstring( $$ns[3] = $reply->verifyerr );
 				next;
 			}
 
-			$self->errorstring( $lastanswer->header->rcode );    # historical quirk
-			return $lastanswer;
+			$lastanswer = $reply;
+
+			my $rcode = $reply->header->rcode;
+			$self->errorstring($rcode);		# historical quirk
+			return $reply if $rcode eq 'NOERROR';
+			return $reply if $rcode eq 'NXDOMAIN';
+			$$ns[3] = $rcode;
 		}						#NAMESERVER LOOP
+
 		no integer;
 		$timeout += $timeout;
 	}							#RETRY LOOP
 
-	$self->_diag( $self->errorstring('query timed out') ) unless $lastanswer;
-	return;
+	$self->{errorstring} = $lastanswer->header->rcode if $lastanswer;
+	$self->errorstring('query timed out') unless $self->{errorstring};
+	return $lastanswer;
 }
 
 
@@ -582,7 +583,6 @@ sub _bgsend_tcp {
 		return $socket;
 	}
 
-	$self->_diag( $self->errorstring );
 	return undef;
 }
 
@@ -612,7 +612,6 @@ sub _bgsend_udp {
 		return $socket;
 	}
 
-	$self->_diag( $self->errorstring );
 	return undef;
 }
 
@@ -648,9 +647,8 @@ sub bgisready {				## historical
 
 
 sub bgread {
-	my ( $self, $handle ) = @_;
 	while (&bgbusy) {					# side effect: TCP retry
-		IO::Select->new($handle)->can_read(0.02);	# cut CPU by 3 orders of magnitude
+		IO::Select->new( $_[1] )->can_read(0.02);	# use 3 orders of magnitude less CPU
 	}
 	&_bgread;
 }
@@ -673,7 +671,10 @@ sub _bgread {
 	my $buffer = $dgram ? _read_udp( $handle, $self->_packetsz ) : _read_tcp($handle);
 	$self->_diag( "answer from [$peer]", length($buffer), 'bytes' );
 
-	my $reply = $self->_decode_reply( \$buffer, $query ) || return;
+	my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
+	$self->errorstring($@);
+	return unless $self->_accept_reply( $reply, $query );
+	$reply->answerfrom($peer);
 
 	return $reply unless $self->{tsig_rr} && !$reply->verify($query);
 	$self->errorstring( $reply->verifyerr );
@@ -681,19 +682,16 @@ sub _bgread {
 }
 
 
-sub _decode_reply {
-	my ( $self, $bufref, $query ) = @_;
-
-	my $reply = Net::DNS::Packet->decode( $bufref, $self->{debug} );
-	$self->errorstring($@);
+sub _accept_reply {
+	my ( $self, $reply, $query ) = @_;
 
 	return unless $reply;
 
 	my $header = $reply->header;
 	return unless $header->qr;
 
-	return $reply unless $query;				# SpamAssassin 3.4.1 workaround
-	return ( $header->id != $query->header->id ) ? undef : $reply;
+	return 1 unless $query;					# SpamAssassin 3.4.1 workaround
+	return $header->id == $query->header->id;
 }
 
 
@@ -896,8 +894,8 @@ sub _create_tcp_socket {
 				unless USE_SOCKET_INET6 && $ip6_addr;
 	}
 
-	$self->{persistent}{$sock_key} = $self->{persistent_tcp} ? $socket : undef;
 	$self->errorstring("no socket $sock_key $!") unless $socket;
+	$self->{persistent}{$sock_key} = $self->{persistent_tcp} ? $socket : undef;
 	return $socket;
 }
 
@@ -937,8 +935,8 @@ sub _create_udp_socket {
 				unless USE_SOCKET_INET6 && $ip6_addr;
 	}
 
-	$self->{persistent}{$sock_key} = $self->{persistent_udp} ? $socket : undef;
 	$self->errorstring("no socket $sock_key $!") unless $socket;
+	$self->{persistent}{$sock_key} = $self->{persistent_udp} ? $socket : undef;
 	return $socket;
 }
 
@@ -959,20 +957,14 @@ my $hints6 = {
 	}
 		if USE_SOCKET_IP;
 
-BEGIN {
-	import Socket6 qw(AI_NUMERICHOST) if USE_SOCKET_INET6;
-}
-
-my @inet6 = ( AF_INET6, SOCK_DGRAM, 0, AI_NUMERICHOST ) if USE_SOCKET_INET6;
+my $inet6 = [AF_INET6, SOCK_DGRAM, 0, Socket6::AI_NUMERICHOST()] if USE_SOCKET_INET6;
 
 sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
 	my ( $self, $ip, $port ) = @_;
 
 	unless (USE_SOCKET_IP) {
-		return ( Socket6::getaddrinfo( $ip, $port, @inet6 ) )[3]
-				if USE_SOCKET_INET6 && _ipv6($ip);
-
-		return sockaddr_in( $port, inet_aton($ip) );	# NB: errors raised in socket->send
+		return sockaddr_in( $port, inet_aton($ip) ) unless _ipv6($ip);
+		return ( Socket6::getaddrinfo( $ip, $port, @$inet6 ) )[3] if USE_SOCKET_INET6;
 	}
 
 	( Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $hints6 : $hints4 ) )[1]->{addr}
@@ -984,15 +976,17 @@ sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
 
 sub _ipv4 {
 	for (shift) {
-		return /^[0-9.]+\.[0-9]+$/;			# dotted digits
+		return if m/[^.0-9]/;				# dots and digits only
+		return m/\.\d+\./;				# dots separated by digits
 	}
 }
 
 sub _ipv6 {
 	for (shift) {
-		return 1 if /^[:0-9a-f]+:[0-9a-f]*$/i;		# mixed : and hexdigits
-		return 1 if /^[:0-9a-f]+:[0-9.]+$/i;		# prefix + dotted digits
-		return /^[:0-9a-f]+:[0-9a-f]*[%].+$/i;		# RFC4007 scoped address
+		return	 unless m/:.*:/;			# must contain two colons
+		return 1 unless m/[^:0-9A-Fa-f]/;		# colons and hexdigits only
+		return 1 if m/^[:.0-9A-Fa-f]+\%.+$/;		# RFC4007 scoped address
+		return m/^[:0-9A-Fa-f]+:[.0-9]+$/;		# prefix : dotted digits
 	}
 }
 

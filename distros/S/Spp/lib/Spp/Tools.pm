@@ -1,480 +1,148 @@
+# Copyright 2016 The Michael Song. All rights rberved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 package Spp::Tools;
 
-=head1 NAME
-
-Spp::Tools - The perl interface for Spp
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.03';
-
-=head1 SYNOPSIS
-
-Tools gather some small reused function
-
-    use Spp::Tools;
-
-    my $first_element = first([1,2,3]);
-    # 1
-
-=cut
-
 use Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(
-create_cursor
-add_exprs
-all_is_spp_array
-all_is_spp_int
-all_is_spp_str
-all_is_spp_sym
-apply_char
-error
-host_range
-fill_array
-get_atoms_type
-get_token_name
-in
-is_bool
-is_false
-is_fail
-is_nil
-is_true
-is_str
-is_int
-is_array
-is_hash
-is_func
-is_match
-is_match_atom
-is_match_atoms
-is_same
-len
-load_file
-host_join
-host_split
-host_substr
-host_zip
-read_file
-rest
-see
-subarray
-to_str
-trim
-type
-uuid
-write_file
-name_match
-gather_match
-get_rule_file
-get_spp_file
-host_sum
-host_concat
-);
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(to_json from_json error count
+  start_with end_with rev_str first tail rest subarray
+  trim read_file write_file len to_trace_str);
 
-use 5.020;
-use Carp qw(croak);
-use JSON qw(encode_json decode_json);
-use List::Util qw(max);
-use experimental qw(switch autoderef);
-use List::MoreUtils qw(pairwise);
+use 5.012;
+no warnings "experimental";
+use JSON::XS qw(encode_json decode_json);
+use Spp::IsAtom;
 
-###################################################
-
-sub create_cursor {
-  my $str = shift;
-  my $trim_str = trim($str);
-  return {
-    STR  => $trim_str,
-    POS  => 0,
-    LEN  => len($trim_str),
-    LOG  => [],
-  };
-}
-
-sub add_exprs {
-  my $atoms = shift;
-  return $atoms->[0] if len($atoms) == 1;
-  return ['exprs', $atoms];
-}
-
-sub all_is_match_atom {
-  my $atoms = shift;
-  for my $atom (values $atoms) {
-    next if is_match_atom($atom);
-    return 0;
-  }
-  return 1;
-}
-
-sub all_is_spp_array {
-  my $atoms = shift;
-  if (all_is_match_atom($atoms)) {
-    return 1 if get_atoms_type($atoms) eq 'array';
-  }
-  return 0;
-}
-
-sub all_is_spp_int {
-  my $atoms = shift;
-  if (all_is_match_atom($atoms)) {
-    return 1 if get_atoms_type($atoms) eq 'int';
-  }
-  return 0;
-}
-
-sub all_is_spp_str {
-  my $atoms = shift;
-  if (all_is_match_atom($atoms)) {
-    return 1 if get_atoms_type($atoms) eq 'str';
-  }
-  return 0;
-}
-
-sub all_is_spp_sym {
-  my $atoms = shift;
-  if (all_is_match_atom($atoms)) {
-    return 1 if get_atoms_type($atoms) eq 'sym';
-  }
-  return 0;
-}
-
-sub apply_char {
-  my ($len, $cursor) = @_;
-  my $pos = $cursor->{POS};
-  my $str = $cursor->{STR};
-  return '' if $pos >= $cursor->{LEN};
-  return substr($str, $pos, $len) if $len > 0;
-  return substr($str, $pos + $len, abs($len)) if $len < 0;
-  return substr($str, $pos, 1) if $len == 0;
-}
-
-sub error { say @_; exit }
-
-sub fill_array {
-  my ($value, $len) = @_;
-  my $fill_array = [];
-  for my $x (1 .. $len) {
-    push $fill_array, $value;
-  }
-  return $fill_array;
-}
-
-sub host_range {
-  my ($from, $to) = @_;
-  return [ $from .. $to ];
-}
-
-sub get_atoms_type {
-  my $atoms = shift;
-  my $type = type($atoms->[0]);
-  for my $atom (values $atoms) {
-    next if type($atom) eq $type;
-    return 0
-  }
-  return $type;
-}
-
-sub get_token_name {
-   my $token_name = shift;
-   if ( $token_name =~ /^\./ ) {
-      return substr($token_name, 1);
-   }
-   return $token_name;
-}
-
-sub in {
-  my ($element, $array) = @_;
-  my $element_str = to_str($element);
-  for my $x (values $array) {
-    return 1 if to_str($x) eq $element_str;
-  }
-  return 0;
-}
-
-sub is_bool {
-  my $x = shift;
-  return 1 if is_match_atom($x) and type($x) eq 'bool';
-  return 0;
-}
-
-sub is_false {
-  my $x = shift;
-  return 1 if is_bool($x) and $x->[1] eq 'false';
-  return 0;
-}
-
-sub is_nil {
-  my $x = shift;
-  return 1 if type($x) eq 'nil';
-  return 0;
-}
-
-sub is_true {
-  my $x = shift;
-  return 1 if is_bool($x) and $x->[1] eq 'true';
-  return 0;
-}
-
-sub is_fail {
-  my $x = shift;
-  return 1 if is_false($x) or is_nil($x);
-  return 0;
-}
-
-sub is_str {
-   my $x = shift;
-   return 1 if ref($x) eq ref('');
-   return 0;
-}
-
-sub is_int {
-  my $x = shift;
-  if (is_str($x)) {
-    return 0 if $x ^ $x;
-    return 0 if $x eq '';
-    return 1;
-  }
-  return 0;
-}
-
-sub is_array {
-   my $x = shift;
-   return 1 if ref($x) eq ref([]);
-   return 0;
-}
-
-sub is_hash {
-   my $x = shift;
-   return 1 if ref($x) eq ref({});
-   return 0;
-}
-
-sub is_func {
-  my $x = shift;
-  return 1 if ref($x) eq ref(sub {});
-  return 0;
-}
-
-sub is_match {
-  my $x = shift;
-  return 0 if is_false($x);
-  return 1 if is_true($x) or is_str($x);
-  return 1 if is_match_atom($x) or is_match_atoms($x);
-  my $data_str = to_str($x);
-  error("error match data: $data_str");
-}
-
-sub is_match_atom {
-   my $x = shift;
-   return 0 unless is_array($x);
-   return 0 unless len($x) > 1;
-   return 0 unless is_str($x->[0]);
-   return 1;
-}
-
-sub is_match_atoms {
-  my $pairs = shift;
-  if ( is_array($pairs) ) {
-    for my $pair (values $pairs) {
-      next if is_match_atom($pair);
-      return 0;
-    }
-    return 1;
-  }
-  return 0;
-}
-
-sub is_same {
-  my ($data_a, $data_b) = @_;
-  return 1 if to_str($data_a) eq to_str($data_b);
-  return 0;
-}
-
-sub len {
+sub to_json { 
   my $data = shift;
-  return scalar( @{$data} ) if is_array($data);
-  return $data if is_int($data);
-  return length( $data ) if is_str($data);
+  if (is_chars($data)) {
+    my $json_str = encode_json([$data]);
+    return substr($json_str, 1, -1);
+  } 
+  return encode_json($data);
 }
 
-sub load_file {
-  my $file_name = shift;
-  my $file_txt = read_file($file_name);
-  return decode_json($file_txt);
+sub from_json { return decode_json(shift) }
+
+sub error { say @_; exit() }
+
+sub first {
+  my $data = shift;
+  if (is_chars($data)) { return substr($data, 0, 1) }
+  if (is_array($data)) { return $data->[0] }
+  error("could not first($data)");
 }
 
-sub host_join {
-  my ($array, $sep) = @_;
-  if (defined $sep) {
-    return join($sep, @$array);
-  }
-  return join('', @$array);
-}
-
-sub host_split {
-  my ($str, $sep) = @_;
-  if (defined $sep) {
-    return [ split($sep, $str) ];
-  }
-  return [ split('', $str) ];
-}
-
-sub host_substr {
-  my ($str, $from, $len) = @_;
-  return substr($str, $from, $len);
-}
-
-sub host_zip {
-  my ($a_one, $a_two) = @_;
-  return [ pairwise { [$a, $b] } @$a_one, @$a_two ];
-}
-
-sub read_file {
-  my $file = shift;
-  error("file: $file not exists") if not -e $file;
-  local $/;
-  open my ($fh), '<', $file or die $!;
-  return <$fh>;
+sub tail {
+  my $data = shift;
+  if (is_chars($data)) { return substr($data, -1) }
+  if (is_array($data)) { return $data->[-1] }
+  error("Could not tail($data)");
 }
 
 sub rest {
    my $data = shift;
-   my $len_data = len($data);
+   return substr($data, 1) if is_chars($data);
    if (is_array($data)) {
-     return [ splice( [ @{$data} ], 1, $len_data ) ];
+     my $len_data = len($data);
+     # copy $data, splice would change array
+     my @array = @{$data};
+     return [ splice(@array, 1, $len_data) ];
    }
-   return substr($data, 1) if is_str($data);
-   error("rest only could implement with str or array");
-}
-
-sub see {
-  my $data = shift;
-  say to_str($data);
-  return 1;
+   error("rest only could do str or array");
 }
 
 sub subarray {
   my ($array, $from, $to) = @_;
+  # make copy of $array, splice would change it
+  my @array = @{$array};
   if (is_array($array)) {
-    my $list = [ @{$array} ];
     if ($to < 0) {
-      my $len = len($list) + $to - $from + 1;
-      my $sub_list = [ splice $list, $from, $len ];
-      return $sub_list;
+      my $len = len($array) + $to - $from + 1;
+      my $sub_array = [ splice @array, $from, $len ];
+      return $sub_array;
     }
-    return [ splice $list, $from, $to ];
+    return [ splice @array, $from, $to ];
   }
-  my $array_str = to_str($array);
-  error("subarray only could process array: not $array_str");
+  error("subarray only could process array");
 }
 
-sub to_str {
-  my $data = shift;
-  return $data if is_str($data);
-  return encode_json($data);
+sub count {
+   my ($str, $char) = @_;
+   my @array = ($str =~ /$char/g);
+   return scalar(@array);
+}
+
+sub start_with {
+   my ($str, $start) = @_;
+   return 1 if index($str, $start) == 0;
+   return 0;
+}
+
+sub end_with {
+   my ($str, $end) = @_;
+   return start_with(rev_str($str), rev_str($end));
+}
+
+sub rev_str {
+   my $str = shift;
+   return scalar(reverse($str));
 }
 
 sub trim {
-  my $str = shift;
-  if (is_str($str)) {
-    $str =~ s/^\s+|\s+$//g;
-    return $str;
-  }
-  my $str_json = to_str($str);
-  error("trim only could make string, not $str_json");
+   my $str = shift;
+   if (is_chars($str)) {
+      $str =~ s/^\s+|\s+$//g;
+      return $str;
+   }
+   my $str_json = str($str);
+   error("! trim only make string: $str_json");
 }
 
-sub type {
-  my $x = shift;
-  return $x->[0] if is_array($x);
-  my $x_str = to_str($x);
-  error("Could not get $x_str type");
+sub read_file {
+   my $file = shift;
+   error("file: $file not exists") if not -e $file;
+   local $/;
+   open my ($fh), '<:utf8', $file or die $!;
+   return <$fh>;
 }
-
-sub uuid { return scalar(rand()) }
 
 sub write_file {
-  my ($file, $str) = @_;
-  open my ($fh), '>', $file or die $!;
-  print {$fh} $str;
-  return $file;
+   my ($file, $str) = @_;
+   open my ($fh), '>:utf8', $file or die $!;
+   print {$fh} $str;
+   return $file;
 }
 
-sub name_match {
-  my ( $name, $match ) = @_;
-  return $match       if is_false($match);
-  return $match       if is_true($match);
-  return [$name, $match] if is_str($match);
-  return $match          if $name =~ /^[a-z_]/;
-  return [$name, [$match]] if is_match_atom($match);
-  return [$name, $match];
+sub len {
+   my $data = shift;
+   return scalar(@{$data}) if is_array($data);
+   return length($data) if is_chars($data);
 }
 
-sub gather_match {
-  my ( $gather, $match ) = @_;
-  return $match if is_false($match);
-  return $match if is_true($gather);
-  if ( is_str($gather) ) {
-    return $gather if is_true($match);
-    return $gather . $match if is_str($match);
-    return $match if is_match_atom($match);
-    return $match if is_match_atoms($match);
-  }
-  return $gather if is_true($match) or is_str($match);
-  if ( is_match_atom($gather) ) {
-    return [ $gather, $match ] if is_match_atom($match); 
-    return [ $gather, @{$match} ] if is_match_atoms($match); 
-  }
-  if ( is_match_atoms($gather) ) {
-    return [ @{$gather}, $match ] if is_match_atom($match);
-    return [ @{$gather}, @{$match} ] if is_match_atoms($match);
-  }
-  my $gather_str = to_str($gather);
-  my $match_str = to_str($match);
-  error("$gather_str could not gather match with $match_str");
-}
-
-sub get_rule_file {
-  my $name = shift;
-  return "$name.json" if (-e "$name.json");
-  for my $dir (@INC) {
-    my $path = "$dir/rule/$name.json";
-    return $path if (-e $path);
-  }
-  error("Could not get rule file: $name.json");
-}
-
-sub get_spp_file {
-  my $name = shift;
-  return "$name.spp" if (-e "$name.spp");
-  for my $dir (@INC) {
-    my $path = "$dir/spp/$name.spp";
-    return $path if (-e $path);
-  }
-  error("Could not get spp file: $name.spp");
-}
-
-sub host_sum {
-  my $nums = shift;
-  my $sum = 0;
-  for my $value (values $nums) {
-    $sum += $value;
-  }
-  return $sum;
-}
-
-sub host_concat {
-  my $arrays = shift;
-  my $concat_array = [];
-  for my $array (values $arrays) {
-    push $concat_array, @{$array};
-  }
-  return $concat_array;
+sub to_trace_str {
+   my ($str, $n) = @_;
+   $str = rev_str($str);
+   my @buf = ();
+   for my $ch (split('', $str)) {
+      given ($ch) {
+         when ("\n") { push @buf, 'n\\' }
+         when ("\r") { push @buf, 'r\\' }
+         when ("\t") { push @buf, 't\\' }
+         default     { push @buf, $ch }
+      }
+   }
+   $str = join('', @buf);
+   my $len = len($str);
+   if ($len > $n) {
+      $str = substr($str, 0, $n);
+   }
+   elsif ($len < $n) {
+      $str = (' ' x ($n - $len)) . $str;
+   }
+   return rev_str($str);
 }
 
 =head1 AUTHOR
@@ -559,4 +227,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Spp::Tools
+1;

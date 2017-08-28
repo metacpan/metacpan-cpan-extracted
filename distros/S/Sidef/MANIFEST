@@ -129,6 +129,7 @@ scripts/continued_fraction.sf
 scripts/currying.sf
 scripts/draw_a_cuboid.sf
 scripts/draw_a_cuboid_2.sf
+scripts/draw_grid_of_squares.sf
 scripts/elementary_cellular_automaton.sf
 scripts/elementary_cellular_automaton_regex.sf
 scripts/ethiopian_multiplication.sf
@@ -302,10 +303,12 @@ scripts/RosettaCode/compile-time_calculation.sf
 scripts/RosettaCode/compile-time_calculation_1.sf
 scripts/RosettaCode/compound_data_type.sf
 scripts/RosettaCode/concurrent_computing.sf
+scripts/RosettaCode/conjugate_transpose.sf
 scripts/RosettaCode/constrained_random_points_on_a_circle.sf
 scripts/RosettaCode/continued_fractions_from_rationals.sf
 scripts/RosettaCode/convert_decimal_number_to_rational.sf
 scripts/RosettaCode/convert_seconds_to_compound_duration.sf
+scripts/RosettaCode/convex_hull.sf
 scripts/RosettaCode/copy_a_string.sf
 scripts/RosettaCode/count_in_factors.sf
 scripts/RosettaCode/count_occurrences_of_a_substring.sf
@@ -325,6 +328,7 @@ scripts/RosettaCode/dinesman_problem_parsing.sf
 scripts/RosettaCode/dinesman_problem_simple.sf
 scripts/RosettaCode/diversity_prediction_theorem.sf
 scripts/RosettaCode/dot_product.sf
+scripts/RosettaCode/elliptic_curve_arithmetic.sf
 scripts/RosettaCode/emirp_primes.sf
 scripts/RosettaCode/empty_directory.sf
 scripts/RosettaCode/empty_directory_1.sf
@@ -538,6 +542,7 @@ scripts/RosettaCode/sort_a_list_of_object_identifiers.sf
 scripts/RosettaCode/sort_an_integer_array.sf
 scripts/RosettaCode/sort_disjoint_sublist.sf
 scripts/RosettaCode/sort_stability.sf
+scripts/RosettaCode/sort_three_variables.sf
 scripts/RosettaCode/sort_using_a_custom_comparator.sf
 scripts/RosettaCode/sorting_algorithms_bubble_sort.sf
 scripts/RosettaCode/sorting_algorithms_circlesort.sf
@@ -580,6 +585,7 @@ scripts/RosettaCode/truncatable_primes.sf
 scripts/RosettaCode/universal_turing_machine.sf
 scripts/RosettaCode/utf8_encode_decode.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
+scripts/RosettaCode/variable_length_quantity.sf
 scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/water_collected_between_towers.sf
 scripts/RosettaCode/word_wrap.sf
@@ -660,6 +666,8 @@ scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf
 scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf
+scripts/Tests/draw_grid_of_squares_multi.sf
+scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf
 scripts/Tests/dynamic_constants.sf
 scripts/Tests/echo.sf
@@ -716,6 +724,7 @@ scripts/Tests/is_even_perfect.sf
 scripts/Tests/is_even_perfect_2.sf
 scripts/Tests/is_power.sf
 scripts/Tests/is_prime.sf
+scripts/Tests/karatsuba_multiplication.sf
 scripts/Tests/lambert_w_and_lgrt.sf
 scripts/Tests/lazy_iterators.sf
 scripts/Tests/lazy_iterators_2.sf
@@ -814,6 +823,7 @@ scripts/Tests/ranges.sf
 scripts/Tests/read_a_configuration_file.sf
 scripts/Tests/rec_reverse.sf
 scripts/Tests/recursion.sf
+scripts/Tests/recursive_block_closures.sf
 scripts/Tests/regex.sf
 scripts/Tests/regex_bool.sf
 scripts/Tests/regex_global_matching.sf
@@ -953,6 +963,7 @@ utils/Experiments/C-inline-function-call.pl
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl
+utils/find_class_typos.pl
 utils/find_invalid_types.pl
 utils/find_undefined_methods.pl
 utils/grep_errors.sh

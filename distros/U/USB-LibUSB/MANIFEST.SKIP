@@ -1,0 +1,28 @@
+.o$
+^.git
+^fallback/
+^.travis.yml$
+^appveyor.yml$
+^update-version.pl$
+
+# dist builds
+^USB-LibUSB
+
+# Makemaker generated files and dirs.
+^Makefile$
+^blib/
+^MakeMaker-\d
+.inc$
+^MANIFEST.bak$
+^LibUSB.bs$
+^LibUSB.c$
+^pm_to_blib$
+^MYMETA
+
+
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#

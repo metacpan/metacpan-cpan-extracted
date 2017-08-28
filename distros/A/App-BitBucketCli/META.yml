@@ -1,0 +1,50 @@
+---
+abstract: 'Library for talking to BitBucket Server (or Stash)'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Module::Build: '0.422'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-BitBucketCli
+provides:
+  App::BitBucketCli:
+    file: lib/App/BitBucketCli.pm
+    version: '0.001'
+  App::BitBucketCli::Branch:
+    file: lib/App/BitBucketCli/Branch.pm
+    version: '0.001'
+  App::BitBucketCli::Core:
+    file: lib/App/BitBucketCli/Core.pm
+    version: '0.001'
+  App::BitBucketCli::Project:
+    file: lib/App/BitBucketCli/Project.pm
+    version: '0.001'
+  App::BitBucketCli::PullRequest:
+    file: lib/App/BitBucketCli/PullRequest.pm
+    version: '0.001'
+  App::BitBucketCli::Repository:
+    file: lib/App/BitBucketCli/Repository.pm
+    version: '0.001'
+requires:
+  Getopt::Alt: v0.4.5
+  JSON::XS: '0'
+  Moo: '2.0'
+  Path::Tiny: '0.076'
+  WWW::Mechanize: '0'
+  YAML::Syck: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::BitBucketCli
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/App-bitbucket-cli.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

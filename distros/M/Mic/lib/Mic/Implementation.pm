@@ -3,10 +3,16 @@ package Mic::Implementation;
 use strict;
 use Mic::_Guts;
 use Package::Stash;
+use Params::Validate qw(:all);
 use Readonly;
 
 sub import {
-    my ($class, %arg) = @_;
+    my $class = shift;
+
+    my %arg = validate(@_, {
+        has         => { type => HASHREF },
+        classmethod => { type => ARRAYREF, optional => 1 },
+    });
 
     strict->import();
 

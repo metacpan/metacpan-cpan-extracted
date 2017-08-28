@@ -8,6 +8,7 @@ use utf8;
 use IO::File ();
 use IO::Handle ();
 use Try::Tiny::ByClass;
+use Datahub::Factory::Error ();
 
 sub import {
     my $pkg = caller;

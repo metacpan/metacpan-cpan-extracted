@@ -22,7 +22,10 @@ my %WriteMakefileArgs = (
     "Data::Clean" => "0.48",
     "Data::Clean::JSON" => "0.38",
     "Data::Rmap" => 0,
+    "Data::Tersify" => 0,
+    "Data::Tersify::Plugin::DateTime" => 0,
     "Data::Visitor::Callback" => 0,
+    "DateTime" => 0,
     "JSON::MaybeXS" => 0,
     "JSON::PP" => 0,
     "JSON::XS" => 0,
@@ -30,13 +33,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bencher::Backend" => "1.034",
+    "Bencher::Backend" => "1.040",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,13 +47,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bencher::Backend" => "1.034",
+  "Bencher::Backend" => "1.040",
   "Cpanel::JSON::XS" => 0,
   "Data::Abridge" => 0,
   "Data::Clean" => "0.48",
   "Data::Clean::JSON" => "0.38",
   "Data::Rmap" => 0,
+  "Data::Tersify" => 0,
+  "Data::Tersify::Plugin::DateTime" => 0,
   "Data::Visitor::Callback" => 0,
+  "DateTime" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

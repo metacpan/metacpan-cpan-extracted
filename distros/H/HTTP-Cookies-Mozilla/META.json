@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -65,6 +65,6 @@
          "web" : "https://github.com/briandfoy/HTTP-Cookies-Mozilla"
       }
    },
-   "version" : "2.032",
+   "version" : "2.033",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

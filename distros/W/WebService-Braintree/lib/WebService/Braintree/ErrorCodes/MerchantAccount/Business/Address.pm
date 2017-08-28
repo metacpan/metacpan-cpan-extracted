@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address;
-$WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::MerchantAccount::Business::Address::VERSION = '0.93';
 use strict;
 
 use constant RegionIsInvalid        => "82684";

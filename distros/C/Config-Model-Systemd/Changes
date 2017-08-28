@@ -1,3 +1,8 @@
+0.234.1 2017-08-27
+
+  Systemd model update:
+    * update from systemd 234 documentation
+
 0.232.7 2017-06-24
 
   This release brings quite a big change to the way cme is invoked for
@@ -69,7 +74,7 @@
   Systemd model update:
     * update with systemd 232
     * specify default value of some integer parameters
-    * can migrate depracated resource-control parameters
+    * can migrate deprecated resource-control parameters
       (for instance, cme replaces deprecated CPUWeight with CPUShares)
 
   Systemd parser update:

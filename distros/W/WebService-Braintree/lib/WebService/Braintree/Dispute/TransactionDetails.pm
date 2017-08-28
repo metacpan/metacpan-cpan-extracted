@@ -1,5 +1,5 @@
 package WebService::Braintree::Dispute::TransactionDetails;
-$WebService::Braintree::Dispute::TransactionDetails::VERSION = '0.92';
+$WebService::Braintree::Dispute::TransactionDetails::VERSION = '0.93';
 =head1 NAME
 
 WebService::Braintree::Dispute::TransactionDetails

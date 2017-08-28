@@ -1,3 +1,5 @@
+2017-08-24      1.2001  Add the set_name method
+
 2017-06-28      1.2000  Let people add fixtures to an existing
                           C::M::G::IT object, with convenient shorthands;
                         Add note to doco about namespace::autoclean

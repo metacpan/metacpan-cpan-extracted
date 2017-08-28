@@ -8,11 +8,12 @@ build_requires:
   MIME::QuotedPrint: '0'
   Perl::Critic: '0'
   Test::More: '0'
+  Test::NoWarnings: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,5 +45,5 @@ resources:
   bugtracker: https://github.com/bk2204/muter/issues
   homepage: https://github.com/bk2204/muter
   repository: https://github.com/bk2204/muter.git
-version: '0.002001'
+version: '0.002002'
 x_serialization_backend: 'YAML::Tiny version 1.70'

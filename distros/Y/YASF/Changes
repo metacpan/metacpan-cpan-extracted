@@ -1,5 +1,10 @@
 Revision history for Perl module YASF
 
+0.005 - 2017-08-19
+  - Fixed GitHub issue #2
+  - Added new tests for the previous fix
+  - Renamed the "binding" property to "bindings"
+  - Added "on_undef" property and tests (GitHub issue #3)
 0.004 - 2016-12-14
   - More tests, based on coverage analysis.
   - Removed useless elsif and croak.

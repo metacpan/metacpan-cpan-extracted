@@ -1,0 +1,642 @@
+---
+global:
+    - indir: "data/processed"
+    - outdir: "data/analysis"
+    - file_rule: (Sample.*)$
+    - by_sample_outdir: 1
+    - find_by_dir: 1
+    - wait: 0
+    - trimmomatic_dir: "data/processed/{$sample}/trimmomatic"
+    - trimmomatic: "data/processed/{$sample}/trimmomatic"
+    - raw_fastqc_dir: "data/processed/{$sample}"
+    - raw_fastqc: "data/processed/{$sample}"
+    - analysis_dir: "data/processed/analysis"
+    - root: data/analysis
+    - samtools: "data/analysis/{$sample}/samtools"
+    - samtools_dir: "data/analysis/{$sample}/samtools"
+    - picard: "data/analysis/{$sample}/picard"
+    - picard_dir: "data/analysis/{$sample}/picard"
+    - gatk: "data/analysis/{$sample}/gatk"
+    - gatk_dir: "{$self->root}/{$sample}/gatk"
+    - bowtie2: "data/analysis/{$sample}/bowtie2"
+    - bowtie2_dir: "{$self->root}/{$sample}/bowtie2"
+    - bowtie2_tmp_dir: "{$self->analysis_dir}/{$sample}/bowtie2/tmp"
+    - freebayes: "data/analysis/{$sample}/freebayes"
+    - freebayes_dir: "{$self->root}/{$sample}/freebayes"
+    - bowtie2_reference: "/scratch/Reference_Genomes/Public/Vertebrate_mammalian/Homo_sapiens/ENSEMBL-release-81-GRCh38/Homo_sapiens.GRCh38.dna.toplevel"
+    - reference: "{$self->bowtie2_reference}.fa"
+    - library: 1
+    - pcrModel: 1
+    - goldenVcf: 0
+    - ploidy: 2
+    - READ1: "{$self->raw_fastqc_dir}/{$sample}_read1.fastq.gz"
+    - READ2: "{$self->raw_fastqc_dir}/{$sample}_read2.fastq.gz"
+    - TR1: "{$self->trimmomatic_dir}/{$sample}_read1_trimmomatic"
+    - TR2: "{$self->trimmomatic_dir}/{$sample}_read2_trimmomatic"
+rules:
+    - bowtie2:
+        local:
+                - indir: "{$self->trimmomatic}"
+                - INPUT: "{$self->trimmomatic_dir}/{$sample}"
+                - OUTPUT: "{$self->bowtie2_dir}/{$sample}_aligned.sam"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=bowtie2
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=50GB
+                        #HPC walltime=05:00:00
+                        #HPC cpus_per_task=12
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                mkdir -p {$self->bowtie2_dir} && \
+                bowtie2 -p 12 -x {$self->bowtie2_reference} \
+                -1 {$self->INPUT}_read1_trimmomatic_1PE.fastq.gz \
+                -2 {$self->INPUT}_read2_trimmomatic_2PE.fastq.gz \
+                -S {$self->OUTPUT}
+    - samtools_view:
+        local:
+                - outdir: "{$self->samtools}"
+                - INPUT: "{$self->bowtie2_dir}/{$sample}_aligned.sam"
+                - OUTPUT: "{$self->samtools_dir}/{$sample}_aligned.bam"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=samtools_view
+                        #HPC deps=bowtie2
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=25GB
+                        #HPC walltime=03:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                mkdir -p {$self->samtools_dir} && \
+                    samtools view -b -S {$self->INPUT} \
+                    > {$self->OUTPUT}
+    - remove_SAM:
+        local:
+                - create_outdir: 0
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=remove_SAM
+                        #HPC deps=samtools_view
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=1GB
+                        #HPC walltime=00:15:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=12
+        process: |
+                #TASK tags={$sample}
+                #rm -rf {$self->bowtie2_dir}/{$sample}_aligned.sam
+    - picard_cleansam:
+        local:
+                - indir: "{$self->samtools}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->samtools_dir}/{$sample}_aligned.bam"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_cleaned.aligned.bam"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_cleansam
+                        #HPC deps=samtools_view
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                mkdir -p {$self->picard_dir} && \
+                picard -Xmx2g CleanSam \
+                    INPUT={$self->INPUT} \
+                    O={$self->OUTPUT} \
+                    TMP_DIR={$self->bowtie2_tmp_dir}
+    - picard_sortsam:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_csorted.cleaned.aligned.bam"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_sortsam
+                        #HPC deps=picard_cleansam
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                picard -Xmx2g  SortSam \
+                    INPUT={$self->INPUT} \
+                    O={$self->OUTPUT} \
+                    SO=coordinate \
+                    TMP_DIR={$self->bowtie2_tmp_dir}
+    - picard_collect_multiple_metrics:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_collmulmetr.csorted.cleaned.aligned"
+                - PROGRAM: "PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics PROGRAM=QualityScoreDistribution PROGRAM=MeanQualityByCycle"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_collect_multiple_metrics
+                        #HPC deps=picard_sortsam
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                picard -Xmx2g CollectMultipleMetrics \
+                    TMP_DIR={$self->bowtie2_tmp_dir} \
+                    I={$self->INPUT} \
+                    O={$self->OUTPUT} \
+                    {$self->PROGRAM}
+    - picard_add_or_replace_groups:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_withrg.csorted.cleaned.aligned.bam"
+                - ARGS: "SORT_ORDER=coordinate RGID=1 RGLB={$self->library} RGPL=illumina RGPU=unit1 RGSM={$sample} RGCN=NYUAD"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_add_or_replace_groups
+                        #HPC deps=picard_sortsam
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                picard -Xmx2g AddOrReplaceReadGroups \
+                    I={$self->INPUT} \
+                    O={$self->OUTPUT} \
+                    {$self->ARGS}
+    - picard_bamindex:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_withrg.csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_withrg.csorted.cleaned.aligned.bam"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_bamindex
+                        #HPC deps=picard_add_or_replace_groups
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                picard -Xmx2g BuildBamIndex \
+                    I={$self->INPUT} \
+                    TMP_DIR={$self->bowtie2_tmp_dir}
+    - picard_markdups:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_withrg.csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_mdup.withrg.csorted.cleaned.aligned.bam"
+                - metrics_file: "{$self->picard_dir}/{$sample}_markDup_metrics_file.txt"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_markdups
+                        #HPC deps=picard_add_or_replace_groups
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=03:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                picard -Xmx2g MarkDuplicates \
+                    M={$self->metrics_file} \
+                    I={$self->INPUT} \
+                    O={$self->OUTPUT} \
+                    MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=100 \
+                    TMP_DIR={$self->bowtie2_tmp_dir}
+
+    - picard_bamindex2:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_mdup.withrg.csorted.cleaned.aligned.bam"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=picard_bamindex2
+                        #HPC deps=picard_markdups
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                picard -Xmx2g BuildBamIndex \
+                    I={$self->INPUT} \
+                    TMP_DIR={$self->bowtie2_tmp_dir}
+    - gatk_bqsr_1:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_mdup.withrg.csorted.cleaned.aligned.bam"
+                - recal_data: "{$self->picard_dir}/{$sample}_recal_data.txt"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=gatk_bqsr_1
+                        #HPC deps=picard_bamindex2
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=60GB
+                        #HPC walltime=14:00:00
+                        #HPC cpus_per_task=12
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                gatk -Xmx25g -T BaseRecalibrator \
+                    -nct 12 \
+                    -R {$self->reference} \
+                    -I {$self->INPUT} \
+                    -knownSites /scratch/Reference_Genomes/Public/Vertebrate_mammalian/Homo_sapiens/dbSNP/GRCh38/00-All.vcf.gz \
+                    -o {$self->recal_data}
+    - gatk_bqsr_2:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_mdup.withrg.csorted.cleaned.aligned.bam"
+                - recal_data: "{$self->picard_dir}/{$sample}_recal_data.txt"
+                - recal_data2: "{$self->picard_dir}/{$sample}_post_recal_data.txt"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=gatk_bqsr_2
+                        #HPC deps=gatk_bqsr_1
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=60GB
+                        #HPC walltime=14:00:00
+                        #HPC cpus_per_task=12
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                gatk -Xmx25g -T BaseRecalibrator \
+                    -nct 12 \
+                    -R {$self->reference} \
+                    -I {$self->INPUT} \
+                    -knownSites /scratch/Reference_Genomes/Public/Vertebrate_mammalian/Homo_sapiens/dbSNP/GRCh38/00-All.vcf.gz \
+                    -BQSR {$self->recal_data} \
+                    -o {$self->recal_data2}
+
+    - gatk_analyzeCovariates:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - recal_data: "{$self->picard_dir}/{$sample}_recal_data.txt"
+                - recal_data2: "{$self->picard_dir}/{$sample}_post_recal_data.txt"
+                - recalib_plots: "{$self->picard_dir}/{$sample}_recalibration_plots.pdf"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=gatk_analyzeCovariates
+                        #HPC deps=gatk_bqsr_2
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=60GB
+                        #HPC walltime=14:00:00
+                        #HPC cpus_per_task=12
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                gatk -Xmx25g -T AnalyzeCovariates \
+                    -R {$self->reference} \
+                    -before {$self->recal_data} \
+                    -after {$self->recal_data2} \
+                    -plots {$self->recalib_plots}
+    - gatk_printreads:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->picard}"
+                - INPUT: "{$self->picard_dir}/{$sample}_mdup.withrg.csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->picard_dir}/{$sample}_recalibrated.mdup.withrg.csorted.cleaned.aligned.bam"
+                - recal_data: "{$self->picard_dir}/{$sample}_recal_data.txt"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=gatk_printreads
+                        #HPC deps=gatk_bqsr_2
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=60GB
+                        #HPC walltime=14:00:00
+                        #HPC cpus_per_task=12
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                gatk -Xmx25g -T PrintReads \
+                    -nct 12 \
+                    -R {$self->reference} \
+                    -I {$self->INPUT} \
+                    -BQSR {$self->recal_data} \
+                    -o {$self->OUTPUT}
+    - samtools_mpileup:
+        local:
+                - indir: "{$self->samtools}"
+                - outdir: "{$self->samtools}"
+                - INPUT: "{$self->picard_dir}/{$sample}_recalibrated.mdup.withrg.csorted.cleaned.aligned.bam"
+                - SAM: "{$self->samtools_dir}/{$sample}_recalibrated.mdup.withrg.csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->samtools_dir}/{$sample}_aligned.sorted.vcf.gz"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=samtools_mpileup
+                        #HPC deps=gatk_printreads
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=30GB
+                        #HPC walltime=04:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                rm -rf {$self->OUTPUT} && \
+                ln -s {$self->INPUT} {$self->SAM} && \
+                samtools index {$self->SAM} && \
+                samtools mpileup -ugf {$self->reference} \
+                    {$self->INPUT} | bcftools call -vmO z -o \
+                    {$self->OUTPUT}
+    - tabix_index:
+        local:
+                - indir: "{$self->samtools}"
+                - outdir: "{$self->samtools}"
+                - INPUT: "{$self->samtools_dir}/{$sample}_aligned.sorted.vcf.gz"
+                - OUTPUT: "{$self->samtools_dir}/{$sample}_aligned.sorted.vcf.gz"
+                - create_outdir: 0
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=tabix_index
+                        #HPC deps=samtools_mpileup
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=02:00:00
+                        #HPC cpus_per_task=1
+                        #HPC commands_per_node=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #
+        process: |
+                #TASK tags={$sample}
+                tabix -p vcf {$self->INPUT}
+    - bcftools_stats:
+        local:
+                - indir: "{$self->samtools}"
+                - outdir: "{$self->samtools}"
+                - INPUT: "{$self->samtools_dir}/{$sample}_aligned.sorted.vcf.gz"
+                - OUTPUT: "{$self->samtools_dir}/{$sample}_aligned.sorted.vcf.stats"
+                - create_outdir: 0
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=bcftools_stats
+                        #HPC deps=tabix_index
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=10GB
+                        #HPC walltime=01:25:00
+                        #HPC cpus_per_task=1
+                        #HPC commands_per_node=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #
+        process: |
+                #TASK tags={$sample}
+                bcftools stats -F {$self->reference} -s - {$self->INPUT} \
+                    > {$self->OUTPUT}
+    - bcftools_filter:
+        local:
+                - indir: "{$self->samtools}"
+                - outdir: "{$self->samtools}"
+                - INPUT: "{$self->samtools_dir}/{$sample}_aligned.sorted.vcf.gz"
+                - OUTPUT: "{$self->samtools_dir}/{$sample}_filteredQ10.aligned.sorted.vcf.gz"
+                - create_outdir: 0
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=bcftools_filter
+                        #HPC deps=tabix_index
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=20GB
+                        #HPC walltime=01:30:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                bcftools filter -O z \
+                    -o {$self->OUTPUT} \
+                    -s LOWQUAL -i'%QUAL>10' \
+                    {$self->INPUT}
+    - bcftools_snpeff:
+        local:
+                - indir: "{$self->samtools}"
+                - outdir: "{$self->samtools}"
+                - INPUT: "{$self->samtools_dir}/{$sample}_filteredQ10.aligned.sorted.vcf.gz"
+                - OUTPUT: "{$self->samtools_dir}/{$sample}_snpeff.filteredQ10.aligned.sorted.vcf"
+                - REPORT: "{$self->samtools_dir}/{$sample}_snpeff.filteredQ10.aligned.sorted.html"
+                - create_outdir: 0
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=bcftools_snpeff
+                        #HPC deps=bcftools_filter
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=30GB
+                        #HPC walltime=03:30:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                snpEff -Xmx25G GRCh38.82 -v \
+                  -s {$self->REPORT} \
+                  {$self->INPUT} > {$self->OUTPUT}
+    - freebayes_vcf_calling:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->freebayes}"
+                - INPUT: "{$self->picard_dir}/{$sample}_recalibrated.mdup.withrg.csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->freebayes_dir}/{$sample}_freebayes_raw.vcf"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=freebayes_vcf_calling
+                        #HPC deps=gatk_printreads
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=30GB
+                        #HPC walltime=10:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                mkdir -p {$self->freebayes_dir} && \
+                freebayes -f {$self->reference} \
+                  {$self->INPUT} \
+                  > {$self->OUTPUT}
+    - freebayes_vcffilter:
+        local:
+                - indir: "{$self->freebayes}"
+                - outdir: "{$self->freebayes}"
+                - INPUT: "{$self->freebayes_dir}/{$sample}_freebayes_raw.vcf"
+                - OUTPUT: "{$self->freebayes_dir}/{$sample}_filtered.freebayes.vcf"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=freebayes_vcffilter
+                        #HPC deps=freebayes_vcf_calling
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=30GB
+                        #HPC walltime=05:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                vcffilter -f "QUAL > 1 & QUAL / AO > 10 & SAF > 0 & SAR > 0 & RPR > 1 & RPL > 1" \
+                  {$self->INPUT} > {$self->OUTPUT}
+    - freebayes_snpeff:
+        local:
+                - indir: "{$self->freebayes}"
+                - outdir: "{$self->freebayes}"
+                - INPUT: "{$self->freebayes_dir}/{$sample}_filtered.freebayes.vcf"
+                - OUTPUT: "{$self->freebayes_dir}/{$sample}_snpeff.filtered.freebayes.vcf"
+                - REPORT: "{$self->freebayes_dir}/{$sample}_snpeff.filtered.freebayes.html"
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=freebayes_snpeff
+                        #HPC deps=freebayes_vcffilter
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=30GB
+                        #HPC walltime=07:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                snpEff -Xmx25G GRCh38.82 -v \
+                  -s {$self->REPORT} \
+                  {$self->INPUT} > {$self->OUTPUT}
+    - gatk_haplotypecaller:
+        local:
+                - indir: "{$self->picard}"
+                - outdir: "{$self->gatk}"
+                - INPUT: "{$self->picard_dir}/{$sample}_recalibrated.mdup.withrg.csorted.cleaned.aligned.bam"
+                - OUTPUT: "{$self->gatk}/{$sample}_haplotype.realigned.withrg.csorted.cleaned.aligned.vcf"
+                - ARGS: "-stand_emit_conf 10 -stand_call_conf 30 --genotyping_mode DISCOVERY"
+                - create_outdir: 1
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=gatk_haplotypecaller
+                        #HPC deps=gatk_printreads
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=40GB
+                        #HPC walltime=36:00:00
+                        #HPC cpus_per_task=12
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=1
+                        #
+        process: |
+                #TASK tags={$sample}
+                gatk -T HaplotypeCaller \
+                    -R {$self->reference} \
+                    -nct 12 \
+                    --dbsnp /scratch/Reference_Genomes/Public/Vertebrate_mammalian/Homo_sapiens/dbSNP/GRCh38/00-All.vcf.gz \
+                    -I {$self->INPUT} \
+                    {$self->ARGS} \
+                    -o {$self->OUTPUT}
+    - remove_tmp:
+        local:
+                - create_outdir: 0
+                - before_meta: |
+                        HPC DIRECTIVES
+                        #
+                        #HPC jobname=remove_tmp
+                        #HPC deps=gatk_variant_filtration
+                        #HPC module=gencore gencore_dev gencore_variant_detection/1.0
+                        #HPC mem=2GB
+                        #HPC walltime=01:00:00
+                        #HPC cpus_per_task=1
+                        #HPC partition=serial
+                        #HPC account=gencore
+                        #HPC commands_per_node=12
+                        #
+        process: |
+                #TASK tags={$sample}
+                #rm -rf {$self->bowtie2_tmp_dir}

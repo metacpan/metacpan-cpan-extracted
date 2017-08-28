@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,29 +16,30 @@ name: Spp
 provides:
   Spp:
     file: lib/Spp.pm
-    version: '0.04'
-  Spp::AtomToStr:
-    file: lib/Spp/AtomToStr.pm
-  Spp::AtomToValue:
-    file: lib/Spp/AtomToValue.pm
-    version: '0.03'
-  Spp::Optimizer:
-    file: lib/Spp/Optimizer.pm
-    version: '0.02'
+    version: '1.02'
+  Spp::Ast::SppAst:
+    file: lib/Spp/Ast/SppAst.pm
+  Spp::Cursor:
+    file: lib/Spp/Cursor.pm
+  Spp::IsAtom:
+    file: lib/Spp/IsAtom.pm
+  Spp::IsChar:
+    file: lib/Spp/IsChar.pm
+  Spp::LintAst:
+    file: lib/Spp/LintAst.pm
+  Spp::MatchGrammar:
+    file: lib/Spp/MatchGrammar.pm
+  Spp::Rule::SppRule:
+    file: lib/Spp/Rule/SppRule.pm
+  Spp::ToSpp:
+    file: lib/Spp/ToSpp.pm
   Spp::Tools:
     file: lib/Spp/Tools.pm
-    version: '0.03'
-  Spp::ValueToAtom:
-    file: lib/Spp/ValueToAtom.pm
-    version: '0.03'
 requires:
-  Carp: '0'
-  JSON: '0'
-  List::MoreUtils: '0'
+  JSON::XS: '0'
   List::Util: '0'
-  Scalar::Util: '0'
-  perl: '5.02'
+  perl: '5.012'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

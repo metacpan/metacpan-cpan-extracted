@@ -1,6 +1,6 @@
 use strict; 
 use Test::More;
-use Test::Requires 'JSON';
+use JSON;
 use DateTime; 
 use DateTime::Event::SolarTerm qw/major_term_after minor_term_after/; 
 

@@ -1,0 +1,112 @@
+NAME
+    Text::DiffU - Diff two sequences and print unified-style output
+
+VERSION
+    This document describes version 0.001 of Text::DiffU (from Perl
+    distribution Text-DiffU), released on 2017-08-19.
+
+FUNCTIONS
+  diff_u
+    Usage:
+
+     diff_u(%args) -> any
+
+    Diff two sequences and print unified-style output.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ctx => *nonnegint* (default: 3)
+
+    *   hook_format_diff_items => *code*
+
+        Hook will be called with these arguments:
+
+         (\@items1, \@items2)
+
+        The default hook will print this, i.e. items1 as lines where each
+        line is prefixed by a "-" (minus) sign, followed by items2 as lines
+        where each line is prefixed by a "+" (plus) sign:
+
+          -line1_from_items1
+          -line2_from_items1
+          ...
+          +line1_from_items2
+          +line2_from_items2
+          ...
+
+    *   hook_format_hunk_header => *code*
+
+        Hook will be called with these arguments:
+
+         ($line1_start, $line2_start, $num_lines1, $num_lines2)
+
+        The default hook will print this:
+
+         @@ -<line1_start>,<num_lines1> +<line2_start>,<num_lines2> @@
+
+    *   hook_format_same_items => *code*
+
+        Hook will be called with these arguments:
+
+         (\@items)
+
+        The default hook will print this (i.e. items as lines where each
+        line is prefixed by a single space):
+
+          line1
+          line2
+          ...
+
+    *   hook_format_seq_header => *code*
+
+        Hook will be called with these arguments:
+
+         ($seq1_name, $seq2_name)
+
+    *   seq1* => *array*
+
+    *   seq1_name => *str* (default: "(seq1)")
+
+    *   seq2* => *array*
+
+    *   seq2_name => *str* (default: "(seq2)")
+
+    *   use_color => *bool*
+
+        Whether the default hooks should print ANSI color escape sequences.
+
+        The default is to use setting from "COLOR" environment variable, or
+        check if program is run interactively.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-DiffU>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Text-DiffU>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-DiffU>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::Diff. Generally Text::Diff should be your go-to module if you want
+    to produce diff ouput. The "diff_u" routine specifically produces
+    unified-style output with hooks to be able to customize the output.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

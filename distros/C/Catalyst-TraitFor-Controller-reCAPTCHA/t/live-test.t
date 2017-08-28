@@ -30,3 +30,7 @@ $mech->submit_form(
 # obviously we can't test success automatically :/
 $mech->content_lacks('OK:', 'Failed wrong answer'); 
 
+
+## Test reCaptcha version 2
+$mech->get_ok('http://localhost/?test=v2', 'get main page with parameter set reCaptcha version 2');
+$mech->content_contains('class="g-recaptcha"', 'Looks like recaptcha code exists'); 

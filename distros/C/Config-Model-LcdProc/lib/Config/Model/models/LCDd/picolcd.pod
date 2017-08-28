@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::picolcd
 # ABSTRACT:  Configuration class LCDd::picolcd
+
 =encoding utf8
 
 =head1 NAME
@@ -16,43 +17,133 @@ generated from LCDd.conf
 
 =head2 Backlight
 
-Sets the initial state of the backlight upon start-up. I<< Optional. Type boolean. upstream_default: 'on'.  >> 
+Sets the initial state of the backlight upon start-up. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+on
+
+=back
+
+
 
 =head2 Brightness
 
 Set the initial brightness . Works only
-with the 20x4 device. I<< Optional. Type integer. upstream_default: '1000'.  >> 
+with the 20x4 device. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1000
+
+=back
+
+
 
 =head2 Contrast
 
-Set the initial contrast I<< Optional. Type integer. upstream_default: '1000'.  >> 
+Set the initial contrast I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1000
+
+=back
+
+
 
 =head2 Key0Light
 
 If Keylights is on, the you can unlight specific keys below:
 Key0 is the directional pad.  Key1 - Key5 correspond to the F1 - F5 keys.
 There is no LED for the +/- keys.  This is a handy way to indicate to users
-which keys are disabled.  I<< Optional. Type boolean. upstream_default: 'on'.  >> 
+which keys are disabled.  I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+on
+
+=back
+
+
 
 =head2 Key1Light
 
-I<< Optional. Type uniline. default: 'on'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+on
+
+=back
+
+
 
 =head2 Key2Light
 
-I<< Optional. Type uniline. default: 'on'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+on
+
+=back
+
+
 
 =head2 Key3Light
 
-I<< Optional. Type uniline. default: 'on'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+on
+
+=back
+
+
 
 =head2 Key4Light
 
-I<< Optional. Type uniline. default: 'on'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+on
+
+=back
+
+
 
 =head2 Key5Light
 
-I<< Optional. Type uniline. default: 'on'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+on
+
+=back
+
+
 
 =head2 KeyRepeatDelay
 
@@ -61,12 +152,32 @@ libusb-1.0. Use KeyRepeatDelay and KeyRepeatInterval to configure key auto
 repeat.
 
 Key auto repeat delay (time in ms from first key report to first repeat). Use
-zero to disable auto repeat. I<< Optional. Type integer. upstream_default: '300'.  >> 
+zero to disable auto repeat. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+300
+
+=back
+
+
 
 =head2 KeyRepeatInterval
 
 Key auto repeat interval (time in ms between repeat reports). Only used if
-KeyRepeatDelay is not zero. I<< Optional. Type integer. upstream_default: '200'.  >> 
+KeyRepeatDelay is not zero. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+200
+
+=back
+
+
 
 =head2 KeyTimeout
 
@@ -77,42 +188,122 @@ KeyTimeout is the time in ms that LCDd spends waiting for a key press before
 cycling through other duties.  Higher values make LCDd use less CPU time and
 make key presses more detectable.  Lower values make LCDd more responsive
 but a little prone to missing key presses.  500 (.5 second) is the default
-and a balanced value. I<< Optional. Type integer. upstream_default: '500'.  >> 
+and a balanced value. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+500
+
+=back
+
+
 
 =head2 Keylights
 
-Light the keys? I<< Optional. Type boolean. upstream_default: 'on'.  >> 
+Light the keys? I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+on
+
+=back
+
+
 
 =head2 LinkLights
 
-Link the key lights to the backlight? I<< Optional. Type boolean. upstream_default: 'on'.  >> 
+Link the key lights to the backlight? I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+on
+
+=back
+
+
 
 =head2 LircFlushThreshold
 
 Threshold in microseconds of the gap that triggers flushing the IR data
 to lirc 
 If LircTime_us is on values greater than 32.767ms will disable the flush
-If LircTime_us is off values greater than 1.999938s will disable the flush. I<< Optional. Type integer. upstream_default: '8000'.  >> 
+If LircTime_us is off values greater than 1.999938s will disable the flush. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+8000
+
+=back
+
+
 
 =head2 LircHost
 
 Host name or IP address of the LIRC instance that is to receive IR codes
-If not set, or set to an empty value, IR support is disabled. I<< Optional. Type uniline. upstream_default: '127.0.0.1'.  >> 
+If not set, or set to an empty value, IR support is disabled. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+127.0.0.1
+
+=back
+
+
 
 =head2 LircPort
 
-UDP port on which LIRC is listening I<< Optional. Type integer. upstream_default: '8765'.  >> 
+UDP port on which LIRC is listening I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+8765
+
+=back
+
+
 
 =head2 LircTime_us
 
 UDP data time unit for LIRC  
 On:  times sent in microseconds (requires LIRC UDP driver that accepts this).
-Off: times sent in 'jiffies' (1/16384s) (supported by standard LIRC UDP driver). I<< Optional. Type boolean. upstream_default: 'off'.  >> 
+Off: times sent in 'jiffies' (1/16384s) (supported by standard LIRC UDP driver). I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+off
+
+=back
+
+
 
 =head2 OffBrightness
 
 Set the brightness while the backlight is 'off' .
-Works only with the 20x4 device. I<< Optional. Type integer. upstream_default: '0'.  >> 
+Works only with the 20x4 device. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head1 SEE ALSO
 

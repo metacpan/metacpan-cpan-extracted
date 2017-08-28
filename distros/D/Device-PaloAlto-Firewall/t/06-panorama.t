@@ -15,7 +15,7 @@ my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', 
 my $test = $fw->tester();
 
 # No Panorama Configured
-$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_panorama_configured() )->simplify()->{result} } );
+$fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_panorama_configured() )->simplify( forcearray => ['entry'] )->{result} } );
 
 ok( !$fw->panorama_status(), "No Panorama peers configured");
 

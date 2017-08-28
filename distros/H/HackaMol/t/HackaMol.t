@@ -328,5 +328,37 @@ dies_ok { $hack->build_angles( @bb[ 0, 1 ] ) } "build_angles croak";
     is( $mol->tmax, 8, "9 models in  test.pdbqt" )
 }
 
+{ # superpose tests... 
+  my $g1 = HackaMol::AtomGroup->new(atoms => [
+      HackaMol::Atom->new(Z => 80, coords => [V(1,1,1)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(2,1,1)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(1,2,1)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(1,1,2)]),
+      HackaMol::Atom->new(Z => 80, coords => [V( 0,1,1)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(1, 0,1)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(1,1, 0)]),
+  ]);
+
+  my $g2 = HackaMol::AtomGroup->new(atoms => [
+      HackaMol::Atom->new(Z => 80, coords => [V(0,0,0)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(1,0,0)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(0,1,0)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(0,0,1)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(-1,0,0)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(0,-1,0)]),
+      HackaMol::Atom->new(Z => 80, coords => [V(0,0,-1)]),
+  ]);
+
+  # superpose has been checked against VMD, but more tests are needed
+
+  my $hack = HackaMol->new;
+  my ($rot,$trans,$rmsd) = $hack->superpose_rt($g1,$g2);
+  cmp_ok( abs( $rmsd ), '<', 1E-8, 'simple rmsd test' );
+  is_deeply( $trans, V(1,1,1), 'translation' );
+  #print Dumper $rmsd,$rot,$trans;
+
+
+}
+
 done_testing();
 

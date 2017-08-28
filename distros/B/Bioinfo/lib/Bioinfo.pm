@@ -3,7 +3,7 @@ use Moo;
 use Modern::Perl;
 use namespace::clean;
 
-our $VERSION = '0.1.1'; # VERSION: 
+our $VERSION = '0.1.8'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -21,7 +21,7 @@ Bioinfo - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.8
 
 =head1 SYNOPSIS
 

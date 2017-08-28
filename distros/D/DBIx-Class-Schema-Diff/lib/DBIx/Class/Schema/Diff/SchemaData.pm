@@ -10,9 +10,13 @@ with 'DBIx::Class::Schema::Diff::Role::Common';
 use Types::Standard qw(:all);
 use Module::Runtime;
 use Scalar::Util qw(blessed);
-use Data::Dumper::Concise;
 use Path::Class qw(file);
 use JSON;
+use Clone 'clone';
+use Digest::SHA1;
+
+use Data::Dumper;
+use Data::Dumper::Concise;
 
 has 'schema', is => 'ro', isa => Maybe[InstanceOf[
   'DBIx::Class::Schema'
@@ -170,6 +174,96 @@ sub _localize_deep_namespace_strings {
   }
 }
 
+
+sub prune {
+  my ($self,@keywords) = @_;
+  die "must supply at least 1 prune keyword" unless (scalar(@keywords) > 0);
+  
+  my $data = clone( $self->data );
+  
+  my @meths = map {
+    my $meth = join('_','__prune',$_);
+    $self->can($meth) or die "Bad prune keyword '$_' (no such method '$meth')";
+    $meth
+  } @keywords;
+  
+  $self->$_($data) for (@meths);
+
+  __PACKAGE__->new({ data => $data })
+}
+
+
+sub __prune_isa {
+  my ($self, $data) = @_;
+  $self->_prune_whole_source_key('isa',$data)
+}
+
+sub __prune_constraints {
+  my ($self, $data) = @_;
+  $self->_prune_whole_source_key('constraints',$data)
+}
+
+sub __prune_relationships {
+  my ($self, $data) = @_;
+  $self->_prune_whole_source_key('relationships',$data)
+}
+
+sub __prune_columns {
+  my ($self, $data) = @_;
+  $self->_prune_whole_source_key('columns',$data)
+}
+
+
+sub __prune_private_col_attrs {
+  my ($self, $data) = @_;
+  
+  for my $rsrcData (values %{ $data->{sources} }) {
+    if(my $columns = $rsrcData->{columns}) {
+      for my $attrs (values %$columns) {
+        # delete all keys starting with underscore '_'
+        $_ =~ /^_/ and delete $attrs->{$_} for (keys %$attrs);
+      }
+    }
+  }
+  
+  $data
+}
+
+
+sub _prune_whole_source_key {
+  my ($self, $key, $data) = @_;
+  
+  for my $rsrcData (values %{ $data->{sources} }) {
+    delete $rsrcData->{$key} if exists $rsrcData->{$key}
+  }
+  
+  $data
+}
+
+
+sub fingerprint {
+  my $self = shift;
+  my $sum = Digest::SHA1->new->add( $self->_string_for_signature )->hexdigest;
+  join('-', 'schemsum', substr($sum,0,15) )
+}
+
+
+# So far this is the only thing I could find to produce a consistent string value across all
+# Travis tested perls (5.10,5.12,5.14,5.16,5.18,5.20,5.22,5.24,5.26)
+sub _string_for_signature {
+  my $self = shift;
+  
+  local $Data::Dumper::Maxdepth = 0;
+  Data::Dumper->new([ $self->data->{sources} ])
+   ->Purity(0)
+   ->Terse(1)
+   ->Indent(0)
+   ->Useqq(1)
+   ->Sortkeys(1)
+   ->Dump()
+}
+
+
 1;
 
 
@@ -237,6 +331,32 @@ Returns C<data> as a serialized JSON string.
 
 Writes output of C<dump_json()> to the supplied filename as long as it doesn't already exists. If the
 file already exists, an exception is thrown.
+
+=head2 prune
+
+Accepts a list of one or more prune C<keywords> and returns a new C<SchemaData> object with the
+specified information pruned/stripped from the C<data>. Currently supported prune keywords:
+
+=over 4
+
+=item isa
+
+=item constraints
+
+=item relationships
+
+=item columns
+
+=item private_col_attrs
+
+=back
+
+=head2 fingerprint
+
+Returns a sha1-based fingerprint string of the current data. Note that C<prune> will result in 
+different fingerprints. An example fingerprint is C<schemsum-448d754e40e09e0>. The 'schemsum' prefix
+is just for fun (and also provides an easy way to eyeball these values down the road).
+
 
 =head1 SEE ALSO
 

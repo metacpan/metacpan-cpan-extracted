@@ -1,10 +1,10 @@
-![](http://41.media.tumblr.com/45c8d33bea2f92da707f4bbe66251d6b/tumblr_nuf7bgeyH51uz9e9oo1_1280.png)
+![](http://libsisimai.org/static/images/logo/sisimai-x01.png)
 
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-Sisimai/blob/master/LICENSE)
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.24-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.21.1-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.22.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README(English)**](README.md)
 - [シシマイ? | What is Sisimai](#what-is-sisimai)
@@ -39,8 +39,8 @@ What is sisimai
 ===============================================================================
 Sisimai(シシマイ)はRFC5322準拠のエラーメールを解析し、解析結果をデータ構造に
 変換するインターフェイスを提供するPerlモジュールです。
-__シシマイ__はbounceHammer version 4として開発していたものであり、Version 4なので
-__シ(Si)__から始まりマイ(MAI: __Mail Analyzing Interface__)を含む名前になりました。
+__シシマイ__ はbounceHammer version 4として開発していたものであり、Version 4なので
+__シ(Si)__ から始まりマイ(MAI: __Mail Analyzing Interface__)を含む名前になりました。
 
 ![](http://libsisimai.org/static/images/figure/sisimai-overview-1.png)
 
@@ -49,7 +49,7 @@ Key features
 * __エラーメールをデータ構造に変換__
   * Perlのデータ形式(HashとArray)とJSON(文字列)に対応
 * __インストールも使用も簡単__
-  * cpanm
+  * `cpan`, `cpanm`, `cpm install`
   * git clone & make
 * __高い解析精度__
   * 解析精度はbounceHammerの2倍
@@ -57,7 +57,7 @@ Key features
   * 22種類の著名なMSPに対応
   * 2種類の著名なメール配信クラウドに対応(JSON)
   * Feedback Loopにも対応
-  * 27種類のエラー理由を検出
+  * 29種類のエラー理由を検出
 * __bounceHammer 2.7.13p3よりも高速に解析__
   * 1.7倍程高速
 
@@ -85,9 +85,9 @@ Install
 -------------------------------------------------------------------------------
 ### From CPAN
 ```shell
-$ sudo cpanm Sisimai
+$ cpanm --sudo Sisimai
 --> Working on Sisimai
-Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-4.21.0.tar.gz ... OK
+Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-4.22.0.tar.gz ... OK
 ...
 1 distribution installed
 $ perldoc -l Sisimai
@@ -101,7 +101,7 @@ $ git clone https://github.com/sisimai/p5-Sisimai.git
 $ cd ./p5-Sisimai
 $ sudo make install-from-local
 --> Working on .
-Configuring Sisimai-4.21.0 ... OK
+Configuring Sisimai-4.22.0 ... OK
 1 distribution installed
 ```
 
@@ -224,7 +224,7 @@ Output example
 ![](http://libsisimai.org/static/images/demo/sisimai-dump-02.gif)
 
 ```json
-[{"recipient": "kijitora@example.jp", "addresser": "shironeko@1jo.example.org", "feedbacktype": "", "action": "failed", "subject": "Nyaaaaan", "smtpcommand": "DATA", "diagnosticcode": "550 Unknown user kijitora@example.jp", "listid": "", "destination": "example.jp", "smtpagent": "Courier", "lhost": "1jo.example.org", "deliverystatus": "5.0.0", "timestamp": 1291954879, "messageid": "201012100421.oBA4LJFU042012@1jo.example.org", "diagnostictype": "SMTP", "timezoneoffset": "+0900", "reason": "filtered", "token": "ce999a4c869e3f5e4d8a77b2e310b23960fb32ab", "alias": "", "senderdomain": "1jo.example.org", "rhost": "mfsmax.example.jp"}, {"diagnostictype": "SMTP", "timezoneoffset": "+0900", "reason": "userunknown", "timestamp": 1381900535, "messageid": "E1C50F1B-1C83-4820-BC36-AC6FBFBE8568@example.org", "token": "9fe754876e9133aae5d20f0fd8dd7f05b4e9d9f0", "alias": "", "senderdomain": "example.org", "rhost": "mx.bouncehammer.jp", "action": "failed", "addresser": "kijitora@example.org", "recipient": "userunknown@bouncehammer.jp", "feedbacktype": "", "smtpcommand": "DATA", "subject": "バウンスメールのテスト(日本語)", "destination": "bouncehammer.jp", "listid": "", "diagnosticcode": "550 5.1.1 <userunknown@bouncehammer.jp>... User Unknown", "deliverystatus": "5.1.1", "lhost": "p0000-ipbfpfx00kyoto.kyoto.example.co.jp", "smtpagent": "Sendmail"}]
+[{"recipient": "kijitora@example.jp", "addresser": "shironeko@1jo.example.org", "feedbacktype": "", "action": "failed", "subject": "Nyaaaaan", "smtpcommand": "DATA", "diagnosticcode": "550 Unknown user kijitora@example.jp", "listid": "", "destination": "example.jp", "smtpagent": "Email::Courier", "lhost": "1jo.example.org", "deliverystatus": "5.0.0", "timestamp": 1291954879, "messageid": "201012100421.oBA4LJFU042012@1jo.example.org", "diagnostictype": "SMTP", "timezoneoffset": "+0900", "reason": "filtered", "token": "ce999a4c869e3f5e4d8a77b2e310b23960fb32ab", "alias": "", "senderdomain": "1jo.example.org", "rhost": "mfsmax.example.jp"}, {"diagnostictype": "SMTP", "timezoneoffset": "+0900", "reason": "userunknown", "timestamp": 1381900535, "messageid": "E1C50F1B-1C83-4820-BC36-AC6FBFBE8568@example.org", "token": "9fe754876e9133aae5d20f0fd8dd7f05b4e9d9f0", "alias": "", "senderdomain": "example.org", "rhost": "mx.bouncehammer.jp", "action": "failed", "addresser": "kijitora@example.org", "recipient": "userunknown@bouncehammer.jp", "feedbacktype": "", "smtpcommand": "DATA", "subject": "バウンスメールのテスト(日本語)", "destination": "bouncehammer.jp", "listid": "", "diagnosticcode": "550 5.1.1 <userunknown@bouncehammer.jp>... User Unknown", "deliverystatus": "5.1.1", "lhost": "p0000-ipbfpfx00kyoto.kyoto.example.co.jp", "smtpagent": "Email::Sendmail"}]
 ```
 
 Sisimai Specification
@@ -245,16 +245,16 @@ bounceHammer 2.7.13p3とSisimai(シシマイ)は下記のような違いがあ�
 | 解析済バウンスデータを保存するDBスキーマ       | あり          | 無し[1]     |
 | 解析精度の割合(2000通のメール)[2]              | 0.49          | 1.00        |
 | メール解析速度(1000通のメール)                 | 4.24秒        | 2.33秒      |
-| 検出可能なバウンス理由の数                     | 19            | 27          |
+| 検出可能なバウンス理由の数                     | 19            | 29          |
 | 2件以上のバウンスがあるメールの解析            | 1件目だけ     | 全件解析可能|
 | FeedBack Loop/ARF形式のメール解析              | 非対応        | 対応済      |
 | 宛先ドメインによる分類項目                     | あり          | 無し        |
 | 解析結果の出力形式                             | YAML,JSON,CSV | JSON        |
 | インストール作業が簡単かどうか                 | やや面倒      | 簡単で楽    |
-| cpanまたはcpanmコマンドでのインストール        | 非対応        | 対応済      |
+| cpan, cpanm, cpmコマンドでのインストール       | 非対応        | 対応済      |
 | 依存モジュール数(Perlのコアモジュールを除く)   | 24モジュール  | 2モジュール |
-| LOC:ソースコードの行数                         | 18200行       | 9000行      |
-| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 191300件    |
+| LOC:ソースコードの行数                         | 18200行       | 9100行      |
+| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 202400件    |
 | ライセンス                                     | GPLv2かPerl   | 二条項BSD   |
 | 開発会社によるサポート契約                     | 終売(EOS)     | 提供中      |
 

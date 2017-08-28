@@ -1,19 +1,29 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Resource::FileList;
-$XML::Ant::BuildFile::Resource::FileList::VERSION = '0.216';
 
 # ABSTRACT: file list node within an Ant build file
 
+#pod =head1 DESCRIPTION
+#pod
+#pod See L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project> for a complete
+#pod description.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use XML::Ant::BuildFile::Project;
+#pod
+#pod     my $project = XML::Ant::BuildFile::Project->new( file => 'build.xml' );
+#pod     for my $list_ref (@{$project->file_lists}) {
+#pod         print 'id: ', $list_ref->id, "\n";
+#pod         print join "\n", @{$list_ref->files};
+#pod         print "\n\n";
+#pod     }
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use Modern::Perl;
 use English '-no_match_vars';
 use Path::Class;
@@ -27,7 +37,18 @@ use MooseX::Types::Path::Class qw(Dir File);
 use XML::Ant::Properties;
 use namespace::autoclean;
 
-has directory => ( ro, required, lazy_build, isa => Dir, init_arg => undef );
+#pod =attr directory
+#pod
+#pod L<Path::Class::Dir|Path::Class::Dir> indicated by the C<< <filelist> >>
+#pod element's C<dir> attribute with all property substitutions applied.
+#pod
+#pod =cut
+
+has directory => ( ro, required, lazy,
+    builder  => '_build_directory',
+    isa      => Dir,
+    init_arg => undef,
+);
 
 sub _build_directory {    ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self      = shift;
@@ -41,12 +62,20 @@ sub _build_directory {    ## no critic (ProhibitUnusedPrivateSubroutines)
     return dir($directory);
 }
 
-has _files => ( ro,
-    lazy_build,
-    isa => ArrayRef [File],
+has _files => ( ro, lazy,
+    builder  => '_build__files',
+    isa      => ArrayRef [File],
     traits   => ['Array'],
     init_arg => undef,
     handles  => {
+
+       #pod =method files
+       #pod
+       #pod Returns an array of L<Path::Class::File|Path::Class::File>s within
+       #pod this file list with all property substitutions applied.
+       #pod
+       #pod =cut
+
         files        => 'elements',
         map_files    => 'map',
         filter_files => 'grep',
@@ -71,46 +100,44 @@ sub _build__files
 
     if ( not state $recursion_guard) {
         $recursion_guard = 1;
-        @file_names = map { XML::Ant::Properties->apply($ARG) } @file_names;
+        @file_names = map { XML::Ant::Properties->apply($_) } @file_names;
         undef $recursion_guard;
     }
 
-    return [ map { $self->_prepend_dir($ARG) } @file_names ];
+    return [ map { $self->_prepend_dir($_) } @file_names ];
 }
 
 sub _prepend_dir {
-    my ( $self, $file_name ) = @ARG;
+    my ( $self, $file_name ) = @_;
     return $self->directory->subsumes( file($file_name) )
         ? file($file_name)
         : $self->directory->file($file_name);
 }
 
 has content =>
-    ( ro, lazy, isa => ArrayRef [File], default => sub { $ARG[0]->_files } );
+    ( ro, lazy, isa => ArrayRef [File], default => sub { $_[0]->_files } );
 
 with 'XML::Ant::BuildFile::Resource';
 
-{
 ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
-    has _dir_attr => ( ro, required,
-        isa         => Str,
-        traits      => ['XPathValue'],
-        xpath_query => './@dir',
-    );
+has _dir_attr => ( ro, required,
+    isa         => Str,
+    traits      => ['XPathValue'],
+    xpath_query => './@dir',
+);
 
-    has _file_names => ( ro,
-        isa => ArrayRef [Str],
-        traits      => ['XPathValueList'],
-        xpath_query => './file/@name',
-    );
+has _file_names => ( ro,
+    isa => ArrayRef [Str],
+    traits      => ['XPathValueList'],
+    xpath_query => './file/@name',
+);
 
-    has _files_attr_names => ( ro,
-        isa         => Str,
-        traits      => ['XPathValue'],
-        xpath_query => './@files',
-    );
-}
+has _files_attr_names => ( ro,
+    isa         => Str,
+    traits      => ['XPathValue'],
+    xpath_query => './@files',
+);
 
 no Moose;
 
@@ -131,7 +158,7 @@ XML::Ant::BuildFile::Resource::FileList - file list node within an Ant build fil
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -282,7 +309,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

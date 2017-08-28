@@ -96,4 +96,4 @@ SOFTWARE.
 
 # AUTHOR
 
-Eric Chernoff <ericschernoff@gmail.com>
+Eric Chernoff &lt;ericschernoff@gmail.com>

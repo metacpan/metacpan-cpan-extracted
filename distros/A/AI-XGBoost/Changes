@@ -1,0 +1,6 @@
+0.11    2017-08-20
+    * Change from NativeCall to FFI::Platypus
+    * Using Alien package Alien::XGBoost
+0.1     2017-08-16
+    * Full raw C API available
+

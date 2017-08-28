@@ -2,7 +2,7 @@ package AuthMilterTest;
 
 use strict;
 use warnings;
-use AuthMilterTestDNSCache;
+use Net::DNS::Resolver::Mock;
 use Test::More;
 use Test::File::Contents;
 
@@ -26,7 +26,7 @@ sub tools_test {
     my $catargs = {
         'sock_type' => 'unix',
         'sock_path' => 'tmp/tools_test.sock',
-        'remove'    => [10],
+        'remove'    => [],
         'output'    => 'tmp/result/tools_test.eml',
     };
     unlink 'tmp/tools_test.sock';
@@ -57,7 +57,7 @@ sub tools_pipeline_test {
     my $catargs = {
         'sock_type' => 'unix',
         'sock_path' => 'tmp/tools_test.sock',
-        'remove'    => [10],
+        'remove'    => [],
         'output'    => 'tmp/result/tools_pipeline_test.eml',
     };
     unlink 'tmp/tools_test.sock';
@@ -127,7 +127,9 @@ sub tools_pipeline_test {
         if (!$milter_pid) {
             $Mail::Milter::Authentication::Config::PREFIX = $prefix;
             $Mail::Milter::Authentication::Config::IDENT  = 'test_authentication_milter_test';
-            $Mail::Milter::Authentication::Handler::TestResolver = AuthMilterTestDNSCache->new(),
+            my $Resolver = Net::DNS::Resolver::Mock->new();
+            $Resolver->zonefile_read( 'zonefile' );
+            $Mail::Milter::Authentication::Handler::TestResolver = $Resolver,
             Mail::Milter::Authentication::start({
                 'pid_file'   => 'tmp/authentication_milter.pid',
                 'daemon'     => 0,
@@ -571,7 +573,7 @@ sub run_smtp_processing {
         'name'   => [ 'test.example.com', 'localhost', 'bad.name.google.com', ],
         'from'   => [ 'test@example.com', 'marc@marcbradshaw.net', 'marc@marcbradshaw.net', ],
         'to'     => [ 'test@example.com', 'marc@fastmail.com', 'marc@fastmail.com', ],
-        'filter' => [10,11,52,53,122,123],
+        'filter' => [10,11,52,53,128,129],
     });
 
     smtp_process_multi({
@@ -583,7 +585,7 @@ sub run_smtp_processing {
         'name'   => [ 'test.example.com', 'localhost', 'bad.name.google.com', 'test.example.com', 'localhost', 'bad.name.google.com', ],
         'from'   => [ 'test@example.com', 'marc@marcbradshaw.net', 'marc@marcbradshaw.net', 'test@example.com', 'marc@marcbradshaw.net', 'marc@marcbradshaw.net', ],
         'to'     => [ 'test@example.com', 'marc@fastmail.com', 'marc@fastmail.com', 'test@example.com', 'marc@fastmail.com', 'marc@fastmail.com', ],
-        'filter' => [10,11,52,53,122,123,203,204],
+        'filter' => [10,11,52,53,128,129,209,210],
     });
 
     smtp_process({
@@ -1117,7 +1119,7 @@ sub smtpcat {
     my $i = 0;
     foreach my $line ( @out_lines ) {
         $i++;
-        next if grep { $i == $_ } @$remove;
+        $line = "############\n" if grep { $i == $_ } @$remove;
         print $file $line;
     }
     close $file;

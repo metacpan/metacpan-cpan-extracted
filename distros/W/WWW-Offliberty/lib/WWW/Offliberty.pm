@@ -4,7 +4,7 @@ use 5.008009;
 use strict;
 use warnings;
 use parent qw/Exporter/;
-our $VERSION = '1.000005';
+our $VERSION = '1.000006';
 our @EXPORT_OK = qw/off/;
 
 our $OFF_URL = 'http://offliberty.com/off03.php';

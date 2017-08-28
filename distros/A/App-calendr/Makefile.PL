@@ -32,8 +32,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'App::calendr'         => { file => 'lib/App/calendr.pm'        , version => '0.20' },
-            'App::calendr::Option' => { file => 'lib/App/calendr/Option.pm' , version => '0.20' },
+            'App::calendr'         => { file => 'lib/App/calendr.pm'        , version => '0.21' },
+            'App::calendr::Option' => { file => 'lib/App/calendr/Option.pm' , version => '0.21' },
         },
         resources => {
             repository => {

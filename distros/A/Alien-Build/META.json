@@ -5,7 +5,7 @@
       "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,6 @@
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
-            "Test::Spelling" : "0",
             "Test::Strict" : "0"
          }
       },
@@ -84,7 +83,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.99",
+   "version" : "1.04",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -105,6 +104,6 @@
       "Nicholas Shipp (nshp)",
       "Juan Juli\u00e1n Merelo Guerv\u00f3s (JJ)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

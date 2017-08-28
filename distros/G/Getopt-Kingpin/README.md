@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sago35/Getopt-Kingpin.svg?branch=master)](https://travis-ci.org/sago35/Getopt-Kingpin) [![Coverage Status](http://codecov.io/github/sago35/Getopt-Kingpin/coverage.svg?branch=master)](https://codecov.io/github/sago35/Getopt-Kingpin?branch=master)
+[![Build Status](https://travis-ci.org/sago35/Getopt-Kingpin.svg?branch=master)](https://travis-ci.org/sago35/Getopt-Kingpin) [![Coverage Status](http://codecov.io/github/sago35/Getopt-Kingpin/coverage.svg?branch=master)](https://codecov.io/github/sago35/Getopt-Kingpin?branch=master) [![Build Status](https://img.shields.io/appveyor/ci/sago35/Getopt-Kingpin/master.svg)](https://ci.appveyor.com/project/sago35/Getopt-Kingpin/branch/master)
 # NAME
 
 Getopt::Kingpin - command line options parser (like golang kingpin)
@@ -141,7 +141,7 @@ The default value can be overridden with the default($value).
 
 ### override\_default\_from\_envar()
 
-The default value can be overriden with the override\_default\_from\_envar($envar).
+The default value can be overridden with the override\_default\_from\_envar($envar).
 
     # Set default value to environment value of __DEBUG__
     # export $__DEBUG__=1 to enable debug mode
@@ -164,7 +164,7 @@ Here are some examples of flags with various permutations.
 
 ### hidden()
 
-If set hidden(), flag does not apear in the help.
+If set hidden(), flag does not appear in the help.
 
 ### types
 
@@ -220,7 +220,7 @@ Set default value.
 
 ### override\_default\_from\_envar()
 
-Set default value by enviroment variable.
+Set default value by environment variable.
 
 ### required()
 

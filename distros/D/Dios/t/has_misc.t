@@ -3,7 +3,7 @@ use strict;
 
 use Test::More;
 
-plan tests => 4;
+plan tests => 6;
 
 use Dios;
 
@@ -19,7 +19,11 @@ class MatchType { has Match[\d] $!B; }
 
 ok(         MatchType->new({ B => 'cat1' })   );
 ok( !eval { MatchType->new({ B => 'catA' }) } );
+ 
 
+class MatchType2 { has Match[ccc] $!B; }
+ok(         MatchType2->new({ B => 'ccc' })   );
+ok( !eval { MatchType2->new({ B => 'CcC' }) } );
 
 done_testing();
 

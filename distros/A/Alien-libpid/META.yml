@@ -1,0 +1,36 @@
+---
+abstract: 'Perl distribution for libpid'
+author:
+  - 'Ahmad Fatoum <athreef@cpan.org>'
+build_requires:
+  Alien::CMake: '0.07'
+  ExtUtils::CBuilder: '0'
+  IO::Socket::SSL: '0'
+  Test2: '1.302015'
+  Test2::Suite: '0.000030'
+  Test::Alien: '0.05'
+configure_requires:
+  Alien::Base::ModuleBuild: '0'
+  Alien::CMake: '0.07'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libpid
+provides:
+  Alien::libpid:
+    file: lib/Alien/libpid.pm
+    version: '0.02'
+recommends:
+  IO::Socket::SSL: '0'
+requires:
+  Alien::Base: '0.030'
+  File::ShareDir: '1.00'
+  perl: '5.008001'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

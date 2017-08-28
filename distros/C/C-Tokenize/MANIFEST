@@ -2,6 +2,7 @@ Changes
 examples/c2html.pl
 examples/cvar.pl
 examples/includes.pl
+examples/strip-comments.pl
 examples/synopsis-comment.pl
 examples/synopsis-cpp.pl
 lib/C/Tokenize.pm
@@ -12,5 +13,7 @@ MANIFEST.SKIP
 README
 t/C-Tokenize.t
 t/cvar-re.t
+t/function-args.t
+t/strip-comments.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

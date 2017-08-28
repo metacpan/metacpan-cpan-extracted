@@ -8,6 +8,22 @@ Wiki:         <http://wiki.perlrdf.org/>
 Mailing list: <http://lists.perlrdf.org/listinfo/dev>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 
+1.00	2017-08-25	Clean up for Milestone 1.0.
+
+ [ Bug Fixes ]
+ - Tests had wrong base_uri attribute.
+
+ [ Other ]
+ - A few smaller changes.
+ - Proofread and improve documentation.
+   Shlomi Fish++
+ - Remove the Error module, use Carp::croak.
+ - Remove the final eval, use Try::Tiny.
+ - Return Turtle rather than RDF/XML if no content type is given.
+ - Updated: Can't rely on . in @INC.
+ - Updated: Check that Integer URI is OK in test.
+ - Use can_load to check for optionals in tests.
+
 0.78	2017-01-03	Use Config::ZOMG for config.
 
  [ Bug Fixes ]

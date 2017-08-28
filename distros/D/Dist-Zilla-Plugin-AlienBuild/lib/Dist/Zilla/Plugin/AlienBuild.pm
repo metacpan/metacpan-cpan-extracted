@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBuild;
+package Dist::Zilla::Plugin::AlienBuild 0.24 {
 
 use 5.014;
 use Moose;
@@ -7,12 +7,18 @@ use Path::Tiny qw( path );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Use Alien::Build with Dist::Zilla
-our $VERSION = '0.22'; # VERSION
+# VERSION
 
 
 with 'Dist::Zilla::Role::FileMunger';
 with 'Dist::Zilla::Role::MetaProvider';
 with 'Dist::Zilla::Role::PrereqSource';
+
+has alienfile_meta => (
+  is      => 'ro',
+  isa     => 'Int',
+  default => 1,
+);
 
 has _installer => (
   is      => 'ro',
@@ -22,6 +28,27 @@ has _installer => (
     my $name = first { /^(Build|Makefile)\.PL$/ } map { $_->name } @{ $self->zilla->files };
     $self->log_fatal('Unable to find Makefile.PL or Build.PL') unless $name;
     $name;
+  },
+);
+
+has _build => (
+  is      => 'ro',
+  lazy    => 1,
+  isa     => 'Alien::Build',
+  default => sub {
+    my($self) = @_;
+    if(my $file = first { $_->name eq 'alienfile' } @{ $self->zilla->files })
+    {
+      require Alien::Build;
+      my $alienfile = Path::Tiny->tempfile;
+      $alienfile->spew($file->content);
+      my(undef, undef, $build) = capture { Alien::Build->load($alienfile) };
+      return $build;
+    }
+    else
+    {
+      $self->log_fatal('No alienfile!');
+    }
   },
 );
 
@@ -45,59 +72,48 @@ sub register_prereqs
     }
   }
 
-  if(my $file = first { $_->name eq 'alienfile' } @{ $self->zilla->files })
+  my $build = $self->_build;
+
+  my $ab_version = '0.32';
+
+  foreach my $hook (qw( build_ffi gather_ffi patch_ffi ))
   {
-    require Alien::Build;
-    my $alienfile = Path::Tiny->tempfile;
-    $alienfile->spew($file->content);
-    my(undef, undef, $build) = capture { Alien::Build->load($alienfile) };
-
-    my $ab_version = '0.32';
-
-    foreach my $hook (qw( build_ffi gather_ffi patch_ffi ))
+    if($build->meta->has_hook($hook))
     {
-      if($build->meta->has_hook($hook))
-      {
-        $ab_version = '0.40';
-        last;
-      }
+      $ab_version = '0.40';
+      last;
     }
+  }
 
-    if($self->_installer eq 'Makefile.PL')
-    {
-      $self->zilla->register_prereqs(
-        { phase => $_ },
-        'Alien::Build::MM' => $ab_version,
-        'ExtUtils::MakeMaker' => '6.52',
-      ) for qw( configure build );
-    }
-    else
-    {
-      $self->zilla->register_prereqs(
-        { phase => $_ },
-        'Alien::Build::MB' => '0.02',
-      ) for qw( configure build );
-    }
-
-    # Configure requires...
+  if($self->_installer eq 'Makefile.PL')
+  {
     $self->zilla->register_prereqs(
-      { phase => 'configure' },
-      'Alien::Build' => $ab_version,
-      %{ $build->requires('configure') },
-    );
-    
-    # Build requires...
-    $self->zilla->register_prereqs(
-      { phase => 'build' },
-      'Alien::Build' => $ab_version,
-      %{ $build->requires('any') },
-    );
+      { phase => $_ },
+      'Alien::Build::MM' => $ab_version,
+      'ExtUtils::MakeMaker' => '6.52',
+    ) for qw( configure build );
   }
   else
   {
-    $self->log_fatal('No alienfile!');
+    $self->zilla->register_prereqs(
+      { phase => $_ },
+      'Alien::Build::MB' => '0.02',
+    ) for qw( configure build );
   }
-  
+
+  # Configure requires...
+  $self->zilla->register_prereqs(
+    { phase => 'configure' },
+    'Alien::Build' => $ab_version,
+    %{ $build->requires('configure') },
+  );
+    
+  # Build requires...
+  $self->zilla->register_prereqs(
+    { phase => 'build' },
+    'Alien::Build' => $ab_version,
+    %{ $build->requires('any') },
+  );
 }
 
 my $mm_code_prereqs = <<'EOF1';
@@ -112,8 +128,8 @@ sub MY::postamble {
 }
 EOF2
 
-my $comment_begin  = "# BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild\n";
-my $comment_end    = "# END code inserted by Dist::Zilla::Plugin::AlienBuild\n";
+my $comment_begin  = "# BEGIN code inserted by @{[ __PACKAGE__ ]}\n";
+my $comment_end    = "# END code inserted by @{[ __PACKAGE__ ]}\n";
 
 sub munge_files
 {
@@ -163,10 +179,26 @@ sub munge_files
 
 sub metadata {
   my($self) = @_;
-  { dynamic_config => 1 };
+  my %meta = ( dynamic_config => 1 );
+  if($self->alienfile_meta)
+  {
+    $meta{x_alienfile} = {
+      generated_by => "@{[ __PACKAGE__ ]} version @{[ __PACKAGE__->VERSION || 'dev' ]}",
+      requires => {
+        map {
+          my %reqs = %{ $self->_build->requires($_) };
+          $reqs{$_} = "$reqs{$_}" for keys %reqs;
+          $_ => \%reqs;
+        } qw( share system )
+      },
+    }
+  }
+  \%meta;
 }
 
 __PACKAGE__->meta->make_immutable;
+
+}
 
 1;
 
@@ -182,7 +214,7 @@ Dist::Zilla::Plugin::AlienBuild - Use Alien::Build with Dist::Zilla
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -220,7 +252,24 @@ plugin.  If you are using L<Module::Build>.
 
 Which are used by most L<Alien::Build> based L<Alien> distributions.
 
+=item sets x_alienfile meta
+
+Unless you turn this feature off using C<alienfile_meta> below.
+
 =back
+
+=head1 PROPERTIES
+
+=head2 alienfile_meta
+
+As of version 0.23, this plugin adds a special C<x_alienfile> metadata to your
+C<META.json> or C<META.yml>.  This contains the C<share> and C<system> prereqs
+based on your alienfile.  This may be useful for one day searching for Aliens
+which use another specific Alien during their build.  Note that by their nature,
+C<share> and C<system> prereqs are dynamic, so on some platforms they may
+actually be different.
+
+This is on by default.  You can turn this off by setting this property to C<0>.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for App-Nopaste
 
+1.011   2017-08-26 20:31:37Z
+        - fix formatting of script pod
+
 1.010   2017-08-02 04:38:50Z
         - fix shebang in 'nopaste' executable
 

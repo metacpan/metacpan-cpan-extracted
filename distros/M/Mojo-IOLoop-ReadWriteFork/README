@@ -2,7 +2,7 @@ NAME
     Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 VERSION
-    0.23
+    0.35
 
 SYNOPSIS
       my $fork = Mojo::IOLoop::ReadWriteFork->new;

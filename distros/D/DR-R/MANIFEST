@@ -1,8 +1,10 @@
 .gitignore
+.travis.yml
 Changes
 MANIFEST
 Makefile.PL
 R.xs
+README.pod
 bench/010-random.pl
 debian/changelog
 debian/compat

@@ -751,7 +751,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           // float
           char *end;
-          if (constant->type->id == SPVM_TYPE_C_ID_FLOAT) {
+          if (constant->type->code == SPVM_TYPE_C_CODE_FLOAT) {
             double num = strtod(num_str, &end);
             
             if (*end != '\0') {
@@ -762,7 +762,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             constant->type = SPVM_TYPE_get_float_type(compiler);
           }
           // double
-          else if (constant->type->id == SPVM_TYPE_C_ID_DOUBLE) {
+          else if (constant->type->code == SPVM_TYPE_C_CODE_DOUBLE) {
             double num = strtod(num_str, &end);
             
             if (*end != '\0') {
@@ -773,7 +773,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             constant->type = SPVM_TYPE_get_double_type(compiler);
           }
           // byte
-          else if (constant->type->id == SPVM_TYPE_C_ID_BYTE) {
+          else if (constant->type->code == SPVM_TYPE_C_CODE_BYTE) {
             int32_t num;
             errno = 0;
             if (num_str[0] == '0' && num_str[1] == 'x') {
@@ -794,7 +794,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             constant->type = SPVM_TYPE_get_byte_type(compiler);
           }
           // short
-          else if (constant->type->id == SPVM_TYPE_C_ID_SHORT) {
+          else if (constant->type->code == SPVM_TYPE_C_CODE_SHORT) {
             int32_t num;
             errno = 0;
             if (num_str[0] == '0' && num_str[1] == 'x') {
@@ -815,7 +815,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             constant->type = SPVM_TYPE_get_short_type(compiler);
           }
           // int
-          else if (constant->type->id == SPVM_TYPE_C_ID_INT) {
+          else if (constant->type->code == SPVM_TYPE_C_CODE_INT) {
             int32_t num;
             errno = 0;
             if (num_str[0] == '0' && num_str[1] == 'x') {
@@ -836,7 +836,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             constant->type = SPVM_TYPE_get_int_type(compiler);
           }
           // long
-          else if (constant->type->id == SPVM_TYPE_C_ID_LONG) {
+          else if (constant->type->code == SPVM_TYPE_C_CODE_LONG) {
             int64_t num;
             errno = 0;
             if (num_str[0] == '0' && num_str[1] == 'x') {
@@ -863,13 +863,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           return CONSTANT;
         }
-        // Keyname or name
+        // Keyword or name
         else if (isalpha(c) || c == '_') {
           // Save current position
           const char* cur_token_ptr = compiler->bufptr;
           
           compiler->bufptr++;
           
+          _Bool has_double_underline = 0;
           while(isalnum(*compiler->bufptr)
             || *compiler->bufptr == '_'
             || (*compiler->bufptr == ':' && *(compiler->bufptr + 1) == ':'))
@@ -878,8 +879,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->bufptr += 2;
             }
             else if (*compiler->bufptr == '_' && *(compiler->bufptr + 1) == '_') {
-              fprintf(stderr, "Can't contain __ in package, subroutine or field name at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              has_double_underline = 1;
+              compiler->bufptr += 2;
             }
             else {
               compiler->bufptr++;
@@ -1163,6 +1164,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 continue;
               }
               break;
+          }
+          
+          if (has_double_underline) {
+            fprintf(stderr, "Can't contain __ in package, subroutine or field name at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
+            exit(EXIT_FAILURE);
           }
           
           SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_NAME);

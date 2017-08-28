@@ -6,6 +6,96 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const char* const SPVM_BYTECODE_C_CODE_NAMES[] = {
   "NOP",
   "UNDEF",
@@ -149,7 +239,8 @@ const char* const SPVM_BYTECODE_C_CODE_NAMES[] = {
   "POP",
   "NEW_OBJECT",
   "NEW_STRING",
-  "NEW_ARRAY",
+  "NEW_OBJECT_ARRAY",
+  "FOO",
   "ARRAY_LOAD_BYTE",
   "ARRAY_LOAD_SHORT",
   "ARRAY_LOAD_INT",
@@ -220,4 +311,10 @@ const char* const SPVM_BYTECODE_C_CODE_NAMES[] = {
   "WIDE",
   "CURRENT_LINE",
   "WEAKEN_FIELD",
+  "NEW_BYTE_ARRAY",
+  "NEW_SHORT_ARRAY",
+  "NEW_INT_ARRAY",
+  "NEW_LONG_ARRAY",
+  "NEW_FLOAT_ARRAY",
+  "NEW_DOUBLE_ARRAY",
 };

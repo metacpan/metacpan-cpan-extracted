@@ -28,214 +28,144 @@ Both the hash keys and example values are documented for each method to provide 
  
 =head1 RETURN VALUES
 
-=head2 system_info()
+=head1 METHODS
+
+=head2 PLATFORM
+
+=head3 system_info
 
     {
-      'global-protect-datafile-release-date' => 'unknown',
-      'uptime' => '0 days, 0:14:08',
-      'wf-private-release-date' => 'unknown',
-      'threat-release-date' => 'unknown',
-      'global-protect-datafile-version' => '0',
-      'threat-version' => '0',
-      'logdb-version' => '7.0.9',
-      'ipv6-address' => 'unknown',
-      'wildfire-version' => '0',
-      'av-release-date' => 'unknown',
-      'family' => 'vm',
-      'vm-license' => 'none',
-      'app-release-date' => 'unknown',
-      'vm-uuid' => 'unknown',
-      'hostname' => 'PA-VM',
-      'multi-vsys' => 'off',
-      'vm-cpuid' => 'C1060200FDFB8B07',
-      'app-version' => '497-2688',
-      'model' => 'PA-VM',
       'wildfire-release-date' => 'unknown',
+      'vm-license' => 'VM-100',
+      'wildfire-version' => '0',
+      'default-gateway' => '10.47.67.126',
+      'wf-private-release-date' => 'unknown',
       'ipv6-default-gateway' => {},
-      'operational-mode' => 'normal',
-      'time' => 'Tue Aug  8 21:06:42 2017\n',
-      'vm-mac-base' => 'BA:DB:EE:FB:AD:00',
-      'mac-address' => '52:54:00:22:b2:e4',
-      'vm-mac-count' => '255',
-      'av-version' => '0',
-      'vpn-disable-mode' => 'off',
+      'multi-vsys' => 'off',
+      'wf-private-version' => '0',
+      'global-protect-datafile-version' => '0',
+      'av-release-date' => 'unknown',
       'global-protect-client-package-version' => '0.0.0',
-      'ipv6-link-local-address' => 'fe80::5054:ff:fe22:b2e4/64',
+      'netmask' => '255.255.255.192',
+      'ipv6-address' => 'unknown',
+      'vm-mode' => 'VMWare ESXi',
       'platform-family' => 'vm',
-      'default-gateway' => '192.168.122.1',
-      'devicename' => 'PA-VM',
-      'sw-version' => '7.0.0',
-      'serial' => 'unknown',
-      'netmask' => '255.255.255.0',
+      'global-protect-datafile-release-date' => 'unknown',
+      'av-version' => '0',
+      'threat-version' => '0',
       'url-db' => 'paloaltonetworks',
+      'vpn-disable-mode' => 'off',
+      'devicename' => 'PA-VM',
+      'model' => 'PA-VM',
+      'ip-address' => '10.47.67.69',
+      'time' => 'Fri Aug 25 10:32:03 2017\n'
+      'mac-address' => '00:50:56:97:e1:bd',
+      'family' => 'vm',
+      'threat-release-date' => 'unknown',
+      'app-release-date' => 'unknown',
+      'app-version' => '564-3168',
+      'vm-uuid' => '4217C1F1-986E-10E7-375E-664A93CF453A',
+      'operational-mode' => 'normal',
+      'vm-mac-base' => 'D4:1D:71:D8:8D:00',
+      'ipv6-link-local-address' => 'fe80::250:56ff:fe97:e1bd/64',
+      'serial' => '007000000025137',
+      'is-dhcp' => 'no',
+      'sw-version' => '7.1.11',
+      'vm-mac-count' => '256',
       'url-filtering-version' => '0000.00.00.000',
-      'ip-address' => '192.168.122.21',
-      'wf-private-version' => '0'
+      'hostname' => 'PA-VM',
+      'uptime' => '34 days, 21:56:18',
+      'vm-cpuid' => 'E4060300FFFBAB1F',
+      'logdb-version' => '7.0.9'
     };
 
-=head2 interfaces()
+=head3 environmentals
 
-    {
-    'hw' => {
-            'entry' => [
-                       {
-                         'mac' => '52:54:00:39:74:c1',
-                         'duplex' => 'auto',
-                         'type' => '0',
-                         'id' => '16',
-                         'mode' => '(autoneg)',
-                         'state' => 'up',
-                         'st' => 'auto/auto/up',
-                         'speed' => 'auto',
-                         'name' => 'ethernet1/1'
-                       },
-                       {
-                         'id' => '17',
-                         'mode' => '(autoneg)',
-                         'duplex' => 'auto',
-                         'mac' => '52:54:00:dd:0c:f3',
-                         'type' => '0',
-                         'speed' => 'auto',
-                         'name' => 'ethernet1/2',
-                         'st' => 'auto/auto/up',
-                         'state' => 'up'
-                       },
-                     ]
-          },
-    'ifnet' => {
-               'entry' => [
-                          {
-                            'vsys' => '1',
-                            'dyn-addr' => {},
-                            'name' => 'ethernet1/1',
-                            'zone' => 'outside',
-                            'ip' => '192.168.122.19/24',
-                            'tag' => '0',
-                            'addr' => {},
-                            'fwd' => 'vr:default',
-                            'addr6' => {},
-                            'id' => '16'
-                          },
-                          {
-                            'dyn-addr' => {},
-                            'vsys' => '1',
-                            'tag' => '0',
-                            'zone' => 'inside',
-                            'ip' => '192.168.124.19/24',
-                            'name' => 'ethernet1/2',
-                            'fwd' => 'vr:default',
-                            'addr' => {},
-                            'id' => '17',
-                            'addr6' => {}
-                          },
-                        ]
-             }
-    };
+If the device is a VM, there are no environmentals an an empty HASHREF is returned.
 
-=head2 high_availability
+	{
+	 'fantray' => {
+	              'Slot1' => [
+	                         {
+	                           'min' => '1',
+	                           'Inserted' => 'True',
+	                           'description' => 'Fan Tray',
+	                           'slot' => '1',
+	                           'alarm' => 'False'
+	                         }
+	                       ]
+	            },
+	 'power-supply' => {
+	                   'Slot1' => [
+	                              {
+	                                'slot' => '1',
+	                                'alarm' => 'False',
+	                                'Inserted' => 'True',
+	                                'min' => 'True',
+	                                'description' => 'Power Supply #1 (left)'
+	                              },
+	                            ]
+	                 },
+	 'thermal' => {
+	              'Slot1' => [
+	                         {
+	                           'min' => '5.0',
+	                           'description' => 'Temperature @ 10G Phys [U171]',
+	                           'DegreesC' => '34.5',
+	                           'max' => '60.0',
+	                           'slot' => '1',
+	                           'alarm' => 'False'
+	                         },
+	                       ]
+	            },
+	 'fan' => {
+	          'Slot1' => [
+	                     {
+	                       'min' => '2500',
+	                       'description' => 'Fan #1 RPM',
+	                       'RPMs' => '6136',
+	                       'slot' => '1',
+	                       'alarm' => 'False'
+	                     },
+	                   ]
+	        },
+	 'power' => {
+	            'Slot1' => [
+	                       {
+	                         'description' => '1.0V Power Rail',
+	                         'min' => '0.9',
+	                         'max' => '1.1',
+	                         'slot' => '1',
+	                         'Volts' => '1.00066666667',
+	                         'alarm' => 'False'
+	                       }
+	                     ]
+	          }
+	};
 
-=head2 ntp
+=head3 high_availability
 
-{
- 'synched' => 'LOCAL'
-};
+=head2 NETWORK
 
-=head2 routing_table
+=head3 interfaces
 
-    [
-     {
-       'virtual-router' => 'default',
-       'age' => {},
-       'destination' => '0.0.0.0/0',
-       'flags' => 'A S  ',
-       'metric' => '10',
-       'interface' => 'ethernet1/1',
-       'nexthop' => '192.168.122.1'
-     },
-     {
-       'metric' => '0',
-       'interface' => {},
-       'nexthop' => '0.0.0.0',
-       'virtual-router' => 'default',
-       'age' => {},
-       'destination' => '1.1.1.0/32',
-       'flags' => 'A H  '
-     },
-    ]
+=head3 interface_counters_logical
 
+=head3 routing_table
 
-=head2 bgp_peers
+=head3 bgp_peers 
 
-If no BGP peers are configured, the function returns an empty ARRAYREF.
+=head3 bfd_peers
 
-If BGP peers are configured, it returns an ARRAYREF of HASHREFs, with each HASHREF a specific BGP peer.
+=head2 MANAGEMENT
 
-    [
-     {
-       'nexthop-thirdparty' => 'yes',
-       'passive' => 'no',
-       'status-flap-counts' => '1',
-       'prefix-counter' => {
-                           'entry' => {
-                                      'afi-safi' => 'bgpAfiIpv4-unicast',
-                                      'incoming-total' => '1',
-                                      'outgoing-total' => '0',
-                                      'incoming-rejected' => '0',
-                                      'outgoing-advertised' => '0',
-                                      'incoming-accepted' => '1'
-                                    }
-                         },
-       'msg-total-out' => '89',
-       'msg-update-out' => '1',
-       'keepalive' => '30',
-       'open-delay' => '0',
-       'remote-as' => '65002',
-       'aggregate-confed-as' => 'no',
-       'config' => {
-                   'remove-private-as' => 'no'
-                 },
-       'holdtime-config' => '90',
-       'nexthop-peer' => 'no',
-       'holdtime' => '90',
-       'peer-capability' => {
-                            'list' => [
-                                      {
-                                        'capability' => 'Multiprotocol Extensions(1)'
-                                      },
-                                      {
-                                        'capability' => 'Route Refresh(2)'
-                                      },
-                                      {
-                                        'capability' => 'Graceful Restart(64)'
-                                      },
-                                      {
-                                        'capability' => 'Route Refresh (Cisco)(128)'
-                                      }
-                                    ]
-                          },
-       'keepalive-config' => '30',
-       'idle-hold' => '15',
-       'peer-address' => '1.1.1.1:179',
-       'peer-router-id' => '1.1.1.1',
-       'prefix-limit' => '5000',
-       'vr' => 'default',
-       'ORF-entry-received' => '0',
-       'established-counts' => '1',
-       'nexthop-self' => 'no',
-       'local-address' => '1.1.1.0:60401',
-       'msg-total-in' => '90',
-       'last-error' => {},
-       'connect-retry-interval' => '120',
-       'password-set' => 'no',
-       'multi-hop-ttl' => '2',
-       'last-update-age' => '10',
-       'peering-type' => 'Unspecified',
-       'reflector-client' => 'not-client',
-       'msg-update-in' => '2',
-       'peer' => 'default_to_inside_vr',
-       'same-confederation' => 'no',
-       'status-duration' => '2249',
-       'status' => 'Established',
-       'peer-group' => 'Internal_VR'
-     },
-    ];
+=head3 ntp
+
+=head3 panorama_status
+
+=head2 SECURITY
+
+=head3 ip_user_mapping
+
+=head3 userid_server_monitor
+

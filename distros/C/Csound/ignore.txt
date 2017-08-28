@@ -1,0 +1,7 @@
+TODO
+Makefile
+Makefile.old
+blib/
+Csound-*.tar.gz
+t/*-gotten.*
+t/*.wav

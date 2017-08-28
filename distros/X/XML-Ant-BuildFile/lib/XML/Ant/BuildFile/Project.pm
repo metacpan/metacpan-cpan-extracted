@@ -1,19 +1,32 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Project;
-$XML::Ant::BuildFile::Project::VERSION = '0.216';
 
 # ABSTRACT: consume Ant build files
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This class uses L<XML::Rabbit|XML::Rabbit> to consume Ant build files using
+#pod a L<Moose|Moose> object-oriented interface.  It is a work in progress and in no
+#pod way a complete implementation of all Ant syntax.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use XML::Ant::BuildFile::Project;
+#pod
+#pod     my $project = XML::Ant::BuildFile::Project->new( file => 'build.xml' );
+#pod     print 'Project name: ', $project->name, "\n";
+#pod     print "File lists:\n";
+#pod     for my $list_ref (@{$project->file_lists}) {
+#pod         print 'id: ', $list_ref->id, "\n";
+#pod         print join "\n", @{$list_ref->files};
+#pod         print "\n\n";
+#pod     }
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use English '-no_match_vars';
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -28,67 +41,40 @@ use Regexp::DefaultFlags;
 extends 'XML::Ant::BuildFile::ResourceContainer';
 with 'XML::Rabbit::RootNode';
 
+#pod =attr file
+#pod
+#pod On top of L<XML::Rabbit|XML::Rabbit>'s normal behavior, this class will also
+#pod coerce L<Path::Class::File|Path::Class::File> objects to the strings expected
+#pod by L<XML::Rabbit::Role::Document|XML::Rabbit::Role::Document>.
+#pod
+#pod =cut
+
 subtype 'FileStr', as Str;
-coerce 'FileStr', from File, via {"$ARG"};
+coerce 'FileStr', from File, via {"$_"};
 has '+_file' => ( isa => 'FileStr', coerce => 1 );
 
-{
-## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-
-    has name => (
-        isa         => Str,
-        traits      => ['XPathValue'],
-        xpath_query => '/project/@name',
-    );
-
-    has _properties => (
-        lazy        => 1,
-        isa         => HashRef [Str],
-        traits      => ['XPathValueMap'],
-        xpath_query => '//property[@name and @value]',
-        xpath_key   => './@name',
-        xpath_value => './@value',
-        default     => sub { {} },
-    );
-
-    has _filelists => (
-        isa         => 'ArrayRef[XML::Ant::BuildFile::Resource::FileList]',
-        traits      => [qw(XPathObjectList Array)],
-        xpath_query => '//filelist[@id]',
-        handles     => {
-            filelists        => 'elements',
-            filelist         => 'get',
-            map_filelists    => 'map',
-            filter_filelists => 'grep',
-            find_filelist    => 'first',
-            num_filelists    => 'count',
-        },
-    );
-
-    has paths => (
-        auto_deref  => 1,
-        isa         => 'HashRef[XML::Ant::BuildFile::Resource::Path]',
-        traits      => [qw(XPathObjectMap Hash)],
-        xpath_query => '//classpath[@id]|//path[@id]',
-        xpath_key   => './@id',
-        handles     => { path => 'get', path_pairs => 'kv' },
-    );
-
-    has targets => (
-        auto_deref  => 1,
-        isa         => 'HashRef[XML::Ant::BuildFile::Target]',
-        traits      => [qw(XPathObjectMap Hash)],
-        xpath_query => '/project/target[@name]',
-        xpath_key   => './@name',
-        handles     => {
-            target       => 'get',
-            all_targets  => 'values',
-            target_names => 'keys',
-            has_target   => 'exists',
-            num_targets  => 'count',
-        },
-    );
-}
+#pod =method BUILD
+#pod
+#pod After construction, the app-wide L<XML::Ant::Properties|XML::Ant::Properties>
+#pod singleton stores any C<< <property/> >> name/value pairs set by the build file,
+#pod as well as any resource string expansions handled by
+#pod L<XML::Ant::BuildFile::Resource|XML::Ant::BuildFile::Resource> plugins.
+#pod It also contains the following predefined properties as per the Ant
+#pod documentation:
+#pod
+#pod =over
+#pod
+#pod =item os.name
+#pod
+#pod =item basedir
+#pod
+#pod =item ant.file
+#pod
+#pod =item ant.project.name
+#pod
+#pod =back
+#pod
+#pod =cut
 
 sub BUILD {
     my $self = shift;
@@ -100,7 +86,7 @@ sub BUILD {
         'ant.project.name' => $self->name,
     );
     for my $property (
-        grep { not XML::Ant::Properties->exists($ARG) }
+        grep { not XML::Ant::Properties->exists($_) }
         keys %ant_property
         )
     {
@@ -122,6 +108,179 @@ sub BUILD {
     return;
 }
 
+## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+
+#pod =attr name
+#pod
+#pod Name of the Ant project.
+#pod
+#pod =cut
+
+has name => (
+    isa         => Str,
+    traits      => ['XPathValue'],
+    xpath_query => '/project/@name',
+);
+
+has _properties => (
+    lazy        => 1,
+    isa         => HashRef [Str],
+    traits      => ['XPathValueMap'],
+    xpath_query => '//property[@name and @value]',
+    xpath_key   => './@name',
+    xpath_value => './@value',
+    default     => sub { {} },
+);
+
+has _filelists => (
+    isa         => 'ArrayRef[XML::Ant::BuildFile::Resource::FileList]',
+    traits      => [qw(XPathObjectList Array)],
+    xpath_query => '//filelist[@id]',
+    handles     => {
+
+#pod =method filelists
+#pod
+#pod Returns an array of all L<filelist|XML::Ant::BuildFile::Resource::FileList>s
+#pod in the project.
+#pod
+#pod =cut
+
+        filelists => 'elements',
+
+        #pod =method filelist
+        #pod
+        #pod Given an index number returns that C<filelist> from the project.
+        #pod You can also use negative numbers to count from the end.
+        #pod Returns C<undef> if the specified C<filelist> does not exist.
+        #pod
+        #pod =cut
+
+        filelist => 'get',
+
+  #pod =method map_filelists
+  #pod
+  #pod Given a code reference, transforms every C<filelist> element into a new
+  #pod array.
+  #pod
+  #pod =cut
+
+        map_filelists => 'map',
+
+  #pod =method filter_filelists
+  #pod
+  #pod Given a code reference, returns an array with every C<filelist> element
+  #pod for which that code returns C<true>.
+  #pod
+  #pod =cut
+
+        filter_filelists => 'grep',
+
+ #pod =method find_filelist
+ #pod
+ #pod Given a code reference, returns the first C<filelist> for which the code
+ #pod returns C<true>.
+ #pod
+ #pod =cut
+
+        find_filelist => 'first',
+
+        #pod =method num_filelists
+        #pod
+        #pod Returns a count of all C<filelist>s in the project.
+        #pod
+        #pod =cut
+
+        num_filelists => 'count',
+    },
+);
+
+#pod =attr paths
+#pod
+#pod Hash of
+#pod L<XML::Ant::BuildFile::Resource::Path|XML::Ant::BuildFile::Resource::Path>s
+#pod from the build file.  The keys are the path C<id>s.
+#pod
+#pod =cut
+
+has paths => (
+    auto_deref  => 1,
+    isa         => 'HashRef[XML::Ant::BuildFile::Resource::Path]',
+    traits      => [qw(XPathObjectMap Hash)],
+    xpath_query => '//classpath[@id]|//path[@id]',
+    xpath_key   => './@id',
+
+#pod =method path
+#pod
+#pod Given a list of one or more C<id> strings, returns a list of
+#pod L<XML::Ant::BuildFile::Resource::Path|XML::Ant::BuildFile::Resource::Path>s
+#pod for C<< <classpath/> >>s and C<< <path/> >>s in the project.
+#pod
+#pod =cut
+
+    handles => { path => 'get', path_pairs => 'kv' },
+);
+
+#pod =attr targets
+#pod
+#pod Hash of L<XML::Ant::BuildFile::Target|XML::Ant::BuildFile::Target>s
+#pod from the build file.  The keys are the target names.
+#pod
+#pod =cut
+
+has targets => (
+    auto_deref  => 1,
+    isa         => 'HashRef[XML::Ant::BuildFile::Target]',
+    traits      => [qw(XPathObjectMap Hash)],
+    xpath_query => '/project/target[@name]',
+    xpath_key   => './@name',
+    handles     => {
+
+       #pod =method target
+       #pod
+       #pod Given a list of target names, return the corresponding
+       #pod L<XML::Ant::BuildFile::Target|XML::Ant::BuildFile::Target>
+       #pod objects.  In scalar context return only the last target specified.
+       #pod
+       #pod =cut
+
+        target => 'get',
+
+        #pod =method all_targets
+        #pod
+        #pod Returns a list of all targets as
+        #pod L<XML::Ant::BuildFile::Target|XML::Ant::BuildFile::Target>
+        #pod objects.
+        #pod
+        #pod =cut
+
+        all_targets => 'values',
+
+        #pod =method target_names
+        #pod
+        #pod Returns a list of the target names from the build file.
+        #pod
+        #pod =cut
+
+        target_names => 'keys',
+
+        #pod =method has_target
+        #pod
+        #pod Given a target name, returns true or false if the target exists.
+        #pod
+        #pod =cut
+
+        has_target => 'exists',
+
+        #pod =method num_targets
+        #pod
+        #pod Returns a count of the number of targets in the build file.
+        #pod
+        #pod =cut
+
+        num_targets => 'count',
+    },
+);
+
 no Moose::Util::TypeConstraints;
 no Moose;
 
@@ -142,7 +301,7 @@ XML::Ant::BuildFile::Project - consume Ant build files
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -187,6 +346,27 @@ Hash of L<XML::Ant::BuildFile::Target|XML::Ant::BuildFile::Target>s
 from the build file.  The keys are the target names.
 
 =head1 METHODS
+
+=head2 BUILD
+
+After construction, the app-wide L<XML::Ant::Properties|XML::Ant::Properties>
+singleton stores any C<< <property/> >> name/value pairs set by the build file,
+as well as any resource string expansions handled by
+L<XML::Ant::BuildFile::Resource|XML::Ant::BuildFile::Resource> plugins.
+It also contains the following predefined properties as per the Ant
+documentation:
+
+=over
+
+=item os.name
+
+=item basedir
+
+=item ant.file
+
+=item ant.project.name
+
+=back
 
 =head2 filelists
 
@@ -247,27 +427,6 @@ Given a target name, returns true or false if the target exists.
 =head2 num_targets
 
 Returns a count of the number of targets in the build file.
-
-=head2 BUILD
-
-After construction, the app-wide L<XML::Ant::Properties|XML::Ant::Properties>
-singleton stores any C<< <property/> >> name/value pairs set by the build file,
-as well as any resource string expansions handled by
-L<XML::Ant::BuildFile::Resource|XML::Ant::BuildFile::Resource> plugins.
-It also contains the following predefined properties as per the Ant
-documentation:
-
-=over
-
-=item os.name
-
-=item basedir
-
-=item ant.file
-
-=item ant.project.name
-
-=back
 
 =head1 SUPPORT
 
@@ -388,7 +547,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

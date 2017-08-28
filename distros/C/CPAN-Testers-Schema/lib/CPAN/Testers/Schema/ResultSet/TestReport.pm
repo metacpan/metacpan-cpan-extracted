@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::TestReport;
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -67,7 +67,10 @@ sub insert_metabase_fact( $self, $fact ) {
 
     my $user_id = $fact->core_metadata->{creator}->resource;
     my ( $metabase_user ) = $self->result_source->schema->resultset( 'MetabaseUser' )
-        ->search( { resource => $user_id }, { order_by => '-id', limit => 1 } )->all;
+        ->search( { resource => $user_id }, { order_by => { -desc => 'id' }, limit => 1 } )->all;
+
+    # Remove leading "v" from Perl version
+    $fact_data{perl_version} =~ s/^v+//;
 
     my %report = (
         reporter => {
@@ -100,7 +103,7 @@ sub insert_metabase_fact( $self, $fact ) {
     my $format = DateTime::Format::ISO8601->new();
     my $creation = $format->parse_datetime( $fact->creation_time );
 
-    return $self->create({
+    return $self->update_or_create({
         id => $fact->guid,
         created => $creation,
         report => \%report,
@@ -119,7 +122,7 @@ CPAN::Testers::Schema::ResultSet::TestReport - Query the raw test reports
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

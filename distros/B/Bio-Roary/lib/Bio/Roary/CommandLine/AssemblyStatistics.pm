@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::AssemblyStatistics;
-$Bio::Roary::CommandLine::AssemblyStatistics::VERSION = '3.8.2';
+$Bio::Roary::CommandLine::AssemblyStatistics::VERSION = '3.9.1';
 # ABSTRACT: Given a spreadsheet of gene presence and absence calculate some statistics
 
 
@@ -140,7 +140,7 @@ Bio::Roary::CommandLine::AssemblyStatistics - Given a spreadsheet of gene presen
 
 =head1 VERSION
 
-version 3.8.2
+version 3.9.1
 
 =head1 SYNOPSIS
 

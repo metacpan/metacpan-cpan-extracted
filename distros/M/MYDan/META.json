@@ -1,0 +1,49 @@
+{
+   "abstract" : "A suite of cluster administration tools and platforms",
+   "author" : [
+      "Li Jinfeng <lijinfeng2011@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MYDan",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.37",
+            "DBI" : "1.625",
+            "DateTime" : "1.03",
+            "Expect" : "1.21",
+            "Getopt::Long" : "2.38",
+            "IO::Socket::Multicast" : "1.12",
+            "IO::Stty" : "0.03",
+            "Thread::Queue" : "2.12",
+            "YAML::XS" : "0.41",
+            "threads" : "1.8"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0.1"
+}

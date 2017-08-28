@@ -4,7 +4,7 @@ use Moose;
 with 'MooseX::DIC::Loggable';
 
 # InterfaceName -> EnvironmentName => ServiceMetadata
-has metadata => ( is => 'ro', isa => 'HashRef[HashRef[MooseX::DIC::ServiceMetadata]]', default => sub { {} } );
+has metadata => ( is => 'ro', isa => 'HashRef[HashRef[MooseX::DIC::Configuration::ServiceMetadata]]', default => sub { {} } );
 
 
 # (interface_name: Str) -> Bool
@@ -14,7 +14,7 @@ sub has_service {
   return exists($self->metadata->{$interface_name});
 }
 
-# (:ServiceMetadata) -> Void
+# (service_metadata: ServiceMetadata) -> Void
 sub add_service_definition {
 	my ($self,$service_metadata) = @_;
 

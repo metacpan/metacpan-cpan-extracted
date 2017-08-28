@@ -20,12 +20,20 @@ for my $prepare_method (qw/prepare prepare_cached/) {
     ok $sth->finish;;
     ok !$sth->{Active};
 
-    $sth = $dbh->$prepare_method('SELECT * FROM my_table');
+    $sth = $dbh->$prepare_method('SELECT foo, bar FROM my_table WHERE id = ?');
     isa_ok $sth, 'DBI::st';
+
+    $ret = $sth->bind_param(1, 1000);
+    is $ret, '1';
 
     $ret = $sth->execute();
     is $ret, '1';
     is $sth->rows, 0;
+
+    $ret = $sth->bind_columns(\my $foo, \my $bar);
+    is $ret, '1';
+    is $foo, undef;
+    is $bar, undef;
 
     for my $fetch_method (qw/fetch fetchrow_array fetchrow_arrayref fetchrow_hashref/) {
         my $row = $sth->$fetch_method;
@@ -34,6 +42,11 @@ for my $prepare_method (qw/prepare prepare_cached/) {
 
     ok $sth->finish;
     ok !$sth->{Active};
+
+    $sth = $dbh->$prepare_method('SELECT foo, bar, buz FROM my_table WHERE id = 1');
+    $ret = $sth->bind_col(3, \my $buz);
+    is $ret, '1';
+    is $buz, undef;
 }
 
 done_testing;

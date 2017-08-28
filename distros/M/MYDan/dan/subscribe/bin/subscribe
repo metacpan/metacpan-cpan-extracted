@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MYDan::Node;
+use MYDan::Util::OptConf;
+
+use MYDan::Subscribe::Conf;
+
+=head1 SYNOPSIS
+
+ select [--name|--attr|--user|--level]
+ $0 
+ $0 --name name1
+ $0 --user user1
+ $0 --name name1 --user user1
+    
+ insert
+ $0 --add --name name1 --attr attr1 --user user1 --level 1
+ 
+ delete [--name|--attr|--user|--level]
+ $0 
+ $0 --del --name name1
+ $0 --del --user user1
+ $0 --del --name name1 --user user1
+    
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( add del name=s attr=s user=s level=i ) )->dump( 'subscribe' );
+ 
+my $conf = MYDan::Subscribe::Conf->new( path => "$o{conf}/subscribe" );
+
+if( $o{add} )
+{
+    $option->assert( 'name', 'attr', 'user', 'level' );
+    $conf->insert( %o );
+}
+elsif($o{del})
+{
+    $conf->delete( %o );
+}
+else
+{
+    my @r = $conf->select( %o );
+    map{printf "%s\n", join '|', @$_; }@r;
+}

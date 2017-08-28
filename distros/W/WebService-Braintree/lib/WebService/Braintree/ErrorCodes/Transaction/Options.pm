@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Transaction::Options;
-$WebService::Braintree::ErrorCodes::Transaction::Options::VERSION = '0.92';
+$WebService::Braintree::ErrorCodes::Transaction::Options::VERSION = '0.93';
 use strict;
 
 use constant SubmitForSettlementIsRequiredForCloning => "91544";

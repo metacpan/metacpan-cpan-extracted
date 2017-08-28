@@ -1,5 +1,5 @@
 package WebService::Braintree::Nonce;
-$WebService::Braintree::Nonce::VERSION = '0.92';
+$WebService::Braintree::Nonce::VERSION = '0.93';
 use Moose;
 extends 'WebService::Braintree::ResultObject';
 

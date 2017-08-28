@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::mtc_s16209x
 # ABSTRACT:  Configuration class LCDd::mtc_s16209x
+
 =encoding utf8
 
 =head1 NAME
@@ -16,15 +17,45 @@ generated from LCDd.conf
 
 =head2 Brightness
 
-Set the initial brightness I<< Optional. Type integer. upstream_default: '255'.  >> 
+Set the initial brightness I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+255
+
+=back
+
+
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/lcd'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/lcd
+
+=back
+
+
 
 =head2 Reboot
 
-Reinitialize the LCD's BIOS I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Reinitialize the LCD's BIOS I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head1 SEE ALSO
 

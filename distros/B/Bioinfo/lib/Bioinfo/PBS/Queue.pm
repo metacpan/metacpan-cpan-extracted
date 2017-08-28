@@ -6,7 +6,7 @@ use IO::All;
 use List::Util 'uniq';
 use namespace::autoclean;
 
-our $VERSION = '0.1.1'; # VERSION:
+our $VERSION = '0.1.8'; # VERSION:
 # ABSTRACT: used to submit a batch of task to Torque cluster
 
 
@@ -43,6 +43,12 @@ has name => (
   is  => 'rw',
   isa => 'Str',
   default => sub { 'pbs' },
+);
+
+has parallel => (
+  is  => 'rw',
+  isa => 'Int',
+  default => sub { '1' }
 );
 
 has _log => (
@@ -88,24 +94,28 @@ has stage => (
 
 sub execute {
   my $self = shift;
+  my $task_run_num = $self->parallel;
   my @tasks =  $self->all_tasks;
   my @stages = uniq (map { $_->priority } @tasks);
+  my $content = "name\tcpu\tpriority\tsh_name\tjob_id\tstat\tcmd\n";
+  $self->_log->lock->append($content)->unlock;
   for my $stage (@stages) {
     $self->_log->lock->append("# Stage$stage: running\n")->unlock;
     say "Stage $stage";
     my @stage_tasks = $self->filter_tasks( sub {$_->priority == $stage} );
-    my $pm = Parallel::ForkManager->new($#stage_tasks+1);
+    my $paralell_num = $task_run_num || ($#stage_tasks + 1);
+    my $pm = Parallel::ForkManager->new($paralell_num);
     DATA_LOOP:
     for my $task (@stage_tasks) {
       sleep 1;
       my ($name, $cpu, $cmd, $priority) = ($task->name, $task->cpu, $task->cmd, $task->priority);
       my $pid = $pm->start and next DATA_LOOP;
-      say "CMD:$cmd will be submitted";
+      say "$name will be submitted\n";
       $task->qsub->wait;
-      say "CMD:$cmd  finished";
+      say "$name  finished\n";
       my ($stat, $job_id, $sh_name) = ($task->job_stat, $task->job_id, $task->_sh_name);
-      my $content = "$name\t$cpu\t$priority\t$sh_name\t$job_id\t$stat\t$cmd\n";
-      say "$content";
+      $content = "$name\t$cpu\t$priority\t$sh_name\t$job_id\t$stat\t$cmd\n";
+      #say "$content";
       #my $log_name = $self->name . ".log";
       #io($log_name)->lock->append($content)->unlock;
       $self->_log->lock->append($content)->unlock;
@@ -136,7 +146,7 @@ Bioinfo::PBS::Queue - used to submit a batch of task to Torque cluster
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.8
 
 =head1 SYNOPSIS
 
@@ -148,6 +158,11 @@ version 0.1.1
     cmd => 'ls -alh; pwd',
   };
   my $pbs_obj = Bioinfo::PBS->new($para);
+
+  # three tasks are running at the same time
+  my $queue_obj = Bioinfo::PBS::Queue->new(name => 'blastnr', parallel => 3);
+
+  # all tasks will be running at the same time if parallel is not setted
   my $queue_obj = Bioinfo::PBS::Queue->new(name => 'blastnr');
   $queue_obj->add_tasks($pbs_obj);
   $queue_obj->add_tasks($pbs_obj);

@@ -8,12 +8,12 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 sub new
 {
-  my($class) = @_;
+  my($class, %prop) = @_;
   
   my $self = bless {}, $class;
   
@@ -23,6 +23,15 @@ sub new
       (-d 'patch' ? (patch => 'patch') : ()),
     )
   ;
+  
+  if(defined $prop{alienfile_meta})
+  {
+    $self->{alienfile_meta} = $prop{alienfile_meta};
+  }
+  else
+  {
+    $self->{alienfile_meta} = 1;
+  }
   
   $self->build->load_requires('configure');
   $self->build->root;
@@ -35,6 +44,12 @@ sub new
 sub build
 {
   shift->{build};
+}
+
+
+sub alienfile_meta
+{
+  shift->{alienfile_meta};
 }
 
 
@@ -109,6 +124,20 @@ sub mm_args
  
   #$args{META_MERGE}->{'meta-spec'}->{version} = 2;
   $args{META_MERGE}->{dynamic_config} = 1;
+  
+  if($self->alienfile_meta)
+  {
+    $args{META_MERGE}->{x_alienfile} = {
+      generated_by => "@{[ __PACKAGE__ ]} version @{[ __PACKAGE__->VERSION || 'dev' ]}",
+      requires => {
+        map {
+          my %reqs = %{ $self->build->requires($_) };
+          $reqs{$_} = "$reqs{$_}" for keys %reqs;
+          $_ => \%reqs;
+        } qw( share system )
+      },
+    };
+  }
   
   $self->build->checkpoint;
   %args;
@@ -304,7 +333,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -352,6 +381,12 @@ Create a new instance of L<Alien::Build::MM>.
  my $build = $abmm->build;
 
 The L<Alien::Build> instance.
+
+=head2 alienfile_meta
+
+ my $bool = $abmm->alienfile_meta
+
+Set to a false value, in order to turn off the x_alienfile meta
 
 =head1 METHODS
 

@@ -39,7 +39,7 @@
             "Modern::Perl" : "0",
             "Moose" : "0",
             "Params::Validate" : "0",
-            "URI" : "0",
+            "URI" : "1.61",
             "XML::Twig" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -57,11 +57,11 @@
    "provides" : {
       "Device::PaloAlto::Firewall" : {
          "file" : "lib/Device/PaloAlto/Firewall.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::PaloAlto::Firewall::Test" : {
          "file" : "lib/Device/PaloAlto/Firewall/Test.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/gregfoletta/Device-PaloAlto"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

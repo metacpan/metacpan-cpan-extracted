@@ -1,6 +1,10 @@
 Revision history for App-redis_traffic_stats
 
-1.004     2015-10-27 10:25:30+00:00 UTC
+1.005     2017-08-23 03:11:38+00:00 UTC
+    [IMPROVEMENTS]
+        - Add --key-normalize-regexp option (#8 by @fujiwara)
+
+1.004     2015-10-27 10:27:59+00:00 UTC
     [IMPROVEMENTS]
         - Reduce slow commands (#2 by @chenzhe07)
 

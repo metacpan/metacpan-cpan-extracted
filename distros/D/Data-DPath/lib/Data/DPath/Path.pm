@@ -1,7 +1,7 @@
 package Data::DPath::Path;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Abstraction for a DPath
-$Data::DPath::Path::VERSION = '0.56';
+$Data::DPath::Path::VERSION = '0.57';
 use strict;
 use warnings;
 

@@ -1,0 +1,8 @@
+Revision history for BioSAILs
+
+0.02  2017-08-24 06:12:45 GST
+	- Fixed formatting issue in CacheUtils
+	- Cleaned up multiple 'uniq' calls https://github.com/biosails/BioSAILs/issues/1
+
+0.01  2017-08-21 08:14:01 GST
+        - Initial release

@@ -292,6 +292,9 @@ extern double		mts_drand(mt_state* state);
 extern NVTYPE		mts_ldrand(mt_state* state);
 					/* Generate floating value, any gen. */
 					/* Slower, with 64-bit precision */
+extern NVTYPE		mts_lldrand(mt_state* state);
+					/* Generate floating value, any gen. */
+					/* Slower, with 128-bit precision */
 
 extern uint32_t		mt_lrand(void);	/* Generate 32-bit random value */
 #ifdef UINT64_MAX
@@ -365,6 +368,8 @@ extern double		mt_32_to_double;
 					/* Multiplier to convert long to dbl */
 extern NVTYPE		mt_64_to_double;
 					/* Mult'r to cvt long long to dbl */
+extern NVTYPE		mt_96_to_double;
+extern NVTYPE		mt_128_to_double;
 
 /*
  * In gcc, inline functions must be declared extern or they'll produce
@@ -543,6 +548,36 @@ MT_EXTERN MT_INLINE NVTYPE mts_ldrand(
 #else /* UINT64_MAX */
     return random_value_1 * (NVTYPE)mt_32_to_double + random_value_2 * mt_64_to_double;
 #endif /* UINT64_MAX */
+    }
+
+MT_EXTERN MT_INLINE NVTYPE mts_lldrand(
+    register mt_state*	state)		/* State for the PRNG */
+    {
+    unsigned i;
+    uint32_t rv[4];			/* Pseudorandom values generated */
+    uint32_t* rvp = rv;
+
+    for (i = 0; i < 4; i++) {
+      if (state->stateptr <= 0)
+	mts_refresh(state);
+
+      *rvp = state->statevec[--state->stateptr];
+      MT_TEMPER(*rvp);
+      rvp++;
+    }
+
+#ifdef UINT64_MAX
+    return
+      ((uint64_t)rv[0] << 32 | (uint64_t)rv[1]) * mt_64_to_double +
+      ((uint64_t)rv[2] << 32 | (uint64_t)rv[3]) * mt_128_to_double;
+#else
+    return rv[0] * (NVTYPE)mt_32_to_double + rv[1] * mt_64_to_double + rv[2] * mt_96_to_double + rv[3] * mt_128_to_double;
+#endif
+    }
+
+MT_EXTERN MT_INLINE NVTYPE mt_lldrand(void)
+    {
+      return mts_lldrand(&mt_default_state);
     }
 
 /*

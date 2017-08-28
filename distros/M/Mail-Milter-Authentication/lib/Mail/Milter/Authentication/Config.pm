@@ -1,7 +1,7 @@
 package Mail::Milter::Authentication::Config;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.2');
 
 use Mail::Milter::Authentication;
 use Module::Load;
@@ -38,6 +38,7 @@ sub default_config {
         'connect_timeout'                 => 30,
         'command_timeout'                 => 30,
         'content_timeout'                 => 300,
+        'addheader_timeout'               => 30,
         'dns_timeout'                     => 10,
         'dns_retry'                       => 2,
         'tempfail_on_error'               => '1',
@@ -101,7 +102,7 @@ sub get_config {
         opendir $dh, $folder;
         my @config_files =
             sort
-            grep { $_ =~ /\.json/ }
+            grep { $_ =~ /\.json$/ }
             grep { not $_ =~ /^\./ }
             readdir($dh);
         closedir $dh;

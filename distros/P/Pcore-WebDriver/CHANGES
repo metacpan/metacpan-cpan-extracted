@@ -1,3 +1,35 @@
+v0.9.6 2017-08-24T08:03:49Z
+ - quote webdriver command line
+
+v0.9.5 2017-08-22T20:13:06Z
+ - chrome caps updated
+
+v0.9.4 2017-08-22T14:46:17Z
+ - xvfb timeout increased
+
+v0.9.3 2017-08-22T06:58:16Z
+ - chrome xvbf mode
+
+v0.9.2 2017-08-21T23:07:25Z
+ - proxy settings updated
+
+v0.9.1 2017-08-21T18:55:08Z
+ - term webdriver process group on wdh destroy
+
+v0.9.0 2017-08-20T16:27:56Z
+
+v0.8.3 2017-08-20T16:26:30Z
+ - chrome replace headless user agent
+
+v0.8.2 2017-08-20T13:10:34Z
+ - chrome --no-sandbox switch added
+
+v0.8.1 2017-08-20T11:44:05Z
+ - set linux permissions
+
+v0.8.0 2017-08-20T10:30:39Z
+ - API refactored
+
 v0.7.3 2017-07-03T18:05:57Z
  - No issues on bugtracker were closed since the last release
  - drivers updated

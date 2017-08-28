@@ -46,4 +46,4 @@ for my $t (@LIST) {
     };
 }
 
-cmpthese 1000000, \%cmp_task;
+cmpthese 1_000_000, \%cmp_task;

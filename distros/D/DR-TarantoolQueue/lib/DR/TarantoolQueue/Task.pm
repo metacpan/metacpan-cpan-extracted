@@ -6,7 +6,7 @@ use Mouse;
 use JSON::XS ();
 use Carp;
 
-has space   => (is => 'ro', isa => 'Str',       required => 1);
+has space   => (is => 'ro', isa => 'Str', required => 1);
 has status  => (
     is          => 'ro',
     isa         => 'Str',
@@ -26,9 +26,17 @@ has data    => (
     is          => 'ro',
     isa         => 'HashRef|ArrayRef|Str|Undef',
     lazy        => 1,
-    builder     => '_build_data',
-    clearer     => '_clean_data'
+    clearer     => '_clean_data',
+    builder     => sub {
+        my ($self) = @_;
+        return undef unless defined $self->rawdata;
+
+        my $res = eval { $self->jse->decode( $self->rawdata ) };
+        warn $@ if $@;
+        return $res;
+    }
 );
+has domain  =>  is => 'ro', isa => 'Maybe[Str]';
 
 has queue   => (is => 'ro', isa => 'Object|Undef', weak_ref => 1);
 
@@ -37,16 +45,6 @@ with 'DR::TarantoolQueue::JSE';
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
-sub _build_data {
-    my ($self) = @_;
-    return undef unless defined $self->rawdata;
-
-    my $res = eval { $self->jse->decode( $self->rawdata ) };
-    warn $@ if $@;
-    return $res;
-}
-
-
 for my $m (qw(ack requeue bury dig unbury delete peek)) {
     no strict 'refs';
     next if *{ __PACKAGE__ . "::$m" }{CODE};
@@ -54,8 +52,8 @@ for my $m (qw(ack requeue bury dig unbury delete peek)) {
         my ($self) = @_;
         croak "Can't find queue for task" unless $self->queue;
         my $task = $self->queue->$m(task => $self);
-        $self->_set_status($task->status);
-        $self;
+        $self->_set_status($task->status) if $task;
+        $task;
     }
 }
 
@@ -81,6 +79,21 @@ sub tuple {
         rawdata => $raw->[3],
         space   => $space,
         queue   => $queue,
+    );
+}
+
+sub tuple_messagepack {
+    my ($class, $tuple, $queue) = @_;
+    return undef unless $tuple;
+
+    $class->new(
+        id      => $tuple->{id},
+        tube    => $tuple->{tube},
+        status  => $tuple->{status},
+        rawdata => $tuple->{data},
+        domain  => $tuple->{domain},
+        queue   => $queue,
+        space   => 'MegaQueue',
     );
 }
 

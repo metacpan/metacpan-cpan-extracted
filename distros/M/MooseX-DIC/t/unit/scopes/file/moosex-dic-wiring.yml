@@ -1,0 +1,9 @@
+mappings:
+  Test5: 
+    Test5Impl:
+      scope: request
+  Test6:
+    Test6Impl:
+      dependencies:
+        dependency1:
+          scope: request

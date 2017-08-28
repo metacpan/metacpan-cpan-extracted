@@ -10,7 +10,7 @@ use warnings;
 #no warnings;
 
 use Carp;
-use Data::Dumper;
+#use Data::Dumper;
 
 use POSIX;
 use XML::Simple;
@@ -18,7 +18,7 @@ use Time::HiRes;
 use Glib qw/TRUE FALSE/;
 
 BEGIN {
-    $Gtk3::Ex::DBI::Form::VERSION = '3.2';
+    $Gtk3::Ex::DBI::Form::VERSION = '3.3';
 }
 
 sub new {
@@ -47,7 +47,7 @@ sub new {
           , before_apply                => $$req{before_apply}                         # A reference to code that is run *before* the 'apply' method is called
           , on_apply                    => $$req{on_apply}                             # A reference to code that is run *after* the 'apply' method is called
           , on_delete                   => $$req{on_delete}                            # A reference to code that is run *after* the 'delete' method is called
-          , on_undo                     => $$req{on_undo}                              # A reference to code that is run *after* teh 'undo' method is called
+          , on_undo                     => $$req{on_undo}                              # A reference to code that is run *after* the 'undo' method is called
           , on_changed                  => $$req{on_changed}                           # A reference to code that is run *every* time a managed field is changed
           , on_initial_changed          => $$req{on_initial_changed}                   # A reference to code that is run when the recordset status *initially* changes to CHANGED 
           , auto_apply                  => $$req{auto_apply}                           # Boolean to force all records to be applied automatically when querying, closing, etc
@@ -1307,10 +1307,10 @@ sub apply {
         
         my $widget_definition = $self->{widgets}->{$fieldname};
         
-        if ( $self->{debug} ) {
-            print "Processing field $fieldname ...\n"
-                . Dumper( $widget_definition ) . "\n";
-        }
+#        if ( $self->{debug} ) {
+#            print "Processing field $fieldname ...\n"
+#                . Dumper( $widget_definition ) . "\n";
+#        }
         
         # Support for aliases
         my $sql_fieldname = $widget_definition->{sql_fieldname} || $fieldname;
@@ -2030,7 +2030,7 @@ sub setup_combo {
     my $counter = 0;
     
     # First is the 'NULL' row ...
-    $model->insert_with_values( $counter, undef, undef );
+    $model->insert_with_values( $counter, 0, undef, 1, undef );
     
     $counter ++;
     
@@ -2350,7 +2350,7 @@ sub get_widget_value {
             $value = 0;
         }
         
-    } elsif ( $type eq "Gtk3::ComboBoxEntry" || $type eq "Gtk3::ComboBox" ) {
+    } elsif ( $type eq "Gtk3::ComboBoxText" || $type eq "Gtk3::ComboBox" ) {
         
         my ( $active, $iter ) = $widget->get_active_iter;
         
@@ -2361,11 +2361,15 @@ sub get_widget_value {
         if ( $active ) {
             $value = $widget->get_model->get( $iter, 0 );
         } else {
-            my $columntype = $widget->get_model->get_column_type( 0 );
-            if ( $columntype eq "Glib::Int" ) {
-                $value = 0;
+            if ( $type eq "Gtk3::ComboBoxText" ) {
+                $value = $widget->get_child->get_text;
             } else {
-                $value = undef;
+                my $columntype = $widget->get_model->get_column_type( 0 );
+                if ($columntype eq "Glib::Int") {
+                    $value = 0;
+                } else {
+                    $value = undef;
+                }
             }
         }
         
@@ -2512,7 +2516,7 @@ sub set_widget_value {
         
         $widget->set_active( $local_value || 0 );
         
-    } elsif ( $type eq "Gtk3::ComboBoxEntry" || $type eq "Gtk3::ComboBox" || $type eq "Gtk3::Combo" ) {
+    } elsif ( $type eq "Gtk3::ComboBoxText" || $type eq "Gtk3::ComboBox" || $type eq "Gtk3::Combo" ) {
         
         # This is some ugly stuff. Gtk3 doesn't support selecting an iter in a model based on the string
         
@@ -2534,7 +2538,7 @@ sub set_widget_value {
         
         my $iter = $model->get_iter_first;
         
-        if ( $type eq "Gtk3::ComboBoxEntry" ) {
+        if ( $type eq "Gtk3::ComboBoxText" ) {
             $widget->get_child->set_text( "" );
         }
         
@@ -2566,12 +2570,16 @@ sub set_widget_value {
         # when we call $self->get_widget_value() anyway, so this is as good as finding a match
          
         if ( ! $match_found && $value ) {
-            carp( "Form [" . $self->{friendly_table_name} . "] failed to set [$fieldname] to value [$value] ( it wasn't in the model )" );
+            if ( $type eq "Gtk3::ComboBoxText" ) {
+                $widget->get_child->set_text( $value );
+            } else {
+                carp( "Form [".$self->{friendly_table_name}."] failed to set [$fieldname] to value [$value] ( it wasn't in the model )" );
+            }
         }
         
     } elsif ( $type eq "Gtk3::TextView" || $type eq "Gtk3::SourceView::View" ) {
         
-        $widget->get_buffer->set_text( $local_value || "" );
+        $widget->get_buffer->set_text( ( defined $local_value ? $local_value : "" ) );
         
     } elsif ( $type eq "Gtk3::CheckButton" ) {
         
@@ -3125,7 +3133,7 @@ sub find_do_search {
         
     }
     
-    print "Find Dialog querying with:\n$where_clause\n" . Dumper( $bind_values );
+#    print "Find Dialog querying with:\n$where_clause\n" . Dumper( $bind_values );
     
     $self->query(
         {

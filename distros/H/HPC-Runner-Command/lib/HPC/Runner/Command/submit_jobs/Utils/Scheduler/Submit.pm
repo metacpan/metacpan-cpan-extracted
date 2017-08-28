@@ -42,7 +42,7 @@ sub process_submit_command {
 
     my $log = "";
     if ( $self->no_log_json ) {
-        $log =  "\t--no_log_json \\\n";
+        $log = "\t--no_log_json \\\n";
     }
 
     $command .=
@@ -152,8 +152,12 @@ sub process_template {
 
     chmod 0777, $self->slurmfile;
 
-    my $scheduler_id = $self->submit_jobs;
+    my $scheduler_id;
+    try {
+        $scheduler_id = $self->submit_jobs;
+    };
 
+    $DB::single = 2;
     if ( defined $scheduler_id ) {
         $self->jobs->{ $self->current_job }->add_scheduler_ids($scheduler_id);
     }
@@ -184,17 +188,20 @@ sub submit_to_scheduler {
 
     my ( $infh, $outfh, $errfh, $exitcode, $cmdpid, $stdout, $stderr );
     $errfh = gensym();
-    try {
-        $cmdpid = open3( $infh, $outfh, $errfh, $submit_command );
-    }
-    catch {
-        $exitcode = $?;
-        $self->app_log->fatal( 'Cmd failed : ' . $submit_command );
-        $self->app_log->fatal( 'Cmd failed with exitcode ' . $exitcode );
-        return [ $exitcode, '', $@ ];
-    };
+    eval {
 
-    return unless $cmdpid;
+        $cmdpid = open3( $infh, $outfh, $errfh, $submit_command );
+    };
+    if ($@) {
+        $exitcode = $?;
+        $stderr = $@;
+        $cmdpid   = 0;
+        $self->app_log->fatal( 'Cmd failed : ' . $submit_command );
+        $self->app_log->fatal($@);
+    }
+
+    $infh->autoflush();
+    return [ $exitcode, '', $stderr, ] if $exitcode;
 
     my $sel = new IO::Select;    # create a select object
     $sel->add( $outfh, $errfh ); # and add the fhs
@@ -219,7 +226,7 @@ sub submit_to_scheduler {
         }
     }
 
-    waitpid( $cmdpid, 1 );
+    waitpid( $cmdpid, 1 ) if $cmdpid;
     $exitcode = $?;
 
     $sel->remove($outfh);

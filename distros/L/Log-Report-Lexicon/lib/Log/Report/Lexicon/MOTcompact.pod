@@ -12,8 +12,7 @@ Log::Report::Lexicon::MOTcompact - use translations from an MO file
 =head1 SYNOPSIS
 
  # using a MO table efficiently
- my $mot = Log::Report::Lexicon::MOTcompact
-             ->read('mo/nl.mo', charset => 'utf-8')
+ my $mot = Log::Report::Lexicon::MOTcompact->read('mo/nl.mo')
     or die;
 
  my $header = $mot->msgid('');
@@ -24,9 +23,8 @@ Log::Report::Lexicon::MOTcompact - use translations from an MO file
 This module is translating, based on MO files (binary versions of
 the PO files, the "Machine Object" format)
 
-Internally, this module tries to be as efficient as possible: high
-speed and low memory foot-print.  You will not be able to sub-class
-this class cleanly.
+Actually, this module is not "compact" anymore: not trading off
+speed for memory.  That may change again in the future.
 
 To get a MO file, you first need a PO file.  Then run F<msgfmt>, which
 is part of the gnu gettext package.
@@ -57,23 +55,15 @@ Inherited, see L<Log::Report::Lexicon::Table/"Constructors">
 
 Read the MOT table information from $filename.
 
- -Option  --Default
-  charset   <required>
-  take_all  <true>
+ -Option --Default
+  charset  <from header>
 
 =over 2
 
 =item charset => STRING
 
-The character-set which is used for the file.  You must specify
-this explicitly, while it cannot be trustfully detected automatically.
-
-=item take_all => BOOLEAN
-
-This will cause the whole translation table to be read at once.  If
-false, a file-handle will be kept open and translations read on demand.
-That may (but very well may not) save a memory foot-print, especially
-when the strings are large.
+The character-set which is used for the file.  When not specified, it is
+taken from the "Content-Type" field in the PO-file.
 
 =back
 
@@ -93,6 +83,11 @@ Returns the name of the source file for this data.
 
 Returns a HASH of all defined PO objects, organized by msgid.  Please try
 to avoid using this: use L<msgid()|Log::Report::Lexicon::MOTcompact/"Managing PO's"> for lookup.
+
+=item $obj-E<gt>B<originalCharset>()
+
+Returns the character-set as found in the PO-file.  The strings are
+converted into utf8 before you use them in the program.
 
 =back
 
@@ -161,14 +156,14 @@ Inherited, see L<Log::Report::Lexicon::Table/"Administration">
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.08,
-built on June 29, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Lexicon distribution version 1.09,
+built on August 28, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
 Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

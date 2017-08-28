@@ -1,5 +1,5 @@
 ---
-abstract: 'Various e-mail related modules'
+abstract: 'Various ancient e-mail related modules'
 author:
   - 'Mark Overmeer <perl@overmeer.net>'
 build_requires:
@@ -24,4 +24,4 @@ requires:
   Net::Domain: 1.05
   Net::SMTP: 1.03
   Test::More: 0
-version: 2.18
+version: 2.19

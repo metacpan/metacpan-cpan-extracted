@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build-MB/issues
   homepage: https://metacpan.org/pod/Alien::Build::MB
   repository: git://github.com/plicease/Alien-Build-MB.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

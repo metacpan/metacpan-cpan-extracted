@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::glcd
 # ABSTRACT:  Configuration class LCDd::glcd
+
 =encoding utf8
 
 =head1 NAME
@@ -16,105 +17,315 @@ generated from LCDd.conf
 
 =head2 Brightness
 
-Set brightness of the backlight if the backlight is switched 'on'. I<< Optional. Type integer. upstream_default: '800'.  >> 
+Set brightness of the backlight if the backlight is switched 'on'. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+800
+
+=back
+
+
 
 =head2 CellSize
 
 Width and height of a character cell in pixels. This value is only used if
 the driver has been compiled with FreeType and it is enabled. Otherwise the
-default 6x8 cell is used. I<< Optional. Type uniline. upstream_default: '12x16'.  >> 
+default 6x8 cell is used. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+12x16
+
+=back
+
+
 
 =head2 ConnectionType
 
-Select what type of connection. See documentation for types. I<< Optional. Type uniline. default: 't6963'.  >> 
+Select what type of connection. See documentation for types. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+t6963
+
+=back
+
+
 
 =head2 Contrast
 
-Set the initial contrast if supported by connection type. I<< Optional. Type integer. upstream_default: '600'.  >> 
+Set the initial contrast if supported by connection type. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+600
+
+=back
+
+
 
 =head2 KeyMap_A
 
 Assign key strings to keys. There may be up to 16 keys numbered 'A' to 'Z'.
-By default keys 'A' to 'F' are assigned Up, Down, Left, Right, Enter, Escape. I<< Optional. Type uniline. default: 'Up'.  >> 
+By default keys 'A' to 'F' are assigned Up, Down, Left, Right, Enter, Escape. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Up
+
+=back
+
+
 
 =head2 KeyMap_B
 
-I<< Optional. Type uniline. default: 'Down'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Down
+
+=back
+
+
 
 =head2 KeyMap_C
 
-I<< Optional. Type uniline. default: 'Enter'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Enter
+
+=back
+
+
 
 =head2 KeyMap_D
 
-I<< Optional. Type uniline. default: 'Escape'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Escape
+
+=back
+
+
 
 =head2 KeyRepeatDelay
 
 Time (ms) from first key report to first repeat. Set to 0 to disable repeated
-key reports. I<< Optional. Type integer. upstream_default: '500'.  >> 
+key reports. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+500
+
+=back
+
+
 
 =head2 KeyRepeatInterval
 
 Time (ms) between repeated key reports. Ignored if KeyRepeatDelay is disabled
-(set to zero). I<< Optional. Type integer. upstream_default: '300'.  >> 
+(set to zero). I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+300
+
+=back
+
+
 
 =head2 OffBrightness
 
 Set brightness of the backlight if the backlight is switched 'off'. Set this
-to zero to completely turn off the backlight. I<< Optional. Type integer. upstream_default: '100'.  >> 
+to zero to completely turn off the backlight. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+100
+
+=back
+
+
 
 =head2 Port
 
 --- t6963 options ---
 Parallel port to use 
-legal: 0x200-0x400 I<< Optional. Type uniline. upstream_default: '0x378'.  >> 
+legal: 0x200-0x400 I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x378
+
+=back
+
+
 
 =head2 Size
 
 Width and height of the display in pixel. The supported sizes may depend on
 the ConnectionType. 
-legal: 1x1-640x480 I<< Optional. Type uniline. upstream_default: '128x64'.  >> 
+legal: 1x1-640x480 I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+128x64
+
+=back
+
+
 
 =head2 bidirectional
 
 Use LPT port in bi-directional mode. This should work on most LPT port
-and is required for proper timing! I<< Optional. Type boolean. upstream_default: 'yes'.  >> 
+and is required for proper timing! I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 delayBus
 
-Insert additional delays into reads / writes. I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Insert additional delays into reads / writes. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 fontHasIcons
 
 Some fonts miss the Unicode characters used to represent icons. In this case
-the built-in 5x8 font can used if this option is turned off. I<< Optional. Type boolean. upstream_default: 'yes'.  >> 
+the built-in 5x8 font can used if this option is turned off. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 normal_font
 
 Path to font file to use for FreeType rendering. This font must be monospace
 and should contain some special Unicode characters like arrows (Andale Mono
-is recommended and can be fetched at http://corefonts.sf.net). I<< Optional. Type uniline. upstream_default: '/usr/local/lib/X11/fonts/TTF/andalemo.ttf'.  >> 
+is recommended and can be fetched at http://corefonts.sf.net). I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/usr/local/lib/X11/fonts/TTF/andalemo.ttf
+
+=back
+
+
 
 =head2 picolcdgfx_Inverted
 
-Inverted: Inverts the pixels. I<< Optional. Type enum. choice: 'yesorno'. upstream_default: 'no'.  >> 
+Inverted: Inverts the pixels. I< Optional. Type enum. choice: 'yesorno'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 picolcdgfx_KeyTimeout
 
 --- picolcdgfx options ---
-Time in ms for usb_read to wait on a key press. I<< Optional. Type integer. upstream_default: '125'.  >> 
+Time in ms for usb_read to wait on a key press. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+125
+
+=back
+
+
 
 =head2 serdisp_device
 
 The display device to use, e.g. serraw:/dev/ttyS0,
-parport:/dev/parport0 or USB:07c0/1501. I<< Optional. Type uniline. default: '/dev/ppi0'.  >> 
+parport:/dev/parport0 or USB:07c0/1501. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+/dev/ppi0
+
+=back
+
+
 
 =head2 serdisp_name
 
 --- serdisplib options ---
 Name of the underlying serdisplib driver, e.g. ctinclud. See
-serdisplib documentation for details. I<< Optional. Type uniline. default: 't6963'.  >> 
+serdisplib documentation for details. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+t6963
+
+=back
+
+
 
 =head2 serdisp_options
 
@@ -122,34 +333,104 @@ Options string to pass to serdisplib during initialization. Use
 this to set any display related options (e.g. wiring). The display size is
 always set based on the Size configured above! By default, no options are
 set.
-Important: The value must be quoted as it contains equal signs! I<< Optional. Type uniline. upstream_default: 'INVERT=1'.  >> 
+Important: The value must be quoted as it contains equal signs! I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+INVERT=1
+
+=back
+
+
 
 =head2 useFT2
 
 If LCDproc has been compiled with FreeType 2 support this option can be used
-to turn if off intentionally. I<< Optional. Type boolean. upstream_default: 'yes'.  >> 
+to turn if off intentionally. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+yes
+
+=back
+
+
 
 =head2 x11_BacklightColor
 
-BacklightColor: The color of the backlight as full brightness. I<< Optional. Type uniline. upstream_default: '0x80FF80'.  >> 
+BacklightColor: The color of the backlight as full brightness. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x80FF80
+
+=back
+
+
 
 =head2 x11_Border
 
-Border: Adds a border (empty space) around the LCD portion of X11 window. I<< Optional. Type uniline. upstream_default: '20'.  >> 
+Border: Adds a border (empty space) around the LCD portion of X11 window. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+20
+
+=back
+
+
 
 =head2 x11_Inverted
 
-Inverted: inverts the pixels I<< Optional. Type boolean. upstream_default: 'no'.  >> 
+Inverted: inverts the pixels I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 x11_PixelColor
 
 Colors are in RRGGBB format prefixed with "0x".
-PixelColor: The color of each dot at full contrast. I<< Optional. Type uniline. upstream_default: '0x000000'.  >> 
+PixelColor: The color of each dot at full contrast. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0x000000
+
+=back
+
+
 
 =head2 x11_PixelSize
 
 --- x11 options ---
-PixelSize is size of each dot in pixels + a pixel gap. I<< Optional. Type uniline. upstream_default: '3+1'.  >> 
+PixelSize is size of each dot in pixels + a pixel gap. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+3+1
+
+=back
+
+
 
 =head1 SEE ALSO
 

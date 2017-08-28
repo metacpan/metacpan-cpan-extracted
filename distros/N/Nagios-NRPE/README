@@ -10,7 +10,8 @@ To install it:
 
    perl Build.PL
    ./Build
-   make install
+   ./Build test 
+   ./Build install
 
 SCRIPTS
 -------

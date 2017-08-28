@@ -19,13 +19,34 @@ sub new {
 			$self->{username} = $username if $username;
 			$self->{password} = $password if $password;
 			$self->{connection_parameters} = $params if $params;
-
-			my $dbh = DBI->connect($dsn, $username, $password, $params) or die DBI->errstr;
-			$self->{dbh} = $dbh;
 		}
 
 		bless $self, $class;
 	}
+	#$self->db_connect;
+
+	return $self;
+}
+
+sub db_connect {
+	my ($self) = @_;
+
+	use Data::Dumper;
+	say '-------';
+
+	$self->{dbh} = DBI->connect(
+		$self->{dsn},
+		$self->{username},
+		$self->{password},
+		#$self->{connection_parameters},
+		{
+			HandleError => sub {
+				my ($a, $b, $c) = @_;
+
+				say 'Simple.Connect.db_connect.HandleError.a = ' . Dumper $a;
+			},
+		}
+	) or die DBI->errstr;
 
 	return $self;
 }
@@ -65,11 +86,10 @@ sub connection_parameters {
 sub dbh {
 	my ($self, $dbh) = @_;
 
-	if ($dbh) {
-		$self->{dbh} = $dbh;
-	}
+	$self->{dbh} = $dbh if $dbh;
+	$self->db_connect unless $self->{dbh} && $self->{dbh}->ping;
 
-	return ref $self->{dbh} eq 'CODE' ? $self->{dbh}->() : $self->{dbh};
+	return $self->{dbh};
 }
 
 1;

@@ -1,0 +1,3 @@
+The files in this directory are taken from the Locale::TextDomain
+example.  It is stripped to contain only some PO-files to test the
+correct processing of character-sets by Log::Report::Lexicon.

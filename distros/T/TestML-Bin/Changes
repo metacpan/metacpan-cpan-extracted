@@ -1,2 +1,9 @@
+0.03 Mon Aug 21 22:30:44 PDT 2017
+ - Fix type testml-p5 -> testml-pl5
+
+0.02 Mon Aug 21 15:29:26 PDT 2017
+ - Move bin/testml-perl5 to bin/testml-pl5 because of way that prove works
+   with hashbangs.
+
 0.01 Mon Jul 17 10:44:52 PDT 2017
  - Initial version.

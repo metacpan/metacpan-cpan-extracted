@@ -3,6 +3,8 @@ ignore.txt
 lib/Async/Stream.pm
 lib/Async/Stream/Item.pm
 lib/Async/Stream/Iterator.pm
+lib/Async/Stream/FromArray.pm
+lib/Async/Stream/Pushable.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -11,6 +13,8 @@ t/00-load.t
 t/10-item.t
 t/20-iterator.t
 t/30-stream.t
+t/40-pusheble-stream.t
+t/50-stream-from-array.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

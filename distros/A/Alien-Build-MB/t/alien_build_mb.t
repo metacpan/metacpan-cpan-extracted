@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Alien::Build::MB;
 use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
@@ -6,7 +6,8 @@ use File::chdir;
 use lib 'corpus/lib';
 use Capture::Tiny qw( capture_merged );
 
-delete $ENV{ALIEN_INSTALL_TYPE};
+delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE );
+$ENV{ALIEN_BUILD_RC} = '-';
 
 @INC = map { ref($_) ? $_ : path($_)->absolute->stringify } @INC;
 

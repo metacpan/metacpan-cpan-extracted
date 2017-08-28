@@ -6,7 +6,7 @@ use 5.008;
 use warnings;
 use strict;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008001'; # VERSION
 
 use Pod::Weaver::Config::Assembler;
 use namespace::autoclean;
@@ -105,7 +105,7 @@ Pod::Weaver::PluginBundle::Author::CCM - A plugin bundle for pod woven by CCM
 
 =head1 VERSION
 
-version 0.007
+version 0.008001
 
 =head1 SYNOPSIS
 

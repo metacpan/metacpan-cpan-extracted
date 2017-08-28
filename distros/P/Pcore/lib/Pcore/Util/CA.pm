@@ -11,7 +11,7 @@ sub update ($cb = undef) {
 
     P->http->get(
         'https://curl.haxx.se/ca/cacert.pem',
-        on_finish => sub ($res) {
+        sub ($res) {
             my $status;
 
             if ($res) {

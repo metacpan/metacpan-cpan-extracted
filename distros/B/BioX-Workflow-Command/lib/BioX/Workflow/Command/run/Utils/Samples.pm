@@ -1,123 +1,22 @@
 package BioX::Workflow::Command::run::Utils::Samples;
 
 use MooseX::App::Role;
+
+with 'BioX::Workflow::Command::run::Rules::Directives::Sample';
+with 'BioX::Workflow::Command::run::Rules::Rules';
+
 use File::Find::Rule;
 use File::Basename;
-use List::Uniq ':all';
-use Data::Walk;
+use File::Glob;
+use List::Util qw(uniq);
 
 use Storable qw(dclone);
-use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
 use Path::Tiny;
 
 =head1 BioX::Workflow::Command::run::Utils::Samples
 
 =head2 Variables
 
-=head3 resample
-
-Boolean value get new samples based on indir/sample_rule or no
-
-Samples are found at the beginning of the workflow, based on the global indir variable and the file_find.
-
-Chances are you don't want to set resample to true. These files probably won't exist outside of the indirectory until the pipeline is run.
-
-One example of doing so, shown in the gemini.yml in the examples directory, is looking for uncompressed files, .vcf extension, compressing them, and
-then resampling based on the .vcf.gz extension.
-
-=cut
-
-has 'resample' => (
-    isa       => 'Bool',
-    is        => 'rw',
-    default   => 0,
-    predicate => 'has_resample',
-    clearer   => 'clear_resample',
-);
-
-=head3 sample_files
-
-Infiles to be processed
-
-=cut
-
-has 'sample_files' => (
-    is  => 'rw',
-    isa => 'ArrayRef',
-);
-
-=head2 by_sample_outdir
-
-    outdir/
-    /outdir/SAMPLE1
-        /rule1
-        /rule2
-        /rule3
-    /outdir/SAMPLE2
-        /rule1
-        /rule2
-        /rule3
-
-Instead of
-
-    /outdir
-        /rule1
-        /rule2
-
-=cut
-
-has 'by_sample_outdir' => (
-    is            => 'rw',
-    isa           => 'Bool',
-    default       => 0,
-    documentation => q{When you want your output by sample},
-    clearer       => 'clear_by_sample_outdir',
-    predicate     => 'has_by_sample_outdir',
-);
-
-=head3 samples
-
-Our samples to process. They are either found through sample_rule, or passed as command line opts
-
-=cut
-
-option 'samples' => (
-    traits    => ['Array'],
-    is        => 'rw',
-    isa       => 'ArrayRef',
-    default   => sub { [] },
-    required  => 0,
-    cmd_split => qr/,/,
-    handles   => {
-        all_samples    => 'elements',
-        add_sample     => 'push',
-        map_samples    => 'map',
-        filter_samples => 'grep',
-        find_sample    => 'first',
-        get_sample     => 'get',
-        join_samples   => 'join',
-        count_samples  => 'count',
-        has_samples    => 'count',
-        has_no_samples => 'is_empty',
-        sorted_samples => 'sort',
-    },
-    documentation =>
-q{Supply samples on the command line as --samples sample1 --samples sample2, or find through sample_rule.}
-);
-
-=head3 sample
-
-Each time we get the sample we set it.
-
-=cut
-
-has 'sample' => (
-    is        => 'rw',
-    isa       => 'Str',
-    required  => 0,
-    default   => '',
-    predicate => 'has_sample',
-);
 
 =head2 Subroutines
 
@@ -143,43 +42,111 @@ Could have
 
 =cut
 
-##TODO Add files
-
 sub get_samples {
     my $self = shift;
-    my ( @whole, @basename, $find_sample_bydir, $text, $attr );
 
     #Stupid resample
     $self->get_global_keys;
 
-    if ( $self->has_samples && !$self->resample ) {
-        my (@samples) = $self->sorted_samples;
-        $self->samples( \@samples );
-        return;
-    }
+    my $exists = $self->check_sample_exist;
+    return if $exists;
 
     #We need to evaluate the global_dirs incase the indir has a var
     #But we don't keep it around, because that would be madness
-    #TODO Fix this we should process these the same way we process rule names
-    $attr       = dclone( $self->global_attr );
-    $DB::single = 2;
-    if ( $attr->indir =~ m/\{\$self/ ) {
+    my $attr = dclone( $self->global_attr );
+    if ( $attr->indir =~ m/\{\$/ ) {
         $attr->walk_process_data( $self->global_keys );
     }
 
-    if ( $self->global_attr->can('sample_rule') ) {
+    my $text = $self->get_sample_rule;
+    $self->find_sample_file_find_rule( $attr, $text );
+    $self->find_sample_glob($attr, $text);
+
+    if ( $self->has_no_samples ) {
+        $self->app_log->warn('No samples were found!');
+        $self->app_log->warn(
+            "Indir: " . $attr->indir . "\tSearch: " . $text . "\n" );
+    }
+
+    $self->remove_excluded_samples;
+    $self->write_sample_meta;
+}
+
+sub remove_excluded_samples {
+  my $self = shift;
+
+  return unless $self->has_samples;
+  return unless $self->has_exclude_samples;
+
+  my %sample_hash = ();
+  map { $sample_hash{$_} = 1 } @{$self->samples};
+
+  foreach my $sample ($self->all_exclude_samples){
+    delete $sample_hash{$sample};
+  }
+
+  my @new_samples  = keys %sample_hash;
+  @new_samples = sort(@new_samples);
+  $self->samples(\@new_samples);
+}
+
+sub find_sample_glob {
+    my $self = shift;
+    my $attr = shift;
+    my $text = shift;
+
+    return unless $attr->has_sample_glob;
+
+    my @sample_files = glob( $attr->sample_glob );
+    return unless @sample_files;
+
+    @sample_files = sort(@sample_files);
+    $self->sample_files( \@sample_files ) if @sample_files;
+
+    my @basename = map { $self->match_samples( $_, $text ) } @sample_files;
+    if (@basename) {
+        @basename = uniq(@basename);
+        @basename = sort(@basename);
+        $self->samples( \@basename );
+    }
+
+    $self->global_attr->samples( dclone( $self->samples ) );
+}
+
+sub get_sample_rule {
+    my $self = shift;
+    my $text;
+
+    #Backwards compatibility
+    #For both file_rule and sample_rule
+    if ( $self->first_index_global_keys( sub { $_ eq 'file_rule' } ) != -1 ) {
+        $text = $self->global_attr->sample_rule;
+    }
+    elsif (
+        $self->first_index_global_keys( sub { $_ eq 'sample_rule' } ) != -1 )
+    {
         $text = $self->global_attr->sample_rule;
     }
     else {
         $text = $self->sample_rule;
     }
+}
+
+sub find_sample_file_find_rule {
+    my $self = shift;
+    my $attr = shift;
+    my $text = shift;
+
+    return if $self->has_samples;
+
+    my ( @whole, @basename, @sample_files, $find_sample_bydir );
 
     $find_sample_bydir = 0;
 
     if ( $attr->find_sample_bydir ) {
         @whole = find(
             directory => name     => qr/$text/,
-            maxdepth  => 1,
+            maxdepth  => $attr->maxdepth,
             in        => $attr->indir,
             extras    => { follow => 1 },
         );
@@ -188,41 +155,53 @@ sub get_samples {
             if ( $whole[0] eq $attr->indir ) {
                 shift(@whole);
             }
-
-            #File find puts directory we are looking in, not just subdirs
-            @basename = map { basename($_) } @whole;
-            @basename = sort(@basename);
         }
     }
     else {
         @whole = find(
             file     => name     => qr/$text/,
-            maxdepth => 1,
+            maxdepth => $attr->maxdepth,
             extras   => { follow => 1 },
             in       => $attr->indir
         );
-
-        @basename = map { $self->match_samples( $_, $text ) } @whole;
-        @basename = uniq(@basename);
-        @basename = sort(@basename);
     }
+    @basename = map { $self->match_samples( $_, $text ) } @whole;
 
-    my @sample_files = map { path($_)->absolute } @whole;
+    @sample_files = map { path($_)->absolute } @whole;
     @sample_files = sort(@sample_files);
 
-    #Throw error if sample don't exist
-    $self->samples( \@basename )          if @basename;
+    if (@basename) {
+        @basename = uniq(@basename);
+        @basename = sort(@basename);
+        $self->samples( \@basename );
+    }
     $self->sample_files( \@sample_files ) if @sample_files;
 
     $self->global_attr->samples( dclone( $self->samples ) );
+}
 
-    if ( $self->has_no_samples ) {
-        $self->app_log->warn('No samples were found!');
-        $self->app_log->warn(
-            "Indir: " . $attr->indir . "\tSearch: " . $text . "\n" );
+sub check_sample_exist {
+    my $self = shift;
+
+    my $exists = 0;
+    if ( $self->has_samples && !$self->resample ) {
+        my (@samples) = $self->sorted_samples;
+        $self->samples( \@samples );
+        ## Fixes Issue #19
+        $self->global_attr->samples( \@samples );
+        $self->app_log->info('Samples passed in on command line.');
+        $exists = 1;
+    }
+    elsif ( $self->global_attr->has_samples ) {
+        my (@samples) = @{ $self->global_attr->samples };
+        @samples = sort(@samples);
+        $self->samples( \@samples );
+        $self->app_log->info('Samples were defined in the global key.');
+        $exists = 1;
     }
 
-    $self->write_sample_meta;
+    $self->write_sample_meta if $exists;
+    return $exists;
 }
 
 =head2 match_samples
@@ -236,10 +215,16 @@ sub match_samples {
     my $file = shift;
     my $text = shift;
 
-    my @tmp = fileparse($_);
-    my ($m) = $tmp[0] =~ qr/$text/;
+    if ( $text =~ m/\(/ ) {
+        my @tmp = fileparse($file);
+        my ($m) = $tmp[0] =~ qr/$text/;
 
-    return $m;
+        return $m;
+    }
+    else {
+        my @tmp = fileparse($file);
+        return $tmp[0];
+    }
 }
 
 =head3 process_by_sample_outdir

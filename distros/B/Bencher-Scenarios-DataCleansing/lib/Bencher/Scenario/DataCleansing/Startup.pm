@@ -1,7 +1,7 @@
 package Bencher::Scenario::DataCleansing::Startup;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-08-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,6 +26,7 @@ our $scenario = {
         {module=>'Data::Rmap'},
         {module=>'Data::Abridge'},
         {module=>'Data::Visitor::Callback'},
+        {module=>'Data::Tersify'},
     ],
 };
 
@@ -44,7 +45,7 @@ Bencher::Scenario::DataCleansing::Startup - Benchmark startup of various data cl
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::DataCleansing::Startup (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2017-01-25.
+This document describes version 0.004 of Bencher::Scenario::DataCleansing::Startup (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2017-08-25.
 
 =head1 SYNOPSIS
 
@@ -66,11 +67,13 @@ L<Cpanel::JSON::XS> 3.0217
 
 L<Data::Abridge> 0.03.01
 
-L<Data::Clean> 0.48
+L<Data::Clean> 0.49
 
 L<Data::Clean::JSON> 0.38
 
 L<Data::Rmap> 0.64
+
+L<Data::Tersify> 0.001
 
 L<Data::Visitor::Callback> 0.30
 
@@ -138,6 +141,12 @@ L<Data::Visitor::Callback>
 
 
 
+=item * Data::Tersify (perl_code)
+
+L<Data::Tersify>
+
+
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
@@ -147,20 +156,21 @@ Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2
 Benchmark with default options (C<< bencher -m DataCleansing::Startup >>):
 
  #table1#
- +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
- | participant             | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors  | samples |
- +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
- | Data::Visitor::Callback | 0.82                         | 4.1                | 16             |     170   |                  164.1 |        1   |   0.0004 |      20 |
- | JSON::PP                | 1.3                          | 4.7                | 20             |      23   |                   17.1 |        7.4 |   6e-05  |      20 |
- | JSON::MaybeXS           | 3.1                          | 6.6                | 22             |      17   |                   11.1 |        9.8 | 8.2e-05  |      20 |
- | Data::Abridge           | 16                           | 19                 | 55             |      16   |                   10.1 |       11   | 5.9e-05  |      20 |
- | Data::Rmap              | 1.7                          | 5.2                | 19             |      13   |                    7.1 |       13   | 7.8e-05  |      20 |
- | JSON::XS                | 1.3                          | 4.7                | 20             |      13   |                    7.1 |       14   | 5.3e-05  |      20 |
- | Cpanel::JSON::XS        | 1.4                          | 4.8                | 19             |      12   |                    6.1 |       14   | 4.6e-05  |      20 |
- | Data::Clean::JSON       | 1.9                          | 5.5                | 23             |      12   |                    6.1 |       15   | 2.9e-05  |      20 |
- | Data::Clean             | 1.3                          | 4.7                | 16             |      10   |                    4.1 |       17   | 5.9e-05  |      20 |
- | perl -e1 (baseline)     | 1.1                          | 4.5                | 16             |       5.9 |                    0   |       29   | 1.3e-05  |      20 |
- +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
+ +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ | participant             | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
+ +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ | Data::Visitor::Callback | 3.1                          | 6.5                | 22             |     210   |                  202.4 |        1   |   0.00045 |      20 |
+ | Data::Tersify           | 0.82                         | 4.2                | 16             |      34   |                   26.4 |        6   |   0.00013 |      20 |
+ | JSON::PP                | 1.3                          | 4.8                | 20             |      29   |                   21.4 |        7.2 |   9e-05   |      20 |
+ | JSON::MaybeXS           | 3.12                         | 6.68               | 22.3           |      20.5 |                   12.9 |       10   | 1.9e-05   |      20 |
+ | Data::Abridge           | 16                           | 19                 | 55             |      19   |                   11.4 |       11   | 4.7e-05   |      20 |
+ | JSON::XS                | 1.3                          | 4.8                | 20             |      16   |                    8.4 |       13   | 6.5e-05   |      20 |
+ | Data::Rmap              | 1.7                          | 5.1                | 19             |      16   |                    8.4 |       13   | 5.7e-05   |      21 |
+ | Cpanel::JSON::XS        | 1.4                          | 4.8                | 19             |      15   |                    7.4 |       14   | 4.5e-05   |      22 |
+ | Data::Clean::JSON       | 1.9                          | 5.4                | 23             |      15   |                    7.4 |       14   | 4.3e-05   |      20 |
+ | Data::Clean             | 1.3                          | 4.7                | 16             |      12   |                    4.4 |       16   | 3.7e-05   |      20 |
+ | perl -e1 (baseline)     | 1.1                          | 4.5                | 16             |       7.6 |                    0   |       27   | 1.6e-05   |      20 |
+ +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -189,7 +199,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

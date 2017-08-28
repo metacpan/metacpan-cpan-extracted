@@ -13,14 +13,12 @@ my $build = Module::Build->new(
   },
   configure_requires => { 'Module::Build' => 0.42 },
   requires => { 
-    'perl' => 5.020,
-    'Carp' => 0,
-    'Scalar::Util' => 0,
-    'JSON' => 0,
+    'perl' => 5.012,
+    'JSON::XS' => 0,
     'List::Util' => 0,
-    'List::MoreUtils' => 0,
   },
   add_to_cleanup  => [ 'Spp-*' ],
+  script_files    => ['bin/spp'],
   create_makefile_pl => 'traditional',
 );
 

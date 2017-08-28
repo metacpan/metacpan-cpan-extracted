@@ -7,6 +7,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Mock::MonkeyPatch: '0'
   SQL::Translator: '0.11018'
   Test::Lib: '0'
   Test::More: '1.001005'
@@ -31,33 +32,34 @@ no_index:
 provides:
   CPAN::Testers::API:
     file: lib/CPAN/Testers/API.pm
-    version: '0.015'
+    version: '0.017'
   CPAN::Testers::API::Base:
     file: lib/CPAN/Testers/API/Base.pm
-    version: '0.015'
+    version: '0.017'
   CPAN::Testers::API::Controller::Release:
     file: lib/CPAN/Testers/API/Controller/Release.pm
-    version: '0.015'
+    version: '0.017'
   CPAN::Testers::API::Controller::Report:
     file: lib/CPAN/Testers/API/Controller/Report.pm
-    version: '0.015'
+    version: '0.017'
   CPAN::Testers::API::Controller::Summary:
     file: lib/CPAN/Testers/API/Controller/Summary.pm
-    version: '0.015'
+    version: '0.017'
   CPAN::Testers::API::Controller::Upload:
     file: lib/CPAN/Testers/API/Controller/Upload.pm
-    version: '0.015'
+    version: '0.017'
 recommends:
   DateTime: '0'
 requires:
   Alien::SwaggerUI: '0'
-  CPAN::Testers::Schema: '0.013'
+  Beam::Minion: '0.004'
+  CPAN::Testers::Schema: '0.014'
   File::Share: '0'
   Import::Base: '0.012'
   Log::Any: '1.045'
   Log::Any::Adapter::MojoLog: '0.02'
-  Mercury: '0.010'
-  Mojolicious: '7.24'
+  Mercury: '0.015'
+  Mojolicious: '7.40'
   Mojolicious::Plugin::Config: '0'
   Mojolicious::Plugin::OpenAPI: '1.13'
   perl: '5.024'
@@ -66,7 +68,7 @@ resources:
   bugtracker: https://github.com/cpan-testers/cpantesters-api/issues
   homepage: http://api.cpantesters.org
   repository: https://github.com/cpan-testers/cpantesters-api.git
-version: '0.015'
+version: '0.017'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Breno G. de Oliveira <garu@cpan.org>'

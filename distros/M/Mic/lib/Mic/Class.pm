@@ -42,4 +42,4 @@ Mic::Class
 
 Mic::Class allows a class to be defined whose implementation is in a separate file.
 
-It is the compile time equivalent of calling C<< Mic->setup_class(...) >>, and takes the same keyword parameters (see L<Mic/USAGE>).
+It is the compile time equivalent of calling C<< Mic->define_class(...) >>, and takes the same keyword parameters (see L<Mic/USAGE>).

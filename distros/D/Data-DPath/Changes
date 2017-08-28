@@ -1,5 +1,9 @@
 Revision history for Data-DPath
 
+0.57      2017-08-18
+  - polished Safe.pm handling to cooperate with older Perl and other modules
+    in particular Test::Exception [Doug Bell, Jonathan William Taylor]
+
 0.56      2017-03-22
   - no warnings: 'uninitialized'; Safe compartments; smartmatch operator usage [Diab Jerius]
   - introduce Point attribute 'idx' to be used in array filters [Diab Jerius]

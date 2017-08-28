@@ -5,7 +5,7 @@ use MooX::Cmd;
 use MooX::Options prefer_commandline => 1;
 use IO::All;
 
-our $VERSION = '0.1.1'; # VERSION: 
+our $VERSION = '0.1.8'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -38,6 +38,7 @@ option prefix => (
   is => 'ro',
   format => 's',
   short => 'p',
+  default => sub { '' },
   doc => 'the prefix of the split file',
 );
 
@@ -105,7 +106,7 @@ Bioinfo::App::Cmd::Fasta::Cmd::Split - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.8
 
 =head1 SYNOPSIS
 

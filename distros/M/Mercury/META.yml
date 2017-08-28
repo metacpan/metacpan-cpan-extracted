@@ -28,37 +28,37 @@ no_index:
 provides:
   Mercury:
     file: lib/Mercury.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Command::mercury:
     file: lib/Mercury/Command/mercury.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Command::mercury::broker:
     file: lib/Mercury/Command/mercury/broker.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Controller::Bus:
     file: lib/Mercury/Controller/Bus.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Controller::PubSub:
     file: lib/Mercury/Controller/PubSub.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Controller::PubSub::Cascade:
     file: lib/Mercury/Controller/PubSub/Cascade.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Controller::PushPull:
     file: lib/Mercury/Controller/PushPull.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Pattern::Bus:
     file: lib/Mercury/Pattern/Bus.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Pattern::PubSub:
     file: lib/Mercury/Pattern/PubSub.pm
-    version: '0.014'
+    version: '0.015'
   Mercury::Pattern::PushPull:
     file: lib/Mercury/Pattern/PushPull.pm
-    version: '0.014'
+    version: '0.015'
   Mojolicious::Plugin::Mercury:
     file: lib/Mojolicious/Plugin/Mercury.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   File::Basename: '0'
   File::Spec::Functions: '0'
@@ -70,7 +70,7 @@ resources:
   bugtracker: https://github.com/preaction/Mercury/issues
   homepage: https://github.com/preaction/Mercury
   repository: https://github.com/preaction/Mercury.git
-version: '0.014'
+version: '0.015'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Joel Berger <joel.a.berger@gmail.com>'

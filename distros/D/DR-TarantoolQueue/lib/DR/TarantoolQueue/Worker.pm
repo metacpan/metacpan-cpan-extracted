@@ -7,6 +7,8 @@ use Mouse;
 use Coro;
 use Data::Dumper;
 use Encode qw(encode_utf8);
+use List::MoreUtils 'any';
+with 'DR::TarantoolQueue::Worker::QueueList';
 
 =head1 NAME
 
@@ -72,13 +74,12 @@ function uses L<Coro> and Your queue uses L<Coro>, too.
 has count       => isa => 'Num',                is => 'rw', default => 1;
 
 
-=head2 queue
+=head2 queues
 
-Ref to Your queue.
+List of queues.
 
 =cut
 
-has queue       => isa => 'DR::TarantoolQueue', is => 'ro', required => 1;
 
 =head2 space & tube
 
@@ -158,6 +159,7 @@ has mailfrom        => isa => 'Maybe[Str]', is => 'ro';
 has mailsublect     => isa => 'Str', is => 'ro', default => 'Worker died';
 has mailheaders     => isa => 'HashRef[Str]', is => 'ro', default => sub {{}};
 
+has restart_check   => isa => 'CodeRef', is => 'ro', default => sub {sub { 0 }};
 
 =head1 METHODS
 
@@ -204,7 +206,8 @@ The function will be called as L<perlfunc/sprintf>.
 sub run {
     my ($self, $cb, $debugf) = @_;
     croak 'process subroutine is not CODEREF' unless 'CODE' eq ref $cb;
-    $debugf //= sub {  };
+    $debugf = sub {  }
+	unless defined $debugf;
     croak 'debugf subroutine is not CODEREF' unless 'CODE' eq ref $debugf;
 
     croak 'worker is already run' if $self->is_run;
@@ -228,47 +231,51 @@ sub run {
         ($no, @f) = (0);
 
         for (1 .. $self->count) {
-            push @f => async {
-                while($self->is_run and !$self->is_stopping) {
-                    last if $self->restart and $no >= $self->restart_limit;
-                    my $task = $self->queue->take(
-                        defined($self->space) ? (space => $self->space) : (),
-                        defined($self->tube)  ? (tube  => $self->tube)  : (),
-                        timeout => $self->timeout,
-                    );
-                    next unless $task;
+            for my $q (@{ $self->queue }) {
+                push @f => async {
+                    while($self->is_run and !$self->is_stopping) {
+                        last if $self->restart and $no >= $self->restart_limit;
+                        last if $self->restart and $self->restart_check->();
+                        my $task = $q->take(
+                            defined($self->space) ? (space => $self->space) : (),
+                            defined($self->tube)  ? (tube  => $self->tube)  : (),
+                            timeout => $self->timeout,
+                        );
+                        next unless $task;
 
-                    $no++;
-                    eval {
-                        $cb->( $task, $self->queue, $no );
-                    };
-
-                    if ($@) {
-                        $debugf->('Worker was died (%s)', $@);
+                        $no++;
                         eval {
-                            $self->sendmail(
-                                $task,
-                                sprintf "Worker was died: %s", $@
-                            );
+                            $cb->( $task, $q, $no );
                         };
+
                         if ($@) {
-                            $debugf->("Can't send mail (%s)", $@);
-                        }
-                        if ($task->status eq 'taken') {
-                            eval { $task->bury };
+                            my $err = $@;
+                            $debugf->('Worker was died (%s)', $@);
+                            eval {
+                                $self->sendmail(
+                                    $task,
+                                    sprintf "Worker was died: %s", $err
+                                );
+                            };
                             if ($@) {
-                                $debugf->("Can't bury task %s: %s",
-                                    $task->id, $@);
+                                $debugf->("Can't send mail (%s)", $@);
                             }
+                            if (any { $_ eq $task->status } 'work', 'taken') {
+                                eval { $task->bury };
+                                if ($@) {
+                                    $debugf->("Can't bury task %s: %s",
+                                        $task->id, $@);
+                                }
+                            }
+                            next;
                         }
-                        next;
-                    }
-                    if ($task->status eq 'taken') {
-                        eval { $task->ack };
-                        if ($@) {
-                            $debugf->("Can't ack task %s: %s", $task->id, $@);
+                        if (any { $_ eq $task->status } 'work', 'taken') {
+                            eval { $task->ack };
+                            if ($@) {
+                                $debugf->("Can't ack task %s: %s", $task->id, $@);
+                            }
+                            next;
                         }
-                        next;
                     }
                 }
             }
@@ -328,7 +335,6 @@ sub sendmail {
 
     $mail->attach(
         Type        => 'text/plain; charset=utf-8',
-        Disposition => 'inline',
         Data        => encode_utf8($error),
     );
     $mail->attach(

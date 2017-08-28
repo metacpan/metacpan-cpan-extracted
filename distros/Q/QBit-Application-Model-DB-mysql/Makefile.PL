@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "qbit" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => ""
   }

@@ -18,7 +18,7 @@ package Algorithm::Cluster;
 # This library was written at the Laboratory of DNA Information Analysis,
 # Human Genome Center, Institute of Medical Science, University of Tokyo,
 # 4-6-1 Shirokanedai, Minato-ku, Tokyo 108-8639, Japan.
-# Contact: mdehoon 'AT' gsc.riken.jp
+# Contact: michiel.dehoon 'AT' riken.jp
 # 
 # The Algorithm::Cluster module for Perl was released under the same terms
 # as the Perl Artistic license. See the file artistic.txt for details.
@@ -32,7 +32,7 @@ use DynaLoader;
 
 require Exporter;
 
-$VERSION     = '1.52';
+$VERSION     = '1.53';
 $DEBUG       = 1;
 @ISA         = qw(DynaLoader Exporter);
 
@@ -779,7 +779,7 @@ See the scripts in the examples subdirectory of the package.
 
 =over 4
 
-=item * C Clustering Library version 1.52 (2013.08.03)
+=item * C Clustering Library version 1.53 (2017.08.19)
 
 =head1 TO DO
 
@@ -793,7 +793,7 @@ Cluster and TreeView.
 =head1 AUTHOR
 
 John Nolan jpnolan@sonic.net 2003.  
-Michiel de Hoon mdehoon "AT" gsc.riken.jp 2003-2010.
+Michiel de Hoon michiel.dehoon "AT" riken.jp 2003-2017.
 Seiya Imoto imoto "AT" ims.u-tokyo.ac.jp 2003-2010.
 Satoru Miyano 2003-2010.
 A copyright statement is contained in the source code itself. 

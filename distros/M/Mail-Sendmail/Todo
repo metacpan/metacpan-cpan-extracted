@@ -1,13 +1,30 @@
-
 # random thoughts about what to do next.
 # suggestions welcome
 
-- Check on older Perl 
+- CLEANUP THE MESS!
 
 - Also MIME-encode headers if they contain accented characters
   Make it configurable?
 
-- support SMTP AUTH
+- Document AUTH
+
+- Also accept hashrefs in place of hashes
+
+- Update web site
+. check with no wanted AUTH method specified
+
+- Also accept MIME::Lite objects? YES! It should be easy, except maybe if mail was built with filehandles?
+
+. Is use vars in sub OK ? And with mod_perl?
+
+. option for stricter email address checker
+
+. problems on Win32 with Perl 5.8.0 and CygWin? (see emails)
+
+
+- Check on older Perl 
+
+- cleanup and widely test SMTP AUTH support
 
 - Check with mod_perl
 
@@ -19,17 +36,11 @@ let the user enter defaults to override automatic detection.
 
 - Add example scripts for CGI forms
 
-- Also accept hashrefs in place of hashes
-
-- Update web site
 
 - Create sourceforge site and mailing list
 
 - Does the test say OK if no mail could be sent? check and fix
 
-- Check we don't die if sending to multiple recipients, and one fails
-
-Also accept MIME::Lite objects?
 
 Have make dist generate README and html ?
 
@@ -41,7 +52,8 @@ Encode only if accented chars really present?
 
 Rename to Mail::Simple?
 
-Not on my todo list anymore:
+
+This is not on my todo list anymore, because it looks like nobody is using Perl on Amiga:
 
 - Setup Perl on an Amiga and see if it runs. (it should)
 (but if someone tries it, I would appreciate knowing about it)

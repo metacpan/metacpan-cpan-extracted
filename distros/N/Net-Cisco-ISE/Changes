@@ -10,3 +10,12 @@ Revision history for Perl module Net::Cisco::ISE
 
 0.02 Wed Dec 7 21:02:00 2016
     - Updated Test to fix dependency - SORRY .. That's all!
+
+0.03 Thu Mar 9 22:10:00 2017
+    - Added initial code for NetworkDevice
+
+0.04 Sun Aug 27 21:30:00 2017
+    - I thought I fixed this SuppressEmpty bug?!?!
+    
+0.05 Sun Aug 27 22:30:00 2017
+    - Forgot to include Net::Cisco::ISE::NetworkDeviceGroup in MANIFEST

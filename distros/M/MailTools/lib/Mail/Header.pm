@@ -1,10 +1,10 @@
-# Copyrights 1995-2016 by [Mark Overmeer <perl@overmeer.net>].
+# Copyrights 1995-2017 by [Mark Overmeer <perl@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package Mail::Header;
 use vars '$VERSION';
-$VERSION = '2.18';
+$VERSION = '2.19';
 
 
 use strict;
@@ -13,17 +13,6 @@ use Carp;
 my $MAIL_FROM = 'KEEP';
 my %HDR_LENGTHS = ();
 
-# Pattern to match a RFC822 Field name ( Extract from RFC #822)
-#
-#     field       =  field-name ":" [ field-body ] CRLF
-#
-#     field-name  =  1*<any CHAR, excluding CTLs, SPACE, and ":">
-#
-#     CHAR        =  <any ASCII character>        ; (  0-177,  0.-127.)
-#     CTL         =  <any ASCII control           ; (  0- 37,  0.- 31.)
-#		      character and DEL>          ; (    177,     127.)
-# I have included the trailing ':' in the field-name
-#
 our $FIELD_NAME = '[^\x00-\x1f\x7f-\xff :]+:';
 
 
@@ -229,6 +218,7 @@ sub _insert
     }
 }
 
+#------------
 
 sub new
 {   my $call  = shift;
@@ -277,6 +267,7 @@ sub dup
     $dup;
 }
 
+#------------
 
 sub extract
 {   my ($self, $lines) = @_;
@@ -371,6 +362,7 @@ sub header_hashref
      }; 
 }
 
+#------------
 
 sub modify
 {   my $self = shift;
@@ -423,6 +415,7 @@ sub fold_length
     $old;
 }
 
+#------------
 
 sub fold
 {   my ($self, $maxlen) = @_;

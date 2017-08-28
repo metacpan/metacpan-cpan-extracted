@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Deploy::Ctrl;
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+use File::Basename;
+use MIME::Base64;
+use MYDan::Subscribe;
+
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'deploy';
+
+=head1 SYNOPSIS
+
+ $0 [--interval seconds(default 2)]
+
+ $0 [--interval seconds(default 2)] [--subscribe]
+
+=cut
+
+my %o = MYDan::Util::OptConf->load()->set( interval => 2 )->get( qw(  interval=i subscribe ) )->dump();
+
+$o{interval} = 60 if $o{subscribe} && $o{interval} < 60;
+
+do
+{
+    system 'clear' unless $o{subscribe};
+    for my $name ( map{ basename $_ }glob "$o{conf}/*" )
+    {
+        next unless -f "$o{ctrl}/$name";
+
+        my ( $ctrl, @stuck, $exc, %data ) = MYDan::Deploy::Ctrl->new( $name => $o{ctrl} );
+
+        @stuck = $ctrl->stuck();
+        $exc = $ctrl->excluded();
+
+        next unless @stuck || @$exc;
+
+        map{ $data{stuck}{$_->[1]}{$_->[2]} = $_->[0].":".decode_base64( $_->[3] ) }@stuck if @stuck;
+        $data{excluded} = $exc if @$exc;
+
+        if( $o{subscribe} )
+        {
+            my $x = keys %data ? join( ',', keys %data ) : 'unkown';
+            MYDan::Subscribe->new()->input( $x, $name, 'mydan_deploy_stuck' );
+        }
+        print "-" x 75, "\nname: $name\n";
+        YAML::XS::DumpFile \*STDOUT, \%data;
+    }
+
+}while( sleep $o{interval} );
+
+

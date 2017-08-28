@@ -1,9 +1,9 @@
 package Net::DNS::RR::DNSKEY;
 
 #
-# $Id: DNSKEY.pm 1567 2017-05-19 09:52:52Z willem $
+# $Id: DNSKEY.pm 1586 2017-08-15 09:01:57Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1586 $)[1];
 
 
 use strict;
@@ -28,7 +28,7 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 #
 {
 	my @algbyname = (
-		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8087]
+		'DELETE'	     => 0,			# [RFC4034][RFC4398][RFC8078]
 		'RSAMD5'	     => 1,			# [RFC3110][RFC4034]
 		'DH'		     => 2,			# [RFC2539]
 		'DSA'		     => 3,			# [RFC3755][RFC2536]
@@ -54,7 +54,7 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
 	my %algbyname = @algrehash;    # work around broken cperl
 
 	sub _algbyname {
@@ -77,15 +77,16 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset ) = @_;
 
-	my $keylength = $self->{rdlength} - 4;
-	@{$self}{qw(flags protocol algorithm keybin)} = unpack "\@$offset n C2 a$keylength", $$data;
+	my $rdata = substr $$data, $offset, $self->{rdlength};
+	$self->{keybin} = unpack '@4 a*', $rdata;
+	@{$self}{qw(flags protocol algorithm)} = unpack 'n C*', $rdata;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless $self->{algorithm};
+	return '' unless defined $self->{algorithm};
 	pack 'n C2 a*', @{$self}{qw(flags protocol algorithm keybin)};
 }
 
@@ -93,20 +94,22 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless $self->{algorithm};
-	$self->_annotation( 'Key ID =', $self->keytag );
+	my $algorithm = $self->{algorithm};
+	return '' unless defined $algorithm;
+	$self->_annotation( 'Key ID =', $self->keytag ) if $algorithm;
 	return $self->SUPER::_format_rdata() unless BASE64;
-	my @base64 = split /\s+/, MIME::Base64::encode( $self->{keybin} );
-	my @rdata = ( @{$self}{qw(flags protocol algorithm)}, @base64 );
+	my @base64 = split /\s+/, MIME::Base64::encode( $self->{keybin} ) || '-';
+	my @rdata = ( @{$self}{qw(flags protocol)}, $algorithm, @base64 );
 }
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
-	$self->flags(shift);
+	my $flags = shift;		## avoid destruction by CDNSKEY algorithm(0)
 	$self->protocol(shift);
-	return unless $self->algorithm(shift);
+	$self->algorithm(shift);
+	$self->flags($flags);
 	$self->key(@_);
 }
 
@@ -171,7 +174,7 @@ sub algorithm {
 
 	unless ( ref($self) ) {		## class method or simple function
 		my $argn = pop;
-		return $argn =~ /[^0-9]/ ? _algbyname($argn) : _algbyval($argn);
+		return $argn =~ /\D/ ? _algbyname($argn) : _algbyval($argn);
 	}
 
 	return $self->{algorithm} unless defined $arg;
@@ -182,9 +185,8 @@ sub algorithm {
 
 sub key {
 	my $self = shift;
-
-	$self->keybin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->keybin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
+	$self->keybin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -196,7 +198,7 @@ sub keybin {
 }
 
 
-sub publickey { &key; }
+sub publickey { shift->key(@_); }
 
 
 sub privatekeyname {

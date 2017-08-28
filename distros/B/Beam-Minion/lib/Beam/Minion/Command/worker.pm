@@ -1,5 +1,5 @@
 package Beam::Minion::Command::worker;
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 # ABSTRACT: Command to run a Beam::Minion worker
 
 #pod =head1 SYNOPSIS
@@ -49,15 +49,24 @@ use strict;
 use warnings;
 use Beam::Wire;
 use Beam::Runner::Util qw( find_container_path );
-use Beam::Minion::Util qw( minion_init_args );
+use Beam::Minion::Util qw( minion );
+use Scalar::Util qw( weaken );
 use Mojolicious;
+use Mojo::Log;
 use Minion::Command::minion::worker;
 
 sub run {
     my ( $class, $container ) = @_;
-    my $app = Mojolicious->new;
-    $app->plugin( Minion => { minion_init_args() } );
-    my $minion = $app->minion;
+    my $app = Mojolicious->new(
+        log => Mojo::Log->new, # Log to STDERR
+    );
+
+    push @{$app->commands->namespaces}, 'Minion::Command';
+
+    my $minion = minion();
+    weaken $minion->app($app)->{app};
+    $app->helper(minion => sub {$minion});
+
     my $path = find_container_path( $container );
     my $wire = Beam::Wire->new( file => $path );
     my $config = $wire->config;
@@ -87,7 +96,7 @@ Beam::Minion::Command::worker - Command to run a Beam::Minion worker
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

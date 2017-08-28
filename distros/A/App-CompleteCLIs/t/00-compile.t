@@ -2,62 +2,65 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
 
 use Test::More;
 
-plan tests => 41 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
 );
 
 my @scripts = (
-    'bin/complete-array-elem',
-    'bin/complete-dist',
-    'bin/complete-dzil-bundle',
-    'bin/complete-dzil-plugin',
-    'bin/complete-dzil-role',
-    'bin/complete-env',
-    'bin/complete-env-elem',
-    'bin/complete-file',
-    'bin/complete-float',
-    'bin/complete-gid',
-    'bin/complete-group',
-    'bin/complete-hash-key',
-    'bin/complete-int',
-    'bin/complete-kernel',
-    'bin/complete-known-host',
-    'bin/complete-known-mac',
-    'bin/complete-locale',
-    'bin/complete-manpage',
-    'bin/complete-manpage-section',
-    'bin/complete-module',
-    'bin/complete-path-env-elem',
-    'bin/complete-perl-builtin-function',
-    'bin/complete-perl-builtin-symbol',
-    'bin/complete-perl-version',
-    'bin/complete-pid',
-    'bin/complete-proc-name',
-    'bin/complete-program',
-    'bin/complete-regexp-pattern-module',
-    'bin/complete-regexp-pattern-pattern',
-    'bin/complete-riap-url',
-    'bin/complete-riap-url-clientless',
-    'bin/complete-service-name',
-    'bin/complete-service-port',
-    'bin/complete-tz',
-    'bin/complete-uid',
-    'bin/complete-user',
-    'bin/complete-weaver-bundle',
-    'bin/complete-weaver-plugin',
-    'bin/complete-weaver-role',
-    'bin/complete-weaver-section'
+    'script/complete-array-elem',
+    'script/complete-dist',
+    'script/complete-dzil-bundle',
+    'script/complete-dzil-plugin',
+    'script/complete-dzil-role',
+    'script/complete-env',
+    'script/complete-env-elem',
+    'script/complete-file',
+    'script/complete-float',
+    'script/complete-gid',
+    'script/complete-group',
+    'script/complete-hash-key',
+    'script/complete-int',
+    'script/complete-kernel',
+    'script/complete-known-host',
+    'script/complete-known-mac',
+    'script/complete-locale',
+    'script/complete-manpage',
+    'script/complete-manpage-section',
+    'script/complete-module',
+    'script/complete-path-env-elem',
+    'script/complete-perl-builtin-function',
+    'script/complete-perl-builtin-symbol',
+    'script/complete-perl-version',
+    'script/complete-pid',
+    'script/complete-ppr-subpattern',
+    'script/complete-proc-name',
+    'script/complete-program',
+    'script/complete-regexp-pattern-module',
+    'script/complete-regexp-pattern-pattern',
+    'script/complete-riap-url',
+    'script/complete-riap-url-clientless',
+    'script/complete-service-name',
+    'script/complete-service-port',
+    'script/complete-tz',
+    'script/complete-uid',
+    'script/complete-user',
+    'script/complete-weaver-bundle',
+    'script/complete-weaver-plugin',
+    'script/complete-weaver-role',
+    'script/complete-weaver-section'
 );
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -71,7 +74,11 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
@@ -93,11 +100,15 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);

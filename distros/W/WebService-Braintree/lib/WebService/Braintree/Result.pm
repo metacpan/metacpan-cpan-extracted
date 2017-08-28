@@ -1,5 +1,5 @@
 package WebService::Braintree::Result;
-$WebService::Braintree::Result::VERSION = '0.92';
+$WebService::Braintree::Result::VERSION = '0.93';
 use Moose;
 use Hash::Inflator;
 use WebService::Braintree::Util;

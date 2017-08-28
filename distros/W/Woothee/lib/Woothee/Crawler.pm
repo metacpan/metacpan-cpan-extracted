@@ -7,7 +7,7 @@ use Carp;
 use Woothee::Util qw/update_map update_category update_version update_os/;
 use Woothee::DataSet qw/dataset/;
 
-our $VERSION = "1.6.0";
+our $VERSION = "1.7.0";
 
 sub challenge_google {
     my ($ua,$result) = @_;
@@ -99,7 +99,10 @@ sub challenge_crawlers {
         }
     }
     elsif (index($ua, "Yeti") > -1) {
-        if (index($ua, "http://help.naver.com/robots") > -1) {
+        if (index($ua, "http://help.naver.com/robots") > -1 ||
+            index($ua, "http://help.naver.com/support/robots.html") > -1 ||
+            index($ua, "http://naver.me/bot") > -1) {
+
             update_map($result, dataset("Yeti"));
             return 1;
         }
@@ -169,6 +172,10 @@ sub challenge_crawlers {
             update_map($result, dataset("IndyLibrary"));
             return 1;
       }
+    }
+    elsif (index($ua, "trendictionbot") > -1) {
+      update_map($result, dataset("trendictionbot"));
+      return 1;
     }
 
     return 0;

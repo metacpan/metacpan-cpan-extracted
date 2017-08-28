@@ -1,0 +1,43 @@
+# PODNAME: Config::Model::models::LCDd::yard2LCD
+# ABSTRACT:  Configuration class LCDd::yard2LCD
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::LCDd::yard2LCD - Configuration class LCDd::yard2LCD
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+generated from LCDd.conf
+
+=head1 Elements
+
+=head2 Size
+
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+20x4
+
+=back
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=cut
+

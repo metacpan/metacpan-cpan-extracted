@@ -1,6 +1,6 @@
 package App::Muter::Backend::Uuencode;
 # ABSTRACT: a uuencode transform for App::Muter
-$App::Muter::Backend::Uuencode::VERSION = '0.002001';
+$App::Muter::Backend::Uuencode::VERSION = '0.002002';
 use strict;
 use warnings;
 
@@ -28,6 +28,7 @@ sub encode_final {
 
 sub decode_chunk {
     my ($self, $data) = @_;
+    return '' unless length $data;
     return unpack('u', $data);
 }
 
@@ -47,7 +48,7 @@ App::Muter::Backend::Uuencode - a uuencode transform for App::Muter
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 AUTHOR
 

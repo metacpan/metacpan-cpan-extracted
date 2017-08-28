@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -959,7 +959,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -980,13 +980,33 @@ This module provides tools for building external (non-CPAN) dependencies
 for CPAN.  It is mainly designed to be used at install time of a CPAN 
 client, and work closely with L<Alien::Base> which is used at runtime.
 
-This is the detailed documentation for L<Alien::Build> class.  If you are
-starting out as a user of an L<Alien::Build> based L<Alien> module, see
-L<Alien::Build::Manual::AlienUser>.  If you are starting out writing a new
-L<Alien::Build> based L<Alien> module, see L<Alien::Build::Manual::AlienAuthor>.
-As an L<Alien> author, you will also likely be interested in
-L<Alien::Build::Manual::FAQ>.  If you are interested in writing a
-L<Alien::Build> plugin, see L<Alien::Build::Manual::PluginAuthor>.
+This is the detailed documentation for the L<Alien::Build> class.
+If you
+are starting out you probably want to do so from one of these documents:
+
+=over 4
+
+=item L<Alien::Build::Manual::AlienUser>
+
+For users of an C<Alien::libfoo> that is implemented using L<Alien::Base>.
+(The developer of C<Alien::libfoo> I<should> provide the documentation
+necessary, but if not, this is the place to start).
+
+=item L<Alien::Build::Manual::AlienAuthor>
+
+If you are writing your own L<Alien> based on L<Alien::Build> and L<Alien::Base>.
+
+=item L<Alien::Build::Manual::FAQ>
+
+If you have a common question that has already been answered, like
+"How do I use L<alienfile> with some build system".
+
+=item L<Alien::Build::Manual::PluginAuthor>
+
+This is for the brave souls who want to write plugins that will work with
+L<Alien::Build> + L<alienfile>.
+
+=back
 
 Note that you will usually not usually create a L<Alien::Build> instance
 directly, but rather be using a thin installer layer, such as
@@ -1257,6 +1277,13 @@ The static compiler flags
 The command name for tools where the name my differ from platform to
 platform.  For example, the GNU version of make is usually C<make> in
 Linux and C<gmake> on FreeBSD.
+
+=item ffi_name
+
+The name DLL or shared object "name" to use when searching for dynamic
+libraries at runtime.  This is passed into L<FFI::CheckLib>, so if
+your library is something like C<libarchive.so> or C<archive.dll> you
+would set this to C<archive>.
 
 =item install_type
 

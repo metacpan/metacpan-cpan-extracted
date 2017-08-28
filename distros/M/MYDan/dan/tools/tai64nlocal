@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Time::TAI64 qw/:tai64n/;
+
+$|++;
+while(<STDIN>) {
+    my($tai,$log) = split(' ',$_,2);
+    printf "%s %s",tai64nlocal($tai),$log;
+}

@@ -4,8 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Carp;
-
+use Carp qw(croak);
 
 use constant {
 	VALUE => 0,
@@ -19,11 +18,11 @@ Item for Async::Stream
 
 =head1 VERSION
 
-Version 0.05
+Version 0.11
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.12';
 
 
 =head1 SYNOPSIS
@@ -33,7 +32,7 @@ Creating and managing item for Async::Stream
   use Async::Stream::Item;
 
   my $stream_item = Async::Stream::Item->new($value, $next_item_cb);
-		
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new($val,$generator)
@@ -45,9 +44,9 @@ Class method gets 2 arguments item's value and generator subroutine references t
   my $stream_item = Async::Stream::Item->new($i++, sub {
       my $return_cb = shift;
       if($i < 100){
-				$return_cb->($i++)
+        $return_cb->($i++)
       } else {
-				$return_cb->()
+        $return_cb->()
       }
     });
 

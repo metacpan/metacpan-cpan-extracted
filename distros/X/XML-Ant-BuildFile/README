@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.216
+    version 0.217
 
 SYNOPSIS
 
@@ -48,6 +48,22 @@ ATTRIBUTES
     the target names.
 
 METHODS
+
+ BUILD
+
+    After construction, the app-wide XML::Ant::Properties singleton stores
+    any <property/> name/value pairs set by the build file, as well as any
+    resource string expansions handled by XML::Ant::BuildFile::Resource
+    plugins. It also contains the following predefined properties as per
+    the Ant documentation:
+
+    os.name
+
+    basedir
+
+    ant.file
+
+    ant.project.name
 
  filelists
 
@@ -105,22 +121,6 @@ METHODS
  num_targets
 
     Returns a count of the number of targets in the build file.
-
- BUILD
-
-    After construction, the app-wide XML::Ant::Properties singleton stores
-    any <property/> name/value pairs set by the build file, as well as any
-    resource string expansions handled by XML::Ant::BuildFile::Resource
-    plugins. It also contains the following predefined properties as per
-    the Ant documentation:
-
-    os.name
-
-    basedir
-
-    ant.file
-
-    ant.project.name
 
 SUPPORT
 
@@ -227,7 +227,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2014 by GSI Commerce.
+    This software is copyright (c) 2017 by GSI Commerce.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

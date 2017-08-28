@@ -8,7 +8,7 @@ use Test::RDF;
 use Test::WWW::Mechanize::PSGI;
 use Module::Load::Conditional qw[can_load];
 
-my $tester = do "script/linked_data.psgi";
+my $tester = do "./script/linked_data.psgi" or BAIL_OUT("Can't do script: " . ($@ || $!));
 
 BAIL_OUT("The application is not running") unless ($tester);
 

@@ -4,6 +4,7 @@ package Sidef::Deparse::Perl {
     use 5.014;
 
     use Scalar::Util qw(refaddr);
+    use Sidef::Types::Number::Number;
 
     my %addr;
     my %type;
@@ -88,7 +89,7 @@ package Sidef::Deparse::Perl {
         $opts{header} .= <<"HEADER";
 
 use utf8;
-use $];
+use ${\($] <= 5.026 ? $] : 5.026)};
 
 HEADER
 
@@ -544,7 +545,7 @@ HEADER
                     my $name = $obj->{name};
 
                     # Check for alphanumeric name
-                    if (not $obj->{name} =~ /^[_\pL][\pL\pN\w]*\z/) {
+                    if (not $obj->{name} =~ /^[^\W\d]\w*+\z/) {
                         $obj->{name} = '__NONANN__';    # use this name for non-alphanumeric names
                     }
 
@@ -766,7 +767,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{$refaddr}++) {
-                $code = q{Sidef::Types::Block::Block->new(code=>__SUB__,type=>'block'};
+                $code = "state\$_$refaddr=" . q{Sidef::Types::Block::Block->new(code=>__SUB__,type=>'block'};
 
                 if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
                     $code .= ',' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
@@ -984,7 +985,16 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $content) = $obj->_dump;
-            $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
+
+            if ($type eq 'int' and $content >= 0 and $content <= Sidef::Types::Number::Number::ULONG_MAX) {
+                $code = $self->make_constant($ref, '_set_uint', "Number$refaddr", "'$content'");
+            }
+            elsif ($type eq 'int' and $content < 0 and $content >= Sidef::Types::Number::Number::LONG_MIN) {
+                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", "'$content'");
+            }
+            else {
+                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
+            }
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
             $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
@@ -1006,7 +1016,14 @@ HEADER
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{if}[$i];
-                $code .= '(do{' . $self->deparse_args($info->{expr}) . '})' . $self->deparse_bare_block($info->{block}{code});
+                my $vars = join(',', map { $self->_dump_var($_) } @{$info->{block}{init_vars}{vars}});
+                my $arg  = $self->deparse_args($info->{expr});
+
+                if ($vars) {
+                    $arg = "(my ($vars) = $arg)[-1]";
+                }
+
+                $code .= '(' . $arg . ')' . $self->deparse_bare_block($info->{block}{code});
             }
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
@@ -1014,7 +1031,14 @@ HEADER
             $code .= '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
-            $code = 'while(do{' . $self->deparse_args($obj->{expr}) . '})' . $self->deparse_bare_block($obj->{block}{code});
+            my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
+            my $arg = $self->deparse_args($obj->{expr});
+
+            if ($vars) {
+                $arg = "(my ($vars) = $arg)[-1]";
+            }
+
+            $code = 'while(' . $arg . ')' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForEach') {
             $code = $self->deparse_args($obj->{expr}) . '->each' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
@@ -1114,18 +1138,32 @@ EOT
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
             $self->top_add(q{no warnings 'experimental::smartmatch';});
-            my $dvar = $self->_dump_var($obj->{block}{init_vars}->{vars}[0]);
+            my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
             $code =
-                'do{given (my '
-              . $dvar . '='
-              . $self->deparse_args($obj->{expr}) . ')'
+                "do{given ((my ($vars) = "
+              . $self->deparse_args($obj->{expr})
+              . ')[-1])'
               . $self->deparse_bare_block($obj->{block}{code}) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
-            $code = 'when($_~~' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+            my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
+            my $arg = $self->deparse_args($obj->{expr});
+
+            if ($vars) {
+                $arg = "(my ($vars) = $arg)[-1]";
+            }
+
+            $code = 'when($_~~' . $arg . ')' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Case') {
-            $code = 'when(!!' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+            my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
+            my $arg = $self->deparse_args($obj->{expr});
+
+            if ($vars) {
+                $arg = "(my ($vars) = $arg)[-1]";
+            }
+
+            $code = 'when(!!' . $arg . ')' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
@@ -1135,10 +1173,11 @@ EOT
             foreach my $i (0 .. $#{$obj->{with}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{with}[$i];
-                my $dvar = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
+                my $vars = join(',', map { $self->_dump_var($_) } @{$info->{block}{init_vars}{vars}});
                 $code .=
-                    "(defined(my $dvar = do{"
-                  . $self->deparse_args($info->{expr}) . '}))'
+                    "(defined((my ($vars) = do{"
+                  . $self->deparse_args($info->{expr})
+                  . '})[-1]))'
                   . $self->deparse_bare_block($info->{block}{code});
             }
             if (exists $obj->{else}) {
@@ -1576,7 +1615,7 @@ EOT
                         $code .=
                           '->${\\do{' . $self->deparse_expr(ref($method) eq 'HASH' ? $method : {self => $method}) . '}}';
                     }
-                    elsif ($method =~ /^[\pL_]/) {
+                    elsif ($method =~ /^[^\W\d]/) {
 
                         # Exclamation mark (!) at the end of a method
                         if (substr($method, -1) eq '!') {

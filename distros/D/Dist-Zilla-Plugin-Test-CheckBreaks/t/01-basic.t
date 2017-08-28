@@ -32,10 +32,12 @@ ok(-e $file, 'test created');
 my $content = $file->slurp;
 unlike($content, qr/[^\S\n]\n/, 'no trailing whitespace in generated test');
 
-# it's important we require using an eval'd string rather than via a bareword,
+# it's important we require using either:
+# - an eval'd string rather than via a bareword,
+# - or a compound expression,
 # so prereq scanners don't grab this module (::Conflicts modules are not
 # usually indexed)
-like($content, qr/eval 'require $_; $_->check_conflicts'/, "test checks $_")
+like($content, qr/eval \{ \+require $_; $_->check_conflicts \}/, "test checks $_")
     for 'Moose::Conflicts';
 
 cmp_deeply(

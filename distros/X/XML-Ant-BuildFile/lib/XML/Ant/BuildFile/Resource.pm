@@ -1,19 +1,31 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Resource;
-$XML::Ant::BuildFile::Resource::VERSION = '0.216';
 
 # ABSTRACT: Role for Ant build file resources
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a role shared by resources in an
+#pod L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project>.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package XML::Ant::BuildFile::Resource::Foo;
+#pod     use Moose;
+#pod     with 'XML::Ant::BuildFile::Resource';
+#pod
+#pod     after BUILD => sub {
+#pod         my $self = shift;
+#pod         print "I'm a ", $self->resource_name, "\n";
+#pod     };
+#pod
+#pod     1;
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use strict;
 use English '-no_match_vars';
 use Moose::Role;
@@ -22,52 +34,71 @@ use MooseX::Types::Moose qw(Maybe Str);
 use namespace::autoclean;
 with 'XML::Ant::BuildFile::Role::InProject';
 
+#pod =attr resource_name
+#pod
+#pod Name of the task's XML node.
+#pod
+#pod =cut
+
 has resource_name => ( ro, lazy,
     isa      => Str,
     init_arg => undef,
-    default  => sub { $ARG[0]->node->nodeName },
+    default  => sub { $_[0]->node->nodeName },
 );
 
 requires qw(as_string content);
 
+#pod =attr as_string
+#pod
+#pod Every role consumer must implement the C<as_string> method.
+#pod
+#pod =cut
+
 around as_string => sub {
-    my ( $orig, $self ) = splice @ARG, 0, 2;
-    return $self->$orig(@ARG) if !$self->_refid;
+    my ( $orig, $self ) = splice @_, 0, 2;
+    return $self->$orig(@_) if !$self->_refid;
 
     my $antecedent = $self->project->find_resource(
         sub {
-            $ARG->resource_name eq $self->resource_name
-                and $ARG->id eq $self->_refid;
+            $_->resource_name eq $self->resource_name
+                and $_->id eq $self->_refid;
         },
     );
     return $antecedent->as_string;
 };
 
-{
-## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-    has id =>
-        ( ro, isa => Str, traits => ['XPathValue'], xpath_query => './@id' );
-    has _refid => ( ro,
-        isa         => Str,
-        traits      => ['XPathValue'],
-        xpath_query => './@refid',
-    );
-}
+#pod =attr content
+#pod
+#pod C<XML::Ant::BuildFile::Resource> provides a
+#pod default C<content> attribute, but it only returns C<undef>.  Consumers should
+#pod use the C<around> method modifier to return something else in order to
+#pod support resources with C<refid> attributes
+#pod
+#pod =cut
 
-has content => ( ro, lazy_build, isa => Maybe );
+has content => ( ro, lazy, builder => '_build_content', isa => Maybe );
 
 around content => sub {
-    my ( $orig, $self ) = splice @ARG, 0, 2;
-    return $self->$orig(@ARG) if !$self->_refid;
+    my ( $orig, $self ) = splice @_, 0, 2;
+    return $self->$orig(@_) if !$self->_refid;
 
     my $antecedent = $self->project->find_resource(
         sub {
-            $ARG->resource_name eq $self->resource_name
-                and $ARG->id eq $self->_refid;
+            $_->resource_name eq $self->resource_name
+                and $_->id eq $self->_refid;
         },
     );
     return $antecedent->content;
 };
+
+#pod =method BUILD
+#pod
+#pod After a resource is constructed, it adds its L<id|/id> and
+#pod L<string representation|/as_string> to the
+#pod L<XML::Ant::Properties|XML::Ant::Properties> singleton with C<toString:>
+#pod prepended to the C<id>.
+#pod
+#pod =cut
 
 sub BUILD {
     my $self = shift;
@@ -77,6 +108,22 @@ sub BUILD {
     }
     return;
 }
+
+## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+
+#pod =attr id
+#pod
+#pod C<id> attribute of this resource.
+#pod
+#pod =cut
+
+has id =>
+    ( ro, isa => Str, traits => ['XPathValue'], xpath_query => './@id' );
+has _refid => ( ro,
+    isa         => Str,
+    traits      => ['XPathValue'],
+    xpath_query => './@refid',
+);
 
 no Moose::Role;
 
@@ -97,7 +144,7 @@ XML::Ant::BuildFile::Resource - Role for Ant build file resources
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -123,10 +170,6 @@ L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project>.
 
 Name of the task's XML node.
 
-=head2 id
-
-C<id> attribute of this resource.
-
 =head2 as_string
 
 Every role consumer must implement the C<as_string> method.
@@ -137,6 +180,10 @@ C<XML::Ant::BuildFile::Resource> provides a
 default C<content> attribute, but it only returns C<undef>.  Consumers should
 use the C<around> method modifier to return something else in order to
 support resources with C<refid> attributes
+
+=head2 id
+
+C<id> attribute of this resource.
 
 =head1 METHODS
 
@@ -266,7 +313,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

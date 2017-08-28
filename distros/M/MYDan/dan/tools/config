@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+my $option = MYDan::Util::OptConf->load();
+
+if( my $name = shift )
+{
+    my ( $n, $k ) = split /\./, $name, 2;
+    my %o = $option->get()->dump( $n );
+    $k ? print "$o{$k}\n" : YAML::XS::DumpFile \*STDOUT, \%o;   
+}
+else { YAML::XS::DumpFile \*STDOUT, $option; }

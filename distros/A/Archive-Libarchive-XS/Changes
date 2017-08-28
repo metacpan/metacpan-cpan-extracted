@@ -1,5 +1,8 @@
 Revision history for Archive-Libarchive-XS
 
+0.0902    2017-08-24 08:26:37 -0400
+  - Switch to Alien::Libarchive3
+
 0.0901    2015-12-15 22:44:18 -0500
   - Remove accidental requirement for Perl 5.10
     Minimum required Perl is probably 5.8.x, though may work on 5.6.x

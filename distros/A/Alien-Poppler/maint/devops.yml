@@ -1,0 +1,23 @@
+---
+native:
+  debian:
+    packages:
+      - libjpeg-dev
+  macos-homebrew:
+    packages:
+      - pkg-config
+      - cairo
+      - fontconfig
+      - freetype
+      - gettext
+      - glib
+      - gobject-introspection
+      - jpeg
+      - libpng
+      - libtiff
+
+      # Alien::OpeJPEG will provide openjpeg library
+      #- openjpeg
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-libjpeg-turbo

@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-# PODNAME: command-line utility to nopaste
+# PODNAME: nopaste
+# ABSTRACT: command-line utility to nopaste
 
 use App::Nopaste::Command;
 
@@ -19,11 +20,11 @@ __END__
 
 =head1 NAME
 
-command-line utility to nopaste
+nopaste - command-line utility to nopaste
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 DESCRIPTION
 

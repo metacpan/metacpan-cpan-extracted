@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.21
+    version 2.22
 
 SYNOPSIS
 
@@ -58,7 +58,6 @@ DESCRIPTION
      [GatherDir]
      exclude_filename = Makefile.PL
      exclude_filename = Build.PL
-     exclude_filename = cpanfile
      exclude_filename = xt/release/changes.t
      exclude_filename = xt/release/fixme.t
      exclude_match = ^_build/
@@ -124,7 +123,6 @@ DESCRIPTION
      travis_status = 0
      
      [Author::Plicease::SpecialPrereqs]
-     [CPANFile]
 
     Some exceptions:
 
@@ -189,8 +187,8 @@ OPTIONS
 
  copy_mb
 
-    Copy Build.PL and cpanfile from the build into the git repository.
-    Exclude them from gather.
+    Copy Build.PL from the build into the git repository. Exclude them from
+    gather.
 
     This allows other developers to use the dist from the git checkout,
     without needing to install Dist::Zilla and

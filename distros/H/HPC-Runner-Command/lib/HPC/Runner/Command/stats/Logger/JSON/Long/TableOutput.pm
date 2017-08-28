@@ -14,7 +14,7 @@ sub iter_jobs_long {
     my $jobref     = shift;
 
     my $submission_id = $submission->{uuid};
-    my $table         = $self->build_table($submission);
+    my $table         = $self->build_table($submission, $submission_id);
 
     $table->setCols(
         [

@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use Digest::MD5;
+use MYDan::Agent::Client::Proxy;
+use AnyEvent::Handle;
+use AnyEvent::Socket;
+
+eval
+{
+    local $/ = undef;
+    my %param = %{ YAML::XS::Load( <> ) };
+
+    my @argv = @{$param{argv}};
+
+    if( $param{single} )
+    {
+        my ( $cv, $skip, $cont ) = ( AE::cv, 0, '' );
+        tcp_connect $argv[0], $argv[1]->{port}, sub {
+            my ( $fh ) = @_  or die "tcp_connect: $!";
+            my $hdl; $hdl = new AnyEvent::Handle(
+               fh => $fh,
+               on_read => sub {
+                   my $self = shift;
+                   $self->unshift_read (
+                       chunk => length $self->{rbuf},
+                       sub {
+                           if( $skip ) { print $_[1]; }
+                           else
+                           {
+                               $cont .= $_[1];
+                               if( $cont =~ s/^\**#\*keepalive\*#// )
+                               {
+                                   print $cont;
+                                   $skip = 1;
+                               }
+                           }
+                       }
+                   );
+                },
+                on_eof => sub{
+                    undef $hdl;
+                     $cv->send;
+                 }
+            );
+            $hdl->push_write($argv[1]->{query});
+            $hdl->push_shutdown;
+        };
+        $cv->recv;
+    }
+    else
+    {
+        my %result = MYDan::Agent::Client::Proxy->new(
+            @{$argv[0]}
+        )->run( %{$argv[1]} );
+        print YAML::XS::Dump \%result;
+    }
+    exit 0;
+};
+
+warn $@;
+print $@;
+
+exit 1;

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+0.88  2017-08-19
+      - Updated dependency on Map::Tube v3.34.
+
 0.87  2017-08-08
       - Added station index for all tube lines.
 

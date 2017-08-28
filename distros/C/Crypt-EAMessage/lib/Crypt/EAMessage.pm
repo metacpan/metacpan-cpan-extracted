@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2015 Joel Maslak
+# Copyright (C) 2015 J. Maslak
 # All Rights Reserved - See License
 #
 
 use v5.22;
 
 package Crypt::EAMessage;
-$Crypt::EAMessage::VERSION = '1.002';
+$Crypt::EAMessage::VERSION = '1.003';
 # ABSTRACT: Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 use strict;
@@ -176,7 +176,7 @@ Crypt::EAMessage - Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -307,11 +307,11 @@ attempt to work with you to develop a plan for fixing the bug.
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Joel Maslak.
+This software is copyright (c) 2016 by J. Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -26,7 +26,7 @@ WriteMakefile(
     clean => { FILES => 'Test-Internet-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
-        provides    => { 'Test::Internet' => { file => 'lib/Test/Internet.pm', version => '0.06' } },
+        provides    => { 'Test::Internet' => { file => 'lib/Test/Internet.pm', version => '0.07' } },
         resources   => {
             repository => {
                 type => 'git',

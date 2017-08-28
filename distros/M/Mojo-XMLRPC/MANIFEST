@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/Mojo/XMLRPC.pm
+lib/Mojo/XMLRPC/Base64.pm
+lib/Mojo/XMLRPC/Message.pm
+lib/Mojo/XMLRPC/Message/Call.pm
+lib/Mojo/XMLRPC/Message/Response.pm
+t/from_xmlrpc.t
+t/lite_app.t
+t/to_xmlrpc.t

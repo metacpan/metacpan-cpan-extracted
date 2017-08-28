@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::rawserial
 # ABSTRACT:  Configuration class LCDd::rawserial
+
 =encoding utf8
 
 =head1 NAME
@@ -16,22 +17,62 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the output device to use I<< Optional. Type uniline. upstream_default: '/dev/cuaU0'.  >> 
+Select the output device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/cuaU0
+
+=back
+
+
 
 =head2 Size
 
 Specifies the size of the LCD. If this driver is loaded as a secondary driver
 it always adopts to the size of the primary driver. If loaded as the only
-(or primary) driver, the size can be set. I<< Optional. Type uniline. upstream_default: '40x4'.  >> 
+(or primary) driver, the size can be set. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+40x4
+
+=back
+
+
 
 =head2 Speed
 
-Serial port baudrate I<< Optional. Type uniline. upstream_default: '9600'.  >> 
+Serial port baudrate I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+9600
+
+=back
+
+
 
 =head2 UpdateRate
 
 How often to dump the LCD contents out the port, in Hertz (times per second)
-1 = once per second, 4 is 4 times per second, 0.1 is once every 10 seconds. I<< Optional. Type number. upstream_default: '1'.  >> 
+1 = once per second, 4 is 4 times per second, 0.1 is once every 10 seconds. I< Optional. Type number.  > 
+
+=over 4
+
+=item upstream_default value :
+
+1
+
+=back
+
+
 
 =head1 SEE ALSO
 

@@ -20,7 +20,7 @@ use Encode;
 use WebService::NetSuite::Config;
 
 our $ME = 'WebService::NetSuite';
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $nsversion = "2013_2";
 
@@ -685,8 +685,7 @@ sub map_sso {
 
     $self->soap->on_action( sub { return 'mapSso'; } );
     my $som = $self->soap->mapSso(
-        $self->_passport,
-        SOAP::Data->name(
+	SOAP::Data->name(
             'ssoCredentials' => \SOAP::Data->value(
                 SOAP::Data->name( 'email'    => $email ),
                 SOAP::Data->name( 'password' => $password ),
@@ -1055,7 +1054,7 @@ sub _parseRequest {
             $ltype =~ s/.*://;
             #print "DEBUG: requestType=$requestType, key=$key, ltype=$ltype\n";
             if (defined $record_fields->{$ltype}) {
-                my @ftypes = keys $record_fields->{$ltype};
+                my @ftypes = keys %{ $record_fields->{$ltype} };
                 if (scalar @ftypes == 1) {
                     #print "DEBUG: ftype for $key is $ftype\n";
                     $listElementName = $ftypes[0];

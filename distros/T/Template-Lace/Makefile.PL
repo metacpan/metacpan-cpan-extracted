@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Moo" => "2.003000",
     "Scalar::Util" => 0,
     "Storable" => 0,
+    "Template::Tiny" => "1.12",
     "UUID::Tiny" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Moo" => "2.003000",
   "Scalar::Util" => 0,
   "Storable" => 0,
+  "Template::Tiny" => "1.12",
   "Test::Most" => 0,
   "UUID::Tiny" => 0
 );

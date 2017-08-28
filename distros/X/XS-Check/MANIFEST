@@ -1,5 +1,9 @@
 .gitignore
 Changes
+examples/reporter.pl
+examples/set-file.pl
+examples/synopsis.pl
+examples/synopsis.xs
 lib/XS/Check.pm
 lib/XS/Check.pod
 Makefile.PL
@@ -8,8 +12,5 @@ MANIFEST.SKIP
 README
 script/checkxs
 t/xs-check.t
-xt/checkpod.t
-xt/distro.t
-xt/git.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

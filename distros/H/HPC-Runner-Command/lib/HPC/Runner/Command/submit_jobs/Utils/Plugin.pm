@@ -2,6 +2,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Plugin;
 
 use MooseX::App::Role;
 use namespace::autoclean;
+use List::MoreUtils qw(first_index indexes uniq);
 
 with 'MooseX::Object::Pluggable';
 

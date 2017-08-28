@@ -14,7 +14,6 @@ $modules{$_} = $_ for qw(
   Alien::Base::ModuleBuild
   Alien::m4
   Capture::Tiny
-  File::ShareDir
   File::chdir
   Test::More
 );

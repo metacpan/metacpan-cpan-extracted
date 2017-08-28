@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard;
-$WebService::Braintree::CreditCard::VERSION = '0.92';
+$WebService::Braintree::CreditCard::VERSION = '0.93';
 use WebService::Braintree::CreditCard::CardType;
 use WebService::Braintree::CreditCard::Location;
 use WebService::Braintree::CreditCard::Prepaid;

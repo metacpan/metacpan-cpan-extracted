@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::lcdm001
 # ABSTRACT:  Configuration class LCDd::lcdm001
+
 =encoding utf8
 
 =head1 NAME
@@ -16,19 +17,59 @@ generated from LCDd.conf
 
 =head2 BackKey
 
-I<< Optional. Type uniline. default: 'UpKey'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+UpKey
+
+=back
+
+
 
 =head2 Device
 
-I<< Optional. Type uniline. default: '/dev/ttyS1'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+/dev/ttyS1
+
+=back
+
+
 
 =head2 ForwardKey
 
-I<< Optional. Type uniline. default: 'DownKey'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+DownKey
+
+=back
+
+
 
 =head2 MainMenuKey
 
-I<< Optional. Type uniline. default: 'RightKey'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+RightKey
+
+=back
+
+
 
 =head2 PauseKey
 
@@ -39,7 +80,17 @@ Keyname      Function
 PauseKey     Pause/Continue              Enter/select
 BackKey      Back(Go to previous screen) Up/Left
 ForwardKey   Forward(Go to next screen)  Down/Right
-MainMenuKey  Open main menu              Exit/Cancel. I<< Optional. Type uniline. default: 'LeftKey'.  >> 
+MainMenuKey  Open main menu              Exit/Cancel. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+LeftKey
+
+=back
+
+
 
 =head1 SEE ALSO
 

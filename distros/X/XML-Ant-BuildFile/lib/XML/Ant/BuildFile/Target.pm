@@ -1,19 +1,27 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Target;
-$XML::Ant::BuildFile::Target::VERSION = '0.216';
 
 # ABSTRACT: target node within an Ant build file
 
+#pod =head1 DESCRIPTION
+#pod
+#pod See L<XML::Ant::BuildFile::Project|XML::Ant::BuildFile::Project> for a complete
+#pod description.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     use XML::Ant::BuildFile::Project;
+#pod
+#pod     my $project = XML::Ant::BuildFile::Project->new( file => 'build.xml' );
+#pod     for my $target ( values %{$project->targets} ) {
+#pod         print 'got target: ', $target->name, "\n";
+#pod     }
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use English '-no_match_vars';
 use Moose;
 use MooseX::Has::Sugar;
@@ -25,30 +33,44 @@ use namespace::autoclean;
 extends 'XML::Ant::BuildFile::TaskContainer';
 with 'XML::Ant::BuildFile::Role::InProject';
 
-{
-## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-    has name => (
-        isa         => Str,
-        traits      => ['XPathValue'],
-        xpath_query => './@name',
-    );
+#pod =attr dependencies
+#pod
+#pod If the target has any dependencies, this will return them as an array reference
+#pod of C<XML::Ant::BuildFile::Target> objects.
+#pod
+#pod =cut
 
-    has _depends => (
-        isa         => Str,
-        traits      => ['XPathValue'],
-        xpath_query => './@depends',
-        predicate   => '_has_depends',
-    );
-}
-
-has dependencies => ( ro, lazy_build, isa => ArrayRef [__PACKAGE__] );
+has dependencies => ( ro, lazy,
+    builder => '_build_dependencies',
+    isa     => ArrayRef [__PACKAGE__],
+);
 
 sub _build_dependencies {    ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
     return if not $self->_has_depends or not $self->_depends;
-    return [ map { $self->project->target($ARG) } split /,/,
-        $self->_depends ];
+    return [ map { $self->project->target($_) } split /,/, $self->_depends ];
 }
+
+## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+
+#pod =attr name
+#pod
+#pod Name of the target.
+#pod
+#pod =cut
+
+has name => (
+    isa         => Str,
+    traits      => ['XPathValue'],
+    xpath_query => './@name',
+);
+
+has _depends => (
+    isa         => Str,
+    traits      => ['XPathValue'],
+    xpath_query => './@depends',
+    predicate   => '_has_depends',
+);
 
 no Moose;
 
@@ -69,7 +91,7 @@ XML::Ant::BuildFile::Target - target node within an Ant build file
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -87,14 +109,14 @@ description.
 
 =head1 ATTRIBUTES
 
-=head2 name
-
-Name of the target.
-
 =head2 dependencies
 
 If the target has any dependencies, this will return them as an array reference
 of C<XML::Ant::BuildFile::Target> objects.
+
+=head2 name
+
+Name of the target.
 
 =head1 SUPPORT
 
@@ -215,7 +237,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

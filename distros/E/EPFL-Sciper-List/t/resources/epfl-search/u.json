@@ -1,0 +1,15 @@
+{
+  "GSA_available": true,
+  "hasMore": false,
+  "maxRows": 99999999,
+  "origin": "ws_autocomplete",
+  "remoteAddr": "192.33.203.170",
+  "result": [{
+    "name": "Upton",
+    "firstname": "Kate",
+    "sciper": "213545"
+  }],
+  "size": 1,
+  "term": "u",
+  "test": false
+}

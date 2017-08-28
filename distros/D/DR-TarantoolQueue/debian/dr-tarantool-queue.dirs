@@ -1,3 +1,4 @@
 /usr/lib/dr-tarantool-queue/
 /etc/tarantool/instances.available/
+/usr/share/tarantool/
 

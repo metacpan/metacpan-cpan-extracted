@@ -1,3 +1,11 @@
+0.840   2017-08-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - [test] Avoid failures due to changing schema description in
+          Sah::Schema::* [RT#122903].
+
+
 0.83    2017-08-09 (PERLANCAR)
 
 	- Use Getopt::Long value type 's' instead of 'i' (for int) or 'f'

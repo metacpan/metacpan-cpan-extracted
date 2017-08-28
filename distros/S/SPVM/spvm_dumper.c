@@ -10,7 +10,7 @@
 #include "spvm_dynamic_array.h"
 #include "spvm_hash.h"
 #include "spvm_constant.h"
-#include "spvm_field.h"
+#include "spvm_field_info.h"
 #include "spvm_sub.h"
 #include "spvm_my_var.h"
 #include "spvm_var.h"
@@ -43,31 +43,31 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     printf("%s", SPVM_OP_C_CODE_NAMES[code]);
     if (op_cur->code == SPVM_OP_C_CODE_CONSTANT) {
       SPVM_CONSTANT* constant = op_cur->uv.constant;
-      printf(" %s", SPVM_TYPE_C_ID_NAMES[constant->type->id]);
-      switch (constant->type->id) {
-        case SPVM_TYPE_C_ID_BYTE:
+      printf(" %s", SPVM_TYPE_C_CODE_NAMES[constant->type->code]);
+      switch (constant->type->code) {
+        case SPVM_TYPE_C_CODE_BYTE:
           printf(" %" PRId8, constant->value.byte_value);
           break;
-        case SPVM_TYPE_C_ID_SHORT:
+        case SPVM_TYPE_C_CODE_SHORT:
           printf(" %" PRId16, constant->value.short_value);
           break;
-        case SPVM_TYPE_C_ID_INT:
+        case SPVM_TYPE_C_CODE_INT:
           printf(" %" PRId32, constant->value.int_value);
           break;
-        case SPVM_TYPE_C_ID_LONG:
+        case SPVM_TYPE_C_CODE_LONG:
           printf(" %" PRId64, constant->value.long_value);
           break;
-        case SPVM_TYPE_C_ID_FLOAT:
+        case SPVM_TYPE_C_CODE_FLOAT:
           printf(" %f", constant->value.float_value);
           break;
-        case SPVM_TYPE_C_ID_DOUBLE:
+        case SPVM_TYPE_C_CODE_DOUBLE:
           printf(" %f", constant->value.double_value);
           break;
-        case SPVM_TYPE_C_ID_STRING:
+        case SPVM_TYPE_C_CODE_STRING:
           printf(" \"%s\"", constant->value.string_value);
           break;
       }
-      printf(" (index %" PRId32 ")", constant->constant_pool_index);
+      printf(" (index %" PRId32 ")", constant->id);
     }
     else if (code == SPVM_OP_C_CODE_MY) {
       SPVM_MY_VAR* my_var = op_cur->uv.my_var;
@@ -124,12 +124,9 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
 
 void SPVM_DUMPER_dump_all(SPVM_COMPILER* compiler) {
   
-  printf("\n[Abstract Syntax Tree]\n");
+  printf("\n[AST]\n");
   SPVM_DUMPER_dump_ast(compiler, compiler->op_grammar);
   
-  printf("\n[Resolved types]\n");
-  SPVM_DUMPER_dump_types(compiler, compiler->types);
-
   printf("\n[Types]\n");
   SPVM_DUMPER_dump_types(compiler, compiler->types);
   
@@ -138,6 +135,9 @@ void SPVM_DUMPER_dump_all(SPVM_COMPILER* compiler) {
   
   printf("\n[Packages]\n");
   SPVM_DUMPER_dump_packages(compiler, compiler->op_packages);
+
+  printf("\n[Subroutines]\n");
+  SPVM_DUMPER_dump_subs(compiler, compiler->op_subs);
 }
 
 void SPVM_DUMPER_dump_constants(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* op_constants) {
@@ -148,6 +148,18 @@ void SPVM_DUMPER_dump_constants(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* op_
       SPVM_CONSTANT* constant = op_constant->uv.constant;
       printf("    constant[%" PRId32 "]\n", i);
       SPVM_DUMPER_dump_constant(compiler, constant);
+    }
+  }
+}
+
+void SPVM_DUMPER_dump_subs(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* op_subs) {
+  {
+    int32_t j;
+    for (j = 0; j < op_subs->length; j++) {
+      SPVM_OP* op_sub = SPVM_DYNAMIC_ARRAY_fetch(op_subs, j);
+      SPVM_SUB* sub = op_sub->uv.sub;
+      printf("  sub[%" PRId32 "]\n", j);
+      SPVM_DUMPER_dump_sub(compiler, sub);
     }
   }
 }
@@ -175,22 +187,9 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* op_p
         int32_t j;
         for (j = 0; j < op_fields->length; j++) {
           SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, j);
-          SPVM_FIELD* field = op_field->uv.field;
+          SPVM_FIELD_INFO* field = op_field->uv.field;
           printf("    field%" PRId32 "\n", j);
           SPVM_DUMPER_dump_field(compiler, field);
-        }
-      }
-      
-      // Sub information
-      printf("  subs\n");
-      SPVM_DYNAMIC_ARRAY* op_subs = package->op_subs;
-      {
-        int32_t j;
-        for (j = 0; j < op_subs->length; j++) {
-          SPVM_OP* op_sub = SPVM_DYNAMIC_ARRAY_fetch(op_subs, j);
-          SPVM_SUB* sub = op_sub->uv.sub;
-          printf("    sub%" PRId32 "\n", j);
-          SPVM_DUMPER_dump_sub(compiler, sub);
         }
       }
     }
@@ -206,7 +205,7 @@ void SPVM_DUMPER_dump_types(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* types) 
       printf("type[%" PRId32 "]\n", i);
       SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(types, i);
       printf("    name => \"%s\"\n", type->name);
-      printf("    id => \"%" PRId32 "\"\n", type->id);
+      printf("    id => \"%" PRId32 "\"\n", type->code);
     }
   }
 }
@@ -269,7 +268,6 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_STORE:
         case SPVM_BYTECODE_C_CODE_STORE_OBJECT:
         case SPVM_BYTECODE_C_CODE_LOAD:
-        case SPVM_BYTECODE_C_CODE_NEW_ARRAY:
         {
           i++;
           bytecode = bytecode_array->values[i];
@@ -335,6 +333,7 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_NEW_STRING:
         case SPVM_BYTECODE_C_CODE_NEW_OBJECT:
         case SPVM_BYTECODE_C_CODE_CURRENT_LINE:
+        case SPVM_BYTECODE_C_CODE_NEW_OBJECT_ARRAY:
         {
           i++;
           bytecode = bytecode_array->values[i];
@@ -475,30 +474,30 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
 void SPVM_DUMPER_dump_constant(SPVM_COMPILER* compiler, SPVM_CONSTANT* constant) {
   (void)compiler;
   
-  switch(constant->type->id) {
-    case SPVM_TYPE_C_ID_BYTE:
+  switch(constant->type->code) {
+    case SPVM_TYPE_C_CODE_BYTE:
       printf("      int %" PRId8 "\n", constant->value.byte_value);
       break;
-    case SPVM_TYPE_C_ID_SHORT:
+    case SPVM_TYPE_C_CODE_SHORT:
       printf("      int %" PRId16 "\n", constant->value.short_value);
       break;
-    case SPVM_TYPE_C_ID_INT:
+    case SPVM_TYPE_C_CODE_INT:
       printf("      int %" PRId32 "\n", constant->value.int_value);
       break;
-    case SPVM_TYPE_C_ID_LONG:
+    case SPVM_TYPE_C_CODE_LONG:
       printf("      long %" PRId64 "\n", constant->value.long_value);
       break;
-    case SPVM_TYPE_C_ID_FLOAT:
+    case SPVM_TYPE_C_CODE_FLOAT:
       printf("      float %f\n", constant->value.float_value);
       break;
-    case SPVM_TYPE_C_ID_DOUBLE:
+    case SPVM_TYPE_C_CODE_DOUBLE:
       printf("      double %f\n", constant->value.double_value);
       break;
-    case SPVM_TYPE_C_ID_STRING:
+    case SPVM_TYPE_C_CODE_STRING:
       printf("      string \"%s\"\n", constant->value.string_value);
       break;
   }
-  printf("      address => %" PRId32 "\n", constant->constant_pool_index);
+  printf("      address => %" PRId32 "\n", constant->id);
 }
 
 void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
@@ -506,11 +505,9 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
   
   if (sub) {
     
-    printf("      name => \"%s\"\n", sub->op_name->uv.name);
     printf("      abs_name => \"%s\"\n", sub->abs_name);
-    
-    printf("      type => \"%s\"\n", sub->op_return_type->uv.type->name);
-    
+    printf("      name => \"%s\"\n", sub->op_name->uv.name);
+    printf("      return_type => \"%s\"\n", sub->op_return_type->uv.type->name);
     printf("      is_constant => %d\n", sub->is_constant);
     printf("      is_native => %d\n", sub->is_native);
     
@@ -550,7 +547,7 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
   }
 }
 
-void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
+void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD_INFO* field) {
   (void)compiler;
   
   if (field) {
@@ -560,9 +557,9 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
     
     SPVM_TYPE* type = field->op_type->uv.type;
     printf("      type => \"%s\"\n", type->name);
-    printf("      byte_size => \"%" PRId32 "\"\n", SPVM_FIELD_get_byte_size(compiler, field));
+    printf("      byte_size => \"%" PRId32 "\"\n", SPVM_FIELD_INFO_get_byte_size(compiler, field));
     
-    printf("      constant_pool_index => \"%" PRId32 "\"\n", field->constant_pool_index);
+    printf("      id => \"%" PRId32 "\"\n", field->id);
   }
   else {
     printf("        None\n");

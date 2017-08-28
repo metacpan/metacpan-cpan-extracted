@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::default;
-our $VERSION = '0.029';
+our $VERSION = '0.032';
 # ABSTRACT: The default format for intra-Yertl communication
 
 #pod =head1 SYNOPSIS
@@ -55,7 +55,7 @@ ETL::Yertl::Format::default - The default format for intra-Yertl communication
 
 =head1 VERSION
 
-version 0.029
+version 0.032
 
 =head1 SYNOPSIS
 

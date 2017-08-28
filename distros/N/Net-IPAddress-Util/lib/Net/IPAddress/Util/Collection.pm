@@ -9,74 +9,75 @@ require Net::IPAddress::Util::Collection::Tie;
 require Net::IPAddress::Util::Range;
 
 sub new {
-    my $class    = ref($_[0]) ? ref(shift()) : shift;
-    my @contents = @_;
-    my @o;
-    tie @o, 'Net::IPAddress::Util::Collection::Tie', \@contents;
-    return bless \@o => $class;
+  my $class    = ref($_[0]) ? ref(shift()) : shift;
+  my @contents = @_;
+  my @o;
+  tie @o, 'Net::IPAddress::Util::Collection::Tie', \@contents;
+  return bless \@o => $class;
 }
 
 sub sorted {
-    my $self = shift;
-    # In theory, a raw radix sort is O(N), which beats Perl's O(N log N) by
-    # a fair margin. However, it _does_ discard duplicates, so ymmv.
-    my $from = [ map { [ unpack('C32', $_->{ lower }->{ address } . $_->{ upper }->{ address }) ] } @$self ];
-    my $to;
-    for (my $i = 31; $i >= 0; $i--) {
-        $to = [];
-        for my $card (@$from) {
-            push @{$to->[ $card->[ $i ] ]}, $card;
-        }
-        $from = [ map { @{$_ // []} } @$to ];
+  my $self = shift;
+  # In theory, a raw radix sort is O(N), which beats Perl's O(N log N) by
+  # a fair margin. However, it _does_ discard duplicates, so ymmv.
+  # FIXME Should we sort by hi, lo instead of lo, hi?
+  my $from = [ map { [ unpack('C32', $_->{ lower }->{ address } . $_->{ upper }->{ address }) ] } @$self ];
+  my $to;
+  for (my $i = 31; $i >= 0; $i--) {
+    $to = [];
+    for my $card (@$from) {
+      push @{$to->[ $card->[ $i ] ]}, $card;
     }
-    my @rv = map {
-        my $n = $_;
-        my $l = Net::IPAddress::Util->new([@{$n}[0 .. 15]]);
-        my $r = Net::IPAddress::Util->new([@{$n}[16 .. 31]]);
-        my $x = Net::IPAddress::Util::Range->new({ lower => $l, upper => $r });
-        $x;
-    } @$from;
-    return $self->new(@rv);
+    $from = [ map { @{$_ // []} } @$to ];
+  }
+  my @rv = map {
+    my $n = $_;
+    my $l = Net::IPAddress::Util->new([@{$n}[0 .. 15]]);
+    my $r = Net::IPAddress::Util->new([@{$n}[16 .. 31]]);
+    my $x = Net::IPAddress::Util::Range->new({ lower => $l, upper => $r });
+    $x;
+  } @$from;
+  return $self->new(@rv);
 }
 
 sub compacted {
-    my $self = shift;
-    my @sorted = @{$self->sorted()};
-    my @compacted;
-    my $elem;
-    while ($elem = shift @sorted) {
-        if (scalar @sorted and $elem->{ upper } >= $sorted[0]->{ lower } - 1) {
-            $elem = ref($elem)->new({ lower => $elem->{ lower }, upper => $sorted[0]->{ upper } });
-            shift @sorted;
-            redo;
-        }
-        else {
-            push @compacted, $elem;
-        }
+  my $self = shift;
+  my @sorted = @{$self->sorted()};
+  my @compacted;
+  my $elem;
+  while ($elem = shift @sorted) {
+    if (scalar @sorted and $elem->{ upper } >= $sorted[0]->{ lower } - 1) {
+      $elem = ref($elem)->new({ lower => $elem->{ lower }, upper => $sorted[0]->{ upper } });
+      shift @sorted;
+      redo;
     }
-    return $self->new(@compacted);
+    else {
+      push @compacted, $elem;
+    }
+  }
+  return $self->new(@compacted);
 }
 
 sub tight {
-    my $self = shift;
-    my @tight;
-    map { push @tight, @{$_->tight()} } @{$self->compacted()};
-    return $self->new(@tight);
+  my $self = shift;
+  my @tight;
+  map { push @tight, @{$_->tight()} } @{$self->compacted()};
+  return $self->new(@tight);
 }
 
 sub as_cidrs {
-    my $self = shift;
-    return map { $_->as_cidr() } grep { eval { $_->{ lower } } } @$self;
+  my $self = shift;
+  return map { $_->as_cidr() } grep { eval { $_->{ lower } } } @$self;
 }
 
 sub as_netmasks {
-    my $self = shift;
-    return map { $_->as_netmask() } grep { eval { $_->{ lower } } } @$self;
+  my $self = shift;
+  return map { $_->as_netmask() } grep { eval { $_->{ lower } } } @$self;
 }
 
 sub as_ranges {
-    my $self = shift;
-    return map { $_->as_string() } grep { eval { $_->{ lower } } } @$self;
+  my $self = shift;
+  return map { $_->as_string() } grep { eval { $_->{ lower } } } @$self;
 }
 
 1;
@@ -89,20 +90,20 @@ Net::IPAddress::Util::Collection - A collection of Net::IPAddress::Util::Range o
 
 =head1 VERSION
 
-Version 3.029
+Version 3.031
 
 =head1 SYNOPSIS
 
-    use Net::IPAddress::Util::Collection;
+  use Net::IPAddress::Util::Collection;
 
-    my $collection = Net::IPAddress::Util::Collection->new();
+  my $collection = Net::IPAddress::Util::Collection->new();
 
-    while (<>) {
-        last unless $_;
-        push @$collection, $_;
-    }
+  while (<>) {
+    last if !defined($_);
+    push @$collection, $_ if $_;
+  }
 
-    print join ', ', $collection->tight()->as_ranges();
+  print join ', ', $collection->tight->as_ranges;
 
 =head1 DESCRIPTION
 
@@ -164,7 +165,7 @@ in its place the smallest single legal CIDR that contains that element.
 
 In other words, if you want complete accuracy, you will want to use:
 
-    $collection->tight->as_cidrs;
+  $collection->tight->as_cidrs;
 
 =head2 as_netmasks
 
@@ -176,7 +177,7 @@ contains that element.
 
 In other words, if you want complete accuracy, you will want to use:
 
-    $collection->tight->as_netmasks;
+  $collection->tight->as_netmasks;
 
 =cut
 

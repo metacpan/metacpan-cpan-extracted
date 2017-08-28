@@ -2,7 +2,8 @@
 
 use strict;
 use warnings all => 'FATAL';
-use Test::More;
+use Test::More skip_all =>
+    "Mo isn't supported in a reasonable way since method modifiers are requires as well as adding private accessors.";
 use Test::Trap;
 use FindBin '$RealBin';
 
@@ -336,6 +337,31 @@ BEGIN {
     use Mo;
     use Role::Tiny::With;
     with 'rg_str_shortRole';
+
+    1;
+}
+
+{
+
+    package rg_str_short_commonRole;
+    use Moo::Role;
+    use Mo;
+    use MooX::Options;
+
+    option 'range_str' =>
+        ( is => 'ro', format => 's', autorange => 1, short => 'r' );
+    option 'range_json' => ( is => 'ro', format => 'json', short => 'j' );
+
+    1;
+}
+
+{
+
+    package rg_str_short_common;
+    use Role::Tiny::With;
+    use Mo;
+
+    with 'rg_str_short_commonRole';
 
     1;
 }

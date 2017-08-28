@@ -1,0 +1,86 @@
+{
+   "abstract" : "Alien package to find, and build if necessary XGBoost dynamic library",
+   "author" : [
+      "Pablo Rodr\u00edguez Gonz\u00e1lez <pablo.rodriguez.gonzalez@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-XGBoost",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "1.04",
+            "Alien::Build::MM" : "0.32",
+            "Alien::git" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "0",
+            "Path::Tiny" : "0",
+            "Sys::Info" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "Alien::git" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "0",
+            "Path::Tiny" : "0",
+            "Sys::Info" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Alien::Build" : "1.04",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Alien" : "0",
+            "Test::Most" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pablrod/p5-Alien-XGBoost/issues"
+      },
+      "homepage" : "https://github.com/pablrod/p5-Alien-XGBoost",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pablrod/p5-Alien-XGBoost.git",
+         "web" : "https://github.com/pablrod/p5-Alien-XGBoost"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

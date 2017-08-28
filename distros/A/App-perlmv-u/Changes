@@ -1,3 +1,11 @@
+0.005   2017-08-19 (PERLANCAR)
+
+	- [Incompatible change] [ux] Don't use last value of code because a
+	  common trap is using e 's/.../.../' and user will be surprised that
+	  when string is not changed, the filename gets changed to '1' (result
+	  of s///); this also makes perlmv-u behave more like perlmv.
+
+
 0.004   2017-08-17 (PERLANCAR)
 
 	- [Bugfix] Redo (as well as undo) should redo (undo) the most

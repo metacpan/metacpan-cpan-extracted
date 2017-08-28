@@ -4,7 +4,7 @@
       "Pieter De Praetere <pieter@packed.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -41,7 +41,7 @@
          },
          "requires" : {
             "App::Cmd" : "0",
-            "Catmandu" : "1.0304",
+            "Catmandu" : "1.0602",
             "Catmandu::Importer::XML" : "0",
             "Catmandu::LIDO" : "0",
             "Catmandu::OAI" : "0",
@@ -61,6 +61,7 @@
             "MooX::Role::Logger" : "0",
             "Ref::Util" : "0",
             "Sub::Exporter" : "0",
+            "Term::ANSIColor" : "0",
             "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "5.008005"
@@ -84,12 +85,12 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.4",
+   "version" : "1.5",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Yogendra Sharma <eh.yogendra@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

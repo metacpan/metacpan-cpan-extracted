@@ -4,17 +4,74 @@ use DR::DateTime::Defaults;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 use Carp;
 
-use Data::Dumper ();
 use POSIX ();
 use Time::Local ();
 use Time::Zone ();
 use feature 'state';
 
+sub TO_JSON { shift->strftime('%F %T%z') }  # JSON::XS compatible
+
+use overload
+        'bool'      => sub { 1 },
+        '""'        => sub { shift->strftime('%F %T%z') },
+        '<=>'       => sub {
+            my ($self, $cv, $flip) = @_;
+            if ('DR::DateTime' eq ref $cv) {
+                return $self->fepoch <=> $cv->fepoch;
+            }
+            return $self->fepoch <=> $cv;
+        },
+
+        'cmp'       => sub {
+            my ($self, $cv, $flip) = @_;
+            if ('DR::DateTime' eq ref $cv) {
+                return $self->strftime('%F %T%z') cmp $cv->strftime('%F %T%z');
+            }
+            my $pct = $self->parse($cv);
+            return $self->strftime('%F %T%z') cmp $cv unless $pct;
+            return $self->strftime('%F %T%z') cmp $pct->strftime('%F %T%z');
+        },
+
+        int         => sub { shift->epoch },
+
+        '+'         => sub {
+            my ($self, $cv, $flip) = @_;
+            if ('DR::DateTime' eq ref $cv) {
+                return $self->new(
+                    $self->fepoch + $cv->fepoch,
+                    $self->[1]
+                )
+            }
+
+            $self->new(
+                $self->fepoch + $cv,
+                $self->[1]
+            )
+        },
+
+        '-'         => sub {
+            my ($self, $cv, $flip) = @_;
+
+            if ($flip) {
+                if ('DR::DateTime' eq ref $cv) {
+                    return $cv->fepoch - $self->fepoch;
+                }
+                return $cv - $self->fepoch;
+            } else {
+                if ('DR::DateTime' eq ref $cv) { # date1 - $date2
+                    return $self->fepoch - $cv->fepoch;
+                }
+                return $self->new($self->fepoch - $cv, $self->[1]);
+            }
+        }
+;
+
+
 sub new {
-    my ($self, $stamp, $tz) = @_;
+    my ($class, $stamp, $tz) = @_;
     $stamp //= time;
 
     if (defined $tz) {
@@ -30,7 +87,7 @@ sub new {
     $tz = $DR::DateTime::Defaults::TZFORCE
         if defined $DR::DateTime::Defaults::TZFORCE;
 
-    bless [ $stamp, $tz // () ] => ref($self) || $self;
+    bless [ $stamp, $tz // () ] => ref($class) || $class;
 }
 
 sub parse {
@@ -39,6 +96,10 @@ sub parse {
     my ($y, $m, $d, $H, $M, $S, $ns, $z);
 
     for ($str) {
+
+        if (/^\d+$/) {
+            return $class->new($str, $default_tz // '+0000');
+        }
         if (/^(\d{4})-(\d{2})-(\d{2})(?:\s+|T)(\d{2}):(\d{2}):(\d{2})(\.\d+)?\s*(\S+)?$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
                 ($1, $2, $3, $4, $5, $6, $7, $8);
@@ -57,7 +118,7 @@ sub parse {
             goto PARSED;
         }
 
-        if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})(\.\d+)\s*(\S+)?$/) {
+        if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{2}):(\d{2}):(\d{2})(\.\d+)?\s*(\S+)?$/) {
             ($y, $m, $d, $H, $M, $S, $ns, $z) =
                 ($3, $2, $1, $4, $5, $6, $7, $8);
             goto PARSED;
@@ -324,6 +385,28 @@ sub clone {
     bless [ @$self ] => ref($self) || $self;
 }
 
+sub set_time_zone {
+    my ($self, $tz) = @_;
+    if (defined $tz) {
+        for ($tz) {
+            s/^\d{1,4}$/+$&/;
+            s/^([+-])(\d)$/${1}0${2}00/;
+            s/^([+-]\d{2})$/${1}00/;
+            s/^([+-])(\d{3})$/${1}0$2/;
+        }
+
+        if ($tz eq 'local') {
+            $tz = undef;
+        } elsif ($tz !~ /^[+-]\d{4}$/) {
+            croak "Wrong time zone: '$tz'";
+        }
+    }
+    $self->[1] = $tz;
+    $self;
+}
+
+sub set_tz { goto \&set_time_zone }
+
 1;
 
 __END__
@@ -457,6 +540,10 @@ Retrun timestamp value.
 =head3 hires_epoch or fepoch
 
 Return timestamp that includes nanoseconds as float value.
+
+=head3 set_time_zone($tz)
+
+Set timezone for the following L</strftime> calls.
 
 =head3 clone
 

@@ -12,7 +12,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(HashRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.007';
 
 has category => (
     is      => 'rw',
@@ -77,7 +77,7 @@ sub slurp {
         ->instance
         ->extract_header_msgstr(
             $messages_ref->[0]->{msgstr}
-                || confess "No header found in file $filename",
+            || confess "No header found in file $filename",
         );
     my $encode_obj = find_encoding( $header->{charset} );
     my $nplurals   = $header->{nplurals};
@@ -166,7 +166,8 @@ sub spew {
     my $header = Locale::TextDomain::OO::Util::ExtractHeader
         ->instance
         ->extract_header_msgstr(
-            $messages_ref->{ q{} }->{msgstr},
+            $messages_ref->{ q{} }->{msgstr}
+            || confess 'No header set.',
         )
         or confess sprintf
             'No header found in lexicon of category "%s", domain "%s", language "%s" and project "%s"',
@@ -189,6 +190,9 @@ sub spew {
             })
         };
 
+    my %mo_key_of
+        = map { $_ => undef }
+        qw( msgctxt msgid msgid_plural msgstr msgstr_plural );
     my $mo = Locale::MO::File->new(
         filename => $filename,
         encoding => $charset,
@@ -197,15 +201,7 @@ sub spew {
                 my $return_ref = $key_util->join_message( $_, $message_ref->{$_} );
                 delete @{$return_ref}{
                     grep {
-                        ! m{
-                            \A (?:
-                                msgctxt
-                                | msgid
-                                | msgid_plural
-                                | msgstr
-                                | msgstr_plural
-                            ) \z
-                        }xms;
+                        ! exists $mo_key_of{$_};
                     } keys %{$return_ref}
                 };
                 $return_ref;
@@ -229,13 +225,13 @@ __END__
 
 Locale::TextDomain::OO::Extract::Process::Plugin::MO - MO file plugin
 
-$Id: MO.pm 576 2015-04-12 05:48:58Z steffenw $
+$Id: MO.pm 683 2017-08-22 18:41:42Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/Process/Plugin/MO.pm $
 
 =head1 VERSION
 
-2.004
+2.007
 
 =head1 SYNOPSIS
 
@@ -271,6 +267,8 @@ Read MO file into lexicon_ref.
 =head2 method spew
 
 Write MO file from lexicon_ref.
+
+Unless no header is set method spew throws an exception.
 
     $self->spew($filename);
 
@@ -331,7 +329,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

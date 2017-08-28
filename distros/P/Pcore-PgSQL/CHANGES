@@ -1,3 +1,15 @@
+v0.11.1 2017-08-25T09:27:56Z
+ - Docker base image changed from "softvisio/pcore:v0.48.3" to
+   "softvisio/pcore:v0.50.0"
+
+v0.11.0 2017-08-25T09:25:34Z
+ - dockerfile MAINTAINER replaced with LABEL
+ - SQL functions returns $dbh as first arg
+
+v0.10.9 2017-08-21T06:29:26Z
+ - Docker base image changed from "softvisio/pcore:devel" to
+   "softvisio/pcore:v0.48.3"
+
 v0.10.8 2017-08-11T00:52:17Z
  - unlimited backlog
 

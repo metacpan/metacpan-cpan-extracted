@@ -1,5 +1,11 @@
 Revision history for Perl extension Getopt-Kingpin
 
+0.07 2017-08-21T08:21:28Z
+
+    - Fix help message when place_holder and default exist
+    - Drop support for perl 5.8
+    - Correct misspellings
+
 0.06 2016-11-03T13:56:23Z
 
     - Support global flag in sub-command

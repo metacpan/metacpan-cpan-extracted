@@ -1,21 +1,25 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::TaskContainer;
-$XML::Ant::BuildFile::TaskContainer::VERSION = '0.216';
 
 # ABSTRACT: Container for XML::Ant::BuildFile::Task plugins
 
+#pod =head1 DESCRIPTION
+#pod
+#pod Base class for containers of multiple
+#pod L<XML::Ant::BuildFile::Task|XML::Ant::BuildFile::Task> plugins.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package XML::Ant::BuildFile::Task::Foo;
+#pod     use Moose;
+#pod     extends 'XML::Ant::BuildFile::TaskContainer';
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use English '-no_match_vars';
-## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 use List::Util 1.33 'any';
 use Moose;
 use Module::Pluggable (
@@ -27,31 +31,71 @@ use Regexp::DefaultFlags;
 ## no critic (RequireDotMatchAnything, RequireExtendedFormatting)
 ## no critic (RequireLineBoundaryMatching)
 
+#pod =method BUILD
+#pod
+#pod Automatically run after object construction to set up task object support.
+#pod
+#pod =cut
+
 sub BUILD {
     my $self = shift;
 
     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-    my %isa_map = map { lc( ( split /::/ => $ARG )[-1] ) => $ARG }
-        $self->task_plugins;
+    my %isa_map
+        = map { lc( ( split /::/ )[-1] ) => $_ } $self->task_plugins;
     $self->meta->add_attribute(
         _tasks => (
             traits      => [qw(XPathObjectList Array)],
-            xpath_query => join( q{|} => map {".//$ARG"} keys %isa_map ),
+            xpath_query => join( q{|} => map {".//$_"} keys %isa_map ),
             isa_map     => \%isa_map,
             handles     => {
-                all_tasks    => 'elements',
-                task         => 'get',
+
+               #pod =method all_tasks
+               #pod
+               #pod Returns an array of task objects contained in this target.
+               #pod
+               #pod =cut
+
+                all_tasks => 'elements',
+
+                #pod =method task
+                #pod
+                #pod Given an index number returns that task from the target.
+                #pod
+                #pod =cut
+
+                task => 'get',
+
+#pod =method filter_tasks
+#pod
+#pod Returns all task objects for which the given code reference returns C<true>.
+#pod
+#pod =cut
+
                 filter_tasks => 'grep',
                 find_task    => 'first',
-                num_tasks    => 'count',
+
+                #pod =method num_tasks
+                #pod
+                #pod Returns a count of the number of tasks in this target.
+                #pod
+                #pod =cut
+
+                num_tasks => 'count',
             },
         ),
     );
     return;
 }
 
+#pod =method tasks
+#pod
+#pod Given one or more task names, returns a list of task objects.
+#pod
+#pod =cut
+
 sub tasks {
-    my ( $self, @names ) = @ARG;
+    my ( $self, @names ) = @_;
     return $self->filter_tasks(
         sub {
             my $task = $_;
@@ -79,7 +123,7 @@ XML::Ant::BuildFile::TaskContainer - Container for XML::Ant::BuildFile::Task plu
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -93,6 +137,10 @@ Base class for containers of multiple
 L<XML::Ant::BuildFile::Task|XML::Ant::BuildFile::Task> plugins.
 
 =head1 METHODS
+
+=head2 BUILD
+
+Automatically run after object construction to set up task object support.
 
 =head2 all_tasks
 
@@ -109,10 +157,6 @@ Returns all task objects for which the given code reference returns C<true>.
 =head2 num_tasks
 
 Returns a count of the number of tasks in this target.
-
-=head2 BUILD
-
-Automatically run after object construction to set up task object support.
 
 =head2 tasks
 
@@ -237,7 +281,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

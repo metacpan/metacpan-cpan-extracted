@@ -327,6 +327,12 @@ CODE:
     cs_restoreContext();
 
 void
+cs_restoreContextUntil(label)
+    int label
+CODE:
+    cs_restoreContextUntil(label);
+
+void
 cs_restoreAll()
 CODE:
     cs_restoreAll();

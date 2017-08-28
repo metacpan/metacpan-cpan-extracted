@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl interface to api.getdrip.com",
+   "author" : [
+      "Dan Wright <Dan@DWright.Org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "API-Drip-Request",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Printer" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Params::ValidationCompiler" : "0",
+            "Readonly" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "API::Drip::Request" : {
+         "file" : "lib/API/Drip/Request.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

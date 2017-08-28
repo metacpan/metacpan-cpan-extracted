@@ -11,6 +11,8 @@ use Test::More;
 
 use App::Muter;
 
+eval { require Test::NoWarnings; };
+
 my @examples = (
     {
         chain  => 'hex',
@@ -129,5 +131,7 @@ foreach my $test (@examples) {
         "$test->{chain} parses properly"
     );
 }
+
+Test::NoWarnings::had_no_warnings() if $INC{'Test/NoWarnings.pm'};
 
 done_testing();

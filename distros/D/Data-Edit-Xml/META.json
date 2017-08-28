@@ -4,7 +4,7 @@
       "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,13 +16,13 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.4224"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Table::Text" : "20170808",
+            "Data::Table::Text" : "20170824",
             "Storable" : "0",
             "Test::More" : "0",
             "XML::Parser" : "0",
@@ -33,7 +33,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20170817"
+         "version" : "20170822"
       }
    },
    "release_status" : "stable",
@@ -42,5 +42,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170817"
+   "version" : "20170822"
 }

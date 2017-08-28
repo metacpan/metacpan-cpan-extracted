@@ -47,12 +47,13 @@ package SVG::Timeline;
 
 use 5.010;
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.6';
 
 use Moose;
 use Moose::Util::TypeConstraints;
 use SVG;
 use List::Util qw[min max];
+use Time::Piece;
 use Carp;
 
 use SVG::Timeline::Event;
@@ -83,6 +84,16 @@ has events => (
     has_events   => 'count',
   },
 );
+
+around 'add_event' => sub {
+  my $orig = shift;
+  my $self = shift;
+
+  my $index = $self->count_events + 1;
+  $_[0]->{index} = $index;
+
+  $self->$orig(@_);
+};
 
 =item * width - the width of the output in any format used by SVG. The default
 is 100%.
@@ -134,7 +145,7 @@ sub _build_viewbox {
     $self->min_year * $self->units_per_year,
     0,
     $self->years * $self->units_per_year,
-    ($self->bar_height * $self->count_events) + $self->bar_height
+    ($self->bar_height * $self->events_in_timeline) + $self->bar_height
     + (($self->count_events - 1) * $self->bar_height * $self->bar_spacing);
 }
 
@@ -236,6 +247,18 @@ has bar_outline_colour => (
 
 =back
 
+=head2 events_in_timeline
+
+The number of events that we need to make space for in the timeline. This
+is generally just the number of events that we have added to the timeline, but
+this method is here in case subclasses want t odo something different.
+
+=cut
+
+sub events_in_timeline {
+  return $_[0]->count_events;
+}
+
 =head2 calculated_height
 
 The height of the timeline in "calculated units".
@@ -246,14 +269,14 @@ sub calculated_height {
   my $self = shift;
 
   # Number of events ...
-  my $calulated_height = $self->count_events;
+  my $calulated_height = $self->events_in_timeline;
   # ... plus one for the header ...
   $calulated_height++;
   # ... multiplied by the bar height...
   $calulated_height *= $self->bar_height;
   # .. add spacing.
   $calulated_height += $self->bar_height * $self->bar_spacing *
-                       ($self->count_events - 1);
+                       ($self->events_in_timeline - 1);
 
   return $calulated_height;
 }
@@ -318,9 +341,9 @@ sub draw_grid{
      x             => $self->min_year * $units_per_year,
      y             => 0,
      width         => $self->years * $units_per_year,
-     height        => ($self->bar_height * ($self->count_events + 1))
+     height        => ($self->bar_height * ($self->events_in_timeline + 1))
                     + ($self->bar_height * $self->bar_spacing
-                       * ($self->count_events - 1)),
+                       * ($self->events_in_timeline - 1)),
      stroke        => $self->bar_outline_colour,
     'stroke-width' => 1,
     fill           => 'none',
@@ -345,28 +368,9 @@ sub draw {
   $self->draw_grid;
 
   my $curr_event_idx = 1;
-  my $units_per_year = $self->units_per_year;
   foreach ($self->all_events) {
-    my $x = $_->start * $units_per_year;
-    my $y = ($self->bar_height * $curr_event_idx)
-          + ($self->bar_height * $self->bar_spacing
-             * ($curr_event_idx - 1));
 
-    $self->rect(
-      x              => $x,
-      y              => $y,
-      width          => ($_->end - $_->start) * $units_per_year,
-      height         => $self->bar_height,
-      fill           => $_->colour // $self->default_colour,
-      stroke         => $self->bar_outline_colour,
-      'stroke-width' => 1
-    );
-
-    $self->text(
-      x => ($x + $self->bar_height * 0.2),
-      y => $y + $self->bar_height * 0.8,
-      'font-size' => $self->bar_height * 0.8,
-    )->cdata($_->text);
+    $_->draw_on($self);
 
     $curr_event_idx++;
   }
@@ -396,7 +400,7 @@ Returns the maximum year from all the events in the timeline.
 sub max_year {
   my $self = shift;
   return unless $self->has_events;
-  my @years = map { $_->end // (localtime)[5] } $self->all_events;
+  my @years = map { $_->end // localtime->year } $self->all_events;
   return max(@years);
 }
 

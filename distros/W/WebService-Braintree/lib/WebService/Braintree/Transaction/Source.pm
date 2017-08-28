@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction::Source;
-$WebService::Braintree::Transaction::Source::VERSION = '0.92';
+$WebService::Braintree::Transaction::Source::VERSION = '0.93';
 use strict;
 
 use constant Api => "api";

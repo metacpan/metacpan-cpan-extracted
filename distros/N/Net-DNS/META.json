@@ -34,7 +34,7 @@
          "recommends" : {
             "Digest::BubbleBabble" : "0.01",
             "Digest::GOST" : "0.06",
-            "IO::Socket::IP" : "0.32",
+            "IO::Socket::IP" : "0.38",
             "Net::LibIDN" : "0.12",
             "Scalar::Util" : "1.25"
          },
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

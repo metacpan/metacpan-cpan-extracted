@@ -7,6 +7,7 @@ use Test::More;
 
 use AuthMilterTest;
 use Mail::Milter::Authentication::Handler;
+use Net::DNS::Resolver::Mock;
 
 if ( ! -e 't/01-tools.t' ) {
     die 'Could not find required files, are we in the correct directory?';
@@ -36,7 +37,9 @@ plan tests => $NumTests;
 my $prefix = 'config/normal.smtp';
 $Mail::Milter::Authentication::Config::PREFIX = $prefix;
 $Mail::Milter::Authentication::Config::IDENT  = 'test_authentication_milter_test';
-$Mail::Milter::Authentication::Handler::TestResolver = AuthMilterTestDNSCache->new(),
+my $Resolver = Net::DNS::Resolver::Mock->new();
+$Resolver->zonefile_read( 'zonefile' );
+$Mail::Milter::Authentication::Handler::TestResolver = $Resolver;
 my $Authentication = Mail::Milter::Authentication->new();
 $Authentication->{'config'} = $Authentication->get_config();
 my $Handler = Mail::Milter::Authentication::Handler->new( $Authentication );

@@ -7,15 +7,15 @@ use Test::More;
 use Test::RDF;
 use RDF::Trine qw[iri literal blank variable statement];
 use Test::WWW::Mechanize::PSGI;
-use Module::Load::Conditional qw[check_install];
+use Module::Load::Conditional qw[can_load];
 use URI::Escape;
 
 
-unless (defined(check_install( module => 'RDF::Endpoint', version => 0.03))) {
+unless (can_load( modules => { 'RDF::Endpoint' => 0.03 })) {
   plan skip_all => 'You need RDF::Endpoint for this test'
 }
 
-unless (defined(check_install( module => 'RDF::Generator::Void', version => 0.04))) {
+unless (can_load( modules => { 'RDF::Generator::Void' => 0.04 })) {
   plan skip_all => 'You need RDF::Generator::Void for this test'
 }
 
@@ -24,7 +24,7 @@ unless (defined(check_install( module => 'RDF::Generator::Void', version => 0.04
 
 $ENV{'RDF_LINKEDDATA_CONFIG_LOCAL_SUFFIX'} = 'void';
 
-my $tester = do "script/linked_data.psgi";
+my $tester = do "./script/linked_data.psgi" or BAIL_OUT("Can't do script: " . ($@ || $!));
 
 BAIL_OUT("The application is not running") unless ($tester);
 

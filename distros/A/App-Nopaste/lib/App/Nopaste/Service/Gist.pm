@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Gist;
 # ABSTRACT: Service provider for GitHub gist - http://gist.github.com/
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 use parent 'App::Nopaste::Service';
 
@@ -171,7 +171,7 @@ App::Nopaste::Service::Gist - Service provider for GitHub gist - http://gist.git
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =for stopwords SIGNES gists oauth plaintext
 

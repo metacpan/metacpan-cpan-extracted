@@ -1,19 +1,35 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Element::Arg;
-$XML::Ant::BuildFile::Element::Arg::VERSION = '0.216';
 
 # ABSTRACT: Argument element for a task in an Ant build file
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is an incomplete class to represent C<< <arg/> >> elements in a
+#pod L<build file project|XML::Ant::BuildFile::Project>.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package My::Ant::Task;
+#pod     use Moose;
+#pod     with 'XML::Ant::BuildFile::Task';
+#pod
+#pod     has arg_objects => (
+#pod         isa         => 'ArrayRef[XML::Ant::BuildFile::Element::Arg]',
+#pod         traits      => ['XPathObjectList'],
+#pod         xpath_query => './arg',
+#pod     );
+#pod
+#pod     sub all_args {
+#pod         my $self = shift;
+#pod         return map {$_->args} @{ $self->arg_objects };
+#pod     }
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use Moose;
 use MooseX::Has::Sugar;
 use MooseX::Types::Moose qw(ArrayRef Maybe Str);
@@ -32,9 +48,28 @@ for my $attr (qw(value file path pathref line prefix suffix)) {
     );
 }
 
-has _args => ( ro, lazy_build,
-    isa => ArrayRef [ Maybe [Str] ],
+has _args => ( ro, lazy,
+    builder => '_build__args',
+    isa     => ArrayRef [ Maybe [Str] ],
     traits  => ['Array'],
+
+    #pod =method args
+    #pod
+    #pod Returns a list of arguments contained in the element.  Currently
+    #pod handles C<< <arg/> >> elements with the following attributes:
+    #pod
+    #pod =over
+    #pod
+    #pod =item value
+    #pod
+    #pod =item line
+    #pod
+    #pod =item pathref
+    #pod
+    #pod =back
+    #pod
+    #pod =cut
+
     handles => { args => 'elements' },
 );
 
@@ -74,7 +109,7 @@ XML::Ant::BuildFile::Element::Arg - Argument element for a task in an Ant build 
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -234,7 +269,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

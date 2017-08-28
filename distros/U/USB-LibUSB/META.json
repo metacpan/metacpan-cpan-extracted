@@ -1,0 +1,64 @@
+{
+   "abstract" : "Perl interface to the libusb-1.0 API.",
+   "author" : [
+      "Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "USB-LibUSB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AutoLoader" : "0",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Moo" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.008003",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.labmeasurement.de",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lab-measurement/USB-LibUSB.git",
+         "web" : "https://github.com/lab-measurement/USB-LibUSB"
+      },
+      "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
+      "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

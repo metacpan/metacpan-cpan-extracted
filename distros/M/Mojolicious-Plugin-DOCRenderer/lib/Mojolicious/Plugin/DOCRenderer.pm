@@ -4,14 +4,14 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
 use Mojo::Asset::File;
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream;
 use Mojo::DOM;
+use Mojo::File 'path';
 use Mojo::URL;
-use Mojo::Util qw(slurp unindent url_escape);
-use Pod::Simple::HTML;
+use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 
-our $VERSION = '4.00';
+our $VERSION = '5.01';
 
 # "Futurama - The One Bright Spot in Your Life!"
 sub register {
@@ -22,12 +22,8 @@ sub register {
   $app->renderer->add_handler(
     $conf->{name} || 'doc' => sub {
       my ($renderer, $c, $output, $options) = @_;
-
-      # Preprocess and render
-      my $handler = $renderer->handlers->{$preprocess};
-      return undef unless $handler->($renderer, $c, $output, $options);
-      $$output = _pod_to_html($$output);
-      return 1;
+      $renderer->handlers->{$preprocess}($renderer, $c, $output, $options);
+      $$output = _pod_to_html($$output) if defined $$output;
     }
   );
 
@@ -35,28 +31,40 @@ sub register {
   push @{$app->renderer->paths}, catdir(dirname(__FILE__), 'DOCRenderer', 'templates');
 
   # Doc
-  my $url    = $conf->{url}    || '/doc';
-  my $module = $conf->{module} || $ENV{MOJO_APP};
-  my $defaults = {url => $url, module => $module, format => 'html'};
+  my $url = $conf->{url} || '/doc';
+  my $module = $conf->{module};
+
+  # Detect script location based on 2nd or 3rd parent (in case of Mojolicious::Lite app)
+  my ( $package, $script ) = (caller(2))[0, 1];
+  if ( $package eq 'Mojolicious::Lite' ) {
+        $script = (caller(3))[1];
+  }
+  else {
+        $module ||= $package;
+  }
+
+  my $defaults = {url => $url, module => $module, script => $script, format => 'html'};
   return $app->routes->any(
     "$url/:module" => $defaults => [module => qr/[^.]+/] => \&_doc);
 }
 
+sub _indentation {
+  (sort map {/^(\s+)/} @{shift()})[0];
+}
+
 sub _html {
-  my ($self, $src) = @_;
+  my ($c, $src) = @_;
 
   # Rewrite links
-  my $dom = Mojo::DOM->new(_pod_to_html($src));
-  my $doc = $self->url_for( $self->param('url') . '/' );
-  for my $e ($dom->find('a[href]')->each) {
-    my $attrs = $e->attr;
-    $attrs->{href} =~ s!%3A%3A!/!gi
-      if $attrs->{href} =~ s!^http://search\.cpan\.org/perldoc\?!$doc!;
-  }
+  my $dom     = Mojo::DOM->new(_pod_to_html($src));
+  my $doc = $c->url_for( $c->param('url') . '/' );
+  $_->{href} =~ s!^https://metacpan\.org/pod/!$doc!
+    and $_->{href} =~ s!::!/!gi
+    for $dom->find('a[href]')->map('attr')->each;
 
   # Rewrite code blocks for syntax highlighting and correct indentation
-  for my $e ($dom->find('pre')->each) {
-    $e->content(my $str = unindent $e->content);
+  for my $e ($dom->find('pre > code')->each) {
+    my $str = $e->content;
     next if $str =~ /^\s*(?:\$|Usage:)\s+/m || $str !~ /[\$\@\%]\w|-&gt;\w/m;
     my $attrs = $e->attr;
     my $class = $attrs->{class};
@@ -65,23 +73,14 @@ sub _html {
 
   # Rewrite headers
   my $toc = Mojo::URL->new->fragment('toc');
-  my (%anchors, @parts);
-  for my $e ($dom->find('h1, h2, h3')->each) {
+  my @parts;
+  for my $e ($dom->find('h1, h2, h3, h4')->each) {
 
-    # Anchor and text
-    my $name = my $text = $e->all_text;
-    $name =~ s/\s+/_/g;
-    $name =~ s/[^\w\-]//g;
-    my $anchor = $name;
-    my $i      = 1;
-    $anchor = $name . $i++ while $anchors{$anchor}++;
-
-    # Rewrite
-    push @parts, [] if $e->type eq 'h1' || !@parts;
-    my $link = Mojo::URL->new->fragment($anchor);
-    push @{$parts[-1]}, $text, $link;
-    my $permalink = $self->link_to('#' => $link, class => 'permalink');
-    $e->content($permalink . $self->link_to($text => $toc, id => $anchor));
+    push @parts, [] if $e->tag eq 'h1' || !@parts;
+    my $link = Mojo::URL->new->fragment($e->{id});
+    push @{$parts[-1]}, my $text = $e->all_text, $link;
+    my $permalink = $c->link_to('#' => $link, class => 'permalink');
+    $e->content($permalink . $c->link_to($text => $toc));
   }
 
   # Try to find a title
@@ -89,37 +88,38 @@ sub _html {
   $dom->find('h1 + p')->first(sub { $title = shift->text });
 
   # Combine everything to a proper response
-  $self->content_for(doc => "$dom");
-  $self->render(title => $title, parts => \@parts);
+  $c->content_for(doc => "$dom");
+  $c->render(title => $title, parts => \@parts);
 }
 
 sub _doc {
-  my $self = shift;
+  my $c = shift;
 
-  # Find module or redirect to CPAN
-  my $module = $self->param('module');
-  $module =~ s!/!::!g;
-  my $path
-    = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
-  return $self->redirect_to("http://metacpan.org/module/$module")
-    unless $path && -r $path;
+  my $path = $c->stash('script');
+  my $module = $c->param('module');
 
-  my $src = slurp $path;
-  $self->respond_to(txt => {data => $src}, any => sub { _html($self, $src) });
+  if (defined $module) {
+    # Find module or redirect to CPAN
+    my $module = join '::', split('/', $c->param('module'));
+    $path
+      = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
+    return $c->redirect_to("https://metacpan.org/pod/$module")
+      unless $path && -r $path;
+  }
+
+  my $src = path($path)->slurp;
+  $c->respond_to(txt => {data => $src}, html => sub { _html($c, $src) });
 }
 
 sub _pod_to_html {
   return '' unless defined(my $pod = ref $_[0] eq 'CODE' ? shift->() : shift);
 
-  my $parser = Pod::Simple::HTML->new;
-  $parser->$_('') for qw(force_title html_header_before_title);
-  $parser->$_('') for qw(html_header_after_title html_footer);
+  my $parser = Pod::Simple::XHTML->new;
+  $parser->perldoc_url_prefix('https://metacpan.org/pod/');
+  $parser->$_('') for qw(html_header html_footer);
+  $parser->strip_verbatim_indent(\&_indentation);
   $parser->output_string(\(my $output));
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
-
-  # Filter
-  $output =~ s!<a name='___top' class='dummyTopAnchor'\s*?></a>\n!!g;
-  $output =~ s!<a class='u'.*?name=".*?"\s*>(.*?)</a>!$1!sg;
 
   return $output;
 }
@@ -154,10 +154,7 @@ Mojolicious::Plugin::DOCRenderer - Doc Renderer Plugin
   use Mojolicious::Lite;
   use File::Basename;
 
-  plugin 'DOCRenderer' => {
-      # use this script base name as a default module to show for "/doc"
-      module => fileparse( __FILE__, qr/\.[^.]*/ );
-  };
+  plugin 'DOCRenderer';
 
   app->start;
 
@@ -167,7 +164,7 @@ Mojolicious::Plugin::DOCRenderer - Doc Renderer Plugin
 
   MyApp - My Mojolicious::Lite Application
 
-=head1 DESCRIPTION
+  =head1 DESCRIPTION
 
   This documentation will be available online, for example from L<http://localhost:3000/doc>.
 
@@ -179,13 +176,12 @@ Mojolicious::Plugin::DOCRenderer - Doc Renderer Plugin
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
-  sub development_mode {
-    # Enable browsing of "/doc" only in development mode
-    shift->plugin( 'DOCRenderer' );
-  }
-
   sub startup {
     my $self = shift;
+
+    # Enable browsing of "/doc" only in development mode
+    $self->plugin( 'DOCRenderer' ) if $self->mode eq 'development';
+
     # some code
   }
 

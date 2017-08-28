@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+$| ++;
+
+use MYDan::Util::OptConf;
+use MYDan::Oncall::Policy;
+
+$MYDan::Util::OptConf::THIS = 'oncall';
+$MYDan::Util::OptConf::ARGC = 1;
+
+=head1 SYNOPSIS
+
+ $0 name --level number
+
+=cut
+my %o = MYDan::Util::OptConf->load()->get( 'level=i' )->dump();
+my $time = time;
+my $who = MYDan::Oncall::Policy->new( "$o{data}/$ARGV[0]" )
+   ->set( $time - MYDan::Oncall::HOUR, $time + MYDan::Oncall::HOUR )
+   ->get( $time, $o{level} || 1 );
+
+print $who->{item}, "\n";
+exit 0;

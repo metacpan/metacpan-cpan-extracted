@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Modern::Perl" => 0,
     "Moose" => 0,
     "Params::Validate" => 0,
-    "URI" => 0,
+    "URI" => "1.61",
     "XML::Twig" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Warn" => 0,
-  "URI" => 0,
+  "URI" => "1.61",
   "XML::Twig" => 0,
   "strict" => 0,
   "warnings" => 0

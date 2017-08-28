@@ -4,16 +4,18 @@ use strict;
 use warnings;
 use utf8;
 
-#use Test::More tests => 12;
-use Test::More skip_all => 'released with a known bug';
-use Test::NoWarnings;
+use Test::More;
 use Test::Differences;
 use Path::Tiny qw(path);
 
-BEGIN {
-    use_ok('Locale::TextDomain::OO::Extract::Perl');
-    use_ok('Locale::TextDomain::OO::Extract::Process');
-}
+$ENV{AUTHOR_TESTING}
+    or plan skip_all => 'Set $ENV{AUTHOR_TESTING} to run this test.';
+plan tests => 12;
+require Test::NoWarnings;
+Test::NoWarnings->import;
+
+use_ok('Locale::TextDomain::OO::Extract::Perl');
+use_ok('Locale::TextDomain::OO::Extract::Process');
 
 my @languages = qw( de de-at );
 my $category  = 'LC_MESSAGES';
@@ -26,9 +28,9 @@ my $process = Locale::TextDomain::OO::Extract::Process->new(
 $process->add_plugin(mo => 'MO');
 
 for my $domain (@domains) {
-    $process->domain($domain); # in this test changed so not in constructor
+    $process->domain($domain); # in this test changed then not in constructor
     for my $language (@languages) {
-        $process->language($language);  # in this test changed so not in constructor
+        $process->language($language);  # in this test changed then not in constructor
         $process->slurp( $suffix_of{$domain} => "./t/LocaleData/$language/$category/$domain.$suffix_of{$domain}" );
     }
 }
@@ -181,12 +183,12 @@ for my $domain (@domains) {
     }
 }
 
-# Stopp with domain test2 here. Read/write PO/MO files is tested.
+# Stop with domain test2 here. Read/write PO/MO files is tested.
 
 $process->remove_all_reference;
 $process->remove_all_automatic;
 
-# Extract source files here
+# Extract source files here.
 my $extract = Locale::TextDomain::OO::Extract::Perl->new;
 $extract->clear;
 $extract->category($category);
@@ -196,9 +198,9 @@ $extract->filename( $file->relative( q{./} )->stringify );
 $extract->content_ref( \( $file->slurp_utf8 ) );
 $extract->extract;
 
-# merge extract
+# Merge extract
 # or put the extracted data with no language (i-default)
-# to all processed languages
+# to all processed languages.
 $process->domain( $domains[0] );
 for my $language (@languages) {
     $process->language($language);
@@ -210,7 +212,7 @@ for my $language (@languages) {
     });
 }
 
-# Normally write into the same files like read at first
+# Normally write into the same files like read at first.
 $process->domain( $domains[0] );
 for my $language (@languages) {
     $process->language($language);

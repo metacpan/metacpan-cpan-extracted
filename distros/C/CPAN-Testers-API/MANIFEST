@@ -48,6 +48,7 @@ t/share/metabase/fact
 t/share/metabase/report
 t/share/metabase/reports-parsed.yml
 t/share/metabase/reports.yml
-t/share/perl5.v3.json
-t/share/perl6.v3.json
+t/share/report/perl5/invalid-version-v.json
+t/share/report/perl5/valid.v3.json
+t/share/report/perl6/valid.v3.json
 weaver.ini

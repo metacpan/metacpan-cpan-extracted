@@ -1,14 +1,34 @@
 package Test::podimage;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 =pod
 
 =head1 NAME
 
-Testing how CPAN and METACPAN display images in pod. To be killed later.
+Testing how CPAN and METACPAN display images in pod.
 
 =head1 SYNOPSIS
+
+local-dist image
+
+=for html <img src="/test.png" title="img-tag, local-dist" alt="Inlineimage" />
+
+remote image
+
+=for html <img src="https://raw.githubusercontent.com/dk/Test-podimage/master/test.png" title="img-tag, local-dist" alt="Inlineimage" />
+
+proposed tag C<=for image> local
+
+=for image /test.png
+
+proposed tag C<=for image> remote
+
+=for image https://raw.githubusercontent.com/dk/Test-podimage/master/test.png
+
+proposed tag C<=for text>
+
+=for text TEXT SAMPLE
 
 inline for 1:
 
@@ -67,7 +87,6 @@ RNscg4yEqm4tBdawTW2bGrdJirh799ZOPoV5Td4gPKYZdm2PperwAAAABJRU5ErkJggg=
 </p>
 
 =end html
-
 
 =cut
 

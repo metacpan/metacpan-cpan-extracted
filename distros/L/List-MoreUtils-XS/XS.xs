@@ -41,6 +41,9 @@
 #ifndef MAX
 # define MAX(a,b) ((a)>(b)?(a):(b))
 #endif
+#ifndef MIN
+# define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
 
 #ifndef aTHX
 #  define aTHX
@@ -119,6 +122,35 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
 #ifndef GV_NOTQUAL
 # define GV_NOTQUAL 0
 #endif
+
+#ifdef _MSC_VER
+# define inline __inline
+#endif
+
+#ifndef HAVE_SIZE_T
+# if SIZEOF_PTR == SIZEOF_LONG_LONG
+typedef unsigned long long size_t;
+# elif SIZEOF_PTR == SIZEOF_LONG
+typedef unsigned long size_t;
+# elif SIZEOF_PTR == SIZEOF_INT
+typedef unsigned int size_t;
+# else
+#  error "Can't determine type for size_t"
+# endif
+#endif
+
+#ifndef HAVE_SSIZE_T
+# if SIZEOF_PTR == SIZEOF_LONG_LONG
+typedef signed long long ssize_t;
+# elif SIZEOF_PTR == SIZEOF_LONG
+typedef signed long ssize_t;
+# elif SIZEOF_PTR == SIZEOF_INT
+typedef signed int ssize_t;
+# else
+#  error "Can't determine type for ssize_t"
+# endif
+#endif
+
 
 /* compare left and right SVs. Returns:
  * -1: <
@@ -587,10 +619,6 @@ LMUav2flat(pTHX_ AV *tgt, AV *args)
  * SUCH DAMAGE.
  */
 
-#ifndef MIN
-# define        MIN(a,b) (((a)<(b))?(a):(b))
-#endif
-
 /*
  * FreeBSD's Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
  * Modified for using Perl Sub (no XSUB) via MULTICALL and all values are SV **
@@ -618,12 +646,23 @@ swapfunc(SV **a, SV **b, size_t n)
 #define vecswap(a, b, n)  \
     if ((n) > 0) swapfunc(a, b, n)
 
-#define CMP(x, y) ({ \
+#if HAVE_FEATURE_STATEMENT_EXPRESSION
+# define CMP(x, y) ({ \
         GvSV(PL_firstgv) = *(x); \
         GvSV(PL_secondgv) = *(y); \
         MULTICALL; \
         SvIV(*PL_stack_sp); \
     })
+#else
+static inline int _cmpsvs(pTHX_ SV *x, SV *y, OP *multicall_cop )
+{
+    GvSV(PL_firstgv) = x;
+    GvSV(PL_secondgv) = y;
+    MULTICALL;
+    return SvIV(*PL_stack_sp);
+}
+# define CMP(x, y) _cmpsvs(aTHX_ *(x), *(y), multicall_cop)
+#endif
 
 #define MED3(a, b, c) ( \
     CMP(a, b) < 0 ? \
@@ -2091,7 +2130,7 @@ CODE:
     I32 i;
 
     if( k > (items - 1) )
-        croak("Cannot get %d samples from %d elements", k, items-1);
+        croak(aTHX_ "Cannot get %" IVdf " samples from %" IVdf " elements", (IV)k, (IV)(items-1));
 
     /* Initialize Drand01 unless rand() or srand() has already been called */
     if(!PL_srand_called)
@@ -2502,7 +2541,12 @@ CODE:
 
     RETVAL = -1;
 
-    if (AvFILLp(list) > 0)
+    if (AvFILLp(list) == -1)
+    {
+	av_push(list, newSVsv(item));
+	RETVAL = 0;
+    }
+    else if (AvFILLp(list) >= 0)
     {
         dMULTICALL;
         dMULTICALLSVCV;
@@ -2535,7 +2579,7 @@ CODE:
     if(!codelike(code))
        croak_xs_usage(cv,  "code, ...");
 
-    if (AvFILLp(list) > 0)
+    if (AvFILLp(list) >= 0)
     {
         dMULTICALL;
         dMULTICALLSVCV;

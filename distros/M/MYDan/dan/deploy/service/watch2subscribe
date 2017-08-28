@@ -1,0 +1,4 @@
+#!/bin/sh
+ulimit -n 655350;ulimit -u 102400;ulimit -s 10240;
+
+exec $MYDanPATH/dan/deploy/bin/watch  -s

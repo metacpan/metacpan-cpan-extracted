@@ -1,5 +1,11 @@
 Revision history for Dancer-Plugin-Catmandu-SRU
 
+0.0501  2017-08-18 13:22:45 CEST
+  - bump required version of Catmandu::Exporter::Template
+
+0.05  2017-08-18 11:25:12 CEST
+  - new template_options setting
+
 0.0403  2016-05-26 15:07:17 CEST
   - more pod and a demo application
   - bugfixes

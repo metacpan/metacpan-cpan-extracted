@@ -3,13 +3,10 @@
 
 #include <stdint.h>
 
-enum {
-  SPVM_API_ERROR_NO_ID = -1
-};
-
 struct SPVM_api;
 typedef struct SPVM_api SPVM_API;
 typedef void SPVM_API_OBJECT;
+typedef void SPVM_API_RUNTIME;
 
 union SPVM_API_value {
   int8_t byte_value;
@@ -60,7 +57,7 @@ struct SPVM_api {
   float (*call_float_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
   double (*call_double_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
   SPVM_API_OBJECT* (*call_object_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
-  int32_t (*get_package_id)(SPVM_API*, const char*);
+  int32_t (*get_type_id)(SPVM_API*, const char*);
   SPVM_API_OBJECT* (*new_object)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_byte_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_short_array)(SPVM_API*, int32_t);
@@ -68,7 +65,7 @@ struct SPVM_api {
   SPVM_API_OBJECT* (*new_long_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_float_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_double_array)(SPVM_API*, int32_t);
-  SPVM_API_OBJECT* (*new_object_array)(SPVM_API*, int32_t);
+  SPVM_API_OBJECT* (*new_object_array)(SPVM_API*, int32_t, int32_t);
   SPVM_API_OBJECT* (*get_exception)(SPVM_API* api);
   void (*set_exception)(SPVM_API* api, SPVM_API_OBJECT* exception);
   int32_t (*get_ref_count)(SPVM_API* api, SPVM_API_OBJECT* base_object);
@@ -76,5 +73,7 @@ struct SPVM_api {
   void (*dec_ref_count)(SPVM_API* api, SPVM_API_OBJECT* base_object);
   void (*inc_dec_ref_count)(SPVM_API* api, SPVM_API_OBJECT* base_object);
   int32_t (*get_objects_count)(SPVM_API* api);
+  SPVM_API_RUNTIME* (*get_runtime)(SPVM_API* api);
+  SPVM_API_OBJECT* (*new_string)(SPVM_API* api, const char* string);
 };
 #endif

@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use MYDan::Agent::Load;
+ 
+eval{
+
+    local $/ = undef;
+    my (  %param, $i ) = %{ YAML::XS::Load( <> ) };
+    my ( $param ) = @{$param{argv}};
+    
+    die "agent/code/download argv no hash" unless $param && ref $param eq 'HASH';
+    
+    map{ 
+        die "agent/code/download $_ undef" unless $param->{$_};
+    }qw( load src port sp dp );
+    
+    MYDan::Agent::Load->new( 
+        node => $param->{src}, 
+        map{ $_ => $param->{$_} }qw( sp dp )
+    )->run( %$param, role => 'agent', query => $param->{load}||1 );
+};
+
+if($@) { print "load fail $@";exit 1; }
+
+exit 0;
+

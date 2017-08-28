@@ -1,22 +1,22 @@
-// ************************************************************************* 
-// Copyright (c) 2014, SUSE LLC
-// 
+// *************************************************************************
+// Copyright (c) 2014-2017, SUSE LLC
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // 3. Neither the name of SUSE LLC nor the names of its contributors may be
 // used to endorse or promote products derived from this software without
 // specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // app/dbrowser-init.js
 //
@@ -71,15 +71,6 @@ define ([
 
         };
 
-    appLib.setBrowserSet([
-        { prop1: 'Some information here', prop2: 1234 },
-        { prop1: null, prop2: 'Some other info' },
-        { prop1: 'Mangled crab crackers', prop2: 'Umpteen whizzles' },
-        { prop1: 'Fandango', prop2: 'Professor!' },
-        { prop1: 'Emfeebled whipple weepers', prop2: 'A godg' },
-        { prop1: 'Wuppo wannabe', prop2: 'Jumbo jamb' }
-    ]);
-    
     return function () {
 
         //
@@ -93,10 +84,8 @@ define ([
             'preamble': 'This is just an illustration',
             'aclProfile': 'passerby',
             'entries': [ entries.browserEntry1, entries.browserEntry2 ],
-            'hook': appLib.getBrowserSet,
             'miniMenu': {
-                entries: ['demoEditFromBrowser'],
-                back: ['Done', 'demoSubmenu']
+                entries: ['demoEditFromBrowser']
             }
         });
 

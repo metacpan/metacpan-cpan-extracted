@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_merged/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '0.99'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 sub import {
@@ -315,6 +315,12 @@ sub dynamic_libs {
   
   if($class->install_type('system')) {
 
+    if(my $prop = $class->runtime_prop)
+    {
+      return FFI::CheckLib::find_lib( lib => $prop->{ffi_name} )
+        if defined $prop->{ffi_name};
+    }
+
     my $name = $class->config('ffi_name');
     unless(defined $name) {
       $name = $class->config('name');
@@ -432,7 +438,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 0.99
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -526,7 +532,32 @@ L<alienfile> as a more modern alternative.
 
 L<Alien::Base> comprises base classes to help in the construction of C<Alien::> modules. Modules in the L<Alien> namespace are used to locate and install (if necessary) external libraries needed by other Perl modules.
 
-This is the documentation for the L<Alien::Base> module itself. To learn more about the system as a whole please see L<Alien::Build::Manual::AlienAuthor>.
+This is the documentation for the L<Alien::Base> module itself. If you
+are starting out you probably want to do so from one of these documents:
+
+=over 4
+
+=item L<Alien::Build::Manual::AlienUser>
+
+For users of an C<Alien::libfoo> that is implemented using L<Alien::Base>.
+(The developer of C<Alien::libfoo> I<should> provide the documentation
+necessary, but if not, this is the place to start).
+
+=item L<Alien::Build::Manual::AlienAuthor>
+
+If you are writing your own L<Alien> based on L<Alien::Build> and L<Alien::Base>.
+
+=item L<Alien::Build::Manual::FAQ>
+
+If you have a common question that has already been answered, like
+"How do I use L<alienfile> with some build system".
+
+=item L<Alien::Build::Manual::PluginAuthor>
+
+This is for the brave souls who want to write plugins that will work with
+L<Alien::Build> + L<alienfile>.
+
+=back
 
 =head1 METHODS
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension List-MoreUtils-XS
 
+0.423	2017-08-19
+    - Fix dealing with lists with one element on bremove/binsert.
+      Thanks shawnlaffan for reporting this via issues#2
+    - add support for compilers before C99
+    - fix some 32-bit compiler warnings
+    - add support for compilers without statement expression feature
+
 0.422	2017-08-15
     - Rename 'occurances' into 'occurrences' as requested in RT#122806 by
       Paul Howarth as a slightly late side-note in RT#91991.

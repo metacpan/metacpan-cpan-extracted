@@ -1,7 +1,7 @@
 use Dios;
 use Test::More;
 
-plan tests => 19;
+plan tests => 26;
 
 my $NAME  = 'Damian';
 my @NUMS  = (1,2,3);
@@ -48,6 +48,17 @@ class Demo is Base1 is Base2 {
 
         return 1;
     }
+
+    method check_all () {
+
+        ::is $name, $NEWNAME => 'Name correct in check_all method';
+
+        ::is_deeply \@nums, \@NEWNUMS => 'Nums correct in check_all method';
+
+        ::is_deeply \%count, \%NEWCOUNT => 'Nums correct in check_all method';
+
+        return 1;
+    }
 }
 
 my $obj = Demo->new({ name => $NAME, count => \%COUNT, nums => \@NUMS });
@@ -55,12 +66,17 @@ my $obj = Demo->new({ name => $NAME, count => \%COUNT, nums => \@NUMS });
 ::is $obj->basic, 'basic' => 'Inherited Base1 correctly';
 ::is $obj->more_basic, 'more basic' => 'Inherited Base2 correctly';
 
-::is        $obj->change_name('me'), 1 => 'Called foo() correctly';
+::is        $obj->change_name('me'), 1 => 'Called change_name() correctly';
 ::is        $obj->get_name,  $NEWNAME  => 'Retained updated name correctly';
 ::is_deeply $obj->get_nums,  \@NUMS    => 'Retained original nums correctly';
 ::is_deeply $obj->get_count, \%COUNT   => 'Retained original count correctly';
 
-::is        $obj->change_others(), 1    => 'Called foo() correctly';
+::is        $obj->change_others(), 1    => 'Called change_others() correctly';
+::is        $obj->get_name,  $NEWNAME   => 'Retained updated name correctly';
+::is_deeply $obj->get_nums,  \@NEWNUMS  => 'Retained original nums correctly';
+::is_deeply $obj->get_count, \%NEWCOUNT => 'Retained original count correctly';
+
+::is        $obj->check_all(), 1        => 'Called check_all() correctly';
 ::is        $obj->get_name,  $NEWNAME   => 'Retained updated name correctly';
 ::is_deeply $obj->get_nums,  \@NEWNUMS  => 'Retained original nums correctly';
 ::is_deeply $obj->get_count, \%NEWCOUNT => 'Retained original count correctly';

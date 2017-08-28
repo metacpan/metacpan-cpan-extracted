@@ -1,6 +1,10 @@
 Revision history for Perl extension BEGIN::Lift
 
-0.05
+0.06 2017-08-19
+    - managed to upload the last one without a
+      Makefile.PL, this should fix this.
+
+0.05 2017-08-14
     - remove enforcement of BEGIN time, it will
       just work at runtime as well
         - removed test that tested this

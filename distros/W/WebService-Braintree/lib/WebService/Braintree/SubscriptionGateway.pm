@@ -1,5 +1,5 @@
 package WebService::Braintree::SubscriptionGateway;
-$WebService::Braintree::SubscriptionGateway::VERSION = '0.92';
+$WebService::Braintree::SubscriptionGateway::VERSION = '0.93';
 use WebService::Braintree::Util qw(to_instance_array validate_id);
 use Carp qw(confess);
 

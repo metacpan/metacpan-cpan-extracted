@@ -144,7 +144,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     @ISA = qw(Exporter);
   }
-  $VERSION = '1.005';
+  $VERSION = '1.006';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -636,6 +636,9 @@ sub _combine {
 
 sub _valid_image {
   my ($self, $method) = @_;
+
+  ref $self
+    or return Imager->_set_error("$method needs an image object");
 
   $self->{IMG} && Scalar::Util::blessed($self->{IMG}) and return 1;
 
@@ -1668,6 +1671,8 @@ sub _load_file {
   else {
     local $SIG{__DIE__};
     my $loaded = eval {
+      local @INC = @INC;
+      pop @INC if $INC[-1] eq '.';
       ++$attempted_to_load{$file};
       require $file;
       return 1;
@@ -1947,6 +1952,10 @@ sub write_multi {
   # translate to ImgRaw
   my $index = 1;
   for my $img (@images) {
+    unless (ref $img && Scalar::Util::blessed($img) && $img->isa("Imager")) {
+      $class->_set_error("write_multi: image $index is not an Imager image object");
+      return;
+    }
     unless ($img->_valid_image("write_multi")) {
       $class->_set_error($img->errstr . " (image $index)");
       return;
@@ -2398,8 +2407,12 @@ sub transform {
 
   if ( $opts{'xexpr'} and $opts{'yexpr'} ) {
     if (!$I2P) {
-      eval ("use Affix::Infix2Postfix;");
-      print $@;
+      {
+	local @INC = @INC;
+	pop @INC if $INC[-1] eq '.';
+	eval ("use Affix::Infix2Postfix;");
+      }
+
       if ( $@ ) {
 	$self->{ERRSTR}='transform: expr given and Affix::Infix2Postfix is not avaliable.'; 
 	return undef;
@@ -4334,6 +4347,8 @@ sub preload {
   # - something for Module::ScanDeps to analyze
   # https://rt.cpan.org/Ticket/Display.html?id=6566
   local $@;
+  local @INC = @INC;
+  pop @INC if $INC[-1] eq '.';
   eval { require Imager::File::GIF };
   eval { require Imager::File::JPEG };
   eval { require Imager::File::PNG };

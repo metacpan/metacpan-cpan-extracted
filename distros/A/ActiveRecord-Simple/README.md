@@ -37,25 +37,6 @@ That's it. ActiveRecord::Simple provides a variety of techniques to make your wo
 data little easier. It contains only a basic set of operations, such as
 search, create, update and delete data.
 
-ActiveRecord::Simple doesn't handle your database connection, but you may keep
-it in the special method (class attribute) "dbh":
-
-    Foo->dbh($dbh);
-
-    # or
-    ActiveRecord::Simple->dbh($dbh);
-
-    # or you can use a special function, like this:
-    sub dbhandler {
-        unless ($dbh->ping) {
-            $dbh->connect("...");
-        }
-
-        return $dbh;
-    }
-
-    ActiveRecord::Simple->dbh(&dbhandler);
-
 See pod documentation of the module for more information about using
 ActiveRecord::Simple.
 
@@ -162,7 +143,7 @@ http://shootnix.github.io/activerecord-simple/
 LICENSE AND COPYRIGHT
 =====================
 
-Copyright (C) 2013-2016 shootnix
+Copyright (C) 2013-2017 shootnix
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+
+use MYDan::Util::XTar;
+use MYDan::Util::OptConf;
+
+=head1 SYNOPSIS
+
+ $0 [--script script.sh] [--package foo.tar.gz] [--output file] 
+ 
+ package filename is $TMP in the script 
+   
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( script=s package=s output=s ) )->dump();
+$option->assert(qw( script package output ));
+
+MYDan::Util::XTar->new( %o )->xtar();

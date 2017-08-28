@@ -7,6 +7,7 @@ use Memoize;
 use Path::Tiny;
 use DateTime;
 use Try::Tiny;
+use Capture::Tiny ':all';
 
 has 'task_start_time' => (
     is       => 'rw',
@@ -148,7 +149,9 @@ sub add_stats_to_archive {
         $self->archive->add_data( $file, $new_content );
     }
 
-    $self->archive->write( $self->data_tar );
+    capture {
+        $self->archive->write( $self->data_tar, 1 );
+    };
 }
 
 =head3 add_proc_stats

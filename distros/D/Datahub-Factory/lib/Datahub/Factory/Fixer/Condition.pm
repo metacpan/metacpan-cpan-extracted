@@ -91,8 +91,10 @@ sub fix_module {
         }
     }
 
-    # @todo
-    #   return false or throw an exception
+    # Sorry, could not find a fixer for this item, throw an error.
+    Datahub::Factory::ModuleNotFound->throw(
+        'message' => sprintf('fixer_%s could not be ', $self->options->{'fixer'})
+    );
 }
 
 1;

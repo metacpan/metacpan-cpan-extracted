@@ -19,7 +19,7 @@ my %module_build_args = (
     "faraco <skelic3\@gmail.com>"
   ],
   "dist_name" => "WebService-Gitter",
-  "dist_version" => "1.1.0",
+  "dist_version" => "1.1.2",
   "license" => "perl",
   "module_name" => "WebService::Gitter",
   "recursive_test_files" => 1,
@@ -34,7 +34,6 @@ my %module_build_args = (
     "warnings" => 0
   },
   "test_requires" => {
-    "Modern::Perl" => 0,
     "Test::More" => 0,
     "lib" => 0
   }
@@ -42,7 +41,6 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Modern::Perl" => 0,
   "Module::Build" => "0.28",
   "Test::More" => 0,
   "lib" => 0

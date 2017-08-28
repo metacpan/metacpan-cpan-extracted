@@ -1,0 +1,77 @@
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/App-BitBucketCli"><img src="https://travis-ci.org/ivanwills/App-BitBucketCli.png" alt="App-BitBucketCli"></a>
+<a href="https://coveralls.io/r/ivanwills/App-BitBucketCli?branch=master"><img src="https://coveralls.io/repos/ivanwills/App-BitBucketCli/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=head1 App-bitbucket-cli
+
+This module provides the C<bb-cli> command for interacting with the Atlasian
+BitBucket Server (nee Stash). It provides tools to view Pull Requests, list
+projects and repositories and more.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    # from CPAN
+    # with cpanm client (https://cpanmin.us/)
+    cpanm [--sudo] App::BitBucketCli
+    # with cpan client
+    cpan App::BitBucketCli
+
+    # from source
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SYNOPSIS
+
+   bb-cli [option] command
+
+ OPTIONS:
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for bb-cli
+
+ COMMANDS:
+
+=head1 CONFIGURATION
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::BitBucketCli
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-BitBucketCli
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-BitBucketCli
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-BitBucketCli
+
+    Search CPAN
+        http://search.cpan.org/dist/App-BitBucketCli/
+
+    Source Code
+        git://github.com/ivanwills/App-bitbucket-cli.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

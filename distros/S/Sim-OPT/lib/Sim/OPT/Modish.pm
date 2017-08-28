@@ -23,15 +23,73 @@ our @EXPORT = qw( modish );
 
 BEGIN { $Devel::DumpTrace::TRACE = 0 }
 
-$VERSION = '0.77.11';
+$VERSION = '0.79';
 $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (shading and insolation) files of the ESP-r building performance simulation suite in order to make it take into account the reflections from obstructions.';
 
-# modish is a program for altering the shading values calculated by
-# the ESP-r simulation platform to take into account the reflections from obstructions.
-# More precisely, modish brings into account the reflective effect of solar obstructions on solar gains
-# in the ESP-r building models on the basis of irradiance ratios. Those ratios are obtained
-# combining the direct radiation on a surface and the total radiation calculated by the means
-# of a raytracer (Radiance) on the same surface.
+# Modish is a program for altering the shading values calculated by the ESP-r simulation platform to take into account the reflections from obstructions.
+# More precisely, modish brings into account the reflective effect of solar obstructions on solar gains in the ESP-r building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface.
+# 
+# How the program works
+# The effect of solar reflections is taken into account at each hour on the basis of the ratios between the irradiances measured at the models' surfaces in two transitiona, fictious model derived from the primary model.
+# 
+# The irradiances are calculated by the means of Radiance and derived from the following building models: a) a model in which the solar obstructions have their true reflectivity and all the other surfaces (with the exception of the ground) are completely black; b) a model in which the solar obstructions and all the other surfaces (with the exception of the ground) are completely black.
+# 
+# The value given by 1 minus those irradiance ratios gives the diffuse shading factors that are put in the ISH file of the ESP-r model in place of the original values.
+# 
+# The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: the ".mod.shda" file is usable by ESP-r. It features the newly calculated shading factors; the ".report.shda" file lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. Note that when the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor will be negative. (But when Modish.pl is run by the means of the Sim::OPT application, the ".shd" and ".shda" files are renamed after the ".mod.shda" and ".mod.sh" files, and the old ones are backed up.)
+# 
+# To launch Modish as a script, it has to be launched from the command like with:
+# 
+# perl ./modish PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg zone_number surface_1_number surface_2_number surface_n_number
+# 
+# For example:
+# 
+# perl ././Modish.pm /home/x/model/cfg/model.cfg 1 7 9 (which means: calculate for zone 1, surfaces 7 and 9.)
+# 
+# The path of the ESP-r model configuration path has to be specified in full, like in the example above.
+# 
+# To launch, instead, Modish, as a Sim::OPT Perl module:
+# 
+# use Sim::OPT::Modish;
+# 
+# modish( "PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg", zone_number, surface_1_number, surface_2_number, ..., surface_n_number );
+# 
+# Example:
+# modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );
+# 
+# In calculating the irradiance ratios, the program defaults to the following settings: diffuse reflections: 1 ; direct reflections: 7; surface grid: 2 x 2; direction vectors for each surface: 1 ; distance from the surface for calculating the irradiances: 0.01 (metres); ratio of the of the original shading factor to the "new" shading factor under which the new shading factor is used to substitute the original one in the ".shda" file. If this value is 0, it is inactive, there is no threshold.
+# These defaults are a compromise between quality and speed. They can be overridden in two manners:
+# 
+# 1) by preparing a "modish_defaults.pl" file and placing it in the same directory from which modish is called.
+# 
+# The content of a configuration file for the present defaults, for example, would be constituted by the following line (note that after it a line of comment follows):
+# 
+# @defaults = ( [  2, 2 ], 1, 1, 7, 0.01, 1 );### i.e ( [ resolution_x, resolution_y ], $dirvectorsnum, $bounceambnum, $bouncemaxnum, $distgrid, $threshold )
+# 
+# 2) By specifying the settings from the command line at the launch inside square brackets. Recurring again to the example above:
+# 
+# modish( "/home/x/model/cfg/model.cfg", 1, 7, 9, [ [  2, 2 ], 1, 1, 7, 0.01, 1 ] );
+# 
+# The value "$dirvectorsnum" controls the numbers of direction vectors that are used for computing the irradiances at each point of each grid over the surfaces. The values that currently can be chosen are 1, 5 and 17. When the points are more than 1, they are evenly distributed on a hemisphere following a precalculated geodetic pattern.
+# Modish works with no limitation of number of surfaces, it can be used with complex geometries and takes into account parent and child surfaces.
+# 
+# For the program to work correctly, the materials, construction and optics databases must be local to the ESP-r model.
+# 
+# The files "fix.sh" "perlfix.pl" contained in the optw.tgz in the "example" directory MUST reside (i.e. be copied) in the folder from which modish is launched and "fix.sh" should be chmodded 777.
+# 
+# The ESP-r "e2rfile.F" source file of the ESP-r distribution should be checked before compilation for verifying that it calls these programs just after the Radiance materials file (".mat") has been created, i.e. just before the line "C Inside description file." (line 587 of ESP-r release 12.4) in the file "e2rfile.F" .
+# If the following Fortran line is absent, it has to be added:  system('./fix.sh')  .
+# 
+# Several calculation methods have been implemented for the Modish procedure. WHich one of them is used depends on the settings written in the "modish_defaults.pl" file. The different calculation options are listed in the "modish_defaults.pl" file, and the needed additional information must be read in the source code. The example configuration file "modish_defaults.pl" presents some options and it is a part of the documentation for this program.
+# 
+# Considerations on the efficiency of the program.
+# The speed of the program largely depends on the number of times that the Radiance raytracer is called, which in turn depends on the resolution of the grid on the external surface which is being considered. On the basis of the irradiance ratios calculated with respect to the points of this grid, Modish modifies the shading factors in ESP-r, in a manner which can even make them positive, if the amount of solar radiation impinging on the surface is actually increased by the presence of the obstructions (due to the reflections which they cause), rather then decreased.
+# 
+# One drawback of the procedure in question from the viewpoint of execution speed may seem to be that the number of calls to the raytracer is double the number of the grid points defined on the considered external surface(s) for taking into account the solar reflections from obstructions. But this is only an apparent drawback. Another aspect of the considered procedure is indeed that it makes possible to decouple the gridding resolution on the considered external surface(s) regarding the effect of direct and diffuse reflections from obstruction from those on: (a) the considered external surface(s), for what is aimed to calculating direct radiation; (b) the internal surfaces, as regards the insolation. This makes possible to adopt a low gridding resolution for the considered external surface(s) relative to the diffuse and specular solar reflections from obstructions while adopting a higher resolution for (a) and (b). This entails that the calculations regarding the direct radiation, which are likely to be the most important quantitatively for determining the solar gains in the thermal zones, and which are much quicker to calculate than the ones performed by the raytracer (which are necessary for determining the amount of solar radiation reflected from obstructions) can be carried out with a higher resolution than those involved in the calculations of the raytracer; so as to avoid to slow down the calculations themselves by a considerable amount. The amount of computations spared in the described manner may be significant, because the gridding entailed in the calculations not requiring the raytracer is commonly in the order of tens (for example, 20 x 20), whilst a gridding suitable for the use of a raytracer in this kind of operation is commonly in the order of units (for example, 2 x 2).
+# 
+# The alternative to this strategy would be that of calculating all the solar radiation explicitly by defining one only gridding density for each surface; one only for all the radiation components entailed: the direct one, the diffuse one, and the one (diffuse and specular) reflected from obstruction. But this would require a gridding resolution of compromise between the components. For this reason, the calculation efficiency of the Modish procedure is likely to be most of the times not lower, but rather higher, than the alternative one entirely relying on calls to a raytracer.
+# 
+# Modish should work with Linux and the Mac.
 #
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # All rights reserved, 2015-17.
@@ -2535,6 +2593,27 @@ sub modifyshda
                       my ( $calcamount, $improvedguess, $newshadingvalue);
                       if ( $irrvariation > 1 )
                       {
+                        my $provisional;
+
+                        if ( "quadratic__" ~~ @calcprocedures )
+                        {
+                          $provisional = ( ( 1 - $irrvariation ) ** 2 );
+                          $irrvariation = ( 1 + $provisional );
+                        }
+
+                         if ( "logarithmic__" ~~ @calcprocedures )
+                        {
+                          $provisional = ( sqrt( 1 - $irrvariation ) );
+                          $irrvariation = ( 1 + $provisional );
+                        }
+
+                         if ( "halved__" ~~ @calcprocedures )
+                        {
+                          $provisional = ( ( 1 - $irrvariation ) / 2 );
+                          $irrvariation = ( 1 + $provisional );
+                        }
+
+
                         $calcamount = ( 1 - $el ); # THIS IS THE RATIO OF NON-SHADED IRRADIATION AS CALCULATED BY THE ESP-r's ISH MODULE
                         $improvedguess = ( $calcamount * $irrvariation ); # THIS IS THE RATIO ABOVE CORRECTED BY MULTIPLYING IT BY THE IRRADIANCE RATIO TO TAKE REFLECTIONS INTO ACCOUNT.
                         unless ( "halved" ~~ @calcprocedures )
@@ -2813,27 +2892,41 @@ sub creatematdbfiles
 
   my @blackcopy;
   my @tempcopy = @newcopy;
+  my $flagthis = 0;
   foreach my $line ( @tempcopy )
   {
-    if ( $line =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
-    {
-      my $absout = "0.990";
-      my $absin = "0.990";
-      $line = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
-    }
+  	if ( ( $line =~ /class,/ ) and ( $line =~ /,Fictitious/ ) )
+  	{ $flagthis == 1; }
+  	
+	if ( $line =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
+	{
+	  if ( $flagthis = 1 )
+      {
+	    my $absout = "0.990";
+	    my $absin = "0.990";
+	    $line = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
+	  }
+	}
     push ( @blackcopy, $line );
   }
 
   my @blackloop;
   my @secondtemploop = @firstloop;
+  my $flagthat = 0;
   foreach ( @secondtemploop )
   {
-    if ( $_ =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
-    {
-      my $absout = "0.990";
-      my $absin = "0.990";
-      $_ = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
-    }
+  	if ( ( $line =~ /class,/ ) and ( $line =~ /,Fictitious/ ) )
+  	{ $flagthat = 1; }
+
+	if ( $_ =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
+	{
+      if ( $flagthat == 1 )
+      {
+	    my $absout = "0.990";
+	    my $absin = "0.990";
+	    $_ = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
+	  }
+	}
     push ( @blackloop, $_ );
   }
 
@@ -2856,6 +2949,168 @@ sub creatematdbfiles
   close MATDBFILE_F2;
   return ( \%exportrefl );
 }
+
+
+sub creatematdbfiles__
+{  # THIS MANAGES THE CREATION OF THE TWO FICTITIOUS MATERIALS DATABASES.
+  my ( $materialsref, $newmaterialsref, $matnumsref,
+  $newmatnumsref, $matdbfile, $matdbfile_f1, $matdbfile_f2 ) = @_;
+
+
+
+  my @materials = @$materialsref;
+  my @newmaterials = @$newmaterialsref;
+  my $newmattotnum = scalar( @newmaterials );
+  my %matnums = %$matnumsref;
+  my %newmatnums = %$newmatnumsref;
+
+  open ( MATDBFILE, "$matdbfile" ) or die;
+  my @lines = <MATDBFILE>;
+  close MATDBFILE;
+
+  my @bag;
+  foreach ( @lines )
+  {
+    $_ =~ /^\*item,(.+),(.+),(.+),(.+)$/ ;
+    push ( @bag, $2 );
+  }
+  my $mattotnum = max( @bag );
+
+  my ( $classnum, $newclassnum, $newclasstotnum );
+
+  my ( @firstloop, @copy );
+  my $countline = 0;
+  foreach my $line ( @lines )
+  {
+    if ( $line =~ /# number of classifications/ )
+    {
+      my @row = split( /\s+|,/ , $line );
+      my $classtotnum = $row[0];
+      $newclasstotnum = ( $classtotnum + 1 );
+      $line =~ s/$classtotnum/$newclasstotnum/;
+      my $extractvalue = $line;
+      $line = $extractvalue;
+    }
+
+    if ( $line =~ /\*item/ )
+    {
+      my @row = split( /,/ , $line );
+      my $item = $row[1];
+      if ( $item ~~ @materials )
+      {
+        my $newitem = $item;
+        $newitem =~ s/\w\b// ;
+        $newitem =~ s/\w\b// ;
+        $newitem = "f_" . $newitem;
+        my $newline = $line;
+        $newline =~ s/$item/$newitem/;
+        my $afterline = $lines[ $countline + 1 ];
+        push ( @copy, [ $newline, $afterline ] );
+      }
+    }
+    push ( @firstloop, $line );
+    $countline++;
+  }
+  pop ( @firstloop );
+
+  my @newcopy;
+  my %exportrefl;
+  my $newmatstotnum = scalar ( @copy );
+  push ( @newcopy, "*class,$newclasstotnum, $newmatstotnum,Fictitious\n" );
+  push ( @newcopy, "Category ($newclasstotnum) holds fictitious materials for shading and insolation calculations\n" );
+  my $countnew = 1;
+  foreach ( @copy )
+  {
+    my $counttwo = 1;
+    my ( $namematobs, $absout, $absin );
+    my @box;
+    foreach ( @$_ )
+    {
+      if ( $counttwo == 1 )
+      {
+        my $newmattotnum = ( $mattotnum + $countnew );
+        $_ =~ /^\*item,(.+),(.+),(.+),(.+)$/ ;
+        $namematobs = $1;
+        $_ = "*item,$1, $newmattotnum, $countnew,$4\n";
+      }
+      $_ =~ s/\s//;
+      $_ =~ s/\s//;
+      if ( $counttwo == 2 )
+      {
+        $_ =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ ;
+        $absout = $6;
+        $absin = $7;
+      }
+      push ( @newcopy, $_ );
+      $exportrefl{ $namematobs }{ absout } =  $absout;
+      $exportrefl{ $namematobs }{ absin } = $absin;
+      $counttwo++;
+    }
+    $countnew++;
+  }
+
+  my @blackcopy;
+  my @tempcopy = @newcopy;
+  my $flagthis = 0;
+  foreach my $line ( @tempcopy )
+  {
+    if ( ( $line =~ /class,/ ) and ( $line =~ /,Fictitious/ ) )
+    { $flagthis == 1; }
+    
+  if ( $line =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
+  {
+    if ( $flagthis = 1 )
+      {
+      my $absout = "0.990";
+      my $absin = "0.990";
+      $line = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
+    }
+  }
+    push ( @blackcopy, $line );
+  }
+
+  my @blackloop;
+  my @secondtemploop = @firstloop;
+  my $flagthat = 0;
+  foreach ( @secondtemploop )
+  {
+    if ( ( $line =~ /class,/ ) and ( $line =~ /,Fictitious/ ) )
+    { $flagthat = 1; }
+
+  if ( $_ =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
+  {
+      if ( $flagthat == 1 )
+      {
+      my $absout = "0.990";
+      my $absin = "0.990";
+      $_ = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
+    }
+  }
+    push ( @blackloop, $_ );
+  }
+
+  my @whiteloop = @blackloop;
+  push ( @blackloop, @blackcopy, "*end\n" );
+  push ( @whiteloop, @newcopy, "\n*end\n" );
+
+  open ( MATDBFILE_F1, ">$matdbfile_f1" ) or die;
+  foreach ( @blackloop )
+  {
+    print MATDBFILE_F1 $_;
+  }
+  close MATDBFILE_F1;
+
+  open ( MATDBFILE_F2, ">$matdbfile_f2" ) or die;
+  foreach ( @whiteloop )
+  {
+    print MATDBFILE_F2 $_;
+  }
+  close MATDBFILE_F2;
+  return ( \%exportrefl );
+}
+
+
+
 
 sub adjust_radmatfile
 { # THIS CHECKS IF THE RADIANCE MATERIAL FILE HAS BEEN PROPERLY MODIFIED. IF NOT, IT DOES THE MODIFICATION BY ITSELF.
@@ -3315,8 +3570,18 @@ sub modish
     my ( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref, $exportconstrref ) =
     createconstrdbfile( $constrdbfile, $constrdbfile_f, \@obsconstrset );
 
-    my $exportreflref = creatematdbfiles( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref,
-    $matdbfile, $matdbfile_f1, $matdbfile_f2 );
+    my $exportreflref;
+
+    unless ( "diluted" ~~ @calcprocedures )
+    {
+      $exportreflref = creatematdbfiles( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref,
+      $matdbfile, $matdbfile_f1, $matdbfile_f2 );
+    }
+    else
+    {
+      $exportreflref = creatematdbfiles__( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref,
+      $matdbfile, $matdbfile_f1, $matdbfile_f2 );
+    }
 
     my ( $surfnumsref, $surfnamesref ) = tellsurfnames( \@transpsurfs, \@geodata );
     my @surfnums = @$surfnumsref;
@@ -3552,38 +3817,35 @@ modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );  (Which means: calculate for z
 Modish is a program for altering the shading values calculated by the ESP-r simulation platform to take into account the reflections from obstructions.
 More precisely, modish brings into account the reflective effect of solar obstructions on solar gains in the ESP-r building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface.
 
-How the program works.
-The effect of solar reflections is taken into account at each hour on the basis of the ratios
-between the irradiances measured at the models' surfaces in: a) the original model; b) a transitional model derived from that.
+How the program works
+The effect of solar reflections is taken into account at each hour on the basis of the ratios between the irradiances measured at the models' surfaces in two transitiona, fictious model derived from the primary model.
 
-The irradiances are calculated through Radiance and derive from the following building models: a) a model in which the solar obstructions have their true reflectivity
-and all the other surfaces (with the exception of the ground) are completely black; b) a model in which the solar obstructions and all the other surfaces (with the exception
-of the ground) are completely black.
+The irradiances are calculated by the means of Radiance and derived from the following building models: a) a model in which the solar obstructions have their true reflectivity and all the other surfaces (with the exception of the ground) are completely black; b) a model in which the solar obstructions and all the other surfaces (with the exception of the ground) are completely black.
 
-The value given by 1 minus those irradiance ratios gives the diffuse shading factors that are put in the ISH file in place of the original values.
+The value given by 1 minus those irradiance ratios gives the diffuse shading factors that are put in the ISH file of the ESP-r model in place of the original values.
 
-The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: the ".mod.shda" file is usable by ESP-r. It features the newly calculated shading factors; the ".report.shda" file lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. Note that when the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor will be negative.
+The original ISH's ".shda" files are not substituted. Two new files are added in the "zone" folder of the ESP-r model: the ".mod.shda" file is usable by ESP-r. It features the newly calculated shading factors; the ".report.shda" file lists the original shading factors and, at the bottom, the irradiance ratios from which the new shading factors in the ".mod.shda" file have been derived. Note that when the radiation on a surface is increased, instead of decreased, as an effect of reflections on obstructions, the shading factor will be negative. (But when Modish.pl is run by the means of the Sim::OPT application, the ".shd" and ".shda" files are renamed after the ".mod.shda" and ".mod.sh" files, and the old ones are backed up.)
 
-To launch Modish, if it is installed as a Perl module:
+To launch Modish as a script, it has to be launched from the command like with:
+
+perl ./modish PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg zone_number surface_1_number surface_2_number surface_n_number
+
+For example:
+
+perl ./Modish.pm /home/x/model/cfg/model.cfg 1 7 9 (which means: calculate for zone 1, surfaces 7 and 9.)
+
+The path of the ESP-r model configuration path has to be specified in full, like in the example above.
+
+To launch, instead, Modish, as a Sim::OPT Perl module:
 
 use Sim::OPT::Modish;
 
 modish( "PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg", zone_number, surface_1_number, surface_2_number, ..., surface_n_number );
 
 Example:
-modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 ); 
+modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );
 
-If instead the file Modish.pm is used by itself, as a script, without installing it as a Perl module, it has to be launched from the command like with:
-
-perl ./modish PATH_TO_THE_ESP-r_CONFIGURATION_FILE.cfg zone_number surface_1_number surface_2_number surface_n_number
-
-For example:
-
-perl ./modish.pl/home/x/model/cfg/model.cfg 1 7 9 (which means: calculate for zone 1, surfaces 7 and 9.)
-
-The path of the ESP-r model configuration path has to be specified in full, like in the example above.
-
-In calculating the irradiance ratios, the program defaults to: diffuse reflections: 1 ; direct reflections: 7; surface grid: 2 x 2; direction vectors for each surface: 1 ; distance from the surface for calculating the irradiances: 0.01 (metres); ratio of the of the original shading factor to the "new" shading factor under which the new shading factor is used to substitute the original one in the ".shda" file. If this value is 0, it is inactive, there is no threshold.
+In calculating the irradiance ratios, the program defaults to the following settings: diffuse reflections: 1 ; direct reflections: 7; surface grid: 2 x 2; direction vectors for each surface: 1 ; distance from the surface for calculating the irradiances: 0.01 (metres); ratio of the of the original shading factor to the "new" shading factor under which the new shading factor is used to substitute the original one in the ".shda" file. If this value is 0, it is inactive, there is no threshold.
 These defaults are a compromise between quality and speed. They can be overridden in two manners:
 
 1) by preparing a "modish_defaults.pl" file and placing it in the same directory from which modish is called.
@@ -3606,14 +3868,14 @@ The files "fix.sh" "perlfix.pl" contained in the optw.tgz in the "example" direc
 The ESP-r "e2rfile.F" source file of the ESP-r distribution should be checked before compilation for verifying that it calls these programs just after the Radiance materials file (".mat") has been created, i.e. just before the line "C Inside description file." (line 587 of ESP-r release 12.4) in the file "e2rfile.F" .
 If the following Fortran line is absent, it has to be added:  system('./fix.sh')  .
 
-Several calculation methods have been implemented. The example configuration file "modish_defaults.pl" presents some options and it is a part of the documentation for this program.
+Several calculation methods have been implemented for the Modish procedure. WHich one of them is used depends on the settings written in the "modish_defaults.pl" file. The different calculation options are listed in the "modish_defaults.pl" file, and the needed additional information must be read in the source code. The example configuration file "modish_defaults.pl" presents some options and it is a part of the documentation for this program.
 
 Considerations on the efficiency of the program.
-The speed of the program largely depends on the number of times that the Radiance raytracer is called, which in turn depends on the resolution of the grid on the external surface which is being considered. On the basis of the irradiance ratios calculated with respect to the points of this grid, Modish modifies the diffuse shading factors in ESP-r, in a manner which can even make them positive, if the amount of solar radiation impinging on the surface is actually increased by the presence of the obstructions (due to the reflections which they cause), rather then decreased.
+The speed of the program largely depends on the number of times that the Radiance raytracer is called, which in turn depends on the resolution of the grid on the external surface which is being considered. On the basis of the irradiance ratios calculated with respect to the points of this grid, Modish modifies the shading factors in ESP-r, in a manner which can even make them positive, if the amount of solar radiation impinging on the surface is actually increased by the presence of the obstructions (due to the reflections which they cause), rather then decreased.
 
-One drawback of the procedure in question from the viewpoint of execution speed may seem to be that the number of calls to the raytracer is double the number of the grid points defined on the considered external surface(s) for taking into account the solar reflections from obstructions. But this is only an apparent drawback. Another aspect of the considered procedure is indeed that it makes possible to decouple the gridding resolution on the considered external surface(s) regarding the effect of direct and diffuse reflections from obstruction from those on: (a) the considered external surface(s), for what is aimed to calculating direct radiation; (b) the internal surfaces, as regards the insolation. This makes possible to adopt a low gridding resolution for the considered external surface(s) relative to the diffuse and specular solar reflections from obstructions while adopting a higher resolution for (a) and (b). This implies that the calculations regarding the direct radiation, which are likely to be the most important quantitatively for determining the solar gains in the thermal zones, and which are much quicker to calculate than the ones performed by the raytracer (which are necessary for determining the amount of solar radiation reflected from obstructions) can be carried out with a higher resolution than those involved in the calculations of the raytracer; so as to avoid to slow down the calculations themselves by a consierable amount. The amount of computations spared in the described manner may be significant, because the gridding implied in the calculations not requiring the raytracer is commonly in the order of tens (for example, 20 x 20), whilst a gridding suitable for the use of a raytracer in this kind of operation is commonly in the order of units (for example, 2 x 2).
+One drawback of the procedure in question from the viewpoint of execution speed may seem to be that the number of calls to the raytracer is double the number of the grid points defined on the considered external surface(s) for taking into account the solar reflections from obstructions. But this is only an apparent drawback. Another aspect of the considered procedure is indeed that it makes possible to decouple the gridding resolution on the considered external surface(s) regarding the effect of direct and diffuse reflections from obstruction from those on: (a) the considered external surface(s), for what is aimed to calculating direct radiation; (b) the internal surfaces, as regards the insolation. This makes possible to adopt a low gridding resolution for the considered external surface(s) relative to the diffuse and specular solar reflections from obstructions while adopting a higher resolution for (a) and (b). This entails that the calculations regarding the direct radiation, which are likely to be the most important quantitatively for determining the solar gains in the thermal zones, and which are much quicker to calculate than the ones performed by the raytracer (which are necessary for determining the amount of solar radiation reflected from obstructions) can be carried out with a higher resolution than those involved in the calculations of the raytracer; so as to avoid to slow down the calculations themselves by a considerable amount. The amount of computations spared in the described manner may be significant, because the gridding entailed in the calculations not requiring the raytracer is commonly in the order of tens (for example, 20 x 20), whilst a gridding suitable for the use of a raytracer in this kind of operation is commonly in the order of units (for example, 2 x 2).
 
-The alternative to this strategy would be that of calculating all the solar radiation explicitly by defining one only gridding density for each surface; one only for all the radiation components implied: the direct one, the diffuse one, and the one (diffuse and specular) reflected from obstruction. But this would require a gridding resolution of compromise between the components. For this reason, the calculation efficiency of the Modish procedure is likely to be most of the times not higher, but rather lower, than the alternative one entirely relying on calls to a raytracer.
+The alternative to this strategy would be that of calculating all the solar radiation explicitly by defining one only gridding density for each surface; one only for all the radiation components entailed: the direct one, the diffuse one, and the one (diffuse and specular) reflected from obstruction. But this would require a gridding resolution of compromise between the components. For this reason, the calculation efficiency of the Modish procedure is likely to be most of the times not lower, but rather higher, than the alternative one entirely relying on calls to a raytracer.
 
 Modish should work with Linux and the Mac.
 

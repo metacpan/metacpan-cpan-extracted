@@ -1,5 +1,5 @@
 package Beam::Minion::Command::run;
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 # ABSTRACT: Command to enqueue a job on Beam::Minion job queue
 
 #pod =head1 SYNOPSIS
@@ -70,7 +70,7 @@ Beam::Minion::Command::run - Command to enqueue a job on Beam::Minion job queue
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

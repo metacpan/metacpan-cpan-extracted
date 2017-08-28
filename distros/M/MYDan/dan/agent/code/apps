@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use File::Temp qw( tempfile );
+
+local $/ = undef;
+
+my ( %param, $i ) = %{ YAML::XS::Load( <> ) };
+
+map
+{
+    my ( $name, $cmd ) = @$_;
+    printf "$name [%d]: [$cmd]\n", ++ $i;
+
+    if( $cmd =~ /^#!/ )
+    {
+        my ( $fh, $filename ) = tempfile();
+        print $fh $cmd;
+        close $fh;
+        chmod 0755, $filename;
+        system $filename;
+        unlink $filename;
+    }
+    else { system $cmd; }
+
+    if( $? == -1 )
+    {
+        print "failed to execute: $!\n";
+        exit 1;
+    }
+    elsif ( $? & 127 )
+    {
+        printf "child died with signal %d, %s coredump\n",
+            ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
+        exit 1;
+    }
+
+    my $exit = $? >> 8;
+    exit $exit if $exit && print "child exited with value $exit\n";
+
+}@{$param{argv}};
+
+exit 0;

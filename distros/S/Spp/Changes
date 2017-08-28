@@ -6,3 +6,14 @@ Revision history for Spp
 0.02    2015-11-2
         to-rule use JSON function encode_json.
 
+0.03    2015-12-2
+        repl spp is interface of spp
+
+0.04    2017-08-14
+        Spp as Parser of grammar, not entire language like lisp
+
+1.01    2017-08-18
+        Spp could use as app to test
+
+1.02    2017-8-21
+        fix bug could not install. readme add some content.

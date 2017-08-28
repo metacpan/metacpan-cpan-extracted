@@ -382,84 +382,6 @@ sub save {
                      expindex   => \@expindex);
 }
 
-sub _treesort {
-    my %param = @_;
-    my @order = @{$param{order}};
-    my @nodeorder = @{$param{nodeorder}};
-    my @nodecounts = @{$param{nodecounts}};
-    my $tree = $param{tree};
-    my $nNodes = $tree->length;
-    my $nElements = $nNodes + 1;
-    my @neworder = (0.0) x $nElements;
-    my @clusterids = (0..$nElements-1);
-    for (my $i = 0; $i < $nNodes; $i++) {
-        my $i1 = $tree->get($i)->left;
-        my $i2 = $tree->get($i)->right;
-        my ($order1, $order2, $count1, $count2);
-        if ($i1 < 0) {
-            $order1 = $nodeorder[-$i1-1];
-            $count1 = $nodecounts[-$i1-1];
-        }
-        else {
-            $order1 = $order[$i1];
-            $count1 = 1;
-        }
-        if ($i2 < 0) {
-            $order2 = $nodeorder[-$i2-1];
-            $count2 = $nodecounts[-$i2-1];
-        }
-        else {
-            $order2 = $order[$i2];
-            $count2 = 1;
-        }
-        # If order1 and order2 are equal, their order is determined by the order in which they were clustered
-        my $increase;
-        if ($i1 < $i2) {
-            if ($order1 < $order2) {
-                $increase = $count1;
-            }
-            else {
-                $increase = $count2;
-            }
-            for (my $j = 0; $j < $nElements; $j++)
-            {
-                my $clusterid = $clusterids[$j];
-                if ($clusterid==$i1 and $order1>=$order2) {
-                    $neworder[$j] += $increase;
-                }
-                if ($clusterid==$i2 and $order1<$order2) {
-                    $neworder[$j] += $increase;
-                }
-                if ($clusterid==$i1 or $clusterid==$i2) {
-                    $clusterids[$j] = -$i-1;
-                }
-            }
-        }
-        else {
-            if ($order1<=$order2) {
-                $increase = $count1;
-            }
-            else {
-                $increase = $count2;
-            }
-            for (my $j = 0; $j < $nElements; $j++) {
-                my $clusterid = $clusterids[$j];
-                if ($clusterid==$i1 and $order1>$order2) {
-                    $neworder[$j] += $increase;
-                }
-                if ($clusterid==$i2 and $order1<=$order2) {
-                    $neworder[$j] += $increase;
-                }
-                if ($clusterid==$i1 or $clusterid==$i2) {
-                    $clusterids[$j] = -$i-1;
-                }
-            }
-        }
-    }
-    my @result = sort { $neworder[$a] <=> $neworder[$b] } (0..$nElements-1);
-    return @result;
-}
-
 sub _savetree {
     my %param = @_;
     my $jobname = $param{jobname};
@@ -478,8 +400,6 @@ sub _savetree {
     my $nnodes = $tree->length;
     open OUTPUT, ">$jobname.$extension" or die 'Error: Unable to open output file';
     my @nodeID = ('') x $nnodes;
-    my @nodecounts = (0) x $nnodes;
-    my @nodeorder = (0.0) x $nnodes;
     my @nodedist;
     my $i;
     for ($i = 0; $i < $nnodes; $i++) {
@@ -489,17 +409,11 @@ sub _savetree {
     for (my $nodeindex = 0; $nodeindex < $nnodes; $nodeindex++) {
         my $min1 = $tree->get($nodeindex)->left;
         my $min2 = $tree->get($nodeindex)->right;
-        my $order1;
-        my $order2;
-        my $counts1;
-        my $counts2;
         $nodeID[$nodeindex] = "NODE" . ($nodeindex+1) . "X";
         print OUTPUT $nodeID[$nodeindex];
         print OUTPUT "\t";
         if ($min1 < 0) {
             my $index1 = -$min1-1;
-            $order1 = $nodeorder[$index1];
-            $counts1 = $nodecounts[$index1];
             print OUTPUT $nodeID[$index1];
             print OUTPUT "\t";
             if ($nodedist[$index1] > $nodedist[$nodeindex]) {
@@ -507,14 +421,10 @@ sub _savetree {
             }
         }
         else {
-            $order1 = $order[$min1];
-            $counts1 = 1;
             print OUTPUT $keyword . $min1 . "X\t";
         }
         if ($min2 < 0) {
             my $index2 = -$min2-1;
-            $order2 = $nodeorder[$index2];
-            $counts2 = $nodecounts[$index2];
             print OUTPUT $nodeID[$index2];
             print OUTPUT "\t";
             if ($nodedist[$index2] > $nodedist[$nodeindex]) {
@@ -522,21 +432,14 @@ sub _savetree {
             }
         }
         else {
-            $order2 = $order[$min2];
-            $counts2 = 1;
             print OUTPUT $keyword . $min2 . "X\t";
         }
         print OUTPUT 1.0-$nodedist[$nodeindex];
         print OUTPUT "\n";
-        $nodecounts[$nodeindex] = $counts1 + $counts2;
-        $nodeorder[$nodeindex] = ($counts1*$order1+$counts2*$order2) / ($counts1+$counts2);
     }
     close(OUTPUT);
     # Now set up order based on the tree structure
-    return _treesort(order      => \@order,
-                     nodeorder  => \@nodeorder,
-                     nodecounts => \@nodecounts,
-                     tree       => $tree);
+    return $tree->sort(\@order);
 }
 
 sub _savekmeans {

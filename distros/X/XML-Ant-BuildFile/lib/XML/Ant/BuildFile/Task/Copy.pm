@@ -1,19 +1,31 @@
-#
-# This file is part of XML-Ant-BuildFile
-#
-# This software is copyright (c) 2014 by GSI Commerce.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
-use utf8;
-use Modern::Perl;    ## no critic (UselessNoCritic,RequireExplicitPackage)
-
 package XML::Ant::BuildFile::Task::Copy;
-$XML::Ant::BuildFile::Task::Copy::VERSION = '0.216';
 
 # ABSTRACT: copy task node in an Ant build file
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a L<Moose|Moose> type class meant for use with
+#pod L<XML::Rabbit|XML::Rabbit> when processing C<< <copy/> >> tasks in an Ant
+#pod build file.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod     package My::Ant;
+#pod     use Moose;
+#pod     with 'XML::Rabbit::Node';
+#pod
+#pod     has paths => (
+#pod         isa         => 'ArrayRef[XML::Ant::BuildFile::Task::Copy]',
+#pod         traits      => 'XPathObjectList',
+#pod         xpath_query => './/copy',
+#pod     );
+#pod
+#pod =cut
+
+use utf8;
+use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
+
+our $VERSION = '0.217';     # VERSION
 use English '-no_match_vars';
 use Moose;
 use MooseX::Types::Moose 'Str';
@@ -32,11 +44,23 @@ for my $attr (qw(dir file)) {
         xpath_query => "./\@to$attr",
     );
 
+  #pod =attr to_file
+  #pod
+  #pod The file to copy to as a L<Path::Class::File|Path::Class::File> object.
+  #pod
+  #pod =attr to_dir
+  #pod
+  #pod The directory to copy a set of
+  #pod L<XML::Ant::BuildFile::Resource|XML::Ant::BuildFile::Resource>s to as a
+  #pod L<Path::Class::Dir|Path::Class::Dir> object.
+  #pod
+  #pod =cut
+
     has "to_$attr" => ( ro, lazy,
         isa     => "Path::Class::\u$attr",
         default => sub {
             my $method  = "_to_$attr";
-            my $applied = XML::Ant::Properties->apply( $ARG[0]->$method );
+            my $applied = XML::Ant::Properties->apply( $_[0]->$method );
             ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
             return eval "Path::Class::$attr('$applied')";
         },
@@ -62,7 +86,7 @@ XML::Ant::BuildFile::Task::Copy - copy task node in an Ant build file
 
 =head1 VERSION
 
-version 0.216
+version 0.217
 
 =head1 SYNOPSIS
 
@@ -213,7 +237,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by GSI Commerce.
+This software is copyright (c) 2017 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

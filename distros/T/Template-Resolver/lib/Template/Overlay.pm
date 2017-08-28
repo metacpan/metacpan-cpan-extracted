@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Template::Overlay;
-$Template::Overlay::VERSION = '1.13';
+$Template::Overlay::VERSION = '1.14';
 # ABSTRACT: A powerful, and simple, library for resolving placeholders in templated files
 # PODNAME: Template::Resolver
 
@@ -136,7 +136,7 @@ Template::Resolver - A powerful, and simple, library for resolving placeholders 
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 SYNOPSIS
 

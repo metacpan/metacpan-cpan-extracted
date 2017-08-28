@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 # shortcuts
 #  os and distros
@@ -337,6 +337,8 @@ sub mapping {
        [package => 'libzbar-dev']],
       [like_fedora,
        [package => 'zbar-devel']],
+      [os_darwin,
+       [package => 'zbar']], # but tests fails (Barcode-ZBar-0.04)
      ],
 
      [cpanmod => ['BerkeleyDB', 'BDB'],
@@ -746,6 +748,8 @@ sub mapping {
        [package => 'libjemalloc-dev']],
       [like_fedora,
        [package => 'jemalloc-devel']],
+      [os_darwin,
+       [package => 'jemalloc']],
      ],
 
      [cpanmod => 'Devel::Valgrind::Client',
@@ -1125,6 +1129,8 @@ sub mapping {
        [linuxdistroversion => qr{^6\.},
 	[package => []]],
        [package => 'goocanvas2-devel']],
+      [os_darwin,
+       [package => 'goocanvas']], # untested
      ],
 
      [cpanmod => 'Google::ProtocolBuffers::Dynamic',
@@ -1158,6 +1164,8 @@ sub mapping {
        [package => 'libsane-dev']],
       [like_fedora,
        [package => 'sane-backends-devel']],
+      [os_darwin,
+       [package => 'sane-backends']],
      ],
 
      [cpanmod => ['GraphViz', 'GraphViz2', 'GraphViz2::Marpa'],
@@ -1696,7 +1704,12 @@ sub mapping {
       [os_freebsd,
        [package => 'opendkim']],
       [like_debian,
-       [package => 'libopendkim-dev']]],
+       [package => 'libopendkim-dev']],
+      [like_fedora,
+       [package => 'libopendkim-devel']],
+      [os_darwin,
+       [package => 'libopendkim']],
+     ],
 
      [cpanmod => ['Math::FFTW', 'PDL::FFTW3'],
       [os_freebsd,
@@ -1876,6 +1889,8 @@ sub mapping {
        [package => 'pl-libgadu']],
       [like_debian,
        [package => 'libgadu-dev']],
+      [os_darwin,
+       [package => 'libgadu']]
      ],
 
      [cpanmod => 'Net::Ifstat',
@@ -2438,6 +2453,8 @@ sub mapping {
        [package => 'libfribidi-dev']],
       [like_fedora,
        [package => 'fribidi-devel']],
+      [os_darwin,
+       [package => 'fribidi']],
      ],
 
      [cpanmod => 'Text::CSV::LibCSV',
@@ -2542,18 +2559,25 @@ sub mapping {
       # XXX what about freebsd?
      ],
 
-     [cpanmod => 'UV::Util',
-      [os_freebsd,
-       [package => 'libuv']], # does not work, -I/usr/local/include seems to be missing
-      [like_debian,
-       [linuxdistrocodename => ['squeeze', 'wheezy'],
-	[package => []], # not available before jessie
-       ],
-       [linuxdistrocodename => ['jessie', 'xenial'],
-	[package => 'libuv0.10-dev']], # does not work, probably too old
-       [package => 'libuv1-dev']],
-      [like_fedora,
-       [package => 'libuv-devel']]],
+     # Since UV::Util 0.03 Alien::libuv is used
+     # But keep this mapping in case somebody wants to
+     # force usage of the native system packages.
+     ($ENV{PERL_CPAN_SYSDEPS_UV_UTIL_NATIVE}
+      ? [cpanmod => 'UV::Util',
+	 [os_freebsd,
+	  [package => 'libuv']], # does not work, -I/usr/local/include seems to be missing
+	 [like_debian,
+	  [linuxdistrocodename => ['squeeze', 'wheezy'],
+	   [package => []], # not available before jessie
+	  ],
+	  [linuxdistrocodename => ['jessie', 'xenial'],
+	   [package => 'libuv0.10-dev']], # does not work, probably too old
+	  [package => 'libuv1-dev']],
+	 [like_fedora,
+	  [package => 'libuv-devel']],
+	]
+      : ()
+     ),
 
      [cpanmod => 'Video::FFmpeg',
       [package => 'ffmpeg']], # on Debian only found in backports or www.deb-multimedia.org; still does not build because avformat.h is not available

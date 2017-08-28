@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Template::Transformer;
-$Template::Transformer::VERSION = '1.13';
+$Template::Transformer::VERSION = '1.14';
 # ABSTRACT: Transformer used by Template::Resolver
 # PODNAME: Template::Transformer
 
@@ -140,7 +140,7 @@ Template::Transformer - Transformer used by Template::Resolver
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 AUTHOR
 

@@ -1,4 +1,26 @@
 Revision history for Alien-Libarchive3
 
+0.29      2017-08-24 08:20:55 -0400
+  - production release identical to 0.028_06 release
+
+0.28_06   2017-07-30 21:40:07 -0400
+  - Bump Alien::Build version for parallel make fix
+  - Tweak netbsd flags
+
+0.28_05   2017-07-17 19:31:10 -0400
+  - Drop support for _macro on non-linux
+
+0.28_04   2017-06-10 13:35:10 -0400
+  - Update alienfile to remove deprecation
+
+0.28_03   2017-06-10 06:36:13 -0400
+  - Build dynamic libraries separately
+
+0.28_02   2017-03-30 18:07:43 -0400
+  - Use Alien::Libxml2 to find libxml2
+
+0.28_01   2017-03-30 14:03:41 -0400
+  - Add legacy Alien::Libarchive compat layer
+
 0.28      2017-03-30 14:01:20 -0400
   - initial version

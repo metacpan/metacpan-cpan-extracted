@@ -1,3 +1,10 @@
+0.004   2017-08-25 (PERLANCAR)
+
+	- Add participant: Data::Tersify.
+
+        - Add scenario: DataCleansing::Object_DateTime.
+
+
 0.003   2017-01-25 (PERLANCAR)
 
 	- No functional changes.

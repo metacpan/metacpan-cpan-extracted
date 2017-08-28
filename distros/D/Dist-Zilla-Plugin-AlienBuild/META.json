@@ -55,9 +55,15 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "0"
+         },
          "requires" : {
+            "Alien::Base::Wrapper" : "1.02",
+            "JSON::MaybeXS" : "0",
+            "Test2::Mock" : "0.000060",
             "Test2::V0" : "0.000060",
-            "Test::More" : "0.94",
+            "YAML" : "0",
             "perl" : "5.014"
          }
       }
@@ -75,7 +81,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.22",
+   "version" : "0.24",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

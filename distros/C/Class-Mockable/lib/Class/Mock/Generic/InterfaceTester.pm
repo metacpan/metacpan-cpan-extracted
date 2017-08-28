@@ -3,7 +3,7 @@ package Class::Mock::Generic::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.2000';
+our $VERSION = '1.2001';
 
 use vars qw($AUTOLOAD);
 
@@ -81,8 +81,6 @@ or, more simply:
 
 =head2 new
 
- In: \@fixtures or @fixtures
-
 This is the main method. It creates a very simple object. Pass to it a list or
 arrayref of fixtures (see L<add_fixtures> for syntax). Any subsequent method
 calls on that object are handled by AUTOLOAD. Note that because
@@ -97,6 +95,8 @@ test failure is emitted.  If that matches, we then compare the actual
 parameters passed to the method with those in the fixture.  If they don't
 match, then that's a test failure.  If they do match, then finally the
 'output' specified in the fixture is returned.
+
+Test failures will tell you what the error was, and where the object was created.
 
 If you want to do anything more complicated than compare input exactly,
 then specify a code-ref thus:
@@ -113,8 +113,6 @@ and false otherwise.  In the example, it will return true if the hash of
 args contains a 'fruit' key with value 'apple'.
 
 =head2 add_fixtures
-
- In: \@fixtures or @fixtures
 
 Supplied with either an arrayref or a list of method call fixtures, adds them
 to the array of fixtures this object maintains internally (although see below
@@ -154,7 +152,16 @@ the input field if you don't care. So the following calls are equivalent:
 
 Caveat: just in case you need to test a call to a method that coincidentally
 is also called C<add_fixtures>, this method is only enabled
-if you did I<not> provide a list of fixtures to the constructor.
+if you did I<not> provide a list of fixtures to the constructor. Note that this
+means that you can't use C<add_fixtures> to add a fixture for a method called
+C<add_fixtures>!
+
+=head2 set_name
+
+Takes a scalar parameter and spits that back out at you in any errors, which
+may make debugging code that used this module easier. This method is only
+available before you add fixtures. As soon as you add fixtures any calls to
+C<set_name> are treated as normal mocked method calls.
 
 =head2 DESTROY
 
@@ -284,19 +291,13 @@ sub new {
         return $class->AUTOLOAD(@_);
     }
 
-    my $caller = (caller(1))[3];
+    my($sub, $line, $file) = ((caller(1))[3], (caller(0))[2, 1]);
+    my $caller = sprintf("defined in %s at line %d of %s", $sub, $line, $file);
     my $self = bless({
         called_from => $caller,
-        _origin_message => sub {
-            my $method = shift;
-            return sprintf(
-                "method '%s' called on mock object defined in %s",
-                $method,
-                $caller
-            )
-        },
         tests => [],
     }, $class);
+    $self->{_fixtures_have_been_set} = 0;
     if (@_) {
         $_add_fixtures->($self, @_);
     } else {
@@ -311,6 +312,8 @@ sub new {
 
 $_add_fixtures = sub {
     my $self = shift;
+
+    $self->{_fixtures_have_been_set} = 1;
 
     # We might have been passed an arrayref or a list.
     my @args = (ref($_[0]) eq 'ARRAY' && @_ == 1) ? @{$_[0]} : @_;
@@ -347,6 +350,11 @@ sub AUTOLOAD {
     # bit by bit rather than all at once), add fixtures to our list.
     if ($method eq 'add_fixtures' && $self->{_no_fixtures_in_constructor}) {
         return $_add_fixtures->($self, @args);
+    # If we haven't set any fixtures at all then we can assume that the
+    # 'set_name' method is supposed to set this object's name
+    } elsif($method eq 'set_name' && !$self->{_fixtures_have_been_set}) {
+        $self->{called_from} = "'$args[0]' ".$self->{called_from};
+        return;
     }
 
     # If we have no more tests, then we've called the mocked $thing more
@@ -354,7 +362,7 @@ sub AUTOLOAD {
     # than expected, which is Bad.
     if(!@{$self->{tests}}) {
         __PACKAGE__->_ok()->(0, sprintf (
-            "run out of tests on mock object defined in %s",
+            "run out of tests on mock object %s",
             $self->{called_from}
         ));
         return;
@@ -368,9 +376,10 @@ sub AUTOLOAD {
     if($next_test->{method} ne $method) {
         __PACKAGE__->_ok()->( 0,
             sprintf (
-                "wrong method (expected %s) %s",
+                "wrong method '%s' (expected '%s') called on mock object %s",
+                $method,
                 $next_test->{method},
-                $self->{_origin_message}->($method)
+                $self->{called_from},
             )
         );
         return;
@@ -387,8 +396,8 @@ sub AUTOLOAD {
         if(!$next_test->{input}->(@args)) {
             __PACKAGE__->_ok()->(0,
                 sprintf (
-                    "wrong args to method %s. Got %s.",
-                    $next_test->{method},
+                    "wrong args to mock object %s. Got %s.",
+                    $self->{called_from},
                     Dumper(\@args)
                 )
             );
@@ -396,8 +405,8 @@ sub AUTOLOAD {
     } elsif (!Compare(\@args, $next_test->{input})) {
         __PACKAGE__->_ok()->( 0,
             sprintf (
-                "wrong args to %s (expected %s, got %s)",
-                $self->{_origin_message}->($method),
+                "wrong args to mock object %s (expected %s, got %s)",
+                $self->{called_from},
                 Dumper($next_test->{input}),
                 Dumper(\@args)
             )
@@ -412,7 +421,7 @@ sub DESTROY {
   if(@{$self->{tests}}) {
     __PACKAGE__->_ok()->( 0,
         sprintf (
-            "didn't run all tests in mock object defined in %s (remaining tests: %s)",
+            "didn't run all tests in mock object %s (remaining tests: %s)",
             $self->{called_from},
             Dumper( $self->{tests} ),
         )

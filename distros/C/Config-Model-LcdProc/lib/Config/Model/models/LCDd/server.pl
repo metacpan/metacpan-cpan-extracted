@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2016 by Dominique Dumont.
+# This software is Copyright (c) 2013-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -55,6 +55,7 @@ backlight for its own screens (only). ',
           'CwLnx',
           'ea65',
           'EyeboxOne',
+          'futaba',
           'g15',
           'glcd',
           'glcdlib',
@@ -69,6 +70,7 @@ backlight for its own screens (only). ',
           'lb216',
           'lcdm001',
           'lcterm',
+          'linux_input',
           'lirc',
           'lis',
           'MD8800',
@@ -78,6 +80,7 @@ backlight for its own screens (only). ',
           'MtxOrb',
           'mx5000',
           'NoritakeVFD',
+          'Olimex_MOD_LCD1x9',
           'picolcd',
           'pyramid',
           'rawserial',
@@ -95,7 +98,8 @@ backlight for its own screens (only). ',
           'tyan',
           'ula200',
           'vlsys_m428',
-          'xosd'
+          'xosd',
+          'yard2LCD'
         ],
         'description' => 'Tells the server to load the given drivers. Multiple lines can be given.
 The name of the driver is case sensitive and determines the section
@@ -105,12 +109,13 @@ The latter one can be changed by giving a File= directive in the
 driver specific section.
 
 The following drivers are supported:
-  bayrad, CFontz, CFontzPacket, curses, CwLnx, ea65, EyeboxOne, g15, glcd,
-  glcdlib, glk, hd44780, icp_a106, imon, imonlcd,, IOWarrior, irman, joy,
-  lb216, lcdm001, lcterm, lirc, lis, MD8800,, mdm166a, ms6931, mtc_s16209x,
-  MtxOrb, mx5000, NoritakeVFD, picolcd,, pyramid, rawserial, sdeclcd,
-  sed1330, sed1520, serialPOS, serialVFD, shuttleVFD, sli,, stv5730, svga,
-  t6963, text, tyan, ula200, vlsys_m428, xosd',
+  bayrad, CFontz, CFontzPacket, curses, CwLnx, ea65, EyeboxOne, futaba,
+  g15, glcd, glcdlib, glk, hd44780, icp_a106, imon, imonlcd,, IOWarrior,
+  irman, joy, lb216, lcdm001, lcterm, linux_input, lirc, lis, MD8800,
+  mdm166a, ms6931, mtc_s16209x, MtxOrb, mx5000, NoritakeVFD,
+  Olimex_MOD_LCD1x9, picolcd, pyramid, rawserial, sdeclcd, sed1330,
+  sed1520, serialPOS, serialVFD, shuttleVFD, sli, stv5730, svga, t6963,
+  text, tyan, ula200, vlsys_m428, xosd, yard2LCD',
         'type' => 'check_list'
       },
       'DriverPath',
@@ -131,6 +136,14 @@ NOTE: Always place a slash as last character !',
         'description' => 'The server will stay in the foreground if set to yes.',
         'type' => 'leaf',
         'upstream_default' => 'no,legal:yes,no',
+        'value_type' => 'uniline'
+      },
+      'FrameInterval',
+      {
+        'description' => 'Sets the interval in microseconds for updating the display.
+default is 125000 meaning 8Hz',
+        'type' => 'leaf',
+        'upstream_default' => '125000',
         'value_type' => 'uniline'
       },
       'GoodBye',

@@ -1,5 +1,55 @@
 Changelog for CPAN-Testers-API
 
+0.017     2017-08-22 20:50:30-05:00 America/Chicago
+
+    [Fixed]
+
+    - All logs for all services are now being written to STDERR and
+      rotated correctly by runit's svlogd.
+
+    - Minion jobs are now using MySQL instead of SQLite. This has been
+      performing much better, since SQLite's locking doesn't make it
+      good for multiple, distributed processes.
+
+0.016     2017-08-18 13:31:09-05:00 America/Chicago
+
+    [Notes]
+
+    - The legacy Metabase compatibility API is now released! Lots of
+      changes went in to fixing the last of the bugs in it, and lots of
+      thanks to all those that helped!
+
+    [Added]
+
+    - Legacy Metabase reports are now being written as jobs to the
+      Minion job queue. This has vastly sped up the processing time for
+      the initial test reports.
+
+    [Fixed]
+
+    - Prevented legacy metabase from fetching the latest 1000 reports
+      twice or from using a `COUNT(*)` query on InnoDB.
+
+    - Moved Metabase tail log generation to a cron job to improve
+      stability.
+
+    - Fixed extra HTML escaping in the Metabase tail log
+
+    - Fixed cache control headers for Metabase tail log. Now the Fastly
+      cache is revalidated efficiently and updates get sent out rapidly.
+
+    - Validate Perl 5 version strings in submitted test reports more
+      strictly. Metabase clients currently send the Perl 5 version
+      prefixed with a "v", which the backend removes. Clients moved to
+      the new test report API will not be allowed to submit a version
+      string starting with "v".
+
+      There is a lot of work to be done to validate reports better...
+
+    - Lowered the verbosity of the legacy Metabase log. We don't need
+      the full text of the report to be logged anymore, now that it
+      seems to be working.
+
 0.015     2017-06-21 01:16:47-04:00 America/New_York
 
     [Added]

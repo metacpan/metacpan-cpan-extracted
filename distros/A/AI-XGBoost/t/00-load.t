@@ -7,5 +7,5 @@ use utf8;
 use Test::More tests => 1;
 
 BEGIN {
-    use_ok('AI::XGBoost::CAPI::RAW');
+    use_ok('AI::XGBoost');
 }

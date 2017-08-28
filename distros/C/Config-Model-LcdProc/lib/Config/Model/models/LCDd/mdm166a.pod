@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::mdm166a
 # ABSTRACT:  Configuration class LCDd::mdm166a
+
 =encoding utf8
 
 =head1 NAME
@@ -17,15 +18,45 @@ generated from LCDd.conf
 =head2 Clock
 
 Show self-running clock after LCDd shutdown
-Possible values: I<< Optional. Type enum. choice: 'no', 'small', 'big'. upstream_default: 'no'.  >> 
+Possible values: I< Optional. Type enum. choice: 'no', 'small', 'big'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
 
 =head2 Dimming
 
-Dim display, no dimming gives full brightness I<< Optional. Type uniline. upstream_default: 'no,legal:yes,no'.  >> 
+Dim display, no dimming gives full brightness I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no,legal:yes,no
+
+=back
+
+
 
 =head2 OffDimming
 
-Dim display in case LCDd is inactive I<< Optional. Type uniline. upstream_default: 'no,legal:yes,no'.  >> 
+Dim display in case LCDd is inactive I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+no,legal:yes,no
+
+=back
+
+
 
 =head1 SEE ALSO
 

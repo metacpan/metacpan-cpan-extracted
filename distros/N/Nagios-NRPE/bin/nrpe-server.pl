@@ -43,7 +43,7 @@ use Nagios::NRPE::Daemon;
 use Nagios::NRPE::Packet;
 use threads;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 use constant { NRPE_CONF_DIR => '/etc/nagios' };
 my ( $listen_cmd, $port_cmd, $config_cmd, $pid_cmd, $ssl_cmd );

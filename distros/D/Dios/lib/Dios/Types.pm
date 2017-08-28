@@ -944,9 +944,11 @@ sub _set_var_type {
         }));
     }
     elsif ($vartype eq 'ARRAY') {
+        return if tied @{$varref};
         tie @{$varref}, 'Dios::Types::TypedArray', [$type, $value_desc, @constraint];
     }
     elsif ($vartype eq 'HASH') {
+        return if tied %{$varref};
         tie %{$varref}, 'Dios::Types::TypedHash',  [$type, $value_desc, @constraint];
     }
     else {

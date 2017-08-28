@@ -44,4 +44,36 @@ $mw->geometry('+0+0');
     }
 }
 
+{
+    # RT #121528
+    my $val = 0.20;
+    { no warnings 'void'; $val * 2 }
+    is $val * 1, 0.20;
+
+    my $e = $mw->Entry(-textvariable => \$val)->pack;
+    { no warnings 'void'; $val * 1.0 }
+
+    # used to fail with perl >= 5.18
+    is $val * 1, 0.20 or
+	do { require Devel::Peek; Devel::Peek::Dump($val) };
+
+    $e->destroy;
+}
+
+{
+    # another variant
+    my $val = 0.20;
+    { no warnings 'void'; $val . "" }
+    is $val * 1, 0.20;
+
+    my $e = $mw->Entry(-textvariable => \$val)->pack;
+    { no warnings 'void'; $val * 1.0 }
+
+    # used to fail with perl >= 5.18
+    is $val * 1, 0.20 or
+	do { require Devel::Peek; Devel::Peek::Dump($val) };
+
+    $e->destroy;
+}
+
 __END__

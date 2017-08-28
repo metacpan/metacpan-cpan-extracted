@@ -1,3 +1,15 @@
+libqbit-application-model-db-perl (0.018) raring; urgency=low
+
+  * perltidy and use new methods in test
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Aug 2017 11:23:10 +0300
+
+libqbit-application-model-db-perl (0.017) raring; urgency=low
+
+  * fix query and added methods: set_dbh, dbh
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Aug 2017 11:06:04 +0300
+
 libqbit-application-model-db-perl (0.016) raring; urgency=low
 
   * added collate and engine into accessors

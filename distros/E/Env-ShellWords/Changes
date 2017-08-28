@@ -1,4 +1,7 @@
 Revision history for Env-ShellWords
 
+0.02      2017-08-25 10:07:46 -0400
+  - customize join and split with callbacks
+
 0.01      2017-02-16 20:41:09 +1100
   - initial version

@@ -1,6 +1,6 @@
 package Redis::RateLimit;
 # ABSTRACT: Sliding window rate limiting with Redis
-$Redis::RateLimit::VERSION = '1.0001';
+$Redis::RateLimit::VERSION = '1.0002';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -66,12 +66,20 @@ has rules => (
 );
 
 around BUILDARGS => sub {
-    my ( $next, $self ) = splice @_, 0, 2;
+    my ( $next, $self ) = ( shift, shift );
 
     my $args = $self->$next(@_);
     my $rules = delete $args->{rules};
     $args->{rules} = [
-        map [ grep defined, @{$_}{qw/interval limit precision/} ], @$rules
+        map {
+            my $rule = $_;
+            defined $rule->{$_} || croak "$_ undefined" for qw/interval limit/;
+            [
+                map 0+$_, # numify for later JSON encoding
+                @{$rule}{qw/interval limit/},
+                grep defined, $rule->{precision}
+            ];
+        } @$rules
     ];
 
     return $args;
@@ -370,7 +378,7 @@ alt="Build Status" /></a>
 
 =head1 VERSION
 
-version 1.0001
+version 1.0002
 
 =head1 SYNOPSIS
 

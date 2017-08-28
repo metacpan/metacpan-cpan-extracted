@@ -1,0 +1,61 @@
+{
+   "abstract" : "a collection of chip drivers",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Chip-AnalogConverters",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Bitfield" : "0",
+            "Device::Chip" : "0.10"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::ADS1115" : {
+         "file" : "lib/Device/Chip/ADS1115.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::AnalogConverters" : {
+         "file" : "lib/Device/Chip/AnalogConverters.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::LTC2400" : {
+         "file" : "lib/Device/Chip/LTC2400.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::MCP4725" : {
+         "file" : "lib/Device/Chip/MCP4725.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

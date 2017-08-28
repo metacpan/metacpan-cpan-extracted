@@ -1,0 +1,14 @@
+#!# perl: collector/code/foo
+use strict;
+use Carp;
+
+use Data::Dumper;
+
+return sub
+{
+    my %param = @_;
+
+    print Dumper \%param;
+
+    return +{ ERROR => 'exit 512', A => 123 };
+};

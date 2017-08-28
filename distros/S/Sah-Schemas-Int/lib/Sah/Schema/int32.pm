@@ -1,7 +1,7 @@
 package Sah::Schema::int32;
 
-our $DATE = '2016-07-22'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-08-19'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 our $schema = [int => {
     summary => '32-bit signed integer',
@@ -24,7 +24,7 @@ Sah::Schema::int32 - 32-bit signed integer
 
 =head1 VERSION
 
-This document describes version 0.06 of Sah::Schema::int32 (from Perl distribution Sah-Schemas-Int), released on 2016-07-22.
+This document describes version 0.070 of Sah::Schema::int32 (from Perl distribution Sah-Schemas-Int), released on 2017-08-19.
 
 =head1 HOMEPAGE
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

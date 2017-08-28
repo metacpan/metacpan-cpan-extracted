@@ -4,7 +4,7 @@
       "Masaaki Saito <masakyst.public@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -44,6 +44,7 @@
          "requires" : {
             "Catalyst::Devel" : "0",
             "Catalyst::Runtime" : "0",
+            "Class::C3::Adopt::NEXT" : "0",
             "Text::MicroTemplate::DataSection" : "0"
          }
       },
@@ -56,7 +57,7 @@
    "provides" : {
       "Catalyst::View::MicroTemplate::DataSection" : {
          "file" : "lib/Catalyst/View/MicroTemplate/DataSection.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -70,9 +71,10 @@
          "web" : "https://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:MASAKYST",
    "x_contributors" : [
       "Masaaki Saito <masakyst.mobile@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

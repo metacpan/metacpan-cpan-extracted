@@ -1,7 +1,10 @@
 Revision history for WebService-Braintree
-0.92    Documentation.  Thanks ROBK.
+0.93    2017-08-26
+        Fix sandbox test failures.  Thanks ROBK.
+0.92    2017-08-12
+        Documentation.  Thanks ROBK.
         Note:  sandbox tests currently failing.  To be repaired RSN
-         Missing dependency DateTime::Format::RFC3339 thanks onlyjob.
+        Missing dependency DateTime::Format::RFC3339 thanks onlyjob.
 0.91    2016-07-09
         Support for payment nonces thanks Tom Heady
 0.6     2017-4-14

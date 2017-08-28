@@ -111,7 +111,7 @@ For other contributors see ChangeLog.
 =head1 LICENSE
 
 Copyrights 1995-2000 Graham Barr E<lt>gbarr@pobox.comE<gt> and
-2001-2007 Mark Overmeer E<lt>perl@overmeer.netE<gt>.
+2001-2017 Mark Overmeer E<lt>perl@overmeer.netE<gt>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,0 +1,27 @@
+{
+  "GSA_available": true,
+  "hasMore": false,
+  "maxRows": 99999999,
+  "origin": "ws_autocomplete",
+  "remoteAddr": "192.33.203.170",
+  "result": [{
+    "name": "Shayk",
+    "firstname": "Irina",
+    "sciper": "212435"
+  }, {
+    "name": "Sims",
+    "firstname": "Molly",
+    "sciper": "213445"
+  }, {
+    "name": "Stone",
+    "firstname": "Lara",
+    "sciper": "167535"
+  }, {
+    "name": "Swanepoel",
+    "firstname": "Candice",
+    "sciper": "162335"
+  }],
+  "size": 4,
+  "term": "s",
+  "test": false
+}

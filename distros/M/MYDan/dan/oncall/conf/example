@@ -1,0 +1,19 @@
+---
+site: cn
+pivot: 2017.06.10
+queue:
+ - user1
+ - user2
+ - user3
+---
+site: us
+pivot: 2017.06.11 20:00
+timezone: America/Los_Angeles
+duration: '19:10 ~ 7:20'
+period: 7
+level: [ 1, 2 ]
+day: [ 1, 2, 3, 4, 5 ]
+queue:
+ - usr1
+ - usr2
+ - usr3

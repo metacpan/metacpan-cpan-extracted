@@ -30,11 +30,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Modern::Perl" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.1.0",
+  "VERSION" => "1.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +44,6 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Function::Parameters" => 0,
   "LWP::Online" => 0,
-  "Modern::Perl" => 0,
   "Module::Build" => "0.28",
   "Moo" => 0,
   "Test::More" => 0,

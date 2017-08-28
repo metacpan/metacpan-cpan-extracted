@@ -11,9 +11,7 @@ use namespace::clean;
 with 'Datahub::Factory::Logger';
 
 has config_file => (is => 'ro');
-
 has config => (is => 'lazy');
-
 
 sub _build_config {
     my $self = shift;

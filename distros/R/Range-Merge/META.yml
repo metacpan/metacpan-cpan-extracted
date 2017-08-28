@@ -1,14 +1,14 @@
 ---
 abstract: 'Merges ranges of data including subset/superset ranges'
 author:
-  - 'Joel Maslak <jmaslak@antelope.net>'
+  - 'J. Maslak <jmaslak@antelope.net>'
 build_requires:
   Perl6::Slurp: '0'
   Test2::Bundle::Extended: '0.000058'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +17,10 @@ name: Range-Merge
 provides:
   Range::Merge:
     file: lib/Range/Merge.pm
-    version: '1.002'
+    version: '1.003'
   Range::Merge::Boilerplate:
     file: lib/Range/Merge/Boilerplate.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   English: '0'
   Exporter: '0'
@@ -36,4 +36,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Range-Merge/issues
   repository: git://github.com/jmaslak/Range-Merge.git
-version: '1.002'
+version: '1.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

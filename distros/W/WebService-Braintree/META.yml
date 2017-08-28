@@ -25,9 +25,11 @@ requires:
   DateTime::Format::Strptime: '0'
   Digest: '0'
   Digest::HMAC_SHA1: '0'
+  Digest::SHA: '0'
   Digest::SHA1: '0'
   Digest::SHA256: '0'
   File::Spec: '0'
+  HTTP::Request: '0'
   Hash::Inflator: '0'
   JSON: '0'
   LWP: '6.02'
@@ -36,6 +38,8 @@ requires:
   Module::Install::TestTarget: '0'
   Moose: '0'
   Mozilla::CA: '0'
+  Try::Tiny: '0'
+  URI: '0'
   URI::Query: '0'
   XML::LibXML: '0'
   XML::Simple: '0'
@@ -44,5 +48,5 @@ resources:
   bugtracker: https://github.com/singingfish/braintree_perl/issues
   homepage: https://www.braintreepayments.com
   repository: git://github.com/singingfish/braintree_perl.git
-version: '0.92'
+version: '0.93'
 x_serialization_backend: 'YAML::Tiny version 1.69'

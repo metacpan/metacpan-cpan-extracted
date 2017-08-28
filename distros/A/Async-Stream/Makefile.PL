@@ -20,7 +20,6 @@ WriteMakefile(
     PREREQ_PM => {
         'Scalar::Util' => '0',
         'Carp'         => '0',
-        'Exporter'     => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Async-Stream-*' },

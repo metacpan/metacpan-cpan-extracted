@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MYDan::Node;
+use MYDan::Util::OptConf;
+
+use MYDan::VSSH;
+use MYDan::VSSH::Execute;
+
+$MYDan::VSSH::Execute::dan=1;
+
+=head1 SYNOPSIS
+
+ $0 [--range host] [--user foo] [--sudo sudoer ]
+
+    [--timeout seconds (default 500)]
+    [--max number (default 128)] \
+
+    
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( range=s user=s sudo=s timeout=i max=i ) )->dump( 'vssh' );
+my $range = MYDan::Node->new( $option->dump( 'range' ) );
+ 
+$option->assert( 'range' );
+
+exit unless my @node = $range->load( delete $o{range} )->list;
+
+$o{user} = `logname` and chop $o{user} unless $o{user};
+
+MYDan::VSSH->new( node => \@node )->run( %o );
+
+exit 0;

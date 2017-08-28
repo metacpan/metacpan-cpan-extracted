@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::LCDd::joy
 # ABSTRACT:  Configuration class LCDd::joy
+
 =encoding utf8
 
 =head1 NAME
@@ -16,31 +17,101 @@ generated from LCDd.conf
 
 =head2 Device
 
-Select the input device to use I<< Optional. Type uniline. upstream_default: '/dev/js0'.  >> 
+Select the input device to use I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+/dev/js0
+
+=back
+
+
 
 =head2 Map_Axis1neg
 
-set the axis map. I<< Optional. Type uniline. default: 'Left'.  >> 
+set the axis map. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Left
+
+=back
+
+
 
 =head2 Map_Axis1pos
 
-I<< Optional. Type uniline. default: 'Right'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Right
+
+=back
+
+
 
 =head2 Map_Axis2neg
 
-I<< Optional. Type uniline. default: 'Up'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Up
+
+=back
+
+
 
 =head2 Map_Axis2pos
 
-I<< Optional. Type uniline. default: 'Down'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Down
+
+=back
+
+
 
 =head2 Map_Button1
 
-set the button map. I<< Optional. Type uniline. default: 'Enter'.  >> 
+set the button map. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Enter
+
+=back
+
+
 
 =head2 Map_Button2
 
-I<< Optional. Type uniline. default: 'Escape'.  >> 
+I< Optional. Type uniline.  > 
+
+=over 4
+
+=item default value :
+
+Escape
+
+=back
+
+
 
 =head1 SEE ALSO
 

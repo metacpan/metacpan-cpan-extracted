@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+use POSIX qw(uname);
+use MYDan;
+
+use File::Basename;
+use MYDan::Util::OptConf;
+
+=head1 SYNOPSIS
+
+ $0 
+     show pack list
+
+ $0 --pack v1.0 
+
+     package 
+
+ $0 --release v1.0 
+
+     release
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( pack=s release=s ) )->dump();
+
+my $mydan = $MYDan::PATH;
+my ( $tmp, $rel ) =
+( 
+    "$mydan/tmp/release",
+    "$mydan/etc/dashboard/download/agent"
+);
+
+system "mkdir -p '$tmp'" unless -d $tmp;
+
+unless( $o{pack} || $o{release} )
+{
+    my %info;
+    map{ push @{$info{tmp}}, basename $_; }glob "$tmp/*";
+
+    map{ 
+        push @{$info{release}{basename $_}}, 
+            map{ basename $_; }glob "$_/*";
+    }glob "$rel/*";
+
+    YAML::XS::DumpFile \*STDOUT, \%info;
+    exit;
+}
+
+my $version = $o{release} || $o{pack};
+system( "rsync -av --delete $mydan/etc/agent/auth/*.pub $mydan/etc/agent/auth.tmp/ && \
+rsync -av --delete $mydan/dan/bootstrap/exec/ $mydan/dan/bootstrap/exec.tmp/ && \
+tar -zcvf $tmp/$version $mydan/perl $mydan/dan $mydan/etc/agent/auth.tmp/*.pub $mydan/etc/agent/proxy $mydan/etc/node/cache/current --exclude=$mydan/dan/bootstrap/exec/* " ) 
+    unless -f "$tmp/$version";
+
+if( $o{release} )
+{
+    my( $os, $arch ) = (uname())[0,4];
+    $arch=~s/^(sun\d+).*$/$1/;
+
+    my $to = "$rel/$os.$arch";
+    system( "mkdir -p '$to'" ) unless -e $to;
+    system "cp '$tmp/$version' '$to/mydan.$version.tar.gz'";
+    system "ln -fsn 'mydan.$version.tar.gz' '$to/mydan.latest.tar.gz'";
+}
+

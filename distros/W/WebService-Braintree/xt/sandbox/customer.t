@@ -1,10 +1,14 @@
 #!/usr/bin/env perl
+
 use lib qw(lib t/lib);
+
 use Test::More;
 use WebService::Braintree;
 use WebService::Braintree::Nonce;
 use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Test;
+
+require 't/lib/WebService/Braintree/Nonce.pm';
 
 my $customer_attributes = {
     first_name => "Johnny",
@@ -12,7 +16,7 @@ my $customer_attributes = {
     company => "Braintree",
     email => 'johnny@example.com',
     phone  => "312.555.0123",
-    website => "www.example.com"
+    website => "www.example.com",
 };
 
 my $customer_with_cc_and_billing = {
@@ -28,7 +32,7 @@ my $customer_with_cc_and_billing = {
             locality => "Chicago",
             region => "Illinois",
             postal_code => "60647",
-            country_code_alpha2 => "US"
+            country_code_alpha2 => "US",
         }
     }
 };
@@ -55,7 +59,7 @@ subtest "Create:S2S" => sub {
             first_name => "Johnny",
             last_name => "Doe",
             credit_card => {
-                venmo_sdk_payment_method_code => WebService::Braintree::Test::VenmoSdk::VisaPaymentMethodCode
+                venmo_sdk_payment_method_code => WebService::Braintree::Test::VenmoSdk::VisaPaymentMethodCode,
             }
         });
 
@@ -70,7 +74,7 @@ subtest "Create:S2S" => sub {
             first_name => "Johnny",
             last_name => "Doe",
             credit_card => {
-                payment_method_nonce => $nonce
+                payment_method_nonce => $nonce,
             }
         });
 
@@ -81,7 +85,7 @@ subtest "Create:S2S" => sub {
     subtest "with paypal payment method nonce" => sub {
         my $nonce = WebService::Braintree::TestHelper::generate_future_payment_paypal_nonce();
         my $customer_result = WebService::Braintree::Customer->create({
-            payment_method_nonce => $nonce
+            payment_method_nonce => $nonce,
         });
 
         ok $customer_result->is_success;
@@ -98,13 +102,13 @@ subtest "Create:S2S" => sub {
                 number => "5431111111111111",
                 expiration_date => "08/2012",
                 options => {
-                    venmo_sdk_session => WebService::Braintree::Test::VenmoSdk::Session
+                    venmo_sdk_session => WebService::Braintree::Test::VenmoSdk::Session,
                 }
             }
         });
 
         ok $result->is_success;
-        ok $result->customer->credit_cards->[0]->venmo_sdk
+        ok $result->customer->credit_cards->[0]->venmo_sdk;
     };
 
     subtest "with security params" => sub {
@@ -122,7 +126,7 @@ subtest "Create:S2S" => sub {
                     locality => "Chicago",
                     region => "Illinois",
                     postal_code => "60647",
-                    country_code_alpha2 => "US"
+                    country_code_alpha2 => "US",
                 }
             }
         });
@@ -222,14 +226,14 @@ subtest "update" => sub {
         my $customer_result = WebService::Braintree::Customer->create({
             credit_card => {
                 number => "4111111111111111",
-                expiration_date => "10/18"
+                expiration_date => "10/18",
             }
         });
 
         my $update_result = WebService::Braintree::Customer->update(
             $customer_result->customer->id,
             {
-                payment_method_nonce => WebService::Braintree::Nonce::paypal_future_payment
+                payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
             });
 
         my $updated_customer = $update_result->customer;
@@ -242,7 +246,7 @@ subtest "update" => sub {
 subtest "Search" => sub {
     subtest "search on paypal account email" => sub {
         my $customer_result = WebService::Braintree::Customer->create({
-            payment_method_nonce => WebService::Braintree::Nonce::paypal_future_payment
+            payment_method_nonce => WebService::Braintree::Nonce->paypal_future_payment,
         });
 
         my $customer = $customer_result->customer;

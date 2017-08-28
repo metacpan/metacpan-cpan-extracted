@@ -4,7 +4,9 @@ package Algorithm::CP::IZ;
 use 5.009000; # need Newx in XS
 use strict;
 use warnings;
+
 use Carp;
+use Scalar::Util qw(weaken);
 
 require Exporter;
 use AutoLoader;
@@ -34,7 +36,7 @@ our @EXPORT = qw(
 	CS_INT_MIN
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -84,6 +86,8 @@ sub new {
 	_cxt => [],
 	_const_vars => {},
 	_backtracks => {},
+	_ref_int_arrays => {},
+	_ref_var_arrays => {},
     }, $class;
 }
 
@@ -103,11 +107,14 @@ sub DESTROY {
 sub save_context {
     my $self = shift;
     
-    Algorithm::CP::IZ::cs_saveContext();
+    my $ret = Algorithm::CP::IZ::cs_saveContext();
+
     my $cxt = $self->{_cxt};
     push(@$cxt, []);
 
-    return scalar(@$cxt);
+    $self->backtrack(undef, 0, sub { pop(@$cxt) });
+
+    return $ret;
 }
 
 sub restore_context {
@@ -119,27 +126,13 @@ sub restore_context {
     }
 
     Algorithm::CP::IZ::cs_restoreContext();
-
-    # pop must be after cs_restoreContext to save cs_backtrack context.
-    pop(@$cxt);
 }
 
 sub restore_context_until {
     my $self = shift;
     my $label = shift;
 
-    my $cxt = $self->{_cxt};
-
-    unless (1 <= $label && $label <= @$cxt) {
-	croak "restore_context_until: invalid label";
-    }
-
-    while (@$cxt >= $label) {
-	Algorithm::CP::IZ::cs_restoreContext();
-
-	# pop must be after cs_restoreContext to save cs_backtrack context.
-	pop(@$cxt);
-    }
+    Algorithm::CP::IZ::cs_restoreContextUntil($label);
 }
 
 sub restore_all {
@@ -202,25 +195,24 @@ sub backtrack {
     my ($var, $index, $handler) = @_;
 
     my $id = $Backtrack_id++;
-    my $backtrack_obj = [$var, $index, $handler];
+    $self->{_backtracks}->{$id} = [$var, $index, $handler];
 
-    $self->{_backtracks}->{$id} = $backtrack_obj;
+    my $backtracks = $self->{_backtracks};
+    weaken($backtracks);
 
-    my $h = sub {
+    $self->{_backtrack_code_ref} ||= sub {
 	my $bid = shift;
-	my $r = $self->{_backtracks}->{$bid};
+	my $r = $backtracks->{$bid};
 	my $bh = $r->[2];
 	&$bh($r->[0], $r->[1]);
 
-	delete $self->{_backtracks}->{$bid};
-	if (scalar keys %{$self->{_backtracks}} == 0) {
-	    $self->{_backtrack_code_ref} = {};
-	}
+	delete $backtracks->{$bid};
     };
 
-    $self->{_backtrack_code_ref} = $h;
+    my $vptr = defined($var) ? $var->{_ptr} : 0;
 
-    Algorithm::CP::IZ::cs_backtrack($var->{_ptr }, $id, $h);
+    Algorithm::CP::IZ::cs_backtrack($vptr, $id,
+				    $self->{_backtrack_code_ref});
 }
 
 sub get_nb_fails {
@@ -403,8 +395,12 @@ sub _create_registered_var_array {
     my $self = shift;
     my $var_array = shift;;
 
+    my $key = join(",", map { sprintf("%x", $_->{_ptr}) } @$var_array);
+    my $r = $self->{_ref_var_arrays}->{$key};
+    return $r if ($r);
+
     my $parray = Algorithm::CP::IZ::RefVarArray->new($var_array);
-    $self->_push_object($parray);
+    $self->{_ref_var_arrays}->{$key} = $parray;
 
     return $parray;
 }
@@ -413,8 +409,12 @@ sub _create_registered_int_array {
     my $self = shift;
     my $int_array = shift;;
 
+    my $key = join(",", map { sprintf("%x", $_) } @$int_array);
+    my $r = $self->{_ref_int_arrays}->{$key};
+    return $r if ($r);
+
     my $parray = Algorithm::CP::IZ::RefIntArray->new($int_array);
-    $self->_push_object($parray);
+    $self->{_ref_int_arrays}->{$key} = $parray;
 
     return $parray;
 }
@@ -739,7 +739,7 @@ sub Max {
     my $var_array = shift;;
 
     unless (ref $var_array eq 'ARRAY') {
-	croak "Min: usage: Min([vars])";
+	croak "Max: usage: Max([vars])";
     }
 
     @$var_array = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$var_array;
@@ -769,7 +769,7 @@ sub IfEq {
 sub IfNeq {
     my $self = shift;
     unless (scalar @_ == 4 && ref $_[0] && ref $_[1]) {
-	croak "IfEq: usage: IfNeq(vint1, vint2, val1, val2)";
+	croak "IfNeq: usage: IfNeq(vint1, vint2, val1, val2)";
     }
     my ($vint1, $vint2, $val1, $val2) = @_;
 

@@ -1,5 +1,7 @@
 use alienfile;
 
+configure { requires 'Alien::Build::Plugin::Build::Make' => '0.01' };
+
 plugin 'PkgConfig' => (
     pkg_name => 'libuv',
     minimum_version => '1.0.0',
@@ -9,27 +11,66 @@ share {
   # note on apple weirdisms: https://github.com/joyent/libuv/issues/1200
   meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
-  requires 'Alien::autoconf' => '0.03';
-  requires 'Alien::automake' => '0.05';
-  requires 'Alien::libtool'  => '0.04';
-  requires 'Alien::m4'       => '0.11';
+  requires 'Alien::Autotools';
 
   plugin Download => (
-    url     => 'http://dist.libuv.org/dist/v1.13.1',
+    url     => 'https://dist.libuv.org/dist/v1.14.0',
     version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
   );
 
   plugin Extract => 'tar.gz';
 
-  plugin 'Build::Autoconf' => ();
+  if($^O eq 'MSWin32')
+  {
+    requires 'Path::Tiny';
+    plugin 'Build::Make' => 'gmake';
 
-  build [
-    'sh autogen.sh',
-    '%{configure}',
-    '%{make}',
-    '%{make} test',
-    '%{make} install',
-  ];
+    meta->before_hook(
+      build => sub {
+        my($build) = @_;
+        my $prefix = $build->install_prop->{prefix};
+        $prefix =~ s{/}{\\}g;
+        meta->interpolator->add_helper(prefix_win => sub { $prefix });
+      }
+    );
+
+    build [
+      '%{make} -f Makefile.mingw CC=%{perl.config.cc}',
+      'mkdir %{prefix_win}\\lib',
+      'mkdir %{prefix_win}\\lib\\pkgconfig',
+      'copy libuv.a %{prefix_win}\\lib',
+      'mkdir %{prefix_win}\\include',
+      'copy include\\*.h %{prefix_win}\\include',
+      sub {
+        my($build) = @_;
+        my($pc) = Path::Tiny->new('libuv.pc.in')->slurp;
+
+        my $prefix = $build->runtime_prop->{prefix};
+        my $version = $build->runtime_prop->{version};
+
+        $pc =~ s{\@prefix\@}{$prefix}g;
+        $pc =~ s{\@libdir\@}{$prefix/lib}g;
+        $pc =~ s{\@includedir\@}{$prefix/include}g;
+        $pc =~ s{\@PACKAGE_NAME\@}{libuv}g;
+        $pc =~ s{\@PACKAGE_VERSION\@}{$version}g;
+        $pc =~ s{\@LIBS\@}{}g;
+
+        Path::Tiny->new($build->install_prop->{prefix})->child('lib/pkgconfig/libuv.pc')->spew($pc);
+      },
+    ];
+  }
+  else
+  {
+    plugin 'Build::Autoconf' => ();
+
+    build [
+      'sh autogen.sh',
+      '%{configure}',
+      '%{make}',
+      '%{make} test',
+      '%{make} install',
+    ];
+  }
 
   plugin 'Gather::IsolateDynamic' => ();
 };

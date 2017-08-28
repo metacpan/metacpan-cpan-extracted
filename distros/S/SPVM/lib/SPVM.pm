@@ -22,31 +22,29 @@ use Encode 'encode';
 
 use Carp 'croak';
 
-our $VERSION = '0.0247';
+our $VERSION = '0.0249';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
-our %PACKAGE_SYMTABLE;
-our %FIELD_SYMTABLE;
-our %SUB_SYMTABLE;
-our @NATIVE_SUB_NAMES;
-our %NATIVE_SUB_SYMTABLE;
 our $API;
-our @TYPE_NAMES;
-our %TYPE_SYMTABLE;
 
 sub _get_dll_file {
   my $package_name = shift;
   
   # DLL file name
   my $dlext = $Config{dlext};
-  my $dll_base_name = $package_name . ".$dlext";
+  my $dll_base_name = $package_name;
   $dll_base_name =~ s/^.*:://;
   my $dll_file_tail = 'auto/' . $package_name . '/' . $dll_base_name;
   $dll_file_tail =~ s/::/\//g;
   my $dll_file;
   for my $dl_shared_object (@DynaLoader::dl_shared_objects) {
-    if ($dl_shared_object =~ /\Q$dll_file_tail\E$/) {
+    my $dl_shared_object_no_ext = $dl_shared_object . '.ppp';
+    # remove .so, xs.dll .dll, etc
+    while ($dl_shared_object_no_ext =~ s/\.[^\/\.]+$//) {
+      1;
+    }
+    if ($dl_shared_object_no_ext =~ /\Q$dll_file_tail\E$/) {
       $dll_file = $dl_shared_object;
       last;
     }
@@ -106,14 +104,15 @@ sub get_sub_native_address {
   return $native_address;
 }
 
-sub build_native_sub_symtable {
-  for my $native_sub_name (@NATIVE_SUB_NAMES) {
+sub bind_native_subs {
+  my $native_sub_names = get_native_sub_names();
+  for my $native_sub_name (@$native_sub_names) {
     my $native_sub_name_spvm = "SPVM::$native_sub_name";
     my $native_address = get_sub_native_address($native_sub_name_spvm);
     unless ($native_address) {
       croak "Can't find native address($native_sub_name())";
     }
-    $NATIVE_SUB_SYMTABLE{$native_sub_name} = $native_address;
+    bind_native_sub($native_sub_name, $native_address);
   }
 }
 
@@ -125,41 +124,19 @@ CHECK {
   # Compile SPVM source code
   compile();
   
-  my $sub_native_address = get_sub_native_address('SPVM::std::sum_int');
-  
-  # Build type names
-  build_type_names();
-  
-  # Build type names
-  build_type_symtable();
-  
-  # Build subroutine symbol table
-  build_sub_symtable();
-  
-  # Build native subroutine names
-  build_native_sub_names();
-  
-  # Build native subroutine
-  build_native_sub_symtable();
-  
-  # Bind native address
-  bind_native_address();
-
-  # Build package symbol table
-  build_package_symtable();
-  
-  # Build field symbol table
-  build_field_symtable();
-  
-  # Build SPVM subroutine
-  build_spvm_subs();
-  
   # Build run-time
   build_runtime();
   
   # Free compiler
   free_compiler();
+  
+  # Bind native subroutines
+  bind_native_subs();
+  
+  # Build SPVM subroutine
+  build_spvm_subs();
 }
+
 sub new_string_raw {
   my $string = shift;
   
@@ -361,8 +338,9 @@ sub import {
 }
 
 sub build_spvm_subs {
-  for my $abs_name (keys %SUB_SYMTABLE) {
-    
+  my $sub_names = get_sub_names();
+  
+  for my $abs_name (@$sub_names) {
     # Define SPVM subroutine
     no strict 'refs';
     *{"SPVM::$abs_name"} = sub {
@@ -373,7 +351,6 @@ sub build_spvm_subs {
     };
   }
 }
-
 
 # Preloaded methods go here.
 

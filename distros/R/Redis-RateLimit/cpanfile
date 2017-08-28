@@ -11,6 +11,7 @@ requires 'Try::Tiny';
 requires 'namespace::clean';
 
 on test => sub {
+    requires 'Test::Fatal';
     requires 'Test::Mock::Time';
     requires 'Test::Spec';
 };

@@ -1,0 +1,8 @@
+Revision history for Log-Log4perl-Layout-Syslog
+
+0.02	Fri Aug 18 09:36:24 EDT 2017
+	Make it work with fluentd and other syslog receivers
+	Renamed Log::Log4perl::Layout::Syslog
+
+0.01	Wed Aug 16 17:15:22 EDT 2017
+        First draft

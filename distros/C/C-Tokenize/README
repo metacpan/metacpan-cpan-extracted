@@ -6,7 +6,7 @@
                                                     
 
 
-This is the README for C::Tokenize version 0.13.
+This is the README for C::Tokenize version 0.15.
 
 C::Tokenize is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -35,7 +35,8 @@ comment line.
 It also supplies some extra regular expressions for, for example,
 local include statements, "$include_local", or C variables,
 "$cvar_re", as well as extra functions, like "decomment" for
-removing traditional C comments.
+removing traditional C comments, and "strip_comments" for removing
+all comments from a C program.
 
 -----------------------------------------------------------------------------
 
@@ -58,7 +59,7 @@ computer using
 
 3. INSTALLATION
 
-This module requires Perl version 5.1.1 or later.
+This module requires Perl version 5.10.1 or later.
 
 To install the module from CPAN, use
 
@@ -68,11 +69,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm C::Tokenize
 
-To install the module from the source file, C-Tokenize-0.13.tar.gz, follow
+To install the module from the source file, C-Tokenize-0.15.tar.gz, follow
 this sequence of commands:
 
-    tar xfz C-Tokenize-0.13.tar.gz
-    cd C-Tokenize-0.13
+    tar xfz C-Tokenize-0.15.tar.gz
+    cd C-Tokenize-0.15
     perl Makefile.PL
     make
     make install
@@ -97,6 +98,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Dec  7 14:27:34 2016.
+This README was written on Mon Aug 28 13:22:15 2017.
 
 -----------------------------------------------------------------------------
